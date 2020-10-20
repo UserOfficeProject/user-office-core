@@ -1,6 +1,3 @@
-/// <reference types="Cypress" />
-/// <reference types="../types" />
-
 context('Instrument tests', () => {
   const faker = require('faker');
 

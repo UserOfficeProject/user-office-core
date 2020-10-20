@@ -1253,6 +1253,7 @@ export type Query = {
   seps: Maybe<SePsQueryResult>;
   templateCategories: Maybe<Array<TemplateCategory>>;
   template: Maybe<Template>;
+  checkToken: TokenResult;
   user: Maybe<User>;
   me: Maybe<User>;
   users: Maybe<UserQueryResult>;
@@ -1443,6 +1444,11 @@ export type QuerySepsArgs = {
 
 export type QueryTemplateArgs = {
   templateId: Scalars['Int'];
+};
+
+
+export type QueryCheckTokenArgs = {
+  token: Scalars['String'];
 };
 
 
@@ -1744,6 +1750,11 @@ export type TokenResponseWrap = {
   __typename?: 'TokenResponseWrap';
   error: Maybe<Scalars['String']>;
   token: Maybe<Scalars['String']>;
+};
+
+export type TokenResult = {
+  __typename?: 'TokenResult';
+  isValid: Scalars['Boolean'];
 };
 
 export type Topic = {
@@ -4080,6 +4091,19 @@ export type UpdateTopicOrderMutation = (
   ) }
 );
 
+export type CheckTokenQueryVariables = Exact<{
+  token: Scalars['String'];
+}>;
+
+
+export type CheckTokenQuery = (
+  { __typename?: 'Query' }
+  & { checkToken: (
+    { __typename?: 'TokenResult' }
+    & Pick<TokenResult, 'isValid'>
+  ) }
+);
+
 export type CreateUserMutationVariables = Exact<{
   user_title?: Maybe<Scalars['String']>;
   firstname: Scalars['String'];
@@ -6176,6 +6200,13 @@ export const UpdateTopicOrderDocument = gql`
   }
 }
     `;
+export const CheckTokenDocument = gql`
+    query checkToken($token: String!) {
+  checkToken(token: $token) {
+    isValid
+  }
+}
+    `;
 export const CreateUserDocument = gql`
     mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $orcid: String!, $orcidHash: String!, $refreshToken: String!, $gender: String!, $nationality: Int!, $birthdate: String!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
   createUser(user_title: $user_title, firstname: $firstname, middlename: $middlename, lastname: $lastname, password: $password, preferredname: $preferredname, orcid: $orcid, orcidHash: $orcidHash, refreshToken: $refreshToken, gender: $gender, nationality: $nationality, birthdate: $birthdate, organisation: $organisation, department: $department, position: $position, email: $email, telephone: $telephone, telephone_alt: $telephone_alt, otherOrganisation: $otherOrganisation) {
@@ -6746,6 +6777,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateTopicOrder(variables: UpdateTopicOrderMutationVariables): Promise<UpdateTopicOrderMutation> {
       return withWrapper(() => client.request<UpdateTopicOrderMutation>(print(UpdateTopicOrderDocument), variables));
+    },
+    checkToken(variables: CheckTokenQueryVariables): Promise<CheckTokenQuery> {
+      return withWrapper(() => client.request<CheckTokenQuery>(print(CheckTokenDocument), variables));
     },
     createUser(variables: CreateUserMutationVariables): Promise<CreateUserMutation> {
       return withWrapper(() => client.request<CreateUserMutation>(print(CreateUserDocument), variables));

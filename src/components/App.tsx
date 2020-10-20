@@ -21,6 +21,7 @@ import DashBoard from './DashBoard';
 import EmailVerification from './user/EmailVerification';
 import ResetPassword from './user/ResetPassword';
 import ResetPasswordEmail from './user/ResetPasswordEmail';
+import SharedAuth from './user/SharedAuth';
 import SignIn from './user/SignIn';
 import SignUp from './user/SignUp';
 
@@ -66,7 +67,9 @@ class App extends React.Component {
     try {
       error = JSON.parse(error);
     } catch (e) {}
-    useUnauthorizedApi().addClientLog({ error });
+    const api = useUnauthorizedApi();
+
+    api().addClientLog({ error });
   }
 
   componentDidMount() {
@@ -92,6 +95,7 @@ class App extends React.Component {
                       <Switch>
                         <Route path="/SignUp" component={SignUp} />
                         <Route path="/SignIn" component={SignIn} />
+                        <Route path="/shared-auth" component={SharedAuth} />
                         <Route
                           path="/ResetPasswordEmail"
                           component={ResetPasswordEmail}
@@ -104,19 +108,6 @@ class App extends React.Component {
                           path="/EmailVerification/:token"
                           component={EmailVerification}
                         />
-                        <Route
-                          path="/LogOut"
-                          render={(): JSX.Element => (
-                            <UserContext.Consumer>
-                              {({ handleLogout }): JSX.Element => {
-                                handleLogout();
-
-                                return <Redirect to="/" />;
-                              }}
-                            </UserContext.Consumer>
-                          )}
-                        />
-
                         <PrivateRoute path="/" component={DashBoard} />
                       </Switch>
                     </div>

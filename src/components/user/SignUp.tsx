@@ -195,7 +195,7 @@ const SignUp: React.FC<SignUpProps> = props => {
   }
 
   const sendSignUpRequest = (values: CreateUserMutationVariables) => {
-    unauthorizedApi
+    unauthorizedApi()
       .createUser({
         ...values,
       })
