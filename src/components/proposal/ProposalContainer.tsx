@@ -17,6 +17,7 @@ import {
   QuestionaryStep,
   UserRole,
 } from 'generated/sdk';
+import { usePrevious } from 'hooks/common/usePrevious';
 import { usePersistProposalModel } from 'hooks/questionary/usePersistProposalModel';
 import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
 import { ProposalSubsetSumbission } from 'models/ProposalSubmissionState';
@@ -133,6 +134,7 @@ export default function ProposalContainer(props: {
     persistModel: persistProposalModel,
     isSavingModel: isSavingProposalModel,
   } = usePersistProposalModel();
+  const previousInitialProposal = usePrevious(props.proposal);
 
   /**
    * Returns true if reset was performed, false otherwise
@@ -226,15 +228,19 @@ export default function ProposalContainer(props: {
   const isSubmitted = state.proposal.submitted;
 
   useEffect(() => {
-    dispatch({
-      type: EventType.PROPOSAL_LOADED,
-      payload: { proposal: props.proposal },
-    });
-    dispatch({
-      type: EventType.QUESTIONARY_STEPS_LOADED,
-      payload: { questionarySteps: props.proposal.questionary.steps },
-    });
-  }, []); // FIXME
+    const isComponentMountedForTheFirstTime =
+      previousInitialProposal === undefined;
+    if (isComponentMountedForTheFirstTime) {
+      dispatch({
+        type: EventType.PROPOSAL_LOADED,
+        payload: { proposal: props.proposal },
+      });
+      dispatch({
+        type: EventType.QUESTIONARY_STEPS_LOADED,
+        payload: { questionarySteps: props.proposal.questionary.steps },
+      });
+    }
+  }, [previousInitialProposal, props.proposal, dispatch]);
 
   const getStepperNavig = () => {
     if (state.steps.length <= 1) {

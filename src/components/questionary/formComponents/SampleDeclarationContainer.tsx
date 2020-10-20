@@ -11,6 +11,7 @@ import { Prompt } from 'react-router';
 import { QuestionaryStepButton } from 'components/questionary/QuestionaryStepButton';
 import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
 import { Sample } from 'generated/sdk';
+import { usePrevious } from 'hooks/common/usePrevious';
 import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
 import {
   Event,
@@ -93,6 +94,7 @@ export function SampleDeclarationContainer(props: {
   const { api, isExecutingCall: isApiInteracting } = useDataApiWithFeedback();
   const { persistModel, isSavingModel } = usePersistQuestionaryModel();
 
+  const previousInitialSample = usePrevious(props.sample);
   /**
    * Returns true if reset was performed, false otherwise
    */
@@ -181,15 +183,19 @@ export function SampleDeclarationContainer(props: {
   );
 
   useEffect(() => {
-    dispatch({
-      type: EventType.SAMPLE_LOADED,
-      payload: { sample: props.sample },
-    });
-    dispatch({
-      type: EventType.QUESTIONARY_STEPS_LOADED,
-      payload: { questionarySteps: props.sample.questionary.steps },
-    });
-  }, []); // FIXME
+    const isComponentMountedForTheFirstTime =
+      previousInitialSample === undefined;
+    if (isComponentMountedForTheFirstTime) {
+      dispatch({
+        type: EventType.SAMPLE_LOADED,
+        payload: { sample: props.sample },
+      });
+      dispatch({
+        type: EventType.QUESTIONARY_STEPS_LOADED,
+        payload: { questionarySteps: props.sample.questionary.steps },
+      });
+    }
+  }, [previousInitialSample, props.sample, dispatch]);
 
   const getStepperNavig = () => {
     if (state.steps.length <= 1) {
