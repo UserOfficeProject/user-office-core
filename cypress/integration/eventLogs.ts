@@ -1,10 +1,7 @@
-/// <reference types="Cypress" />
-/// <reference types="../types" />
+import faker from 'faker';
+import dateformat from 'dateformat';
 
 context('Event log tests', () => {
-  const faker = require('faker');
-  const dateformat = require('dateformat');
-
   before(() => {
     cy.resetDB();
   });
