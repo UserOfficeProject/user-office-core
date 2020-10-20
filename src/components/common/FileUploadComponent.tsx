@@ -7,17 +7,17 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import CancelIcon from '@material-ui/icons/Cancel';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import ErrorIcon from '@material-ui/icons/Error';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent } from 'react';
 
-import { useDataApi } from 'hooks/common/useDataApi';
 import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
-import { usePrevious } from 'hooks/common/usePrevious';
+import { useFileMetadata } from 'hooks/file/useFileMetadata';
 import { FileMetaData } from 'models/FileUpload';
 
 import UOLoader from './UOLoader';
@@ -27,13 +27,9 @@ export function FileUploadComponent(props: {
   id?: string;
   fileType?: string;
   value: string[];
-  onChange: Function;
-  className?: string;
+  onChange: (files: FileMetaData[]) => any;
 }) {
-  const [files, setFiles] = useState<FileMetaData[]>([]);
-  const previousFiles = usePrevious(files);
-  const inputRef = useRef(null);
-  const api = useDataApi();
+  const { files, setFiles } = useFileMetadata(props.value);
 
   const classes = makeStyles(() => ({
     questionariesList: {
@@ -46,44 +42,21 @@ export function FileUploadComponent(props: {
     },
   }))();
 
-  useEffect(() => {
-    if (previousFiles === undefined) {
-      return; // first call
-    }
-
-    if (previousFiles.length === files.length) {
-      return; // no files added or removed
-    }
-  }, [files, previousFiles]);
-
-  useEffect(() => {
-    if (props.value) {
-      api()
-        .getFileMetadata({ fileIds: props.value })
-        .then(data => {
-          setFiles(data?.fileMetadata || []);
-        });
-    }
-  }, [api, props.value]);
-
-  const dispatchChange = (): void => {
-    const inputElement: HTMLInputElement = inputRef.current!;
-    const event: any = {};
-    event.target = inputElement;
-    props.onChange(event);
-  };
-
   const onUploadComplete = (newFile: FileMetaData): void => {
-    setFiles(files.concat(newFile));
-    dispatchChange();
+    const newValue = files.concat(newFile);
+    setFiles(newValue);
+    props.onChange(newValue);
   };
 
   const onDeleteClicked = (deleteFile: FileMetaData): void => {
-    setFiles(files.filter(fileId => fileId.fileId !== deleteFile.fileId));
-    dispatchChange();
+    const newValue = files.filter(
+      fileId => fileId.fileId !== deleteFile.fileId
+    );
+    setFiles(newValue);
+    props.onChange(newValue);
   };
 
-  const { fileType, id } = props;
+  const { fileType } = props;
   const maxFiles = props.maxFiles || 1;
 
   let newFileEntry;
@@ -98,14 +71,6 @@ export function FileUploadComponent(props: {
 
   return (
     <>
-      <input
-        type="hidden"
-        id={id}
-        name={id}
-        readOnly
-        value={files.map(metaData => metaData.fileId).join(',')}
-        ref={inputRef}
-      />
       {amountFilesInfo}
       <List component="ul" className={classes.questionariesList}>
         {files.map &&
@@ -125,6 +90,14 @@ export function FileUploadComponent(props: {
     </>
   );
 }
+
+const ListItemWithWiderSecondaryAction = withStyles({
+  secondaryAction: {
+    paddingRight: 96,
+    width: 400,
+    maxWidth: 400,
+  },
+})(ListItem);
 
 export function FileEntry(props: {
   onDeleteClicked: Function;
@@ -160,7 +133,7 @@ export function FileEntry(props: {
   };
 
   return (
-    <>
+    <ListItemWithWiderSecondaryAction button>
       <ListItemAvatar>
         <Avatar className={classes.avatar}>
           <AttachFileIcon />
@@ -185,7 +158,7 @@ export function FileEntry(props: {
           <DeleteOutlineIcon />
         </IconButton>
       </ListItemSecondaryAction>
-    </>
+    </ListItemWithWiderSecondaryAction>
   );
 }
 

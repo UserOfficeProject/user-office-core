@@ -1,11 +1,6 @@
-/// <reference types="Cypress" />
-/// <reference types="../types" />
-
-const addItemToTopic = element => {};
+import faker from 'faker';
 
 context('Template tests', () => {
-  const faker = require('faker');
-
   before(() => {
     cy.resetDB();
   });
@@ -14,9 +9,9 @@ context('Template tests', () => {
     cy.visit('/');
   });
 
-  let boolId;
-  let textId;
-  let dateId;
+  let boolId: string;
+  let textId: string;
+  let dateId: string;
   const booleanQuestion = faker.random.words(2);
   const textQuestion = faker.random.words(2);
   const dateQuestion = faker.random.words(2);

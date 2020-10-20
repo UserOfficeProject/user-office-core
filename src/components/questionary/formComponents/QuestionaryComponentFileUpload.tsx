@@ -1,6 +1,8 @@
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
-import React, { ChangeEvent, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+
+import { FileMetaData } from 'models/FileUpload';
 
 import { FileUploadConfig } from '../../../generated/sdk';
 import { FileUploadComponent } from '../../common/FileUploadComponent';
@@ -31,10 +33,10 @@ export function QuestionaryComponentFileUpload(
         maxFiles={config.max_files}
         id={templateField.question.proposalQuestionId}
         fileType={config.file_type ? config.file_type.join(',') : ''}
-        onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-          const newValue = evt.target.value.split(',');
-          setStateValue(newValue);
-          onComplete(evt, newValue); // letting Formik know that there was a change
+        onChange={(fileMetaDataList: FileMetaData[]) => {
+          const newStateValue = fileMetaDataList.map(file => file.fileId);
+          setStateValue(newStateValue);
+          onComplete(null as any, newStateValue); // letting Formik know that there was a change
         }}
         value={stateValue}
       />
