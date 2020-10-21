@@ -103,6 +103,6 @@
     "nodemon": "^1.19.1",
     "prettier": "^1.19.1",
     "ts-jest": "^26.4.1",
-    "ts-node-dev": "^1.0.0-pre.63"
+    "ts-node-dev": "^1.0.0"
   }
 }
