@@ -18,6 +18,7 @@ export enum EventType {
   READY,
   ADD_WORKFLOW_STATUS_REQUESTED,
   WORKFLOW_STATUS_ADDED,
+  WORKFLOW_STATUS_UPDATED,
   DELETE_WORKFLOW_STATUS_REQUESTED,
   WORKFLOW_STATUS_DELETED,
   REORDER_WORKFLOW_STATUS_REQUESTED,
@@ -142,7 +143,7 @@ const ProposalWorkflowEditorModel = (
       switch (action.type) {
         case EventType.READY:
           return action.payload;
-        case EventType.WORKFLOW_STATUS_ADDED:
+        case EventType.WORKFLOW_STATUS_ADDED: {
           const { proposalWorkflowConnectionGroups } = draft;
           const newConnectionToAdd = action.payload;
 
@@ -152,6 +153,22 @@ const ProposalWorkflowEditorModel = (
           );
 
           return draft;
+        }
+        case EventType.WORKFLOW_STATUS_UPDATED: {
+          const { proposalWorkflowConnectionGroups } = draft;
+          const connectionToUpdate = action.payload;
+
+          const groupIndexWhereStatusShouldBeAdded = findGroupIndexByGroupId(
+            proposalWorkflowConnectionGroups,
+            connectionToUpdate.droppableGroupId
+          );
+
+          proposalWorkflowConnectionGroups[
+            groupIndexWhereStatusShouldBeAdded
+          ].connections[action.payload.sortOrder].id = action.payload.id;
+
+          return draft;
+        }
         case EventType.REORDER_WORKFLOW_STATUS_REQUESTED:
           const { source, destination } = action.payload;
 
