@@ -130,11 +130,9 @@ context('Samples tests', () => {
       .type(sampleTitle)
       .should('have.value', sampleTitle);
 
-    cy.get('[data-cy=save-and-continue-button]')
-      .eq(1)
-      .click();
-
-    cy.wait(4000);
+    cy.get(
+      '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+    ).click();
 
     cy.get('[data-cy="questionaries-list-item"]').should('have.length', 1);
 

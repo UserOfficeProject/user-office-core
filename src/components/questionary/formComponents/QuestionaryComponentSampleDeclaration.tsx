@@ -2,7 +2,8 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import React, { useEffect, useState } from 'react';
 
-import ModalWrapper from 'components/common/ModalWrapper';
+import StyledModal from 'components/common/StyledModal';
+import UOLoader from 'components/common/UOLoader';
 import {
   Answer,
   QuestionaryStep,
@@ -132,9 +133,10 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
           <ProposalErrorLabel>{errors[proposalQuestionId]}</ProposalErrorLabel>
         )}
       </FormControl>
-      <ModalWrapper
-        close={() => setSelectedSample(null)}
-        isOpen={selectedSample !== null}
+      <StyledModal
+        onClose={() => setSelectedSample(null)}
+        open={selectedSample !== null}
+        data-cy="sample-declaration-modal"
       >
         {selectedSample ? (
           <SampleDeclarationContainer
@@ -165,8 +167,10 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
             }}
             sampleEditDone={() => setSelectedSample(null)}
           ></SampleDeclarationContainer>
-        ) : null}
-      </ModalWrapper>
+        ) : (
+          <UOLoader />
+        )}
+      </StyledModal>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ModalWrapper from 'components/common/ModalWrapper';
+import StyledModal from 'components/common/StyledModal';
 import { DataType, Template, QuestionTemplateRelation } from 'generated/sdk';
 import { Event } from 'models/QuestionaryEditorModel';
 
@@ -40,13 +40,13 @@ export default function QuestionTemplateRelationEditor(props: {
   }
 
   return (
-    <ModalWrapper close={props.closeMe} isOpen={props.field != null}>
+    <StyledModal onClose={props.closeMe} open={props.field != null}>
       {React.createElement(map.get(props.field.question.dataType)!, {
         field: props.field,
         dispatch: props.dispatch,
         closeMe: props.closeMe,
         template: props.template,
       })}
-    </ModalWrapper>
+    </StyledModal>
   );
 }
