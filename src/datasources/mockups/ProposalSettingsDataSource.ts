@@ -168,4 +168,11 @@ export class ProposalSettingsDataSourceMock
   ): Promise<NextStatusEvent[]> {
     return [dummyNextStatusEvent];
   }
+
+  async markEventAsDoneOnProposal(
+    event: Event,
+    proposalId: number
+  ): Promise<boolean> {
+    return true;
+  }
 }
