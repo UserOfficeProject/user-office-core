@@ -23,13 +23,13 @@ export const QuestionTemplateRelationSampleBasisForm: TFormSignature<QuestionTem
         <>
           <QuestionExcerpt question={props.field.question} />
           <Field
-            name="config.placeholder"
+            name="config.titlePlaceholder"
             label="Title input placeholder"
             type="text"
             component={TextField}
             margin="normal"
             fullWidth
-            data-cy="placeholder"
+            data-cy="titlePlaceholder"
           />
         </>
       )}
