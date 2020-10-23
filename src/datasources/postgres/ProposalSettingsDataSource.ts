@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { NextStatusEvent } from '../../models/NextStatusEvent';
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
@@ -8,6 +9,7 @@ import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import database from './database';
 import {
+  NextStatusEventRecord,
   ProposalStatusRecord,
   ProposalWorkflowConnectionRecord,
   ProposalWorkflowRecord,
@@ -219,7 +221,6 @@ export default class PostgresProposalSettingsDataSource
       },
       proposalWorkflowConnection.next_proposal_status_id,
       proposalWorkflowConnection.prev_proposal_status_id,
-      proposalWorkflowConnection.next_status_event_type,
       proposalWorkflowConnection.droppable_group_id,
       proposalWorkflowConnection.parent_droppable_group_id
     );
@@ -315,8 +316,6 @@ export default class PostgresProposalSettingsDataSource
         droppable_group_id: newProposalWorkflowStatusInput.droppableGroupId,
         parent_droppable_group_id:
           newProposalWorkflowStatusInput.parentDroppableGroupId,
-        next_status_event_type:
-          newProposalWorkflowStatusInput.nextStatusEventType,
       })
       .into('proposal_workflow_connections as pwc')
       .returning(['*'])
@@ -352,7 +351,6 @@ export default class PostgresProposalSettingsDataSource
       sort_order: item.sortOrder,
       droppable_group_id: item.droppableGroupId,
       parent_droppable_group_id: item.parentDroppableGroupId,
-      next_status_event_type: item.nextStatusEventType,
     }));
 
     const result = await database.raw(
@@ -367,18 +365,26 @@ export default class PostgresProposalSettingsDataSource
       [database('proposal_workflow_connections').insert(dataToInsert)]
     );
 
-    return result.rows;
+    return result.rows as ProposalWorkflowConnectionRecord[];
   }
 
   async updateProposalWorkflowStatuses(
     proposalWorkflowStatusesInput: ProposalWorkflowConnection[]
   ): Promise<ProposalWorkflowConnection[]> {
-    const result = await this.upsertProposalWorkflowStatuses(
+    const connectionsResult = await this.upsertProposalWorkflowStatuses(
       proposalWorkflowStatusesInput
     );
 
-    if (result) {
-      return result;
+    if (connectionsResult) {
+      // NOTE: Return result as ProposalWorkflowConnection[] but do not care about name and description.
+      return connectionsResult.map(connection =>
+        this.createProposalWorkflowConnectionObject({
+          ...connection,
+          name: '',
+          description: '',
+          full_count: connectionsResult.length,
+        })
+      );
     } else {
       return [];
     }
@@ -424,5 +430,52 @@ export default class PostgresProposalSettingsDataSource
         });
       }
     );
+  }
+
+  private createNextStatusEventObject(nextStatusEvent: NextStatusEventRecord) {
+    return new NextStatusEvent(
+      nextStatusEvent.next_status_event_id,
+      nextStatusEvent.proposal_workflow_connection_id,
+      nextStatusEvent.next_status_event
+    );
+  }
+
+  async addNextStatusEventsToConnection(
+    proposalWorkflowConnectionId: number,
+    nextStatusEvents: string[]
+  ): Promise<NextStatusEvent[]> {
+    const eventsToInsert = nextStatusEvents.map(nextStatusEvent => ({
+      proposal_workflow_connection_id: proposalWorkflowConnectionId,
+      next_status_event: nextStatusEvent,
+    }));
+
+    const result = await database.raw(
+      '? ON CONFLICT ON CONSTRAINT unique_connection_event DO NOTHING RETURNING *;',
+      [database('next_status_events').insert(eventsToInsert)]
+    );
+
+    const nextStatusEventsResult: NextStatusEventRecord[] = result.rows;
+
+    if (nextStatusEventsResult) {
+      return nextStatusEventsResult.map(nextStatusEventResult =>
+        this.createNextStatusEventObject(nextStatusEventResult)
+      );
+    } else {
+      return [];
+    }
+  }
+
+  async getNextStatusEventsByConnectionId(
+    proposalWorkflowConnectionId: number
+  ): Promise<NextStatusEvent[]> {
+    return database
+      .select('*')
+      .from('next_status_events')
+      .where('proposal_workflow_connection_id', proposalWorkflowConnectionId)
+      .then((nextStatusEvents: NextStatusEventRecord[]) => {
+        return nextStatusEvents.map(nextStatusEvent =>
+          this.createNextStatusEventObject(nextStatusEvent)
+        );
+      });
   }
 }

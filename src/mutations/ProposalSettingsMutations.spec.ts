@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import {
   anotherDummyProposalStatus,
+  dummyNextStatusEvent,
   dummyProposalStatus,
   dummyProposalWorkflow,
   dummyProposalWorkflowConnection,
@@ -140,5 +141,29 @@ describe('Test Proposal settings mutations', () => {
         dummyProposalWorkflowConnection
       )
     ).resolves.toStrictEqual(dummyProposalWorkflowConnection);
+  });
+
+  test('A userofficer can add next status event/s to workflow connection', () => {
+    return expect(
+      ProposalSettingsMutationsInstance.addNextStatusEventsToConnection(
+        dummyUserOfficerWithRole,
+        {
+          nextStatusEvents: ['PROPOSAL_SUBMITTED'],
+          proposalWorkflowConnectionId: 1,
+        }
+      )
+    ).resolves.toStrictEqual([dummyNextStatusEvent]);
+  });
+
+  test('A userofficer can remove proposal workflow connection', () => {
+    return expect(
+      ProposalSettingsMutationsInstance.deleteProposalWorkflowStatus(
+        dummyUserOfficerWithRole,
+        {
+          proposalStatusId: 1,
+          proposalWorkflowId: 1,
+        }
+      )
+    ).resolves.toStrictEqual(true);
   });
 });

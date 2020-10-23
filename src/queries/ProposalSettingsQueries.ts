@@ -90,4 +90,16 @@ export default class ProposalSettingsQueries {
 
     return groupedProposalWorkflowConnections;
   }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getNextStatusEventsByConnectionId(
+    agent: UserWithRole | null,
+    proposalWorkflowConnectionId: number
+  ) {
+    const nextStatusEvents = await this.dataSource.getNextStatusEventsByConnectionId(
+      proposalWorkflowConnectionId
+    );
+
+    return nextStatusEvents;
+  }
 }

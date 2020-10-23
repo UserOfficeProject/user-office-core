@@ -1,3 +1,4 @@
+import { NextStatusEvent } from '../../models/NextStatusEvent';
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
@@ -36,7 +37,6 @@ export const dummyProposalWorkflowConnection = new ProposalWorkflowConnection(
   },
   null,
   null,
-  'PROPOSAL_SUBMITTED',
   'proposalWorkflowConnections_0',
   null
 );
@@ -53,9 +53,14 @@ export const anotherDummyProposalWorkflowConnection = new ProposalWorkflowConnec
   },
   null,
   1,
-  'PROPOSAL_REVIEWED',
   'proposalWorkflowConnections_0',
   null
+);
+
+export const dummyNextStatusEvent = new NextStatusEvent(
+  1,
+  1,
+  'PROPOSAL_SUBMITTED'
 );
 
 export class ProposalSettingsDataSourceMock
@@ -149,5 +154,18 @@ export class ProposalSettingsDataSourceMock
     proposalWorkflowId: number
   ): Promise<ProposalWorkflowConnection> {
     return dummyProposalWorkflowConnection;
+  }
+
+  async addNextStatusEventsToConnection(
+    proposalWorkflowConnectionId: number,
+    nextStatusEvents: string[]
+  ): Promise<NextStatusEvent[]> {
+    return [dummyNextStatusEvent];
+  }
+
+  async getNextStatusEventsByConnectionId(
+    proposalWorkflowConnectionId: number
+  ): Promise<NextStatusEvent[]> {
+    return [dummyNextStatusEvent];
   }
 }
