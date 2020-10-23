@@ -68,7 +68,7 @@ export interface TemplateDataSource {
   ): Promise<Template>;
 
   // Topic
-  createTopic(args: CreateTopicArgs): Promise<Template>;
+  createTopic(args: CreateTopicArgs): Promise<Topic>;
   updateTopic(
     topicId: number,
     values: { title?: string; isEnabled?: boolean; sortOrder?: number }
