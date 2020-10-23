@@ -187,7 +187,7 @@ context('Samples tests', () => {
 
     cy.get('[data-cy="safety-status"]').click();
 
-    cy.contains('Safe').click();
+    cy.contains('Low risk').click();
 
     cy.get('[data-cy="safety-comment"]').type(safetyComment);
 
@@ -205,11 +205,11 @@ context('Samples tests', () => {
 
     cy.get('[data-cy="safety-status"]').click();
 
-    cy.contains('Unsafe').click();
+    cy.contains('High risk').click();
 
     cy.get('[data-cy="submit"]').click();
 
-    cy.contains('Unsafe'); // test if status has changed
+    cy.contains('High risk'); // test if status has changed
   });
 
   it('Officer should able to delete proposal with sample', () => {

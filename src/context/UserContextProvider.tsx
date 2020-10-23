@@ -141,7 +141,16 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
 
   checkLocalStorage(dispatch, state);
   useEffect(() => {
-    setCookie('token', state.token, { path: '/', secure: false });
+    const hostname = window.location.hostname;
+
+    setCookie('token', state.token, {
+      path: '/',
+      secure: false,
+      // looks like domains like `localhost` or `proxy` in e2e
+      // don't support .domain in browsers while setting cookies
+      // include the leading dot only for "real" domains
+      domain: hostname.includes('.') ? `.${hostname}` : hostname,
+    });
   }, [setCookie, state]);
 
   return (
