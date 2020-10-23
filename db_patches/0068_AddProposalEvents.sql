@@ -7,7 +7,6 @@ BEGIN
 				proposal_id INT REFERENCES proposals(proposal_id) ON DELETE CASCADE,
 				PRIMARY KEY(proposal_id),
 				proposal_created BOOLEAN DEFAULT FALSE,
-				proposal_updated BOOLEAN DEFAULT FALSE,
 				proposal_submitted BOOLEAN DEFAULT FALSE,
 				call_ended BOOLEAN DEFAULT FALSE,
 				proposal_sep_selected BOOLEAN DEFAULT FALSE,

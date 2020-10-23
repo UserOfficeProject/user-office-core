@@ -1,6 +1,6 @@
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import createEmailHandler from './email';
@@ -13,13 +13,13 @@ export default function createEventHandlers({
   eventLogsDataSource,
   reviewDataSource,
   instrumentDataSource,
-  proposalSettingsDataSource,
+  proposalDataSource,
 }: {
   userDataSource: UserDataSource;
   eventLogsDataSource: EventLogsDataSource;
   reviewDataSource: ReviewDataSource;
   instrumentDataSource: InstrumentDataSource;
-  proposalSettingsDataSource: ProposalSettingsDataSource;
+  proposalDataSource: ProposalDataSource;
 }) {
   return [
     createEmailHandler(userDataSource),
@@ -28,6 +28,6 @@ export default function createEventHandlers({
       instrumentDataSource,
       reviewDataSource,
     }),
-    createProposalWorkflowHandler(proposalSettingsDataSource),
+    createProposalWorkflowHandler(proposalDataSource),
   ];
 }

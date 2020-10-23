@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Event } from '../../events/event.enum';
 import { NextStatusEvent } from '../../models/NextStatusEvent';
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
@@ -478,29 +477,5 @@ export default class PostgresProposalSettingsDataSource
           this.createNextStatusEventObject(nextStatusEvent)
         );
       });
-  }
-
-  async markEventAsDoneOnProposal(
-    event: Event,
-    proposalId: number
-  ): Promise<boolean> {
-    const dataToInsert = {
-      proposal_id: proposalId,
-      [event.toLowerCase()]: true,
-    };
-
-    const result = await database.raw(
-      `? ON CONFLICT (proposal_id)
-        DO UPDATE SET
-        ${event.toLowerCase()} = true
-        RETURNING *;`,
-      [database('proposal_events').insert(dataToInsert)]
-    );
-
-    if (result.rows && result.rows.length) {
-      return true;
-    } else {
-      return false;
-    }
   }
 }

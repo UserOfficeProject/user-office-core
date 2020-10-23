@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import 'reflect-metadata';
+import { Event } from '../../events/event.enum';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
@@ -157,5 +158,12 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     offset?: number
   ) {
     return { totalCount: 1, proposals: [dummyProposal] };
+  }
+
+  async markEventAsDoneOnProposal(
+    event: Event,
+    proposalId: number
+  ): Promise<boolean> {
+    return true;
   }
 }

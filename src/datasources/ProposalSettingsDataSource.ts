@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Event } from '../events/event.enum';
 import { NextStatusEvent } from '../models/NextStatusEvent';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
@@ -54,5 +53,4 @@ export interface ProposalSettingsDataSource {
   getNextStatusEventsByConnectionId(
     proposalWorkflowConnectionId: number
   ): Promise<NextStatusEvent[]>;
-  markEventAsDoneOnProposal(event: Event, proposalId: number): Promise<boolean>;
 }
