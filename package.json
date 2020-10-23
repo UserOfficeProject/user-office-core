@@ -76,7 +76,7 @@
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.16.5",
     "multer": "^1.4.2",
-    "pdfkit": "^0.10.0",
+    "pdfkit": "^0.11.0",
     "pg": "^7.18.2",
     "pg-large-object": "^2.0.0",
     "reflect-metadata": "^0.1.13",
