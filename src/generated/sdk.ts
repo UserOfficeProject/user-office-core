@@ -2,7 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import { print } from 'graphql';
 import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -92,6 +92,13 @@ export type AssignQuestionsToTopicResponseWrap = {
   __typename?: 'AssignQuestionsToTopicResponseWrap';
   error: Maybe<Scalars['String']>;
   result: Maybe<Array<Scalars['String']>>;
+};
+
+export type AuthJwtPayload = {
+  __typename?: 'AuthJwtPayload';
+  user: User;
+  currentRole: Role;
+  roles: Array<Role>;
 };
 
 export type BasicUserDetails = {
@@ -1751,6 +1758,7 @@ export type TokenResponseWrap = {
 export type TokenResult = {
   __typename?: 'TokenResult';
   isValid: Scalars['Boolean'];
+  payload: Maybe<AuthJwtPayload>;
 };
 
 export type Topic = {
