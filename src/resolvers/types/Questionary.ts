@@ -14,8 +14,8 @@ import { QuestionaryStep } from './QuestionaryStep';
 
 @ObjectType()
 export class Questionary implements Partial<QuestionaryOrigin> {
-  @Field(() => Int, { nullable: true }) // null if questionary is blank
-  public questionaryId?: number;
+  @Field(() => Int)
+  public questionaryId: number;
 
   @Field(() => Int)
   public templateId: number;
@@ -31,17 +31,9 @@ export class QuestionaryResolver {
     @Root() questionary: Questionary,
     @Ctx() context: ResolverContext
   ): Promise<QuestionaryStep[] | null> {
-    if (!questionary.questionaryId) {
-      // if questionary is blank
-      return context.queries.questionary.getBlankQuestionarySteps(
-        context.user,
-        questionary.templateId
-      );
-    } else {
-      return context.queries.questionary.getQuestionarySteps(
-        context.user,
-        questionary.questionaryId
-      );
-    }
+    return context.queries.questionary.getQuestionarySteps(
+      context.user,
+      questionary.questionaryId
+    );
   }
 }
