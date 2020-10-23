@@ -127,10 +127,21 @@ export default class PostgresProposalSettingsDataSource
       .insert(args)
       .into('proposal_workflows')
       .returning(['*'])
-      .then((proposalWorkflow: ProposalWorkflowRecord[]) => {
+      .then(async (proposalWorkflow: ProposalWorkflowRecord[]) => {
         if (proposalWorkflow.length !== 1) {
           throw new Error('Could not create proposal status');
         }
+
+        // NOTE: Add default DRAFT status to proposal workflow when it is created.
+        await this.addProposalWorkflowStatus({
+          sortOrder: 0,
+          droppableGroupId: 'proposalWorkflowConnections_0',
+          nextProposalStatusId: null,
+          prevProposalStatusId: null,
+          parentDroppableGroupId: null,
+          proposalStatusId: 1,
+          proposalWorkflowId: proposalWorkflow[0].proposal_workflow_id,
+        });
 
         return this.createProposalWorkflowObject(proposalWorkflow[0]);
       });
