@@ -181,15 +181,26 @@ export default class UserQueries {
     return this.dataSource.getProposalUsers(proposalId);
   }
 
-  async checkToken(token: string): Promise<boolean> {
+  async checkToken(
+    token: string
+  ): Promise<{
+    isValid: boolean;
+    payload: AuthJwtPayload | null;
+  }> {
     try {
-      verifyToken<AuthJwtPayload>(token);
+      const payload = verifyToken<AuthJwtPayload>(token);
 
-      return true;
+      return {
+        isValid: true,
+        payload,
+      };
     } catch (error) {
       logger.logError('Bad token', { error });
 
-      return false;
+      return {
+        isValid: false,
+        payload: null,
+      };
     }
   }
 }

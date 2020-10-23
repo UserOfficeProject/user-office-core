@@ -184,12 +184,6 @@ export default class PostgresQuestionaryDataSource
     return selectResult[0].answer_id;
   }
 
-  async getBlankQuestionarySteps(
-    template_id: number
-  ): Promise<QuestionaryStep[]> {
-    return this.getQuestionaryStepsWithTemplateId(0, template_id);
-  }
-
   async getQuestionary(questionary_id: number): Promise<Questionary | null> {
     return database('questionaries')
       .select('*')
@@ -214,6 +208,12 @@ export default class PostgresQuestionaryDataSource
       questionary_id,
       questionary.templateId
     );
+  }
+
+  async getBlankQuestionarySteps(
+    template_id: number
+  ): Promise<QuestionaryStep[]> {
+    return this.getQuestionaryStepsWithTemplateId(0, template_id);
   }
 
   async updateTopicCompleteness(

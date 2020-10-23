@@ -175,24 +175,24 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return steps;
   }
 
-  async createTopic(args: CreateTopicArgs): Promise<Template> {
+  async createTopic(args: CreateTopicArgs): Promise<Topic> {
     await database('topics')
       .update({ sort_order: args.sortOrder + 1 })
-      .where('sort_order', '>=', args.sortOrder);
+      .where('sort_order', '>=', args.sortOrder)
+      .andWhere('template_id', '=', args.templateId);
 
-    await database('topics').insert({
-      topic_title: 'New Topic',
-      sort_order: args.sortOrder,
-      is_enabled: true,
-      template_id: args.templateId,
-    });
+    const newTopic = (
+      await database('topics')
+        .insert({
+          topic_title: args.title || 'New Topic',
+          sort_order: args.sortOrder,
+          is_enabled: true,
+          template_id: args.templateId,
+        })
+        .returning('*')
+    )[0] as TopicRecord;
 
-    const response = await this.getTemplate(args.templateId);
-    if (!response) {
-      throw new Error('Could not find template');
-    }
-
-    return response;
+    return createTopicObject(newTopic);
   }
 
   async updateTopic(

@@ -83,6 +83,7 @@ export interface ProposalViewRecord {
 export interface TopicRecord {
   readonly topic_id: number;
   readonly topic_title: string;
+  readonly template_id: number;
   readonly is_enabled: boolean;
   readonly sort_order: number;
 }
@@ -347,12 +348,13 @@ export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
 
-export const createTopicObject = (proposal: TopicRecord) => {
+export const createTopicObject = (record: TopicRecord) => {
   return new Topic(
-    proposal.topic_id,
-    proposal.topic_title,
-    proposal.sort_order,
-    proposal.is_enabled
+    record.topic_id,
+    record.topic_title,
+    record.template_id,
+    record.sort_order,
+    record.is_enabled
   );
 };
 

@@ -19,6 +19,9 @@ export class CreateTopicArgs {
 
   @Field(() => Int)
   sortOrder: number;
+
+  @Field(() => Int, { nullable: true })
+  title?: string;
 }
 
 @Resolver()
