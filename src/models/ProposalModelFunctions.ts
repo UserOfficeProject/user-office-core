@@ -1,23 +1,26 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
-  SelectionFromOptionsConfig,
-  TextInputConfig,
   BooleanConfig,
   DateConfig,
   EmbellishmentConfig,
-  FileUploadConfig,
-  SubtemplateConfig,
   FieldConfigType,
+  FileUploadConfig,
+  ProposalBasisConfig,
+  SampleBasisConfig,
+  SelectionFromOptionsConfig,
+  SubtemplateConfig,
+  TextInputConfig,
 } from '../resolvers/types/FieldConfig';
+import { logger } from '../utils/Logger';
 import { ConditionEvaluator } from './ConditionEvaluator';
 import { Answer, QuestionaryStep } from './Questionary';
 import {
   DataType,
   DataTypeSpec,
   FieldDependency,
-  TemplateStep,
-  TemplateCategoryId,
   QuestionTemplateRelation,
+  TemplateCategoryId,
+  TemplateStep,
 } from './Template';
 type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
@@ -186,6 +189,7 @@ const defaultConfigs = new Map<
   | FileUploadConfig
   | SelectionFromOptionsConfig
   | TextInputConfig
+  | SampleBasisConfig
   | SubtemplateConfig
 >();
 defaultConfigs.set('BooleanConfig', { ...baseDefaultConfig });
@@ -213,6 +217,12 @@ defaultConfigs.set('TextInputConfig', {
   placeholder: '',
   ...baseDefaultConfig,
 });
+
+defaultConfigs.set('SampleBasisConfig', {
+  titlePlaceholder: 'Title',
+  ...baseDefaultConfig,
+});
+
 defaultConfigs.set('SubtemplateConfig', {
   templateId: 0,
   templateCategory: TemplateCategoryId[TemplateCategoryId.SAMPLE_DECLARATION],
@@ -227,6 +237,8 @@ f.set(DataType.FILE_UPLOAD, () => new FileUploadConfig());
 f.set(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
 f.set(DataType.TEXT_INPUT, () => new TextInputConfig());
 f.set(DataType.SUBTEMPLATE, () => new SubtemplateConfig());
+f.set(DataType.SAMPLE_BASIS, () => new SampleBasisConfig());
+f.set(DataType.PROPOSAL_BASIS, () => new ProposalBasisConfig());
 
 export function createConfig<T extends typeof FieldConfigType>(
   config: T,
@@ -240,9 +252,13 @@ export function createConfig<T extends typeof FieldConfigType>(
 }
 
 export function createConfigByType(dataType: DataType, init: object | string) {
-  const config = f.get(dataType)!;
+  const configCreator = f.get(dataType)!;
+  if (!configCreator) {
+    logger.logError('ConfigCreator not implemented', { dataType });
+    throw new Error('ConfigCreator not implemented');
+  }
 
-  return createConfig(config(), init);
+  return createConfig(configCreator(), init);
 }
 
 export function getDefaultAnswerValue(type: DataType): any {

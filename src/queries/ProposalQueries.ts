@@ -46,7 +46,8 @@ export default class ProposalQueries {
     }
   }
 
-  byRef(id: number) {
+  @Authorized()
+  async byRef(agent: UserWithRole | null, id: number) {
     return this.dataSource.get(id);
   }
 
@@ -94,59 +95,5 @@ export default class ProposalQueries {
       first,
       offset
     );
-  }
-
-  @Authorized()
-  async getBlank(agent: UserWithRole | null, callId: number) {
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.dataSource.checkActiveCall(callId))
-    ) {
-      logger.logWarn('User tried to create proposal on inactive call', {
-        agent,
-        callId,
-      });
-
-      return null;
-    }
-
-    const call = await this.callDataSource.get(callId);
-    if (!call) {
-      logger.logError('User tried accessing non existing call', {
-        callId,
-        agent,
-      });
-
-      return null;
-    }
-
-    if (!call.templateId) {
-      logger.logError('User tried to getBlank for misconfigured call', {
-        call,
-      });
-
-      return null;
-    }
-
-    const blankProposal = new Proposal(
-      0,
-      '',
-      '',
-      (agent as UserWithRole).id,
-      0,
-      new Date(),
-      new Date(),
-      '',
-      0,
-      ProposalEndStatus.UNSET,
-      call?.id,
-      -1,
-      '',
-      '',
-      false,
-      false
-    );
-
-    return blankProposal;
   }
 }

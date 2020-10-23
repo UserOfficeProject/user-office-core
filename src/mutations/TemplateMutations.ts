@@ -20,7 +20,13 @@ import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { createConfig } from '../models/ProposalModelFunctions';
 import { Roles } from '../models/Role';
-import { DataType, Question, Template, Topic } from '../models/Template';
+import {
+  DataType,
+  Question,
+  Template,
+  TemplateCategoryId,
+  Topic,
+} from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
@@ -51,16 +57,64 @@ export default class TemplateMutations {
     agent: UserWithRole | null,
     args: CreateTemplateArgs
   ): Promise<Template | Rejection> {
-    const result = await this.dataSource
+    const newTemplate = await this.dataSource
       .createTemplate(args)
       .then(result => result);
 
-    await this.dataSource.createTopic({
-      sortOrder: 0,
-      templateId: result.templateId,
-    }); // Create first topic automatically
+    switch (args.categoryId) {
+      case TemplateCategoryId.PROPOSAL_QUESTIONARY:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New proposal',
+          'proposal_basis'
+        );
+        break;
+      case TemplateCategoryId.SAMPLE_DECLARATION:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New sample',
+          'sample_basis'
+        );
+        break;
+    }
 
-    return result;
+    return newTemplate;
+  }
+
+  /** cretes first topic, so that template is not empty to begin with */
+  private async createInitialTopic(
+    templateId: number,
+    sortOrder: number,
+    title: string,
+    firstQuestionId?: string
+  ) {
+    const newTopic = await this.dataSource.createTopic({
+      sortOrder,
+      templateId,
+      title,
+    });
+
+    if (firstQuestionId) {
+      const sampleBasisQuestion = await this.dataSource.getQuestion(
+        firstQuestionId
+      );
+      if (!sampleBasisQuestion) {
+        logger.logError(
+          'Missing question with firstQuestionId from the database',
+          { firstQuestionId }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      }
+      await this.dataSource.createQuestionTemplateRelation({
+        questionId: firstQuestionId,
+        sortOrder: 0,
+        topicId: newTopic.id,
+        templateId: newTopic.templateId,
+      });
+    }
   }
 
   @ValidateArgs(cloneTemplateValidationSchema)
@@ -107,7 +161,14 @@ export default class TemplateMutations {
   ): Promise<Template | Rejection> {
     return this.dataSource
       .createTopic(args)
-      .then(response => response)
+      .then(async () => {
+        const template = await this.dataSource.getTemplate(args.templateId);
+        if (!template) {
+          throw new Error('Could not fetch template');
+        }
+
+        return template;
+      })
       .catch(err => {
         logger.logException('Could not create topic', err, {
           user,
