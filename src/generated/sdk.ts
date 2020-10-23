@@ -1471,7 +1471,7 @@ export type Question = {
 
 export type Questionary = {
   __typename?: 'Questionary';
-  questionaryId: Maybe<Scalars['Int']>;
+  questionaryId: Scalars['Int'];
   templateId: Scalars['Int'];
   created: Scalars['DateTime'];
   steps: Array<QuestionaryStep>;
