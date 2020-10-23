@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { EmbellishmentConfig } from '../../../generated/sdk';
-import { BasicComponentProps } from '../IBasicComponentProps';
+import { BasicComponentProps } from '../../proposal/IBasicComponentProps';
 
-export function ProposalComponentEmbellishment(props: BasicComponentProps) {
+export function QuestionaryComponentEmbellishment(props: BasicComponentProps) {
   return (
     <div
       dangerouslySetInnerHTML={{

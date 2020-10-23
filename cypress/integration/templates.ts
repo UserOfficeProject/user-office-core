@@ -84,17 +84,26 @@ context('Template tests', () => {
       .first()
       .click();
 
-    cy.contains('Add topic').click();
+    cy.get('[data-cy=show-more-button]').click();
 
-    cy.get('[data-cy=topic-title]').click();
+    cy.get('[data-cy=add-topic-menu-item]').click();
+
+    cy.get('[data-cy=topic-title]')
+      .last()
+      .click();
 
     cy.get('[data-cy=topic-title-input]')
+      .last()
       .clear()
       .type(`${topic}{enter}`);
 
-    cy.get('[data-cy=show-more-button]').click();
+    cy.get('[data-cy=show-more-button]')
+      .last()
+      .click();
 
-    cy.contains('Add question').click();
+    cy.get('[data-cy=add-question-menu-item]')
+      .last()
+      .click();
 
     /* Boolean */
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
@@ -394,7 +403,11 @@ context('Template tests', () => {
     cy.contains(fileQuestion).click();
     cy.get("[data-cy='delete']").click();
 
-    cy.get('[data-cy=show-more-button]').click();
-    cy.contains('Delete topic').click();
+    cy.get('[data-cy=show-more-button]')
+      .last()
+      .click();
+    cy.get('[data-cy=add-topic-menu-item]')
+      .last()
+      .click();
   });
 });

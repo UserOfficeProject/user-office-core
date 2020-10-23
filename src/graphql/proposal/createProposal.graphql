@@ -12,6 +12,12 @@ mutation createProposal($callId: Int!) {
       questionary {
         ...questionary
       }
+      proposer {
+        ...basicUserDetails
+      }
+      users {
+        ...basicUserDetails
+      }
     }
     error
   }

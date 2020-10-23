@@ -1,57 +1,63 @@
 import * as Yup from 'yup';
 
 import {
-  FieldConfig,
   Answer,
+  DataType,
   SelectionFromOptionsConfig,
   TextInputConfig,
 } from 'generated/sdk';
-import { DataType } from 'generated/sdk';
 
 const toYupValidationSchema = (field: Answer): Yup.Schema<any> => {
-  let config: FieldConfig;
   switch (field.question.dataType) {
-    case DataType.TEXT_INPUT:
-      let txtInputSchema = Yup.string();
-      config = field.config as TextInputConfig;
+    case DataType.TEXT_INPUT: {
+      let schema = Yup.string();
+      const config = field.config as TextInputConfig;
       field.config.required &&
-        (txtInputSchema = txtInputSchema.required(`This is a required field`));
+        (schema = schema.required(`This is a required field`));
       config.min &&
-        (txtInputSchema = txtInputSchema.min(
+        (schema = schema.min(
           config.min,
           `Value must be at least ${config.min} characters`
         ));
       config.max &&
-        (txtInputSchema = txtInputSchema.max(
+        (schema = schema.max(
           config.max,
           `Value must be at most ${config.max} characters`
         ));
 
-      return txtInputSchema;
-    case DataType.SELECTION_FROM_OPTIONS:
-      let selectFromOptionsSchema = Yup.string();
-      config = field.config as SelectionFromOptionsConfig;
-      field.config.required &&
-        (selectFromOptionsSchema = selectFromOptionsSchema.required(
-          `This is a required field`
-        ));
+      return schema;
+    }
+    case DataType.SELECTION_FROM_OPTIONS: {
+      let schema = Yup.string();
+      const config = field.config as SelectionFromOptionsConfig;
+      config.required && (schema = schema.required(`This is a required field`));
 
-      return selectFromOptionsSchema;
-    case DataType.DATE:
-      let dateSchema = Yup.date();
+      return schema;
+    }
+    case DataType.DATE: {
+      let schema = Yup.date();
       field.config.required &&
-        (dateSchema = dateSchema.required(`This date is required`));
+        (schema = schema.required(`This date is required`));
 
-      return dateSchema;
-    case DataType.BOOLEAN:
-      let booleanSchema = Yup.bool();
+      return schema;
+    }
+    case DataType.BOOLEAN: {
+      let schema = Yup.bool();
 
       field.config.required &&
-        (booleanSchema = booleanSchema
+        (schema = schema
           .oneOf([true], 'This field is required')
           .required('This field is required'));
 
-      return booleanSchema;
+      return schema;
+    }
+
+    case DataType.SAMPLE_BASIS: {
+      // eslint-disable-next-line prefer-const
+      let schema = Yup.object().shape({});
+
+      return schema;
+    }
     default:
       return Yup.string();
   }

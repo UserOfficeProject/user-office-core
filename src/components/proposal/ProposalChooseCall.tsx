@@ -42,8 +42,8 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
   const history = useHistory();
   const classes = useStyles();
 
-  const handleSelect = (callId: number) => {
-    const url = '/ProposalCreate/' + callId;
+  const handleSelect = (callId: number, templateId: number) => {
+    const url = `/ProposalCreate/${callId}/${templateId}`;
     history.push(url);
   };
 
@@ -66,7 +66,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
               <ListItem
                 button
                 key={call.id}
-                onClick={() => handleSelect(call.id)}
+                onClick={() => handleSelect(call.id, call.templateId!)}
                 divider={true}
               >
                 <ListItemText
@@ -90,7 +90,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
                   <IconButton
                     edge="end"
                     aria-label="comments"
-                    onClick={() => handleSelect(call.id)}
+                    onClick={() => handleSelect(call.id, call.templateId!)}
                   >
                     <NavigateNext />
                   </IconButton>

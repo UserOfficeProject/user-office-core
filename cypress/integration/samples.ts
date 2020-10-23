@@ -10,6 +10,7 @@ context('Samples tests', () => {
     cy.viewport(1100, 1000);
   });
 
+  const proposalTemplateName = faker.lorem.words(2);
   const sampleTemplateName = faker.lorem.words(2);
   const sampleTemplateDescription = faker.lorem.words(4);
   const sampleQuestion = faker.lorem.words(4);
@@ -17,6 +18,7 @@ context('Samples tests', () => {
   const proposalAbstract = faker.lorem.words(5);
   const safetyComment = faker.lorem.words(5);
   const sampleTitle = faker.lorem.words(2);
+  const proposalTitleUpdated = faker.lorem.words(2);
 
   it('Should be able to create proposal template with sample', () => {
     cy.login('officer');
@@ -25,27 +27,43 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=create-new-button]').click();
 
-    cy.get('[data-cy=name]').type(sampleTemplateName);
+    cy.get('[data-cy=name] input')
+      .type(sampleTemplateName)
+      .should('have.value', sampleTemplateName);
 
     cy.get('[data-cy=description]').type(sampleTemplateDescription);
 
     cy.get('[data-cy=submit]').click();
 
-    cy.contains('New Topic');
+    cy.contains('New sample');
 
     cy.visit('/');
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get('[title="Edit"]')
-      .first()
+    cy.get('[data-cy=create-new-button]').click();
+
+    cy.get('[data-cy=name] input')
+      .type(proposalTemplateName)
+      .should('have.value', proposalTemplateName);
+
+    cy.get('[data-cy=submit]').click();
+
+    cy.get('[data-cy=show-more-button]')
+      .last()
       .click();
 
-    cy.contains('Add topic').click();
+    cy.get('[data-cy=add-topic-menu-item]')
+      .last()
+      .click();
 
-    cy.get('[data-cy=show-more-button]').click();
+    cy.get('[data-cy=show-more-button]')
+      .last()
+      .click();
 
-    cy.contains('Add question').click();
+    cy.get('[data-cy=add-question-menu-item]')
+      .last()
+      .click();
 
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
@@ -53,7 +71,8 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=question]')
       .clear()
-      .type(sampleQuestion);
+      .type(sampleQuestion)
+      .should('have.value', sampleQuestion);
 
     cy.get('[data-cy=template-id]').click();
 
@@ -71,14 +90,36 @@ context('Samples tests', () => {
     cy.contains(sampleQuestion); // checking if question in the topic column
   });
 
+  it('Should be possible to change template in a call', () => {
+    cy.login('officer');
+
+    cy.contains('Calls').click();
+
+    cy.get('[title="Edit"]').click();
+
+    cy.get('[data-cy=call-template]').click();
+
+    cy.contains(proposalTemplateName).click();
+
+    cy.contains('Next').click();
+
+    cy.contains('Next').click();
+
+    cy.contains('Update Call').click();
+  });
+
   it('Should be able to create proposal with sample', () => {
     cy.login('user');
 
     cy.contains('New Proposal').click();
 
-    cy.get('#title').type(proposalTitle);
+    cy.get('#title')
+      .type(proposalTitle)
+      .should('have.value', proposalTitle);
 
-    cy.get('#abstract').type(proposalAbstract);
+    cy.get('#abstract')
+      .type(proposalAbstract)
+      .should('have.value', proposalAbstract);
 
     cy.contains('Save and continue').click();
 
@@ -86,17 +127,12 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=title-input] input')
       .clear()
-      .type(sampleTitle);
+      .type(sampleTitle)
+      .should('have.value', sampleTitle);
 
-    cy.get('[role="presentation"] [data-cy=save-and-continue-button]')
-      .first()
-      .click();
-
-    cy.wait(4000);
-
-    cy.get('[role="presentation"] [data-cy=save-and-continue-button]')
-      .first()
-      .click();
+    cy.get(
+      '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+    ).click();
 
     cy.get('[data-cy="questionaries-list-item"]').should('have.length', 1);
 
@@ -115,6 +151,29 @@ context('Samples tests', () => {
     cy.contains('Submit').click();
 
     cy.contains('OK').click();
+  });
+
+  it('Officer should be able to edit proposal', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.get('[title="View proposal"]').click();
+
+    cy.contains('Edit proposal').click();
+
+    cy.contains('New proposal').click();
+
+    cy.get('[data-cy=title] input')
+      .clear()
+      .type(proposalTitleUpdated)
+      .should('have.value', proposalTitleUpdated);
+
+    cy.get('[data-cy=save-and-continue-button]').click();
+
+    cy.contains('Close').click();
+
+    cy.contains(proposalTitleUpdated);
   });
 
   it('Should be able to evaluate sample', () => {

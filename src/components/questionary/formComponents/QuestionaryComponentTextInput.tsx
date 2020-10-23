@@ -5,9 +5,9 @@ import { Key } from 'ts-keycode-enum';
 
 import { TextInputConfig } from '../../../generated/sdk';
 import TextFieldWithCounter from '../../common/TextFieldWithCounter';
-import { BasicComponentProps } from '../IBasicComponentProps';
+import { BasicComponentProps } from '../../proposal/IBasicComponentProps';
 
-export function ProposalComponentTextInput(props: BasicComponentProps) {
+export function QuestionaryComponentTextInput(props: BasicComponentProps) {
   const classes = makeStyles({
     textField: {
       margin: '15px 0 10px 0',

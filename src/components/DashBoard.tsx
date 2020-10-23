@@ -185,7 +185,10 @@ const Dashboard: React.FC = () => {
             path="/ProposalSelectType"
             component={() => <ProposalChooseCall callsData={calls} />}
           />
-          <Route path="/ProposalCreate/:callId" component={ProposalCreate} />
+          <Route
+            path="/ProposalCreate/:callId/:templateId"
+            component={ProposalCreate}
+          />
           <Route path="/ProfilePage/:id" component={ProfilePage} />
           {isUserOfficer && (
             <Route path="/PeoplePage/:id" component={UserPage} />

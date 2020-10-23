@@ -8,7 +8,7 @@ import React, { Fragment, HTMLAttributes } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
-import { ProposalSubsetSumbission } from 'models/ProposalModel';
+import { ProposalSubsetSumbission } from 'models/ProposalSubmissionState';
 
 const useStyles = makeStyles(theme => ({
   heading: {

@@ -129,14 +129,16 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
     return (
       <>
-        <IconButton data-cy="view-proposal" style={iconButtonStyle}>
-          <Link
-            to={`/ProposalReviewUserOfficer/${rowData.id}`}
-            style={{ color: 'inherit', textDecoration: 'inherit' }}
-          >
-            <Visibility />
-          </Link>
-        </IconButton>
+        <Tooltip title="View proposal">
+          <IconButton data-cy="view-proposal" style={iconButtonStyle}>
+            <Link
+              to={`/ProposalReviewUserOfficer/${rowData.id}`}
+              style={{ color: 'inherit', textDecoration: 'inherit' }}
+            >
+              <Visibility />
+            </Link>
+          </IconButton>
+        </Tooltip>
         <Tooltip title="Download proposal as pdf">
           <IconButton
             data-cy="download-proposal"

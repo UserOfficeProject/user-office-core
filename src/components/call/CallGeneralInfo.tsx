@@ -63,7 +63,7 @@ const CallGeneralInfo: React.FC = () => {
           text: template.name,
           value: template.templateId,
         }))}
-        data-cy="call-template"
+        InputProps={{ 'data-cy': 'call-template' }}
       />
       <FormikDropdown
         name="proposalWorkflowId"
@@ -75,7 +75,7 @@ const CallGeneralInfo: React.FC = () => {
             ? proposalWorkflowsWithInjectedSelectionRemoval
             : []
         }
-        data-cy="call-workflow"
+        InputProps={{ 'data-cy': 'call-workflow' }}
       />
     </>
   );
