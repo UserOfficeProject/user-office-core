@@ -14,4 +14,17 @@ export class UserResolver {
   me(@Ctx() context: ResolverContext) {
     return context.queries.user.me(context.user);
   }
+
+  @Query(() => Boolean, { nullable: true })
+  async instrumentScientistHasAccess(
+    @Arg('instrumentId', () => Int) instrumentId: number,
+    @Arg('proposalId', () => Int) proposalId: number,
+    @Ctx() context: ResolverContext
+  ): Promise<boolean> {
+    return context.queries.user.hasInstrumentScientistAccess(
+      context.user,
+      instrumentId,
+      proposalId
+    );
+  }
 }

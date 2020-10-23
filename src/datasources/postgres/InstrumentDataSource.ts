@@ -396,4 +396,22 @@ export default class PostgresInstrumentDataSource
       return false;
     }
   }
+
+  hasInstrumentScientistInstrument(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    return database
+      .count('*')
+      .from('instruments as i')
+      .join('instrument_has_scientists as ihs', {
+        'i.instrument_id': 'ihs.instrument_id',
+      })
+      .where('ihs.user_id', userId)
+      .where('i.instrument_id', instrumentId)
+      .first()
+      .then((result: undefined | { count: string }) => {
+        return result?.count === '1';
+      });
+  }
 }

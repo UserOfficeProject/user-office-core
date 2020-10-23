@@ -270,4 +270,12 @@ export class UserDataSourceMock implements UserDataSource {
   async create(firstname: string, lastname: string) {
     return dummyUser;
   }
+
+  hasInstrumentScientistAccess(
+    userId: number,
+    instrumentId: number,
+    proposalId: number
+  ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
 }

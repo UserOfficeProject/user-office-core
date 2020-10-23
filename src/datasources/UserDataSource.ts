@@ -60,4 +60,9 @@ export interface UserDataSource {
     userId: number,
     proposalId: number
   ): Promise<boolean>;
+  hasInstrumentScientistAccess(
+    userId: number,
+    instrumentId: number,
+    proposalId: number
+  ): Promise<boolean>;
 }

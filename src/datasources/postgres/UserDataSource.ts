@@ -451,4 +451,28 @@ export default class PostgresUserDataSource implements UserDataSource {
 
     return !!proposal;
   }
+
+  async hasInstrumentScientistAccess(
+    scientistId: number,
+    instrumentId: number,
+    proposalId: number
+  ): Promise<boolean> {
+    return database
+      .select([database.raw('count(*) OVER() AS count')])
+      .from('proposals')
+      .join('instrument_has_scientists', {
+        'instrument_has_scientists.user_id': scientistId,
+      })
+      .join('instrument_has_proposals', {
+        'instrument_has_proposals.proposal_id': 'proposals.proposal_id',
+        'instrument_has_proposals.instrument_id':
+          'instrument_has_scientists.instrument_id',
+      })
+      .where('proposals.proposal_id', '=', proposalId)
+      .where('instrument_has_scientists.instrument_id', '=', instrumentId)
+      .first()
+      .then((result: undefined | { count: string }) => {
+        return result?.count === '1';
+      });
+  }
 }
