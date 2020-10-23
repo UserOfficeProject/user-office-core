@@ -2,21 +2,24 @@ import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useContext } from 'react';
 
+import NavigationFragment from 'components/questionary/NavigationFragment';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
-import { useSubmitProposal } from 'hooks/proposal/useSubmitProposal';
-import {
-  EventType,
-  ProposalSubmissionModelState,
-} from 'models/ProposalSubmissionModel';
+import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
+import { EventType } from 'models/QuestionarySubmissionState';
 import withConfirm from 'utils/withConfirm';
 
-import { SubmissionContext } from '../../utils/SubmissionContext';
-import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
+import { ProposalContext } from './ProposalContainer';
 
 function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
-  const { dispatch } = useContext(SubmissionContext)!;
-  const { isLoading, submitProposal } = useSubmitProposal();
+  const context = useContext(ProposalContext);
+
+  if (!context) {
+    throw new Error(
+      'ProposalReview is missing SubmissionContext. Wrap ProposalReview or one of its parrents with SubmissionContext'
+    );
+  }
+  const { dispatch } = context;
   const downloadPDFProposal = useDownloadPDFProposal();
   const proposal = data.proposal;
 
@@ -51,17 +54,15 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
         className={readonly ? classes.disabled : undefined}
       />
       <div className={classes.buttons}>
-        <QuestionaryNavigationFragment
+        <NavigationFragment
           back={undefined}
           saveAndNext={{
             callback: () => {
               confirm(
                 () => {
-                  submitProposal(proposal.id).then(() => {
-                    dispatch({
-                      type: EventType.SUBMIT_PROPOSAL_CLICKED,
-                      payload: proposal,
-                    });
+                  dispatch({
+                    type: EventType.PROPOSAL_SUBMIT_CLICKED,
+                    payload: { proposalId: proposal.id },
                   });
                 },
                 {
@@ -73,7 +74,6 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
             },
             label: proposal.submitted ? '✔ Submitted' : 'Submit',
             disabled: !allStepsComplete || proposal.submitted,
-            isBusy: isLoading,
           }}
           reset={undefined}
           isLoading={false}
@@ -93,7 +93,7 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
 }
 
 interface ProposalSummaryProps {
-  data: ProposalSubmissionModelState;
+  data: ProposalSubmissionState;
   readonly: boolean;
   confirm: Function;
 }

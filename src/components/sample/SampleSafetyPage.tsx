@@ -1,3 +1,4 @@
+import { Avatar, ListItemIcon, MenuItem, Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -8,7 +9,6 @@ import React, { useEffect, useState } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import FormikDropdown from 'components/common/FormikDropdown';
 import InputDialog from 'components/common/InputDialog';
 import SelectedCallFilter from 'components/common/SelectedCallFilter';
 import { Maybe, Sample, SampleStatus } from 'generated/sdk';
@@ -142,16 +142,61 @@ function SampleEvaluationDialog(props: {
       >
         {({ isSubmitting }) => (
           <Form>
-            <FormikDropdown
+            <Field
+              type="text"
               name="safetyStatus"
               label="Status"
-              items={[
-                { text: 'Safe', value: SampleStatus.SAFE },
-                { text: 'Unsafe', value: SampleStatus.UNSAFE },
-              ]}
-              disabled={isSubmitting}
+              select
+              margin="normal"
+              component={TextField}
+              InputLabelProps={{
+                shrink: true,
+              }}
               InputProps={{ 'data-cy': 'safety-status' }}
-            />
+              fullWidth
+              required={true}
+              disabled={isSubmitting}
+            >
+              <MenuItem
+                key={SampleStatus.PENDING_EVALUTATION}
+                value={SampleStatus.PENDING_EVALUTATION}
+              >
+                <ListItemIcon>
+                  <Avatar style={{ backgroundColor: '#CCC' }}>&nbsp;</Avatar>
+                </ListItemIcon>
+                <Typography variant="inherit">Not evaluated</Typography>
+              </MenuItem>
+
+              <MenuItem
+                key={SampleStatus.LOW_RISK}
+                value={SampleStatus.LOW_RISK}
+              >
+                <ListItemIcon>
+                  <Avatar style={{ backgroundColor: '#88C100' }}>&nbsp;</Avatar>
+                </ListItemIcon>
+                <Typography variant="inherit">Low risk</Typography>
+              </MenuItem>
+
+              <MenuItem
+                key={SampleStatus.ELEVATED_RISK}
+                value={SampleStatus.ELEVATED_RISK}
+              >
+                <ListItemIcon>
+                  <Avatar style={{ backgroundColor: '#FF8A00' }}>&nbsp;</Avatar>
+                </ListItemIcon>
+                <Typography variant="inherit">Elevated risk</Typography>
+              </MenuItem>
+
+              <MenuItem
+                key={SampleStatus.HIGH_RISK}
+                value={SampleStatus.HIGH_RISK}
+              >
+                <ListItemIcon>
+                  <Avatar style={{ backgroundColor: '#FF003C' }}>&nbsp;</Avatar>
+                </ListItemIcon>
+                <Typography variant="inherit">High risk</Typography>
+              </MenuItem>
+            </Field>
 
             <Field
               name="safetyComment"
@@ -164,6 +209,7 @@ function SampleEvaluationDialog(props: {
               disabled={isSubmitting}
               InputProps={{ rows: 4, rowsMax: 10, 'data-cy': 'safety-comment' }}
             />
+
             <ActionButtonContainer>
               <Button
                 variant="contained"

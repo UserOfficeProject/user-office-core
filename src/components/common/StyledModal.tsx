@@ -1,15 +1,14 @@
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import Grid from '@material-ui/core/Grid';
-import Modal from '@material-ui/core/Modal';
+import Modal, { ModalProps } from '@material-ui/core/Modal';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React from 'react';
 
-export default function ModalWrapper(props: {
-  isOpen: boolean;
-  close: () => void;
-  children: React.ReactNode;
-}) {
+export default function StyledModal(
+  props: Omit<ModalProps, 'Backdrop' | 'BackdropProps' | 'className'>
+) {
+  const { children, ...restOfTheProps } = props;
   const classes = makeStyles(theme => ({
     container: {
       backgroundColor: 'white',
@@ -27,18 +26,17 @@ export default function ModalWrapper(props: {
 
   return (
     <Modal
+      {...restOfTheProps}
       className={classes.modal}
-      open={props.isOpen}
-      onClose={props.close}
       closeAfterTransition
       BackdropComponent={Backdrop}
       BackdropProps={{
         timeout: 500,
       }}
     >
-      <Fade in={props.isOpen}>
+      <Fade in={props.open}>
         <Grid container className={classes.container}>
-          {props.children}
+          {children}
         </Grid>
       </Fade>
     </Modal>

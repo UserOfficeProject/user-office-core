@@ -6,10 +6,6 @@ import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 
-const AUTH_ALLOWED_HOSTNAMES = (
-  process.env.REACT_APP_AUTH_ALLOWED_HOSTNAMES || ''
-).split(',');
-
 const useStyles = makeStyles(theme => ({
   root: {
     position: 'absolute',
@@ -28,13 +24,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function checkAuthRedirect(authRedirect: string) {
+function checkAuthRedirect(authRedirect: string): boolean {
   try {
-    const url = new URL(authRedirect);
+    new URL(authRedirect);
 
-    return AUTH_ALLOWED_HOSTNAMES.some(
-      allowedHostname => allowedHostname === url.hostname
-    );
+    return true;
   } catch (err) {
     //  malformed URL probably
     console.error(err);

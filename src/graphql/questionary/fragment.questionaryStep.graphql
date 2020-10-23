@@ -1,9 +1,6 @@
 fragment questionaryStep on QuestionaryStep {
   topic {
-    title
-    id
-    sortOrder
-    isEnabled
+    ...topic
   }
   isCompleted
   fields {

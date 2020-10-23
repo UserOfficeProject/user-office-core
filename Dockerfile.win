@@ -1,3 +1,4 @@
+#escape=`
 ARG WINDOWS_VERSION
 
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
@@ -11,12 +12,18 @@ RUN npm install --only=production --silent
 
 COPY ./ /app/
 
-RUN npm run build
+RUN npm run build; `
+    # Copy the IIS config to the output directory
+    Copy-Item iis.conf build\web.config
 
 
 FROM mcr.microsoft.com/windows/servercore/iis:windowsservercore-${WINDOWS_VERSION}
 
-RUN powershell -NoProfile -Command Remove-Item -Recurse C:\inetpub\wwwroot\*
+RUN powershell -NoProfile -Command Remove-Item -Recurse C:\inetpub\wwwroot\*; `
+    # IIS needs the URLRewrite module to handle React redirects
+    Invoke-WebRequest -UseBasicParsing 'https://download.microsoft.com/download/1/2/8/128E2E22-C1B9-44A4-BE2A-5859ED1D4592/rewrite_amd64_en-US.msi' -Outfile 'urlRewrite.msi'; `
+    Start-Process msiexec.exe -ArgumentList @('/i', 'urlRewrite.msi', '/qn') -NoNewWindow -Wait; `
+    Remove-Item 'urlRewrite.msi'
 
 WORKDIR /inetpub/wwwroot
 

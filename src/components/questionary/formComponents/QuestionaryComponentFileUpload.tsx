@@ -6,10 +6,10 @@ import { FileMetaData } from 'models/FileUpload';
 
 import { FileUploadConfig } from '../../../generated/sdk';
 import { FileUploadComponent } from '../../common/FileUploadComponent';
-import { BasicComponentProps } from '../IBasicComponentProps';
-import ProposalErrorLabel from '../ProposalErrorLabel';
+import { BasicComponentProps } from '../../proposal/IBasicComponentProps';
+import ProposalErrorLabel from '../../proposal/ProposalErrorLabel';
 
-export function ProposalComponentFileUpload(
+export function QuestionaryComponentFileUpload(
   props: BasicComponentProps & { files?: string[] }
 ) {
   const { templateField, errors, onComplete } = props;

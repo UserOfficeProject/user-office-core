@@ -1,5 +1,4 @@
 import { EvaluatorOperator, Answer } from 'generated/sdk';
-import JSDict from 'utils/Dictionary';
 
 export class EqualityValidator implements FieldConditionEvaluator {
   isSatisfied(field: Answer, params: string): boolean {
@@ -14,17 +13,14 @@ export class InequalityValidator implements FieldConditionEvaluator {
 }
 
 export class ConditionEvaluator {
-  private validatorMap!: JSDict<EvaluatorOperator, FieldConditionEvaluator>;
+  private validatorMap!: Map<EvaluatorOperator, FieldConditionEvaluator>;
 
   private getMappings() {
     if (!this.validatorMap) {
       // lazy initialization
-      this.validatorMap = JSDict.Create<
-        EvaluatorOperator,
-        FieldConditionEvaluator
-      >();
-      this.validatorMap.put(EvaluatorOperator.EQ, new EqualityValidator());
-      this.validatorMap.put(EvaluatorOperator.NEQ, new InequalityValidator());
+      this.validatorMap = new Map<EvaluatorOperator, FieldConditionEvaluator>();
+      this.validatorMap.set(EvaluatorOperator.EQ, new EqualityValidator());
+      this.validatorMap.set(EvaluatorOperator.NEQ, new InequalityValidator());
     }
 
     return this.validatorMap;
