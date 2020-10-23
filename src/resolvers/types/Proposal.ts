@@ -205,6 +205,7 @@ export async function resolveProposalReference(
 
   // dataSource.get can be null, even with non-null operator the compiler complains
   return (await (ctx.queries.proposal.byRef(
+    ctx.user,
     reference.id
   ) as unknown)) as Proposal;
 }

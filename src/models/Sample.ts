@@ -11,7 +11,8 @@ export class Sample {
 }
 
 export enum SampleStatus {
-  NONE = 0,
-  SAFE,
-  UNSAFE,
+  PENDING_EVALUTATION = 0,
+  LOW_RISK,
+  ELEVATED_RISK,
+  HIGH_RISK,
 }
