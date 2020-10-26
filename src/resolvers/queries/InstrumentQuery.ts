@@ -66,4 +66,17 @@ export class InstrumentQuery {
       instrumentId
     );
   }
+
+  @Query(() => Boolean, { nullable: true })
+  async instrumentScientistHasAccess(
+    @Arg('instrumentId', () => Int) instrumentId: number,
+    @Arg('proposalId', () => Int) proposalId: number,
+    @Ctx() context: ResolverContext
+  ): Promise<boolean> {
+    return context.queries.instrument.hasInstrumentScientistAccess(
+      context.user,
+      instrumentId,
+      proposalId
+    );
+  }
 }

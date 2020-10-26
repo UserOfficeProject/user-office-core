@@ -55,17 +55,6 @@ export default class InstrumentQueries {
     return { totalCount: instruments.length, instruments };
   }
 
-  @Authorized([Roles.INSTRUMENT_SCIENTIST])
-  async hasInstrumentScientistInstrument(
-    agent: UserWithRole | null,
-    instrumentId: number
-  ) {
-    return this.dataSource.hasInstrumentScientistInstrument(
-      agent?.id as number,
-      instrumentId
-    );
-  }
-
   @Authorized([
     Roles.USER_OFFICER,
     Roles.SEP_CHAIR,
@@ -89,6 +78,30 @@ export default class InstrumentQueries {
     } else {
       return null;
     }
+  }
+
+  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  async hasInstrumentScientistInstrument(
+    agent: UserWithRole | null,
+    instrumentId: number
+  ) {
+    return this.dataSource.hasInstrumentScientistInstrument(
+      agent?.id as number,
+      instrumentId
+    );
+  }
+
+  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  async hasInstrumentScientistAccess(
+    agent: UserWithRole | null,
+    instrumentId: number,
+    proposalId: number
+  ) {
+    return this.dataSource.hasInstrumentScientistAccess(
+      agent?.id as number,
+      instrumentId,
+      proposalId
+    );
   }
 
   @Authorized()

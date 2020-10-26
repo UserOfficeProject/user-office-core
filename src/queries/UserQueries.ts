@@ -203,17 +203,4 @@ export default class UserQueries {
       };
     }
   }
-
-  @Authorized([Roles.INSTRUMENT_SCIENTIST])
-  async hasInstrumentScientistAccess(
-    agent: UserWithRole | null,
-    instrumentId: number,
-    proposalId: number
-  ) {
-    return this.dataSource.hasInstrumentScientistAccess(
-      agent?.id as number,
-      instrumentId,
-      proposalId
-    );
-  }
 }
