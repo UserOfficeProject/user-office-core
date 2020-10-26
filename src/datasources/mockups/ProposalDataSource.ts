@@ -7,6 +7,7 @@ import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 
 export let dummyProposal: Proposal;
 export let dummyProposalSubmitted: Proposal;
+let allProposals: Proposal[];
 
 export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends Array<infer U>
@@ -26,14 +27,14 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.created || new Date(),
     values?.updated || new Date(),
     values?.shortCode || 'shortCode',
-    values?.rankOrder || 0,
-    values?.finalStatus || 0,
-    values?.callId || 0,
+    values?.rankOrder || 1,
+    values?.finalStatus || ProposalEndStatus.UNSET,
+    values?.callId || 1,
     values?.questionaryId || 1,
     values?.commentForUser || 'comment for user',
     values?.commentForManagement || 'comment for management',
-    false,
-    false
+    values?.notified || false,
+    values?.submitted || false
   );
 };
 
@@ -44,43 +45,16 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return [];
   }
   public init() {
-    dummyProposal = new Proposal(
-      1,
-      'title',
-      'abstract',
-      1, // main proposer
-      1, // status
-      new Date('2019-07-17 08:25:12.23043+00'),
-      new Date('2019-07-17 08:25:12.23043+00'),
-      'GQX639',
-      1,
-      1,
-      1,
-      1,
-      '',
-      '',
-      false,
-      false
-    );
+    dummyProposal = dummyProposalFactory({ id: 1 });
+    dummyProposalSubmitted = dummyProposalFactory({
+      id: 2,
+      title: 'Submitted proposal',
+      submitted: true,
+      finalStatus: ProposalEndStatus.ACCEPTED,
+      notified: true,
+    });
 
-    dummyProposalSubmitted = new Proposal(
-      2,
-      'submitted proposal',
-      'abstract',
-      1, // main proposer
-      2, // status
-      new Date('2019-07-17 08:25:12.23043+00'),
-      new Date('2019-07-17 08:25:12.23043+00'),
-      'GQX639',
-      1,
-      1,
-      1,
-      1,
-      '',
-      '',
-      false,
-      true
-    );
+    allProposals = [dummyProposal, dummyProposalSubmitted];
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
@@ -127,15 +101,22 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async get(id: number) {
-    return id === dummyProposal.id ? dummyProposal : null;
+    return (
+      [dummyProposal, dummyProposalSubmitted].find(
+        proposal => proposal.id === id
+      ) || null
+    );
   }
 
   async create(proposerId: number, callId: number, questionaryId: number) {
-    dummyProposal.proposerId = proposerId;
-    dummyProposal.callId = callId;
-    dummyProposal.questionaryId = questionaryId;
+    const newProposal = dummyProposalFactory({
+      proposerId,
+      callId,
+      questionaryId,
+    });
+    allProposals.push(newProposal);
 
-    return dummyProposal;
+    return newProposal;
   }
 
   async getProposals(
@@ -143,11 +124,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
-    return { totalCount: 1, proposals: [dummyProposal] };
+    return { totalCount: allProposals.length, proposals: allProposals };
   }
 
   async getUserProposals(id: number) {
-    return [dummyProposal];
+    return allProposals.filter(proposal => proposal.proposerId === id);
   }
 
   async getInstrumentScientistProposals(
