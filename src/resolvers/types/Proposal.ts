@@ -13,6 +13,7 @@ import { ResolverContext } from '../../context';
 import {
   Proposal as ProposalOrigin,
   ProposalEndStatus,
+  ProposalPublicStatus,
 } from '../../models/Proposal';
 import { isRejection } from '../../rejection';
 import { BasicUserDetails } from './BasicUserDetails';
@@ -110,6 +111,14 @@ export class ProposalResolver {
       context.user,
       proposal.statusId
     );
+  }
+
+  @FieldResolver(() => ProposalPublicStatus)
+  async publicStatus(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<ProposalPublicStatus> {
+    return context.queries.proposal.getPublicStatus(context.user, proposal.id);
   }
 
   @FieldResolver(() => [Review], { nullable: true })

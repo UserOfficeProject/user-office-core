@@ -1,9 +1,19 @@
 export enum ProposalEndStatus {
   UNSET = 0,
-  ACCEPTED = 1,
-  RESERVED = 2,
-  REJECTED = 3,
+  ACCEPTED,
+  RESERVED,
+  REJECTED,
 }
+
+export enum ProposalPublicStatus {
+  draft = 'draft',
+  submitted = 'submitted',
+  accepted = 'accepted',
+  rejected = 'rejected',
+  unknown = 'unknown',
+  reserved = 'reserved',
+}
+
 export class Proposal {
   constructor(
     public id: number,
@@ -15,7 +25,7 @@ export class Proposal {
     public updated: Date,
     public shortCode: string,
     public rankOrder: number,
-    public finalStatus: number, // Should use ProposalEndStatus enum here
+    public finalStatus: ProposalEndStatus,
     public callId: number,
     public questionaryId: number,
     public commentForUser: string,
