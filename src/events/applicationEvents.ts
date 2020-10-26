@@ -1,6 +1,7 @@
 import { Call } from '../models/Call';
 import { Proposal } from '../models/Proposal';
 import { SEP } from '../models/SEP';
+import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
 
@@ -44,7 +45,7 @@ interface ProposalNotifiedEvent extends GeneralEvent {
 
 interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED;
-  proposal: Proposal;
+  technicalreview: TechnicalReview;
 }
 
 interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {

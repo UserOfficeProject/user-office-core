@@ -344,6 +344,24 @@ export interface NextStatusEventRecord {
   readonly next_status_event: string;
 }
 
+export interface ProposalEventsRecord {
+  readonly proposal_id: number;
+  readonly proposal_created: boolean;
+  readonly proposal_submitted: boolean;
+  readonly call_ended: boolean;
+  readonly proposal_sep_selected: boolean;
+  readonly proposal_instrument_selected: boolean;
+  readonly proposal_feasibility_review_submitted: boolean;
+  readonly proposal_sample_review_submitted: boolean;
+  readonly proposal_all_sep_reviewers_selected: boolean;
+  readonly proposal_sep_review_submitted: boolean;
+  readonly proposal_sep_meeting_submitted: boolean;
+  readonly proposal_instrument_submitted: boolean;
+  readonly proposal_accepted: boolean;
+  readonly proposal_rejected: boolean;
+  readonly proposal_notified: boolean;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };

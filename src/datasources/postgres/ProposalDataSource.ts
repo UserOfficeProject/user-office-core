@@ -12,6 +12,7 @@ import {
   CallRecord,
   createProposalObject,
   createProposalViewObject,
+  ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
 } from './records';
@@ -111,6 +112,28 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((records: ProposalRecord[]) => {
         if (records === undefined || !records.length) {
           throw new Error(`Proposal not found ${proposal.id}`);
+        }
+
+        return createProposalObject(records[0]);
+      });
+  }
+
+  async updateProposalStatus(
+    proposalId: number,
+    proposalStatusId: number
+  ): Promise<Proposal> {
+    return database
+      .update(
+        {
+          status_id: proposalStatusId,
+        },
+        ['*']
+      )
+      .from('proposals')
+      .where('proposal_id', proposalId)
+      .then((records: ProposalRecord[]) => {
+        if (records === undefined || !records.length) {
+          throw new Error(`Proposal not found ${proposalId}`);
         }
 
         return createProposalObject(records[0]);
@@ -292,7 +315,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async markEventAsDoneOnProposal(
     event: Event,
     proposalId: number
-  ): Promise<boolean> {
+  ): Promise<ProposalEventsRecord | null> {
     const dataToInsert = {
       proposal_id: proposalId,
       [event.toLowerCase()]: true,
@@ -307,9 +330,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     );
 
     if (result.rows && result.rows.length) {
-      return true;
+      return result.rows[0];
     } else {
-      return false;
+      return null;
     }
   }
 }

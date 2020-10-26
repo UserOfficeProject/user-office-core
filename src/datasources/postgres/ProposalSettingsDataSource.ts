@@ -162,6 +162,24 @@ export default class PostgresProposalSettingsDataSource
       );
   }
 
+  async getProposalWorkflowByCall(
+    callId: number
+  ): Promise<ProposalWorkflow | null> {
+    return database
+      .select()
+      .from('call as c')
+      .join('proposal_workflows as pw', {
+        'pw.proposal_workflow_id': 'c.proposal_workflow_id',
+      })
+      .where('c.call_id', callId)
+      .first()
+      .then((proposalWorkflow: ProposalWorkflowRecord | null) =>
+        proposalWorkflow
+          ? this.createProposalWorkflowObject(proposalWorkflow)
+          : null
+      );
+  }
+
   async getAllProposalWorkflows(): Promise<ProposalWorkflow[]> {
     return database
       .select('*')
