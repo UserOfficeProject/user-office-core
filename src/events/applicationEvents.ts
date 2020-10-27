@@ -1,5 +1,5 @@
 import { Call } from '../models/Call';
-import { Proposal } from '../models/Proposal';
+import { Proposal, ProposalIds } from '../models/Proposal';
 import { SEP } from '../models/SEP';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
@@ -55,12 +55,12 @@ interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SELECTED;
-  proposal: Proposal;
+  proposalids: ProposalIds;
 }
 
 interface ProposalSEPSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_SELECTED;
-  proposal: Proposal;
+  proposalids: ProposalIds;
 }
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {

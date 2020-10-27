@@ -69,7 +69,7 @@ export interface ProposalViewRecord {
   readonly final_status: number;
   readonly time_allocation: number;
   readonly notified: boolean;
-  readonly status_id: number;
+  readonly technical_review_status: number;
   readonly instrument_name: string;
   readonly call_short_code: string;
   readonly code: string;
@@ -430,7 +430,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.final_status,
     proposal.time_allocation,
     proposal.notified,
-    proposal.status_id,
+    proposal.technical_review_status,
     proposal.instrument_name,
     proposal.call_short_code,
     proposal.code,

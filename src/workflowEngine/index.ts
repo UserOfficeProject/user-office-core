@@ -51,8 +51,16 @@ const updateProposalStatus = (
   );
 };
 
+export type WorkflowEngineProposalType = {
+  id: number;
+  callId: number;
+  statusId: number;
+};
+
 export const workflowEngine = async (
-  proposal: Proposal & { proposalEvents: ProposalEventsRecord | null }
+  proposal: WorkflowEngineProposalType & {
+    proposalEvents: ProposalEventsRecord | null;
+  }
 ) => {
   if (!proposal.proposalEvents) {
     return;

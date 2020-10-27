@@ -3,9 +3,9 @@ import { proposalDataSource } from '../datasources';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { Proposal } from '../models/Proposal';
+import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { logger } from '../utils/Logger';
-import { workflowEngine } from '../workflowEngine';
+import { workflowEngine, WorkflowEngineProposalType } from '../workflowEngine';
 
 export default function createHandler(proposalDatasource: ProposalDataSource) {
   // Handler to align input for workflowEngine
@@ -19,7 +19,7 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
 
     const markProposalEventAsDoneAndCallWorkflowEngine = async (
       eventType: Event,
-      proposal: Proposal
+      proposal: WorkflowEngineProposalType
     ) => {
       const allProposalEvents = await proposalDatasource.markEventAsDoneOnProposal(
         eventType,
@@ -46,13 +46,34 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
           );
         }
         break;
+      case Event.PROPOSAL_INSTRUMENT_SELECTED:
+      case Event.PROPOSAL_SEP_SELECTED:
+        try {
+          await Promise.all(
+            event.proposalids.proposalIds.map(async proposalId => {
+              const proposal = await proposalDataSource.get(proposalId);
+
+              if (proposal?.id) {
+                return await markProposalEventAsDoneAndCallWorkflowEngine(
+                  event.type,
+                  proposal
+                );
+              }
+            })
+          );
+        } catch (error) {
+          logger.logError(
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposalids.proposalIds}: `,
+            error
+          );
+        }
+
+        break;
       case Event.PROPOSAL_SUBMITTED:
       case Event.PROPOSAL_NOTIFIED:
       case Event.PROPOSAL_ACCEPTED:
       case Event.PROPOSAL_REJECTED:
       case Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED:
-      case Event.PROPOSAL_INSTRUMENT_SELECTED:
-      case Event.PROPOSAL_SEP_SELECTED:
       case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
       case Event.PROPOSAL_SEP_MEETING_SUBMITTED:
         try {
@@ -80,10 +101,16 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
             );
           }
 
-          await markProposalEventAsDoneAndCallWorkflowEngine(
-            event.type,
-            proposal
-          );
+          if (
+            event.technicalreview.status === TechnicalReviewStatus.FEASIBLE ||
+            event.technicalreview.status ===
+              TechnicalReviewStatus.PARTIALLY_FEASIBLE
+          ) {
+            await markProposalEventAsDoneAndCallWorkflowEngine(
+              event.type,
+              proposal
+            );
+          }
         } catch (error) {
           logger.logError(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.technicalreview.proposalID}: `,
@@ -99,13 +126,12 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
           );
 
           if (allProposalsOnCall && allProposalsOnCall.length) {
-            // TODO: Call worklowEngine here for each proposal and then update events.
             await Promise.all(
               allProposalsOnCall.map(
                 async proposalOnCall =>
-                  await proposalDataSource.markEventAsDoneOnProposal(
+                  await markProposalEventAsDoneAndCallWorkflowEngine(
                     event.type,
-                    proposalOnCall.id
+                    proposalOnCall
                   )
               )
             );

@@ -478,20 +478,21 @@ export default class PostgresProposalSettingsDataSource
       next_status_event: nextStatusEvent,
     }));
 
-    const result = await database.raw(
-      '? ON CONFLICT ON CONSTRAINT unique_connection_event DO NOTHING RETURNING *;',
-      [database('next_status_events').insert(eventsToInsert)]
-    );
+    await database('next_status_events')
+      .where('proposal_workflow_connection_id', proposalWorkflowConnectionId)
+      .del();
 
-    const nextStatusEventsResult: NextStatusEventRecord[] = result.rows;
+    const nextStatusEventsResult: NextStatusEventRecord[] = await database(
+      'next_status_events'
+    )
+      .insert(eventsToInsert)
+      .returning(['*']);
 
-    if (nextStatusEventsResult) {
-      return nextStatusEventsResult.map(nextStatusEventResult =>
+    return (
+      nextStatusEventsResult?.map(nextStatusEventResult =>
         this.createNextStatusEventObject(nextStatusEventResult)
-      );
-    } else {
-      return [];
-    }
+      ) || []
+    );
   }
 
   async getNextStatusEventsByConnectionId(

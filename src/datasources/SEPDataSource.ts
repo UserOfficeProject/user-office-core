@@ -1,3 +1,4 @@
+import { ProposalIds } from '../models/Proposal';
 import { Role } from '../models/Role';
 import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../models/SEP';
 import { User } from '../models/User';
@@ -45,7 +46,7 @@ export interface SEPDataSource {
     sepId: number,
     roleId: number
   ): Promise<SEP>;
-  assignProposal(proposalId: number, sepId: number): Promise<SEP>;
+  assignProposal(proposalId: number, sepId: number): Promise<ProposalIds>;
   removeMemberFromSepProposal(
     proposalId: number,
     sepId: number,

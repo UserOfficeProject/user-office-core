@@ -44,6 +44,17 @@ export default function createHandler(
             event.emailinviteresponse.userId.toString()
           );
           break;
+        case Event.PROPOSAL_INSTRUMENT_SELECTED:
+        case Event.PROPOSAL_SEP_SELECTED:
+          event.proposalids.proposalIds.forEach(async proposalId => {
+            await eventLogsDataSource.set(
+              event.loggedInUserId,
+              event.type,
+              json,
+              proposalId.toString()
+            );
+          });
+          break;
         default:
           await eventLogsDataSource.set(
             event.loggedInUserId,
