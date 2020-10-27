@@ -61,13 +61,15 @@ const ProposalWorkflowEditor: React.FC = () => {
     proposalWorkflowConnection => proposalWorkflowConnection.proposalStatus
   );
 
-  const proposalStatusesInThePicker = proposalStatuses.filter(
-    proposalStatus =>
-      !proposalStatusesPartOfWorkflow.find(
-        proposalStatusPartOfWorkflow =>
-          proposalStatusPartOfWorkflow.id === proposalStatus.id
+  const proposalStatusesInThePicker = state.id
+    ? proposalStatuses.filter(
+        proposalStatus =>
+          !proposalStatusesPartOfWorkflow.find(
+            proposalStatusPartOfWorkflow =>
+              proposalStatusPartOfWorkflow.id === proposalStatus.id
+          )
       )
-  );
+    : [];
 
   const getPreviousWorkflowStatus = (
     destinationIndex: number,
@@ -191,8 +193,10 @@ const ProposalWorkflowEditor: React.FC = () => {
     }
   };
 
+  const dataLoaded = !isLoading && !loadingProposalStatuses && state.id;
+
   const getContainerStyle = () => {
-    return isLoading || loadingProposalStatuses || state.id === 0
+    return !dataLoaded
       ? {
           pointerEvents: 'none',
           userSelect: 'none',
@@ -202,10 +206,7 @@ const ProposalWorkflowEditor: React.FC = () => {
       : {};
   };
 
-  const progressJsx =
-    isLoading || loadingProposalStatuses || state.id === 0 ? (
-      <LinearProgress />
-    ) : null;
+  const progressJsx = !dataLoaded ? <LinearProgress /> : null;
 
   return (
     <>
@@ -226,11 +227,9 @@ const ProposalWorkflowEditor: React.FC = () => {
               />
             </Grid>
             <Grid item xs={3}>
-              {state.id !== 0 && (
-                <ProposalStatusPicker
-                  proposalStatuses={proposalStatusesInThePicker}
-                />
-              )}
+              <ProposalStatusPicker
+                proposalStatuses={proposalStatusesInThePicker}
+              />
             </Grid>
           </Grid>
         </DragDropContext>

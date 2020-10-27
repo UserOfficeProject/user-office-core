@@ -100,20 +100,22 @@ const ProposalStatusPicker: React.FC<{
       <Grid item xs={12} className={classes.title}>
         Proposal statuses
       </Grid>
-      <Droppable droppableId="proposalStatusPicker">
-        {(provided, snapshot) => (
-          <Grid
-            item
-            xs={12}
-            ref={provided.innerRef}
-            style={getListStyle(snapshot.isDraggingOver)}
-            className={classes.itemContainer}
-          >
-            {getItems()}
-            {provided.placeholder}
-          </Grid>
-        )}
-      </Droppable>
+      {proposalStatuses && !!proposalStatuses.length && (
+        <Droppable droppableId="proposalStatusPicker">
+          {(provided, snapshot) => (
+            <Grid
+              item
+              xs={12}
+              ref={provided.innerRef}
+              style={getListStyle(snapshot.isDraggingOver)}
+              className={classes.itemContainer}
+            >
+              {getItems()}
+              {provided.placeholder}
+            </Grid>
+          )}
+        </Droppable>
+      )}
     </Grid>
   );
 };

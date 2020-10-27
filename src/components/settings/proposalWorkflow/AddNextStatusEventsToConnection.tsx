@@ -9,6 +9,7 @@ import React from 'react';
 import * as yup from 'yup';
 
 import FormikUICustomMultipleSelect from 'components/common/FormikUICustomMultipleSelect';
+import { useProposalEventsData } from 'hooks/settings/useProposalEventsData';
 
 const addNextStatusEventsToConnectionValidationSchema = yup.object().shape({
   selectedNextStatusEvents: yup
@@ -43,26 +44,13 @@ const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionP
 }) => {
   const classes = useStyles();
 
+  const { proposalEvents } = useProposalEventsData();
+
   const initialValues: {
     selectedNextStatusEvents: string[];
   } = {
     selectedNextStatusEvents: nextStatusEvents || [],
   };
-
-  // TODO: This list should come from the server.
-  const events = [
-    'PROPOSAL_SUBMITTED',
-    'PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED',
-    'PROPOSAL_SAMPLE_REVIEW_SUBMITTED',
-    'PROPOSAL_SEP_SELECTED',
-    'PROPOSAL_INSTRUMENT_SELECTED',
-    'PROPOSAL_ALL_SEP_REVIEWERS_SELECTED',
-    'PROPOSAL_SEP_REVIEW_SUBMITTED',
-    'PROPOSAL_SEP_MEETING_SUBMITTED',
-    'PROPOSAL_INSTRUMENT_SUBMITTED',
-    'PROPOSAL_FINAL_DECISION_SUBMITTED',
-    'PROPOSAL_REJECTED',
-  ];
 
   return (
     <Container component="main" maxWidth="xs">
@@ -89,7 +77,7 @@ const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionP
                   name="selectedNextStatusEvents"
                   id="selectedNextStatusEvents"
                   component={FormikUICustomMultipleSelect}
-                  availableOptions={events}
+                  availableOptions={proposalEvents}
                   margin="dense"
                   width="auto"
                   fullWidth

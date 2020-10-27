@@ -2,7 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import { print } from 'graphql';
 import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -242,6 +242,38 @@ export type Entry = {
 export enum EvaluatorOperator {
   EQ = 'eq',
   NEQ = 'neq'
+}
+
+export enum Event {
+  PROPOSAL_CREATED = 'PROPOSAL_CREATED',
+  PROPOSAL_UPDATED = 'PROPOSAL_UPDATED',
+  PROPOSAL_SUBMITTED = 'PROPOSAL_SUBMITTED',
+  PROPOSAL_SEP_SELECTED = 'PROPOSAL_SEP_SELECTED',
+  PROPOSAL_INSTRUMENT_SELECTED = 'PROPOSAL_INSTRUMENT_SELECTED',
+  PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED = 'PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED',
+  PROPOSAL_SAMPLE_REVIEW_SUBMITTED = 'PROPOSAL_SAMPLE_REVIEW_SUBMITTED',
+  PROPOSAL_ALL_SEP_REVIEWERS_SELECTED = 'PROPOSAL_ALL_SEP_REVIEWERS_SELECTED',
+  PROPOSAL_SEP_REVIEW_SUBMITTED = 'PROPOSAL_SEP_REVIEW_SUBMITTED',
+  PROPOSAL_SEP_MEETING_SUBMITTED = 'PROPOSAL_SEP_MEETING_SUBMITTED',
+  PROPOSAL_INSTRUMENT_SUBMITTED = 'PROPOSAL_INSTRUMENT_SUBMITTED',
+  PROPOSAL_ACCEPTED = 'PROPOSAL_ACCEPTED',
+  PROPOSAL_REJECTED = 'PROPOSAL_REJECTED',
+  CALL_ENDED = 'CALL_ENDED',
+  USER_CREATED = 'USER_CREATED',
+  USER_UPDATED = 'USER_UPDATED',
+  USER_ROLE_UPDATED = 'USER_ROLE_UPDATED',
+  USER_DELETED = 'USER_DELETED',
+  USER_PASSWORD_RESET_EMAIL = 'USER_PASSWORD_RESET_EMAIL',
+  EMAIL_INVITE = 'EMAIL_INVITE',
+  SEP_CREATED = 'SEP_CREATED',
+  SEP_UPDATED = 'SEP_UPDATED',
+  SEP_MEMBERS_ASSIGNED = 'SEP_MEMBERS_ASSIGNED',
+  SEP_MEMBER_REMOVED = 'SEP_MEMBER_REMOVED',
+  SEP_PROPOSAL_ASSIGNED = 'SEP_PROPOSAL_ASSIGNED',
+  SEP_PROPOSAL_REMOVED = 'SEP_PROPOSAL_REMOVED',
+  SEP_MEMBER_ASSIGNED_TO_PROPOSAL = 'SEP_MEMBER_ASSIGNED_TO_PROPOSAL',
+  SEP_MEMBER_REMOVED_FROM_PROPOSAL = 'SEP_MEMBER_REMOVED_FROM_PROPOSAL',
+  PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED'
 }
 
 export type EventLog = {
@@ -1256,6 +1288,7 @@ export type Query = {
   proposalTemplates: Maybe<Array<ProposalTemplate>>;
   proposalWorkflow: Maybe<ProposalWorkflow>;
   proposalWorkflows: Maybe<Array<ProposalWorkflow>>;
+  proposalEvents: Maybe<Array<Event>>;
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
   roles: Maybe<Array<Role>>;
@@ -2376,18 +2409,6 @@ export type CallFragment = (
   )>, proposalWorkflow: Maybe<(
     { __typename?: 'ProposalWorkflow' }
     & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
-    & { proposalWorkflowConnectionGroups: Array<(
-      { __typename?: 'ProposalWorkflowConnectionGroup' }
-      & Pick<ProposalWorkflowConnectionGroup, 'groupId' | 'parentGroupId'>
-      & { connections: Array<(
-        { __typename?: 'ProposalWorkflowConnection' }
-        & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType' | 'droppableGroupId'>
-        & { proposalStatus: (
-          { __typename?: 'ProposalStatus' }
-          & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-        ) }
-      )> }
-    )> }
   )> }
 );
 
@@ -3548,6 +3569,14 @@ export type DeleteProposalWorkflowStatusMutation = (
   ) }
 );
 
+export type GetProposalEventsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetProposalEventsQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'proposalEvents'>
+);
+
 export type GetProposalStatusesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -4590,25 +4619,6 @@ export const CallFragmentDoc = gql`
     id
     name
     description
-    proposalWorkflowConnectionGroups {
-      groupId
-      parentGroupId
-      connections {
-        id
-        sortOrder
-        proposalWorkflowId
-        proposalStatusId
-        proposalStatus {
-          id
-          name
-          description
-        }
-        nextProposalStatusId
-        prevProposalStatusId
-        nextStatusEventType
-        droppableGroupId
-      }
-    }
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
@@ -5978,6 +5988,11 @@ export const DeleteProposalWorkflowStatusDocument = gql`
   }
 }
     `;
+export const GetProposalEventsDocument = gql`
+    query getProposalEvents {
+  proposalEvents
+}
+    `;
 export const GetProposalStatusesDocument = gql`
     query getProposalStatuses {
   proposalStatuses {
@@ -6768,6 +6783,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     deleteProposalWorkflowStatus(variables: DeleteProposalWorkflowStatusMutationVariables): Promise<DeleteProposalWorkflowStatusMutation> {
       return withWrapper(() => client.request<DeleteProposalWorkflowStatusMutation>(print(DeleteProposalWorkflowStatusDocument), variables));
+    },
+    getProposalEvents(variables?: GetProposalEventsQueryVariables): Promise<GetProposalEventsQuery> {
+      return withWrapper(() => client.request<GetProposalEventsQuery>(print(GetProposalEventsDocument), variables));
     },
     getProposalStatuses(variables?: GetProposalStatusesQueryVariables): Promise<GetProposalStatusesQuery> {
       return withWrapper(() => client.request<GetProposalStatusesQuery>(print(GetProposalStatusesDocument), variables));

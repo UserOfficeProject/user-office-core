@@ -14,7 +14,7 @@ export function useCallData(callId: number) {
       .getCall({ id: callId })
       .then(data => {
         if (data.call) {
-          setCall(data.call);
+          setCall(data.call as Call);
         }
         setLoading(false);
       });

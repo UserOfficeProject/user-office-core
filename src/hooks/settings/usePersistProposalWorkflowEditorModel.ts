@@ -196,6 +196,13 @@ export function usePersistProposalWorkflowEditorModel() {
             droppableGroupId,
           } = action.payload;
 
+          dispatch({
+            type: EventType.WORKFLOW_STATUS_ADDED,
+            payload: {
+              ...action.payload,
+            },
+          });
+
           return executeAndMonitorCall(async () => {
             const result = await insertNewStatusInProposalWorkflow(
               proposalWorkflowId,
@@ -208,7 +215,7 @@ export function usePersistProposalWorkflowEditorModel() {
             );
 
             dispatch({
-              type: EventType.WORKFLOW_STATUS_ADDED,
+              type: EventType.WORKFLOW_STATUS_UPDATED,
               payload: {
                 ...action.payload,
                 id: result.proposalWorkflowConnection?.id,
