@@ -29,6 +29,11 @@ export type Service = {
   sdl: Maybe<Scalars['String']>;
 };
 
+export type AddNextStatusEventsToConnectionInput = {
+  proposalWorkflowConnectionId: Scalars['Int'];
+  nextStatusEvents: Array<Scalars['String']>;
+};
+
 export type AddProposalWorkflowStatusInput = {
   proposalWorkflowId: Scalars['Int'];
   sortOrder: Scalars['Int'];
@@ -37,7 +42,6 @@ export type AddProposalWorkflowStatusInput = {
   proposalStatusId: Scalars['Int'];
   nextProposalStatusId?: Maybe<Scalars['Int']>;
   prevProposalStatusId?: Maybe<Scalars['Int']>;
-  nextStatusEventType: Scalars['String'];
 };
 
 export type AddSepMembersRole = {
@@ -379,6 +383,7 @@ export type Mutation = {
   submitInstrument: SuccessResponseWrap;
   administrationProposal: ProposalResponseWrap;
   updateProposal: ProposalResponseWrap;
+  addNextStatusEventsToConnection: ProposalNextStatusEventResponseWrap;
   addProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
   createProposalStatus: ProposalStatusResponseWrap;
   createProposalWorkflow: ProposalWorkflowResponseWrap;
@@ -555,6 +560,11 @@ export type MutationUpdateProposalArgs = {
   abstract?: Maybe<Scalars['String']>;
   users?: Maybe<Array<Scalars['Int']>>;
   proposerId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationAddNextStatusEventsToConnectionArgs = {
+  addNextStatusEventsToConnectionInput: AddNextStatusEventsToConnectionInput;
 };
 
 
@@ -1008,6 +1018,13 @@ export type MutationUpdateTopicOrderArgs = {
   topicOrder: Array<Scalars['Int']>;
 };
 
+export type NextStatusEvent = {
+  __typename?: 'NextStatusEvent';
+  nextStatusEventId: Scalars['Int'];
+  proposalWorkflowConnectionId: Scalars['Int'];
+  nextStatusEvent: Scalars['String'];
+};
+
 export type OrcIdInformation = {
   __typename?: 'OrcIDInformation';
   firstname: Maybe<Scalars['String']>;
@@ -1085,6 +1102,12 @@ export enum ProposalEndStatus {
   RESERVED = 'RESERVED',
   REJECTED = 'REJECTED'
 }
+
+export type ProposalNextStatusEventResponseWrap = {
+  __typename?: 'ProposalNextStatusEventResponseWrap';
+  error: Maybe<Scalars['String']>;
+  nextStatusEvents: Maybe<Array<NextStatusEvent>>;
+};
 
 export type ProposalResponseWrap = {
   __typename?: 'ProposalResponseWrap';
@@ -1181,8 +1204,8 @@ export type ProposalWorkflowConnection = {
   proposalStatus: ProposalStatus;
   nextProposalStatusId: Maybe<Scalars['Int']>;
   prevProposalStatusId: Maybe<Scalars['Int']>;
-  nextStatusEventType: Scalars['String'];
   droppableGroupId: Scalars['String'];
+  nextStatusEvents: Array<NextStatusEvent>;
 };
 
 export type ProposalWorkflowConnectionGroup = {
@@ -3385,6 +3408,24 @@ export type UpdateSampleTitleMutation = (
   ) }
 );
 
+export type AddNextStatusEventsToConnectionMutationVariables = Exact<{
+  proposalWorkflowConnectionId: Scalars['Int'];
+  nextStatusEvents: Array<Scalars['String']>;
+}>;
+
+
+export type AddNextStatusEventsToConnectionMutation = (
+  { __typename?: 'Mutation' }
+  & { addNextStatusEventsToConnection: (
+    { __typename?: 'ProposalNextStatusEventResponseWrap' }
+    & Pick<ProposalNextStatusEventResponseWrap, 'error'>
+    & { nextStatusEvents: Maybe<Array<(
+      { __typename?: 'NextStatusEvent' }
+      & Pick<NextStatusEvent, 'nextStatusEventId' | 'proposalWorkflowConnectionId' | 'nextStatusEvent'>
+    )>> }
+  ) }
+);
+
 export type AddProposalWorkflowStatusMutationVariables = Exact<{
   proposalWorkflowId: Scalars['Int'];
   sortOrder: Scalars['Int'];
@@ -3393,7 +3434,6 @@ export type AddProposalWorkflowStatusMutationVariables = Exact<{
   proposalStatusId: Scalars['Int'];
   nextProposalStatusId?: Maybe<Scalars['Int']>;
   prevProposalStatusId?: Maybe<Scalars['Int']>;
-  nextStatusEventType: Scalars['String'];
 }>;
 
 
@@ -3402,6 +3442,10 @@ export type AddProposalWorkflowStatusMutation = (
   & { addProposalWorkflowStatus: (
     { __typename?: 'ProposalWorkflowConnectionResponseWrap' }
     & Pick<ProposalWorkflowConnectionResponseWrap, 'error'>
+    & { proposalWorkflowConnection: Maybe<(
+      { __typename?: 'ProposalWorkflowConnection' }
+      & Pick<ProposalWorkflowConnection, 'id'>
+    )> }
   ) }
 );
 
@@ -3442,11 +3486,14 @@ export type CreateProposalWorkflowMutation = (
         & Pick<ProposalWorkflowConnectionGroup, 'groupId' | 'parentGroupId'>
         & { connections: Array<(
           { __typename?: 'ProposalWorkflowConnection' }
-          & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType' | 'droppableGroupId'>
+          & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'droppableGroupId'>
           & { proposalStatus: (
             { __typename?: 'ProposalStatus' }
             & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-          ) }
+          ), nextStatusEvents: Array<(
+            { __typename?: 'NextStatusEvent' }
+            & Pick<NextStatusEvent, 'nextStatusEventId' | 'proposalWorkflowConnectionId' | 'nextStatusEvent'>
+          )> }
         )> }
       )> }
     )> }
@@ -3527,11 +3574,14 @@ export type GetProposalWorkflowQuery = (
       & Pick<ProposalWorkflowConnectionGroup, 'groupId' | 'parentGroupId'>
       & { connections: Array<(
         { __typename?: 'ProposalWorkflowConnection' }
-        & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType' | 'droppableGroupId'>
+        & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'droppableGroupId'>
         & { proposalStatus: (
           { __typename?: 'ProposalStatus' }
           & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-        ) }
+        ), nextStatusEvents: Array<(
+          { __typename?: 'NextStatusEvent' }
+          & Pick<NextStatusEvent, 'nextStatusEventId' | 'proposalWorkflowConnectionId' | 'nextStatusEvent'>
+        )> }
       )> }
     )> }
   )> }
@@ -3602,11 +3652,14 @@ export type UpdateProposalWorkflowMutation = (
         & Pick<ProposalWorkflowConnectionGroup, 'groupId' | 'parentGroupId'>
         & { connections: Array<(
           { __typename?: 'ProposalWorkflowConnection' }
-          & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType' | 'droppableGroupId'>
+          & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'droppableGroupId'>
           & { proposalStatus: (
             { __typename?: 'ProposalStatus' }
             & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-          ) }
+          ), nextStatusEvents: Array<(
+            { __typename?: 'NextStatusEvent' }
+            & Pick<NextStatusEvent, 'nextStatusEventId' | 'proposalWorkflowConnectionId' | 'nextStatusEvent'>
+          )> }
         )> }
       )> }
     )> }
@@ -5824,9 +5877,24 @@ export const UpdateSampleTitleDocument = gql`
   }
 }
     ${SampleFragmentDoc}`;
+export const AddNextStatusEventsToConnectionDocument = gql`
+    mutation addNextStatusEventsToConnection($proposalWorkflowConnectionId: Int!, $nextStatusEvents: [String!]!) {
+  addNextStatusEventsToConnection(addNextStatusEventsToConnectionInput: {proposalWorkflowConnectionId: $proposalWorkflowConnectionId, nextStatusEvents: $nextStatusEvents}) {
+    nextStatusEvents {
+      nextStatusEventId
+      proposalWorkflowConnectionId
+      nextStatusEvent
+    }
+    error
+  }
+}
+    `;
 export const AddProposalWorkflowStatusDocument = gql`
-    mutation addProposalWorkflowStatus($proposalWorkflowId: Int!, $sortOrder: Int!, $droppableGroupId: String!, $parentDroppableGroupId: String, $proposalStatusId: Int!, $nextProposalStatusId: Int, $prevProposalStatusId: Int, $nextStatusEventType: String!) {
-  addProposalWorkflowStatus(newProposalWorkflowStatusInput: {proposalWorkflowId: $proposalWorkflowId, sortOrder: $sortOrder, droppableGroupId: $droppableGroupId, parentDroppableGroupId: $parentDroppableGroupId, proposalStatusId: $proposalStatusId, nextProposalStatusId: $nextProposalStatusId, prevProposalStatusId: $prevProposalStatusId, nextStatusEventType: $nextStatusEventType}) {
+    mutation addProposalWorkflowStatus($proposalWorkflowId: Int!, $sortOrder: Int!, $droppableGroupId: String!, $parentDroppableGroupId: String, $proposalStatusId: Int!, $nextProposalStatusId: Int, $prevProposalStatusId: Int) {
+  addProposalWorkflowStatus(newProposalWorkflowStatusInput: {proposalWorkflowId: $proposalWorkflowId, sortOrder: $sortOrder, droppableGroupId: $droppableGroupId, parentDroppableGroupId: $parentDroppableGroupId, proposalStatusId: $proposalStatusId, nextProposalStatusId: $nextProposalStatusId, prevProposalStatusId: $prevProposalStatusId}) {
+    proposalWorkflowConnection {
+      id
+    }
     error
   }
 }
@@ -5865,8 +5933,12 @@ export const CreateProposalWorkflowDocument = gql`
           }
           nextProposalStatusId
           prevProposalStatusId
-          nextStatusEventType
           droppableGroupId
+          nextStatusEvents {
+            nextStatusEventId
+            proposalWorkflowConnectionId
+            nextStatusEvent
+          }
         }
       }
     }
@@ -5936,8 +6008,12 @@ export const GetProposalWorkflowDocument = gql`
         }
         nextProposalStatusId
         prevProposalStatusId
-        nextStatusEventType
         droppableGroupId
+        nextStatusEvents {
+          nextStatusEventId
+          proposalWorkflowConnectionId
+          nextStatusEvent
+        }
       }
     }
   }
@@ -5993,8 +6069,12 @@ export const UpdateProposalWorkflowDocument = gql`
           }
           nextProposalStatusId
           prevProposalStatusId
-          nextStatusEventType
           droppableGroupId
+          nextStatusEvents {
+            nextStatusEventId
+            proposalWorkflowConnectionId
+            nextStatusEvent
+          }
         }
       }
     }
@@ -6667,6 +6747,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateSampleTitle(variables: UpdateSampleTitleMutationVariables): Promise<UpdateSampleTitleMutation> {
       return withWrapper(() => client.request<UpdateSampleTitleMutation>(print(UpdateSampleTitleDocument), variables));
+    },
+    addNextStatusEventsToConnection(variables: AddNextStatusEventsToConnectionMutationVariables): Promise<AddNextStatusEventsToConnectionMutation> {
+      return withWrapper(() => client.request<AddNextStatusEventsToConnectionMutation>(print(AddNextStatusEventsToConnectionDocument), variables));
     },
     addProposalWorkflowStatus(variables: AddProposalWorkflowStatusMutationVariables): Promise<AddProposalWorkflowStatusMutation> {
       return withWrapper(() => client.request<AddProposalWorkflowStatusMutation>(print(AddProposalWorkflowStatusDocument), variables));
