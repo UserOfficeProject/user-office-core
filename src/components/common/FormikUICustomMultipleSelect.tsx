@@ -26,7 +26,7 @@ const FormikUICustomMultipleSelect = ({
   availableOptions: string[];
   id: string;
   label: string;
-  width: string;
+  width?: string;
 }) => {
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
