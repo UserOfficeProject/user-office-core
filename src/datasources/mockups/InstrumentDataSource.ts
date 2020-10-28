@@ -76,7 +76,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     proposalIds: number[],
     instrumentId: number
   ): Promise<ProposalIds> {
-    return { proposalIds: [1] };
+    return { proposalIds };
   }
 
   async removeProposalFromInstrument(
