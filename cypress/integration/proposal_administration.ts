@@ -15,13 +15,8 @@ context('Proposal administration tests', () => {
   const textManager = faker.random.words(5);
 
   it('Should be able to set comment for user/manager and final status', () => {
-    const title = faker.random.words(3);
-    const abstract = faker.random.words(8);
     cy.login('user');
-    cy.contains('New Proposal').click();
-    cy.get('#title').type(title);
-    cy.get('#abstract').type(abstract);
-    cy.contains('Save and continue').click();
+    cy.createProposal();
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();

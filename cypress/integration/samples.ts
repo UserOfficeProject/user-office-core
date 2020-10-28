@@ -15,7 +15,6 @@ context('Samples tests', () => {
   const sampleTemplateDescription = faker.lorem.words(4);
   const sampleQuestion = faker.lorem.words(4);
   const proposalTitle = faker.lorem.words(2);
-  const proposalAbstract = faker.lorem.words(5);
   const safetyComment = faker.lorem.words(5);
   const sampleTitle = faker.lorem.words(2);
   const proposalTitleUpdated = faker.lorem.words(2);
@@ -101,27 +100,17 @@ context('Samples tests', () => {
 
     cy.contains(proposalTemplateName).click();
 
-    cy.contains('Next').click();
+    cy.get('[data-cy="next-step"]').click();
 
-    cy.contains('Next').click();
+    cy.get('[data-cy="next-step"]').click();
 
-    cy.contains('Update Call').click();
+    cy.get('[data-cy="submit"]').click();
   });
 
   it('Should be able to create proposal with sample', () => {
     cy.login('user');
 
-    cy.contains('New Proposal').click();
-
-    cy.get('#title')
-      .type(proposalTitle)
-      .should('have.value', proposalTitle);
-
-    cy.get('#abstract')
-      .type(proposalAbstract)
-      .should('have.value', proposalAbstract);
-
-    cy.contains('Save and continue').click();
+    cy.createProposal();
 
     cy.get('[data-cy=add-button]').click();
 

@@ -1,8 +1,6 @@
-mutation assignProposal($proposalId: Int!, $sepId: Int!) {
-  assignProposal(proposalId: $proposalId, sepId: $sepId) {
+mutation assignProposalToSEP($proposalId: Int!, $sepId: Int!) {
+  assignProposalToSEP(proposalId: $proposalId, sepId: $sepId) {
     error
-    sep {
-      id
-    }
+    isSuccess
   }
 }

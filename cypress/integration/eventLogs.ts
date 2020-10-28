@@ -12,15 +12,9 @@ context('Event log tests', () => {
   });
 
   it('If user creates a proposal, officer should be able to see the event logs for that proposal', () => {
-    const title = faker.random.words(3);
-    const abstract = faker.random.words(8);
-
     cy.login('user');
 
-    cy.contains('New Proposal').click();
-    cy.get('#title').type(title);
-    cy.get('#abstract').type(abstract);
-    cy.contains('Save and continue').click();
+    cy.createProposal();
 
     cy.logout();
 

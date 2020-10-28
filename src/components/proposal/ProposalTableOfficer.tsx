@@ -292,12 +292,14 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const assignProposalToSEP = async (sep: Sep): Promise<void> => {
     const assignmentsErrors = await Promise.all(
       selectedProposals.map(async selectedProposal => {
-        const result = await api('Proposal/s assigned to SEP').assignProposal({
+        const result = await api(
+          'Proposal/s assigned to SEP'
+        ).assignProposalToSEP({
           proposalId: selectedProposal.id,
           sepId: sep.id,
         });
 
-        return result.assignProposal.error;
+        return result.assignProposalToSEP.error;
       })
     );
 
