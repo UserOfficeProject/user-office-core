@@ -101,11 +101,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async get(id: number) {
-    return (
-      [dummyProposal, dummyProposalSubmitted].find(
-        proposal => proposal.id === id
-      ) || null
-    );
+    return allProposals.find(proposal => proposal.id === id) || null;
   }
 
   async create(proposerId: number, callId: number, questionaryId: number) {
