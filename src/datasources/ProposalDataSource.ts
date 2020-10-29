@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
@@ -31,4 +32,5 @@ export interface ProposalDataSource {
   setProposalUsers(id: number, users: number[]): Promise<void>;
   submitProposal(id: number): Promise<Proposal>;
   deleteProposal(id: number): Promise<Proposal>;
+  markEventAsDoneOnProposal(event: Event, proposalId: number): Promise<boolean>;
 }
