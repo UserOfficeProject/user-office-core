@@ -17,7 +17,7 @@ export enum DataType {
   FILE_UPLOAD = 'FILE_UPLOAD',
   SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
   TEXT_INPUT = 'TEXT_INPUT',
-  SUBTEMPLATE = 'SUBTEMPLATE',
+  SAMPLE_DECLARATION = 'SAMPLE_DECLARATION',
   SAMPLE_BASIS = 'SAMPLE_BASIS',
   PROPOSAL_BASIS = 'PROPOSAL_BASIS',
 }
@@ -68,10 +68,6 @@ export enum TemplateCategoryId {
 
 export class FieldCondition {
   constructor(public condition: EvaluatorOperator, public params: any) {}
-}
-
-export interface DataTypeSpec {
-  readonly: boolean;
 }
 
 export class Template {

@@ -12,8 +12,7 @@ import {
   templateDataSource,
   userDataSource,
 } from '../datasources';
-import database from '../datasources/postgres/database';
-import { createConfigByType } from '../models/ProposalModelFunctions';
+import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { DataType, TemplateCategoryId } from '../models/Template';
 import { UserRole } from '../models/User';
@@ -162,7 +161,9 @@ const createTemplates = async () => {
           questionId,
           DataType.TEXT_INPUT,
           `${faker.random.words(5)}?`,
-          JSON.stringify(createConfigByType(DataType.TEXT_INPUT, {}))
+          JSON.stringify(
+            getQuestionDefinition(DataType.TEXT_INPUT).createBlankConfig()
+          )
         );
       }, 10);
 

@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
-import { createConfig } from '../../models/ProposalModelFunctions';
 import {
   Questionary,
   QuestionaryStep,
   Answer,
   AnswerBasic,
 } from '../../models/Questionary';
+import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import {
   DataType,
   FieldCondition,
@@ -62,12 +62,15 @@ export const dummyQuestionFactory = (
 export const dummyQuestionTemplateRelationFactory = (
   values?: DeepPartial<QuestionTemplateRelation>
 ): QuestionTemplateRelation => {
-  return new QuestionTemplateRelation(
+  const relation = new QuestionTemplateRelation(
     dummyQuestionFactory(values?.question),
     values?.sortOrder || Math.round(Math.random() * 100),
     values?.topicId || Math.round(Math.random() * 10),
-    new BooleanConfig()
+    (values?.config as any) || new BooleanConfig(),
+    values?.dependency as any
   );
+
+  return relation;
 };
 
 const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
@@ -84,7 +87,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
               naturalKey: 'ttl_general',
               dataType: DataType.EMBELLISHMENT,
               config: createConfig<EmbellishmentConfig>(
-                new EmbellishmentConfig(),
+                DataType.EMBELLISHMENT,
                 {
                   plain: 'General information',
                   html: '<h1>General information</h1>',
@@ -103,7 +106,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
               naturalKey: 'has_links_with_industry',
               dataType: DataType.SELECTION_FROM_OPTIONS,
               config: createConfig<SelectionFromOptionsConfig>(
-                new SelectionFromOptionsConfig(),
+                DataType.SELECTION_FROM_OPTIONS,
                 {
                   options: ['yes', 'no'],
                   variant: 'radio',
@@ -121,9 +124,10 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
               proposalQuestionId: 'links_with_industry',
               naturalKey: 'links_with_industry',
               dataType: DataType.TEXT_INPUT,
-              config: createConfig<TextInputConfig>(new TextInputConfig(), {
+              config: createConfig<TextInputConfig>(DataType.TEXT_INPUT, {
                 placeholder: 'Please specify links with industry',
                 multiline: true,
+                required: true,
               }),
             }),
             dependency: new FieldDependency(

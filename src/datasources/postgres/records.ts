@@ -3,9 +3,9 @@ import { FileMetadata } from '../../models/Blob';
 import { Call } from '../../models/Call';
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import { Proposal } from '../../models/Proposal';
-import { createConfigByType } from '../../models/ProposalModelFunctions';
 import { ProposalView } from '../../models/ProposalView';
-import { Questionary, AnswerBasic } from '../../models/Questionary';
+import { AnswerBasic, Questionary } from '../../models/Questionary';
+import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import { Sample } from '../../models/Sample';
 import {
   DataType,
@@ -13,10 +13,10 @@ import {
   FieldDependency,
   Question,
   QuestionTemplateRelation,
+  Template,
   TemplateCategory,
   Topic,
 } from '../../models/Template';
-import { Template } from '../../models/Template';
 import { BasicUserDetails, User } from '../../models/User';
 
 // Interfaces corresponding exactly to database tables
@@ -383,7 +383,7 @@ export const createQuestionObject = (question: QuestionRecord) => {
     question.natural_key,
     question.data_type as DataType,
     question.question,
-    createConfigByType(question.data_type as DataType, question.default_config)
+    createConfig<any>(question.data_type as DataType, question.default_config)
   );
 };
 
@@ -479,11 +479,11 @@ export const createQuestionTemplateRelationObject = (
       record.natural_key,
       record.data_type as DataType,
       record.question,
-      createConfigByType(record.data_type as DataType, record.default_config)
+      createConfig<any>(record.data_type as DataType, record.default_config)
     ),
     record.topic_id,
     record.sort_order,
-    createConfigByType(record.data_type as DataType, record.config),
+    createConfig<any>(record.data_type as DataType, record.config),
     record.dependency_question_id && record.dependency_condition
       ? new FieldDependency(
           record.question_id,
