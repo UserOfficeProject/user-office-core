@@ -53,7 +53,7 @@ services:
     depends_on:
       - frontend
   factory:
-    image: dmsc/duo-factory:${TAG}
+    image: dmsc/duo-factory:${FACTORY_TAG}
     init: true
     environment:
       - NODE_ENV=production
