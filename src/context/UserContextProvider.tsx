@@ -93,6 +93,7 @@ const reducer = (
       }
 
       return {
+        ...state,
         token: action.payload,
         user: decoded.user,
         expToken: decoded.exp,
