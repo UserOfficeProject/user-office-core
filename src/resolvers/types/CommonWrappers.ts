@@ -8,9 +8,11 @@ import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
+import { NextStatusEvent } from './NextStatusEvent';
 import { Proposal } from './Proposal';
 import { ProposalStatus } from './ProposalStatus';
 import { ProposalWorkflow } from './ProposalWorkflow';
+import { ProposalWorkflowConnection } from './ProposalWorkflowConnection';
 import { Question } from './Question';
 import { Questionary } from './Questionary';
 import { QuestionaryStep } from './QuestionaryStep';
@@ -223,4 +225,22 @@ export class ProposalWorkflowResponseWrap extends ResponseWrapBase<
   @Response()
   @Field(() => ProposalWorkflow, { nullable: true })
   public proposalWorkflow: ProposalWorkflow;
+}
+
+@ObjectType()
+export class ProposalWorkflowConnectionResponseWrap extends ResponseWrapBase<
+  ProposalWorkflowConnection
+> {
+  @Response()
+  @Field(() => ProposalWorkflowConnection, { nullable: true })
+  public proposalWorkflowConnection: ProposalWorkflowConnection;
+}
+
+@ObjectType()
+export class ProposalNextStatusEventResponseWrap extends ResponseWrapBase<
+  NextStatusEvent
+> {
+  @Response()
+  @Field(() => [NextStatusEvent], { nullable: true })
+  public nextStatusEvents: NextStatusEvent[];
 }

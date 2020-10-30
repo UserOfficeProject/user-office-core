@@ -83,6 +83,7 @@ export interface ProposalViewRecord {
 export interface TopicRecord {
   readonly topic_id: number;
   readonly topic_title: string;
+  readonly template_id: number;
   readonly is_enabled: boolean;
   readonly sort_order: number;
 }
@@ -203,6 +204,7 @@ export interface CallRecord {
   readonly end_cycle: Date;
   readonly cycle_comment: string;
   readonly survey_comment: string;
+  readonly proposal_workflow_id: number;
   readonly template_id: number;
 }
 
@@ -325,16 +327,34 @@ export interface ProposalWorkflowRecord {
   readonly full_count: number;
 }
 
+export interface ProposalWorkflowConnectionRecord {
+  readonly proposal_workflow_connection_id: number;
+  readonly sort_order: number;
+  readonly proposal_workflow_id: number;
+  readonly proposal_status_id: number;
+  readonly next_proposal_status_id: number | null;
+  readonly prev_proposal_status_id: number | null;
+  readonly droppable_group_id: string;
+  readonly parent_droppable_group_id: string;
+}
+
+export interface NextStatusEventRecord {
+  readonly next_status_event_id: number;
+  readonly proposal_workflow_connection_id: number;
+  readonly next_status_event: string;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
 
-export const createTopicObject = (proposal: TopicRecord) => {
+export const createTopicObject = (record: TopicRecord) => {
   return new Topic(
-    proposal.topic_id,
-    proposal.topic_title,
-    proposal.sort_order,
-    proposal.is_enabled
+    record.topic_id,
+    record.topic_title,
+    record.template_id,
+    record.sort_order,
+    record.is_enabled
   );
 };
 
@@ -510,6 +530,7 @@ export const createCallObject = (call: CallRecord) => {
     call.end_cycle,
     call.cycle_comment,
     call.survey_comment,
+    call.proposal_workflow_id,
     call.template_id
   );
 };

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Sample } from '../../models/Sample';
+import { Sample, SampleStatus } from '../../models/Sample';
 import { UpdateSampleSafetyReviewArgs } from '../../resolvers/mutations/UpdateSampleSafetyReviewMutation';
 import { UpdateSampleStatusArgs } from '../../resolvers/mutations/UpdateSampleStatusMutation';
 import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitleMutation';
@@ -23,6 +23,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         return createSampleObject(records[0]);
       });
   }
+
   updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample> {
     return database('samples')
       .update({ status: args.status }, '*')
@@ -36,6 +37,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         return createSampleObject(records[0]);
       });
   }
+
   updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample> {
     return database('samples')
       .update({ title: args.title }, '*')
@@ -64,6 +66,27 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         if (records.length !== 1) {
           logger.logError('Could not update sample safety review', { args });
           throw new Error('Could not update sample safety review');
+        }
+
+        return createSampleObject(records[0]);
+      });
+  }
+
+  updateSample(args: Partial<Sample> & Pick<Sample, 'id'>): Promise<Sample> {
+    return database('samples')
+      .update(
+        {
+          title: args.title,
+          safety_comment: args.safetyComment,
+          safety_status: args.safetyStatus,
+        },
+        '*'
+      )
+      .where({ sample_id: args.id })
+      .then((records: SampleRecord[]) => {
+        if (records.length !== 1) {
+          logger.logError('Could not update sample title', { args });
+          throw new Error('Could not update sample title');
         }
 
         return createSampleObject(records[0]);

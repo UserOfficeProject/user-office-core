@@ -1,9 +1,9 @@
 # Use postgres/example user/password credentials
-version: '3.1'
+version: "3.1"
 
 services:
   backend:
-    image: 'dmsc/duo-backend:${USER_OFFICE_BACKEND_TAG}'
+    image: "dmsc/duo-backend:${USER_OFFICE_BACKEND_TAG}"
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
@@ -12,12 +12,12 @@ services:
       SPARKPOST_TOKEN: dummytoken
       NODE_ENV: development
     labels:
-      - 'traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /proposal, /uploads'
-      - 'traefik.port=4000'
+      - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /proposal, /uploads"
+      - "traefik.port=4000"
   duo-cron-job:
     image: dmsc/duo-cron-job
   db:
-    image: postgres:11.2
+    image: postgres:11-alpine
     restart: always
     environment:
       POSTGRES_PASSWORD: duopassword
@@ -26,14 +26,14 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - './${USER_OFFICE_BACKEND_DIR}/db_patches/:/docker-entrypoint-initdb.d/'
+      - "./${USER_OFFICE_BACKEND_DIR}/db_patches/:/docker-entrypoint-initdb.d/"
   rabbitmq:
-    image: 'rabbitmq:3-management'
-    hostname: 'rabbit'
+    image: "rabbitmq:3-management"
+    hostname: "rabbit"
     ports:
-      - '15672:15672'
-      - '5672:5672'
+      - "15672:15672"
+      - "5672:5672"
     labels:
-      NAME: 'rabbitmq'
+      NAME: "rabbitmq"
     volumes:
-      - './${USER_OFFICE_BACKEND_DIR}/rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config'
+      - "./${USER_OFFICE_BACKEND_DIR}/rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config"

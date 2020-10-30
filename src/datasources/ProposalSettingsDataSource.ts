@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { NextStatusEvent } from '../models/NextStatusEvent';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
+import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
+import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 
@@ -23,4 +26,31 @@ export interface ProposalSettingsDataSource {
     proposalWorkflow: ProposalWorkflow
   ): Promise<ProposalWorkflow>;
   deleteProposalWorkflow(proposalWorkflowId: number): Promise<ProposalWorkflow>;
+  getProposalWorkflowConnections(
+    proposalWorkflowId: number,
+    droppableGroupId?: string | undefined,
+    byParentGroupId?: boolean | undefined
+  ): Promise<ProposalWorkflowConnection[]>;
+  getProposalWorkflowConnection(
+    proposalWorkflowId: number,
+    proposalWorkflowConnectionId: number
+  ): Promise<ProposalWorkflowConnection | null>;
+  addProposalWorkflowStatus(
+    newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
+  ): Promise<ProposalWorkflowConnection>;
+  updateProposalWorkflowStatuses(
+    proposalWorkflowStatuses: ProposalWorkflowConnection[]
+  ): Promise<ProposalWorkflowConnection[]>;
+  deleteProposalWorkflowStatus(
+    proposalStatusId: number,
+    proposalWorkflowId: number,
+    nextProposalStatusId?: number
+  ): Promise<ProposalWorkflowConnection>;
+  addNextStatusEventsToConnection(
+    proposalWorkflowConnectionId: number,
+    nextStatusEvents: string[]
+  ): Promise<NextStatusEvent[]>;
+  getNextStatusEventsByConnectionId(
+    proposalWorkflowConnectionId: number
+  ): Promise<NextStatusEvent[]>;
 }

@@ -1,14 +1,19 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import * as bcrypt from 'bcryptjs';
-import jsonwebtoken from 'jsonwebtoken';
 // TODO: Try to replace request-promise with axios. request-promise depends on reqest which is deprecated.
 import { CoreOptions, UriOptions } from 'request';
 import rp from 'request-promise';
 
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
-import { Roles } from '../models/Role';
-import { BasicUserDetails, UserWithRole } from '../models/User';
+import { Role, Roles } from '../models/Role';
+import {
+  BasicUserDetails,
+  User,
+  UserWithRole,
+  AuthJwtPayload,
+} from '../models/User';
+import { signToken, verifyToken } from '../utils/jwt';
 import { logger } from '../utils/Logger';
 
 export default class UserQueries {
@@ -23,7 +28,8 @@ export default class UserQueries {
     return this.dataSource.get(id);
   }
 
-  async byRef(id: number) {
+  @Authorized()
+  async byRef(agent: UserWithRole | null, id: number) {
     return this.dataSource.get(id);
   }
 
@@ -103,10 +109,10 @@ export default class UserQueries {
     const user = await this.dataSource.getByOrcID(orcData.orcid);
     if (user) {
       const roles = await this.dataSource.getUserRoles(user.id);
-      const secret = process.env.secret as string;
-      const token = jsonwebtoken.sign({ user, roles }, secret, {
-        expiresIn: process.env.tokenLife,
-      });
+
+      const token = signToken<{ user: User; roles: Role[]; currentRole: Role }>(
+        { user, roles, currentRole: roles[0] }
+      );
 
       return { token };
     }
@@ -173,5 +179,28 @@ export default class UserQueries {
 
   async getProposers(agent: UserWithRole | null, proposalId: number) {
     return this.dataSource.getProposalUsers(proposalId);
+  }
+
+  async checkToken(
+    token: string
+  ): Promise<{
+    isValid: boolean;
+    payload: AuthJwtPayload | null;
+  }> {
+    try {
+      const payload = verifyToken<AuthJwtPayload>(token);
+
+      return {
+        isValid: true,
+        payload,
+      };
+    } catch (error) {
+      logger.logError('Bad token', { error });
+
+      return {
+        isValid: false,
+        payload: null,
+      };
+    }
   }
 }

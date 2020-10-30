@@ -14,7 +14,7 @@ export class SampleDataSourceMock implements SampleDataSource {
         'title',
         1,
         1,
-        SampleStatus.SAFE,
+        SampleStatus.LOW_RISK,
         'safety comment',
         new Date()
       ),
@@ -43,7 +43,7 @@ export class SampleDataSourceMock implements SampleDataSource {
       title,
       creatorId,
       questionaryId,
-      SampleStatus.NONE,
+      SampleStatus.PENDING_EVALUTATION,
       '',
       new Date()
     );
@@ -76,5 +76,11 @@ export class SampleDataSourceMock implements SampleDataSource {
     sample.safetyComment = args.safetyComment;
 
     return sample;
+  }
+
+  async cloneSample(sampleId: number): Promise<Sample> {
+    const sample = await this.getSample(sampleId);
+
+    return { ...sample, id: sample.id++ };
   }
 }

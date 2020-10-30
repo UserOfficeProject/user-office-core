@@ -26,6 +26,7 @@ describe('Test Call Mutations', () => {
         endCycle: new Date('2019-02-19'),
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
+        proposalWorkflowId: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -44,6 +45,7 @@ describe('Test Call Mutations', () => {
         endCycle: new Date('2019-02-19'),
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
+        proposalWorkflowId: 1,
       })
     ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
   });
@@ -61,6 +63,7 @@ describe('Test Call Mutations', () => {
       endCycle: new Date('2019-02-19'),
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
+      proposalWorkflowId: 1,
     };
 
     return expect(
@@ -83,6 +86,7 @@ describe('Test Call Mutations', () => {
         endCycle: new Date('2020-06-18'),
         cycleComment: 'Comment review update',
         surveyComment: 'Comment feedback update',
+        proposalWorkflowId: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -101,6 +105,7 @@ describe('Test Call Mutations', () => {
       endCycle: new Date('2020-06-18'),
       cycleComment: 'Comment review update',
       surveyComment: 'Comment feedback update',
+      proposalWorkflowId: 1,
     };
 
     return expect(
@@ -110,7 +115,7 @@ describe('Test Call Mutations', () => {
 
   test('A logged in user can not assign instrument to a call', () => {
     return expect(
-      callMutations.assignInstrumentToCall(dummyUserWithRole, {
+      callMutations.assignInstrumentsToCall(dummyUserWithRole, {
         callId: 1,
         instrumentIds: [1],
       })
@@ -119,7 +124,7 @@ describe('Test Call Mutations', () => {
 
   test('A logged in user officer can assign instrument to a call', () => {
     return expect(
-      callMutations.assignInstrumentToCall(dummyUserOfficerWithRole, {
+      callMutations.assignInstrumentsToCall(dummyUserOfficerWithRole, {
         callId: 1,
         instrumentIds: [1],
       })

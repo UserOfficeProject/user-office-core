@@ -65,4 +65,9 @@ export default class InstrumentQueries {
       return null;
     }
   }
+
+  @Authorized()
+  async byRef(agent: UserWithRole | null, id: number) {
+    return this.dataSource.get(id);
+  }
 }

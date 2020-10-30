@@ -2,6 +2,7 @@
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
 
+import { Event } from '../../events/event.enum';
 import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
@@ -286,5 +287,29 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((proposals: ProposalRecord[]) =>
         proposals.map(proposal => createProposalObject(proposal))
       );
+  }
+
+  async markEventAsDoneOnProposal(
+    event: Event,
+    proposalId: number
+  ): Promise<boolean> {
+    const dataToInsert = {
+      proposal_id: proposalId,
+      [event.toLowerCase()]: true,
+    };
+
+    const result = await database.raw(
+      `? ON CONFLICT (proposal_id)
+        DO UPDATE SET
+        ${event.toLowerCase()} = true
+        RETURNING *;`,
+      [database('proposal_events').insert(dataToInsert)]
+    );
+
+    if (result.rows && result.rows.length) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

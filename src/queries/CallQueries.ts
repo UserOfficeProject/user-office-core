@@ -19,4 +19,10 @@ export default class CallQueries {
 
     return calls;
   }
+
+  // TODO: figure out the role parts
+  @Authorized()
+  async byRef(agent: UserWithRole | null, id: number) {
+    return this.dataSource.get(id);
+  }
 }

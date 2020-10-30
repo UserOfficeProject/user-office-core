@@ -1,11 +1,19 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { NextStatusEvent } from '../../models/NextStatusEvent';
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
+import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
+import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import database from './database';
-import { ProposalStatusRecord, ProposalWorkflowRecord } from './records';
+import {
+  NextStatusEventRecord,
+  ProposalStatusRecord,
+  ProposalWorkflowConnectionRecord,
+  ProposalWorkflowRecord,
+} from './records';
 
 export default class PostgresProposalSettingsDataSource
   implements ProposalSettingsDataSource {
@@ -196,4 +204,278 @@ export default class PostgresProposalSettingsDataSource
       });
   }
   // <---------- Proposal workflows -----------
+
+  private createProposalWorkflowConnectionObject(
+    proposalWorkflowConnection: ProposalWorkflowConnectionRecord &
+      ProposalStatusRecord
+  ) {
+    return new ProposalWorkflowConnection(
+      proposalWorkflowConnection.proposal_workflow_connection_id,
+      proposalWorkflowConnection.sort_order,
+      proposalWorkflowConnection.proposal_workflow_id,
+      proposalWorkflowConnection.proposal_status_id,
+      {
+        id: proposalWorkflowConnection.proposal_status_id,
+        name: proposalWorkflowConnection.name,
+        description: proposalWorkflowConnection.description,
+      },
+      proposalWorkflowConnection.next_proposal_status_id,
+      proposalWorkflowConnection.prev_proposal_status_id,
+      proposalWorkflowConnection.droppable_group_id,
+      proposalWorkflowConnection.parent_droppable_group_id
+    );
+  }
+
+  async getProposalWorkflowConnections(
+    proposalWorkflowId: number,
+    droppableGroupId: string | undefined = undefined,
+    byParentGroupId: boolean | undefined = false
+  ): Promise<ProposalWorkflowConnection[]> {
+    const andConditionIfDroppableGroupIdDefined = `AND droppable_group_id = '${droppableGroupId}'`;
+    const andConditionIfParentDroppableGroupIdDefined =
+      byParentGroupId &&
+      !!droppableGroupId &&
+      `AND parent_droppable_group_id = '${droppableGroupId}'`;
+    const andWhereCondition =
+      !byParentGroupId && !!droppableGroupId
+        ? andConditionIfDroppableGroupIdDefined
+        : byParentGroupId && !!droppableGroupId
+        ? andConditionIfParentDroppableGroupIdDefined
+        : '';
+
+    const getUniqueOrderedProposalWorkflowConnectionsQuery = `
+      SELECT * FROM (
+        SELECT DISTINCT ON (pwc.proposal_status_id) *
+        FROM proposal_workflow_connections as pwc
+        LEFT JOIN
+          proposal_statuses as ps
+        ON
+          ps.proposal_status_id = pwc.proposal_status_id
+        WHERE proposal_workflow_id = ${proposalWorkflowId}
+        ${andWhereCondition}
+      ) t
+      ORDER BY
+        droppable_group_id ASC,
+        sort_order ASC
+    `;
+
+    const proposalWorkflowConnections:
+      | (ProposalWorkflowConnectionRecord & ProposalStatusRecord)[]
+      | null = (
+      await database.raw(getUniqueOrderedProposalWorkflowConnectionsQuery)
+    ).rows;
+
+    return proposalWorkflowConnections
+      ? proposalWorkflowConnections.map(proposalWorkflowConnection =>
+          this.createProposalWorkflowConnectionObject(
+            proposalWorkflowConnection
+          )
+        )
+      : [];
+  }
+
+  async getProposalWorkflowConnection(
+    proposalWorkflowId: number,
+    proposalStatusId: number
+  ): Promise<ProposalWorkflowConnection | null> {
+    return database
+      .select()
+      .from('proposal_workflow_connections as pwc')
+      .join('proposal_statuses as ps', {
+        'ps.proposal_status_id': 'pwc.proposal_status_id',
+      })
+      .where('proposal_workflow_id', proposalWorkflowId)
+      .andWhere('pwc.proposal_status_id', proposalStatusId)
+      .first()
+      .then(
+        (
+          proposalWorkflowConnection:
+            | (ProposalWorkflowConnectionRecord & ProposalStatusRecord)
+            | null
+        ) =>
+          proposalWorkflowConnection
+            ? this.createProposalWorkflowConnectionObject(
+                proposalWorkflowConnection
+              )
+            : null
+      );
+  }
+
+  async addProposalWorkflowStatus(
+    newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
+  ): Promise<ProposalWorkflowConnection> {
+    return database
+      .insert({
+        proposal_workflow_id: newProposalWorkflowStatusInput.proposalWorkflowId,
+        proposal_status_id: newProposalWorkflowStatusInput.proposalStatusId,
+        next_proposal_status_id:
+          newProposalWorkflowStatusInput.nextProposalStatusId,
+        prev_proposal_status_id:
+          newProposalWorkflowStatusInput.prevProposalStatusId,
+        sort_order: newProposalWorkflowStatusInput.sortOrder,
+        droppable_group_id: newProposalWorkflowStatusInput.droppableGroupId,
+        parent_droppable_group_id:
+          newProposalWorkflowStatusInput.parentDroppableGroupId,
+      })
+      .into('proposal_workflow_connections as pwc')
+      .returning(['*'])
+      .join('proposal_statuses as ps', {
+        'ps.proposal_status_id':
+          newProposalWorkflowStatusInput.proposalStatusId,
+      })
+      .then(
+        (
+          proposalWorkflowConnections: (ProposalWorkflowConnectionRecord &
+            ProposalStatusRecord)[]
+        ) => {
+          if (proposalWorkflowConnections.length !== 1) {
+            throw new Error('Could not create proposal workflow status');
+          }
+
+          return this.createProposalWorkflowConnectionObject(
+            proposalWorkflowConnections[0]
+          );
+        }
+      );
+  }
+
+  async upsertProposalWorkflowStatuses(
+    collection: ProposalWorkflowConnection[]
+  ) {
+    const dataToInsert = collection.map(item => ({
+      proposal_workflow_connection_id: item.id,
+      proposal_workflow_id: item.proposalWorkflowId,
+      proposal_status_id: item.proposalStatusId,
+      next_proposal_status_id: item.nextProposalStatusId,
+      prev_proposal_status_id: item.prevProposalStatusId,
+      sort_order: item.sortOrder,
+      droppable_group_id: item.droppableGroupId,
+      parent_droppable_group_id: item.parentDroppableGroupId,
+    }));
+
+    const result = await database.raw(
+      `? ON CONFLICT (proposal_workflow_connection_id)
+                  DO UPDATE SET
+                  next_proposal_status_id = EXCLUDED.next_proposal_status_id,
+                  prev_proposal_status_id = EXCLUDED.prev_proposal_status_id,
+                  sort_order = EXCLUDED.sort_order,
+                  droppable_group_id = EXCLUDED.droppable_group_id,
+                  parent_droppable_group_id = EXCLUDED.parent_droppable_group_id
+                RETURNING *;`,
+      [database('proposal_workflow_connections').insert(dataToInsert)]
+    );
+
+    return result.rows as ProposalWorkflowConnectionRecord[];
+  }
+
+  async updateProposalWorkflowStatuses(
+    proposalWorkflowStatusesInput: ProposalWorkflowConnection[]
+  ): Promise<ProposalWorkflowConnection[]> {
+    const connectionsResult = await this.upsertProposalWorkflowStatuses(
+      proposalWorkflowStatusesInput
+    );
+
+    if (connectionsResult) {
+      // NOTE: Return result as ProposalWorkflowConnection[] but do not care about name and description.
+      return connectionsResult.map(connection =>
+        this.createProposalWorkflowConnectionObject({
+          ...connection,
+          name: '',
+          description: '',
+          full_count: connectionsResult.length,
+        })
+      );
+    } else {
+      return [];
+    }
+  }
+
+  async deleteProposalWorkflowStatus(
+    proposalStatusId: number,
+    proposalWorkflowId: number,
+    nextProposalStatusId: number
+  ): Promise<ProposalWorkflowConnection> {
+    const removeWorkflowConnectionQuery = database(
+      'proposal_workflow_connections'
+    )
+      .where('proposal_workflow_id', proposalWorkflowId)
+      .andWhere('proposal_status_id', proposalStatusId)
+      .del()
+      .returning('*');
+
+    if (nextProposalStatusId) {
+      removeWorkflowConnectionQuery.andWhere(
+        'next_proposal_status_id',
+        nextProposalStatusId
+      );
+    }
+
+    return removeWorkflowConnectionQuery.then(
+      (proposalWorkflowStatus: ProposalWorkflowConnectionRecord[]) => {
+        if (
+          proposalWorkflowStatus === undefined ||
+          proposalWorkflowStatus.length < 1
+        ) {
+          throw new Error(
+            `Could not delete proposal workflow status with id: ${proposalWorkflowId} `
+          );
+        }
+
+        // NOTE: I need this object only to be able to reorder and update other statuses in the logic layer.
+        return this.createProposalWorkflowConnectionObject({
+          ...proposalWorkflowStatus[0],
+          name: '',
+          description: '',
+          full_count: 1,
+        });
+      }
+    );
+  }
+
+  private createNextStatusEventObject(nextStatusEvent: NextStatusEventRecord) {
+    return new NextStatusEvent(
+      nextStatusEvent.next_status_event_id,
+      nextStatusEvent.proposal_workflow_connection_id,
+      nextStatusEvent.next_status_event
+    );
+  }
+
+  async addNextStatusEventsToConnection(
+    proposalWorkflowConnectionId: number,
+    nextStatusEvents: string[]
+  ): Promise<NextStatusEvent[]> {
+    const eventsToInsert = nextStatusEvents.map(nextStatusEvent => ({
+      proposal_workflow_connection_id: proposalWorkflowConnectionId,
+      next_status_event: nextStatusEvent,
+    }));
+
+    const result = await database.raw(
+      '? ON CONFLICT ON CONSTRAINT unique_connection_event DO NOTHING RETURNING *;',
+      [database('next_status_events').insert(eventsToInsert)]
+    );
+
+    const nextStatusEventsResult: NextStatusEventRecord[] = result.rows;
+
+    if (nextStatusEventsResult) {
+      return nextStatusEventsResult.map(nextStatusEventResult =>
+        this.createNextStatusEventObject(nextStatusEventResult)
+      );
+    } else {
+      return [];
+    }
+  }
+
+  async getNextStatusEventsByConnectionId(
+    proposalWorkflowConnectionId: number
+  ): Promise<NextStatusEvent[]> {
+    return database
+      .select('*')
+      .from('next_status_events')
+      .where('proposal_workflow_connection_id', proposalWorkflowConnectionId)
+      .then((nextStatusEvents: NextStatusEventRecord[]) => {
+        return nextStatusEvents.map(nextStatusEvent =>
+          this.createNextStatusEventObject(nextStatusEvent)
+        );
+      });
+  }
 }

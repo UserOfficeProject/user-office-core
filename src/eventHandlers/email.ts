@@ -17,6 +17,12 @@ export default function createHandler(userDataSource: UserDataSource) {
   // Handler to send email to proposers in accepted proposal
 
   return async function emailHandler(event: ApplicationEvent) {
+    // if the original method failed
+    // there is no point of sending any email
+    if (event.isRejection) {
+      return;
+    }
+
     switch (event.type) {
       case Event.USER_PASSWORD_RESET_EMAIL: {
         client.transmissions

@@ -3,6 +3,7 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { UserWithRole } from '../models/User';
 import { Rejection, isRejection } from '../rejection';
+import { logger } from '../utils/Logger';
 
 const EventBusDecorator = (eventType: Event) => {
   return (
@@ -37,7 +38,11 @@ const EventBusDecorator = (eventType: Event) => {
 
       // NOTE: Do not log the event in testing environment.
       if (process.env.NODE_ENV !== 'test') {
-        eventBus.publish(event);
+        eventBus
+          .publish(event)
+          .catch(e =>
+            logger.logError(`EventBus publish failed ${event.type}`, e)
+          );
       }
 
       return result;

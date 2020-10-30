@@ -1,3 +1,4 @@
+import { Call } from '../models/Call';
 import { Proposal } from '../models/Proposal';
 import { SEP } from '../models/SEP';
 import { User, UserRole } from '../models/User';
@@ -38,6 +39,36 @@ interface ProposalCreatedEvent extends GeneralEvent {
 
 interface ProposalNotifiedEvent extends GeneralEvent {
   type: Event.PROPOSAL_NOTIFIED;
+  proposal: Proposal;
+}
+
+interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface ProposalInstrumentSelectedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_INSTRUMENT_SELECTED;
+  proposal: Proposal;
+}
+
+interface ProposalSEPSelectedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_SELECTED;
+  proposal: Proposal;
+}
+
+interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface ProposalSEPMeetingSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_SUBMITTED;
   proposal: Proposal;
 }
 
@@ -121,6 +152,11 @@ interface SEPMemberRemovedEvent extends GeneralEvent {
   sep: SEP;
 }
 
+interface CallEndedEvent extends GeneralEvent {
+  type: Event.CALL_ENDED;
+  call: Call;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -141,4 +177,11 @@ export type ApplicationEvent =
   | SEPMemberAssignedToProposalEvent
   | SEPMemberRemovedFromProposalEvent
   | UserDeletedEvent
-  | ProposalNotifiedEvent;
+  | ProposalNotifiedEvent
+  | CallEndedEvent
+  | ProposalFeasibilityReviewSubmittedEvent
+  | ProposalSampleReviewSubmittedEvent
+  | ProposalInstrumentSelectedEvent
+  | ProposalSEPSelectedEvent
+  | ProposalInstrumentSubmittedEvent
+  | ProposalSEPMeetingSubmittedEvent;

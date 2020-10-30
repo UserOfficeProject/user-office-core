@@ -117,4 +117,29 @@ export default class SampleMutations {
 
     return this.dataSource.updateSampleSafetyReview(args);
   }
+
+  @Authorized()
+  async cloneSample(agent: UserWithRole | null, sampleId: number) {
+    if (!sampleAuthorization.hasWriteRights(agent, sampleId)) {
+      return rejection('NOT_AUTHORIZED');
+    }
+
+    try {
+      const sourceSample = await this.dataSource.getSample(sampleId);
+      const clonedQuestionary = await this.questionaryDataSource.clone(
+        sourceSample.questionaryId
+      );
+      const clonedSample = await this.dataSource.create(
+        clonedQuestionary.questionaryId!,
+        `Copy of ${sourceSample.title}`,
+        sourceSample.creatorId
+      );
+
+      return clonedSample;
+    } catch (e) {
+      logger.logError('Could not clone sample', e);
+
+      return rejection('INTERNAL_ERROR');
+    }
+  }
 }
