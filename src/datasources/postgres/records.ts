@@ -205,6 +205,7 @@ export interface CallRecord {
   readonly cycle_comment: string;
   readonly survey_comment: string;
   readonly proposal_workflow_id: number;
+  readonly call_ended: boolean;
   readonly template_id: number;
 }
 
@@ -549,6 +550,7 @@ export const createCallObject = (call: CallRecord) => {
     call.cycle_comment,
     call.survey_comment,
     call.proposal_workflow_id,
+    call.call_ended,
     call.template_id
   );
 };

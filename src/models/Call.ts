@@ -13,6 +13,7 @@ export class Call {
     public cycleComment: string,
     public surveyComment: string,
     public proposalWorkflowId: number,
+    public callEnded: boolean,
     public templateId?: number
   ) {}
 }

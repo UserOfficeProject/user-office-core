@@ -22,6 +22,7 @@ export const dummyCall = new Call(
   '',
   '',
   1,
+  false,
   1
 );
 

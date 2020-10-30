@@ -54,6 +54,9 @@ export class UpdateCallInput {
   public proposalWorkflowId: number;
 
   @Field(() => Int, { nullable: true })
+  public callEnded?: boolean;
+
+  @Field(() => Int, { nullable: true })
   public templateId?: number;
 }
 
