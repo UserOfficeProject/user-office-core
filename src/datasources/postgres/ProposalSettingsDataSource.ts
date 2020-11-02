@@ -127,10 +127,21 @@ export default class PostgresProposalSettingsDataSource
       .insert(args)
       .into('proposal_workflows')
       .returning(['*'])
-      .then((proposalWorkflow: ProposalWorkflowRecord[]) => {
+      .then(async (proposalWorkflow: ProposalWorkflowRecord[]) => {
         if (proposalWorkflow.length !== 1) {
           throw new Error('Could not create proposal status');
         }
+
+        // NOTE: Add default DRAFT status to proposal workflow when it is created.
+        await this.addProposalWorkflowStatus({
+          sortOrder: 0,
+          droppableGroupId: 'proposalWorkflowConnections_0',
+          nextProposalStatusId: null,
+          prevProposalStatusId: null,
+          parentDroppableGroupId: null,
+          proposalStatusId: 1,
+          proposalWorkflowId: proposalWorkflow[0].proposal_workflow_id,
+        });
 
         return this.createProposalWorkflowObject(proposalWorkflow[0]);
       });
@@ -143,6 +154,24 @@ export default class PostgresProposalSettingsDataSource
       .select()
       .from('proposal_workflows')
       .where('proposal_workflow_id', proposalWorkflowId)
+      .first()
+      .then((proposalWorkflow: ProposalWorkflowRecord | null) =>
+        proposalWorkflow
+          ? this.createProposalWorkflowObject(proposalWorkflow)
+          : null
+      );
+  }
+
+  async getProposalWorkflowByCall(
+    callId: number
+  ): Promise<ProposalWorkflow | null> {
+    return database
+      .select()
+      .from('call as c')
+      .join('proposal_workflows as pw', {
+        'pw.proposal_workflow_id': 'c.proposal_workflow_id',
+      })
+      .where('c.call_id', callId)
       .first()
       .then((proposalWorkflow: ProposalWorkflowRecord | null) =>
         proposalWorkflow
@@ -449,20 +478,21 @@ export default class PostgresProposalSettingsDataSource
       next_status_event: nextStatusEvent,
     }));
 
-    const result = await database.raw(
-      '? ON CONFLICT ON CONSTRAINT unique_connection_event DO NOTHING RETURNING *;',
-      [database('next_status_events').insert(eventsToInsert)]
-    );
+    await database('next_status_events')
+      .where('proposal_workflow_connection_id', proposalWorkflowConnectionId)
+      .del();
 
-    const nextStatusEventsResult: NextStatusEventRecord[] = result.rows;
+    const nextStatusEventsResult: NextStatusEventRecord[] = await database(
+      'next_status_events'
+    )
+      .insert(eventsToInsert)
+      .returning(['*']);
 
-    if (nextStatusEventsResult) {
-      return nextStatusEventsResult.map(nextStatusEventResult =>
+    return (
+      nextStatusEventsResult?.map(nextStatusEventResult =>
         this.createNextStatusEventObject(nextStatusEventResult)
-      );
-    } else {
-      return [];
-    }
+      ) || []
+    );
   }
 
   async getNextStatusEventsByConnectionId(

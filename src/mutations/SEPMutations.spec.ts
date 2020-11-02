@@ -11,6 +11,7 @@ import {
   dummyUserWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { ProposalIds } from '../models/Proposal';
 import { UserRole } from '../models/User';
 import { Rejection } from '../rejection';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -184,7 +185,7 @@ describe('Test SEPMutations', () => {
         proposalId: 1,
         sepId: 1,
       })
-    ).resolves.toStrictEqual(dummySEP);
+    ).resolves.toStrictEqual(new ProposalIds([1]));
   });
 
   test('A user can not remove proposal from SEP', async () => {

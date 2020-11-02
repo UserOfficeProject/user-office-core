@@ -3,6 +3,7 @@ import {
   Instrument,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
+import { ProposalIds } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
@@ -197,21 +198,34 @@ export default class PostgresInstrumentDataSource
   async assignProposalsToInstrument(
     proposalIds: number[],
     instrumentId: number
-  ): Promise<boolean> {
+  ): Promise<ProposalIds> {
     const dataToInsert = proposalIds.map(proposalId => ({
       instrument_id: instrumentId,
       proposal_id: proposalId,
     }));
 
-    const result = await database('instrument_has_proposals').insert(
-      dataToInsert
+    const proposalInstrumentPairs: {
+      proposal_id: number;
+      instrument_id: number;
+    }[] = await database('instrument_has_proposals')
+      .insert(dataToInsert)
+      .returning(['*']);
+
+    const returnedProposalIds = proposalInstrumentPairs.map(
+      proposalInstrumentPair => proposalInstrumentPair.proposal_id
     );
 
-    if (result) {
-      return true;
-    } else {
-      return false;
+    if (proposalInstrumentPairs) {
+      /**
+       * NOTE: We need to return changed proposalIds because we listen to events and
+       * we need to do some changes on proposals based on what is changed.
+       */
+      return new ProposalIds(returnedProposalIds);
     }
+
+    throw new Error(
+      `Could not assign proposals ${proposalIds} to instrument with id: ${instrumentId} `
+    );
   }
 
   async removeProposalFromInstrument(
