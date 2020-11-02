@@ -182,6 +182,13 @@ export class TokenResponseWrap extends ResponseWrapBase<string> {
 }
 
 @ObjectType()
+export class CheckExternalTokenWrap extends ResponseWrapBase<string> {
+  @Response()
+  @Field(() => String, { nullable: true })
+  public token: string;
+}
+
+@ObjectType()
 export class PrepareDBResponseWrap extends ResponseWrapBase<string> {
   @Response()
   @Field(() => String, { nullable: true })
