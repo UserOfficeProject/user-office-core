@@ -39,7 +39,6 @@ export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRel
             <Field
               name="config.required"
               label="Is required"
-              checked={config.required}
               component={FormikUICustomCheckbox}
               margin="normal"
               fullWidth

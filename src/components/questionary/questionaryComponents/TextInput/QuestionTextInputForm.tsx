@@ -16,10 +16,6 @@ import { QuestionFormShell } from '../QuestionFormShell';
 export const QuestionTextInputForm: FormComponent<Question> = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
-  const config = field.config as TextInputConfig;
-  const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
-    (field.config as TextInputConfig).isHtmlQuestion
-  );
 
   return (
     <QuestionFormShell
@@ -63,7 +59,6 @@ export const QuestionTextInputForm: FormComponent<Question> = props => {
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
-              checked={config.required}
               component={FormikUICustomCheckbox}
               label="Is required"
               margin="normal"
@@ -96,14 +91,14 @@ export const QuestionTextInputForm: FormComponent<Question> = props => {
               label="Enable rich text question"
               name="config.isHtmlQuestion"
               component={FormikUICustomCheckbox}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setIsRichQuestion(event.target.checked);
-              }}
-              checked={isRichQuestion}
             />
-            <Collapse in={isRichQuestion}>
+            <Collapse
+              in={(formikProps.values.config as TextInputConfig).isHtmlQuestion}
+            >
               <Field
-                visible={isRichQuestion}
+                visible={
+                  (formikProps.values.config as TextInputConfig).isHtmlQuestion
+                }
                 name="config.htmlQuestion"
                 type="text"
                 component={FormikUICustomEditor}
@@ -131,7 +126,6 @@ export const QuestionTextInputForm: FormComponent<Question> = props => {
 
             <Field
               name="config.multiline"
-              checked={(formikProps.values.config as TextInputConfig).multiline}
               component={FormikUICustomCheckbox}
               label="Multiple lines"
               margin="normal"

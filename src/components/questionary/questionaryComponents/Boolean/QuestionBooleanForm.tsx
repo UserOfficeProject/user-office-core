@@ -52,7 +52,6 @@ export const QuestionBooleanForm: FormComponent<Question> = props => {
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
-              checked={config.required}
               component={FormikUICustomCheckbox}
               label="User must check it to continue"
               margin="normal"

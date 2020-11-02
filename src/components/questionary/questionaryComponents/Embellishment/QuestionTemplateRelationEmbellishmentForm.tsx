@@ -58,9 +58,6 @@ export const QuestionTemplateRelationEmbellishmentForm: FormComponent<QuestionTe
 
           <Field
             name="config.omitFromPdf"
-            checked={
-              (formikProps.values.config as EmbellishmentConfig).omitFromPdf
-            }
             component={FormikUICustomCheckbox}
             label="Omit from PDF"
             margin="normal"

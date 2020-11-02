@@ -60,7 +60,6 @@ export const QuestionDateForm: FormComponent<Question> = props => {
             <Field
               name="config.required"
               label="Is required"
-              checked={config.required}
               component={FormikUICustomCheckbox}
               margin="normal"
               fullWidth

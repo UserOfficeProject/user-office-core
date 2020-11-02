@@ -41,7 +41,6 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
             <Field
               name="config.required"
               label="Is required"
-              checked={config.required}
               component={FormikUICustomCheckbox}
               margin="normal"
               fullWidth
