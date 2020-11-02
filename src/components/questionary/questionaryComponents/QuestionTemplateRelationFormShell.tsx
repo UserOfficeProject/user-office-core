@@ -6,48 +6,52 @@ import { Form, Formik, FormikProps } from 'formik';
 import React from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { getTemplateFieldIcon } from 'components/questionary/QuestionaryComponentRegistry';
-import { Template, QuestionTemplateRelation } from 'generated/sdk';
+import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionTemplateRelation, Template } from 'generated/sdk';
 import { Event, EventType } from 'models/QuestionaryEditorModel';
+
+const useStyles = makeStyles(theme => ({
+  container: {
+    width: '100%',
+  },
+  heading: {
+    marginTop: theme.spacing(2),
+    marginBottom: '21px',
+    display: 'flex',
+    alignItems: 'center',
+    color: theme.palette.grey[600],
+    '& SVG': {
+      marginRight: theme.spacing(1),
+    },
+  },
+  naturalKey: {
+    fontSize: '16px',
+    paddingLeft: '21px',
+    display: 'block',
+    marginBottom: '16px',
+  },
+}));
 
 export const QuestionTemplateRelationFormShell = (props: {
   validationSchema: any;
   questionRel: QuestionTemplateRelation;
   dispatch: React.Dispatch<Event>;
   closeMe: Function;
-  label: string;
   template: Template;
   children: (
     formikProps: FormikProps<QuestionTemplateRelation>
   ) => React.ReactNode;
 }) => {
-  const classes = makeStyles(theme => ({
-    container: {
-      width: '100%',
-    },
-    heading: {
-      marginTop: theme.spacing(2),
-      marginBottom: '21px',
-      display: 'flex',
-      alignItems: 'center',
-      color: theme.palette.grey[600],
-      '& SVG': {
-        marginRight: theme.spacing(1),
-      },
-    },
-    naturalKey: {
-      fontSize: '16px',
-      paddingLeft: '21px',
-      display: 'block',
-      marginBottom: '16px',
-    },
-  }))();
+  const classes = useStyles();
+  const definition = getQuestionaryComponentDefinition(
+    props.questionRel.question.dataType
+  );
 
   return (
     <div className={classes.container}>
       <Typography variant="h4" className={classes.heading}>
-        {getTemplateFieldIcon(props.questionRel.question.dataType)}
-        {props.label}
+        {definition.icon}
+        {definition.name}
       </Typography>
       <Link
         href="#"

@@ -17,7 +17,6 @@ export const QuestionBooleanForm: FormComponent<Question> = props => {
 
   return (
     <QuestionFormShell
-      label="Boolean"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       question={props.field}

@@ -16,7 +16,6 @@ export const QuestionSampleBasisForm: FormComponent<Question> = props => {
 
   return (
     <QuestionFormShell
-      label="Sample basis"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       question={props.field}

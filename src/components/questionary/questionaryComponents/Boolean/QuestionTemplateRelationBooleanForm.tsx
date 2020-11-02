@@ -19,7 +19,6 @@ export const QuestionTemplateRelationBooleanForm: FormComponent<QuestionTemplate
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
-      label="Boolean"
       template={props.template}
       validationSchema={Yup.object().shape({
         question: Yup.object({

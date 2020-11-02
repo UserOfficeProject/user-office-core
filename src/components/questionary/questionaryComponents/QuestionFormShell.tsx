@@ -5,44 +5,41 @@ import { Form, Formik, FormikProps } from 'formik';
 import React from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { getTemplateFieldIcon } from 'components/questionary/QuestionaryComponentRegistry';
+import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { Question } from 'generated/sdk';
 import { Event, EventType } from 'models/QuestionaryEditorModel';
+
+const useStyles = makeStyles(theme => ({
+  container: {
+    width: '100%',
+  },
+  heading: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+    display: 'flex',
+    alignItems: 'center',
+    color: theme.palette.grey[600],
+    '& SVG': {
+      marginRight: theme.spacing(1),
+    },
+  },
+}));
 
 export const QuestionFormShell = (props: {
   validationSchema: any;
   question: Question;
   dispatch: React.Dispatch<Event>;
-  label: string;
   closeMe: Function;
   children: (formikProps: FormikProps<Question>) => React.ReactNode;
 }) => {
-  const classes = makeStyles(theme => ({
-    container: {
-      width: '100%',
-    },
-    heading: {
-      marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(1),
-      display: 'flex',
-      alignItems: 'center',
-      color: theme.palette.grey[600],
-      '& SVG': {
-        marginRight: theme.spacing(1),
-      },
-    },
-    actions: {
-      marginTop: theme.spacing(4),
-      display: 'flex',
-      justifyContent: 'space-between',
-    },
-  }))();
+  const classes = useStyles();
+  const definition = getQuestionaryComponentDefinition(props.question.dataType);
 
   return (
     <div className={classes.container}>
       <Typography variant="h4" className={classes.heading}>
-        {getTemplateFieldIcon(props.question.dataType)}
-        {props.label}
+        {definition.icon}
+        {definition.name}
       </Typography>
       <Formik
         initialValues={props.question}

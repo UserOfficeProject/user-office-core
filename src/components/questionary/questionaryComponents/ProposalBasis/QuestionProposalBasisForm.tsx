@@ -15,7 +15,6 @@ export const QuestionProposalBasisForm: FormComponent<Question> = props => {
 
   return (
     <QuestionFormShell
-      label="Proposal basis"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       question={props.field}

@@ -17,7 +17,6 @@ export const QuestionFileUploadForm: FormComponent<Question> = props => {
 
   return (
     <QuestionFormShell
-      label="File upload"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       question={props.field}

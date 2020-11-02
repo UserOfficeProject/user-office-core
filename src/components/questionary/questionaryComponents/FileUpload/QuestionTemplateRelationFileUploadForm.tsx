@@ -18,7 +18,6 @@ export const QuestionTemplateRelationFileUploadForm: FormComponent<QuestionTempl
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
-      label="File upload"
       template={props.template}
       validationSchema={Yup.object().shape({
         question: Yup.object({

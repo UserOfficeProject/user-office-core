@@ -17,7 +17,6 @@ export const QuestionEmbellismentForm: FormComponent<Question> = props => {
 
   return (
     <QuestionFormShell
-      label="Embellisment"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       question={props.field}

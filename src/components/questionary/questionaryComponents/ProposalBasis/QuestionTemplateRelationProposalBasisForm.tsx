@@ -13,7 +13,6 @@ export const QuestionTemplateRelationProposalBasisForm: FormComponent<QuestionTe
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
-      label="Proposal basis"
       template={props.template}
       validationSchema={Yup.object().shape({})}
     >

@@ -27,7 +27,6 @@ export const QuestionSubtemplateForm: FormComponent<Question> = props => {
 
   return (
     <QuestionFormShell
-      label="Template"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       question={props.field}

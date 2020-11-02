@@ -21,7 +21,6 @@ export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
 
   return (
     <QuestionFormShell
-      label="Multiple choice"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       question={props.field}

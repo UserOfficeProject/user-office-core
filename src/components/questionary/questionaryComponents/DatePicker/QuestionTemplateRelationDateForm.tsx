@@ -20,7 +20,6 @@ export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRel
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
-      label="Date"
       template={props.template}
       validationSchema={Yup.object().shape({})}
     >

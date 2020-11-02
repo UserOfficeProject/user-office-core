@@ -23,7 +23,6 @@ export const QuestionTemplateRelationTextInputForm: FormComponent<QuestionTempla
 
   return (
     <QuestionTemplateRelationFormShell
-      label="Text input"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}

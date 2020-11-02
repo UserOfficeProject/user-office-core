@@ -19,7 +19,6 @@ export const QuestionDateForm: FormComponent<Question> = props => {
 
   return (
     <QuestionFormShell
-      label="Date"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       question={props.field}

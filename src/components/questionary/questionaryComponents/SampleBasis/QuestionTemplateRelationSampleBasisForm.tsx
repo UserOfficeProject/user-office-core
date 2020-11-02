@@ -15,7 +15,6 @@ export const QuestionTemplateRelationSampleBasisForm: FormComponent<QuestionTemp
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
-      label="Sample basis"
       template={props.template}
       validationSchema={Yup.object().shape({})}
     >

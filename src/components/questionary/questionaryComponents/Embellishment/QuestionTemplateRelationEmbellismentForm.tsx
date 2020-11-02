@@ -18,7 +18,6 @@ export const QuestionTemplateRelationEmbellismentForm: FormComponent<QuestionTem
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
-      label="Embellishment"
       template={props.template}
       validationSchema={Yup.object().shape({
         question: Yup.object({

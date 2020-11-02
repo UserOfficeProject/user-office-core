@@ -24,7 +24,6 @@ export const QuestionTemplateRelationSubtemplateForm: FormComponent<QuestionTemp
 
   return (
     <QuestionTemplateRelationFormShell
-      label="Sub template"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}

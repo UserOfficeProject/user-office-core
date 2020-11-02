@@ -23,7 +23,6 @@ export const QuestionTextInputForm: FormComponent<Question> = props => {
 
   return (
     <QuestionFormShell
-      label="Text input"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       question={props.field}

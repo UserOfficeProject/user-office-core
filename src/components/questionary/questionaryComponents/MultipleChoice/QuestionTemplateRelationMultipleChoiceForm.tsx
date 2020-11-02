@@ -24,7 +24,6 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
-      label="Multiple choice"
       template={props.template}
       validationSchema={Yup.object().shape({
         question: Yup.object({
