@@ -23,6 +23,7 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+import faker from 'faker';
 import { GraphQLClient } from 'graphql-request';
 
 const resetDB = () => {
@@ -107,6 +108,23 @@ const finishedLoading = () => {
   cy.get('[role="progressbar"]').should('not.exist');
 };
 
+const createProposal = (proposalTitle = '', proposalAbstract = '') => {
+  const title = proposalTitle || faker.random.words(3);
+  const abstract = proposalAbstract || faker.random.words(8);
+
+  cy.contains('New Proposal').click();
+
+  cy.get('#title')
+    .type(title)
+    .should('have.value', title);
+
+  cy.get('#abstract')
+    .type(abstract)
+    .should('have.value', abstract);
+
+  cy.contains('Save and continue').click();
+};
+
 Cypress.Commands.add('resetDB', resetDB);
 
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
@@ -118,6 +136,8 @@ Cypress.Commands.add('logout', logout);
 Cypress.Commands.add('notification', notification);
 
 Cypress.Commands.add('finishedLoading', finishedLoading);
+
+Cypress.Commands.add('createProposal', createProposal);
 
 // call cy.presentationMode(); before your test to have delay between clicks.
 // Excellent for presentation purposes

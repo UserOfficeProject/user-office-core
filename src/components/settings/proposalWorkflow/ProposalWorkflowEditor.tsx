@@ -140,6 +140,19 @@ const ProposalWorkflowEditor: React.FC = () => {
           proposalWorkflowConnectionGroup.groupId === destination.droppableId
       );
 
+      const statusDroppedBeforeDraft =
+        currentDroppableGroup?.groupId === 'proposalWorkflowConnections_0' &&
+        destination.index === 0;
+
+      if (statusDroppedBeforeDraft) {
+        enqueueSnackbar('Dropping before DRAFT status not alowed', {
+          variant: 'info',
+          className: 'snackbar-info',
+        });
+
+        return;
+      }
+
       const proposalStatusId = proposalStatusesInThePicker[source.index].id;
       const nextProposalStatusId = getNextWorkflowStatus(
         destination,

@@ -223,7 +223,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
               <Button
                 variant="contained"
                 color="primary"
-                data-cy="submit"
+                data-cy={isLastStep ? 'submit' : 'next-step'}
                 type={isLastStep ? 'submit' : 'button'}
                 fullWidth
                 onClick={isLastStep ? () => null : handleNext}
