@@ -1,6 +1,7 @@
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized } from '../decorators';
+import { Instrument } from '../models/Instrument';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 
@@ -41,6 +42,19 @@ export default class InstrumentQueries {
     }
   }
 
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async getUserInstruments(
+    agent: UserWithRole | null
+  ): Promise<{ totalCount: number; instruments: Instrument[] }> {
+    if (this.isUserOfficer(agent)) {
+      return this.dataSource.getAll();
+    }
+
+    const instruments = await this.dataSource.getUserInstruments(agent?.id!);
+
+    return { totalCount: instruments.length, instruments };
+  }
+
   @Authorized([
     Roles.USER_OFFICER,
     Roles.SEP_CHAIR,
@@ -64,6 +78,30 @@ export default class InstrumentQueries {
     } else {
       return null;
     }
+  }
+
+  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  async hasInstrumentScientistInstrument(
+    agent: UserWithRole | null,
+    instrumentId: number
+  ) {
+    return this.dataSource.hasInstrumentScientistInstrument(
+      agent?.id as number,
+      instrumentId
+    );
+  }
+
+  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  async hasInstrumentScientistAccess(
+    agent: UserWithRole | null,
+    instrumentId: number,
+    proposalId: number
+  ) {
+    return this.dataSource.hasInstrumentScientistAccess(
+      agent?.id as number,
+      instrumentId,
+      proposalId
+    );
   }
 
   @Authorized()

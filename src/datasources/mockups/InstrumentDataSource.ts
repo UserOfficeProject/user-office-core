@@ -130,4 +130,19 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   ): Promise<boolean> {
     return true;
   }
+
+  hasInstrumentScientistInstrument(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  hasInstrumentScientistAccess(
+    userId: number,
+    instrumentId: number,
+    proposalId: number
+  ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
 }

@@ -10,7 +10,7 @@ const Authorized = (roles: Roles[] = []) => {
     descriptor: {
       value?: (
         agent: UserWithRole | null,
-        args: any
+        ...args: any[]
       ) => Promise<Rejection | any>;
     }
   ) => {
