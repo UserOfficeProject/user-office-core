@@ -368,6 +368,32 @@ export default class UserMutations {
     }
   }
 
+  async checkExternalToken(externalToken: string): Promise<string | Rejection> {
+    try {
+      // call UOWS with external token
+      // const userFromUOWS : BasicPersonDetailsDTO = uows.getBasicPersonDetailsForSessionId(externalToken);
+      // const user = convertUserDTO(userFromUOWS);
+
+      const user = await this.dataSource.getByEmail('Aaron_Harris49@gmail.com');
+      if (!user){
+        return rejection('USER_DOES_NOT_EXIST');
+      }
+      const roles = await this.dataSource.getUserRoles(user.id);
+
+      const essToken = signToken<AuthJwtPayload>({
+        user: user,
+        roles,
+        currentRole: roles[0],
+      });
+
+      return essToken;
+    } catch (error) {
+      logger.logError('Bad token', { externalToken });
+
+      return rejection('BAD_TOKEN');
+    }
+  }
+
   async selectRole(
     token: string,
     selectedRoleId: number
