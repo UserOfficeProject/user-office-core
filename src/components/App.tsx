@@ -19,6 +19,7 @@ import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 import { getTheme } from '../theme';
 import DashBoard from './DashBoard';
 import EmailVerification from './user/EmailVerification';
+import ExternalAuth from './user/ExternalAuth';
 import ResetPassword from './user/ResetPassword';
 import ResetPasswordEmail from './user/ResetPasswordEmail';
 import SharedAuth from './user/SharedAuth';
@@ -98,6 +99,10 @@ class App extends React.Component {
                   <QueryParamProvider ReactRouterRoute={Route}>
                     <div className="App">
                       <Switch>
+                        <Route
+                          path="/external-auth/:sessionId"
+                          component={ExternalAuth}
+                        />
                         <Route path="/SignUp" component={SignUp} />
                         <Route path="/SignIn" component={SignIn} />
                         <Route path="/shared-auth" component={SharedAuth} />

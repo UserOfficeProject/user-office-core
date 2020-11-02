@@ -160,6 +160,12 @@ export type CallsFilter = {
   isActive?: Maybe<Scalars['Boolean']>;
 };
 
+export type CheckExternalTokenWrap = {
+  __typename?: 'CheckExternalTokenWrap';
+  error: Maybe<Scalars['String']>;
+  token: Maybe<Scalars['String']>;
+};
+
 export type CreateCallInput = {
   shortCode: Scalars['String'];
   startCall: Scalars['DateTime'];
@@ -457,6 +463,7 @@ export type Mutation = {
   addClientLog: SuccessResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
+  checkExternalToken: CheckExternalTokenWrap;
   cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   createAnswerQuestionaryRelations: AnswerBasicResponseWrap;
@@ -894,6 +901,11 @@ export type MutationAssignQuestionsToTopicArgs = {
   templateId: Scalars['Int'];
   topicId: Scalars['Int'];
   questionIds?: Maybe<Array<Scalars['String']>>;
+};
+
+
+export type MutationCheckExternalTokenArgs = {
+  externalToken: Scalars['String'];
 };
 
 
@@ -4184,6 +4196,19 @@ export type UpdateTopicOrderMutation = (
   ) }
 );
 
+export type CheckExternalTokenMutationVariables = Exact<{
+  externalToken: Scalars['String'];
+}>;
+
+
+export type CheckExternalTokenMutation = (
+  { __typename?: 'Mutation' }
+  & { checkExternalToken: (
+    { __typename?: 'CheckExternalTokenWrap' }
+    & Pick<CheckExternalTokenWrap, 'token' | 'error'>
+  ) }
+);
+
 export type CheckTokenQueryVariables = Exact<{
   token: Scalars['String'];
 }>;
@@ -6275,6 +6300,14 @@ export const UpdateTopicOrderDocument = gql`
   }
 }
     `;
+export const CheckExternalTokenDocument = gql`
+    mutation checkExternalToken($externalToken: String!) {
+  checkExternalToken(externalToken: $externalToken) {
+    token
+    error
+  }
+}
+    `;
 export const CheckTokenDocument = gql`
     query checkToken($token: String!) {
   checkToken(token: $token) {
@@ -6858,6 +6891,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateTopicOrder(variables: UpdateTopicOrderMutationVariables): Promise<UpdateTopicOrderMutation> {
       return withWrapper(() => client.request<UpdateTopicOrderMutation>(print(UpdateTopicOrderDocument), variables));
+    },
+    checkExternalToken(variables: CheckExternalTokenMutationVariables): Promise<CheckExternalTokenMutation> {
+      return withWrapper(() => client.request<CheckExternalTokenMutation>(print(CheckExternalTokenDocument), variables));
     },
     checkToken(variables: CheckTokenQueryVariables): Promise<CheckTokenQuery> {
       return withWrapper(() => client.request<CheckTokenQuery>(print(CheckTokenDocument), variables));
