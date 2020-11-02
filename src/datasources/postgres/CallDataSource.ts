@@ -48,6 +48,18 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('call_ended', false);
     }
 
+    if (filter?.isReviewEnded === true) {
+      query.where('call_review_ended', true);
+    } else if (filter?.isReviewEnded === false) {
+      query.where('call_review_ended', false);
+    }
+
+    if (filter?.isSEPReviewEnded === true) {
+      query.where('call_sep_review_ended', true);
+    } else if (filter?.isSEPReviewEnded === false) {
+      query.where('call_sep_review_ended', false);
+    }
+
     return query.then((callDB: CallRecord[]) =>
       callDB.map(call => createCallObject(call))
     );
@@ -98,6 +110,8 @@ export default class PostgresCallDataSource implements CallDataSource {
           survey_comment: args.surveyComment,
           proposal_workflow_id: args.proposalWorkflowId,
           call_ended: args.callEnded,
+          call_review_ended: args.callReviewEnded,
+          call_sep_review_ended: args.callSEPReviewEnded,
           template_id: args.templateId,
         },
         ['*']

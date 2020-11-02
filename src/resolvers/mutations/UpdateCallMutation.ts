@@ -33,6 +33,12 @@ export class UpdateCallInput {
   public endReview: Date;
 
   @Field()
+  public startSEPReview: Date;
+
+  @Field()
+  public endSEPReview: Date;
+
+  @Field()
   public startNotify: Date;
 
   @Field()
@@ -55,6 +61,12 @@ export class UpdateCallInput {
 
   @Field(() => Int, { nullable: true })
   public callEnded?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public callReviewEnded?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public callSEPReviewEnded?: boolean;
 
   @Field(() => Int, { nullable: true })
   public templateId?: number;

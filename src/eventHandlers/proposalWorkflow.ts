@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { proposalDataSource } from '../datasources';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { eventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
@@ -70,6 +71,7 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
 
         break;
       case Event.PROPOSAL_SUBMITTED:
+      case Event.PROPOSAL_FEASIBLE:
       case Event.PROPOSAL_NOTIFIED:
       case Event.PROPOSAL_ACCEPTED:
       case Event.PROPOSAL_REJECTED:
@@ -101,16 +103,26 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
             );
           }
 
-          if (
-            event.technicalreview.status === TechnicalReviewStatus.FEASIBLE ||
-            event.technicalreview.status ===
-              TechnicalReviewStatus.PARTIALLY_FEASIBLE
-          ) {
-            await markProposalEventAsDoneAndCallWorkflowEngine(
-              event.type,
-              proposal
-            );
+          switch (event.technicalreview.status) {
+            // TODO: Review this if both feasible and partialy feasible should emit PROPOSAL_FEASIBLE
+            case TechnicalReviewStatus.FEASIBLE:
+            case TechnicalReviewStatus.PARTIALLY_FEASIBLE:
+              eventBus.publish({
+                type: Event.PROPOSAL_FEASIBLE,
+                proposal,
+                isRejection: false,
+                key: 'proposal',
+                loggedInUserId: event.loggedInUserId,
+              });
+              break;
+            default:
+              break;
           }
+
+          await markProposalEventAsDoneAndCallWorkflowEngine(
+            event.type,
+            proposal
+          );
         } catch (error) {
           logger.logError(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.technicalreview.proposalID}: `,
@@ -120,6 +132,8 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
 
         break;
       case Event.CALL_ENDED:
+      case Event.CALL_REVIEW_ENDED:
+      case Event.CALL_SEP_REVIEW_ENDED:
         try {
           const allProposalsOnCall = await proposalDataSource.getProposalsFromView(
             { callId: event.call.id }

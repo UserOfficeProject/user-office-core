@@ -22,6 +22,11 @@ interface ProposalSubmittedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalFeasibleEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FEASIBLE;
+  proposal: Proposal;
+}
+
 interface ProposalUpdatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_UPDATED;
   proposal: Proposal;
@@ -158,10 +163,21 @@ interface CallEndedEvent extends GeneralEvent {
   call: Call;
 }
 
+interface CallReviewEndedEvent extends GeneralEvent {
+  type: Event.CALL_REVIEW_ENDED;
+  call: Call;
+}
+
+interface CallSEPReviewEndedEvent extends GeneralEvent {
+  type: Event.CALL_SEP_REVIEW_ENDED;
+  call: Call;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
   | ProposalSubmittedEvent
+  | ProposalFeasibleEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
   | UserCreateEvent
@@ -180,6 +196,8 @@ export type ApplicationEvent =
   | UserDeletedEvent
   | ProposalNotifiedEvent
   | CallEndedEvent
+  | CallReviewEndedEvent
+  | CallSEPReviewEndedEvent
   | ProposalFeasibilityReviewSubmittedEvent
   | ProposalSampleReviewSubmittedEvent
   | ProposalInstrumentSelectedEvent

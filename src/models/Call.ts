@@ -6,6 +6,8 @@ export class Call {
     public endCall: Date,
     public startReview: Date,
     public endReview: Date,
+    public startSEPReview: Date,
+    public endSEPReview: Date,
     public startNotify: Date,
     public endNotify: Date,
     public startCycle: Date,
@@ -14,6 +16,8 @@ export class Call {
     public surveyComment: string,
     public proposalWorkflowId: number,
     public callEnded: boolean,
+    public callReviewEnded: boolean,
+    public callSEPReviewEnded: boolean,
     public templateId?: number
   ) {}
 }

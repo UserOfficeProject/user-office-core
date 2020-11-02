@@ -30,6 +30,12 @@ export class CreateCallInput {
   public endReview: Date;
 
   @Field()
+  public startSEPReview: Date;
+
+  @Field()
+  public endSEPReview: Date;
+
+  @Field()
   public startNotify: Date;
 
   @Field()
