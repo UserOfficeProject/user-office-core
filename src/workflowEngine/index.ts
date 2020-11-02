@@ -34,11 +34,7 @@ const shouldMoveToNextStatus = (
       ) >= 0
   );
 
-  if (allNextStatusRulesFulfilled) {
-    return true;
-  } else {
-    return false;
-  }
+  return allNextStatusRulesFulfilled;
 };
 
 const updateProposalStatus = (
