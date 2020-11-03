@@ -177,7 +177,7 @@ export const collectProposalPDFData = async (
       proposal.id
     );
     if (technicalReview) {
-      out.technicalReview;
+      out.technicalReview = technicalReview;
     }
   }
 
