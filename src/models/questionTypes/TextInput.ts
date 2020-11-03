@@ -9,7 +9,7 @@ export const textInputDefinition: Question = {
     if (field.question.dataType !== DataType.TEXT_INPUT) {
       throw new Error('DataType should be TEXT_INPUT');
     }
-    const config = field.question.config as TextInputConfig;
+    const config = field.config as TextInputConfig;
     if (config.required && !value) {
       return false;
     }

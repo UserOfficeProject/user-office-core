@@ -10,7 +10,7 @@ export const selectionFromOptionsDefinition: Question = {
       throw new Error('DataType should be SELECTION_FROM_OPTIONS');
     }
 
-    const config = field.question.config as SelectionFromOptionsConfig;
+    const config = field.config as SelectionFromOptionsConfig;
     if (config.required && !value) {
       return false;
     }

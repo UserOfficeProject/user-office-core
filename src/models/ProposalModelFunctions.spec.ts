@@ -40,8 +40,8 @@ it('Field config "required=false" should make field not required', async () => {
       required: false,
     }),
   });
-  expect(isMatchingConstraints(question, false)).toBe(true);
-  expect(isMatchingConstraints(question, true)).toBe(true);
+  expect(isMatchingConstraints(question, 'text')).toBe(true);
+  expect(isMatchingConstraints(question, '')).toBe(true);
 });
 
 it('Dependencies should be sattisfied if value matches', async () => {
