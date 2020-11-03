@@ -97,6 +97,15 @@ export class SubtemplateConfig {
 }
 
 @ObjectType()
+export class IntervalConfig extends ConfigBase {
+  @Field(() => [String], { nullable: true })
+  units: string[] | null;
+
+  @Field(() => String)
+  property: string;
+}
+
+@ObjectType()
 export class ProposalBasisConfig {
   @Field(() => String)
   tooltip: string;
@@ -114,5 +123,6 @@ export const FieldConfigType = createUnionType({
     SampleBasisConfig,
     SubtemplateConfig,
     ProposalBasisConfig,
+    IntervalConfig,
   ], // function that returns array of object types classes
 });

@@ -4,6 +4,7 @@ import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
 import { embellishmentDefinition } from './Embellishment';
 import { fileUploadDefinition } from './FileUpload';
+import { intervalDefinition } from './Interval';
 import { proposalBasisDefinition } from './ProposalBasis';
 import { sampleBasisDefinition } from './SampleBasis';
 import { sampleDeclarationDefinition } from './SampleDeclaration';
@@ -29,6 +30,7 @@ const registry = [
   sampleDeclarationDefinition,
   proposalBasisDefinition,
   sampleBasisDefinition,
+  intervalDefinition,
 ];
 
 Object.freeze(registry);
