@@ -29,6 +29,7 @@ services:
       SPARKPOST_TOKEN: dummytoken
       NODE_ENV: development
       UO_FEATURE_DISABLE_MESSAGE_BROKER: 1
+      GENERATE_PROPOSAL_PDF_ENDPOINT: http://factory:4500/generate-pdf
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads"
       - "traefik.port=4000"
@@ -51,3 +52,17 @@ services:
     entrypoint: ["./wait-for-frontend.sh", "frontend:80", "npm run cy:run"]
     depends_on:
       - frontend
+  factory:
+    image: dmsc/duo-factory:${FACTORY_TAG}
+    init: true
+    environment:
+      - NODE_ENV=production
+      - DATABASE_HOSTNAME=localhost
+      - DATABASE_PORT=5432
+      - DATABASE_USER=duouser
+      - DATABASE_PASSWORD=duopassword
+      - DATABASE_DATABASE=duo
+    ports:
+      - 4500:4500
+    cap_add:
+      - SYS_ADMIN
