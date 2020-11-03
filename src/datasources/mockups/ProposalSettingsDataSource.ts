@@ -105,6 +105,12 @@ export class ProposalSettingsDataSourceMock
     return dummyProposalWorkflow;
   }
 
+  async getProposalWorkflowByCall(
+    callId: number
+  ): Promise<ProposalWorkflow | null> {
+    return dummyProposalWorkflow;
+  }
+
   async getAllProposalWorkflows(): Promise<ProposalWorkflow[]> {
     return [dummyProposalWorkflow];
   }
