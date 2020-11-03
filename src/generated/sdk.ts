@@ -2,7 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import { print } from 'graphql';
 import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -1280,6 +1280,9 @@ export type Query = {
   instrument: Maybe<Instrument>;
   instruments: Maybe<InstrumentsQueryResult>;
   instrumentsBySep: Maybe<Array<InstrumentWithAvailabilityTime>>;
+  userInstruments: Maybe<InstrumentsQueryResult>;
+  instrumentScientistHasInstrument: Maybe<Scalars['Boolean']>;
+  instrumentScientistHasAccess: Maybe<Scalars['Boolean']>;
   isNaturalKeyPresent: Maybe<Scalars['Boolean']>;
   proposal: Maybe<Proposal>;
   proposalStatus: Maybe<ProposalStatus>;
@@ -1398,6 +1401,17 @@ export type QueryInstrumentsArgs = {
 export type QueryInstrumentsBySepArgs = {
   callId: Scalars['Int'];
   sepId: Scalars['Int'];
+};
+
+
+export type QueryInstrumentScientistHasInstrumentArgs = {
+  instrumentId: Scalars['Int'];
+};
+
+
+export type QueryInstrumentScientistHasAccessArgs = {
+  proposalId: Scalars['Int'];
+  instrumentId: Scalars['Int'];
 };
 
 
@@ -1643,7 +1657,7 @@ export type SamplesFilter = {
 };
 
 export enum SampleStatus {
-  PENDING_EVALUTATION = 'PENDING_EVALUTATION',
+  PENDING_EVALUATION = 'PENDING_EVALUATION',
   LOW_RISK = 'LOW_RISK',
   ELEVATED_RISK = 'ELEVATED_RISK',
   HIGH_RISK = 'HIGH_RISK'

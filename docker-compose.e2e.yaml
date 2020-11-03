@@ -1,19 +1,19 @@
 # Use postgres/example user/password credentials
-version: '3.1'
+version: "3.1"
 
 services:
   proxy:
     image: traefik:1.7 # The official Traefik docker image
     command: --api --docker # Enables the web UI and tells Traefik to listen to docker
     ports:
-      - '80:80' # The HTTP port
-      - '8080:8080' # The Web UI (enabled by --api)
+      - "80:80" # The HTTP port
+      - "8080:8080" # The Web UI (enabled by --api)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   db:
     build:
       context: ./
-      dockerfile: './cypress/Dockerfile.psql'
+      dockerfile: "./cypress/Dockerfile.psql"
     restart: always
     environment:
       POSTGRES_PASSWORD: duopassword
@@ -30,17 +30,17 @@ services:
       NODE_ENV: development
       UO_FEATURE_DISABLE_MESSAGE_BROKER: 1
     labels:
-      - 'traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /proposal, /uploads'
-      - 'traefik.port=4000'
+      - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads"
+      - "traefik.port=4000"
     depends_on:
       - db
   frontend:
     build:
       context: ./
-      dockerfile: './Dockerfile'
+      dockerfile: "./Dockerfile"
     labels:
-      - 'traefik.frontend.rule=PathPrefix:/'
-      - 'traefik.port=80'
+      - "traefik.frontend.rule=PathPrefix:/"
+      - "traefik.port=80"
     depends_on:
       - backend
   cypress:
@@ -48,6 +48,6 @@ services:
       CYPRESS_SVC_ACC_TOKEN: $SVC_ACC_TOKEN
     ipc: host
     build: ./cypress
-    entrypoint: ['./wait-for-frontend.sh', 'frontend:80', 'npm run cy:run']
+    entrypoint: ["./wait-for-frontend.sh", "frontend:80", "npm run cy:run"]
     depends_on:
       - frontend
