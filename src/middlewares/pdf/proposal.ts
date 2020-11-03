@@ -10,6 +10,7 @@ import { TechnicalReview } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { UserWithRole, BasicUserDetails } from '../../models/User';
 import { isRejection } from '../../rejection';
+import { collectSamplePDFData, SamplePDFData } from './sample';
 import { getFileAttachmentIds } from './util';
 
 type ProposalPDFData = {
@@ -19,6 +20,7 @@ type ProposalPDFData = {
   questionarySteps: QuestionaryStep[];
   attachmentIds: string[];
   technicalReview?: TechnicalReview;
+  samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
   filename: string;
 };
 
@@ -110,12 +112,23 @@ export const collectProposalPDFData = async (
     throw new Error('User was not PI or co-proposer');
   }
 
+  const sampleAttachmentIds: string[] = [];
+
+  const samplePDFData = (
+    await Promise.all([8].map(sampleId => collectSamplePDFData(sampleId, user)))
+  ).map(({ sample, sampleQuestionaryFields, attachmentIds }) => {
+    sampleAttachmentIds.push(...attachmentIds);
+
+    return { sample, sampleQuestionaryFields };
+  });
+
   const out: ProposalPDFData = {
     proposal,
     principalInvestigator,
     coProposers,
     questionarySteps: [],
     attachmentIds: [],
+    samples: samplePDFData,
     filename: `${proposal.created.getUTCFullYear()}_${
       principalInvestigator.lastname
     }_${proposal.shortCode}.pdf`,
@@ -155,6 +168,7 @@ export const collectProposalPDFData = async (
       fields: answers,
     });
     out.attachmentIds.push(...questionaryAttachmentIds);
+    out.attachmentIds.push(...sampleAttachmentIds);
   }
 
   if (UserAuthorization.isReviewerOfProposal(user, proposal.id)) {

@@ -55,7 +55,7 @@ function factoryRequest<T extends { filename: string }>(
         res.setHeader(
           'Content-Disposition',
           contentDisposition(
-            data.length > 1 ? `${pdfType}.pdf` : data[0].filename
+            data.length > 1 ? `${pdfType}_collection.pdf` : data[0].filename
           )
         );
 
@@ -79,7 +79,8 @@ router.get('/download/proposal/:proposal_ids', async (req: any, res) => {
 
     const proposalIds: number[] = req.params.proposal_ids
       .split(',')
-      .map((n: string) => parseInt(n));
+      .map((n: string) => parseInt(n))
+      .filter((id: number) => !isNaN(id));
 
     const userWithRole = { ...user, currentRole: decoded.currentRole };
 
@@ -107,7 +108,8 @@ router.get('/download/sample/:sample_ids', async (req: any, res) => {
 
     const sampleIds: number[] = req.params.sample_ids
       .split(',')
-      .map((n: string) => parseInt(n));
+      .map((n: string) => parseInt(n))
+      .filter((id: number) => !isNaN(id));
 
     const userWithRole = { ...user, currentRole: decoded.currentRole };
 

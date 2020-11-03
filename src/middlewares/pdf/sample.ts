@@ -5,7 +5,6 @@ import {
 } from '../../models/ProposalModelFunctions';
 import { Answer } from '../../models/Questionary';
 import { Sample, SampleStatus } from '../../models/Sample';
-import { DataType, TemplateCategoryId } from '../../models/Template';
 import { UserWithRole } from '../../models/User';
 import { getFileAttachmentIds } from './util';
 
