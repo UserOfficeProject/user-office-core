@@ -6,14 +6,13 @@ import * as Yup from 'yup';
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { DateConfig, Question } from 'generated/sdk';
+import { Question } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionDateForm: FormComponent<Question> = props => {
   const field = props.field;
-  const config = field.config as DateConfig;
 
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 

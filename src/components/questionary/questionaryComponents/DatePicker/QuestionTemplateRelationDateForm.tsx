@@ -7,14 +7,12 @@ import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from 'components/common/FormikUICustomDependencySelector';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { DateConfig, QuestionTemplateRelation } from 'generated/sdk';
+import { QuestionTemplateRelation } from 'generated/sdk';
 
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
 export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRelation> = props => {
-  const config = props.field.config as DateConfig;
-
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}

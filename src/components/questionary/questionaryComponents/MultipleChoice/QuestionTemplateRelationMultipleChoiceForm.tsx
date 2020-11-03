@@ -8,17 +8,12 @@ import FormikUICustomDependencySelector from 'components/common/FormikUICustomDe
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import {
-  QuestionTemplateRelation,
-  SelectionFromOptionsConfig,
-} from 'generated/sdk';
+import { QuestionTemplateRelation } from 'generated/sdk';
 
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
 export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionTemplateRelation> = props => {
-  const config = props.field.config as SelectionFromOptionsConfig;
-
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}

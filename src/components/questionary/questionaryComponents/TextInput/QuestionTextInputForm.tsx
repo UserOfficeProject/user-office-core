@@ -1,7 +1,7 @@
 import Collapse from '@material-ui/core/Collapse';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { useState } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
