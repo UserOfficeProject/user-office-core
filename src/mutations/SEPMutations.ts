@@ -11,6 +11,7 @@ import {
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
+import { ProposalIds } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
 import { UserRole, UserWithRole } from '../models/User';
@@ -191,11 +192,11 @@ export default class SEPMutations {
 
   @ValidateArgs(assignProposalToSEPValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  @EventBus(Event.SEP_PROPOSAL_ASSIGNED)
+  @EventBus(Event.PROPOSAL_SEP_SELECTED)
   async assignProposalToSEP(
     agent: UserWithRole | null,
     args: AssignProposalToSEPArgs
-  ): Promise<SEP | Rejection> {
+  ): Promise<ProposalIds | Rejection> {
     return this.dataSource
       .assignProposal(args.proposalId, args.sepId)
       .then(result => result)

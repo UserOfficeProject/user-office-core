@@ -69,24 +69,26 @@ const collectSubtemplateData = async (answer: Answer) => {
   const questionaryAnswers: Array<{ fields: Answer[] }> = [];
 
   for (const subQuestionaryId of subQuestionaryIds) {
-    const subquestionarySteps = await questionaryDataSource.getQuestionarySteps(
+    const questionarySteps = await questionaryDataSource.getQuestionarySteps(
       subQuestionaryId
     );
-    if (subquestionarySteps.length === 0) {
-      continue;
-    }
-    const firstStepTopicId = subquestionarySteps[0].topic.id; // NOTE: for now only the first topic
-    const answers = getTopicActiveAnswers(
-      subquestionarySteps!,
-      firstStepTopicId
-    );
 
-    for (const answer of answers) {
-      attachmentIds.push(...getFileAttachmentIds(answer));
-    }
+    const stepAnswers: Answer[] = [];
+
+    questionarySteps.forEach(questionaryStep => {
+      const answers = getTopicActiveAnswers(
+        questionarySteps,
+        questionaryStep.topic.id
+      );
+
+      for (const answer of answers) {
+        stepAnswers.push(answer);
+        attachmentIds.push(...getFileAttachmentIds(answer));
+      }
+    });
 
     questionaryAnswers.push({
-      fields: answers,
+      fields: stepAnswers,
     });
   }
 

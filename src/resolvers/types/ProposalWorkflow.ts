@@ -11,10 +11,7 @@ import {
 import { ResolverContext } from '../../context';
 import { ProposalWorkflow as ProposalWorkflowOrigin } from '../../models/ProposalWorkflow';
 import { isRejection } from '../../rejection';
-import {
-  ProposalWorkflowConnection,
-  ProposalWorkflowConnectionGroup,
-} from './ProposalWorkflowConnection';
+import { ProposalWorkflowConnectionGroup } from './ProposalWorkflowConnection';
 
 @ObjectType()
 export class ProposalWorkflow implements Partial<ProposalWorkflowOrigin> {

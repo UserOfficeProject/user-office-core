@@ -1,6 +1,7 @@
 import { Call } from '../models/Call';
-import { Proposal } from '../models/Proposal';
+import { Proposal, ProposalIds } from '../models/Proposal';
 import { SEP } from '../models/SEP';
+import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
 
@@ -44,7 +45,7 @@ interface ProposalNotifiedEvent extends GeneralEvent {
 
 interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED;
-  proposal: Proposal;
+  technicalreview: TechnicalReview;
 }
 
 interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
@@ -54,12 +55,12 @@ interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SELECTED;
-  proposal: Proposal;
+  proposalids: ProposalIds;
 }
 
 interface ProposalSEPSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_SELECTED;
-  proposal: Proposal;
+  proposalids: ProposalIds;
 }
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
