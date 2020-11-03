@@ -92,7 +92,7 @@ export function createQuestionTemplateForm(
 export function createQuestionaryComponent(
   props: BasicComponentProps
 ): JSX.Element {
-  const dataType = props.templateField.question.dataType;
+  const dataType = props.answer.question.dataType;
   const definition = getQuestionaryComponentDefinition(dataType);
 
   return React.createElement(definition.questionaryComponent, props);

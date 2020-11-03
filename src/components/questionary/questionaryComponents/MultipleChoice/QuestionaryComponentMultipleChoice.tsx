@@ -30,7 +30,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     },
   })();
 
-  const { templateField, touched, errors, onComplete } = props;
+  const { answer: templateField, touched, errors, onComplete } = props;
   const {
     question: { proposalQuestionId, question },
     value,

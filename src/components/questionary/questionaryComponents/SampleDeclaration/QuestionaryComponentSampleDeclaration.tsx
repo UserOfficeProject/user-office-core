@@ -46,7 +46,7 @@ function createSampleStub(
 }
 
 function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
-  const { templateField, errors, onComplete } = props;
+  const { answer: templateField, errors, onComplete } = props;
   const proposalQuestionId = templateField.question.proposalQuestionId;
   const config = templateField.config as SubtemplateConfig;
 

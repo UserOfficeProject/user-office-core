@@ -4,7 +4,7 @@ import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { EmbellishmentConfig } from 'generated/sdk';
 
 export function QuestionaryComponentEmbellishment(props: BasicComponentProps) {
-  const config = props.templateField.config as EmbellishmentConfig;
+  const config = props.answer.config as EmbellishmentConfig;
 
   return (
     <div

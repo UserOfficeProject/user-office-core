@@ -10,7 +10,7 @@ import ProposalErrorLabel from 'components/proposal/ProposalErrorLabel';
 import { BooleanConfig } from 'generated/sdk';
 
 export function QuestionaryComponentBoolean(props: BasicComponentProps) {
-  const { templateField, errors, onComplete, touched } = props;
+  const { answer: templateField, errors, onComplete, touched } = props;
   const {
     question: { proposalQuestionId, question },
   } = templateField;

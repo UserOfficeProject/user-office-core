@@ -11,7 +11,7 @@ import { FileMetaData } from 'models/FileUpload';
 export function QuestionaryComponentFileUpload(
   props: BasicComponentProps & { files?: string[] }
 ) {
-  const { templateField, errors, onComplete } = props;
+  const { answer: templateField, errors, onComplete } = props;
   const {
     question: { proposalQuestionId },
     value,

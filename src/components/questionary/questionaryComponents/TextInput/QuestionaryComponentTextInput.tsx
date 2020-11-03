@@ -13,7 +13,7 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
       margin: '15px 0 10px 0',
     },
   })();
-  const { templateField, touched, errors, onComplete } = props;
+  const { answer: templateField, touched, errors, onComplete } = props;
   const {
     question: { proposalQuestionId },
     question,

@@ -22,7 +22,7 @@ function TextFieldWithTooltip(props: TextFieldProps & { title: string }) {
 }
 
 export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
-  const { templateField, touched, errors, onComplete } = props;
+  const { answer: templateField, touched, errors, onComplete } = props;
   const {
     question: { proposalQuestionId, question },
     value,

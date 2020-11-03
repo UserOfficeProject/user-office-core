@@ -84,7 +84,7 @@ export default function QuestionaryStepView(props: {
                 key={field.question.proposalQuestionId}
               >
                 {createQuestionaryComponent({
-                  templateField: field,
+                  answer: field,
                   touched: touched, // for formik
                   errors: errors, // for formik
                   onComplete: (evt: SyntheticEvent, newValue: any) => {
