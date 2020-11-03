@@ -6,14 +6,15 @@ import { UserOfficeAsyncJob } from '../startAsyncJobs';
 
 const checkCallsReviewEnded = async () => {
   try {
-    const notEndedCalls = await callDataSource.getCalls({
+    const reviewNotEndedCalls = await callDataSource.getCalls({
       isReviewEnded: false,
     });
 
     const currentDate = new Date();
 
-    const callsThatShouldEndReview = notEndedCalls.filter(
-      notEndedCall => notEndedCall.endReview.getTime() <= currentDate.getTime()
+    const callsThatShouldEndReview = reviewNotEndedCalls.filter(
+      reviewNotEndedCall =>
+        reviewNotEndedCall.endReview.getTime() <= currentDate.getTime()
     );
 
     callsThatShouldEndReview.forEach(async callThatShouldEndReview => {

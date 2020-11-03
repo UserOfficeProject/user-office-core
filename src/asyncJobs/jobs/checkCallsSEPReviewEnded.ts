@@ -4,22 +4,22 @@ import { Event } from '../../events/event.enum';
 import { logger } from '../../utils/Logger';
 import { UserOfficeAsyncJob } from '../startAsyncJobs';
 
-const checkCallsReviewEnded = async () => {
+const checkCallsSEPReviewEnded = async () => {
   try {
-    const notEndedCalls = await callDataSource.getCalls({
+    const sepReviewNotEndedCalls = await callDataSource.getCalls({
       isSEPReviewEnded: false,
     });
 
     const currentDate = new Date();
 
-    const callsThatShouldEndReview = notEndedCalls.filter(
-      notEndedCall =>
-        notEndedCall.endSEPReview.getTime() <= currentDate.getTime()
+    const callsThatShouldEndSEPReview = sepReviewNotEndedCalls.filter(
+      sepReviewNotEndedCall =>
+        sepReviewNotEndedCall.endSEPReview.getTime() <= currentDate.getTime()
     );
 
-    callsThatShouldEndReview.forEach(async callThatShouldEndReview => {
+    callsThatShouldEndSEPReview.forEach(async callThatShouldEndSEPReview => {
       const updatedCall = await callDataSource.update({
-        ...callThatShouldEndReview,
+        ...callThatShouldEndSEPReview,
         callSEPReviewEnded: true,
       });
 
@@ -40,9 +40,9 @@ const checkCallsReviewEnded = async () => {
 // NOTE: Run every day at 00:07
 const options = { timeToRun: '7 0 * * *' };
 
-const checkCallsReviewEndedJob: UserOfficeAsyncJob = {
-  functionToRun: checkCallsReviewEnded,
+const checkCallsSEPReviewEndedJob: UserOfficeAsyncJob = {
+  functionToRun: checkCallsSEPReviewEnded,
   options,
 };
 
-export default checkCallsReviewEndedJob;
+export default checkCallsSEPReviewEndedJob;

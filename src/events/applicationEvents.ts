@@ -1,5 +1,6 @@
 import { Call } from '../models/Call';
 import { Proposal, ProposalIds } from '../models/Proposal';
+import { Review } from '../models/Review';
 import { SEP } from '../models/SEP';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
@@ -51,6 +52,11 @@ interface ProposalNotifiedEvent extends GeneralEvent {
 interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED;
   technicalreview: TechnicalReview;
+}
+
+interface ProposalSEPReviewSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_REVIEW_SUBMITTED;
+  review: Review;
 }
 
 interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
@@ -199,6 +205,7 @@ export type ApplicationEvent =
   | CallReviewEndedEvent
   | CallSEPReviewEndedEvent
   | ProposalFeasibilityReviewSubmittedEvent
+  | ProposalSEPReviewSubmittedEvent
   | ProposalSampleReviewSubmittedEvent
   | ProposalInstrumentSelectedEvent
   | ProposalSEPSelectedEvent

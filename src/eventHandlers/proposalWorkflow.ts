@@ -131,6 +131,29 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
         }
 
         break;
+      case Event.PROPOSAL_SEP_REVIEW_SUBMITTED:
+        try {
+          const proposal = await proposalDataSource.get(
+            event.review.proposalID
+          );
+
+          if (!proposal || !proposal.id) {
+            throw new Error(
+              `Proposal with id ${event.review.proposalID} not found`
+            );
+          }
+
+          await markProposalEventAsDoneAndCallWorkflowEngine(
+            event.type,
+            proposal
+          );
+        } catch (error) {
+          logger.logError(
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.review.proposalID}: `,
+            error
+          );
+        }
+        break;
       case Event.CALL_ENDED:
       case Event.CALL_REVIEW_ENDED:
       case Event.CALL_SEP_REVIEW_ENDED:
