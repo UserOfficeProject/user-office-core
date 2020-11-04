@@ -52,6 +52,10 @@ function factoryRequest<T extends { filename: string }>(
 
         res.status(500).send('Failed to generate PDF');
       } else {
+        if (pdfResp.headers['content-type']) {
+          res.setHeader('content-type', pdfResp.headers['content-type']);
+        }
+
         res.setHeader(
           'Content-Disposition',
           contentDisposition(

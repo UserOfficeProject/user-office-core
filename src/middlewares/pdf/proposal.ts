@@ -114,8 +114,15 @@ export const collectProposalPDFData = async (
 
   const sampleAttachmentIds: string[] = [];
 
+  // use random samples until https://jira.esss.lu.se/browse/SWAP-1184 is implemented
+  const testSamples = await baseContext.queries.sample.getSamples(user, {});
+
   const samplePDFData = (
-    await Promise.all([8].map(sampleId => collectSamplePDFData(sampleId, user)))
+    await Promise.all(
+      testSamples
+        .slice(0, 1)
+        .map(sample => collectSamplePDFData(sample.id, user))
+    )
   ).map(({ sample, sampleQuestionaryFields, attachmentIds }) => {
     sampleAttachmentIds.push(...attachmentIds);
 
