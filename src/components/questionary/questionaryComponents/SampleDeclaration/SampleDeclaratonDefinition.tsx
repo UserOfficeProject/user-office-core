@@ -21,7 +21,7 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
   icon: <CheckBoxOutlineBlankIcon />,
   answerRenderer: ({ answer }) => <SamplesAnswerRenderer answer={answer} />,
   createYupValidationSchema: answer => {
-    const schema = Yup.object().shape({});
+    const schema = Yup.array().of(Yup.number());
 
     return schema;
   },
