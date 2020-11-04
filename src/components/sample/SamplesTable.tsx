@@ -5,16 +5,16 @@ import { DecodedValueMap, SetQuery, QueryParamConfig } from 'use-query-params';
 import { SampleBasic } from 'models/Sample';
 import { tableIcons } from 'utils/materialIcons';
 
-type SamplesTableQueryParamsType = {
-  call: QueryParamConfig<number | null | undefined>;
-  search: QueryParamConfig<string | null | undefined>;
-};
-
 const defaultColumns: Column<SampleBasic>[] = [
   { title: 'Title', field: 'title' },
   { title: 'Status', field: 'safetyStatus' },
   { title: 'Created', field: 'created' },
 ];
+
+type SamplesTableQueryParamsType = {
+  call: QueryParamConfig<number | null | undefined>;
+  search: QueryParamConfig<string | null | undefined>;
+};
 
 const SamplesTable = (
   props: Omit<MaterialTableProps<SampleBasic>, 'columns'> & {

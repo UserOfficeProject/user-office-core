@@ -85,7 +85,7 @@ function SampleSafetyPage() {
 
     return (
       <>
-        <Tooltip title="View sample">
+        <Tooltip title="Review sample">
           <IconButton
             style={iconButtonStyle}
             onClick={() => setSelectedSample(rowData)}
