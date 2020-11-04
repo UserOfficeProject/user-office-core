@@ -1,9 +1,13 @@
-import { Tooltip, IconButton } from '@material-ui/core';
-import { Avatar, ListItemIcon, MenuItem, Typography } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import { Visibility } from '@material-ui/icons';
+import IconButton from '@material-ui/core/IconButton';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import MenuItem from '@material-ui/core/MenuItem';
+import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { Options } from 'material-table';
@@ -86,7 +90,7 @@ function SampleSafetyPage() {
             style={iconButtonStyle}
             onClick={() => setSelectedSample(rowData)}
           >
-            <Visibility />
+            <VisibilityIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Download sample as pdf">
