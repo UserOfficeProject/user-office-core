@@ -163,7 +163,7 @@ const collectProposalPDFData = async (
 
       questionaryAttachmentIds.push(...getFileAttachmentIds(answer));
 
-      if (answer.question.dataType === DataType.SUBTEMPLATE) {
+      if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
         const {
           attachmentIds,
           questionaryAnswers,
