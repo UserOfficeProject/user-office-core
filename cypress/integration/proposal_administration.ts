@@ -75,7 +75,7 @@ context('Proposal administration tests', () => {
         for (const mutation of mutationList) {
           for (const child of mutation.addedNodes) {
             if (child.nodeName === 'A') {
-              expect(child.href).to.contain('/proposal/download/1');
+              expect(child.href).to.contain('/download/proposal/1');
               expect(child.download).to.contain('download');
             }
           }
@@ -100,7 +100,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Proposals').click();
 
-    cy.request('GET', '/proposal/download/1').then(response => {
+    cy.request('GET', '/download/proposal/1').then(response => {
       expect(response.headers['content-type']).to.be.equal('application/pdf');
       expect(response.status).to.be.equal(200);
     });
