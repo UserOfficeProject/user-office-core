@@ -29,7 +29,7 @@ services:
       SPARKPOST_TOKEN: dummytoken
       NODE_ENV: development
       UO_FEATURE_DISABLE_MESSAGE_BROKER: 1
-      GENERATE_PROPOSAL_PDF_ENDPOINT: http://factory:4500/generate-pdf
+      USER_OFFICE_PDF_FACTORY_ENDPOINT: http://factory:4500/generate-pdf
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads"
       - "traefik.port=4000"
