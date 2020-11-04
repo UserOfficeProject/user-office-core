@@ -2,6 +2,7 @@
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
 
+import { Event } from '../../events/event.enum';
 import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
@@ -11,6 +12,7 @@ import {
   CallRecord,
   createProposalObject,
   createProposalViewObject,
+  ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
 } from './records';
@@ -110,6 +112,28 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((records: ProposalRecord[]) => {
         if (records === undefined || !records.length) {
           throw new Error(`Proposal not found ${proposal.id}`);
+        }
+
+        return createProposalObject(records[0]);
+      });
+  }
+
+  async updateProposalStatus(
+    proposalId: number,
+    proposalStatusId: number
+  ): Promise<Proposal> {
+    return database
+      .update(
+        {
+          status_id: proposalStatusId,
+        },
+        ['*']
+      )
+      .from('proposals')
+      .where('proposal_id', proposalId)
+      .then((records: ProposalRecord[]) => {
+        if (records === undefined || !records.length) {
+          throw new Error(`Proposal not found ${proposalId}`);
         }
 
         return createProposalObject(records[0]);
@@ -286,5 +310,29 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((proposals: ProposalRecord[]) =>
         proposals.map(proposal => createProposalObject(proposal))
       );
+  }
+
+  async markEventAsDoneOnProposal(
+    event: Event,
+    proposalId: number
+  ): Promise<ProposalEventsRecord | null> {
+    const dataToInsert = {
+      proposal_id: proposalId,
+      [event.toLowerCase()]: true,
+    };
+
+    const result = await database.raw(
+      `? ON CONFLICT (proposal_id)
+        DO UPDATE SET
+        ${event.toLowerCase()} = true
+        RETURNING *;`,
+      [database('proposal_events').insert(dataToInsert)]
+    );
+
+    if (result.rows && result.rows.length) {
+      return result.rows[0];
+    } else {
+      return null;
+    }
   }
 }

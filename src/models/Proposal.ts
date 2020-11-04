@@ -47,3 +47,7 @@ export class Proposal {
     public submitted: boolean
   ) {}
 }
+
+export class ProposalIds {
+  constructor(public proposalIds: number[]) {}
+}

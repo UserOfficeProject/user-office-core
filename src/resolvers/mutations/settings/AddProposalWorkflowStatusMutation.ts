@@ -36,9 +36,6 @@ export class AddProposalWorkflowStatusInput
 
   @Field(() => Int, { nullable: true })
   public prevProposalStatusId: number | null;
-
-  @Field(() => String)
-  public nextStatusEventType: string;
 }
 
 @Resolver()

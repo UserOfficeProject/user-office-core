@@ -1,6 +1,17 @@
-import { ObjectType, Field, Int } from 'type-graphql';
+import {
+  ObjectType,
+  Field,
+  Int,
+  Resolver,
+  FieldResolver,
+  Root,
+  Ctx,
+} from 'type-graphql';
 
+import { ResolverContext } from '../../context';
 import { ProposalWorkflowConnection as ProposalWorkflowConnectionOrigin } from '../../models/ProposalWorkflowConnections';
+import { isRejection } from '../../rejection';
+import { NextStatusEvent } from './NextStatusEvent';
 import { ProposalStatus } from './ProposalStatus';
 
 @ObjectType()
@@ -28,9 +39,6 @@ export class ProposalWorkflowConnection
   public prevProposalStatusId: number | null;
 
   @Field()
-  public nextStatusEventType: string;
-
-  @Field()
   public droppableGroupId: string;
 }
 
@@ -44,4 +52,20 @@ export class ProposalWorkflowConnectionGroup {
 
   @Field(() => [ProposalWorkflowConnection])
   public connections: ProposalWorkflowConnection[];
+}
+
+@Resolver(() => ProposalWorkflowConnection)
+export class ProposalWorkflowConnectionResolver {
+  @FieldResolver(() => [NextStatusEvent])
+  async nextStatusEvents(
+    @Root() proposalWorkflowConnection: ProposalWorkflowConnection,
+    @Ctx() context: ResolverContext
+  ): Promise<NextStatusEvent[]> {
+    const nextStatusEvents = await context.queries.proposalSettings.getNextStatusEventsByConnectionId(
+      context.user,
+      proposalWorkflowConnection.id
+    );
+
+    return isRejection(nextStatusEvents) ? [] : nextStatusEvents;
+  }
 }

@@ -3,6 +3,7 @@ import {
   Instrument,
   InstrumentWithAvailabilityTime,
 } from '../models/Instrument';
+import { ProposalIds } from '../models/Proposal';
 import { BasicUserDetails } from '../models/User';
 import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMutation';
 
@@ -26,7 +27,7 @@ export interface InstrumentDataSource {
   assignProposalsToInstrument(
     proposalIds: number[],
     instrumentId: number
-  ): Promise<boolean>;
+  ): Promise<ProposalIds>;
   removeProposalFromInstrument(
     proposalId: number,
     instrumentId: number
@@ -51,4 +52,13 @@ export interface InstrumentDataSource {
     availabilityTime: number
   ): Promise<boolean>;
   submitInstrument(callId: number, instrumentId: number): Promise<boolean>;
+  hasInstrumentScientistInstrument(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean>;
+  hasInstrumentScientistAccess(
+    userId: number,
+    instrumentId: number,
+    proposalId: number
+  ): Promise<boolean>;
 }
