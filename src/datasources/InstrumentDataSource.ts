@@ -52,4 +52,13 @@ export interface InstrumentDataSource {
     availabilityTime: number
   ): Promise<boolean>;
   submitInstrument(callId: number, instrumentId: number): Promise<boolean>;
+  hasInstrumentScientistInstrument(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean>;
+  hasInstrumentScientistAccess(
+    userId: number,
+    instrumentId: number,
+    proposalId: number
+  ): Promise<boolean>;
 }
