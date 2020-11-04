@@ -105,13 +105,13 @@ export const QuestionIntervalForm: FormComponent<Question> = props => {
               name="config.property"
               label="Physical property"
               items={allProperties}
-              data-cy="property"
               InputProps={{
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
                   formikProps.setFieldValue('config.property', e.target.value);
                   formikProps.setFieldValue('config.units', []); // reset units to empty array
                   setShowUnits(e.target.value !== 'unitless');
                 },
+                'data-cy': 'property',
               }}
             />
 
@@ -124,6 +124,7 @@ export const QuestionIntervalForm: FormComponent<Question> = props => {
               )}
               disabled={!showUnits}
               className={classes.units}
+              data-cy="units"
             />
           </TitledContainer>
         </>
