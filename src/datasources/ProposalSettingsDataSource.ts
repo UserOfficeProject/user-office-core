@@ -21,6 +21,7 @@ export interface ProposalSettingsDataSource {
   getProposalWorkflow(
     proposalWorkflowId: number
   ): Promise<ProposalWorkflow | null>;
+  getProposalWorkflowByCall(callId: number): Promise<ProposalWorkflow | null>;
   getAllProposalWorkflows(): Promise<ProposalWorkflow[]>;
   updateProposalWorkflow(
     proposalWorkflow: ProposalWorkflow

@@ -3,6 +3,7 @@ import {
   Instrument,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
+import { ProposalIds } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
@@ -197,21 +198,34 @@ export default class PostgresInstrumentDataSource
   async assignProposalsToInstrument(
     proposalIds: number[],
     instrumentId: number
-  ): Promise<boolean> {
+  ): Promise<ProposalIds> {
     const dataToInsert = proposalIds.map(proposalId => ({
       instrument_id: instrumentId,
       proposal_id: proposalId,
     }));
 
-    const result = await database('instrument_has_proposals').insert(
-      dataToInsert
+    const proposalInstrumentPairs: {
+      proposal_id: number;
+      instrument_id: number;
+    }[] = await database('instrument_has_proposals')
+      .insert(dataToInsert)
+      .returning(['*']);
+
+    const returnedProposalIds = proposalInstrumentPairs.map(
+      proposalInstrumentPair => proposalInstrumentPair.proposal_id
     );
 
-    if (result) {
-      return true;
-    } else {
-      return false;
+    if (proposalInstrumentPairs) {
+      /**
+       * NOTE: We need to return changed proposalIds because we listen to events and
+       * we need to do some changes on proposals based on what is changed.
+       */
+      return new ProposalIds(returnedProposalIds);
     }
+
+    throw new Error(
+      `Could not assign proposals ${proposalIds} to instrument with id: ${instrumentId} `
+    );
   }
 
   async removeProposalFromInstrument(
@@ -395,5 +409,47 @@ export default class PostgresInstrumentDataSource
     } else {
       return false;
     }
+  }
+
+  hasInstrumentScientistInstrument(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    return database
+      .count('*')
+      .from('instruments as i')
+      .join('instrument_has_scientists as ihs', {
+        'i.instrument_id': 'ihs.instrument_id',
+      })
+      .where('ihs.user_id', userId)
+      .where('i.instrument_id', instrumentId)
+      .first()
+      .then((result: undefined | { count: string }) => {
+        return result?.count === '1';
+      });
+  }
+
+  async hasInstrumentScientistAccess(
+    scientistId: number,
+    instrumentId: number,
+    proposalId: number
+  ): Promise<boolean> {
+    return database
+      .select([database.raw('count(*) OVER() AS count')])
+      .from('proposals')
+      .join('instrument_has_scientists', {
+        'instrument_has_scientists.user_id': scientistId,
+      })
+      .join('instrument_has_proposals', {
+        'instrument_has_proposals.proposal_id': 'proposals.proposal_id',
+        'instrument_has_proposals.instrument_id':
+          'instrument_has_scientists.instrument_id',
+      })
+      .where('proposals.proposal_id', '=', proposalId)
+      .where('instrument_has_scientists.instrument_id', '=', instrumentId)
+      .first()
+      .then((result: undefined | { count: string }) => {
+        return result?.count === '1';
+      });
   }
 }

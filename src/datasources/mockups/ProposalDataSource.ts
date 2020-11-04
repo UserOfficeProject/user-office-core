@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
+import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 
@@ -114,6 +115,17 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return dummyProposal;
   }
 
+  async updateProposalStatus(
+    proposalId: number,
+    proposalStatusId: number
+  ): Promise<Proposal> {
+    if (proposalId !== dummyProposal.id) {
+      throw new Error('Proposal does not exist');
+    }
+
+    return dummyProposal;
+  }
+
   async setProposalUsers(id: number, users: number[]): Promise<void> {
     throw new Error('Not implemented');
   }
@@ -163,7 +175,23 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async markEventAsDoneOnProposal(
     event: Event,
     proposalId: number
-  ): Promise<boolean> {
-    return true;
+  ): Promise<ProposalEventsRecord | null> {
+    return {
+      proposal_id: 1,
+      proposal_created: true,
+      proposal_submitted: true,
+      call_ended: false,
+      proposal_sep_selected: false,
+      proposal_instrument_selected: false,
+      proposal_feasibility_review_submitted: false,
+      proposal_sample_review_submitted: false,
+      proposal_all_sep_reviewers_selected: false,
+      proposal_sep_review_submitted: false,
+      proposal_sep_meeting_submitted: false,
+      proposal_instrument_submitted: false,
+      proposal_accepted: false,
+      proposal_rejected: false,
+      proposal_notified: false,
+    };
   }
 }
