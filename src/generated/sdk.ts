@@ -29,6 +29,11 @@ export type Service = {
   sdl: Maybe<Scalars['String']>;
 };
 
+export type AddNextStatusEventsToConnectionInput = {
+  proposalWorkflowConnectionId: Scalars['Int'];
+  nextStatusEvents: Array<Scalars['String']>;
+};
+
 export type AddProposalWorkflowStatusInput = {
   proposalWorkflowId: Scalars['Int'];
   sortOrder: Scalars['Int'];
@@ -37,7 +42,6 @@ export type AddProposalWorkflowStatusInput = {
   proposalStatusId: Scalars['Int'];
   nextProposalStatusId?: Maybe<Scalars['Int']>;
   prevProposalStatusId?: Maybe<Scalars['Int']>;
-  nextStatusEventType: Scalars['String'];
 };
 
 export type AddSepMembersRole = {
@@ -240,6 +244,38 @@ export enum EvaluatorOperator {
   NEQ = 'neq'
 }
 
+export enum Event {
+  PROPOSAL_CREATED = 'PROPOSAL_CREATED',
+  PROPOSAL_UPDATED = 'PROPOSAL_UPDATED',
+  PROPOSAL_SUBMITTED = 'PROPOSAL_SUBMITTED',
+  PROPOSAL_SEP_SELECTED = 'PROPOSAL_SEP_SELECTED',
+  PROPOSAL_INSTRUMENT_SELECTED = 'PROPOSAL_INSTRUMENT_SELECTED',
+  PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED = 'PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED',
+  PROPOSAL_SAMPLE_REVIEW_SUBMITTED = 'PROPOSAL_SAMPLE_REVIEW_SUBMITTED',
+  PROPOSAL_ALL_SEP_REVIEWERS_SELECTED = 'PROPOSAL_ALL_SEP_REVIEWERS_SELECTED',
+  PROPOSAL_SEP_REVIEW_SUBMITTED = 'PROPOSAL_SEP_REVIEW_SUBMITTED',
+  PROPOSAL_SEP_MEETING_SUBMITTED = 'PROPOSAL_SEP_MEETING_SUBMITTED',
+  PROPOSAL_INSTRUMENT_SUBMITTED = 'PROPOSAL_INSTRUMENT_SUBMITTED',
+  PROPOSAL_ACCEPTED = 'PROPOSAL_ACCEPTED',
+  PROPOSAL_REJECTED = 'PROPOSAL_REJECTED',
+  CALL_ENDED = 'CALL_ENDED',
+  USER_CREATED = 'USER_CREATED',
+  USER_UPDATED = 'USER_UPDATED',
+  USER_ROLE_UPDATED = 'USER_ROLE_UPDATED',
+  USER_DELETED = 'USER_DELETED',
+  USER_PASSWORD_RESET_EMAIL = 'USER_PASSWORD_RESET_EMAIL',
+  EMAIL_INVITE = 'EMAIL_INVITE',
+  SEP_CREATED = 'SEP_CREATED',
+  SEP_UPDATED = 'SEP_UPDATED',
+  SEP_MEMBERS_ASSIGNED = 'SEP_MEMBERS_ASSIGNED',
+  SEP_MEMBER_REMOVED = 'SEP_MEMBER_REMOVED',
+  SEP_PROPOSAL_ASSIGNED = 'SEP_PROPOSAL_ASSIGNED',
+  SEP_PROPOSAL_REMOVED = 'SEP_PROPOSAL_REMOVED',
+  SEP_MEMBER_ASSIGNED_TO_PROPOSAL = 'SEP_MEMBER_ASSIGNED_TO_PROPOSAL',
+  SEP_MEMBER_REMOVED_FROM_PROPOSAL = 'SEP_MEMBER_REMOVED_FROM_PROPOSAL',
+  PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED'
+}
+
 export type EventLog = {
   __typename?: 'EventLog';
   id: Scalars['Int'];
@@ -379,6 +415,7 @@ export type Mutation = {
   submitInstrument: SuccessResponseWrap;
   administrationProposal: ProposalResponseWrap;
   updateProposal: ProposalResponseWrap;
+  addNextStatusEventsToConnection: ProposalNextStatusEventResponseWrap;
   addProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
   createProposalStatus: ProposalStatusResponseWrap;
   createProposalWorkflow: ProposalWorkflowResponseWrap;
@@ -399,7 +436,7 @@ export type Mutation = {
   removeMember: SepResponseWrap;
   assignMemberToSEPProposal: SepResponseWrap;
   removeMemberFromSEPProposal: SepResponseWrap;
-  assignProposal: SepResponseWrap;
+  assignProposalToSEP: SuccessResponseWrap;
   removeProposalAssignment: SepResponseWrap;
   createSEP: SepResponseWrap;
   updateSEP: SepResponseWrap;
@@ -558,6 +595,11 @@ export type MutationUpdateProposalArgs = {
 };
 
 
+export type MutationAddNextStatusEventsToConnectionArgs = {
+  addNextStatusEventsToConnectionInput: AddNextStatusEventsToConnectionInput;
+};
+
+
 export type MutationAddProposalWorkflowStatusArgs = {
   newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput;
 };
@@ -680,7 +722,7 @@ export type MutationRemoveMemberFromSepProposalArgs = {
 };
 
 
-export type MutationAssignProposalArgs = {
+export type MutationAssignProposalToSepArgs = {
   proposalId: Scalars['Int'];
   sepId: Scalars['Int'];
 };
@@ -1008,6 +1050,13 @@ export type MutationUpdateTopicOrderArgs = {
   topicOrder: Array<Scalars['Int']>;
 };
 
+export type NextStatusEvent = {
+  __typename?: 'NextStatusEvent';
+  nextStatusEventId: Scalars['Int'];
+  proposalWorkflowConnectionId: Scalars['Int'];
+  nextStatusEvent: Scalars['String'];
+};
+
 export type OrcIdInformation = {
   __typename?: 'OrcIDInformation';
   firstname: Maybe<Scalars['String']>;
@@ -1087,12 +1136,19 @@ export enum ProposalEndStatus {
   REJECTED = 'REJECTED'
 }
 
+export type ProposalNextStatusEventResponseWrap = {
+  __typename?: 'ProposalNextStatusEventResponseWrap';
+  error: Maybe<Scalars['String']>;
+  nextStatusEvents: Maybe<Array<NextStatusEvent>>;
+};
+
 export enum ProposalPublicStatus {
   DRAFT = 'draft',
   SUBMITTED = 'submitted',
   ACCEPTED = 'accepted',
   REJECTED = 'rejected',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
+  RESERVED = 'reserved'
 }
 
 export type ProposalResponseWrap = {
@@ -1190,8 +1246,8 @@ export type ProposalWorkflowConnection = {
   proposalStatus: ProposalStatus;
   nextProposalStatusId: Maybe<Scalars['Int']>;
   prevProposalStatusId: Maybe<Scalars['Int']>;
-  nextStatusEventType: Scalars['String'];
   droppableGroupId: Scalars['String'];
+  nextStatusEvents: Array<NextStatusEvent>;
 };
 
 export type ProposalWorkflowConnectionGroup = {
@@ -1234,6 +1290,9 @@ export type Query = {
   instrument: Maybe<Instrument>;
   instruments: Maybe<InstrumentsQueryResult>;
   instrumentsBySep: Maybe<Array<InstrumentWithAvailabilityTime>>;
+  userInstruments: Maybe<InstrumentsQueryResult>;
+  instrumentScientistHasInstrument: Maybe<Scalars['Boolean']>;
+  instrumentScientistHasAccess: Maybe<Scalars['Boolean']>;
   isNaturalKeyPresent: Maybe<Scalars['Boolean']>;
   proposal: Maybe<Proposal>;
   proposalStatus: Maybe<ProposalStatus>;
@@ -1242,6 +1301,7 @@ export type Query = {
   proposalTemplates: Maybe<Array<ProposalTemplate>>;
   proposalWorkflow: Maybe<ProposalWorkflow>;
   proposalWorkflows: Maybe<Array<ProposalWorkflow>>;
+  proposalEvents: Maybe<Array<Event>>;
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
   roles: Maybe<Array<Role>>;
@@ -1351,6 +1411,17 @@ export type QueryInstrumentsArgs = {
 export type QueryInstrumentsBySepArgs = {
   callId: Scalars['Int'];
   sepId: Scalars['Int'];
+};
+
+
+export type QueryInstrumentScientistHasInstrumentArgs = {
+  instrumentId: Scalars['Int'];
+};
+
+
+export type QueryInstrumentScientistHasAccessArgs = {
+  proposalId: Scalars['Int'];
+  instrumentId: Scalars['Int'];
 };
 
 
@@ -1880,21 +1951,17 @@ export enum UserRole {
   SAMPLE_SAFETY_REVIEWER = 'SAMPLE_SAFETY_REVIEWER'
 }
 
-export type AssignProposalMutationVariables = Exact<{
+export type AssignProposalToSepMutationVariables = Exact<{
   proposalId: Scalars['Int'];
   sepId: Scalars['Int'];
 }>;
 
 
-export type AssignProposalMutation = (
+export type AssignProposalToSepMutation = (
   { __typename?: 'Mutation' }
-  & { assignProposal: (
-    { __typename?: 'SEPResponseWrap' }
-    & Pick<SepResponseWrap, 'error'>
-    & { sep: Maybe<(
-      { __typename?: 'SEP' }
-      & Pick<Sep, 'id'>
-    )> }
+  & { assignProposalToSEP: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
   ) }
 );
 
@@ -2362,18 +2429,6 @@ export type CallFragment = (
   )>, proposalWorkflow: Maybe<(
     { __typename?: 'ProposalWorkflow' }
     & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
-    & { proposalWorkflowConnectionGroups: Array<(
-      { __typename?: 'ProposalWorkflowConnectionGroup' }
-      & Pick<ProposalWorkflowConnectionGroup, 'groupId' | 'parentGroupId'>
-      & { connections: Array<(
-        { __typename?: 'ProposalWorkflowConnection' }
-        & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType' | 'droppableGroupId'>
-        & { proposalStatus: (
-          { __typename?: 'ProposalStatus' }
-          & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-        ) }
-      )> }
-    )> }
   )> }
 );
 
@@ -3394,6 +3449,24 @@ export type UpdateSampleTitleMutation = (
   ) }
 );
 
+export type AddNextStatusEventsToConnectionMutationVariables = Exact<{
+  proposalWorkflowConnectionId: Scalars['Int'];
+  nextStatusEvents: Array<Scalars['String']>;
+}>;
+
+
+export type AddNextStatusEventsToConnectionMutation = (
+  { __typename?: 'Mutation' }
+  & { addNextStatusEventsToConnection: (
+    { __typename?: 'ProposalNextStatusEventResponseWrap' }
+    & Pick<ProposalNextStatusEventResponseWrap, 'error'>
+    & { nextStatusEvents: Maybe<Array<(
+      { __typename?: 'NextStatusEvent' }
+      & Pick<NextStatusEvent, 'nextStatusEventId' | 'proposalWorkflowConnectionId' | 'nextStatusEvent'>
+    )>> }
+  ) }
+);
+
 export type AddProposalWorkflowStatusMutationVariables = Exact<{
   proposalWorkflowId: Scalars['Int'];
   sortOrder: Scalars['Int'];
@@ -3402,7 +3475,6 @@ export type AddProposalWorkflowStatusMutationVariables = Exact<{
   proposalStatusId: Scalars['Int'];
   nextProposalStatusId?: Maybe<Scalars['Int']>;
   prevProposalStatusId?: Maybe<Scalars['Int']>;
-  nextStatusEventType: Scalars['String'];
 }>;
 
 
@@ -3411,6 +3483,10 @@ export type AddProposalWorkflowStatusMutation = (
   & { addProposalWorkflowStatus: (
     { __typename?: 'ProposalWorkflowConnectionResponseWrap' }
     & Pick<ProposalWorkflowConnectionResponseWrap, 'error'>
+    & { proposalWorkflowConnection: Maybe<(
+      { __typename?: 'ProposalWorkflowConnection' }
+      & Pick<ProposalWorkflowConnection, 'id'>
+    )> }
   ) }
 );
 
@@ -3451,11 +3527,14 @@ export type CreateProposalWorkflowMutation = (
         & Pick<ProposalWorkflowConnectionGroup, 'groupId' | 'parentGroupId'>
         & { connections: Array<(
           { __typename?: 'ProposalWorkflowConnection' }
-          & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType' | 'droppableGroupId'>
+          & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'droppableGroupId'>
           & { proposalStatus: (
             { __typename?: 'ProposalStatus' }
             & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-          ) }
+          ), nextStatusEvents: Array<(
+            { __typename?: 'NextStatusEvent' }
+            & Pick<NextStatusEvent, 'nextStatusEventId' | 'proposalWorkflowConnectionId' | 'nextStatusEvent'>
+          )> }
         )> }
       )> }
     )> }
@@ -3510,6 +3589,14 @@ export type DeleteProposalWorkflowStatusMutation = (
   ) }
 );
 
+export type GetProposalEventsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetProposalEventsQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'proposalEvents'>
+);
+
 export type GetProposalStatusesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3536,11 +3623,14 @@ export type GetProposalWorkflowQuery = (
       & Pick<ProposalWorkflowConnectionGroup, 'groupId' | 'parentGroupId'>
       & { connections: Array<(
         { __typename?: 'ProposalWorkflowConnection' }
-        & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType' | 'droppableGroupId'>
+        & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'droppableGroupId'>
         & { proposalStatus: (
           { __typename?: 'ProposalStatus' }
           & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-        ) }
+        ), nextStatusEvents: Array<(
+          { __typename?: 'NextStatusEvent' }
+          & Pick<NextStatusEvent, 'nextStatusEventId' | 'proposalWorkflowConnectionId' | 'nextStatusEvent'>
+        )> }
       )> }
     )> }
   )> }
@@ -3611,11 +3701,14 @@ export type UpdateProposalWorkflowMutation = (
         & Pick<ProposalWorkflowConnectionGroup, 'groupId' | 'parentGroupId'>
         & { connections: Array<(
           { __typename?: 'ProposalWorkflowConnection' }
-          & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType' | 'droppableGroupId'>
+          & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'droppableGroupId'>
           & { proposalStatus: (
             { __typename?: 'ProposalStatus' }
             & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-          ) }
+          ), nextStatusEvents: Array<(
+            { __typename?: 'NextStatusEvent' }
+            & Pick<NextStatusEvent, 'nextStatusEventId' | 'proposalWorkflowConnectionId' | 'nextStatusEvent'>
+          )> }
         )> }
       )> }
     )> }
@@ -4546,25 +4639,6 @@ export const CallFragmentDoc = gql`
     id
     name
     description
-    proposalWorkflowConnectionGroups {
-      groupId
-      parentGroupId
-      connections {
-        id
-        sortOrder
-        proposalWorkflowId
-        proposalStatusId
-        proposalStatus {
-          id
-          name
-          description
-        }
-        nextProposalStatusId
-        prevProposalStatusId
-        nextStatusEventType
-        droppableGroupId
-      }
-    }
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
@@ -4837,13 +4911,11 @@ export const TemplateStepFragmentDoc = gql`
   }
 }
     ${QuestionTemplateRelationFragmentDoc}`;
-export const AssignProposalDocument = gql`
-    mutation assignProposal($proposalId: Int!, $sepId: Int!) {
-  assignProposal(proposalId: $proposalId, sepId: $sepId) {
+export const AssignProposalToSepDocument = gql`
+    mutation assignProposalToSEP($proposalId: Int!, $sepId: Int!) {
+  assignProposalToSEP(proposalId: $proposalId, sepId: $sepId) {
     error
-    sep {
-      id
-    }
+    isSuccess
   }
 }
     `;
@@ -5834,9 +5906,24 @@ export const UpdateSampleTitleDocument = gql`
   }
 }
     ${SampleFragmentDoc}`;
+export const AddNextStatusEventsToConnectionDocument = gql`
+    mutation addNextStatusEventsToConnection($proposalWorkflowConnectionId: Int!, $nextStatusEvents: [String!]!) {
+  addNextStatusEventsToConnection(addNextStatusEventsToConnectionInput: {proposalWorkflowConnectionId: $proposalWorkflowConnectionId, nextStatusEvents: $nextStatusEvents}) {
+    nextStatusEvents {
+      nextStatusEventId
+      proposalWorkflowConnectionId
+      nextStatusEvent
+    }
+    error
+  }
+}
+    `;
 export const AddProposalWorkflowStatusDocument = gql`
-    mutation addProposalWorkflowStatus($proposalWorkflowId: Int!, $sortOrder: Int!, $droppableGroupId: String!, $parentDroppableGroupId: String, $proposalStatusId: Int!, $nextProposalStatusId: Int, $prevProposalStatusId: Int, $nextStatusEventType: String!) {
-  addProposalWorkflowStatus(newProposalWorkflowStatusInput: {proposalWorkflowId: $proposalWorkflowId, sortOrder: $sortOrder, droppableGroupId: $droppableGroupId, parentDroppableGroupId: $parentDroppableGroupId, proposalStatusId: $proposalStatusId, nextProposalStatusId: $nextProposalStatusId, prevProposalStatusId: $prevProposalStatusId, nextStatusEventType: $nextStatusEventType}) {
+    mutation addProposalWorkflowStatus($proposalWorkflowId: Int!, $sortOrder: Int!, $droppableGroupId: String!, $parentDroppableGroupId: String, $proposalStatusId: Int!, $nextProposalStatusId: Int, $prevProposalStatusId: Int) {
+  addProposalWorkflowStatus(newProposalWorkflowStatusInput: {proposalWorkflowId: $proposalWorkflowId, sortOrder: $sortOrder, droppableGroupId: $droppableGroupId, parentDroppableGroupId: $parentDroppableGroupId, proposalStatusId: $proposalStatusId, nextProposalStatusId: $nextProposalStatusId, prevProposalStatusId: $prevProposalStatusId}) {
+    proposalWorkflowConnection {
+      id
+    }
     error
   }
 }
@@ -5875,8 +5962,12 @@ export const CreateProposalWorkflowDocument = gql`
           }
           nextProposalStatusId
           prevProposalStatusId
-          nextStatusEventType
           droppableGroupId
+          nextStatusEvents {
+            nextStatusEventId
+            proposalWorkflowConnectionId
+            nextStatusEvent
+          }
         }
       }
     }
@@ -5916,6 +6007,11 @@ export const DeleteProposalWorkflowStatusDocument = gql`
   }
 }
     `;
+export const GetProposalEventsDocument = gql`
+    query getProposalEvents {
+  proposalEvents
+}
+    `;
 export const GetProposalStatusesDocument = gql`
     query getProposalStatuses {
   proposalStatuses {
@@ -5946,8 +6042,12 @@ export const GetProposalWorkflowDocument = gql`
         }
         nextProposalStatusId
         prevProposalStatusId
-        nextStatusEventType
         droppableGroupId
+        nextStatusEvents {
+          nextStatusEventId
+          proposalWorkflowConnectionId
+          nextStatusEvent
+        }
       }
     }
   }
@@ -6003,8 +6103,12 @@ export const UpdateProposalWorkflowDocument = gql`
           }
           nextProposalStatusId
           prevProposalStatusId
-          nextStatusEventType
           droppableGroupId
+          nextStatusEvents {
+            nextStatusEventId
+            proposalWorkflowConnectionId
+            nextStatusEvent
+          }
         }
       }
     }
@@ -6460,8 +6564,8 @@ export type SdkFunctionWrapper = <T>(action: () => Promise<T>) => Promise<T>;
 const defaultWrapper: SdkFunctionWrapper = sdkFunction => sdkFunction();
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    assignProposal(variables: AssignProposalMutationVariables): Promise<AssignProposalMutation> {
-      return withWrapper(() => client.request<AssignProposalMutation>(print(AssignProposalDocument), variables));
+    assignProposalToSEP(variables: AssignProposalToSepMutationVariables): Promise<AssignProposalToSepMutation> {
+      return withWrapper(() => client.request<AssignProposalToSepMutation>(print(AssignProposalToSepDocument), variables));
     },
     assignMembers(variables: AssignMembersMutationVariables): Promise<AssignMembersMutation> {
       return withWrapper(() => client.request<AssignMembersMutation>(print(AssignMembersDocument), variables));
@@ -6679,6 +6783,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     updateSampleTitle(variables: UpdateSampleTitleMutationVariables): Promise<UpdateSampleTitleMutation> {
       return withWrapper(() => client.request<UpdateSampleTitleMutation>(print(UpdateSampleTitleDocument), variables));
     },
+    addNextStatusEventsToConnection(variables: AddNextStatusEventsToConnectionMutationVariables): Promise<AddNextStatusEventsToConnectionMutation> {
+      return withWrapper(() => client.request<AddNextStatusEventsToConnectionMutation>(print(AddNextStatusEventsToConnectionDocument), variables));
+    },
     addProposalWorkflowStatus(variables: AddProposalWorkflowStatusMutationVariables): Promise<AddProposalWorkflowStatusMutation> {
       return withWrapper(() => client.request<AddProposalWorkflowStatusMutation>(print(AddProposalWorkflowStatusDocument), variables));
     },
@@ -6696,6 +6803,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     deleteProposalWorkflowStatus(variables: DeleteProposalWorkflowStatusMutationVariables): Promise<DeleteProposalWorkflowStatusMutation> {
       return withWrapper(() => client.request<DeleteProposalWorkflowStatusMutation>(print(DeleteProposalWorkflowStatusDocument), variables));
+    },
+    getProposalEvents(variables?: GetProposalEventsQueryVariables): Promise<GetProposalEventsQuery> {
+      return withWrapper(() => client.request<GetProposalEventsQuery>(print(GetProposalEventsDocument), variables));
     },
     getProposalStatuses(variables?: GetProposalStatusesQueryVariables): Promise<GetProposalStatusesQuery> {
       return withWrapper(() => client.request<GetProposalStatusesQuery>(print(GetProposalStatusesDocument), variables));
