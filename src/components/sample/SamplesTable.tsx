@@ -22,26 +22,24 @@ const SamplesTable = (
     setUrlQueryParams: SetQuery<SamplesTableQueryParamsType>;
     columns?: Column<SampleBasic>[];
   }
-) => {
-  return (
-    <MaterialTable
-      columns={props.columns ? props.columns : defaultColumns}
-      icons={tableIcons}
-      title="Samples"
-      onSearchChange={searchText => {
-        props.setUrlQueryParams({
-          search: searchText ? searchText : undefined,
-        });
-      }}
-      options={{
-        ...props.options,
-        searchText: props.urlQueryParams.search || undefined,
-        selection: true,
-      }}
-      {...props}
-    />
-  );
-};
+) => (
+  <MaterialTable
+    columns={props.columns ? props.columns : defaultColumns}
+    icons={tableIcons}
+    title="Samples"
+    onSearchChange={searchText => {
+      props.setUrlQueryParams({
+        search: searchText ? searchText : undefined,
+      });
+    }}
+    options={{
+      ...props.options,
+      searchText: props.urlQueryParams.search || undefined,
+      selection: true,
+    }}
+    {...props}
+  />
+);
 
 export default React.memo(
   SamplesTable,
