@@ -1,6 +1,9 @@
+import { Tooltip, IconButton } from '@material-ui/core';
 import { Avatar, ListItemIcon, MenuItem, Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import { Visibility } from '@material-ui/icons';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { Options } from 'material-table';
@@ -12,6 +15,7 @@ import InputDialog from 'components/common/InputDialog';
 import SelectedCallFilter from 'components/common/SelectedCallFilter';
 import { Maybe, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useDownloadPDFSample } from 'hooks/sample/useDownloadPDFSample';
 import { SampleBasic } from 'models/Sample';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -71,6 +75,45 @@ function SampleSafetyPage() {
       </>
     );
 
+  const downloadPDFSample = useDownloadPDFSample();
+  const RowActionButtons = (rowData: SampleBasic) => {
+    const iconButtonStyle = { padding: '7px' };
+
+    return (
+      <>
+        <Tooltip title="View sample">
+          <IconButton
+            style={iconButtonStyle}
+            onClick={() => setSelectedSample(rowData)}
+          >
+            <Visibility />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Download sample as pdf">
+          <IconButton
+            data-cy="download-sample"
+            onClick={() => downloadPDFSample(rowData.id)}
+            style={iconButtonStyle}
+          >
+            <GetAppIcon />
+          </IconButton>
+        </Tooltip>
+      </>
+    );
+  };
+
+  const columns = [
+    {
+      title: 'Actions',
+      sorting: false,
+      removable: false,
+      render: RowActionButtons,
+    },
+    { title: 'Title', field: 'title' },
+    { title: 'Status', field: 'safetyStatus' },
+    { title: 'Created', field: 'created' },
+  ];
+
   return (
     <>
       <ContentContainer>
@@ -83,7 +126,17 @@ function SampleSafetyPage() {
                 isLoading={isExecutingCall}
                 urlQueryParams={urlQueryParams}
                 setUrlQueryParams={setUrlQueryParams}
-                setSelectedSample={setSelectedSample}
+                columns={columns}
+                actions={[
+                  {
+                    icon: GetAppIcon,
+                    tooltip: 'Download sample',
+                    onClick: (event, rowData) =>
+                      downloadPDFSample(
+                        (rowData as SampleBasic[]).map(({ id }) => id).join(',')
+                      ),
+                  },
+                ]}
               />
             </StyledPaper>
           </Grid>
