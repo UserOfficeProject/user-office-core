@@ -436,7 +436,7 @@ export type Mutation = {
   removeMember: SepResponseWrap;
   assignMemberToSEPProposal: SepResponseWrap;
   removeMemberFromSEPProposal: SepResponseWrap;
-  assignProposal: SepResponseWrap;
+  assignProposalToSEP: SuccessResponseWrap;
   removeProposalAssignment: SepResponseWrap;
   createSEP: SepResponseWrap;
   updateSEP: SepResponseWrap;
@@ -722,7 +722,7 @@ export type MutationRemoveMemberFromSepProposalArgs = {
 };
 
 
-export type MutationAssignProposalArgs = {
+export type MutationAssignProposalToSepArgs = {
   proposalId: Scalars['Int'];
   sepId: Scalars['Int'];
 };
@@ -1927,21 +1927,17 @@ export enum UserRole {
   SAMPLE_SAFETY_REVIEWER = 'SAMPLE_SAFETY_REVIEWER'
 }
 
-export type AssignProposalMutationVariables = Exact<{
+export type AssignProposalToSepMutationVariables = Exact<{
   proposalId: Scalars['Int'];
   sepId: Scalars['Int'];
 }>;
 
 
-export type AssignProposalMutation = (
+export type AssignProposalToSepMutation = (
   { __typename?: 'Mutation' }
-  & { assignProposal: (
-    { __typename?: 'SEPResponseWrap' }
-    & Pick<SepResponseWrap, 'error'>
-    & { sep: Maybe<(
-      { __typename?: 'SEP' }
-      & Pick<Sep, 'id'>
-    )> }
+  & { assignProposalToSEP: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
   ) }
 );
 
@@ -4890,13 +4886,11 @@ export const TemplateStepFragmentDoc = gql`
   }
 }
     ${QuestionTemplateRelationFragmentDoc}`;
-export const AssignProposalDocument = gql`
-    mutation assignProposal($proposalId: Int!, $sepId: Int!) {
-  assignProposal(proposalId: $proposalId, sepId: $sepId) {
+export const AssignProposalToSepDocument = gql`
+    mutation assignProposalToSEP($proposalId: Int!, $sepId: Int!) {
+  assignProposalToSEP(proposalId: $proposalId, sepId: $sepId) {
     error
-    sep {
-      id
-    }
+    isSuccess
   }
 }
     `;
@@ -6544,8 +6538,8 @@ export type SdkFunctionWrapper = <T>(action: () => Promise<T>) => Promise<T>;
 const defaultWrapper: SdkFunctionWrapper = sdkFunction => sdkFunction();
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    assignProposal(variables: AssignProposalMutationVariables): Promise<AssignProposalMutation> {
-      return withWrapper(() => client.request<AssignProposalMutation>(print(AssignProposalDocument), variables));
+    assignProposalToSEP(variables: AssignProposalToSepMutationVariables): Promise<AssignProposalToSepMutation> {
+      return withWrapper(() => client.request<AssignProposalToSepMutation>(print(AssignProposalToSepDocument), variables));
     },
     assignMembers(variables: AssignMembersMutationVariables): Promise<AssignMembersMutation> {
       return withWrapper(() => client.request<AssignMembersMutation>(print(AssignMembersDocument), variables));

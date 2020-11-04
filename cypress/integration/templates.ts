@@ -310,13 +310,7 @@ context('Template tests', () => {
   it('User can create proposal', () => {
     cy.login('user');
 
-    cy.contains('New Proposal').click();
-
-    cy.get('#title').type(title);
-
-    cy.get('#abstract').type(abstract);
-
-    cy.contains('Save and continue').click();
+    cy.createProposal(title, abstract);
     cy.get(`#${boolId}`).click();
     cy.get(`#${textId}`).type(textAnswer);
     cy.get(`[data-cy='${dateId}_field'] button`).click();

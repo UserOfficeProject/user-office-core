@@ -163,6 +163,12 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     }
   };
 
+  const isDraftStatus = (
+    proposalWorkflowConnection: ProposalWorkflowConnection
+  ) =>
+    proposalWorkflowConnection.proposalStatus.id === 1 &&
+    proposalWorkflowConnection.proposalStatus.name === 'DRAFT';
+
   const getConnectionGroupItems = (
     connections: ProposalWorkflowConnection[]
   ) => {
@@ -193,28 +199,30 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
                 }
               }}
             >
-              <DialogActions className={classes.dialogActions}>
-                <IconButton
-                  size="small"
-                  className={classes.removeButton}
-                  data-cy="remove-workflow-status-button"
-                  onClick={e => {
-                    e.stopPropagation();
-                    dispatch({
-                      type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
-                      payload: {
-                        source: {
-                          index,
-                          droppableId:
-                            proposalWorkflowConnection.droppableGroupId,
+              {!isDraftStatus(proposalWorkflowConnection) && (
+                <DialogActions className={classes.dialogActions}>
+                  <IconButton
+                    size="small"
+                    className={classes.removeButton}
+                    data-cy="remove-workflow-status-button"
+                    onClick={e => {
+                      e.stopPropagation();
+                      dispatch({
+                        type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
+                        payload: {
+                          source: {
+                            index,
+                            droppableId:
+                              proposalWorkflowConnection.droppableGroupId,
+                          },
                         },
-                      },
-                    });
-                  }}
-                >
-                  <Delete />
-                </IconButton>
-              </DialogActions>
+                      });
+                    }}
+                  >
+                    <Delete />
+                  </IconButton>
+                </DialogActions>
+              )}
               <Box fontSize="1rem">
                 {proposalWorkflowConnection.proposalStatus.name}
               </Box>
