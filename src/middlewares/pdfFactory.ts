@@ -11,7 +11,7 @@ import { collectSamplePDFData } from './pdf/sample';
 
 const router = express.Router();
 
-const ENDPOINT = process.env.GENERATE_PROPOSAL_PDF_ENDPOINT!;
+const ENDPOINT = process.env.USER_OFFICE_PDF_FACTORY_ENDPOINT!;
 
 const bufferRequestBody = (req: request.Request) =>
   new Promise(resolve => {

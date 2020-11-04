@@ -13,7 +13,7 @@ services:
       baseURL: localhost:3000
       SPARKPOST_TOKEN: dummytoken
       NODE_ENV: development
-      GENERATE_PROPOSAL_PDF_ENDPOINT: ${USER_OFFICE_PDF_FACTORY_ENDPOINT}
+      USER_OFFICE_PDF_FACTORY_ENDPOINT: ${USER_OFFICE_PDF_FACTORY_ENDPOINT}
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads"
       - "traefik.port=4000"
