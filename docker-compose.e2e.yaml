@@ -54,7 +54,6 @@ services:
       - frontend
   factory:
     image: dmsc/duo-factory:${FACTORY_TAG}
-    init: true
     environment:
       - NODE_ENV=production
       - DATABASE_HOSTNAME=localhost
