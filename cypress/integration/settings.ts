@@ -350,7 +350,7 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then(element => expect(element.text()).to.contain('DRAFT'));
+        .then(element => expect(element.text()).to.contain('draft'));
 
       cy.get('.MuiTable-root tbody tr')
         .first()
@@ -369,9 +369,7 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then(element =>
-          expect(element.text()).to.contain('FEASIBILITY_REVIEW')
-        );
+        .then(element => expect(element.text()).to.contain('submitted'));
     });
 
     it('User Officer should be able to split workflow into two or more paths', () => {

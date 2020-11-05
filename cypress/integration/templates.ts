@@ -331,7 +331,7 @@ context('Template tests', () => {
 
     cy.contains('Dashboard').click();
     cy.contains(title);
-    cy.contains('Submitted');
+    cy.contains('submitted');
   });
 
   it('Officer can save proposal column selection', () => {
