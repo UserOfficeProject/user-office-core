@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
+import { ProposalEventsRecord } from './postgres/records';
 
 export interface ProposalDataSource {
   getProposalsFromView(filter?: ProposalsFilter): Promise<ProposalView[]>;
@@ -28,7 +30,15 @@ export interface ProposalDataSource {
     questionary_id: number
   ): Promise<Proposal>;
   update(proposal: Proposal): Promise<Proposal>;
+  updateProposalStatus(
+    proposalId: number,
+    proposalStatusId: number
+  ): Promise<Proposal>;
   setProposalUsers(id: number, users: number[]): Promise<void>;
   submitProposal(id: number): Promise<Proposal>;
   deleteProposal(id: number): Promise<Proposal>;
+  markEventAsDoneOnProposal(
+    event: Event,
+    proposalId: number
+  ): Promise<ProposalEventsRecord | null>;
 }

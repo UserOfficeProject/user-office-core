@@ -13,6 +13,12 @@ export class ConfigBase {
 }
 
 @ObjectType()
+export class SampleBasisConfig extends ConfigBase {
+  @Field(() => String)
+  titlePlaceholder: string;
+}
+
+@ObjectType()
 export class BooleanConfig extends ConfigBase {}
 
 @ObjectType()
@@ -84,6 +90,9 @@ export class SubtemplateConfig extends ConfigBase {
   addEntryButtonLabel: string;
 }
 
+@ObjectType()
+export class ProposalBasisConfig extends ConfigBase {}
+
 export const FieldConfigType = createUnionType({
   name: 'FieldConfig', // the name of the GraphQL union
   types: () => [
@@ -93,6 +102,8 @@ export const FieldConfigType = createUnionType({
     FileUploadConfig,
     SelectionFromOptionsConfig,
     TextInputConfig,
+    SampleBasisConfig,
     SubtemplateConfig,
+    ProposalBasisConfig,
   ], // function that returns array of object types classes
 });

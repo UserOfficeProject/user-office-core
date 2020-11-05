@@ -4,6 +4,8 @@ version: "3.1"
 services:
   backend:
     image: "dmsc/duo-backend:${USER_OFFICE_BACKEND_TAG}"
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
@@ -11,6 +13,7 @@ services:
       baseURL: localhost:3000
       SPARKPOST_TOKEN: dummytoken
       NODE_ENV: development
+      GENERATE_PROPOSAL_PDF_ENDPOINT: ${USER_OFFICE_PDF_FACTORY_ENDPOINT}
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /proposal, /uploads"
       - "traefik.port=4000"

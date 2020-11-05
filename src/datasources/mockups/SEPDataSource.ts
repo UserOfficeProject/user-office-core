@@ -1,3 +1,4 @@
+import { ProposalIds } from '../../models/Proposal';
 import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../../models/SEP';
 import { User } from '../../models/User';
 import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
@@ -197,7 +198,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     const sep = dummySEPs.find(element => element.id === sepId);
 
     if (sep) {
-      return sep;
+      return new ProposalIds([1]);
     }
 
     throw new Error(`SEP not found ${sepId}`);

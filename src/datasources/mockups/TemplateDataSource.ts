@@ -19,6 +19,7 @@ import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/De
 import { UpdateQuestionTemplateRelationArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
+import { logger } from '../../utils/Logger';
 import { TemplateDataSource } from '../TemplateDataSource';
 import {
   dummyQuestionFactory,
@@ -43,6 +44,7 @@ const dummyTopicFactory = (values?: Partial<Topic>) => {
   return new Topic(
     values?.id || 1,
     values?.title || 'General information',
+    values?.templateId || 1,
     values?.sortOrder || 0,
     values?.isEnabled || true
   );
@@ -86,12 +88,21 @@ const dummyTemplateStepsFactory = () => {
     }),
   });
 
+  const proposalBasis = dummyQuestionTemplateRelationFactory({
+    question: dummyQuestionFactory({
+      proposalQuestionId: 'proposal_basis',
+      naturalKey: 'proposal_basis',
+      dataType: DataType.PROPOSAL_BASIS,
+    }),
+  });
+
   return [
-    new TemplateStep(new Topic(1, 'General information', 1, true), [
+    new TemplateStep(new Topic(1, 'General information', 1, 1, true), [
       hasLinksToField,
       linksToField,
       hasLinksWithIndustry,
       enableCrystallization,
+      proposalBasis,
     ]),
   ];
 };
@@ -221,7 +232,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       question => question.proposalQuestionId === questionId
     );
     if (!question) {
-      throw new Error('Question does not exist');
+      throw new Error(`Question ${questionId} does not exist`);
     }
 
     return question;
@@ -230,7 +241,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   async deleteQuestion(questionId: string): Promise<Question> {
     const question = await this.getQuestion(questionId);
     if (!question) {
-      throw new Error('Question does not exist');
+      throw new Error(`Question ${questionId} does not exist`);
     }
     const copy = dummyQuestionFactory(question);
     question.proposalQuestionId = 'deleted_question'; //works for mocking purposes
@@ -283,14 +294,15 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return topic;
   }
 
-  async createTopic(args: CreateTopicArgs): Promise<Template> {
+  async createTopic(args: CreateTopicArgs): Promise<Topic> {
+    const newTopic = new Topic(2, 'New Topic', 1, args.sortOrder, false);
     dummyTemplateSteps.splice(
       args.sortOrder,
       0,
-      new TemplateStep(new Topic(2, 'New Topic', args.sortOrder, false), [])
+      new TemplateStep(newTopic, [])
     );
 
-    return dummyProposalTemplate;
+    return newTopic;
   }
 
   async getTemplateSteps(): Promise<TemplateStep[]> {

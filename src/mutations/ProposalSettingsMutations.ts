@@ -8,16 +8,19 @@ import {
   addProposalWorkflowStatusValidationSchema,
   moveProposalWorkflowStatusValidationSchema,
   deleteProposalWorkflowStatusValidationSchema,
+  addNextStatusEventsValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
+import { NextStatusEvent } from '../models/NextStatusEvent';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
+import { AddNextStatusEventsToConnectionInput } from '../resolvers/mutations/settings/AddNextStatusEventsToConnection';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
@@ -399,6 +402,28 @@ export default class ProposalSettingsMutations {
     }
   }
 
+  @ValidateArgs(addNextStatusEventsValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async addNextStatusEventsToConnection(
+    agent: UserWithRole | null,
+    args: AddNextStatusEventsToConnectionInput
+  ): Promise<NextStatusEvent[] | Rejection> {
+    return this.dataSource
+      .addNextStatusEventsToConnection(
+        args.proposalWorkflowConnectionId,
+        args.nextStatusEvents
+      )
+      .then(result => result)
+      .catch(error => {
+        logger.logException('Could not add next status events', error, {
+          agent,
+          args,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
   // NOTE: Moving statuses inside workflow is not enabled at the moment so this is not used at all. I keep it if we deceide to use this feature later.
   @ValidateArgs(moveProposalWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
@@ -464,7 +489,7 @@ export default class ProposalSettingsMutations {
           allGroupWorkflowConnections.length > 0;
 
         if (connectionsLeftInTheGroup) {
-          if (isLastConnectionInGroupRemoved) {
+          if (isLastConnectionInGroupRemoved && result.nextProposalStatusId) {
             await this.dataSource.deleteProposalWorkflowStatus(
               result.prevProposalStatusId as number,
               result.proposalWorkflowId,
@@ -475,11 +500,19 @@ export default class ProposalSettingsMutations {
               allGroupWorkflowConnections[
                 allGroupWorkflowConnections.length - 1
               ];
+
             if (newLastParentConnection) {
               await this.insertNewAndUpdateExistingProposalWorkflowStatuses(
                 omit(newLastParentConnection, 'id')
               );
             }
+          } else if (!result.nextProposalStatusId) {
+            await this.updateProposalWorkflowConnectionStatuses(
+              allGroupWorkflowConnections,
+              false,
+              false,
+              false
+            );
           }
 
           if (
