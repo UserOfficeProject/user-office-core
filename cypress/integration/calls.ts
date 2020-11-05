@@ -60,13 +60,13 @@ context('Calls tests', () => {
       .type(endDate)
       .should('have.value', endDate);
 
-    cy.contains('Next').click();
+    cy.get('[data-cy="next-step"]').click();
 
     cy.get('[data-cy=survey-comment] input').type(
       faker.random.word().split(' ')[0]
     );
 
-    cy.contains('Next').click();
+    cy.get('[data-cy="next-step"]').click();
 
     cy.get('[data-cy=cycle-comment] input').type(
       faker.random.word().split(' ')[0]
@@ -117,13 +117,13 @@ context('Calls tests', () => {
       .type(endDate)
       .should('have.value', endDate);
 
-    cy.contains('Next').click();
+    cy.get('[data-cy="next-step"]').click();
 
     cy.get('[data-cy=survey-comment] input').type(
       faker.random.word().split(' ')[0]
     );
 
-    cy.contains('Next').click();
+    cy.get('[data-cy="next-step"]').click();
 
     cy.get('[data-cy=cycle-comment] input').type(
       faker.random.word().split(' ')[0]
@@ -291,9 +291,9 @@ context('Calls tests', () => {
       })
       .click();
 
-    cy.contains('Next').click();
+    cy.get('[data-cy="next-step"]').click();
 
-    cy.contains('Next').click();
+    cy.get('[data-cy="next-step"]').click();
 
     cy.get('[data-cy="submit"]').click();
 
@@ -324,9 +324,9 @@ context('Calls tests', () => {
 
     cy.contains('None (remove selection)').click();
 
-    cy.contains('Next').click();
+    cy.get('[data-cy="next-step"]').click();
 
-    cy.contains('Next').click();
+    cy.get('[data-cy="next-step"]').click();
 
     cy.get('[data-cy="submit"]').click();
 

@@ -9,6 +9,7 @@ query getUserProposals {
         name
         description
       }
+      publicStatus
       statusId
       created
       finalStatus

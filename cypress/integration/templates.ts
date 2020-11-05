@@ -84,17 +84,26 @@ context('Template tests', () => {
       .first()
       .click();
 
-    cy.contains('Add topic').click();
+    cy.get('[data-cy=show-more-button]').click();
 
-    cy.get('[data-cy=topic-title]').click();
+    cy.get('[data-cy=add-topic-menu-item]').click();
+
+    cy.get('[data-cy=topic-title]')
+      .last()
+      .click();
 
     cy.get('[data-cy=topic-title-input]')
+      .last()
       .clear()
       .type(`${topic}{enter}`);
 
-    cy.get('[data-cy=show-more-button]').click();
+    cy.get('[data-cy=show-more-button]')
+      .last()
+      .click();
 
-    cy.contains('Add question').click();
+    cy.get('[data-cy=add-question-menu-item]')
+      .last()
+      .click();
 
     /* Boolean */
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
@@ -301,13 +310,7 @@ context('Template tests', () => {
   it('User can create proposal', () => {
     cy.login('user');
 
-    cy.contains('New Proposal').click();
-
-    cy.get('#title').type(title);
-
-    cy.get('#abstract').type(abstract);
-
-    cy.contains('Save and continue').click();
+    cy.createProposal(title, abstract);
     cy.get(`#${boolId}`).click();
     cy.get(`#${textId}`).type(textAnswer);
     cy.get(`[data-cy='${dateId}_field'] button`).click();
@@ -328,7 +331,7 @@ context('Template tests', () => {
 
     cy.contains('Dashboard').click();
     cy.contains(title);
-    cy.contains('Submitted');
+    cy.contains('submitted');
   });
 
   it('Officer can save proposal column selection', () => {
@@ -394,7 +397,11 @@ context('Template tests', () => {
     cy.contains(fileQuestion).click();
     cy.get("[data-cy='delete']").click();
 
-    cy.get('[data-cy=show-more-button]').click();
-    cy.contains('Delete topic').click();
+    cy.get('[data-cy=show-more-button]')
+      .last()
+      .click();
+    cy.get('[data-cy=add-topic-menu-item]')
+      .last()
+      .click();
   });
 });

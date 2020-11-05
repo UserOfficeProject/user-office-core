@@ -20,7 +20,8 @@ export class User {
     public telephone: string,
     public telephone_alt: string | null,
     public created: string,
-    public updated: string
+    public updated: string,
+    public placeholder: boolean
   ) {}
 }
 
@@ -54,5 +55,6 @@ export const dummyUser = new User(
   '',
   null,
   '',
-  ''
+  '',
+  false
 );

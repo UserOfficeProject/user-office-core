@@ -1,8 +1,6 @@
 import { Proposal } from 'generated/sdk';
 
-export interface DataTypeSpec {
-  readonly: boolean;
-}
+import { QuestionarySubmissionState } from './QuestionarySubmissionState';
 
 export type ProposalSubsetSumbission = Pick<
   Proposal,
@@ -18,3 +16,7 @@ export type ProposalSubsetSumbission = Pick<
   | 'questionaryId'
   | 'submitted'
 >;
+
+export interface ProposalSubmissionState extends QuestionarySubmissionState {
+  proposal: ProposalSubsetSumbission;
+}

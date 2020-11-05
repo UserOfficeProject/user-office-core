@@ -5,10 +5,10 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
-import { BasicComponentProps } from '../IBasicComponentProps';
-import ProposalErrorLabel from '../ProposalErrorLabel';
+import { BasicComponentProps } from '../../proposal/IBasicComponentProps';
+import ProposalErrorLabel from '../../proposal/ProposalErrorLabel';
 
-export function ProposalComponentBoolean(props: BasicComponentProps) {
+export function QuestionaryComponentBoolean(props: BasicComponentProps) {
   const { templateField, errors, onComplete, touched } = props;
   const {
     question: { proposalQuestionId, question },

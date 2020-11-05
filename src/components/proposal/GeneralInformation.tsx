@@ -5,7 +5,6 @@ import React, { HTMLAttributes, useState } from 'react';
 import { useCheckAccess } from 'components/common/Can';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
 import { Proposal, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 
 import ProposalContainer from './ProposalContainer';
 
@@ -16,12 +15,15 @@ export default function GeneralInformation(
   }
 ) {
   const [isEditable, setIsEditable] = useState(false);
-  const [proposal, setProposal] = useState(props.data);
-  const api = useDataApi();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const readonlyView = <ProposalQuestionaryReview data={proposal} />;
-  const editableView = <ProposalContainer data={proposal} />;
+  const getReadonlyView = () => <ProposalQuestionaryReview data={props.data} />;
+  const getEditableView = () => (
+    <ProposalContainer
+      proposal={props.data}
+      proposalUpdated={props.onProposalChanged}
+    />
+  );
 
   return (
     <div>
@@ -32,14 +34,6 @@ export default function GeneralInformation(
             <Switch
               checked={isEditable}
               onChange={() => {
-                api()
-                  .getProposal({ id: proposal.id })
-                  .then(data => {
-                    const { proposal } = data;
-                    setProposal(proposal as Proposal);
-                    props.onProposalChanged &&
-                      props.onProposalChanged(proposal as Proposal);
-                  });
                 setIsEditable(!isEditable);
               }}
               color="primary"
@@ -48,7 +42,7 @@ export default function GeneralInformation(
           label={isEditable ? 'Close' : 'Edit proposal'}
         />
       )}
-      {isEditable ? editableView : readonlyView}
+      {isEditable ? getEditableView() : getReadonlyView()}
     </div>
   );
 }

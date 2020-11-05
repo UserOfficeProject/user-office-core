@@ -139,7 +139,7 @@ context('Settings tests', () => {
       cy.viewport(1100, 1000);
     });
 
-    it('User Officer should be able to create proposal workflow', () => {
+    it('User Officer should be able to create proposal workflow and it should contain default DRAFT status', () => {
       const name = faker.random.words(2);
       const description = faker.random.words(5);
 
@@ -167,6 +167,15 @@ context('Settings tests', () => {
 
       lastRowText.should('contain', name);
       lastRowText.should('contain', description);
+
+      cy.get('[title="Edit"]')
+        .last()
+        .click();
+
+      cy.get('[data-cy="connection_DRAFT_1"]').should('contain.text', 'DRAFT');
+      cy.get('[data-cy="status_DRAFT_1"]').should('not.exist');
+
+      cy.get('[data-cy="remove-workflow-status-button"]').should('not.exist');
     });
 
     it('User Officer should be able to update proposal workflow', () => {
@@ -199,33 +208,6 @@ context('Settings tests', () => {
         .should('contain.text', description);
     });
 
-    it('User Officer should be able to drag and drop statuses in proposal workflow', () => {
-      cy.login('officer');
-
-      cy.contains('Settings').click();
-      cy.contains('Proposal workflows').click();
-
-      cy.get('[title="Edit"]')
-        .last()
-        .click();
-
-      cy.get('[data-cy="status_DRAFT_1"]')
-        .focus()
-        .trigger('keydown', { keyCode: spaceKeyCode })
-        .trigger('keydown', { keyCode: arrowLeftKeyCode, force: true })
-        .wait(500)
-        .trigger('keydown', { keyCode: spaceKeyCode, force: true });
-
-      cy.get('[data-cy="connection_DRAFT_1"]').should('contain.text', 'DRAFT');
-
-      cy.get('[data-cy="status_DRAFT_1"]').should('not.exist');
-
-      cy.notification({
-        variant: 'success',
-        text: 'Workflow status added successfully',
-      });
-    });
-
     it('User Officer should be able to add more statuses in proposal workflow', () => {
       cy.login('officer');
 
@@ -255,6 +237,139 @@ context('Settings tests', () => {
       });
 
       cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').should('not.exist');
+    });
+
+    it('User Officer should be able to select events that are triggering next workflow status', () => {
+      cy.login('officer');
+
+      cy.contains('Settings').click();
+      cy.contains('Proposal workflows').click();
+
+      cy.get('[title="Edit"]')
+        .last()
+        .click();
+
+      cy.get('[data-cy="connection_DRAFT_1"]').click();
+
+      cy.get('[data-cy="next-status-events-modal"]').should('exist');
+
+      cy.get('[data-cy="next-status-events"]').click();
+
+      cy.contains('PROPOSAL_SUBMITTED').click();
+
+      cy.get('[data-cy="submit"]').click({ force: true });
+
+      cy.notification({
+        variant: 'success',
+        text: 'Next status events added successfully!',
+      });
+    });
+
+    it('Proposal should follow the selected workflow', () => {
+      const name = 'Fast track';
+      const description = 'Faster than the fastest workflow';
+
+      cy.login('officer');
+
+      cy.contains('Settings').click();
+      cy.contains('Proposal workflows').click();
+
+      cy.contains('Create').click();
+      cy.get('#name').type(name);
+      cy.get('#description').type(description);
+      cy.get('[data-cy="submit"]').click();
+
+      cy.notification({ variant: 'success', text: 'created successfully' });
+
+      cy.get('[title="Edit"]')
+        .last()
+        .click();
+
+      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]')
+        .focus()
+        .trigger('keydown', { keyCode: spaceKeyCode })
+        .trigger('keydown', { keyCode: arrowLeftKeyCode, force: true })
+        .trigger('keydown', { keyCode: arrowDownKeyCode, force: true })
+        .wait(500)
+        .trigger('keydown', { keyCode: spaceKeyCode, force: true });
+
+      cy.notification({
+        variant: 'success',
+        text: 'Workflow status added successfully',
+      });
+
+      cy.get('[data-cy="connection_DRAFT_1"]').click();
+
+      cy.get('[data-cy="next-status-events-modal"]').should('exist');
+
+      cy.get('[data-cy="next-status-events"]').click();
+
+      cy.contains('PROPOSAL_SUBMITTED').click();
+
+      cy.get('[data-cy="submit"]').click({ force: true });
+
+      cy.notification({
+        variant: 'success',
+        text: 'Next status events added successfully!',
+      });
+
+      cy.contains('Calls').click();
+
+      cy.get('[title="Edit"]')
+        .first()
+        .click();
+
+      cy.get('#mui-component-select-proposalWorkflowId').click();
+
+      cy.contains('Loading...').should('not.exist');
+
+      cy.get('[role="presentation"] [role="listbox"] li')
+        .last()
+        .click();
+
+      cy.get('[data-cy="next-step"]').click();
+
+      cy.get('[data-cy="next-step"]').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Call updated successfully!',
+      });
+
+      cy.logout();
+
+      cy.login('user');
+
+      cy.createProposal();
+
+      cy.contains('Dashboard').click();
+
+      cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr')
+        .first()
+        .then(element => expect(element.text()).to.contain('draft'));
+
+      cy.get('.MuiTable-root tbody tr')
+        .first()
+        .find('[title="Edit proposal"]')
+        .click();
+
+      cy.contains('Save and continue').click();
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+
+      cy.contains('Dashboard').click();
+
+      cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr')
+        .first()
+        .then(element => expect(element.text()).to.contain('submitted'));
     });
 
     it('User Officer should be able to split workflow into two or more paths', () => {
@@ -329,14 +444,17 @@ context('Settings tests', () => {
         .first()
         .click();
 
-      cy.get('[data-cy="status_DRAFT_1"]').should('contain.text', 'DRAFT');
+      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').should(
+        'contain.text',
+        'FEASIBILITY_REVIEW'
+      );
 
       cy.notification({
         variant: 'success',
         text: 'Workflow status removed successfully',
       });
 
-      cy.get('[data-cy="connection_DRAFT_1"]').should('not.exist');
+      cy.get('[data-cy="connection_FEASIBILITY_REVIEW_2"]').should('not.exist');
     });
   });
 });

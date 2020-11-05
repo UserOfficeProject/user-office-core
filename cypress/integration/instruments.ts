@@ -68,13 +68,8 @@ context('Instrument tests', () => {
   });
 
   it('User Officer should be able to assign proposal to existing instrument', () => {
-    const title = faker.random.words(3);
-    const abstract = faker.random.words(5);
     cy.login('user');
-    cy.contains('New Proposal').click();
-    cy.get('#title').type(title);
-    cy.get('#abstract').type(abstract);
-    cy.contains('Save and continue').click();
+    cy.createProposal();
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();

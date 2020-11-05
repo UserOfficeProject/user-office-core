@@ -156,3 +156,7 @@ export function useUnauthorizedApi() {
     [enqueueSnackbar]
   );
 }
+
+export function getUnauthorizedApi() {
+  return getSdk(new GraphQLClient(endpoint));
+}

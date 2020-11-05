@@ -49,8 +49,7 @@ export function usePersistProposalWorkflowEditorModel() {
       parentDroppableGroupId: string,
       proposalStatusId: number,
       nextProposalStatusId: number,
-      prevProposalStatusId: number,
-      nextStatusEventType: string
+      prevProposalStatusId: number
     ) => {
       return api('Workflow status added successfully')
         .addProposalWorkflowStatus({
@@ -61,7 +60,6 @@ export function usePersistProposalWorkflowEditorModel() {
           proposalStatusId,
           nextProposalStatusId,
           prevProposalStatusId,
-          nextStatusEventType,
         })
         .then(data => data.addProposalWorkflowStatus);
     };
@@ -90,6 +88,18 @@ export function usePersistProposalWorkflowEditorModel() {
           proposalWorkflowId,
         })
         .then(data => data.deleteProposalWorkflowStatus);
+    };
+
+    const addNextStatusEventsToConnection = async (
+      proposalWorkflowConnectionId: number,
+      nextStatusEvents: string[]
+    ) => {
+      return api('Next status events added successfully!')
+        .addNextStatusEventsToConnection({
+          proposalWorkflowConnectionId,
+          nextStatusEvents,
+        })
+        .then(data => data.addNextStatusEventsToConnection);
     };
 
     return (next: Function) => (action: Event) => {
@@ -185,12 +195,12 @@ export function usePersistProposalWorkflowEditorModel() {
             parentDroppableGroupId,
             droppableGroupId,
           } = action.payload;
-          // TODO: We should be able to define this event in the UI maybe. This is about what kind of event triggers proposal status to move forward in the workflow.
-          const nextStatusEventType = 'DEFAULT_EVENT';
 
           dispatch({
             type: EventType.WORKFLOW_STATUS_ADDED,
-            payload: action.payload,
+            payload: {
+              ...action.payload,
+            },
           });
 
           return executeAndMonitorCall(async () => {
@@ -201,15 +211,45 @@ export function usePersistProposalWorkflowEditorModel() {
               parentDroppableGroupId,
               proposalStatusId,
               nextProposalStatusId,
-              prevProposalStatusId,
-              nextStatusEventType
+              prevProposalStatusId
             );
+
+            dispatch({
+              type: EventType.WORKFLOW_STATUS_UPDATED,
+              payload: {
+                ...action.payload,
+                id: result.proposalWorkflowConnection?.id,
+              },
+            });
 
             if (result.error) {
               dispatch({
                 type: EventType.WORKFLOW_STATUS_DELETED,
                 payload: {
                   source: { index: sortOrder, droppableId: droppableGroupId },
+                },
+              });
+            }
+
+            return result;
+          });
+        }
+
+        case EventType.ADD_NEXT_STATUS_EVENTS_REQUESTED: {
+          const { workflowConnection, nextStatusEvents } = action.payload;
+
+          return executeAndMonitorCall(async () => {
+            const result = await addNextStatusEventsToConnection(
+              workflowConnection.id,
+              nextStatusEvents
+            );
+
+            if (!result.error) {
+              dispatch({
+                type: EventType.NEXT_STATUS_EVENTS_ADDED,
+                payload: {
+                  workflowConnection,
+                  nextStatusEvents: result.nextStatusEvents,
                 },
               });
             }

@@ -4,7 +4,7 @@ import React, { Fragment } from 'react';
 import { NavigButton } from 'components/common/NavigButton';
 import UOLoader from 'components/common/UOLoader';
 
-const QuestionaryNavigationFragment = (props: {
+const NavigationFragment = (props: {
   back?: ButtonConfig;
   reset?: ButtonConfig;
   save?: ButtonConfig;
@@ -98,7 +98,7 @@ const QuestionaryNavigationFragment = (props: {
   return <div className={classes.buttons}>{buttonArea}</div>;
 };
 
-export default QuestionaryNavigationFragment;
+export default NavigationFragment;
 
 interface ButtonConfig {
   callback: () => void;

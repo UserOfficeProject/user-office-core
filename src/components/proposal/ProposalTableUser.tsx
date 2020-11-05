@@ -1,7 +1,11 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import React, { useCallback, useState } from 'react';
 
-import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
+import {
+  ProposalEndStatus,
+  ProposalPublicStatus,
+  ProposalStatus,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { timeAgo } from 'utils/Time';
 
@@ -11,6 +15,7 @@ export type PartialProposalsDataType = {
   id: number;
   title: string;
   status: string;
+  publicStatus: ProposalPublicStatus;
   finalStatus?: string;
   notified?: boolean;
   submitted: boolean;
@@ -61,6 +66,7 @@ const ProposalTableUser: React.FC = () => {
                 id: proposal.id,
                 title: proposal.title,
                 status: getProposalStatus(proposal),
+                publicStatus: proposal.publicStatus,
                 submitted: proposal.submitted,
                 shortCode: proposal.shortCode,
                 created: timeAgo(proposal.created),

@@ -9,13 +9,17 @@ import {
   AnswerInput,
 } from 'generated/sdk';
 import { ConditionEvaluator } from 'models/ConditionEvaluator';
-import { DataTypeSpec } from 'models/ProposalModel';
 
 type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
+interface DataTypeSpec {
+  readonly: boolean;
+}
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
   switch (type) {
     case DataType.EMBELLISHMENT:
+    case DataType.SAMPLE_BASIS:
+    case DataType.PROPOSAL_BASIS:
       return { readonly: true };
     default:
       return { readonly: false };

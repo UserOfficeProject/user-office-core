@@ -23,6 +23,7 @@ import {
 } from 'generated/sdk';
 
 import AddNewWorkflowConnectionsRow from './AddNewWorkflowConnectionsRow';
+import AddNextStatusEventsToConnection from './AddNextStatusEventsToConnection';
 import { Event, EventType } from './ProposalWorkflowEditorModel';
 
 type ProposalWorkflowConnectionsEditorProps = {
@@ -40,6 +41,10 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
 }) => {
   const theme = useTheme();
   const [openNewRowDialog, setOpenNewRowDialog] = useState(false);
+  const [
+    workflowConnection,
+    setWorkflowConnection,
+  ] = useState<ProposalWorkflowConnection | null>(null);
   const classes = makeStyles(theme => ({
     container: {
       alignItems: 'flex-start',
@@ -158,6 +163,12 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     }
   };
 
+  const isDraftStatus = (
+    proposalWorkflowConnection: ProposalWorkflowConnection
+  ) =>
+    proposalWorkflowConnection.proposalStatus.id === 1 &&
+    proposalWorkflowConnection.proposalStatus.name === 'DRAFT';
+
   const getConnectionGroupItems = (
     connections: ProposalWorkflowConnection[]
   ) => {
@@ -182,28 +193,36 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
                 provided.draggableProps.style
               )}
               className={classes.item}
+              onClick={() => {
+                if (proposalWorkflowConnection.nextProposalStatusId) {
+                  setWorkflowConnection(proposalWorkflowConnection);
+                }
+              }}
             >
-              <DialogActions className={classes.dialogActions}>
-                <IconButton
-                  size="small"
-                  className={classes.removeButton}
-                  data-cy="remove-workflow-status-button"
-                  onClick={() => {
-                    dispatch({
-                      type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
-                      payload: {
-                        source: {
-                          index,
-                          droppableId:
-                            proposalWorkflowConnection.droppableGroupId,
+              {!isDraftStatus(proposalWorkflowConnection) && (
+                <DialogActions className={classes.dialogActions}>
+                  <IconButton
+                    size="small"
+                    className={classes.removeButton}
+                    data-cy="remove-workflow-status-button"
+                    onClick={e => {
+                      e.stopPropagation();
+                      dispatch({
+                        type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
+                        payload: {
+                          source: {
+                            index,
+                            droppableId:
+                              proposalWorkflowConnection.droppableGroupId,
+                          },
                         },
-                      },
-                    });
-                  }}
-                >
-                  <Delete />
-                </IconButton>
-              </DialogActions>
+                      });
+                    }}
+                  >
+                    <Delete />
+                  </IconButton>
+                </DialogActions>
+              )}
               <Box fontSize="1rem">
                 {proposalWorkflowConnection.proposalStatus.name}
               </Box>
@@ -303,6 +322,33 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
               dispatch({
                 type: EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS,
                 payload: { numberOfColumns, parentDroppableId },
+              })
+            }
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={!!workflowConnection}
+        onClose={(): void => setWorkflowConnection(null)}
+        data-cy="next-status-events-modal"
+      >
+        <DialogContent>
+          <AddNextStatusEventsToConnection
+            close={(): void => setWorkflowConnection(null)}
+            nextStatusEvents={
+              workflowConnection?.nextStatusEvents?.map(
+                nextStatusEvent => nextStatusEvent.nextStatusEvent
+              ) as string[]
+            }
+            addNextStatusEventsToConnection={(nextStatusEvents: string[]) =>
+              dispatch({
+                type: EventType.ADD_NEXT_STATUS_EVENTS_REQUESTED,
+                payload: {
+                  nextStatusEvents,
+                  workflowConnection,
+                },
               })
             }
           />

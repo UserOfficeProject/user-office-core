@@ -1,0 +1,18 @@
+mutation addNextStatusEventsToConnection(
+  $proposalWorkflowConnectionId: Int!
+  $nextStatusEvents: [String!]!
+) {
+  addNextStatusEventsToConnection(
+    addNextStatusEventsToConnectionInput: {
+      proposalWorkflowConnectionId: $proposalWorkflowConnectionId
+      nextStatusEvents: $nextStatusEvents
+    }
+  ) {
+    nextStatusEvents {
+      nextStatusEventId
+      proposalWorkflowConnectionId
+      nextStatusEvent
+    }
+    error
+  }
+}

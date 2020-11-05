@@ -263,13 +263,8 @@ context('Scientific evaluation panel tests', () => {
   });
 
   it('Officer should be able to assign proposal to existing SEP', () => {
-    const title = faker.random.words(3);
-    const abstract = faker.random.words(8);
     cy.login('user');
-    cy.contains('New Proposal').click();
-    cy.get('#title').type(title);
-    cy.get('#abstract').type(abstract);
-    cy.contains('Save and continue').click();
+    cy.createProposal();
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();
@@ -473,14 +468,8 @@ context('Scientific evaluation panel tests', () => {
     const code = faker.random.words(3);
     const description = faker.random.words(8);
 
-    const title = faker.random.words(3);
-    const abstract = faker.random.words(8);
-
     cy.login('user');
-    cy.contains('New Proposal').click();
-    cy.get('#title').type(title);
-    cy.get('#abstract').type(abstract);
-    cy.contains('Save and continue').click();
+    cy.createProposal();
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();

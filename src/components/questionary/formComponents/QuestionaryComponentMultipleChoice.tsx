@@ -10,9 +10,9 @@ import { getIn } from 'formik';
 import React, { useState, useEffect } from 'react';
 
 import { SelectionFromOptionsConfig } from '../../../generated/sdk';
-import { BasicComponentProps } from '../IBasicComponentProps';
+import { BasicComponentProps } from '../../proposal/IBasicComponentProps';
 
-export function ProposalComponentMultipleChoice(props: BasicComponentProps) {
+export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
   const classes = makeStyles({
     horizontalLayout: {
       flexDirection: 'row',

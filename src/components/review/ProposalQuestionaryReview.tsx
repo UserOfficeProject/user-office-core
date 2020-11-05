@@ -8,7 +8,7 @@ import React, { Fragment, HTMLAttributes } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
-import { ProposalSubsetSumbission } from 'models/ProposalModel';
+import { ProposalSubsetSumbission } from 'models/ProposalSubmissionState';
 
 const useStyles = makeStyles(theme => ({
   heading: {
@@ -65,7 +65,7 @@ export default function ProposalQuestionaryReview(
       <Typography variant="h6" className={classes.heading} gutterBottom>
         Questionary
       </Typography>
-      <QuestionaryDetails questionaryId={questionary.questionaryId!} />
+      <QuestionaryDetails questionaryId={questionary.questionaryId} />
     </Fragment>
   );
 }
