@@ -10,6 +10,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { isRejection } from '../../rejection';
 import { SuccessResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
@@ -47,11 +48,13 @@ export class AssignProposalsToInstrumentMutation {
     @Args() args: AssignProposalsToInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
+    const res = await context.mutations.instrument.assignProposalsToInstrument(
+      context.user,
+      args
+    );
+
     return wrapResponse(
-      context.mutations.instrument.assignProposalsToInstrument(
-        context.user,
-        args
-      ),
+      isRejection(res) ? Promise.resolve(res) : Promise.resolve(true),
       SuccessResponseWrap
     );
   }

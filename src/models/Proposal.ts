@@ -1,21 +1,44 @@
+/**
+ * This status is given by system or manager to indicate
+ * or override the final status of proposal
+ */
 export enum ProposalEndStatus {
   UNSET = 0,
-  ACCEPTED = 1,
-  RESERVED = 2,
-  REJECTED = 3,
+  ACCEPTED,
+  RESERVED,
+  REJECTED,
 }
+
+/**
+ * This status is visible to the proposal authors
+ * It servers two purposes.
+ * Firstly, hides internal status proposal has while
+ * moving though the proposal workflow, which could have
+ * sensitive information
+ * Secondly gives clear and unserstandable indication
+ * for the proposal authors
+ */
+export enum ProposalPublicStatus {
+  draft = 'draft',
+  submitted = 'submitted',
+  accepted = 'accepted',
+  rejected = 'rejected',
+  unknown = 'unknown',
+  reserved = 'reserved',
+}
+
 export class Proposal {
   constructor(
     public id: number,
     public title: string,
     public abstract: string,
     public proposerId: number,
-    public statusId: number,
+    public statusId: number, // proposal status id while it moving though proposal workflow
     public created: Date,
     public updated: Date,
     public shortCode: string,
     public rankOrder: number,
-    public finalStatus: number, // Should use ProposalEndStatus enum here
+    public finalStatus: ProposalEndStatus,
     public callId: number,
     public questionaryId: number,
     public commentForUser: string,
@@ -23,4 +46,8 @@ export class Proposal {
     public notified: boolean,
     public submitted: boolean
   ) {}
+}
+
+export class ProposalIds {
+  constructor(public proposalIds: number[]) {}
 }

@@ -90,7 +90,7 @@ describe('Test Instrument Mutations', () => {
           instrumentId: 1,
         }
       )
-    ).resolves.toBe(true);
+    ).resolves.toStrictEqual({ proposalIds: [1, 2] });
   });
 
   test('A logged in user officer can remove assigned proposal from instrument', () => {

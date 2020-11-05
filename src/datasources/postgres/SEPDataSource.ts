@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { ProposalIds } from '../../models/Proposal';
 import { Role } from '../../models/Role';
 import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../../models/SEP';
 import { User } from '../../models/User';
@@ -306,20 +307,18 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async assignProposal(proposalId: number, sepId: number) {
-    await database.raw(
+    const result = await database.raw(
       `${database('SEP_Proposals').insert({
         proposal_id: proposalId,
         sep_id: sepId,
         call_id: database('proposals')
           .select('call_id')
           .where('proposal_id', proposalId),
-      })} ON CONFLICT (sep_id, proposal_id) DO UPDATE SET date_assigned=NOW()`
+      })} ON CONFLICT (sep_id, proposal_id) DO UPDATE SET date_assigned=NOW() RETURNING *`
     );
 
-    const sepUpdated = await this.get(sepId);
-
-    if (sepUpdated) {
-      return sepUpdated;
+    if (result.rows?.length) {
+      return new ProposalIds([proposalId]);
     }
 
     throw new Error(`SEP not found ${sepId}`);

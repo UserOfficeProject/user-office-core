@@ -9,7 +9,6 @@ export class ProposalWorkflowConnection {
     public proposalStatus: ProposalStatus,
     public nextProposalStatusId: number | null,
     public prevProposalStatusId: number | null,
-    public nextStatusEventType: string,
     public droppableGroupId: string,
     public parentDroppableGroupId: string | null
   ) {}
