@@ -36,7 +36,7 @@ export class QuestionaryStep {
 
 export class Questionary {
   constructor(
-    public questionaryId: number | undefined,
+    public questionaryId: number,
     public templateId: number,
     public creatorId: number,
     public created: Date

@@ -10,7 +10,6 @@ import exceptionHandler from './src/middlewares/exceptionHandler';
 import files from './src/middlewares/files';
 import apolloServer from './src/middlewares/graphql';
 import pdfFactory from './src/middlewares/pdfFactory';
-import proposalDownload from './src/middlewares/proposalDownload';
 import { logger } from './src/utils/Logger';
 
 async function bootstrap() {
@@ -21,11 +20,7 @@ async function bootstrap() {
     .use(cookieParser())
     .use(authorization())
     .use(files())
-    .use(
-      process.env.UO_FEATURE_ENABLE_UO_FACTORY === '1'
-        ? pdfFactory()
-        : proposalDownload()
-    )
+    .use(pdfFactory())
     .use(exceptionHandler());
 
   await apolloServer(app);
