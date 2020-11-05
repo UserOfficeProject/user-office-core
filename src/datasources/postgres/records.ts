@@ -69,7 +69,7 @@ export interface ProposalViewRecord {
   readonly final_status: number;
   readonly time_allocation: number;
   readonly notified: boolean;
-  readonly status_id: number;
+  readonly technical_review_status: number;
   readonly instrument_name: string;
   readonly call_short_code: string;
   readonly code: string;
@@ -83,6 +83,7 @@ export interface ProposalViewRecord {
 export interface TopicRecord {
   readonly topic_id: number;
   readonly topic_title: string;
+  readonly template_id: number;
   readonly is_enabled: boolean;
   readonly sort_order: number;
 }
@@ -333,21 +334,45 @@ export interface ProposalWorkflowConnectionRecord {
   readonly proposal_status_id: number;
   readonly next_proposal_status_id: number | null;
   readonly prev_proposal_status_id: number | null;
-  readonly next_status_event_type: string;
   readonly droppable_group_id: string;
   readonly parent_droppable_group_id: string;
+}
+
+export interface NextStatusEventRecord {
+  readonly next_status_event_id: number;
+  readonly proposal_workflow_connection_id: number;
+  readonly next_status_event: string;
+}
+
+export interface ProposalEventsRecord {
+  readonly proposal_id: number;
+  readonly proposal_created: boolean;
+  readonly proposal_submitted: boolean;
+  readonly call_ended: boolean;
+  readonly proposal_sep_selected: boolean;
+  readonly proposal_instrument_selected: boolean;
+  readonly proposal_feasibility_review_submitted: boolean;
+  readonly proposal_sample_review_submitted: boolean;
+  readonly proposal_all_sep_reviewers_selected: boolean;
+  readonly proposal_sep_review_submitted: boolean;
+  readonly proposal_sep_meeting_submitted: boolean;
+  readonly proposal_instrument_submitted: boolean;
+  readonly proposal_accepted: boolean;
+  readonly proposal_rejected: boolean;
+  readonly proposal_notified: boolean;
 }
 
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
 
-export const createTopicObject = (proposal: TopicRecord) => {
+export const createTopicObject = (record: TopicRecord) => {
   return new Topic(
-    proposal.topic_id,
-    proposal.topic_title,
-    proposal.sort_order,
-    proposal.is_enabled
+    record.topic_id,
+    record.topic_title,
+    record.template_id,
+    record.sort_order,
+    record.is_enabled
   );
 };
 
@@ -405,7 +430,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.final_status,
     proposal.time_allocation,
     proposal.notified,
-    proposal.status_id,
+    proposal.technical_review_status,
     proposal.instrument_name,
     proposal.call_short_code,
     proposal.code,

@@ -72,67 +72,71 @@ export const dummyQuestionTemplateRelationFactory = (
 
 const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
   return [
-    new QuestionaryStep(new Topic(0, 'General information', 0, true), false, [
-      new Answer(
-        1,
-        dummyQuestionTemplateRelationFactory({
-          question: dummyQuestionFactory({
-            proposalQuestionId: 'ttl_general',
-            naturalKey: 'ttl_general',
-            dataType: DataType.EMBELLISHMENT,
-            config: createConfig<EmbellishmentConfig>(
-              new EmbellishmentConfig(),
-              {
-                plain: 'General information',
-                html: '<h1>General information</h1>',
-              }
-            ),
-          }),
-        }),
-        null
-      ),
-
-      new Answer(
-        2,
-        dummyQuestionTemplateRelationFactory({
-          question: dummyQuestionFactory({
-            proposalQuestionId: 'has_links_with_industry',
-            naturalKey: 'has_links_with_industry',
-            dataType: DataType.SELECTION_FROM_OPTIONS,
-            config: createConfig<SelectionFromOptionsConfig>(
-              new SelectionFromOptionsConfig(),
-              {
-                options: ['yes', 'no'],
-                variant: 'radio',
-              }
-            ),
-          }),
-        }),
-        'yes'
-      ),
-
-      new Answer(
-        3,
-        dummyQuestionTemplateRelationFactory({
-          question: dummyQuestionFactory({
-            proposalQuestionId: 'links_with_industry',
-            naturalKey: 'links_with_industry',
-            dataType: DataType.TEXT_INPUT,
-            config: createConfig<TextInputConfig>(new TextInputConfig(), {
-              placeholder: 'Please specify links with industry',
-              multiline: true,
+    new QuestionaryStep(
+      new Topic(0, 'General information', 1, 0, true),
+      false,
+      [
+        new Answer(
+          1,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              proposalQuestionId: 'ttl_general',
+              naturalKey: 'ttl_general',
+              dataType: DataType.EMBELLISHMENT,
+              config: createConfig<EmbellishmentConfig>(
+                new EmbellishmentConfig(),
+                {
+                  plain: 'General information',
+                  html: '<h1>General information</h1>',
+                }
+              ),
             }),
           }),
-          dependency: new FieldDependency(
-            'links_with_industry',
-            'has_links_with_industry',
-            'has_links_with_industry',
-            new FieldCondition(EvaluatorOperator.eq, 'yes')
-          ),
-        }),
-        'https://example.com'
-      ),
-    ]),
+          null
+        ),
+
+        new Answer(
+          2,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              proposalQuestionId: 'has_links_with_industry',
+              naturalKey: 'has_links_with_industry',
+              dataType: DataType.SELECTION_FROM_OPTIONS,
+              config: createConfig<SelectionFromOptionsConfig>(
+                new SelectionFromOptionsConfig(),
+                {
+                  options: ['yes', 'no'],
+                  variant: 'radio',
+                }
+              ),
+            }),
+          }),
+          'yes'
+        ),
+
+        new Answer(
+          3,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              proposalQuestionId: 'links_with_industry',
+              naturalKey: 'links_with_industry',
+              dataType: DataType.TEXT_INPUT,
+              config: createConfig<TextInputConfig>(new TextInputConfig(), {
+                placeholder: 'Please specify links with industry',
+                multiline: true,
+              }),
+            }),
+            dependency: new FieldDependency(
+              'links_with_industry',
+              'has_links_with_industry',
+              'has_links_with_industry',
+              new FieldCondition(EvaluatorOperator.eq, 'yes')
+            ),
+          }),
+          'https://example.com'
+        ),
+      ]
+    ),
   ];
 };
 
@@ -171,6 +175,13 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   ): Promise<Questionary | null> {
     return createDummyQuestionary();
   }
+
+  async getBlankQuestionarySteps(
+    template_id: number
+  ): Promise<QuestionaryStep[]> {
+    return dummyQuestionarySteps;
+  }
+
   async delete(questionaryId: number): Promise<Questionary> {
     return createDummyQuestionary({ questionaryId });
   }
@@ -212,11 +223,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   async deleteFiles(proposalId: number, questionId: string): Promise<string[]> {
     return ['file_id_012345'];
   }
-  async getBlankQuestionarySteps(
-    template_id: number
-  ): Promise<QuestionaryStep[]> {
-    return dummyQuestionarySteps;
-  }
+
   async getQuestionary(questionary_id: number): Promise<Questionary | null> {
     return questionary_id === dummyQuestionary.questionaryId
       ? dummyQuestionary

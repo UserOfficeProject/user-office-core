@@ -11,8 +11,10 @@ import {
 } from '@esss-swap/duo-validation';
 
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { Authorized, ValidateArgs } from '../decorators';
+import { Authorized, EventBus, ValidateArgs } from '../decorators';
+import { Event } from '../events/event.enum';
 import { Instrument } from '../models/Instrument';
+import { ProposalIds } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
@@ -119,12 +121,13 @@ export default class InstrumentMutations {
     );
   }
 
+  @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
   @ValidateArgs(assignProposalsToInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async assignProposalsToInstrument(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
-  ): Promise<boolean | Rejection> {
+  ): Promise<ProposalIds | Rejection> {
     const allProposalsAreOnSameCallAsInstrument = await this.checkIfProposalsAreOnSameCallAsInstrument(
       args
     );

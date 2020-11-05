@@ -49,19 +49,6 @@ export default class QuestionaryQueries {
     return this.dataSource.getQuestionarySteps(questionaryId);
   }
 
-  async getBlankQuestionary(
-    agent: UserWithRole | null,
-    templateId: number
-  ): Promise<Questionary | null> {
-    return this.templateDataSource
-      .getTemplate(templateId)
-      .then(template =>
-        template
-          ? new Questionary(undefined, template.templateId, -1, new Date())
-          : null
-      );
-  }
-
   async getBlankQuestionarySteps(
     agent: UserWithRole | null,
     templateId: number

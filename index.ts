@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import 'dotenv/config';
+
 import cookieParser from 'cookie-parser';
 import express from 'express';
 
@@ -7,7 +9,7 @@ import authorization from './src/middlewares/authorization';
 import exceptionHandler from './src/middlewares/exceptionHandler';
 import files from './src/middlewares/files';
 import apolloServer from './src/middlewares/graphql';
-import proposalDownload from './src/middlewares/proposalDownload';
+import pdfFactory from './src/middlewares/pdfFactory';
 import { logger } from './src/utils/Logger';
 
 async function bootstrap() {
@@ -18,7 +20,7 @@ async function bootstrap() {
     .use(cookieParser())
     .use(authorization())
     .use(files())
-    .use(proposalDownload())
+    .use(pdfFactory())
     .use(exceptionHandler());
 
   await apolloServer(app);

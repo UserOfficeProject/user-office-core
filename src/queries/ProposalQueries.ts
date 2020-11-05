@@ -1,14 +1,21 @@
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
-import { Proposal } from '../models/Proposal';
-import { ProposalEndStatus } from '../models/Proposal';
+import {
+  Proposal,
+  ProposalEndStatus,
+  ProposalPublicStatus,
+} from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { omit } from '../utils/helperFunctions';
-import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
+
+const statusMap = new Map<ProposalEndStatus, ProposalPublicStatus>();
+statusMap.set(ProposalEndStatus.ACCEPTED, ProposalPublicStatus.accepted);
+statusMap.set(ProposalEndStatus.REJECTED, ProposalPublicStatus.rejected);
+statusMap.set(ProposalEndStatus.RESERVED, ProposalPublicStatus.reserved);
 
 export default class ProposalQueries {
   constructor(
@@ -97,57 +104,18 @@ export default class ProposalQueries {
     );
   }
 
-  @Authorized()
-  async getBlank(agent: UserWithRole | null, callId: number) {
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.dataSource.checkActiveCall(callId))
-    ) {
-      logger.logWarn('User tried to create proposal on inactive call', {
-        agent,
-        callId,
-      });
-
-      return null;
+  async getPublicStatus(agent: UserWithRole | null, id: number) {
+    const proposal = await this.get(agent, id);
+    if (!proposal) {
+      return ProposalPublicStatus.unknown;
     }
 
-    const call = await this.callDataSource.get(callId);
-    if (!call) {
-      logger.logError('User tried accessing non existing call', {
-        callId,
-        agent,
-      });
-
-      return null;
+    if (proposal.submitted) {
+      return (
+        statusMap.get(proposal.finalStatus) || ProposalPublicStatus.submitted
+      );
+    } else {
+      return ProposalPublicStatus.draft;
     }
-
-    if (!call.templateId) {
-      logger.logError('User tried to getBlank for misconfigured call', {
-        call,
-      });
-
-      return null;
-    }
-
-    const blankProposal = new Proposal(
-      0,
-      '',
-      '',
-      (agent as UserWithRole).id,
-      0,
-      new Date(),
-      new Date(),
-      '',
-      0,
-      ProposalEndStatus.UNSET,
-      call?.id,
-      -1,
-      '',
-      '',
-      false,
-      false
-    );
-
-    return blankProposal;
   }
 }
