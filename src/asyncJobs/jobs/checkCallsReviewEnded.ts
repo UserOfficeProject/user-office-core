@@ -1,12 +1,14 @@
-import { callDataSource } from '../../datasources';
+import { CallDataSource } from '../../datasources/CallDataSource';
 import { eventBus } from '../../events';
 import { Event } from '../../events/event.enum';
 import { logger } from '../../utils/Logger';
 import { UserOfficeAsyncJob } from '../startAsyncJobs';
 
-const checkCallsReviewEnded = async () => {
+const checkCallsReviewEnded = async (dataSource: CallDataSource) => {
+  const isTestingMode = process.env.NODE_ENV === 'test';
+
   try {
-    const reviewNotEndedCalls = await callDataSource.getCalls({
+    const reviewNotEndedCalls = await dataSource.getCalls({
       isReviewEnded: false,
     });
 
@@ -17,21 +19,29 @@ const checkCallsReviewEnded = async () => {
         reviewNotEndedCall.endReview.getTime() <= currentDate.getTime()
     );
 
-    callsThatShouldEndReview.forEach(async callThatShouldEndReview => {
-      const updatedCall = await callDataSource.update({
+    const updatedCalls = [];
+
+    for (const callThatShouldEndReview of callsThatShouldEndReview) {
+      const updatedCall = await dataSource.update({
         ...callThatShouldEndReview,
         callReviewEnded: true,
       });
 
-      // NOTE: Fire the "CALL_REVIEW_ENDED" event.
-      eventBus.publish({
-        type: Event.CALL_REVIEW_ENDED,
-        call: updatedCall,
-        isRejection: false,
-        key: 'call',
-        loggedInUserId: 0,
-      });
-    });
+      if (!isTestingMode) {
+        // NOTE: Fire the "CALL_REVIEW_ENDED" event if not in testing mode.
+        eventBus.publish({
+          type: Event.CALL_REVIEW_ENDED,
+          call: updatedCall,
+          isRejection: false,
+          key: 'call',
+          loggedInUserId: 0,
+        });
+      }
+
+      updatedCalls.push(updatedCall);
+    }
+
+    return updatedCalls;
   } catch (error) {
     logger.logError('Checking and ending calls review failed: ', error);
   }

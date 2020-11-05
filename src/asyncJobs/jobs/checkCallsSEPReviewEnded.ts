@@ -1,12 +1,14 @@
-import { callDataSource } from '../../datasources';
+import { CallDataSource } from '../../datasources/CallDataSource';
 import { eventBus } from '../../events';
 import { Event } from '../../events/event.enum';
 import { logger } from '../../utils/Logger';
 import { UserOfficeAsyncJob } from '../startAsyncJobs';
 
-const checkCallsSEPReviewEnded = async () => {
+const checkCallsSEPReviewEnded = async (dataSource: CallDataSource) => {
+  const isTestingMode = process.env.NODE_ENV === 'test';
+
   try {
-    const sepReviewNotEndedCalls = await callDataSource.getCalls({
+    const sepReviewNotEndedCalls = await dataSource.getCalls({
       isSEPReviewEnded: false,
     });
 
@@ -17,21 +19,29 @@ const checkCallsSEPReviewEnded = async () => {
         sepReviewNotEndedCall.endSEPReview.getTime() <= currentDate.getTime()
     );
 
-    callsThatShouldEndSEPReview.forEach(async callThatShouldEndSEPReview => {
-      const updatedCall = await callDataSource.update({
+    const updatedCalls = [];
+
+    for (const callThatShouldEndSEPReview of callsThatShouldEndSEPReview) {
+      const updatedCall = await dataSource.update({
         ...callThatShouldEndSEPReview,
         callSEPReviewEnded: true,
       });
 
-      // NOTE: Fire the "CALL_SEP_REVIEW_ENDED" event.
-      eventBus.publish({
-        type: Event.CALL_SEP_REVIEW_ENDED,
-        call: updatedCall,
-        isRejection: false,
-        key: 'call',
-        loggedInUserId: 0,
-      });
-    });
+      if (!isTestingMode) {
+        // NOTE: Fire the "CALL_SEP_REVIEW_ENDED" event.
+        eventBus.publish({
+          type: Event.CALL_SEP_REVIEW_ENDED,
+          call: updatedCall,
+          isRejection: false,
+          key: 'call',
+          loggedInUserId: 0,
+        });
+      }
+
+      updatedCalls.push(updatedCall);
+    }
+
+    return updatedCalls;
   } catch (error) {
     logger.logError('Checking and ending calls review failed: ', error);
   }

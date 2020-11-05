@@ -30,7 +30,29 @@ export const dummyCall = new Call(
   1
 );
 
-const dummyCalls = [dummyCall];
+export const anotherDummyCall = new Call(
+  2,
+  'shortCode2',
+  new Date('2019-07-17 08:25:12.23043+00'),
+  new Date('2019-07-17 08:25:12.23043+00'),
+  new Date('2019-07-17 08:25:12.23043+00'),
+  new Date('2019-07-17 08:25:12.23043+00'),
+  new Date('2019-07-17 08:25:12.23043+00'),
+  new Date('2019-07-17 08:25:12.23043+00'),
+  new Date('2019-07-17 08:25:12.23043+00'),
+  new Date('2019-07-17 08:25:12.23043+00'),
+  new Date('2019-07-17 08:25:12.23043+00'),
+  new Date('2019-07-17 08:25:12.23043+00'),
+  '',
+  '',
+  1,
+  true,
+  false,
+  false,
+  1
+);
+
+export const dummyCalls = [dummyCall, anotherDummyCall];
 
 export class CallDataSourceMock implements CallDataSource {
   async get(id: number): Promise<Call | null> {
@@ -44,7 +66,15 @@ export class CallDataSourceMock implements CallDataSource {
   }
 
   async getCalls(filter?: CallsFilter): Promise<Call[]> {
-    return [dummyCall];
+    if (filter?.isReviewEnded === false) {
+      return dummyCalls.filter(dummyCallItem => !dummyCallItem.callReviewEnded);
+    }
+
+    if (filter?.isEnded === false) {
+      return dummyCalls.filter(dummyCallItem => !dummyCallItem.callEnded);
+    }
+
+    return dummyCalls;
   }
 
   async create(args: CreateCallInput) {
@@ -52,7 +82,11 @@ export class CallDataSourceMock implements CallDataSource {
   }
 
   async update(args: UpdateCallInput) {
-    return { ...dummyCall, ...args };
+    const indexOfCallToUpdate = dummyCalls.indexOf(dummyCall);
+
+    dummyCalls[indexOfCallToUpdate] = { ...dummyCall, ...args };
+
+    return dummyCalls[indexOfCallToUpdate];
   }
 
   async assignInstrumentsToCall(args: AssignInstrumentsToCallInput) {

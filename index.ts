@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import 'dotenv/config';
 
 import cookieParser from 'cookie-parser';
 import express from 'express';
 
 import 'reflect-metadata';
-import ALL_AYNC_JOBS from './src/asyncJobs/allAsyncJobs';
-import startAsyncJobs from './src/asyncJobs/startAsyncJobs';
+import { startAsyncJobs } from './src/asyncJobs/startAsyncJobs';
 import authorization from './src/middlewares/authorization';
 import exceptionHandler from './src/middlewares/exceptionHandler';
 import files from './src/middlewares/files';
@@ -40,7 +38,7 @@ async function bootstrap() {
 
   console.info(`Running a GraphQL API server at localhost:${PORT}/graphql`);
 
-  startAsyncJobs(ALL_AYNC_JOBS);
+  startAsyncJobs();
 }
 
 bootstrap();
