@@ -42,7 +42,7 @@ const checkCallsEnded = async (dataSource: CallDataSource) => {
 
     return updatedCalls;
   } catch (error) {
-    logger.logError('Checking and ending calls failed: ', error);
+    logger.logException('Checking and ending calls failed: ', error);
   }
 };
 

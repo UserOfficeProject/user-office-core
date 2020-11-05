@@ -43,7 +43,7 @@ const checkCallsSEPReviewEnded = async (dataSource: CallDataSource) => {
 
     return updatedCalls;
   } catch (error) {
-    logger.logError('Checking and ending calls review failed: ', error);
+    logger.logException('Checking and ending calls review failed: ', error);
   }
 };
 
