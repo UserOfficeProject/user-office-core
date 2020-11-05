@@ -131,6 +131,7 @@ function SampleSafetyPage() {
                 urlQueryParams={urlQueryParams}
                 setUrlQueryParams={setUrlQueryParams}
                 columns={columns}
+                options={{ selection: true }}
                 actions={[
                   {
                     icon: GetAppIcon,

@@ -35,7 +35,6 @@ const SamplesTable = (
     options={{
       ...props.options,
       searchText: props.urlQueryParams.search || undefined,
-      selection: true,
     }}
     {...props}
   />
