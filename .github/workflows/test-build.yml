@@ -21,6 +21,14 @@ jobs:
       - run: echo "TAG_COUNT $TAG_COUNT"
       - run: if [ "$TAG_COUNT" != 0 ]; then    echo "::set-env name=TAG::${{ github.head_ref }}"; else    echo "::set-env name=TAG::develop"; fi
       - run: echo "TAG $TAG"
+
+      - run: echo "::set-env name=FACTORY_TAGS_JSON::$(curl -sb -H https://registry.hub.docker.com/v1/repositories/dmsc/duo-factory/tags)"
+      - run: echo "FACTORY_TAGS_JSON $FACTORY_TAGS_JSON"
+      - run: echo "::set-env name=FACTORY_TAG_COUNT::$(echo $FACTORY_TAGS_JSON | jq -c '.[] | select(.name=="${{ github.head_ref }}")' | jq -s '. | length')"
+      - run: echo "FACTORY_TAG_COUNT $FACTORY_TAG_COUNT"
+      - run: if [ "$FACTORY_TAG_COUNT" != 0 ]; then    echo "::set-env name=FACTORY_TAG::${{ github.head_ref }}"; else    echo "::set-env name=FACTORY_TAG::develop"; fi
+      - run: echo "FACTORY_TAG $FACTORY_TAG"
+
       - run: rm -rf user-office-backend
       - run: git clone https://github.com/UserOfficeProject/user-office-backend
       - run: cd user-office-backend && git fetch && git checkout $TAG && cd ..
