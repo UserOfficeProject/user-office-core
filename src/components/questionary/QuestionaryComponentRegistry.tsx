@@ -69,6 +69,7 @@ export function getQuestionaryComponentDefinition(id: DataType) {
   return definition;
 }
 
+// Convenience methods below
 export const getQuestionaryComponentDefinitions = () => registry.slice(0);
 
 export function createQuestionTemplateRelationForm(
