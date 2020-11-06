@@ -32,16 +32,20 @@ export type FormComponent<ValueObjectType> = FunctionComponent<
 >;
 
 export interface QuestionaryComponentDefinition {
-  dataType: DataType;
-  name: string;
-  questionTemplateRelationForm: () => FormComponent<QuestionTemplateRelation>;
-  questionForm: () => FormComponent<Question>;
-  questionaryComponent: (props: BasicComponentProps) => JSX.Element | null;
-  answerRenderer: (props: { answer: Answer }) => JSX.Element | null;
-  createYupValidationSchema: ((field: Answer) => object) | null;
-  readonly: boolean; // if true then no answer will be produced
-  creatable: boolean; // if true then the question can be added to a questionary
-  icon: JSX.Element;
+  readonly dataType: DataType;
+  readonly name: string;
+  readonly questionTemplateRelationForm: () => FormComponent<
+    QuestionTemplateRelation
+  >;
+  readonly questionForm: () => FormComponent<Question>;
+  readonly questionaryComponent: (
+    props: BasicComponentProps
+  ) => JSX.Element | null;
+  readonly answerRenderer: (props: { answer: Answer }) => JSX.Element | null;
+  readonly createYupValidationSchema: ((field: Answer) => object) | null;
+  readonly readonly: boolean; // if true then no answer will be produced
+  readonly creatable: boolean; // if true then the question can be added to a questionary
+  readonly icon: JSX.Element;
 }
 
 const registry = [
@@ -56,10 +60,13 @@ const registry = [
   sampleBasisDefinition,
 ];
 
+Object.freeze(registry);
+
 const componentMap = new Map<DataType, QuestionaryComponentDefinition>();
 registry.forEach(definition =>
   componentMap.set(definition.dataType, definition)
 );
+
 export function getQuestionaryComponentDefinition(id: DataType) {
   const definition = componentMap.get(id);
   if (!definition) {
@@ -70,7 +77,7 @@ export function getQuestionaryComponentDefinition(id: DataType) {
 }
 
 // Convenience methods below
-export const getQuestionaryComponentDefinitions = () => registry.slice(0);
+export const getQuestionaryComponentDefinitions = () => registry;
 
 export function createQuestionTemplateRelationForm(
   props: FormProps<QuestionTemplateRelation>
