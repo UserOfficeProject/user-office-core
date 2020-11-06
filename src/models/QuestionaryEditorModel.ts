@@ -111,7 +111,7 @@ export default function QuestionaryEditorModel(
 
           return draft;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
-          getTopicById(draft.steps, action.payload.topicId).topic_title =
+          getTopicById(draft.steps, action.payload.topicId).topic.topic_title =
             action.payload.title;
 
           return draft;
@@ -172,6 +172,8 @@ export default function QuestionaryEditorModel(
 
           return draft;
         case EventType.QUESTION_REL_CREATED:
+          console.log(action);
+
           return { ...action.payload };
         case EventType.QUESTION_UPDATED: {
           const newQuestion = action.payload as Question;

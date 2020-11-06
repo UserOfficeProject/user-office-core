@@ -59,7 +59,7 @@ export type AddUserRoleResponseWrap = {
 export type Answer = {
   __typename?: 'Answer';
   question: Question;
-  sortOrder: Scalars['Int'];
+  sortOrder: Scalars['Float'];
   topicId: Scalars['Int'];
   config: FieldConfig;
   dependency: Maybe<FieldDependency>;
@@ -760,7 +760,7 @@ export type MutationCreateQuestionArgs = {
 export type MutationCreateQuestionTemplateRelationArgs = {
   templateId: Scalars['Int'];
   questionId: Scalars['String'];
-  sortOrder: Scalars['Int'];
+  sortOrder: Scalars['Float'];
   topicId: Scalars['Int'];
 };
 
@@ -797,7 +797,7 @@ export type MutationUpdateQuestionTemplateRelationArgs = {
   questionId: Scalars['String'];
   templateId: Scalars['Int'];
   topicId?: Maybe<Scalars['Int']>;
-  sortOrder?: Maybe<Scalars['Int']>;
+  sortOrder?: Maybe<Scalars['Float']>;
   config?: Maybe<Scalars['String']>;
   dependency?: Maybe<FieldDependencyInput>;
 };
@@ -1585,7 +1585,7 @@ export type QuestionResponseWrap = {
 export type QuestionTemplateRelation = {
   __typename?: 'QuestionTemplateRelation';
   question: Question;
-  sortOrder: Scalars['Int'];
+  sortOrder: Scalars['Float'];
   topicId: Scalars['Int'];
   config: FieldConfig;
   dependency: Maybe<FieldDependency>;
@@ -3788,7 +3788,7 @@ export type CreateQuestionTemplateRelationMutationVariables = Exact<{
   templateId: Scalars['Int'];
   questionId: Scalars['String'];
   topicId: Scalars['Int'];
-  sortOrder: Scalars['Int'];
+  sortOrder: Scalars['Float'];
 }>;
 
 
@@ -4138,7 +4138,7 @@ export type UpdateQuestionTemplateRelationMutationVariables = Exact<{
   questionId: Scalars['String'];
   templateId: Scalars['Int'];
   topicId?: Maybe<Scalars['Int']>;
-  sortOrder?: Maybe<Scalars['Int']>;
+  sortOrder?: Maybe<Scalars['Float']>;
   config?: Maybe<Scalars['String']>;
   dependency?: Maybe<FieldDependencyInput>;
 }>;
@@ -6154,7 +6154,7 @@ export const CreateQuestionDocument = gql`
 }
     ${QuestionFragmentDoc}`;
 export const CreateQuestionTemplateRelationDocument = gql`
-    mutation createQuestionTemplateRelation($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Int!) {
+    mutation createQuestionTemplateRelation($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Float!) {
   createQuestionTemplateRelation(templateId: $templateId, questionId: $questionId, topicId: $topicId, sortOrder: $sortOrder) {
     template {
       ...template
@@ -6264,7 +6264,7 @@ export const UpdateQuestionDocument = gql`
 }
     ${QuestionFragmentDoc}`;
 export const UpdateQuestionTemplateRelationDocument = gql`
-    mutation updateQuestionTemplateRelation($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int, $config: String, $dependency: FieldDependencyInput) {
+    mutation updateQuestionTemplateRelation($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Float, $config: String, $dependency: FieldDependencyInput) {
   updateQuestionTemplateRelation(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, config: $config, dependency: $dependency) {
     template {
       ...template

@@ -2,7 +2,7 @@ mutation createQuestionTemplateRelation(
   $templateId: Int!
   $questionId: String!
   $topicId: Int!
-  $sortOrder: Int!
+  $sortOrder: Float!
 ) {
   createQuestionTemplateRelation(
     templateId: $templateId

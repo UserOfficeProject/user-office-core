@@ -17,20 +17,6 @@ export function usePersistQuestionaryEditorModel() {
 
   const api = useDataApi();
 
-  const assignQuestionsToTopic = async (
-    templateId: number,
-    topicId: number,
-    questionIds: string[]
-  ) => {
-    return api()
-      .assignQuestionsToTopic({
-        templateId,
-        topicId,
-        questionIds,
-      })
-      .then(data => data.assignQuestionsToTopic);
-  };
-
   const updateTopic = async (
     topicId: number,
     values: { title?: string; isEnabled?: boolean }
@@ -80,6 +66,8 @@ export function usePersistQuestionaryEditorModel() {
     templateId: number,
     field: QuestionTemplateRelation
   ) => {
+    debugger;
+
     return api()
       .updateQuestionTemplateRelation({
         templateId,
@@ -186,6 +174,10 @@ export function usePersistQuestionaryEditorModel() {
       .then(data => data.updateTemplate);
   };
 
+  const randomNumberBetween = (min = 0, max = 1) => {
+    return Math.random() * (max - min) + min;
+  };
+
   type MonitorableServiceCall = () => Promise<{
     error?: string | null;
   }>;
@@ -213,6 +205,7 @@ export function usePersistQuestionaryEditorModel() {
 
       switch (action.type) {
         case EventType.REORDER_QUESTION_REL_REQUESTED:
+          // TODO: Clean everything here!
           const reducedTopicId = parseInt(action.payload.source.droppableId);
           const extendedTopicId = parseInt(
             action.payload.destination.droppableId
@@ -224,26 +217,33 @@ export function usePersistQuestionaryEditorModel() {
             step => step.topic.id === extendedTopicId
           );
 
-          executeAndMonitorCall(() =>
-            assignQuestionsToTopic(
-              state.templateId,
-              reducedTopic!.topic.id,
-              reducedTopic!.fields.map(
-                field => field.question.proposalQuestionId
-              )
-            )
-          );
+          let destinationTopic = reducedTopic;
+
           if (reducedTopicId !== extendedTopicId) {
-            executeAndMonitorCall(() =>
-              assignQuestionsToTopic(
-                state.templateId,
-                extendedTopic!.topic.id,
-                extendedTopic!.fields.map(
-                  field => field.question.proposalQuestionId
-                )
-              )
-            );
+            destinationTopic = extendedTopic;
           }
+
+          const questionRelToChange =
+            destinationTopic?.fields[action.payload.destination.index];
+          const prevQuestion =
+            destinationTopic?.fields[action.payload.destination.index - 1];
+          const nextQuestion =
+            destinationTopic?.fields[action.payload.destination.index + 1];
+
+          const newSortOrder = randomNumberBetween(
+            prevQuestion?.sortOrder,
+            nextQuestion?.sortOrder
+          );
+
+          const questionRel = {
+            ...questionRelToChange,
+            sortOrder: newSortOrder,
+            topicId: destinationTopic?.topic.id,
+          } as QuestionTemplateRelation;
+
+          executeAndMonitorCall(() =>
+            updateQuestionTopicRelation(state.templateId, questionRel)
+          );
           break;
         case EventType.REORDER_TOPIC_REQUESTED:
           const topicOrder = state.steps.map(step => step.topic.id);
@@ -381,6 +381,7 @@ export function usePersistQuestionaryEditorModel() {
               questionId,
               sortOrder
             );
+
             if (result.template) {
               dispatch({
                 type: EventType.QUESTION_REL_CREATED,

@@ -20,7 +20,10 @@ import QuestionaryEditorModel, {
   Event,
   EventType,
 } from 'models/QuestionaryEditorModel';
-import { getQuestionaryStepByTopicId } from 'models/QuestionaryFunctions';
+import {
+  getQuestionaryStepByTopicId,
+  getTopicById,
+} from 'models/QuestionaryFunctions';
 import { StyledPaper } from 'styles/StyledComponents';
 
 import QuestionEditor from './forms/QuestionEditor';
@@ -98,17 +101,55 @@ export default function TemplateEditor() {
     display: 'flex',
   });
 
+  const randomNumberBetween = (min = 0, max = 1) => {
+    return Math.random() * (max - min) + min;
+  };
+
   const onDragEnd = (result: DropResult): void => {
-    if (result.type === 'field') {
+    const isDraggingQuestion = result.type === 'field';
+    const isDraggingTopic = result.type === 'topic';
+
+    if (isDraggingQuestion) {
       const dragSource = result.source;
       const dragDestination = result.destination;
-      if (result.source.droppableId === 'questionPicker') {
+      const isDraggingFromQuestionDrawerToTopic =
+        dragSource.droppableId === 'questionPicker';
+      const isDraggingFromTopicToQuestionDrawer =
+        dragDestination?.droppableId === 'questionPicker';
+      const isReorderingInsideTopics = dragDestination && dragSource;
+
+      if (isDraggingFromQuestionDrawerToTopic) {
         const questionId =
           state.complementaryQuestions[dragSource.index].proposalQuestionId;
         const topicId = dragDestination?.droppableId
           ? +dragDestination.droppableId
           : undefined;
-        const sortOrder = dragDestination?.index;
+
+        // const sortOrder = dragDestination?.index;
+
+        const topic = getTopicById(state.steps, topicId as number);
+
+        const previousField =
+          topic.fields[(dragDestination?.index as number) - 1];
+        const nextField = topic.fields[dragDestination?.index as number];
+
+        // console.log(
+        //   result,
+        //   getTopicById(state.steps, topicId as number),
+        //   previousField.sortOrder,
+        //   nextField.sortOrder
+        // );
+
+        const prevSortOrder = previousField ? previousField.sortOrder : 0;
+        const nextSortOrder = nextField ? nextField.sortOrder : 1;
+
+        const sortOrder = randomNumberBetween(prevSortOrder, nextSortOrder);
+
+        console.log(sortOrder);
+
+        // const sortOrder = randomNumberBetween(state.complementaryQuestions[dragSource.index - 1], 1);
+
+        // debugger;
         if (topicId && questionId) {
           dispatch({
             type: EventType.CREATE_QUESTION_REL_REQUESTED,
@@ -120,8 +161,7 @@ export default function TemplateEditor() {
             },
           });
         }
-      } else if (result?.destination?.droppableId === 'questionPicker') {
-        const dragSource = result.source;
+      } else if (isDraggingFromTopicToQuestionDrawer) {
         const topicId = parseInt(dragSource.droppableId);
         const step = getQuestionaryStepByTopicId(
           state.steps,
@@ -135,14 +175,14 @@ export default function TemplateEditor() {
             templateId: state.templateId,
           },
         });
-      } else if (result?.destination && result?.source) {
+      } else if (isReorderingInsideTopics) {
         dispatch({
           type: EventType.REORDER_QUESTION_REL_REQUESTED,
           payload: { source: result.source, destination: result.destination },
         });
       }
     }
-    if (result.type === 'topic') {
+    if (isDraggingTopic) {
       dispatch({
         type: EventType.REORDER_TOPIC_REQUESTED,
         payload: { source: result.source, destination: result.destination },
