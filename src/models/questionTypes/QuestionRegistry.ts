@@ -11,11 +11,11 @@ import { selectionFromOptionsDefinition } from './SelectionFromOptions';
 import { textInputDefinition } from './TextInput';
 
 export interface Question {
-  dataType: DataType;
-  validate: (field: QuestionTemplateRelation, value: any) => boolean;
-  createBlankConfig: () => any;
-  isReadOnly: boolean;
-  defaultAnswer: any;
+  readonly dataType: DataType;
+  readonly validate: (field: QuestionTemplateRelation, value: any) => boolean;
+  readonly createBlankConfig: () => any;
+  readonly isReadOnly: boolean;
+  readonly defaultAnswer: any;
 }
 
 // Add new component definitions here
@@ -30,6 +30,8 @@ const registry = [
   proposalBasisDefinition,
   sampleBasisDefinition,
 ];
+
+Object.freeze(registry);
 
 const componentMap = new Map<DataType, Question>();
 registry.forEach(definition =>
