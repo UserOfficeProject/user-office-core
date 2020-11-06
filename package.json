@@ -37,7 +37,7 @@
     "graphql": "~14.7.0",
     "graphql-request": "~1.8.2",
     "html-react-parser": "~0.9.2",
-    "http-proxy-middleware": "~0.20.0",
+    "http-proxy-middleware": "~0.21.0",
     "immer": "~4.0.2",
     "jsonwebtoken": "~8.5.1",
     "material-table": "~1.62.0",
