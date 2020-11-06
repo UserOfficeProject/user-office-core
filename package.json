@@ -56,7 +56,7 @@
     "typescript": "~3.9.6",
     "use-query-params": "^1.1.8",
     "xlsx": "^0.16.8",
-    "yup": "~0.27.0"
+    "yup": "~0.29.3"
   },
   "proxy": "http://localhost:4000",
   "scripts": {
