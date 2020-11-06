@@ -36,7 +36,7 @@
     "formik-material-ui": "0.0.18",
     "graphql": "~14.7.0",
     "graphql-request": "~1.8.2",
-    "html-react-parser": "~0.9.2",
+    "html-react-parser": "~0.14.0",
     "http-proxy-middleware": "~0.20.0",
     "immer": "~4.0.2",
     "jsonwebtoken": "~8.5.1",
