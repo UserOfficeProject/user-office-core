@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from 'type-graphql';
+import { Field, Float, Int, ObjectType } from 'type-graphql';
 
 import { QuestionTemplateRelation as QuestionTemplateRelationOrign } from '../../models/Template';
 import { FieldConfigType } from './FieldConfig';
@@ -11,7 +11,7 @@ export class QuestionTemplateRelation
   @Field(() => Question)
   public question: Question;
 
-  @Field(() => Int)
+  @Field(() => Float)
   public sortOrder: number;
 
   @Field(() => Int)

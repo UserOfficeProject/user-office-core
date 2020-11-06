@@ -6,6 +6,7 @@ import {
   Int,
   Mutation,
   Resolver,
+  Float,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -20,7 +21,7 @@ export class CreateQuestionTemplateRelationArgs {
   @Field()
   questionId: string;
 
-  @Field(() => Int)
+  @Field(() => Float)
   sortOrder: number;
 
   @Field(() => Int)
