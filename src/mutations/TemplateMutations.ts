@@ -110,7 +110,7 @@ export default class TemplateMutations {
       }
       await this.dataSource.createQuestionTemplateRelation({
         questionId: firstQuestionId,
-        sortOrder: 0,
+        sortOrder: 0.5,
         topicId: newTopic.id,
         templateId: newTopic.templateId,
       });

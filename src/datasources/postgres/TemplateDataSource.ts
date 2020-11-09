@@ -176,10 +176,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async createTopic(args: CreateTopicArgs): Promise<Topic> {
-    await database('topics')
-      .update({ sort_order: args.sortOrder + 1 })
-      .where('sort_order', '>=', args.sortOrder)
-      .andWhere('template_id', '=', args.templateId);
+    // await database('topics')
+    //   .update({ sort_order: args.sortOrder })
+    //   .andWhere('template_id', '=', args.templateId);
 
     const newTopic = (
       await database('topics')
@@ -208,7 +207,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         {
           topic_title: values.title,
           is_enabled: values.isEnabled,
-          sortOrder: values.sortOrder,
+          sort_order: values.sortOrder,
         },
         ['*']
       )

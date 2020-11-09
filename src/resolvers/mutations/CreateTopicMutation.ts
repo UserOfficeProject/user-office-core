@@ -3,6 +3,7 @@ import {
   ArgsType,
   Ctx,
   Field,
+  Float,
   Int,
   Mutation,
   Resolver,
@@ -17,7 +18,7 @@ export class CreateTopicArgs {
   @Field(() => Int)
   templateId: number;
 
-  @Field(() => Int)
+  @Field(() => Float)
   sortOrder: number;
 
   @Field(() => Int, { nullable: true })

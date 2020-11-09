@@ -6,7 +6,13 @@ BEGIN
 			ALTER TABLE templates_has_questions ALTER COLUMN sort_order TYPE DECIMAL(15, 14);
 
 			UPDATE templates_has_questions
-			SET sort_order = 0.1
+			SET sort_order = 0.5
+			WHERE sort_order = 0;
+
+			ALTER TABLE topics ALTER COLUMN sort_order TYPE DECIMAL(9, 8);
+
+			UPDATE topics
+			SET sort_order = 0.5
 			WHERE sort_order = 0;
     END;
 	END IF;

@@ -45,7 +45,7 @@ const dummyTopicFactory = (values?: Partial<Topic>) => {
     values?.id || 1,
     values?.title || 'General information',
     values?.templateId || 1,
-    values?.sortOrder || 0,
+    values?.sortOrder || 0.5,
     values?.isEnabled || true
   );
 };
@@ -166,7 +166,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       dummyTemplateSteps,
       args.questionId
     ) as QuestionTemplateRelation;
-    question.sortOrder = args.sortOrder || 0;
+    question.sortOrder = args.sortOrder || 0.5;
     question.topicId = args.topicId || 1;
 
     return dummyProposalTemplate;
@@ -277,7 +277,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
   async updateTopic(
     topicId: number,
-    values: { title?: string; isEnabled?: boolean }
+    values: { title?: string; isEnabled?: boolean; sortOrder?: number }
   ): Promise<Topic> {
     const steps = await this.getTemplateSteps();
     const allTopics = steps.reduce((accumulated, current) => {

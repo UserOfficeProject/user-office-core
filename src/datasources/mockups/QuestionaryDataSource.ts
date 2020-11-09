@@ -64,7 +64,7 @@ export const dummyQuestionTemplateRelationFactory = (
 ): QuestionTemplateRelation => {
   return new QuestionTemplateRelation(
     dummyQuestionFactory(values?.question),
-    values?.sortOrder || Math.round(Math.random() * 100),
+    values?.sortOrder || +Math.random().toFixed(8),
     values?.topicId || Math.round(Math.random() * 10),
     new BooleanConfig()
   );

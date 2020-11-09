@@ -143,7 +143,11 @@ const createTemplates = async () => {
   for (const template of templates) {
     await execute(() => {
       return templateDataSource.createTopic({
-        sortOrder: 0,
+        sortOrder: faker.random.number({
+          min: 0,
+          max: 1,
+          precision: 0.00000001,
+        }),
         templateId: template.templateId,
       });
     }, dummy.positiveNumber(5));
@@ -169,7 +173,11 @@ const createTemplates = async () => {
       for (const question of questions) {
         await templateDataSource.createQuestionTemplateRelation({
           questionId: question.proposalQuestionId,
-          sortOrder: 0,
+          sortOrder: faker.random.number({
+            min: 0,
+            max: 1,
+            precision: 0.00000000000001,
+          }),
           templateId: template.templateId,
           topicId: step.topic.id,
         });

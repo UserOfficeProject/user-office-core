@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int } from 'type-graphql';
+import { ObjectType, Field, Int, Float } from 'type-graphql';
 
 import { Topic as TopicOrigin } from '../../models/Template';
 @ObjectType()
@@ -12,7 +12,7 @@ export class Topic implements Partial<TopicOrigin> {
   @Field(() => Int)
   public templateId: number;
 
-  @Field(type => Int)
+  @Field(() => Float)
   public sortOrder: number;
 
   @Field()

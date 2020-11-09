@@ -32,6 +32,7 @@ test('An userofficer can update topic', async () => {
     id: 1,
     title: newTopicTitle,
     isEnabled: topicEnabled,
+    sortOrder: 0.5,
   });
 
   expect(isRejection(result)).toBeFalsy();
@@ -47,6 +48,7 @@ test('Can not update topic that does not exist', async () => {
     id: 9,
     title: '',
     isEnabled: false,
+    sortOrder: 0.5,
   });
 
   expect(isRejection(result)).toBeTruthy();
@@ -106,6 +108,7 @@ test('A user can not update topic', async () => {
     id: 1,
     title: 'New topic title',
     isEnabled: false,
+    sortOrder: 0.5,
   });
 
   expect(topic instanceof Topic).toBe(false);
@@ -114,7 +117,7 @@ test('A user can not update topic', async () => {
 test('A user-officer can create topic', async () => {
   const response = await mutations.createTopic(dummyUserOfficerWithRole, {
     templateId: 1,
-    sortOrder: 0,
+    sortOrder: 0.6,
   });
   expect(isRejection(response)).toBe(false);
 });
@@ -122,7 +125,7 @@ test('A user-officer can create topic', async () => {
 test('A user can not create topic', async () => {
   const response = await mutations.createTopic(dummyUserOfficerWithRole, {
     templateId: 1,
-    sortOrder: 0,
+    sortOrder: 0.65,
   });
   expect(isRejection(response)).toBe(false);
 });
@@ -216,7 +219,7 @@ test('User can not update question rel', async () => {
     {
       templateId: 1,
       questionId: QUESTION_ID,
-      sortOrder: 2,
+      sortOrder: 0.6,
       topicId: 1,
     }
   );
@@ -229,7 +232,7 @@ test('User officer can update question rel', async () => {
     {
       templateId: 1,
       questionId: QUESTION_ID,
-      sortOrder: 2,
+      sortOrder: 0.7,
     }
   );
   expect(isRejection(response)).toBe(false);
@@ -304,7 +307,7 @@ test('User officer can clone template', async () => {
 
 test('User officer can add question to template', async () => {
   const questionId = 'questionId';
-  const sortOrder = 0;
+  const sortOrder = 0.65;
   const templateId = 1;
   const topicId = 1;
 

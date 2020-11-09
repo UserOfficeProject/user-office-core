@@ -3,6 +3,7 @@ import {
   ArgsType,
   Ctx,
   Field,
+  Float,
   Int,
   Mutation,
   Resolver,
@@ -19,6 +20,9 @@ export class UpdateTopicArgs {
 
   @Field(() => String, { nullable: true })
   title: string;
+
+  @Field(() => Float, { nullable: true })
+  sortOrder: number;
 
   @Field(() => Boolean, { nullable: true })
   isEnabled: boolean;
