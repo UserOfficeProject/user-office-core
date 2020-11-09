@@ -9,59 +9,25 @@ services:
       - "80:80" # The HTTP port
       - "8080:8080" # The Web UI (enabled by --api)
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-  db:
-    build:
-      context: ./
-      dockerfile: "./cypress/Dockerfile.psql"
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: duopassword
-      POSTGRES_USER: duouser
-      POSTGRES_DB: duo
-  backend:
-    image: dmsc/duo-backend:$TAG
-    environment:
-      DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
-      secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
-      tokenLife: 7d
-      baseURL: localhost:3000
-      SPARKPOST_TOKEN: dummytoken
-      NODE_ENV: development
-      UO_FEATURE_DISABLE_MESSAGE_BROKER: 1
-      USER_OFFICE_PDF_FACTORY_ENDPOINT: http://factory:4500/generate-pdf
-    labels:
-      - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads"
-      - "traefik.port=4000"
-    depends_on:
-      - db
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
   frontend:
-    build:
-      context: ./
-      dockerfile: "./Dockerfile"
+    image: "duo-frontend:${BUILD_TAG}"
     labels:
       - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.port=80"
     depends_on:
       - backend
+
   cypress:
+    image: e2e-cypress:latest
     environment:
       CYPRESS_SVC_ACC_TOKEN: $SVC_ACC_TOKEN
-    ipc: host
-    build: ./cypress
-    entrypoint: ["./wait-for-frontend.sh", "frontend:80", "npm run cy:run"]
+    entrypoint: ["/wait-for-frontend.sh", "frontend:80", "npm run cy:run"]
     depends_on:
       - frontend
-  factory:
-    image: dmsc/duo-factory:${FACTORY_TAG}
-    environment:
-      - NODE_ENV=production
-      - DATABASE_HOSTNAME=localhost
-      - DATABASE_PORT=5432
-      - DATABASE_USER=duouser
-      - DATABASE_PASSWORD=duopassword
-      - DATABASE_DATABASE=duo
-    ports:
-      - 4500:4500
-    cap_add:
-      - SYS_ADMIN
+    volumes:
+      - "./${USER_OFFICE_SCHEDULER_FRONTEND_DIR}/cypress/fixtures:/e2e/cypress/fixtures"
+      - "./${USER_OFFICE_SCHEDULER_FRONTEND_DIR}/cypress/integration:/e2e/cypress/integration"
+      - "./${USER_OFFICE_SCHEDULER_FRONTEND_DIR}/cypress/plugins:/e2e/cypress/plugins"
+      - "./${USER_OFFICE_SCHEDULER_FRONTEND_DIR}/cypress/support:/e2e/cypress/support"
