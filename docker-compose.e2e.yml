@@ -10,7 +10,7 @@ services:
       tokenLife: 7d
       baseURL: localhost:3000
       SPARKPOST_TOKEN: dummytoken
-      NODE_ENV: production
+      NODE_ENV: development
       UO_FEATURE_DISABLE_MESSAGE_BROKER: 1
       USER_OFFICE_PDF_FACTORY_ENDPOINT: ${USER_OFFICE_PDF_FACTORY_ENDPOINT}
     labels:
