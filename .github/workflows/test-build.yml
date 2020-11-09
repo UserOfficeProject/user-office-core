@@ -141,6 +141,8 @@ jobs:
           EOF
 
       - name: Run docker-compose
+        env:
+          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
         run: |
           cd "$GITHUB_WORKSPACE/.."
 
