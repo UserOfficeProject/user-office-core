@@ -162,43 +162,42 @@ jobs:
             -f user-office-factory/docker-compose.e2e.yml \
             -f "$REPO_DIR_NAME/docker-compose.e2e.yml" \
             up --exit-code-from cypress
-  # e2e:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         ref: ${{ github.head_ref }}
-  #     - run: echo ${{ github.head_ref }}
-  #     - run: echo "::set-env name=TAGS_JSON::$(curl -sb -H https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags)"
-  #     - run: echo "TAGS_JSON $TAGS_JSON"
-  #     - run: echo "::set-env name=TAG_COUNT::$(echo $TAGS_JSON | jq -c '.[] | select(.name=="${{ github.head_ref }}")' | jq -s '. | length')"
-  #     - run: echo "TAG_COUNT $TAG_COUNT"
-  #     - run: if [ "$TAG_COUNT" != 0 ]; then    echo "::set-env name=TAG::${{ github.head_ref }}"; else    echo "::set-env name=TAG::develop"; fi
-  #     - run: echo "TAG $TAG"
-  #     - run: echo "::set-env name=FACTORY_TAGS_JSON::$(curl -sb -H https://registry.hub.docker.com/v1/repositories/dmsc/duo-factory/tags)"
-  #     - run: echo "FACTORY_TAGS_JSON $FACTORY_TAGS_JSON"
-  #     - run: echo "::set-env name=FACTORY_TAG_COUNT::$(echo $FACTORY_TAGS_JSON | jq -c '.[] | select(.name=="${{ github.head_ref }}")' | jq -s '. | length')"
-  #     - run: echo "FACTORY_TAG_COUNT $FACTORY_TAG_COUNT"
-  #     - run: if [ "$FACTORY_TAG_COUNT" != 0 ]; then    echo "::set-env name=FACTORY_TAG::${{ github.head_ref }}"; else    echo "::set-env name=FACTORY_TAG::develop"; fi
-  #     - run: echo "FACTORY_TAG $FACTORY_TAG"
-  #     - run: rm -rf user-office-backend
-  #     - run: git clone https://github.com/UserOfficeProject/user-office-backend
-  #     - run: cd user-office-backend && git fetch && git checkout $TAG && cd ..
-  #     - run: docker-compose -f docker-compose.e2e.yaml rm
-  #     - run: docker-compose -f docker-compose.e2e.yaml down --remove-orphans
-  #     - run: docker-compose -f docker-compose.e2e.yaml pull
-  #     - run: docker-compose -f docker-compose.e2e.yaml build --no-cache
-  #     - run: docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
-  #     - run: docker-compose -f docker-compose.e2e.yaml down
-  #   env:
-  #     SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
-  # build:
-  #   runs-on: ubuntu-latest
-  #   needs: e2e
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: docker/build-push-action@v1
-  #       with:
-  #         username: ${{ secrets.DOCKER_USERNAME }}
-  #         password: ${{ secrets.DOCKER_PASSWORD }}
-  #         push: false
+  push:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: e2e
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Load app cache
+        id: cached-image
+        uses: actions/cache@v2
+        with:
+          path: |
+            /tmp/.buildx-layer-cache
+            /tmp/.buildx-image-cache
+          key: ${{ runner.os }}-buildx-${{ github.head_ref }}-${{ github.sha }}
+
+      - name: Fail on cache miss
+        if: steps.cached-image.outputs.cache-hit != 'true'
+        run: |
+          echo "No cache hit!"
+          exit 1
+
+      # For debugging capture the selected branch
+      - name: Branch
+        run: echo "Branch ${{ github.head_ref }}"
+
+      - name: Load cached app image
+        run: |
+          docker load --input /tmp/.buildx-image-cache/img.tar
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push
+        run: |
+          docker tag duo-frontend:${{ github.sha }} dmsc/duo-frontend:${{ github.head_ref }}
+          docker push dmsc/duo-frontend:${{ github.head_ref }}
