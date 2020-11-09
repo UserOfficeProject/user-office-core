@@ -40,6 +40,16 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
+              if (
+                process.env.REACT_APP_AUTH_TYPE === 'external' &&
+                process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL
+              ) {
+                window.location.href =
+                  process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL;
+
+                return <p>Redirecting to external sign-in page...</p>;
+              }
+
               return <Redirect to="/SignIn" />;
             } else {
               if (!currentRole) {
@@ -86,6 +96,31 @@ class App extends React.Component {
   }
 
   render(): JSX.Element {
+    let routes;
+    if (process.env.REACT_APP_AUTH_TYPE === 'external') {
+      routes = (
+        <Switch>
+          <Route path="/external-auth/:sessionId" component={ExternalAuth} />
+          <PrivateRoute path="/" component={DashBoard} />
+        </Switch>
+      );
+    } else {
+      routes = (
+        <Switch>
+          <Route path="/SignUp" component={SignUp} />
+          <Route path="/SignIn" component={SignIn} />
+          <Route path="/shared-auth" component={SharedAuth} />
+          <Route path="/ResetPasswordEmail" component={ResetPasswordEmail} />
+          <Route path="/ResetPassword/:token" component={ResetPassword} />
+          <Route
+            path="/EmailVerification/:token"
+            component={EmailVerification}
+          />
+          <PrivateRoute path="/" component={DashBoard} />
+        </Switch>
+      );
+    }
+
     return (
       <ThemeProvider theme={getTheme()}>
         <CookiesProvider>
@@ -97,30 +132,7 @@ class App extends React.Component {
               <ReviewAndAssignmentContextProvider>
                 <Router>
                   <QueryParamProvider ReactRouterRoute={Route}>
-                    <div className="App">
-                      <Switch>
-                        <Route
-                          path="/external-auth/:sessionId"
-                          component={ExternalAuth}
-                        />
-                        <Route path="/SignUp" component={SignUp} />
-                        <Route path="/SignIn" component={SignIn} />
-                        <Route path="/shared-auth" component={SharedAuth} />
-                        <Route
-                          path="/ResetPasswordEmail"
-                          component={ResetPasswordEmail}
-                        />
-                        <Route
-                          path="/ResetPassword/:token"
-                          component={ResetPassword}
-                        />
-                        <Route
-                          path="/EmailVerification/:token"
-                          component={EmailVerification}
-                        />
-                        <PrivateRoute path="/" component={DashBoard} />
-                      </Switch>
-                    </div>
+                    <div className="App">{routes}</div>
                   </QueryParamProvider>
                 </Router>
               </ReviewAndAssignmentContextProvider>
