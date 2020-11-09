@@ -27,7 +27,7 @@ services:
     depends_on:
       - frontend
     volumes:
-      - "./${USER_OFFICE_SCHEDULER_FRONTEND_DIR}/cypress/screenshots:/tmp/screenshots"
+      - "./${USER_OFFICE_FRONTEND_DIR}/cypress/screenshots:/tmp/screenshots"
       - "./${USER_OFFICE_FRONTEND_DIR}/cypress/fixtures:/e2e/cypress/fixtures"
       - "./${USER_OFFICE_FRONTEND_DIR}/cypress/integration:/e2e/cypress/integration"
       - "./${USER_OFFICE_FRONTEND_DIR}/cypress/plugins:/e2e/cypress/plugins"
