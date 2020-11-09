@@ -1,5 +1,15 @@
-mutation updateTopic($topicId: Int!, $title: String, $isEnabled: Boolean) {
-  updateTopic(id: $topicId, title: $title, isEnabled: $isEnabled) {
+mutation updateTopic(
+  $topicId: Int!
+  $title: String
+  $sortOrder: Float
+  $isEnabled: Boolean
+) {
+  updateTopic(
+    id: $topicId
+    title: $title
+    sortOrder: $sortOrder
+    isEnabled: $isEnabled
+  ) {
     topic {
       ...topic
     }

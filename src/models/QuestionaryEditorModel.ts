@@ -7,6 +7,7 @@ import {
   Question,
   QuestionTemplateRelation,
   TemplateCategoryId,
+  TemplateStep,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import {
@@ -36,6 +37,7 @@ export enum EventType {
   CREATE_TOPIC_REQUESTED,
   DELETE_TOPIC_REQUESTED,
   TOPIC_CREATED,
+  TOPIC_REORDERED,
   UPDATE_TOPIC_TITLE_REQUESTED,
   REORDER_TOPIC_REQUESTED,
   PICK_QUESTION_REQUESTED,
@@ -81,16 +83,16 @@ export default function QuestionaryEditorModel(
             return (
               step.topic.id.toString() === action.payload.source.droppableId
             );
-          })!;
+          }) as TemplateStep;
 
           const to = draft.steps.find(step => {
             return (
               step.topic.id.toString() ===
               action.payload.destination.droppableId
             );
-          })!;
+          });
 
-          to.fields.splice(
+          to?.fields.splice(
             action.payload.destination.index,
             0,
             ...from.fields.splice(action.payload.source.index, 1)
@@ -98,7 +100,7 @@ export default function QuestionaryEditorModel(
 
           return draft;
         }
-        case EventType.REORDER_TOPIC_REQUESTED:
+        case EventType.TOPIC_REORDERED:
           if (!action.payload.destination) {
             return draft;
           }
@@ -111,7 +113,7 @@ export default function QuestionaryEditorModel(
 
           return draft;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
-          getTopicById(draft.steps, action.payload.topicId).topic.topic_title =
+          getTopicById(draft.steps, action.payload.topicId).topic.title =
             action.payload.title;
 
           return draft;
@@ -172,8 +174,6 @@ export default function QuestionaryEditorModel(
 
           return draft;
         case EventType.QUESTION_REL_CREATED:
-          console.log(action);
-
           return { ...action.payload };
         case EventType.QUESTION_UPDATED: {
           const newQuestion = action.payload as Question;
@@ -206,7 +206,7 @@ export default function QuestionaryEditorModel(
 
   useEffect(() => {
     api()
-      .getTemplate({ templateId: parseInt(templateId!) })
+      .getTemplate({ templateId: parseInt(templateId) })
       .then(data => {
         memoizedDispatch({
           type: EventType.READY,

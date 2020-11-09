@@ -3,7 +3,11 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
 import LockIcon from '@material-ui/icons/Lock';
 import React, { useState } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import {
+  Draggable,
+  DraggingStyle,
+  NotDraggingStyle,
+} from 'react-beautiful-dnd';
 
 import {
   DataType,
@@ -62,7 +66,10 @@ export default function TemplateQuestionEditor(props: {
 
   const [isHover, setIsHover] = useState<boolean>(false);
 
-  const getItemStyle = (isDragging: any, draggableStyle: any) => ({
+  const getItemStyle = (
+    isDragging: boolean,
+    draggableStyle: DraggingStyle | NotDraggingStyle | undefined
+  ) => ({
     display: 'flex',
     padding: '12px 8px 8px 8px',
     margin: '1px',

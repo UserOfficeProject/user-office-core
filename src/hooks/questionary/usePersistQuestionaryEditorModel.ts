@@ -10,6 +10,7 @@ import {
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { Event, EventType } from 'models/QuestionaryEditorModel';
+import { randomNumberBetween } from 'utils/Math';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 
 export function usePersistQuestionaryEditorModel() {
@@ -19,7 +20,7 @@ export function usePersistQuestionaryEditorModel() {
 
   const updateTopic = async (
     topicId: number,
-    values: { title?: string; isEnabled?: boolean }
+    values: { title?: string; sortOrder?: number; isEnabled?: boolean }
   ) => {
     return api()
       .updateTopic({
@@ -29,14 +30,6 @@ export function usePersistQuestionaryEditorModel() {
       .then(data => {
         return data.updateTopic;
       });
-  };
-
-  const updateTopicOrder = async (topicOrder: number[]) => {
-    return api()
-      .updateTopicOrder({
-        topicOrder,
-      })
-      .then(data => data.updateTopicOrder);
   };
 
   // Have this until GQL accepts Union types
@@ -66,8 +59,6 @@ export function usePersistQuestionaryEditorModel() {
     templateId: number,
     field: QuestionTemplateRelation
   ) => {
-    debugger;
-
     return api()
       .updateQuestionTemplateRelation({
         templateId,
@@ -174,10 +165,6 @@ export function usePersistQuestionaryEditorModel() {
       .then(data => data.updateTemplate);
   };
 
-  const randomNumberBetween = (min = 0, max = 1) => {
-    return Math.random() * (max - min) + min;
-  };
-
   type MonitorableServiceCall = () => Promise<{
     error?: string | null;
   }>;
@@ -205,7 +192,6 @@ export function usePersistQuestionaryEditorModel() {
 
       switch (action.type) {
         case EventType.REORDER_QUESTION_REL_REQUESTED:
-          // TODO: Clean everything here!
           const reducedTopicId = parseInt(action.payload.source.droppableId);
           const extendedTopicId = parseInt(
             action.payload.destination.droppableId
@@ -245,10 +231,48 @@ export function usePersistQuestionaryEditorModel() {
             updateQuestionTopicRelation(state.templateId, questionRel)
           );
           break;
-        case EventType.REORDER_TOPIC_REQUESTED:
-          const topicOrder = state.steps.map(step => step.topic.id);
-          executeAndMonitorCall(() => updateTopicOrder(topicOrder));
+        case EventType.REORDER_TOPIC_REQUESTED: {
+          const sourceIndex = action.payload.source.index;
+          const destinationIndex = action.payload.destination.index;
+
+          const stepToUpdate = state.steps[action.payload.source.index];
+          let stepIndexBeforeTheOneWeReorder =
+            action.payload.destination.index - 1;
+          let stepIndexAfterTheOneWeReorder = action.payload.destination.index;
+
+          if (sourceIndex < destinationIndex) {
+            stepIndexBeforeTheOneWeReorder = action.payload.destination.index;
+            stepIndexAfterTheOneWeReorder =
+              action.payload.destination.index + 1;
+          }
+
+          const stepBeforeTheOneWeReorder =
+            state.steps[stepIndexBeforeTheOneWeReorder];
+          const stepAfterTheOneWeReorder =
+            state.steps[stepIndexAfterTheOneWeReorder];
+
+          const sortOrder = randomNumberBetween(
+            stepBeforeTheOneWeReorder?.topic.sortOrder,
+            stepAfterTheOneWeReorder?.topic.sortOrder
+          );
+
+          executeAndMonitorCall(async () => {
+            const result = await updateTopic(stepToUpdate.topic.id, {
+              sortOrder,
+            });
+
+            if (result.topic) {
+              dispatch({
+                type: EventType.TOPIC_REORDERED,
+                payload: action.payload,
+              });
+            }
+
+            return result;
+          });
+
           break;
+        }
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
           executeAndMonitorCall(() =>
             updateTopic(action.payload.topicId, {
@@ -336,12 +360,26 @@ export function usePersistQuestionaryEditorModel() {
           });
           break;
         }
-        case EventType.CREATE_TOPIC_REQUESTED:
-          executeAndMonitorCall(async () => {
-            const result = await createTopic(
-              state.templateId,
-              action.payload.sortOrder
+        case EventType.CREATE_TOPIC_REQUESTED: {
+          const { isFirstStep, topicId } = action.payload;
+          let sortOrder = 0.5;
+
+          if (!isFirstStep) {
+            const stepIndex = state.steps.findIndex(
+              stepItem => stepItem.topic.id === topicId
             );
+
+            const previousStep = state.steps[stepIndex];
+            const nextStep = state.steps[stepIndex + 1];
+
+            sortOrder = randomNumberBetween(
+              previousStep.topic.sortOrder,
+              nextStep?.topic.sortOrder
+            );
+          }
+
+          executeAndMonitorCall(async () => {
+            const result = await createTopic(state.templateId, sortOrder);
             if (result.template) {
               dispatch({
                 type: EventType.TOPIC_CREATED,
@@ -352,6 +390,7 @@ export function usePersistQuestionaryEditorModel() {
             return result;
           });
           break;
+        }
         case EventType.UPDATE_TEMPLATE_METADATA_REQUESTED: {
           const { templateId, name, description } = action.payload;
 

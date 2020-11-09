@@ -774,7 +774,7 @@ export type MutationCreateTemplateArgs = {
 
 export type MutationCreateTopicArgs = {
   templateId: Scalars['Int'];
-  sortOrder: Scalars['Int'];
+  sortOrder: Scalars['Float'];
   title?: Maybe<Scalars['Int']>;
 };
 
@@ -814,6 +814,7 @@ export type MutationUpdateTemplateArgs = {
 export type MutationUpdateTopicArgs = {
   id: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
+  sortOrder?: Maybe<Scalars['Float']>;
   isEnabled?: Maybe<Scalars['Boolean']>;
 };
 
@@ -1846,7 +1847,7 @@ export type Topic = {
   id: Scalars['Int'];
   title: Scalars['String'];
   templateId: Scalars['Int'];
-  sortOrder: Scalars['Int'];
+  sortOrder: Scalars['Float'];
   isEnabled: Scalars['Boolean'];
 };
 
@@ -3806,7 +3807,7 @@ export type CreateQuestionTemplateRelationMutation = (
 
 export type CreateTopicMutationVariables = Exact<{
   templateId: Scalars['Int'];
-  sortOrder: Scalars['Int'];
+  sortOrder: Scalars['Float'];
 }>;
 
 
@@ -4022,7 +4023,7 @@ export type TemplateFragment = (
     { __typename?: 'TemplateStep' }
     & { topic: (
       { __typename?: 'Topic' }
-      & Pick<Topic, 'title' | 'id'>
+      & Pick<Topic, 'title' | 'id' | 'sortOrder'>
     ), fields: Array<(
       { __typename?: 'QuestionTemplateRelation' }
       & QuestionTemplateRelationFragment
@@ -4179,6 +4180,7 @@ export type UpdateTemplateMutation = (
 export type UpdateTopicMutationVariables = Exact<{
   topicId: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
+  sortOrder?: Maybe<Scalars['Float']>;
   isEnabled?: Maybe<Scalars['Boolean']>;
 }>;
 
@@ -4875,6 +4877,7 @@ export const TemplateFragmentDoc = gql`
     topic {
       title
       id
+      sortOrder
     }
     fields {
       ...questionTemplateRelation
@@ -6164,7 +6167,7 @@ export const CreateQuestionTemplateRelationDocument = gql`
 }
     ${TemplateFragmentDoc}`;
 export const CreateTopicDocument = gql`
-    mutation createTopic($templateId: Int!, $sortOrder: Int!) {
+    mutation createTopic($templateId: Int!, $sortOrder: Float!) {
   createTopic(templateId: $templateId, sortOrder: $sortOrder) {
     template {
       ...template
@@ -6284,8 +6287,8 @@ export const UpdateTemplateDocument = gql`
 }
     ${TemplateMetadataFragmentDoc}`;
 export const UpdateTopicDocument = gql`
-    mutation updateTopic($topicId: Int!, $title: String, $isEnabled: Boolean) {
-  updateTopic(id: $topicId, title: $title, isEnabled: $isEnabled) {
+    mutation updateTopic($topicId: Int!, $title: String, $sortOrder: Float, $isEnabled: Boolean) {
+  updateTopic(id: $topicId, title: $title, sortOrder: $sortOrder, isEnabled: $isEnabled) {
     topic {
       ...topic
     }

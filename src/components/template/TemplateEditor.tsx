@@ -25,6 +25,7 @@ import {
   getTopicById,
 } from 'models/QuestionaryFunctions';
 import { StyledPaper } from 'styles/StyledComponents';
+import { randomNumberBetween } from 'utils/Math';
 
 import QuestionEditor from './forms/QuestionEditor';
 import QuestionTemplateRelationEditor from './forms/QuestionTemplateRelationEditor';
@@ -93,7 +94,7 @@ export default function TemplateEditor() {
     },
   }))();
 
-  const getTopicListStyle = (isDraggingOver: any) => ({
+  const getTopicListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver
       ? theme.palette.primary.light
       : theme.palette.grey[100],
@@ -101,11 +102,15 @@ export default function TemplateEditor() {
     display: 'flex',
   });
 
-  const randomNumberBetween = (min = 0, max = 1) => {
-    return Math.random() * (max - min) + min;
-  };
-
   const onDragEnd = (result: DropResult): void => {
+    if (
+      !result.destination ||
+      (result.destination.droppableId === result.source.droppableId &&
+        result.destination.index === result.source.index)
+    ) {
+      return;
+    }
+
     const isDraggingQuestion = result.type === 'field';
     const isDraggingTopic = result.type === 'topic';
 
@@ -113,10 +118,14 @@ export default function TemplateEditor() {
       const dragSource = result.source;
       const dragDestination = result.destination;
       const isDraggingFromQuestionDrawerToTopic =
-        dragSource.droppableId === 'questionPicker';
+        dragSource.droppableId === 'questionPicker' &&
+        dragDestination?.droppableId !== 'questionPicker';
       const isDraggingFromTopicToQuestionDrawer =
-        dragDestination?.droppableId === 'questionPicker';
-      const isReorderingInsideTopics = dragDestination && dragSource;
+        dragDestination?.droppableId === 'questionPicker' &&
+        dragSource.droppableId !== 'questionPicker';
+      const isReorderingInsideTopics =
+        dragDestination?.droppableId !== 'questionPicker' &&
+        dragSource.droppableId !== 'questionPicker';
 
       if (isDraggingFromQuestionDrawerToTopic) {
         const questionId =
@@ -125,31 +134,17 @@ export default function TemplateEditor() {
           ? +dragDestination.droppableId
           : undefined;
 
-        // const sortOrder = dragDestination?.index;
-
         const topic = getTopicById(state.steps, topicId as number);
 
         const previousField =
           topic.fields[(dragDestination?.index as number) - 1];
         const nextField = topic.fields[dragDestination?.index as number];
 
-        // console.log(
-        //   result,
-        //   getTopicById(state.steps, topicId as number),
-        //   previousField.sortOrder,
-        //   nextField.sortOrder
-        // );
+        const sortOrder = randomNumberBetween(
+          previousField?.sortOrder,
+          nextField?.sortOrder
+        );
 
-        const prevSortOrder = previousField ? previousField.sortOrder : 0;
-        const nextSortOrder = nextField ? nextField.sortOrder : 1;
-
-        const sortOrder = randomNumberBetween(prevSortOrder, nextSortOrder);
-
-        console.log(sortOrder);
-
-        // const sortOrder = randomNumberBetween(state.complementaryQuestions[dragSource.index - 1], 1);
-
-        // debugger;
         if (topicId && questionId) {
           dispatch({
             type: EventType.CREATE_QUESTION_REL_REQUESTED,
@@ -190,7 +185,7 @@ export default function TemplateEditor() {
     }
   };
 
-  const getContainerStyle = (): any => {
+  const getContainerStyle = () => {
     return isLoading || state.templateId === 0
       ? {
           pointerEvents: 'none',
@@ -210,7 +205,7 @@ export default function TemplateEditor() {
         onClick={(): void =>
           dispatch({
             type: EventType.CREATE_TOPIC_REQUESTED,
-            payload: { sortOrder: 0 },
+            payload: { sortOrder: 0.5, isFirstTopic: true },
           })
         }
       >

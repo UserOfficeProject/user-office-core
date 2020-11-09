@@ -93,7 +93,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
     },
   }))();
 
-  const getListStyle = (isDraggingOver: any) => ({
+  const getListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver ? theme.palette.primary.light : 'transparent',
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
   });
@@ -106,13 +106,14 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
         onClick={item => {
           const isAltDown = (window.event as MouseEvent)?.altKey;
 
+          // NOTE: sortOrder is always 0.1 because we add at that position using alt key and after that you can reorder if you want.
           if (isAltDown) {
             dispatch({
               type: EventType.CREATE_QUESTION_REL_REQUESTED,
               payload: {
                 topicId: props.topic.id,
                 questionId: item.proposalQuestionId,
-                sortOrder: 0,
+                sortOrder: 0.1,
                 templateId: template.templateId,
               },
             });
@@ -170,7 +171,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
               onClick={() => onCreateNewQuestionClicked(DataType.TEXT_INPUT)}
             >
               <ListItemIcon>
-                {getTemplateFieldIcon(DataType.TEXT_INPUT)!}
+                {getTemplateFieldIcon(DataType.TEXT_INPUT)}
               </ListItemIcon>
               <Typography variant="inherit">Add Text input</Typography>
             </MenuItem>
@@ -180,7 +181,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
               onClick={() => onCreateNewQuestionClicked(DataType.EMBELLISHMENT)}
             >
               <ListItemIcon>
-                {getTemplateFieldIcon(DataType.EMBELLISHMENT)!}
+                {getTemplateFieldIcon(DataType.EMBELLISHMENT)}
               </ListItemIcon>
               <Typography variant="inherit">Add Embellishment</Typography>
             </MenuItem>
@@ -189,9 +190,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
               className={classes.addQuestionMenuItem}
               onClick={() => onCreateNewQuestionClicked(DataType.DATE)}
             >
-              <ListItemIcon>
-                {getTemplateFieldIcon(DataType.DATE)!}
-              </ListItemIcon>
+              <ListItemIcon>{getTemplateFieldIcon(DataType.DATE)}</ListItemIcon>
               <Typography variant="inherit">Add Date</Typography>
             </MenuItem>
 
@@ -200,7 +199,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
               onClick={() => onCreateNewQuestionClicked(DataType.FILE_UPLOAD)}
             >
               <ListItemIcon>
-                {getTemplateFieldIcon(DataType.FILE_UPLOAD)!}
+                {getTemplateFieldIcon(DataType.FILE_UPLOAD)}
               </ListItemIcon>
               <Typography variant="inherit">Add File upload</Typography>
             </MenuItem>
@@ -212,7 +211,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
               }
             >
               <ListItemIcon>
-                {getTemplateFieldIcon(DataType.SELECTION_FROM_OPTIONS)!}
+                {getTemplateFieldIcon(DataType.SELECTION_FROM_OPTIONS)}
               </ListItemIcon>
               <Typography variant="inherit">Add Multiple choice</Typography>
             </MenuItem>
@@ -222,7 +221,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
               onClick={() => onCreateNewQuestionClicked(DataType.BOOLEAN)}
             >
               <ListItemIcon>
-                {getTemplateFieldIcon(DataType.BOOLEAN)!}
+                {getTemplateFieldIcon(DataType.BOOLEAN)}
               </ListItemIcon>
               <Typography variant="inherit">Add Boolean</Typography>
             </MenuItem>
@@ -235,7 +234,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
               }
             >
               <ListItemIcon>
-                {getTemplateFieldIcon(DataType.SUBTEMPLATE)!}
+                {getTemplateFieldIcon(DataType.SUBTEMPLATE)}
               </ListItemIcon>
               <Typography variant="inherit">Add Subtemplate</Typography>
             </MenuItem>
