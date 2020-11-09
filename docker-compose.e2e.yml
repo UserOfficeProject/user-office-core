@@ -31,3 +31,4 @@ services:
       - "./${USER_OFFICE_FRONTEND_DIR}/cypress/integration:/e2e/cypress/integration"
       - "./${USER_OFFICE_FRONTEND_DIR}/cypress/plugins:/e2e/cypress/plugins"
       - "./${USER_OFFICE_FRONTEND_DIR}/cypress/support:/e2e/cypress/support"
+      - "./${USER_OFFICE_FRONTEND_DIR}/cypress/types:/e2e/cypress/types"
