@@ -21,6 +21,7 @@ services:
 
   cypress:
     image: e2e-cypress:latest
+    ipc: host # see https://github.com/cypress-io/cypress/issues/350
     environment:
       CYPRESS_SVC_ACC_TOKEN: $SVC_ACC_TOKEN
     entrypoint: ["/wait-for-frontend.sh", "frontend:80", "npm run cy:run"]
