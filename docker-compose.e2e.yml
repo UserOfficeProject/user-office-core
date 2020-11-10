@@ -16,6 +16,9 @@ services:
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads"
       - "traefik.port=4000"
+    volumes:
+      - "./${USER_OFFICE_BACKEND_DIR}/db_patches:./db_patches"
+
   db:
     image: postgres:11-alpine
     restart: always
