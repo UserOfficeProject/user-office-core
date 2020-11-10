@@ -63,7 +63,7 @@ export default class TemplateMutations {
       case TemplateCategoryId.PROPOSAL_QUESTIONARY:
         await this.createInitialTopic(
           newTemplate.templateId,
-          0,
+          0.5,
           'New proposal',
           'proposal_basis'
         );
@@ -71,7 +71,7 @@ export default class TemplateMutations {
       case TemplateCategoryId.SAMPLE_DECLARATION:
         await this.createInitialTopic(
           newTemplate.templateId,
-          0,
+          0.5,
           'New sample',
           'sample_basis'
         );
