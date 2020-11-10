@@ -375,7 +375,7 @@ export default class UserMutations {
       // const user = convertUserDTO(userFromUOWS);
 
       const user = await this.dataSource.getByEmail('Aaron_Harris49@gmail.com');
-      if (!user){
+      if (!user) {
         return rejection('USER_DOES_NOT_EXIST');
       }
       const roles = await this.dataSource.getUserRoles(user.id);
