@@ -5,15 +5,15 @@ import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { QuestionaryComponentEmbellishment } from './QuestionaryComponentEmbellishment';
-import { QuestionEmbellismentForm } from './QuestionEmbellismentForm';
-import { QuestionTemplateRelationEmbellismentForm } from './QuestionTemplateRelationEmbellismentForm';
+import { QuestionEmbellishmentForm } from './QuestionEmbellishmentForm';
+import { QuestionTemplateRelationEmbellishmentForm } from './QuestionTemplateRelationEmbellishmentForm';
 
 export const embellishmentDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.EMBELLISHMENT,
   name: 'Embellishment',
   questionaryComponent: QuestionaryComponentEmbellishment,
-  questionForm: () => QuestionEmbellismentForm,
-  questionTemplateRelationForm: () => QuestionTemplateRelationEmbellismentForm,
+  questionForm: () => QuestionEmbellishmentForm,
+  questionTemplateRelationForm: () => QuestionTemplateRelationEmbellishmentForm,
   readonly: true,
   creatable: true,
   answerRenderer: () => null,

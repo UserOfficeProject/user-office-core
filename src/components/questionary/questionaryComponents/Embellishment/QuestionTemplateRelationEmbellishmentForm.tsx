@@ -12,7 +12,7 @@ import { EmbellishmentConfig, QuestionTemplateRelation } from 'generated/sdk';
 
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationEmbellismentForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationEmbellishmentForm: FormComponent<QuestionTemplateRelation> = props => {
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}

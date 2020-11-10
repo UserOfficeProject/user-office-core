@@ -11,7 +11,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionEmbellismentForm: FormComponent<Question> = props => {
+export const QuestionEmbellishmentForm: FormComponent<Question> = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
