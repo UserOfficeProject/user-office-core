@@ -28,7 +28,7 @@ export const QuestionSampleBasisForm: TFormSignature<Question> = props => {
         }),
       })}
     >
-      {formikProps => (
+      {() => (
         <>
           <Field
             name="naturalKey"

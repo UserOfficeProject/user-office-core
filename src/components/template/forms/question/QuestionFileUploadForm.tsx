@@ -31,7 +31,7 @@ export const QuestionFileUploadForm: TFormSignature<Question> = props => {
         }),
       })}
     >
-      {formikProps => (
+      {() => (
         <>
           <Field
             name="naturalKey"

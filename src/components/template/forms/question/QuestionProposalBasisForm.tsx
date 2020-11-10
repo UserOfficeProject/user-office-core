@@ -24,7 +24,7 @@ export const QuestionProposalBasisForm: TFormSignature<Question> = props => {
         question: Yup.string().required('Question is required'),
       })}
     >
-      {formikProps => (
+      {() => (
         <>
           <Field
             name="naturalKey"
