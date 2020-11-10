@@ -5,7 +5,7 @@ WORKDIR /app
 
 COPY package*.json /app/
 
-RUN npm ci --only=production --silent
+RUN npm ci --only=production --loglevel error --no-fund
 
 COPY ./ ./
 
