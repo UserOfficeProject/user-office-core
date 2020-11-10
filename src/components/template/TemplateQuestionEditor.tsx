@@ -82,11 +82,9 @@ export default function TemplateQuestionEditor(props: {
     <>
       <LockIcon className={classes.lockIcon} />
       <ul>
-        return (
         <li key={dependency.dependencyId + dependency.questionId}>
           {dependency.dependencyNaturalKey}
         </li>
-        );
       </ul>
     </>
   ) : null;
