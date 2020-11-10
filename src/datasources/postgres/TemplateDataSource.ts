@@ -176,10 +176,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async createTopic(args: CreateTopicArgs): Promise<Topic> {
-    // await database('topics')
-    //   .update({ sort_order: args.sortOrder })
-    //   .andWhere('template_id', '=', args.templateId);
-
     const newTopic = (
       await database('topics')
         .insert({
@@ -436,17 +432,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
-    topicOrder.forEach(async (topicId, index) => {
-      return database('topics')
-        .update({ sort_order: index })
-        .where({ topic_id: topicId });
-    });
-
-    return topicOrder;
-  }
-
-  isNaturalKeyPresent(naturalKey: string): Promise<boolean> {
+  async isNaturalKeyPresent(naturalKey: string): Promise<boolean> {
     return database('questions')
       .where({ natural_key: naturalKey })
       .select('natural_key')

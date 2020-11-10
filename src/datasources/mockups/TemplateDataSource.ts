@@ -202,9 +202,6 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return true;
   }
 
-  async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
-    return topicOrder;
-  }
   async deleteTopic(id: number): Promise<Topic> {
     return dummyTopicFactory({ id });
   }

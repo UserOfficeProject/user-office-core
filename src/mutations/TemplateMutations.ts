@@ -8,11 +8,9 @@ import {
   deleteQuestionValidationSchema,
   deleteTemplateValidationSchema,
   deleteTopicValidationSchema,
-  updateQuestionsTopicRelsValidationSchema,
   updateQuestionTemplateRelationValidationSchema,
   updateQuestionValidationSchema,
   updateTemplateValidationSchema,
-  updateTopicOrderValidationSchema,
   updateTopicValidationSchema,
 } from '@esss-swap/duo-validation';
 
@@ -319,59 +317,9 @@ export default class TemplateMutations {
       });
   }
 
-  @ValidateArgs(updateTopicOrderValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
-  async updateTopicOrder(
-    agent: UserWithRole | null,
-    { topicOrder }: { topicOrder: number[] }
-  ): Promise<number[] | Rejection> {
-    return this.dataSource
-      .updateTopicOrder(topicOrder)
-      .then(order => order)
-      .catch(err => {
-        logger.logException('Could not update topic order', err, {
-          agent,
-          topicOrder,
-        });
-
-        return rejection('INTERNAL_ERROR');
-      });
-  }
-
-  @ValidateArgs(updateQuestionsTopicRelsValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
-  async assignQuestionsToTopic(
-    agent: UserWithRole | null,
-    args: {
-      templateId: number;
-      topicId: number;
-      questionIds: string[];
-    }
-  ): Promise<string[] | Rejection> {
-    let isSuccess = true;
-    let index = 1;
-    for (const questionId of args.questionIds) {
-      const updatedField = await this.dataSource.updateQuestionTemplateRelation(
-        {
-          questionId,
-          topicId: args.topicId,
-          templateId: args.templateId,
-          sortOrder: index,
-        }
-      );
-      isSuccess = isSuccess && updatedField != null;
-      index++;
-    }
-    if (isSuccess === false) {
-      return rejection('INTERNAL_ERROR');
-    }
-
-    return args.questionIds;
-  }
-
   @ValidateArgs(updateTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  updateTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
+  async updateTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
     return this.dataSource
       .updateTemplate(args)
       .then(data => data)
