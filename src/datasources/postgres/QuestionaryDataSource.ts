@@ -255,10 +255,12 @@ export default class PostgresQuestionaryDataSource
     ).rows;
 
     const answerRecords: Array<QuestionRecord &
-      QuestionTemplateRelRecord & { value: any; answer_id: number }> = (
+      QuestionTemplateRelRecord & { value: any; answer_id: number } & {
+        dependency_natural_key: string;
+      }> = (
       await database.raw(`
                 SELECT 
-                  templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id
+                  templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id, dependency.natural_key as dependency_natural_key
                 FROM 
                   templates_has_questions
                 LEFT JOIN
@@ -271,6 +273,11 @@ export default class PostgresQuestionaryDataSource
                 ON
                   templates_has_questions.question_id = 
                   answers.question_id
+                LEFT JOIN
+                  questions dependency
+                ON 
+                  dependency.question_id = 
+                  templates_has_questions.dependency_question_id
                 AND
                   answers.questionary_id=${questionary_id}
                 ORDER BY

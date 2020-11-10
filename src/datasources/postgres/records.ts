@@ -5,7 +5,7 @@ import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import { Proposal } from '../../models/Proposal';
 import { createConfigByType } from '../../models/ProposalModelFunctions';
 import { ProposalView } from '../../models/ProposalView';
-import { Questionary, AnswerBasic } from '../../models/Questionary';
+import { AnswerBasic, Questionary } from '../../models/Questionary';
 import { Sample } from '../../models/Sample';
 import {
   DataType,
@@ -13,10 +13,10 @@ import {
   FieldDependency,
   Question,
   QuestionTemplateRelation,
+  Template,
   TemplateCategory,
   Topic,
 } from '../../models/Template';
-import { Template } from '../../models/Template';
 import { BasicUserDetails, User } from '../../models/User';
 
 // Interfaces corresponding exactly to database tables
@@ -470,7 +470,8 @@ export const createFileMetadata = (record: FileRecord) => {
 };
 
 export const createQuestionTemplateRelationObject = (
-  record: QuestionRecord & QuestionTemplateRelRecord
+  record: QuestionRecord &
+    QuestionTemplateRelRecord & { dependency_natural_key: string }
 ) => {
   return new QuestionTemplateRelation(
     new Question(
@@ -488,7 +489,7 @@ export const createQuestionTemplateRelationObject = (
       ? new FieldDependency(
           record.question_id,
           record.dependency_question_id,
-          record.natural_key,
+          record.dependency_natural_key,
           record.dependency_condition
         )
       : undefined
