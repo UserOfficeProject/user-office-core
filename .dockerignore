@@ -4,3 +4,4 @@
 !src
 !package*
 !tsconfig.json
+!index.ts
