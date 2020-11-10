@@ -92,12 +92,6 @@ export type AssignInstrumentsToCallInput = {
   callId: Scalars['Int'];
 };
 
-export type AssignQuestionsToTopicResponseWrap = {
-  __typename?: 'AssignQuestionsToTopicResponseWrap';
-  error: Maybe<Scalars['String']>;
-  result: Maybe<Array<Scalars['String']>>;
-};
-
 export type AuthJwtPayload = {
   __typename?: 'AuthJwtPayload';
   user: User;
@@ -456,7 +450,6 @@ export type Mutation = {
   updateUserRoles: UserResponseWrap;
   addClientLog: SuccessResponseWrap;
   applyPatches: PrepareDbResponseWrap;
-  assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
   cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   createAnswerQuestionaryRelations: AnswerBasicResponseWrap;
@@ -486,7 +479,6 @@ export type Mutation = {
   updatePassword: BasicUserDetailsResponseWrap;
   updateSampleSafetyReview: SampleResponseWrap;
   updateSampleTitle: SampleResponseWrap;
-  updateTopicOrder: UpdateTopicOrderResponseWrap;
 };
 
 
@@ -891,13 +883,6 @@ export type MutationAddClientLogArgs = {
 };
 
 
-export type MutationAssignQuestionsToTopicArgs = {
-  templateId: Scalars['Int'];
-  topicId: Scalars['Int'];
-  questionIds?: Maybe<Array<Scalars['String']>>;
-};
-
-
 export type MutationCloneSampleArgs = {
   sampleId: Scalars['Int'];
 };
@@ -1044,11 +1029,6 @@ export type MutationUpdateSampleSafetyReviewArgs = {
 export type MutationUpdateSampleTitleArgs = {
   sampleId: Scalars['Int'];
   title: Scalars['String'];
-};
-
-
-export type MutationUpdateTopicOrderArgs = {
-  topicOrder: Array<Scalars['Int']>;
 };
 
 export type NextStatusEvent = {
@@ -1890,12 +1870,6 @@ export type UpdateProposalWorkflowInput = {
   id: Scalars['Int'];
   name: Scalars['String'];
   description: Scalars['String'];
-};
-
-export type UpdateTopicOrderResponseWrap = {
-  __typename?: 'UpdateTopicOrderResponseWrap';
-  error: Maybe<Scalars['String']>;
-  topicOrder: Maybe<Array<Scalars['Int']>>;
 };
 
 export type User = {
@@ -3716,21 +3690,6 @@ export type UpdateProposalWorkflowMutation = (
   ) }
 );
 
-export type AssignQuestionsToTopicMutationVariables = Exact<{
-  templateId: Scalars['Int'];
-  topicId: Scalars['Int'];
-  questionIds?: Maybe<Array<Scalars['String']>>;
-}>;
-
-
-export type AssignQuestionsToTopicMutation = (
-  { __typename?: 'Mutation' }
-  & { assignQuestionsToTopic: (
-    { __typename?: 'AssignQuestionsToTopicResponseWrap' }
-    & Pick<AssignQuestionsToTopicResponseWrap, 'error'>
-  ) }
-);
-
 export type CloneTemplateMutationVariables = Exact<{
   templateId: Scalars['Int'];
 }>;
@@ -4194,19 +4153,6 @@ export type UpdateTopicMutation = (
       { __typename?: 'Topic' }
       & TopicFragment
     )> }
-  ) }
-);
-
-export type UpdateTopicOrderMutationVariables = Exact<{
-  topicOrder: Array<Scalars['Int']>;
-}>;
-
-
-export type UpdateTopicOrderMutation = (
-  { __typename?: 'Mutation' }
-  & { updateTopicOrder: (
-    { __typename?: 'UpdateTopicOrderResponseWrap' }
-    & Pick<UpdateTopicOrderResponseWrap, 'error'>
   ) }
 );
 
@@ -6119,13 +6065,6 @@ export const UpdateProposalWorkflowDocument = gql`
   }
 }
     `;
-export const AssignQuestionsToTopicDocument = gql`
-    mutation assignQuestionsToTopic($templateId: Int!, $topicId: Int!, $questionIds: [String!]) {
-  assignQuestionsToTopic(templateId: $templateId, topicId: $topicId, questionIds: $questionIds) {
-    error
-  }
-}
-    `;
 export const CloneTemplateDocument = gql`
     mutation cloneTemplate($templateId: Int!) {
   cloneTemplate(templateId: $templateId) {
@@ -6296,13 +6235,6 @@ export const UpdateTopicDocument = gql`
   }
 }
     ${TopicFragmentDoc}`;
-export const UpdateTopicOrderDocument = gql`
-    mutation updateTopicOrder($topicOrder: [Int!]!) {
-  updateTopicOrder(topicOrder: $topicOrder) {
-    error
-  }
-}
-    `;
 export const CheckTokenDocument = gql`
     query checkToken($token: String!) {
   checkToken(token: $token) {
@@ -6828,9 +6760,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     updateProposalWorkflow(variables: UpdateProposalWorkflowMutationVariables): Promise<UpdateProposalWorkflowMutation> {
       return withWrapper(() => client.request<UpdateProposalWorkflowMutation>(print(UpdateProposalWorkflowDocument), variables));
     },
-    assignQuestionsToTopic(variables: AssignQuestionsToTopicMutationVariables): Promise<AssignQuestionsToTopicMutation> {
-      return withWrapper(() => client.request<AssignQuestionsToTopicMutation>(print(AssignQuestionsToTopicDocument), variables));
-    },
     cloneTemplate(variables: CloneTemplateMutationVariables): Promise<CloneTemplateMutation> {
       return withWrapper(() => client.request<CloneTemplateMutation>(print(CloneTemplateDocument), variables));
     },
@@ -6884,9 +6813,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateTopic(variables: UpdateTopicMutationVariables): Promise<UpdateTopicMutation> {
       return withWrapper(() => client.request<UpdateTopicMutation>(print(UpdateTopicDocument), variables));
-    },
-    updateTopicOrder(variables: UpdateTopicOrderMutationVariables): Promise<UpdateTopicOrderMutation> {
-      return withWrapper(() => client.request<UpdateTopicOrderMutation>(print(UpdateTopicOrderDocument), variables));
     },
     checkToken(variables: CheckTokenQueryVariables): Promise<CheckTokenQuery> {
       return withWrapper(() => client.request<CheckTokenQuery>(print(CheckTokenDocument), variables));
