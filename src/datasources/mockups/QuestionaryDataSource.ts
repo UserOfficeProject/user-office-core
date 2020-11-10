@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import {
-  Questionary,
-  QuestionaryStep,
   Answer,
   AnswerBasic,
+  Questionary,
+  QuestionaryStep,
 } from '../../models/Questionary';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import {
@@ -12,9 +12,9 @@ import {
   FieldCondition,
   FieldDependency,
   Question,
+  QuestionTemplateRelation,
   TemplateCategoryId,
   Topic,
-  QuestionTemplateRelation,
 } from '../../models/Template';
 import {
   BooleanConfig,
@@ -47,7 +47,7 @@ const createDummyQuestionary = (values?: DeepPartial<Questionary>) => {
   );
 };
 export const dummyQuestionFactory = (
-  values?: DeepPartial<Question>
+  values?: DeepPartial<Question> & Partial<Pick<Question, 'config'>>
 ): Question => {
   return new Question(
     values?.categoryId || TemplateCategoryId.PROPOSAL_QUESTIONARY,
@@ -55,19 +55,22 @@ export const dummyQuestionFactory = (
     values?.naturalKey || 'is_dangerous',
     values?.dataType || DataType.TEXT_INPUT,
     values?.question || 'Some random question',
-    (values?.config as any) || dummyConfigFactory()
+    values?.config || dummyConfigFactory()
   );
 };
 
 export const dummyQuestionTemplateRelationFactory = (
-  values?: DeepPartial<QuestionTemplateRelation>
+  values?: DeepPartial<QuestionTemplateRelation> &
+    Partial<Pick<QuestionTemplateRelation, 'config' | 'dependency'>> & {
+      question: Partial<Pick<Question, 'config'>>;
+    }
 ): QuestionTemplateRelation => {
   const relation = new QuestionTemplateRelation(
     dummyQuestionFactory(values?.question),
     values?.sortOrder || Math.round(Math.random() * 100),
     values?.topicId || Math.round(Math.random() * 10),
-    (values?.config as any) || new BooleanConfig(),
-    values?.dependency as any
+    values?.config || new BooleanConfig(),
+    values?.dependency
   );
 
   return relation;
