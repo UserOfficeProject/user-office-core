@@ -100,6 +100,7 @@ export default function TemplateEditor() {
       : theme.palette.grey[100],
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
     display: 'flex',
+    overflow: 'auto',
   });
 
   const onDragEnd = (result: DropResult): void => {
@@ -246,6 +247,7 @@ export default function TemplateEditor() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 style={getTopicListStyle(snapshot.isDraggingOver)}
+                className="topicsDroppable"
               >
                 {state.steps.map((step, index) => {
                   const questionPicker =
@@ -254,7 +256,6 @@ export default function TemplateEditor() {
                         topic={step.topic}
                         dispatch={dispatch}
                         template={state}
-                        key="questionPicker"
                         closeMe={() => {
                           setQuestionPickerTopicId(null);
                         }}
@@ -263,16 +264,15 @@ export default function TemplateEditor() {
                     ) : null;
 
                   return (
-                    <>
+                    <React.Fragment key={step.topic.id}>
                       <QuestionaryEditorTopic
                         data={step}
                         dispatch={dispatch}
                         index={index}
-                        key={step.topic.id}
                         dragMode={isTopicReorderMode}
                       />
                       {questionPicker}
-                    </>
+                    </React.Fragment>
                   );
                 })}
                 {provided.placeholder}
