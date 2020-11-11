@@ -373,7 +373,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     questionId: string,
     templateId: number
   ): Promise<QuestionTemplateRelation | null> {
-    return database('templates_has_questions')
+    return database({ templates_has_questions: 'templates_has_questions' })
       .where({
         'templates_has_questions.question_id': questionId,
       })
@@ -381,17 +381,20 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         'templates_has_questions.template_id': templateId,
       })
       .leftJoin(
-        'questions',
+        { questions: 'questions' },
         'templates_has_questions.question_id',
         'questions.question_id'
       )
       .leftJoin(
-        'questions dependency',
+        { dependency: 'questions' },
         'templates_has_questions.dependency_question_id',
-        'questions.question_id'
+        '=',
+        'dependency.question_id'
       )
       .select(
-        'templates_has_questions.*, questions.*, , dependency.natural_key as dependency_natural_key'
+        'templates_has_questions.*',
+        'questions.*',
+        'dependency.natural_key as dependency_natural_key'
       )
       .then(
         (
