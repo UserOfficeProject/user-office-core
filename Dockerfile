@@ -16,5 +16,8 @@ FROM nginx:1.18-alpine
 
 COPY --from=build-stage /app/build/ /usr/share/nginx/html
 
+ARG BUILD_VERSION=<unknown>
+RUN echo $BUILD_VERSION > /usr/share/nginx/html/build-version.txt
+
 # Copy the default nginx.conf provided by tiangolo/node-frontend
 COPY --from=build-stage /app/nginx.conf /etc/nginx/conf.d/default.conf
