@@ -9,3 +9,5 @@ uploads
 .vscode/launch.json
 .vscode/settings.json
 .env
+
+build-version*.txt

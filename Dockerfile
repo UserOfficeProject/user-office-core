@@ -27,6 +27,9 @@ COPY --from=build-stage --chown=node:node /home/node/app/package*.json ./
 
 RUN npm ci --only=production --loglevel error --no-fund
 
+ARG BUILD_VERSION=<unknown>
+RUN echo $BUILD_VERSION > build-version.txt
+
 EXPOSE 4000
 
 CMD [ "node", "./build/index.js" ]
