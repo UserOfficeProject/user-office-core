@@ -10,9 +10,11 @@ export interface SampleDataSource {
   updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample>;
   updateSampleSafetyReview(args: UpdateSampleSafetyReviewArgs): Promise<Sample>;
   create(
-    questionaryId: number,
     title: string,
-    creatorId: number
+    creatorId: number,
+    proposalId: number,
+    questionaryId: number,
+    questionId: string
   ): Promise<Sample>;
   getSample(sampleId: number): Promise<Sample>;
   getSamplesByCallId(callId: number): Promise<Sample[]>;

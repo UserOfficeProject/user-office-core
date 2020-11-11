@@ -307,7 +307,9 @@ export interface SampleRecord {
   readonly sample_id: number;
   readonly title: string;
   readonly creator_id: number;
+  readonly proposal_id: number;
   readonly questionary_id: number;
+  readonly question_id: string;
   readonly safety_status: number;
   readonly safety_comment: string;
   readonly created_at: Date;
@@ -577,6 +579,8 @@ export const createSampleObject = (sample: SampleRecord) => {
     sample.title,
     sample.creator_id,
     sample.questionary_id,
+    sample.proposal_id,
+    sample.question_id,
     sample.safety_status,
     sample.safety_comment,
     sample.created_at

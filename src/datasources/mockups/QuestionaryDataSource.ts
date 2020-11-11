@@ -149,7 +149,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
 
 export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   async clone(questionaryId: number): Promise<Questionary> {
-    return createDummyQuestionary({ questionaryId: questionaryId++ });
+    return createDummyQuestionary({ questionaryId: questionaryId + 1 });
   }
   public init() {
     dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();

@@ -15,30 +15,18 @@ import { sampleAuthorization } from '../utils/SampleAuthorization';
 
 export default class SampleMutations {
   constructor(
-    private dataSource: SampleDataSource,
+    private sampleDataSource: SampleDataSource,
     private questionaryDataSource: QuestionaryDataSource,
     private templateDataSource: TemplateDataSource,
-    private logger: Logger
+    private proposalDataSource: ProposalDataSource
   ) {}
 
-  @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
-  updateSampleStatus(agent: UserWithRole | null, args: UpdateSampleStatusArgs) {
-    return this.dataSource
-      .updateSampleStatus(args)
-      .then(sample => sample)
-      .catch(error => {
-        logger.logException('Could not update sample status', error, {
-          agent,
-          args,
-        });
-      });
-  }
-
   @Authorized()
-  async createSample(agent: UserWithRole | null, args: CreateSampleArgs) {
+  async createSample(agent: UserWithRole | null, args: CreateSampleInput) {
     if (!agent) {
       return rejection('NOT_AUTHORIZED');
     }
+
     const template = await this.templateDataSource.getTemplate(args.templateId);
     if (template?.categoryId !== TemplateCategoryId.SAMPLE_DECLARATION) {
       logger.logError('Cant create sample with this template', {
@@ -49,13 +37,24 @@ export default class SampleMutations {
       return rejection('INTERNAL_ERROR');
     }
 
+    const proposal = await this.proposalDataSource.get(args.proposalId);
+    if (!proposal) {
+      return rejection('NOT_FOUND');
+    }
+
+    if ((await userAuthorization.hasAccessRights(agent, proposal)) === false) {
+      return rejection('NOT_ALLOWED');
+    }
+
     return this.questionaryDataSource
       .create(agent.id, args.templateId)
       .then(questionary => {
-        return this.dataSource.create(
-          questionary.questionaryId!,
+        return this.sampleDataSource.create(
           args.title,
-          agent.id
+          agent.id,
+          args.proposalId,
+          questionary.questionaryId,
+          args.questionId
         );
       })
       .catch(error => {

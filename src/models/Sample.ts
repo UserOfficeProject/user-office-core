@@ -3,7 +3,9 @@ export class Sample {
     public id: number,
     public title: string,
     public creatorId: number,
+    public proposalId: number,
     public questionaryId: number,
+    public questionId: string,
     public safetyStatus: SampleStatus,
     public safetyComment: string,
     public created: Date

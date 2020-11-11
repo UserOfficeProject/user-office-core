@@ -94,18 +94,24 @@ export default class PostgresSampleDataSource implements SampleDataSource {
   }
 
   create(
-    questionary_id: number,
     title: string,
-    creator_id: number
+    creator_id: number,
+    proposal_id: number,
+    questionary_id: number,
+    question_id: string
   ): Promise<Sample> {
     return database('samples')
-      .insert({ title, questionary_id, creator_id }, '*')
+      .insert(
+        { title, creator_id, proposal_id, questionary_id, question_id },
+        '*'
+      )
       .then((records: SampleRecord[]) => {
         if (records.length !== 1) {
           logger.logError('Could not create sample', {
-            questionary_id,
             title,
             creator_id,
+            proposal_id,
+            questionary_id,
           });
           throw new Error('Failed to insert sample');
         }

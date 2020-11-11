@@ -14,6 +14,8 @@ export class SampleDataSourceMock implements SampleDataSource {
         'title',
         1,
         1,
+        1,
+        'sampleQuestionId',
         SampleStatus.LOW_RISK,
         'safety comment',
         new Date()
@@ -34,15 +36,19 @@ export class SampleDataSourceMock implements SampleDataSource {
     return this.samples;
   }
   async create(
-    questionaryId: number,
     title: string,
-    creatorId: number
+    creatorId: number,
+    proposalId: number,
+    questionaryId: number,
+    questionId: string
   ): Promise<Sample> {
     return new Sample(
       1,
       title,
       creatorId,
+      proposalId,
       questionaryId,
+      questionId,
       SampleStatus.PENDING_EVALUTATION,
       '',
       new Date()
