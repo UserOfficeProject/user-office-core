@@ -72,7 +72,7 @@ export default function TemplateQuestionEditor(props: {
   ) => ({
     display: 'flex',
     padding: '12px 8px 8px 8px',
-    margin: '1px',
+    margin: '0',
     backgroundColor: isDragging
       ? theme.palette.grey[200]
       : isHover

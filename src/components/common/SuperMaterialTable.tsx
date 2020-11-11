@@ -129,7 +129,10 @@ function SuperMaterialTable<Entry extends EntryID>({
                 {
                   icon: EditIcon,
                   tooltip: 'Edit',
-                  onClick: (_event: unknown, rowData: Entry | Entry[]) => {
+                  onClick: (
+                    _event: React.MouseEvent<JSX.Element>,
+                    rowData: Entry | Entry[]
+                  ) => {
                     setShow(true);
                     setEditObject(rowData as Entry);
                   },
