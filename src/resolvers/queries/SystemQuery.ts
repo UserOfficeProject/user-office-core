@@ -33,6 +33,10 @@ export class SystemQuery {
 
   @Query(() => String)
   async factoryVersion() {
+    if (cached) {
+      return cached;
+    }
+
     try {
       // For some reasons it can't find the global URL type for Node.js
       //  override the default endpoint path end use the version
