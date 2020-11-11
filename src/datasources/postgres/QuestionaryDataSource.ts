@@ -273,13 +273,13 @@ export default class PostgresQuestionaryDataSource
                 ON
                   templates_has_questions.question_id = 
                   answers.question_id
+                AND
+                  answers.questionary_id=${questionary_id}
                 LEFT JOIN
                   questions dependency
                 ON 
                   dependency.question_id = 
                   templates_has_questions.dependency_question_id
-                AND
-                  answers.questionary_id=${questionary_id}
                 ORDER BY
                  templates_has_questions.sort_order`)
     ).rows;
