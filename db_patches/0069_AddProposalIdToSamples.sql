@@ -18,6 +18,8 @@ BEGIN
           REFERENCES "questions" ("question_id")
           ON DELETE CASCADE;
 
+
+    DROP TABLE answer_has_questionaries;
     END;
 	END IF;
 END;
