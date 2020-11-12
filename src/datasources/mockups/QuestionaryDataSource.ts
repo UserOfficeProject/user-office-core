@@ -155,32 +155,8 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
     dummyQuestionary = createDummyQuestionary();
   }
-
-  async deleteAnswerQuestionaryRelations(
-    answerId: number
-  ): Promise<AnswerBasic> {
-    const answers = dummyQuestionarySteps.reduce(
-      (acc, val) => acc.concat(val.fields),
-      new Array<Answer>()
-    );
-    const answer = answers.find(answer => answer.answerId === answerId)!;
-    answer.value = '';
-
-    return new AnswerBasic(answerId, 1, '', '', new Date());
-  }
-  async createAnswerQuestionaryRelations(
-    answerId: number,
-    questionaryIds: number[]
-  ): Promise<AnswerBasic> {
-    return new AnswerBasic(answerId, 1, '', '', new Date());
-  }
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
     return new AnswerBasic(answer_id, 1, 'questionId', '', new Date());
-  }
-  async getParentQuestionary(
-    child_questionary_id: number
-  ): Promise<Questionary | null> {
-    return createDummyQuestionary();
   }
 
   async getBlankQuestionarySteps(

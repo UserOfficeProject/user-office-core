@@ -1,14 +1,10 @@
 import { Sample } from '../models/Sample';
-import { UpdateSampleSafetyReviewArgs } from '../resolvers/mutations/UpdateSampleSafetyReviewMutation';
-import { UpdateSampleStatusArgs } from '../resolvers/mutations/UpdateSampleStatusMutation';
-import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitleMutation';
+import { UpdateSampleArgs } from '../resolvers/mutations/UpdateSampleMutation';
 import { SamplesArgs } from '../resolvers/queries/SamplesQuery';
 
 export interface SampleDataSource {
   delete(sampleId: number): Promise<Sample>;
-  updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample>;
-  updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample>;
-  updateSampleSafetyReview(args: UpdateSampleSafetyReviewArgs): Promise<Sample>;
+  updateSample(args: UpdateSampleArgs): Promise<Sample>;
   create(
     title: string,
     creatorId: number,
@@ -18,6 +14,5 @@ export interface SampleDataSource {
   ): Promise<Sample>;
   getSample(sampleId: number): Promise<Sample>;
   getSamplesByCallId(callId: number): Promise<Sample[]>;
-  getSamplesByAnswerId(answerId: number): Promise<Sample[]>;
   getSamples(args: SamplesArgs): Promise<Sample[]>;
 }
