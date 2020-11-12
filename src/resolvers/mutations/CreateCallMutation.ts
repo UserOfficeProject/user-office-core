@@ -29,6 +29,12 @@ export class CreateCallInput {
   @Field()
   public endReview: Date;
 
+  @Field(() => Date, { nullable: true })
+  public startSEPReview?: Date;
+
+  @Field(() => Date, { nullable: true })
+  public endSEPReview?: Date;
+
   @Field()
   public startNotify: Date;
 
