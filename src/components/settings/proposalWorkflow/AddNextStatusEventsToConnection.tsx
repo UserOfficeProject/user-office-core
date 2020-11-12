@@ -1,21 +1,24 @@
 import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
 import Container from '@material-ui/core/Container';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
-import { Field, Form, Formik } from 'formik';
+import { ErrorMessage, FieldArray, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
 import * as yup from 'yup';
 
-import FormikUICustomMultipleSelect from 'components/common/FormikUICustomMultipleSelect';
+import UOLoader from 'components/common/UOLoader';
+import { Event } from 'generated/sdk';
 import { useProposalEventsData } from 'hooks/settings/useProposalEventsData';
 
 const addNextStatusEventsToConnectionValidationSchema = yup.object().shape({
   selectedNextStatusEvents: yup
     .array()
     .of(yup.string())
-    .required('You must select parent droppable group id'),
+    .required('You must select at least one event'),
 });
 
 const useStyles = makeStyles(theme => ({
@@ -23,18 +26,26 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
   },
   cardHeader: {
-    fontSize: '18px',
+    fontSize: '20px',
     padding: '22px 0 0',
   },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
+  container: {
+    minHeight: '350px',
+    marginTop: '10px',
+  },
+  error: {
+    color: theme.palette.error.main,
+    marginRight: '10px',
+  },
+  submitContainer: {
+    margin: theme.spacing(2, 0, 2),
   },
 }));
 
 type AddNextStatusEventsToConnectionProps = {
   close: () => void;
   addNextStatusEventsToConnection: (nextStatusEvents: string[]) => void;
-  nextStatusEvents?: string[];
+  nextStatusEvents?: Event[];
 };
 
 const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionProps> = ({
@@ -44,16 +55,16 @@ const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionP
 }) => {
   const classes = useStyles();
 
-  const { proposalEvents } = useProposalEventsData();
+  const { proposalEvents, loadingProposalEvents } = useProposalEventsData();
 
   const initialValues: {
-    selectedNextStatusEvents: string[];
+    selectedNextStatusEvents: Event[];
   } = {
     selectedNextStatusEvents: nextStatusEvents || [],
   };
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="md">
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, actions): Promise<void> => {
@@ -64,39 +75,80 @@ const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionP
         }}
         validationSchema={addNextStatusEventsToConnectionValidationSchema}
       >
-        {({ isSubmitting }): JSX.Element => (
+        {({ isSubmitting, values }): JSX.Element => (
           <Form>
             <Typography className={classes.cardHeader}>
               Events that are triggering next status
             </Typography>
 
-            {/* TODO: As improvement instead of multi-select we can list all events with checkboxes. For the first version it is good. */}
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Field
+            <Grid container spacing={1} className={classes.container}>
+              {loadingProposalEvents ? (
+                <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
+              ) : (
+                <FieldArray
                   name="selectedNextStatusEvents"
-                  id="selectedNextStatusEvents"
-                  component={FormikUICustomMultipleSelect}
-                  availableOptions={proposalEvents}
-                  margin="dense"
-                  width="auto"
-                  fullWidth
-                  required
-                  data-cy="next-status-events"
+                  render={arrayHelpers => (
+                    <>
+                      {proposalEvents.map((proposalEvent, index) => (
+                        <Grid key={index} item sm={6}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                id={proposalEvent}
+                                name="selectedNextStatusEvents"
+                                value={proposalEvent}
+                                checked={values.selectedNextStatusEvents.includes(
+                                  proposalEvent
+                                )}
+                                color="primary"
+                                data-cy="next-status-event"
+                                onChange={e => {
+                                  if (e.target.checked)
+                                    arrayHelpers.push(proposalEvent);
+                                  else {
+                                    const idx = values.selectedNextStatusEvents.indexOf(
+                                      proposalEvent
+                                    );
+                                    arrayHelpers.remove(idx);
+                                  }
+                                }}
+                                inputProps={{
+                                  'aria-label': 'primary checkbox',
+                                }}
+                              />
+                            }
+                            label={proposalEvent}
+                          />
+                        </Grid>
+                      ))}
+                    </>
+                  )}
                 />
+              )}
+            </Grid>
+            <Grid
+              container
+              justify="flex-end"
+              className={classes.submitContainer}
+            >
+              <Grid item>
+                <ErrorMessage
+                  className={classes.error}
+                  component="span"
+                  name="selectedNextStatusEvents"
+                />
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={isSubmitting || loadingProposalEvents}
+                  data-cy="submit"
+                >
+                  Add next status events
+                </Button>
               </Grid>
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              disabled={isSubmitting}
-              data-cy="submit"
-            >
-              Add status events
-            </Button>
           </Form>
         )}
       </Formik>
