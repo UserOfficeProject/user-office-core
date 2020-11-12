@@ -5,7 +5,7 @@ import { logger } from '@esss-swap/duo-logger';
 import rp from 'request-promise';
 import { Resolver, Query } from 'type-graphql';
 
-let cached: string;
+let cachedVersion: string;
 
 @Resolver()
 export class SystemQuery {
@@ -16,9 +16,9 @@ export class SystemQuery {
         join(process.cwd(), 'build-version.txt')
       );
 
-      cached = content.toString().trim();
+      cachedVersion = content.toString().trim();
 
-      return cached;
+      return cachedVersion;
     } catch (err) {
       if (err.code !== 'ENOENT') {
         logger.logException(
@@ -33,10 +33,6 @@ export class SystemQuery {
 
   @Query(() => String)
   async factoryVersion() {
-    if (cached) {
-      return cached;
-    }
-
     try {
       // For some reasons it can't find the global URL type for Node.js
       //  override the default endpoint path end use the version
