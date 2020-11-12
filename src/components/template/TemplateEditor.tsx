@@ -25,7 +25,7 @@ import {
   getTopicById,
 } from 'models/QuestionaryFunctions';
 import { StyledPaper } from 'styles/StyledComponents';
-import { randomNumberBetween } from 'utils/Math';
+import { midNumberBetween } from 'utils/Math';
 
 import QuestionEditor from './forms/QuestionEditor';
 import QuestionTemplateRelationEditor from './forms/QuestionTemplateRelationEditor';
@@ -140,7 +140,7 @@ export default function TemplateEditor() {
           topic.fields[(dragDestination?.index as number) - 1];
         const nextField = topic.fields[dragDestination?.index as number];
 
-        const sortOrder = randomNumberBetween(
+        const sortOrder = midNumberBetween(
           previousField?.sortOrder,
           nextField?.sortOrder
         );
@@ -171,9 +171,29 @@ export default function TemplateEditor() {
           },
         });
       } else if (isReorderingInsideTopics) {
+        // TODO: Put this into a function because it is repeated ------
+        const topicId = dragDestination?.droppableId
+          ? +dragDestination.droppableId
+          : undefined;
+        const topic = getTopicById(state.steps, topicId as number);
+
+        const previousField =
+          topic.fields[(dragDestination?.index as number) - 1];
+        const nextField = topic.fields[dragDestination?.index as number];
+
+        const sortOrder = midNumberBetween(
+          previousField?.sortOrder,
+          nextField?.sortOrder
+        );
+        // ---------------
+
         dispatch({
           type: EventType.REORDER_QUESTION_REL_REQUESTED,
-          payload: { source: result.source, destination: result.destination },
+          payload: {
+            source: result.source,
+            destination: result.destination,
+            sortOrder,
+          },
         });
       }
     }

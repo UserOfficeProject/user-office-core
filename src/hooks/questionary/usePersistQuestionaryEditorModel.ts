@@ -10,7 +10,7 @@ import {
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { Event, EventType } from 'models/QuestionaryEditorModel';
-import { randomNumberBetween } from 'utils/Math';
+import { midNumberBetween } from 'utils/Math';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 
 export function usePersistQuestionaryEditorModel() {
@@ -216,7 +216,7 @@ export function usePersistQuestionaryEditorModel() {
           const nextQuestion =
             destinationTopic?.fields[action.payload.destination.index + 1];
 
-          const newSortOrder = randomNumberBetween(
+          const newSortOrder = midNumberBetween(
             prevQuestion?.sortOrder,
             nextQuestion?.sortOrder
           );
@@ -235,15 +235,13 @@ export function usePersistQuestionaryEditorModel() {
           const sourceIndex = action.payload.source.index;
           const destinationIndex = action.payload.destination.index;
 
-          const stepToUpdate = state.steps[action.payload.source.index];
-          let stepIndexBeforeTheOneWeReorder =
-            action.payload.destination.index - 1;
-          let stepIndexAfterTheOneWeReorder = action.payload.destination.index;
+          const stepToUpdate = state.steps[sourceIndex];
+          let stepIndexBeforeTheOneWeReorder = destinationIndex - 1;
+          let stepIndexAfterTheOneWeReorder = destinationIndex;
 
           if (sourceIndex < destinationIndex) {
-            stepIndexBeforeTheOneWeReorder = action.payload.destination.index;
-            stepIndexAfterTheOneWeReorder =
-              action.payload.destination.index + 1;
+            stepIndexBeforeTheOneWeReorder = destinationIndex;
+            stepIndexAfterTheOneWeReorder = destinationIndex + 1;
           }
 
           const stepBeforeTheOneWeReorder =
@@ -251,7 +249,7 @@ export function usePersistQuestionaryEditorModel() {
           const stepAfterTheOneWeReorder =
             state.steps[stepIndexAfterTheOneWeReorder];
 
-          const sortOrder = randomNumberBetween(
+          const sortOrder = midNumberBetween(
             stepBeforeTheOneWeReorder?.topic.sortOrder,
             stepAfterTheOneWeReorder?.topic.sortOrder
           );
@@ -372,7 +370,7 @@ export function usePersistQuestionaryEditorModel() {
             const previousStep = state.steps[stepIndex];
             const nextStep = state.steps[stepIndex + 1];
 
-            sortOrder = randomNumberBetween(
+            sortOrder = midNumberBetween(
               previousStep.topic.sortOrder,
               nextStep?.topic.sortOrder
             );

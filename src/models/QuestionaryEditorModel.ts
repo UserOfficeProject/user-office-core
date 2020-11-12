@@ -90,13 +90,17 @@ export default function QuestionaryEditorModel(
               step.topic.id.toString() ===
               action.payload.destination.droppableId
             );
-          });
+          }) as TemplateStep;
 
-          to?.fields.splice(
-            action.payload.destination.index,
-            0,
-            ...from.fields.splice(action.payload.source.index, 1)
+          const [fieldToAddAtDestination] = from.fields.splice(
+            action.payload.source.index,
+            1
           );
+
+          to.fields.splice(action.payload.destination.index, 0, {
+            ...fieldToAddAtDestination,
+            sortOrder: action.payload.sortOrder,
+          });
 
           return draft;
         }
