@@ -1,11 +1,11 @@
-import MaterialTable, { MaterialTableProps } from 'material-table';
+import MaterialTable, { MaterialTableProps, Column } from 'material-table';
 import React from 'react';
 import { DecodedValueMap, SetQuery, QueryParamConfig } from 'use-query-params';
 
 import { SampleBasic } from 'models/Sample';
 import { tableIcons } from 'utils/materialIcons';
 
-const columns = [
+const defaultColumns: Column<SampleBasic>[] = [
   { title: 'Title', field: 'title' },
   { title: 'Status', field: 'safetyStatus' },
   { title: 'Created', field: 'created' },
@@ -20,11 +20,12 @@ const SamplesTable = (
   props: Omit<MaterialTableProps<SampleBasic>, 'columns'> & {
     urlQueryParams: DecodedValueMap<SamplesTableQueryParamsType>;
     setUrlQueryParams: SetQuery<SamplesTableQueryParamsType>;
+    columns?: Column<SampleBasic>[];
   }
 ) => (
   <MaterialTable
+    columns={props.columns ? props.columns : defaultColumns}
     icons={tableIcons}
-    columns={columns}
     title="Samples"
     onSearchChange={searchText => {
       props.setUrlQueryParams({

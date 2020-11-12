@@ -40,7 +40,7 @@ function createSampleStub(
     },
     questionaryId: 0,
     safetyComment: '',
-    safetyStatus: SampleStatus.PENDING_EVALUTATION,
+    safetyStatus: SampleStatus.PENDING_EVALUATION,
     title: '',
   };
 }
