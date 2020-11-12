@@ -9,7 +9,7 @@ module.exports = function(app) {
     })
   );
   app.use(
-    '/proposal/*',
+    '/download/*',
     proxy({
       target: 'http://localhost:4000',
       changeOrigin: true,
