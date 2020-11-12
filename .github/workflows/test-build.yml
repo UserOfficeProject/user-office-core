@@ -35,7 +35,7 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}
+            ${{ runner.os }}-${{ env.cache-name }}-
 
       - run: npm ci --loglevel error --no-fund
       - run: npm run build
