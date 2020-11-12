@@ -42,6 +42,24 @@ export default class PostgresCallDataSource implements CallDataSource {
         .orWhere('end_call', '<=', currentDate);
     }
 
+    if (filter?.isEnded === true) {
+      query.where('call_ended', true);
+    } else if (filter?.isEnded === false) {
+      query.where('call_ended', false);
+    }
+
+    if (filter?.isReviewEnded === true) {
+      query.where('call_review_ended', true);
+    } else if (filter?.isReviewEnded === false) {
+      query.where('call_review_ended', false);
+    }
+
+    if (filter?.isSEPReviewEnded === true) {
+      query.where('call_sep_review_ended', true);
+    } else if (filter?.isSEPReviewEnded === false) {
+      query.where('call_sep_review_ended', false);
+    }
+
     return query.then((callDB: CallRecord[]) =>
       callDB.map(call => createCallObject(call))
     );
@@ -55,6 +73,8 @@ export default class PostgresCallDataSource implements CallDataSource {
         end_call: args.endCall,
         start_review: args.startReview,
         end_review: args.endReview,
+        start_sep_review: args.startSEPReview,
+        end_sep_review: args.endSEPReview,
         start_notify: args.startNotify,
         end_notify: args.endNotify,
         start_cycle: args.startCycle,
@@ -84,6 +104,8 @@ export default class PostgresCallDataSource implements CallDataSource {
           end_call: args.endCall,
           start_review: args.startReview,
           end_review: args.endReview,
+          start_sep_review: args.startSEPReview,
+          end_sep_review: args.endSEPReview,
           start_notify: args.startNotify,
           end_notify: args.endNotify,
           start_cycle: args.startCycle,
@@ -91,6 +113,9 @@ export default class PostgresCallDataSource implements CallDataSource {
           cycle_comment: args.cycleComment,
           survey_comment: args.surveyComment,
           proposal_workflow_id: args.proposalWorkflowId,
+          call_ended: args.callEnded,
+          call_review_ended: args.callReviewEnded,
+          call_sep_review_ended: args.callSEPReviewEnded,
           template_id: args.templateId,
         },
         ['*']
@@ -99,7 +124,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       .where('call_id', args.id)
       .then((call: CallRecord[]) => {
         if (call.length !== 1) {
-          throw new Error('Could not create call');
+          throw new Error('Could not update call');
         }
 
         return createCallObject(call[0]);
