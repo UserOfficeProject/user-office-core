@@ -1,8 +1,0 @@
-mutation updateSampleStatus($sampleId: Int!, $status: SampleStatus!) {
-  updateSampleStatus(sampleId: $sampleId, status: $status) {
-    sample {
-      ...sample
-    }
-    error
-  }
-}
