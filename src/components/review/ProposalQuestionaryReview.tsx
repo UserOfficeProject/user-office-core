@@ -65,7 +65,7 @@ export default function ProposalQuestionaryReview(
       <Typography variant="h6" className={classes.heading} gutterBottom>
         Questionary
       </Typography>
-      <QuestionaryDetails questionaryId={questionary.questionaryId!} />
+      <QuestionaryDetails questionaryId={questionary.questionaryId} />
     </Fragment>
   );
 }

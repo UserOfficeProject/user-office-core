@@ -20,7 +20,7 @@ export const userFieldSchema = Yup.object().shape({
   birthdate: Yup.date()
     .min(new Date(1900, 1, 1), 'You are not that old')
     .test('DOB', 'You must be at least 18 years old', value => {
-      const dateOfBirth = new Date(value);
+      const dateOfBirth = new Date(value || new Date());
       const dateNow = new Date();
 
       if (dateNow.getFullYear() - dateOfBirth.getFullYear() < 18) {

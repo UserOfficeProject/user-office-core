@@ -1113,6 +1113,7 @@ export type Proposal = {
   users: Array<BasicUserDetails>;
   proposer: BasicUserDetails;
   status: ProposalStatus;
+  publicStatus: ProposalPublicStatus;
   reviews: Maybe<Array<Review>>;
   technicalReview: Maybe<TechnicalReview>;
   instrument: Maybe<Instrument>;
@@ -1140,6 +1141,15 @@ export type ProposalNextStatusEventResponseWrap = {
   error: Maybe<Scalars['String']>;
   nextStatusEvents: Maybe<Array<NextStatusEvent>>;
 };
+
+export enum ProposalPublicStatus {
+  DRAFT = 'draft',
+  SUBMITTED = 'submitted',
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected',
+  UNKNOWN = 'unknown',
+  RESERVED = 'reserved'
+}
 
 export type ProposalResponseWrap = {
   __typename?: 'ProposalResponseWrap';
@@ -1541,7 +1551,7 @@ export type Question = {
 
 export type Questionary = {
   __typename?: 'Questionary';
-  questionaryId: Maybe<Scalars['Int']>;
+  questionaryId: Scalars['Int'];
   templateId: Scalars['Int'];
   created: Scalars['DateTime'];
   steps: Array<QuestionaryStep>;
@@ -2781,7 +2791,7 @@ export type CoreTechnicalReviewFragment = (
 
 export type ProposalFragment = (
   { __typename?: 'Proposal' }
-  & Pick<Proposal, 'id' | 'title' | 'abstract' | 'statusId' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'questionaryId' | 'notified' | 'submitted'>
+  & Pick<Proposal, 'id' | 'title' | 'abstract' | 'statusId' | 'publicStatus' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'questionaryId' | 'notified' | 'submitted'>
   & { status: (
     { __typename?: 'ProposalStatus' }
     & Pick<ProposalStatus, 'id' | 'name' | 'description'>
@@ -4409,7 +4419,7 @@ export type GetUserProposalsQuery = (
     { __typename?: 'User' }
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'shortCode' | 'title' | 'statusId' | 'created' | 'finalStatus' | 'notified' | 'submitted'>
+      & Pick<Proposal, 'id' | 'shortCode' | 'title' | 'publicStatus' | 'statusId' | 'created' | 'finalStatus' | 'notified' | 'submitted'>
       & { status: (
         { __typename?: 'ProposalStatus' }
         & Pick<ProposalStatus, 'id' | 'name' | 'description'>
@@ -4653,6 +4663,7 @@ export const ProposalFragmentDoc = gql`
     name
     description
   }
+  publicStatus
   shortCode
   rankOrder
   finalStatus
@@ -6447,6 +6458,7 @@ export const GetUserProposalsDocument = gql`
         name
         description
       }
+      publicStatus
       statusId
       created
       finalStatus
