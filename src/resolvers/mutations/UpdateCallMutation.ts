@@ -32,6 +32,12 @@ export class UpdateCallInput {
   @Field()
   public endReview: Date;
 
+  @Field(() => Date, { nullable: true })
+  public startSEPReview?: Date;
+
+  @Field(() => Date, { nullable: true })
+  public endSEPReview?: Date;
+
   @Field()
   public startNotify: Date;
 
@@ -52,6 +58,15 @@ export class UpdateCallInput {
 
   @Field(() => Int, { nullable: true })
   public proposalWorkflowId: number;
+
+  @Field(() => Int, { nullable: true })
+  public callEnded?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public callReviewEnded?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public callSEPReviewEnded?: boolean;
 
   @Field(() => Int, { nullable: true })
   public templateId?: number;
