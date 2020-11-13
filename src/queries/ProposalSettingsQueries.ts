@@ -107,8 +107,9 @@ export default class ProposalSettingsQueries {
   @Authorized([Roles.USER_OFFICER])
   async getAllProposalEvents(agent: UserWithRole | null) {
     const allEventsArray = Object.values(Event);
-    const allProposalEvents = allEventsArray.filter(eventItem =>
-      eventItem.startsWith('PROPOSAL_')
+    const allProposalEvents = allEventsArray.filter(
+      eventItem =>
+        eventItem.startsWith('PROPOSAL_') || eventItem.startsWith('CALL')
     );
 
     return allProposalEvents;

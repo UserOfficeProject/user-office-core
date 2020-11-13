@@ -25,6 +25,7 @@ export default class ReviewMutations {
     private userAuth: UserAuthorization
   ) {}
 
+  @EventBus(Event.PROPOSAL_SEP_REVIEW_SUBMITTED)
   @ValidateArgs(proposalGradeValidationSchema)
   @Authorized()
   async updateReview(

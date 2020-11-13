@@ -20,6 +20,8 @@ describe('Test Call Mutations', () => {
         endCall: new Date('2019-02-19'),
         startReview: new Date('2019-02-19'),
         endReview: new Date('2019-02-19'),
+        startSEPReview: new Date('2019-02-19'),
+        endSEPReview: new Date('2019-02-19'),
         startNotify: new Date('2019-02-19'),
         endNotify: new Date('2019-02-19'),
         startCycle: new Date('2019-02-19'),
@@ -39,6 +41,8 @@ describe('Test Call Mutations', () => {
         endCall: new Date('2019-02-19'),
         startReview: new Date('2019-02-19'),
         endReview: new Date('2019-02-19'),
+        startSEPReview: new Date('2019-02-19'),
+        endSEPReview: new Date('2019-02-19'),
         startNotify: new Date('2019-02-19'),
         endNotify: new Date('2019-02-19'),
         startCycle: new Date('2019-02-19'),
@@ -57,6 +61,8 @@ describe('Test Call Mutations', () => {
       endCall: new Date('2019-02-19'),
       startReview: new Date('2019-02-19'),
       endReview: new Date('2019-02-19'),
+      startSEPReview: new Date('2019-02-19'),
+      endSEPReview: new Date('2019-02-19'),
       startNotify: new Date('2019-02-19'),
       endNotify: new Date('2019-02-19'),
       startCycle: new Date('2019-02-19'),
@@ -68,7 +74,14 @@ describe('Test Call Mutations', () => {
 
     return expect(
       callMutations.create(dummyUserOfficerWithRole, callToCreate)
-    ).resolves.toStrictEqual({ id: 1, ...callToCreate, templateId: 1 });
+    ).resolves.toStrictEqual({
+      id: 1,
+      ...callToCreate,
+      callEnded: false,
+      callReviewEnded: false,
+      callSEPReviewEnded: false,
+      templateId: 1,
+    });
   });
 
   test('A logged in user can not update a call', () => {
@@ -80,6 +93,8 @@ describe('Test Call Mutations', () => {
         endCall: new Date('2020-06-18'),
         startReview: new Date('2020-06-18'),
         endReview: new Date('2020-06-18'),
+        startSEPReview: new Date('2019-02-19'),
+        endSEPReview: new Date('2019-02-19'),
         startNotify: new Date('2020-06-18'),
         endNotify: new Date('2020-06-18'),
         startCycle: new Date('2020-06-18'),
@@ -99,6 +114,8 @@ describe('Test Call Mutations', () => {
       endCall: new Date('2020-06-18'),
       startReview: new Date('2020-06-18'),
       endReview: new Date('2020-06-18'),
+      startSEPReview: new Date('2019-02-19'),
+      endSEPReview: new Date('2019-02-19'),
       startNotify: new Date('2020-06-18'),
       endNotify: new Date('2020-06-18'),
       startCycle: new Date('2020-06-18'),
