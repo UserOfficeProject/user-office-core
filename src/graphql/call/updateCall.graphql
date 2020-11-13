@@ -5,6 +5,8 @@ mutation updateCall(
   $endCall: DateTime!
   $startReview: DateTime!
   $endReview: DateTime!
+  $startSEPReview: DateTime
+  $endSEPReview: DateTime
   $startNotify: DateTime!
   $endNotify: DateTime!
   $startCycle: DateTime!
@@ -22,6 +24,8 @@ mutation updateCall(
       endCall: $endCall
       startReview: $startReview
       endReview: $endReview
+      startSEPReview: $startSEPReview
+      endSEPReview: $endSEPReview
       startNotify: $startNotify
       endNotify: $endNotify
       startCycle: $startCycle
@@ -34,32 +38,7 @@ mutation updateCall(
   ) {
     error
     call {
-      id
-      shortCode
-      startCall
-      endCall
-      startReview
-      endReview
-      startNotify
-      endNotify
-      startCycle
-      endCycle
-      cycleComment
-      surveyComment
-      proposalWorkflowId
-      templateId
-      instruments {
-        id
-        name
-        shortCode
-        description
-        availabilityTime
-      }
-      proposalWorkflow {
-        id
-        name
-        description
-      }
+      ...call
     }
   }
 }
