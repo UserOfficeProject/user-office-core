@@ -15,6 +15,7 @@ import {
   TemplateCategoryId,
   Topic,
   QuestionTemplateRelation,
+  TemplatesHasQuestions,
 } from '../../models/Template';
 import {
   BooleanConfig,
@@ -64,9 +65,25 @@ export const dummyQuestionTemplateRelationFactory = (
 ): QuestionTemplateRelation => {
   return new QuestionTemplateRelation(
     dummyQuestionFactory(values?.question),
-    values?.sortOrder || +Math.random().toFixed(8),
+    values?.sortOrder || Math.round(Math.random() * 100),
     values?.topicId || Math.round(Math.random() * 10),
     new BooleanConfig()
+  );
+};
+
+export const dummyTemplateHasQuestionRelationFactory = (
+  sortOrder: number,
+  templateId: number
+): TemplatesHasQuestions => {
+  return new TemplatesHasQuestions(
+    Math.round(Math.random() * 100),
+    dummyQuestionFactory().proposalQuestionId,
+    templateId || Math.round(Math.random() * 100),
+    Math.round(Math.random() * 10),
+    sortOrder + 1,
+    JSON.stringify(new BooleanConfig()),
+    null,
+    null
   );
 };
 

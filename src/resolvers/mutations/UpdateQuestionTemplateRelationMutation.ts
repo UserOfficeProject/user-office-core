@@ -3,7 +3,6 @@ import {
   ArgsType,
   Ctx,
   Field,
-  Float,
   InputType,
   Int,
   Mutation,
@@ -46,8 +45,8 @@ export class UpdateQuestionTemplateRelationArgs {
   @Field(() => Int, { nullable: true })
   public topicId?: number;
 
-  @Field(() => Float, { nullable: true })
-  public sortOrder?: number;
+  @Field(() => Int)
+  public sortOrder: number;
 
   @Field({ nullable: true })
   public config?: string;

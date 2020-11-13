@@ -1068,7 +1068,7 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "mutation ($templateId: Int!) {\n  createTopic(templateId: $templateId, sortOrder: 0.5) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n      }\n    }\n    error\n  }\n}\n",
+            "query": "mutation ($templateId: Int!) {\n  createTopic(templateId: $templateId, sortOrder: 0) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n      }\n    }\n    error\n  }\n}\n",
             "variables": "{\n\t\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
           },
           "options": {

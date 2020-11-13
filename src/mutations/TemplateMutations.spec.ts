@@ -30,28 +30,16 @@ test('An userofficer can update topic', async () => {
   const topicEnabled = false;
   const result = await mutations.updateTopic(dummyUserOfficerWithRole, {
     id: 1,
+    templateId: 1,
     title: newTopicTitle,
     isEnabled: topicEnabled,
-    sortOrder: 0.5,
+    sortOrder: 0,
   });
 
   expect(isRejection(result)).toBeFalsy();
 
-  const topic = result as Topic;
-  expect(topic instanceof Topic).toBe(true);
-  expect(topic.title).toEqual(newTopicTitle);
-  expect(topic.isEnabled).toEqual(topicEnabled);
-});
-
-test('Can not update topic that does not exist', async () => {
-  const result = await mutations.updateTopic(dummyUserOfficerWithRole, {
-    id: 9,
-    title: '',
-    isEnabled: false,
-    sortOrder: 0.5,
-  });
-
-  expect(isRejection(result)).toBeTruthy();
+  const template = result as Template;
+  expect(template instanceof Template).toBe(true);
 });
 
 test('An userofficer can create template', async () => {
@@ -106,9 +94,10 @@ test('Can not delete non-existing template', async () => {
 test('A user can not update topic', async () => {
   const topic = await mutations.updateTopic(dummyUserWithRole, {
     id: 1,
+    templateId: 1,
     title: 'New topic title',
     isEnabled: false,
-    sortOrder: 0.5,
+    sortOrder: 0,
   });
 
   expect(topic instanceof Topic).toBe(false);
