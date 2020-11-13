@@ -7,7 +7,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import TextField from '@material-ui/core/TextField';
 import { getIn } from 'formik';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { SelectionFromOptionsConfig } from 'generated/sdk';
@@ -35,7 +35,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     question: { proposalQuestionId, question },
     value,
   } = templateField;
-  const [stateValue, setStateValue] = useState(value);
+  const [stateValue, setStateValue] = useState<Array<string>>(value);
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
   const config = templateField.config as SelectionFromOptionsConfig;
@@ -63,7 +63,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
             }
             SelectProps={{
-              MenuProps: {},
+              multiple: config.isMultipleSelect,
             }}
             error={isError}
             helperText={config.small_label}

@@ -1682,6 +1682,7 @@ export type SelectionFromOptionsConfig = {
   tooltip: Scalars['String'];
   variant: Scalars['String'];
   options: Array<Scalars['String']>;
+  isMultipleSelect: Scalars['Boolean'];
 };
 
 export type Sep = {
@@ -3917,7 +3918,7 @@ type FieldConfigFileUploadConfigFragment = (
 
 type FieldConfigSelectionFromOptionsConfigFragment = (
   { __typename?: 'SelectionFromOptionsConfig' }
-  & Pick<SelectionFromOptionsConfig, 'variant' | 'options' | 'small_label' | 'required' | 'tooltip'>
+  & Pick<SelectionFromOptionsConfig, 'variant' | 'options' | 'isMultipleSelect' | 'small_label' | 'required' | 'tooltip'>
 );
 
 type FieldConfigTextInputConfigFragment = (
@@ -4741,6 +4742,7 @@ export const FieldConfigFragmentDoc = gql`
   ... on SelectionFromOptionsConfig {
     variant
     options
+    isMultipleSelect
     small_label
     required
     tooltip
