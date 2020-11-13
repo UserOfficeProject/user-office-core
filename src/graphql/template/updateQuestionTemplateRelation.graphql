@@ -2,7 +2,7 @@ mutation updateQuestionTemplateRelation(
   $questionId: String!
   $templateId: Int!
   $topicId: Int
-  $sortOrder: Float
+  $sortOrder: Int!
   $config: String
   $dependency: FieldDependencyInput
 ) {

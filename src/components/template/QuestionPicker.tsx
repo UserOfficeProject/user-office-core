@@ -113,7 +113,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
               payload: {
                 topicId: props.topic.id,
                 questionId: item.proposalQuestionId,
-                sortOrder: 0.1,
+                sortOrder: 0,
                 templateId: template.templateId,
               },
             });

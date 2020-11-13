@@ -59,7 +59,7 @@ export type AddUserRoleResponseWrap = {
 export type Answer = {
   __typename?: 'Answer';
   question: Question;
-  sortOrder: Scalars['Float'];
+  sortOrder: Scalars['Int'];
   topicId: Scalars['Int'];
   config: FieldConfig;
   dependency: Maybe<FieldDependency>;
@@ -452,7 +452,7 @@ export type Mutation = {
   updateQuestion: QuestionResponseWrap;
   updateQuestionTemplateRelation: TemplateResponseWrap;
   updateTemplate: TemplateResponseWrap;
-  updateTopic: TopicResponseWrap;
+  updateTopic: TemplateResponseWrap;
   addUserRole: AddUserRoleResponseWrap;
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap;
   createUser: UserResponseWrap;
@@ -762,7 +762,7 @@ export type MutationCreateQuestionArgs = {
 export type MutationCreateQuestionTemplateRelationArgs = {
   templateId: Scalars['Int'];
   questionId: Scalars['String'];
-  sortOrder: Scalars['Float'];
+  sortOrder: Scalars['Int'];
   topicId: Scalars['Int'];
 };
 
@@ -776,7 +776,7 @@ export type MutationCreateTemplateArgs = {
 
 export type MutationCreateTopicArgs = {
   templateId: Scalars['Int'];
-  sortOrder: Scalars['Float'];
+  sortOrder?: Maybe<Scalars['Int']>;
   title?: Maybe<Scalars['Int']>;
 };
 
@@ -799,7 +799,7 @@ export type MutationUpdateQuestionTemplateRelationArgs = {
   questionId: Scalars['String'];
   templateId: Scalars['Int'];
   topicId?: Maybe<Scalars['Int']>;
-  sortOrder?: Maybe<Scalars['Float']>;
+  sortOrder: Scalars['Int'];
   config?: Maybe<Scalars['String']>;
   dependency?: Maybe<FieldDependencyInput>;
 };
@@ -815,8 +815,9 @@ export type MutationUpdateTemplateArgs = {
 
 export type MutationUpdateTopicArgs = {
   id: Scalars['Int'];
+  templateId?: Maybe<Scalars['Int']>;
   title?: Maybe<Scalars['String']>;
-  sortOrder?: Maybe<Scalars['Float']>;
+  sortOrder?: Maybe<Scalars['Int']>;
   isEnabled?: Maybe<Scalars['Boolean']>;
 };
 
@@ -1576,7 +1577,7 @@ export type QuestionResponseWrap = {
 export type QuestionTemplateRelation = {
   __typename?: 'QuestionTemplateRelation';
   question: Question;
-  sortOrder: Scalars['Float'];
+  sortOrder: Scalars['Int'];
   topicId: Scalars['Int'];
   config: FieldConfig;
   dependency: Maybe<FieldDependency>;
@@ -1837,14 +1838,8 @@ export type Topic = {
   id: Scalars['Int'];
   title: Scalars['String'];
   templateId: Scalars['Int'];
-  sortOrder: Scalars['Float'];
+  sortOrder: Scalars['Int'];
   isEnabled: Scalars['Boolean'];
-};
-
-export type TopicResponseWrap = {
-  __typename?: 'TopicResponseWrap';
-  error: Maybe<Scalars['String']>;
-  topic: Maybe<Topic>;
 };
 
 export type UpdateAnswerResponseWrap = {
@@ -3760,7 +3755,7 @@ export type CreateQuestionTemplateRelationMutationVariables = Exact<{
   templateId: Scalars['Int'];
   questionId: Scalars['String'];
   topicId: Scalars['Int'];
-  sortOrder: Scalars['Float'];
+  sortOrder: Scalars['Int'];
 }>;
 
 
@@ -3778,7 +3773,7 @@ export type CreateQuestionTemplateRelationMutation = (
 
 export type CreateTopicMutationVariables = Exact<{
   templateId: Scalars['Int'];
-  sortOrder: Scalars['Float'];
+  sortOrder: Scalars['Int'];
 }>;
 
 
@@ -4110,7 +4105,7 @@ export type UpdateQuestionTemplateRelationMutationVariables = Exact<{
   questionId: Scalars['String'];
   templateId: Scalars['Int'];
   topicId?: Maybe<Scalars['Int']>;
-  sortOrder?: Maybe<Scalars['Float']>;
+  sortOrder: Scalars['Int'];
   config?: Maybe<Scalars['String']>;
   dependency?: Maybe<FieldDependencyInput>;
 }>;
@@ -4150,8 +4145,9 @@ export type UpdateTemplateMutation = (
 
 export type UpdateTopicMutationVariables = Exact<{
   topicId: Scalars['Int'];
+  templateId?: Maybe<Scalars['Int']>;
   title?: Maybe<Scalars['String']>;
-  sortOrder?: Maybe<Scalars['Float']>;
+  sortOrder?: Maybe<Scalars['Int']>;
   isEnabled?: Maybe<Scalars['Boolean']>;
 }>;
 
@@ -4159,11 +4155,11 @@ export type UpdateTopicMutationVariables = Exact<{
 export type UpdateTopicMutation = (
   { __typename?: 'Mutation' }
   & { updateTopic: (
-    { __typename?: 'TopicResponseWrap' }
-    & Pick<TopicResponseWrap, 'error'>
-    & { topic: Maybe<(
-      { __typename?: 'Topic' }
-      & TopicFragment
+    { __typename?: 'TemplateResponseWrap' }
+    & Pick<TemplateResponseWrap, 'error'>
+    & { template: Maybe<(
+      { __typename?: 'Template' }
+      & TemplateFragment
     )> }
   ) }
 );
@@ -6085,7 +6081,7 @@ export const CreateQuestionDocument = gql`
 }
     ${QuestionFragmentDoc}`;
 export const CreateQuestionTemplateRelationDocument = gql`
-    mutation createQuestionTemplateRelation($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Float!) {
+    mutation createQuestionTemplateRelation($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Int!) {
   createQuestionTemplateRelation(templateId: $templateId, questionId: $questionId, topicId: $topicId, sortOrder: $sortOrder) {
     template {
       ...template
@@ -6095,7 +6091,7 @@ export const CreateQuestionTemplateRelationDocument = gql`
 }
     ${TemplateFragmentDoc}`;
 export const CreateTopicDocument = gql`
-    mutation createTopic($templateId: Int!, $sortOrder: Float!) {
+    mutation createTopic($templateId: Int!, $sortOrder: Int!) {
   createTopic(templateId: $templateId, sortOrder: $sortOrder) {
     template {
       ...template
@@ -6195,7 +6191,7 @@ export const UpdateQuestionDocument = gql`
 }
     ${QuestionFragmentDoc}`;
 export const UpdateQuestionTemplateRelationDocument = gql`
-    mutation updateQuestionTemplateRelation($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Float, $config: String, $dependency: FieldDependencyInput) {
+    mutation updateQuestionTemplateRelation($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int!, $config: String, $dependency: FieldDependencyInput) {
   updateQuestionTemplateRelation(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, config: $config, dependency: $dependency) {
     template {
       ...template
@@ -6215,15 +6211,15 @@ export const UpdateTemplateDocument = gql`
 }
     ${TemplateMetadataFragmentDoc}`;
 export const UpdateTopicDocument = gql`
-    mutation updateTopic($topicId: Int!, $title: String, $sortOrder: Float, $isEnabled: Boolean) {
-  updateTopic(id: $topicId, title: $title, sortOrder: $sortOrder, isEnabled: $isEnabled) {
-    topic {
-      ...topic
+    mutation updateTopic($topicId: Int!, $templateId: Int, $title: String, $sortOrder: Int, $isEnabled: Boolean) {
+  updateTopic(id: $topicId, templateId: $templateId, title: $title, sortOrder: $sortOrder, isEnabled: $isEnabled) {
+    template {
+      ...template
     }
     error
   }
 }
-    ${TopicFragmentDoc}`;
+    ${TemplateFragmentDoc}`;
 export const CheckTokenDocument = gql`
     query checkToken($token: String!) {
   checkToken(token: $token) {
