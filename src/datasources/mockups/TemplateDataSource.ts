@@ -225,7 +225,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       question => question.proposalQuestionId === questionId
     );
     if (!question) {
-      throw new Error(`Question ${questionId} does not exist`);
+      return null;
     }
 
     return question;
