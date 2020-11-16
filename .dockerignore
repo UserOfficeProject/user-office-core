@@ -2,6 +2,7 @@
 # this improves docker caching
 *
 !src
+!db_patches
 !package*
 !tsconfig.json
 !index.ts
