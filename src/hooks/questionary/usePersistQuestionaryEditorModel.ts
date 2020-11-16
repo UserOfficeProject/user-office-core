@@ -258,6 +258,7 @@ export function usePersistQuestionaryEditorModel() {
           executeAndMonitorCall(() =>
             updateTopic(action.payload.topicId, {
               title: action.payload.title as string,
+              templateId: state.templateId,
             })
           );
           break;
