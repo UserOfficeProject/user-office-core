@@ -44,7 +44,7 @@ it('Field config "required=false" should make field not required', async () => {
   expect(isMatchingConstraints(question, '')).toBe(true);
 });
 
-it('Dependencies should be sattisfied if value matches', async () => {
+it('Dependencies should be satisfied if value matches', async () => {
   const questionarySteps = await dummyQuestionaryDataSource.getQuestionarySteps(
     1
   );
