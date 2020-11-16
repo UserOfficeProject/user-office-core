@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 
-export function useDownloadPDFProposal() {
-  const downloadProposalPDF = useCallback(proposalId => {
+export function useDownloadPDFSample() {
+  const downloadSamplePDF = useCallback((sampleId: number | string) => {
     const element = document.createElement('a');
-    element.setAttribute('href', '/download/proposal/' + proposalId);
+    element.setAttribute('href', '/download/sample/' + sampleId);
     element.setAttribute('download', 'download');
 
     element.style.display = 'none';
@@ -14,5 +14,5 @@ export function useDownloadPDFProposal() {
     document.body.removeChild(element);
   }, []);
 
-  return downloadProposalPDF;
+  return downloadSamplePDF;
 }

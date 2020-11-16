@@ -21,6 +21,7 @@ import {
   ProposalWorkflowConnection,
   ProposalWorkflowConnectionGroup,
 } from 'generated/sdk';
+import { Event as ProposalEvent } from 'generated/sdk';
 
 import AddNewWorkflowConnectionsRow from './AddNewWorkflowConnectionsRow';
 import AddNextStatusEventsToConnection from './AddNextStatusEventsToConnection';
@@ -328,6 +329,8 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
         </DialogContent>
       </Dialog>
       <Dialog
+        maxWidth="md"
+        fullWidth={true}
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={!!workflowConnection}
@@ -340,7 +343,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
             nextStatusEvents={
               workflowConnection?.nextStatusEvents?.map(
                 nextStatusEvent => nextStatusEvent.nextStatusEvent
-              ) as string[]
+              ) as ProposalEvent[]
             }
             addNextStatusEventsToConnection={(nextStatusEvents: string[]) =>
               dispatch({

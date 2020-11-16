@@ -40,7 +40,7 @@ function createSampleStub(
     },
     questionaryId: 0,
     safetyComment: '',
-    safetyStatus: SampleStatus.PENDING_EVALUTATION,
+    safetyStatus: SampleStatus.PENDING_EVALUATION,
     title: '',
   };
 }
@@ -109,6 +109,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
                 const clonedSample = response.cloneSample.sample;
                 if (clonedSample) {
                   const newStateValue = [...stateValue, clonedSample.id];
+                  setStateValue(newStateValue);
                   setRows([...rows, sampleToListRow(clonedSample)]);
                   onComplete(null as any, newStateValue);
                 }
