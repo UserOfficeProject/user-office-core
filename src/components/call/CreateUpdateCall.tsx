@@ -20,9 +20,9 @@ import UOLoader from 'components/common/UOLoader';
 import { Call } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import CallCycleInfo from './CallCycleInfo';
 import CallGeneralInfo from './CallGeneralInfo';
-import CallReviewAndNotification from './CallReviewAndNotification';
+import CallNotificationAndCycleInfo from './CallNotificationAndCycleInfo';
+import CallReviewsInfo from './CallReviewsInfo';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -66,16 +66,16 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const currentDayEnd = new Date();
   currentDayEnd.setHours(23, 59, 59, 999);
 
-  const steps = ['General info', 'Review and notification', 'Cycle info'];
+  const steps = ['General', 'Reviews', 'Notification and cycle'];
 
   const getStepContent = (step: number) => {
     switch (step) {
       case 0:
         return <CallGeneralInfo />;
       case 1:
-        return <CallReviewAndNotification />;
+        return <CallReviewsInfo />;
       case 2:
-        return <CallCycleInfo />;
+        return <CallNotificationAndCycleInfo />;
       default:
         return 'Unknown step';
     }
@@ -107,6 +107,8 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         endCall: currentDayEnd,
         startReview: currentDayStart,
         endReview: currentDayEnd,
+        startSEPReview: null,
+        endSEPReview: null,
         startNotify: currentDayStart,
         endNotify: currentDayEnd,
         startCycle: currentDayStart,

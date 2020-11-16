@@ -5,6 +5,8 @@ fragment call on Call {
   endCall
   startReview
   endReview
+  startSEPReview
+  endSEPReview
   startNotify
   endNotify
   startCycle

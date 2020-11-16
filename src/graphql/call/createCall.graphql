@@ -4,6 +4,8 @@ mutation createCall(
   $endCall: DateTime!
   $startReview: DateTime!
   $endReview: DateTime!
+  $startSEPReview: DateTime
+  $endSEPReview: DateTime
   $startNotify: DateTime!
   $endNotify: DateTime!
   $startCycle: DateTime!
@@ -20,6 +22,8 @@ mutation createCall(
       endCall: $endCall
       startReview: $startReview
       endReview: $endReview
+      startSEPReview: $startSEPReview
+      endSEPReview: $endSEPReview
       startNotify: $startNotify
       endNotify: $endNotify
       startCycle: $startCycle

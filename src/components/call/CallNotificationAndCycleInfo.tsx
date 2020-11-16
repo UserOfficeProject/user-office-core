@@ -10,6 +10,20 @@ const CallCycleInfo: React.FC = () => (
   <>
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <Field
+        name="startNotify"
+        label="Start of notification period"
+        component={FormikUICustomDatePicker}
+        margin="normal"
+        fullWidth
+      />
+      <Field
+        name="endNotify"
+        label="End of notification period"
+        component={FormikUICustomDatePicker}
+        margin="normal"
+        fullWidth
+      />
+      <Field
         name="startCycle"
         label="Start of cycle"
         component={FormikUICustomDatePicker}
