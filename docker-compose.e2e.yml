@@ -10,10 +10,15 @@ services:
       tokenLife: 7d
       baseURL: localhost:3000
       SPARKPOST_TOKEN: dummytoken
-      NODE_ENV: production
+      NODE_ENV: development
+      UO_FEATURE_DISABLE_MESSAGE_BROKER: 1
+      USER_OFFICE_PDF_FACTORY_ENDPOINT: ${USER_OFFICE_PDF_FACTORY_ENDPOINT}
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads"
       - "traefik.port=4000"
+    volumes:
+      - "./${USER_OFFICE_BACKEND_DIR}/db_patches:/home/node/app/db_patches"
+
   db:
     image: postgres:11-alpine
     restart: always
@@ -26,13 +31,3 @@ services:
       - 5432:5432
     volumes:
       - "./${USER_OFFICE_BACKEND_DIR}/db_patches/:/docker-entrypoint-initdb.d/"
-  rabbitmq:
-    image: "rabbitmq:3-management"
-    hostname: "rabbit"
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-    labels:
-      NAME: "rabbitmq"
-    volumes:
-      - "./${USER_OFFICE_BACKEND_DIR}/rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config"
