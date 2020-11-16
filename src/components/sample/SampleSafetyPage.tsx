@@ -10,7 +10,6 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { Options } from 'material-table';
 import React, { useEffect, useState } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
@@ -63,14 +62,14 @@ function SampleSafetyPage() {
     }
   }, [api, selectedCallId]);
 
-  const Toolbar = (data: Options): JSX.Element =>
+  const Toolbar = (): JSX.Element =>
     loadingCalls ? (
       <div>Loading...</div>
     ) : (
       <>
         <SelectedCallFilter
           callId={selectedCallId}
-          callsData={calls || []}
+          calls={calls || []}
           onChange={callId => {
             setSelectedCallId(callId);
           }}

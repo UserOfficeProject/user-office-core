@@ -25,7 +25,7 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
       <>
         <MTableToolbar {...data} />
         <SelectedCallFilter
-          callsData={calls}
+          calls={calls}
           onChange={setSelectedCallId}
           shouldShowAll={true}
           callId={selectedCallId}

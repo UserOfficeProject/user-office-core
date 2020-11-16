@@ -25,7 +25,7 @@ const SEPMeetingComponentsView: React.FC<SEPMeetingComponentsViewProps> = ({
       <>
         <MTableToolbar {...data} />
         <SelectedCallFilter
-          callsData={calls}
+          calls={calls}
           onChange={setSelectedCallId}
           callId={selectedCallId}
         />

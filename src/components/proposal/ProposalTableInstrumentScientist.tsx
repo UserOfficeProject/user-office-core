@@ -20,7 +20,7 @@ import {
 } from 'utils/mathFunctions';
 
 const ProposalTableInstrumentScientist: React.FC = () => {
-  const { loading, proposalsData } = useProposalsData({});
+  const { loading, proposalsData } = useProposalsData({ proposalStatusId: 2 });
 
   const downloadPDFProposal = useDownloadPDFProposal();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<

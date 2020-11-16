@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
-import { Call } from 'generated/sdk';
+import { ProposalStatus } from 'generated/sdk';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -19,22 +19,22 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-type SelectedCallFilterProps = {
-  calls: Call[];
+type SelectedProposalStatusFilterProps = {
+  proposalStatuses: ProposalStatus[];
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
-  callId?: number;
+  proposalStatusId?: number;
 };
 
-const SelectedCallFilter: React.FC<SelectedCallFilterProps> = ({
-  calls,
-  callId,
+const SelectedProposalStatusFilter: React.FC<SelectedProposalStatusFilterProps> = ({
+  proposalStatuses,
+  proposalStatusId,
   onChange,
   shouldShowAll,
 }) => {
   const classes = useStyles();
   const [, setQuery] = useQueryParams({
-    call: NumberParam,
+    proposalStatus: NumberParam,
   });
 
   /**
@@ -44,23 +44,23 @@ const SelectedCallFilter: React.FC<SelectedCallFilterProps> = ({
   return (
     <>
       <FormControl className={classes.formControl}>
-        <InputLabel>Call</InputLabel>
+        <InputLabel>Status</InputLabel>
         <Select
-          onChange={call => {
+          onChange={proposalStatus => {
             setQuery({
-              call: call.target.value
-                ? (call.target.value as number)
+              proposalStatus: proposalStatus.target.value
+                ? (proposalStatus.target.value as number)
                 : undefined,
             });
-            onChange?.(call.target.value as number);
+            onChange?.(proposalStatus.target.value as number);
           }}
-          value={callId}
+          value={proposalStatusId}
           defaultValue={0}
         >
           {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
-          {calls.map(call => (
-            <MenuItem key={call.id} value={call.id}>
-              {call.shortCode}
+          {proposalStatuses.map(proposalStatus => (
+            <MenuItem key={proposalStatus.id} value={proposalStatus.id}>
+              {proposalStatus.name}
             </MenuItem>
           ))}
         </Select>
@@ -69,11 +69,11 @@ const SelectedCallFilter: React.FC<SelectedCallFilterProps> = ({
   );
 };
 
-SelectedCallFilter.propTypes = {
-  calls: PropTypes.array.isRequired,
+SelectedProposalStatusFilter.propTypes = {
+  proposalStatuses: PropTypes.array.isRequired,
   onChange: PropTypes.func,
   shouldShowAll: PropTypes.bool,
-  callId: PropTypes.number,
+  proposalStatusId: PropTypes.number,
 };
 
-export default SelectedCallFilter;
+export default SelectedProposalStatusFilter;

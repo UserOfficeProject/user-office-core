@@ -1168,6 +1168,7 @@ export type ProposalsFilter = {
   questionaryIds?: Maybe<Array<Scalars['Int']>>;
   callId?: Maybe<Scalars['Int']>;
   instrumentId?: Maybe<Scalars['Int']>;
+  proposalStatusId?: Maybe<Scalars['Int']>;
 };
 
 export type ProposalsQueryResult = {

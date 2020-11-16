@@ -3,11 +3,18 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
 import SelectedCallFilter from 'components/common/SelectedCallFilter';
-import { ProposalsFilter, Call, Instrument } from 'generated/sdk';
+import SelectedProposalStatusFilter from 'components/common/SelectedProposalStatusFilter';
+import {
+  ProposalsFilter,
+  Call,
+  Instrument,
+  ProposalStatus,
+} from 'generated/sdk';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -18,12 +25,22 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(2),
   },
 }));
-export default function ProposalFilterBar(props: {
-  callsData: Call[];
-  instrumentsData: Instrument[];
+
+type ProposalFilterBarProps = {
+  calls: Call[];
+  instruments: Instrument[];
+  proposalStatuses: ProposalStatus[];
   setProposalFilter: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;
-}) {
+};
+
+const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
+  calls,
+  instruments,
+  proposalStatuses,
+  setProposalFilter,
+  filter,
+}) => {
   const classes = useStyles();
   const [, setQuery] = useQueryParams({
     instrument: NumberParam,
@@ -32,16 +49,17 @@ export default function ProposalFilterBar(props: {
   return (
     <>
       <SelectedCallFilter
-        callId={props.filter.callId as number}
-        callsData={props.callsData}
+        callId={filter.callId as number}
+        calls={calls}
         shouldShowAll={true}
         onChange={callId => {
-          props.setProposalFilter({
-            ...props.filter,
+          setProposalFilter({
+            ...filter,
             callId,
           });
         }}
       />
+
       <FormControl className={classes.formControl}>
         <InputLabel>Instrument</InputLabel>
         <Select
@@ -51,22 +69,44 @@ export default function ProposalFilterBar(props: {
                 ? (instrument.target.value as number)
                 : undefined,
             });
-            props.setProposalFilter({
-              ...props.filter,
+            setProposalFilter({
+              ...filter,
               instrumentId: instrument.target.value as number,
             });
           }}
-          value={props.filter.instrumentId}
+          value={filter.instrumentId}
           defaultValue={0}
         >
           <MenuItem value={0}>All</MenuItem>
-          {props.instrumentsData.map(instrument => (
+          {instruments.map(instrument => (
             <MenuItem key={instrument.id} value={instrument.id}>
               {instrument.name}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
+
+      <SelectedProposalStatusFilter
+        proposalStatusId={filter.proposalStatusId as number}
+        proposalStatuses={proposalStatuses}
+        shouldShowAll={true}
+        onChange={proposalStatusId => {
+          setProposalFilter({
+            ...filter,
+            proposalStatusId,
+          });
+        }}
+      />
     </>
   );
-}
+};
+
+ProposalFilterBar.propTypes = {
+  calls: PropTypes.array.isRequired,
+  instruments: PropTypes.array.isRequired,
+  proposalStatuses: PropTypes.array.isRequired,
+  setProposalFilter: PropTypes.func.isRequired,
+  filter: PropTypes.object.isRequired,
+};
+
+export default ProposalFilterBar;
