@@ -43,7 +43,7 @@ export class SampleDataSourceMock implements SampleDataSource {
       title,
       creatorId,
       questionaryId,
-      SampleStatus.PENDING_EVALUTATION,
+      SampleStatus.PENDING_EVALUATION,
       '',
       new Date()
     );

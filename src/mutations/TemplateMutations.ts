@@ -18,7 +18,7 @@ import {
 
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
-import { createConfig } from '../models/ProposalModelFunctions';
+import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { Roles } from '../models/Role';
 import {
   DataType,
@@ -230,7 +230,7 @@ export default class TemplateMutations {
         newFieldId, // natural key defaults to id
         dataType,
         'New question',
-        JSON.stringify(this.createBlankConfig(dataType))
+        JSON.stringify(getQuestionDefinition(dataType).createBlankConfig())
       )
       .then(question => question)
       .catch(err => {
@@ -400,27 +400,5 @@ export default class TemplateMutations {
 
         return rejection('INTERNAL_ERROR');
       });
-  }
-
-  private createBlankConfig(dataType: DataType): typeof FieldConfigType {
-    switch (dataType) {
-      case DataType.FILE_UPLOAD:
-        return createConfig<FileUploadConfig>(new FileUploadConfig());
-      case DataType.EMBELLISHMENT:
-        return createConfig<EmbellishmentConfig>(new EmbellishmentConfig(), {
-          plain: 'New embellishment',
-          html: '<p>New embellishment</p>',
-        });
-      case DataType.SELECTION_FROM_OPTIONS:
-        return createConfig<SelectionFromOptionsConfig>(
-          new SelectionFromOptionsConfig()
-        );
-      case DataType.SUBTEMPLATE:
-        return createConfig<SubtemplateConfig>(new SubtemplateConfig(), {
-          addEntryButtonLabel: 'Add',
-        });
-      default:
-        return new ConfigBase();
-    }
   }
 }

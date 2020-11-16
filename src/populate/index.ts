@@ -12,8 +12,7 @@ import {
   templateDataSource,
   userDataSource,
 } from '../datasources';
-import database from '../datasources/postgres/database';
-import { createConfigByType } from '../models/ProposalModelFunctions';
+import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { DataType, TemplateCategoryId } from '../models/Template';
 import { UserRole } from '../models/User';
@@ -119,10 +118,12 @@ const createCalls = async () => {
       startCycle: faker.date.past(1),
       startNotify: faker.date.past(1),
       startReview: faker.date.past(1),
+      startSEPReview: faker.date.past(1),
       endNotify: faker.date.future(1),
       endCall: faker.date.future(1),
       endCycle: faker.date.future(1),
       endReview: faker.date.future(1),
+      endSEPReview: faker.date.future(1),
       shortCode: `${dummy.word().substr(0, 15)}${dummy.positiveNumber(100)}`,
       surveyComment: faker.random.words(5),
       proposalWorkflowId: 1,
@@ -162,7 +163,9 @@ const createTemplates = async () => {
           questionId,
           DataType.TEXT_INPUT,
           `${faker.random.words(5)}?`,
-          JSON.stringify(createConfigByType(DataType.TEXT_INPUT, {}))
+          JSON.stringify(
+            getQuestionDefinition(DataType.TEXT_INPUT).createBlankConfig()
+          )
         );
       }, 10);
 
