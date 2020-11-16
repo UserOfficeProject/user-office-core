@@ -13,7 +13,7 @@ export class ConfigBase {
 }
 
 @ObjectType()
-export class SampleBasisConfig extends ConfigBase {
+export class SampleBasisConfig {
   @Field(() => String)
   titlePlaceholder: string;
 }
@@ -25,7 +25,7 @@ export class BooleanConfig extends ConfigBase {}
 export class DateConfig extends ConfigBase {}
 
 @ObjectType()
-export class EmbellishmentConfig extends ConfigBase {
+export class EmbellishmentConfig {
   @Field(() => Boolean)
   omitFromPdf: boolean;
 
@@ -76,7 +76,7 @@ export class TextInputConfig extends ConfigBase {
 }
 
 @ObjectType()
-export class SubtemplateConfig extends ConfigBase {
+export class SubtemplateConfig {
   @Field(() => Int, { nullable: true })
   maxEntries: number | null;
 
@@ -88,10 +88,19 @@ export class SubtemplateConfig extends ConfigBase {
 
   @Field(() => String)
   addEntryButtonLabel: string;
+
+  @Field(() => String)
+  small_label: string;
+
+  @Field(() => Boolean)
+  required: boolean;
 }
 
 @ObjectType()
-export class ProposalBasisConfig extends ConfigBase {}
+export class ProposalBasisConfig {
+  @Field(() => String)
+  tooltip: string;
+}
 
 export const FieldConfigType = createUnionType({
   name: 'FieldConfig', // the name of the GraphQL union

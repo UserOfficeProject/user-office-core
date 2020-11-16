@@ -5,12 +5,12 @@ import {
   FieldCondition,
   FieldDependency,
   Question,
+  QuestionTemplateRelation,
   Template,
   TemplateCategory,
   TemplateCategoryId,
   TemplateStep,
   Topic,
-  QuestionTemplateRelation,
 } from '../../models/Template';
 import { CreateQuestionTemplateRelationArgs } from '../../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
@@ -19,7 +19,6 @@ import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/De
 import { UpdateQuestionTemplateRelationArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
-import { logger } from '../../utils/Logger';
 import { TemplateDataSource } from '../TemplateDataSource';
 import {
   dummyQuestionFactory,
