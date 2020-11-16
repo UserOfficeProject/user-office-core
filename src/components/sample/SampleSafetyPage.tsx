@@ -1,6 +1,12 @@
-import { Avatar, ListItemIcon, MenuItem, Typography } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import MenuItem from '@material-ui/core/MenuItem';
+import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -11,8 +17,9 @@ import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
 import SelectedCallFilter from 'components/common/SelectedCallFilter';
-import { Maybe, Sample, SampleStatus } from 'generated/sdk';
+import { Maybe, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useDownloadPDFSample } from 'hooks/sample/useDownloadPDFSample';
 import { SampleBasic } from 'models/Sample';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -32,7 +39,9 @@ function SampleSafetyPage() {
     urlQueryParams.call ? urlQueryParams.call : 0
   );
   const [samples, setSamples] = useState<SampleBasic[]>([]);
-  const [selectedSample, setSelecedSample] = useState<Sample | null>(null);
+  const [selectedSample, setSelectedSample] = useState<SampleBasic | null>(
+    null
+  );
 
   useEffect(() => {
     if (selectedCallId === null) {
@@ -70,6 +79,45 @@ function SampleSafetyPage() {
       </>
     );
 
+  const downloadPDFSample = useDownloadPDFSample();
+  const RowActionButtons = (rowData: SampleBasic) => {
+    const iconButtonStyle = { padding: '7px' };
+
+    return (
+      <>
+        <Tooltip title="Review sample">
+          <IconButton
+            style={iconButtonStyle}
+            onClick={() => setSelectedSample(rowData)}
+          >
+            <VisibilityIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Download sample as pdf">
+          <IconButton
+            data-cy="download-sample"
+            onClick={() => downloadPDFSample(rowData.id)}
+            style={iconButtonStyle}
+          >
+            <GetAppIcon />
+          </IconButton>
+        </Tooltip>
+      </>
+    );
+  };
+
+  const columns = [
+    {
+      title: 'Actions',
+      sorting: false,
+      removable: false,
+      render: RowActionButtons,
+    },
+    { title: 'Title', field: 'title' },
+    { title: 'Status', field: 'safetyStatus' },
+    { title: 'Created', field: 'created' },
+  ];
+
   return (
     <>
       <ContentContainer>
@@ -80,44 +128,54 @@ function SampleSafetyPage() {
               <SamplesTable
                 data={samples}
                 isLoading={isExecutingCall}
-                actions={[
-                  {
-                    icon: VisibilityIcon,
-                    tooltip: 'Review sample',
-                    onClick: (event, rowData) =>
-                      setSelecedSample(rowData as Sample),
-                  },
-                ]}
                 urlQueryParams={urlQueryParams}
                 setUrlQueryParams={setUrlQueryParams}
+                columns={columns}
+                options={{ selection: true }}
+                actions={[
+                  {
+                    icon: GetAppIcon,
+                    tooltip: 'Download sample',
+                    onClick: (event, rowData) =>
+                      downloadPDFSample(
+                        (rowData as SampleBasic[]).map(({ id }) => id).join(',')
+                      ),
+                  },
+                ]}
               />
             </StyledPaper>
           </Grid>
         </Grid>
       </ContentContainer>
-      <SampleEvaluationDialog
-        sample={selectedSample}
-        onClose={newSample => {
-          if (newSample) {
-            const newSamples = samples.map(sample =>
-              sample.id === newSample.id ? newSample : sample
-            );
+      {selectedSample && (
+        <SampleEvaluationDialog
+          sample={selectedSample}
+          onClose={newSample => {
+            if (newSample) {
+              const newSamples = samples.map(sample =>
+                sample.id === newSample.id ? newSample : sample
+              );
 
-            setSamples(newSamples);
-          }
-          setSelecedSample(null);
-        }}
-      />
+              setSamples(newSamples);
+            }
+            setSelectedSample(null);
+          }}
+        />
+      )}
     </>
   );
 }
 
 function SampleEvaluationDialog(props: {
-  sample: Maybe<Sample>;
+  sample: SampleBasic;
   onClose: (sample: Maybe<SampleBasic>) => any;
 }) {
   const { sample, onClose } = props;
   const { api } = useDataApiWithFeedback();
+
+  const initialValues: SampleBasic = {
+    ...sample,
+  };
 
   return (
     <InputDialog
@@ -125,10 +183,10 @@ function SampleEvaluationDialog(props: {
       onClose={() => onClose(null)}
       fullWidth={true}
     >
-      {sample ? <SampleDetails sampleId={sample.id} /> : null}
+      <SampleDetails sampleId={sample.id} />
       <Formik
-        initialValues={sample}
-        onSubmit={async (values, actions) => {
+        initialValues={initialValues}
+        onSubmit={async values => {
           if (values) {
             const { id, safetyComment, safetyStatus } = values;
             api(`Review for '${sample?.title}' submitted`)
@@ -158,8 +216,8 @@ function SampleEvaluationDialog(props: {
               disabled={isSubmitting}
             >
               <MenuItem
-                key={SampleStatus.PENDING_EVALUTATION}
-                value={SampleStatus.PENDING_EVALUTATION}
+                key={SampleStatus.PENDING_EVALUATION}
+                value={SampleStatus.PENDING_EVALUATION}
               >
                 <ListItemIcon>
                   <Avatar style={{ backgroundColor: '#CCC' }}>&nbsp;</Avatar>

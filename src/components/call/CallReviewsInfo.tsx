@@ -25,15 +25,15 @@ const CallReviewAndNotification: React.FC = () => (
         fullWidth
       />
       <Field
-        name="startNotify"
-        label="Start of notification period"
+        name="startSEPReview"
+        label="Start of SEP review"
         component={FormikUICustomDatePicker}
         margin="normal"
         fullWidth
       />
       <Field
-        name="endNotify"
-        label="End of notification period"
+        name="endSEPReview"
+        label="End of SEP review"
         component={FormikUICustomDatePicker}
         margin="normal"
         fullWidth
