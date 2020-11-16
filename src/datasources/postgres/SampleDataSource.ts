@@ -83,10 +83,9 @@ export default class PostgresSampleDataSource implements SampleDataSource {
       });
   }
 
-  // TODO fix this
   getSamplesByCallId(callId: number): Promise<Sample[]> {
     return database('proposals')
-      .leftJoin('samples', 'proposals.proposal_id', 'samples.propsal_id')
+      .leftJoin('samples', 'proposals.proposal_id', 'samples.proposal_id')
       .select('samples.*')
       .where(' proposals.call_id', callId)
       .then((records: SampleRecord[]) => {
