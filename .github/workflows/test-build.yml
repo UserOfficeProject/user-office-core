@@ -1,7 +1,7 @@
 name: E2E and build testing.
 
 # Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the develop branch
+# events but only for the develop and master branches
 on:
   pull_request:
     branches: [develop, master]
