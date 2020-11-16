@@ -8,6 +8,7 @@ fragment proposal on Proposal {
     name
     description
   }
+  publicStatus
   shortCode
   rankOrder
   finalStatus

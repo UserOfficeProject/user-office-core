@@ -1,7 +1,7 @@
 import { Answer } from 'generated/sdk';
 
 export interface BasicComponentProps {
-  templateField: Answer;
+  answer: Answer;
   touched: any;
   errors: any;
   onComplete: (evt: React.SyntheticEvent, newValue: any) => void;

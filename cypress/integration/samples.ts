@@ -66,7 +66,7 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
-    cy.contains('Add Subtemplate').click();
+    cy.contains('Add Sample Declaration').click();
 
     cy.get('[data-cy=question]')
       .clear()

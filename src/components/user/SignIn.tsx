@@ -78,7 +78,7 @@ export default function SignInSide() {
   const classes = useStyles();
   const [failedLogin, setFailed] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const { handleLogin, token } = useContext(UserContext);
+  const { handleLogin, token, currentRole } = useContext(UserContext);
   const unauthorizedApi = useUnauthorizedApi();
   const location = useLocation();
 
@@ -105,7 +105,7 @@ export default function SignInSide() {
     }
   };
 
-  if (token) {
+  if (token && currentRole) {
     const authRedirect = new URLSearchParams(location.search).get(
       'authRedirect'
     );

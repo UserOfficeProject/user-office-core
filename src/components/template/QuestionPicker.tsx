@@ -15,6 +15,8 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
+import { getQuestionaryComponentDefinitions } from 'components/questionary/QuestionaryComponentRegistry';
+import { getTemplateFieldIcon } from 'components/questionary/QuestionaryComponentRegistry';
 import {
   DataType,
   Question,
@@ -24,7 +26,6 @@ import {
 } from 'generated/sdk';
 import { Event, EventType } from 'models/QuestionaryEditorModel';
 
-import getTemplateFieldIcon from './getTemplateFieldIcon';
 import TemplateQuestionEditor, {
   TemplateTopicEditorData,
 } from './TemplateQuestionEditor';
@@ -165,80 +166,29 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             onClose={() => setAnchorEl(null)}
             TransitionComponent={Fade}
           >
-            <MenuItem
-              className={classes.addQuestionMenuItem}
-              onClick={() => onCreateNewQuestionClicked(DataType.TEXT_INPUT)}
-            >
-              <ListItemIcon>
-                {getTemplateFieldIcon(DataType.TEXT_INPUT)!}
-              </ListItemIcon>
-              <Typography variant="inherit">Add Text input</Typography>
-            </MenuItem>
-
-            <MenuItem
-              className={classes.addQuestionMenuItem}
-              onClick={() => onCreateNewQuestionClicked(DataType.EMBELLISHMENT)}
-            >
-              <ListItemIcon>
-                {getTemplateFieldIcon(DataType.EMBELLISHMENT)!}
-              </ListItemIcon>
-              <Typography variant="inherit">Add Embellishment</Typography>
-            </MenuItem>
-
-            <MenuItem
-              className={classes.addQuestionMenuItem}
-              onClick={() => onCreateNewQuestionClicked(DataType.DATE)}
-            >
-              <ListItemIcon>
-                {getTemplateFieldIcon(DataType.DATE)!}
-              </ListItemIcon>
-              <Typography variant="inherit">Add Date</Typography>
-            </MenuItem>
-
-            <MenuItem
-              className={classes.addQuestionMenuItem}
-              onClick={() => onCreateNewQuestionClicked(DataType.FILE_UPLOAD)}
-            >
-              <ListItemIcon>
-                {getTemplateFieldIcon(DataType.FILE_UPLOAD)!}
-              </ListItemIcon>
-              <Typography variant="inherit">Add File upload</Typography>
-            </MenuItem>
-
-            <MenuItem
-              className={classes.addQuestionMenuItem}
-              onClick={() =>
-                onCreateNewQuestionClicked(DataType.SELECTION_FROM_OPTIONS)
-              }
-            >
-              <ListItemIcon>
-                {getTemplateFieldIcon(DataType.SELECTION_FROM_OPTIONS)!}
-              </ListItemIcon>
-              <Typography variant="inherit">Add Multiple choice</Typography>
-            </MenuItem>
-
-            <MenuItem
-              className={classes.addQuestionMenuItem}
-              onClick={() => onCreateNewQuestionClicked(DataType.BOOLEAN)}
-            >
-              <ListItemIcon>
-                {getTemplateFieldIcon(DataType.BOOLEAN)!}
-              </ListItemIcon>
-              <Typography variant="inherit">Add Boolean</Typography>
-            </MenuItem>
-
-            <MenuItem
-              className={classes.addQuestionMenuItem}
-              onClick={() => onCreateNewQuestionClicked(DataType.SUBTEMPLATE)}
-              disabled={
-                template.categoryId !== TemplateCategoryId.PROPOSAL_QUESTIONARY
-              }
-            >
-              <ListItemIcon>
-                {getTemplateFieldIcon(DataType.SUBTEMPLATE)!}
-              </ListItemIcon>
-              <Typography variant="inherit">Add Subtemplate</Typography>
-            </MenuItem>
+            {getQuestionaryComponentDefinitions()
+              .filter(definition => definition.creatable)
+              .map(definition => {
+                return (
+                  <MenuItem
+                    className={classes.addQuestionMenuItem}
+                    onClick={() =>
+                      onCreateNewQuestionClicked(definition.dataType)
+                    }
+                    disabled={
+                      definition.dataType === DataType.SAMPLE_DECLARATION &&
+                      template.categoryId !==
+                        TemplateCategoryId.PROPOSAL_QUESTIONARY
+                    }
+                    key={definition.dataType}
+                  >
+                    <ListItemIcon>
+                      {getTemplateFieldIcon(definition.dataType)}
+                    </ListItemIcon>
+                    <Typography variant="inherit">{`Add ${definition.name}`}</Typography>
+                  </MenuItem>
+                );
+              })}
 
             <Divider />
 

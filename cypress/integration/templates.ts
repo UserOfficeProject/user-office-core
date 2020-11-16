@@ -55,7 +55,7 @@ context('Template tests', () => {
     /* Add Text Input */
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
-    cy.contains('Add Text input').click();
+    cy.contains('Add Text Input').click();
 
     cy.get('[data-cy=question]')
       .clear()
@@ -131,7 +131,7 @@ context('Template tests', () => {
     /* Text input */
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
-    cy.contains('Add Text input').click();
+    cy.contains('Add Text Input').click();
 
     cy.get('[data-cy=question]')
       .clear()
@@ -213,7 +213,7 @@ context('Template tests', () => {
     /* File */
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
-    cy.contains('Add File upload').click();
+    cy.contains('Add File Upload').click();
 
     cy.get('[data-cy=question]')
       .clear()
@@ -331,7 +331,7 @@ context('Template tests', () => {
 
     cy.contains('Dashboard').click();
     cy.contains(title);
-    cy.contains('Submitted');
+    cy.contains('submitted');
   });
 
   it('Officer can save proposal column selection', () => {

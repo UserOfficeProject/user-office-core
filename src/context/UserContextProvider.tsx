@@ -88,19 +88,15 @@ const reducer = (
       localStorage.token = action.payload;
       localStorage.expToken = decoded.exp;
 
-      if (decoded.roles.length === 1) {
-        localStorage.currentRole = decoded.roles[0].shortCode.toUpperCase();
-      }
+      localStorage.currentRole = decoded.roles[0].shortCode.toUpperCase();
 
       return {
+        ...state,
         token: action.payload,
         user: decoded.user,
         expToken: decoded.exp,
         roles: decoded.roles,
-        currentRole:
-          decoded.roles.length === 1
-            ? decoded.roles[0].shortCode.toUpperCase()
-            : null,
+        currentRole: decoded.roles[0].shortCode.toUpperCase(),
       };
     case ActionType.SETTOKEN:
       const newToken = decode(action.payload) as DecodedTokenData;

@@ -12,10 +12,6 @@ fragment fieldConfig on FieldConfig {
   ... on EmbellishmentConfig {
     html
     plain
-
-    small_label
-    required
-    tooltip
     omitFromPdf
   }
   ... on FileUploadConfig {
@@ -26,6 +22,24 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
   }
+
+  ... on ProposalBasisConfig {
+    tooltip
+  }
+
+  ... on SampleBasisConfig {
+    titlePlaceholder
+  }
+
+  ... on SubtemplateConfig {
+    addEntryButtonLabel
+    maxEntries
+    templateId
+    templateCategory
+    required
+    small_label
+  }
+
   ... on SelectionFromOptionsConfig {
     variant
     options
@@ -45,30 +59,5 @@ fragment fieldConfig on FieldConfig {
     tooltip
     htmlQuestion
     isHtmlQuestion
-  }
-
-  ... on SubtemplateConfig {
-    addEntryButtonLabel
-    maxEntries
-    templateId
-    templateCategory
-
-    small_label
-    required
-    tooltip
-  }
-
-  ... on SampleBasisConfig {
-    titlePlaceholder
-
-    small_label
-    required
-    tooltip
-  }
-
-  ... on ProposalBasisConfig {
-    small_label
-    required
-    tooltip
   }
 }

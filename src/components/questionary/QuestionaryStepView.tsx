@@ -6,7 +6,6 @@ import * as Yup from 'yup';
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
 import { createFormikConfigObjects } from 'components/proposal/createFormikConfigObjects';
-import { createComponent } from 'components/questionary/QuestionaryComponentFactory';
 import { QuestionaryStep } from 'generated/sdk';
 import {
   areDependenciesSatisfied,
@@ -20,6 +19,7 @@ import {
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
 
 import NavigationFragment from './NavigationFragment';
+import { createQuestionaryComponent } from './QuestionaryComponentRegistry';
 
 const useStyles = makeStyles({
   componentWrapper: {
@@ -83,7 +83,8 @@ export default function QuestionaryStepView(props: {
                 className={classes.componentWrapper}
                 key={field.question.proposalQuestionId}
               >
-                {createComponent(field, {
+                {createQuestionaryComponent({
+                  answer: field,
                   touched: touched, // for formik
                   errors: errors, // for formik
                   onComplete: (evt: SyntheticEvent, newValue: any) => {
