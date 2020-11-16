@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import {
   CallDataSourceMock,
   dummyCall,
+  dummyCalls,
 } from '../datasources/mockups/CallDataSource';
 import { dummyUserWithRole } from '../datasources/mockups/UserDataSource';
 import CallQueries from './CallQueries';
@@ -19,9 +20,9 @@ test('A not logged in user can not get a call', () => {
 });
 
 test('A user can get all calls', () => {
-  return expect(
-    callMutations.getAll(dummyUserWithRole)
-  ).resolves.toStrictEqual([dummyCall]);
+  return expect(callMutations.getAll(dummyUserWithRole)).resolves.toStrictEqual(
+    dummyCalls
+  );
 });
 
 test('A not logged in user can not get all calls', () => {

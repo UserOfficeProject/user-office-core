@@ -13,7 +13,7 @@ export class Sample {
 }
 
 export enum SampleStatus {
-  PENDING_EVALUTATION = 0,
+  PENDING_EVALUATION = 0,
   LOW_RISK,
   ELEVATED_RISK,
   HIGH_RISK,

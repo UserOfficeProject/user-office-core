@@ -198,6 +198,8 @@ export interface CallRecord {
   readonly end_call: Date;
   readonly start_review: Date;
   readonly end_review: Date;
+  readonly start_sep_review: Date;
+  readonly end_sep_review: Date;
   readonly start_notify: Date;
   readonly end_notify: Date;
   readonly start_cycle: Date;
@@ -205,6 +207,9 @@ export interface CallRecord {
   readonly cycle_comment: string;
   readonly survey_comment: string;
   readonly proposal_workflow_id: number;
+  readonly call_ended: boolean;
+  readonly call_review_ended: boolean;
+  readonly call_sep_review_ended: boolean;
   readonly template_id: number;
 }
 
@@ -350,7 +355,9 @@ export interface ProposalEventsRecord {
   readonly proposal_id: number;
   readonly proposal_created: boolean;
   readonly proposal_submitted: boolean;
+  readonly proposal_feasible: boolean;
   readonly call_ended: boolean;
+  readonly call_review_ended: boolean;
   readonly proposal_sep_selected: boolean;
   readonly proposal_instrument_selected: boolean;
   readonly proposal_feasibility_review_submitted: boolean;
@@ -544,6 +551,8 @@ export const createCallObject = (call: CallRecord) => {
     call.end_call,
     call.start_review,
     call.end_review,
+    call.start_sep_review,
+    call.end_sep_review,
     call.start_notify,
     call.end_notify,
     call.start_cycle,
@@ -551,6 +560,9 @@ export const createCallObject = (call: CallRecord) => {
     call.cycle_comment,
     call.survey_comment,
     call.proposal_workflow_id,
+    call.call_ended,
+    call.call_review_ended,
+    call.call_sep_review_ended,
     call.template_id
   );
 };
