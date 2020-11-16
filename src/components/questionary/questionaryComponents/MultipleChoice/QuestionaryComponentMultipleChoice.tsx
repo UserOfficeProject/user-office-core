@@ -30,19 +30,19 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     },
   })();
 
-  const { answer: templateField, touched, errors, onComplete } = props;
+  const { answer, touched, errors, onComplete } = props;
   const {
     question: { proposalQuestionId, question },
     value,
-  } = templateField;
+  } = answer;
   const [stateValue, setStateValue] = useState<Array<string>>(value);
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
-  const config = templateField.config as SelectionFromOptionsConfig;
+  const config = answer.config as SelectionFromOptionsConfig;
 
   useEffect(() => {
-    setStateValue(templateField.value);
-  }, [templateField]);
+    setStateValue(answer.value);
+  }, [answer]);
 
   const handleOnChange = (evt: any, newValue: any) => {
     setStateValue(newValue);
