@@ -15,7 +15,7 @@ export interface Question {
   readonly validate: (field: QuestionTemplateRelation, value: any) => boolean;
   readonly createBlankConfig: () => any;
   readonly isReadOnly: boolean;
-  readonly defaultAnswer: any;
+  readonly getDefaultAnswer: (field: QuestionTemplateRelation) => any;
 }
 
 // Add new component definitions here
@@ -67,8 +67,12 @@ export function createConfig<T>(
 /**
  * Convenience function to get default value for datatype
  */
-export function getDefaultAnswerValue(dataType: DataType): any {
-  const definition = getQuestionDefinition(dataType);
+export function getDefaultAnswerValue(
+  questionTemplateRelation: QuestionTemplateRelation
+): any {
+  const definition = getQuestionDefinition(
+    questionTemplateRelation.question.dataType
+  );
 
-  return definition.defaultAnswer;
+  return definition.getDefaultAnswer(questionTemplateRelation);
 }

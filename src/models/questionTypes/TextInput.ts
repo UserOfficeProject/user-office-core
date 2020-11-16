@@ -38,5 +38,5 @@ export const textInputDefinition: Question = {
     return config;
   },
   isReadOnly: false,
-  defaultAnswer: '',
+  getDefaultAnswer: () => '',
 };
