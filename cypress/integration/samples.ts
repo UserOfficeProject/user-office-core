@@ -66,7 +66,7 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
-    cy.contains('Add Subtemplate').click();
+    cy.contains('Add Sample Declaration').click();
 
     cy.get('[data-cy=question]')
       .clear()
@@ -198,7 +198,49 @@ context('Samples tests', () => {
 
     cy.get('[data-cy="submit"]').click();
 
-    cy.contains('High risk'); // test if status has changed
+    cy.contains('HIGH_RISK'); // test if status has changed
+  });
+
+  it('Check if link for download samples is created with the correct attributes', () => {
+    cy.login('officer');
+
+    cy.contains('Sample safety').click();
+
+    cy.document().then(document => {
+      const observer = new MutationObserver(function() {
+        const [mutationList] = arguments;
+        for (const mutation of mutationList) {
+          for (const child of mutation.addedNodes) {
+            if (child.nodeName === 'A') {
+              expect(child.href).to.contain('/download/sample/1');
+              expect(child.download).to.contain('download');
+            }
+          }
+        }
+      });
+      observer.observe(document, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+      });
+
+      observer.disconnect();
+    });
+
+    cy.get('[data-cy="download-sample"]')
+      .first()
+      .click();
+  });
+
+  it('Should be able to download sample pdf', () => {
+    cy.login('officer');
+
+    cy.contains('Sample safety').click();
+
+    cy.request('GET', '/download/sample/1').then(response => {
+      expect(response.headers['content-type']).to.be.equal('application/pdf');
+      expect(response.status).to.be.equal(200);
+    });
   });
 
   it('Officer should able to delete proposal with sample', () => {
