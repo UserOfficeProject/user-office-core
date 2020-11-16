@@ -593,8 +593,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($newUserID:Int!, $position:String) {\n  updateUser(id:$newUserID, position:$position)\n    {\n      user {\n        position\n      }\n      error\n    }\n}\n",
-						"variables": "{\n\t\"newUserID\":{{NEW_USER_ID}},\n\t\"position\":\"{{NEW_USER_POSITION}}\"\n}"
+						"query": "mutation($newUserID:Int!, $position:String, $firstname:String, $lastname:String) {\n  updateUser(id:$newUserID, position:$position, firstname:$firstname, lastname:$lastname)\n    {\n      user {\n        position\n      }\n      error\n    }\n}\n",
+						"variables": "{\n\t\"newUserID\":{{NEW_USER_ID}},\n\t\"position\":\"{{NEW_USER_POSITION}}\",\n\t \"firstname\":\"{{$randomFirstName}}\",\n\t\"lastname\":\"{{$randomLastName}}\"\n}"
 					}
 				},
 				"url": {
@@ -1039,7 +1039,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($shortCode: String!, $startDate: DateTime!, $endDate: DateTime!, $comment: String!, $templateId: Int) {\n  createCall (\n    shortCode:$shortCode\n    startCall: $startDate\n    endCall: $endDate\n    startReview: $startDate\n    endReview: $endDate\n    startNotify: $startDate\n    endNotify: $endDate\n    startCycle: $startDate\n    endCycle: $endDate\n    cycleComment: $comment\n    surveyComment: \"Test\"\n    templateId: $templateId\n  )\n  {\n    call {\n      id\n      shortCode\n      startCall\n    }\n    error\n  }\n}",
+						"query": "mutation ($shortCode: String!, $startDate: DateTime!, $endDate: DateTime!, $comment: String!, $templateId: Int) {\n  createCall (createCallInput:{\n    shortCode:$shortCode\n    startCall: $startDate\n    endCall: $endDate\n    startReview: $startDate\n    endReview: $endDate\n    startNotify: $startDate\n    endNotify: $endDate\n    startCycle: $startDate\n    endCycle: $endDate\n    cycleComment: $comment\n    surveyComment: \"Test\"\n    templateId: $templateId\n  }\n  )\n  {\n    call {\n      id\n      shortCode\n      startCall\n    }\n    error\n  }\n}",
 						"variables": "{\n\t\"shortCode\":\"{{$randomLoremWord}}\",\n\t\"startDate\":\"2010-01-01\",\n\t\"endDate\":\"2030-01-01\",\n\t\"comment\":\"{{$randomPhrase}}\",\n\t\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
@@ -1742,7 +1742,7 @@
 			"response": []
 		},
 		{
-			"name": "blankProposal [Query]",
+			"name": "blankQuestionarySteps",
 			"event": [
 				{
 					"listen": "test",
@@ -1751,8 +1751,7 @@
 						"exec": [
 							"pm.test(\"Should create proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.blankProposal.status).to.eql(\"BLANK\")",
-							"    pm.expect(jsonData.data.blankProposal.id).to.eql(0)",
+							"    pm.expect(jsonData.data.blankQuestionarySteps.fields).not.eq(null)",
 							"});",
 							"",
 							""
@@ -1824,8 +1823,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query($callId:Int!) {\nblankProposal(callId:$callId) {\n  id\n  status\n  shortCode\n  proposer {\n    id\n    firstname\n    lastname\n    organisation\n  }\n  questionary {\n    steps {\n      topic {\n        title\n        id\n      }\n      isCompleted\n      fields {\n          question {\n            proposalQuestionId\n              dataType\n              question\n \n          }\n        \n        value\n        dependency {\n          questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n                  condition\n                  params\n            }\n        }\n      }\n    }\n  }\n}\n}",
-						"variables": "{\n\t\"callId\": {{NEW_CALL_ID}}\n}"
+						"query": "query($templateId:Int!) {\nblankQuestionarySteps(templateId:$templateId) {\n\n      fields {\n          question {\n            proposalQuestionId\n              dataType\n              question\n \n          }\n        \n        value\n        dependency {\n          questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n                  condition\n                  params\n            }\n        }\n      }\n}\n}",
+						"variables": "{\n\t\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
@@ -1929,7 +1928,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($callId: Int!) {\n  createProposal(callId: $callId) {\n    proposal {\n      id\n      status\n      questionaryId\n      questionary {\n        steps {\n          topic {\n            title\n            id\n          }\n          fields {\n            question {\n              proposalQuestionId\n              dataType\n              question\n              config {\n                ... on BooleanConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on DateConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on EmbellishmentConfig {\n                  html\n                  plain\n                  small_label\n                  required\n                  tooltip\n                  omitFromPdf\n                }\n                ... on FileUploadConfig {\n                  file_type\n                  max_files\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on SelectionFromOptionsConfig {\n                  variant\n                  options\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on TextInputConfig {\n                  min\n                  max\n                  multiline\n                  placeholder\n                  small_label\n                  required\n                  tooltip\n                }\n              }\n            }\n            value\n            dependency {\n              questionId\n              dependencyId\n              dependencyNaturalKey\n              condition {\n                condition\n                params\n              }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($callId: Int!) {\n  createProposal(callId: $callId) {\n    proposal {\n      id\n      status\n      {\n        name\n      }\n      questionaryId\n      questionary {\n        steps {\n          topic {\n            title\n            id\n          }\n          fields {\n            question {\n              proposalQuestionId\n              dataType\n              question\n            }\n            value\n            dependency {\n              questionId\n              dependencyId\n              dependencyNaturalKey\n              condition {\n                condition\n                params\n              }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": "{\n\t\"callId\": {{NEW_CALL_ID}}\n}"
 					},
 					"options": {
@@ -2335,7 +2334,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query ($id: Int!) {\n  proposal(id: $id) {\n    id\n    title\n    abstract\n    status\n    users {\n      firstname\n      lastname\n      id\n    }\n    questionary {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            proposalQuestionId\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n          value\n          dependency {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n              condition\n              params\n            }\n          }\n        }\n      }\n    }\n    reviews {\n      id\n      comment\n      status\n      reviewer {\n        firstname\n        lastname\n        id\n      }\n    }\n  }\n}\n",
+						"query": "query ($id: Int!) {\n  proposal(id: $id) {\n    id\n    title\n    abstract\n    status\n    {\n      name\n    }\n    users {\n      firstname\n      lastname\n      id\n    }\n    questionary {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            proposalQuestionId\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n          value\n          dependency {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n              condition\n              params\n            }\n          }\n        }\n      }\n    }\n    reviews {\n      id\n      comment\n      status\n      reviewer {\n        firstname\n        lastname\n        id\n      }\n    }\n  }\n}\n",
 						"variables": "{\n\t\"id\":{{NEW_PROPOSAL_ID}}\n}"
 					},
 					"options": {
@@ -3547,7 +3546,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\n  proposals {\n    proposals{\n      id\n      shortCode\n      title\n      status\n      }\n    totalCount\n    }\n  }",
+						"query": "query {\n  proposals {\n    proposals{\n      id\n      shortCode\n      title\n      status {\n        name\n      }\n      }\n    totalCount\n    }\n  }",
 						"variables": "{\n    \"filter\": \"\"\n}"
 					},
 					"options": {
@@ -3629,7 +3628,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query($questionaryIds: [Int!]) {\n  proposals(filter:{questionaryIds:$questionaryIds}) {\n    proposals{\n      id\n      shortCode\n      title\n      status\n      }\n    totalCount\n    }\n  }",
+						"query": "query($questionaryIds: [Int!]) {\n  proposals(filter:{questionaryIds:$questionaryIds}) {\n    proposals{\n      id\n      shortCode\n      title\n      status {\n        name\n      }\n      }\n    totalCount\n    }\n  }",
 						"variables": "{\n    \"questionaryIds\": [{{NEW_QUESTIONARY_ID}}]\n}"
 					},
 					"options": {
