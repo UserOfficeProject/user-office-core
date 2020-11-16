@@ -8,7 +8,7 @@ import {
 import { Answer, QuestionaryStep } from '../../models/Questionary';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
-import { UserWithRole, BasicUserDetails } from '../../models/User';
+import { BasicUserDetails, UserWithRole } from '../../models/User';
 import { isRejection } from '../../rejection';
 import { collectSamplePDFData, SamplePDFData } from './sample';
 import { getFileAttachmentIds } from './util';
@@ -159,7 +159,7 @@ export const collectProposalPDFData = async (
 
       questionaryAttachmentIds.push(...getFileAttachmentIds(answer));
 
-      if (answer.question.dataType === DataType.SUBTEMPLATE) {
+      if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
         const {
           attachmentIds,
           questionaryAnswers,

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { getDefaultAnswerValue } from '../../models/ProposalModelFunctions';
 import {
   Answer,
   AnswerBasic,
   Questionary,
   QuestionaryStep,
 } from '../../models/Questionary';
+import { getDefaultAnswerValue } from '../../models/questionTypes/QuestionRegistry';
 import { logger } from '../../utils/Logger';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
