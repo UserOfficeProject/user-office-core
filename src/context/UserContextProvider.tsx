@@ -91,6 +91,7 @@ const reducer = (
       localStorage.currentRole = decoded.roles[0].shortCode.toUpperCase();
 
       return {
+        ...state,
         token: action.payload,
         user: decoded.user,
         expToken: decoded.exp,
