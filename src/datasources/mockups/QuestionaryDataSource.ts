@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
-import { createConfig } from '../../models/ProposalModelFunctions';
 import {
-  Questionary,
-  QuestionaryStep,
   Answer,
   AnswerBasic,
+  Questionary,
+  QuestionaryStep,
 } from '../../models/Questionary';
+import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import {
   DataType,
   FieldCondition,
   FieldDependency,
   Question,
+  QuestionTemplateRelation,
   TemplateCategoryId,
   Topic,
-  QuestionTemplateRelation,
   TemplatesHasQuestions,
 } from '../../models/Template';
 import {
@@ -48,7 +48,7 @@ const createDummyQuestionary = (values?: DeepPartial<Questionary>) => {
   );
 };
 export const dummyQuestionFactory = (
-  values?: DeepPartial<Question>
+  values?: DeepPartial<Question> & Partial<Pick<Question, 'config'>>
 ): Question => {
   return new Question(
     values?.categoryId || TemplateCategoryId.PROPOSAL_QUESTIONARY,
@@ -56,19 +56,25 @@ export const dummyQuestionFactory = (
     values?.naturalKey || 'is_dangerous',
     values?.dataType || DataType.TEXT_INPUT,
     values?.question || 'Some random question',
-    (values?.config as any) || dummyConfigFactory()
+    values?.config || dummyConfigFactory()
   );
 };
 
 export const dummyQuestionTemplateRelationFactory = (
-  values?: DeepPartial<QuestionTemplateRelation>
+  values?: DeepPartial<QuestionTemplateRelation> &
+    Partial<Pick<QuestionTemplateRelation, 'config' | 'dependency'>> & {
+      question: Partial<Pick<Question, 'config'>>;
+    }
 ): QuestionTemplateRelation => {
-  return new QuestionTemplateRelation(
+  const relation = new QuestionTemplateRelation(
     dummyQuestionFactory(values?.question),
     values?.sortOrder || Math.round(Math.random() * 100),
     values?.topicId || Math.round(Math.random() * 10),
-    new BooleanConfig()
+    values?.config || new BooleanConfig(),
+    values?.dependency
   );
+
+  return relation;
 };
 
 export const dummyTemplateHasQuestionRelationFactory = (
@@ -101,7 +107,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
               naturalKey: 'ttl_general',
               dataType: DataType.EMBELLISHMENT,
               config: createConfig<EmbellishmentConfig>(
-                new EmbellishmentConfig(),
+                DataType.EMBELLISHMENT,
                 {
                   plain: 'General information',
                   html: '<h1>General information</h1>',
@@ -120,7 +126,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
               naturalKey: 'has_links_with_industry',
               dataType: DataType.SELECTION_FROM_OPTIONS,
               config: createConfig<SelectionFromOptionsConfig>(
-                new SelectionFromOptionsConfig(),
+                DataType.SELECTION_FROM_OPTIONS,
                 {
                   options: ['yes', 'no'],
                   variant: 'radio',
@@ -138,9 +144,10 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
               proposalQuestionId: 'links_with_industry',
               naturalKey: 'links_with_industry',
               dataType: DataType.TEXT_INPUT,
-              config: createConfig<TextInputConfig>(new TextInputConfig(), {
+              config: createConfig<TextInputConfig>(DataType.TEXT_INPUT, {
                 placeholder: 'Please specify links with industry',
                 multiline: true,
+                required: true,
               }),
             }),
             dependency: new FieldDependency(

@@ -4,12 +4,12 @@ import {
   FieldCondition,
   FieldDependency,
   Question,
+  QuestionTemplateRelation,
   Template,
   TemplateCategory,
   TemplateCategoryId,
   TemplateStep,
   Topic,
-  QuestionTemplateRelation,
   TemplatesHasQuestions,
 } from '../../models/Template';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
