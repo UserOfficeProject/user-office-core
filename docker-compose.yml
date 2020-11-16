@@ -18,6 +18,7 @@ services:
       tokenLife: 7d
       baseURL: localhost:3000
       SPARKPOST_TOKEN: dummytoken
+      USER_OFFICE_PDF_FACTORY_ENDPOINT: http://factory:4500/generate-pdf
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads"
       - "traefik.port=4000"
