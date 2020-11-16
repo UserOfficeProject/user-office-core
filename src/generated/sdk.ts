@@ -200,7 +200,7 @@ export enum DataType {
   FILE_UPLOAD = 'FILE_UPLOAD',
   SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
   TEXT_INPUT = 'TEXT_INPUT',
-  SUBTEMPLATE = 'SUBTEMPLATE',
+  SAMPLE_DECLARATION = 'SAMPLE_DECLARATION',
   SAMPLE_BASIS = 'SAMPLE_BASIS',
   PROPOSAL_BASIS = 'PROPOSAL_BASIS'
 }
@@ -226,9 +226,6 @@ export type EmailVerificationResponseWrap = {
 
 export type EmbellishmentConfig = {
   __typename?: 'EmbellishmentConfig';
-  small_label: Scalars['String'];
-  required: Scalars['Boolean'];
-  tooltip: Scalars['String'];
   omitFromPdf: Scalars['Boolean'];
   html: Scalars['String'];
   plain: Scalars['String'];
@@ -1116,8 +1113,6 @@ export type Proposal = {
 
 export type ProposalBasisConfig = {
   __typename?: 'ProposalBasisConfig';
-  small_label: Scalars['String'];
-  required: Scalars['Boolean'];
   tooltip: Scalars['String'];
 };
 
@@ -1638,9 +1633,6 @@ export type Sample = {
 
 export type SampleBasisConfig = {
   __typename?: 'SampleBasisConfig';
-  small_label: Scalars['String'];
-  required: Scalars['Boolean'];
-  tooltip: Scalars['String'];
   titlePlaceholder: Scalars['String'];
 };
 
@@ -1731,13 +1723,12 @@ export type SePsQueryResult = {
 
 export type SubtemplateConfig = {
   __typename?: 'SubtemplateConfig';
-  small_label: Scalars['String'];
-  required: Scalars['Boolean'];
-  tooltip: Scalars['String'];
   maxEntries: Maybe<Scalars['Int']>;
   templateId: Scalars['Int'];
   templateCategory: Scalars['String'];
   addEntryButtonLabel: Scalars['String'];
+  small_label: Scalars['String'];
+  required: Scalars['Boolean'];
 };
 
 export type SuccessResponseWrap = {
@@ -3871,7 +3862,7 @@ type FieldConfigDateConfigFragment = (
 
 type FieldConfigEmbellishmentConfigFragment = (
   { __typename?: 'EmbellishmentConfig' }
-  & Pick<EmbellishmentConfig, 'html' | 'plain' | 'small_label' | 'required' | 'tooltip' | 'omitFromPdf'>
+  & Pick<EmbellishmentConfig, 'html' | 'plain' | 'omitFromPdf'>
 );
 
 type FieldConfigFileUploadConfigFragment = (
@@ -3891,17 +3882,17 @@ type FieldConfigTextInputConfigFragment = (
 
 type FieldConfigSampleBasisConfigFragment = (
   { __typename?: 'SampleBasisConfig' }
-  & Pick<SampleBasisConfig, 'titlePlaceholder' | 'small_label' | 'required' | 'tooltip'>
+  & Pick<SampleBasisConfig, 'titlePlaceholder'>
 );
 
 type FieldConfigSubtemplateConfigFragment = (
   { __typename?: 'SubtemplateConfig' }
-  & Pick<SubtemplateConfig, 'addEntryButtonLabel' | 'maxEntries' | 'templateId' | 'templateCategory' | 'small_label' | 'required' | 'tooltip'>
+  & Pick<SubtemplateConfig, 'addEntryButtonLabel' | 'maxEntries' | 'templateId' | 'templateCategory' | 'required' | 'small_label'>
 );
 
 type FieldConfigProposalBasisConfigFragment = (
   { __typename?: 'ProposalBasisConfig' }
-  & Pick<ProposalBasisConfig, 'small_label' | 'required' | 'tooltip'>
+  & Pick<ProposalBasisConfig, 'tooltip'>
 );
 
 export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment | FieldConfigProposalBasisConfigFragment;
@@ -4668,9 +4659,6 @@ export const FieldConfigFragmentDoc = gql`
   ... on EmbellishmentConfig {
     html
     plain
-    small_label
-    required
-    tooltip
     omitFromPdf
   }
   ... on FileUploadConfig {
@@ -4679,6 +4667,20 @@ export const FieldConfigFragmentDoc = gql`
     small_label
     required
     tooltip
+  }
+  ... on ProposalBasisConfig {
+    tooltip
+  }
+  ... on SampleBasisConfig {
+    titlePlaceholder
+  }
+  ... on SubtemplateConfig {
+    addEntryButtonLabel
+    maxEntries
+    templateId
+    templateCategory
+    required
+    small_label
   }
   ... on SelectionFromOptionsConfig {
     variant
@@ -4697,26 +4699,6 @@ export const FieldConfigFragmentDoc = gql`
     tooltip
     htmlQuestion
     isHtmlQuestion
-  }
-  ... on SubtemplateConfig {
-    addEntryButtonLabel
-    maxEntries
-    templateId
-    templateCategory
-    small_label
-    required
-    tooltip
-  }
-  ... on SampleBasisConfig {
-    titlePlaceholder
-    small_label
-    required
-    tooltip
-  }
-  ... on ProposalBasisConfig {
-    small_label
-    required
-    tooltip
   }
 }
     `;

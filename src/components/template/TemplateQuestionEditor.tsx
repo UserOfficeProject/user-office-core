@@ -9,14 +9,13 @@ import {
   NotDraggingStyle,
 } from 'react-beautiful-dnd';
 
+import { getTemplateFieldIcon } from 'components/questionary/QuestionaryComponentRegistry';
 import {
   DataType,
   EmbellishmentConfig,
   FieldConfig,
   FieldDependency,
 } from 'generated/sdk';
-
-import getTemplateFieldIcon from './getTemplateFieldIcon';
 
 export default function TemplateQuestionEditor(props: {
   data: TemplateTopicEditorData;

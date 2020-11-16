@@ -23,9 +23,9 @@ import QuestionaryEditorModel, {
 import { getQuestionaryStepByTopicId } from 'models/QuestionaryFunctions';
 import { StyledPaper } from 'styles/StyledComponents';
 
-import QuestionEditor from './forms/QuestionEditor';
-import QuestionTemplateRelationEditor from './forms/QuestionTemplateRelationEditor';
+import QuestionEditor from './QuestionEditor';
 import { QuestionPicker } from './QuestionPicker';
+import QuestionTemplateRelationEditor from './QuestionTemplateRelationEditor';
 import { TemplateMetadataEditor } from './TemplateMetadataEditor';
 import QuestionaryEditorTopic from './TemplateTopicEditor';
 

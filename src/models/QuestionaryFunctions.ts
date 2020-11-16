@@ -1,30 +1,17 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
+import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
   Answer,
-  DataType,
+  AnswerInput,
   FieldDependency,
   QuestionaryStep,
   QuestionTemplateRelation,
   TemplateStep,
-  AnswerInput,
 } from 'generated/sdk';
 import { ConditionEvaluator } from 'models/ConditionEvaluator';
 
 type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
-interface DataTypeSpec {
-  readonly: boolean;
-}
-export function getDataTypeSpec(type: DataType): DataTypeSpec {
-  switch (type) {
-    case DataType.EMBELLISHMENT:
-    case DataType.SAMPLE_BASIS:
-    case DataType.PROPOSAL_BASIS:
-      return { readonly: true };
-    default:
-      return { readonly: false };
-  }
-}
 
 export function getTopicById(collection: AbstractCollection, topicId: number) {
   // @ts-ignore-line
@@ -111,9 +98,13 @@ export function areDependenciesSatisfied(
 
 export function prepareAnswers(answers?: Answer[]): AnswerInput[] {
   if (answers) {
-    answers = answers.filter(
-      answer => getDataTypeSpec(answer.question.dataType).readonly === false // filter out read only fields
-    );
+    answers = answers.filter(answer => {
+      const definition = getQuestionaryComponentDefinition(
+        answer.question.dataType
+      );
+
+      return !definition.readonly;
+    });
     const preparedAnswers = answers.map(answer => {
       return {
         questionId: answer.question.proposalQuestionId,

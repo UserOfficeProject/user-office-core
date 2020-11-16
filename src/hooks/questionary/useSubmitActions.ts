@@ -1,6 +1,6 @@
-import { proposalBasisPreSubmit } from 'components/questionary/formComponents/QuestionaryComponentProposalBasis';
-import { sampleBasisPreSubmit } from 'components/questionary/formComponents/QuestionaryComponentSampleBasis';
-import { sampleDeclarationPostSubmit } from 'components/questionary/formComponents/QuestionaryComponentSampleDeclaration';
+import { proposalBasisPreSubmit } from 'components/questionary/questionaryComponents/ProposalBasis/QuestionaryComponentProposalBasis';
+import { sampleBasisPreSubmit } from 'components/questionary/questionaryComponents/SampleBasis/QuestionaryComponentSampleBasis';
+import { sampleDeclarationPostSubmit } from 'components/questionary/questionaryComponents/SampleDeclaration/QuestionaryComponentSampleDeclaration';
 import {
   Answer,
   DataType,
@@ -44,7 +44,7 @@ export function usePostSubmitActions() {
     const actions = answers
       .flatMap(answer => {
         switch (answer.question.dataType) {
-          case DataType.SUBTEMPLATE:
+          case DataType.SAMPLE_DECLARATION:
             if (
               (answer.config as SubtemplateConfig).templateCategory ===
               TemplateCategoryId.SAMPLE_DECLARATION
