@@ -197,13 +197,14 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       topic_id: item.id,
       topic_title: item.title,
       template_id: item.templateId,
-      is_enabled: item.isEnabled,
-      sort_order: item.sortOrder,
+      ...(item.isEnabled !== undefined && { is_enabled: item.isEnabled }),
+      ...(item.sortOrder !== undefined && { sort_order: item.sortOrder }),
     }));
 
     const result = await database.raw(
       `? ON CONFLICT (topic_id)
         DO UPDATE SET
+        topic_title = EXCLUDED.topic_title,
         sort_order = EXCLUDED.sort_order
       RETURNING *;`,
       [database('topics').insert(dataToUpsert)]
@@ -286,22 +287,35 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async upsertQuestionTemplateRelations(
     collection: TemplatesHasQuestions[]
   ): Promise<Template> {
-    const dataToUpsert = collection.map(item => ({
-      id: item.id,
-      question_id: item.questionId,
-      template_id: item.templateId,
-      topic_id: item.topicId,
-      sort_order: item.sortOrder,
-      dependency_question_id: item.dependencyQuestionId,
-      dependency_condition: item.dependencyCondition,
-      config: item.config,
-    }));
+    const dataToUpsert: QuestionTemplateRelRecord[] = [];
+
+    for (const item of collection) {
+      if (!item.config) {
+        const question = await this.getQuestion(item.questionId);
+
+        item.config = JSON.stringify(question?.config);
+      }
+
+      dataToUpsert.push({
+        id: item.id,
+        question_id: item.questionId,
+        template_id: item.templateId,
+        topic_id: item.topicId,
+        sort_order: item.sortOrder,
+        dependency_question_id: item.dependencyQuestionId,
+        dependency_condition: item.dependencyCondition,
+        config: item.config,
+      });
+    }
 
     const result = await database.raw(
       `? ON CONFLICT (template_id, question_id)
           DO UPDATE SET
           sort_order = EXCLUDED.sort_order,
-          topic_id = EXCLUDED.topic_id
+          topic_id = EXCLUDED.topic_id,
+          dependency_question_id = EXCLUDED.dependency_question_id,
+          dependency_condition = EXCLUDED.dependency_condition,
+          config = EXCLUDED.config
         RETURNING *;`,
       [database('templates_has_questions').insert(dataToUpsert)]
     );

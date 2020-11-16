@@ -216,7 +216,11 @@ export default class TemplateMutations {
     agent: UserWithRole | null,
     args: UpdateTopicArgs
   ): Promise<Template | Rejection> {
-    const dataToUpsert = await this.getTopicsDataToUpsert(args);
+    let dataToUpsert = [{ ...args }];
+
+    if (args.sortOrder >= 0) {
+      dataToUpsert = await this.getTopicsDataToUpsert(args);
+    }
 
     return this.dataSource
       .upsertTopics(dataToUpsert)
