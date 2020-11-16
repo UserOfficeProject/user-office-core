@@ -61,6 +61,7 @@
   "proxy": "http://localhost:4000",
   "scripts": {
     "dev": "react-scripts start",
+    "dev:docker": "npm install && react-scripts start",
     "build": "react-scripts --max_old_space_size=4096 build",
     "debug": "react-scripts --inspect-brk start",
     "test": "react-scripts test",

@@ -1,0 +1,7 @@
+ARG WINDOWS_VERSION
+FROM docker-registry.devs.facilities.rl.ac.uk/bisapps-node:10-servercore${WINDOWS_VERSION}-1.0.0-SNAPSHOT
+
+# The Git repo should be mounted from the host into this directory
+WORKDIR /app
+
+CMD ["npm.cmd", "run", "dev:docker"]
