@@ -5,7 +5,7 @@ import { Question } from './QuestionRegistry';
 
 export const selectionFromOptionsDefinition: Question = {
   dataType: DataType.SELECTION_FROM_OPTIONS,
-  validate: (field: QuestionTemplateRelation, value: any) => {
+  validate: (field: QuestionTemplateRelation, value: string[]) => {
     if (field.question.dataType !== DataType.SELECTION_FROM_OPTIONS) {
       throw new Error('DataType should be SELECTION_FROM_OPTIONS');
     }
@@ -15,7 +15,11 @@ export const selectionFromOptionsDefinition: Question = {
       return false;
     }
 
-    if (config.required && config.options!.indexOf(value) === -1) {
+    if (config.required && value.length === 0) {
+      return false;
+    }
+
+    if (value.every(val => config.options.includes(val)) !== true) {
       return false;
     }
 
@@ -28,9 +32,10 @@ export const selectionFromOptionsDefinition: Question = {
     config.tooltip = '';
     config.variant = 'radio';
     config.options = [];
+    config.isMultipleSelect = false;
 
     return config;
   },
   isReadOnly: false,
-  defaultAnswer: '',
+  defaultAnswer: [],
 };
