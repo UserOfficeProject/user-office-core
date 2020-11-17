@@ -23,14 +23,14 @@ export class User implements Partial<UserOrigin> {
   @Field(() => Int)
   public id: number;
 
-  @Field(() => String, { nullable: true })
-  public user_title: string | null;
+  @Field(() => String)
+  public user_title: string;
 
   @Field()
   public firstname: string;
 
   @Field(() => String, { nullable: true })
-  public middlename: string | null;
+  public middlename: string | undefined;
 
   @Field()
   public lastname: string;
@@ -39,7 +39,7 @@ export class User implements Partial<UserOrigin> {
   public username: string;
 
   @Field(() => String, { nullable: true })
-  public preferredname: string | null;
+  public preferredname: string | undefined;
 
   @Field()
   public orcid: string;
@@ -75,7 +75,7 @@ export class User implements Partial<UserOrigin> {
   public telephone: string;
 
   @Field(() => String, { nullable: true })
-  public telephone_alt: string | null;
+  public telephone_alt: string | undefined;
 
   @Field()
   public placeholder: boolean;

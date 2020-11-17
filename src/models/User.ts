@@ -19,12 +19,12 @@ export type EmailVerificationJwtPayload = SpecialActionJwtPayload & {
 export class User {
   constructor(
     public id: number,
-    public user_title: string | null,
+    public user_title: string,
     public firstname: string,
-    public middlename: string | null,
+    public middlename: string | undefined,
     public lastname: string,
     public username: string,
-    public preferredname: string | null,
+    public preferredname: string | undefined,
     public orcid: string,
     public refreshToken: string,
     public gender: string,
@@ -36,7 +36,7 @@ export class User {
     public email: string,
     public emailVerified: boolean,
     public telephone: string,
-    public telephone_alt: string | null,
+    public telephone_alt: string | undefined,
     public placeholder: boolean,
     public created: string,
     public updated: string
