@@ -3,9 +3,9 @@ import { FileMetadata } from '../../models/Blob';
 import { Call } from '../../models/Call';
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import { Proposal } from '../../models/Proposal';
-import { createConfigByType } from '../../models/ProposalModelFunctions';
 import { ProposalView } from '../../models/ProposalView';
-import { Questionary, AnswerBasic } from '../../models/Questionary';
+import { AnswerBasic, Questionary } from '../../models/Questionary';
+import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import { Sample } from '../../models/Sample';
 import {
   DataType,
@@ -13,10 +13,10 @@ import {
   FieldDependency,
   Question,
   QuestionTemplateRelation,
+  Template,
   TemplateCategory,
   Topic,
 } from '../../models/Template';
-import { Template } from '../../models/Template';
 import { BasicUserDetails, User } from '../../models/User';
 
 // Interfaces corresponding exactly to database tables
@@ -69,7 +69,7 @@ export interface ProposalViewRecord {
   readonly final_status: number;
   readonly time_allocation: number;
   readonly notified: boolean;
-  readonly status_id: number;
+  readonly technical_review_status: number;
   readonly instrument_name: string;
   readonly call_short_code: string;
   readonly code: string;
@@ -198,6 +198,8 @@ export interface CallRecord {
   readonly end_call: Date;
   readonly start_review: Date;
   readonly end_review: Date;
+  readonly start_sep_review: Date;
+  readonly end_sep_review: Date;
   readonly start_notify: Date;
   readonly end_notify: Date;
   readonly start_cycle: Date;
@@ -205,6 +207,9 @@ export interface CallRecord {
   readonly cycle_comment: string;
   readonly survey_comment: string;
   readonly proposal_workflow_id: number;
+  readonly call_ended: boolean;
+  readonly call_review_ended: boolean;
+  readonly call_sep_review_ended: boolean;
   readonly template_id: number;
 }
 
@@ -344,6 +349,26 @@ export interface NextStatusEventRecord {
   readonly next_status_event: string;
 }
 
+export interface ProposalEventsRecord {
+  readonly proposal_id: number;
+  readonly proposal_created: boolean;
+  readonly proposal_submitted: boolean;
+  readonly proposal_feasible: boolean;
+  readonly call_ended: boolean;
+  readonly call_review_ended: boolean;
+  readonly proposal_sep_selected: boolean;
+  readonly proposal_instrument_selected: boolean;
+  readonly proposal_feasibility_review_submitted: boolean;
+  readonly proposal_sample_review_submitted: boolean;
+  readonly proposal_all_sep_reviewers_selected: boolean;
+  readonly proposal_sep_review_submitted: boolean;
+  readonly proposal_sep_meeting_submitted: boolean;
+  readonly proposal_instrument_submitted: boolean;
+  readonly proposal_accepted: boolean;
+  readonly proposal_rejected: boolean;
+  readonly proposal_notified: boolean;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
@@ -365,7 +390,7 @@ export const createQuestionObject = (question: QuestionRecord) => {
     question.natural_key,
     question.data_type as DataType,
     question.question,
-    createConfigByType(question.data_type as DataType, question.default_config)
+    createConfig<any>(question.data_type as DataType, question.default_config)
   );
 };
 
@@ -412,7 +437,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.final_status,
     proposal.time_allocation,
     proposal.notified,
-    proposal.status_id,
+    proposal.technical_review_status,
     proposal.instrument_name,
     proposal.call_short_code,
     proposal.code,
@@ -452,7 +477,8 @@ export const createFileMetadata = (record: FileRecord) => {
 };
 
 export const createQuestionTemplateRelationObject = (
-  record: QuestionRecord & QuestionTemplateRelRecord
+  record: QuestionRecord &
+    QuestionTemplateRelRecord & { dependency_natural_key: string }
 ) => {
   return new QuestionTemplateRelation(
     new Question(
@@ -461,16 +487,16 @@ export const createQuestionTemplateRelationObject = (
       record.natural_key,
       record.data_type as DataType,
       record.question,
-      createConfigByType(record.data_type as DataType, record.default_config)
+      createConfig<any>(record.data_type as DataType, record.default_config)
     ),
     record.topic_id,
     record.sort_order,
-    createConfigByType(record.data_type as DataType, record.config),
+    createConfig<any>(record.data_type as DataType, record.config),
     record.dependency_question_id && record.dependency_condition
       ? new FieldDependency(
           record.question_id,
           record.dependency_question_id,
-          record.natural_key,
+          record.dependency_natural_key,
           record.dependency_condition
         )
       : undefined
@@ -524,6 +550,8 @@ export const createCallObject = (call: CallRecord) => {
     call.end_call,
     call.start_review,
     call.end_review,
+    call.start_sep_review,
+    call.end_sep_review,
     call.start_notify,
     call.end_notify,
     call.start_cycle,
@@ -531,6 +559,9 @@ export const createCallObject = (call: CallRecord) => {
     call.cycle_comment,
     call.survey_comment,
     call.proposal_workflow_id,
+    call.call_ended,
+    call.call_review_ended,
+    call.call_sep_review_ended,
     call.template_id
   );
 };

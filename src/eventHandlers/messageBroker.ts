@@ -57,8 +57,10 @@ export default function createHandler({
         const { proposal } = event;
 
         if (
-          // we only care about accepted proposals
-          proposal.finalStatus !== ProposalEndStatus.ACCEPTED
+          // we only care about accepted and reserved proposals
+          ![ProposalEndStatus.ACCEPTED, ProposalEndStatus.RESERVED].includes(
+            proposal.finalStatus
+          )
         ) {
           return;
         }

@@ -2,6 +2,7 @@ import {
   Instrument,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
+import { ProposalIds } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
@@ -74,8 +75,8 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   async assignProposalsToInstrument(
     proposalIds: number[],
     instrumentId: number
-  ): Promise<boolean> {
-    return true;
+  ): Promise<ProposalIds> {
+    return { proposalIds };
   }
 
   async removeProposalFromInstrument(
@@ -129,5 +130,20 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     instrumentId: number
   ): Promise<boolean> {
     return true;
+  }
+
+  hasInstrumentScientistInstrument(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  hasInstrumentScientistAccess(
+    userId: number,
+    instrumentId: number,
+    proposalId: number
+  ): Promise<boolean> {
+    throw new Error('Method not implemented.');
   }
 }

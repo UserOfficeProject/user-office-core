@@ -6,7 +6,8 @@ import {
 } from '@esss-swap/duo-validation';
 
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { Authorized, ValidateArgs } from '../decorators';
+import { Authorized, EventBus, ValidateArgs } from '../decorators';
+import { Event } from '../events/event.enum';
 import { Review } from '../models/Review';
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
@@ -24,6 +25,7 @@ export default class ReviewMutations {
     private userAuth: UserAuthorization
   ) {}
 
+  @EventBus(Event.PROPOSAL_SEP_REVIEW_SUBMITTED)
   @ValidateArgs(proposalGradeValidationSchema)
   @Authorized()
   async updateReview(
@@ -59,6 +61,7 @@ export default class ReviewMutations {
       });
   }
 
+  @EventBus(Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED)
   @ValidateArgs(proposalTechnicalReviewValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async setTechnicalReview(

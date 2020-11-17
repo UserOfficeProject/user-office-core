@@ -64,9 +64,10 @@ export default class QuestionaryMutations {
 
           return rejection('INTERNAL_ERROR');
         }
+        const value = JSON.parse(answer.value).value;
         if (
           !isPartialSave &&
-          !isMatchingConstraints(answer.value, questionTemplateRelation)
+          !isMatchingConstraints(questionTemplateRelation, value)
         ) {
           this.logger.logError('User provided value not matching constraint', {
             answer,

@@ -1,6 +1,8 @@
 import { Call } from '../models/Call';
-import { Proposal } from '../models/Proposal';
+import { Proposal, ProposalIds } from '../models/Proposal';
+import { Review } from '../models/Review';
 import { SEP } from '../models/SEP';
+import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
 
@@ -18,6 +20,11 @@ interface ProposalAcceptedEvent extends GeneralEvent {
 
 interface ProposalSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface ProposalFeasibleEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FEASIBLE;
   proposal: Proposal;
 }
 
@@ -44,7 +51,12 @@ interface ProposalNotifiedEvent extends GeneralEvent {
 
 interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED;
-  proposal: Proposal;
+  technicalreview: TechnicalReview;
+}
+
+interface ProposalSEPReviewSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_REVIEW_SUBMITTED;
+  review: Review;
 }
 
 interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
@@ -54,12 +66,12 @@ interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SELECTED;
-  proposal: Proposal;
+  proposalids: ProposalIds;
 }
 
 interface ProposalSEPSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_SELECTED;
-  proposal: Proposal;
+  proposalids: ProposalIds;
 }
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
@@ -157,10 +169,21 @@ interface CallEndedEvent extends GeneralEvent {
   call: Call;
 }
 
+interface CallReviewEndedEvent extends GeneralEvent {
+  type: Event.CALL_REVIEW_ENDED;
+  call: Call;
+}
+
+interface CallSEPReviewEndedEvent extends GeneralEvent {
+  type: Event.CALL_SEP_REVIEW_ENDED;
+  call: Call;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
   | ProposalSubmittedEvent
+  | ProposalFeasibleEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
   | UserCreateEvent
@@ -179,7 +202,10 @@ export type ApplicationEvent =
   | UserDeletedEvent
   | ProposalNotifiedEvent
   | CallEndedEvent
+  | CallReviewEndedEvent
+  | CallSEPReviewEndedEvent
   | ProposalFeasibilityReviewSubmittedEvent
+  | ProposalSEPReviewSubmittedEvent
   | ProposalSampleReviewSubmittedEvent
   | ProposalInstrumentSelectedEvent
   | ProposalSEPSelectedEvent
