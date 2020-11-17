@@ -19,6 +19,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
   } = filter;
 
   useEffect(() => {
+    setLoading(true);
     api()
       .getProposalsCore({
         filter: {

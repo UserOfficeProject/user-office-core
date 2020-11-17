@@ -205,6 +205,10 @@ context('Instrument tests', () => {
     cy.notification({ variant: 'success', text: 'User role changed' });
 
     cy.contains('Proposals');
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"] [data-value="0"]').click();
+
     cy.get('[data-cy="view-proposal"]').should('exist');
   });
 
@@ -224,6 +228,10 @@ context('Instrument tests', () => {
     cy.notification({ variant: 'success', text: 'User role changed' });
 
     cy.contains('Proposals');
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"] [data-value="0"]').click();
+
     cy.get('[data-cy="view-proposal"]').click();
     cy.contains('Technical').click();
 
@@ -237,6 +245,9 @@ context('Instrument tests', () => {
     });
 
     cy.contains('Proposals').click();
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"] [data-value="0"]').click();
 
     cy.contains('20');
   });

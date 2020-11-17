@@ -17,17 +17,23 @@ const useStyles = makeStyles(theme => ({
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
+  loadingText: {
+    minHeight: '32px',
+    marginTop: '16px',
+  },
 }));
 
-type SelectedCallFilterProps = {
-  calls: Call[];
+type CallFilterProps = {
+  calls?: Call[];
+  isLoading?: boolean;
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
   callId?: number;
 };
 
-const SelectedCallFilter: React.FC<SelectedCallFilterProps> = ({
+const CallFilter: React.FC<CallFilterProps> = ({
   calls,
+  isLoading,
   callId,
   onChange,
   shouldShowAll,
@@ -37,6 +43,10 @@ const SelectedCallFilter: React.FC<SelectedCallFilterProps> = ({
     call: NumberParam,
   });
 
+  if (calls === undefined) {
+    return null;
+  }
+
   /**
    * NOTE: We might use https://material-ui.com/components/autocomplete/.
    * If we have lot of dropdown options to be able to search.
@@ -44,36 +54,42 @@ const SelectedCallFilter: React.FC<SelectedCallFilterProps> = ({
   return (
     <>
       <FormControl className={classes.formControl}>
-        <InputLabel>Call</InputLabel>
-        <Select
-          onChange={call => {
-            setQuery({
-              call: call.target.value
-                ? (call.target.value as number)
-                : undefined,
-            });
-            onChange?.(call.target.value as number);
-          }}
-          value={callId}
-          defaultValue={0}
-        >
-          {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
-          {calls.map(call => (
-            <MenuItem key={call.id} value={call.id}>
-              {call.shortCode}
-            </MenuItem>
-          ))}
-        </Select>
+        <InputLabel shrink>Call</InputLabel>
+        {isLoading ? (
+          <div className={classes.loadingText}>Loading...</div>
+        ) : (
+          <Select
+            onChange={call => {
+              setQuery({
+                call: call.target.value
+                  ? (call.target.value as number)
+                  : undefined,
+              });
+              onChange?.(call.target.value as number);
+            }}
+            value={callId}
+            defaultValue={0}
+            data-cy="call-filter"
+          >
+            {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
+            {calls.map(call => (
+              <MenuItem key={call.id} value={call.id}>
+                {call.shortCode}
+              </MenuItem>
+            ))}
+          </Select>
+        )}
       </FormControl>
     </>
   );
 };
 
-SelectedCallFilter.propTypes = {
-  calls: PropTypes.array.isRequired,
+CallFilter.propTypes = {
+  calls: PropTypes.array,
+  isLoading: PropTypes.bool,
   onChange: PropTypes.func,
   shouldShowAll: PropTypes.bool,
   callId: PropTypes.number,
 };
 
-export default SelectedCallFilter;
+export default CallFilter;

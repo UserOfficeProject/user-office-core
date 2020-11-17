@@ -1,14 +1,9 @@
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import makeStyles from '@material-ui/core/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useQueryParams, NumberParam } from 'use-query-params';
 
-import SelectedCallFilter from 'components/common/SelectedCallFilter';
-import SelectedProposalStatusFilter from 'components/common/SelectedProposalStatusFilter';
+import CallFilter from 'components/common/proposalFilters/CallFilter';
+import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
+import ProposalStatusFilter from 'components/common/proposalFilters/ProposalStatusFilter';
 import {
   ProposalsFilter,
   Call,
@@ -16,20 +11,10 @@ import {
   ProposalStatus,
 } from 'generated/sdk';
 
-const useStyles = makeStyles(theme => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-}));
-
 type ProposalFilterBarProps = {
-  calls: Call[];
-  instruments: Instrument[];
-  proposalStatuses: ProposalStatus[];
+  calls?: { data: Call[]; isLoading?: boolean };
+  instruments?: { data: Instrument[]; isLoading?: boolean };
+  proposalStatuses?: { data: ProposalStatus[]; isLoading?: boolean };
   setProposalFilter: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;
 };
@@ -41,16 +26,12 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
   setProposalFilter,
   filter,
 }) => {
-  const classes = useStyles();
-  const [, setQuery] = useQueryParams({
-    instrument: NumberParam,
-  });
-
   return (
     <>
-      <SelectedCallFilter
+      <CallFilter
         callId={filter.callId as number}
-        calls={calls}
+        calls={calls?.data}
+        isLoading={calls?.isLoading}
         shouldShowAll={true}
         onChange={callId => {
           setProposalFilter({
@@ -60,35 +41,23 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
         }}
       />
 
-      <FormControl className={classes.formControl}>
-        <InputLabel>Instrument</InputLabel>
-        <Select
-          onChange={instrument => {
-            setQuery({
-              instrument: instrument.target.value
-                ? (instrument.target.value as number)
-                : undefined,
-            });
-            setProposalFilter({
-              ...filter,
-              instrumentId: instrument.target.value as number,
-            });
-          }}
-          value={filter.instrumentId}
-          defaultValue={0}
-        >
-          <MenuItem value={0}>All</MenuItem>
-          {instruments.map(instrument => (
-            <MenuItem key={instrument.id} value={instrument.id}>
-              {instrument.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <InstrumentFilter
+        instrumentId={filter.instrumentId as number}
+        instruments={instruments?.data}
+        isLoading={instruments?.isLoading}
+        shouldShowAll={true}
+        onChange={instrumentId => {
+          setProposalFilter({
+            ...filter,
+            instrumentId,
+          });
+        }}
+      />
 
-      <SelectedProposalStatusFilter
+      <ProposalStatusFilter
         proposalStatusId={filter.proposalStatusId as number}
-        proposalStatuses={proposalStatuses}
+        proposalStatuses={proposalStatuses?.data}
+        isLoading={proposalStatuses?.isLoading}
         shouldShowAll={true}
         onChange={proposalStatusId => {
           setProposalFilter({
@@ -102,9 +71,18 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
 };
 
 ProposalFilterBar.propTypes = {
-  calls: PropTypes.array.isRequired,
-  instruments: PropTypes.array.isRequired,
-  proposalStatuses: PropTypes.array.isRequired,
+  calls: PropTypes.shape({
+    data: PropTypes.array.isRequired,
+    isLoading: PropTypes.any,
+  }).isRequired,
+  instruments: PropTypes.shape({
+    data: PropTypes.array.isRequired,
+    isLoading: PropTypes.any,
+  }).isRequired,
+  proposalStatuses: PropTypes.shape({
+    data: PropTypes.array.isRequired,
+    isLoading: PropTypes.any,
+  }).isRequired,
   setProposalFilter: PropTypes.func.isRequired,
   filter: PropTypes.object.isRequired,
 };

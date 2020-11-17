@@ -6,11 +6,20 @@ import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column } from 'material-table';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import {
+  useQueryParams,
+  NumberParam,
+  StringParam,
+  withDefault,
+  DelimitedNumericArrayParam,
+} from 'use-query-params';
 
-import { Proposal } from 'generated/sdk';
+import { Proposal, ProposalsFilter } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
+import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useProposalsData } from 'hooks/proposal/useProposalsData';
+import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { tableIcons } from 'utils/materialIcons';
 import {
   average,
@@ -19,8 +28,35 @@ import {
   getGrades,
 } from 'utils/mathFunctions';
 
+import ProposalFilterBar from './ProposalFilterBar';
+import { ProposalUrlQueryParamsType } from './ProposalPage';
+
 const ProposalTableInstrumentScientist: React.FC = () => {
-  const { loading, proposalsData } = useProposalsData({ proposalStatusId: 2 });
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
+    ProposalUrlQueryParamsType
+  >({
+    call: NumberParam,
+    instrument: NumberParam,
+    proposalStatus: NumberParam,
+    search: StringParam,
+    selection: withDefault(DelimitedNumericArrayParam, []),
+  });
+
+  // NOTE: proposalStatusId has default value 2 because for IS default view should be all proposals in FEASIBILITY_REVIEW status
+  const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
+    callId: urlQueryParams.call,
+    instrumentId: urlQueryParams.instrument,
+    proposalStatusId: urlQueryParams.proposalStatus || 2,
+  });
+  const { instruments, loadingInstruments } = useInstrumentsData();
+  const {
+    proposalStatuses,
+    loadingProposalStatuses,
+  } = useProposalStatusesData();
+
+  const { loading, proposalsData } = useProposalsData({
+    proposalStatusId: proposalFilter.proposalStatusId,
+  });
 
   const downloadPDFProposal = useDownloadPDFProposal();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
@@ -157,31 +193,45 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   }
 
   return (
-    <MaterialTable
-      icons={tableIcons}
-      title={'Proposals'}
-      columns={columns}
-      data={proposalsData}
-      isLoading={loading}
-      options={{
-        search: true,
-        debounceInterval: 400,
-        columnsButton: true,
-      }}
-      onChangeColumnHidden={collumnChange => {
-        const proposalColumns = columns.map(
-          (proposalColumn: Column<Proposal>) => ({
-            hidden:
-              proposalColumn.title === collumnChange.title
-                ? collumnChange.hidden
-                : proposalColumn.hidden,
-            title: proposalColumn.title,
-          })
-        );
+    <>
+      <ProposalFilterBar
+        instruments={{ data: instruments, isLoading: loadingInstruments }}
+        proposalStatuses={{
+          data: proposalStatuses,
+          isLoading: loadingProposalStatuses,
+        }}
+        setProposalFilter={setProposalFilter}
+        filter={proposalFilter}
+      />
+      <MaterialTable
+        icons={tableIcons}
+        title={'Proposals'}
+        columns={columns}
+        data={proposalsData}
+        isLoading={loading}
+        options={{
+          search: true,
+          debounceInterval: 400,
+          columnsButton: true,
+        }}
+        onSearchChange={searchText => {
+          setUrlQueryParams({ search: searchText ? searchText : undefined });
+        }}
+        onChangeColumnHidden={collumnChange => {
+          const proposalColumns = columns.map(
+            (proposalColumn: Column<Proposal>) => ({
+              hidden:
+                proposalColumn.title === collumnChange.title
+                  ? collumnChange.hidden
+                  : proposalColumn.hidden,
+              title: proposalColumn.title,
+            })
+          );
 
-        setLocalStorageValue(proposalColumns);
-      }}
-    />
+          setLocalStorageValue(proposalColumns);
+        }}
+      />
+    </>
   );
 };
 
