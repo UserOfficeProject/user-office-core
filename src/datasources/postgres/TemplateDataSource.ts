@@ -3,6 +3,8 @@ import to from 'await-to-js';
 
 import {
   DataType,
+  Question,
+  QuestionTemplateRelation,
   Template,
   TemplateCategory,
   TemplateCategoryId,
@@ -10,7 +12,6 @@ import {
   TemplateStep,
   Topic,
 } from '../../models/Template';
-import { Question, QuestionTemplateRelation } from '../../models/Template';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
@@ -142,10 +143,11 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .andWhere('is_enabled', true)
       .orderBy('sort_order');
 
-    const questionRecords: Array<QuestionRecord & QuestionTemplateRelRecord> = (
+    const questionRecords: Array<QuestionRecord &
+      QuestionTemplateRelRecord & { dependency_natural_key: string }> = (
       await database.raw(`
       SELECT 
-        templates_has_questions.*, questions.*
+        templates_has_questions.*, questions.*, dependency.natural_key as dependency_natural_key
       FROM 
         templates_has_questions
       LEFT JOIN
@@ -153,6 +155,13 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       ON 
         templates_has_questions.question_id = 
         questions.question_id
+      LEFT JOIN
+        questions dependency
+      ON 
+        dependency.question_id = 
+        templates_has_questions.dependency_question_id
+      WHERE
+        templates_has_questions.template_id = ${templateId}
       ORDER BY
        templates_has_questions.sort_order`)
     ).rows;
@@ -390,7 +399,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     questionId: string,
     templateId: number
   ): Promise<QuestionTemplateRelation | null> {
-    return database('templates_has_questions')
+    return database({ templates_has_questions: 'templates_has_questions' })
       .where({
         'templates_has_questions.question_id': questionId,
       })
@@ -398,18 +407,35 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         'templates_has_questions.template_id': templateId,
       })
       .leftJoin(
-        'questions',
+        { questions: 'questions' },
         'templates_has_questions.question_id',
         'questions.question_id'
       )
-      .select('*')
-      .then((resultSet: Array<QuestionTemplateRelRecord & QuestionRecord>) => {
-        if (!resultSet || resultSet.length !== 1) {
-          return null;
-        }
+      .leftJoin(
+        { dependency: 'questions' },
+        'templates_has_questions.dependency_question_id',
+        '=',
+        'dependency.question_id'
+      )
+      .select(
+        'templates_has_questions.*',
+        'questions.*',
+        'dependency.natural_key as dependency_natural_key'
+      )
+      .then(
+        (
+          resultSet: Array<
+            QuestionTemplateRelRecord &
+              QuestionRecord & { dependency_natural_key: string }
+          >
+        ) => {
+          if (!resultSet || resultSet.length !== 1) {
+            return null;
+          }
 
-        return createQuestionTemplateRelationObject(resultSet[0]);
-      });
+          return createQuestionTemplateRelationObject(resultSet[0]);
+        }
+      );
   }
 
   async getQuestionTemplateRelations(

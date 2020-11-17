@@ -1,6 +1,8 @@
-.git
-.idea
-node_modules
-coverage
-build
-.env
+# Ignore everything except the required files
+# this improves docker caching
+*
+!src
+!db_patches
+!package*
+!tsconfig.json
+!index.ts
