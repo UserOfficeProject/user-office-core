@@ -75,9 +75,14 @@ export const userFieldSchema = Yup.object().shape({
     .matches(phoneRegExp, 'Phone number is not valid')
     .required('telephone must be at least 2 characters'),
   telephone_alt: Yup.string()
-    .min(2, 'telephone must be at least 2 characters')
-    .max(30, 'telephone must be at most 20 characters')
-    .matches(phoneRegExp, 'Phone number is not valid'),
+    .test('telephone_alt', 'Provided number is not valid', value => {
+      if (!value) {
+        return true;
+      }
+
+      return phoneRegExp.test(value);
+    })
+    .notRequired(),
 });
 
 export const emailFieldSchema = Yup.object().shape({
