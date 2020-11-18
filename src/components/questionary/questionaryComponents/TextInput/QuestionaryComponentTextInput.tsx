@@ -38,6 +38,7 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
         ></div>
       )}
       <TextFieldWithCounter
+        isCounterHidden={config.isCounterHidden}
         variant="standard"
         id={proposalQuestionId}
         name={proposalQuestionId}
