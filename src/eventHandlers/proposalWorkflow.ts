@@ -73,6 +73,7 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
         break;
       case Event.PROPOSAL_SUBMITTED:
       case Event.PROPOSAL_FEASIBLE:
+      case Event.PROPOSAL_SAMPLE_SAFE:
       case Event.PROPOSAL_NOTIFIED:
       case Event.PROPOSAL_ACCEPTED:
       case Event.PROPOSAL_REJECTED:

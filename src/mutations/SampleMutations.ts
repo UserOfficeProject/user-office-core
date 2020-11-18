@@ -2,7 +2,8 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, EventBus } from '../decorators';
+import { Event } from '../events/event.enum';
 import { TemplateCategoryId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { rejection } from '../rejection';
@@ -66,6 +67,7 @@ export default class SampleMutations {
       });
   }
 
+  @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
   async updateSample(agent: UserWithRole | null, args: UpdateSampleArgs) {
     if (!sampleAuthorization.hasWriteRights(agent, args.sampleId)) {
       return rejection('NOT_AUTHORIZED');
