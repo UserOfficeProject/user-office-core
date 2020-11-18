@@ -5,7 +5,7 @@ context('Template tests', () => {
     cy.resetDB();
   });
   beforeEach(() => {
-    cy.viewport(1100, 800);
+    cy.viewport(1100, 1100);
     cy.visit('/');
   });
 
@@ -213,15 +213,15 @@ context('Template tests', () => {
 
     cy.contains('Is multiple select').click();
 
-    cy.get('[title="Add"]').click();
+    cy.contains('Add answer').click();
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[0]);
     cy.get('[title="Save"]').click();
 
-    cy.get('[title="Add"]').click();
+    cy.contains('Add answer').click();
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[1]);
     cy.get('[title="Save"]').click();
 
-    cy.get('[title="Add"]').click();
+    cy.contains('Add answer').click();
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[2]);
     cy.get('[title="Save"]').click();
 
