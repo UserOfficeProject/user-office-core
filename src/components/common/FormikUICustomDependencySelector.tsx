@@ -12,9 +12,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   DataType,
   EvaluatorOperator,
-  Template,
   QuestionTemplateRelation,
   SelectionFromOptionsConfig,
+  Template,
 } from 'generated/sdk';
 import { getAllFields, getFieldById } from 'models/QuestionaryFunctions';
 
@@ -95,7 +95,7 @@ const FormikUICustomDependencySelector = ({
         depField.question.dataType === DataType.SELECTION_FROM_OPTIONS
       ) {
         setAvailableValues(
-          (depField.question.config as SelectionFromOptionsConfig).options.map(
+          (depField.config as SelectionFromOptionsConfig).options.map(
             option => {
               return { value: option, label: option };
             }

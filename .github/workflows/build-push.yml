@@ -45,5 +45,6 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
+          build-args: BUILD_VERSION=${{ github.sha }}
           push: true
           tags: dmsc/duo-frontend:${{ steps.extract_branch.outputs.branch }}
