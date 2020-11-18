@@ -213,17 +213,17 @@ context('Template tests', () => {
 
     cy.contains('Is multiple select').click();
 
-    cy.get('[title=Add]').click();
+    cy.get('[title="Add"]').click();
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[0]);
-    cy.get('[title=Save]').click();
+    cy.get('[title="Save"]').click();
 
-    cy.get('[title=Add]').click();
+    cy.get('[title="Add"]').click();
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[1]);
-    cy.get('[title=Save]').click();
+    cy.get('[title="Save"]').click();
 
-    cy.get('[title=Add]').click();
+    cy.get('[title="Add"]').click();
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[2]);
-    cy.get('[title=Save]').click();
+    cy.get('[title="Save"]').click();
 
     cy.contains('Save').click();
 
