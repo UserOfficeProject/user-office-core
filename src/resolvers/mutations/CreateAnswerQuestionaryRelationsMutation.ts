@@ -9,19 +9,15 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import {
-  SamplesResponseWrap,
-  AnswerResponseWrap,
-  AnswerBasicResponseWrap,
-} from '../types/CommonWrappers';
+import { AnswerBasicResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class CreateAnswerQuestionaryRelationsArgs {
-  @Field(() => Int!)
+  @Field(() => Int)
   answerId: number;
 
-  @Field(() => [Int!]!)
+  @Field(() => [Int])
   questionaryIds: number[];
 }
 

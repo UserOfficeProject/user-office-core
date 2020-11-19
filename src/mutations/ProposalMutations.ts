@@ -54,12 +54,12 @@ export default class ProposalMutations {
     }
 
     const questionary = await this.questionaryDataSource.create(
-      agent!.id,
+      (agent as UserWithRole).id,
       call.templateId
     );
 
     return this.proposalDataSource
-      .create(agent!.id, callId, questionary.questionaryId!)
+      .create((agent as UserWithRole).id, callId, questionary.questionaryId)
       .then(proposal => proposal)
       .catch(err => {
         logger.logException('Could not create proposal', err, { agent });
@@ -214,6 +214,7 @@ export default class ProposalMutations {
     return result || rejection('INTERNAL_ERROR');
   }
 
+  @EventBus(Event.PROPOSAL_SEP_MEETING_SUBMITTED)
   @ValidateArgs(administrationProposalBEValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async admin(
