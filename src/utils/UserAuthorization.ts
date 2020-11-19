@@ -1,7 +1,7 @@
 import {
-  userDataSource,
   reviewDataSource,
   sepDataSource,
+  userDataSource,
 } from '../datasources';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
@@ -13,7 +13,7 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
-import { User, UserWithRole, UserRole } from '../models/User';
+import { User, UserRole, UserWithRole } from '../models/User';
 
 export class UserAuthorization {
   constructor(
@@ -85,6 +85,14 @@ export class UserAuthorization {
       .then(result => {
         return result;
       });
+  }
+
+  async isSampleSafetyReviewer(agent: UserWithRole | null) {
+    if (agent == null) {
+      return false;
+    }
+
+    return agent?.currentRole?.shortCode === Roles.SAMPLE_SAFETY_REVIEWER;
   }
 
   async hasAccessRights(

@@ -1,14 +1,17 @@
 import {
   proposalDataSource,
   questionaryDataSource,
+  sampleDataSource,
   templateDataSource,
 } from '../datasources';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
+import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateCategoryId } from '../models/Template';
 import { User, UserWithRole } from '../models/User';
 import { userAuthorization } from '../utils/UserAuthorization';
+import { logger } from './Logger';
 
 interface QuestionaryAuthorizer {
   hasReadRights(agent: User | null, questionaryId: number): Promise<boolean>;
@@ -42,7 +45,8 @@ class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
 class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
   constructor(
     private proposalDataSource: ProposalDataSource,
-    private questionaryDataSource: QuestionaryDataSource
+    private questionaryDataSource: QuestionaryDataSource,
+    private sampleDataSource: SampleDataSource
   ) {}
   async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
@@ -60,28 +64,28 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
       return true;
     }
 
-    const sampleDeclarationQuestionary = await this.questionaryDataSource.getQuestionary(
-      questionaryId
-    );
-    if (sampleDeclarationQuestionary?.creatorId === agent.id) {
-      return true;
-    }
-
-    const proposalQuestionary = await this.questionaryDataSource.getParentQuestionary(
-      questionaryId
-    );
-    if (!proposalQuestionary) return false;
-    if (!proposalQuestionary.questionaryId) return false;
-
-    const result = await this.proposalDataSource.getProposals({
-      questionaryIds: [proposalQuestionary.questionaryId],
+    const queryResult = await this.sampleDataSource.getSamples({
+      filter: { questionaryId },
     });
 
-    if (!result) {
+    if (queryResult.length !== 1) {
+      logger.logError(
+        'Expected to find exactly one sample with questionaryId',
+        { questionaryId }
+      );
+
       return false;
     }
-    const proposal = result.proposals[0];
+
+    const sample = queryResult[0];
+
+    const proposal = await proposalDataSource.get(sample.proposalId);
+
     if (!proposal) {
+      logger.logError('Could not find proposal for questionary', {
+        questionaryId,
+      });
+
       return false;
     }
 
@@ -104,7 +108,8 @@ export class QuestionaryAuthorization {
       TemplateCategoryId.SAMPLE_DECLARATION,
       new SampleDeclarationQuestionaryAuthorizer(
         proposalDataSource,
-        questionaryDataSource
+        questionaryDataSource,
+        sampleDataSource
       )
     );
   }

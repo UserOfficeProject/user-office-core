@@ -1,18 +1,27 @@
 ARG WINDOWS_VERSION
-FROM docker-registry.devs.facilities.rl.ac.uk/bisapps-node:12-servercore${WINDOWS_VERSION}-1.0.0-SNAPSHOT
+FROM docker-registry.devs.facilities.rl.ac.uk/bisapps-node:12-servercore${WINDOWS_VERSION}-1.0.0-SNAPSHOT AS build-stage
 
-# Create app directory
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install --only=production
+RUN npm ci --loglevel error --no-fund
 
 COPY . .
 
-RUN mkdir downloads
-
 RUN npm run tsc
 
+
+FROM docker-registry.devs.facilities.rl.ac.uk/bisapps-node:12-servercore${WINDOWS_VERSION}-1.0.0-SNAPSHOT
+
+WORKDIR /app
+
+COPY --from=build-stage /app/db_patches ./db_patches
+COPY --from=build-stage /app/build ./build
+COPY --from=build-stage /app/package.json /app/package-lock.json ./
+
+RUN npm ci --only=production --loglevel error --no-fund
+
 EXPOSE 4000
+
 CMD [ "node", "./build/index.js" ]
