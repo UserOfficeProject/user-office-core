@@ -16,7 +16,11 @@ export default function QuestionTemplateRelationEditor(props: {
   }
 
   return (
-    <StyledModal onClose={props.closeMe} open={props.field != null}>
+    <StyledModal
+      onClose={props.closeMe}
+      open={props.field != null}
+      data-cy="question-relation-dialogue"
+    >
       {createQuestionTemplateRelationForm({
         field: props.field,
         dispatch: props.dispatch,
