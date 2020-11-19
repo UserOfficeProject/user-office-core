@@ -52,6 +52,9 @@ export class SelectionFromOptionsConfig extends ConfigBase {
 
   @Field(() => [String])
   options: string[];
+
+  @Field(() => Boolean)
+  isMultipleSelect: boolean;
 }
 
 @ObjectType()
