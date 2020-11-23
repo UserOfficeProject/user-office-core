@@ -5,15 +5,15 @@ import {
   callDataSource,
   eventLogsDataSource,
   fileDataSource,
+  instrumentDatasource,
   proposalDataSource,
+  proposalSettingsDataSource,
+  questionaryDataSource,
   reviewDataSource,
+  sampleDataSource,
   sepDataSource,
   templateDataSource,
   userDataSource,
-  instrumentDatasource,
-  questionaryDataSource,
-  sampleDataSource,
-  proposalSettingsDataSource,
 } from './datasources';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
@@ -114,7 +114,7 @@ const sampleMutations = new SampleMutations(
   sampleDataSource,
   questionaryDataSource,
   templateDataSource,
-  logger
+  proposalDataSource
 );
 
 const proposalSettingsQueries = new ProposalSettingsQueries(

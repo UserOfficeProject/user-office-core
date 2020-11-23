@@ -1,5 +1,5 @@
 import { Role } from '../../models/Role';
-import { User, BasicUserDetails, UserWithRole } from '../../models/User';
+import { BasicUserDetails, User, UserWithRole } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UserDataSource } from '../UserDataSource';
@@ -82,6 +82,15 @@ export const dummyUser = new User(
 export const dummyUserWithRole: UserWithRole = {
   ...dummyUser,
   currentRole: { id: 1, title: 'User', shortCode: 'user' },
+};
+
+export const dummySampleReviewer: UserWithRole = {
+  ...dummyUser,
+  currentRole: {
+    id: 1,
+    title: 'Sample Reviewer',
+    shortCode: 'sample_safety_reviewer',
+  },
 };
 
 export const dummyPlaceHolderUser = new User(

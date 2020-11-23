@@ -52,6 +52,9 @@ export class SelectionFromOptionsConfig extends ConfigBase {
 
   @Field(() => [String])
   options: string[];
+
+  @Field(() => Boolean)
+  isMultipleSelect: boolean;
 }
 
 @ObjectType()
@@ -73,6 +76,9 @@ export class TextInputConfig extends ConfigBase {
 
   @Field(() => Boolean)
   isHtmlQuestion: boolean;
+
+  @Field(() => Boolean)
+  isCounterHidden: boolean;
 }
 
 @ObjectType()
