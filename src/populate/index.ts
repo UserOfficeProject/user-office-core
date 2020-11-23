@@ -150,8 +150,7 @@ const createTemplates = async () => {
       return templateDataSource.createTopic({
         sortOrder: faker.random.number({
           min: 0,
-          max: 1,
-          precision: 0.00000001,
+          max: 100,
         }),
         templateId: template.templateId,
       });
