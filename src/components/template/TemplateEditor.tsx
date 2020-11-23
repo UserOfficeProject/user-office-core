@@ -195,7 +195,7 @@ export default function TemplateEditor() {
         onClick={(): void =>
           dispatch({
             type: EventType.CREATE_TOPIC_REQUESTED,
-            payload: { sortOrder: 0.5, isFirstTopic: true },
+            payload: { isFirstTopic: true },
           })
         }
       >
