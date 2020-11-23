@@ -12,6 +12,7 @@ import {
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { ProposalPublicStatus } from '../models/Proposal';
 import { omit } from '../utils/helperFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import ProposalQueries from './ProposalQueries';
@@ -60,15 +61,24 @@ test('A userofficer can get any proposal', () => {
   );
 });
 
-test('A userofficer can get all proposal', () => {
+test('A userofficer can get all proposal', async () => {
   return expect(
-    proposalQueries.getAll(dummyUserOfficerWithRole)
-  ).resolves.toStrictEqual({
-    totalCount: 1,
-    proposals: [dummyProposal],
-  });
+    (await proposalQueries.getAll(dummyUserOfficerWithRole)).totalCount
+  ).toBeGreaterThan(0);
 });
 
 test('A user cannot query all proposals', () => {
   return expect(proposalQueries.getAll(dummyUserWithRole)).resolves.toBe(null);
+});
+
+test('User should see the right status for draft proposal', async () => {
+  return expect(
+    proposalQueries.getPublicStatus(dummyUserWithRole, 1)
+  ).resolves.toBe(ProposalPublicStatus.draft);
+});
+
+test('User should see the right status for submitted proposal', async () => {
+  return expect(
+    proposalQueries.getPublicStatus(dummyUserWithRole, 2)
+  ).resolves.toBe(ProposalPublicStatus.accepted);
 });

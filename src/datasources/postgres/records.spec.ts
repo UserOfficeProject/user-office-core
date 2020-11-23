@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import 'reflect-metadata';
-import { createConfig } from '../../models/ProposalModelFunctions';
+import { createConfig } from '../../models/questionTypes/QuestionRegistry';
+import { DataType } from '../../models/Template';
 import {
   BooleanConfig,
   TextInputConfig,
@@ -9,7 +10,7 @@ import {
 test('Should able to create boolean config', () => {
   const isRequired = true;
   const smallLabel = 'some text';
-  const config = createConfig<BooleanConfig>(new BooleanConfig(), {
+  const config = createConfig<BooleanConfig>(DataType.BOOLEAN, {
     required: isRequired,
     small_label: 'some text',
   });
@@ -20,7 +21,7 @@ test('Should able to create boolean config', () => {
 test('Should able to create text input config', () => {
   const isRequired = false;
   const tooltip = 'This is tooltip';
-  const config = createConfig<TextInputConfig>(new TextInputConfig(), {
+  const config = createConfig<TextInputConfig>(DataType.TEXT_INPUT, {
     required: isRequired,
     tooltip: tooltip,
   });

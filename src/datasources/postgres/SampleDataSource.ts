@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Sample, SampleStatus } from '../../models/Sample';
-import { UpdateSampleSafetyReviewArgs } from '../../resolvers/mutations/UpdateSampleSafetyReviewMutation';
-import { UpdateSampleStatusArgs } from '../../resolvers/mutations/UpdateSampleStatusMutation';
-import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitleMutation';
+import { Sample } from '../../models/Sample';
+import { UpdateSampleArgs } from '../../resolvers/mutations/UpdateSampleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
 import { logger } from '../../utils/Logger';
 import { SampleDataSource } from '../SampleDataSource';
@@ -24,55 +22,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
       });
   }
 
-  updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample> {
-    return database('samples')
-      .update({ status: args.status }, '*')
-      .where({ sample_id: args.sampleId })
-      .then((records: SampleRecord[]) => {
-        if (records.length !== 1) {
-          logger.logError('Could not update sample status', { args });
-          throw new Error('Could not update sample status');
-        }
-
-        return createSampleObject(records[0]);
-      });
-  }
-
-  updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample> {
-    return database('samples')
-      .update({ title: args.title }, '*')
-      .where({ sample_id: args.sampleId })
-      .then((records: SampleRecord[]) => {
-        if (records.length !== 1) {
-          logger.logError('Could not update sample title', { args });
-          throw new Error('Could not update sample title');
-        }
-
-        return createSampleObject(records[0]);
-      });
-  }
-
-  updateSampleSafetyReview(args: UpdateSampleSafetyReviewArgs) {
-    return database('samples')
-      .update(
-        {
-          safety_comment: args.safetyComment,
-          safety_status: args.safetyStatus,
-        },
-        '*'
-      )
-      .where({ sample_id: args.id })
-      .then((records: SampleRecord[]) => {
-        if (records.length !== 1) {
-          logger.logError('Could not update sample safety review', { args });
-          throw new Error('Could not update sample safety review');
-        }
-
-        return createSampleObject(records[0]);
-      });
-  }
-
-  updateSample(args: Partial<Sample> & Pick<Sample, 'id'>): Promise<Sample> {
+  updateSample(args: UpdateSampleArgs): Promise<Sample> {
     return database('samples')
       .update(
         {
@@ -82,11 +32,11 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         },
         '*'
       )
-      .where({ sample_id: args.id })
+      .where({ sample_id: args.sampleId })
       .then((records: SampleRecord[]) => {
         if (records.length !== 1) {
-          logger.logError('Could not update sample title', { args });
-          throw new Error('Could not update sample title');
+          logger.logError('Could not update sample', { args });
+          throw new Error('Could not update sample');
         }
 
         return createSampleObject(records[0]);
@@ -94,18 +44,24 @@ export default class PostgresSampleDataSource implements SampleDataSource {
   }
 
   create(
-    questionary_id: number,
     title: string,
-    creator_id: number
+    creator_id: number,
+    proposal_id: number,
+    questionary_id: number,
+    question_id: string
   ): Promise<Sample> {
     return database('samples')
-      .insert({ title, questionary_id, creator_id }, '*')
+      .insert(
+        { title, creator_id, proposal_id, questionary_id, question_id },
+        '*'
+      )
       .then((records: SampleRecord[]) => {
         if (records.length !== 1) {
           logger.logError('Could not create sample', {
-            questionary_id,
             title,
             creator_id,
+            proposal_id,
+            questionary_id,
           });
           throw new Error('Failed to insert sample');
         }
@@ -128,40 +84,15 @@ export default class PostgresSampleDataSource implements SampleDataSource {
   }
 
   getSamplesByCallId(callId: number): Promise<Sample[]> {
-    return database('answer_has_questionaries')
-      .leftJoin(
-        'answers',
-        'answer_has_questionaries.answer_id',
-        'answers.answer_id'
-      )
-      .leftJoin(
-        'proposals',
-        'answers.questionary_id',
-        'proposals.questionary_id'
-      )
-      .leftJoin(
-        'samples',
-        'samples.questionary_id',
-        'answer_has_questionaries.questionary_id'
-      )
+    return database('proposals')
+      .leftJoin('samples', 'proposals.proposal_id', 'samples.proposal_id')
       .select('samples.*')
       .where(' proposals.call_id', callId)
       .then((records: SampleRecord[]) => {
         return records.map(record => createSampleObject(record)) || [];
       });
   }
-  getSamplesByAnswerId(answerId: number): Promise<Sample[]> {
-    const subQuery = database('answer_has_questionaries')
-      .where('answer_id', answerId)
-      .select('questionary_id');
 
-    return database('samples')
-      .where('questionary_id', 'in', subQuery)
-      .select('*')
-      .then((records: SampleRecord[]) => {
-        return records.map(record => createSampleObject(record)) || [];
-      });
-  }
   async getSamples(args: SamplesArgs): Promise<Sample[]> {
     const filter = args.filter;
 
@@ -181,6 +112,12 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         }
         if (filter?.sampleIds) {
           query.where('sample_id', 'in', filter.sampleIds);
+        }
+        if (filter?.proposalId) {
+          query.where('proposal_id', filter.proposalId);
+        }
+        if (filter?.questionId) {
+          query.where('question_id', filter.questionId);
         }
       })
       .select('*')

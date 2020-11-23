@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
-import { createConfig } from '../../models/ProposalModelFunctions';
 import {
-  Questionary,
-  QuestionaryStep,
   Answer,
   AnswerBasic,
+  Questionary,
+  QuestionaryStep,
 } from '../../models/Questionary';
+import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import {
   DataType,
   FieldCondition,
   FieldDependency,
   Question,
+  QuestionTemplateRelation,
   TemplateCategoryId,
   Topic,
-  QuestionTemplateRelation,
 } from '../../models/Template';
 import {
   BooleanConfig,
@@ -47,7 +47,7 @@ const createDummyQuestionary = (values?: DeepPartial<Questionary>) => {
   );
 };
 export const dummyQuestionFactory = (
-  values?: DeepPartial<Question>
+  values?: DeepPartial<Question> & Partial<Pick<Question, 'config'>>
 ): Question => {
   return new Question(
     values?.categoryId || TemplateCategoryId.PROPOSAL_QUESTIONARY,
@@ -55,19 +55,25 @@ export const dummyQuestionFactory = (
     values?.naturalKey || 'is_dangerous',
     values?.dataType || DataType.TEXT_INPUT,
     values?.question || 'Some random question',
-    (values?.config as any) || dummyConfigFactory()
+    values?.config || dummyConfigFactory()
   );
 };
 
 export const dummyQuestionTemplateRelationFactory = (
-  values?: DeepPartial<QuestionTemplateRelation>
+  values?: DeepPartial<QuestionTemplateRelation> &
+    Partial<Pick<QuestionTemplateRelation, 'config' | 'dependency'>> & {
+      question: Partial<Pick<Question, 'config'>>;
+    }
 ): QuestionTemplateRelation => {
-  return new QuestionTemplateRelation(
+  const relation = new QuestionTemplateRelation(
     dummyQuestionFactory(values?.question),
     values?.sortOrder || Math.round(Math.random() * 100),
     values?.topicId || Math.round(Math.random() * 10),
-    new BooleanConfig()
+    values?.config || new BooleanConfig(),
+    values?.dependency
   );
+
+  return relation;
 };
 
 const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
@@ -84,7 +90,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
               naturalKey: 'ttl_general',
               dataType: DataType.EMBELLISHMENT,
               config: createConfig<EmbellishmentConfig>(
-                new EmbellishmentConfig(),
+                DataType.EMBELLISHMENT,
                 {
                   plain: 'General information',
                   html: '<h1>General information</h1>',
@@ -103,7 +109,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
               naturalKey: 'has_links_with_industry',
               dataType: DataType.SELECTION_FROM_OPTIONS,
               config: createConfig<SelectionFromOptionsConfig>(
-                new SelectionFromOptionsConfig(),
+                DataType.SELECTION_FROM_OPTIONS,
                 {
                   options: ['yes', 'no'],
                   variant: 'radio',
@@ -121,9 +127,10 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
               proposalQuestionId: 'links_with_industry',
               naturalKey: 'links_with_industry',
               dataType: DataType.TEXT_INPUT,
-              config: createConfig<TextInputConfig>(new TextInputConfig(), {
+              config: createConfig<TextInputConfig>(DataType.TEXT_INPUT, {
                 placeholder: 'Please specify links with industry',
                 multiline: true,
+                required: true,
               }),
             }),
             dependency: new FieldDependency(
@@ -142,38 +149,14 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
 
 export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   async clone(questionaryId: number): Promise<Questionary> {
-    return createDummyQuestionary({ questionaryId: questionaryId++ });
+    return createDummyQuestionary({ questionaryId: questionaryId + 1 });
   }
   public init() {
     dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
     dummyQuestionary = createDummyQuestionary();
   }
-
-  async deleteAnswerQuestionaryRelations(
-    answerId: number
-  ): Promise<AnswerBasic> {
-    const answers = dummyQuestionarySteps.reduce(
-      (acc, val) => acc.concat(val.fields),
-      new Array<Answer>()
-    );
-    const answer = answers.find(answer => answer.answerId === answerId)!;
-    answer.value = '';
-
-    return new AnswerBasic(answerId, 1, '', '', new Date());
-  }
-  async createAnswerQuestionaryRelations(
-    answerId: number,
-    questionaryIds: number[]
-  ): Promise<AnswerBasic> {
-    return new AnswerBasic(answerId, 1, '', '', new Date());
-  }
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
     return new AnswerBasic(answer_id, 1, 'questionId', '', new Date());
-  }
-  async getParentQuestionary(
-    child_questionary_id: number
-  ): Promise<Questionary | null> {
-    return createDummyQuestionary();
   }
 
   async getBlankQuestionarySteps(

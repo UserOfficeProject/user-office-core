@@ -1,7 +1,5 @@
 import { Sample, SampleStatus } from '../../models/Sample';
-import { UpdateSampleSafetyReviewArgs } from '../../resolvers/mutations/UpdateSampleSafetyReviewMutation';
-import { UpdateSampleStatusArgs } from '../../resolvers/mutations/UpdateSampleStatusMutation';
-import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitleMutation';
+import { UpdateSampleArgs } from '../../resolvers/mutations/UpdateSampleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
 import { SampleDataSource } from '../SampleDataSource';
 
@@ -14,6 +12,8 @@ export class SampleDataSourceMock implements SampleDataSource {
         'title',
         1,
         1,
+        1,
+        'sampleQuestionId',
         SampleStatus.LOW_RISK,
         'safety comment',
         new Date()
@@ -27,23 +27,25 @@ export class SampleDataSourceMock implements SampleDataSource {
   async getSamples(args: SamplesArgs): Promise<Sample[]> {
     return this.samples;
   }
-  async getSamplesByAnswerId(answerId: number): Promise<Sample[]> {
-    return this.samples;
-  }
+
   async getSamplesByCallId(callId: number): Promise<Sample[]> {
     return this.samples;
   }
   async create(
-    questionaryId: number,
     title: string,
-    creatorId: number
+    creatorId: number,
+    proposalId: number,
+    questionaryId: number,
+    questionId: string
   ): Promise<Sample> {
     return new Sample(
       1,
       title,
       creatorId,
+      proposalId,
       questionaryId,
-      SampleStatus.PENDING_EVALUTATION,
+      questionId,
+      SampleStatus.PENDING_EVALUATION,
       '',
       new Date()
     );
@@ -55,25 +57,12 @@ export class SampleDataSourceMock implements SampleDataSource {
       1
     )[0];
   }
-  async updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample> {
+
+  async updateSample(args: UpdateSampleArgs): Promise<Sample> {
     const sample = await this.getSample(args.sampleId);
-    sample.safetyStatus = args.status;
-
-    return sample;
-  }
-  async updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample> {
-    const sample = await this.getSample(args.sampleId);
-    sample.title = args.title;
-
-    return sample;
-  }
-
-  async updateSampleSafetyReview(
-    args: UpdateSampleSafetyReviewArgs
-  ): Promise<Sample> {
-    const sample = await this.getSample(args.id);
-    sample.safetyStatus = args.safetyStatus;
-    sample.safetyComment = args.safetyComment;
+    sample.title = args.title || sample.title;
+    sample.safetyComment = args.safetyComment || sample.safetyComment;
+    sample.safetyStatus = args.safetyStatus || sample.safetyStatus;
 
     return sample;
   }

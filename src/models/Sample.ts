@@ -3,7 +3,9 @@ export class Sample {
     public id: number,
     public title: string,
     public creatorId: number,
+    public proposalId: number,
     public questionaryId: number,
+    public questionId: string,
     public safetyStatus: SampleStatus,
     public safetyComment: string,
     public created: Date
@@ -11,7 +13,7 @@ export class Sample {
 }
 
 export enum SampleStatus {
-  PENDING_EVALUTATION = 0,
+  PENDING_EVALUATION = 0,
   LOW_RISK,
   ELEVATED_RISK,
   HIGH_RISK,

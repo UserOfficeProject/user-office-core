@@ -6,7 +6,6 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { SamplesArgs } from '../resolvers/queries/SamplesQuery';
 import { logger } from '../utils/Logger';
-import { questionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import { sampleAuthorization } from '../utils/SampleAuthorization';
 
 export default class SampleQueries {
@@ -33,20 +32,6 @@ export default class SampleQueries {
     ).then(results => samples.filter((_v, index) => results[index]));
 
     return samples;
-  }
-
-  async getSamplesByAnswerId(agent: UserWithRole | null, answerId: number) {
-    const answer = await this.questionaryDataSource.getAnswer(answerId);
-    if (!questionaryAuthorization.hasReadRights(agent, answer.questionaryId)) {
-      logger.logWarn('Unauthorized getSamplesByAnswerId access', {
-        agent,
-        answerId,
-      });
-
-      return null;
-    }
-
-    return await this.dataSource.getSamplesByAnswerId(answerId);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])

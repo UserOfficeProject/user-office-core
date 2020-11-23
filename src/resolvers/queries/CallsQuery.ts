@@ -10,6 +10,15 @@ export class CallsFilter {
 
   @Field(() => Boolean, { nullable: true })
   public isActive?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isEnded?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isReviewEnded?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isSEPReviewEnded?: boolean;
 }
 
 @Resolver()

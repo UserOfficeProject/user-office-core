@@ -31,12 +31,6 @@ test('Get questionary should succeed for authorized user', () => {
   ).resolves.not.toBe(null);
 });
 
-test('Get blank questionary should succeed for authorized user', () => {
-  return expect(
-    questionaryQueries.getBlankQuestionary(dummyUserWithRole, 1)
-  ).resolves.not.toBe(null);
-});
-
 test('Get blank questionary steps should succeed for authorized user', () => {
   return expect(
     questionaryQueries.getBlankQuestionarySteps(dummyUserWithRole, 1)
