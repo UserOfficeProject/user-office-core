@@ -9,7 +9,7 @@
   "private": true,
   "dependencies": {
     "@esss-swap/duo-localisation": "^1.1.15",
-    "@esss-swap/duo-validation": "^1.1.37",
+    "@esss-swap/duo-validation": "^1.1.39",
     "@graphql-codegen/cli": "^1.17.10",
     "@graphql-codegen/typescript": "^1.17.11",
     "@graphql-codegen/typescript-graphql-request": "^1.17.7",
@@ -22,7 +22,7 @@
     "@types/jsonwebtoken": "~8.5.0",
     "@types/react": "^16.9.53",
     "@types/react-beautiful-dnd": "~11.0.5",
-    "@types/react-dom": "~16.9.8",
+    "@types/react-dom": "~16.9.9",
     "@types/react-router": "~5.1.8",
     "@types/react-router-dom": "~4.3.5",
     "@types/tinymce": "~4.5.24",
@@ -63,6 +63,7 @@
   "proxy": "http://localhost:4000",
   "scripts": {
     "dev": "react-scripts start",
+    "dev:docker": "npm install && react-scripts start",
     "build": "react-scripts --max_old_space_size=4096 build",
     "debug": "react-scripts --inspect-brk start",
     "test": "react-scripts test",
@@ -74,6 +75,7 @@
     "cypress:open": "env CYPRESS_SVC_ACC_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjowLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiU2VydmljZSBBY2NvdW50IiwibWlkZGxlbmFtZSI6IiIsImxhc3RuYW1lIjoiIiwidXNlcm5hbWUiOiJzZXJ2aWNlIiwicHJlZmVycmVkbmFtZSI6IiIsIm9yY2lkIjoiIiwicmVmcmVzaFRva2VuIjoiIiwiZ2VuZGVyIjoibWFsZSIsIm5hdGlvbmFsaXR5IjoxLCJiaXJ0aGRhdGUiOiIyMDAwLTA0LTAxVDIyOjAwOjAwLjAwMFoiLCJvcmdhbmlzYXRpb24iOjEsImRlcGFydG1lbnQiOiIiLCJwb3NpdGlvbiI6IiIsImVtYWlsIjoic2VydmljZUB1c2Vyb2ZmaWNlLmVzcy5ldSIsImVtYWlsVmVyaWZpZWQiOnRydWUsInRlbGVwaG9uZSI6IiIsInRlbGVwaG9uZV9hbHQiOiIiLCJwbGFjZWhvbGRlciI6ZmFsc2UsImNyZWF0ZWQiOiIyMDIwLTA4LTEwVDE2OjQwOjAyLjk1NloiLCJ1cGRhdGVkIjoiMjAyMC0wOC0xMFQxNjo0MDowMy4yNjhaIn0sInJvbGVzIjpbeyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImN1cnJlbnRSb2xlIjp7ImlkIjoyLCJzaG9ydENvZGUiOiJ1c2VyX29mZmljZXIiLCJ0aXRsZSI6IlVzZXIgT2ZmaWNlciJ9LCJpYXQiOjE1OTcwNzc3NjF9.y_coY649frw5dgl549tGjirF99nqwz1-BrUAILhE6pI cypress open --config defaultCommandTimeout=15000",
     "cy:run": "env CYPRESS_SVC_ACC_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjowLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiU2VydmljZSBBY2NvdW50IiwibWlkZGxlbmFtZSI6IiIsImxhc3RuYW1lIjoiIiwidXNlcm5hbWUiOiJzZXJ2aWNlIiwicHJlZmVycmVkbmFtZSI6IiIsIm9yY2lkIjoiIiwicmVmcmVzaFRva2VuIjoiIiwiZ2VuZGVyIjoibWFsZSIsIm5hdGlvbmFsaXR5IjoxLCJiaXJ0aGRhdGUiOiIyMDAwLTA0LTAxVDIyOjAwOjAwLjAwMFoiLCJvcmdhbmlzYXRpb24iOjEsImRlcGFydG1lbnQiOiIiLCJwb3NpdGlvbiI6IiIsImVtYWlsIjoic2VydmljZUB1c2Vyb2ZmaWNlLmVzcy5ldSIsImVtYWlsVmVyaWZpZWQiOnRydWUsInRlbGVwaG9uZSI6IiIsInRlbGVwaG9uZV9hbHQiOiIiLCJwbGFjZWhvbGRlciI6ZmFsc2UsImNyZWF0ZWQiOiIyMDIwLTA4LTEwVDE2OjQwOjAyLjk1NloiLCJ1cGRhdGVkIjoiMjAyMC0wOC0xMFQxNjo0MDowMy4yNjhaIn0sInJvbGVzIjpbeyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImN1cnJlbnRSb2xlIjp7ImlkIjoyLCJzaG9ydENvZGUiOiJ1c2VyX29mZmljZXIiLCJ0aXRsZSI6IlVzZXIgT2ZmaWNlciJ9LCJpYXQiOjE1OTcwNzc3NjF9.y_coY649frw5dgl549tGjirF99nqwz1-BrUAILhE6pI cypress run --config defaultCommandTimeout=15000",
     "generate:local": "sed \"s@<SCHEMA_URL>@http://localhost:4000/graphql@g\" codegen_template.yml > codegen_tmp.yml && graphql-codegen -c codegen_tmp.yml && rm ./codegen_tmp.yml",
+    "generate:local:windows": "powershell \"$c = Get-Content codegen_template.yml; $c -replace '<SCHEMA_URL>', 'http://localhost:4000/graphql' | Set-Content codegen_tmp.yml; graphql-codegen -c codegen_tmp.yml; Remove-Item codegen_tmp.yml\"",
     "analyze": "source-map-explorer 'build/static/js/*.js'"
   },
   "lint-staged": {

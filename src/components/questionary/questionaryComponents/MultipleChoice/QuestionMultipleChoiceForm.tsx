@@ -1,6 +1,6 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
-import React from 'react';
+import { CheckboxWithLabel, TextField } from 'formik-material-ui';
+import React, { ChangeEvent, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
@@ -18,6 +18,10 @@ export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
   const config = field.config as SelectionFromOptionsConfig;
 
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
+  const [
+    showIsMultipleSelectCheckbox,
+    setShowIsMultipleSelectCheckbox,
+  ] = useState(config.variant === 'dropdown');
 
   return (
     <QuestionFormShell
@@ -75,7 +79,24 @@ export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
                 { text: 'Dropdown', value: 'dropdown' },
               ]}
               data-cy="variant"
+              InputProps={{
+                onChange: (e: ChangeEvent<HTMLInputElement>) => {
+                  formikProps.setFieldValue('config.variant', e.target.value);
+                  setShowIsMultipleSelectCheckbox(
+                    e.target.value === 'dropdown'
+                  );
+                },
+              }}
             />
+
+            {showIsMultipleSelectCheckbox && (
+              <Field
+                name="config.isMultipleSelect"
+                component={CheckboxWithLabel}
+                Label={{ label: 'Is multiple select' }}
+                margin="normal"
+              />
+            )}
           </TitledContainer>
 
           <TitledContainer label="Items">

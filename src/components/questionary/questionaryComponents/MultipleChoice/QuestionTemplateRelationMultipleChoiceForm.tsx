@@ -1,5 +1,6 @@
 import { Field } from 'formik';
-import React from 'react';
+import { CheckboxWithLabel } from 'formik-material-ui';
+import React, { ChangeEvent, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
@@ -8,12 +9,21 @@ import FormikUICustomDependencySelector from 'components/common/FormikUICustomDe
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionTemplateRelation } from 'generated/sdk';
+import {
+  QuestionTemplateRelation,
+  SelectionFromOptionsConfig,
+} from 'generated/sdk';
 
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
 export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionTemplateRelation> = props => {
+  const config = props.field.config as SelectionFromOptionsConfig;
+  const [
+    showIsMultipleSelectCheckbox,
+    setShowIsMultipleSelectCheckbox,
+  ] = useState(config.variant === 'dropdown');
+
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
@@ -52,7 +62,23 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
                 { text: 'Dropdown', value: 'dropdown' },
               ]}
               data-cy="variant"
+              InputProps={{
+                onChange: (e: ChangeEvent<HTMLInputElement>) => {
+                  formikProps.setFieldValue('config.variant', e.target.value);
+                  setShowIsMultipleSelectCheckbox(
+                    e.target.value === 'dropdown'
+                  );
+                },
+              }}
             />
+            {showIsMultipleSelectCheckbox && (
+              <Field
+                name="config.isMultipleSelect"
+                component={CheckboxWithLabel}
+                Label={{ label: 'Is multiple select' }}
+                margin="normal"
+              />
+            )}
           </TitledContainer>
 
           <TitledContainer label="Items">

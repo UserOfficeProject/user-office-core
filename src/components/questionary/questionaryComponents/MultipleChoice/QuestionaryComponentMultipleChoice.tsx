@@ -35,7 +35,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     question: { proposalQuestionId, question },
     value,
   } = answer;
-  const [stateValue, setStateValue] = useState(value);
+  const [stateValue, setStateValue] = useState<Array<string>>(value);
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
   const config = answer.config as SelectionFromOptionsConfig;
@@ -63,7 +63,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
             }
             SelectProps={{
-              MenuProps: {},
+              multiple: config.isMultipleSelect,
             }}
             error={isError}
             helperText={config.small_label}

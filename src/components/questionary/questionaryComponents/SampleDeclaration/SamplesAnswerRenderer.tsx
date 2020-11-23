@@ -20,13 +20,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function SampleList(props: {
-  sampleIds: number[];
+  samples: SampleBasic[];
   onClick?: (sample: SampleBasic) => any;
 }) {
-  const { sampleIds } = props;
-
   const classes = useStyles();
-  const { samples } = useSamples({ sampleIds });
 
   const sampleLink = (sample: SampleBasic) => (
     <Link href="#" onClick={() => props.onClick?.(sample)}>
@@ -36,7 +33,7 @@ function SampleList(props: {
 
   return (
     <ul className={classes.list}>
-      {samples.map(sample => (
+      {props.samples.map(sample => (
         <li key={`sample-${sample.id}`}>{sampleLink(sample)}</li>
       ))}
     </ul>
@@ -46,10 +43,14 @@ function SampleList(props: {
 function SamplesAnswerRenderer(props: { answer: Answer }) {
   const [selectedSampleId, setSelectedSampleId] = useState<number | null>(null);
 
+  const { samples } = useSamples({
+    sampleIds: props.answer.value,
+  });
+
   return (
     <div>
       <SampleList
-        sampleIds={props.answer.value}
+        samples={samples}
         onClick={sample => setSelectedSampleId(sample.id)}
       />
       <InputDialog

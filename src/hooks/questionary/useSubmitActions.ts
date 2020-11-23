@@ -1,13 +1,6 @@
 import { proposalBasisPreSubmit } from 'components/questionary/questionaryComponents/ProposalBasis/QuestionaryComponentProposalBasis';
 import { sampleBasisPreSubmit } from 'components/questionary/questionaryComponents/SampleBasis/QuestionaryComponentSampleBasis';
-import { sampleDeclarationPostSubmit } from 'components/questionary/questionaryComponents/SampleDeclaration/QuestionaryComponentSampleDeclaration';
-import {
-  Answer,
-  DataType,
-  Sdk,
-  SubtemplateConfig,
-  TemplateCategoryId,
-} from 'generated/sdk';
+import { Answer, DataType, Sdk } from 'generated/sdk';
 import {
   Event,
   QuestionarySubmissionState,
@@ -43,14 +36,10 @@ export function usePostSubmitActions() {
   return (answers: Answer[]): SubmitAction[] => {
     const actions = answers
       .flatMap(answer => {
-        switch (answer.question.dataType) {
-          case DataType.SAMPLE_DECLARATION:
-            if (
-              (answer.config as SubtemplateConfig).templateCategory ===
-              TemplateCategoryId.SAMPLE_DECLARATION
-            ) {
-              return sampleDeclarationPostSubmit(answer);
-            }
+        switch (
+          answer.question.dataType
+          // nothing here for now
+        ) {
         }
 
         return [];

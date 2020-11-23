@@ -2,7 +2,9 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import React, { ChangeEvent, useState } from 'react';
 
-const TextFieldWithCounter = (props: TextFieldProps & { maxLen?: number }) => {
+const TextFieldWithCounter = (
+  props: TextFieldProps & { maxLen?: number; isCounterHidden?: boolean }
+) => {
   const classes = makeStyles(theme => ({
     counter: {
       color: 'gray',
@@ -16,14 +18,14 @@ const TextFieldWithCounter = (props: TextFieldProps & { maxLen?: number }) => {
     },
   }))();
   const [textLen, setTextLen] = useState(
-    props.value ? String(props.value).length : 0
+    props.value ? (props.value as string).length : 0
   );
   const handleChange = (evt: ChangeEvent<HTMLInputElement>): void => {
     props.onChange?.(evt);
     setTextLen(evt.target.value.length);
   };
 
-  const { maxLen, ...other } = props;
+  const { maxLen, isCounterHidden, ...other } = props;
 
   const getCounterClassNames = (): string => {
     const classNames = [classes.counter];
@@ -34,12 +36,16 @@ const TextFieldWithCounter = (props: TextFieldProps & { maxLen?: number }) => {
     return classNames.join(' ');
   };
 
+  const counter = isCounterHidden ? null : (
+    <span className={getCounterClassNames()}>
+      {textLen ? (maxLen ? `${textLen}/${maxLen}` : textLen) : ''}
+    </span>
+  );
+
   return (
     <div className={classes.wrapper}>
       <TextField {...other} onChange={handleChange} />
-      <span className={getCounterClassNames()}>
-        {textLen ? (maxLen ? `${textLen}/${maxLen}` : textLen) : ''}
-      </span>
+      {counter}
     </div>
   );
 };
