@@ -65,7 +65,7 @@ export default function PeoplePage() {
                       userRole: UserRole.USER,
                     })
                   }
-                  action={() => console.log()}
+                  action={() => {}}
                 />
               ) : (
                 <PeopleTable

@@ -1,7 +1,6 @@
 import { FormikActions } from 'formik';
 import MaterialTable from 'material-table';
-import React from 'react';
-
+import React, { forwardRef } from 'react';
 import { tableIcons } from 'utils/materialIcons';
 
 export const FormikUICustomTable = ({
@@ -32,7 +31,10 @@ export const FormikUICustomTable = ({
 
   return (
     <MaterialTable
-      icons={tableIcons}
+      icons={{
+        ...tableIcons,
+        Add: forwardRef((props, ref) => <>Add answer</>),
+      }}
       columns={columns}
       data={state}
       options={{ search: false, paging: false }}

@@ -2,13 +2,13 @@
 ARG WINDOWS_VERSION
 
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM docker-registry.devs.facilities.rl.ac.uk/bisapps-node:10-servercore${WINDOWS_VERSION}-1.0.0-SNAPSHOT as build-stage
+FROM docker-registry.devs.facilities.rl.ac.uk/bisapps-node:12-servercore${WINDOWS_VERSION}-1.0.0-SNAPSHOT as build-stage
 
 WORKDIR /app
 
 COPY package*.json /app/
 
-RUN npm install --only=production --silent
+RUN npm ci --only=production --loglevel error --no-fund
 
 COPY ./ /app/
 

@@ -20,8 +20,10 @@ import {
 import { usePrevious } from 'hooks/common/usePrevious';
 import { usePersistProposalModel } from 'hooks/questionary/usePersistProposalModel';
 import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
-import { ProposalSubsetSumbission } from 'models/ProposalSubmissionState';
-import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
+import {
+  ProposalSubmissionState,
+  ProposalSubsetSumbission,
+} from 'models/ProposalSubmissionState';
 import {
   Event,
   EventType,

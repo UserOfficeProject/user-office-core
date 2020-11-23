@@ -1,7 +1,0 @@
-fragment answerBasic on AnswerBasic {
-  answerId
-  answer
-  questionaryId
-  questionId
-  createdAt
-}

@@ -1,44 +1,203 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
 name: E2E and build testing.
 
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the develop and master branches
 on:
   pull_request:
     branches: [develop, master]
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache app docker layers and image
+        id: cached-image
+        uses: actions/cache@v2
+        with:
+          path: |
+            /tmp/.buildx-layer-cache
+            /tmp/.buildx-image-cache
+          key: ${{ runner.os }}-buildx-${{ github.head_ref }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ github.head_ref }}-
+            ${{ runner.os }}-buildx-
+
+      - name: Set up Docker Buildx
+        if: steps.cached-image.outputs.cache-hit != 'true'
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and cache image
+        if: steps.cached-image.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /tmp/.buildx-image-cache
+          TAG=duo-frontend:${{ github.sha }}
+
+          docker buildx build --cache-to="type=local,dest=/tmp/.buildx-layer-cache,mode=max" --cache-from="type=local,src=/tmp/.buildx-layer-cache" -t $TAG -o type=docker,dest=- . > /tmp/.buildx-image-cache/img.tar
+
+  cypress:
+    runs-on: ubuntu-latest
+    needs: build
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to GitHub Packages Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build new e2e test image if changed
+        run: |
+          DOCKERFILE_VERSION=${{ hashFiles('cypress/Dockerfile') }}
+          MANIFEST_URL="https://docker.pkg.github.com/v2/userofficeproject/user-office-frontend/e2e-cypress-core/manifests/$DOCKERFILE_VERSION"
+          MANIFEST_STATUS=$(curl -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' -o /dev/null --silent --get --write-out '%{http_code}' $MANIFEST_URL)
+          TAG="docker.pkg.github.com/userofficeproject/user-office-frontend/e2e-cypress-core:$DOCKERFILE_VERSION"
+
+          echo MANIFEST_STATUS $MANIFEST_STATUS
+
+          if [[ $MANIFEST_STATUS != "200" ]]; then
+            docker build -t $TAG ./cypress
+            docker push $TAG
+          fi
   e2e:
     runs-on: ubuntu-latest
+    needs: cypress
+
     steps:
       - uses: actions/checkout@v2
+
+      - name: Login to GitHub Packages Docker Registry
+        uses: docker/login-action@v1
         with:
-          ref: ${{ github.head_ref }}
-      - run: echo ${{ github.head_ref }}
-      - run: echo "::set-env name=TAGS_JSON::$(curl -sb -H https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags)"
-      - run: echo "TAGS_JSON $TAGS_JSON"
-      - run: echo "::set-env name=TAG_COUNT::$(echo $TAGS_JSON | jq -c '.[] | select(.name=="${{ github.head_ref }}")' | jq -s '. | length')"
-      - run: echo "TAG_COUNT $TAG_COUNT"
-      - run: if [ "$TAG_COUNT" != 0 ]; then    echo "::set-env name=TAG::${{ github.head_ref }}"; else    echo "::set-env name=TAG::develop"; fi
-      - run: echo "TAG $TAG"
-      - run: rm -rf user-office-backend
-      - run: git clone https://github.com/UserOfficeProject/user-office-backend
-      - run: cd user-office-backend && git fetch && git checkout $TAG && cd ..
-      - run: docker-compose -f docker-compose.e2e.yaml rm
-      - run: docker-compose -f docker-compose.e2e.yaml down --remove-orphans
-      - run: docker-compose -f docker-compose.e2e.yaml pull
-      - run: docker-compose -f docker-compose.e2e.yaml build --no-cache
-      - run: docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
-      - run: docker-compose -f docker-compose.e2e.yaml down
-    env:
-      SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
-  build:
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull cypress image
+        run: |
+          DOCKERFILE_VERSION=${{ hashFiles('cypress/Dockerfile') }}
+          TAG="docker.pkg.github.com/userofficeproject/user-office-frontend/e2e-cypress-core:$DOCKERFILE_VERSION"
+          docker pull $TAG 
+          docker tag $TAG e2e-cypress:latest
+
+      - name: Load app cache
+        id: cached-image
+        uses: actions/cache@v2
+        with:
+          path: |
+            /tmp/.buildx-layer-cache
+            /tmp/.buildx-image-cache
+          key: ${{ runner.os }}-buildx-${{ github.head_ref }}-${{ github.sha }}
+
+      - name: Fail on app cache miss
+        if: steps.cached-image.outputs.cache-hit != 'true'
+        run: |
+          echo "No cache hit!"
+          exit 1
+
+      - name: Load cached app image
+        run: |
+          docker load --input /tmp/.buildx-image-cache/img.tar
+
+      - name: Resolve required repositories
+        id: resolve_rep
+        run: |
+          BE_TAGS_JSON=$(curl -sb -H https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags)
+          FACTORY_TAGS_JSON=$(curl -sb -H https://registry.hub.docker.com/v1/repositories/dmsc/duo-factory/tags)
+
+          BE_TAG=develop
+          if [[ $(echo $BE_TAGS_JSON | jq -c '.[] | select(.name=="${{ github.head_ref }}")' | jq -s '. | length') != "0" ]]; then
+            BE_TAG="${{ github.head_ref }}"
+          fi
+
+          FACTORY_TAG=develop
+          if [[ $(echo $FACTORY_TAGS_JSON | jq -c '.[] | select(.name=="${{ github.head_ref }}")' | jq -s '. | length') != "0" ]]; then
+            FACTORY_TAG="${{ github.head_ref }}"
+          fi
+
+          echo ::set-output name=BE_TAG::${BE_TAG}
+          echo ::set-output name=FACTORY_TAG::${FACTORY_TAG}
+
+      - name: Download required repositories
+        run: |
+          cd "$GITHUB_WORKSPACE/.."
+          git clone --depth 1 --branch "${{ steps.resolve_rep.outputs.BE_TAG }}" https://github.com/UserOfficeProject/user-office-backend.git
+          git clone --depth 1 --branch "${{ steps.resolve_rep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
+
+      - name: Setup base docker-compose
+        run: |
+          cd "$GITHUB_WORKSPACE/.."
+          cat > docker-compose.all.yml << EOF
+          version: "3.1"
+          EOF
+
+      - name: Run docker-compose
+        env:
+          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
+        run: |
+          cd "$GITHUB_WORKSPACE/.."
+
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          export USER_OFFICE_BACKEND_TAG=${{ steps.resolve_rep.outputs.BE_TAG }}
+          export USER_OFFICE_BACKEND_DIR=user-office-backend
+
+          export USER_OFFICE_FACTORY_TAG=${{ steps.resolve_rep.outputs.FACTORY_TAG }}
+          export USER_OFFICE_PDF_FACTORY_ENDPOINT=http://factory:4500/generate-pdf
+
+          export USER_OFFICE_FRONTEND_DIR=$REPO_DIR_NAME
+          export BUILD_TAG=${{ github.sha }}
+
+          docker-compose -f docker-compose.all.yml \
+            -f user-office-backend/docker-compose.e2e.yml \
+            -f user-office-factory/docker-compose.e2e.yml \
+            -f "$REPO_DIR_NAME/docker-compose.e2e.yml" \
+            up --exit-code-from cypress
+  push:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
     needs: e2e
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v2
-      - uses: docker/build-push-action@v1
+      - name: Load app cache
+        id: cached-image
+        uses: actions/cache@v2
+        with:
+          path: |
+            /tmp/.buildx-layer-cache
+            /tmp/.buildx-image-cache
+          key: ${{ runner.os }}-buildx-${{ github.head_ref }}-${{ github.sha }}
+
+      - name: Fail on cache miss
+        if: steps.cached-image.outputs.cache-hit != 'true'
+        run: |
+          echo "No cache hit!"
+          exit 1
+
+      # For debugging capture the selected branch
+      - name: Branch
+        run: echo "Branch ${{ github.head_ref }}"
+
+      - name: Load cached app image
+        run: |
+          docker load --input /tmp/.buildx-image-cache/img.tar
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          push: false
+
+      - name: Push
+        run: |
+          docker tag duo-frontend:${{ github.sha }} dmsc/duo-frontend:${{ github.head_ref }}
+          docker push dmsc/duo-frontend:${{ github.head_ref }}
