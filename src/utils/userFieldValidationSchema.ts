@@ -20,7 +20,7 @@ export const userFieldSchema = Yup.object().shape({
   birthdate: Yup.date()
     .min(new Date(1900, 1, 1), 'You are not that old')
     .test('DOB', 'You must be at least 18 years old', value => {
-      const dateOfBirth = new Date(value || new Date());
+      const dateOfBirth = new Date(value || Date.now());
       const dateNow = new Date();
 
       if (dateNow.getFullYear() - dateOfBirth.getFullYear() < 18) {
@@ -134,7 +134,6 @@ export function useNaturalKeySchema(initialValue: string): any {
             if (response === null) {
               reject();
             } else {
-              console.log(response);
               resolve(!response);
             }
           });

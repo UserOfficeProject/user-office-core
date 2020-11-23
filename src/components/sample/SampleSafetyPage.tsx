@@ -190,9 +190,9 @@ function SampleEvaluationDialog(props: {
           if (values) {
             const { id, safetyComment, safetyStatus } = values;
             api(`Review for '${sample?.title}' submitted`)
-              .updateSampleSafetyReview({ id, safetyComment, safetyStatus })
+              .updateSample({ sampleId: id, safetyComment, safetyStatus })
               .then(result => {
-                const newSample = result.updateSampleSafetyReview.sample;
+                const newSample = result.updateSample.sample;
                 onClose(newSample || null);
               });
           }
