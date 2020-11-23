@@ -21,91 +21,96 @@ export default class PostgresProposalSettingsDataSource
   private createProposalStatusObject(proposalStatus: ProposalStatusRecord) {
     return new ProposalStatus(
       proposalStatus.proposal_status_id,
+      proposalStatus.short_code,
       proposalStatus.name,
-      proposalStatus.description
+      proposalStatus.description,
+      proposalStatus.is_default
     );
   }
 
   async createProposalStatus(
     newProposalStatusInput: CreateProposalStatusInput
   ): Promise<ProposalStatus> {
-    return database
-      .insert(newProposalStatusInput)
+    const [addedProposalStatus]: ProposalStatusRecord[] = await database
+      .insert({
+        short_code: newProposalStatusInput.shortCode,
+        name: newProposalStatusInput.name,
+        description: newProposalStatusInput.description,
+      })
       .into('proposal_statuses')
-      .returning(['*'])
-      .then((proposalStatus: ProposalStatusRecord[]) => {
-        if (proposalStatus.length !== 1) {
-          throw new Error('Could not create proposal status');
-        }
+      .returning(['*']);
 
-        return this.createProposalStatusObject(proposalStatus[0]);
-      });
+    if (!addedProposalStatus) {
+      throw new Error('Could not create proposal status');
+    }
+
+    return this.createProposalStatusObject(addedProposalStatus);
   }
 
   async getProposalStatus(
     proposalStatusId: number
   ): Promise<ProposalStatus | null> {
-    return database
+    const proposalStatus: ProposalStatusRecord = await database
       .select()
       .from('proposal_statuses')
       .where('proposal_status_id', proposalStatusId)
-      .first()
-      .then((proposalStatus: ProposalStatusRecord | null) =>
-        proposalStatus ? this.createProposalStatusObject(proposalStatus) : null
-      );
+      .first();
+
+    return proposalStatus
+      ? this.createProposalStatusObject(proposalStatus)
+      : null;
   }
 
   async getAllProposalStatuses(): Promise<ProposalStatus[]> {
-    return database
+    const proposalStatuses: ProposalStatusRecord[] = await database
       .select('*')
       .from('proposal_statuses')
-      .orderBy('proposal_status_id', 'asc')
-      .then((proposalStatuses: ProposalStatusRecord[]) => {
-        return proposalStatuses.map(proposalStatus =>
-          this.createProposalStatusObject(proposalStatus)
-        );
-      });
+      .orderBy('proposal_status_id', 'asc');
+
+    return proposalStatuses.map(proposalStatus =>
+      this.createProposalStatusObject(proposalStatus)
+    );
   }
 
   async updateProposalStatus(
     proposalStatus: ProposalStatus
   ): Promise<ProposalStatus> {
-    return database
+    const [updatedProposalStatus]: ProposalStatusRecord[] = await database
       .update(
         {
-          proposal_status_id: proposalStatus.id,
           name: proposalStatus.name,
           description: proposalStatus.description,
         },
         ['*']
       )
       .from('proposal_statuses')
-      .where('proposal_status_id', proposalStatus.id)
-      .then((records: ProposalStatusRecord[]) => {
-        if (records === undefined || !records.length) {
-          throw new Error(`ProposalStatus not found ${proposalStatus.id}`);
-        }
+      .where('proposal_status_id', proposalStatus.id);
 
-        return this.createProposalStatusObject(records[0]);
-      });
+    if (!updatedProposalStatus) {
+      throw new Error(`ProposalStatus not found ${proposalStatus.id}`);
+    }
+
+    return this.createProposalStatusObject(updatedProposalStatus);
   }
 
   async deleteProposalStatus(
     proposalStatusId: number
   ): Promise<ProposalStatus> {
-    return database('proposal_statuses')
+    const [removedProposalStatus]: ProposalStatusRecord[] = await database(
+      'proposal_statuses'
+    )
       .where('proposal_status_id', proposalStatusId)
+      .andWhere('is_default', false)
       .del()
-      .returning('*')
-      .then((proposalStatus: ProposalStatusRecord[]) => {
-        if (proposalStatus === undefined || proposalStatus.length !== 1) {
-          throw new Error(
-            `Could not delete proposalStatus with id: ${proposalStatusId} `
-          );
-        }
+      .returning('*');
 
-        return this.createProposalStatusObject(proposalStatus[0]);
-      });
+    if (!removedProposalStatus) {
+      throw new Error(
+        `Could not delete proposalStatus with id: ${proposalStatusId} `
+      );
+    }
+
+    return this.createProposalStatusObject(removedProposalStatus);
   }
   // <---------- Proposal statuses -----------
 
@@ -245,8 +250,10 @@ export default class PostgresProposalSettingsDataSource
       proposalWorkflowConnection.proposal_status_id,
       {
         id: proposalWorkflowConnection.proposal_status_id,
+        shortCode: proposalWorkflowConnection.short_code,
         name: proposalWorkflowConnection.name,
         description: proposalWorkflowConnection.description,
+        isDefault: proposalWorkflowConnection.is_default,
       },
       proposalWorkflowConnection.next_proposal_status_id,
       proposalWorkflowConnection.prev_proposal_status_id,
@@ -409,8 +416,10 @@ export default class PostgresProposalSettingsDataSource
       return connectionsResult.map(connection =>
         this.createProposalWorkflowConnectionObject({
           ...connection,
+          short_code: '',
           name: '',
           description: '',
+          is_default: true,
           full_count: connectionsResult.length,
         })
       );
@@ -453,8 +462,10 @@ export default class PostgresProposalSettingsDataSource
         // NOTE: I need this object only to be able to reorder and update other statuses in the logic layer.
         return this.createProposalWorkflowConnectionObject({
           ...proposalWorkflowStatus[0],
+          short_code: '',
           name: '',
           description: '',
+          is_default: true,
           full_count: 1,
         });
       }

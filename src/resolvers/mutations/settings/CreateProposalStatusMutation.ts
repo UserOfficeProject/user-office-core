@@ -8,6 +8,9 @@ import { wrapResponse } from '../../wrapResponse';
 @InputType()
 export class CreateProposalStatusInput implements Partial<ProposalStatus> {
   @Field(() => String)
+  public shortCode: string;
+
+  @Field(() => String)
   public name: string;
 
   @Field(() => String)
