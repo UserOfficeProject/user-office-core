@@ -1,19 +1,19 @@
 mutation updateProposalStatus(
   $id: Int!
+  $shortCode: String!
   $name: String!
   $description: String!
 ) {
   updateProposalStatus(
     updatedProposalStatusInput: {
       id: $id
+      shortCode: $shortCode
       name: $name
       description: $description
     }
   ) {
     proposalStatus {
-      id
-      name
-      description
+      ...proposalStatus
     }
     error
   }

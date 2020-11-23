@@ -1,6 +1,7 @@
 import { FormikActions } from 'formik';
 import MaterialTable from 'material-table';
 import React, { forwardRef } from 'react';
+
 import { tableIcons } from 'utils/materialIcons';
 
 export const FormikUICustomTable = ({
