@@ -136,7 +136,7 @@ test('A user cannot invite a reviewer by email', () => {
 test('A user can update its own name', () => {
   return expect(
     userMutations.update(dummyUserWithRole, {
-      id: 2,
+      ...dummyUser,
       firstname: 'klara',
       lastname: 'undefined',
     })
@@ -146,7 +146,7 @@ test('A user can update its own name', () => {
 test('A user cannot update another users name', () => {
   return expect(
     userMutations.update(dummyUserNotOnProposalWithRole, {
-      id: 2,
+      ...dummyUser,
       firstname: 'klara',
       lastname: 'undefined',
     })
@@ -156,7 +156,7 @@ test('A user cannot update another users name', () => {
 test('A not logged in user cannot update another users name', () => {
   return expect(
     userMutations.update(null, {
-      id: 2,
+      ...dummyUser,
       firstname: 'klara',
       lastname: 'undefined',
     })
@@ -166,7 +166,7 @@ test('A not logged in user cannot update another users name', () => {
 test('A userofficer can update another users name', () => {
   return expect(
     userMutations.update(dummyUserOfficerWithRole, {
-      id: 2,
+      ...dummyUser,
       firstname: 'klara',
       lastname: 'undefined',
     })
