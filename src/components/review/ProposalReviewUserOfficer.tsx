@@ -1,6 +1,6 @@
 import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/TabPanel';
@@ -10,7 +10,7 @@ import GeneralInformation from 'components/proposal/GeneralInformation';
 import ProposalAdmin, {
   AdministrationFormData,
 } from 'components/proposal/ProposalAdmin';
-import { Proposal, CoreTechnicalReviewFragment, UserRole } from 'generated/sdk';
+import { CoreTechnicalReviewFragment, Proposal, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 import ProposalTechnicalReview from './ProposalTechnicalReview';

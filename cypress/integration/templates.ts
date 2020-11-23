@@ -5,27 +5,37 @@ context('Template tests', () => {
     cy.resetDB();
   });
   beforeEach(() => {
-    cy.viewport(1100, 800);
+    cy.viewport(1100, 1100);
     cy.visit('/');
   });
 
   let boolId: string;
   let textId: string;
   let dateId: string;
-  const booleanQuestion = faker.random.words(2);
-  const textQuestion = faker.random.words(2);
-  const dateQuestion = faker.random.words(2);
-  const fileQuestion = faker.random.words(2);
+  let multipleChoiceId: string;
 
-  const dateTooltip = faker.random.words(2);
+  const booleanQuestion = faker.lorem.words(2);
+  const textQuestion = faker.lorem.words(2);
+  const dateQuestion = faker.lorem.words(2);
+  const fileQuestion = faker.lorem.words(2);
+  const multipleChoiceQuestion = faker.lorem.words(2);
+  const multipleChoiceAnswers = [
+    faker.lorem.words(2),
+    faker.lorem.words(2),
+    faker.lorem.words(2),
+  ];
 
-  const topic = faker.random.words(1);
-  const title = faker.random.words(3);
-  const abstract = faker.random.words(8);
-  const textAnswer = faker.random.words(5);
+  const dateTooltip = faker.lorem.words(2);
 
-  const sampleDeclarationName = faker.random.words(2);
-  const sampleDeclarationDescription = faker.random.words(5);
+  const topic = faker.lorem.words(1);
+  const title = faker.lorem.words(3);
+  const abstract = faker.lorem.words(8);
+  const textAnswer = faker.lorem.words(5);
+
+  const sampleDeclarationName = faker.lorem.words(2);
+  const sampleDeclarationDescription = faker.lorem.words(5);
+
+  const minimumCharacters = 1000;
 
   it('User officer can create sample declaration template', () => {
     cy.login('officer');
@@ -139,6 +149,8 @@ context('Template tests', () => {
 
     cy.contains('Is required').click();
 
+    cy.get('[data-cy=max]').type(minimumCharacters.toString());
+
     cy.contains('Save').click();
 
     cy.contains(textQuestion)
@@ -179,12 +191,57 @@ context('Template tests', () => {
 
     // Updating dependencies
     cy.get('#dependency-id').click();
-    cy.get('#menu- > .MuiPaper-root > .MuiList-root').click(); // Get first answer from dropdown
+    cy.get('[data-cy=question-relation-dialogue]')
+      .get('#menu- > .MuiPaper-root > .MuiList-root > [tabindex="0"]')
+      .click(); // get boolean question
 
     cy.get('#dependencyValue').click();
-    cy.get("#menu- > .MuiPaper-root > .MuiList-root > [tabindex='0']").click(); // get true from fropdown
+    cy.get('[data-cy=question-relation-dialogue]')
+      .get("#menu- > .MuiPaper-root > .MuiList-root > [tabindex='0']")
+      .click(); // get true from dropdown
 
     cy.contains('Update').click();
+
+    /* Selection from options */
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
+
+    cy.contains('Add Multiple choice').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(multipleChoiceQuestion);
+
+    cy.contains('Radio').click();
+
+    cy.contains('Dropdown').click();
+
+    cy.contains('Is multiple select').click();
+
+    cy.contains('Add answer').click();
+    cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[0]);
+    cy.get('[title="Save"]').click();
+
+    cy.contains('Add answer').click();
+    cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[1]);
+    cy.get('[title="Save"]').click();
+
+    cy.contains('Add answer').click();
+    cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[2]);
+    cy.get('[title="Save"]').click();
+
+    cy.contains('Save').click();
+
+    cy.contains(multipleChoiceQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        multipleChoiceId = fieldId;
+      });
+
+    cy.get('body').type('{alt}', { release: false });
+    cy.contains(multipleChoiceQuestion).click();
+
+    /* --- */
 
     /* Date */
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
@@ -313,11 +370,17 @@ context('Template tests', () => {
     cy.createProposal(title, abstract);
     cy.get(`#${boolId}`).click();
     cy.get(`#${textId}`).type(textAnswer);
+    cy.contains(`${textAnswer.length}/${minimumCharacters}`);
     cy.get(`[data-cy='${dateId}_field'] button`).click();
     cy.wait(300);
     cy.get(`[data-cy='${dateId}_field'] button`).click({ force: true }); // click twice because ui hangs sometimes
     cy.contains('15').click({ force: true });
     cy.contains('OK').click();
+
+    cy.get(`#${multipleChoiceId}`).click();
+    cy.contains(multipleChoiceAnswers[0]).click();
+    cy.contains(multipleChoiceAnswers[2]).click();
+    cy.get('body').type('{esc}');
 
     cy.contains('Save and continue').click();
 
@@ -328,6 +391,9 @@ context('Template tests', () => {
     cy.contains(title);
     cy.contains(abstract);
     cy.contains(textAnswer);
+    cy.contains(multipleChoiceAnswers[0]);
+    cy.contains(multipleChoiceAnswers[1]).should('not.exist');
+    cy.contains(multipleChoiceAnswers[2]);
 
     cy.contains('Dashboard').click();
     cy.contains(title);

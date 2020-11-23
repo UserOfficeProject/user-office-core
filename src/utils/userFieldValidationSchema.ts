@@ -20,7 +20,7 @@ export const userFieldSchema = Yup.object().shape({
   birthdate: Yup.date()
     .min(new Date(1900, 1, 1), 'You are not that old')
     .test('DOB', 'You must be at least 18 years old', value => {
-      const dateOfBirth = new Date(value || new Date());
+      const dateOfBirth = new Date(value || Date.now());
       const dateNow = new Date();
 
       if (dateNow.getFullYear() - dateOfBirth.getFullYear() < 18) {
@@ -75,9 +75,14 @@ export const userFieldSchema = Yup.object().shape({
     .matches(phoneRegExp, 'Phone number is not valid')
     .required('telephone must be at least 2 characters'),
   telephone_alt: Yup.string()
-    .min(2, 'telephone must be at least 2 characters')
-    .max(30, 'telephone must be at most 20 characters')
-    .matches(phoneRegExp, 'Phone number is not valid'),
+    .test('telephone_alt', 'Provided number is not valid', value => {
+      if (!value) {
+        return true;
+      }
+
+      return phoneRegExp.test(value);
+    })
+    .notRequired(),
 });
 
 export const emailFieldSchema = Yup.object().shape({

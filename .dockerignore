@@ -1,5 +1,10 @@
-.git
-.idea
-node_modules
-coverage
-cypress
+# Ignore everything except the required files
+# this improves docker caching
+*
+!src
+!public
+!package*
+!tsconfig.json
+!iis.conf
+!nginx.conf
+!.env

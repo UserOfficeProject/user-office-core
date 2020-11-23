@@ -7,7 +7,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import TextField from '@material-ui/core/TextField';
 import { getIn } from 'formik';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { SelectionFromOptionsConfig } from 'generated/sdk';
@@ -30,19 +30,19 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     },
   })();
 
-  const { answer: templateField, touched, errors, onComplete } = props;
+  const { answer, touched, errors, onComplete } = props;
   const {
     question: { proposalQuestionId, question },
     value,
-  } = templateField;
-  const [stateValue, setStateValue] = useState(value);
+  } = answer;
+  const [stateValue, setStateValue] = useState<Array<string>>(value);
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
-  const config = templateField.config as SelectionFromOptionsConfig;
+  const config = answer.config as SelectionFromOptionsConfig;
 
   useEffect(() => {
-    setStateValue(templateField.value);
-  }, [templateField]);
+    setStateValue(answer.value);
+  }, [answer]);
 
   const handleOnChange = (evt: any, newValue: any) => {
     setStateValue(newValue);
@@ -63,7 +63,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
             }
             SelectProps={{
-              MenuProps: {},
+              multiple: config.isMultipleSelect,
             }}
             error={isError}
             helperText={config.small_label}

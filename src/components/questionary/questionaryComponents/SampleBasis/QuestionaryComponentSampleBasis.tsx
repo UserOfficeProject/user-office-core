@@ -59,15 +59,15 @@ const sampleBasisPreSubmit = (answer: Answer) => async ({
   const title = sample.title;
 
   if (sample.id > 0) {
-    const result = await api.updateSampleTitle({
+    const result = await api.updateSample({
       title: title,
       sampleId: sample.id,
     });
-    if (result.updateSampleTitle.sample) {
+    if (result.updateSample.sample) {
       dispatch({
         type: EventType.SAMPLE_UPDATED,
         payload: {
-          sample: result.updateSampleTitle.sample,
+          sample: result.updateSample.sample,
         },
       });
     }
@@ -75,6 +75,8 @@ const sampleBasisPreSubmit = (answer: Answer) => async ({
     const result = await api.createSample({
       title: title,
       templateId: state.templateId,
+      proposalId: sample.proposalId,
+      questionId: sample.questionId,
     });
 
     if (result.createSample.sample) {

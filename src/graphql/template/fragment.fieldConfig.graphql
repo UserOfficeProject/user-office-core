@@ -43,6 +43,7 @@ fragment fieldConfig on FieldConfig {
   ... on SelectionFromOptionsConfig {
     variant
     options
+    isMultipleSelect
 
     small_label
     required
@@ -59,5 +60,6 @@ fragment fieldConfig on FieldConfig {
     tooltip
     htmlQuestion
     isHtmlQuestion
+    isCounterHidden
   }
 }

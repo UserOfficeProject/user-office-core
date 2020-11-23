@@ -16,7 +16,7 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
 
   if (!context) {
     throw new Error(
-      'ProposalReview is missing SubmissionContext. Wrap ProposalReview or one of its parrents with SubmissionContext'
+      'ProposalReview is missing ProposalContext. Wrap ProposalReview or one of its parrents with ProposalContext'
     );
   }
   const { dispatch } = context;

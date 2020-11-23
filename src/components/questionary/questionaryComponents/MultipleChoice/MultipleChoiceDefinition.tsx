@@ -19,6 +19,6 @@ export const multipleChoiceDefinition: QuestionaryComponentDefinition = {
   readonly: false,
   creatable: true,
   icon: <RadioButtonCheckedIcon />,
-  answerRenderer: ({ answer }) => <span>{answer.value}</span>,
+  answerRenderer: ({ answer }) => <span>{answer.value.join(', ')}</span>,
   createYupValidationSchema: createMultipleChoiceValidationSchema,
 };

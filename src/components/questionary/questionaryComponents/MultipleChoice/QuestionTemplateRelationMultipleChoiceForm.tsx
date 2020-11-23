@@ -1,5 +1,6 @@
 import { Field } from 'formik';
-import React from 'react';
+import { CheckboxWithLabel } from 'formik-material-ui';
+import React, { ChangeEvent, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
@@ -18,6 +19,10 @@ import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFo
 
 export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionTemplateRelation> = props => {
   const config = props.field.config as SelectionFromOptionsConfig;
+  const [
+    showIsMultipleSelectCheckbox,
+    setShowIsMultipleSelectCheckbox,
+  ] = useState(config.variant === 'dropdown');
 
   return (
     <QuestionTemplateRelationFormShell
@@ -58,7 +63,23 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
                 { text: 'Dropdown', value: 'dropdown' },
               ]}
               data-cy="variant"
+              InputProps={{
+                onChange: (e: ChangeEvent<HTMLInputElement>) => {
+                  formikProps.setFieldValue('config.variant', e.target.value);
+                  setShowIsMultipleSelectCheckbox(
+                    e.target.value === 'dropdown'
+                  );
+                },
+              }}
             />
+            {showIsMultipleSelectCheckbox && (
+              <Field
+                name="config.isMultipleSelect"
+                component={CheckboxWithLabel}
+                Label={{ label: 'Is multiple select' }}
+                margin="normal"
+              />
+            )}
           </TitledContainer>
 
           <TitledContainer label="Items">

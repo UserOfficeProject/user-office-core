@@ -1,23 +1,22 @@
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import StyledModal from 'components/common/StyledModal';
 import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import { ProposalContext } from 'components/proposal/ProposalContainer';
 import ProposalErrorLabel from 'components/proposal/ProposalErrorLabel';
 import {
-  Answer,
   QuestionaryStep,
   Sample,
   SampleStatus,
   SubtemplateConfig,
 } from 'generated/sdk';
-import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { SampleBasic } from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import { QuestionariesListRow, QuestionariesList } from '../QuestionariesList';
+import { QuestionariesList, QuestionariesListRow } from '../QuestionariesList';
 import { SampleDeclarationContainer } from './SampleDeclarationContainer';
 
 const sampleToListRow = (sample: SampleBasic): QuestionariesListRow => {
@@ -26,7 +25,9 @@ const sampleToListRow = (sample: SampleBasic): QuestionariesListRow => {
 
 function createSampleStub(
   templateId: number,
-  questionarySteps: QuestionaryStep[]
+  questionarySteps: QuestionaryStep[],
+  proposalId: number,
+  questionId: string
 ): Sample {
   return {
     id: 0,
@@ -38,10 +39,12 @@ function createSampleStub(
       created: new Date(),
       steps: questionarySteps,
     },
+    questionId: questionId,
     questionaryId: 0,
     safetyComment: '',
     safetyStatus: SampleStatus.PENDING_EVALUATION,
     title: '',
+    proposalId: proposalId,
   };
 }
 
@@ -49,6 +52,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   const { answer: templateField, errors, onComplete } = props;
   const proposalQuestionId = templateField.question.proposalQuestionId;
   const config = templateField.config as SubtemplateConfig;
+  const proposalContext = useContext(ProposalContext);
 
   const isError = errors[proposalQuestionId] ? true : false;
 
@@ -61,20 +65,26 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
 
   useEffect(() => {
-    const getSamples = async (answerId: number): Promise<SampleBasic[]> => {
+    const getSamples = async (
+      proposalId: number,
+      questionId: string
+    ): Promise<SampleBasic[]> => {
       return api()
-        .getSamplesByAnswerId({ answerId })
+        .getSamples({ filter: { questionId, proposalId } })
         .then(response => {
-          return response.samplesByAnswerId || [];
+          return response.samples || [];
         });
     };
 
-    if (templateField.answerId) {
-      getSamples(templateField.answerId).then(samples =>
+    const proposalId = proposalContext.state?.proposal.id;
+    const questionId = templateField.question.proposalQuestionId;
+
+    if (proposalId && questionId) {
+      getSamples(proposalId, questionId).then(samples =>
         setRows(samples.map(sampleToListRow))
       );
     }
-  }, [templateField.answerId, api]);
+  }, [templateField.question.proposalQuestionId, proposalContext.state, api]);
 
   return (
     <>
@@ -95,12 +105,18 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
               })
           }
           onDeleteClick={item => {
-            const newStateValue = stateValue.filter(
-              sampleId => sampleId !== item.id
-            );
-            setStateValue(newStateValue);
-            setRows(rows.filter(row => row.id !== item.id));
-            onComplete(null as any, newStateValue);
+            api()
+              .deleteSample({ sampleId: item.id })
+              .then(response => {
+                if (!response.deleteSample.error) {
+                  const newStateValue = stateValue.filter(
+                    sampleId => sampleId !== item.id
+                  );
+                  setStateValue(newStateValue);
+                  setRows(rows.filter(row => row.id !== item.id));
+                  onComplete(null as any, newStateValue);
+                }
+              });
           }}
           onCloneClick={item => {
             api()
@@ -116,13 +132,30 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
               });
           }}
           onAddNewClick={() => {
+            const state = proposalContext.state;
+            if (!state) {
+              throw new Error('Sample Declaration is missing proposal context');
+            }
+
+            const proposalId = state.proposal.id;
+            const questionId = props.answer.question.proposalQuestionId;
+            if (proposalId <= 0 || !questionId) {
+              throw new Error(
+                'Sample Declaration is missing proposal id and/or proposalQuestionId'
+              );
+            }
             const templateId = config.templateId;
             api()
               .getBlankQuestionarySteps({ templateId })
               .then(result => {
                 const blankSteps = result.blankQuestionarySteps;
                 if (blankSteps) {
-                  const sampleStub = createSampleStub(templateId, blankSteps);
+                  const sampleStub = createSampleStub(
+                    templateId,
+                    blankSteps,
+                    proposalId,
+                    questionId
+                  );
                   setSelectedSample(sampleStub);
                 }
               });
@@ -175,27 +208,4 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   );
 }
 
-const sampleDeclarationPostSubmit = (answer: Answer) => async ({
-  api,
-  state,
-}: SubmitActionDependencyContainer) => {
-  const sampleIds = answer.value;
-  if (sampleIds) {
-    const { samples } = await api.getSamples({
-      filter: { sampleIds: answer.value },
-    });
-    if (samples) {
-      if (!answer.answerId) {
-        throw new Error(
-          'Answer ID must be set in order to create answer-questionary relation'
-        );
-      }
-      await api.createAnswerQuestionaryRelations({
-        answerId: answer.answerId,
-        questionaryIds: samples.map(sample => sample.questionaryId),
-      });
-    }
-  }
-};
-
-export { QuestionaryComponentSampleDeclaration, sampleDeclarationPostSubmit };
+export { QuestionaryComponentSampleDeclaration };

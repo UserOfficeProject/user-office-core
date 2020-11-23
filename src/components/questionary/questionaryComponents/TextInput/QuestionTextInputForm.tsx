@@ -1,3 +1,4 @@
+import { Box } from '@material-ui/core';
 import Collapse from '@material-ui/core/Collapse';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -36,6 +37,7 @@ export const QuestionTextInputForm: FormComponent<Question> = props => {
           placeholder: Yup.string(),
           multiline: Yup.boolean(),
           isHtmlQuestion: Yup.boolean(),
+          isCounterHidden: Yup.boolean(),
         }),
       })}
     >
@@ -93,6 +95,44 @@ export const QuestionTextInputForm: FormComponent<Question> = props => {
           </TitledContainer>
           <TitledContainer label="Options">
             <Field
+              name="config.placeholder"
+              label="Placeholder text"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="placeholder"
+            />
+
+            <Box component="div">
+              <Field
+                name="config.multiline"
+                checked={
+                  (formikProps.values.config as TextInputConfig).multiline
+                }
+                component={FormikUICustomCheckbox}
+                label="Multiple lines"
+                margin="normal"
+                fullWidth
+                data-cy="multiline"
+              />
+            </Box>
+
+            <Box component="div">
+              <Field
+                name="config.isCounterHidden"
+                checked={
+                  (formikProps.values.config as TextInputConfig).isCounterHidden
+                }
+                component={FormikUICustomCheckbox}
+                label="Hide counter"
+                margin="normal"
+                fullWidth
+                data-cy="multiline"
+              />
+            </Box>
+
+            <Field
               label="Enable rich text question"
               name="config.isHtmlQuestion"
               component={FormikUICustomCheckbox}
@@ -119,25 +159,6 @@ export const QuestionTextInputForm: FormComponent<Question> = props => {
                 data-cy="htmlQuestion"
               />
             </Collapse>
-            <Field
-              name="config.placeholder"
-              label="Placeholder text"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="placeholder"
-            />
-
-            <Field
-              name="config.multiline"
-              checked={(formikProps.values.config as TextInputConfig).multiline}
-              component={FormikUICustomCheckbox}
-              label="Multiple lines"
-              margin="normal"
-              fullWidth
-              data-cy="multiline"
-            />
           </TitledContainer>
         </>
       )}
