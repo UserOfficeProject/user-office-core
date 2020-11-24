@@ -19,7 +19,7 @@ const coerce = (value: AnswerType) => {
     return value;
   }
 
-  return String(value);
+  return value;
 };
 
 export const IntStringDateBoolArray = new GraphQLScalarType({

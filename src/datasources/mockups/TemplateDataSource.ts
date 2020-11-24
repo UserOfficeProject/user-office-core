@@ -1,5 +1,4 @@
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
-import { getFieldById } from '../../models/ProposalModelFunctions';
 import {
   DataType,
   FieldCondition,
@@ -11,18 +10,18 @@ import {
   TemplateCategoryId,
   TemplateStep,
   Topic,
+  TemplatesHasQuestions,
 } from '../../models/Template';
-import { CreateQuestionTemplateRelationArgs } from '../../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
-import { UpdateQuestionTemplateRelationArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import {
   dummyQuestionFactory,
   dummyQuestionTemplateRelationFactory,
+  dummyTemplateHasQuestionRelationFactory,
 } from './QuestionaryDataSource';
 
 export let dummyProposalTemplate: Template;
@@ -123,22 +122,21 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   ): Promise<Question[] | null> {
     return [dummyQuestionFactory()];
   }
+
   async cloneTemplate(templateId: number): Promise<Template> {
     return dummyProposalTemplateFactory({ templateId: templateId + 1 });
   }
+
   async getTemplate(templateId: number): Promise<Template | null> {
     return dummyProposalTemplate;
   }
+
   async updateTemplate(values: UpdateTemplateArgs): Promise<Template | null> {
     dummyProposalTemplate = { ...dummyProposalTemplate, ...values };
 
     return dummyProposalTemplate;
   }
-  async createQuestionTemplateRelation(
-    args: CreateQuestionTemplateRelationArgs
-  ): Promise<Template> {
-    return dummyProposalTemplate;
-  }
+
   async getQuestionTemplateRelation(
     questionId: string,
     templateId: number
@@ -147,6 +145,15 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       question: { proposalQuestionId: questionId },
     });
   }
+
+  async getQuestionTemplateRelations(
+    sortOrder: number,
+    templateId: number,
+    questionToExcludeId?: string
+  ): Promise<TemplatesHasQuestions[] | null> {
+    return [dummyTemplateHasQuestionRelationFactory(sortOrder, templateId)];
+  }
+
   async deleteQuestionTemplateRelation(
     args: DeleteQuestionTemplateRelationArgs
   ): Promise<Template> {
@@ -158,23 +165,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
     return dummyProposalTemplate;
   }
-  async updateQuestionTemplateRelation(
-    args: UpdateQuestionTemplateRelationArgs
-  ): Promise<Template> {
-    const question = getFieldById(
-      dummyTemplateSteps,
-      args.questionId
-    ) as QuestionTemplateRelation;
-    question.sortOrder = args.sortOrder || 0;
-    question.topicId = args.topicId || 1;
 
-    return dummyProposalTemplate;
-  }
   async createTemplate(args: CreateTemplateArgs): Promise<Template> {
     dummyProposalTemplate = dummyProposalTemplateFactory({ ...args });
 
     return dummyProposalTemplate;
   }
+
   async deleteTemplate(templateId: number): Promise<Template> {
     if (dummyProposalTemplate.templateId !== templateId) {
       throw new Error(`Template with ID ${templateId} does not exist`);
@@ -201,9 +198,6 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return true;
   }
 
-  async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
-    return topicOrder;
-  }
   async deleteTopic(id: number): Promise<Topic> {
     return dummyTopicFactory({ id });
   }
@@ -231,7 +225,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       question => question.proposalQuestionId === questionId
     );
     if (!question) {
-      throw new Error(`Question ${questionId} does not exist`);
+      return null;
     }
 
     return question;
@@ -274,10 +268,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     }
   }
 
-  async updateTopic(
-    topicId: number,
-    values: { title?: string; isEnabled?: boolean }
-  ): Promise<Topic> {
+  async updateTopicTitle(topicId: number, title: string): Promise<Topic> {
     const steps = await this.getTemplateSteps();
     const allTopics = steps.reduce((accumulated, current) => {
       return accumulated.concat(current.topic);
@@ -288,9 +279,15 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     if (!topic) {
       throw new Error('Topic not found');
     }
-    Object.assign(topic, values);
+    Object.assign(topic, { title });
 
     return topic;
+  }
+
+  async upsertQuestionTemplateRelations(
+    collection: TemplatesHasQuestions[]
+  ): Promise<Template> {
+    return dummyProposalTemplate;
   }
 
   async createTopic(args: CreateTopicArgs): Promise<Topic> {
@@ -302,6 +299,17 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     );
 
     return newTopic;
+  }
+
+  async upsertTopics(data: Topic[]): Promise<Template> {
+    return dummyProposalTemplate;
+  }
+
+  async getTopics(
+    templateId: number,
+    topicToExcludeId?: number
+  ): Promise<Topic[]> {
+    return [dummyTopicFactory()];
   }
 
   async getTemplateSteps(): Promise<TemplateStep[]> {

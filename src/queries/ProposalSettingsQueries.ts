@@ -15,7 +15,7 @@ export default class ProposalSettingsQueries {
     return proposalStatus;
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized()
   async getAllProposalStatuses(agent: UserWithRole | null) {
     const proposalStatuses = await this.dataSource.getAllProposalStatuses();
 

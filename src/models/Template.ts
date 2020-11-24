@@ -1,3 +1,4 @@
+import { DependencyCondition } from '../datasources/postgres/records';
 import { FieldConfigType } from '../resolvers/types/FieldConfig';
 import { EvaluatorOperator } from './ConditionEvaluator';
 
@@ -20,6 +21,7 @@ export enum DataType {
   SAMPLE_DECLARATION = 'SAMPLE_DECLARATION',
   SAMPLE_BASIS = 'SAMPLE_BASIS',
   PROPOSAL_BASIS = 'PROPOSAL_BASIS',
+  INTERVAL = 'INTERVAL',
 }
 
 export class Topic {
@@ -40,6 +42,19 @@ export class Question {
     public dataType: DataType,
     public question: string,
     public config: typeof FieldConfigType
+  ) {}
+}
+
+export class TemplatesHasQuestions {
+  constructor(
+    public id: number,
+    public questionId: string,
+    public templateId: number,
+    public topicId: number,
+    public sortOrder: number,
+    public config: string,
+    public dependencyCondition: DependencyCondition | null,
+    public dependencyQuestionId: string | null
   ) {}
 }
 

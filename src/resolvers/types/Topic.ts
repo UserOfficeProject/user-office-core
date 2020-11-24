@@ -12,7 +12,7 @@ export class Topic implements Partial<TopicOrigin> {
   @Field(() => Int)
   public templateId: number;
 
-  @Field(type => Int)
+  @Field(() => Int)
   public sortOrder: number;
 
   @Field()

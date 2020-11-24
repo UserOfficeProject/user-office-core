@@ -15,6 +15,7 @@ import {
   QuestionTemplateRelation,
   TemplateCategoryId,
   Topic,
+  TemplatesHasQuestions,
 } from '../../models/Template';
 import {
   BooleanConfig,
@@ -74,6 +75,22 @@ export const dummyQuestionTemplateRelationFactory = (
   );
 
   return relation;
+};
+
+export const dummyTemplateHasQuestionRelationFactory = (
+  sortOrder: number,
+  templateId: number
+): TemplatesHasQuestions => {
+  return new TemplatesHasQuestions(
+    Math.round(Math.random() * 100),
+    dummyQuestionFactory().proposalQuestionId,
+    templateId || Math.round(Math.random() * 100),
+    Math.round(Math.random() * 10),
+    sortOrder + 1,
+    JSON.stringify(new BooleanConfig()),
+    null,
+    null
+  );
 };
 
 const create1Topic3FieldWithDependenciesQuestionarySteps = () => {

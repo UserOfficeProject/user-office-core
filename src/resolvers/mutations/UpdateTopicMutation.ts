@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { TopicResponseWrap } from '../types/CommonWrappers';
+import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
@@ -17,8 +17,14 @@ export class UpdateTopicArgs {
   @Field(() => Int)
   id: number;
 
+  @Field(() => Int, { nullable: true })
+  templateId: number;
+
   @Field(() => String, { nullable: true })
   title: string;
+
+  @Field(() => Int, { nullable: true })
+  sortOrder: number;
 
   @Field(() => Boolean, { nullable: true })
   isEnabled: boolean;
@@ -26,11 +32,11 @@ export class UpdateTopicArgs {
 
 @Resolver()
 export class UpdateTopicMutation {
-  @Mutation(() => TopicResponseWrap)
+  @Mutation(() => TemplateResponseWrap)
   updateTopic(@Args() args: UpdateTopicArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
       context.mutations.template.updateTopic(context.user, args),
-      TopicResponseWrap
+      TemplateResponseWrap
     );
   }
 }

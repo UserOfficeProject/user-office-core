@@ -114,14 +114,14 @@ export interface AnswerRecord {
   readonly created_at: Date;
 }
 
-interface DependencyCondition {
+export interface DependencyCondition {
   condition: EvaluatorOperator;
   params: string | boolean | number;
 }
 export interface QuestionTemplateRelRecord {
   readonly id: number;
   readonly question_id: string;
-  readonly template_id: string;
+  readonly template_id: number;
   readonly topic_id: number;
   readonly sort_order: number;
   readonly config: string;
@@ -290,6 +290,13 @@ export interface InstrumentRecord {
   readonly short_code: string;
   readonly description: string;
   readonly full_count: number;
+}
+
+export interface CallHasInstrumentRecord {
+  readonly call_id: number;
+  readonly instrument_id: number;
+  readonly availability_time: number;
+  readonly submitted: boolean;
 }
 
 export interface InstrumentWithAvailabilityTimeRecord {
