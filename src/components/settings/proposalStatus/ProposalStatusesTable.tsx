@@ -91,7 +91,7 @@ const ProposalStatusesTable: React.FC = () => {
           rowActionData => {
             return {
               icon: Delete,
-              tooltip: 'Remove',
+              tooltip: 'Delete',
               onClick: (event, rowData) =>
                 setProposalStatusToRemove(rowData as ProposalStatus),
               hidden: rowActionData.isDefault,
