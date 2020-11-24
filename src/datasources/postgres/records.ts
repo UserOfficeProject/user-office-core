@@ -292,6 +292,13 @@ export interface InstrumentRecord {
   readonly full_count: number;
 }
 
+export interface CallHasInstrumentRecord {
+  readonly call_id: number;
+  readonly instrument_id: number;
+  readonly availability_time: number;
+  readonly submitted: boolean;
+}
+
 export interface InstrumentWithAvailabilityTimeRecord {
   readonly instrument_id: number;
   readonly name: string;

@@ -55,6 +55,14 @@ export default function createHandler(
             );
           });
           break;
+        case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            event.callhasinstrument.instrumentId.toString()
+          );
+          break;
         default:
           await eventLogsDataSource.set(
             event.loggedInUserId,
