@@ -77,7 +77,6 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
       case Event.PROPOSAL_NOTIFIED:
       case Event.PROPOSAL_ACCEPTED:
       case Event.PROPOSAL_REJECTED:
-      case Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED:
       case Event.PROPOSAL_SEP_MEETING_SUBMITTED:
         try {
           await markProposalEventAsDoneAndCallWorkflowEngine(
