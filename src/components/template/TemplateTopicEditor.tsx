@@ -13,7 +13,12 @@ import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import React, { useState } from 'react';
-import { Draggable, Droppable } from 'react-beautiful-dnd';
+import {
+  Draggable,
+  DraggingStyle,
+  Droppable,
+  NotDraggingStyle,
+} from 'react-beautiful-dnd';
 
 import { QuestionTemplateRelation, TemplateStep } from 'generated/sdk';
 import { Event, EventType } from 'models/QuestionaryEditorModel';
@@ -113,14 +118,16 @@ export default function QuestionaryEditorTopic(props: {
   const [anchorEl, setAnchorEl] = React.useState<null | SVGSVGElement>(null);
   const open = Boolean(anchorEl);
 
-  const getListStyle = (isDraggingOver: any) => ({
+  const getListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver
       ? theme.palette.primary.light
       : theme.palette.grey[100],
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
   });
 
-  const getItemStyle = (isDragging: any, draggableStyle: any) => ({
+  const getItemStyle = (
+    draggableStyle: DraggingStyle | NotDraggingStyle | undefined
+  ) => ({
     background: '#FFF',
     ...draggableStyle,
   });
@@ -183,7 +190,7 @@ export default function QuestionaryEditorTopic(props: {
       index={index}
       isDragDisabled={!props.dragMode}
     >
-      {(provided, snapshotDraggable) => (
+      {provided => (
         <Grid
           container
           className={`${classes.container} ${
@@ -191,10 +198,7 @@ export default function QuestionaryEditorTopic(props: {
           }`}
           {...provided.draggableProps}
           ref={provided.innerRef}
-          style={getItemStyle(
-            snapshotDraggable.isDragging,
-            provided.draggableProps.style
-          )}
+          style={getItemStyle(provided.draggableProps.style)}
           {...provided.dragHandleProps}
         >
           <AppBar position="static" className={classes.appbar}>
@@ -261,8 +265,10 @@ export default function QuestionaryEditorTopic(props: {
                     onClick={() => {
                       dispatch({
                         type: EventType.CREATE_TOPIC_REQUESTED,
-                        payload: { sortOrder: index + 1 },
-                        // +1 means - add immediately after this topic
+                        payload: {
+                          topicId: data.topic.id,
+                          isFirstTopic: false,
+                        },
                       });
                       setAnchorEl(null);
                     }}

@@ -7,12 +7,11 @@ import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
-import { BooleanConfig, Question } from 'generated/sdk';
+import { Question } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 export const QuestionBooleanForm: FormComponent<Question> = props => {
   const field = props.field;
-  const config = props.field.config as BooleanConfig;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
   return (
@@ -52,7 +51,6 @@ export const QuestionBooleanForm: FormComponent<Question> = props => {
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
-              checked={config.required}
               component={FormikUICustomCheckbox}
               label="User must check it to continue"
               margin="normal"

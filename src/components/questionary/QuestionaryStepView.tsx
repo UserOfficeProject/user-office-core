@@ -1,6 +1,6 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Formik } from 'formik';
-import React, { SyntheticEvent } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
@@ -87,7 +87,7 @@ export default function QuestionaryStepView(props: {
                   answer: field,
                   touched: touched, // for formik
                   errors: errors, // for formik
-                  onComplete: (evt: SyntheticEvent, newValue: any) => {
+                  onComplete: (evt: React.ChangeEvent<any>, newValue: any) => {
                     if (field.value !== newValue) {
                       dispatch({
                         type: EventType.FIELD_CHANGED,

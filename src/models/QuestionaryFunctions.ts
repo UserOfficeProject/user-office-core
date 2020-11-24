@@ -17,7 +17,7 @@ export function getTopicById(collection: AbstractCollection, topicId: number) {
   // @ts-ignore-line
   const step = collection.find(step => step.topic.id === topicId);
 
-  return step ? step.topic : undefined;
+  return step ? step : undefined;
 }
 
 export function getQuestionaryStepByTopicId(
