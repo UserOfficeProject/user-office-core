@@ -243,8 +243,7 @@ export default class PostgresQuestionaryDataSource
         record
       );
       const value =
-        record.value?.value ||
-        getDefaultAnswerValue(questionTemplateRelation.question.dataType);
+        record.value?.value || getDefaultAnswerValue(questionTemplateRelation);
 
       return new Answer(record.answer_id, questionTemplateRelation, value);
     });

@@ -19,5 +19,5 @@ export const sampleBasisDefinition: Question = {
     return config;
   },
   isReadOnly: true,
-  defaultAnswer: null,
+  getDefaultAnswer: () => null,
 };
