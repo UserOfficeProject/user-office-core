@@ -25,5 +25,5 @@ export const dateDefinition: Question = {
     return config;
   },
   isReadOnly: false,
-  defaultAnswer: '',
+  getDefaultAnswer: () => '',
 };

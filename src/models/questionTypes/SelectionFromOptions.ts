@@ -37,5 +37,5 @@ export const selectionFromOptionsDefinition: Question = {
     return config;
   },
   isReadOnly: false,
-  defaultAnswer: [],
+  getDefaultAnswer: () => [],
 };

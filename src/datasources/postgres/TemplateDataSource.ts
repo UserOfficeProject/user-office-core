@@ -8,14 +8,13 @@ import {
   Template,
   TemplateCategory,
   TemplateCategoryId,
+  TemplatesHasQuestions,
   TemplateStep,
   Topic,
 } from '../../models/Template';
-import { CreateQuestionTemplateRelationArgs } from '../../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
-import { UpdateQuestionTemplateRelationArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
@@ -184,12 +183,55 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return steps;
   }
 
-  async createTopic(args: CreateTopicArgs): Promise<Topic> {
-    await database('topics')
-      .update({ sort_order: args.sortOrder + 1 })
-      .where('sort_order', '>=', args.sortOrder)
-      .andWhere('template_id', '=', args.templateId);
+  async getTopics(
+    templateId: number,
+    topicToExcludeId = 0
+  ): Promise<Topic[] | null> {
+    return database('topics')
+      .where('template_id', templateId)
+      .andWhere('topic_id', '!=', topicToExcludeId)
+      .orderBy('sort_order')
+      .select('*')
+      .then((resultSet: TopicRecord[]) => {
+        if (!resultSet) {
+          return null;
+        }
 
+        return resultSet.map(resultItem => createTopicObject(resultItem));
+      });
+  }
+
+  async upsertTopics(data: Topic[]): Promise<Template> {
+    const dataToUpsert = data.map(item => ({
+      topic_id: item.id,
+      topic_title: item.title,
+      template_id: item.templateId,
+      ...(item.isEnabled !== undefined && { is_enabled: item.isEnabled }),
+      ...(item.sortOrder !== undefined && { sort_order: item.sortOrder }),
+    }));
+
+    const result = await database.raw(
+      `? ON CONFLICT (topic_id)
+        DO UPDATE SET
+        topic_title = EXCLUDED.topic_title,
+        sort_order = EXCLUDED.sort_order
+      RETURNING *;`,
+      [database('topics').insert(dataToUpsert)]
+    );
+
+    if (result?.rows?.length) {
+      const returnValue = await this.getTemplate(dataToUpsert[0].template_id);
+      if (!returnValue) {
+        throw new Error('Could not get template');
+      }
+
+      return returnValue;
+    } else {
+      throw new Error('Something went wrong');
+    }
+  }
+
+  async createTopic(args: CreateTopicArgs): Promise<Topic> {
     const newTopic = (
       await database('topics')
         .insert({
@@ -204,20 +246,11 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return createTopicObject(newTopic);
   }
 
-  async updateTopic(
-    topicId: number,
-    values: {
-      title?: string;
-      isEnabled?: boolean;
-      sortOrder?: number;
-    }
-  ): Promise<Topic> {
+  async updateTopicTitle(topicId: number, title: string): Promise<Topic> {
     const resultSet: TopicRecord[] = await database
       .update(
         {
-          topic_title: values.title,
-          is_enabled: values.isEnabled,
-          sortOrder: values.sortOrder,
+          topic_title: title,
         },
         ['*']
       )
@@ -260,59 +293,52 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return question;
   }
 
-  async createQuestionTemplateRelation(
-    args: CreateQuestionTemplateRelationArgs
+  async upsertQuestionTemplateRelations(
+    collection: TemplatesHasQuestions[]
   ): Promise<Template> {
-    const { templateId, questionId, sortOrder, topicId } = args;
-    const question = await this.getQuestion(questionId);
+    const dataToUpsert: QuestionTemplateRelRecord[] = [];
 
-    if (!question) {
-      throw new Error(`Could not find question ${questionId}`);
+    for (const item of collection) {
+      if (!item.config) {
+        const question = await this.getQuestion(item.questionId);
+
+        item.config = JSON.stringify(question?.config);
+      }
+
+      dataToUpsert.push({
+        id: item.id,
+        question_id: item.questionId,
+        template_id: item.templateId,
+        topic_id: item.topicId,
+        sort_order: item.sortOrder,
+        dependency_question_id: item.dependencyQuestionId,
+        dependency_condition: item.dependencyCondition,
+        config: item.config,
+      });
     }
 
-    await database('templates_has_questions').insert({
-      question_id: questionId,
-      template_id: templateId,
-      topic_id: topicId,
-      sort_order: sortOrder,
-      config: question.config, // default_config
-    });
+    const result = await database.raw(
+      `? ON CONFLICT (template_id, question_id)
+          DO UPDATE SET
+          sort_order = EXCLUDED.sort_order,
+          topic_id = EXCLUDED.topic_id,
+          dependency_question_id = EXCLUDED.dependency_question_id,
+          dependency_condition = EXCLUDED.dependency_condition,
+          config = EXCLUDED.config
+        RETURNING *;`,
+      [database('templates_has_questions').insert(dataToUpsert)]
+    );
 
-    const returnValue = await this.getTemplate(templateId);
-    if (!returnValue) {
-      throw new Error('Could not get template');
+    if (result?.rows?.length) {
+      const returnValue = await this.getTemplate(dataToUpsert[0].template_id);
+      if (!returnValue) {
+        throw new Error('Could not get template');
+      }
+
+      return returnValue;
+    } else {
+      throw new Error('Something went wrong');
     }
-
-    return returnValue;
-  }
-
-  async updateQuestionTemplateRelation(
-    args: UpdateQuestionTemplateRelationArgs
-  ): Promise<Template> {
-    const {
-      templateId,
-      questionId,
-      dependency,
-      sortOrder,
-      topicId,
-      config,
-    } = args;
-    await database('templates_has_questions')
-      .update({
-        topic_id: topicId,
-        sort_order: sortOrder,
-        config: config,
-        dependency_question_id: dependency?.dependencyId || dependency,
-        dependency_condition: dependency?.condition || dependency,
-      })
-      .where({ question_id: questionId, template_id: templateId });
-
-    const returnValue = await this.getTemplate(templateId);
-    if (!returnValue) {
-      throw new Error('Could not get template');
-    }
-
-    return returnValue;
   }
 
   async updateTemplate(values: UpdateTemplateArgs): Promise<Template | null> {
@@ -412,6 +438,35 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       );
   }
 
+  async getQuestionTemplateRelations(
+    templateId: number,
+    topicId: number,
+    questionToExcludeId: string
+  ): Promise<TemplatesHasQuestions[] | null> {
+    return database('templates_has_questions')
+      .where('template_id', templateId)
+      .where('topic_id', topicId)
+      .andWhere('question_id', '!=', questionToExcludeId)
+      .orderBy('sort_order')
+      .select('*')
+      .then((resultSet: QuestionTemplateRelRecord[]) => {
+        if (!resultSet) {
+          return null;
+        }
+
+        return resultSet.map(resultItem => ({
+          id: resultItem.id,
+          questionId: resultItem.question_id,
+          templateId: resultItem.template_id,
+          topicId: resultItem.topic_id,
+          sortOrder: resultItem.sort_order,
+          dependencyQuestionId: resultItem.dependency_question_id,
+          dependencyCondition: resultItem.dependency_condition,
+          config: resultItem.config,
+        }));
+      });
+  }
+
   async deleteQuestion(questionId: string): Promise<Question> {
     const [error, row] = await to(
       database('questions')
@@ -463,17 +518,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
-    topicOrder.forEach(async (topicId, index) => {
-      return database('topics')
-        .update({ sort_order: index })
-        .where({ topic_id: topicId });
-    });
-
-    return topicOrder;
-  }
-
-  isNaturalKeyPresent(naturalKey: string): Promise<boolean> {
+  async isNaturalKeyPresent(naturalKey: string): Promise<boolean> {
     return database('questions')
       .where({ natural_key: naturalKey })
       .select('natural_key')

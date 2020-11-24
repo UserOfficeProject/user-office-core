@@ -2,6 +2,7 @@ import { Call } from '../models/Call';
 import { CallHasInstrument } from '../models/Instrument';
 import { Proposal, ProposalIds } from '../models/Proposal';
 import { Review } from '../models/Review';
+import { Sample } from '../models/Sample';
 import { SEP } from '../models/SEP';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
@@ -26,6 +27,11 @@ interface ProposalSubmittedEvent extends GeneralEvent {
 
 interface ProposalFeasibleEvent extends GeneralEvent {
   type: Event.PROPOSAL_FEASIBLE;
+  proposal: Proposal;
+}
+
+interface ProposalSampleSafeEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SAMPLE_SAFE;
   proposal: Proposal;
 }
 
@@ -62,7 +68,7 @@ interface ProposalSEPReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED;
-  proposal: Proposal;
+  sample: Sample;
 }
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
@@ -185,6 +191,7 @@ export type ApplicationEvent =
   | ProposalUpdatedEvent
   | ProposalSubmittedEvent
   | ProposalFeasibleEvent
+  | ProposalSampleSafeEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
   | UserCreateEvent

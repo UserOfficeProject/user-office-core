@@ -30,26 +30,16 @@ test('An userofficer can update topic', async () => {
   const topicEnabled = false;
   const result = await mutations.updateTopic(dummyUserOfficerWithRole, {
     id: 1,
+    templateId: 1,
     title: newTopicTitle,
     isEnabled: topicEnabled,
+    sortOrder: 0,
   });
 
   expect(isRejection(result)).toBeFalsy();
 
-  const topic = result as Topic;
-  expect(topic instanceof Topic).toBe(true);
-  expect(topic.title).toEqual(newTopicTitle);
-  expect(topic.isEnabled).toEqual(topicEnabled);
-});
-
-test('Can not update topic that does not exist', async () => {
-  const result = await mutations.updateTopic(dummyUserOfficerWithRole, {
-    id: 9,
-    title: '',
-    isEnabled: false,
-  });
-
-  expect(isRejection(result)).toBeTruthy();
+  const template = result as Template;
+  expect(template instanceof Template).toBe(true);
 });
 
 test('An userofficer can create template', async () => {
@@ -104,8 +94,10 @@ test('Can not delete non-existing template', async () => {
 test('A user can not update topic', async () => {
   const topic = await mutations.updateTopic(dummyUserWithRole, {
     id: 1,
+    templateId: 1,
     title: 'New topic title',
     isEnabled: false,
+    sortOrder: 0,
   });
 
   expect(topic instanceof Topic).toBe(false);
@@ -125,28 +117,6 @@ test('A user can not create topic', async () => {
     sortOrder: 0,
   });
   expect(isRejection(response)).toBe(false);
-});
-
-test('A user-officer can update question topic rel', async () => {
-  const response = await mutations.assignQuestionsToTopic(
-    dummyUserOfficerWithRole,
-    {
-      templateId: 1,
-      topicId: 1,
-      questionIds: ['has_links_with_industry', 'enable_crystallization'],
-    }
-  );
-  expect(isRejection(response)).toEqual(false);
-  expect((response as string[])[0]).toEqual('has_links_with_industry');
-});
-
-test('A user can not update question topic rel', async () => {
-  const response = await mutations.assignQuestionsToTopic(dummyUserWithRole, {
-    templateId: 1,
-    topicId: 1,
-    questionIds: ['has_links_with_industry', 'enable_crystallization'],
-  });
-  expect(isRejection(response)).toEqual(true);
 });
 
 test('User can not create question', async () => {
@@ -189,22 +159,6 @@ test('Can not delete non-existing question', async () => {
   await expect(isRejection(result)).toBeTruthy();
 });
 
-test('Officer can update topic order', async () => {
-  return expect(
-    mutations.updateTopicOrder(dummyUserOfficerWithRole, {
-      topicOrder: [1, 3, 2],
-    })
-  ).resolves.toBeTruthy();
-});
-
-test('User can not update topic order', async () => {
-  const result = await mutations.updateTopicOrder(dummyUserWithRole, {
-    topicOrder: [1, 3, 2],
-  });
-
-  return expect(isRejection(result)).toBeTruthy();
-});
-
 test('User can not delete a topic', async () => {
   const topic = await mutations.deleteTopic(dummyUserWithRole, { topicId: 1 });
   expect(topic instanceof Topic).toBe(false);
@@ -216,7 +170,7 @@ test('User can not update question rel', async () => {
     {
       templateId: 1,
       questionId: QUESTION_ID,
-      sortOrder: 2,
+      sortOrder: 0,
       topicId: 1,
     }
   );
@@ -229,7 +183,7 @@ test('User officer can update question rel', async () => {
     {
       templateId: 1,
       questionId: QUESTION_ID,
-      sortOrder: 2,
+      sortOrder: 0,
     }
   );
   expect(isRejection(response)).toBe(false);
