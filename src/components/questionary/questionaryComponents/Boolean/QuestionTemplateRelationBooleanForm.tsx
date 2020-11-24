@@ -7,13 +7,11 @@ import FormikUICustomDependencySelector from 'components/common/FormikUICustomDe
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionExcerpt } from 'components/questionary/questionaryComponents/QuestionExcerpt';
-import { BooleanConfig, QuestionTemplateRelation } from 'generated/sdk';
+import { QuestionTemplateRelation } from 'generated/sdk';
 
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
 export const QuestionTemplateRelationBooleanForm: FormComponent<QuestionTemplateRelation> = props => {
-  const config = props.field.config as BooleanConfig;
-
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
@@ -34,7 +32,6 @@ export const QuestionTemplateRelationBooleanForm: FormComponent<QuestionTemplate
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
-              checked={config.required}
               component={FormikUICustomCheckbox}
               label="User must check it to continue"
               margin="normal"
