@@ -236,11 +236,9 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="next-status-events-modal"]').should('exist');
 
-      cy.get('[data-cy="next-status-events"]').click();
-
       cy.contains('PROPOSAL_SUBMITTED').click();
 
-      cy.get('[data-cy="submit"]').click({ force: true });
+      cy.get('[data-cy="submit"]').click();
 
       cy.notification({
         variant: 'success',
@@ -281,11 +279,9 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="next-status-events-modal"]').should('exist');
 
-      cy.get('[data-cy="next-status-events"]').click();
-
       cy.contains('PROPOSAL_SUBMITTED').click();
 
-      cy.get('[data-cy="submit"]').click({ force: true });
+      cy.get('[data-cy="submit"]').click();
 
       cy.notification({
         variant: 'success',

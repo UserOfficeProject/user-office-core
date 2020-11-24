@@ -1,4 +1,4 @@
-mutation createTopic($templateId: Int!, $sortOrder: Float!) {
+mutation createTopic($templateId: Int!, $sortOrder: Int!) {
   createTopic(templateId: $templateId, sortOrder: $sortOrder) {
     template {
       ...template

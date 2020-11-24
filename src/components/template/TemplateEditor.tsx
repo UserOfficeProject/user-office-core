@@ -20,16 +20,12 @@ import QuestionaryEditorModel, {
   Event,
   EventType,
 } from 'models/QuestionaryEditorModel';
-import {
-  getQuestionaryStepByTopicId,
-  getTopicById,
-} from 'models/QuestionaryFunctions';
+import { getQuestionaryStepByTopicId } from 'models/QuestionaryFunctions';
 import { StyledPaper } from 'styles/StyledComponents';
-import { randomNumberBetween } from 'utils/Math';
 
-import QuestionEditor from './forms/QuestionEditor';
-import QuestionTemplateRelationEditor from './forms/QuestionTemplateRelationEditor';
+import QuestionEditor from './QuestionEditor';
 import { QuestionPicker } from './QuestionPicker';
+import QuestionTemplateRelationEditor from './QuestionTemplateRelationEditor';
 import { TemplateMetadataEditor } from './TemplateMetadataEditor';
 import QuestionaryEditorTopic from './TemplateTopicEditor';
 
@@ -104,10 +100,12 @@ export default function TemplateEditor() {
   });
 
   const onDragEnd = (result: DropResult): void => {
+    const dragSource = result.source;
+    const dragDestination = result.destination;
     if (
-      !result.destination ||
-      (result.destination.droppableId === result.source.droppableId &&
-        result.destination.index === result.source.index)
+      !dragDestination ||
+      (dragDestination.droppableId === dragSource.droppableId &&
+        dragDestination.index === dragSource.index)
     ) {
       return;
     }
@@ -116,35 +114,24 @@ export default function TemplateEditor() {
     const isDraggingTopic = result.type === 'topic';
 
     if (isDraggingQuestion) {
-      const dragSource = result.source;
-      const dragDestination = result.destination;
       const isDraggingFromQuestionDrawerToTopic =
         dragSource.droppableId === 'questionPicker' &&
-        dragDestination?.droppableId !== 'questionPicker';
+        dragDestination.droppableId !== 'questionPicker';
       const isDraggingFromTopicToQuestionDrawer =
-        dragDestination?.droppableId === 'questionPicker' &&
+        dragDestination.droppableId === 'questionPicker' &&
         dragSource.droppableId !== 'questionPicker';
       const isReorderingInsideTopics =
-        dragDestination?.droppableId !== 'questionPicker' &&
+        dragDestination.droppableId !== 'questionPicker' &&
         dragSource.droppableId !== 'questionPicker';
 
       if (isDraggingFromQuestionDrawerToTopic) {
         const questionId =
           state.complementaryQuestions[dragSource.index].proposalQuestionId;
-        const topicId = dragDestination?.droppableId
+        const topicId = dragDestination.droppableId
           ? +dragDestination.droppableId
           : undefined;
 
-        const topic = getTopicById(state.steps, topicId as number);
-
-        const previousField =
-          topic.fields[(dragDestination?.index as number) - 1];
-        const nextField = topic.fields[dragDestination?.index as number];
-
-        const sortOrder = randomNumberBetween(
-          previousField?.sortOrder,
-          nextField?.sortOrder
-        );
+        const sortOrder = dragDestination.index;
 
         if (topicId && questionId) {
           dispatch({
@@ -174,14 +161,17 @@ export default function TemplateEditor() {
       } else if (isReorderingInsideTopics) {
         dispatch({
           type: EventType.REORDER_QUESTION_REL_REQUESTED,
-          payload: { source: result.source, destination: result.destination },
+          payload: {
+            source: dragSource,
+            destination: dragDestination,
+          },
         });
       }
     }
     if (isDraggingTopic) {
       dispatch({
         type: EventType.REORDER_TOPIC_REQUESTED,
-        payload: { source: result.source, destination: result.destination },
+        payload: { source: dragSource, destination: dragDestination },
       });
     }
   };
@@ -206,7 +196,7 @@ export default function TemplateEditor() {
         onClick={(): void =>
           dispatch({
             type: EventType.CREATE_TOPIC_REQUESTED,
-            payload: { sortOrder: 0.5, isFirstTopic: true },
+            payload: { isFirstTopic: true },
           })
         }
       >

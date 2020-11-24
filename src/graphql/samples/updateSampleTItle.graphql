@@ -1,8 +1,0 @@
-mutation updateSampleTitle($sampleId: Int!, $title: String!) {
-  updateSampleTitle(sampleId: $sampleId, title: $title) {
-    sample {
-      ...sample
-    }
-    error
-  }
-}

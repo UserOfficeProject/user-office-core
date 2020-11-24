@@ -90,28 +90,20 @@ export default function QuestionaryEditorModel(
               step.topic.id.toString() ===
               action.payload.destination.droppableId
             );
-          });
+          }) as TemplateStep;
 
-          to?.fields.splice(
-            action.payload.destination.index,
-            0,
-            ...from.fields.splice(action.payload.source.index, 1)
+          const [fieldToAddAtDestination] = from.fields.splice(
+            action.payload.source.index,
+            1
           );
+
+          to.fields.splice(action.payload.destination.index, 0, {
+            ...fieldToAddAtDestination,
+            sortOrder: action.payload.sortOrder,
+          });
 
           return draft;
         }
-        case EventType.TOPIC_REORDERED:
-          if (!action.payload.destination) {
-            return draft;
-          }
-
-          draft.steps.splice(
-            action.payload.destination.index,
-            0,
-            ...draft.steps.splice(action.payload.source.index, 1)
-          );
-
-          return draft;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
           getTopicById(draft.steps, action.payload.topicId).topic.title =
             action.payload.title;
@@ -166,6 +158,7 @@ export default function QuestionaryEditorModel(
           return draft;
         }
         case EventType.TOPIC_CREATED:
+        case EventType.TOPIC_REORDERED:
         case EventType.QUESTION_REL_UPDATED:
         case EventType.QUESTION_REL_DELETED:
           return { ...action.payload };

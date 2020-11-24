@@ -10,7 +10,6 @@ import {
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { Event, EventType } from 'models/QuestionaryEditorModel';
-import { randomNumberBetween } from 'utils/Math';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 
 export function usePersistQuestionaryEditorModel() {
@@ -20,7 +19,12 @@ export function usePersistQuestionaryEditorModel() {
 
   const updateTopic = async (
     topicId: number,
-    values: { title?: string; sortOrder?: number; isEnabled?: boolean }
+    values: {
+      templateId?: number;
+      title?: string;
+      sortOrder?: number;
+      isEnabled?: boolean;
+    }
   ) => {
     return api()
       .updateTopic({
@@ -211,15 +215,8 @@ export function usePersistQuestionaryEditorModel() {
 
           const questionRelToChange =
             destinationTopic?.fields[action.payload.destination.index];
-          const prevQuestion =
-            destinationTopic?.fields[action.payload.destination.index - 1];
-          const nextQuestion =
-            destinationTopic?.fields[action.payload.destination.index + 1];
 
-          const newSortOrder = randomNumberBetween(
-            prevQuestion?.sortOrder,
-            nextQuestion?.sortOrder
-          );
+          const newSortOrder = action.payload.destination.index;
 
           const questionRel = {
             ...questionRelToChange,
@@ -235,36 +232,20 @@ export function usePersistQuestionaryEditorModel() {
           const sourceIndex = action.payload.source.index;
           const destinationIndex = action.payload.destination.index;
 
-          const stepToUpdate = state.steps[action.payload.source.index];
-          let stepIndexBeforeTheOneWeReorder =
-            action.payload.destination.index - 1;
-          let stepIndexAfterTheOneWeReorder = action.payload.destination.index;
-
-          if (sourceIndex < destinationIndex) {
-            stepIndexBeforeTheOneWeReorder = action.payload.destination.index;
-            stepIndexAfterTheOneWeReorder =
-              action.payload.destination.index + 1;
-          }
-
-          const stepBeforeTheOneWeReorder =
-            state.steps[stepIndexBeforeTheOneWeReorder];
-          const stepAfterTheOneWeReorder =
-            state.steps[stepIndexAfterTheOneWeReorder];
-
-          const sortOrder = randomNumberBetween(
-            stepBeforeTheOneWeReorder?.topic.sortOrder,
-            stepAfterTheOneWeReorder?.topic.sortOrder
-          );
+          const stepToUpdate = state.steps[sourceIndex];
+          const sortOrder = destinationIndex;
 
           executeAndMonitorCall(async () => {
             const result = await updateTopic(stepToUpdate.topic.id, {
               sortOrder,
+              templateId: state.templateId,
+              title: stepToUpdate.topic.title,
             });
 
-            if (result.topic) {
+            if (result.template) {
               dispatch({
                 type: EventType.TOPIC_REORDERED,
-                payload: action.payload,
+                payload: result.template,
               });
             }
 
@@ -277,6 +258,7 @@ export function usePersistQuestionaryEditorModel() {
           executeAndMonitorCall(() =>
             updateTopic(action.payload.topicId, {
               title: action.payload.title as string,
+              templateId: state.templateId,
             })
           );
           break;
@@ -362,7 +344,7 @@ export function usePersistQuestionaryEditorModel() {
         }
         case EventType.CREATE_TOPIC_REQUESTED: {
           const { isFirstStep, topicId } = action.payload;
-          let sortOrder = 0.5;
+          let sortOrder = 0;
 
           if (!isFirstStep) {
             const stepIndex = state.steps.findIndex(
@@ -370,12 +352,8 @@ export function usePersistQuestionaryEditorModel() {
             );
 
             const previousStep = state.steps[stepIndex];
-            const nextStep = state.steps[stepIndex + 1];
 
-            sortOrder = randomNumberBetween(
-              previousStep.topic.sortOrder,
-              nextStep?.topic.sortOrder
-            );
+            sortOrder = previousStep.topic.sortOrder + 1;
           }
 
           executeAndMonitorCall(async () => {

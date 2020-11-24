@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 export function useDownloadPDFProposal() {
   const downloadProposalPDF = useCallback(proposalId => {
     const element = document.createElement('a');
-    element.setAttribute('href', '/proposal/download/' + proposalId);
+    element.setAttribute('href', '/download/proposal/' + proposalId);
     element.setAttribute('download', 'download');
 
     element.style.display = 'none';
