@@ -114,6 +114,11 @@ export interface AnswerRecord {
   readonly created_at: Date;
 }
 
+export interface Dependency {
+  condition: DependencyCondition;
+  dependencyId: string;
+}
+
 export interface DependencyCondition {
   condition: EvaluatorOperator;
   params: string | boolean | number;

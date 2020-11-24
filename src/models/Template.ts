@@ -1,4 +1,4 @@
-import { DependencyCondition } from '../datasources/postgres/records';
+import { Dependency } from '../datasources/postgres/records';
 import { FieldConfigType } from '../resolvers/types/FieldConfig';
 import { EvaluatorOperator } from './ConditionEvaluator';
 
@@ -53,8 +53,7 @@ export class TemplatesHasQuestions {
     public topicId: number,
     public sortOrder: number,
     public config: string,
-    public dependencyCondition: DependencyCondition | null,
-    public dependencyQuestionId: string | null
+    public dependency: Dependency | null
   ) {}
 }
 
