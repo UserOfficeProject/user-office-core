@@ -11,6 +11,7 @@ export function useProposalData(id: number | null | undefined) {
 
   useEffect(() => {
     if (id) {
+      setLoading(true);
       api()
         .getProposal({ id })
         .then(data => {

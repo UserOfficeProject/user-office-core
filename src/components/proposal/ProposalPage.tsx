@@ -1,5 +1,5 @@
 import Grid from '@material-ui/core/Grid';
-import React, { Suspense } from 'react';
+import React from 'react';
 import {
   NumberParam,
   useQueryParams,
@@ -13,15 +13,16 @@ import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
+import ProposalFilterBar from './ProposalFilterBar';
 import ProposalTableOfficer from './ProposalTableOfficer';
-
-const ProposalFilterBar = React.lazy(() => import('./ProposalFilterBar'));
 
 export type ProposalUrlQueryParamsType = {
   call: QueryParamConfig<number | null | undefined>;
   instrument: QueryParamConfig<number | null | undefined>;
+  proposalStatus: QueryParamConfig<number | null | undefined>;
 } & UrlQueryParamsType;
 
 export default function ProposalPage() {
@@ -30,26 +31,21 @@ export default function ProposalPage() {
   >({
     call: NumberParam,
     instrument: NumberParam,
+    proposalStatus: NumberParam,
     search: StringParam,
     selection: withDefault(DelimitedNumericArrayParam, []),
   });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
+    proposalStatusId: urlQueryParams.proposalStatus,
   });
-  const { calls } = useCallsData();
-  const { instruments } = useInstrumentsData();
-
-  const ProposalToolbar = (): JSX.Element => (
-    <Suspense fallback={<div>Loading filters...</div>}>
-      <ProposalFilterBar
-        callsData={calls}
-        instrumentsData={instruments}
-        setProposalFilter={setProposalFilter}
-        filter={proposalFilter}
-      />
-    </Suspense>
-  );
+  const { calls, loadingCalls } = useCallsData();
+  const { instruments, loadingInstruments } = useInstrumentsData();
+  const {
+    proposalStatuses,
+    loadingProposalStatuses,
+  } = useProposalStatusesData();
 
   return (
     <>
@@ -57,7 +53,19 @@ export default function ProposalPage() {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <StyledPaper>
-              <ProposalToolbar />
+              <ProposalFilterBar
+                calls={{ data: calls, isLoading: loadingCalls }}
+                instruments={{
+                  data: instruments,
+                  isLoading: loadingInstruments,
+                }}
+                proposalStatuses={{
+                  data: proposalStatuses,
+                  isLoading: loadingProposalStatuses,
+                }}
+                setProposalFilter={setProposalFilter}
+                filter={proposalFilter}
+              />
               <ProposalTableOfficer
                 proposalFilter={proposalFilter}
                 urlQueryParams={urlQueryParams}
