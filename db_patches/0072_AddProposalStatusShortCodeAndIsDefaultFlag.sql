@@ -39,6 +39,8 @@ BEGIN
 
         INSERT INTO proposal_statuses (name, short_code, description, is_default) VALUES ('Feasibility and sample review', 'FEASIBILITY_AND_SAMPLE_REVIEW', 'Status that indicates that proposal feasibility and sample review can be done in the same time.', true);
         INSERT INTO proposal_statuses (name, short_code, description, is_default) VALUES ('Sample review', 'SAMPLE_REVIEW', 'Status that indicates that proposal sample review can be done.', true);
+        INSERT INTO proposal_statuses (name, short_code, description, is_default) VALUES ('SEP Meeting', 'SEP_MEETING', 'Proposal is ready for SEP meeting ranking.', true);
+        INSERT INTO proposal_statuses (name, short_code, description, is_default) VALUES ('Management decision', 'MANAGEMENT_DECISION', 'Proposal is ready for management decision.', true);
     END;
 	END IF;
 END;
