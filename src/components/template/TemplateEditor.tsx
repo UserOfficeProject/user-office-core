@@ -90,7 +90,7 @@ export default function TemplateEditor() {
     },
   }))();
 
-  const getTopicListStyle = (isDraggingOver: any) => ({
+  const getTopicListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver
       ? theme.palette.primary.light
       : theme.palette.grey[100],
@@ -99,16 +99,39 @@ export default function TemplateEditor() {
   });
 
   const onDragEnd = (result: DropResult): void => {
-    if (result.type === 'field') {
-      const dragSource = result.source;
-      const dragDestination = result.destination;
-      if (result.source.droppableId === 'questionPicker') {
+    const dragSource = result.source;
+    const dragDestination = result.destination;
+    if (
+      !dragDestination ||
+      (dragDestination.droppableId === dragSource.droppableId &&
+        dragDestination.index === dragSource.index)
+    ) {
+      return;
+    }
+
+    const isDraggingQuestion = result.type === 'field';
+    const isDraggingTopic = result.type === 'topic';
+
+    if (isDraggingQuestion) {
+      const isDraggingFromQuestionDrawerToTopic =
+        dragSource.droppableId === 'questionPicker' &&
+        dragDestination.droppableId !== 'questionPicker';
+      const isDraggingFromTopicToQuestionDrawer =
+        dragDestination.droppableId === 'questionPicker' &&
+        dragSource.droppableId !== 'questionPicker';
+      const isReorderingInsideTopics =
+        dragDestination.droppableId !== 'questionPicker' &&
+        dragSource.droppableId !== 'questionPicker';
+
+      if (isDraggingFromQuestionDrawerToTopic) {
         const questionId =
           state.complementaryQuestions[dragSource.index].proposalQuestionId;
-        const topicId = dragDestination?.droppableId
+        const topicId = dragDestination.droppableId
           ? +dragDestination.droppableId
           : undefined;
-        const sortOrder = dragDestination?.index;
+
+        const sortOrder = dragDestination.index;
+
         if (topicId && questionId) {
           dispatch({
             type: EventType.CREATE_QUESTION_REL_REQUESTED,
@@ -120,8 +143,7 @@ export default function TemplateEditor() {
             },
           });
         }
-      } else if (result?.destination?.droppableId === 'questionPicker') {
-        const dragSource = result.source;
+      } else if (isDraggingFromTopicToQuestionDrawer) {
         const topicId = parseInt(dragSource.droppableId);
         const step = getQuestionaryStepByTopicId(
           state.steps,
@@ -135,22 +157,25 @@ export default function TemplateEditor() {
             templateId: state.templateId,
           },
         });
-      } else if (result?.destination && result?.source) {
+      } else if (isReorderingInsideTopics) {
         dispatch({
           type: EventType.REORDER_QUESTION_REL_REQUESTED,
-          payload: { source: result.source, destination: result.destination },
+          payload: {
+            source: dragSource,
+            destination: dragDestination,
+          },
         });
       }
     }
-    if (result.type === 'topic') {
+    if (isDraggingTopic) {
       dispatch({
         type: EventType.REORDER_TOPIC_REQUESTED,
-        payload: { source: result.source, destination: result.destination },
+        payload: { source: dragSource, destination: dragDestination },
       });
     }
   };
 
-  const getContainerStyle = (): any => {
+  const getContainerStyle = () => {
     return isLoading || state.templateId === 0
       ? {
           pointerEvents: 'none',
@@ -170,7 +195,7 @@ export default function TemplateEditor() {
         onClick={(): void =>
           dispatch({
             type: EventType.CREATE_TOPIC_REQUESTED,
-            payload: { sortOrder: 0 },
+            payload: { isFirstTopic: true },
           })
         }
       >

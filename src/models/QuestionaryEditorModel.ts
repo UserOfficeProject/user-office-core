@@ -7,6 +7,7 @@ import {
   Question,
   QuestionTemplateRelation,
   TemplateCategoryId,
+  TemplateStep,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import {
@@ -36,6 +37,7 @@ export enum EventType {
   CREATE_TOPIC_REQUESTED,
   DELETE_TOPIC_REQUESTED,
   TOPIC_CREATED,
+  TOPIC_REORDERED,
   UPDATE_TOPIC_TITLE_REQUESTED,
   REORDER_TOPIC_REQUESTED,
   PICK_QUESTION_REQUESTED,
@@ -81,37 +83,29 @@ export default function QuestionaryEditorModel(
             return (
               step.topic.id.toString() === action.payload.source.droppableId
             );
-          })!;
+          }) as TemplateStep;
 
           const to = draft.steps.find(step => {
             return (
               step.topic.id.toString() ===
               action.payload.destination.droppableId
             );
-          })!;
+          }) as TemplateStep;
 
-          to.fields.splice(
-            action.payload.destination.index,
-            0,
-            ...from.fields.splice(action.payload.source.index, 1)
+          const [fieldToAddAtDestination] = from.fields.splice(
+            action.payload.source.index,
+            1
           );
+
+          to.fields.splice(action.payload.destination.index, 0, {
+            ...fieldToAddAtDestination,
+            sortOrder: action.payload.sortOrder,
+          });
 
           return draft;
         }
-        case EventType.REORDER_TOPIC_REQUESTED:
-          if (!action.payload.destination) {
-            return draft;
-          }
-
-          draft.steps.splice(
-            action.payload.destination.index,
-            0,
-            ...draft.steps.splice(action.payload.source.index, 1)
-          );
-
-          return draft;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
-          getTopicById(draft.steps, action.payload.topicId).topic_title =
+          getTopicById(draft.steps, action.payload.topicId).topic.title =
             action.payload.title;
 
           return draft;
@@ -164,6 +158,7 @@ export default function QuestionaryEditorModel(
           return draft;
         }
         case EventType.TOPIC_CREATED:
+        case EventType.TOPIC_REORDERED:
         case EventType.QUESTION_REL_UPDATED:
         case EventType.QUESTION_REL_DELETED:
           return { ...action.payload };
@@ -204,7 +199,7 @@ export default function QuestionaryEditorModel(
 
   useEffect(() => {
     api()
-      .getTemplate({ templateId: parseInt(templateId!) })
+      .getTemplate({ templateId: parseInt(templateId) })
       .then(data => {
         memoizedDispatch({
           type: EventType.READY,

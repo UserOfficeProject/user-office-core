@@ -94,7 +94,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
     },
   }))();
 
-  const getListStyle = (isDraggingOver: any) => ({
+  const getListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver ? theme.palette.primary.light : 'transparent',
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
   });
@@ -107,6 +107,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
         onClick={item => {
           const isAltDown = (window.event as MouseEvent)?.altKey;
 
+          // NOTE: sortOrder is always 0 because we add at that position using alt key and after that you can reorder if you want.
           if (isAltDown) {
             dispatch({
               type: EventType.CREATE_QUESTION_REL_REQUESTED,
