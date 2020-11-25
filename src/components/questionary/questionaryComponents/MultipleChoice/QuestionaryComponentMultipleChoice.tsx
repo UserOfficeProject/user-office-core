@@ -12,6 +12,14 @@ import React, { useEffect, useState } from 'react';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { SelectionFromOptionsConfig } from 'generated/sdk';
 
+const toArray = (input: string | string[]): string[] => {
+  if (typeof input === 'string') {
+    return [input];
+  }
+
+  return input;
+};
+
 export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
   const classes = makeStyles({
     horizontalLayout: {
@@ -44,7 +52,8 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     setStateValue(answer.value);
   }, [answer]);
 
-  const handleOnChange = (evt: any, newValue: any) => {
+  const handleOnChange = (evt: any, value: string | string[]) => {
+    const newValue = toArray(value);
     setStateValue(newValue);
     onComplete(evt, newValue);
   };
@@ -56,7 +65,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
           <TextField
             id={proposalQuestionId}
             name={proposalQuestionId}
-            value={stateValue}
+            value={config.isMultipleSelect ? stateValue : stateValue[0]}
             label={question}
             select
             onChange={evt =>
@@ -93,7 +102,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
           <RadioGroup
             id={proposalQuestionId}
             name={proposalQuestionId}
-            value={stateValue}
+            value={stateValue[0]}
             onChange={evt =>
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
             }
