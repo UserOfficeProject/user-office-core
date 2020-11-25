@@ -13,11 +13,12 @@ context('Template tests', () => {
   let textId: string;
   let dateId: string;
   let multipleChoiceId: string;
-
-  const booleanQuestion = faker.lorem.words(2);
-  const textQuestion = faker.lorem.words(2);
-  const dateQuestion = faker.lorem.words(2);
-  const fileQuestion = faker.lorem.words(2);
+  let intervalId: string;
+  const booleanQuestion = faker.random.words(2);
+  const textQuestion = faker.random.words(2);
+  const dateQuestion = faker.random.words(2);
+  const fileQuestion = faker.random.words(2);
+  const intervalQuestion = faker.random.words(2);
   const multipleChoiceQuestion = faker.lorem.words(2);
   const multipleChoiceAnswers = [
     faker.lorem.words(2),
@@ -136,6 +137,40 @@ context('Template tests', () => {
     cy.get('body').type('{alt}', { release: false });
     cy.contains(booleanQuestion).click();
 
+    /* --- */
+
+    /* Interval */
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
+
+    cy.contains('Add Interval').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(intervalQuestion);
+
+    cy.get('[data-cy=property]').click();
+
+    cy.contains('energy').click();
+
+    cy.get('[data-cy=units]>[role=button]').click({ force: true });
+
+    cy.contains('btu').click();
+
+    cy.contains('joule').click();
+
+    cy.get('body').type('{esc}');
+
+    cy.contains('Save').click();
+
+    cy.contains(intervalQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        intervalId = fieldId;
+      });
+
+    cy.get('body').type('{alt}', { release: false });
+    cy.contains(intervalQuestion).click();
     /* --- */
 
     /* Text input */
@@ -368,6 +403,12 @@ context('Template tests', () => {
     cy.login('user');
 
     cy.createProposal(title, abstract);
+    cy.get(`[data-cy="${intervalId}.min"]`)
+      .click()
+      .type('1');
+    cy.get(`[data-cy="${intervalId}.max"]`)
+      .click()
+      .type('2');
     cy.get(`#${boolId}`).click();
     cy.get(`#${textId}`).type(textAnswer);
     cy.contains(`${textAnswer.length}/${minimumCharacters}`);

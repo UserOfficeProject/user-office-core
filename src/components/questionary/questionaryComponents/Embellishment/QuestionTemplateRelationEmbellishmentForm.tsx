@@ -8,7 +8,7 @@ import FormikUICustomDependencySelector from 'components/common/FormikUICustomDe
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { EmbellishmentConfig, QuestionTemplateRelation } from 'generated/sdk';
+import { QuestionTemplateRelation } from 'generated/sdk';
 
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
@@ -58,9 +58,6 @@ export const QuestionTemplateRelationEmbellishmentForm: FormComponent<QuestionTe
 
           <Field
             name="config.omitFromPdf"
-            checked={
-              (formikProps.values.config as EmbellishmentConfig).omitFromPdf
-            }
             component={FormikUICustomCheckbox}
             label="Omit from PDF"
             margin="normal"

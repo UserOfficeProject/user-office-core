@@ -10,13 +10,12 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { Options } from 'material-table';
 import React, { useEffect, useState } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
-import SelectedCallFilter from 'components/common/SelectedCallFilter';
+import CallFilter from 'components/common/proposalFilters/CallFilter';
 import { Maybe, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useDownloadPDFSample } from 'hooks/sample/useDownloadPDFSample';
@@ -63,22 +62,6 @@ function SampleSafetyPage() {
     }
   }, [api, selectedCallId]);
 
-  const Toolbar = (data: Options): JSX.Element =>
-    loadingCalls ? (
-      <div>Loading...</div>
-    ) : (
-      <>
-        <SelectedCallFilter
-          callId={selectedCallId}
-          callsData={calls || []}
-          onChange={callId => {
-            setSelectedCallId(callId);
-          }}
-          shouldShowAll={true}
-        />
-      </>
-    );
-
   const downloadPDFSample = useDownloadPDFSample();
   const RowActionButtons = (rowData: SampleBasic) => {
     const iconButtonStyle = { padding: '7px' };
@@ -124,7 +107,15 @@ function SampleSafetyPage() {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <StyledPaper>
-              <Toolbar />
+              <CallFilter
+                callId={selectedCallId}
+                calls={calls}
+                isLoading={loadingCalls}
+                onChange={callId => {
+                  setSelectedCallId(callId);
+                }}
+                shouldShowAll={true}
+              />
               <SamplesTable
                 data={samples}
                 isLoading={isExecutingCall}

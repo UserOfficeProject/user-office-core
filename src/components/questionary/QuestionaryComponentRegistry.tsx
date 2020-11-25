@@ -14,6 +14,7 @@ import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefini
 import { dateDefinition } from './questionaryComponents/DatePicker/DatePickerDefinition';
 import { embellishmentDefinition } from './questionaryComponents/Embellishment/EmbellishmentDefinition';
 import { fileUploadDefinition } from './questionaryComponents/FileUpload/FileUploadDefinition';
+import { intervalDefinition } from './questionaryComponents/Interval/IntervalDefinition';
 import { multipleChoiceDefinition as multiChoiceDefinition } from './questionaryComponents/MultipleChoice/MultipleChoiceDefinition';
 import { proposalBasisDefinition } from './questionaryComponents/ProposalBasis/ProposalBasisDefinition';
 import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/SampleBasisDefinition';
@@ -58,6 +59,7 @@ const registry = [
   sampleDeclarationDefinition,
   proposalBasisDefinition,
   sampleBasisDefinition,
+  intervalDefinition,
 ];
 
 Object.freeze(registry);

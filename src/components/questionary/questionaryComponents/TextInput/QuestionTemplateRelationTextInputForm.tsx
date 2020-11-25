@@ -2,7 +2,7 @@ import { Box } from '@material-ui/core';
 import Collapse from '@material-ui/core/Collapse';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { useState } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
@@ -16,12 +16,6 @@ import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
 export const QuestionTemplateRelationTextInputForm: FormComponent<QuestionTemplateRelation> = props => {
-  const config = props.field.config as TextInputConfig;
-
-  const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
-    (props.field.config as TextInputConfig).isHtmlQuestion
-  );
-
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
@@ -48,7 +42,6 @@ export const QuestionTemplateRelationTextInputForm: FormComponent<QuestionTempla
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
-              checked={config.required}
               component={FormikUICustomCheckbox}
               label="Is required"
               margin="normal"
@@ -116,14 +109,14 @@ export const QuestionTemplateRelationTextInputForm: FormComponent<QuestionTempla
               label="Enable rich text question"
               name="config.isHtmlQuestion"
               component={FormikUICustomCheckbox}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setIsRichQuestion(event.target.checked);
-              }}
-              checked={isRichQuestion}
             />
-            <Collapse in={isRichQuestion}>
+            <Collapse
+              in={(formikProps.values.config as TextInputConfig).isHtmlQuestion}
+            >
               <Field
-                visible={isRichQuestion}
+                visible={
+                  (formikProps.values.config as TextInputConfig).isHtmlQuestion
+                }
                 name="config.htmlQuestion"
                 type="text"
                 component={FormikUICustomEditor}

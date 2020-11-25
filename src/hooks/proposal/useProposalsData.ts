@@ -10,13 +10,27 @@ export function useProposalsData(filter: ProposalsFilter) {
   const [loading, setLoading] = useState(true);
   const { currentRole } = useContext(UserContext);
 
-  const { callId, instrumentId, questionaryIds, templateIds, text } = filter;
+  const {
+    callId,
+    instrumentId,
+    proposalStatusId,
+    questionaryIds,
+    templateIds,
+    text,
+  } = filter;
 
   useEffect(() => {
     if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
       api()
         .getInstrumentScientistProposals({
-          filter: { callId, instrumentId, questionaryIds, templateIds, text },
+          filter: {
+            callId,
+            instrumentId,
+            proposalStatusId,
+            questionaryIds,
+            templateIds,
+            text,
+          },
         })
         .then(data => {
           if (data.instrumentScientistProposals) {
@@ -29,7 +43,14 @@ export function useProposalsData(filter: ProposalsFilter) {
     } else {
       api()
         .getProposals({
-          filter: { callId, instrumentId, questionaryIds, templateIds, text },
+          filter: {
+            callId,
+            instrumentId,
+            proposalStatusId,
+            questionaryIds,
+            templateIds,
+            text,
+          },
         })
         .then(data => {
           if (data.proposals) {
@@ -41,6 +62,7 @@ export function useProposalsData(filter: ProposalsFilter) {
   }, [
     callId,
     instrumentId,
+    proposalStatusId,
     questionaryIds,
     templateIds,
     text,
