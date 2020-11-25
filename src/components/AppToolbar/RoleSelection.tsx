@@ -15,9 +15,7 @@ type RoleSelectionProps = {
 };
 
 const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
-  const { currentRole, user, token, handleNewToken, handleRole } = useContext(
-    UserContext
-  );
+  const { currentRole, user, token, handleNewToken } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const { api } = useDataApiWithFeedback();
   const history = useHistory();
@@ -51,12 +49,10 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
     });
 
     if (!result.selectRole.error) {
-      handleNewToken(result.selectRole.token);
+      history.push('/');
 
       setTimeout(() => {
-        handleRole(role.shortCode);
-        history.push('/');
-        setLoading(false);
+        handleNewToken(result.selectRole.token);
 
         close();
       }, 500);
