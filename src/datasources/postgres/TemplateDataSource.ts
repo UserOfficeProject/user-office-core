@@ -311,8 +311,8 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         template_id: item.templateId,
         topic_id: item.topicId,
         sort_order: item.sortOrder,
-        dependency_question_id: item.dependencyQuestionId,
-        dependency_condition: item.dependencyCondition,
+        dependency_question_id: item.dependency?.dependencyId || null,
+        dependency_condition: item.dependency?.condition || null,
         config: item.config,
       });
     }
@@ -460,8 +460,13 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           templateId: resultItem.template_id,
           topicId: resultItem.topic_id,
           sortOrder: resultItem.sort_order,
-          dependencyQuestionId: resultItem.dependency_question_id,
-          dependencyCondition: resultItem.dependency_condition,
+          dependency:
+            resultItem.dependency_question_id && resultItem.dependency_condition
+              ? {
+                  dependencyId: resultItem.dependency_question_id,
+                  condition: resultItem.dependency_condition,
+                }
+              : null,
           config: resultItem.config,
         }));
       });

@@ -14,8 +14,8 @@ import {
   Question,
   QuestionTemplateRelation,
   TemplateCategoryId,
-  Topic,
   TemplatesHasQuestions,
+  Topic,
 } from '../../models/Template';
 import {
   BooleanConfig,
@@ -88,7 +88,6 @@ export const dummyTemplateHasQuestionRelationFactory = (
     Math.round(Math.random() * 10),
     sortOrder + 1,
     JSON.stringify(new BooleanConfig()),
-    null,
     null
   );
 };
