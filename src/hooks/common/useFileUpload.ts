@@ -28,7 +28,10 @@ export function useFileUpload() {
     reset();
   };
 
-  const uploadFile = (file: File, completeHandler: Function) => {
+  const uploadFile = (
+    file: File,
+    completeHandler: (data: FileMetaData) => any
+  ) => {
     setState(UPLOAD_STATE.UPLOADING);
     const formData = new FormData();
     formData.append('file', file);
@@ -46,12 +49,14 @@ export function useFileUpload() {
     xhr.addEventListener(
       'load',
       event => {
-        const { responseText } = event.currentTarget as XMLHttpRequest;
+        const { responseText, status } = event.currentTarget as XMLHttpRequest;
         try {
-          if (responseText) {
+          if (status === 200 && responseText) {
             const metaData: FileMetaData = JSON.parse(responseText);
             completeHandler(metaData);
-            reset(); //auto reset
+            reset(); // auto reset
+          } else {
+            setState(UPLOAD_STATE.ERROR);
           }
         } catch (e) {
           setState(UPLOAD_STATE.ERROR);

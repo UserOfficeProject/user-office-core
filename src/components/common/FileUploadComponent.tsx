@@ -164,7 +164,7 @@ export function FileEntry(props: {
 
 export function NewFileEntry(props: {
   filetype: string | undefined;
-  onUploadComplete: Function;
+  onUploadComplete: (data: FileMetaData) => any;
 }) {
   const classes = makeStyles(theme => ({
     fileListWrapper: {
