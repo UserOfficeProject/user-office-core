@@ -1,4 +1,4 @@
-import { unlink, existsSync } from 'fs';
+import { existsSync, unlink } from 'fs';
 
 import express, { Request, Response } from 'express';
 import multer from 'multer';
@@ -49,8 +49,13 @@ const files = () => {
         size,
         path
       );
-      res.status(200).send(result);
+      if (!isRejection(result)) {
+        res.status(200).send(result);
+      } else {
+        res.status(500).send(result);
+      }
     } catch (e) {
+      logger.logException('Could not upload file', e, { req });
       res.status(500).send(e);
     }
   };
