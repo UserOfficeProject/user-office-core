@@ -27,9 +27,13 @@ const ProposalWorkflowsTable: React.FC = () => {
 
   const createModal = (onUpdate: Function, onCreate: Function) => (
     <CreateProposalWorkflow
-      close={(proposalWorkflow: ProposalWorkflow | null) =>
-        onCreate(proposalWorkflow)
-      }
+      close={(proposalWorkflow: ProposalWorkflow | null) => {
+        onCreate(proposalWorkflow);
+
+        history.push(
+          `/ProposalWorkflowEditor/${(proposalWorkflow as ProposalWorkflow).id}`
+        );
+      }}
     />
   );
 

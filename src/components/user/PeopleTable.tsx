@@ -123,7 +123,8 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
       icon: () => props.actionIcon,
       isFreeAction: props.isFreeAction,
       tooltip: props.actionText,
-      onClick: (event: any, rowData: any) => props.action(rowData),
+      onClick: (event: React.MouseEvent<JSX.Element>, rowData: any) =>
+        props.action(rowData),
     });
   props.emailInvite &&
     actionArray.push({

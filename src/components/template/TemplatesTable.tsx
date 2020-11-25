@@ -10,12 +10,18 @@ import { useHistory } from 'react-router';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
-import { GetTemplatesQuery, Template, TemplateCategoryId } from 'generated/sdk';
+import {
+  GetTemplatesQuery,
+  Template,
+  TemplateCategoryId,
+  TemplateMetadataFragment,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
 import { WithConfirmType } from 'utils/withConfirm';
 
 import CreateTemplate from './CreateTemplate';
+import { ProposalTemplateRowDataType } from './ProposalTemplatesTable';
 
 export type TemplateRowDataType = Pick<
   Template,
@@ -23,7 +29,7 @@ export type TemplateRowDataType = Pick<
 >;
 
 interface TemplatesTableProps {
-  columns: Column<any>[];
+  columns: Column<ProposalTemplateRowDataType>[];
   templateCategory: TemplateCategoryId;
   dataProvider: () => Promise<Exclude<GetTemplatesQuery['templates'], null>>;
   isRowRemovable: (row: TemplateRowDataType) => boolean;
@@ -48,7 +54,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
       icon: () => <UnarchiveIcon />,
       tooltip: 'Unarchive',
       onClick: (
-        event: any,
+        event: React.MouseEvent<HTMLButtonElement>,
         data: TemplateRowDataType | TemplateRowDataType[]
       ) => {
         props.confirm(
@@ -67,7 +73,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
                       response.updateTemplate.template?.templateId
                   ),
                   1,
-                  response.updateTemplate.template!
+                  response.updateTemplate.template as TemplateMetadataFragment
                 );
                 setTemplates(data);
               });
@@ -90,7 +96,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
       icon: () => <Archive />,
       tooltip: 'Archive',
       onClick: (
-        event: any,
+        event: React.MouseEvent<HTMLButtonElement>,
         data: TemplateRowDataType | TemplateRowDataType[]
       ) => {
         props.confirm(
@@ -109,7 +115,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
                       response.updateTemplate.template?.templateId
                   ),
                   1,
-                  response.updateTemplate.template!
+                  response.updateTemplate.template as TemplateMetadataFragment
                 );
                 setTemplates(data);
               });
@@ -132,7 +138,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
       icon: () => <Delete />,
       tooltip: 'Delete',
       onClick: (
-        event: any,
+        event: React.MouseEvent<HTMLButtonElement>,
         data: TemplateRowDataType | TemplateRowDataType[]
       ) => {
         props.confirm(
@@ -191,7 +197,10 @@ export function TemplatesTable(props: TemplatesTableProps) {
           onComplete={template => {
             if (template) {
               setTemplates([...templates, template]);
-              editTemplate(template.templateId);
+
+              setTimeout(() => {
+                editTemplate(template.templateId);
+              });
             }
             setShow(false);
           }}
