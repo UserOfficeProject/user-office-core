@@ -303,10 +303,15 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
     const isError = !!assignmentsErrors.join('');
 
-    enqueueSnackbar('Proposal/s assigned to SEP', {
-      variant: isError ? 'error' : 'success',
-      className: isError ? 'snackbar-success' : 'snackbar-error',
-    });
+    enqueueSnackbar(
+      isError
+        ? 'Proposal/s can not be assigned to SEP'
+        : 'Proposal/s assigned to SEP',
+      {
+        variant: isError ? 'error' : 'success',
+        className: isError ? 'snackbar-success' : 'snackbar-error',
+      }
+    );
 
     if (!isError) {
       setProposalsData(
