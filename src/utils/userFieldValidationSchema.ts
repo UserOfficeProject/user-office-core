@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { request } from 'graphql-request';
 import * as Yup from 'yup';
 
+import { Query } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 const phoneRegExp = /^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$/;
@@ -60,12 +62,10 @@ export const userFieldSchema = Yup.object().shape({
       {
           checkEmailExist(email: $email)
       }`;
-        request('/graphql', query, {
+        request<Query>('/graphql', query, {
           email: value,
         })
-          .then((data: any) =>
-            data.checkEmailExist ? resolve(false) : resolve(true)
-          )
+          .then(data => (data.checkEmailExist ? resolve(false) : resolve(true)))
           .catch(() => resolve(false));
       });
     }),
@@ -100,18 +100,16 @@ export const emailFieldSchema = Yup.object().shape({
       {
           checkEmailExist(email: $email)
       }`;
-        request('/graphql', query, {
+        request<Query>('/graphql', query, {
           email: value,
         })
-          .then((data: any) =>
-            data.checkEmailExist ? resolve(false) : resolve(true)
-          )
+          .then(data => (data.checkEmailExist ? resolve(false) : resolve(true)))
           .catch(() => resolve(false));
       });
     }),
 });
 
-export function useNaturalKeySchema(initialValue: string): any {
+export function useNaturalKeySchema(initialValue: string) {
   const api = useDataApi();
 
   return Yup.string()

@@ -156,23 +156,6 @@ context('Settings tests', () => {
 
       cy.notification({ variant: 'success', text: 'created successfully' });
 
-      let proposalWorkflowsTable = cy.get(
-        '[data-cy="proposal-workflows-table"]'
-      );
-
-      const proposalWorkflowsTableLastRow = proposalWorkflowsTable
-        .find('tr[level="0"]')
-        .last();
-
-      const lastRowText = proposalWorkflowsTableLastRow.invoke('text');
-
-      lastRowText.should('contain', name);
-      lastRowText.should('contain', description);
-
-      cy.get('[title="Edit"]')
-        .last()
-        .click();
-
       cy.get('[data-cy="connection_DRAFT_1"]').should('contain.text', 'DRAFT');
       cy.get('[data-cy="status_DRAFT_1"]').should('not.exist');
 
@@ -279,10 +262,6 @@ context('Settings tests', () => {
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({ variant: 'success', text: 'created successfully' });
-
-      cy.get('[title="Edit"]')
-        .last()
-        .click();
 
       cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]')
         .focus()

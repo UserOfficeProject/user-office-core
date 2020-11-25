@@ -30,7 +30,7 @@ export const QuestionFileUploadForm: FormComponent<Question> = props => {
         }),
       })}
     >
-      {formikProps => (
+      {() => (
         <>
           <Field
             name="naturalKey"

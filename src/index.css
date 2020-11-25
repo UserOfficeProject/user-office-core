@@ -27,3 +27,25 @@ code {
 .MuiList-root .MuiCollapse-wrapper .MuiListItem-root {
   padding-left: 26px;
 }
+
+.topicsDroppable::-webkit-scrollbar {
+  -webkit-appearance: none;
+  max-height: 10px;
+}
+
+.topicsDroppable::-webkit-scrollbar-thumb {
+  border: 2px solid white;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.questionItemsWrapper::-webkit-scrollbar {
+  -webkit-appearance: none;
+  max-width: 10px;
+}
+
+.questionItemsWrapper::-webkit-scrollbar-thumb {
+  border: 2px solid white;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.3);
+}

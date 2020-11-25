@@ -20,7 +20,7 @@ function SampleTemplatesTable(props: SampleTemplatesTableProps) {
       <TemplatesTable
         columns={columns}
         templateCategory={TemplateCategoryId.SAMPLE_DECLARATION}
-        isRowRemovable={rowData => {
+        isRowRemovable={() => {
           return true;
         }}
         dataProvider={props.dataProvider}

@@ -84,6 +84,9 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
     },
     itemContainer: {
       minHeight: '180px',
+      maxHeight: '600px',
+      overflowY: 'auto',
+      overflowX: 'hidden',
     },
     addQuestionMenuItem: {
       minHeight: 0,
@@ -209,7 +212,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             xs={12}
             ref={provided.innerRef}
             style={getListStyle(snapshot.isDraggingOver)}
-            className={classes.itemContainer}
+            className={`${classes.itemContainer} questionItemsWrapper`}
           >
             {getItems()}
             {provided.placeholder}
