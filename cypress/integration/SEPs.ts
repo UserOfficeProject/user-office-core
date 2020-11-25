@@ -289,6 +289,20 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Assign to SEP').click();
 
+    // Manually changing the proposal status to be shown in the SEPs. -------->
+    cy.get('[title="View proposal"]')
+      .first()
+      .click();
+
+    cy.contains('Admin').click();
+
+    cy.get('#mui-component-select-proposalStatus').click();
+
+    cy.contains('SEP_REVIEW').click();
+
+    cy.get('[type="submit"]').click();
+    // <------------------------------------------
+
     cy.contains('SEPs').click();
     cy.get('button[title="Edit"]')
       .first()
