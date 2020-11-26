@@ -65,7 +65,7 @@
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "sparkpost": "^2.1.4",
-    "type-graphql": "^1.1.0",
+    "type-graphql": "^1.1.1",
     "typedi": "^0.8.0",
     "yup": "^0.29.3"
   },
