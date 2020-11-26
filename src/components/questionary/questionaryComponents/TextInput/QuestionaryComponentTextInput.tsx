@@ -1,7 +1,6 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
-import { Key } from 'ts-keycode-enum';
 
 import TextFieldWithCounter from 'components/common/TextFieldWithCounter';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -50,7 +49,10 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
           setStateValue(event.currentTarget.value);
         }}
         onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
-          if (event.keyCode === Key.Enter) {
+          if (
+            config.multiline === false &&
+            event.key.toLowerCase() === 'enter'
+          ) {
             event.preventDefault();
             setStateValue(event.currentTarget.value);
             onComplete(event, event.currentTarget.value);

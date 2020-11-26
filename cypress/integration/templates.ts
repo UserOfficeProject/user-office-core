@@ -184,6 +184,8 @@ context('Template tests', () => {
 
     cy.contains('Is required').click();
 
+    cy.contains('Multiple lines').click();
+
     cy.get('[data-cy=max]').type(minimumCharacters.toString());
 
     cy.contains('Save').click();
@@ -410,7 +412,13 @@ context('Template tests', () => {
       .click()
       .type('2');
     cy.get(`#${boolId}`).click();
-    cy.get(`#${textId}`).type(textAnswer);
+    cy.get(`#${textId}`)
+      .clear()
+      .type('this_word_{enter}should_be_multiline');
+    cy.contains('this_word_should_be_multiline').should('not.exist');
+    cy.get(`#${textId}`)
+      .clear()
+      .type(textAnswer);
     cy.contains(`${textAnswer.length}/${minimumCharacters}`);
     cy.get(`[data-cy='${dateId}_field'] button`).click();
     cy.wait(300);
