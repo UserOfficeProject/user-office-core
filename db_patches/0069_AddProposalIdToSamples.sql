@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-  IF register_patch('AddProposalIdToSamples.sql', 'Peter Asztalos', 'Add proposal events table to keep track of all fired events on a proposal.', '2020-10-22') THEN
+  IF register_patch('AddProposalIdToSamples.sql', 'jekabskarklins', 'Adding columns proposal_id and question_id to samples', '2020-10-22') THEN
     BEGIN
 
     ALTER TABLE "samples" ADD "proposal_id" INT DEFAULT NULL;
