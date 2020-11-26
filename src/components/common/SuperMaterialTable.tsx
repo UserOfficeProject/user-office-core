@@ -2,7 +2,15 @@ import Button from '@material-ui/core/Button';
 import Edit from '@material-ui/icons/Edit';
 import MaterialTable, { MaterialTableProps } from 'material-table';
 import React, { useState } from 'react';
-import { QueryParamConfig, DecodedValueMap, SetQuery } from 'use-query-params';
+import {
+  QueryParamConfig,
+  DecodedValueMap,
+  SetQuery,
+  DelimitedNumericArrayParam,
+  NumberParam,
+  StringParam,
+  withDefault,
+} from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
@@ -11,6 +19,15 @@ import { tableIcons } from 'utils/materialIcons';
 export type UrlQueryParamsType = {
   search: QueryParamConfig<string | null | undefined>;
   selection: QueryParamConfig<(number | null | never)[]>;
+  sortColumn: QueryParamConfig<number | null | undefined>;
+  sortDirection: QueryParamConfig<string | null | undefined>;
+};
+
+export const DefaultQueryParams = {
+  sortColumn: NumberParam,
+  sortDirection: StringParam,
+  search: StringParam,
+  selection: withDefault(DelimitedNumericArrayParam, []),
 };
 
 interface SuperProps<RowData extends object> {
@@ -60,6 +77,17 @@ function SuperMaterialTable<Entry extends EntryID>({
 
   if (props.options?.search && props.urlQueryParams) {
     props.options.searchText = props.urlQueryParams.search || undefined;
+  }
+
+  const { columns } = props;
+
+  if (
+    props.urlQueryParams?.sortColumn !== undefined &&
+    props.urlQueryParams?.sortColumn !== null &&
+    props.urlQueryParams?.sortDirection
+  ) {
+    columns[props.urlQueryParams.sortColumn].defaultSort = props.urlQueryParams
+      .sortDirection as 'asc' | 'desc' | undefined;
   }
 
   const onCreated = (objectAdded: Entry) => {
@@ -113,6 +141,7 @@ function SuperMaterialTable<Entry extends EntryID>({
       </InputDialog>
       <MaterialTable
         {...props}
+        columns={columns}
         data={data}
         icons={tableIcons}
         editable={
@@ -155,6 +184,13 @@ function SuperMaterialTable<Entry extends EntryID>({
                 selectedItems.length > 0
                   ? selectedItems.map(selectedItem => selectedItem.id)
                   : undefined,
+            });
+        }}
+        onOrderChange={(orderedColumnId, orderDirection) => {
+          props.setUrlQueryParams &&
+            props.setUrlQueryParams({
+              sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
+              sortDirection: orderDirection ? orderDirection : undefined,
             });
         }}
       />

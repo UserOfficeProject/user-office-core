@@ -6,14 +6,9 @@ import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column } from 'material-table';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  useQueryParams,
-  NumberParam,
-  StringParam,
-  withDefault,
-  DelimitedNumericArrayParam,
-} from 'use-query-params';
+import { useQueryParams, NumberParam } from 'use-query-params';
 
+import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import { Proposal, ProposalsFilter } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -38,8 +33,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     call: NumberParam,
     instrument: NumberParam,
     proposalStatus: NumberParam,
-    search: StringParam,
-    selection: withDefault(DelimitedNumericArrayParam, []),
+    ...DefaultQueryParams,
   });
 
   // NOTE: proposalStatusId has default value 2 because for IS default view should be all proposals in FEASIBILITY_REVIEW status

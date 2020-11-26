@@ -3,13 +3,13 @@ import React from 'react';
 import {
   NumberParam,
   useQueryParams,
-  StringParam,
-  withDefault,
-  DelimitedNumericArrayParam,
   QueryParamConfig,
 } from 'use-query-params';
 
-import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
+import {
+  DefaultQueryParams,
+  UrlQueryParamsType,
+} from 'components/common/SuperMaterialTable';
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -29,11 +29,10 @@ export default function ProposalPage() {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
     ProposalUrlQueryParamsType
   >({
+    ...DefaultQueryParams,
     call: NumberParam,
     instrument: NumberParam,
     proposalStatus: NumberParam,
-    search: StringParam,
-    selection: withDefault(DelimitedNumericArrayParam, []),
   });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,

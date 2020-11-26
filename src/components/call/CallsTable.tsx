@@ -1,10 +1,15 @@
 import dateformat from 'dateformat';
+import { Column } from 'material-table';
 import React, { useState } from 'react';
+import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
 import ScienceIconAdd from 'components/common/icons/ScienceIconAdd';
 import InputDialog from 'components/common/InputDialog';
-import SuperMaterialTable from 'components/common/SuperMaterialTable';
+import SuperMaterialTable, {
+  DefaultQueryParams,
+  UrlQueryParamsType,
+} from 'components/common/SuperMaterialTable';
 import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
@@ -19,6 +24,9 @@ const CallsTable: React.FC = () => {
     number | null
   >(null);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
+    UrlQueryParamsType
+  >(DefaultQueryParams);
 
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
@@ -188,6 +196,8 @@ const CallsTable: React.FC = () => {
             position: 'row',
           },
         ]}
+        urlQueryParams={urlQueryParams}
+        setUrlQueryParams={setUrlQueryParams}
       />
     </div>
   );

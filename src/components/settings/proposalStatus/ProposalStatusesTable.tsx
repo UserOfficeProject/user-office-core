@@ -1,7 +1,11 @@
 import React from 'react';
+import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
-import SuperMaterialTable from 'components/common/SuperMaterialTable';
+import SuperMaterialTable, {
+  DefaultQueryParams,
+  UrlQueryParamsType,
+} from 'components/common/SuperMaterialTable';
 import { UserRole, ProposalStatus } from 'generated/sdk';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { tableIcons } from 'utils/materialIcons';
@@ -21,6 +25,9 @@ const ProposalStatusesTable: React.FC = () => {
     { title: 'Description', field: 'description' },
   ];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
+    UrlQueryParamsType
+  >(DefaultQueryParams);
 
   const createModal = (
     onUpdate: Function,
@@ -71,6 +78,8 @@ const ProposalStatusesTable: React.FC = () => {
           search: true,
           debounceInterval: 400,
         }}
+        urlQueryParams={urlQueryParams}
+        setUrlQueryParams={setUrlQueryParams}
       />
     </div>
   );

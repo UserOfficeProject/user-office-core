@@ -1,14 +1,10 @@
 import AssignmentInd from '@material-ui/icons/AssignmentInd';
 import React, { useState } from 'react';
-import {
-  useQueryParams,
-  StringParam,
-  withDefault,
-  DelimitedNumericArrayParam,
-} from 'use-query-params';
+import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable, {
+  DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -43,10 +39,7 @@ const InstrumentTable: React.FC = () => {
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
     UrlQueryParamsType
-  >({
-    search: StringParam,
-    selection: withDefault(DelimitedNumericArrayParam, []),
-  });
+  >(DefaultQueryParams);
 
   const onInstrumentDelete = async (instrumentDeletedId: number) => {
     return await api('Instrument removed successfully!')

@@ -387,6 +387,16 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         })
       : proposalsData;
 
+  if (
+    urlQueryParams.sortColumn !== undefined &&
+    urlQueryParams.sortColumn !== null &&
+    urlQueryParams.sortDirection
+  ) {
+    columns[
+      urlQueryParams.sortColumn
+    ].defaultSort = urlQueryParams.sortDirection as 'asc' | 'desc' | undefined;
+  }
+
   return (
     <>
       <DialogConfirmation
@@ -558,6 +568,13 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           );
 
           setLocalStorageValue(proposalColumns);
+        }}
+        onOrderChange={(orderedColumnId, orderDirection) => {
+          setUrlQueryParams &&
+            setUrlQueryParams({
+              sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
+              sortDirection: orderDirection ? orderDirection : undefined,
+            });
         }}
       />
     </>
