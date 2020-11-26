@@ -48,3 +48,22 @@ jobs:
           build-args: BUILD_VERSION=${{ github.sha }}
           push: true
           tags: dmsc/duo-frontend:${{ steps.extract_branch.outputs.branch }}
+
+      - name: Trigger pipeline
+        run: |
+          REPOSITORY=${{ github.repository }}
+          RESULT=$(curl -X POST \
+            -F token="${{ secrets.GITLAB_TRIGGER_TOKEN }}" \
+            -F ref=master \
+            -F "variables[RUN_DEPLOY]=1" \
+            -F "variables[BRANCH]=${{ steps.extract_branch.outputs.branch }}" \
+            -F "variables[REPOSITORY]=${REPOSITORY#UserOfficeProject/}" \
+            -o /dev/null \
+            --silent \
+            --write-out '%{http_code}' \
+            ${{ secrets.GITLAB_TRIGGER_URL }})
+
+          if [[ $RESULT != "201" ]]; then
+            echo "Failed to trigger Gitlab pipeline: $RESULT"
+            exit 1
+          fi
