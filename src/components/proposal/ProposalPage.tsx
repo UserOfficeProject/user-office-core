@@ -51,7 +51,7 @@ export default function ProposalPage() {
       <ContentContainer>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <StyledPaper>
+            <StyledPaper data-cy="officer-proposals-table">
               <ProposalFilterBar
                 calls={{ data: calls, isLoading: loadingCalls }}
                 instruments={{

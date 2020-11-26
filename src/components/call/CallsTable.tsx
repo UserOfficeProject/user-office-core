@@ -1,5 +1,4 @@
 import dateformat from 'dateformat';
-import { Column } from 'material-table';
 import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
 
