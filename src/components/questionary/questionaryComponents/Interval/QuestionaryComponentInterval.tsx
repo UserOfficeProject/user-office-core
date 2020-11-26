@@ -1,8 +1,8 @@
 import { Grid, MenuItem, Select, TextField } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import { getIn } from 'formik';
-import React, { useEffect, useState } from 'react';
+import { Field, getIn } from 'formik';
+import React, { useState } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import ProposalErrorLabel from 'components/proposal/ProposalErrorLabel';
@@ -46,10 +46,6 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
     unit: string;
   }>(answer.value);
 
-  useEffect(() => {
-    setStateValue(answer.value || false);
-  }, [answer]);
-
   const classes = useStyles();
 
   const minFieldId = `${proposalQuestionId}.min`;
@@ -62,12 +58,12 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
   ) => {
     const maybeNumber = parseFloat(input);
 
-    return isNaN(maybeNumber) ? defaultValue : maybeNumber;
+    return isNaN(maybeNumber) && input !== '' ? defaultValue : maybeNumber;
   };
 
   const getUnits = () => {
     if (config.units?.length === 0) {
-      return null;
+      return <Field type={TextField} value="" name={unitFieldId} />;
     } else if (config.units?.length === 1) {
       return <span className={`${classes.singleUnit}`}>{stateValue.unit}</span>;
     } else {
@@ -76,8 +72,9 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           label="Unit"
           value={stateValue.unit}
           onChange={e => {
-            setStateValue({ ...stateValue, unit: e.target.value as string });
-            onComplete(e, stateValue);
+            const newState = { ...stateValue, unit: e.target.value as string };
+            setStateValue(newState);
+            onComplete(e, newState);
           }}
           name={unitFieldId}
           data-cy={unitFieldId}

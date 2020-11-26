@@ -22,8 +22,8 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to create Proposal status', () => {
-      const name = faker.random.words(2);
-      const description = faker.random.words(5);
+      const name = faker.lorem.words(2);
+      const description = faker.lorem.words(5);
 
       // NOTE: Valid proposal status name is uppercase characters without spaces but underscores.
       const shortCode = name.toUpperCase().replace(/\s/g, '_');
@@ -61,8 +61,8 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to update Proposal status', () => {
-      const newName = faker.random.words(2);
-      const newDescription = faker.random.words(5);
+      const newName = faker.lorem.words(2);
+      const newDescription = faker.lorem.words(5);
 
       cy.login('officer');
 
@@ -141,8 +141,8 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to create proposal workflow and it should contain default DRAFT status', () => {
-      const name = faker.random.words(2);
-      const description = faker.random.words(5);
+      const name = faker.lorem.words(2);
+      const description = faker.lorem.words(5);
 
       cy.login('officer');
 
@@ -163,8 +163,8 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to update proposal workflow', () => {
-      const name = faker.random.words(2);
-      const description = faker.random.words(5);
+      const name = faker.lorem.words(2);
+      const description = faker.lorem.words(5);
 
       cy.login('officer');
 
