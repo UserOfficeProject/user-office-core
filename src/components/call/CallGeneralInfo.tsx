@@ -2,20 +2,24 @@ import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker';
-import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
-import { useProposalsTemplates } from 'hooks/template/useProposalTemplates';
+import { GetProposalTemplatesQuery, ProposalWorkflow } from 'generated/sdk';
 
-const CallGeneralInfo: React.FC = () => {
-  const { templates, loadingTemplates } = useProposalsTemplates(false);
-  const {
-    proposalWorkflows,
-    loadingProposalWorkflows,
-  } = useProposalWorkflowsData();
-
+const CallGeneralInfo: React.FC<{
+  templates: Exclude<GetProposalTemplatesQuery['proposalTemplates'], null>;
+  loadingTemplates: boolean;
+  proposalWorkflows: ProposalWorkflow[];
+  loadingProposalWorkflows: boolean;
+}> = ({
+  loadingProposalWorkflows,
+  proposalWorkflows,
+  loadingTemplates,
+  templates,
+}) => {
   const proposalWorkflowsWithInjectedSelectionRemoval = [
     { id: '', name: 'None (remove selection)' },
     ...proposalWorkflows,
@@ -33,6 +37,7 @@ const CallGeneralInfo: React.FC = () => {
         component={TextField}
         margin="normal"
         fullWidth
+        required
         data-cy="short-code"
       />
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -79,6 +84,13 @@ const CallGeneralInfo: React.FC = () => {
       />
     </>
   );
+};
+
+CallGeneralInfo.propTypes = {
+  loadingProposalWorkflows: PropTypes.bool.isRequired,
+  proposalWorkflows: PropTypes.array.isRequired,
+  loadingTemplates: PropTypes.bool.isRequired,
+  templates: PropTypes.array.isRequired,
 };
 
 export default CallGeneralInfo;
