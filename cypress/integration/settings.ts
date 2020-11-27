@@ -24,8 +24,6 @@ context('Settings tests', () => {
     it('User Officer should be able to create Proposal status', () => {
       const name = faker.lorem.words(2);
       const description = faker.lorem.words(5);
-
-      // NOTE: Valid proposal status name is uppercase characters without spaces but underscores.
       const shortCode = name.toUpperCase().replace(/\s/g, '_');
 
       cy.login('officer');

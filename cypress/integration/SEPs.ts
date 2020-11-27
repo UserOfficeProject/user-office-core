@@ -219,49 +219,6 @@ context('Scientific evaluation panel tests', () => {
       });
   });
 
-  it('Officer should be able to remove SEP Reviewers from existing SEP', () => {
-    cy.login('officer');
-
-    cy.contains('SEPs').click();
-    cy.get('button[title="Edit"]')
-      .first()
-      .click();
-
-    cy.contains('Members').click();
-
-    cy.get('[title="Delete"]').click();
-
-    cy.get('[title="Save"]').click();
-
-    cy.notification({
-      variant: 'success',
-      text: 'SEP member removed successfully',
-    });
-
-    cy.contains('Logs').click({ force: true });
-
-    cy.finishedLoading();
-
-    cy.get("[title='Last Page'] button")
-      .first()
-      .click({ force: true });
-
-    cy.contains('SEP_MEMBER_REMOVED');
-
-    cy.contains('Members').click();
-
-    cy.get('[data-cy="sep-reviewers-table"]')
-      .find('tbody td')
-      .should('have.length', 1);
-
-    cy.get('[data-cy="sep-reviewers-table"]')
-      .find('tbody td')
-      .first()
-      .then(element => {
-        expect(element.text()).to.be.equal('No records to display');
-      });
-  });
-
   it('Officer should be able to assign proposal to existing SEP', () => {
     cy.login('user');
     cy.createProposal();
@@ -478,6 +435,49 @@ context('Scientific evaluation panel tests', () => {
     cy.contains('External reviews');
   });
 
+  it('Officer should be able to remove SEP Reviewers from existing SEP', () => {
+    cy.login('officer');
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit"]')
+      .first()
+      .click();
+
+    cy.contains('Members').click();
+
+    cy.get('[title="Delete"]').click();
+
+    cy.get('[title="Save"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'SEP member removed successfully',
+    });
+
+    cy.contains('Logs').click({ force: true });
+
+    cy.finishedLoading();
+
+    cy.get("[title='Last Page'] button")
+      .first()
+      .click({ force: true });
+
+    cy.contains('SEP_MEMBER_REMOVED');
+
+    cy.contains('Members').click();
+
+    cy.get('[data-cy="sep-reviewers-table"]')
+      .find('tbody td')
+      .should('have.length', 1);
+
+    cy.get('[data-cy="sep-reviewers-table"]')
+      .find('tbody td')
+      .first()
+      .then(element => {
+        expect(element.text()).to.be.equal('No records to display');
+      });
+  });
+
   it('Officer should be able to see calculated availability time on instrument per SEP inside meeting components', () => {
     const code = faker.random.words(3);
     const description = faker.random.words(8);
@@ -610,6 +610,14 @@ context('Scientific evaluation panel tests', () => {
     cy.contains('Yes').click();
 
     cy.contains('Yes');
+
+    cy.contains('Proposals and Assignments').click();
+
+    cy.finishedLoading();
+
+    cy.contains('Meeting Components').click();
+
+    cy.finishedLoading();
 
     cy.get('[title="Submit instrument"] button').should('be.disabled');
   });
