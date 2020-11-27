@@ -235,7 +235,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     },
     {
       title: 'SEP',
-      field: 'sepShortCode',
+      field: 'sepCode',
     },
   ];
 
@@ -313,7 +313,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               selectedProposal => selectedProposal.id === prop.id
             )
           ) {
-            prop.sepShortCode = sep.code;
+            prop.sepCode = sep.code;
           }
 
           return prop;
