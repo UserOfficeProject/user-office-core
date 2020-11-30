@@ -54,7 +54,7 @@
     "tinymce": "^5.4.2",
     "ts-keycode-enum": "^1.0.6",
     "typescript": "~3.9.6",
-    "use-query-params": "^1.1.8",
+    "use-query-params": "^1.1.9",
     "xlsx": "^0.16.8",
     "yup": "~0.29.3"
   },
