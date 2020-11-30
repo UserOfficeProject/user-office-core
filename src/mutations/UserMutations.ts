@@ -39,6 +39,8 @@ import {
 import { signToken, verifyToken } from '../utils/jwt';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import UOWSSoapClient from '../UOWSSoapInterface';
+
 
 export default class UserMutations {
   constructor(
@@ -370,18 +372,42 @@ export default class UserMutations {
 
   async checkExternalToken(externalToken: string): Promise<string | Rejection> {
     try {
-      // call UOWS with external token
-      // const userFromUOWS : BasicPersonDetailsDTO = uows.getBasicPersonDetailsForSessionId(externalToken);
-      // const user = convertUserDTO(userFromUOWS);
+      const client = new UOWSSoapClient('https://devapis.facilities.rl.ac.uk/ws/UserOfficeWebService?wsdl');
+      const stfcUser = (await client.getPersonDetailsFromSessionId(externalToken)).return;
+      const convertedUser = new User(
+        stfcUser.userNumber,
+        stfcUser.title,
+        stfcUser.givenName,
+        undefined,
+        stfcUser.familyName,
+        stfcUser.firstNameKnownAs,
+        stfcUser.firstNameKnownAs,
+        "",
+        "",
+        "",
+        0,
+        "",
+        0,
+        stfcUser.deptName,
+        "",
+        stfcUser.email,
+        true,
+        stfcUser.workPhone,
+        stfcUser.mobilePhone,
+        false,
+        "",
+        ""
+      );
 
-      const user = await this.dataSource.getByEmail('Aaron_Harris49@gmail.com');
-      if (!user) {
+      if (!convertedUser) {
         return rejection('USER_DOES_NOT_EXIST');
       }
-      const roles = await this.dataSource.getUserRoles(user.id);
+
+      // TODO: this should get the user's roles
+      const roles = await this.dataSource.getRoles();
 
       const essToken = signToken<AuthJwtPayload>({
-        user: user,
+        user: convertedUser,
         roles,
         currentRole: roles[0],
       });
