@@ -8,9 +8,7 @@ query getSEPProposals($sepId: Int!, $callId: Int!) {
       id
       shortCode
       status {
-        id
-        name
-        description
+        ...proposalStatus
       }
     }
     assignments {

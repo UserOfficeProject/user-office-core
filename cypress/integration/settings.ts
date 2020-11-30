@@ -24,19 +24,15 @@ context('Settings tests', () => {
     it('User Officer should be able to create Proposal status', () => {
       const name = faker.lorem.words(2);
       const description = faker.lorem.words(5);
-
-      // NOTE: Valid proposal status name is uppercase characters without spaces but underscores.
-      const validName = name
-        .toUpperCase()
-        .replace(/\s/g, '_')
-        .substr(0, 30);
+      const shortCode = name.toUpperCase().replace(/\s/g, '_');
 
       cy.login('officer');
 
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
       cy.contains('Create').click();
-      cy.get('#name').type(validName);
+      cy.get('#shortCode').type(shortCode);
+      cy.get('#name').type(name);
       cy.get('#description').type(description);
       cy.get('[data-cy="submit"]').click();
 
@@ -57,19 +53,14 @@ context('Settings tests', () => {
 
       const lastRowText = proposalStatusesTableLastRow.invoke('text');
 
-      lastRowText.should('contain', validName);
+      lastRowText.should('contain', shortCode);
+      lastRowText.should('contain', name);
       lastRowText.should('contain', description);
     });
 
     it('User Officer should be able to update Proposal status', () => {
       const newName = faker.lorem.words(2);
       const newDescription = faker.lorem.words(5);
-
-      // NOTE: Valid proposal status name is uppercase characters without spaces but underscores.
-      const newValidName = newName
-        .toUpperCase()
-        .replace(/\s/g, '_')
-        .substr(0, 30);
 
       cy.login('officer');
 
@@ -88,8 +79,10 @@ context('Settings tests', () => {
         .last()
         .click();
 
+      cy.get('#shortCode').should('be.disabled');
+
       cy.get('#name').clear();
-      cy.get('#name').type(newValidName);
+      cy.get('#name').type(newName);
       cy.get('#description').type(newDescription);
       cy.get('[data-cy="submit"]').click();
 
@@ -102,7 +95,7 @@ context('Settings tests', () => {
 
       const lastRowText = proposalStatusesTableLastRow.invoke('text');
 
-      lastRowText.should('contain', newValidName);
+      lastRowText.should('contain', newName);
       lastRowText.should('contain', newDescription);
     });
 
@@ -124,7 +117,7 @@ context('Settings tests', () => {
         .last()
         .click();
 
-      cy.get('[title="Save"]').click();
+      cy.get('[data-cy="confirm-yes"]').click();
 
       cy.notification({ variant: 'success', text: 'deleted successfully' });
     });
