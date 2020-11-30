@@ -340,9 +340,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
 
         return createUserObject(user[0]);
-      })
-      .then((user: User) => {
-        return user;
       });
   }
 

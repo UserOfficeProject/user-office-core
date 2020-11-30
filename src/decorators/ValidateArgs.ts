@@ -36,6 +36,7 @@ const ValidateArgs = (schema: yup.ObjectSchema) => {
       if (errors) {
         if (process.env.NODE_ENV === 'development') {
           logger.logError(`Input validation errors: ${errors}`, {
+            errors: errors.errors,
             inputArgs,
           });
         }
