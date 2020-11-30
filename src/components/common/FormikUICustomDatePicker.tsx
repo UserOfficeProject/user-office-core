@@ -27,7 +27,7 @@ const FormikUICustomDatePicker = ({
         }
       }}
       // if you are using custom validation schema you probably want to pass `true` as third argument
-      onChange={date => form.setFieldValue(field.name, date, false)}
+      onChange={date => form.setFieldValue(field.name, date, true)}
       {...other}
     />
   );

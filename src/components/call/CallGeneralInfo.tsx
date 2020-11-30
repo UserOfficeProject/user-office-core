@@ -47,6 +47,7 @@ const CallGeneralInfo: React.FC<{
           component={FormikUICustomDatePicker}
           margin="normal"
           fullWidth
+          required
           data-cy="start-date"
         />
 
@@ -56,6 +57,7 @@ const CallGeneralInfo: React.FC<{
           component={FormikUICustomDatePicker}
           margin="normal"
           fullWidth
+          required
           data-cy="end-date"
         />
       </MuiPickersUtilsProvider>
