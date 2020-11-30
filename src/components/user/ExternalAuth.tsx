@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
@@ -19,10 +19,13 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
   const unauthorizedApi = useUnauthorizedApi();
   const sessionId: string = match.params.sessionId;
 
+  const isFirstRun= useRef<boolean>(true);
+
   useEffect(() => {
-    if (token) {
+    if (!isFirstRun.current) {
       return;
     }
+    isFirstRun.current = false;
 
     unauthorizedApi()
       .checkExternalToken({
