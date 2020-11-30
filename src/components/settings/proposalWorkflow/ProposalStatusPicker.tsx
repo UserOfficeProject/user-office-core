@@ -58,15 +58,15 @@ const ProposalStatusPicker: React.FC<{
   const getItems = () =>
     proposalStatuses.map((proposalStatus, index) => (
       <Draggable
-        key={`${proposalStatus.name}_${proposalStatus.id}`}
-        draggableId={`${proposalStatus.name}_${proposalStatus.id}`}
+        key={`${proposalStatus.shortCode}_${proposalStatus.id}`}
+        draggableId={`${proposalStatus.shortCode}_${proposalStatus.id}`}
         index={index}
       >
         {(provided, snapshot) => (
           <Grid
             item
             xs={12}
-            data-cy={`status_${proposalStatus.name}_${proposalStatus.id}`}
+            data-cy={`status_${proposalStatus.shortCode}_${proposalStatus.id}`}
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}

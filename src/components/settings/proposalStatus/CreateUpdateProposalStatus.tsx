@@ -10,6 +10,7 @@ import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { DarkerDisabledTextField } from 'components/common/DarkerDisabledTextField';
 import UOLoader from 'components/common/UOLoader';
 import { ProposalStatus } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -35,6 +36,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
   const initialValues = proposalStatus
     ? proposalStatus
     : {
+        shortCode: '',
         name: '',
         description: '',
       };
@@ -79,6 +81,21 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             {proposalStatus ? 'Update' : 'Create new'} proposal status
           </Typography>
           <Field
+            name="shortCode"
+            id="shortCode"
+            label="Short code"
+            type="text"
+            value={initialValues.shortCode ? initialValues.shortCode : ''}
+            component={
+              initialValues.shortCode ? DarkerDisabledTextField : TextField
+            }
+            margin="normal"
+            fullWidth
+            data-cy="shortCode"
+            required
+            disabled={!!initialValues.shortCode || isExecutingCall}
+          />
+          <Field
             name="name"
             id="name"
             label="Name"
@@ -88,6 +105,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             fullWidth
             data-cy="name"
             disabled={isExecutingCall}
+            required
           />
           <Field
             id="description"
@@ -102,6 +120,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             rows="3"
             data-cy="description"
             disabled={isExecutingCall}
+            required
           />
 
           <Button

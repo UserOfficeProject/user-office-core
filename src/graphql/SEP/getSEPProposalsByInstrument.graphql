@@ -14,9 +14,7 @@ query sepProposalsByInstrument(
       shortCode
       rankOrder
       status {
-        id
-        name
-        description
+        ...proposalStatus
       }
       reviews {
         id

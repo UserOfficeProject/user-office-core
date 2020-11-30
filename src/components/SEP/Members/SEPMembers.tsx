@@ -1,6 +1,5 @@
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
-import withStyles from '@material-ui/core/styles/withStyles';
 import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
@@ -12,6 +11,7 @@ import PropTypes from 'prop-types';
 import React, { useState, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
+import { DarkerDisabledTextField } from 'components/common/DarkerDisabledTextField';
 import UOLoader from 'components/common/UOLoader';
 import ParticipantModal from 'components/proposal/ParticipantModal';
 import { UserContext } from 'context/UserContextProvider';
@@ -31,15 +31,6 @@ type SEPMemberAssignments = {
   SEPSecretary: BasicUserDetails | null;
   SEPReviewers: BasicUserDetails[];
 };
-
-const DarkerDisabledTextField = withStyles({
-  root: {
-    marginRight: 8,
-    '& .MuiInputBase-root.Mui-disabled': {
-      color: 'rgba(0, 0, 0, 0.7)', // (default alpha is 0.38)
-    },
-  },
-})(TextField);
 
 const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   const [modalOpen, setOpen] = useState(false);

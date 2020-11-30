@@ -235,7 +235,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     },
     {
       title: 'SEP',
-      field: 'sepShortCode',
+      field: 'sepCode',
     },
   ];
 
@@ -292,9 +292,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const assignProposalToSEP = async (sep: Sep): Promise<void> => {
     const assignmentsErrors = await Promise.all(
       selectedProposals.map(async selectedProposal => {
-        const result = await api(
-          'Proposal/s assigned to SEP'
-        ).assignProposalToSEP({
+        const result = await api().assignProposalToSEP({
           proposalId: selectedProposal.id,
           sepId: sep.id,
         });
@@ -305,6 +303,16 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
     const isError = !!assignmentsErrors.join('');
 
+    enqueueSnackbar(
+      isError
+        ? 'Proposal/s can not be assigned to SEP'
+        : 'Proposal/s assigned to SEP',
+      {
+        variant: isError ? 'error' : 'success',
+        className: isError ? 'snackbar-success' : 'snackbar-error',
+      }
+    );
+
     if (!isError) {
       setProposalsData(
         proposalsData.map(prop => {
@@ -313,7 +321,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               selectedProposal => selectedProposal.id === prop.id
             )
           ) {
-            prop.sepShortCode = sep.code;
+            prop.sepCode = sep.code;
           }
 
           return prop;

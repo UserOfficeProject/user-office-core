@@ -29,7 +29,13 @@ function createProposalStub(
     },
     questionaryId: 0,
     shortCode: '',
-    status: { id: 0, description: '', name: '' },
+    status: {
+      id: 0,
+      shortCode: '',
+      description: '',
+      name: '',
+      isDefault: true,
+    },
     submitted: false,
     users: [],
   };

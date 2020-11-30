@@ -1,9 +1,7 @@
 mutation deleteProposalStatus($id: Int!) {
   deleteProposalStatus(id: $id) {
     proposalStatus {
-      id
-      name
-      description
+      ...proposalStatus
     }
     error
   }
