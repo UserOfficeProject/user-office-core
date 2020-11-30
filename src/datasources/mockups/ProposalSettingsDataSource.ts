@@ -10,13 +10,17 @@ import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 export const dummyProposalStatus = new ProposalStatus(
   1,
   'DRAFT',
-  'When proposal is created it gets draft status before it is submitted.'
+  'Draft',
+  'When proposal is created it gets draft status before it is submitted.',
+  true
 );
 
 export const anotherDummyProposalStatus = new ProposalStatus(
   11,
   'NEW_PROPOSAL_STATUS',
-  'Proposal status for testing.'
+  'New proposal status',
+  'Proposal status for testing.',
+  false
 );
 
 export const dummyProposalWorkflow = new ProposalWorkflow(
@@ -32,8 +36,10 @@ export const dummyProposalWorkflowConnection = new ProposalWorkflowConnection(
   1,
   {
     id: 1,
-    name: 'TEST_STATUS',
+    shortCode: 'TEST_STATUS',
+    name: 'Test status',
     description: 'Test status',
+    isDefault: false,
   },
   null,
   null,
@@ -48,8 +54,10 @@ export const anotherDummyProposalWorkflowConnection = new ProposalWorkflowConnec
   2,
   {
     id: 2,
-    name: 'TEST_STATUS_2',
+    shortCode: 'TEST_STATUS_2',
+    name: 'Test status 2',
     description: 'Test status 2',
+    isDefault: false,
   },
   null,
   1,
