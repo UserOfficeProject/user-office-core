@@ -44,7 +44,7 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
         name={proposalQuestionId}
         fullWidth
         required={config.required ? true : false}
-        label={config.htmlQuestion ? '' : question.question}
+        label={question.question}
         value={stateValue}
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
           setStateValue(event.currentTarget.value);

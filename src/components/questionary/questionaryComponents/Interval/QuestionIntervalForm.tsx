@@ -1,7 +1,6 @@
 import { makeStyles } from '@material-ui/core';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import Qty from 'js-quantities';
 import React, { ChangeEvent, useState } from 'react';
 import * as Yup from 'yup';
 
@@ -14,19 +13,7 @@ import { QuestionFormShell } from 'components/questionary/questionaryComponents/
 import { IntervalConfig, Question } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-const getAllProperties = () =>
-  Qty.getKinds()
-    .sort()
-    .map(kind => {
-      return {
-        text: kind.split('_').join(' '),
-        value: kind,
-      };
-    });
-
-const getAllUnitsForProperty = (property: string) => {
-  return Qty.getUnits(property || 'unitless');
-};
+import { allProperties, IntervalPropertyId } from './intervalUnits';
 
 const useStyles = makeStyles(theme => ({
   units: {
@@ -34,13 +21,20 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const propertyDropdownEntries = Array.from(allProperties).map(
+  ([id, property]) => ({
+    text: property.name,
+    value: id,
+  })
+);
+
 export const QuestionIntervalForm: FormComponent<Question> = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
-  const [allProperties] = useState(getAllProperties());
   const [showUnits, setShowUnits] = useState(
-    (props.field.config as IntervalConfig).property !== 'unitless'
+    (props.field.config as IntervalConfig).property !==
+      IntervalPropertyId.UNITLESS
   );
 
   const classes = useStyles();
@@ -104,12 +98,12 @@ export const QuestionIntervalForm: FormComponent<Question> = props => {
             <FormikDropdown
               name="config.property"
               label="Physical property"
-              items={allProperties}
+              items={propertyDropdownEntries}
               InputProps={{
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
                   formikProps.setFieldValue('config.property', e.target.value);
                   formikProps.setFieldValue('config.units', []); // reset units to empty array
-                  setShowUnits(e.target.value !== 'unitless');
+                  setShowUnits(e.target.value !== IntervalPropertyId.UNITLESS);
                 },
                 'data-cy': 'property',
               }}
@@ -119,9 +113,12 @@ export const QuestionIntervalForm: FormComponent<Question> = props => {
               name="config.units"
               component={FormikUICustomMultipleSelect}
               label="Units"
-              availableOptions={getAllUnitsForProperty(
-                (formikProps.values.config as IntervalConfig).property
-              )}
+              availableOptions={
+                allProperties.get(
+                  (formikProps.values.config as IntervalConfig)
+                    .property as IntervalPropertyId
+                )?.units || []
+              }
               disabled={!showUnits}
               className={classes.units}
               data-cy="units"
