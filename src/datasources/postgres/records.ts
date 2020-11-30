@@ -334,8 +334,10 @@ export interface SampleRecord {
 
 export interface ProposalStatusRecord {
   readonly proposal_status_id: number;
+  readonly short_code: string;
   readonly name: string;
   readonly description: string;
+  readonly is_default: boolean;
   readonly full_count: number;
 }
 

@@ -40,17 +40,14 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: CreateProposalStatusInput
   ): Promise<ProposalStatus | Rejection> {
-    return this.dataSource
-      .createProposalStatus(args)
-      .then(result => result)
-      .catch(error => {
-        logger.logException('Could not create proposal status', error, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+    return this.dataSource.createProposalStatus(args).catch(error => {
+      logger.logException('Could not create proposal status', error, {
+        agent,
+        args,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(updateProposalStatusValidationSchema)
@@ -59,22 +56,14 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: UpdateProposalStatusInput
   ): Promise<ProposalStatus | Rejection> {
-    // TODO: Find better way of preventing update and remove on default proposal statuses.
-    if (args.id < 10) {
-      return rejection('NOT_ALLOWED');
-    }
-
-    return this.dataSource
-      .updateProposalStatus(args)
-      .then(result => result)
-      .catch(error => {
-        logger.logException('Could not update proposal status', error, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+    return this.dataSource.updateProposalStatus(args).catch(error => {
+      logger.logException('Could not update proposal status', error, {
+        agent,
+        args,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(deleteProposalStatusValidationSchema)
@@ -83,22 +72,14 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: { id: number }
   ): Promise<ProposalStatus | Rejection> {
-    // TODO: Find better way of preventing update and remove on default proposal statuses.
-    if (args.id < 10) {
-      return rejection('NOT_ALLOWED');
-    }
-
-    return this.dataSource
-      .deleteProposalStatus(args.id)
-      .then(result => result)
-      .catch(error => {
-        logger.logException('Could not delete proposal status', error, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+    return this.dataSource.deleteProposalStatus(args.id).catch(error => {
+      logger.logException('Could not delete proposal status', error, {
+        agent,
+        args,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(createProposalWorkflowValidationSchema)
@@ -107,17 +88,14 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: CreateProposalWorkflowInput
   ): Promise<ProposalWorkflow | Rejection> {
-    return this.dataSource
-      .createProposalWorkflow(args)
-      .then(result => result)
-      .catch(error => {
-        logger.logException('Could not create proposal workflow', error, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+    return this.dataSource.createProposalWorkflow(args).catch(error => {
+      logger.logException('Could not create proposal workflow', error, {
+        agent,
+        args,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(updateProposalWorkflowValidationSchema)
@@ -126,17 +104,14 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: UpdateProposalWorkflowInput
   ): Promise<ProposalWorkflow | Rejection> {
-    return this.dataSource
-      .updateProposalWorkflow(args)
-      .then(result => result)
-      .catch(error => {
-        logger.logException('Could not update proposal workflow', error, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+    return this.dataSource.updateProposalWorkflow(args).catch(error => {
+      logger.logException('Could not update proposal workflow', error, {
+        agent,
+        args,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(deleteProposalWorkflowValidationSchema)
@@ -145,17 +120,14 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: { id: number }
   ): Promise<ProposalWorkflow | Rejection> {
-    return this.dataSource
-      .deleteProposalWorkflow(args.id)
-      .then(result => result)
-      .catch(error => {
-        logger.logException('Could not delete proposal workflow', error, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+    return this.dataSource.deleteProposalWorkflow(args.id).catch(error => {
+      logger.logException('Could not delete proposal workflow', error, {
+        agent,
+        args,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   // TODO: It is messy code but it works! Clean it from here to the bottom!
@@ -373,9 +345,7 @@ export default class ProposalSettingsMutations {
   }
 
   async insertProposalWorkflowStatus(args: AddProposalWorkflowStatusInput) {
-    return this.dataSource
-      .addProposalWorkflowStatus(args)
-      .then(result => result);
+    return this.dataSource.addProposalWorkflowStatus(args);
   }
 
   @ValidateArgs(addProposalWorkflowStatusValidationSchema)
@@ -413,7 +383,6 @@ export default class ProposalSettingsMutations {
         args.proposalWorkflowConnectionId,
         args.nextStatusEvents
       )
-      .then(result => result)
       .catch(error => {
         logger.logException('Could not add next status events', error, {
           agent,
