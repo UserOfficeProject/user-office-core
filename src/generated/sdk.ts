@@ -1191,7 +1191,7 @@ export type ProposalView = {
   technicalStatus: Maybe<TechnicalReviewStatus>;
   instrumentName: Maybe<Scalars['String']>;
   callShortCode: Maybe<Scalars['String']>;
-  sepShortCode: Maybe<Scalars['String']>;
+  sepCode: Maybe<Scalars['String']>;
   reviewAverage: Maybe<Scalars['Float']>;
   reviewDeviation: Maybe<Scalars['Float']>;
   instrumentId: Maybe<Scalars['Int']>;
@@ -2891,7 +2891,7 @@ export type GetProposalsCoreQuery = (
   { __typename?: 'Query' }
   & { proposalsView: Maybe<Array<(
     { __typename?: 'ProposalView' }
-    & Pick<ProposalView, 'id' | 'title' | 'statusId' | 'statusName' | 'statusDescription' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'notified' | 'timeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepShortCode' | 'reviewAverage' | 'reviewDeviation' | 'instrumentId' | 'callId' | 'submitted'>
+    & Pick<ProposalView, 'id' | 'title' | 'statusId' | 'statusName' | 'statusDescription' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'notified' | 'timeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepCode' | 'reviewAverage' | 'reviewDeviation' | 'instrumentId' | 'callId' | 'submitted'>
   )>> }
 );
 
@@ -5496,7 +5496,7 @@ export const GetProposalsCoreDocument = gql`
     technicalStatus
     instrumentName
     callShortCode
-    sepShortCode
+    sepCode
     reviewAverage
     reviewDeviation
     instrumentId

@@ -13,7 +13,7 @@ query getProposalsCore($filter: ProposalsFilter) {
     technicalStatus
     instrumentName
     callShortCode
-    sepShortCode
+    sepCode
     reviewAverage
     reviewDeviation
     instrumentId

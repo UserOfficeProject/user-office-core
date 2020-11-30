@@ -54,6 +54,46 @@ type CreateUpdateCallProps = {
   call: Call | null;
 };
 
+const steps = ['General', 'Reviews', 'Notification and cycle'];
+
+const getFieldStep = (field: string) => {
+  switch (field) {
+    case 'shortCode':
+    case 'startCall':
+    case 'endCall':
+    case 'templateId':
+    case 'proposalWorkflowId':
+      return steps[0];
+    case 'startReview':
+    case 'endReview':
+    case 'startSEPReview':
+    case 'endSEPReview':
+    case 'surveyComment':
+      return steps[1];
+    case 'startNotify':
+    case 'endNotify':
+    case 'startCycle':
+    case 'endCycle':
+    case 'cycleComment':
+      return steps[2];
+    default:
+      return 'unknown step';
+  }
+};
+
+const getStepContent = (step: number) => {
+  switch (step) {
+    case 0:
+      return <CallGeneralInfo />;
+    case 1:
+      return <CallReviewsInfo />;
+    case 2:
+      return <CallNotificationAndCycleInfo />;
+    default:
+      return 'Unknown step';
+  }
+};
+
 const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const [activeStep, setActiveStep] = React.useState(0);
   const { api, isExecutingCall } = useDataApiWithFeedback();
@@ -66,24 +106,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const currentDayEnd = new Date();
   currentDayEnd.setHours(23, 59, 59, 999);
 
-  const steps = ['General', 'Reviews', 'Notification and cycle'];
-
-  const getStepContent = (step: number) => {
-    switch (step) {
-      case 0:
-        return <CallGeneralInfo />;
-      case 1:
-        return <CallReviewsInfo />;
-      case 2:
-        return <CallNotificationAndCycleInfo />;
-      default:
-        return 'Unknown step';
-    }
-  };
-
-  const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-
+  const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
   };
 
@@ -132,12 +155,12 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   }
 
   const showFormErrors = (errors: FormikErrors<Call>): JSX.Element | null => {
-    const errorsToShow: string[] = [];
+    const errorsToShow: Array<[string, string]> = [];
 
     for (const [key, value] of Object.entries(errors)) {
       if (errors.hasOwnProperty(key)) {
         if (value) {
-          errorsToShow.push(value.toString());
+          errorsToShow.push([key, value.toString()]);
         }
       }
     }
@@ -145,9 +168,9 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
     if (errorsToShow.length > 0) {
       return (
         <FormHelperText className={classes.formErrors}>
-          {errorsToShow.map((errorToShow, index) => (
-            <span key={index}>
-              {errorToShow}
+          {errorsToShow.map(([key, errorToShow]) => (
+            <span key={key}>
+              {getFieldStep(key)}: {errorToShow}
               <br />
             </span>
           ))}
@@ -209,10 +232,10 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
           call ? updateCallValidationSchema : createCallValidationSchema
         }
       >
-        {({ errors }): JSX.Element => (
+        {({ errors, submitCount }): JSX.Element => (
           <Form>
             {getStepContent(activeStep)}
-            {activeStep === 2 && showFormErrors(errors)}
+            {submitCount > 0 && showFormErrors(errors)}
             <ActionButtonContainer>
               <Button
                 disabled={activeStep === 0}
@@ -223,6 +246,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
                 Back
               </Button>
               <Button
+                key={`step-button-${activeStep}`}
                 variant="contained"
                 color="primary"
                 data-cy={isLastStep ? 'submit' : 'next-step'}
