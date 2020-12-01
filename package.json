@@ -19,7 +19,7 @@
     "@tinymce/tinymce-react": "^3.6.1",
     "@types/dateformat": "~3.0.1",
     "@types/jsonwebtoken": "~8.5.0",
-    "@types/react": "^16.9.53",
+    "@types/react": "^16.9.56",
     "@types/react-beautiful-dnd": "~11.0.5",
     "@types/react-dom": "~16.9.9",
     "@types/react-router": "~5.1.8",
@@ -55,7 +55,6 @@
     "ts-keycode-enum": "^1.0.6",
     "typescript": "~3.9.6",
     "use-query-params": "^1.1.9",
-    "xlsx": "^0.16.8",
     "yup": "~0.29.3"
   },
   "proxy": "http://localhost:4000",

@@ -6,6 +6,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Delete from '@material-ui/icons/Delete';
 import Email from '@material-ui/icons/Email';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import GridOnIcon from '@material-ui/icons/GridOn';
 import GroupWork from '@material-ui/icons/GroupWork';
 import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column } from 'material-table';
@@ -23,11 +24,11 @@ import { Instrument, Sep, ProposalsToInstrumentArgs } from 'generated/sdk';
 import { ProposalsFilter } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import {
   useProposalsCoreData,
   ProposalViewData,
 } from 'hooks/proposal/useProposalsCoreData';
-import { excelDownload } from 'utils/excelDownload';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -65,6 +66,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     initalSelectedProposals
   );
   const downloadPDFProposal = useDownloadPDFProposal();
+  const downloadXLSXProposal = useDownloadXLSXProposal();
   const { api } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
@@ -379,6 +381,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const GroupWorkIcon = (): JSX.Element => <GroupWork />;
   const EmailIcon = (): JSX.Element => <Email />;
   const AddScienceIcon = (): JSX.Element => <ScienceIconAdd />;
+  const ExportIcon = (): JSX.Element => <GridOnIcon />;
 
   const preselectedProposalsData =
     urlQueryParams.selection.length > 0
@@ -474,26 +477,29 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
                 : undefined,
           });
         }}
-        localization={{
-          toolbar: {
-            exportName: 'Export as Excel',
-          },
-        }}
         options={{
           search: true,
           searchText: urlQueryParams.search || undefined,
           selection: true,
           debounceInterval: 400,
           columnsButton: true,
-          exportButton: true,
-          exportCsv: excelDownload,
         }}
         actions={[
           {
             icon: GetAppIconComponent,
-            tooltip: 'Download proposals',
+            tooltip: 'Download proposals in PDF',
             onClick: (event, rowData): void => {
               downloadPDFProposal(
+                (rowData as ProposalViewData[]).map(row => row.id).join(',')
+              );
+            },
+            position: 'toolbarOnSelect',
+          },
+          {
+            icon: ExportIcon,
+            tooltip: 'Export proposals in Excel',
+            onClick: (event, rowData): void => {
+              downloadXLSXProposal(
                 (rowData as ProposalViewData[]).map(row => row.id).join(',')
               );
             },

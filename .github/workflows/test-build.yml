@@ -182,7 +182,7 @@ jobs:
           export USER_OFFICE_BACKEND_DIR=user-office-backend
 
           export USER_OFFICE_FACTORY_TAG=${{ steps.resolve_rep.outputs.FACTORY_TAG }}
-          export USER_OFFICE_PDF_FACTORY_ENDPOINT=http://factory:4500/generate-pdf
+          export USER_OFFICE_FACTORY_ENDPOINT=http://factory:4500/generate
 
           export USER_OFFICE_FRONTEND_DIR=$REPO_DIR_NAME
           export BUILD_TAG=${{ github.sha }}
