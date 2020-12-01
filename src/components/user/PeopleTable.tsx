@@ -17,7 +17,8 @@ function sendUserRequest(
   api: any,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   selectedUsers: number[] | undefined,
-  userRole: UserRole | undefined
+  userRole: UserRole | undefined,
+  selectedParticipants: number[]
 ) {
   const variables = {
     filter: searchQuery.search,
@@ -43,6 +44,7 @@ function sendUserRequest(
             lastname: user.lastname,
             organisation: user.organisation,
             id: user.id,
+            tableData: { checked: selectedParticipants.includes(user.id) },
           };
         }),
       };
@@ -67,6 +69,39 @@ type PeopleTableProps = {
   selectedUsers?: number[];
 };
 
+const useStyles = makeStyles({
+  tableWrapper: {
+    '& .MuiToolbar-gutters': {
+      paddingLeft: '0',
+    },
+  },
+  verticalCentered: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+});
+
+const columns = [
+  { title: 'Name', field: 'firstname' },
+  { title: 'Surname', field: 'lastname' },
+  { title: 'Organisation', field: 'organisation' },
+];
+
+const getTitle = (invitationUserRole?: UserRole): string => {
+  switch (invitationUserRole) {
+    case UserRole.USER_OFFICER:
+      return 'Invite User';
+    case UserRole.SEP_CHAIR:
+      return 'Invite SEP Chair';
+    case UserRole.SEP_SECRETARY:
+      return 'Invite SEP Secretary';
+    case UserRole.INSTRUMENT_SCIENTIST:
+      return 'Invite Instrument Scientist';
+    default:
+      return 'Invite User';
+  }
+};
+
 const PeopleTable: React.FC<PeopleTableProps> = props => {
   const sendRequest = useDataApi();
   const [loading, setLoading] = useState(false);
@@ -75,39 +110,14 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]
   >([]);
-  const columns = [
-    { title: 'Name', field: 'firstname' },
-    { title: 'Surname', field: 'lastname' },
-    { title: 'Organisation', field: 'organisation' },
-  ];
+  const [searchText, setSearchText] = useState('');
 
-  const classes = makeStyles({
-    tableWrapper: {
-      '& .MuiToolbar-gutters': {
-        paddingLeft: '0',
-      },
-    },
-  })();
-
-  const getTitle = (): string => {
-    switch (props.invitationUserRole) {
-      case UserRole.USER_OFFICER:
-        return 'Invite User';
-      case UserRole.SEP_CHAIR:
-        return 'Invite SEP Chair';
-      case UserRole.SEP_SECRETARY:
-        return 'Invite SEP Secretary';
-      case UserRole.INSTRUMENT_SCIENTIST:
-        return 'Invite Instrument Scientist';
-      default:
-        return 'Invite User';
-    }
-  };
+  const classes = useStyles();
 
   if (sendUserEmail && props.invitationUserRole) {
     return (
       <InviteUserForm
-        title={getTitle()}
+        title={getTitle(props.invitationUserRole)}
         action={props.action}
         close={() => setSendUserEmail(false)}
         userRole={props.invitationUserRole}
@@ -154,6 +164,10 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
           props.data
             ? props.data
             : query => {
+                if (searchText !== query.search) {
+                  setSearchText(query.search);
+                }
+
                 setPageSize(query.pageSize);
 
                 return sendUserRequest(
@@ -161,7 +175,8 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
                   sendRequest,
                   setLoading,
                   props.selectedUsers,
-                  props.userRole
+                  props.userRole,
+                  selectedParticipants.map(({ id }) => id)
                 );
               }
         }
@@ -187,6 +202,9 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
       />
       {props.selection && (
         <ActionButtonContainer>
+          <div className={classes.verticalCentered}>
+            {selectedParticipants.length} user(s) selected
+          </div>
           <Button
             type="button"
             variant="contained"
@@ -198,7 +216,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
               }
             }}
             disabled={selectedParticipants.length === 0}
-            data-cy="assign-instrument-to-call"
+            data-cy="assign-selected-users"
           >
             Update
           </Button>
