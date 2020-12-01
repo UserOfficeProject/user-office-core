@@ -37,7 +37,7 @@ export class SystemQuery {
       // For some reasons it can't find the global URL type for Node.js
       //  override the default endpoint path end use the version
       // @ts-ignore
-      const url = new URL(process.env.USER_OFFICE_PDF_FACTORY_ENDPOINT!);
+      const url = new URL(process.env.USER_OFFICE_FACTORY_ENDPOINT!);
       url.pathname = '/version';
 
       return await rp.get(url.toString());

@@ -58,6 +58,7 @@
     "graphql-tools": "^4.0.8",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.16.5",
+    "moment": "^2.29.1",
     "multer": "^1.4.2",
     "pg": "^7.18.2",
     "pg-large-object": "^2.0.0",
