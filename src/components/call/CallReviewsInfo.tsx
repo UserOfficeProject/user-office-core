@@ -46,6 +46,7 @@ const CallReviewAndNotification: React.FC = () => (
       component={TextField}
       margin="normal"
       fullWidth
+      required
       data-cy="survey-comment"
     />
   </>
