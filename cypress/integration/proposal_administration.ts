@@ -143,6 +143,7 @@ context('Proposal administration tests', () => {
     let officerProposalsTableAsTextAfterSort = '';
 
     cy.login('user');
+    // Create a proposal with title that will be always last if sort order by title is 'desc'
     cy.createProposal(
       'Aaaaaaaaa test proposal title',
       'Test proposal descrtiption'
