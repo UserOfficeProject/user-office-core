@@ -5,9 +5,7 @@ query getUserProposals {
       shortCode
       title
       status {
-        id
-        name
-        description
+        ...proposalStatus
       }
       publicStatus
       statusId

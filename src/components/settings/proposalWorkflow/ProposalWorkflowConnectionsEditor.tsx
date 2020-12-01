@@ -168,7 +168,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     proposalWorkflowConnection: ProposalWorkflowConnection
   ) =>
     proposalWorkflowConnection.proposalStatus.id === 1 &&
-    proposalWorkflowConnection.proposalStatus.name === 'DRAFT';
+    proposalWorkflowConnection.proposalStatus.shortCode === 'DRAFT';
 
   const getConnectionGroupItems = (
     connections: ProposalWorkflowConnection[]
@@ -176,8 +176,8 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     return connections.map((proposalWorkflowConnection, index) => {
       return (
         <Draggable
-          key={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.name}`}
-          draggableId={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.name}`}
+          key={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.shortCode}`}
+          draggableId={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.shortCode}`}
           index={index}
           isDragDisabled={true}
         >
@@ -185,7 +185,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
             <Grid
               item
               xs={12}
-              data-cy={`connection_${proposalWorkflowConnection.proposalStatus.name}_${proposalWorkflowConnection.proposalStatus.id}`}
+              data-cy={`connection_${proposalWorkflowConnection.proposalStatus.shortCode}_${proposalWorkflowConnection.proposalStatus.id}`}
               ref={provided.innerRef}
               {...provided.draggableProps}
               {...provided.dragHandleProps}

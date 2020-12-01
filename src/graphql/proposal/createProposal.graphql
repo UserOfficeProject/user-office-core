@@ -3,9 +3,7 @@ mutation createProposal($callId: Int!) {
     proposal {
       id
       status {
-        id
-        name
-        description
+        ...proposalStatus
       }
       shortCode
       questionaryId

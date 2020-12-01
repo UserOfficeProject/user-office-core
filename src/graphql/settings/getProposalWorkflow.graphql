@@ -12,9 +12,7 @@ query getProposalWorkflow($id: Int!) {
         proposalWorkflowId
         proposalStatusId
         proposalStatus {
-          id
-          name
-          description
+          ...proposalStatus
         }
         nextProposalStatusId
         prevProposalStatusId

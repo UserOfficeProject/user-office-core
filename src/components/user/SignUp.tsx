@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { userPasswordFieldValidationSchema } from '@esss-swap/duo-validation/lib/User';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -195,16 +196,15 @@ const SignUp: React.FC<SignUpProps> = props => {
   }
 
   const sendSignUpRequest = (values: CreateUserMutationVariables) => {
-    unauthorizedApi()
+    return unauthorizedApi()
       .createUser({
         ...values,
       })
       .then(data => {
         if (data.createUser.error) {
-          if (data.createUser.error === 'BAD_REQUEST')
-            enqueueSnackbar('Invalid input arguments', {
-              variant: 'error',
-            });
+          enqueueSnackbar(getTranslation(data.createUser.error as ResourceId), {
+            variant: 'error',
+          });
         } else {
           setUserID(data?.createUser?.user?.id as number);
         }
@@ -238,7 +238,7 @@ const SignUp: React.FC<SignUpProps> = props => {
           privacy_agreement: false,
           cookie_policy: false,
         }}
-        onSubmit={(values, actions) => {
+        onSubmit={async (values, actions) => {
           if (orcData && orcData.orcid) {
             const newValues = {
               ...values,
@@ -254,7 +254,7 @@ const SignUp: React.FC<SignUpProps> = props => {
                 values.gender === 'other' ? values.othergender : values.gender,
             };
 
-            sendSignUpRequest(newValues);
+            await sendSignUpRequest(newValues);
           } else {
             setOrcidError(true);
           }
@@ -264,7 +264,7 @@ const SignUp: React.FC<SignUpProps> = props => {
           userPasswordFieldValidationSchema as ObjectSchema<object>
         )}
       >
-        {({ values }) => (
+        {({ values, isSubmitting }) => (
           <Form>
             <CssBaseline />
             <Avatar className={classes.avatar}>
@@ -651,9 +651,13 @@ const SignUp: React.FC<SignUpProps> = props => {
                   color="primary"
                   className={classes.submit}
                   data-cy="submit"
-                  disabled={!values.privacy_agreement || !values.cookie_policy}
+                  disabled={
+                    isSubmitting ||
+                    !values.privacy_agreement ||
+                    !values.cookie_policy
+                  }
                 >
-                  Sign Up
+                  {isSubmitting ? <UOLoader /> : 'Sign Up'}
                 </Button>
               </React.Fragment>
             )}

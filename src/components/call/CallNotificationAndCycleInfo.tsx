@@ -46,6 +46,7 @@ const CallCycleInfo: React.FC = () => (
       type="text"
       component={TextField}
       margin="normal"
+      required
       fullWidth
       data-cy="cycle-comment"
     />
