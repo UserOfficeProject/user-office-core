@@ -1,7 +1,9 @@
-import React from 'react';
+import Delete from '@material-ui/icons/DeleteOutline';
+import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
+import DialogConfirmation from 'components/common/DialogConfirmation';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
@@ -20,7 +22,12 @@ const ProposalStatusesTable: React.FC = () => {
     proposalStatuses,
     setProposalStatusesWithLoading: setProposalStatuses,
   } = useProposalStatusesData();
+  const [
+    proposalStatusToRemove,
+    setProposalStatusToRemove,
+  ] = useState<ProposalStatus | null>(null);
   const columns = [
+    { title: 'Short code', field: 'shortCode' },
     { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },
   ];
@@ -50,23 +57,32 @@ const ProposalStatusesTable: React.FC = () => {
         id: id,
       })
       .then(resp => {
-        if (resp.deleteProposalStatus.error) {
-          return false;
-        } else {
-          return true;
+        if (!resp.deleteProposalStatus.error) {
+          const newObjectsArray = proposalStatuses.filter(
+            objectItem => objectItem.id !== id
+          );
+          setProposalStatuses(newObjectsArray);
         }
       });
   };
 
   return (
     <div data-cy="proposal-statuses-table">
+      <DialogConfirmation
+        title="Remove proposal status"
+        text="Are you sure you want to remove this proposal status?"
+        open={!!proposalStatusToRemove}
+        action={() =>
+          deleteProposalStatus((proposalStatusToRemove as ProposalStatus).id)
+        }
+        handleOpen={() => setProposalStatusToRemove(null)}
+      />
       <SuperMaterialTable
-        delete={deleteProposalStatus}
         createModal={createModal}
         hasAccess={{
           update: isUserOfficer,
           create: isUserOfficer,
-          remove: isUserOfficer,
+          remove: false,
         }}
         setData={setProposalStatuses}
         icons={tableIcons}
@@ -80,6 +96,17 @@ const ProposalStatusesTable: React.FC = () => {
         }}
         urlQueryParams={urlQueryParams}
         setUrlQueryParams={setUrlQueryParams}
+        actions={[
+          rowActionData => {
+            return {
+              icon: Delete,
+              tooltip: 'Delete',
+              onClick: (event, rowData) =>
+                setProposalStatusToRemove(rowData as ProposalStatus),
+              hidden: rowActionData.isDefault,
+            };
+          },
+        ]}
       />
     </div>
   );

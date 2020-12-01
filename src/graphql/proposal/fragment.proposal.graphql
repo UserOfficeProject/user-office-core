@@ -4,9 +4,7 @@ fragment proposal on Proposal {
   abstract
   statusId
   status {
-    id
-    name
-    description
+    ...proposalStatus
   }
   publicStatus
   shortCode

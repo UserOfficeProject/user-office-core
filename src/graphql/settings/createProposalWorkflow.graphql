@@ -15,9 +15,7 @@ mutation createProposalWorkflow($name: String!, $description: String!) {
           proposalWorkflowId
           proposalStatusId
           proposalStatus {
-            id
-            name
-            description
+            ...proposalStatus
           }
           nextProposalStatusId
           prevProposalStatusId

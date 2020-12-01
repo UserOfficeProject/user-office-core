@@ -163,6 +163,7 @@ export type CreateCallInput = {
 };
 
 export type CreateProposalStatusInput = {
+  shortCode: Scalars['String'];
   name: Scalars['String'];
   description: Scalars['String'];
 };
@@ -1140,8 +1141,10 @@ export type ProposalsQueryResult = {
 export type ProposalStatus = {
   __typename?: 'ProposalStatus';
   id: Scalars['Int'];
+  shortCode: Scalars['String'];
   name: Scalars['String'];
   description: Scalars['String'];
+  isDefault: Scalars['Boolean'];
 };
 
 export type ProposalStatusResponseWrap = {
@@ -1844,8 +1847,10 @@ export type UpdateCallInput = {
 
 export type UpdateProposalStatusInput = {
   id: Scalars['Int'];
+  shortCode?: Maybe<Scalars['String']>;
   name: Scalars['String'];
   description: Scalars['String'];
+  isDefault?: Maybe<Scalars['Boolean']>;
 };
 
 export type UpdateProposalWorkflowInput = {
@@ -2077,7 +2082,7 @@ export type GetSepProposalsQuery = (
       & Pick<Proposal, 'title' | 'id' | 'shortCode'>
       & { status: (
         { __typename?: 'ProposalStatus' }
-        & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+        & ProposalStatusFragment
       ) }
     ), assignments: Maybe<Array<(
       { __typename?: 'SEPAssignment' }
@@ -2112,7 +2117,7 @@ export type SepProposalsByInstrumentQuery = (
       & Pick<Proposal, 'id' | 'title' | 'shortCode' | 'rankOrder'>
       & { status: (
         { __typename?: 'ProposalStatus' }
-        & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+        & ProposalStatusFragment
       ), reviews: Maybe<Array<(
         { __typename?: 'Review' }
         & Pick<Review, 'id' | 'comment' | 'grade' | 'status'>
@@ -2707,7 +2712,7 @@ export type CreateProposalMutation = (
       & Pick<Proposal, 'id' | 'shortCode' | 'questionaryId'>
       & { status: (
         { __typename?: 'ProposalStatus' }
-        & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+        & ProposalStatusFragment
       ), questionary: (
         { __typename?: 'Questionary' }
         & QuestionaryFragment
@@ -2748,7 +2753,7 @@ export type ProposalFragment = (
   & Pick<Proposal, 'id' | 'title' | 'abstract' | 'statusId' | 'publicStatus' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'questionaryId' | 'notified' | 'submitted'>
   & { status: (
     { __typename?: 'ProposalStatus' }
-    & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+    & ProposalStatusFragment
   ) }
 );
 
@@ -3379,6 +3384,7 @@ export type AddProposalWorkflowStatusMutation = (
 );
 
 export type CreateProposalStatusMutationVariables = Exact<{
+  shortCode: Scalars['String'];
   name: Scalars['String'];
   description: Scalars['String'];
 }>;
@@ -3391,7 +3397,7 @@ export type CreateProposalStatusMutation = (
     & Pick<ProposalStatusResponseWrap, 'error'>
     & { proposalStatus: Maybe<(
       { __typename?: 'ProposalStatus' }
-      & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+      & ProposalStatusFragment
     )> }
   ) }
 );
@@ -3418,7 +3424,7 @@ export type CreateProposalWorkflowMutation = (
           & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'droppableGroupId'>
           & { proposalStatus: (
             { __typename?: 'ProposalStatus' }
-            & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+            & ProposalStatusFragment
           ), nextStatusEvents: Array<(
             { __typename?: 'NextStatusEvent' }
             & Pick<NextStatusEvent, 'nextStatusEventId' | 'proposalWorkflowConnectionId' | 'nextStatusEvent'>
@@ -3441,7 +3447,7 @@ export type DeleteProposalStatusMutation = (
     & Pick<ProposalStatusResponseWrap, 'error'>
     & { proposalStatus: Maybe<(
       { __typename?: 'ProposalStatus' }
-      & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+      & ProposalStatusFragment
     )> }
   ) }
 );
@@ -3477,6 +3483,11 @@ export type DeleteProposalWorkflowStatusMutation = (
   ) }
 );
 
+export type ProposalStatusFragment = (
+  { __typename?: 'ProposalStatus' }
+  & Pick<ProposalStatus, 'id' | 'shortCode' | 'name' | 'description' | 'isDefault'>
+);
+
 export type GetProposalEventsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3492,7 +3503,7 @@ export type GetProposalStatusesQuery = (
   { __typename?: 'Query' }
   & { proposalStatuses: Maybe<Array<(
     { __typename?: 'ProposalStatus' }
-    & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+    & ProposalStatusFragment
   )>> }
 );
 
@@ -3514,7 +3525,7 @@ export type GetProposalWorkflowQuery = (
         & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'droppableGroupId'>
         & { proposalStatus: (
           { __typename?: 'ProposalStatus' }
-          & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+          & ProposalStatusFragment
         ), nextStatusEvents: Array<(
           { __typename?: 'NextStatusEvent' }
           & Pick<NextStatusEvent, 'nextStatusEventId' | 'proposalWorkflowConnectionId' | 'nextStatusEvent'>
@@ -3552,6 +3563,7 @@ export type MoveProposalWorkflowStatusMutation = (
 
 export type UpdateProposalStatusMutationVariables = Exact<{
   id: Scalars['Int'];
+  shortCode: Scalars['String'];
   name: Scalars['String'];
   description: Scalars['String'];
 }>;
@@ -3564,7 +3576,7 @@ export type UpdateProposalStatusMutation = (
     & Pick<ProposalStatusResponseWrap, 'error'>
     & { proposalStatus: Maybe<(
       { __typename?: 'ProposalStatus' }
-      & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+      & ProposalStatusFragment
     )> }
   ) }
 );
@@ -4295,7 +4307,7 @@ export type GetUserProposalsQuery = (
       & Pick<Proposal, 'id' | 'shortCode' | 'title' | 'publicStatus' | 'statusId' | 'created' | 'finalStatus' | 'notified' | 'submitted'>
       & { status: (
         { __typename?: 'ProposalStatus' }
-        & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+        & ProposalStatusFragment
       ) }
     )> }
   )> }
@@ -4527,6 +4539,15 @@ export const CoreTechnicalReviewFragmentDoc = gql`
   proposalID
 }
     `;
+export const ProposalStatusFragmentDoc = gql`
+    fragment proposalStatus on ProposalStatus {
+  id
+  shortCode
+  name
+  description
+  isDefault
+}
+    `;
 export const ProposalFragmentDoc = gql`
     fragment proposal on Proposal {
   id
@@ -4534,9 +4555,7 @@ export const ProposalFragmentDoc = gql`
   abstract
   statusId
   status {
-    id
-    name
-    description
+    ...proposalStatus
   }
   publicStatus
   shortCode
@@ -4551,7 +4570,7 @@ export const ProposalFragmentDoc = gql`
   notified
   submitted
 }
-    `;
+    ${ProposalStatusFragmentDoc}`;
 export const TopicFragmentDoc = gql`
     fragment topic on Topic {
   title
@@ -4903,9 +4922,7 @@ export const GetSepProposalsDocument = gql`
       id
       shortCode
       status {
-        id
-        name
-        description
+        ...proposalStatus
       }
     }
     assignments {
@@ -4933,7 +4950,7 @@ export const GetSepProposalsDocument = gql`
     }
   }
 }
-    `;
+    ${ProposalStatusFragmentDoc}`;
 export const SepProposalsByInstrumentDocument = gql`
     query sepProposalsByInstrument($instrumentId: Int!, $sepId: Int!, $callId: Int!) {
   sepProposalsByInstrument(instrumentId: $instrumentId, sepId: $sepId, callId: $callId) {
@@ -4943,9 +4960,7 @@ export const SepProposalsByInstrumentDocument = gql`
       shortCode
       rankOrder
       status {
-        id
-        name
-        description
+        ...proposalStatus
       }
       reviews {
         id
@@ -4961,7 +4976,7 @@ export const SepProposalsByInstrumentDocument = gql`
     }
   }
 }
-    `;
+    ${ProposalStatusFragmentDoc}`;
 export const GetSePsDocument = gql`
     query getSEPs($filter: String!, $active: Boolean!) {
   seps(filter: $filter, active: $active) {
@@ -5289,9 +5304,7 @@ export const CreateProposalDocument = gql`
     proposal {
       id
       status {
-        id
-        name
-        description
+        ...proposalStatus
       }
       shortCode
       questionaryId
@@ -5308,7 +5321,8 @@ export const CreateProposalDocument = gql`
     error
   }
 }
-    ${QuestionaryFragmentDoc}
+    ${ProposalStatusFragmentDoc}
+${QuestionaryFragmentDoc}
 ${BasicUserDetailsFragmentDoc}`;
 export const DeleteProposalDocument = gql`
     mutation deleteProposal($id: Int!) {
@@ -5736,17 +5750,15 @@ export const AddProposalWorkflowStatusDocument = gql`
 }
     `;
 export const CreateProposalStatusDocument = gql`
-    mutation createProposalStatus($name: String!, $description: String!) {
-  createProposalStatus(newProposalStatusInput: {name: $name, description: $description}) {
+    mutation createProposalStatus($shortCode: String!, $name: String!, $description: String!) {
+  createProposalStatus(newProposalStatusInput: {shortCode: $shortCode, name: $name, description: $description}) {
     proposalStatus {
-      id
-      name
-      description
+      ...proposalStatus
     }
     error
   }
 }
-    `;
+    ${ProposalStatusFragmentDoc}`;
 export const CreateProposalWorkflowDocument = gql`
     mutation createProposalWorkflow($name: String!, $description: String!) {
   createProposalWorkflow(newProposalWorkflowInput: {name: $name, description: $description}) {
@@ -5763,9 +5775,7 @@ export const CreateProposalWorkflowDocument = gql`
           proposalWorkflowId
           proposalStatusId
           proposalStatus {
-            id
-            name
-            description
+            ...proposalStatus
           }
           nextProposalStatusId
           prevProposalStatusId
@@ -5781,19 +5791,17 @@ export const CreateProposalWorkflowDocument = gql`
     error
   }
 }
-    `;
+    ${ProposalStatusFragmentDoc}`;
 export const DeleteProposalStatusDocument = gql`
     mutation deleteProposalStatus($id: Int!) {
   deleteProposalStatus(id: $id) {
     proposalStatus {
-      id
-      name
-      description
+      ...proposalStatus
     }
     error
   }
 }
-    `;
+    ${ProposalStatusFragmentDoc}`;
 export const DeleteProposalWorkflowDocument = gql`
     mutation deleteProposalWorkflow($id: Int!) {
   deleteProposalWorkflow(id: $id) {
@@ -5822,12 +5830,10 @@ export const GetProposalEventsDocument = gql`
 export const GetProposalStatusesDocument = gql`
     query getProposalStatuses {
   proposalStatuses {
-    id
-    name
-    description
+    ...proposalStatus
   }
 }
-    `;
+    ${ProposalStatusFragmentDoc}`;
 export const GetProposalWorkflowDocument = gql`
     query getProposalWorkflow($id: Int!) {
   proposalWorkflow(id: $id) {
@@ -5843,9 +5849,7 @@ export const GetProposalWorkflowDocument = gql`
         proposalWorkflowId
         proposalStatusId
         proposalStatus {
-          id
-          name
-          description
+          ...proposalStatus
         }
         nextProposalStatusId
         prevProposalStatusId
@@ -5859,7 +5863,7 @@ export const GetProposalWorkflowDocument = gql`
     }
   }
 }
-    `;
+    ${ProposalStatusFragmentDoc}`;
 export const GetProposalWorkflowsDocument = gql`
     query getProposalWorkflows {
   proposalWorkflows {
@@ -5877,17 +5881,15 @@ export const MoveProposalWorkflowStatusDocument = gql`
 }
     `;
 export const UpdateProposalStatusDocument = gql`
-    mutation updateProposalStatus($id: Int!, $name: String!, $description: String!) {
-  updateProposalStatus(updatedProposalStatusInput: {id: $id, name: $name, description: $description}) {
+    mutation updateProposalStatus($id: Int!, $shortCode: String!, $name: String!, $description: String!) {
+  updateProposalStatus(updatedProposalStatusInput: {id: $id, shortCode: $shortCode, name: $name, description: $description}) {
     proposalStatus {
-      id
-      name
-      description
+      ...proposalStatus
     }
     error
   }
 }
-    `;
+    ${ProposalStatusFragmentDoc}`;
 export const UpdateProposalWorkflowDocument = gql`
     mutation updateProposalWorkflow($id: Int!, $name: String!, $description: String!) {
   updateProposalWorkflow(updatedProposalWorkflowInput: {id: $id, name: $name, description: $description}) {
@@ -6247,9 +6249,7 @@ export const GetUserProposalsDocument = gql`
       shortCode
       title
       status {
-        id
-        name
-        description
+        ...proposalStatus
       }
       publicStatus
       statusId
@@ -6260,7 +6260,7 @@ export const GetUserProposalsDocument = gql`
     }
   }
 }
-    `;
+    ${ProposalStatusFragmentDoc}`;
 export const GetUserWithRolesDocument = gql`
     query getUserWithRoles($id: Int!) {
   user(id: $id) {

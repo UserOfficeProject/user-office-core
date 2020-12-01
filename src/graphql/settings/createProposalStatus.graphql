@@ -1,11 +1,17 @@
-mutation createProposalStatus($name: String!, $description: String!) {
+mutation createProposalStatus(
+  $shortCode: String!
+  $name: String!
+  $description: String!
+) {
   createProposalStatus(
-    newProposalStatusInput: { name: $name, description: $description }
+    newProposalStatusInput: {
+      shortCode: $shortCode
+      name: $name
+      description: $description
+    }
   ) {
     proposalStatus {
-      id
-      name
-      description
+      ...proposalStatus
     }
     error
   }
