@@ -622,6 +622,57 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[title="Submit instrument"] button').should('be.disabled');
   });
 
+  it('Officer should be able to download SEP as Excel file', () => {
+    cy.login('officer');
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit"]')
+      .eq(1)
+      .click();
+
+    cy.contains('Meeting Components').click();
+
+    cy.document().then(document => {
+      const observer = new MutationObserver(function() {
+        const [mutationList] = arguments;
+        for (const mutation of mutationList) {
+          for (const child of mutation.addedNodes) {
+            if (child.nodeName === 'A') {
+              expect(child.href).to.contain('/download/xlsx/sep/2/call/1');
+              expect(child.download).to.contain('download');
+            }
+          }
+        }
+      });
+      observer.observe(document, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+      });
+
+      observer.disconnect();
+    });
+
+    cy.finishedLoading();
+
+    cy.wait(500);
+
+    cy.get('[data-cy="download-sep-xlsx"]').click();
+  });
+
+  it('Should be able to download SEP as Excel file', () => {
+    cy.login('officer');
+
+    cy.contains('Sample safety').click();
+
+    cy.request('GET', '/download/xlsx/sep/2/call/1').then(response => {
+      expect(response.headers['content-type']).to.be.equal(
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      );
+      expect(response.status).to.be.equal(200);
+    });
+  });
+
   it('Officer should be able to remove assigned SEP member from proposal in existing SEP', () => {
     cy.login('officer');
 
