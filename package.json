@@ -40,7 +40,7 @@
     "@apollo/gateway": "^0.21.0",
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-message-broker": "^1.0.2",
-    "@esss-swap/duo-validation": "^1.1.40",
+    "@esss-swap/duo-validation": "^1.1.41",
     "apollo-server": "^2.19.0",
     "apollo-server-core": "^2.19.0",
     "apollo-server-express": "^2.19.0",
