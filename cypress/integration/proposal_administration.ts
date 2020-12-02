@@ -137,4 +137,62 @@ context('Proposal administration tests', () => {
 
     cy.get('[placeholder="Search"]').should('have.value', 'test');
   });
+
+  it('Should be able to save table sort state in url', () => {
+    let officerProposalsTableAsTextBeforeSort = '';
+    let officerProposalsTableAsTextAfterSort = '';
+
+    cy.login('user');
+    // Create a proposal with title that will be always last if sort order by title is 'desc'
+    cy.createProposal(
+      'Aaaaaaaaa test proposal title',
+      'Test proposal descrtiption'
+    );
+    cy.contains('Submit').click();
+    cy.contains('OK').click();
+    cy.logout();
+
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy="officer-proposals-table"] table').then(element => {
+      officerProposalsTableAsTextBeforeSort = element.text();
+    });
+
+    cy.contains('Title').dblclick();
+
+    cy.get('[data-cy="officer-proposals-table"] table').then(element => {
+      officerProposalsTableAsTextAfterSort = element.text();
+    });
+
+    cy.reload();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy="officer-proposals-table"] table').then(element => {
+      expect(element.text()).to.be.equal(officerProposalsTableAsTextAfterSort);
+      expect(element.text()).not.equal(officerProposalsTableAsTextBeforeSort);
+    });
+
+    cy.get(
+      '.MuiTableSortLabel-active .MuiTableSortLabel-iconDirectionDesc'
+    ).should('exist');
+
+    cy.contains('Calls').click();
+
+    cy.finishedLoading();
+
+    cy.contains('Short Code').click();
+
+    cy.reload();
+
+    cy.finishedLoading();
+
+    cy.get(
+      '.MuiTableSortLabel-active .MuiTableSortLabel-iconDirectionAsc'
+    ).should('exist');
+  });
 });

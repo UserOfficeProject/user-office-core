@@ -2,7 +2,15 @@ import Button from '@material-ui/core/Button';
 import Edit from '@material-ui/icons/Edit';
 import MaterialTable, { MaterialTableProps } from 'material-table';
 import React, { useState } from 'react';
-import { QueryParamConfig, DecodedValueMap, SetQuery } from 'use-query-params';
+import {
+  QueryParamConfig,
+  DecodedValueMap,
+  SetQuery,
+  DelimitedNumericArrayParam,
+  NumberParam,
+  StringParam,
+  withDefault,
+} from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
@@ -11,6 +19,15 @@ import { tableIcons } from 'utils/materialIcons';
 export type UrlQueryParamsType = {
   search: QueryParamConfig<string | null | undefined>;
   selection: QueryParamConfig<(number | null | never)[]>;
+  sortColumn: QueryParamConfig<number | null | undefined>;
+  sortDirection: QueryParamConfig<string | null | undefined>;
+};
+
+export const DefaultQueryParams = {
+  sortColumn: NumberParam,
+  sortDirection: StringParam,
+  search: StringParam,
+  selection: withDefault(DelimitedNumericArrayParam, []),
 };
 
 interface SuperProps<RowData extends object> {
@@ -43,14 +60,23 @@ function SuperMaterialTable<Entry extends EntryID>({
   const [editObject, setEditObject] = useState<Entry | null>(null);
 
   let { data } = props;
+  const {
+    setData,
+    options,
+    columns,
+    urlQueryParams,
+    actions,
+    createModal,
+    setUrlQueryParams,
+  } = props;
 
   // NOTE: If selection is on than read the selected items from the url.
-  if (props.options?.selection && props.urlQueryParams) {
+  if (options?.selection && urlQueryParams) {
     data = data.map(objectItem => {
       return {
         ...objectItem,
         tableData: {
-          checked: props.urlQueryParams?.selection?.some(
+          checked: urlQueryParams?.selection?.some(
             (selectedItem: number | null) => selectedItem === objectItem.id
           ),
         },
@@ -58,12 +84,22 @@ function SuperMaterialTable<Entry extends EntryID>({
     });
   }
 
-  if (props.options?.search && props.urlQueryParams) {
-    props.options.searchText = props.urlQueryParams.search || undefined;
+  if (options?.search && urlQueryParams) {
+    options.searchText = urlQueryParams.search || undefined;
+  }
+
+  if (
+    urlQueryParams?.sortColumn !== undefined &&
+    urlQueryParams?.sortColumn !== null &&
+    urlQueryParams?.sortDirection
+  ) {
+    columns[
+      urlQueryParams.sortColumn
+    ].defaultSort = urlQueryParams.sortDirection as 'asc' | 'desc' | undefined;
   }
 
   const onCreated = (objectAdded: Entry) => {
-    props.setData([...data, objectAdded]);
+    setData([...data, objectAdded]);
     setShow(false);
   };
 
@@ -72,7 +108,7 @@ function SuperMaterialTable<Entry extends EntryID>({
       const newObjectsArray = data.map(objectItem =>
         objectItem.id === objectUpdated.id ? objectUpdated : objectItem
       );
-      props.setData(newObjectsArray);
+      setData(newObjectsArray);
     }
     setEditObject(null);
     setShow(false);
@@ -85,17 +121,17 @@ function SuperMaterialTable<Entry extends EntryID>({
       const newObjectsArray = data.filter(
         objectItem => objectItem.id !== deletedId
       );
-      props.setData(newObjectsArray);
+      setData(newObjectsArray);
     }
   };
 
   const EditIcon = (): JSX.Element => <Edit />;
-  let actions: (
+  let localActions: (
     | import('material-table').Action<Entry>
     | ((rowData: Entry) => import('material-table').Action<Entry>)
   )[] = [];
-  if (props.actions) {
-    actions = props.actions;
+  if (actions) {
+    localActions = actions;
   }
 
   return (
@@ -109,10 +145,11 @@ function SuperMaterialTable<Entry extends EntryID>({
           setEditObject(null);
         }}
       >
-        {props.createModal(onUpdated, onCreated, editObject)}
+        {createModal(onUpdated, onCreated, editObject)}
       </InputDialog>
       <MaterialTable
         {...props}
+        columns={columns}
         data={data}
         icons={tableIcons}
         editable={
@@ -138,23 +175,30 @@ function SuperMaterialTable<Entry extends EntryID>({
                   },
                   position: 'row',
                 },
-                ...actions,
+                ...localActions,
               ]
-            : [...actions]
+            : [...localActions]
         }
         onSearchChange={searchText => {
-          props.setUrlQueryParams &&
-            props.setUrlQueryParams({
+          setUrlQueryParams &&
+            setUrlQueryParams({
               search: searchText ? searchText : undefined,
             });
         }}
         onSelectionChange={selectedItems => {
-          props.setUrlQueryParams &&
-            props.setUrlQueryParams({
+          setUrlQueryParams &&
+            setUrlQueryParams({
               selection:
                 selectedItems.length > 0
                   ? selectedItems.map(selectedItem => selectedItem.id)
                   : undefined,
+            });
+        }}
+        onOrderChange={(orderedColumnId, orderDirection) => {
+          setUrlQueryParams &&
+            setUrlQueryParams({
+              sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
+              sortDirection: orderDirection ? orderDirection : undefined,
             });
         }}
       />

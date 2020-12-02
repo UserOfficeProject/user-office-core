@@ -1,9 +1,13 @@
 import Edit from '@material-ui/icons/Edit';
 import React from 'react';
 import { useHistory } from 'react-router';
+import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
-import SuperMaterialTable from 'components/common/SuperMaterialTable';
+import SuperMaterialTable, {
+  DefaultQueryParams,
+  UrlQueryParamsType,
+} from 'components/common/SuperMaterialTable';
 import { UserRole, ProposalWorkflow } from 'generated/sdk';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
 import { tableIcons } from 'utils/materialIcons';
@@ -18,6 +22,9 @@ const ProposalWorkflowsTable: React.FC = () => {
     proposalWorkflows,
     setProposalWorkflowsWithLoading: setProposalWorkflows,
   } = useProposalWorkflowsData();
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
+    UrlQueryParamsType
+  >(DefaultQueryParams);
   const columns = [
     { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },
@@ -84,6 +91,8 @@ const ProposalWorkflowsTable: React.FC = () => {
             position: 'row',
           },
         ]}
+        urlQueryParams={urlQueryParams}
+        setUrlQueryParams={setUrlQueryParams}
       />
     </div>
   );

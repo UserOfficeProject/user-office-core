@@ -1,15 +1,11 @@
 import Edit from '@material-ui/icons/Edit';
 import React, { useContext, useState } from 'react';
 import { Redirect, useHistory } from 'react-router';
-import {
-  useQueryParams,
-  StringParam,
-  withDefault,
-  DelimitedNumericArrayParam,
-} from 'use-query-params';
+import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable, {
+  DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
 import { UserContext } from 'context/UserContextProvider';
@@ -39,10 +35,7 @@ const SEPsTable: React.FC = () => {
   const [editSEPID, setEditSEPID] = useState(0);
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
     UrlQueryParamsType
-  >({
-    search: StringParam,
-    selection: withDefault(DelimitedNumericArrayParam, []),
-  });
+  >(DefaultQueryParams);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   if (editSEPID) {

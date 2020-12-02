@@ -87,7 +87,7 @@ context('Personal information tests', () => {
       .should('eq', newTelephone);
   });
 
-  it('User Officer should be able to see all and change roles if we have multiple', () => {
+  it('User Officer should be able to see all and change roles if there are multiple', () => {
     cy.login('officer');
 
     cy.contains('People').click();
@@ -167,5 +167,40 @@ context('Personal information tests', () => {
 
         expect(element.text()).to.contain('In Use');
       });
+  });
+
+  it('Should be able to change role even in the view where next role is not allowed to be', () => {
+    const workflowName = faker.lorem.words(2);
+    const workflowDescription = faker.lorem.words(5);
+    cy.login('officer');
+
+    cy.contains('Settings').click();
+    cy.contains('Proposal workflows').click();
+
+    cy.contains('Create').click();
+    cy.get('#name').type(workflowName);
+    cy.get('#description').type(workflowDescription);
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ variant: 'success', text: 'created successfully' });
+
+    cy.get('[data-cy="connection_DRAFT_1"]').should('contain.text', 'DRAFT');
+
+    cy.get("[data-cy='profile-page-btn']").click();
+
+    cy.contains('Roles').click();
+
+    cy.finishedLoading();
+
+    cy.contains('User roles');
+
+    cy.get("[data-cy='role-selection-table'] table tbody tr")
+      .eq(1)
+      .contains('Use')
+      .click();
+
+    cy.notification({ variant: 'success', text: 'User role changed' });
+
+    cy.get('[data-cy="SEPRoles-menu-items"]').should('exist');
   });
 });

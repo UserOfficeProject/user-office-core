@@ -3,13 +3,13 @@ import React from 'react';
 import {
   NumberParam,
   useQueryParams,
-  StringParam,
-  withDefault,
-  DelimitedNumericArrayParam,
   QueryParamConfig,
 } from 'use-query-params';
 
-import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
+import {
+  DefaultQueryParams,
+  UrlQueryParamsType,
+} from 'components/common/SuperMaterialTable';
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -29,11 +29,10 @@ export default function ProposalPage() {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
     ProposalUrlQueryParamsType
   >({
+    ...DefaultQueryParams,
     call: NumberParam,
     instrument: NumberParam,
     proposalStatus: NumberParam,
-    search: StringParam,
-    selection: withDefault(DelimitedNumericArrayParam, []),
   });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
@@ -52,7 +51,7 @@ export default function ProposalPage() {
       <ContentContainer>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <StyledPaper>
+            <StyledPaper data-cy="officer-proposals-table">
               <ProposalFilterBar
                 calls={{ data: calls, isLoading: loadingCalls }}
                 instruments={{
