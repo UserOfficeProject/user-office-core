@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { userPasswordFieldValidationSchema } from '@esss-swap/duo-validation/lib/User';
+import { createUserValidationSchema } from '@esss-swap/duo-validation';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -20,7 +20,6 @@ import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
-import { ObjectSchema } from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
@@ -34,7 +33,6 @@ import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 import { useGetFields } from 'hooks/user/useGetFields';
 import { useOrcIDInformation } from 'hooks/user/useOrcIDInformation';
 import orcid from 'images/orcid.png';
-import { userFieldSchema } from 'utils/userFieldValidationSchema';
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -215,7 +213,6 @@ const SignUp: React.FC<SignUpProps> = props => {
     <Container component="main" maxWidth="xs" className={classes.container}>
       <Formik
         validateOnChange={false}
-        validateOnBlur={false}
         initialValues={{
           user_title: '',
           firstname: firstname as string,
@@ -237,6 +234,9 @@ const SignUp: React.FC<SignUpProps> = props => {
           telephone_alt: '',
           privacy_agreement: false,
           cookie_policy: false,
+          orcid: orcData?.orcid as string,
+          orcidHash: orcData?.orcidHash as string,
+          refreshToken: orcData?.refreshToken as string,
         }}
         onSubmit={async (values, actions) => {
           if (orcData && orcData.orcid) {
@@ -260,9 +260,7 @@ const SignUp: React.FC<SignUpProps> = props => {
           }
           actions.setSubmitting(false);
         }}
-        validationSchema={userFieldSchema.concat(
-          userPasswordFieldValidationSchema as ObjectSchema<object>
-        )}
+        validationSchema={createUserValidationSchema}
       >
         {({ values, isSubmitting }) => (
           <Form>
@@ -644,6 +642,7 @@ const SignUp: React.FC<SignUpProps> = props => {
                   data-cy="cookie-policy"
                   disabled={!orcData}
                 />
+
                 <Button
                   type="submit"
                   fullWidth

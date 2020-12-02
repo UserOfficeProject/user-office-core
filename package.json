@@ -9,7 +9,7 @@
   "private": true,
   "dependencies": {
     "@esss-swap/duo-localisation": "^1.1.15",
-    "@esss-swap/duo-validation": "^1.1.41",
+    "@esss-swap/duo-validation": "^1.1.42",
     "@graphql-codegen/cli": "^1.17.10",
     "@graphql-codegen/typescript": "^1.17.11",
     "@graphql-codegen/typescript-graphql-request": "^1.17.7",
