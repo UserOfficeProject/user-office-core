@@ -182,6 +182,8 @@ export default class UserMutations {
         return rejection('INTERNAL_ERROR');
       }
       user = updatedUser;
+    } else if (user) {
+      return rejection('ACCOUNT_EXIST');
     } else {
       try {
         user = (await this.dataSource.create(
@@ -261,6 +263,10 @@ export default class UserMutations {
     if (!user) {
       return rejection('INTERNAL_ERROR');
     }
+
+    delete args.orcid;
+    delete args.refreshToken;
+
     user = {
       ...user,
       ...args,
