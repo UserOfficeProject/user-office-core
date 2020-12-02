@@ -11,8 +11,15 @@ import PostgresSampleDataSource from './postgres/SampleDataSource';
 import PostgresSEPDataSource from './postgres/SEPDataSource';
 import PostgresTemplateDataSource from './postgres/TemplateDataSource';
 import PostgresUserDataSource from './postgres/UserDataSource';
+import { StfcDataSource } from './stfc/StfcDataSource';
+import { UserDataSource } from './UserDataSource';
 
-export const userDataSource = new PostgresUserDataSource();
+export let userDataSource: UserDataSource;
+if (true) { //(process.env.EXTERNAL_AUTH_PROVIDER === 'stfc') {        
+    // userDataSource = new StfcDataSource(); // broken
+// } else {
+    userDataSource = new PostgresUserDataSource();
+}
 export const proposalDataSource = new PostgresProposalDataSource();
 export const reviewDataSource = new PostgresReviewDataSource();
 export const callDataSource = new PostgresCallDataSource();

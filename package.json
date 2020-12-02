@@ -41,6 +41,8 @@
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-message-broker": "^1.0.2",
     "@esss-swap/duo-validation": "^1.1.39",
+    "@stfc-user-programme/uows_client_generator": "^1.0.7",
+    "@types/sax": "^1.2.1",
     "apollo-server": "^2.18.2",
     "apollo-server-core": "^2.18.2",
     "apollo-server-express": "^2.18.2",

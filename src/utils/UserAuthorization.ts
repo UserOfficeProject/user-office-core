@@ -10,6 +10,7 @@ import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresSEPDataSource from '../datasources/postgres/SEPDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
+import { StfcDataSource } from '../datasources/stfc/StfcDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
@@ -133,6 +134,10 @@ if (process.env.NODE_ENV === 'test') {
   reviewDataSourceInstance = new ReviewDataSourceMock() as PostgresReviewDataSource;
   sepDataSourceInstance = new SEPDataSourceMock() as PostgresSEPDataSource;
 }
+
+// if (process.env.EXTERNAL_AUTH_PROVIDER === 'stfc') {
+  userDataSourceInstance = new StfcDataSource();
+// }
 
 export const userAuthorization = new UserAuthorization(
   userDataSourceInstance,
