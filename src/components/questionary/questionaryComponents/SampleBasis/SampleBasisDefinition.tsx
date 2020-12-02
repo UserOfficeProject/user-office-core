@@ -4,6 +4,7 @@ import React from 'react';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
+import { createSampleBasisValidationSchema } from './createSampleBasisValidationSchema';
 import { QuestionaryComponentSampleBasis } from './QuestionaryComponentSampleBasis';
 import { QuestionSampleBasisForm } from './QuestionSampleBasisForm';
 import { QuestionTemplateRelationSampleBasisForm } from './QuestionTemplateRelationSampleBasisForm';
@@ -18,5 +19,5 @@ export const sampleBasisDefinition: QuestionaryComponentDefinition = {
   creatable: false,
   icon: <QuestionAnswerIcon />,
   answerRenderer: ({ answer }) => null,
-  createYupValidationSchema: null,
+  createYupValidationSchema: createSampleBasisValidationSchema,
 };

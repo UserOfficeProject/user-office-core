@@ -7,7 +7,7 @@ import {
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
 import { Field, getIn } from 'formik';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { DateConfig } from 'generated/sdk';
 
@@ -22,19 +22,23 @@ function TextFieldWithTooltip(props: TextFieldProps & { title: string }) {
 }
 
 export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
-  const { answer: templateField, touched, errors, onComplete } = props;
+  const {
+    answer,
+    onComplete,
+    formikProps: { errors, touched },
+  } = props;
   const {
     question: { proposalQuestionId, question },
     value,
-  } = templateField;
-  const config = templateField.config as DateConfig;
+  } = answer;
+  const config = answer.config as DateConfig;
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
   const [stateValue, setStateValue] = useState(value || '');
 
   useEffect(() => {
-    setStateValue(templateField.value);
-  }, [templateField]);
+    setStateValue(answer.value);
+  }, [answer]);
 
   return (
     <FormControl error={isError}>

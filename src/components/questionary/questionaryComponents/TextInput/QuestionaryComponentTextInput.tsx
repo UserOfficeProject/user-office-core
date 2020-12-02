@@ -12,20 +12,24 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
       margin: '15px 0 10px 0',
     },
   })();
-  const { answer: templateField, touched, errors, onComplete } = props;
+  const {
+    answer,
+    onComplete,
+    formikProps: { errors, touched },
+  } = props;
   const {
     question: { proposalQuestionId },
     question,
     value,
-  } = templateField;
+  } = answer;
   const [stateValue, setStateValue] = useState(value);
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
-  const config = templateField.config as TextInputConfig;
+  const config = answer.config as TextInputConfig;
 
   useEffect(() => {
-    setStateValue(templateField.value);
-  }, [templateField]);
+    setStateValue(answer.value);
+  }, [answer]);
 
   return (
     <div>

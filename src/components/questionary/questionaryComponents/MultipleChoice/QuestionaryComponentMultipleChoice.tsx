@@ -38,7 +38,11 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     },
   })();
 
-  const { answer, touched, errors, onComplete } = props;
+  const {
+    answer,
+    onComplete,
+    formikProps: { errors, touched },
+  } = props;
   const {
     question: { proposalQuestionId, question },
     value,

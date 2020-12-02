@@ -25,8 +25,9 @@ const useStyles = makeStyles({
 function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   const MAX_TITLE_LEN = 175;
   const MAX_ABSTRACT_LEN = 1500;
-
-  const { errors, touched } = props;
+  const {
+    formikProps: { errors, touched },
+  } = props;
 
   const classes = useStyles();
   const proposalContext = useContext(ProposalContext);
