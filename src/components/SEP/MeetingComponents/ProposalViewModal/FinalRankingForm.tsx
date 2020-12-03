@@ -14,24 +14,25 @@ import { Proposal, ProposalEndStatus, UserRole } from 'generated/sdk';
 import { StyledPaper, ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+const useStyles = makeStyles(() => ({
+  button: {
+    marginTop: '25px',
+    marginLeft: '10px',
+  },
+}));
+
 type FinalRankingFormProps = {
   closeModal: () => void;
   proposalData: Proposal;
-  meetingSubmited: (data: AdministrationFormData) => void;
+  meetingSubmitted: (data: AdministrationFormData) => void;
 };
 
 const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
   closeModal,
   proposalData,
-  meetingSubmited,
+  meetingSubmitted,
 }) => {
-  const classes = makeStyles(() => ({
-    button: {
-      marginTop: '25px',
-      marginLeft: '10px',
-    },
-  }))();
-  const [submitting, setSubmitting] = useState<boolean>(false);
+  const classes = useStyles();
   const [shouldClose, setShouldClose] = useState<boolean>(false);
   const { api } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([
@@ -62,9 +63,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
 
     const isError = !!data.administrationProposal.error;
 
-    setSubmitting(false);
-
-    meetingSubmited(administrationProposalVales);
+    meetingSubmitted(administrationProposalVales);
 
     if (shouldClose && !isError) {
       closeModal();
@@ -78,17 +77,21 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
           validateOnChange={false}
           validateOnBlur={false}
           initialValues={initialData}
-          onSubmit={async (values, actions): Promise<void> => {
-            setSubmitting(true);
+          onSubmit={async (values): Promise<void> => {
             await handleSubmit({
               id: proposalData.id,
               ...values,
               rankOrder: +values.rankOrder,
             });
-            actions.setSubmitting(false);
           }}
         >
-          {({ values, errors, touched, handleChange }): JSX.Element => (
+          {({
+            values,
+            errors,
+            touched,
+            isSubmitting,
+            handleChange,
+          }): JSX.Element => (
             <Form>
               <Typography variant="h6" gutterBottom>
                 SEP Meeting form
@@ -191,7 +194,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       color="primary"
                       className={classes.button}
                       data-cy="save"
-                      disabled={submitting}
+                      disabled={isSubmitting}
                     >
                       Save
                     </Button>
@@ -204,7 +207,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       color="primary"
                       className={classes.button}
                       data-cy="saveAndContinue"
-                      disabled={submitting}
+                      disabled={isSubmitting}
                     >
                       Save and continue
                     </Button>
@@ -231,7 +234,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
 FinalRankingForm.propTypes = {
   closeModal: PropTypes.func.isRequired,
   proposalData: PropTypes.any.isRequired,
-  meetingSubmited: PropTypes.func.isRequired,
+  meetingSubmitted: PropTypes.func.isRequired,
 };
 
 export default FinalRankingForm;

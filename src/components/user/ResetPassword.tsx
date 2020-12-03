@@ -72,9 +72,8 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
     <PhotoInSide>
       <Formik
         initialValues={{ password: '' }}
-        onSubmit={async (values, actions) => {
+        onSubmit={async (values): Promise<void> => {
           await requestResetPassword(values);
-          actions.setSubmitting(false);
         }}
         validationSchema={userPasswordFieldValidationSchema}
       >

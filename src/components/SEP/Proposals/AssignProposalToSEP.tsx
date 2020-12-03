@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
 
 type AssignProposalToSEPProps = {
   close: () => void;
-  assignProposalToSEP: (sep: Sep) => void;
+  assignProposalToSEP: (sep: Sep) => Promise<void>;
 };
 
 const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
@@ -47,11 +47,17 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
           selectedSEPId: '',
         }}
         onSubmit={async (values, actions): Promise<void> => {
-          actions.setSubmitting(false);
           const selectedSEP = SEPs.find(
             sep => sep.id === +values.selectedSEPId
           );
-          assignProposalToSEP(selectedSEP as Sep);
+
+          if (!selectedSEP) {
+            actions.setFieldError('selectedSEPId', 'Required');
+
+            return;
+          }
+
+          await assignProposalToSEP(selectedSEP);
           close();
         }}
         validationSchema={assignProposalToSEPValidationSchema}

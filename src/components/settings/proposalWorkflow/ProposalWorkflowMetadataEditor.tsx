@@ -68,7 +68,7 @@ const ProposalWorkflowMetadataEditor: React.FC<{
     <Formik
       initialValues={proposalWorkflow}
       validationSchema={updateProposalWorkflowValidationSchema}
-      onSubmit={async values => {
+      onSubmit={async (values): Promise<void> => {
         dispatch({
           type: EventType.UPDATE_WORKFLOW_METADATA_REQUESTED,
           payload: { ...values, id: proposalWorkflow.id },

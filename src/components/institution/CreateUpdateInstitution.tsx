@@ -31,48 +31,53 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
         verified: false,
       };
 
-  const createInstitution = (verified: boolean, name: string) => {
-    api('Institution created successfully!')
-      .createInstitution({
-        name,
-        verified,
-      })
-      .then(response => {
-        const { error, institution } = response.createInstitution;
-        if (error) {
-          close(null);
-        } else if (institution) {
-          close(institution);
-        }
-      });
+  const createInstitution = async (verified: boolean, name: string) => {
+    const response = await api(
+      'Institution created successfully!'
+    ).createInstitution({
+      name,
+      verified,
+    });
+
+    const { error, institution } = response.createInstitution;
+    if (error) {
+      close(null);
+    } else if (institution) {
+      close(institution);
+    }
   };
 
-  const updateInstitution = (id: number, verified: boolean, name: string) => {
-    api('Institution updated successfully!')
-      .updateInstitution({
-        id,
-        name,
-        verified,
-      })
-      .then(response => {
-        const { error, institution } = response.updateInstitution;
-
-        if (error) {
-          close(null);
-        } else if (institution) {
-          close(institution);
-        }
-      });
+  const updateInstitution = async (
+    id: number,
+    verified: boolean,
+    name: string
+  ) => {
+    const response = await api(
+      'Institution updated successfully!'
+    ).updateInstitution({
+      id,
+      name,
+      verified,
+    });
+    const { error, institution } = response.updateInstitution;
+    if (error) {
+      close(null);
+    } else if (institution) {
+      close(institution);
+    }
   };
 
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (values, actions): Promise<void> => {
+      onSubmit={async (values): Promise<void> => {
         institution
-          ? updateInstitution(institution.id, values.verified, values.name)
-          : createInstitution(values.verified, values.name);
-        actions.setSubmitting(false);
+          ? await updateInstitution(
+              institution.id,
+              values.verified,
+              values.name
+            )
+          : await createInstitution(values.verified, values.name);
       }}
       validationSchema={Yup.object().shape({
         name: Yup.string().required(),

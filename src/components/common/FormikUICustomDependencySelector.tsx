@@ -6,7 +6,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import ClearIcon from '@material-ui/icons/Clear';
-import { FormikActions } from 'formik';
+import { FormikHelpers } from 'formik';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import {
@@ -25,7 +25,7 @@ const FormikUICustomDependencySelector = ({
   templateField,
 }: {
   field: { name: string; onBlur: Function; onChange: Function; value: string };
-  form: FormikActions<any>;
+  form: FormikHelpers<any>;
   template: Template;
   templateField: QuestionTemplateRelation;
 }) => {

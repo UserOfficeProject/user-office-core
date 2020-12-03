@@ -143,7 +143,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     },
   ];
 
-  const onMeetingSubmited = (data: AdministrationFormData) => {
+  const onMeetingSubmitted = (data: AdministrationFormData) => {
     const newInstrumentProposalsData = instrumentProposalsData.map(
       proposalData => {
         if (proposalData.proposal.id === data.id) {
@@ -171,7 +171,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
 
   const ViewIcon = (): JSX.Element => <Visibility />;
 
-  const redBackgroundWhenOutOfAvailabiliyZone = (
+  const redBackgroundWhenOutOfAvailabilityZone = (
     isInsideAvailabilityZone: boolean
   ): CSSProperties =>
     isInsideAvailabilityZone
@@ -184,7 +184,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         proposalViewModalOpen={!!openProposalId}
         setProposalViewModalOpen={() => setOpenProposalId(null)}
         proposalId={openProposalId || 0}
-        meetingSubmited={onMeetingSubmited}
+        meetingSubmitted={onMeetingSubmitted}
       />
       <MaterialTable
         icons={tableIcons}
@@ -212,7 +212,9 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
               isInAvailabilityZone: boolean;
             }
           ) =>
-            redBackgroundWhenOutOfAvailabiliyZone(rowData.isInAvailabilityZone),
+            redBackgroundWhenOutOfAvailabilityZone(
+              rowData.isInAvailabilityZone
+            ),
         }}
       />
     </div>

@@ -177,16 +177,18 @@ function SampleEvaluationDialog(props: {
       <SampleDetails sampleId={sample.id} />
       <Formik
         initialValues={initialValues}
-        onSubmit={async values => {
-          if (values) {
-            const { id, safetyComment, safetyStatus } = values;
-            api(`Review for '${sample?.title}' submitted`)
-              .updateSample({ sampleId: id, safetyComment, safetyStatus })
-              .then(result => {
-                const newSample = result.updateSample.sample;
-                onClose(newSample || null);
-              });
+        onSubmit={async (values): Promise<void> => {
+          if (!values) {
+            return;
           }
+
+          const { id, safetyComment, safetyStatus } = values;
+          const result = await api(
+            `Review for '${sample?.title}' submitted`
+          ).updateSample({ sampleId: id, safetyComment, safetyStatus });
+
+          const newSample = result.updateSample.sample;
+          onClose(newSample || null);
         }}
       >
         {({ isSubmitting }) => (

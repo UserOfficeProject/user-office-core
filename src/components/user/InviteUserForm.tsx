@@ -34,7 +34,7 @@ export function InviteUserForm(props: {
         lastname: '',
         email: '',
       }}
-      onSubmit={async values => {
+      onSubmit={async (values): Promise<void> => {
         const createResult = await api().createUserByEmailInvite({
           firstname: values.name,
           lastname: values.lastname,

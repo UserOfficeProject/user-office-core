@@ -36,7 +36,7 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (values, actions): Promise<void> => {
+      onSubmit={async (values): Promise<void> => {
         const data = await api(
           'Proposal workflow created successfully'
         ).createProposalWorkflow(values);
@@ -45,8 +45,6 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
         } else if (data.createProposalWorkflow.proposalWorkflow) {
           close(data.createProposalWorkflow.proposalWorkflow);
         }
-
-        actions.setSubmitting(false);
       }}
       validationSchema={createProposalWorkflowValidationSchema}
     >

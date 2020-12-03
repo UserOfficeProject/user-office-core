@@ -34,17 +34,14 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
         numberRatingsRequired: 2,
         active: true,
       }}
-      onSubmit={async (values, actions): Promise<void> => {
-        await api('SEP created successfully!')
-          .createSEP(values)
-          .then(data => {
-            if (data.createSEP.error) {
-              close(null);
-            } else {
-              close(data.createSEP.sep);
-            }
-          });
-        actions.setSubmitting(false);
+      onSubmit={async (values): Promise<void> => {
+        const data = await api('SEP created successfully!').createSEP(values);
+
+        if (data.createSEP.error) {
+          close(null);
+        } else {
+          close(data.createSEP.sep);
+        }
       }}
       validationSchema={createSEPValidationSchema}
     >

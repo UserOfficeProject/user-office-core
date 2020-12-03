@@ -116,7 +116,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
                   );
                   setStateValue(newStateValue);
                   setRows(rows.filter(row => row.id !== item.id));
-                  onComplete(null as any, newStateValue);
+                  onComplete(proposalQuestionId, newStateValue);
                 }
               });
           }}
@@ -129,7 +129,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
                   const newStateValue = [...stateValue, clonedSample.id];
                   setStateValue(newStateValue);
                   setRows([...rows, sampleToListRow(clonedSample)]);
-                  onComplete(null as any, newStateValue);
+                  onComplete(proposalQuestionId, newStateValue);
                 }
               });
           }}
@@ -194,8 +194,9 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
             }}
             sampleCreated={newSample => {
               const newStateValue = [...stateValue, newSample.id];
+
               setStateValue(newStateValue);
-              onComplete(null as any, newStateValue);
+              onComplete(proposalQuestionId, newStateValue);
 
               const newRows = [...rows, sampleToListRow(newSample)];
               setRows(newRows);

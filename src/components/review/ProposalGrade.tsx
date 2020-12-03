@@ -52,26 +52,21 @@ export default function ProposalGrade(props: {
         comment: review.comment || '',
         saveOnly: true,
       }}
-      onSubmit={async (values, actions) => {
-        await api('Updated')
-          .updateReview({
-            reviewID: props.reviewID,
-            //This should be taken care of in validationSchema
-            grade: +values.grade,
-            comment: values.comment ? values.comment : '',
-            status: values.saveOnly
-              ? ReviewStatus.DRAFT
-              : ReviewStatus.SUBMITTED,
-            sepID: review.sepID,
-          })
-          .then(data => {
-            if (!data.addReview.error) {
-              setReview(data.addReview.review);
-              setAssignmentReview(data.addReview.review);
-            }
-            props.onChange();
-            actions.setSubmitting(false);
-          });
+      onSubmit={async (values): Promise<void> => {
+        const data = await api('Updated').updateReview({
+          reviewID: props.reviewID,
+          //This should be taken care of in validationSchema
+          grade: +values.grade,
+          comment: values.comment ? values.comment : '',
+          status: values.saveOnly ? ReviewStatus.DRAFT : ReviewStatus.SUBMITTED,
+          sepID: review.sepID,
+        });
+
+        if (!data.addReview.error) {
+          setReview(data.addReview.review);
+          setAssignmentReview(data.addReview.review);
+        }
+        props.onChange();
       }}
       validationSchema={proposalGradeValidationSchema}
     >

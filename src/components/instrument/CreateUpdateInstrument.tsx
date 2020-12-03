@@ -43,7 +43,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (values, actions): Promise<void> => {
+      onSubmit={async (values): Promise<void> => {
         if (instrument) {
           const data = await api(
             'Instrument updated successfully!'
@@ -66,7 +66,6 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             close(data.createInstrument.instrument);
           }
         }
-        actions.setSubmitting(false);
       }}
       validationSchema={
         instrument

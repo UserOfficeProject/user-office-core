@@ -1,4 +1,4 @@
-import { FormikActions } from 'formik';
+import { FormikHelpers } from 'formik';
 import MaterialTable from 'material-table';
 import React, { forwardRef } from 'react';
 
@@ -25,7 +25,7 @@ export const FormikUICustomTable = ({
     onChange: Function;
     value: string | undefined;
   };
-  form: FormikActions<any>;
+  form: FormikHelpers<any>;
 }) => {
   const transformedValues = dataTransforms.toTable(field.value);
   const [state, setState] = React.useState(transformedValues);

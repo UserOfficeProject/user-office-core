@@ -44,7 +44,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (values, actions): Promise<void> => {
+      onSubmit={async (values): Promise<void> => {
         if (proposalStatus) {
           const data = await api(
             'Proposal status updated successfully'
@@ -67,7 +67,6 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             close(data.createProposalStatus.proposalStatus);
           }
         }
-        actions.setSubmitting(false);
       }}
       validationSchema={
         proposalStatus
@@ -85,7 +84,6 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             id="shortCode"
             label="Short code"
             type="text"
-            value={initialValues.shortCode ? initialValues.shortCode : ''}
             component={
               initialValues.shortCode ? DarkerDisabledTextField : TextField
             }

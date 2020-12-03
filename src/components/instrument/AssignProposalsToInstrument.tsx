@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
 
 type AssignProposalsToInstrumentProps = {
   close: () => void;
-  assignProposalsToInstrument: (instrument: Instrument) => void;
+  assignProposalsToInstrument: (instrument: Instrument) => Promise<void>;
   callIds: number[];
 };
 
@@ -47,13 +47,17 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
           selectedInstrumentId: '',
         }}
         onSubmit={async (values, actions): Promise<void> => {
-          actions.setSubmitting(false);
-
           const selectedInstrument = instruments.find(
             instrument => instrument.id === +values.selectedInstrumentId
           );
 
-          assignProposalsToInstrument(selectedInstrument as Instrument);
+          if (!selectedInstrument) {
+            actions.setFieldError('selectedInstrumentId', 'Required');
+
+            return;
+          }
+
+          await assignProposalsToInstrument(selectedInstrument);
           close();
         }}
         validationSchema={assignProposalToInstrumentValidationSchema}

@@ -82,12 +82,6 @@ export default function SignInSide() {
   const unauthorizedApi = useUnauthorizedApi();
   const location = useLocation();
 
-  /**
-   * NOTE: Use this submitting flag to rerender the form when submitting because of this: https://github.com/formium/formik/issues/2097.
-   * It is resolved in version 2.0.7 so we can use just isSubmitting from formik.
-   */
-  const [submitting, setSubmitting] = useState<boolean>(false);
-
   const requestToken = async (values: { email: string; password: string }) => {
     const { email, password } = values;
 
@@ -100,8 +94,6 @@ export default function SignInSide() {
         setErrorMessage(getTranslation(data.login.error as ResourceId));
         setFailed(true);
       }
-
-      setSubmitting(false);
     }
   };
 
@@ -128,90 +120,89 @@ export default function SignInSide() {
     <PhotoInSide>
       <Formik
         initialValues={{ email: '', password: '' }}
-        onSubmit={async (values, actions) => {
-          setSubmitting(true);
+        onSubmit={async (values): Promise<void> => {
           await requestToken(values);
-          actions.setSubmitting(false);
         }}
         validationSchema={signInValidationSchema}
       >
-        <Form className={classes.form}>
-          <CssBaseline />
-          <FormWrapper margin={[8, 4]}>
-            <Avatar className={classes.avatar}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Sign in
-            </Typography>
-            <Field
-              name="email"
-              label="Email"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="input-email"
-              disabled={submitting}
-            />
-            <Field
-              name="password"
-              label="Password"
-              type="password"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="input-password"
-              disabled={submitting}
-            />
-            {failedLogin && (
-              <p className={classes.errorMessage}>{errorMessage}</p>
-            )}
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              data-cy="submit"
-              disabled={submitting}
-            >
-              {submitting && <UOLoader size={14} />}
-              Sign In
-            </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link to="/ResetPasswordEmail/">Forgot password?</Link>
+        {({ isSubmitting }) => (
+          <Form className={classes.form}>
+            <CssBaseline />
+            <FormWrapper margin={[8, 4]}>
+              <Avatar className={classes.avatar}>
+                <LockOutlinedIcon />
+              </Avatar>
+              <Typography component="h1" variant="h5">
+                Sign in
+              </Typography>
+              <Field
+                name="email"
+                label="Email"
+                type="text"
+                component={TextField}
+                margin="normal"
+                fullWidth
+                data-cy="input-email"
+                disabled={isSubmitting}
+              />
+              <Field
+                name="password"
+                label="Password"
+                type="password"
+                component={TextField}
+                margin="normal"
+                fullWidth
+                data-cy="input-password"
+                disabled={isSubmitting}
+              />
+              {failedLogin && (
+                <p className={classes.errorMessage}>{errorMessage}</p>
+              )}
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                data-cy="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? <UOLoader size={24} /> : 'Sign In'}
+              </Button>
+              <Grid container>
+                <Grid item xs>
+                  <Link to="/ResetPasswordEmail">Forgot password?</Link>
+                </Grid>
+                <Grid item>
+                  <Link to="/SignUp" data-cy="create-account">
+                    Don&apos;t have an account? Sign Up
+                  </Link>
+                </Grid>
+                <Grid item xs={12}>
+                  <div className={classes.loginAlternative}>
+                    <span className={classes.loginAlternativeOr}>or</span>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      className={classes.orcButton}
+                      onClick={() =>
+                        (window.location.href = process.env
+                          .REACT_APP_ORCID_REDIRECT as string)
+                      }
+                    >
+                      <img
+                        className={classes.orcidIconMedium}
+                        src={orcid}
+                        alt="ORCID iD icon"
+                      />
+                      Sign in with <b>&nbsp;ORCID</b>
+                    </Button>
+                  </div>
+                </Grid>
               </Grid>
-              <Grid item>
-                <Link to="/SignUp/" data-cy="create-account">
-                  Don&apos;t have an account? Sign Up
-                </Link>
-              </Grid>
-              <Grid item xs={12}>
-                <div className={classes.loginAlternative}>
-                  <span className={classes.loginAlternativeOr}>or</span>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    className={classes.orcButton}
-                    onClick={() =>
-                      (window.location.href = process.env
-                        .REACT_APP_ORCID_REDIRECT as string)
-                    }
-                  >
-                    <img
-                      className={classes.orcidIconMedium}
-                      src={orcid}
-                      alt="ORCID iD icon"
-                    />
-                    Sign in with <b>&nbsp;ORCID</b>
-                  </Button>
-                </div>
-              </Grid>
-            </Grid>
-          </FormWrapper>
-        </Form>
+            </FormWrapper>
+          </Form>
+        )}
       </Formik>
     </PhotoInSide>
   );

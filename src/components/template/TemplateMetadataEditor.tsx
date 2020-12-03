@@ -68,7 +68,7 @@ export function TemplateMetadataEditor(props: {
         name: Yup.string().min(1),
         description: Yup.string().nullable(),
       })}
-      onSubmit={async values => {
+      onSubmit={async (values): Promise<void> => {
         dispatch({
           type: EventType.UPDATE_TEMPLATE_METADATA_REQUESTED,
           payload: { ...values, templateId: template.templateId },

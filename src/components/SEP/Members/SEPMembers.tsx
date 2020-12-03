@@ -234,13 +234,15 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
         title={'SEP Secretary'}
         invitationUserRole={UserRole.SEP_SECRETARY}
       />
+      {/**
+       * Note: Do we actually need Formik here? It looks like it could be removed
+       *       and we can use regular React hooks and Mui form components
+       */}
       <Formik
         validateOnChange={false}
         validateOnBlur={false}
         initialValues={initialValues}
-        onSubmit={(values, actions): void => {
-          actions.setSubmitting(false);
-        }}
+        onSubmit={() => {}}
       >
         {({ errors }): JSX.Element => (
           <Form>

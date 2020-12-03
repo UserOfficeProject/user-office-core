@@ -262,6 +262,14 @@ export function SampleDeclarationContainer(props: {
   const getProgressBar = () =>
     isApiInteracting || isSavingModel ? <LinearProgress /> : null;
 
+  /**
+   * Note: try to fix in the future
+   *
+   * Warning: A history supports only one prompt at a time
+   *    at Lifecycle (http://localhost:3000/static/js/1.chunk.js:335796:29)
+   *    at Prompt (http://localhost:3000/static/js/1.chunk.js:335825:22)
+   *    at div
+   */
   return (
     <Container maxWidth="lg">
       <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />

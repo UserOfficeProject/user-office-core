@@ -36,7 +36,7 @@ export default function ProposalTechnicalReview(props: {
       <Formik
         initialValues={initialValues}
         validationSchema={proposalTechnicalReviewValidationSchema}
-        onSubmit={async (values, actions) => {
+        onSubmit={async (values): Promise<void> => {
           await api(
             'Technical review updated successfully!'
           ).addTechnicalReview({
@@ -55,7 +55,6 @@ export default function ProposalTechnicalReview(props: {
             status:
               TechnicalReviewStatus[values.status as TechnicalReviewStatus],
           } as CoreTechnicalReviewFragment);
-          actions.setSubmitting(false);
         }}
       >
         {({ isSubmitting }) => (

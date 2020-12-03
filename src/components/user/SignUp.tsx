@@ -238,7 +238,7 @@ const SignUp: React.FC<SignUpProps> = props => {
           orcidHash: orcData?.orcidHash as string,
           refreshToken: orcData?.refreshToken as string,
         }}
-        onSubmit={async (values, actions) => {
+        onSubmit={async (values): Promise<void> => {
           if (orcData && orcData.orcid) {
             const newValues = {
               ...values,
@@ -258,7 +258,6 @@ const SignUp: React.FC<SignUpProps> = props => {
           } else {
             setOrcidError(true);
           }
-          actions.setSubmitting(false);
         }}
         validationSchema={createUserValidationSchema}
       >

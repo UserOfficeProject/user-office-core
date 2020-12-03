@@ -48,7 +48,7 @@ export default function ProposalAdmin(props: {
       <Formik
         initialValues={initialValues}
         validationSchema={administrationProposalValidationSchema}
-        onSubmit={async (values, actions) => {
+        onSubmit={async (values): Promise<void> => {
           const administrationValues = {
             id: props.data.id,
             finalStatus:
@@ -64,7 +64,6 @@ export default function ProposalAdmin(props: {
           if (!data.administrationProposal.error) {
             props.setAdministration(administrationValues);
           }
-          actions.setSubmitting(false);
         }}
       >
         {({ isSubmitting }) => (

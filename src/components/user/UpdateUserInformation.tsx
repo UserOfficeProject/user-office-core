@@ -124,7 +124,7 @@ export default function UpdateUserInformation(props: { id: number }) {
           user_title: userData.user_title,
           orcid: userData.orcid,
         }}
-        onSubmit={async (values, actions) => {
+        onSubmit={async (values, actions): Promise<void> => {
           const newValues = {
             id: props.id,
             ...values,
@@ -138,7 +138,6 @@ export default function UpdateUserInformation(props: { id: number }) {
             ...newValues,
           });
           actions.setFieldValue('oldEmail', values.email);
-          actions.setSubmitting(false);
         }}
         validationSchema={updateUserValidationSchema}
       >

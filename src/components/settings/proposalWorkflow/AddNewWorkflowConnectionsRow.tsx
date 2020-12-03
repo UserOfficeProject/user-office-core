@@ -55,9 +55,7 @@ const AddNewWorkflowConnectionsRow: React.FC<AddNewWorkflowConnectionsRowProps> 
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={initialValues}
-        onSubmit={async (values, actions): Promise<void> => {
-          actions.setSubmitting(false);
-
+        onSubmit={async (values): Promise<void> => {
           addNewWorkflowConnectionsRow(
             values.numberOfColumns as number,
             values.selectedParentDroppableId

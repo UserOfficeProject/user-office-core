@@ -50,9 +50,8 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
       validateOnChange={false}
       validateOnBlur={false}
       initialValues={sep}
-      onSubmit={async (values, actions): Promise<void> => {
+      onSubmit={async (values): Promise<void> => {
         await sendSEPUpdate(values);
-        actions.setSubmitting(false);
       }}
       validationSchema={updateSEPValidationSchema}
     >
