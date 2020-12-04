@@ -75,9 +75,13 @@ const AddNewWorkflowConnectionsRow: React.FC<AddNewWorkflowConnectionsRowProps> 
                 <FormikDropdown
                   name="selectedParentDroppableId"
                   label="Select parent droppable group"
-                  items={parentDroppableIds.map(parentDroppableId => ({
+                  items={parentDroppableIds.map((parentDroppableId, index) => ({
                     value: parentDroppableId,
-                    text: parentDroppableId,
+                    text: index
+                      ? `Workflow droppable group ${
+                          parentDroppableId.split('_')[1]
+                        }`
+                      : 'Default droppable group',
                   }))}
                   required
                 />

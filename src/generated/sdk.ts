@@ -1102,6 +1102,12 @@ export enum ProposalEndStatus {
   REJECTED = 'REJECTED'
 }
 
+export type ProposalEvent = {
+  __typename?: 'ProposalEvent';
+  name: Event;
+  description: Scalars['String'];
+};
+
 export type ProposalNextStatusEventResponseWrap = {
   __typename?: 'ProposalNextStatusEventResponseWrap';
   error: Maybe<Scalars['String']>;
@@ -1270,7 +1276,7 @@ export type Query = {
   proposalTemplates: Maybe<Array<ProposalTemplate>>;
   proposalWorkflow: Maybe<ProposalWorkflow>;
   proposalWorkflows: Maybe<Array<ProposalWorkflow>>;
-  proposalEvents: Maybe<Array<Event>>;
+  proposalEvents: Maybe<Array<ProposalEvent>>;
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
   roles: Maybe<Array<Role>>;
@@ -3493,7 +3499,10 @@ export type GetProposalEventsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetProposalEventsQuery = (
   { __typename?: 'Query' }
-  & Pick<Query, 'proposalEvents'>
+  & { proposalEvents: Maybe<Array<(
+    { __typename?: 'ProposalEvent' }
+    & Pick<ProposalEvent, 'name' | 'description'>
+  )>> }
 );
 
 export type GetProposalStatusesQueryVariables = Exact<{ [key: string]: never; }>;
@@ -5824,7 +5833,10 @@ export const DeleteProposalWorkflowStatusDocument = gql`
     `;
 export const GetProposalEventsDocument = gql`
     query getProposalEvents {
-  proposalEvents
+  proposalEvents {
+    name
+    description
+  }
 }
     `;
 export const GetProposalStatusesDocument = gql`

@@ -1,6 +1,6 @@
 import DateFnsUtils from '@date-io/date-fns';
-import { TextField, TextFieldProps } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
+import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
   KeyboardDatePicker,

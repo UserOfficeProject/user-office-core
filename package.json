@@ -52,7 +52,6 @@
     "react-router-dom": "~5.2.0",
     "react-scripts": "^3.4.4",
     "tinymce": "^5.4.2",
-    "ts-keycode-enum": "^1.0.6",
     "typescript": "~3.9.6",
     "use-query-params": "^1.1.9",
     "yup": "~0.29.3"

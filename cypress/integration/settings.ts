@@ -243,6 +243,18 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Next status events added successfully!',
       });
+
+      cy.contains('PROPOSAL_SUBMITTED');
+
+      cy.get('[data-cy="connection_DRAFT_1"]').click();
+
+      cy.get('[data-cy="next-status-events-modal"]').should('exist');
+
+      cy.contains('PROPOSAL_FEASIBLE').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.contains('PROPOSAL_SUBMITTED & PROPOSAL_FEASIBLE');
     });
 
     it('Proposal should follow the selected workflow', () => {

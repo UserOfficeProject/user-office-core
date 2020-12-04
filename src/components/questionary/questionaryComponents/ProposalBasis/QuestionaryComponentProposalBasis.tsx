@@ -1,4 +1,5 @@
-import { Grid, makeStyles } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useContext, useEffect, useState } from 'react';
 
 import TextFieldWithCounter from 'components/common/TextFieldWithCounter';

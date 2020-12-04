@@ -40,6 +40,11 @@ const useStyles = makeStyles(theme => ({
   submitContainer: {
     margin: theme.spacing(2, 0, 2),
   },
+  eventDescription: {
+    margin: '-5px 0',
+    fontSize: 'small',
+    color: theme.palette.grey[400],
+  },
 }));
 
 type AddNextStatusEventsToConnectionProps = {
@@ -92,20 +97,20 @@ const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionP
                           <FormControlLabel
                             control={
                               <Checkbox
-                                id={proposalEvent}
+                                id={proposalEvent.name}
                                 name="selectedNextStatusEvents"
-                                value={proposalEvent}
+                                value={proposalEvent.name}
                                 checked={values.selectedNextStatusEvents.includes(
-                                  proposalEvent
+                                  proposalEvent.name
                                 )}
                                 color="primary"
                                 data-cy="next-status-event"
                                 onChange={e => {
                                   if (e.target.checked)
-                                    arrayHelpers.push(proposalEvent);
+                                    arrayHelpers.push(proposalEvent.name);
                                   else {
                                     const idx = values.selectedNextStatusEvents.indexOf(
-                                      proposalEvent
+                                      proposalEvent.name
                                     );
                                     arrayHelpers.remove(idx);
                                   }
@@ -115,8 +120,11 @@ const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionP
                                 }}
                               />
                             }
-                            label={proposalEvent}
+                            label={proposalEvent.name}
                           />
+                          <p className={classes.eventDescription}>
+                            {proposalEvent.description}
+                          </p>
                         </Grid>
                       ))}
                     </>
