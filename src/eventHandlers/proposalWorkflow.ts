@@ -104,9 +104,7 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
           }
 
           switch (event.technicalreview.status) {
-            // TODO: Review this if both feasible and partialy feasible should emit PROPOSAL_FEASIBLE
             case TechnicalReviewStatus.FEASIBLE:
-            case TechnicalReviewStatus.PARTIALLY_FEASIBLE:
               eventBus.publish({
                 type: Event.PROPOSAL_FEASIBLE,
                 proposal,
@@ -144,9 +142,7 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
           }
 
           switch (event.sample.safetyStatus) {
-            // TODO: Review this if both LOW_RISK and ELEVATED_RISK should emit PROPOSAL_SAMPLE_SAFE
             case SampleStatus.LOW_RISK:
-            case SampleStatus.ELEVATED_RISK:
               eventBus.publish({
                 type: Event.PROPOSAL_SAMPLE_SAFE,
                 proposal,
