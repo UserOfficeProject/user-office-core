@@ -30,11 +30,17 @@ export function useInstrumentsData(
   };
 
   useEffect(() => {
+    let unmounted = false;
+
     setLoadingInstruments(true);
     if (currentRole === UserRole.USER_OFFICER) {
       api()
         .getInstruments({ callIds })
         .then(data => {
+          if (unmounted) {
+            return;
+          }
+
           if (data.instruments) {
             setInstruments(data.instruments.instruments as Instrument[]);
           }
@@ -44,12 +50,21 @@ export function useInstrumentsData(
       api()
         .getUserInstruments()
         .then(data => {
+          if (unmounted) {
+            return;
+          }
+
           if (data.me?.instruments) {
             setInstruments(data.me.instruments as Instrument[]);
           }
           setLoadingInstruments(false);
         });
     }
+
+    return () => {
+      // used to avoid unmounted component state update error
+      unmounted = true;
+    };
   }, [api, currentRole, callIds]);
 
   return {
