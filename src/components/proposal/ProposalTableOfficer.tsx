@@ -29,6 +29,7 @@ import {
   useProposalsCoreData,
   ProposalViewData,
 } from 'hooks/proposal/useProposalsCoreData';
+import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -404,15 +405,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         })
       : proposalsData;
 
-  if (
-    urlQueryParams.sortColumn !== undefined &&
-    urlQueryParams.sortColumn !== null &&
+  columns = setSortDirectionOnSortColumn(
+    columns,
+    urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
-  ) {
-    columns[
-      urlQueryParams.sortColumn
-    ].defaultSort = urlQueryParams.sortDirection as 'asc' | 'desc' | undefined;
-  }
+  );
 
   return (
     <>

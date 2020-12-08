@@ -14,6 +14,7 @@ import {
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
+import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 
 export type UrlQueryParamsType = {
@@ -29,6 +30,8 @@ export const DefaultQueryParams = {
   search: StringParam,
   selection: withDefault(DelimitedNumericArrayParam, []),
 };
+
+export type SortDirectionType = 'asc' | 'desc' | undefined;
 
 interface SuperProps<RowData extends object> {
   createModal: (
@@ -59,11 +62,10 @@ function SuperMaterialTable<Entry extends EntryID>({
   const [show, setShow] = useState(false);
   const [editObject, setEditObject] = useState<Entry | null>(null);
 
-  let { data } = props;
+  let { data, columns } = props;
   const {
     setData,
     options,
-    columns,
     urlQueryParams,
     actions,
     createModal,
@@ -88,15 +90,11 @@ function SuperMaterialTable<Entry extends EntryID>({
     options.searchText = urlQueryParams.search || undefined;
   }
 
-  if (
-    urlQueryParams?.sortColumn !== undefined &&
-    urlQueryParams?.sortColumn !== null &&
+  columns = setSortDirectionOnSortColumn(
+    columns,
+    urlQueryParams?.sortColumn,
     urlQueryParams?.sortDirection
-  ) {
-    columns[
-      urlQueryParams.sortColumn
-    ].defaultSort = urlQueryParams.sortDirection as 'asc' | 'desc' | undefined;
-  }
+  );
 
   const onCreated = (objectAdded: Entry) => {
     setData([...data, objectAdded]);

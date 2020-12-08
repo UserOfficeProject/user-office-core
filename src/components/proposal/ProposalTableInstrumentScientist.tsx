@@ -15,6 +15,7 @@ import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useProposalsData } from 'hooks/proposal/useProposalsData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import {
   average,
@@ -180,11 +181,17 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   if (localStorageValue) {
     columns = columns.map(column => ({
       ...column,
-      hidden: localStorageValue?.find(
+      hidden: localStorageValue.find(
         localStorageValueItem => localStorageValueItem.title === column.title
       )?.hidden,
     }));
   }
+
+  columns = setSortDirectionOnSortColumn(
+    columns,
+    urlQueryParams.sortColumn,
+    urlQueryParams.sortDirection
+  );
 
   return (
     <>
@@ -205,6 +212,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         isLoading={loading}
         options={{
           search: true,
+          searchText: urlQueryParams.search || undefined,
           debounceInterval: 400,
           columnsButton: true,
         }}
@@ -223,6 +231,13 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           );
 
           setLocalStorageValue(proposalColumns);
+        }}
+        onOrderChange={(orderedColumnId, orderDirection) => {
+          setUrlQueryParams &&
+            setUrlQueryParams({
+              sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
+              sortDirection: orderDirection ? orderDirection : undefined,
+            });
         }}
       />
     </>

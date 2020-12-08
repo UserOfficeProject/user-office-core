@@ -74,15 +74,15 @@ ProposalFilterBar.propTypes = {
   calls: PropTypes.shape({
     data: PropTypes.array.isRequired,
     isLoading: PropTypes.any,
-  }).isRequired,
+  }),
   instruments: PropTypes.shape({
     data: PropTypes.array.isRequired,
     isLoading: PropTypes.any,
-  }).isRequired,
+  }),
   proposalStatuses: PropTypes.shape({
     data: PropTypes.array.isRequired,
     isLoading: PropTypes.any,
-  }).isRequired,
+  }),
   setProposalFilter: PropTypes.func.isRequired,
   filter: PropTypes.object.isRequired,
 };
