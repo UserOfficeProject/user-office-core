@@ -2,6 +2,7 @@ import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';
+import { SampleSubmissionState } from 'models/SampleSubmissionState';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createSampleBasisValidationSchema } from './createSampleBasisValidationSchema';
@@ -18,6 +19,11 @@ export const sampleBasisDefinition: QuestionaryComponentDefinition = {
   readonly: true,
   creatable: false,
   icon: <QuestionAnswerIcon />,
-  answerRenderer: ({ answer }) => null,
+  answerRenderer: () => null,
   createYupValidationSchema: createSampleBasisValidationSchema,
+  getYupInitialValue: ({ state }) => {
+    const sampleState = state as SampleSubmissionState;
+
+    return sampleState.sample.title;
+  },
 };

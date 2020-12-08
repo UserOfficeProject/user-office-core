@@ -23,4 +23,6 @@ export const intervalDefinition: QuestionaryComponentDefinition = {
       ''}`}</span>
   ),
   createYupValidationSchema: createIntervalValidationSchema,
+  getYupInitialValue: ({ answer }) =>
+    answer.value || { min: '', max: '', unit: 'unitless' },
 };

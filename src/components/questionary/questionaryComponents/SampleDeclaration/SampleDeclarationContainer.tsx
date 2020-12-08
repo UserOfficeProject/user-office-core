@@ -75,7 +75,7 @@ const samplesReducer = (
     case EventType.SAMPLE_MODIFIED:
       draftState.sample = {
         ...draftState.sample,
-        ...action.payload.sample,
+        ...action.payload,
       };
       draftState.isDirty = true;
       break;

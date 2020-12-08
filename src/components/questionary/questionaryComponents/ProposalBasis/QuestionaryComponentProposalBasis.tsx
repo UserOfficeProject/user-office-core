@@ -1,8 +1,9 @@
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import React, { useContext, useEffect, useState } from 'react';
+import { Field } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React, { ChangeEvent, KeyboardEvent, useContext, useState } from 'react';
 
-import TextFieldWithCounter from 'components/common/TextFieldWithCounter';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContext } from 'components/proposal/ProposalContainer';
 import ProposalParticipant from 'components/proposal/ProposalParticipant';
@@ -24,10 +25,10 @@ const useStyles = makeStyles({
 });
 
 function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
-  const MAX_TITLE_LEN = 175;
-  const MAX_ABSTRACT_LEN = 1500;
   const {
-    formikProps: { errors, touched },
+    answer: {
+      question: { proposalQuestionId },
+    },
   } = props;
 
   const classes = useStyles();
@@ -40,11 +41,6 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     proposalContext.state?.proposal.abstract
   );
 
-  useEffect(() => {
-    setLocalTitle(proposalContext.state?.proposal.title);
-    setLocalAbstract(proposalContext.state?.proposal.abstract);
-  }, [proposalContext.state]);
-
   if (!proposalContext?.state) {
     return null;
   }
@@ -56,52 +52,64 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     <div>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <TextFieldWithCounter
-            required
-            id="title"
-            name="title"
+          <Field
+            name={`${proposalQuestionId}.title`}
             label="Title"
-            value={localTitle}
-            fullWidth
-            onBlur={event => {
-              dispatch({
-                type: EventType.PROPOSAL_MODIFIED,
-                payload: {
-                  proposal: { ...state.proposal, title: event.target.value },
-                },
-              });
+            inputProps={{
+              onChange: (event: ChangeEvent<HTMLInputElement>) =>
+                setLocalTitle(event.target.value),
+              onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+
+                  return false;
+                }
+              },
+              onBlur: () => {
+                dispatch({
+                  type: EventType.PROPOSAL_MODIFIED,
+                  payload: {
+                    proposal: { ...state.proposal, title: localTitle },
+                  },
+                });
+              },
             }}
-            onChange={event => setLocalTitle(event.target.value)}
-            error={touched.title && errors.title !== undefined}
-            helperText={touched.title && errors.title && errors.title}
+            required
+            fullWidth
+            component={TextField}
             data-cy="title"
-            maxLen={MAX_TITLE_LEN}
           />
         </Grid>
         <Grid item xs={12}>
-          <TextFieldWithCounter
-            required
-            id="abstract"
-            name="abstract"
+          <Field
+            name={`${proposalQuestionId}.abstract`}
             label="Abstract"
+            inputProps={{
+              onChange: (event: ChangeEvent<HTMLInputElement>) =>
+                setLocalAbstract(event.target.value),
+              onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+
+                  return false;
+                }
+              },
+              onBlur: () => {
+                dispatch({
+                  type: EventType.PROPOSAL_MODIFIED,
+                  payload: {
+                    proposal: { ...state.proposal, abstract: localAbstract },
+                  },
+                });
+              },
+            }}
+            required
             multiline
             rowsMax="16"
             rows="4"
-            value={localAbstract}
-            onChange={event => setLocalAbstract(event.target.value)}
             fullWidth
-            onBlur={event => {
-              dispatch({
-                type: EventType.PROPOSAL_MODIFIED,
-                payload: {
-                  proposal: { ...state.proposal, abstract: event.target.value },
-                },
-              });
-            }}
-            error={touched.abstract && errors.abstract !== undefined}
-            helperText={touched.abstract && errors.abstract && errors.abstract}
+            component={TextField}
             data-cy="abstract"
-            maxLen={MAX_ABSTRACT_LEN}
           />
         </Grid>
       </Grid>

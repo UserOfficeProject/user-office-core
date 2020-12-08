@@ -1,13 +1,7 @@
 import Typography from '@material-ui/core/Typography';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, {
-  ChangeEvent,
-  KeyboardEvent,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { ChangeEvent, KeyboardEvent, useContext, useState } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { Answer, SampleBasisConfig } from 'generated/sdk';
@@ -23,20 +17,16 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
       question: { proposalQuestionId, question },
     },
   } = props;
-  const sampleContext = useContext(SampleContext);
-  const [title, setTitle] = useState(sampleContext.state?.sample.title || '');
 
-  useEffect(() => {
-    const newTitle = sampleContext.state?.sample.title || '';
-    setTitle(newTitle);
-    sampleContext.dispatch({
-      type: EventType.FIELD_CHANGED,
-      payload: {
-        id: proposalQuestionId,
-        newValue: newTitle,
-      },
-    }); // Sets this sets Formik initial value, because sample_basis is a little special and initial value contains null
-  }, [sampleContext, proposalQuestionId]);
+  const sampleContext = useContext(SampleContext);
+
+  const [title, setTitle] = useState(sampleContext.state?.sample.title);
+
+  if (!sampleContext.state) {
+    return null;
+  }
+
+  const { dispatch, state } = sampleContext;
 
   return (
     <>
@@ -44,9 +34,6 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
       <Field
         name={proposalQuestionId}
         label={(props.answer.config as SampleBasisConfig).titlePlaceholder}
-        component={TextField}
-        fullWidth
-        data-cy="title-input"
         inputProps={{
           onChange: (event: ChangeEvent<HTMLInputElement>) => {
             setTitle(event.currentTarget.value);
@@ -59,12 +46,16 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
             }
           },
           onBlur: () => {
-            sampleContext.dispatch({
+            dispatch({
               type: EventType.SAMPLE_MODIFIED,
-              payload: { sample: { title: title } },
+              payload: { ...state.sample, title: title },
             });
           },
         }}
+        required
+        fullWidth
+        component={TextField}
+        data-cy="title-input"
       />
     </>
   );

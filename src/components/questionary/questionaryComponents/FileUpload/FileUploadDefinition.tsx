@@ -21,4 +21,5 @@ export const fileUploadDefinition: QuestionaryComponentDefinition = {
   icon: <AttachFileIcon />,
   answerRenderer: ({ answer }) => <FilesAnswerRenderer answer={answer} />,
   createYupValidationSchema: answer => Yup.array().of(Yup.string()),
+  getYupInitialValue: ({ answer }) => answer.value || [],
 };
