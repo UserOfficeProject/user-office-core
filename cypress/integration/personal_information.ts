@@ -94,9 +94,9 @@ context('Personal information tests', () => {
 
     cy.finishedLoading();
 
-    cy.get('[data-cy="people-table"] table tbody tr')
-      .eq(1)
-      .find('[title="Edit user"]')
+    cy.contains('Andersson')
+      .parent()
+      .find('button[title="Edit user"]')
       .click();
 
     const mainContentElement = cy.get('main');

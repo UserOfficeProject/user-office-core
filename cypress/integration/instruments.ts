@@ -198,8 +198,10 @@ context('Instrument tests', () => {
     cy.login('officer');
 
     cy.contains('People').click();
-    cy.get('[title="Edit user"]')
-      .eq(2)
+
+    cy.contains('Carlsson')
+      .parent()
+      .find('button[title="Edit user"]')
       .click();
 
     const mainContentElement = cy.get('main');

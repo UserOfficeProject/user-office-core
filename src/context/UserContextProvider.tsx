@@ -1,10 +1,10 @@
 import { decode } from 'jsonwebtoken';
 import PropTypes from 'prop-types';
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 
 import { Role, UserRole } from 'generated/sdk';
-import { User, dummyUser } from 'models/User';
+import { dummyUser, User } from 'models/User';
 
 interface UserContextData {
   user: User;
@@ -42,6 +42,9 @@ const initUserData: UserContextData = {
   handleRole: value => value,
 };
 
+export const getCurrentUser = () =>
+  decode(localStorage.token) as DecodedTokenData | null;
+
 const checkLocalStorage = (
   dispatch: React.Dispatch<{
     type: ActionType;
@@ -50,9 +53,9 @@ const checkLocalStorage = (
   state: UserContextData
 ): void => {
   if (!state.token && localStorage.token && localStorage.currentRole) {
-    const decoded = decode(localStorage.token) as DecodedTokenData;
+    const decoded = getCurrentUser();
 
-    if (decoded?.exp > Date.now() / 1000) {
+    if (decoded && decoded.exp > Date.now() / 1000) {
       dispatch({
         type: ActionType.SETUSERFROMLOCALSTORAGE,
         payload: {

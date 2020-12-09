@@ -1,10 +1,10 @@
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import EditIcon from '@material-ui/icons/Edit';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { UserRole, BasicUserDetails } from 'generated/sdk';
-import { useBasicUserData, BasicUserData } from 'hooks/user/useUserData';
+import { BasicUserDetails, UserRole } from 'generated/sdk';
+import { BasicUserData, useBasicUserData } from 'hooks/user/useUserData';
 
 import ParticipantModal from './ParticipantModal';
 
@@ -51,7 +51,7 @@ export default function ProposalParticipant(props: {
           ? `${curUser.firstname} ${curUser.lastname}; ${curUser.organisation}`
           : ''}
         <IconButton edge="end" onClick={() => setIsPickerOpen(true)}>
-          <EditIcon />
+          <EditIcon data-cy="edit-proposer-button" />
         </IconButton>
       </div>
     </div>
