@@ -50,6 +50,7 @@ export interface UserDataSource {
     telephone: string,
     telephone_alt: string | undefined
   ): Promise<User>;
+  createDummyUser(user_id: number): Promise<User>;
   createOrganisation(name: string, verified: boolean): Promise<number>;
   update(user: User): Promise<User>;
   setUserRoles(id: number, roles: number[]): Promise<void>;

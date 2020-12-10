@@ -40,6 +40,7 @@ import { signToken, verifyToken } from '../utils/jwt';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import UOWSSoapClient from '../UOWSSoapInterface';
+import { userDataSource } from '../datasources';
 
 
 export default class UserMutations {
@@ -372,51 +373,46 @@ export default class UserMutations {
 
   async checkExternalToken(externalToken: string): Promise<string | Rejection> {
     try {
-      const client = new UOWSSoapClient('https://devapis.facilities.rl.ac.uk/ws/UserOfficeWebService?wsdl');
-      const stfcUser = (await client.getPersonDetailsFromSessionId(externalToken)).return;
-      const convertedUser = new User(
-        stfcUser.userNumber,
-        stfcUser.title,
-        stfcUser.givenName,
-        undefined,
-        stfcUser.familyName,
-        stfcUser.firstNameKnownAs,
-        stfcUser.firstNameKnownAs,
-        "",
-        "",
-        "",
-        0,
-        "",
-        0,
-        stfcUser.deptName,
-        "",
-        stfcUser.email,
-        true,
-        stfcUser.workPhone,
-        stfcUser.mobilePhone,
-        false,
-        "",
-        ""
-      );
+      const client = new UOWSSoapClient();
+      
+      let stfcUser;
+      try {
+        const rawStfcUser = await client.getPersonDetailsFromSessionId(externalToken);
+        if (!rawStfcUser) {
+          logger.logInfo('User not found for token', { externalToken });
 
-      if (!convertedUser) {
-        return rejection('USER_DOES_NOT_EXIST');
+          return rejection('USER_DOES_NOT_EXIST');
+        }
+        stfcUser = rawStfcUser.return;
+      } catch (error) {
+        logger.logError('Error while connecting to UserOfficeWebService', { error });
+
+        return rejection('INTERNAL_ERROR');
+      }
+     
+      // Create dummy user if one does not exist in the proposals DB.
+      // This is needed to satisfy the FOREIGN_KEY constraints
+      // in tables that link to a user (such as proposals)
+      const userNumber = parseInt(stfcUser.userNumber);
+      let dummyUser = await this.dataSource.get(userNumber);
+      if (!dummyUser) {
+        dummyUser = await this.dataSource.createDummyUser(userNumber);
       }
 
-      // TODO: this should get the user's roles
+      // TODO: this should get the user's roles rather than all roles
       const roles = await this.dataSource.getRoles();
 
-      const essToken = signToken<AuthJwtPayload>({
-        user: convertedUser,
+      const proposalsToken = signToken<AuthJwtPayload>({
+        user: dummyUser,
         roles,
-        currentRole: roles[0],
+        currentRole: roles[1], // Currently hardcoded to UserOfficer
       });
 
-      return essToken;
+      return proposalsToken;
     } catch (error) {
-      logger.logError('Bad token', { externalToken });
+      logger.logError('Error occured during external authentication', { error });
 
-      return rejection('BAD_TOKEN');
+      return rejection('INTERNAL_ERROR');
     }
   }
 
