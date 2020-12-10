@@ -24,7 +24,7 @@
     "apitest": "newman run api_tests/tests.json --environment api_tests/environment.json",
     "debug": "rm -R -f ./build && tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere GRAYLOG_SERVER=127.0.0.1 GRAYLOG_PORT=12202 ts-node-dev --inspect --respawn -- ./index.ts",
     "populate": "DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo env secret=qMyLZALzs229ybdQXNyzYRdju7X784TH env tokenLife=7d env baseURL=localhost:3000 env NODE_ENV=development ts-node-dev --respawn --transpileOnly ./src/populate/index.ts",
-    "generate:uows-client": "uows-client-generator https://devapis.facilities.rl.ac.uk/ws/UserOfficeWebService?wsdl"
+    "generate:uows-client:dev": "uows-client-generator https://devapis.facilities.rl.ac.uk/ws/UserOfficeWebService?wsdl src/datasources/stfc/UOWSSoapInterface.ts"
   },
   "lint-staged": {
     "**/*.{js,ts}": "npm run lint"
@@ -42,7 +42,6 @@
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-message-broker": "^1.0.2",
     "@esss-swap/duo-validation": "^1.1.39",
-    "@stfc-user-programme/uows_client_generator": "^1.0.7",
     "apollo-server": "^2.19.0",
     "apollo-server-core": "^2.19.0",
     "apollo-server-express": "^2.19.0",
@@ -72,6 +71,7 @@
     "yup": "^0.29.3"
   },
   "devDependencies": {
+    "@stfc-user-programme/uows_client_generator": "^1.0.14",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.2",
     "@types/cron": "^1.7.2",
@@ -87,6 +87,7 @@
     "@types/pg-large-object": "^2.0.2",
     "@types/react-beautiful-dnd": "^11.0.5",
     "@types/request-promise": "^4.1.46",
+    "@types/sax": "^1.2.1",
     "@types/sinon": "^9.0.8",
     "@types/sparkpost": "^2.1.4",
     "@types/yup": "^0.29.8",

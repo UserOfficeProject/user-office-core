@@ -13,6 +13,7 @@ import {
 } from '@esss-swap/duo-validation';
 import * as bcrypt from 'bcryptjs';
 
+import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -39,9 +40,6 @@ import {
 import { signToken, verifyToken } from '../utils/jwt';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
-import UOWSSoapClient from '../UOWSSoapInterface';
-import { userDataSource } from '../datasources';
-
 
 export default class UserMutations {
   constructor(
@@ -374,10 +372,12 @@ export default class UserMutations {
   async checkExternalToken(externalToken: string): Promise<string | Rejection> {
     try {
       const client = new UOWSSoapClient();
-      
+
       let stfcUser;
       try {
-        const rawStfcUser = await client.getPersonDetailsFromSessionId(externalToken);
+        const rawStfcUser = await client.getPersonDetailsFromSessionId(
+          externalToken
+        );
         if (!rawStfcUser) {
           logger.logInfo('User not found for token', { externalToken });
 
@@ -385,11 +385,13 @@ export default class UserMutations {
         }
         stfcUser = rawStfcUser.return;
       } catch (error) {
-        logger.logError('Error while connecting to UserOfficeWebService', { error });
+        logger.logError('Error while connecting to UserOfficeWebService', {
+          error,
+        });
 
         return rejection('INTERNAL_ERROR');
       }
-     
+
       // Create dummy user if one does not exist in the proposals DB.
       // This is needed to satisfy the FOREIGN_KEY constraints
       // in tables that link to a user (such as proposals)
@@ -410,7 +412,9 @@ export default class UserMutations {
 
       return proposalsToken;
     } catch (error) {
-      logger.logError('Error occured during external authentication', { error });
+      logger.logError('Error occured during external authentication', {
+        error,
+      });
 
       return rejection('INTERNAL_ERROR');
     }

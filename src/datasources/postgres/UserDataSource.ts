@@ -224,7 +224,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .where('user_id', id)
       .first()
-      .then((user: UserRecord) => (!user) ? null : createUserObject(user));
+      .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
   async get(id: number): Promise<User | null> {
@@ -233,7 +233,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .where('user_id', id)
       .first()
-      .then((user: UserRecord) => (!user) ? null : createUserObject(user));
+      .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
@@ -252,7 +252,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .where('username', username)
       .first()
-      .then((user: UserRecord) => (!user) ? null : createUserObject(user));
+      .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
   async getByOrcID(orcID: string): Promise<User | null> {
@@ -261,7 +261,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .where('orcid', orcID)
       .first()
-      .then((user: UserRecord) => (!user) ? null : createUserObject(user));
+      .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
   async getByEmail(email: string): Promise<User | null> {
@@ -270,7 +270,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .where('email', 'ilike', email)
       .first()
-      .then((user: UserRecord) => (!user) ? null : createUserObject(user));
+      .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
   async create(
@@ -325,32 +325,28 @@ export default class PostgresUserDataSource implements UserDataSource {
       });
   }
 
-
-
-  async createDummyUser(
-    user_id: number
-  ): Promise<User> {
+  async createDummyUser(userId: number): Promise<User> {
     return database
       .insert({
-        user_id: user_id,
-        user_title: "",
-        firstname: "",
-        middlename: "",
-        lastname: "",
-        username: user_id.toString(),
-        password: "",
-        preferredname: "",
-        orcid: "",
-        orcid_refreshtoken: "",
-        gender: "",
+        user_id: userId,
+        user_title: '',
+        firstname: '',
+        middlename: '',
+        lastname: '',
+        username: userId.toString(),
+        password: '',
+        preferredname: '',
+        orcid: '',
+        orcid_refreshtoken: '',
+        gender: '',
         nationality: 1,
-        birthdate: "2000-01-01",
+        birthdate: '2000-01-01',
         organisation: 1,
-        department: "",
-        position: "",
-        email: user_id.toString(),
-        telephone: "",
-        telephone_alt: "",
+        department: '',
+        position: '',
+        email: userId.toString(),
+        telephone: '',
+        telephone_alt: '',
       })
       .returning(['*'])
       .into('users')
@@ -360,10 +356,9 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
 
         return createUserObject(user[0]);
-      })
+      });
   }
-  
-  
+
   async getUsers(
     filter?: string,
     first?: number,

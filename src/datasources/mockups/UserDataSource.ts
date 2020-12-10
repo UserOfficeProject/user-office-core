@@ -280,7 +280,7 @@ export class UserDataSourceMock implements UserDataSource {
     return dummyUser;
   }
 
-  async createDummyUser(user_id: number): Promise<User> {
+  async createDummyUser(userId: number): Promise<User> {
     return dummyUser;
   }
 }
