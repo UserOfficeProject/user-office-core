@@ -6,13 +6,12 @@ import {
 import { Answer } from '../../models/Questionary';
 import { Sample, SampleStatus } from '../../models/Sample';
 import { UserWithRole } from '../../models/User';
-import { getFileAttachmentIds } from './util';
+import { getFileAttachmentIds } from '../util';
 
 export type SamplePDFData = {
   sample: Sample & { status: string };
   sampleQuestionaryFields: Answer[];
   attachmentIds: string[];
-  filename: string;
 };
 
 const getHumanReadableStatus = (safetyStatus: SampleStatus): string => {
@@ -32,7 +31,8 @@ const getHumanReadableStatus = (safetyStatus: SampleStatus): string => {
 
 export async function collectSamplePDFData(
   sampleId: number,
-  user: UserWithRole
+  user: UserWithRole,
+  notify?: CallableFunction
 ): Promise<SamplePDFData> {
   const sample = await baseContext.queries.sample.getSample(user, sampleId);
   if (!sample) {
@@ -40,6 +40,8 @@ export async function collectSamplePDFData(
       `Sample with ID '${sampleId}' not found, or the user has insufficient rights`
     );
   }
+
+  notify?.(`sample_${sample.id}.pdf`);
 
   const questionary = await baseContext.queries.questionary.getQuestionary(
     user,
@@ -86,7 +88,7 @@ export async function collectSamplePDFData(
       status, //  human readable version of status
     },
     sampleQuestionaryFields: completedFields,
-    filename: `sample_${sample.id}.pdf`,
+
     attachmentIds,
   };
 

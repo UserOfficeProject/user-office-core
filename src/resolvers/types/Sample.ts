@@ -26,6 +26,12 @@ export class Sample implements Partial<SampleOrigin> {
   @Field(() => Int)
   public questionaryId: number;
 
+  @Field(() => Int)
+  public proposalId: number;
+
+  @Field()
+  public questionId: string;
+
   @Field(() => SampleStatus)
   public safetyStatus: SampleStatus;
 

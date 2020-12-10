@@ -19,12 +19,6 @@ const ProposalSettingsQueriesInstance = new ProposalSettingsQueries(
 );
 
 describe('Test Proposal Statuses Queries', () => {
-  test('A user cannot query all Proposal Statuses', () => {
-    return expect(
-      ProposalSettingsQueriesInstance.getAllProposalStatuses(dummyUserWithRole)
-    ).resolves.toBe(null);
-  });
-
   test('A userofficer can get all Proposal Statuses', () => {
     return expect(
       ProposalSettingsQueriesInstance.getAllProposalStatuses(

@@ -1,11 +1,11 @@
 import {
   Args,
-  Ctx,
-  Mutation,
-  Resolver,
   ArgsType,
+  Ctx,
   Field,
   Int,
+  Mutation,
+  Resolver,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -14,26 +14,29 @@ import { SampleResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class UpdateSampleSafetyReviewArgs {
+export class UpdateSampleArgs {
   @Field(() => Int)
-  public id: number;
+  sampleId: number;
 
-  @Field(() => SampleStatus)
-  public safetyStatus: SampleStatus;
+  @Field(() => String, { nullable: true })
+  title?: string;
 
-  @Field()
-  public safetyComment: string;
+  @Field(() => String, { nullable: true })
+  safetyComment?: string;
+
+  @Field(() => SampleStatus, { nullable: true })
+  safetyStatus?: SampleStatus;
 }
 
 @Resolver()
-export class UpdateSampleSafetyReview {
+export class UpdateSampleMutation {
   @Mutation(() => SampleResponseWrap)
-  updateSampleSafetyReview(
-    @Args() args: UpdateSampleSafetyReviewArgs,
+  updateSample(
+    @Args() args: UpdateSampleArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sample.updateSampleSafetyReview(context.user, args),
+      context.mutations.sample.updateSample(context.user, args),
       SampleResponseWrap
     );
   }

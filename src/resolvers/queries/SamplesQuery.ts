@@ -4,9 +4,9 @@ import {
   Ctx,
   Field,
   InputType,
+  Int,
   Query,
   Resolver,
-  Int,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -29,6 +29,12 @@ class SamplesFilter {
 
   @Field(() => SampleStatus, { nullable: true })
   public status?: SampleStatus;
+
+  @Field(() => String, { nullable: true })
+  public questionId?: string;
+
+  @Field(() => Int, { nullable: true })
+  public proposalId?: number;
 }
 
 @ArgsType()

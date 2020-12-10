@@ -34,9 +34,10 @@ export const textInputDefinition: Question = {
     config.max = null;
     config.multiline = false;
     config.placeholder = '';
+    config.isCounterHidden = false;
 
     return config;
   },
   isReadOnly: false,
-  defaultAnswer: '',
+  getDefaultAnswer: () => '',
 };

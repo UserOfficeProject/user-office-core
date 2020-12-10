@@ -14,7 +14,7 @@ export class ProposalView {
     public technicalStatus: TechnicalReviewStatus,
     public instrumentName: string,
     public callShortCode: string,
-    public sepShortCode: string,
+    public sepCode: string,
     public reviewAverage: number,
     public reviewDeviation: number,
     public instrumentId: number,

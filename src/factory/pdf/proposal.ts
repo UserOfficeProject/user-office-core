@@ -10,8 +10,8 @@ import { TechnicalReview } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
 import { isRejection } from '../../rejection';
+import { getFileAttachmentIds } from '../util';
 import { collectSamplePDFData, SamplePDFData } from './sample';
-import { getFileAttachmentIds } from './util';
 
 type ProposalPDFData = {
   proposal: Proposal;
@@ -21,7 +21,6 @@ type ProposalPDFData = {
   attachmentIds: string[];
   technicalReview?: TechnicalReview;
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
-  filename: string;
 };
 
 const getTopicActiveAnswers = (
@@ -78,13 +77,14 @@ const collectSubtemplateData = async (answer: Answer) => {
 
 export const collectProposalPDFData = async (
   proposalId: number,
-  user: UserWithRole
+  user: UserWithRole,
+  notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
-  const UserAuthorization = baseContext.userAuthorization;
+  const userAuthorization = baseContext.userAuthorization;
   const proposal = await baseContext.queries.proposal.get(user, proposalId);
 
   // Authenticate user
-  if (!proposal || !UserAuthorization.hasAccessRights(user, proposal)) {
+  if (!proposal || !userAuthorization.hasAccessRights(user, proposal)) {
     throw new Error('User was not allowed to download PDF');
   }
 
@@ -129,6 +129,12 @@ export const collectProposalPDFData = async (
     return { sample, sampleQuestionaryFields };
   });
 
+  notify?.(
+    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
+      proposal.shortCode
+    }.pdf`
+  );
+
   const out: ProposalPDFData = {
     proposal,
     principalInvestigator,
@@ -136,9 +142,6 @@ export const collectProposalPDFData = async (
     questionarySteps: [],
     attachmentIds: [],
     samples: samplePDFData,
-    filename: `${proposal.created.getUTCFullYear()}_${
-      principalInvestigator.lastname
-    }_${proposal.shortCode}.pdf`,
   };
 
   // Information from each topic in proposal
@@ -178,7 +181,7 @@ export const collectProposalPDFData = async (
     out.attachmentIds.push(...sampleAttachmentIds);
   }
 
-  if (UserAuthorization.isReviewerOfProposal(user, proposal.id)) {
+  if (userAuthorization.isReviewerOfProposal(user, proposal.id)) {
     const technicalReview = await baseContext.queries.review.technicalReviewForProposal(
       user,
       proposal.id

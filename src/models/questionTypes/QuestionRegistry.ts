@@ -4,6 +4,7 @@ import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
 import { embellishmentDefinition } from './Embellishment';
 import { fileUploadDefinition } from './FileUpload';
+import { intervalDefinition } from './Interval';
 import { proposalBasisDefinition } from './ProposalBasis';
 import { sampleBasisDefinition } from './SampleBasis';
 import { sampleDeclarationDefinition } from './SampleDeclaration';
@@ -15,7 +16,7 @@ export interface Question {
   readonly validate: (field: QuestionTemplateRelation, value: any) => boolean;
   readonly createBlankConfig: () => any;
   readonly isReadOnly: boolean;
-  readonly defaultAnswer: any;
+  readonly getDefaultAnswer: (field: QuestionTemplateRelation) => any;
 }
 
 // Add new component definitions here
@@ -29,6 +30,7 @@ const registry = [
   sampleDeclarationDefinition,
   proposalBasisDefinition,
   sampleBasisDefinition,
+  intervalDefinition,
 ];
 
 Object.freeze(registry);
@@ -67,8 +69,12 @@ export function createConfig<T>(
 /**
  * Convenience function to get default value for datatype
  */
-export function getDefaultAnswerValue(dataType: DataType): any {
-  const definition = getQuestionDefinition(dataType);
+export function getDefaultAnswerValue(
+  questionTemplateRelation: QuestionTemplateRelation
+): any {
+  const definition = getQuestionDefinition(
+    questionTemplateRelation.question.dataType
+  );
 
-  return definition.defaultAnswer;
+  return definition.getDefaultAnswer(questionTemplateRelation);
 }

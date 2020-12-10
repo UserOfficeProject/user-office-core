@@ -7,9 +7,9 @@ import 'reflect-metadata';
 import { startAsyncJobs } from './src/asyncJobs/startAsyncJobs';
 import authorization from './src/middlewares/authorization';
 import exceptionHandler from './src/middlewares/exceptionHandler';
+import factory from './src/middlewares/factory';
 import files from './src/middlewares/files';
 import apolloServer from './src/middlewares/graphql';
-import pdfFactory from './src/middlewares/pdfFactory';
 import { logger } from './src/utils/Logger';
 
 async function bootstrap() {
@@ -20,7 +20,7 @@ async function bootstrap() {
     .use(cookieParser())
     .use(authorization())
     .use(files())
-    .use(pdfFactory())
+    .use(factory())
     .use(exceptionHandler());
 
   await apolloServer(app);

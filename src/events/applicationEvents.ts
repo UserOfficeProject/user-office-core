@@ -1,6 +1,8 @@
 import { Call } from '../models/Call';
+import { CallHasInstrument } from '../models/Instrument';
 import { Proposal, ProposalIds } from '../models/Proposal';
 import { Review } from '../models/Review';
+import { Sample } from '../models/Sample';
 import { SEP } from '../models/SEP';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
@@ -25,6 +27,11 @@ interface ProposalSubmittedEvent extends GeneralEvent {
 
 interface ProposalFeasibleEvent extends GeneralEvent {
   type: Event.PROPOSAL_FEASIBLE;
+  proposal: Proposal;
+}
+
+interface ProposalSampleSafeEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SAMPLE_SAFE;
   proposal: Proposal;
 }
 
@@ -61,7 +68,7 @@ interface ProposalSEPReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED;
-  proposal: Proposal;
+  sample: Sample;
 }
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
@@ -76,7 +83,7 @@ interface ProposalSEPSelectedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
-  proposal: Proposal;
+  callhasinstrument: CallHasInstrument;
 }
 
 interface ProposalSEPMeetingSubmittedEvent extends GeneralEvent {
@@ -139,11 +146,6 @@ interface SEPMembersAssignedEvent extends GeneralEvent {
   sep: SEP;
 }
 
-interface SEPProposalAssignedEvent extends GeneralEvent {
-  type: Event.SEP_PROPOSAL_ASSIGNED;
-  sep: SEP;
-}
-
 interface SEPMemberAssignedToProposalEvent extends GeneralEvent {
   type: Event.SEP_MEMBER_ASSIGNED_TO_PROPOSAL;
   sep: SEP;
@@ -184,6 +186,7 @@ export type ApplicationEvent =
   | ProposalUpdatedEvent
   | ProposalSubmittedEvent
   | ProposalFeasibleEvent
+  | ProposalSampleSafeEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
   | UserCreateEvent
@@ -194,7 +197,6 @@ export type ApplicationEvent =
   | SEPCreatedEvent
   | SEPUpdatedEvent
   | SEPMembersAssignedEvent
-  | SEPProposalAssignedEvent
   | SEPProposalRemovedEvent
   | SEPMemberRemovedEvent
   | SEPMemberAssignedToProposalEvent

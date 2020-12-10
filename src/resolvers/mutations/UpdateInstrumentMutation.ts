@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { isRejection } from '../../rejection';
 import {
   InstrumentResponseWrap,
   SuccessResponseWrap,
@@ -86,8 +87,13 @@ export class UpdateInstrumentMutation {
     @Args() args: InstrumentSubmitArgs,
     @Ctx() context: ResolverContext
   ) {
+    const res = await context.mutations.instrument.submitInstrument(
+      context.user,
+      args
+    );
+
     return wrapResponse(
-      context.mutations.instrument.submitInstrument(context.user, args),
+      isRejection(res) ? Promise.resolve(res) : Promise.resolve(true),
       SuccessResponseWrap
     );
   }

@@ -14,7 +14,11 @@ import {
 } from '../datasources';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
-import { DataType, TemplateCategoryId } from '../models/Template';
+import {
+  DataType,
+  TemplateCategoryId,
+  TemplatesHasQuestions,
+} from '../models/Template';
 import { UserRole } from '../models/User';
 import * as dummy from './dummy';
 import { execute } from './executor';
@@ -111,7 +115,7 @@ const createUsers = async () => {
 };
 
 const createCalls = async () => {
-  const calls = await execute(() => {
+  await execute(() => {
     return callDataSource.create({
       cycleComment: faker.random.words(5),
       startCall: faker.date.past(1),
@@ -144,7 +148,10 @@ const createTemplates = async () => {
   for (const template of templates) {
     await execute(() => {
       return templateDataSource.createTopic({
-        sortOrder: 0,
+        sortOrder: faker.random.number({
+          min: 0,
+          max: 100,
+        }),
         templateId: template.templateId,
       });
     }, dummy.positiveNumber(5));
@@ -170,12 +177,17 @@ const createTemplates = async () => {
       }, 10);
 
       for (const question of questions) {
-        await templateDataSource.createQuestionTemplateRelation({
-          questionId: question.proposalQuestionId,
-          sortOrder: 0,
-          templateId: template.templateId,
-          topicId: step.topic.id,
-        });
+        await templateDataSource.upsertQuestionTemplateRelations([
+          {
+            questionId: question.proposalQuestionId,
+            sortOrder: faker.random.number({
+              min: 0,
+              max: 100,
+            }),
+            templateId: template.templateId,
+            topicId: step.topic.id,
+          } as TemplatesHasQuestions,
+        ]);
       }
     }
   }

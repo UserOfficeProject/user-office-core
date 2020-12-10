@@ -180,6 +180,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             filter?.instrumentId
           );
         }
+
+        if (filter?.proposalStatusId) {
+          query.where(
+            'proposal_table_view.proposal_status_id',
+            filter?.proposalStatusId
+          );
+        }
       })
       .then((proposals: ProposalViewRecord[]) => {
         return proposals.map(proposal => createProposalViewObject(proposal));
@@ -227,6 +234,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               'instrument_has_proposals.instrument_id',
               filter.instrumentId
             );
+        }
+
+        if (filter?.proposalStatusId) {
+          query.where('proposals.status_id', filter?.proposalStatusId);
         }
 
         if (first) {
@@ -278,6 +289,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             'instrument_has_proposals.instrument_id',
             filter.instrumentId
           );
+        }
+
+        if (filter?.proposalStatusId) {
+          query.where('proposals.status_id', filter?.proposalStatusId);
         }
 
         if (first) {

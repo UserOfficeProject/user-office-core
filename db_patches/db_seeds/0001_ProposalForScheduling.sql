@@ -9,7 +9,44 @@ BEGIN
 
   INSERT INTO questionaries(questionary_id, template_id, created_at, creator_id) VALUES (1, 1, NOW(), 1);
 
-  INSERT INTO proposals (proposal_id, title, abstract, status_id, proposer_id, created_at, updated_at, short_code, rank_order, final_status, sep_id, call_id, questionary_id, comment_for_management, comment_for_user, notified, submitted) VALUES (1, 'Test proposal', 'Lorem ipsum', 8, 1, NOW(), NOW(), '999999', NULL, 1, NULL, 1, 1, NULL, NULL, true, true);
+  INSERT INTO proposals 
+    (
+       proposal_id
+     , title
+     , abstract
+     , status_id
+     , proposer_id
+     , created_at
+     , updated_at
+     , short_code
+     , rank_order
+     , final_status
+     , call_id
+     , questionary_id
+     , comment_for_management
+     , comment_for_user
+     , notified
+     , submitted
+    )
+    VALUES 
+    (
+       1                  -- proposal_id
+     , 'Test proposal'    -- title
+     , 'Lorem ipsum'      -- abstract
+     , 8                  -- status_id
+     , 1                  -- proposer_id
+     , NOW()              -- created_at
+     , NOW()              -- updated_at
+     , '999999'           -- short_code
+     , NULL               -- rank_order
+     , 1                  -- final_status
+     , 1                  -- call_id
+     , 1                  -- questionary_id
+     , NULL               -- comment_for_management
+     , NULL               -- comment_for_user
+     , true               -- notified
+     , true               -- submitted
+    );
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_id) VALUES (1, 1);
 

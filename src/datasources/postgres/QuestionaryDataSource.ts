@@ -23,30 +23,6 @@ import {
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
-  async deleteAnswerQuestionaryRelations(
-    answerId: number
-  ): Promise<AnswerBasic> {
-    return database('answer_has_questionaries')
-      .delete('*')
-      .where({ answer_id: answerId })
-      .then((records: QuestionaryRecord[]) => {
-        return this.getAnswer(answerId);
-      });
-  }
-  async createAnswerQuestionaryRelations(
-    answerId: number,
-    questionaryIds: number[]
-  ): Promise<AnswerBasic> {
-    const rows = questionaryIds.map(questionaryId => {
-      return { answer_id: answerId, questionary_id: questionaryId };
-    });
-
-    return database('answer_has_questionaries')
-      .insert(rows)
-      .then(async () => {
-        return this.getAnswer(answerId);
-      });
-  }
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
     return database('answers')
       .select('*')
@@ -56,28 +32,6 @@ export default class PostgresQuestionaryDataSource
       });
   }
 
-  getParentQuestionary(
-    child_questionary_id: number
-  ): Promise<Questionary | null> {
-    const subQuery = database('answer_has_questionaries')
-      .select('answer_id')
-      .where({ questionary_id: child_questionary_id });
-
-    const subQuery2 = database('answers')
-      .select('questionary_id')
-      .whereIn('answer_id', subQuery);
-
-    return database('questionaries')
-      .select('*')
-      .whereIn('questionary_id', subQuery2)
-      .then((rows: QuestionaryRecord[]) => {
-        if (rows.length !== 1) {
-          return null;
-        }
-
-        return createQuestionaryObject(rows[0]);
-      });
-  }
   create(creator_id: number, template_id: number): Promise<Questionary> {
     return database('questionaries')
       .insert({ template_id, creator_id }, '*')
@@ -289,8 +243,7 @@ export default class PostgresQuestionaryDataSource
         record
       );
       const value =
-        record.value?.value ||
-        getDefaultAnswerValue(questionTemplateRelation.question.dataType);
+        record.value?.value || getDefaultAnswerValue(questionTemplateRelation);
 
       return new Answer(record.answer_id, questionTemplateRelation, value);
     });
