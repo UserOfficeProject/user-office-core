@@ -1,4 +1,5 @@
 import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
 import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
@@ -22,6 +23,10 @@ const useStyles = makeStyles(theme => ({
     height: '100%',
     fontSize: '17px',
     padding: '0px 5px',
+  },
+  label: {
+    marginTop: '10px',
+    marginRight: '5px',
   },
   smallLabel: {
     fontSize: '12px',
@@ -97,10 +102,10 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
   };
 
   return (
-    <FormControl error={isError}>
+    <FormControl error={isError} required={config.required ? true : false}>
       <Grid container className={classes.container}>
         <Grid item xs={12}>
-          {question}
+          <FormLabel className={classes.label}>{question}</FormLabel>
           {config.small_label ? (
             <div className={classes.smallLabel}>{config.small_label}</div>
           ) : null}
