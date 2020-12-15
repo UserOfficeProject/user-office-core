@@ -8,12 +8,11 @@ import {
   TemplateStep,
   Topic,
   TemplateCategoryId,
+  TemplatesHasQuestions,
 } from '../models/Template';
-import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
-import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
@@ -51,16 +50,18 @@ export interface TemplateDataSource {
   getComplementaryQuestions(templateId: number): Promise<Question[] | null>;
 
   // TemplateField rel
-  createQuestionTemplateRelation(
-    args: CreateQuestionTemplateRelationArgs
-  ): Promise<Template>;
   getQuestionTemplateRelation(
     questionId: string,
     templateId: number
   ): Promise<QuestionTemplateRelation | null>;
+  getQuestionTemplateRelations(
+    templateId: number,
+    topicId: number,
+    questionToExcludeId?: string
+  ): Promise<TemplatesHasQuestions[] | null>;
 
-  updateQuestionTemplateRelation(
-    args: UpdateQuestionTemplateRelationArgs
+  upsertQuestionTemplateRelations(
+    collection: TemplatesHasQuestions[]
   ): Promise<Template>;
 
   deleteQuestionTemplateRelation(
@@ -68,14 +69,14 @@ export interface TemplateDataSource {
   ): Promise<Template>;
 
   // Topic
+  getTopics(
+    templateId: number,
+    topicToExcludeId?: number
+  ): Promise<Topic[] | null>;
+  upsertTopics(data: Topic[]): Promise<Template>;
   createTopic(args: CreateTopicArgs): Promise<Topic>;
-  updateTopic(
-    topicId: number,
-    values: { title?: string; isEnabled?: boolean; sortOrder?: number }
-  ): Promise<Topic>;
+  updateTopicTitle(topicId: number, title: string): Promise<Topic>;
   deleteTopic(id: number): Promise<Topic>;
-
-  updateTopicOrder(topicOrder: number[]): Promise<number[]>;
 
   isNaturalKeyPresent(naturalKey: string): Promise<boolean>;
 }

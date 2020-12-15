@@ -19,5 +19,5 @@ export const proposalBasisDefinition: Question = {
     return config;
   },
   isReadOnly: true,
-  defaultAnswer: null,
+  getDefaultAnswer: () => null,
 };

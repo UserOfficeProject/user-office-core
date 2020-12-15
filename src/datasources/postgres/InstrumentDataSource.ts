@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
+  CallHasInstrument,
   Instrument,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
@@ -13,6 +14,7 @@ import {
   UserRecord,
   createBasicUserObject,
   InstrumentWithAvailabilityTimeRecord,
+  CallHasInstrumentRecord,
 } from './records';
 
 export default class PostgresInstrumentDataSource
@@ -396,19 +398,31 @@ export default class PostgresInstrumentDataSource
   async submitInstrument(
     callId: number,
     instrumentId: number
-  ): Promise<boolean> {
-    const result = await database('call_has_instruments')
-      .update({
-        submitted: true,
-      })
+  ): Promise<CallHasInstrument> {
+    const [record]: CallHasInstrumentRecord[] = await database(
+      'call_has_instruments'
+    )
+      .update(
+        {
+          submitted: true,
+        },
+        ['*']
+      )
       .where('instrument_id', instrumentId)
       .andWhere('call_id', callId);
 
-    if (result) {
-      return true;
-    } else {
-      return false;
+    if (!record) {
+      throw new Error(
+        `Record call_has_instruments not found with callId: ${callId} and instrumentId: ${instrumentId}`
+      );
     }
+
+    return new CallHasInstrument(
+      record.call_id,
+      record.instrument_id,
+      record.availability_time,
+      record.submitted
+    );
   }
 
   hasInstrumentScientistInstrument(

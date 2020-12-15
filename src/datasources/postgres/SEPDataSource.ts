@@ -191,11 +191,19 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .select(['sp.*'])
       .from('SEP_Proposals as sp')
       .modify(query => {
-        if (callId) {
-          query.join('proposals as p', {
+        query
+          .join('proposals as p', {
             'p.proposal_id': 'sp.proposal_id',
-            'p.call_id': callId,
+          })
+          .join('proposal_statuses as ps', {
+            'p.status_id': 'ps.proposal_status_id',
+          })
+          .where(function() {
+            this.where('ps.name', 'ilike', 'SEP_%');
           });
+
+        if (callId) {
+          query.andWhere('p.call_id', callId);
         }
       })
       .where('sp.sep_id', sepId);
@@ -220,8 +228,12 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         'p.proposal_id': 'sp.proposal_id',
         'p.call_id': callId,
       })
+      .join('proposal_statuses as ps', {
+        'p.status_id': 'ps.proposal_status_id',
+      })
       .where('sp.sep_id', sepId)
-      .andWhere('ihp.instrument_id', instrumentId);
+      .andWhere('ihp.instrument_id', instrumentId)
+      .andWhere('ps.name', 'ilike', 'SEP_%');
 
     return sepProposals.map(sepProposal =>
       this.createSEPProposalObject(sepProposal)

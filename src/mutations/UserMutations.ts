@@ -183,27 +183,35 @@ export default class UserMutations {
         return rejection('INTERNAL_ERROR');
       }
       user = updatedUser;
+    } else if (user) {
+      return rejection('ACCOUNT_EXIST');
     } else {
-      user = (await this.dataSource.create(
-        args.user_title,
-        args.firstname,
-        args.middlename,
-        args.lastname,
-        `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
-        hash,
-        args.preferredname,
-        args.orcid,
-        args.refreshToken,
-        args.gender,
-        args.nationality,
-        args.birthdate,
-        organisationId,
-        args.department,
-        args.position,
-        args.email,
-        args.telephone,
-        args.telephone_alt
-      )) as UserWithRole;
+      try {
+        user = (await this.dataSource.create(
+          args.user_title,
+          args.firstname,
+          args.middlename,
+          args.lastname,
+          `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
+          hash,
+          args.preferredname,
+          args.orcid,
+          args.refreshToken,
+          args.gender,
+          args.nationality,
+          args.birthdate,
+          organisationId,
+          args.department,
+          args.position,
+          args.email,
+          args.telephone,
+          args.telephone_alt
+        )) as UserWithRole;
+      } catch (err) {
+        if ('code' in err && err.code === '23505') {
+          return rejection('ACCOUNT_EXIST');
+        }
+      }
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
@@ -256,6 +264,10 @@ export default class UserMutations {
     if (!user) {
       return rejection('INTERNAL_ERROR');
     }
+
+    delete args.orcid;
+    delete args.refreshToken;
+
     user = {
       ...user,
       ...args,

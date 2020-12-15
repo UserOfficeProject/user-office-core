@@ -26,5 +26,5 @@ export const booleanDefinition: Question = {
     return config;
   },
   isReadOnly: false,
-  defaultAnswer: false,
+  getDefaultAnswer: () => false,
 };

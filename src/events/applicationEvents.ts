@@ -1,4 +1,5 @@
 import { Call } from '../models/Call';
+import { CallHasInstrument } from '../models/Instrument';
 import { Proposal, ProposalIds } from '../models/Proposal';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
@@ -82,7 +83,7 @@ interface ProposalSEPSelectedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
-  proposal: Proposal;
+  callhasinstrument: CallHasInstrument;
 }
 
 interface ProposalSEPMeetingSubmittedEvent extends GeneralEvent {
@@ -145,11 +146,6 @@ interface SEPMembersAssignedEvent extends GeneralEvent {
   sep: SEP;
 }
 
-interface SEPProposalAssignedEvent extends GeneralEvent {
-  type: Event.SEP_PROPOSAL_ASSIGNED;
-  sep: SEP;
-}
-
 interface SEPMemberAssignedToProposalEvent extends GeneralEvent {
   type: Event.SEP_MEMBER_ASSIGNED_TO_PROPOSAL;
   sep: SEP;
@@ -201,7 +197,6 @@ export type ApplicationEvent =
   | SEPCreatedEvent
   | SEPUpdatedEvent
   | SEPMembersAssignedEvent
-  | SEPProposalAssignedEvent
   | SEPProposalRemovedEvent
   | SEPMemberRemovedEvent
   | SEPMemberAssignedToProposalEvent

@@ -1,11 +1,11 @@
 import { ResourceId } from '@esss-swap/duo-localisation';
-import * as yup from 'yup';
+import * as Yup from 'yup';
 
 import { UserWithRole } from '../models/User';
 import { Rejection, rejection } from '../rejection';
 import { logger } from '../utils/Logger';
 
-const schemaValidation = async (schema: yup.ObjectSchema, inputArgs: any) => {
+const schemaValidation = async (schema: Yup.ObjectSchema, inputArgs: any) => {
   try {
     await schema.validate(inputArgs, { abortEarly: false });
   } catch (error) {
@@ -15,7 +15,7 @@ const schemaValidation = async (schema: yup.ObjectSchema, inputArgs: any) => {
   return null;
 };
 
-const ValidateArgs = (schema: yup.ObjectSchema) => {
+const ValidateArgs = (schema: Yup.ObjectSchema) => {
   return (
     target: object,
     name: string,
@@ -36,6 +36,7 @@ const ValidateArgs = (schema: yup.ObjectSchema) => {
       if (errors) {
         if (process.env.NODE_ENV === 'development') {
           logger.logError(`Input validation errors: ${errors}`, {
+            errors: errors.errors,
             inputArgs,
           });
         }

@@ -34,6 +34,7 @@ describe('Test Proposal settings mutations', () => {
       ProposalSettingsMutationsInstance.createProposalStatus(
         dummyUserOfficerWithRole,
         {
+          shortCode: 'Test',
           name: 'Test',
           description: 'This is some small description',
         }
@@ -88,7 +89,7 @@ describe('Test Proposal settings mutations', () => {
 
   test('A userofficer can not create proposal workflow with bad input arguments', () => {
     return expect(
-      ProposalSettingsMutationsInstance.createProposalStatus(
+      ProposalSettingsMutationsInstance.createProposalWorkflow(
         dummyUserOfficerWithRole,
         {
           name: '',

@@ -28,5 +28,5 @@ export const fileUploadDefinition: Question = {
     return config;
   },
   isReadOnly: false,
-  defaultAnswer: [],
+  getDefaultAnswer: () => [],
 };
