@@ -373,24 +373,15 @@ export default class UserMutations {
     try {
       const client = new UOWSSoapClient();
 
-      let stfcUser;
-      try {
-        const rawStfcUser = await client.getPersonDetailsFromSessionId(
-          externalToken
-        );
-        if (!rawStfcUser) {
-          logger.logInfo('User not found for token', { externalToken });
+      const rawStfcUser = await client.getPersonDetailsFromSessionId(
+        externalToken
+      );
+      if (!rawStfcUser) {
+        logger.logInfo('User not found for token', { externalToken });
 
-          return rejection('USER_DOES_NOT_EXIST');
-        }
-        stfcUser = rawStfcUser.return;
-      } catch (error) {
-        logger.logError('Error while connecting to UserOfficeWebService', {
-          error,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection('USER_DOES_NOT_EXIST');
       }
+      const stfcUser = rawStfcUser.return;
 
       // Create dummy user if one does not exist in the proposals DB.
       // This is needed to satisfy the FOREIGN_KEY constraints
