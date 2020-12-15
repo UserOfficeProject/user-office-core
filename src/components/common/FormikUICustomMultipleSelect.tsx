@@ -4,7 +4,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-import { FormikActions } from 'formik';
+import { FormikHelpers } from 'formik';
 import React from 'react';
 
 const FormikUICustomMultipleSelect = ({
@@ -22,7 +22,7 @@ const FormikUICustomMultipleSelect = ({
     onChange: Function;
     value: string[];
   };
-  form: FormikActions<any>;
+  form: FormikHelpers<any>;
   availableOptions: string[];
   id: string;
   label: string;
@@ -59,7 +59,7 @@ const FormikUICustomMultipleSelect = ({
         id={id}
         {...props}
       >
-        {availableOptions.map(curOption => (
+        {(availableOptions || []).map(curOption => (
           <MenuItem key={curOption} value={curOption}>
             <Checkbox
               checked={field.value && field.value.indexOf(curOption) > -1}

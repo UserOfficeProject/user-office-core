@@ -23,7 +23,7 @@ export const QuestionProposalBasisForm: FormComponent<Question> = props => {
         question: Yup.string().required('Question is required'),
       })}
     >
-      {formikProps => (
+      {() => (
         <>
           <Field
             name="naturalKey"

@@ -80,6 +80,16 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     addRowButton: {
       float: 'right',
     },
+    groupTitle: {
+      padding: '5px',
+      color: theme.palette.grey[500],
+    },
+    nextStatusEvents: {
+      textAlign: 'center',
+      display: 'block',
+      padding: '2px 0',
+      color: theme.palette.grey[500],
+    },
   }))();
 
   const getItemStyle = (
@@ -168,7 +178,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     proposalWorkflowConnection: ProposalWorkflowConnection
   ) =>
     proposalWorkflowConnection.proposalStatus.id === 1 &&
-    proposalWorkflowConnection.proposalStatus.name === 'DRAFT';
+    proposalWorkflowConnection.proposalStatus.shortCode === 'DRAFT';
 
   const getConnectionGroupItems = (
     connections: ProposalWorkflowConnection[]
@@ -176,61 +186,70 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     return connections.map((proposalWorkflowConnection, index) => {
       return (
         <Draggable
-          key={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.name}`}
-          draggableId={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.name}`}
+          key={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.shortCode}`}
+          draggableId={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.shortCode}`}
           index={index}
           isDragDisabled={true}
         >
           {(provided, snapshot) => (
-            <Grid
-              item
-              xs={12}
-              data-cy={`connection_${proposalWorkflowConnection.proposalStatus.name}_${proposalWorkflowConnection.proposalStatus.id}`}
-              ref={provided.innerRef}
-              {...provided.draggableProps}
-              {...provided.dragHandleProps}
-              style={getItemStyle(
-                snapshot.isDragging,
-                provided.draggableProps.style
-              )}
-              className={classes.item}
-              onClick={() => {
-                if (proposalWorkflowConnection.nextProposalStatusId) {
-                  setWorkflowConnection(proposalWorkflowConnection);
-                }
-              }}
-            >
-              {!isDraftStatus(proposalWorkflowConnection) && (
-                <DialogActions className={classes.dialogActions}>
-                  <IconButton
-                    size="small"
-                    className={classes.removeButton}
-                    data-cy="remove-workflow-status-button"
-                    onClick={e => {
-                      e.stopPropagation();
-                      dispatch({
-                        type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
-                        payload: {
-                          source: {
-                            index,
-                            droppableId:
-                              proposalWorkflowConnection.droppableGroupId,
+            <>
+              <Grid
+                item
+                xs={12}
+                data-cy={`connection_${proposalWorkflowConnection.proposalStatus.shortCode}_${proposalWorkflowConnection.proposalStatus.id}`}
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                style={getItemStyle(
+                  snapshot.isDragging,
+                  provided.draggableProps.style
+                )}
+                className={classes.item}
+                onClick={() => {
+                  if (proposalWorkflowConnection.nextProposalStatusId) {
+                    setWorkflowConnection(proposalWorkflowConnection);
+                  }
+                }}
+              >
+                {!isDraftStatus(proposalWorkflowConnection) && (
+                  <DialogActions className={classes.dialogActions}>
+                    <IconButton
+                      size="small"
+                      className={classes.removeButton}
+                      data-cy="remove-workflow-status-button"
+                      onClick={e => {
+                        e.stopPropagation();
+                        dispatch({
+                          type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
+                          payload: {
+                            source: {
+                              index,
+                              droppableId:
+                                proposalWorkflowConnection.droppableGroupId,
+                            },
                           },
-                        },
-                      });
-                    }}
-                  >
-                    <Delete />
-                  </IconButton>
-                </DialogActions>
+                        });
+                      }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </DialogActions>
+                )}
+                <Box fontSize="1rem">
+                  {proposalWorkflowConnection.proposalStatus.name}
+                </Box>
+                <Box fontSize="small" mt={1} color={theme.palette.grey[400]}>
+                  {proposalWorkflowConnection.proposalStatus.description}
+                </Box>
+              </Grid>
+              {!!proposalWorkflowConnection.nextStatusEvents?.length && (
+                <small className={classes.nextStatusEvents}>
+                  {proposalWorkflowConnection.nextStatusEvents
+                    .map(nextEventStatus => nextEventStatus.nextStatusEvent)
+                    .join(' & ')}
+                </small>
               )}
-              <Box fontSize="1rem">
-                {proposalWorkflowConnection.proposalStatus.name}
-              </Box>
-              <Box fontSize="small" mt={1} color={theme.palette.grey[400]}>
-                {proposalWorkflowConnection.proposalStatus.description}
-              </Box>
-            </Grid>
+            </>
           )}
         </Draggable>
       );
@@ -252,7 +271,9 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
               className={classes.itemContainer}
               data-cy="droppable-group"
             >
-              <small>{subGroup.groupId}</small>
+              <small className={classes.groupTitle}>
+                Workflow droppable group {subGroup.groupId.split('_')[1]}
+              </small>
               {getConnectionGroupItems(subGroup.connections)}
               {provided.placeholder}
             </Grid>
@@ -285,7 +306,11 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
               className={classes.itemContainer}
               data-cy="droppable-group"
             >
-              <small>{connectionGroup.groupId}</small>
+              {connectionGroup.subGroups.length > 0 && (
+                <small className={classes.groupTitle}>
+                  Default droppable group
+                </small>
+              )}
               {getConnectionGroupItems(connectionGroup.connections)}
               {provided.placeholder}
             </Grid>

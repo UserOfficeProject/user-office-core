@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 export function useDownloadPDFSample() {
   const downloadSamplePDF = useCallback((sampleId: number | string) => {
     const element = document.createElement('a');
-    element.setAttribute('href', '/download/sample/' + sampleId);
+    element.setAttribute('href', '/download/pdf/sample/' + sampleId);
     element.setAttribute('download', 'download');
 
     element.style.display = 'none';

@@ -28,12 +28,14 @@ function useDataApiWithFeedback() {
                 enqueueSnackbar(result.error, {
                   variant: 'error',
                   className: 'snackbar-error',
+                  autoHideDuration: 10000,
                 });
               } else {
                 successToastMessage &&
                   enqueueSnackbar(successToastMessage, {
                     variant: 'success',
                     className: 'snackbar-success',
+                    autoHideDuration: 10000,
                   });
               }
             }

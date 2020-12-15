@@ -25,7 +25,73 @@ context('Calls tests', () => {
     cy.contains('Your proposals');
   });
 
-  it('A user-officer should be able to add a call', () => {
+  it('A user-officer should not be able go to next step or create call if there is validation error', () => {
+    const shortCode = faker.random.word().split(' ')[0]; // faker random word is buggy, it ofter returns phrases
+
+    const startDate = faker.date
+      .past()
+      .toISOString()
+      .slice(0, 10);
+
+    const endDate = faker.date
+      .future()
+      .toISOString()
+      .slice(0, 10);
+
+    cy.login('officer');
+
+    cy.contains('Proposals');
+
+    cy.contains('Calls').click();
+
+    cy.contains('Create').click();
+
+    cy.get('[data-cy="next-step"]').click();
+
+    cy.get('[data-cy="short-code"] input').should('be.focused');
+    cy.get('[data-cy="short-code"] input:invalid').should('have.length', 1);
+
+    cy.get('[data-cy=short-code] input')
+      .type(shortCode)
+      .should('have.value', shortCode);
+
+    cy.get('[data-cy=start-date] input').clear();
+
+    cy.get('[data-cy="next-step"]').click();
+
+    cy.contains('Invalid Date');
+
+    cy.get('[data-cy=start-date] input')
+      .type(startDate)
+      .should('have.value', startDate);
+
+    cy.get('[data-cy=end-date] input').clear();
+    cy.get('[data-cy=end-date] input')
+      .type(endDate)
+      .should('have.value', endDate);
+
+    cy.get('[data-cy="next-step"]').click();
+
+    cy.get('[data-cy="next-step"]').click();
+
+    cy.get('[data-cy="submit"]').should('not.exist');
+
+    cy.get('[data-cy="survey-comment"] input').should('be.focused');
+    cy.get('[data-cy="survey-comment"] input:invalid').should('have.length', 1);
+
+    cy.get('[data-cy=survey-comment] input').type(
+      faker.random.word().split(' ')[0]
+    );
+
+    cy.get('[data-cy="next-step"]').click();
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.get('[data-cy="cycle-comment"] input').should('be.focused');
+    cy.get('[data-cy="cycle-comment"] input:invalid').should('have.length', 1);
+  });
+
+  it('A user-officer should be able to create a call', () => {
     const shortCode = faker.random.word().split(' ')[0]; // faker random word is buggy, it ofter returns phrases
 
     const startDate = faker.date

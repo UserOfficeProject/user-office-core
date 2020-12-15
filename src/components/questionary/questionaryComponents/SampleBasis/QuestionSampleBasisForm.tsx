@@ -27,7 +27,7 @@ export const QuestionSampleBasisForm: FormComponent<Question> = props => {
         }),
       })}
     >
-      {formikProps => (
+      {() => (
         <>
           <Field
             name="naturalKey"

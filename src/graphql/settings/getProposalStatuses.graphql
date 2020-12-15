@@ -1,7 +1,5 @@
 query getProposalStatuses {
   proposalStatuses {
-    id
-    name
-    description
+    ...proposalStatus
   }
 }

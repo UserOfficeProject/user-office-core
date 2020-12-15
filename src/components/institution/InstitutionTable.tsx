@@ -1,6 +1,10 @@
 import React from 'react';
+import { useQueryParams } from 'use-query-params';
 
-import SuperMaterialTable from 'components/common/SuperMaterialTable';
+import SuperMaterialTable, {
+  DefaultQueryParams,
+  UrlQueryParamsType,
+} from 'components/common/SuperMaterialTable';
 import { Institution } from 'generated/sdk';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { tableIcons } from 'utils/materialIcons';
@@ -16,6 +20,9 @@ const InstitutionPage: React.FC = () => {
     institutions,
     setInstitutionsWithLoading: setInstitutions,
   } = useInstitutionsData();
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
+    UrlQueryParamsType
+  >(DefaultQueryParams);
 
   const deleteInstitution = async (id: number) => {
     return await api('Institution removed successfully!')
@@ -68,6 +75,8 @@ const InstitutionPage: React.FC = () => {
           search: true,
           debounceInterval: 400,
         }}
+        urlQueryParams={urlQueryParams}
+        setUrlQueryParams={setUrlQueryParams}
       />
     </div>
   );

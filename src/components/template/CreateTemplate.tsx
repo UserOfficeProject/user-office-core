@@ -26,7 +26,7 @@ const CreateTemplate = (props: {
           name: '',
           description: '',
         }}
-        onSubmit={async values => {
+        onSubmit={async (values): Promise<void> => {
           const result = await api().createTemplate({ ...values, categoryId });
           const {
             createTemplate: { template, error },

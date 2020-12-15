@@ -1,5 +1,5 @@
-import faker from 'faker';
 import dateformat from 'dateformat';
+import faker from 'faker';
 
 context('Event log tests', () => {
   before(() => {
@@ -59,8 +59,9 @@ context('Event log tests', () => {
 
     lastPeoplePageButtonElement.click({ force: true });
 
-    cy.get('button[title="Edit user"]')
-      .eq(2)
+    cy.contains('Carlsson')
+      .parent()
+      .find('button[title="Edit user"]')
       .click();
 
     cy.get("[name='firstname']").should('have.value', newFirstName);

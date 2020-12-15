@@ -1,12 +1,11 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Formik } from 'formik';
-import React, { SyntheticEvent } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
-import { createFormikConfigObjects } from 'components/proposal/createFormikConfigObjects';
-import { QuestionaryStep } from 'generated/sdk';
+import { Answer, QuestionaryStep } from 'generated/sdk';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
@@ -19,7 +18,10 @@ import {
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
 
 import NavigationFragment from './NavigationFragment';
-import { createQuestionaryComponent } from './QuestionaryComponentRegistry';
+import {
+  createQuestionaryComponent,
+  getQuestionaryComponentDefinition,
+} from './QuestionaryComponentRegistry';
 
 const useStyles = makeStyles({
   componentWrapper: {
@@ -30,6 +32,30 @@ const useStyles = makeStyles({
     opacity: 0.7,
   },
 });
+
+export const createFormikConfigObjects = (
+  answers: Answer[],
+  state: QuestionarySubmissionState
+): { validationSchema: any; initialValues: any } => {
+  const validationSchema: any = {};
+  const initialValues: any = {};
+
+  answers.forEach(answer => {
+    const definition = getQuestionaryComponentDefinition(
+      answer.question.dataType
+    );
+    if (definition.createYupValidationSchema) {
+      validationSchema[
+        answer.question.proposalQuestionId
+      ] = definition.createYupValidationSchema(answer);
+      initialValues[
+        answer.question.proposalQuestionId
+      ] = definition.getYupInitialValue({ answer, state });
+    }
+  });
+
+  return { initialValues, validationSchema };
+};
 
 export default function QuestionaryStepView(props: {
   state: QuestionarySubmissionState;
@@ -58,7 +84,8 @@ export default function QuestionaryStepView(props: {
   }
 
   const { initialValues, validationSchema } = createFormikConfigObjects(
-    activeFields
+    activeFields,
+    state
   );
 
   return (
@@ -68,85 +95,95 @@ export default function QuestionaryStepView(props: {
       onSubmit={() => {}}
       enableReinitialize={true}
     >
-      {({
-        errors,
-        touched,
-        handleChange,
-        submitForm,
-        validateForm,
-        isSubmitting,
-      }) => (
-        <form className={props.readonly ? classes.disabled : undefined}>
-          {activeFields.map(field => {
-            return (
-              <div
-                className={classes.componentWrapper}
-                key={field.question.proposalQuestionId}
-              >
-                {createQuestionaryComponent({
-                  answer: field,
-                  touched: touched, // for formik
-                  errors: errors, // for formik
-                  onComplete: (evt: SyntheticEvent, newValue: any) => {
-                    if (field.value !== newValue) {
-                      dispatch({
-                        type: EventType.FIELD_CHANGED,
-                        payload: {
-                          id: field.question.proposalQuestionId,
-                          newValue: newValue,
-                        },
-                      });
-                      handleChange(evt);
-                    }
-                  },
-                })}
-              </div>
-            );
-          })}
-          <NavigationFragment
-            disabled={props.readonly}
-            back={{
-              callback: () => {
-                dispatch({ type: EventType.BACK_CLICKED });
-              },
-              disabled: state.stepIndex === 0,
-            }}
-            reset={{
-              callback: () => dispatch({ type: EventType.RESET_CLICKED }),
-              disabled: !state.isDirty,
-            }}
-            save={
-              questionaryStep.isCompleted
-                ? undefined
-                : {
-                    callback: () => {
-                      dispatch({
-                        type: EventType.SAVE_CLICKED,
-                        payload: { answers: activeFields, topicId: topicId },
-                      });
+      {formikProps => {
+        const {
+          handleChange,
+          submitForm,
+          validateForm,
+          setFieldValue,
+          isSubmitting,
+        } = formikProps;
+
+        return (
+          <form className={props.readonly ? classes.disabled : undefined}>
+            {activeFields.map(field => {
+              return (
+                <div
+                  className={classes.componentWrapper}
+                  key={field.question.proposalQuestionId}
+                >
+                  {createQuestionaryComponent({
+                    answer: field,
+                    formikProps,
+                    onComplete: (
+                      evt: React.ChangeEvent<any> | string,
+                      newValue: Answer['value']
+                    ) => {
+                      if (field.value !== newValue) {
+                        dispatch({
+                          type: EventType.FIELD_CHANGED,
+                          payload: {
+                            id: field.question.proposalQuestionId,
+                            newValue: newValue,
+                          },
+                        });
+
+                        if (typeof evt === 'string') {
+                          setFieldValue(evt, newValue, true);
+                        } else {
+                          handleChange(evt);
+                        }
+                      }
                     },
-                    disabled: !props.state.isDirty,
-                  }
-            }
-            saveAndNext={{
-              callback: () => {
-                submitFormAsync(submitForm, validateForm).then(
-                  (isValid: boolean) => {
-                    if (isValid) {
-                      dispatch({
-                        type: EventType.SAVE_AND_CONTINUE_CLICKED,
-                        payload: { answers: activeFields, topicId: topicId },
-                      });
+                  })}
+                </div>
+              );
+            })}
+            <NavigationFragment
+              disabled={props.readonly}
+              back={{
+                callback: () => {
+                  dispatch({ type: EventType.BACK_CLICKED });
+                },
+                disabled: state.stepIndex === 0,
+              }}
+              reset={{
+                callback: () => dispatch({ type: EventType.RESET_CLICKED }),
+                disabled: !state.isDirty,
+              }}
+              save={
+                questionaryStep.isCompleted
+                  ? undefined
+                  : {
+                      callback: () => {
+                        dispatch({
+                          type: EventType.SAVE_CLICKED,
+                          payload: { answers: activeFields, topicId: topicId },
+                        });
+                      },
+                      disabled: !props.state.isDirty,
                     }
-                  }
-                );
-              },
-            }}
-            isLoading={isSubmitting}
-          />
-          <ErrorFocus />
-        </form>
-      )}
+              }
+              saveAndNext={{
+                callback: () => {
+                  submitFormAsync(submitForm, validateForm).then(
+                    (isValid: boolean) => {
+                      if (isValid) {
+                        dispatch({
+                          type: EventType.SAVE_AND_CONTINUE_CLICKED,
+                          payload: { answers: activeFields, topicId: topicId },
+                        });
+                      }
+                    }
+                  );
+                },
+              }}
+              isLoading={isSubmitting}
+            />
+            <ErrorFocus />
+          </form>
+        );
+      }}
     </Formik>
   );
 }

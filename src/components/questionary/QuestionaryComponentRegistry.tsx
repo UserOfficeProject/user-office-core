@@ -9,11 +9,13 @@ import {
   Template,
 } from 'generated/sdk';
 import { Event } from 'models/QuestionaryEditorModel';
+import { QuestionarySubmissionState } from 'models/QuestionarySubmissionState';
 
 import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefinition';
 import { dateDefinition } from './questionaryComponents/DatePicker/DatePickerDefinition';
 import { embellishmentDefinition } from './questionaryComponents/Embellishment/EmbellishmentDefinition';
 import { fileUploadDefinition } from './questionaryComponents/FileUpload/FileUploadDefinition';
+import { intervalDefinition } from './questionaryComponents/Interval/IntervalDefinition';
 import { multipleChoiceDefinition as multiChoiceDefinition } from './questionaryComponents/MultipleChoice/MultipleChoiceDefinition';
 import { proposalBasisDefinition } from './questionaryComponents/ProposalBasis/ProposalBasisDefinition';
 import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/SampleBasisDefinition';
@@ -43,6 +45,10 @@ export interface QuestionaryComponentDefinition {
   ) => JSX.Element | null;
   readonly answerRenderer: (props: { answer: Answer }) => JSX.Element | null;
   readonly createYupValidationSchema: ((field: Answer) => object) | null;
+  readonly getYupInitialValue: (props: {
+    answer: Answer;
+    state: QuestionarySubmissionState;
+  }) => Answer['value'];
   readonly readonly: boolean; // if true then no answer will be produced
   readonly creatable: boolean; // if true then the question can be added to a questionary
   readonly icon: JSX.Element;
@@ -58,6 +64,7 @@ const registry = [
   sampleDeclarationDefinition,
   proposalBasisDefinition,
   sampleBasisDefinition,
+  intervalDefinition,
 ];
 
 Object.freeze(registry);

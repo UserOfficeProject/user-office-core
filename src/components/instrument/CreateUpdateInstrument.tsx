@@ -20,12 +20,15 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-type AddInstrumentProps = {
+type CreateUpdateInstrumentProps = {
   close: (instrumentAdded: Instrument | null) => void;
   instrument: Instrument | null;
 };
 
-const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
+const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
+  close,
+  instrument,
+}) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
@@ -40,7 +43,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (values, actions): Promise<void> => {
+      onSubmit={async (values): Promise<void> => {
         if (instrument) {
           const data = await api(
             'Instrument updated successfully!'
@@ -63,7 +66,6 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
             close(data.createInstrument.instrument);
           }
         }
-        actions.setSubmitting(false);
       }}
       validationSchema={
         instrument
@@ -131,9 +133,15 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
   );
 };
 
-AddInstrument.propTypes = {
-  instrument: PropTypes.any,
+CreateUpdateInstrument.propTypes = {
+  instrument: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    shortCode: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    scientists: PropTypes.array.isRequired,
+  }),
   close: PropTypes.func.isRequired,
 };
 
-export default AddInstrument;
+export default CreateUpdateInstrument;

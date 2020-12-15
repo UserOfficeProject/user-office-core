@@ -10,6 +10,7 @@ import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { DarkerDisabledTextField } from 'components/common/DarkerDisabledTextField';
 import UOLoader from 'components/common/UOLoader';
 import { ProposalStatus } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -35,6 +36,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
   const initialValues = proposalStatus
     ? proposalStatus
     : {
+        shortCode: '',
         name: '',
         description: '',
       };
@@ -42,7 +44,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (values, actions): Promise<void> => {
+      onSubmit={async (values): Promise<void> => {
         if (proposalStatus) {
           const data = await api(
             'Proposal status updated successfully'
@@ -65,7 +67,6 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             close(data.createProposalStatus.proposalStatus);
           }
         }
-        actions.setSubmitting(false);
       }}
       validationSchema={
         proposalStatus
@@ -79,6 +80,20 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             {proposalStatus ? 'Update' : 'Create new'} proposal status
           </Typography>
           <Field
+            name="shortCode"
+            id="shortCode"
+            label="Short code"
+            type="text"
+            component={
+              initialValues.shortCode ? DarkerDisabledTextField : TextField
+            }
+            margin="normal"
+            fullWidth
+            data-cy="shortCode"
+            required
+            disabled={!!initialValues.shortCode || isExecutingCall}
+          />
+          <Field
             name="name"
             id="name"
             label="Name"
@@ -88,6 +103,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             fullWidth
             data-cy="name"
             disabled={isExecutingCall}
+            required
           />
           <Field
             id="description"
@@ -102,6 +118,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             rows="3"
             data-cy="description"
             disabled={isExecutingCall}
+            required
           />
 
           <Button

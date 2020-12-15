@@ -19,4 +19,5 @@ export const embellishmentDefinition: QuestionaryComponentDefinition = {
   answerRenderer: () => null,
   icon: <TextFieldsIcon />,
   createYupValidationSchema: null,
+  getYupInitialValue: () => null,
 };

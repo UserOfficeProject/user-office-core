@@ -23,7 +23,7 @@ const useStyles = makeStyles({
 export default function UpdatePassword(props: { id: number }) {
   const { api } = useDataApiWithFeedback();
   const sendPasswordUpdate = (password: string) => {
-    api('Updated Password').updatePassword({ id: props.id, password });
+    return api('Updated Password').updatePassword({ id: props.id, password });
   };
 
   const classes = useStyles();
@@ -35,9 +35,8 @@ export default function UpdatePassword(props: { id: number }) {
           password: '',
           confirmPassword: '',
         }}
-        onSubmit={(values, actions) => {
-          sendPasswordUpdate(values.password);
-          actions.setSubmitting(false);
+        onSubmit={async (values): Promise<void> => {
+          await sendPasswordUpdate(values.password);
         }}
         validationSchema={userPasswordFieldValidationSchema}
       >

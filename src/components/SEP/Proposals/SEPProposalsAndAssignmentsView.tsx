@@ -2,7 +2,7 @@ import { MTableToolbar, Options } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import SelectedCallFilter from 'components/common/SelectedCallFilter';
+import CallFilter from 'components/common/proposalFilters/CallFilter';
 import { useCallsData } from 'hooks/call/useCallsData';
 
 import SEPProposalsAndAssignmentsTable from './SEPProposalsAndAssignmentsTable';
@@ -18,20 +18,18 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   const { loadingCalls, calls } = useCallsData();
   const [selectedCallId, setSelectedCallId] = useState<number>(0);
 
-  const Toolbar = (data: Options): JSX.Element =>
-    loadingCalls ? (
-      <div>Loading...</div>
-    ) : (
-      <>
-        <MTableToolbar {...data} />
-        <SelectedCallFilter
-          callsData={calls}
-          onChange={setSelectedCallId}
-          shouldShowAll={true}
-          callId={selectedCallId}
-        />
-      </>
-    );
+  const Toolbar = (data: Options): JSX.Element => (
+    <>
+      <MTableToolbar {...data} />
+      <CallFilter
+        calls={calls}
+        isLoading={loadingCalls}
+        onChange={setSelectedCallId}
+        shouldShowAll={true}
+        callId={selectedCallId}
+      />
+    </>
+  );
 
   return (
     <SEPProposalsAndAssignmentsTable

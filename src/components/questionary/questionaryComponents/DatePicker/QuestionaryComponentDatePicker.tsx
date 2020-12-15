@@ -1,40 +1,47 @@
 import DateFnsUtils from '@date-io/date-fns';
-import { TextField, TextFieldProps } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
+import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
 import { Field, getIn } from 'formik';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { DateConfig } from 'generated/sdk';
 
 import { BasicComponentProps } from '../../../proposal/IBasicComponentProps';
 
-function TextFieldWithTooltip(props: TextFieldProps & { title: string }) {
+function TextFieldWithTooltip({
+  title,
+  ...props
+}: TextFieldProps & { title: string }) {
   return (
-    <Tooltip title={props.title}>
+    <Tooltip title={title}>
       <TextField {...props} />
     </Tooltip>
   );
 }
 
 export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
-  const { answer: templateField, touched, errors, onComplete } = props;
+  const {
+    answer,
+    onComplete,
+    formikProps: { errors, touched },
+  } = props;
   const {
     question: { proposalQuestionId, question },
     value,
-  } = templateField;
-  const config = templateField.config as DateConfig;
+  } = answer;
+  const config = answer.config as DateConfig;
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
   const [stateValue, setStateValue] = useState(value || '');
 
   useEffect(() => {
-    setStateValue(templateField.value);
-  }, [templateField]);
+    setStateValue(answer.value);
+  }, [answer]);
 
   return (
     <FormControl error={isError}>
@@ -54,14 +61,14 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
                 label={question}
                 value={stateValue}
                 format="yyyy-MM-dd"
-                title={config.tooltip} // title prop will be passed down to TextFieldWithTooltip by KeyboardDatePicker
                 onChange={date => {
                   setStateValue(date);
-                  onComplete(null as any, date); // There is no event in the callback for DatePicker :( We, therefore, send null as event and inform Formik through setFieldValue
+                  onComplete(proposalQuestionId, date);
                   form.setFieldValue(field.name, date, false);
                 }}
-                // @ts-ignore-line // https://material-ui-pickers.dev/api/KeyboardDatePicker Any prop not recognized by the pickers and their sub-components are passed down to material-ui TextField component.
-                TextFieldComponent={TextFieldWithTooltip}
+                TextFieldComponent={props => (
+                  <TextFieldWithTooltip {...props} title={config.tooltip} />
+                )}
                 {...other}
               />
             );

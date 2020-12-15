@@ -49,18 +49,20 @@ function createSampleStub(
 }
 
 function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
-  const { answer: templateField, errors, onComplete } = props;
-  const proposalQuestionId = templateField.question.proposalQuestionId;
-  const config = templateField.config as SubtemplateConfig;
+  const {
+    answer,
+    onComplete,
+    formikProps: { errors },
+  } = props;
+  const proposalQuestionId = answer.question.proposalQuestionId;
+  const config = answer.config as SubtemplateConfig;
   const proposalContext = useContext(ProposalContext);
 
   const isError = errors[proposalQuestionId] ? true : false;
 
   const { api } = useDataApiWithFeedback();
 
-  const [stateValue, setStateValue] = useState<number[]>(
-    templateField.value || []
-  ); // ids of samples
+  const [stateValue, setStateValue] = useState<number[]>(answer.value || []); // ids of samples
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
 
@@ -77,19 +79,19 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
     };
 
     const proposalId = proposalContext.state?.proposal.id;
-    const questionId = templateField.question.proposalQuestionId;
+    const questionId = answer.question.proposalQuestionId;
 
     if (proposalId && questionId) {
       getSamples(proposalId, questionId).then(samples =>
         setRows(samples.map(sampleToListRow))
       );
     }
-  }, [templateField.question.proposalQuestionId, proposalContext.state, api]);
+  }, [answer.question.proposalQuestionId, proposalContext.state, api]);
 
   return (
     <>
       <FormControl error={isError} required={config.required} fullWidth>
-        <FormLabel error={isError}>{templateField.question.question}</FormLabel>
+        <FormLabel error={isError}>{answer.question.question}</FormLabel>
         <span>{config.small_label}</span>
 
         <QuestionariesList
@@ -114,7 +116,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
                   );
                   setStateValue(newStateValue);
                   setRows(rows.filter(row => row.id !== item.id));
-                  onComplete(null as any, newStateValue);
+                  onComplete(proposalQuestionId, newStateValue);
                 }
               });
           }}
@@ -127,7 +129,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
                   const newStateValue = [...stateValue, clonedSample.id];
                   setStateValue(newStateValue);
                   setRows([...rows, sampleToListRow(clonedSample)]);
-                  onComplete(null as any, newStateValue);
+                  onComplete(proposalQuestionId, newStateValue);
                 }
               });
           }}
@@ -192,8 +194,9 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
             }}
             sampleCreated={newSample => {
               const newStateValue = [...stateValue, newSample.id];
+
               setStateValue(newStateValue);
-              onComplete(null as any, newStateValue);
+              onComplete(proposalQuestionId, newStateValue);
 
               const newRows = [...rows, sampleToListRow(newSample)];
               setRows(newRows);

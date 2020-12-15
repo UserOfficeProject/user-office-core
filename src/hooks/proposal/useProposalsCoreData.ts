@@ -9,12 +9,27 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
   const [proposalsData, setProposalsData] = useState<ProposalViewData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const { callId, instrumentId, questionaryIds, templateIds, text } = filter;
+  const {
+    callId,
+    instrumentId,
+    proposalStatusId,
+    questionaryIds,
+    templateIds,
+    text,
+  } = filter;
 
   useEffect(() => {
+    setLoading(true);
     api()
       .getProposalsCore({
-        filter: { callId, instrumentId, questionaryIds, templateIds, text },
+        filter: {
+          callId,
+          instrumentId,
+          proposalStatusId,
+          questionaryIds,
+          templateIds,
+          text,
+        },
       })
       .then(data => {
         if (data.proposalsView) {
@@ -33,7 +48,15 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
         }
         setLoading(false);
       });
-  }, [callId, instrumentId, questionaryIds, templateIds, text, api]);
+  }, [
+    callId,
+    instrumentId,
+    proposalStatusId,
+    questionaryIds,
+    templateIds,
+    text,
+    api,
+  ]);
 
   return { loading, proposalsData, setProposalsData };
 }

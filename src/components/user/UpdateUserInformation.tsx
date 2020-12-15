@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import DateFnsUtils from '@date-io/date-fns'; // choose your lib
+import { updateUserValidationSchema } from '@esss-swap/duo-validation';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -21,7 +22,6 @@ import { useGetFields } from 'hooks/user/useGetFields';
 import orcid from 'images/orcid.png';
 import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { userFieldSchema } from 'utils/userFieldValidationSchema';
 
 const useStyles = makeStyles({
   button: {
@@ -91,14 +91,13 @@ export default function UpdateUserInformation(props: { id: number }) {
   }
 
   const sendUserUpdate = (variables: UpdateUserMutationVariables) => {
-    api('Updated Information').updateUser(variables);
+    return api('Updated Information').updateUser(variables);
   };
 
   return (
     <React.Fragment>
       <Formik
         validateOnChange={false}
-        validateOnBlur={false}
         initialValues={{
           username: userData.username,
           firstname: userData.firstname,
@@ -125,7 +124,7 @@ export default function UpdateUserInformation(props: { id: number }) {
           user_title: userData.user_title,
           orcid: userData.orcid,
         }}
-        onSubmit={(values, actions) => {
+        onSubmit={async (values, actions): Promise<void> => {
           const newValues = {
             id: props.id,
             ...values,
@@ -135,13 +134,12 @@ export default function UpdateUserInformation(props: { id: number }) {
               values.gender === 'other' ? values.othergender : values.gender,
           } as UpdateUserMutationVariables;
 
-          sendUserUpdate({
+          await sendUserUpdate({
             ...newValues,
           });
           actions.setFieldValue('oldEmail', values.email);
-          actions.setSubmitting(false);
         }}
-        validationSchema={userFieldSchema}
+        validationSchema={updateUserValidationSchema}
       >
         {({ isSubmitting, values }) => (
           <Form>

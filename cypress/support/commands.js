@@ -114,11 +114,12 @@ const createProposal = (proposalTitle = '', proposalAbstract = '') => {
 
   cy.contains('New Proposal').click();
 
-  cy.get('#title')
+  cy.get('[data-cy=title] input')
     .type(title)
     .should('have.value', title);
 
-  cy.get('#abstract')
+  cy.get('[data-cy=abstract] textarea')
+    .first()
     .type(abstract)
     .should('have.value', abstract);
 

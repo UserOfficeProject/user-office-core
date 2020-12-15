@@ -48,7 +48,7 @@ function CallsModal(props: { templateId?: number; onClose: () => void }) {
       onClose={props.onClose}
       fullWidth={true}
     >
-      <CallsList filterTemplateId={props.templateId!} />
+      <CallsList filterTemplateId={props.templateId as number} />
       <ActionButtonContainer>
         <Button variant="text" onClick={() => props.onClose()}>
           Close
@@ -57,32 +57,34 @@ function CallsModal(props: { templateId?: number; onClose: () => void }) {
     </InputDialog>
   );
 }
-type ProposalTemplateRowDataType = TemplateRowDataType & {
-  callCount: number;
-  proposalCount: number;
+export type ProposalTemplateRowDataType = TemplateRowDataType & {
+  callCount?: number;
+  proposalCount?: number;
 };
 
 function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number>();
 
+  const NumberOfCalls = (rowData: ProposalTemplateRowDataType) => (
+    <Link
+      onClick={() => {
+        setSelectedTemplateId(rowData.templateId);
+      }}
+      style={{ cursor: 'pointer' }}
+    >
+      {rowData.callCount || 0}
+    </Link>
+  );
+
   const columns: Column<ProposalTemplateRowDataType>[] = [
     { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },
-    { title: '# proposals', field: 'proposalCount' },
+    { title: '# proposals', render: rowData => rowData.proposalCount || 0 },
     {
       title: '# calls',
       field: 'callCount',
       editable: 'never',
-      render: rowData => (
-        <Link
-          onClick={() => {
-            setSelectedTemplateId(rowData.templateId);
-          }}
-          style={{ cursor: 'pointer' }}
-        >
-          {rowData.callCount}
-        </Link>
-      ),
+      render: NumberOfCalls,
     },
   ];
 

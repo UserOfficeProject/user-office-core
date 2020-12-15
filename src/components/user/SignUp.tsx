@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { userPasswordFieldValidationSchema } from '@esss-swap/duo-validation/lib/User';
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import { createUserValidationSchema } from '@esss-swap/duo-validation';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -19,7 +20,6 @@ import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
-import { ObjectSchema } from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
@@ -33,7 +33,6 @@ import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 import { useGetFields } from 'hooks/user/useGetFields';
 import { useOrcIDInformation } from 'hooks/user/useOrcIDInformation';
 import orcid from 'images/orcid.png';
-import { userFieldSchema } from 'utils/userFieldValidationSchema';
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -195,16 +194,15 @@ const SignUp: React.FC<SignUpProps> = props => {
   }
 
   const sendSignUpRequest = (values: CreateUserMutationVariables) => {
-    unauthorizedApi()
+    return unauthorizedApi()
       .createUser({
         ...values,
       })
       .then(data => {
         if (data.createUser.error) {
-          if (data.createUser.error === 'BAD_REQUEST')
-            enqueueSnackbar('Invalid input arguments', {
-              variant: 'error',
-            });
+          enqueueSnackbar(getTranslation(data.createUser.error as ResourceId), {
+            variant: 'error',
+          });
         } else {
           setUserID(data?.createUser?.user?.id as number);
         }
@@ -215,7 +213,6 @@ const SignUp: React.FC<SignUpProps> = props => {
     <Container component="main" maxWidth="xs" className={classes.container}>
       <Formik
         validateOnChange={false}
-        validateOnBlur={false}
         initialValues={{
           user_title: '',
           firstname: firstname as string,
@@ -237,8 +234,11 @@ const SignUp: React.FC<SignUpProps> = props => {
           telephone_alt: '',
           privacy_agreement: false,
           cookie_policy: false,
+          orcid: orcData?.orcid as string,
+          orcidHash: orcData?.orcidHash as string,
+          refreshToken: orcData?.refreshToken as string,
         }}
-        onSubmit={(values, actions) => {
+        onSubmit={async (values): Promise<void> => {
           if (orcData && orcData.orcid) {
             const newValues = {
               ...values,
@@ -254,17 +254,14 @@ const SignUp: React.FC<SignUpProps> = props => {
                 values.gender === 'other' ? values.othergender : values.gender,
             };
 
-            sendSignUpRequest(newValues);
+            await sendSignUpRequest(newValues);
           } else {
             setOrcidError(true);
           }
-          actions.setSubmitting(false);
         }}
-        validationSchema={userFieldSchema.concat(
-          userPasswordFieldValidationSchema as ObjectSchema<object>
-        )}
+        validationSchema={createUserValidationSchema}
       >
-        {({ values }) => (
+        {({ values, isSubmitting }) => (
           <Form>
             <CssBaseline />
             <Avatar className={classes.avatar}>
@@ -644,6 +641,7 @@ const SignUp: React.FC<SignUpProps> = props => {
                   data-cy="cookie-policy"
                   disabled={!orcData}
                 />
+
                 <Button
                   type="submit"
                   fullWidth
@@ -651,9 +649,13 @@ const SignUp: React.FC<SignUpProps> = props => {
                   color="primary"
                   className={classes.submit}
                   data-cy="submit"
-                  disabled={!values.privacy_agreement || !values.cookie_policy}
+                  disabled={
+                    isSubmitting ||
+                    !values.privacy_agreement ||
+                    !values.cookie_policy
+                  }
                 >
-                  Sign Up
+                  {isSubmitting ? <UOLoader /> : 'Sign Up'}
                 </Button>
               </React.Fragment>
             )}

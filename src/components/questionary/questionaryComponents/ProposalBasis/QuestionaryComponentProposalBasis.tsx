@@ -1,7 +1,9 @@
-import { Grid, makeStyles } from '@material-ui/core';
-import React, { useContext, useEffect, useState } from 'react';
+import Grid from '@material-ui/core/Grid';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import { ErrorMessage, Field } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React, { ChangeEvent, KeyboardEvent, useContext, useState } from 'react';
 
-import TextFieldWithCounter from 'components/common/TextFieldWithCounter';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContext } from 'components/proposal/ProposalContainer';
 import ProposalParticipant from 'components/proposal/ProposalParticipant';
@@ -11,7 +13,7 @@ import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActi
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import { EventType } from 'models/QuestionarySubmissionState';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   disabled: {
     pointerEvents: 'none',
     opacity: 0.7,
@@ -20,13 +22,19 @@ const useStyles = makeStyles({
     marginTop: '30px',
     marginBottom: '30px',
   },
-});
+  error: {
+    color: theme.palette.error.main,
+    marginRight: '10px',
+  },
+}));
 
 function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
-  const MAX_TITLE_LEN = 175;
-  const MAX_ABSTRACT_LEN = 1500;
-
-  const { errors, touched } = props;
+  const {
+    answer: {
+      question: { proposalQuestionId },
+    },
+    formikProps,
+  } = props;
 
   const classes = useStyles();
   const proposalContext = useContext(ProposalContext);
@@ -37,11 +45,6 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   const [localAbstract, setLocalAbstract] = useState(
     proposalContext.state?.proposal.abstract
   );
-
-  useEffect(() => {
-    setLocalTitle(proposalContext.state?.proposal.title);
-    setLocalAbstract(proposalContext.state?.proposal.abstract);
-  }, [proposalContext.state]);
 
   if (!proposalContext?.state) {
     return null;
@@ -54,57 +57,70 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     <div>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <TextFieldWithCounter
-            required
-            id="title"
-            name="title"
+          <Field
+            name={`${proposalQuestionId}.title`}
             label="Title"
-            value={localTitle}
-            fullWidth
-            onBlur={event => {
-              dispatch({
-                type: EventType.PROPOSAL_MODIFIED,
-                payload: {
-                  proposal: { ...state.proposal, title: event.target.value },
-                },
-              });
+            inputProps={{
+              onChange: (event: ChangeEvent<HTMLInputElement>) =>
+                setLocalTitle(event.target.value),
+              onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+
+                  return false;
+                }
+              },
+              onBlur: () => {
+                dispatch({
+                  type: EventType.PROPOSAL_MODIFIED,
+                  payload: {
+                    proposal: { ...state.proposal, title: localTitle },
+                  },
+                });
+              },
             }}
-            onChange={event => setLocalTitle(event.target.value)}
-            error={touched.title && errors.title !== undefined}
-            helperText={touched.title && errors.title && errors.title}
+            required
+            fullWidth
+            component={TextField}
             data-cy="title"
-            maxLen={MAX_TITLE_LEN}
           />
         </Grid>
         <Grid item xs={12}>
-          <TextFieldWithCounter
-            required
-            id="abstract"
-            name="abstract"
+          <Field
+            name={`${proposalQuestionId}.abstract`}
             label="Abstract"
+            inputProps={{
+              onChange: (event: ChangeEvent<HTMLInputElement>) =>
+                setLocalAbstract(event.target.value),
+              onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+
+                  return false;
+                }
+              },
+              onBlur: () => {
+                dispatch({
+                  type: EventType.PROPOSAL_MODIFIED,
+                  payload: {
+                    proposal: { ...state.proposal, abstract: localAbstract },
+                  },
+                });
+              },
+            }}
+            required
             multiline
             rowsMax="16"
             rows="4"
-            value={localAbstract}
-            onChange={event => setLocalAbstract(event.target.value)}
             fullWidth
-            onBlur={event => {
-              dispatch({
-                type: EventType.PROPOSAL_MODIFIED,
-                payload: {
-                  proposal: { ...state.proposal, abstract: event.target.value },
-                },
-              });
-            }}
-            error={touched.abstract && errors.abstract !== undefined}
-            helperText={touched.abstract && errors.abstract && errors.abstract}
+            component={TextField}
             data-cy="abstract"
-            maxLen={MAX_ABSTRACT_LEN}
           />
         </Grid>
       </Grid>
       <ProposalParticipant
         userChanged={(user: BasicUserDetails) => {
+          formikProps.setFieldValue(`${proposalQuestionId}.proposer`, user.id);
           dispatch({
             type: EventType.PROPOSAL_MODIFIED,
             payload: { proposal: { ...state.proposal, proposer: user } },
@@ -117,6 +133,10 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       <ProposalParticipants
         error={false} // FIXME
         setUsers={(users: BasicUserDetails[]) => {
+          formikProps.setFieldValue(
+            `${proposalQuestionId}.users`,
+            users.map(user => user.id)
+          );
           dispatch({
             type: EventType.PROPOSAL_MODIFIED,
             payload: { proposal: { ...state.proposal, users: users } },
@@ -125,6 +145,11 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         // quickfix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
+      />
+      <ErrorMessage
+        name={`${proposalQuestionId}.users`}
+        className={classes.error}
+        component="span"
       />
     </div>
   );

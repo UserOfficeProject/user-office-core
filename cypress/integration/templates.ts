@@ -13,11 +13,12 @@ context('Template tests', () => {
   let textId: string;
   let dateId: string;
   let multipleChoiceId: string;
-
-  const booleanQuestion = faker.lorem.words(2);
-  const textQuestion = faker.lorem.words(2);
-  const dateQuestion = faker.lorem.words(2);
-  const fileQuestion = faker.lorem.words(2);
+  let intervalId: string;
+  const booleanQuestion = faker.random.words(2);
+  const textQuestion = faker.random.words(2);
+  const dateQuestion = faker.random.words(2);
+  const fileQuestion = faker.random.words(2);
+  const intervalQuestion = faker.random.words(2);
   const multipleChoiceQuestion = faker.lorem.words(2);
   const multipleChoiceAnswers = [
     faker.lorem.words(2),
@@ -138,6 +139,40 @@ context('Template tests', () => {
 
     /* --- */
 
+    /* Interval */
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
+
+    cy.contains('Add Interval').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(intervalQuestion);
+
+    cy.get('[data-cy=property]').click();
+
+    cy.contains('energy').click();
+
+    cy.get('[data-cy=units]>[role=button]').click({ force: true });
+
+    cy.contains('btu').click();
+
+    cy.contains('joule').click();
+
+    cy.get('body').type('{esc}');
+
+    cy.contains('Save').click();
+
+    cy.contains(intervalQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        intervalId = fieldId;
+      });
+
+    cy.get('body').type('{alt}', { release: false });
+    cy.contains(intervalQuestion).click();
+    /* --- */
+
     /* Text input */
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
@@ -148,6 +183,8 @@ context('Template tests', () => {
       .type(textQuestion);
 
     cy.contains('Is required').click();
+
+    cy.contains('Multiple lines').click();
 
     cy.get('[data-cy=max]').type(minimumCharacters.toString());
 
@@ -368,8 +405,20 @@ context('Template tests', () => {
     cy.login('user');
 
     cy.createProposal(title, abstract);
+    cy.get(`[data-cy="${intervalId}.min"]`)
+      .click()
+      .type('1');
+    cy.get(`[data-cy="${intervalId}.max"]`)
+      .click()
+      .type('2');
     cy.get(`#${boolId}`).click();
-    cy.get(`#${textId}`).type(textAnswer);
+    cy.get(`#${textId}`)
+      .clear()
+      .type('this_word_{enter}should_be_multiline');
+    cy.contains('this_word_should_be_multiline').should('not.exist');
+    cy.get(`#${textId}`)
+      .clear()
+      .type(textAnswer);
     cy.contains(`${textAnswer.length}/${minimumCharacters}`);
     cy.get(`[data-cy='${dateId}_field'] button`).click();
     cy.wait(300);

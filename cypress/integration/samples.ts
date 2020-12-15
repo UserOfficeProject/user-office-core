@@ -114,6 +114,14 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=add-button]').click();
 
+    cy.get('[data-cy=title-input] input').clear();
+
+    cy.get(
+      '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+    ).click();
+
+    cy.contains('This is a required field');
+
     cy.get('[data-cy=title-input] input')
       .clear()
       .type(sampleTitle)
@@ -212,7 +220,7 @@ context('Samples tests', () => {
         for (const mutation of mutationList) {
           for (const child of mutation.addedNodes) {
             if (child.nodeName === 'A') {
-              expect(child.href).to.contain('/download/sample/1');
+              expect(child.href).to.contain('/download/pdf/sample/1');
               expect(child.download).to.contain('download');
             }
           }
@@ -237,7 +245,7 @@ context('Samples tests', () => {
 
     cy.contains('Sample safety').click();
 
-    cy.request('GET', '/download/sample/1').then(response => {
+    cy.request('GET', '/download/pdf/sample/1').then(response => {
       expect(response.headers['content-type']).to.be.equal('application/pdf');
       expect(response.status).to.be.equal(200);
     });

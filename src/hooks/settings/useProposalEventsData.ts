@@ -1,19 +1,21 @@
 import { useEffect, useState, SetStateAction, Dispatch } from 'react';
 
-import { Event } from 'generated/sdk';
+import { ProposalEvent } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useProposalEventsData(): {
   loadingProposalEvents: boolean;
-  proposalEvents: Event[];
-  setProposalEventsWithLoading: Dispatch<SetStateAction<Event[]>>;
+  proposalEvents: ProposalEvent[];
+  setProposalEventsWithLoading: Dispatch<SetStateAction<ProposalEvent[]>>;
 } {
-  const [proposalEvents, setProposalEvents] = useState<Event[]>([]);
+  const [proposalEvents, setProposalEvents] = useState<ProposalEvent[]>([]);
   const [loadingProposalEvents, setLoadingProposalEvents] = useState(true);
 
   const api = useDataApi();
 
-  const setProposalEventsWithLoading = (data: SetStateAction<Event[]>) => {
+  const setProposalEventsWithLoading = (
+    data: SetStateAction<ProposalEvent[]>
+  ) => {
     setLoadingProposalEvents(true);
     setProposalEvents(data);
     setLoadingProposalEvents(false);

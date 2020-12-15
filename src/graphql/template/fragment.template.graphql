@@ -3,6 +3,7 @@ fragment template on Template {
     topic {
       title
       id
+      sortOrder
     }
     fields {
       ...questionTemplateRelation

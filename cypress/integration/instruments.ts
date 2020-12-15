@@ -120,12 +120,88 @@ context('Instrument tests', () => {
     cy.get('[title="Remove assigned instrument"]').should('exist');
   });
 
+  it('User Officer should be able to assign and unassign instrument to proposal without page refresh', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.finishedLoading();
+
+    cy.get('tbody [type="checkbox"]')
+      .first()
+      .check();
+
+    cy.get('[title="Remove assigned instrument"]')
+      .first()
+      .click();
+
+    cy.get('[data-cy="confirm-yes"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Proposal removed from the instrument successfully!',
+    });
+
+    cy.get('[data-cy="assign-proposals-to-instrument"]')
+      .first()
+      .click();
+
+    cy.get("[id='mui-component-select-selectedInstrumentId']")
+      .first()
+      .click();
+
+    cy.get("[id='menu-selectedInstrumentId'] li")
+      .first()
+      .click();
+
+    cy.contains('Assign to Instrument').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Proposal/s assigned to the selected instrument',
+    });
+
+    cy.get('[title="Remove assigned instrument"]')
+      .first()
+      .click();
+
+    cy.get('[data-cy="confirm-yes"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Proposal removed from the instrument successfully!',
+    });
+
+    cy.get('[data-cy="assign-proposals-to-instrument"]')
+      .first()
+      .click();
+
+    cy.get("[id='mui-component-select-selectedInstrumentId']")
+      .first()
+      .click();
+
+    cy.get("[id='menu-selectedInstrumentId'] li")
+      .first()
+      .click();
+
+    cy.contains('Assign to Instrument').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Proposal/s assigned to the selected instrument',
+    });
+
+    cy.get('[title="Remove assigned instrument"]').should('exist');
+  });
+
   it('User Officer should be able to assign scientist to instrument and instrument scientist should be able to see instruments he is assigned to', () => {
     cy.login('officer');
 
     cy.contains('People').click();
-    cy.get('[title="Edit user"]')
-      .eq(2)
+
+    cy.contains('Carlsson')
+      .parent()
+      .find('button[title="Edit user"]')
       .click();
 
     const mainContentElement = cy.get('main');
@@ -189,7 +265,7 @@ context('Instrument tests', () => {
     cy.get('[title="Show Scientists"]').should('exist');
   });
 
-  it('Instrument scientsit should be able to see proposals assigned to instrument where he is instrument scientist', () => {
+  it('Instrument scientist should be able to see proposals assigned to instrument where he is instrument scientist', () => {
     cy.login('user');
 
     cy.get('[data-cy="profile-page-btn"]').click();
@@ -205,6 +281,10 @@ context('Instrument tests', () => {
     cy.notification({ variant: 'success', text: 'User role changed' });
 
     cy.contains('Proposals');
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"] [data-value="0"]').click();
+
     cy.get('[data-cy="view-proposal"]').should('exist');
   });
 
@@ -224,6 +304,10 @@ context('Instrument tests', () => {
     cy.notification({ variant: 'success', text: 'User role changed' });
 
     cy.contains('Proposals');
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"] [data-value="0"]').click();
+
     cy.get('[data-cy="view-proposal"]').click();
     cy.contains('Technical').click();
 
@@ -237,6 +321,9 @@ context('Instrument tests', () => {
     });
 
     cy.contains('Proposals').click();
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"] [data-value="0"]').click();
 
     cy.contains('20');
   });

@@ -21,7 +21,7 @@ const TextFieldWithCounter = (
     props.value ? (props.value as string).length : 0
   );
   const handleChange = (evt: ChangeEvent<HTMLInputElement>): void => {
-    props.onChange && props.onChange(evt);
+    props.onChange?.(evt);
     setTextLen(evt.target.value.length);
   };
 

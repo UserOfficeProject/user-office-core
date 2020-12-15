@@ -19,7 +19,7 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
   const unauthorizedApi = useUnauthorizedApi();
   const sessionId: string = match.params.sessionId;
 
-  const isFirstRun= useRef<boolean>(true);
+  const isFirstRun = useRef<boolean>(true);
 
   useEffect(() => {
     if (!isFirstRun.current) {

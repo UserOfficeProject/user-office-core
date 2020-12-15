@@ -10,20 +10,22 @@ import ProposalErrorLabel from 'components/proposal/ProposalErrorLabel';
 import { BooleanConfig } from 'generated/sdk';
 
 export function QuestionaryComponentBoolean(props: BasicComponentProps) {
-  const { answer: templateField, errors, onComplete, touched } = props;
+  const {
+    answer,
+    onComplete,
+    formikProps: { errors, touched },
+  } = props;
   const {
     question: { proposalQuestionId, question },
-  } = templateField;
-  const config = templateField.config as BooleanConfig;
+  } = answer;
+  const config = answer.config as BooleanConfig;
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
-  const [stateValue, setStateValue] = useState<boolean>(
-    templateField.value || false
-  );
+  const [stateValue, setStateValue] = useState<boolean>(answer.value || false);
 
   useEffect(() => {
-    setStateValue(templateField.value || false);
-  }, [templateField]);
+    setStateValue(answer.value || false);
+  }, [answer]);
 
   const classes = makeStyles({
     label: {

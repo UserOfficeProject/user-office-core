@@ -1,6 +1,6 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
-import { FormikActions } from 'formik';
+import { FormikHelpers } from 'formik';
 import React from 'react';
 
 const FormikUICustomEditor = ({
@@ -9,7 +9,7 @@ const FormikUICustomEditor = ({
   ...props
 }: {
   field: { name: string; onBlur: Function; onChange: Function; value: string };
-  form: FormikActions<any>;
+  form: FormikHelpers<any>;
   label?: string;
 }) => {
   const classes = makeStyles(theme => ({

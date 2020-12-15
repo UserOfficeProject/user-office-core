@@ -1,53 +1,20 @@
 import {
-  createCallValidationSchema,
-  updateCallValidationSchema,
+  createCallValidationSchemas,
+  updateCallValidationSchemas,
 } from '@esss-swap/duo-validation/lib/Call';
-import Button from '@material-ui/core/Button';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import Stepper from '@material-ui/core/Stepper';
-import { Theme } from '@material-ui/core/styles/createMuiTheme';
-import createStyles from '@material-ui/core/styles/createStyles';
-import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
-import { Form, Formik, FormikErrors } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import UOLoader from 'components/common/UOLoader';
+import { Wizard, WizardStep } from 'components/common/MultistepWizard';
 import { Call } from 'generated/sdk';
+import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
+import { useProposalsTemplates } from 'hooks/template/useProposalTemplates';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import CallGeneralInfo from './CallGeneralInfo';
 import CallNotificationAndCycleInfo from './CallNotificationAndCycleInfo';
 import CallReviewsInfo from './CallReviewsInfo';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%',
-    },
-    button: {
-      marginRight: theme.spacing(1),
-    },
-    instructions: {
-      marginTop: theme.spacing(1),
-      marginBottom: theme.spacing(1),
-    },
-    stepper: {
-      padding: '20px 0 0',
-    },
-    formErrors: {
-      color: theme.palette.error.main,
-      marginBottom: '10px',
-    },
-    step: {
-      cursor: 'pointer',
-    },
-  })
-);
 
 type CreateUpdateCallProps = {
   close: (call: Call | null) => void;
@@ -55,45 +22,18 @@ type CreateUpdateCallProps = {
 };
 
 const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
-  const [activeStep, setActiveStep] = React.useState(0);
-  const { api, isExecutingCall } = useDataApiWithFeedback();
-  const classes = useStyles();
-  let isLastStep = false;
+  const { api } = useDataApiWithFeedback();
+  const { templates, loadingTemplates } = useProposalsTemplates(false);
+  const {
+    proposalWorkflows,
+    loadingProposalWorkflows,
+  } = useProposalWorkflowsData();
 
   const currentDayStart = new Date();
   currentDayStart.setHours(0, 0, 0, 0);
 
   const currentDayEnd = new Date();
   currentDayEnd.setHours(23, 59, 59, 999);
-
-  const steps = ['General', 'Reviews', 'Notification and cycle'];
-
-  const getStepContent = (step: number) => {
-    switch (step) {
-      case 0:
-        return <CallGeneralInfo />;
-      case 1:
-        return <CallReviewsInfo />;
-      case 2:
-        return <CallNotificationAndCycleInfo />;
-      default:
-        return 'Unknown step';
-    }
-  };
-
-  const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
-  };
-
-  const handleStep = (step: number) => () => {
-    setActiveStep(step);
-  };
 
   const initialValues = call
     ? {
@@ -120,42 +60,9 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       };
 
   const closeModal = (error: string | null | undefined, callToReturn: Call) => {
-    if (error) {
-      close(null);
-    } else {
+    if (!error) {
       close(callToReturn);
     }
-  };
-
-  if (activeStep + 1 === steps.length) {
-    isLastStep = true;
-  }
-
-  const showFormErrors = (errors: FormikErrors<Call>): JSX.Element | null => {
-    const errorsToShow: string[] = [];
-
-    for (const [key, value] of Object.entries(errors)) {
-      if (errors.hasOwnProperty(key)) {
-        if (value) {
-          errorsToShow.push(value.toString());
-        }
-      }
-    }
-
-    if (errorsToShow.length > 0) {
-      return (
-        <FormHelperText className={classes.formErrors}>
-          {errorsToShow.map((errorToShow, index) => (
-            <span key={index}>
-              {errorToShow}
-              <br />
-            </span>
-          ))}
-        </FormHelperText>
-      );
-    }
-
-    return null;
   };
 
   return (
@@ -163,28 +70,19 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       <Typography variant="h6">
         {call ? 'Update the call' : 'Create new call'}
       </Typography>
-      <Stepper nonLinear activeStep={activeStep} className={classes.stepper}>
-        {steps.map((label, index) => {
-          const stepProps: { completed?: boolean; onClick: () => void } = {
-            onClick: handleStep(index),
-          };
-          const labelProps: { optional?: React.ReactNode } = {};
-
-          return (
-            <Step key={label} {...stepProps} className={classes.step}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
-      <Formik
+      <Wizard
         initialValues={initialValues}
-        onSubmit={async (values, actions): Promise<void> => {
-          const { templateId, proposalWorkflowId } = values;
+        onSubmit={async values => {
+          const {
+            id,
+            templateId,
+            proposalWorkflowId,
+            ...restValues
+          } = values as Call;
           if (call) {
             const data = await api('Call updated successfully!').updateCall({
-              id: call.id,
-              ...values,
+              ...restValues,
+              id: id,
               templateId: templateId ? +templateId : null,
               proposalWorkflowId: proposalWorkflowId
                 ? +proposalWorkflowId
@@ -193,7 +91,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
             closeModal(data.updateCall.error, data.updateCall.call as Call);
           } else {
             const data = await api('Call created successfully!').createCall({
-              ...values,
+              ...restValues,
               templateId: templateId ? +templateId : null,
               proposalWorkflowId: proposalWorkflowId
                 ? +proposalWorkflowId
@@ -202,43 +100,45 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
 
             closeModal(data.createCall.error, data.createCall.call as Call);
           }
-
-          actions.setSubmitting(false);
         }}
-        validationSchema={
-          call ? updateCallValidationSchema : createCallValidationSchema
-        }
+        shouldCreate={!!call}
       >
-        {({ errors }): JSX.Element => (
-          <Form>
-            {getStepContent(activeStep)}
-            {activeStep === 2 && showFormErrors(errors)}
-            <ActionButtonContainer>
-              <Button
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                fullWidth
-                className={classes.button}
-              >
-                Back
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                data-cy={isLastStep ? 'submit' : 'next-step'}
-                type={isLastStep ? 'submit' : 'button'}
-                fullWidth
-                onClick={isLastStep ? () => null : handleNext}
-                className={classes.button}
-                disabled={isExecutingCall}
-              >
-                {isExecutingCall && <UOLoader size={14} />}
-                {isLastStep ? (call ? 'Update Call' : 'Add Call') : 'Next'}
-              </Button>
-            </ActionButtonContainer>
-          </Form>
-        )}
-      </Formik>
+        <WizardStep
+          title="General"
+          validationSchema={
+            !!call
+              ? updateCallValidationSchemas[0]
+              : createCallValidationSchemas[0]
+          }
+        >
+          <CallGeneralInfo
+            templates={templates}
+            loadingTemplates={loadingTemplates}
+            proposalWorkflows={proposalWorkflows}
+            loadingProposalWorkflows={loadingProposalWorkflows}
+          />
+        </WizardStep>
+        <WizardStep
+          title="Reviews"
+          validationSchema={
+            !!call
+              ? updateCallValidationSchemas[1]
+              : createCallValidationSchemas[1]
+          }
+        >
+          <CallReviewsInfo />
+        </WizardStep>
+        <WizardStep
+          title="Notification and cycle"
+          validationSchema={
+            !!call
+              ? updateCallValidationSchemas[2]
+              : createCallValidationSchemas[2]
+          }
+        >
+          <CallNotificationAndCycleInfo />
+        </WizardStep>
+      </Wizard>
     </>
   );
 };

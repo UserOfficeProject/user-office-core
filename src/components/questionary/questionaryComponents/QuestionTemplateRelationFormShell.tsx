@@ -68,11 +68,11 @@ export const QuestionTemplateRelationFormShell = (props: {
       </Link>
       <Formik
         initialValues={props.questionRel}
-        onSubmit={async form => {
+        onSubmit={async (values): Promise<void> => {
           props.dispatch({
             type: EventType.UPDATE_QUESTION_REL_REQUESTED,
             payload: {
-              field: { ...props.questionRel, ...form },
+              field: { ...props.questionRel, ...values },
               templateId: props.template.templateId,
             },
           });

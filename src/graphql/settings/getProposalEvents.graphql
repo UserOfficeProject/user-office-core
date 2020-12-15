@@ -1,3 +1,6 @@
 query getProposalEvents {
-  proposalEvents
+  proposalEvents {
+    name
+    description
+  }
 }

@@ -22,18 +22,17 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to create Proposal status', () => {
-      const name = faker.random.words(2);
-      const description = faker.random.words(5);
-
-      // NOTE: Valid proposal status name is uppercase characters without spaces but underscores.
-      const validName = name.toUpperCase().replace(/\s/g, '_');
+      const name = faker.lorem.words(2);
+      const description = faker.lorem.words(5);
+      const shortCode = name.toUpperCase().replace(/\s/g, '_');
 
       cy.login('officer');
 
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
       cy.contains('Create').click();
-      cy.get('#name').type(validName);
+      cy.get('#shortCode').type(shortCode);
+      cy.get('#name').type(name);
       cy.get('#description').type(description);
       cy.get('[data-cy="submit"]').click();
 
@@ -54,16 +53,14 @@ context('Settings tests', () => {
 
       const lastRowText = proposalStatusesTableLastRow.invoke('text');
 
-      lastRowText.should('contain', validName);
+      lastRowText.should('contain', shortCode);
+      lastRowText.should('contain', name);
       lastRowText.should('contain', description);
     });
 
     it('User Officer should be able to update Proposal status', () => {
-      const newName = faker.random.words(2);
-      const newDescription = faker.random.words(5);
-
-      // NOTE: Valid proposal status name is uppercase characters without spaces but underscores.
-      const newValidName = newName.toUpperCase().replace(/\s/g, '_');
+      const newName = faker.lorem.words(2);
+      const newDescription = faker.lorem.words(5);
 
       cy.login('officer');
 
@@ -82,8 +79,10 @@ context('Settings tests', () => {
         .last()
         .click();
 
+      cy.get('#shortCode').should('be.disabled');
+
       cy.get('#name').clear();
-      cy.get('#name').type(newValidName);
+      cy.get('#name').type(newName);
       cy.get('#description').type(newDescription);
       cy.get('[data-cy="submit"]').click();
 
@@ -96,7 +95,7 @@ context('Settings tests', () => {
 
       const lastRowText = proposalStatusesTableLastRow.invoke('text');
 
-      lastRowText.should('contain', newValidName);
+      lastRowText.should('contain', newName);
       lastRowText.should('contain', newDescription);
     });
 
@@ -118,7 +117,7 @@ context('Settings tests', () => {
         .last()
         .click();
 
-      cy.get('[title="Save"]').click();
+      cy.get('[data-cy="confirm-yes"]').click();
 
       cy.notification({ variant: 'success', text: 'deleted successfully' });
     });
@@ -140,8 +139,8 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to create proposal workflow and it should contain default DRAFT status', () => {
-      const name = faker.random.words(2);
-      const description = faker.random.words(5);
+      const name = faker.lorem.words(2);
+      const description = faker.lorem.words(5);
 
       cy.login('officer');
 
@@ -155,23 +154,6 @@ context('Settings tests', () => {
 
       cy.notification({ variant: 'success', text: 'created successfully' });
 
-      let proposalWorkflowsTable = cy.get(
-        '[data-cy="proposal-workflows-table"]'
-      );
-
-      const proposalWorkflowsTableLastRow = proposalWorkflowsTable
-        .find('tr[level="0"]')
-        .last();
-
-      const lastRowText = proposalWorkflowsTableLastRow.invoke('text');
-
-      lastRowText.should('contain', name);
-      lastRowText.should('contain', description);
-
-      cy.get('[title="Edit"]')
-        .last()
-        .click();
-
       cy.get('[data-cy="connection_DRAFT_1"]').should('contain.text', 'DRAFT');
       cy.get('[data-cy="status_DRAFT_1"]').should('not.exist');
 
@@ -179,8 +161,8 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to update proposal workflow', () => {
-      const name = faker.random.words(2);
-      const description = faker.random.words(5);
+      const name = faker.lorem.words(2);
+      const description = faker.lorem.words(5);
 
       cy.login('officer');
 
@@ -261,6 +243,18 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Next status events added successfully!',
       });
+
+      cy.contains('PROPOSAL_SUBMITTED');
+
+      cy.get('[data-cy="connection_DRAFT_1"]').click();
+
+      cy.get('[data-cy="next-status-events-modal"]').should('exist');
+
+      cy.contains('PROPOSAL_FEASIBLE').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.contains('PROPOSAL_SUBMITTED & PROPOSAL_FEASIBLE');
     });
 
     it('Proposal should follow the selected workflow', () => {
@@ -278,10 +272,6 @@ context('Settings tests', () => {
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({ variant: 'success', text: 'created successfully' });
-
-      cy.get('[title="Edit"]')
-        .last()
-        .click();
 
       cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]')
         .focus()
@@ -366,6 +356,59 @@ context('Settings tests', () => {
       cy.get('.MuiTable-root tbody tr')
         .first()
         .then(element => expect(element.text()).to.contain('submitted'));
+
+      cy.logout();
+      cy.login('officer');
+
+      cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr')
+        .first()
+        .then(element =>
+          expect(element.text()).to.contain('FEASIBILITY_REVIEW')
+        );
+    });
+
+    it('User Officer should be able to filter proposals based on statuses', () => {
+      cy.login('user');
+
+      cy.createProposal();
+
+      cy.logout();
+
+      cy.login('officer');
+
+      cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody')
+        .first()
+        .then(element => expect(element.text()).to.contain('DRAFT'));
+
+      cy.get('.MuiTable-root tbody')
+        .first()
+        .then(element =>
+          expect(element.text()).to.contain('FEASIBILITY_REVIEW')
+        );
+
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get('[role="listbox"] [data-value="2"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr')
+        .first()
+        .then(element =>
+          expect(element.text()).to.contain('FEASIBILITY_REVIEW')
+        );
+
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get('[role="listbox"] [data-value="1"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr')
+        .first()
+        .then(element => expect(element.text()).to.contain('DRAFT'));
     });
 
     it('User Officer should be able to split workflow into two or more paths', () => {
