@@ -8,8 +8,14 @@ export class ProposalStatus implements Partial<ProposalStatusOrigin> {
   public id: number;
 
   @Field(() => String)
+  public shortCode: string;
+
+  @Field(() => String)
   public name: string;
 
   @Field(() => String)
   public description: string;
+
+  @Field(() => Boolean)
+  public isDefault: boolean;
 }

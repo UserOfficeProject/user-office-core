@@ -1,6 +1,6 @@
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized } from '../decorators';
-import { Event } from '../events/event.enum';
+import { Event, EventLabel } from '../events/event.enum';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -15,7 +15,7 @@ export default class ProposalSettingsQueries {
     return proposalStatus;
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized()
   async getAllProposalStatuses(agent: UserWithRole | null) {
     const proposalStatuses = await this.dataSource.getAllProposalStatuses();
 
@@ -107,10 +107,15 @@ export default class ProposalSettingsQueries {
   @Authorized([Roles.USER_OFFICER])
   async getAllProposalEvents(agent: UserWithRole | null) {
     const allEventsArray = Object.values(Event);
-    const allProposalEvents = allEventsArray.filter(
-      eventItem =>
-        eventItem.startsWith('PROPOSAL_') || eventItem.startsWith('CALL')
-    );
+    const allProposalEvents = allEventsArray
+      .filter(
+        eventItem =>
+          eventItem.startsWith('PROPOSAL_') || eventItem.startsWith('CALL_')
+      )
+      .map(eventItem => ({
+        name: eventItem,
+        description: EventLabel.get(eventItem),
+      }));
 
     return allProposalEvents;
   }

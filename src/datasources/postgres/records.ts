@@ -72,7 +72,7 @@ export interface ProposalViewRecord {
   readonly technical_review_status: number;
   readonly instrument_name: string;
   readonly call_short_code: string;
-  readonly code: string;
+  readonly sep_code: string;
   readonly average: number;
   readonly deviation: number;
   readonly instrument_id: number;
@@ -114,14 +114,19 @@ export interface AnswerRecord {
   readonly created_at: Date;
 }
 
-interface DependencyCondition {
+export interface Dependency {
+  condition: DependencyCondition;
+  dependencyId: string;
+}
+
+export interface DependencyCondition {
   condition: EvaluatorOperator;
   params: string | boolean | number;
 }
 export interface QuestionTemplateRelRecord {
   readonly id: number;
   readonly question_id: string;
-  readonly template_id: string;
+  readonly template_id: number;
   readonly topic_id: number;
   readonly sort_order: number;
   readonly config: string;
@@ -292,6 +297,13 @@ export interface InstrumentRecord {
   readonly full_count: number;
 }
 
+export interface CallHasInstrumentRecord {
+  readonly call_id: number;
+  readonly instrument_id: number;
+  readonly availability_time: number;
+  readonly submitted: boolean;
+}
+
 export interface InstrumentWithAvailabilityTimeRecord {
   readonly instrument_id: number;
   readonly name: string;
@@ -322,8 +334,10 @@ export interface SampleRecord {
 
 export interface ProposalStatusRecord {
   readonly proposal_status_id: number;
+  readonly short_code: string;
   readonly name: string;
   readonly description: string;
+  readonly is_default: boolean;
   readonly full_count: number;
 }
 
@@ -442,7 +456,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.technical_review_status,
     proposal.instrument_name,
     proposal.call_short_code,
-    proposal.code,
+    proposal.sep_code,
     proposal.average,
     proposal.deviation,
     proposal.instrument_id,

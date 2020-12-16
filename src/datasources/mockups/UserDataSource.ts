@@ -279,4 +279,8 @@ export class UserDataSourceMock implements UserDataSource {
   async create(firstname: string, lastname: string) {
     return dummyUser;
   }
+
+  async createDummyUser(userId: number): Promise<User> {
+    return dummyUser;
+  }
 }

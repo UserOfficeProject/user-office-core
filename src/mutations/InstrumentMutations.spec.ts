@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import {
   InstrumentDataSourceMock,
   dummyInstrument,
+  dummyCallHasInstrument,
 } from '../datasources/mockups/InstrumentDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
@@ -162,6 +163,6 @@ describe('Test Instrument Mutations', () => {
         instrumentId: 1,
         sepId: 1,
       })
-    ).resolves.toBe(true);
+    ).resolves.toBe(dummyCallHasInstrument);
   });
 });

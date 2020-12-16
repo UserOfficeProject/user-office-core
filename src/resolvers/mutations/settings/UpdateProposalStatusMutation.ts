@@ -18,11 +18,17 @@ export class UpdateProposalStatusInput implements ProposalStatus {
   @Field(() => Int)
   public id: number;
 
+  @Field(() => String, { nullable: true })
+  public shortCode: string;
+
   @Field(() => String)
   public name: string;
 
   @Field(() => String)
   public description: string;
+
+  @Field(() => Boolean, { nullable: true })
+  public isDefault: boolean;
 }
 
 @Resolver()

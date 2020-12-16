@@ -13,6 +13,7 @@ import {
 } from '@esss-swap/duo-validation';
 import * as bcrypt from 'bcryptjs';
 
+import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -182,27 +183,35 @@ export default class UserMutations {
         return rejection('INTERNAL_ERROR');
       }
       user = updatedUser;
+    } else if (user) {
+      return rejection('ACCOUNT_EXIST');
     } else {
-      user = (await this.dataSource.create(
-        args.user_title,
-        args.firstname,
-        args.middlename,
-        args.lastname,
-        `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
-        hash,
-        args.preferredname,
-        args.orcid,
-        args.refreshToken,
-        args.gender,
-        args.nationality,
-        args.birthdate,
-        organisationId,
-        args.department,
-        args.position,
-        args.email,
-        args.telephone,
-        args.telephone_alt
-      )) as UserWithRole;
+      try {
+        user = (await this.dataSource.create(
+          args.user_title,
+          args.firstname,
+          args.middlename,
+          args.lastname,
+          `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
+          hash,
+          args.preferredname,
+          args.orcid,
+          args.refreshToken,
+          args.gender,
+          args.nationality,
+          args.birthdate,
+          organisationId,
+          args.department,
+          args.position,
+          args.email,
+          args.telephone,
+          args.telephone_alt
+        )) as UserWithRole;
+      } catch (err) {
+        if ('code' in err && err.code === '23505') {
+          return rejection('ACCOUNT_EXIST');
+        }
+      }
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
@@ -255,6 +264,10 @@ export default class UserMutations {
     if (!user) {
       return rejection('INTERNAL_ERROR');
     }
+
+    delete args.orcid;
+    delete args.refreshToken;
+
     user = {
       ...user,
       ...args,
@@ -370,27 +383,43 @@ export default class UserMutations {
 
   async checkExternalToken(externalToken: string): Promise<string | Rejection> {
     try {
-      // call UOWS with external token
-      // const userFromUOWS : BasicPersonDetailsDTO = uows.getBasicPersonDetailsForSessionId(externalToken);
-      // const user = convertUserDTO(userFromUOWS);
+      const client = new UOWSSoapClient();
 
-      const user = await this.dataSource.getByEmail('Aaron_Harris49@gmail.com');
-      if (!user) {
+      const rawStfcUser = await client.getPersonDetailsFromSessionId(
+        externalToken
+      );
+      if (!rawStfcUser) {
+        logger.logInfo('User not found for token', { externalToken });
+
         return rejection('USER_DOES_NOT_EXIST');
       }
-      const roles = await this.dataSource.getUserRoles(user.id);
+      const stfcUser = rawStfcUser.return;
 
-      const essToken = signToken<AuthJwtPayload>({
-        user: user,
+      // Create dummy user if one does not exist in the proposals DB.
+      // This is needed to satisfy the FOREIGN_KEY constraints
+      // in tables that link to a user (such as proposals)
+      const userNumber = parseInt(stfcUser.userNumber);
+      let dummyUser = await this.dataSource.get(userNumber);
+      if (!dummyUser) {
+        dummyUser = await this.dataSource.createDummyUser(userNumber);
+      }
+
+      // TODO: this should get the user's roles rather than all roles
+      const roles = await this.dataSource.getRoles();
+
+      const proposalsToken = signToken<AuthJwtPayload>({
+        user: dummyUser,
         roles,
-        currentRole: roles[0],
+        currentRole: roles[1], // Currently hardcoded to UserOfficer
       });
 
-      return essToken;
+      return proposalsToken;
     } catch (error) {
-      logger.logError('Bad token', { externalToken });
+      logger.logError('Error occured during external authentication', {
+        error,
+      });
 
-      return rejection('BAD_TOKEN');
+      return rejection('INTERNAL_ERROR');
     }
   }
 

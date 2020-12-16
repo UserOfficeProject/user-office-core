@@ -1,7 +1,7 @@
 import { Query, Arg, Ctx, Resolver, Int } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Event } from '../../events/event.enum';
+import { ProposalEvent } from '../types/NextStatusEvent';
 import { ProposalWorkflow } from '../types/ProposalWorkflow';
 
 @Resolver()
@@ -24,7 +24,9 @@ export class ProposalWorkflowQuery {
     );
   }
 
-  @Query(() => [Event], { nullable: true })
+  @Query(() => [ProposalEvent], {
+    nullable: true,
+  })
   proposalEvents(@Ctx() context: ResolverContext) {
     return context.queries.proposalSettings.getAllProposalEvents(context.user);
   }

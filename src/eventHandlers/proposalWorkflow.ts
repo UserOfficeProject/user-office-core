@@ -4,6 +4,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { eventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
+import { SampleStatus } from '../models/Sample';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { logger } from '../utils/Logger';
 import { workflowEngine, WorkflowEngineProposalType } from '../workflowEngine';
@@ -72,11 +73,10 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
         break;
       case Event.PROPOSAL_SUBMITTED:
       case Event.PROPOSAL_FEASIBLE:
+      case Event.PROPOSAL_SAMPLE_SAFE:
       case Event.PROPOSAL_NOTIFIED:
       case Event.PROPOSAL_ACCEPTED:
       case Event.PROPOSAL_REJECTED:
-      case Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED:
-      case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
       case Event.PROPOSAL_SEP_MEETING_SUBMITTED:
         try {
           await markProposalEventAsDoneAndCallWorkflowEngine(
@@ -104,9 +104,7 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
           }
 
           switch (event.technicalreview.status) {
-            // TODO: Review this if both feasible and partialy feasible should emit PROPOSAL_FEASIBLE
             case TechnicalReviewStatus.FEASIBLE:
-            case TechnicalReviewStatus.PARTIALLY_FEASIBLE:
               eventBus.publish({
                 type: Event.PROPOSAL_FEASIBLE,
                 proposal,
@@ -130,6 +128,43 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
           );
         }
 
+        break;
+      case Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED:
+        try {
+          const proposal = await proposalDataSource.get(
+            event.sample.proposalId
+          );
+
+          if (!proposal || !proposal.id) {
+            throw new Error(
+              `Proposal with id ${event.sample.proposalId} not found`
+            );
+          }
+
+          switch (event.sample.safetyStatus) {
+            case SampleStatus.LOW_RISK:
+              eventBus.publish({
+                type: Event.PROPOSAL_SAMPLE_SAFE,
+                proposal,
+                isRejection: false,
+                key: 'proposal',
+                loggedInUserId: event.loggedInUserId,
+              });
+              break;
+            default:
+              break;
+          }
+
+          await markProposalEventAsDoneAndCallWorkflowEngine(
+            event.type,
+            proposal
+          );
+        } catch (error) {
+          logger.logError(
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sample.proposalId}: `,
+            error
+          );
+        }
         break;
       case Event.PROPOSAL_SEP_REVIEW_SUBMITTED:
         try {
@@ -176,6 +211,35 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
         } catch (error) {
           logger.logError(
             `Error while trying to mark ${event.type} event as done and calling workflow engine on proposals with callId = ${event.call.id}: `,
+            error
+          );
+        }
+
+        break;
+
+      case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
+        try {
+          const allProposalsOnCallWithInstrument = await proposalDataSource.getProposalsFromView(
+            {
+              callId: event.callhasinstrument.callId,
+              instrumentId: event.callhasinstrument.instrumentId,
+            }
+          );
+
+          if (allProposalsOnCallWithInstrument?.length) {
+            await Promise.all(
+              allProposalsOnCallWithInstrument.map(
+                async proposalOnCall =>
+                  await markProposalEventAsDoneAndCallWorkflowEngine(
+                    event.type,
+                    proposalOnCall
+                  )
+              )
+            );
+          }
+        } catch (error) {
+          logger.logError(
+            `Error while trying to mark ${event.type} event as done and calling workflow engine on proposals with callId = ${event.callhasinstrument.callId}: `,
             error
           );
         }

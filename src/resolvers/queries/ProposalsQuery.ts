@@ -29,6 +29,9 @@ export class ProposalsFilter {
 
   @Field(() => Int, { nullable: true })
   public instrumentId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public proposalStatusId?: number;
 }
 
 @ArgsType()

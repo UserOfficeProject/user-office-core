@@ -45,8 +45,8 @@ export class UpdateQuestionTemplateRelationArgs {
   @Field(() => Int, { nullable: true })
   public topicId?: number;
 
-  @Field(() => Int, { nullable: true })
-  public sortOrder?: number;
+  @Field(() => Int)
+  public sortOrder: number;
 
   @Field({ nullable: true })
   public config?: string;
