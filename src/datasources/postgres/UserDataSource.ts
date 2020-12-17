@@ -401,14 +401,31 @@ export default class PostgresUserDataSource implements UserDataSource {
         };
       });
   }
-  async setUserEmailVerified(id: number): Promise<void> {
-    return database
+
+  async setUserEmailVerified(id: number): Promise<User | null> {
+    const [userRecord]: [UserRecord] = await database
       .update({
         email_verified: true,
       })
       .from('users')
-      .where('user_id', id);
+      .where('user_id', id)
+      .returning('*');
+
+    return userRecord ? createUserObject(userRecord) : null;
   }
+
+  async setUserNotPlaceholder(id: number): Promise<User | null> {
+    const [userRecord]: [UserRecord] = await database
+      .update({
+        placeholder: false,
+      })
+      .from('users')
+      .where('user_id', id)
+      .returning('*');
+
+    return userRecord ? createUserObject(userRecord) : null;
+  }
+
   async getProposalUsersFull(proposalId: number): Promise<User[]> {
     return database
       .select()
