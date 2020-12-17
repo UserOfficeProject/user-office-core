@@ -282,7 +282,7 @@ export interface SEPAssignmentRecord {
   readonly email_sent: boolean;
 }
 
-export interface SEPMemberRecord {
+export interface RoleUserRecord {
   readonly role_user_id: number;
   readonly role_id: number;
   readonly user_id: number;

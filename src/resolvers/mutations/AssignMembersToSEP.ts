@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { UserRole } from '../../models/User';
 import { SEPResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 import { AddSEPMembersRoleArgs } from './AddSEPMembersRoleMutation';
@@ -20,6 +21,9 @@ export class UpdateMemberSEPArgs {
 
   @Field(() => Int)
   public sepId: number;
+
+  @Field(() => UserRole)
+  public roleId: UserRole;
 }
 
 @ArgsType()
