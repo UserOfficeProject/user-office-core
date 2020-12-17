@@ -4,6 +4,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import Clear from '@material-ui/icons/Clear';
 import Person from '@material-ui/icons/Person';
 import PersonAdd from '@material-ui/icons/PersonAdd';
 import MaterialTable from 'material-table';
@@ -11,6 +12,7 @@ import PropTypes from 'prop-types';
 import React, { useState, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
+import DialogConfirmation from 'components/common/DialogConfirmation';
 import UOLoader from 'components/common/UOLoader';
 import ParticipantModal from 'components/proposal/ParticipantModal';
 import { UserContext } from 'context/UserContextProvider';
@@ -27,6 +29,8 @@ const useStyles = makeStyles(() => ({
     },
   },
 }));
+
+type BasicUserDetailsWithRole = BasicUserDetails & { roleId: UserRole };
 
 type SEPMembersProps = {
   /** Id of the SEP we are assigning members to */
@@ -45,6 +49,10 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   const [sepSecretaryModalOpen, setSepSecretaryModalOpen] = useState(false);
   const { user } = useContext(UserContext);
   const { setRenewTokenValue } = useRenewToken();
+  const [
+    memberToRemove,
+    setMemberToRemove,
+  ] = useState<BasicUserDetailsWithRole | null>(null);
   const classes = useStyles();
   const {
     loadingMembers,
@@ -164,20 +172,23 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     setOpen(false);
   };
 
-  const removeMember = async (user: BasicUserDetails): Promise<void> => {
-    await api('SEP member removed successfully!').removeMember({
+  const removeMember = async (
+    user: BasicUserDetailsWithRole
+  ): Promise<void> => {
+    const result = await api('SEP member removed successfully!').removeMember({
       memberId: user.id,
       sepId,
+      roleId: user.roleId,
     });
 
-    if (SEPMembersData) {
+    if (SEPMembersData && !result.removeMember.error) {
       setSEPMembersData(
         SEPMembersData.map(member => {
           if (member.userId === user.id) {
             return {
               ...member,
               roles: member.roles.filter(
-                role => role.shortCode.toUpperCase() !== UserRole.SEP_REVIEWER
+                role => role.shortCode.toUpperCase() !== user.roleId
               ),
             };
           }
@@ -209,13 +220,26 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       ]
     : [];
 
+  const alreadySelectedMembers = [
+    ...initialValues.SEPReviewers.map(reviewer => reviewer.id),
+  ]
+    .concat(initialValues.SEPChair ? [initialValues.SEPChair?.id] : [])
+    .concat(initialValues.SEPSecretary ? [initialValues.SEPSecretary?.id] : []);
+
   return (
     <React.Fragment>
+      <DialogConfirmation
+        title="Remove SEP member"
+        text={`Are you sure you want to remove ${memberToRemove?.firstname} ${memberToRemove?.lastname} from this SEP?`}
+        open={!!memberToRemove}
+        action={() => removeMember(memberToRemove as BasicUserDetailsWithRole)}
+        handleOpen={() => setMemberToRemove(null)}
+      />
       <ParticipantModal
         show={modalOpen}
         close={(): void => setOpen(false)}
         addParticipants={addMember}
-        selectedUsers={initialValues.SEPReviewers.map(reviewer => reviewer.id)}
+        selectedUsers={alreadySelectedMembers}
         selection={true}
         title={'Reviewer'}
         userRole={UserRole.REVIEWER}
@@ -224,9 +248,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
         show={sepChairModalOpen}
         close={(): void => setSepChairModalOpen(false)}
         addParticipants={sendSEPChairUpdate}
-        selectedUsers={[
-          ...initialValues.SEPReviewers.map(reviewer => reviewer.id),
-        ].concat(initialValues.SEPChair ? [initialValues.SEPChair?.id] : [])}
+        selectedUsers={alreadySelectedMembers}
         title={'SEP Chair'}
         invitationUserRole={UserRole.SEP_CHAIR}
       />
@@ -234,11 +256,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
         show={sepSecretaryModalOpen}
         close={(): void => setSepSecretaryModalOpen(false)}
         addParticipants={sendSEPSecretaryUpdate}
-        selectedUsers={[
-          ...initialValues.SEPReviewers.map(reviewer => reviewer.id),
-        ].concat(
-          initialValues.SEPSecretary ? [initialValues.SEPSecretary?.id] : []
-        )}
+        selectedUsers={alreadySelectedMembers}
         title={'SEP Secretary'}
         invitationUserRole={UserRole.SEP_SECRETARY}
       />
@@ -247,7 +265,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
           SEP Members
         </Typography>
         <Grid container spacing={3} alignItems="center">
-          <Grid item xs={5}>
+          <Grid item xs={6}>
             <TextField
               name="SEPChair"
               id="SEPChair"
@@ -266,21 +284,38 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
               className={
                 initialValues.SEPChair ? classes.darkerDisabledTextField : ''
               }
+              InputProps={{
+                endAdornment: hasAccessRights && (
+                  <>
+                    {!!initialValues.SEPChair && (
+                      <Tooltip title="Remove SEP Chair">
+                        <IconButton
+                          aria-label="Remove SEP chair"
+                          onClick={() =>
+                            setMemberToRemove({
+                              ...(initialValues.SEPChair as BasicUserDetails),
+                              roleId: UserRole.SEP_CHAIR,
+                            })
+                          }
+                        >
+                          <Clear />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    <Tooltip title="Set SEP Chair">
+                      <IconButton
+                        edge="start"
+                        onClick={() => setSepChairModalOpen(true)}
+                      >
+                        <Person />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                ),
+              }}
             />
           </Grid>
-          <Grid item xs={1}>
-            {hasAccessRights && (
-              <Tooltip title="Set SEP Chair">
-                <IconButton
-                  edge="start"
-                  onClick={() => setSepChairModalOpen(true)}
-                >
-                  <Person />
-                </IconButton>
-              </Tooltip>
-            )}
-          </Grid>
-          <Grid item xs={5}>
+          <Grid item xs={6}>
             <TextField
               name="SEPSecretary"
               id="SEPSecretary"
@@ -301,19 +336,36 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                   ? classes.darkerDisabledTextField
                   : ''
               }
+              InputProps={{
+                endAdornment: hasAccessRights && (
+                  <>
+                    {!!initialValues.SEPSecretary && (
+                      <Tooltip title="Remove SEP Secretary">
+                        <IconButton
+                          aria-label="Remove SEP secretary"
+                          onClick={() =>
+                            setMemberToRemove({
+                              ...(initialValues.SEPSecretary as BasicUserDetails),
+                              roleId: UserRole.SEP_SECRETARY,
+                            })
+                          }
+                        >
+                          <Clear />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    <Tooltip title="Set SEP Secretary">
+                      <IconButton
+                        edge="start"
+                        onClick={() => setSepSecretaryModalOpen(true)}
+                      >
+                        <Person />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                ),
+              }}
             />
-          </Grid>
-          <Grid item xs={1}>
-            {hasAccessRights && (
-              <Tooltip title="Set SEP Secretary">
-                <IconButton
-                  edge="start"
-                  onClick={() => setSepSecretaryModalOpen(true)}
-                >
-                  <Person />
-                </IconButton>
-              </Tooltip>
-            )}
           </Grid>
         </Grid>
         <Grid container spacing={3}>
@@ -327,7 +379,10 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                 hasAccessRights
                   ? {
                       onRowDelete: (rowData: BasicUserDetails): Promise<void> =>
-                        removeMember(rowData),
+                        removeMember({
+                          ...rowData,
+                          roleId: UserRole.SEP_REVIEWER,
+                        }),
                     }
                   : {}
               }

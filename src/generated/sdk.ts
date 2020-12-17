@@ -258,7 +258,6 @@ export enum Event {
   SEP_UPDATED = 'SEP_UPDATED',
   SEP_MEMBERS_ASSIGNED = 'SEP_MEMBERS_ASSIGNED',
   SEP_MEMBER_REMOVED = 'SEP_MEMBER_REMOVED',
-  SEP_PROPOSAL_ASSIGNED = 'SEP_PROPOSAL_ASSIGNED',
   SEP_PROPOSAL_REMOVED = 'SEP_PROPOSAL_REMOVED',
   SEP_MEMBER_ASSIGNED_TO_PROPOSAL = 'SEP_MEMBER_ASSIGNED_TO_PROPOSAL',
   SEP_MEMBER_REMOVED_FROM_PROPOSAL = 'SEP_MEMBER_REMOVED_FROM_PROPOSAL',
@@ -702,6 +701,7 @@ export type MutationAssignMembersArgs = {
 export type MutationRemoveMemberArgs = {
   memberId: Scalars['Int'];
   sepId: Scalars['Int'];
+  roleId: UserRole;
 };
 
 
@@ -2174,6 +2174,7 @@ export type RemoveProposalAssignmentMutation = (
 export type RemoveMemberMutationVariables = Exact<{
   memberId: Scalars['Int'];
   sepId: Scalars['Int'];
+  roleId: UserRole;
 }>;
 
 
@@ -5011,8 +5012,8 @@ export const RemoveProposalAssignmentDocument = gql`
 }
     `;
 export const RemoveMemberDocument = gql`
-    mutation removeMember($memberId: Int!, $sepId: Int!) {
-  removeMember(memberId: $memberId, sepId: $sepId) {
+    mutation removeMember($memberId: Int!, $sepId: Int!, $roleId: UserRole!) {
+  removeMember(memberId: $memberId, sepId: $sepId, roleId: $roleId) {
     error
     sep {
       id
