@@ -51,13 +51,7 @@ context('Event log tests', () => {
 
     cy.contains('People').click();
 
-    let peopleTable = cy.get('[data-cy="co-proposers"]');
-
-    const lastPeoplePageButtonElement = peopleTable.find(
-      'span[title="Last Page"] > button'
-    );
-
-    lastPeoplePageButtonElement.click({ force: true });
+    cy.get('[aria-label="Search"]').type('Carlsson');
 
     cy.contains('Carlsson')
       .parent()

@@ -19,6 +19,49 @@ context('User administration tests', () => {
   const newTelephone = faker.phone.phoneNumber('0##########');
   const newTelephoneAlt = faker.phone.phoneNumber('0##########');
 
+  it('should be able to verify email manually', () => {
+    cy.login('officer');
+
+    cy.contains('People').click();
+
+    cy.get('input[aria-label=Search]').type('placeholder');
+
+    cy.get("[title='Edit user']")
+      .first()
+      .click();
+
+    cy.contains('Email not verified');
+
+    cy.get('[data-cy=btn-verify-email]').click();
+
+    cy.notification({ variant: 'success', text: 'Email verified' });
+
+    cy.contains('Email not verified').should('not.be.visible');
+  });
+
+  it('should be able to remove the placeholder flag', () => {
+    cy.login('officer');
+
+    cy.contains('People').click();
+
+    cy.get('input[aria-label=Search]').type('placeholder');
+
+    cy.get("[title='Edit user']")
+      .first()
+      .click();
+
+    cy.contains('Placeholder user');
+
+    cy.get('[data-cy=btn-set-user-not-placeholder]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'User is no longer placeholder',
+    });
+
+    cy.contains('Placeholder user').should('not.be.visible');
+  });
+
   it('Should be able administer user information', () => {
     cy.login('officer');
 
@@ -108,6 +151,6 @@ context('User administration tests', () => {
       .first()
       .click();
 
-    cy.contains('1-4 of 4');
+    cy.contains('1-5 of 5');
   });
 });

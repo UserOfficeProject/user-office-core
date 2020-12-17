@@ -1,12 +1,17 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import DateFnsUtils from '@date-io/date-fns'; // choose your lib
 import { updateUserValidationSchema } from '@esss-swap/duo-validation';
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Chip from '@material-ui/core/Chip';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
+import DoneIcon from '@material-ui/icons/Done';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import makeStyles from '@material-ui/styles/makeStyles';
 import dateformat from 'dateformat';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -16,14 +21,14 @@ import FormikDropdown, { Option } from 'components/common/FormikDropdown';
 import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
-import { UpdateUserMutationVariables, User } from 'generated/sdk';
+import { UpdateUserMutationVariables, User, UserRole } from 'generated/sdk';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { useGetFields } from 'hooks/user/useGetFields';
 import orcid from 'images/orcid.png';
 import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   button: {
     marginTop: '25px',
     marginLeft: '10px',
@@ -39,10 +44,15 @@ const useStyles = makeStyles({
     'margin-top': '16px',
     'margin-bottom': '19px',
   },
-});
+  chipSpace: {
+    '& > * + *': {
+      margin: theme.spacing(0.5),
+    },
+  },
+}));
 
 export default function UpdateUserInformation(props: { id: number }) {
-  const { user } = useContext(UserContext);
+  const { user, currentRole } = useContext(UserContext);
   const [userData, setUserData] = useState<User | null>(null);
   const { api } = useDataApiWithFeedback();
   const fieldsContent = useGetFields();
@@ -92,6 +102,44 @@ export default function UpdateUserInformation(props: { id: number }) {
 
   const sendUserUpdate = (variables: UpdateUserMutationVariables) => {
     return api('Updated Information').updateUser(variables);
+  };
+
+  const isUserOfficer = currentRole === UserRole.USER_OFFICER;
+
+  const handleSetUserEmailVerified = async () => {
+    const {
+      setUserEmailVerified: { error },
+    } = await api('Email verified').setUserEmailVerified({ id: props.id });
+
+    if (!error) {
+      setUserData(userData =>
+        userData
+          ? {
+              ...userData,
+              emailVerified: true,
+            }
+          : null
+      );
+    }
+  };
+
+  const handleSetUserNotPlaceholder = async () => {
+    const {
+      setUserNotPlaceholder: { error },
+    } = await api('User is no longer placeholder').setUserNotPlaceholder({
+      id: props.id,
+    });
+
+    if (!error) {
+      setUserData(userData =>
+        userData
+          ? {
+              ...userData,
+              placeholder: false,
+            }
+          : null
+      );
+    }
   };
 
   return (
@@ -145,6 +193,34 @@ export default function UpdateUserInformation(props: { id: number }) {
           <Form>
             <Typography variant="h6" gutterBottom>
               User Information
+              <Box className={classes.chipSpace}>
+                {!userData.emailVerified && (
+                  <Chip
+                    color="primary"
+                    deleteIcon={<DoneIcon data-cy="btn-verify-email" />}
+                    onDelete={
+                      isUserOfficer ? handleSetUserEmailVerified : undefined
+                    }
+                    icon={<AlternateEmailIcon />}
+                    size="small"
+                    label="Email not verified"
+                  />
+                )}
+                {userData.placeholder && (
+                  <Chip
+                    color="primary"
+                    deleteIcon={
+                      <DoneIcon data-cy="btn-set-user-not-placeholder" />
+                    }
+                    onDelete={
+                      isUserOfficer ? handleSetUserNotPlaceholder : undefined
+                    }
+                    icon={<AccountCircleIcon />}
+                    size="small"
+                    label="Placeholder user"
+                  />
+                )}
+              </Box>
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={6}>
