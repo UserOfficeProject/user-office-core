@@ -6,6 +6,7 @@ import {
   Int,
   Mutation,
   Resolver,
+  Arg,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -101,6 +102,28 @@ export class UpdateUserMutation {
   ) {
     return wrapResponse(
       context.mutations.user.updateRoles(context.user, args),
+      UserResponseWrap
+    );
+  }
+
+  @Mutation(() => UserResponseWrap)
+  setUserEmailVerified(
+    @Arg('id', () => Int) id: number,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.user.setUserEmailVerified(context.user, id),
+      UserResponseWrap
+    );
+  }
+
+  @Mutation(() => UserResponseWrap)
+  setUserNotPlaceholder(
+    @Arg('id', () => Int) id: number,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.user.setUserNotPlaceholder(context.user, id),
       UserResponseWrap
     );
   }

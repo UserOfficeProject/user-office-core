@@ -94,20 +94,22 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     args: AddSEPMembersRoleArgs
   ): Promise<SEP | Rejection> {
-    const [existingChairOrSecretary] = (
-      await this.dataSource.getMembers(args.addSEPMembersRole.SEPID)
-    ).filter(
+    const allSEPMembers = await this.dataSource.getMembers(
+      args.addSEPMembersRole.SEPID
+    );
+
+    const [existingChairOrSecretary] = allSEPMembers.filter(
       member =>
         member.roleId === args.addSEPMembersRole.roleID &&
         member.sepId === args.addSEPMembersRole.SEPID
     );
 
     if (existingChairOrSecretary) {
-      await this.dataSource.removeSEPMemberRole(
-        existingChairOrSecretary.userId,
-        existingChairOrSecretary.sepId,
-        existingChairOrSecretary.roleId
-      );
+      await this.dataSource.removeSEPMemberRole({
+        memberId: existingChairOrSecretary.userId,
+        sepId: existingChairOrSecretary.sepId,
+        roleId: existingChairOrSecretary.roleId,
+      });
     }
 
     return this.dataSource
@@ -177,7 +179,7 @@ export default class SEPMutations {
     }
 
     return this.dataSource
-      .removeSEPMemberRole(args.memberId, args.sepId, UserRole.SEP_REVIEWER)
+      .removeSEPMemberRole(args)
       .then(result => result)
       .catch(err => {
         logger.logException(

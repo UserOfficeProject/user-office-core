@@ -452,6 +452,55 @@ INSERT INTO users (
 
     INSERT INTO role_user (role_id, user_id) VALUES (1, 4);
 
+    -- this user is used for testing manual email verification and to remove the placeholder flag
+    INSERT INTO users (
+                      user_title, 
+                      firstname, 
+                      middlename, 
+                      lastname, 
+                      username, 
+                      password,
+                      preferredname,
+                      orcid,
+                      orcid_refreshToken,
+                      gender,
+                      nationality,
+                      birthdate,
+                      organisation,
+                      department,
+                      organisation_address,
+                      position,
+                      email,
+                      email_verified,
+                      telephone,
+                      telephone_alt
+                      ) 
+    VALUES 
+                    (
+                      'Mr.', 
+                      'Unverified email',
+                      '', 
+                      'Placeholder', 
+                      'testuser3', 
+                      '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
+                      '',
+                      '123123123',
+                      '581459604',
+                      'male',
+                      'Danish',
+                      '2000-04-02',
+                      'Roberts, Reilly and Gutkowski',
+                      'IT deparment',
+                      'Denmark, Carlton Road, 2100 Riverside Avenue',
+                      'Management',
+                      'unverified-user@example.com',
+                      false,
+                      '(288) 221-4533',
+                      '(370) 555-4432'
+                      );
+
+    INSERT INTO role_user (role_id, user_id) VALUES (1, 5);
+
 
     INSERT INTO call(
               call_short_code 
