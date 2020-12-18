@@ -1,9 +1,10 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { QuestionaryStep, Questionary } from '../models/Questionary';
 import { UserWithRole } from '../models/User';
-import { logger } from '../utils/Logger';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 
 export default class QuestionaryQueries {

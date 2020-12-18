@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import {
   createCallValidationSchemas,
   updateCallValidationSchemas,
@@ -18,7 +19,6 @@ import {
   RemoveAssignedInstrumentFromCallInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { mergeValidationSchemas } from '../utils/helperFunctions';
-import { logger } from '../utils/Logger';
 
 const createCallValidationSchema = mergeValidationSchemas(
   ...createCallValidationSchemas

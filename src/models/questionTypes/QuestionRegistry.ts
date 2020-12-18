@@ -1,4 +1,5 @@
-import { logger } from '../../utils/Logger';
+import { logger } from '@esss-swap/duo-logger';
+
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';

@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import { setPageTextValidationSchema } from '@esss-swap/duo-validation';
 
 import { AdminDataSource } from '../datasources/AdminDataSource';
@@ -9,7 +10,6 @@ import { UserWithRole } from '../models/User';
 import { Rejection, rejection } from '../rejection';
 import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
-import { logger } from '../utils/Logger';
 
 export default class AdminMutations {
   constructor(private dataSource: AdminDataSource) {}

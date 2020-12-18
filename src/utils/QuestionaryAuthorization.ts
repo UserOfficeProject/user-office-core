@@ -1,3 +1,5 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import {
   proposalDataSource,
   questionaryDataSource,
@@ -11,7 +13,6 @@ import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateCategoryId } from '../models/Template';
 import { User, UserWithRole } from '../models/User';
 import { userAuthorization } from '../utils/UserAuthorization';
-import { logger } from './Logger';
 
 interface QuestionaryAuthorizer {
   hasReadRights(agent: User | null, questionaryId: number): Promise<boolean>;

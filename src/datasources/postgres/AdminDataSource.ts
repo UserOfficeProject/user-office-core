@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 
+import { logger } from '@esss-swap/duo-logger';
+
 import { Page } from '../../models/Admin';
 import { Institution } from '../../models/Institution';
 import { BasicUserDetails } from '../../models/User';
-import { logger } from '../../utils/Logger';
 import { AdminDataSource, Entry } from '../AdminDataSource';
 import { InstitutionsFilter } from './../../resolvers/queries/InstitutionsQuery';
 import database from './database';

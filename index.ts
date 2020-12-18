@@ -1,5 +1,6 @@
 import 'dotenv/config';
 
+import { logger } from '@esss-swap/duo-logger';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 
@@ -10,7 +11,6 @@ import exceptionHandler from './src/middlewares/exceptionHandler';
 import factory from './src/middlewares/factory';
 import files from './src/middlewares/files';
 import apolloServer from './src/middlewares/graphql';
-import { logger } from './src/utils/Logger';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 4000;

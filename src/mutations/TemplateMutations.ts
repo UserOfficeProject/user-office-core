@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
 import {
   cloneTemplateValidationSchema,
   createQuestionTemplateRelationValidationSchema,
@@ -38,7 +39,6 @@ import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutatio
 import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
-import { logger } from '../utils/Logger';
 
 export default class TemplateMutations {
   constructor(private dataSource: TemplateDataSource) {}

@@ -1,3 +1,5 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { BasicResolverContext } from './context';
 // Site specific imports (only ESS atm)
 import {
@@ -40,7 +42,6 @@ import SampleQueries from './queries/SampleQueries';
 import SEPQueries from './queries/SEPQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
-import { logger } from './utils/Logger';
 import { questionaryAuthorization } from './utils/QuestionaryAuthorization';
 import { userAuthorization } from './utils/UserAuthorization';
 

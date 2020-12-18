@@ -1,7 +1,8 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { logger } from '../utils/Logger';
 
 export default function createHandler(
   eventLogsDataSource: EventLogsDataSource

@@ -1,5 +1,7 @@
 /* eslint-disable prettier/prettier */
 import 'reflect-metadata';
+import { MutedLogger } from '@esss-swap/duo-logger';
+
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
@@ -12,7 +14,6 @@ import {
   dummyUserNotOnProposalWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
-import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
 import ProposalMutations from './ProposalMutations';

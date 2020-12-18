@@ -1,3 +1,5 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
@@ -9,7 +11,6 @@ import { UserWithRole } from '../models/User';
 import { rejection } from '../rejection';
 import { CreateSampleInput } from '../resolvers/mutations/CreateSampleMutations';
 import { UpdateSampleArgs } from '../resolvers/mutations/UpdateSampleMutation';
-import { logger } from '../utils/Logger';
 import { sampleAuthorization } from '../utils/SampleAuthorization';
 import { userAuthorization } from '../utils/UserAuthorization';
 

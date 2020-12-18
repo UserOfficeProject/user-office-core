@@ -1,3 +1,4 @@
+import { logger, Logger } from '@esss-swap/duo-logger';
 import {
   administrationProposalBEValidationSchema,
   createProposalValidationSchema,
@@ -18,7 +19,6 @@ import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
-import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 

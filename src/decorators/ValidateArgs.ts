@@ -1,9 +1,9 @@
 import { ResourceId } from '@esss-swap/duo-localisation';
+import { logger } from '@esss-swap/duo-logger';
 import * as Yup from 'yup';
 
 import { UserWithRole } from '../models/User';
 import { Rejection, rejection } from '../rejection';
-import { logger } from '../utils/Logger';
 
 const schemaValidation = async (schema: Yup.ObjectSchema, inputArgs: any) => {
   try {

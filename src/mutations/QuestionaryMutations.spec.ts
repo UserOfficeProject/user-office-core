@@ -1,4 +1,6 @@
 import 'reflect-metadata';
+import { MutedLogger } from '@esss-swap/duo-logger';
+
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
@@ -8,7 +10,6 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import { isRejection } from '../rejection';
-import { MutedLogger } from '../utils/Logger';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import QuestionaryMutations from './QuestionaryMutations';
 

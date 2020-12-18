@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import {
   proposalGradeValidationSchema,
   proposalTechnicalReviewValidationSchema,
@@ -16,7 +17,6 @@ import { rejection, Rejection } from '../rejection';
 import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
 import { AddTechnicalReviewArgs } from '../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
-import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ReviewMutations {
