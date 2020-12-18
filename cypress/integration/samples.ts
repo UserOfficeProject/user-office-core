@@ -79,11 +79,10 @@ context('Samples tests', () => {
 
     cy.contains('Save').click();
 
-    cy.get('body').type('{alt}', { release: false });
+    cy.contains(sampleQuestion)
+      .parent()
+      .dragElement([{ direction: 'left', length: 1 }]);
 
-    cy.contains(sampleQuestion).click();
-
-    // now check if the question that was ALT-clicked was moved away from question list
     cy.get('[data-cy=close-button]').click(); // closing question list
 
     cy.contains(sampleQuestion); // checking if question in the topic column
