@@ -384,7 +384,7 @@ const SignUp: React.FC<SignUpProps> = props => {
                       component={TextField}
                       margin="normal"
                       fullWidth
-                      autoComplete="off"
+                      autoComplete="new-password"
                       data-cy="password"
                       helperText="Password must contain at least 8 characters (including upper case, lower case and numbers)"
                       required
@@ -397,7 +397,7 @@ const SignUp: React.FC<SignUpProps> = props => {
                       component={TextField}
                       margin="normal"
                       fullWidth
-                      autoComplete="off"
+                      autoComplete="new-password"
                       data-cy="confirmPassword"
                       required
                       disabled={!orcData}
