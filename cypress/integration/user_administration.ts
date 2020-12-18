@@ -36,7 +36,7 @@ context('User administration tests', () => {
 
     cy.notification({ variant: 'success', text: 'Email verified' });
 
-    cy.contains('Email not verified').should('not.be.visible');
+    cy.contains('Email not verified').should('not.exist');
   });
 
   it('should be able to remove the placeholder flag', () => {
@@ -59,7 +59,7 @@ context('User administration tests', () => {
       text: 'User is no longer placeholder',
     });
 
-    cy.contains('Placeholder user').should('not.be.visible');
+    cy.contains('Placeholder user').should('not.exist');
   });
 
   it('Should be able administer user information', () => {

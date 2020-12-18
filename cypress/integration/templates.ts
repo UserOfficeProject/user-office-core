@@ -625,17 +625,11 @@ context('Template tests', () => {
 
     cy.contains('Multichoice question');
 
-    cy.get('main form .MuiCheckbox-root').should(
-      'not.contain.text',
-      'Boolean question'
-    );
+    cy.get('main form').should('not.contain.text', 'Boolean question');
 
     cy.contains('Answer 1').click();
     cy.contains('Boolean question').click();
     cy.contains('Answer 2').click();
-    cy.get('main form .MuiCheckbox-root').should(
-      'not.contain.text',
-      'Boolean question'
-    );
+    cy.get('main form').should('not.contain.text', 'Boolean question');
   });
 });

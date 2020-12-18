@@ -11,6 +11,6 @@
   },
   "scripts": {
     "cypress:open": "cypress open",
-    "cy:run": "cypress run --config defaultCommandTimeout=15000"
+    "cy:run": "cypress run --browser chrome --config defaultCommandTimeout=15000"
   }
 }
