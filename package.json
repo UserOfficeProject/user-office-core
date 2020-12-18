@@ -21,7 +21,7 @@
     "@types/jsonwebtoken": "~8.5.0",
     "@types/react": "^16.14.1",
     "@types/react-beautiful-dnd": "~11.0.5",
-    "@types/react-dom": "~16.9.9",
+    "@types/react-dom": "~16.9.10",
     "@types/react-router": "~5.1.8",
     "@types/react-router-dom": "~4.3.5",
     "@types/tinymce": "~4.5.24",
