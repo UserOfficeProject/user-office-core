@@ -317,7 +317,11 @@ export default function UpdateUserInformation(props: { id: number }) {
               <Grid item xs={6}>
                 <div className={classes.orcIdContainer}>
                   <InputLabel shrink>ORCID iD</InputLabel>
-                  <a href={'https://orcid.org/' + values.orcid}>
+                  <a
+                    href={'https://orcid.org/' + values.orcid}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
                     <img
                       className={classes.orcidIconSmall}
                       src={orcid}
