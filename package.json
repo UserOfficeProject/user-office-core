@@ -68,7 +68,7 @@
     "sparkpost": "^2.1.4",
     "type-graphql": "^1.1.1",
     "typedi": "^0.8.0",
-    "yup": "^0.30.0"
+    "yup": "^0.31.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
