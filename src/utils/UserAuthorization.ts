@@ -135,9 +135,11 @@ if (process.env.NODE_ENV === 'test') {
   sepDataSourceInstance = new SEPDataSourceMock() as PostgresSEPDataSource;
 }
 
-// if (process.env.EXTERNAL_AUTH_PROVIDER === 'stfc') {
-  userDataSourceInstance = new StfcDataSource();
-// }
+if (process.env.EXTERNAL_AUTH_PROVIDER) {
+  if (process.env.EXTERNAL_AUTH_PROVIDER === 'stfc') {
+    userDataSourceInstance = new StfcDataSource();
+  }
+}
 
 export const userAuthorization = new UserAuthorization(
   userDataSourceInstance,
