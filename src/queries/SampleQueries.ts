@@ -1,22 +1,21 @@
 import { logger } from '@esss-swap/duo-logger';
 
 import { sampleDataSource } from '../datasources';
-import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { SamplesArgs } from '../resolvers/queries/SamplesQuery';
-import { sampleAuthorization } from '../utils/SampleAuthorization';
+import { SampleAuthorization } from '../utils/SampleAuthorization';
 
 export default class SampleQueries {
   constructor(
-    public dataSource: SampleDataSource,
-    public questionaryDataSource: QuestionaryDataSource
+    private dataSource: SampleDataSource,
+    private sampleAuthorization: SampleAuthorization
   ) {}
 
   async getSample(agent: UserWithRole | null, sampleId: number) {
-    if (!sampleAuthorization.hasReadRights(agent, sampleId)) {
+    if (!this.sampleAuthorization.hasReadRights(agent, sampleId)) {
       logger.logWarn('Unauthorized getSample access', { agent, sampleId });
 
       return null;
@@ -29,7 +28,9 @@ export default class SampleQueries {
     let samples = await this.dataSource.getSamples(args);
 
     samples = await Promise.all(
-      samples.map(sample => sampleAuthorization.hasReadRights(agent, sample.id))
+      samples.map(sample =>
+        this.sampleAuthorization.hasReadRights(agent, sample.id)
+      )
     ).then(results => samples.filter((_v, index) => results[index]));
 
     return samples;

@@ -11,7 +11,7 @@ import { UserWithRole } from '../models/User';
 import { rejection } from '../rejection';
 import { CreateSampleInput } from '../resolvers/mutations/CreateSampleMutations';
 import { UpdateSampleArgs } from '../resolvers/mutations/UpdateSampleMutation';
-import { sampleAuthorization } from '../utils/SampleAuthorization';
+import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { userAuthorization } from '../utils/UserAuthorization';
 
 export default class SampleMutations {
@@ -19,7 +19,8 @@ export default class SampleMutations {
     private sampleDataSource: SampleDataSource,
     private questionaryDataSource: QuestionaryDataSource,
     private templateDataSource: TemplateDataSource,
-    private proposalDataSource: ProposalDataSource
+    private proposalDataSource: ProposalDataSource,
+    private sampleAuthorization: SampleAuthorization
   ) {}
 
   @Authorized()
@@ -70,7 +71,7 @@ export default class SampleMutations {
 
   @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
   async updateSample(agent: UserWithRole | null, args: UpdateSampleArgs) {
-    if (!sampleAuthorization.hasWriteRights(agent, args.sampleId)) {
+    if (!this.sampleAuthorization.hasWriteRights(agent, args.sampleId)) {
       return rejection('NOT_AUTHORIZED');
     }
 
@@ -99,7 +100,7 @@ export default class SampleMutations {
   }
 
   async deleteSample(agent: UserWithRole | null, sampleId: number) {
-    if (!sampleAuthorization.hasWriteRights(agent, sampleId)) {
+    if (!this.sampleAuthorization.hasWriteRights(agent, sampleId)) {
       return rejection('NOT_AUTHORIZED');
     }
 
@@ -121,7 +122,7 @@ export default class SampleMutations {
     if (!agent) {
       return rejection('NOT_AUTHORIZED');
     }
-    if (!sampleAuthorization.hasWriteRights(agent, sampleId)) {
+    if (!this.sampleAuthorization.hasWriteRights(agent, sampleId)) {
       return rejection('NOT_AUTHORIZED');
     }
 
