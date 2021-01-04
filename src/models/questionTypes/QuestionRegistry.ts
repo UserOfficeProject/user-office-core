@@ -5,6 +5,7 @@ import { dateDefinition } from './Date';
 import { embellishmentDefinition } from './Embellishment';
 import { fileUploadDefinition } from './FileUpload';
 import { intervalDefinition } from './Interval';
+import { numberInputDefinition } from './NumberInput';
 import { proposalBasisDefinition } from './ProposalBasis';
 import { sampleBasisDefinition } from './SampleBasis';
 import { sampleDeclarationDefinition } from './SampleDeclaration';
@@ -31,6 +32,7 @@ const registry = [
   proposalBasisDefinition,
   sampleBasisDefinition,
   intervalDefinition,
+  numberInputDefinition,
 ];
 
 Object.freeze(registry);
