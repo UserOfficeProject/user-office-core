@@ -26,6 +26,14 @@
 import faker from 'faker';
 import { GraphQLClient } from 'graphql-request';
 
+const KEY_CODES = {
+  space: 32,
+  left: 37,
+  up: 38,
+  right: 39,
+  down: 40,
+};
+
 const resetDB = () => {
   const query = `mutation {
     prepareDB {
@@ -126,6 +134,25 @@ const createProposal = (proposalTitle = '', proposalAbstract = '') => {
   cy.contains('Save and continue').click();
 };
 
+const dragElement = (element, moveArgs) => {
+  const focusedElement = cy.get(element).focus();
+
+  focusedElement.trigger('keydown', { keyCode: KEY_CODES.space });
+
+  moveArgs.forEach(({ direction, length }) => {
+    for (let i = 1; i <= length; i++) {
+      focusedElement.trigger('keydown', {
+        keyCode: KEY_CODES[direction],
+        force: true,
+      });
+    }
+  });
+
+  focusedElement.trigger('keydown', { keyCode: KEY_CODES.space, force: true });
+
+  return element;
+};
+
 Cypress.Commands.add('resetDB', resetDB);
 
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
@@ -139,6 +166,13 @@ Cypress.Commands.add('notification', notification);
 Cypress.Commands.add('finishedLoading', finishedLoading);
 
 Cypress.Commands.add('createProposal', createProposal);
+Cypress.Commands.add(
+  'dragElement',
+  { prevSubject: 'element' },
+  (element, args) => {
+    dragElement(element, args);
+  }
+);
 
 // call cy.presentationMode(); before your test to have delay between clicks.
 // Excellent for presentation purposes

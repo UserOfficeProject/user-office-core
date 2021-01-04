@@ -54,7 +54,7 @@ export default function UpdatePassword(props: { id: number }) {
                   component={TextField}
                   margin="normal"
                   fullWidth
-                  autoComplete="off"
+                  autoComplete="new-password"
                   data-cy="password"
                   helperText="Password must contain at least 8 characters (including upper case, lower case and numbers)"
                 />
@@ -67,7 +67,7 @@ export default function UpdatePassword(props: { id: number }) {
                   component={TextField}
                   margin="normal"
                   fullWidth
-                  autoComplete="off"
+                  autoComplete="new-password"
                   data-cy="confirmPassword"
                 />
               </Grid>

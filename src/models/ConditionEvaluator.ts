@@ -1,13 +1,23 @@
-import { EvaluatorOperator, Answer } from 'generated/sdk';
+import { EvaluatorOperator, Answer, DataType } from 'generated/sdk';
 
 export class EqualityValidator implements FieldConditionEvaluator {
   isSatisfied(field: Answer, params: string): boolean {
+    // NOTE: Check against array of values when multichoice field dependency.
+    if (field.question.dataType === DataType.SELECTION_FROM_OPTIONS) {
+      return field.value.includes(params);
+    }
+
     return field.value === params;
   }
 }
 
 export class InequalityValidator implements FieldConditionEvaluator {
   isSatisfied(field: Answer, params: string): boolean {
+    // NOTE: Check against array of values when multichoice field dependency.
+    if (field.question.dataType === DataType.SELECTION_FROM_OPTIONS) {
+      return field.value?.length && !field.value.includes(params);
+    }
+
     return field.value !== params;
   }
 }

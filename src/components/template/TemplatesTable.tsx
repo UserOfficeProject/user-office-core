@@ -16,8 +16,8 @@ import {
   TemplateCategoryId,
   TemplateMetadataFragment,
 } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { WithConfirmType } from 'utils/withConfirm';
 
 import CreateTemplate from './CreateTemplate';
@@ -37,7 +37,7 @@ interface TemplatesTableProps {
 }
 export function TemplatesTable(props: TemplatesTableProps) {
   const [templates, setTemplates] = useState<TemplateRowDataType[]>([]);
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const history = useHistory();
   const [show, setShow] = useState(false);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
@@ -101,7 +101,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
       ) => {
         props.confirm(
           () => {
-            api()
+            api('Template archived successfully')
               .updateTemplate({
                 templateId: (data as TemplateRowDataType).templateId,
                 isArchived: true,
