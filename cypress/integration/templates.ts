@@ -14,11 +14,13 @@ context('Template tests', () => {
   let dateId: string;
   let multipleChoiceId: string;
   let intervalId: string;
+  let numberId: string;
   const booleanQuestion = faker.random.words(2);
   const textQuestion = faker.random.words(2);
   const dateQuestion = faker.random.words(2);
   const fileQuestion = faker.random.words(2);
   const intervalQuestion = faker.random.words(2);
+  const numberQuestion = faker.random.words(2);
   const multipleChoiceQuestion = faker.lorem.words(2);
   const multipleChoiceAnswers = [
     faker.lorem.words(2),
@@ -171,6 +173,41 @@ context('Template tests', () => {
       });
 
     cy.contains(intervalQuestion)
+      .parent()
+      .dragElement([{ direction: 'left', length: 1 }]);
+    /* --- */
+
+    /* Number */
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
+
+    cy.contains('Add Number').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(numberQuestion);
+
+    cy.get('[data-cy=property]').click();
+
+    cy.contains('energy').click();
+
+    cy.get('[data-cy=units]>[role=button]').click({ force: true });
+
+    cy.contains('btu').click();
+
+    cy.contains('joule').click();
+
+    cy.get('body').type('{esc}');
+
+    cy.contains('Save').click();
+
+    cy.contains(numberQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        numberId = fieldId;
+      });
+
+    cy.contains(numberQuestion)
       .parent()
       .dragElement([{ direction: 'left', length: 1 }]);
     /* --- */
@@ -416,6 +453,9 @@ context('Template tests', () => {
     cy.get(`[data-cy="${intervalId}.max"]`)
       .click()
       .type('2');
+    cy.get(`[data-cy="${numberId}.value"]`)
+      .click()
+      .type('1');
     cy.get(`#${boolId}`).click();
     cy.get(`#${textId}`)
       .clear()
