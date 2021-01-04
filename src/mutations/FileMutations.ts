@@ -1,7 +1,8 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { FileDataSource } from '../datasources/IFileDataSource';
 import { FileMetadata } from '../models/Blob';
 import { Rejection, rejection } from '../rejection';
-import { logger } from '../utils/Logger';
 
 export default class FileMutations {
   constructor(private dataSource: FileDataSource) {}

@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
+
 import {
   Answer,
   AnswerBasic,
@@ -6,7 +8,6 @@ import {
   QuestionaryStep,
 } from '../../models/Questionary';
 import { getDefaultAnswerValue } from '../../models/questionTypes/QuestionRegistry';
-import { logger } from '../../utils/Logger';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {

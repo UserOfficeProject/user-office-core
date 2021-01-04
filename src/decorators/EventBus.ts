@@ -1,9 +1,10 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { eventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { UserWithRole } from '../models/User';
 import { Rejection, isRejection } from '../rejection';
-import { logger } from '../utils/Logger';
 
 const EventBusDecorator = (eventType: Event) => {
   return (

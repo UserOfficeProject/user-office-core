@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import {
   createSEPValidationSchema,
   updateSEPValidationSchema,
@@ -25,7 +26,6 @@ import {
 import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
-import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class SEPMutations {

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
 import to from 'await-to-js';
 
 import {
@@ -18,7 +19,6 @@ import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/De
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
-import { logger } from './../../utils/Logger';
 import database from './database';
 import {
   createProposalTemplateObject,

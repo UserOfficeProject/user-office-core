@@ -1,9 +1,9 @@
+import { logger } from '@esss-swap/duo-logger';
 import moment from 'moment';
 import request from 'request';
 
 import { Answer } from '../models/Questionary';
 import { DataType } from '../models/Template';
-import { logger } from '../utils/Logger';
 
 export const getFileAttachmentIds = (answer: Answer) => {
   if (answer.question.dataType === DataType.FILE_UPLOAD && answer.value) {

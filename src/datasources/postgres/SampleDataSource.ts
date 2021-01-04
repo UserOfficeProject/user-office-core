@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
+
 import { Sample } from '../../models/Sample';
 import { UpdateSampleArgs } from '../../resolvers/mutations/UpdateSampleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
-import { logger } from '../../utils/Logger';
 import { SampleDataSource } from '../SampleDataSource';
 import database from './database';
 import { createSampleObject, SampleRecord } from './records';

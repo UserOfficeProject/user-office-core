@@ -1,3 +1,5 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { BasicResolverContext } from './context';
 // Site specific imports (only ESS atm)
 import {
@@ -40,11 +42,17 @@ import SampleQueries from './queries/SampleQueries';
 import SEPQueries from './queries/SEPQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
-import { logger } from './utils/Logger';
 import { questionaryAuthorization } from './utils/QuestionaryAuthorization';
+import { SampleAuthorization } from './utils/SampleAuthorization';
 import { userAuthorization } from './utils/UserAuthorization';
 
 // From this point nothing is site-specific
+
+const sampleAuthorization = new SampleAuthorization(
+  sampleDataSource,
+  proposalDataSource
+);
+
 const userQueries = new UserQueries(userDataSource);
 const userMutations = new UserMutations(userDataSource, userAuthorization);
 
@@ -105,16 +113,14 @@ const questionaryMutations = new QuestionaryMutations(
   logger
 );
 
-const sampleQueries = new SampleQueries(
-  sampleDataSource,
-  questionaryDataSource
-);
+const sampleQueries = new SampleQueries(sampleDataSource, sampleAuthorization);
 
 const sampleMutations = new SampleMutations(
   sampleDataSource,
   questionaryDataSource,
   templateDataSource,
-  proposalDataSource
+  proposalDataSource,
+  sampleAuthorization
 );
 
 const proposalSettingsQueries = new ProposalSettingsQueries(
