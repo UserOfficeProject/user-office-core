@@ -77,7 +77,7 @@ export const QuestionNumberForm: FormComponent<Question> = props => {
 
           <Field
             name="config.small_label"
-            label="Small label!"
+            label="Small label"
             type="text"
             component={TextField}
             margin="normal"
