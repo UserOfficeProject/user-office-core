@@ -59,7 +59,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
 
   const classes = useStyles();
 
-  const minFieldId = `${proposalQuestionId}.value`;
+  const valueFieldId = `${proposalQuestionId}.value`;
   const unitFieldId = `${proposalQuestionId}.unit`;
 
   const getNumberOrDefault = (
@@ -119,9 +119,9 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
             }
             onBlur={e => onComplete(e, stateValue)}
             value={stateValue.value}
-            data-cy={minFieldId}
+            data-cy={valueFieldId}
             type="number"
-            name={minFieldId}
+            name={valueFieldId}
           />
         </Grid>
         <Grid item xs={6} className={classes.unitField}>

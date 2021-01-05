@@ -4,6 +4,7 @@ import React from 'react';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
+import { IntervalPropertyId } from '../Interval/intervalUnits';
 import { createNumberInputValidationSchema } from './createNumberInputValidationSchema';
 import { QuestionaryComponentNumber } from './QuestionaryComponentNumberInput';
 import { QuestionNumberForm } from './QuestionNumberInputForm';
@@ -24,5 +25,5 @@ export const numberInputDefinition: QuestionaryComponentDefinition = {
     ) : null,
   createYupValidationSchema: createNumberInputValidationSchema,
   getYupInitialValue: ({ answer }) =>
-    answer.value || { value: '', unit: 'unitless' },
+    answer.value || { value: '', unit: IntervalPropertyId.UNITLESS },
 };
