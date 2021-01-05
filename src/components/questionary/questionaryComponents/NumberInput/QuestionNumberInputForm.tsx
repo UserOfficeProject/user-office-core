@@ -28,7 +28,7 @@ const propertyDropdownEntries = Array.from(allProperties).map(
   })
 );
 
-export const QuestionIntervalForm: FormComponent<Question> = props => {
+export const QuestionNumberForm: FormComponent<Question> = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 

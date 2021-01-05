@@ -29,7 +29,7 @@ const propertyDropdownEntries = Array.from(allProperties).map(
   })
 );
 
-export const QuestionTemplateRelationIntervalForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationNumberForm: FormComponent<QuestionTemplateRelation> = props => {
   const [showUnits, setShowUnits] = useState(
     (props.field.config as IntervalConfig).property !==
       IntervalPropertyId.UNITLESS

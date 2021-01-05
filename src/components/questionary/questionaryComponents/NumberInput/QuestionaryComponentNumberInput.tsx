@@ -40,7 +40,7 @@ const useStyles = makeStyles(theme => ({
 
 type AcceptableUserInput = number | '';
 
-export function QuestionaryComponentInterval(props: BasicComponentProps) {
+export function QuestionaryComponentNumber(props: BasicComponentProps) {
   const {
     answer,
     onComplete,

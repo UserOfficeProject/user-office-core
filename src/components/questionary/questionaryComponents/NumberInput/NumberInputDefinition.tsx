@@ -5,16 +5,16 @@ import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createNumberInputValidationSchema } from './createNumberInputValidationSchema';
-import { QuestionaryComponentInterval } from './QuestionaryComponentNumberInput';
-import { QuestionIntervalForm } from './QuestionNumberInputForm';
-import { QuestionTemplateRelationIntervalForm } from './QuestionTemplateRelationNumberInputForm';
+import { QuestionaryComponentNumber } from './QuestionaryComponentNumberInput';
+import { QuestionNumberForm } from './QuestionNumberInputForm';
+import { QuestionTemplateRelationNumberForm } from './QuestionTemplateRelationNumberInputForm';
 
 export const numberInputDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.NUMBER_INPUT,
   name: 'Number',
-  questionaryComponent: QuestionaryComponentInterval,
-  questionForm: () => QuestionIntervalForm,
-  questionTemplateRelationForm: () => QuestionTemplateRelationIntervalForm,
+  questionaryComponent: QuestionaryComponentNumber,
+  questionForm: () => QuestionNumberForm,
+  questionTemplateRelationForm: () => QuestionTemplateRelationNumberForm,
   readonly: false,
   creatable: true,
   icon: <ExposureZeroIcon />,
