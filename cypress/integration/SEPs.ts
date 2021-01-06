@@ -84,7 +84,7 @@ context('Scientific evaluation panel tests', () => {
     cy.finishedLoading();
 
     cy.get('.MuiDialog-container [role="dialog"] table tbody tr')
-      .eq(1)
+      .first()
       .find('td.MuiTableCell-alignLeft')
       .first()
       .then(element => {
@@ -92,7 +92,7 @@ context('Scientific evaluation panel tests', () => {
       });
 
     cy.get('.MuiDialog-container [role="dialog"] table tbody tr')
-      .eq(1)
+      .first()
       .find('td.MuiTableCell-alignLeft')
       .eq(1)
       .then(element => {
@@ -100,7 +100,7 @@ context('Scientific evaluation panel tests', () => {
       });
 
     cy.get('[title="Select user"]')
-      .eq(1)
+      .first()
       .click();
 
     cy.notification({
@@ -758,5 +758,36 @@ context('Scientific evaluation panel tests', () => {
       .then(element => {
         expect(element.text()).to.be.equal('No records to display');
       });
+  });
+
+  it('Officer should be able to remove assigned SEP Chair and SEP Secretary from existing SEP', () => {
+    cy.login('officer');
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit"]')
+      .eq(1)
+      .click();
+
+    cy.contains('Members').click();
+
+    cy.finishedLoading();
+
+    cy.get('[title="Remove SEP Chair"]').click();
+
+    cy.get('[data-cy="confirm-yes"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'SEP member removed successfully',
+    });
+
+    cy.get('[title="Remove SEP Secretary"]').click();
+
+    cy.get('[data-cy="confirm-yes"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'SEP member removed successfully',
+    });
   });
 });

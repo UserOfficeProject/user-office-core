@@ -1,4 +1,4 @@
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import TodayIcon from '@material-ui/icons/Today';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';
@@ -17,7 +17,7 @@ export const dateDefinition: QuestionaryComponentDefinition = {
   questionTemplateRelationForm: () => QuestionTemplateRelationDateForm,
   readonly: false,
   creatable: true,
-  icon: <CheckBoxOutlineBlankIcon />,
+  icon: <TodayIcon />,
   answerRenderer: ({ answer }) => <span>{answer.value}</span>,
   createYupValidationSchema: createDateValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || '',

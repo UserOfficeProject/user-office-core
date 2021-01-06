@@ -124,11 +124,6 @@ context('Settings tests', () => {
   });
 
   describe('Proposal workflows tests', () => {
-    const spaceKeyCode = 32;
-    const arrowLeftKeyCode = 37;
-    const arrowRightKeyCode = 39;
-    const arrowDownKeyCode = 40;
-
     before(() => {
       cy.resetDB();
     });
@@ -200,13 +195,10 @@ context('Settings tests', () => {
         .last()
         .click();
 
-      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]')
-        .focus()
-        .trigger('keydown', { keyCode: spaceKeyCode })
-        .trigger('keydown', { keyCode: arrowLeftKeyCode, force: true })
-        .trigger('keydown', { keyCode: arrowDownKeyCode, force: true })
-        .wait(500)
-        .trigger('keydown', { keyCode: spaceKeyCode, force: true });
+      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').dragElement([
+        { direction: 'left', length: 1 },
+        { direction: 'down', length: 1 },
+      ]);
 
       cy.get('[data-cy="connection_FEASIBILITY_REVIEW_2"]').should(
         'contain.text',
@@ -273,13 +265,10 @@ context('Settings tests', () => {
 
       cy.notification({ variant: 'success', text: 'created successfully' });
 
-      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]')
-        .focus()
-        .trigger('keydown', { keyCode: spaceKeyCode })
-        .trigger('keydown', { keyCode: arrowLeftKeyCode, force: true })
-        .trigger('keydown', { keyCode: arrowDownKeyCode, force: true })
-        .wait(500)
-        .trigger('keydown', { keyCode: spaceKeyCode, force: true });
+      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').dragElement([
+        { direction: 'left', length: 1 },
+        { direction: 'down', length: 1 },
+      ]);
 
       cy.notification({
         variant: 'success',
@@ -435,25 +424,18 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="droppable-group"]').should('have.length', 3);
 
-      cy.get('[data-cy="status_SEP_SELECTION_4"]')
-        .focus()
-        .trigger('keydown', { keyCode: spaceKeyCode })
-        .trigger('keydown', { keyCode: arrowLeftKeyCode, force: true })
-        .trigger('keydown', { keyCode: arrowLeftKeyCode, force: true })
-        .wait(500)
-        .trigger('keydown', { keyCode: spaceKeyCode, force: true });
+      cy.get('[data-cy="status_SEP_SELECTION_4"]').dragElement([
+        { direction: 'left', length: 2 },
+      ]);
 
       cy.get('[data-cy="connection_SEP_SELECTION_4"]').should(
         'contain.text',
         'SEP_SELECTION'
       );
 
-      cy.get('[data-cy="status_NOT_FEASIBLE_3"]')
-        .focus()
-        .trigger('keydown', { keyCode: spaceKeyCode })
-        .trigger('keydown', { keyCode: arrowLeftKeyCode, force: true })
-        .wait(500)
-        .trigger('keydown', { keyCode: spaceKeyCode, force: true });
+      cy.get('[data-cy="status_NOT_FEASIBLE_3"]').dragElement([
+        { direction: 'left', length: 1 },
+      ]);
 
       cy.get('[data-cy="connection_NOT_FEASIBLE_3"]').should(
         'contain.text',
