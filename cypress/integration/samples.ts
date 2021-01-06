@@ -133,13 +133,13 @@ context('Samples tests', () => {
     cy.get('[data-cy="questionaries-list-item"]').should('have.length', 1);
 
     cy.get('[data-cy="clone"]').click();
-
+    cy.get('[data-cy="confirm-yes"]').click();
     cy.get('[data-cy="questionaries-list-item"]').should('have.length', 2);
 
     cy.get('[data-cy="delete"]')
       .eq(1)
       .click();
-
+    cy.get('[data-cy="confirm-yes"]').click();
     cy.get('[data-cy="questionaries-list-item"]').should('have.length', 1);
 
     cy.contains('Save and continue').click();
