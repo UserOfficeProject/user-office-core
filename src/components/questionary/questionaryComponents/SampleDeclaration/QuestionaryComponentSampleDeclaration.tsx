@@ -2,6 +2,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import React, { useContext, useEffect, useState } from 'react';
 
+import DialogConfirmation from 'components/common/DialogConfirmation';
 import StyledModal from 'components/common/StyledModal';
 import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -65,7 +66,20 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   const [stateValue, setStateValue] = useState<number[]>(answer.value || []); // ids of samples
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
-
+  const [openCopySample, setOpenCopySample] = useState(false);
+  const [sampleToCopy, setSampleToCopy] = useState<number>(0);
+  const copySample = () =>
+    api()
+      .cloneSample({ sampleId: sampleToCopy })
+      .then(response => {
+        const clonedSample = response.cloneSample.sample;
+        if (clonedSample) {
+          const newStateValue = [...stateValue, clonedSample.id];
+          setStateValue(newStateValue);
+          setRows([...rows, sampleToListRow(clonedSample)]);
+          onComplete(proposalQuestionId, newStateValue);
+        }
+      });
   useEffect(() => {
     const getSamples = async (
       proposalId: number,
@@ -90,6 +104,13 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
 
   return (
     <>
+      <DialogConfirmation
+        title="Copy Sample"
+        text="This action will copy the sample and all data associated with it"
+        open={openCopySample}
+        action={copySample}
+        handleOpen={setOpenCopySample}
+      />
       <FormControl error={isError} required={config.required} fullWidth>
         <FormLabel error={isError}>{answer.question.question}</FormLabel>
         <span>{config.small_label}</span>
@@ -121,17 +142,8 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
               });
           }}
           onCloneClick={item => {
-            api()
-              .cloneSample({ sampleId: item.id })
-              .then(response => {
-                const clonedSample = response.cloneSample.sample;
-                if (clonedSample) {
-                  const newStateValue = [...stateValue, clonedSample.id];
-                  setStateValue(newStateValue);
-                  setRows([...rows, sampleToListRow(clonedSample)]);
-                  onComplete(proposalQuestionId, newStateValue);
-                }
-              });
+            setSampleToCopy(item.id);
+            setOpenCopySample(true);
           }}
           onAddNewClick={() => {
             const state = proposalContext.state;
