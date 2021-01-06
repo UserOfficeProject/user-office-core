@@ -67,16 +67,30 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
   const [openCopySample, setOpenCopySample] = useState(false);
-  const [sampleToCopy, setSampleToCopy] = useState<number>(0);
+  const [openDeleteSample, setOpenDeleteSample] = useState(false);
+  const [sampleToChange, setSampleToChange] = useState<number>(0);
   const copySample = () =>
     api()
-      .cloneSample({ sampleId: sampleToCopy })
+      .cloneSample({ sampleId: sampleToChange })
       .then(response => {
         const clonedSample = response.cloneSample.sample;
         if (clonedSample) {
           const newStateValue = [...stateValue, clonedSample.id];
           setStateValue(newStateValue);
           setRows([...rows, sampleToListRow(clonedSample)]);
+          onComplete(proposalQuestionId, newStateValue);
+        }
+      });
+  const deleteSample = () =>
+    api()
+      .deleteSample({ sampleId: sampleToChange })
+      .then(response => {
+        if (!response.deleteSample.error) {
+          const newStateValue = stateValue.filter(
+            sampleId => sampleId !== sampleToChange
+          );
+          setStateValue(newStateValue);
+          setRows(rows.filter(row => row.id !== sampleToChange));
           onComplete(proposalQuestionId, newStateValue);
         }
       });
@@ -111,6 +125,13 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
         action={copySample}
         handleOpen={setOpenCopySample}
       />
+      <DialogConfirmation
+        title="Delete Sample"
+        text="This action will delete the sample and all data associated with it"
+        open={openDeleteSample}
+        action={deleteSample}
+        handleOpen={setOpenDeleteSample}
+      />
       <FormControl error={isError} required={config.required} fullWidth>
         <FormLabel error={isError}>{answer.question.question}</FormLabel>
         <span>{config.small_label}</span>
@@ -128,21 +149,11 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
               })
           }
           onDeleteClick={item => {
-            api()
-              .deleteSample({ sampleId: item.id })
-              .then(response => {
-                if (!response.deleteSample.error) {
-                  const newStateValue = stateValue.filter(
-                    sampleId => sampleId !== item.id
-                  );
-                  setStateValue(newStateValue);
-                  setRows(rows.filter(row => row.id !== item.id));
-                  onComplete(proposalQuestionId, newStateValue);
-                }
-              });
+            setSampleToChange(item.id);
+            setOpenDeleteSample(true);
           }}
           onCloneClick={item => {
-            setSampleToCopy(item.id);
+            setSampleToChange(item.id);
             setOpenCopySample(true);
           }}
           onAddNewClick={() => {
