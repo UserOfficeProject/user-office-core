@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import * as dotenv from 'dotenv';
 import SparkPost from 'sparkpost';
 
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -7,11 +8,25 @@ import { Event } from '../events/event.enum';
 import { ProposalEndStatus } from '../models/Proposal';
 import { UserRole } from '../models/User';
 import { logger } from '../utils/Logger';
+import EmailSettings from './MailService/EmailSettings';
+import MailService from './MailService/MailService';
+import { SMTPMailService } from './MailService/SMTPMailService';
+import { SparkPostMailService } from './MailService/SparkPostMailService';
 
 const options = {
   endpoint: 'https://api.eu.sparkpost.com:443',
 };
 const client = new SparkPost(process.env.SPARKPOST_TOKEN, options);
+
+// Decide whether to use STFC's SMTP server to send mail or ESS's SparkPost solution
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
+
+const mailService: MailService =
+  process.env.EMAIL_PROTOCOL === 'SPARK'
+    ? new SparkPostMailService(options)
+    : new SMTPMailService();
 
 export default function createHandler(userDataSource: UserDataSource) {
   // Handler to send email to proposers in accepted proposal
@@ -103,45 +118,48 @@ export default function createHandler(userDataSource: UserDataSource) {
         if (!principalInvestigator) {
           return;
         }
-        client.transmissions
-          .send({
-            content: {
-              template_id: 'proposal-submitted',
-            },
-            substitution_data: {
-              piPreferredname: principalInvestigator.preferredname,
-              piLastname: principalInvestigator.lastname,
-              proposalNumber: event.proposal.shortCode,
-              proposalTitle: event.proposal.title,
-              coProposers: participants.map(
-                partipant => `${partipant.preferredname} ${partipant.lastname} `
-              ),
-              call: '',
-            },
-            recipients: [
-              { address: { email: principalInvestigator.email } },
-              ...participants.map(partipant => {
-                return {
-                  address: {
-                    email: partipant.email,
-                    header_to: principalInvestigator.email,
-                  },
-                };
-              }),
-            ],
-          })
+
+        const options: EmailSettings = {
+          content: {
+            template_id: '',
+          },
+          substitution_data: {
+            piPreferredname: principalInvestigator.preferredname,
+            piLastname: principalInvestigator.lastname,
+            proposalNumber: event.proposal.shortCode,
+            proposalTitle: event.proposal.title,
+            coProposers: participants.map(
+              partipant => `${partipant.preferredname} ${partipant.lastname} `
+            ),
+            call: '',
+          },
+          recipients: [
+            { address: { email: principalInvestigator.email } },
+            ...participants.map(partipant => {
+              return {
+                address: {
+                  email: partipant.email,
+                  header_to: principalInvestigator.email,
+                },
+              };
+            }),
+          ],
+        };
+        /*
+        mailService
+          .sendMail(options)
           .then((res: any) => {
-            logger.logInfo('Email sent on proposal submission:', {
+            logger.logInfo('Emails sent on proposal submission:', {
               result: res,
               event,
             });
           })
           .catch((err: string) => {
-            logger.logError('Could not send email on proposal submission:', {
+            logger.logError('Could not send email(s) on proposal submission:', {
               error: err,
               event,
             });
-          });
+          });*/
 
         return;
       }
