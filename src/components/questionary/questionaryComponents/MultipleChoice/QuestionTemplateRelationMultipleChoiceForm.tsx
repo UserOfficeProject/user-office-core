@@ -62,13 +62,8 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
                 { text: 'Dropdown', value: 'dropdown' },
               ]}
               data-cy="variant"
-              InputProps={{
-                onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  formikProps.setFieldValue('config.variant', e.target.value);
-                  setShowIsMultipleSelectCheckbox(
-                    e.target.value === 'dropdown'
-                  );
-                },
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setShowIsMultipleSelectCheckbox(e.target.value === 'dropdown');
               }}
             />
             {showIsMultipleSelectCheckbox && (

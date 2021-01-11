@@ -4,7 +4,7 @@ import React from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomDependencySelector from 'components/common/FormikUICustomDependencySelector';
-import FormikUICustomMultipleSelect from 'components/common/FormikUICustomMultipleSelect';
+import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionTemplateRelation } from 'generated/sdk';
@@ -50,7 +50,7 @@ export const QuestionTemplateRelationFileUploadForm: FormComponent<QuestionTempl
               name="config.file_type"
               label="Accepted file types (leave empty for any)"
               id="fileType"
-              component={FormikUICustomMultipleSelect}
+              component={FormikUICustomSelect}
               availableOptions={[
                 '.pdf',
                 '.doc',

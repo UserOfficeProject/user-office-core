@@ -1,0 +1,11 @@
+mutation addSamplesToShipment($shipmentId: Int!, $sampleIds: [Int!]!) {
+  addSamplesToShipment(shipmentId: $shipmentId, sampleIds: $sampleIds) {
+    error
+    shipment {
+      ...shipment
+      samples {
+        ...sample
+      }
+    }
+  }
+}

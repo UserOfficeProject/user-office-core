@@ -95,18 +95,7 @@ context('Template tests', () => {
       .first()
       .click();
 
-    cy.get('[data-cy=show-more-button]').click();
-
-    cy.get('[data-cy=add-topic-menu-item]').click();
-
-    cy.get('[data-cy=topic-title]')
-      .last()
-      .click();
-
-    cy.get('[data-cy=topic-title-input]')
-      .last()
-      .clear()
-      .type(`${topic}{enter}`);
+    cy.createTopic(topic);
 
     cy.get('[data-cy=show-more-button]')
       .last()
@@ -254,15 +243,21 @@ context('Template tests', () => {
 
     cy.contains('Is multiple select').click();
 
-    cy.contains('Add answer').click();
+    cy.get('[data-cy=add-answer-button]')
+      .closest('button')
+      .click({ force: true });
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[0]);
     cy.get('[title="Save"]').click();
 
-    cy.contains('Add answer').click();
+    cy.get('[data-cy=add-answer-button]')
+      .closest('button')
+      .click({ force: true });
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[1]);
     cy.get('[title="Save"]').click();
 
-    cy.contains('Add answer').click();
+    cy.get('[data-cy=add-answer-button]')
+      .closest('button')
+      .click({ force: true });
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[2]);
     cy.get('[title="Save"]').click();
 
@@ -516,13 +511,6 @@ context('Template tests', () => {
 
     cy.contains(fileQuestion).click();
     cy.get("[data-cy='delete']").click();
-
-    cy.get('[data-cy=show-more-button]')
-      .last()
-      .click();
-    cy.get('[data-cy=add-topic-menu-item]')
-      .last()
-      .click();
   });
 
   it('User officer can add multiple choice quesion as a dependency', () => {
@@ -550,11 +538,15 @@ context('Template tests', () => {
       .clear()
       .type('Multichoice question');
 
-    cy.contains('Add answer').click();
+    cy.get('[data-cy=add-answer-button]')
+      .closest('button')
+      .click({ force: true });
     cy.get('input[placeholder="Answer"]').type('Answer 1');
     cy.get('[title="Save"]').click();
 
-    cy.contains('Add answer').click();
+    cy.get('[data-cy=add-answer-button]')
+      .closest('button')
+      .click({ force: true });
     cy.get('input[placeholder="Answer"]').type('Answer 2');
     cy.get('[title="Save"]').click();
 

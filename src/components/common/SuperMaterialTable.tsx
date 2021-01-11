@@ -3,11 +3,11 @@ import Edit from '@material-ui/icons/Edit';
 import MaterialTable, { MaterialTableProps } from 'material-table';
 import React, { useState } from 'react';
 import {
-  QueryParamConfig,
   DecodedValueMap,
-  SetQuery,
   DelimitedNumericArrayParam,
   NumberParam,
+  QueryParamConfig,
+  SetQuery,
   StringParam,
   withDefault,
 } from 'use-query-params';
@@ -51,7 +51,7 @@ interface EntryID {
   id: number;
 }
 
-function SuperMaterialTable<Entry extends EntryID>({
+export function SuperMaterialTable<Entry extends EntryID>({
   hasAccess = {
     create: true,
     remove: true,
@@ -207,6 +207,7 @@ function SuperMaterialTable<Entry extends EntryID>({
             variant="contained"
             color="primary"
             onClick={() => setShow(true)}
+            data-cy="create-new-entry"
           >
             Create
           </Button>

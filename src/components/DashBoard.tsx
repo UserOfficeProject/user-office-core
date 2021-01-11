@@ -39,8 +39,12 @@ import SEPsPage from './SEP/SEPsPage';
 import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage';
 import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
+import ShipmentCreate from './shipments/CreateUpdateShipment';
+import MyShipments from './shipments/MyShipments';
+import ShipmentsPage from './shipments/ShipmentsPage';
 import ProposalTemplates from './template/ProposalTemplates';
 import SampleTemplatesPage from './template/SampleTemplates';
+import ShipmentTemplatesPage from './template/ShipmentTemplatesPage';
 import TemplateEditor from './template/TemplateEditor';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
@@ -189,6 +193,8 @@ const Dashboard: React.FC = () => {
             path="/ProposalCreate/:callId/:templateId"
             component={ProposalCreate}
           />
+          <Route path="/ShipmentCreate" component={ShipmentCreate} />
+          <Route path="/MyShipments" component={MyShipments} />
           <Route path="/ProfilePage/:id" component={ProfilePage} />
           {isUserOfficer && (
             <Route path="/PeoplePage/:id" component={UserPage} />
@@ -211,6 +217,10 @@ const Dashboard: React.FC = () => {
           <Route
             path="/SampleDeclarationTemplates"
             component={SampleTemplatesPage}
+          />
+          <Route
+            path="/ShipmentDeclarationTemplates"
+            component={ShipmentTemplatesPage}
           />
           <Route
             path="/ProposalTableReviewer"
@@ -237,6 +247,9 @@ const Dashboard: React.FC = () => {
           )}
           {(isSampleSafetyReviewer || isUserOfficer) && (
             <Route path="/SampleSafety" component={SampleSafetyPage} />
+          )}
+          {isUserOfficer && (
+            <Route path="/Shipments" component={ShipmentsPage} />
           )}
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}

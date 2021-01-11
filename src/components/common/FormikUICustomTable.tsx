@@ -1,3 +1,4 @@
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import { FormikHelpers } from 'formik';
 import MaterialTable from 'material-table';
 import React, { forwardRef } from 'react';
@@ -34,7 +35,11 @@ export const FormikUICustomTable = ({
     <MaterialTable
       icons={{
         ...tableIcons,
-        Add: forwardRef((props, ref) => <>Add answer</>),
+        Add: forwardRef(() => (
+          <div data-cy="add-answer-button">
+            <AddCircleOutlineIcon />
+          </div>
+        )),
       }}
       columns={columns}
       data={state}
@@ -66,7 +71,6 @@ export const FormikUICustomTable = ({
           }),
       }}
       {...props}
-      data-cy="options"
     />
   );
 };

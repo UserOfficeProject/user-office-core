@@ -1,8 +1,9 @@
 import Typography from '@material-ui/core/Typography';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { ChangeEvent, KeyboardEvent, useContext, useState } from 'react';
+import React, { ChangeEvent, useContext, useState } from 'react';
 
+import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { Answer, SampleBasisConfig } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
@@ -10,6 +11,8 @@ import { EventType } from 'models/QuestionarySubmissionState';
 import { SampleSubmissionState } from 'models/SampleSubmissionState';
 
 import { SampleContext } from '../SampleDeclaration/SampleDeclarationContainer';
+
+const TextFieldNoSubmit = withPreventSubmit(TextField);
 
 function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
   const {
@@ -38,13 +41,6 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
           onChange: (event: ChangeEvent<HTMLInputElement>) => {
             setTitle(event.currentTarget.value);
           },
-          onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-
-              return false;
-            }
-          },
           onBlur: () => {
             dispatch({
               type: EventType.SAMPLE_MODIFIED,
@@ -54,7 +50,7 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
         }}
         required
         fullWidth
-        component={TextField}
+        component={TextFieldNoSubmit}
         data-cy="title-input"
       />
     </>

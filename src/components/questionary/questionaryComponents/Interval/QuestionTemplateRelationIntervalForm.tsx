@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from 'components/common/FormikUICustomDependencySelector';
-import FormikUICustomMultipleSelect from 'components/common/FormikUICustomMultipleSelect';
+import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionExcerpt } from 'components/questionary/questionaryComponents/QuestionExcerpt';
@@ -80,18 +80,15 @@ export const QuestionTemplateRelationIntervalForm: FormComponent<QuestionTemplat
               label="Physical property"
               items={propertyDropdownEntries}
               data-cy="property"
-              InputProps={{
-                onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  formikProps.setFieldValue('config.property', e.target.value);
-                  formikProps.setFieldValue('config.units', []); // reset units to empty array
-                  setShowUnits(e.target.value !== IntervalPropertyId.UNITLESS);
-                },
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                formikProps.setFieldValue('config.units', []); // reset units to empty array
+                setShowUnits(e.target.value !== IntervalPropertyId.UNITLESS);
               }}
             />
 
             <Field
               name="config.units"
-              component={FormikUICustomMultipleSelect}
+              component={FormikUICustomSelect}
               label="Units"
               margin="normal"
               availableOptions={
