@@ -1,7 +1,7 @@
-import { useEffect, useState, useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import { ProposalsFilter, Proposal, UserRole } from 'generated/sdk';
+import { Proposal, ProposalsFilter, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useProposalsData(filter: ProposalsFilter) {
@@ -15,7 +15,6 @@ export function useProposalsData(filter: ProposalsFilter) {
     instrumentId,
     proposalStatusId,
     questionaryIds,
-    templateIds,
     text,
   } = filter;
 
@@ -28,7 +27,6 @@ export function useProposalsData(filter: ProposalsFilter) {
             instrumentId,
             proposalStatusId,
             questionaryIds,
-            templateIds,
             text,
           },
         })
@@ -48,7 +46,6 @@ export function useProposalsData(filter: ProposalsFilter) {
             instrumentId,
             proposalStatusId,
             questionaryIds,
-            templateIds,
             text,
           },
         })
@@ -64,7 +61,6 @@ export function useProposalsData(filter: ProposalsFilter) {
     instrumentId,
     proposalStatusId,
     questionaryIds,
-    templateIds,
     text,
     api,
     currentRole,

@@ -4,5 +4,6 @@ query getTemplates($filter: TemplatesFilter) {
     name
     description
     isArchived
+    questionaryCount
   }
 }

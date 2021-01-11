@@ -1,0 +1,12 @@
+mutation setActiveTemplate(
+  $templateCategoryId: TemplateCategoryId!
+  $templateId: Int!
+) {
+  setActiveTemplate(
+    templateId: $templateId
+    templateCategoryId: $templateCategoryId
+  ) {
+    isSuccess
+    error
+  }
+}

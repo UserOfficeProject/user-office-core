@@ -116,7 +116,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
                   );
                   setStateValue(newStateValue);
                   setRows(rows.filter(row => row.id !== item.id));
-                  onComplete(proposalQuestionId, newStateValue);
+                  onComplete(newStateValue);
                 }
               });
           }}
@@ -129,7 +129,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
                   const newStateValue = [...stateValue, clonedSample.id];
                   setStateValue(newStateValue);
                   setRows([...rows, sampleToListRow(clonedSample)]);
-                  onComplete(proposalQuestionId, newStateValue);
+                  onComplete(newStateValue);
                 }
               });
           }}
@@ -147,6 +147,11 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
               );
             }
             const templateId = config.templateId;
+
+            if (!templateId) {
+              throw new Error('Sample Declaration is missing templateId');
+            }
+
             api()
               .getBlankQuestionarySteps({ templateId })
               .then(result => {
@@ -196,7 +201,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
               const newStateValue = [...stateValue, newSample.id];
 
               setStateValue(newStateValue);
-              onComplete(proposalQuestionId, newStateValue);
+              onComplete(newStateValue);
 
               const newRows = [...rows, sampleToListRow(newSample)];
               setRows(newRows);

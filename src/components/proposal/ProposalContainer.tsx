@@ -18,7 +18,7 @@ import {
   UserRole,
 } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
-import { usePersistProposalModel } from 'hooks/questionary/usePersistProposalModel';
+import { usePersistProposalModel } from 'hooks/proposal/usePersistProposalModel';
 import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
 import {
   ProposalSubmissionState,

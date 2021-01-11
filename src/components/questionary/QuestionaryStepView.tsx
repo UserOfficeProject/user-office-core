@@ -97,7 +97,6 @@ export default function QuestionaryStepView(props: {
     >
       {formikProps => {
         const {
-          handleChange,
           submitForm,
           validateForm,
           setFieldValue,
@@ -115,10 +114,7 @@ export default function QuestionaryStepView(props: {
                   {createQuestionaryComponent({
                     answer: field,
                     formikProps,
-                    onComplete: (
-                      evt: React.ChangeEvent<any> | string,
-                      newValue: Answer['value']
-                    ) => {
+                    onComplete: (newValue: Answer['value']) => {
                       if (field.value !== newValue) {
                         dispatch({
                           type: EventType.FIELD_CHANGED,
@@ -127,12 +123,11 @@ export default function QuestionaryStepView(props: {
                             newValue: newValue,
                           },
                         });
-
-                        if (typeof evt === 'string') {
-                          setFieldValue(evt, newValue, true);
-                        } else {
-                          handleChange(evt);
-                        }
+                        setFieldValue(
+                          field.question.proposalQuestionId,
+                          newValue,
+                          true
+                        );
                       }
                     },
                   })}

@@ -3,7 +3,7 @@ import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
 
-import FormikUICustomMultipleSelect from 'components/common/FormikUICustomMultipleSelect';
+import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
 import { Question } from 'generated/sdk';
@@ -69,7 +69,7 @@ export const QuestionFileUploadForm: FormComponent<Question> = props => {
               name="config.file_type"
               label="Accepted file types (leave empty for any)"
               id="fileType"
-              component={FormikUICustomMultipleSelect}
+              component={FormikUICustomSelect}
               availableOptions={[
                 '.pdf',
                 '.doc',

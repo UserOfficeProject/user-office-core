@@ -1,0 +1,14 @@
+mutation createShipment($title: String!, $proposalId: Int!) {
+  createShipment(title: $title, proposalId: $proposalId) {
+    shipment {
+      ...shipment
+      questionary {
+        ...questionary
+      }
+      samples {
+        ...sample
+      }
+    }
+    error
+  }
+}

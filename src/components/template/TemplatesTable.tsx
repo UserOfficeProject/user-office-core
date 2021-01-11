@@ -4,7 +4,7 @@ import Delete from '@material-ui/icons/Delete';
 import Edit from '@material-ui/icons/Edit';
 import FileCopy from '@material-ui/icons/FileCopy';
 import UnarchiveIcon from '@material-ui/icons/Unarchive';
-import MaterialTable, { Column } from 'material-table';
+import MaterialTable, { Column, MaterialTableProps } from 'material-table';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
@@ -21,7 +21,6 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { WithConfirmType } from 'utils/withConfirm';
 
 import CreateTemplate from './CreateTemplate';
-import { ProposalTemplateRowDataType } from './ProposalTemplatesTable';
 
 export type TemplateRowDataType = Pick<
   Template,
@@ -29,11 +28,12 @@ export type TemplateRowDataType = Pick<
 >;
 
 interface TemplatesTableProps {
-  columns: Column<ProposalTemplateRowDataType>[];
+  columns: Column<TemplateRowDataType>[];
   templateCategory: TemplateCategoryId;
   dataProvider: () => Promise<Exclude<GetTemplatesQuery['templates'], null>>;
   isRowRemovable: (row: TemplateRowDataType) => boolean;
   confirm: WithConfirmType;
+  actions?: MaterialTableProps<TemplateRowDataType>['actions'];
 }
 export function TemplatesTable(props: TemplatesTableProps) {
   const [templates, setTemplates] = useState<TemplateRowDataType[]>([]);
@@ -190,6 +190,8 @@ export function TemplatesTable(props: TemplatesTableProps) {
     history.push(`/QuestionaryEditor/${templateId}`);
   };
 
+  const customActions = props.actions || [];
+
   return (
     <>
       <InputDialog open={show} onClose={() => setShow(false)}>
@@ -209,7 +211,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
       </InputDialog>
       <MaterialTable
         icons={tableIcons}
-        title="Proposal templates"
+        title="Templates"
         columns={props.columns}
         isLoading={loadingTemplates}
         data={templates}
@@ -253,6 +255,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
             },
           },
           rowData => getMaintenanceButton(rowData),
+          ...customActions,
         ]}
       />
       <ActionButtonContainer>

@@ -2,8 +2,9 @@ import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { ErrorMessage, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { ChangeEvent, KeyboardEvent, useContext, useState } from 'react';
+import React, { ChangeEvent, useContext, useState } from 'react';
 
+import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContext } from 'components/proposal/ProposalContainer';
 import ProposalParticipant from 'components/proposal/ProposalParticipant';
@@ -12,6 +13,8 @@ import { Answer, BasicUserDetails } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import { EventType } from 'models/QuestionarySubmissionState';
+
+const TextFieldNoSubmit = withPreventSubmit(TextField);
 
 const useStyles = makeStyles(theme => ({
   disabled: {
@@ -63,13 +66,6 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             inputProps={{
               onChange: (event: ChangeEvent<HTMLInputElement>) =>
                 setLocalTitle(event.target.value),
-              onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-
-                  return false;
-                }
-              },
               onBlur: () => {
                 dispatch({
                   type: EventType.PROPOSAL_MODIFIED,
@@ -92,13 +88,6 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             inputProps={{
               onChange: (event: ChangeEvent<HTMLInputElement>) =>
                 setLocalAbstract(event.target.value),
-              onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-
-                  return false;
-                }
-              },
               onBlur: () => {
                 dispatch({
                   type: EventType.PROPOSAL_MODIFIED,
@@ -113,7 +102,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             rowsMax="16"
             rows="4"
             fullWidth
-            component={TextField}
+            component={TextFieldNoSubmit}
             data-cy="abstract"
           />
         </Grid>

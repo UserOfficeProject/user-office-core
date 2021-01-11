@@ -5,7 +5,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import React, { Fragment, useState, useCallback } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 
 const defaultOptions = {
   title: '',
@@ -102,7 +102,7 @@ interface Options {
 }
 
 export type WithConfirmType = (
-  callback: () => void,
+  callback: () => any,
   params: Options
 ) => Function;
 
