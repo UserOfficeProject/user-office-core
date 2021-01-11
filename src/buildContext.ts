@@ -1,3 +1,5 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { BasicResolverContext } from './context';
 // Site specific imports (only ESS atm)
 import {
@@ -12,6 +14,7 @@ import {
   reviewDataSource,
   sampleDataSource,
   sepDataSource,
+  shipmentDataSource,
   templateDataSource,
   userDataSource,
 } from './datasources';
@@ -25,6 +28,7 @@ import QuestionaryMutations from './mutations/QuestionaryMutations';
 import ReviewMutations from './mutations/ReviewMutations';
 import SampleMutations from './mutations/SampleMutations';
 import SEPMutations from './mutations/SEPMutations';
+import ShipmentMutations from './mutations/ShipmentMutations';
 import TemplateMutations from './mutations/TemplateMutations';
 import UserMutations from './mutations/UserMutations';
 import AdminQueries from './queries/AdminQueries';
@@ -38,13 +42,26 @@ import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
 import SampleQueries from './queries/SampleQueries';
 import SEPQueries from './queries/SEPQueries';
+import ShipmentQueries from './queries/ShipmentQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
-import { logger } from './utils/Logger';
 import { questionaryAuthorization } from './utils/QuestionaryAuthorization';
+import { SampleAuthorization } from './utils/SampleAuthorization';
+import { ShipmentAuthorization } from './utils/ShipmentAuthorization';
 import { userAuthorization } from './utils/UserAuthorization';
 
 // From this point nothing is site-specific
+
+const sampleAuthorization = new SampleAuthorization(
+  sampleDataSource,
+  proposalDataSource
+);
+
+const shipmentAuthorization = new ShipmentAuthorization(
+  shipmentDataSource,
+  proposalDataSource
+);
+
 const userQueries = new UserQueries(userDataSource);
 const userMutations = new UserMutations(userDataSource, userAuthorization);
 
@@ -95,7 +112,6 @@ const instrumentMutations = new InstrumentMutations(
 
 const questionaryQueries = new QuestionaryQueries(
   questionaryDataSource,
-  templateDataSource,
   questionaryAuthorization
 );
 const questionaryMutations = new QuestionaryMutations(
@@ -107,14 +123,16 @@ const questionaryMutations = new QuestionaryMutations(
 
 const sampleQueries = new SampleQueries(
   sampleDataSource,
-  questionaryDataSource
+  sampleAuthorization,
+  shipmentAuthorization
 );
 
 const sampleMutations = new SampleMutations(
   sampleDataSource,
   questionaryDataSource,
   templateDataSource,
-  proposalDataSource
+  proposalDataSource,
+  sampleAuthorization
 );
 
 const proposalSettingsQueries = new ProposalSettingsQueries(
@@ -123,6 +141,20 @@ const proposalSettingsQueries = new ProposalSettingsQueries(
 
 const proposalSettingsMutations = new ProposalSettingsMutations(
   proposalSettingsDataSource
+);
+
+const shipmentQueries = new ShipmentQueries(
+  shipmentDataSource,
+  shipmentAuthorization
+);
+
+const shipmentMutations = new ShipmentMutations(
+  shipmentDataSource,
+  questionaryDataSource,
+  templateDataSource,
+  proposalDataSource,
+  sampleAuthorization,
+  shipmentAuthorization
 );
 
 const context: BasicResolverContext = {
@@ -141,6 +173,7 @@ const context: BasicResolverContext = {
     questionary: questionaryQueries,
     sample: sampleQueries,
     proposalSettings: proposalSettingsQueries,
+    shipment: shipmentQueries,
   },
   mutations: {
     user: userMutations,
@@ -155,6 +188,7 @@ const context: BasicResolverContext = {
     questionary: questionaryMutations,
     sample: sampleMutations,
     proposalSettings: proposalSettingsMutations,
+    shipment: shipmentMutations,
   },
 };
 

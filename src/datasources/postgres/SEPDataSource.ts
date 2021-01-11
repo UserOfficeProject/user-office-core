@@ -4,12 +4,13 @@ import { Role } from '../../models/Role';
 import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../../models/SEP';
 import { User } from '../../models/User';
 import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
+import { UpdateMemberSEPArgs } from '../../resolvers/mutations/AssignMembersToSEP';
 import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
 import {
   SEPRecord,
   SEPAssignmentRecord,
-  SEPMemberRecord,
+  RoleUserRecord,
   RoleRecord,
   SEPProposalRecord,
 } from './records';
@@ -44,7 +45,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     );
   }
 
-  private createSEPMemberObject(sepMember: SEPMemberRecord) {
+  private createSEPMemberObject(sepMember: RoleUserRecord) {
     return new SEPMember(
       sepMember.role_user_id,
       sepMember.role_id,
@@ -241,7 +242,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async getMembers(sepId: number): Promise<SEPMember[]> {
-    const sepMembers: SEPMemberRecord[] = await database
+    const sepMembers: RoleUserRecord[] = await database
       .from('role_user')
       .where('sep_id', sepId)
       .distinct(database.raw('ON (user_id) *'));
@@ -302,20 +303,20 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     throw new Error(`SEP not found ${usersWithRole.SEPID}`);
   }
 
-  async removeSEPMemberRole(memberId: number, sepId: number, roleId: number) {
+  async removeSEPMemberRole(args: UpdateMemberSEPArgs) {
     const memberRemoved = await database('role_user')
       .del()
-      .where('sep_id', sepId)
-      .andWhere('user_id', memberId)
-      .andWhere('role_id', roleId);
+      .where('sep_id', args.sepId)
+      .andWhere('user_id', args.memberId)
+      .andWhere('role_id', args.roleId);
 
-    const sepUpdated = await this.get(sepId);
+    const sepUpdated = await this.get(args.sepId);
 
     if (memberRemoved && sepUpdated) {
       return sepUpdated;
     }
 
-    throw new Error(`SEP not found ${sepId}`);
+    throw new Error(`SEP not found ${args.sepId}`);
   }
 
   async assignProposal(proposalId: number, sepId: number) {

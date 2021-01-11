@@ -26,7 +26,6 @@ it('Field config "required=true" should make field required', async () => {
     },
     config: createConfig<BooleanConfig>(DataType.BOOLEAN, { required: true }),
   });
-
   expect(isMatchingConstraints(question, false)).toBe(false);
   expect(isMatchingConstraints(question, true)).toBe(true);
 });

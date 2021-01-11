@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
@@ -32,7 +33,6 @@ import {
   InstrumentAvailabilityTimeArgs,
   InstrumentSubmitArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
-import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class InstrumentMutations {

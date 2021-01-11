@@ -1,7 +1,7 @@
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
-import { TemplateStep, Question } from '../models/Template';
+import { Question, TemplateCategoryId, TemplateStep } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
@@ -42,5 +42,13 @@ export default class TemplateQueries {
   @Authorized([Roles.USER_OFFICER])
   getTemplateCategories(user: UserWithRole | null) {
     return this.dataSource.getTemplateCategories();
+  }
+
+  @Authorized()
+  getActiveTemplateId(
+    user: UserWithRole | null,
+    templateCategoryId: TemplateCategoryId
+  ) {
+    return this.dataSource.getActiveTemplateId(templateCategoryId);
   }
 }

@@ -9,6 +9,7 @@ import QuestionaryMutations from '../mutations/QuestionaryMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
 import SampleMutations from '../mutations/SampleMutations';
 import SEPMutations from '../mutations/SEPMutations';
+import ShipmentMutations from '../mutations/ShipmentMutations';
 import TemplateMutations from '../mutations/TemplateMutations';
 import UserMutations from '../mutations/UserMutations';
 import AdminQueries from '../queries/AdminQueries';
@@ -22,6 +23,7 @@ import QuestionaryQueries from '../queries/QuestionaryQueries';
 import ReviewQueries from '../queries/ReviewQueries';
 import SampleQueries from '../queries/SampleQueries';
 import SEPQueries from '../queries/SEPQueries';
+import ShipmentQueries from '../queries/ShipmentQueries';
 import TemplateQueries from '../queries/TemplateQueries';
 import UserQueries from '../queries/UserQueries';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -40,6 +42,7 @@ interface ResolverContextQueries {
   questionary: QuestionaryQueries;
   sample: SampleQueries;
   proposalSettings: ProposalSettingsQueries;
+  shipment: ShipmentQueries;
 }
 
 interface ResolverContextMutations {
@@ -55,6 +58,7 @@ interface ResolverContextMutations {
   questionary: QuestionaryMutations;
   sample: SampleMutations;
   proposalSettings: ProposalSettingsMutations;
+  shipment: ShipmentMutations;
 }
 
 export interface BasicResolverContext {

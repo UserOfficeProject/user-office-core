@@ -22,6 +22,7 @@ export enum DataType {
   SAMPLE_BASIS = 'SAMPLE_BASIS',
   PROPOSAL_BASIS = 'PROPOSAL_BASIS',
   INTERVAL = 'INTERVAL',
+  SHIPMENT_BASIS = 'SHIPMENT_BASIS',
 }
 
 export class Topic {
@@ -78,6 +79,7 @@ export class TemplateCategory {
 export enum TemplateCategoryId {
   PROPOSAL_QUESTIONARY = 1,
   SAMPLE_DECLARATION,
+  SHIPMENT_DECLARATION,
 }
 
 export class FieldCondition {

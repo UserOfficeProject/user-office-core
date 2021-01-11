@@ -2,6 +2,7 @@ import { ProposalIds } from '../../models/Proposal';
 import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../../models/SEP';
 import { User } from '../../models/User';
 import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
+import { UpdateMemberSEPArgs } from '../../resolvers/mutations/AssignMembersToSEP';
 import { SEPDataSource } from '../SEPDataSource';
 
 export const dummySEP = new SEP(
@@ -184,14 +185,14 @@ export class SEPDataSourceMock implements SEPDataSource {
     throw new Error(`SEP not found ${args.SEPID}`);
   }
 
-  async removeSEPMemberRole(memberId: number, sepId: number, roleId: number) {
-    const sep = dummySEPs.find(element => element.id === sepId);
+  async removeSEPMemberRole(args: UpdateMemberSEPArgs) {
+    const sep = dummySEPs.find(element => element.id === args.sepId);
 
     if (sep) {
       return sep;
     }
 
-    throw new Error(`SEP not found ${sepId}`);
+    throw new Error(`SEP not found ${args.sepId}`);
   }
 
   async assignProposal(proposalId: number, sepId: number) {

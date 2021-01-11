@@ -82,12 +82,15 @@ export class TextInputConfig extends ConfigBase {
 }
 
 @ObjectType()
+export class ShipmentBasisConfig extends ConfigBase {}
+
+@ObjectType()
 export class SubtemplateConfig {
   @Field(() => Int, { nullable: true })
   maxEntries: number | null;
 
-  @Field(() => Int)
-  templateId: number;
+  @Field(() => Int, { nullable: true })
+  templateId: number | null;
 
   @Field(() => String)
   templateCategory: string;
@@ -130,5 +133,6 @@ export const FieldConfigType = createUnionType({
     SubtemplateConfig,
     ProposalBasisConfig,
     IntervalConfig,
+    ShipmentBasisConfig,
   ], // function that returns array of object types classes
 });

@@ -1,6 +1,10 @@
 import 'reflect-metadata';
+import { MutedLogger } from '@esss-swap/duo-logger';
+
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
+import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
+import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUser,
@@ -8,18 +12,22 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import { isRejection } from '../rejection';
-import { MutedLogger } from '../utils/Logger';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import QuestionaryMutations from './QuestionaryMutations';
 
 const dummyProposalDataSource = new ProposalDataSourceMock();
 const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
+const dummySampleDataSource = new SampleDataSourceMock();
+const dummyShipmentDataSource = new ShipmentDataSourceMock();
+
 const dummyLogger = new MutedLogger();
 const questionaryAuth = new QuestionaryAuthorization(
   dummyProposalDataSource,
   dummyQuestionaryDataSource,
-  dummyTemplateDataSource
+  dummyTemplateDataSource,
+  dummySampleDataSource,
+  dummyShipmentDataSource
 );
 const mutations = new QuestionaryMutations(
   dummyQuestionaryDataSource,
@@ -29,7 +37,6 @@ const mutations = new QuestionaryMutations(
 );
 const queries = new QuestionaryQueries(
   dummyQuestionaryDataSource,
-  dummyTemplateDataSource,
   questionaryAuth
 );
 

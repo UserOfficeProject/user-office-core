@@ -52,7 +52,6 @@ services:
       - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
   factory:
     image: dmsc/duo-factory:develop
-    init: true
     environment:
       - NODE_ENV=production
       - DATABASE_HOSTNAME=localhost

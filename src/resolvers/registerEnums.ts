@@ -6,6 +6,7 @@ import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
 import { ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
+import { ShipmentStatus } from '../models/Shipment';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { DataType, TemplateCategoryId } from '../models/Template';
 import { UserRole } from '../models/User';
@@ -22,4 +23,5 @@ export const registerEnums = () => {
   registerEnumType(DataType, { name: 'DataType' });
   registerEnumType(SampleStatus, { name: 'SampleStatus' });
   registerEnumType(Event, { name: 'Event' });
+  registerEnumType(ShipmentStatus, { name: 'ShipmentStatus' });
 };

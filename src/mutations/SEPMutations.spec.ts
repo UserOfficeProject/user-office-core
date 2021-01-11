@@ -152,6 +152,7 @@ describe('Test SEPMutations', () => {
       {
         memberId: 1,
         sepId: 1,
+        roleId: UserRole.SEP_CHAIR,
       }
     )) as Rejection;
 
@@ -163,6 +164,7 @@ describe('Test SEPMutations', () => {
       SEPMutationsInstance.removeMemberFromSEP(dummyUserOfficerWithRole, {
         memberId: 1,
         sepId: 1,
+        roleId: UserRole.SEP_CHAIR,
       })
     ).resolves.toStrictEqual(dummySEP);
   });

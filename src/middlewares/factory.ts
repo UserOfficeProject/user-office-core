@@ -1,10 +1,10 @@
+import { logger } from '@esss-swap/duo-logger';
 import express, { Request, Response, NextFunction } from 'express';
 
 import baseContext from '../buildContext';
 import { DownloadType } from '../factory/service';
 import { AuthJwtPayload, UserWithRole } from '../models/User';
 import { verifyToken } from '../utils/jwt';
-import { logger } from '../utils/Logger';
 import pdfDownload from './factory/pdf';
 import xlsxDownload from './factory/xlsx';
 

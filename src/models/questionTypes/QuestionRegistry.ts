@@ -1,4 +1,5 @@
-import { logger } from '../../utils/Logger';
+import { logger } from '@esss-swap/duo-logger';
+
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
@@ -9,11 +10,12 @@ import { proposalBasisDefinition } from './ProposalBasis';
 import { sampleBasisDefinition } from './SampleBasis';
 import { sampleDeclarationDefinition } from './SampleDeclaration';
 import { selectionFromOptionsDefinition } from './SelectionFromOptions';
+import { shipmentBasis } from './ShipmentBasis';
 import { textInputDefinition } from './TextInput';
 
 export interface Question {
   readonly dataType: DataType;
-  readonly validate: (field: QuestionTemplateRelation, value: any) => boolean;
+  readonly validate?: (field: QuestionTemplateRelation, value: any) => boolean;
   readonly createBlankConfig: () => any;
   readonly isReadOnly: boolean;
   readonly getDefaultAnswer: (field: QuestionTemplateRelation) => any;
@@ -31,6 +33,7 @@ const registry = [
   proposalBasisDefinition,
   sampleBasisDefinition,
   intervalDefinition,
+  shipmentBasis,
 ];
 
 Object.freeze(registry);

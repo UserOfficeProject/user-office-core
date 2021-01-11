@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
+
 import { Sample } from '../../models/Sample';
 import { UpdateSampleArgs } from '../../resolvers/mutations/UpdateSampleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
-import { logger } from '../../utils/Logger';
 import { SampleDataSource } from '../SampleDataSource';
 import database from './database';
 import { createSampleObject, SampleRecord } from './records';
@@ -124,5 +125,19 @@ export default class PostgresSampleDataSource implements SampleDataSource {
       .then((records: SampleRecord[]) =>
         records.map(record => createSampleObject(record))
       );
+  }
+
+  getSamplesByShipmentId(shipmentId: number): Promise<Sample[]> {
+    return database('shipments_has_samples')
+      .leftJoin(
+        'samples',
+        'shipments_has_samples.sample_id',
+        'samples.sample_id'
+      )
+      .select('samples.*')
+      .where(' shipments_has_samples.shipment_id', shipmentId)
+      .then((records: SampleRecord[]) => {
+        return records.map(record => createSampleObject(record)) || [];
+      });
   }
 }

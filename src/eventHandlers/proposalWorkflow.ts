@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
+
 import { proposalDataSource } from '../datasources';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { eventBus } from '../events';
@@ -6,7 +8,6 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { SampleStatus } from '../models/Sample';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
-import { logger } from '../utils/Logger';
 import { workflowEngine, WorkflowEngineProposalType } from '../workflowEngine';
 
 export default function createHandler(proposalDatasource: ProposalDataSource) {

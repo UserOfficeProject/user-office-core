@@ -37,9 +37,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@apollo/federation": "^0.20.4",
-    "@apollo/gateway": "^0.21.1",
+    "@apollo/federation": "^0.20.7",
+    "@apollo/gateway": "^0.21.4",
     "@esss-swap/duo-localisation": "^1.1.15",
+    "@esss-swap/duo-logger": "^1.0.3",
     "@esss-swap/duo-message-broker": "^1.0.2",
     "@esss-swap/duo-validation": "^1.1.42",
     "apollo-server": "^2.19.0",
@@ -69,7 +70,7 @@
     "sparkpost": "^2.1.4",
     "type-graphql": "^1.1.1",
     "typedi": "^0.8.0",
-    "yup": "^0.29.3"
+    "yup": "^0.31.1"
   },
   "devDependencies": {
     "@stfc-user-programme/uows_client_generator": "^1.0.14",
