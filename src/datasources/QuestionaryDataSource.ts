@@ -6,6 +6,7 @@ import {
 } from '../models/Questionary';
 
 export interface QuestionaryDataSource {
+  getCount(templateId: number): Promise<number>;
   getAnswer(answer_id: number): Promise<AnswerBasic>;
   delete(questionary_id: number): Promise<Questionary>;
   getQuestionary(questionary_id: number): Promise<Questionary | null>;

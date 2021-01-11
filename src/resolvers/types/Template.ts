@@ -1,11 +1,11 @@
 import {
-  Field,
-  ObjectType,
-  Int,
-  FieldResolver,
-  Root,
   Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  ObjectType,
   Resolver,
+  Root,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -53,6 +53,17 @@ export class TemplateResolver {
     @Ctx() context: ResolverContext
   ): Promise<Question[] | null> {
     return context.queries.template.getComplementaryQuestions(
+      context.user,
+      template.templateId
+    );
+  }
+
+  @FieldResolver(() => Int)
+  async questionaryCount(
+    @Root() template: Template,
+    @Ctx() context: ResolverContext
+  ): Promise<number> {
+    return context.queries.questionary.getCount(
       context.user,
       template.templateId
     );

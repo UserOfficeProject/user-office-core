@@ -7,6 +7,7 @@ import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import { Sample } from '../../models/Sample';
+import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import {
   DataType,
   FieldCondition,
@@ -332,6 +333,17 @@ export interface SampleRecord {
   readonly created_at: Date;
 }
 
+export interface ShipmentRecord {
+  readonly shipment_id: number;
+  readonly title: string;
+  readonly creator_id: number;
+  readonly proposal_id: number;
+  readonly questionary_id: number;
+  readonly status: string;
+  readonly external_ref: string;
+  readonly created_at: Date;
+}
+
 export interface ProposalStatusRecord {
   readonly proposal_status_id: number;
   readonly short_code: string;
@@ -621,5 +633,18 @@ export const createAnswerBasic = (answer: AnswerRecord) => {
     answer.question_id,
     answer.answer,
     answer.created_at
+  );
+};
+
+export const createShipmentObject = (shipment: ShipmentRecord) => {
+  return new Shipment(
+    shipment.shipment_id,
+    shipment.title,
+    shipment.creator_id,
+    shipment.proposal_id,
+    shipment.questionary_id,
+    shipment.status as ShipmentStatus,
+    shipment.external_ref,
+    shipment.created_at
   );
 };

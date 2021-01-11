@@ -24,6 +24,15 @@ import {
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
+  async getCount(templateId: number): Promise<number> {
+    return database('questionaries')
+      .count('questionary_id')
+      .where('template_id', templateId)
+      .first()
+      .then(({ count }: { count: string }) => {
+        return parseInt(count);
+      });
+  }
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
     return database('answers')
       .select('*')
@@ -33,7 +42,7 @@ export default class PostgresQuestionaryDataSource
       });
   }
 
-  create(creator_id: number, template_id: number): Promise<Questionary> {
+  async create(creator_id: number, template_id: number): Promise<Questionary> {
     return database('questionaries')
       .insert({ template_id, creator_id }, '*')
       .then((rows: QuestionaryRecord[]) => {
