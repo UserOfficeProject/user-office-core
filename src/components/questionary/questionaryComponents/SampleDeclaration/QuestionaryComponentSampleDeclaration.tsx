@@ -20,7 +20,11 @@ import { QuestionariesList, QuestionariesListRow } from '../QuestionariesList';
 import { SampleDeclarationContainer } from './SampleDeclarationContainer';
 
 const sampleToListRow = (sample: SampleBasic): QuestionariesListRow => {
-  return { id: sample.id, label: sample.title };
+  return {
+    id: sample.id,
+    label: sample.title,
+    isCompleted: sample.questionary!.steps.every(step => step.isCompleted),
+  };
 };
 
 function createSampleStub(
@@ -194,14 +198,26 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
             }}
             sampleCreated={newSample => {
               const newStateValue = [...stateValue, newSample.id];
-
+              setSelectedSample(newSample);
               setStateValue(newStateValue);
               onComplete(proposalQuestionId, newStateValue);
 
               const newRows = [...rows, sampleToListRow(newSample)];
               setRows(newRows);
             }}
-            sampleEditDone={() => setSelectedSample(null)}
+            sampleEditDone={() => {
+              setSelectedSample(null);
+              const index = rows.findIndex(
+                sample => sample.id === selectedSample.id
+              );
+              if (index === -1) {
+                // unexpected
+                return;
+              }
+              const newRows = [...rows];
+              newRows[index].isCompleted = true;
+              setRows(newRows);
+            }}
           ></SampleDeclarationContainer>
         ) : (
           <UOLoader />

@@ -1,4 +1,4 @@
-import { Sample } from 'generated/sdk';
+import { Sample, QuestionaryStep } from 'generated/sdk';
 
 export type SampleBasic = Pick<
   Sample,
@@ -9,4 +9,6 @@ export type SampleBasic = Pick<
   | 'questionaryId'
   | 'created'
   | 'creatorId'
->;
+> & {
+  questionary?: { steps: Array<Pick<QuestionaryStep, 'isCompleted'>> };
+};

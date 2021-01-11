@@ -24,7 +24,9 @@ export function QuestionariesListItem(props: {
     >
       <ListItemAvatar>
         <Avatar>
-          <DescriptionIcon />
+          <DescriptionIcon
+            color={props.record.isCompleted ? 'primary' : 'secondary'}
+          />
         </Avatar>
       </ListItemAvatar>
       <ListItemText primary={props.record.label} />

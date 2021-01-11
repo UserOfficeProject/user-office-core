@@ -3324,6 +3324,13 @@ export type GetSamplesQuery = (
   { __typename?: 'Query' }
   & { samples: Maybe<Array<(
     { __typename?: 'Sample' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & { steps: Array<(
+        { __typename?: 'QuestionaryStep' }
+        & Pick<QuestionaryStep, 'isCompleted'>
+      )> }
+    ) }
     & SampleFragment
   )>> }
 );
@@ -3337,6 +3344,13 @@ export type GetSamplesByCallIdQuery = (
   { __typename?: 'Query' }
   & { samplesByCallId: Maybe<Array<(
     { __typename?: 'Sample' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & { steps: Array<(
+        { __typename?: 'QuestionaryStep' }
+        & Pick<QuestionaryStep, 'isCompleted'>
+      )> }
+    ) }
     & SampleFragment
   )>> }
 );
@@ -3356,6 +3370,13 @@ export type UpdateSampleMutation = (
     & Pick<SampleResponseWrap, 'error'>
     & { sample: Maybe<(
       { __typename?: 'Sample' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & { steps: Array<(
+          { __typename?: 'QuestionaryStep' }
+          & Pick<QuestionaryStep, 'isCompleted'>
+        )> }
+      ) }
       & SampleFragment
     )> }
   ) }
@@ -5755,6 +5776,11 @@ export const GetSamplesDocument = gql`
     query getSamples($filter: SamplesFilter) {
   samples(filter: $filter) {
     ...sample
+    questionary {
+      steps {
+        isCompleted
+      }
+    }
   }
 }
     ${SampleFragmentDoc}`;
@@ -5762,6 +5788,11 @@ export const GetSamplesByCallIdDocument = gql`
     query getSamplesByCallId($callId: Int!) {
   samplesByCallId(callId: $callId) {
     ...sample
+    questionary {
+      steps {
+        isCompleted
+      }
+    }
   }
 }
     ${SampleFragmentDoc}`;
@@ -5770,6 +5801,11 @@ export const UpdateSampleDocument = gql`
   updateSample(sampleId: $sampleId, title: $title, safetyComment: $safetyComment, safetyStatus: $safetyStatus) {
     sample {
       ...sample
+      questionary {
+        steps {
+          isCompleted
+        }
+      }
     }
     error
   }
