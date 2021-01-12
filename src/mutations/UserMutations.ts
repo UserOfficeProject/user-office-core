@@ -14,6 +14,7 @@ import {
 } from '@esss-swap/duo-validation';
 import * as bcrypt from 'bcryptjs';
 
+import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -377,6 +378,48 @@ export default class UserMutations {
       logger.logError('Bad token', { token });
 
       return rejection('BAD_TOKEN');
+    }
+  }
+
+  async checkExternalToken(externalToken: string): Promise<string | Rejection> {
+    try {
+      const client = new UOWSSoapClient();
+
+      const rawStfcUser = await client.getPersonDetailsFromSessionId(
+        externalToken
+      );
+      if (!rawStfcUser) {
+        logger.logInfo('User not found for token', { externalToken });
+
+        return rejection('USER_DOES_NOT_EXIST');
+      }
+      const stfcUser = rawStfcUser.return;
+
+      // Create dummy user if one does not exist in the proposals DB.
+      // This is needed to satisfy the FOREIGN_KEY constraints
+      // in tables that link to a user (such as proposals)
+      const userNumber = parseInt(stfcUser.userNumber);
+      let dummyUser = await this.dataSource.get(userNumber);
+      if (!dummyUser) {
+        dummyUser = await this.dataSource.createDummyUser(userNumber);
+      }
+
+      // TODO: this should get the user's roles rather than all roles
+      const roles = await this.dataSource.getRoles();
+
+      const proposalsToken = signToken<AuthJwtPayload>({
+        user: dummyUser,
+        roles,
+        currentRole: roles[1], // Currently hardcoded to UserOfficer
+      });
+
+      return proposalsToken;
+    } catch (error) {
+      logger.logError('Error occured during external authentication', {
+        error,
+      });
+
+      return rejection('INTERNAL_ERROR');
     }
   }
 
