@@ -67,6 +67,7 @@
     "reflect-metadata": "^0.1.13",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
+    "soap": "^0.35.0",
     "sparkpost": "^2.1.4",
     "type-graphql": "^1.1.1",
     "typedi": "^0.8.0",
