@@ -3,6 +3,8 @@ import { print } from 'graphql';
 import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -15,6 +17,12 @@ export type Scalars = {
   DateTime: any;
   IntStringDateBoolArray: any;
 };
+
+
+
+
+
+
 
 
 export type Entity = Call | Instrument | Proposal | User;
@@ -142,6 +150,12 @@ export type CallsFilter = {
   isEnded?: Maybe<Scalars['Boolean']>;
   isReviewEnded?: Maybe<Scalars['Boolean']>;
   isSEPReviewEnded?: Maybe<Scalars['Boolean']>;
+};
+
+export type CheckExternalTokenWrap = {
+  __typename?: 'CheckExternalTokenWrap';
+  error: Maybe<Scalars['String']>;
+  token: Maybe<Scalars['String']>;
 };
 
 export type CreateCallInput = {
@@ -460,6 +474,7 @@ export type Mutation = {
   addClientLog: SuccessResponseWrap;
   addSamplesToShipment: ShipmentResponseWrap;
   applyPatches: PrepareDbResponseWrap;
+  checkExternalToken: CheckExternalTokenWrap;
   cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   createProposal: ProposalResponseWrap;
@@ -930,6 +945,11 @@ export type MutationAddClientLogArgs = {
 export type MutationAddSamplesToShipmentArgs = {
   shipmentId: Scalars['Int'];
   sampleIds: Array<Scalars['Int']>;
+};
+
+
+export type MutationCheckExternalTokenArgs = {
+  externalToken: Scalars['String'];
 };
 
 
@@ -4373,6 +4393,19 @@ export type UpdateTopicMutation = (
   ) }
 );
 
+export type CheckExternalTokenMutationVariables = Exact<{
+  externalToken: Scalars['String'];
+}>;
+
+
+export type CheckExternalTokenMutation = (
+  { __typename?: 'Mutation' }
+  & { checkExternalToken: (
+    { __typename?: 'CheckExternalTokenWrap' }
+    & Pick<CheckExternalTokenWrap, 'token' | 'error'>
+  ) }
+);
+
 export type CheckTokenQueryVariables = Exact<{
   token: Scalars['String'];
 }>;
@@ -6510,6 +6543,14 @@ export const UpdateTopicDocument = gql`
   }
 }
     ${TemplateFragmentDoc}`;
+export const CheckExternalTokenDocument = gql`
+    mutation checkExternalToken($externalToken: String!) {
+  checkExternalToken(externalToken: $externalToken) {
+    token
+    error
+  }
+}
+    `;
 export const CheckTokenDocument = gql`
     query checkToken($token: String!) {
   checkToken(token: $token) {
@@ -7114,6 +7155,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateTopic(variables: UpdateTopicMutationVariables): Promise<UpdateTopicMutation> {
       return withWrapper(() => client.request<UpdateTopicMutation>(print(UpdateTopicDocument), variables));
+    },
+    checkExternalToken(variables: CheckExternalTokenMutationVariables): Promise<CheckExternalTokenMutation> {
+      return withWrapper(() => client.request<CheckExternalTokenMutation>(print(CheckExternalTokenDocument), variables));
     },
     checkToken(variables: CheckTokenQueryVariables): Promise<CheckTokenQuery> {
       return withWrapper(() => client.request<CheckTokenQuery>(print(CheckTokenDocument), variables));
