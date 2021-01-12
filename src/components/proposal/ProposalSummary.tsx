@@ -3,23 +3,25 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useContext } from 'react';
 
 import NavigationFragment from 'components/questionary/NavigationFragment';
+import {
+  createMissingContextErrorMessage,
+  QuestionaryContext,
+} from 'components/questionary/QuestionaryContext';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import { EventType } from 'models/QuestionarySubmissionState';
 import withConfirm from 'utils/withConfirm';
 
-import { ProposalContext } from './ProposalContainer';
+import { ProposalContextType } from './ProposalContainer';
 
+// TODO remove data from argument here
 function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
-  const context = useContext(ProposalContext);
+  const { dispatch } = useContext(QuestionaryContext) as ProposalContextType;
 
-  if (!context) {
-    throw new Error(
-      'ProposalReview is missing ProposalContext. Wrap ProposalReview or one of its parrents with ProposalContext'
-    );
+  if (!dispatch) {
+    throw new Error(createMissingContextErrorMessage());
   }
-  const { dispatch } = context;
   const downloadPDFProposal = useDownloadPDFProposal();
   const proposal = data.proposal;
 

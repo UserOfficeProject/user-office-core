@@ -332,8 +332,6 @@ context('Settings tests', () => {
         .find('[title="Edit proposal"]')
         .click();
 
-      cy.contains('Save and continue').click();
-
       cy.contains('Submit').click();
 
       cy.contains('OK').click();

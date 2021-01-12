@@ -8,7 +8,7 @@ export function QuestionaryStepButton(
     active?: boolean;
     completed?: boolean;
     clickable?: boolean;
-    editable: boolean;
+    readonly: boolean;
   }>
 ) {
   const classes = makeStyles(theme => ({
@@ -24,19 +24,19 @@ export function QuestionaryStepButton(
     },
   }))();
 
-  // NOTE: Exluding editable because it fires console warning when passed to StepButton component.
-  const { editable, ...propsWithoutEditable } = props;
+  // NOTE: Exluding readonly because it fires console warning when passed to StepButton component.
+  const { readonly, ...propsWithoutReadonly } = props;
 
   const buttonClasses = [];
 
-  if (propsWithoutEditable.active) {
+  if (propsWithoutReadonly.active) {
     buttonClasses.push(classes.active);
-  } else if (editable) {
+  } else if (!readonly) {
     buttonClasses.push(classes.editable);
   }
 
   return (
-    <StepButton {...propsWithoutEditable} className={buttonClasses.join(' ')}>
+    <StepButton {...propsWithoutReadonly} className={buttonClasses.join(' ')}>
       {props.children}
     </StepButton>
   );

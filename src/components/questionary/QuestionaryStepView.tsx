@@ -1,27 +1,34 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import { Formik } from 'formik';
-import React from 'react';
+import { Formik, useFormikContext } from 'formik';
+import React, { useContext } from 'react';
+import { Prompt } from 'react-router';
 import * as Yup from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
 import { Answer, QuestionaryStep } from 'generated/sdk';
+import { usePreSubmitActions } from 'hooks/questionary/useSubmitActions';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
+  prepareAnswers,
 } from 'models/QuestionaryFunctions';
 import {
-  Event,
   EventType,
   QuestionarySubmissionState,
 } from 'models/QuestionarySubmissionState';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import NavigationFragment from './NavigationFragment';
 import {
   createQuestionaryComponent,
   getQuestionaryComponentDefinition,
 } from './QuestionaryComponentRegistry';
+import {
+  createMissingContextErrorMessage,
+  QuestionaryContext,
+} from './QuestionaryContext';
 
 const useStyles = makeStyles({
   componentWrapper: {
@@ -57,27 +64,82 @@ export const createFormikConfigObjects = (
   return { initialValues, validationSchema };
 };
 
+const PromptIfDirty = () => {
+  const formik = useFormikContext();
+
+  return (
+    <Prompt
+      when={formik.dirty && formik.submitCount === 0}
+      message="Changes you recently made in this step will not be saved! Are you sure?"
+    />
+  );
+};
+
 export default function QuestionaryStepView(props: {
-  state: QuestionarySubmissionState;
   topicId: number;
-  dispatch: React.Dispatch<Event>;
   readonly: boolean;
+  onStepComplete?: (topicId: number) => any;
 }) {
-  const { state, topicId, dispatch } = props;
+  const { topicId } = props;
   const classes = useStyles();
+
+  const preSubmitActions = usePreSubmitActions();
+  const { api } = useDataApiWithFeedback();
+
+  const { state, dispatch } = useContext(QuestionaryContext);
+
+  if (!state || !dispatch) {
+    throw new Error(createMissingContextErrorMessage());
+  }
 
   const questionaryStep = getStepByTopicId(state.steps, topicId) as
     | QuestionaryStep
     | undefined;
 
-  const activeFields = questionaryStep
-    ? questionaryStep.fields.filter(field => {
-        return areDependenciesSatisfied(
-          state.steps,
-          field.question.proposalQuestionId
-        );
-      })
-    : [];
+  if (!questionaryStep) {
+    throw new Error(
+      `Could not find questionary step with topic id: ${topicId}`
+    );
+  }
+
+  const activeFields = questionaryStep.fields.filter(field => {
+    return areDependenciesSatisfied(
+      state.steps,
+      field.question.proposalQuestionId
+    );
+  });
+
+  const saveHandler = async (isPartialSave: boolean) => {
+    const result =
+      (
+        await Promise.all(
+          preSubmitActions(activeFields).map(
+            async f => await f({ state, dispatch, api: api() })
+          )
+        )
+      ).pop() || state.questionaryId; // TODO obtain newly created questionary ID some other way
+
+    const questionaryId = state.questionaryId || result;
+    if (!questionaryId) {
+      throw new Error('Missing questionaryId');
+    }
+
+    const answerTopicResult = await api('Saved').answerTopic({
+      questionaryId: questionaryId,
+      answers: prepareAnswers(activeFields),
+      topicId: topicId,
+      isPartialSave: isPartialSave,
+    });
+
+    if (answerTopicResult.answerTopic.questionaryStep) {
+      dispatch({
+        type: EventType.QUESTIONARY_STEP_ANSWERED,
+        payload: {
+          questionaryStep: answerTopicResult.answerTopic.questionaryStep,
+        },
+      });
+    }
+  };
 
   if (state === null || !questionaryStep) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -105,6 +167,7 @@ export default function QuestionaryStepView(props: {
 
         return (
           <form className={props.readonly ? classes.disabled : undefined}>
+            <PromptIfDirty />
             {activeFields.map(field => {
               return (
                 <div
@@ -150,24 +213,18 @@ export default function QuestionaryStepView(props: {
                 questionaryStep.isCompleted
                   ? undefined
                   : {
-                      callback: () => {
-                        dispatch({
-                          type: EventType.SAVE_CLICKED,
-                          payload: { answers: activeFields, topicId: topicId },
-                        });
-                      },
-                      disabled: !props.state.isDirty,
+                      callback: () => saveHandler(true),
+                      disabled: !state.isDirty,
                     }
               }
               saveAndNext={{
                 callback: () => {
                   submitFormAsync(submitForm, validateForm).then(
-                    (isValid: boolean) => {
+                    async (isValid: boolean) => {
                       if (isValid) {
-                        dispatch({
-                          type: EventType.SAVE_AND_CONTINUE_CLICKED,
-                          payload: { answers: activeFields, topicId: topicId },
-                        });
+                        await saveHandler(false);
+                        dispatch({ type: EventType.GO_STEP_FORWARD });
+                        props.onStepComplete?.(topicId);
                       }
                     }
                   );
