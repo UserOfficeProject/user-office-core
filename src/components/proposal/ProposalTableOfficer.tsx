@@ -20,14 +20,18 @@ import ScienceIconAdd from 'components/common/icons/ScienceIconAdd';
 import ScienceIconRemove from 'components/common/icons/ScienceIconRemove';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
 import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
-import { Instrument, Sep, ProposalsToInstrumentArgs } from 'generated/sdk';
-import { ProposalsFilter } from 'generated/sdk';
+import {
+  Instrument,
+  ProposalsFilter,
+  ProposalsToInstrumentArgs,
+  Sep,
+} from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import {
-  useProposalsCoreData,
   ProposalViewData,
+  useProposalsCoreData,
 } from 'hooks/proposal/useProposalsCoreData';
 import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
@@ -257,7 +261,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const emailProposals = (): void => {
     selectedProposals.forEach(proposal => {
-      new Promise(async resolve => {
+      new Promise<void>(async resolve => {
         await api()
           .notifyProposal({ id: proposal.id })
           .then(data => {
@@ -283,7 +287,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const deleteProposals = (): void => {
     selectedProposals.forEach(proposal => {
-      new Promise(async resolve => {
+      new Promise<void>(async resolve => {
         await api().deleteProposal({ id: proposal.id });
         proposalsData.splice(
           proposalsData.findIndex(val => val.id === proposal.id),

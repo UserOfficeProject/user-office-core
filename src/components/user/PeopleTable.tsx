@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { UserRole, GetUsersQuery, BasicUserDetails } from 'generated/sdk';
+import { BasicUserDetails, GetUsersQuery, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -192,7 +192,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
           props.onRemove
             ? {
                 onRowDelete: oldData =>
-                  new Promise(resolve => {
+                  new Promise<void>(resolve => {
                     resolve();
                     (props.onRemove as any)(oldData);
                   }),

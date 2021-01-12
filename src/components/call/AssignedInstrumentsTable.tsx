@@ -3,7 +3,7 @@ import TextField from '@material-ui/core/TextField';
 import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState, ChangeEvent } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 
 import { Call, InstrumentWithAvailabilityTime } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';
@@ -136,7 +136,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
             rowAssignmentsData: InstrumentWithAvailabilityTime
           ): Promise<void> => removeAssignedInstrument(rowAssignmentsData.id),
           onRowUpdate: (newData, oldData) =>
-            new Promise(async (resolve, reject) => {
+            new Promise<void>(async (resolve, reject) => {
               if (
                 newData &&
                 newData.availabilityTime &&

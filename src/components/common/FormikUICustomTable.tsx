@@ -46,7 +46,7 @@ export const FormikUICustomTable = ({
       options={{ search: false, paging: false }}
       editable={{
         onRowAdd: newData =>
-          new Promise(resolve => {
+          new Promise<void>(resolve => {
             const data = [...state];
             data.push(newData);
             setState(data);
@@ -54,7 +54,7 @@ export const FormikUICustomTable = ({
             resolve();
           }),
         onRowUpdate: (newData, oldData) =>
-          new Promise(resolve => {
+          new Promise<void>(resolve => {
             const data = [...state];
             data[data.indexOf(oldData!)] = newData;
             setState(data);
@@ -62,7 +62,7 @@ export const FormikUICustomTable = ({
             resolve();
           }),
         onRowDelete: oldData =>
-          new Promise(resolve => {
+          new Promise<void>(resolve => {
             const data = [...state];
             data.splice(data.indexOf(oldData), 1);
             setState(data);
