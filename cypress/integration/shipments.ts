@@ -115,6 +115,8 @@ context('Shipments tests', () => {
 
     cy.contains('Finish').click();
 
+    cy.contains('OK').click();
+
     cy.contains(shipmentTitle).click();
   });
 
@@ -131,6 +133,6 @@ context('Shipments tests', () => {
 
     cy.contains('OK').click();
 
-    cy.should('not.contain', shipmentTitle);
+    cy.get('[data-cy=shipments-table]').should('not.contain', shipmentTitle);
   });
 });

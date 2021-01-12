@@ -6,9 +6,13 @@ import React, { ChangeEvent, useContext, useState } from 'react';
 
 import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { ProposalContext } from 'components/proposal/ProposalContainer';
+import { ProposalContextType } from 'components/proposal/ProposalContainer';
 import ProposalParticipant from 'components/proposal/ProposalParticipant';
 import ProposalParticipants from 'components/proposal/ProposalParticipants';
+import {
+  createMissingContextErrorMessage,
+  QuestionaryContext,
+} from 'components/questionary/QuestionaryContext';
 import { Answer, BasicUserDetails } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
@@ -40,20 +44,17 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   } = props;
 
   const classes = useStyles();
-  const proposalContext = useContext(ProposalContext);
+  const { state, dispatch } = useContext(
+    QuestionaryContext
+  ) as ProposalContextType;
 
-  const [localTitle, setLocalTitle] = useState(
-    proposalContext.state?.proposal.title
-  );
-  const [localAbstract, setLocalAbstract] = useState(
-    proposalContext.state?.proposal.abstract
-  );
+  const [localTitle, setLocalTitle] = useState(state?.proposal.title);
+  const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
 
-  if (!proposalContext?.state) {
-    return null;
+  if (!state || !dispatch) {
+    throw new Error(createMissingContextErrorMessage());
   }
 
-  const { dispatch, state } = proposalContext;
   const { proposer, users } = state.proposal;
 
   return (
@@ -152,6 +153,8 @@ const proposalBasisPreSubmit = (answer: Answer) => async ({
   const proposal = (state as ProposalSubmissionState).proposal;
   const { id, title, abstract, users, proposer, callId } = proposal;
 
+  let returnValue = state.questionaryId;
+
   if (id > 0) {
     const result = await api.updateProposal({
       id: id,
@@ -192,8 +195,11 @@ const proposalBasisPreSubmit = (answer: Answer) => async ({
           },
         },
       });
+      returnValue = createResult.createProposal.proposal.questionaryId;
     }
   }
+
+  return returnValue;
 };
 
 export { QuestionaryComponentProposalBasis, proposalBasisPreSubmit };

@@ -1,61 +1,28 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import Container from '@material-ui/core/Container';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Step from '@material-ui/core/Step';
-import Stepper from '@material-ui/core/Stepper';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
 import { default as React, useEffect } from 'react';
-import { Prompt } from 'react-router';
 
-import { QuestionaryStepButton } from 'components/questionary/QuestionaryStepButton';
+import Questionary from 'components/questionary/Questionary';
+import {
+  QuestionaryContext,
+  QuestionaryContextType,
+} from 'components/questionary/QuestionaryContext';
 import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
-import { Sample } from 'generated/sdk';
+import { QuestionaryStep, Sample } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
-import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
 import {
   Event,
   EventType,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
+  WizardStep,
 } from 'models/QuestionarySubmissionState';
 import { SampleSubmissionState } from 'models/SampleSubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 
-const useStyles = makeStyles(theme => ({
-  stepper: {
-    padding: theme.spacing(3, 0, 1),
-  },
-  heading: {
-    textOverflow: 'ellipsis',
-    width: '80%',
-    margin: '0 auto',
-    textAlign: 'center',
-    minWidth: '450px',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-  },
-  infoline: {
-    color: theme.palette.grey[600],
-    textAlign: 'right',
-  },
-  title: {
-    marginTop: theme.spacing(1),
-  },
-}));
-type SampleContextType = {
+export interface SampleContextType extends QuestionaryContextType {
   state: SampleSubmissionState | null;
-  dispatch: React.Dispatch<Event>;
-};
-export const SampleContext = React.createContext<SampleContextType>({
-  state: null,
-  dispatch: e => {},
-});
-
-const getConfirmNavigMsg = (): string => {
-  return 'Changes you recently made in this step will not be saved! Are you sure?';
-};
+}
 
 const samplesReducer = (
   state: SampleSubmissionState,
@@ -79,10 +46,40 @@ const samplesReducer = (
       };
       draftState.isDirty = true;
       break;
+
+    case EventType.QUESTIONARY_STEPS_LOADED: {
+      draftState.sample.questionary.steps = action.payload.questionarySteps;
+      break;
+    }
+    case EventType.QUESTIONARY_STEP_ANSWERED:
+      const updatedStep = action.payload.questionaryStep as QuestionaryStep;
+      const stepIndex = draftState.sample.questionary.steps.findIndex(
+        step => step.topic.id === updatedStep.topic.id
+      );
+      draftState.sample.questionary.steps[stepIndex] = updatedStep;
+
+      break;
   }
 
   return draftState;
 };
+
+const createQuestionaryWizardStep = (
+  step: QuestionaryStep,
+  index: number
+): WizardStep => ({
+  type: 'QuestionaryStep',
+  payload: { topicId: step.topic.id, questionaryStepIndex: index },
+  getMetadata: (state, payload) => {
+    const questionaryStep = state.steps[payload.questionaryStepIndex];
+
+    return {
+      title: questionaryStep.topic.title,
+      isCompleted: questionaryStep.isCompleted,
+      isReadonly: index > 0 && state.steps[index - 1].isCompleted === false,
+    };
+  },
+});
 
 export function SampleDeclarationContainer(props: {
   sample: Sample;
@@ -90,52 +87,71 @@ export function SampleDeclarationContainer(props: {
   sampleUpdated?: (sample: Sample) => any;
   sampleEditDone?: () => any;
 }) {
-  const classes = useStyles();
   const { api, isExecutingCall: isApiInteracting } = useDataApiWithFeedback();
-  const { persistModel, isSavingModel } = usePersistQuestionaryModel();
 
   const previousInitialSample = usePrevious(props.sample);
+
+  const createSampleWizardSteps = (): WizardStep[] => {
+    const wizardSteps: WizardStep[] = [];
+    const questionarySteps = props.sample.questionary.steps;
+
+    questionarySteps.forEach((step, index) =>
+      wizardSteps.push(createQuestionaryWizardStep(step, index))
+    );
+
+    return wizardSteps;
+  };
+
+  const isLastStep = (wizardStep: WizardStep) =>
+    state.wizardSteps[state.wizardSteps.length - 1] === wizardStep;
+
+  const displayElementFactory = (
+    wizardStep: WizardStep,
+    isReadonly: boolean
+  ) => {
+    return (
+      <QuestionaryStepView
+        readonly={isReadonly}
+        topicId={wizardStep.payload.topicId}
+        onStepComplete={() =>
+          isLastStep(wizardStep) ? props.sampleEditDone?.() : undefined
+        }
+      />
+    );
+  };
+
   /**
    * Returns true if reset was performed, false otherwise
    */
   const handleReset = async (): Promise<boolean> => {
-    if (state.isDirty) {
-      const confirmed = window.confirm(getConfirmNavigMsg());
-      const sampleState = state as SampleSubmissionState;
-      if (confirmed) {
-        if (sampleState.sample.id === 0) {
-          // if sample isn't created yet
-          dispatch({
-            type: EventType.SAMPLE_LOADED,
-            payload: { sample: initialState.sample },
-          });
-        } else {
-          await api()
-            .getSample({ sampleId: sampleState.sample.id }) // or load blankQuestionarySteps if sample is null
-            .then(data => {
-              if (data.sample && data.sample.questionary.steps) {
-                dispatch({
-                  type: EventType.SAMPLE_LOADED,
-                  payload: { sample: data.sample },
-                });
-                dispatch({
-                  type: EventType.QUESTIONARY_STEPS_LOADED,
-                  payload: {
-                    questionarySteps: data.sample.questionary.steps,
-                    stepIndex: state.stepIndex,
-                  },
-                });
-              }
+    const sampleState = state as SampleSubmissionState;
+    if (sampleState.sample.id === 0) {
+      // if sample isn't created yet
+      dispatch({
+        type: EventType.SAMPLE_LOADED,
+        payload: { sample: initialState.sample },
+      });
+    } else {
+      await api()
+        .getSample({ sampleId: sampleState.sample.id }) // or load blankQuestionarySteps if sample is null
+        .then(data => {
+          if (data.sample && data.sample.questionary.steps) {
+            dispatch({
+              type: EventType.SAMPLE_LOADED,
+              payload: { sample: data.sample },
             });
-        }
-
-        return true;
-      } else {
-        return false;
-      }
+            dispatch({
+              type: EventType.QUESTIONARY_STEPS_LOADED,
+              payload: {
+                questionarySteps: data.sample.questionary.steps,
+                stepIndex: state.stepIndex,
+              },
+            });
+          }
+        });
     }
 
-    return false;
+    return true;
   };
 
   const handleEvents = ({
@@ -160,9 +176,6 @@ export function SampleDeclarationContainer(props: {
         case EventType.RESET_CLICKED:
           handleReset();
           break;
-        case EventType.QUESTIONARY_STEPS_COMPLETE:
-          props.sampleEditDone?.();
-          break;
       }
     };
   };
@@ -174,11 +187,12 @@ export function SampleDeclarationContainer(props: {
     questionaryId: props.sample.questionary.questionaryId,
     stepIndex: 0,
     steps: props.sample.questionary.steps,
+    wizardSteps: createSampleWizardSteps(),
   };
 
   const { state, dispatch } = QuestionarySubmissionModel<SampleSubmissionState>(
     initialState,
-    [handleEvents, persistModel],
+    [handleEvents],
     samplesReducer
   );
 
@@ -197,88 +211,13 @@ export function SampleDeclarationContainer(props: {
     }
   }, [previousInitialSample, props.sample, dispatch]);
 
-  const getStepperNavig = () => {
-    if (state.steps.length <= 1) {
-      return null;
-    }
-
-    return (
-      <Stepper
-        nonLinear
-        activeStep={state.stepIndex}
-        className={classes.stepper}
-      >
-        {state.steps.map((step, index, steps) => (
-          <Step key={index}>
-            <QuestionaryStepButton
-              onClick={async () => {
-                if (!state.isDirty || (await handleReset())) {
-                  dispatch({
-                    type: EventType.GO_TO_STEP,
-                    payload: { stepIndex: index },
-                  });
-                }
-              }}
-              completed={step.isCompleted}
-              editable={
-                index === 0 ||
-                step.isCompleted ||
-                steps[index].isCompleted === true
-              }
-            >
-              <span>{step.topic.title}</span>
-            </QuestionaryStepButton>
-          </Step>
-        ))}
-      </Stepper>
-    );
-  };
-
-  const getStepContent = () => {
-    const currentStep = state.steps[state.stepIndex];
-    const previousStep = state.steps[state.stepIndex - 1];
-
-    if (!currentStep) {
-      return null;
-    }
-
-    return (
-      <SampleContext.Provider value={{ state, dispatch }}>
-        <QuestionaryStepView
-          topicId={currentStep.topic.id}
-          state={state}
-          readonly={
-            isSavingModel ||
-            isApiInteracting ||
-            (previousStep ? previousStep.isCompleted === false : false)
-          }
-          dispatch={dispatch}
-          key={currentStep.topic.id}
-        />
-      </SampleContext.Provider>
-    );
-  };
-
-  const getProgressBar = () =>
-    isApiInteracting || isSavingModel ? <LinearProgress /> : null;
-
-  /**
-   * Note: try to fix in the future
-   *
-   * Warning: A history supports only one prompt at a time
-   *    at Lifecycle (http://localhost:3000/static/js/1.chunk.js:335796:29)
-   *    at Prompt (http://localhost:3000/static/js/1.chunk.js:335825:22)
-   *    at div
-   */
   return (
-    <Container maxWidth="lg">
-      <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
-      <Typography variant="h5" className={classes.title}>
-        {state.sample.title || 'Untited'}
-      </Typography>
-      {getStepperNavig()}
-      {getProgressBar()}
-      {getStepContent()}
-    </Container>
+    <QuestionaryContext.Provider value={{ state, dispatch }}>
+      <Questionary
+        title={state.sample.title || 'New Sample'}
+        handleReset={handleReset}
+        displayElementFactory={displayElementFactory}
+      />
+    </QuestionaryContext.Provider>
   );
 }

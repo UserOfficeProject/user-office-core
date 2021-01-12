@@ -1,31 +1,21 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Step from '@material-ui/core/Step';
-import Stepper from '@material-ui/core/Stepper';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
 import { default as React, useEffect } from 'react';
-import { Prompt } from 'react-router';
 
-import { useCheckAccess } from 'components/common/Can';
-import NavigationFragment from 'components/questionary/NavigationFragment';
-import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
-import { QuestionaryStepButton } from 'components/questionary/QuestionaryStepButton';
-import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
+import Questionary from 'components/questionary/Questionary';
 import {
-  Questionary,
-  QuestionaryStep,
-  ShipmentStatus,
-  UserRole,
-} from 'generated/sdk';
+  QuestionaryContext,
+  QuestionaryContextType,
+} from 'components/questionary/QuestionaryContext';
+import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
+import { QuestionaryStep, ShipmentStatus } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
-import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
 import { usePersistShipmentModel } from 'hooks/shipment/usePersistShipmentModel';
 import {
   Event,
   EventType,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
+  WizardStep,
 } from 'models/QuestionarySubmissionState';
 import {
   ShipmentExtended,
@@ -34,41 +24,11 @@ import {
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 
-const useStyles = makeStyles(theme => ({
-  stepper: {
-    padding: theme.spacing(3, 0, 5),
-  },
-  heading: {
-    textOverflow: 'ellipsis',
-    width: '80%',
-    margin: '0 auto',
-    textAlign: 'center',
-    minWidth: '450px',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-  },
-  infoline: {
-    color: theme.palette.grey[600],
-    textAlign: 'right',
-  },
-}));
+import ShipmentReview from './ShipmentReview';
 
-type ShipmentContextType = {
+export interface ShipmentContextType extends QuestionaryContextType {
   state: ShipmentSubmissionState | null;
-  dispatch: React.Dispatch<Event>;
-};
-
-export const ShipmentContext = React.createContext<ShipmentContextType>({
-  state: null,
-  dispatch: (e: Event) => {},
-});
-
-const getReviewStepIndex = (state: ShipmentSubmissionState) =>
-  state.steps.length;
-
-const getConfirmNavigMsg = (): string => {
-  return 'Changes you recently made in this step will not be saved! Are you sure?';
-};
+}
 
 const shipmentReducer = (
   state: ShipmentSubmissionState,
@@ -92,22 +52,11 @@ const shipmentReducer = (
       };
       draftState.isDirty = true;
       break;
-    case EventType.GO_TO_STEP:
-      const reviewStepIdx = getReviewStepIndex(state);
-      if (action.payload.stepIndex === reviewStepIdx) {
-        draftState.stepIndex = reviewStepIdx;
-      }
-      break;
-
-    case EventType.QUESTIONARY_STEPS_COMPLETE: {
-      draftState.stepIndex = getReviewStepIndex(state);
-      break;
-    }
     case EventType.QUESTIONARY_STEPS_LOADED: {
       draftState.shipment.questionary.steps = action.payload.questionarySteps;
       break;
     }
-    case EventType.QUESTIONARY_STEP_ANSWERED: // THIS should be part of questionary reducer?
+    case EventType.QUESTIONARY_STEP_ANSWERED:
       const updatedStep = action.payload.questionaryStep as QuestionaryStep;
       const stepIndex = draftState.shipment.questionary.steps.findIndex(
         step => step.topic.id === updatedStep.topic.id
@@ -120,66 +69,122 @@ const shipmentReducer = (
   return draftState;
 };
 
+const isShipmentSubmitted = (shipment: { status: ShipmentStatus }) =>
+  shipment.status === ShipmentStatus.SUBMITTED;
+
+const createQuestionaryWizardStep = (
+  step: QuestionaryStep,
+  index: number
+): WizardStep => ({
+  type: 'QuestionaryStep',
+  payload: { topicId: step.topic.id, questionaryStepIndex: index },
+  getMetadata: (state, payload) => {
+    const shipmentState = state as ShipmentSubmissionState;
+    const questionaryStep = state.steps[payload.questionaryStepIndex];
+
+    return {
+      title: questionaryStep.topic.title,
+      isCompleted: questionaryStep.isCompleted,
+      isReadonly:
+        isShipmentSubmitted(shipmentState.shipment) ||
+        (index > 0 && state.steps[index - 1].isCompleted === false),
+    };
+  },
+});
+
+const createReviewWizardStep = (): WizardStep => ({
+  type: 'ShipmentReview',
+  getMetadata: state => {
+    const shipmentState = state as ShipmentSubmissionState;
+    const lastShipmentStep = shipmentState.steps[state.steps.length - 1];
+
+    return {
+      title: 'Review',
+      isCompleted: isShipmentSubmitted(shipmentState.shipment),
+      isReadonly:
+        isShipmentSubmitted(shipmentState.shipment) ||
+        lastShipmentStep.isCompleted === false,
+    };
+  },
+});
 export default function ShipmentContainer(props: {
   shipment: ShipmentExtended;
   done?: (shipment: ShipmentExtended) => any;
 }) {
-  const isNonOfficer = !useCheckAccess([UserRole.USER_OFFICER]);
+  const { api } = useDataApiWithFeedback();
+  const { persistModel: persistShipmentModel } = usePersistShipmentModel();
 
-  const classes = useStyles();
-  const { api, isExecutingCall: isApiInteracting } = useDataApiWithFeedback();
-  const { persistModel, isSavingModel } = usePersistQuestionaryModel();
-  const {
-    persistModel: persistShipmentModel,
-    isSavingModel: isSavingShipmentModel,
-  } = usePersistShipmentModel();
   const previousInitialShipment = usePrevious(props.shipment);
+
+  const createShipmentWizardSteps = (): WizardStep[] => {
+    const wizardSteps: WizardStep[] = [];
+    const questionarySteps = props.shipment.questionary.steps;
+
+    questionarySteps.forEach((step, index) =>
+      wizardSteps.push(createQuestionaryWizardStep(step, index))
+    );
+
+    wizardSteps.push(createReviewWizardStep());
+
+    return wizardSteps;
+  };
+
+  const displayElementFactory = (metadata: WizardStep, isReadonly: boolean) => {
+    switch (metadata.type) {
+      case 'QuestionaryStep':
+        return (
+          <QuestionaryStepView
+            readonly={isReadonly}
+            topicId={metadata.payload.topicId}
+          />
+        );
+      case 'ShipmentReview':
+        return (
+          <ShipmentReview
+            isReadonly={isReadonly}
+            onComplete={() => props.done?.(state.shipment)}
+          />
+        );
+
+      default:
+        throw new Error(`Unknown step type ${metadata.type}`);
+    }
+  };
 
   /**
    * Returns true if reset was performed, false otherwise
    */
   const handleReset = async (): Promise<boolean> => {
-    if (state.isDirty) {
-      const confirmed = window.confirm(getConfirmNavigMsg());
-      const shipmentState = state as ShipmentSubmissionState;
-      if (confirmed) {
-        if (shipmentState.shipment.id === 0) {
-          // if shipment is not created yet
-          dispatch({
-            type: EventType.SHIPMENT_LOADED,
-            payload: { shipment: initialState.shipment },
-          });
-        } else {
-          await api()
-            .getShipment({ shipmentId: shipmentState.shipment.id }) // or load blankQuestionarySteps if sample is null
-            .then(data => {
-              if (data.shipment && data.shipment.questionary.steps) {
-                dispatch({
-                  type: EventType.SHIPMENT_LOADED,
-                  payload: { proposal: data.shipment },
-                });
-                dispatch({
-                  type: EventType.QUESTIONARY_STEPS_LOADED,
-                  payload: {
-                    questionarySteps: data.shipment.questionary.steps,
-                    stepIndex: state.stepIndex,
-                  },
-                });
-              }
-            });
-        }
+    const shipmentState = state as ShipmentSubmissionState;
 
-        return true;
-      } else {
-        return false;
-      }
+    if (shipmentState.shipment.id === 0) {
+      // if shipment is not created yet
+      dispatch({
+        type: EventType.SHIPMENT_LOADED,
+        payload: { shipment: initialState.shipment },
+      });
+    } else {
+      await api()
+        .getShipment({ shipmentId: shipmentState.shipment.id }) // or load blankQuestionarySteps if sample is null
+        .then(data => {
+          if (data.shipment && data.shipment.questionary.steps) {
+            dispatch({
+              type: EventType.SHIPMENT_LOADED,
+              payload: { shipment: data.shipment },
+            });
+            dispatch({
+              type: EventType.QUESTIONARY_STEPS_LOADED,
+              payload: {
+                questionarySteps: data.shipment.questionary.steps,
+                stepIndex: state.stepIndex,
+              },
+            });
+          }
+        });
     }
 
-    return false;
+    return true;
   };
-
-  const allStepsComplete = (questionary: Questionary) =>
-    questionary && questionary.steps.every(step => step.isCompleted);
 
   const handleEvents = ({
     getState,
@@ -192,7 +197,8 @@ export default function ShipmentContainer(props: {
         case EventType.SHIPMENT_DONE:
           props.done?.(action.payload.shipment);
           break;
-        case EventType.BACK_CLICKED:
+
+        case EventType.BACK_CLICKED: // move this
           if (!state.isDirty || (await handleReset())) {
             dispatch({ type: EventType.GO_STEP_BACK });
           }
@@ -211,17 +217,12 @@ export default function ShipmentContainer(props: {
     questionaryId: props.shipment.questionary.questionaryId,
     stepIndex: 0,
     steps: props.shipment.questionary.steps,
+    wizardSteps: createShipmentWizardSteps(),
   };
 
   const { state, dispatch } = QuestionarySubmissionModel<
     ShipmentSubmissionState
-  >(
-    initialState,
-    [handleEvents, persistModel, persistShipmentModel],
-    shipmentReducer
-  );
-
-  const isSubmitted = state.shipment.status === ShipmentStatus.SUBMITTED;
+  >(initialState, [handleEvents, persistShipmentModel], shipmentReducer);
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =
@@ -238,123 +239,14 @@ export default function ShipmentContainer(props: {
     }
   }, [previousInitialShipment, props.shipment, dispatch]);
 
-  const getStepperNavig = () => {
-    if (state.steps.length <= 1) {
-      return null;
-    }
-
-    return (
-      <Stepper
-        nonLinear
-        activeStep={state.stepIndex}
-        className={classes.stepper}
-      >
-        {state.steps.map((step, index, steps) => (
-          <Step key={index}>
-            <QuestionaryStepButton
-              onClick={async () => {
-                if (!state.isDirty || (await handleReset())) {
-                  dispatch({
-                    type: EventType.GO_TO_STEP,
-                    payload: { stepIndex: index },
-                  });
-                }
-              }}
-              completed={step.isCompleted}
-              editable={
-                index === 0 ||
-                step.isCompleted ||
-                steps[index].isCompleted === true
-              }
-            >
-              <span>{step.topic.title}</span>
-            </QuestionaryStepButton>
-          </Step>
-        ))}
-        <Step key="review">
-          <QuestionaryStepButton
-            onClick={async () => {
-              dispatch({
-                type: EventType.GO_TO_STEP,
-                payload: { stepIndex: state.steps.length },
-              });
-            }}
-            completed={isSubmitted}
-            editable={allStepsComplete(state.shipment.questionary)}
-          >
-            <span>Review</span>
-          </QuestionaryStepButton>
-        </Step>
-      </Stepper>
-    );
-  };
-
-  const getStepContent = () => {
-    if (state.stepIndex === getReviewStepIndex(state)) {
-      return (
-        <div>
-          <QuestionaryDetails questionaryId={state.shipment.questionaryId} />
-          <div>
-            <NavigationFragment
-              back={undefined}
-              saveAndNext={{
-                callback: () =>
-                  dispatch({
-                    type: EventType.SHIPMENT_DONE,
-                    payload: { shipment: state.shipment },
-                  }),
-                label: 'Finish',
-              }}
-              reset={undefined}
-              isLoading={false}
-            />
-          </div>
-        </div>
-      );
-    }
-    const currentStep = state.steps[state.stepIndex];
-    const previousStep = state.steps[state.stepIndex - 1];
-
-    if (!currentStep) {
-      return null;
-    }
-
-    return (
-      <QuestionaryStepView
-        topicId={currentStep.topic.id}
-        state={state}
-        readonly={
-          isApiInteracting ||
-          (previousStep ? previousStep.isCompleted === false : false) ||
-          (isSubmitted && isNonOfficer)
-        }
-        dispatch={dispatch}
-        key={currentStep.topic.id}
-      />
-    );
-  };
-
-  const getProgressBar = () =>
-    isApiInteracting || isSavingModel || isSavingShipmentModel ? (
-      <LinearProgress />
-    ) : null;
-
   return (
-    <ShipmentContext.Provider value={{ state, dispatch }}>
-      <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
-
-      <Typography
-        component="h1"
-        variant="h4"
-        align="center"
-        className={classes.heading}
-      >
-        {state.shipment.title || 'New Proposal'}
-      </Typography>
-      <div className={classes.infoline}>{state.shipment.status}</div>
-      {getStepperNavig()}
-      {getProgressBar()}
-      {getStepContent()}
-    </ShipmentContext.Provider>
+    <QuestionaryContext.Provider value={{ state, dispatch }}>
+      <Questionary
+        title={state.shipment.title || 'New Shipment'}
+        info={state.shipment.status}
+        handleReset={handleReset}
+        displayElementFactory={displayElementFactory}
+      />
+    </QuestionaryContext.Provider>
   );
 }
