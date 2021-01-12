@@ -91,6 +91,10 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
                 ? (item as string[]).join(', ')
                 : (item as string)
             }
+            MenuProps={{
+              variant: 'menu',
+              getContentAnchorEl: null,
+            }}
           >
             {config.options.map(option => {
               return (
