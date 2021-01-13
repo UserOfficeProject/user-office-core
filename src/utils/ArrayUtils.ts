@@ -16,3 +16,11 @@ export function stringToTextArray(
     .split(separator)
     .filter((maybeString: any) => typeof maybeString === 'string');
 }
+
+export function toArray(input: string | string[]): string[] {
+  if (typeof input === 'string') {
+    return [input];
+  }
+
+  return input;
+}

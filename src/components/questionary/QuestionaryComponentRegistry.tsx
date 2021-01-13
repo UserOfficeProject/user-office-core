@@ -20,6 +20,7 @@ import { multipleChoiceDefinition as multiChoiceDefinition } from './questionary
 import { proposalBasisDefinition } from './questionaryComponents/ProposalBasis/ProposalBasisDefinition';
 import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/SampleBasisDefinition';
 import { sampleDeclarationDefinition } from './questionaryComponents/SampleDeclaration/SampleDeclaratonDefinition';
+import { shipmentBasisDefinition } from './questionaryComponents/ShipmentBasis/ShipmentBasisDefinition';
 import { textInputDefinition } from './questionaryComponents/TextInput/TextInputDefinition';
 
 export interface FormProps<ValueObjectType> {
@@ -65,6 +66,7 @@ const registry = [
   proposalBasisDefinition,
   sampleBasisDefinition,
   intervalDefinition,
+  shipmentBasisDefinition,
 ];
 
 Object.freeze(registry);

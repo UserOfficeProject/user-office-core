@@ -4,6 +4,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import React from 'react';
 
+import UOLoader from 'components/common/UOLoader';
 import { Answer } from 'generated/sdk';
 import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import {
@@ -14,10 +15,16 @@ import {
 import { formatQuestionaryComponentAnswer } from './QuestionaryComponentRegistry';
 
 function QuestionaryDetails(props: { questionaryId: number }) {
-  const { questionary } = useQuestionary(props.questionaryId);
+  const { questionary, loadingQuestionary } = useQuestionary(
+    props.questionaryId
+  );
+
+  if (loadingQuestionary) {
+    return <UOLoader />;
+  }
 
   if (!questionary) {
-    return <span>loading...</span>;
+    return <span>Failed to load questionary details</span>;
   }
 
   const allFields = getAllFields(questionary.steps) as Answer[];

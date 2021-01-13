@@ -3,8 +3,11 @@ import { getIn } from 'formik';
 import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 
 import TextFieldWithCounter from 'components/common/TextFieldWithCounter';
+import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { TextInputConfig } from 'generated/sdk';
+
+const TextFieldNoSubmit = withPreventSubmit(TextFieldWithCounter);
 
 export function QuestionaryComponentTextInput(props: BasicComponentProps) {
   const classes = makeStyles({
@@ -40,7 +43,7 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
           }}
         ></div>
       )}
-      <TextFieldWithCounter
+      <TextFieldNoSubmit
         isCounterHidden={config.isCounterHidden}
         variant="standard"
         id={proposalQuestionId}
@@ -57,15 +60,14 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
             config.multiline === false &&
             event.key.toLowerCase() === 'enter'
           ) {
-            event.preventDefault();
             setStateValue(event.currentTarget.value);
-            onComplete(event, event.currentTarget.value);
-
-            return false;
+            onComplete(event.currentTarget.value);
           }
+
+          return undefined;
         }}
         onBlur={event => {
-          onComplete(event, event.currentTarget.value);
+          onComplete(event.currentTarget.value);
         }}
         placeholder={config.placeholder}
         error={isError}

@@ -59,7 +59,7 @@ function CallsModal(props: { templateId?: number; onClose: () => void }) {
 }
 export type ProposalTemplateRowDataType = TemplateRowDataType & {
   callCount?: number;
-  proposalCount?: number;
+  questionaryCount?: number;
 };
 
 function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
@@ -79,7 +79,7 @@ function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
   const columns: Column<ProposalTemplateRowDataType>[] = [
     { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },
-    { title: '# proposals', render: rowData => rowData.proposalCount || 0 },
+    { title: '# proposals', field: 'questionaryCount' },
     {
       title: '# calls',
       field: 'callCount',
@@ -98,7 +98,7 @@ function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
 
           return (
             proposalTemplateRowData.callCount === 0 &&
-            proposalTemplateRowData.proposalCount === 0
+            proposalTemplateRowData.questionaryCount === 0
           );
         }}
         dataProvider={props.dataProvider}
@@ -121,7 +121,7 @@ interface ProposalTemplatesTableProps {
       | 'description'
       | 'isArchived'
       | 'callCount'
-      | 'proposalCount'
+      | 'questionaryCount'
     >[]
   >;
   confirm: WithConfirmType;

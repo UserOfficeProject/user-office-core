@@ -1,10 +1,10 @@
+import { FormControlLabel } from '@material-ui/core';
 import { Field } from 'formik';
-import { CheckboxWithLabel } from 'formik-material-ui';
+import { Checkbox, CheckboxWithLabel } from 'formik-material-ui';
 import React, { ChangeEvent, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from 'components/common/FormikUICustomDependencySelector';
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import TitledContainer from 'components/common/TitledContainer';
@@ -43,13 +43,17 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
         <>
           <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Constraints">
-            <Field
-              name="config.required"
+            <FormControlLabel
+              control={
+                <Field
+                  name="config.required"
+                  component={Checkbox}
+                  margin="normal"
+                  type="checkbox"
+                  inputProps={{ 'data-cy': 'required' }}
+                />
+              }
               label="Is required"
-              component={FormikUICustomCheckbox}
-              margin="normal"
-              fullWidth
-              inputProps={{ 'data-cy': 'required' }}
             />
           </TitledContainer>
 
@@ -62,13 +66,8 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
                 { text: 'Dropdown', value: 'dropdown' },
               ]}
               data-cy="variant"
-              InputProps={{
-                onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  formikProps.setFieldValue('config.variant', e.target.value);
-                  setShowIsMultipleSelectCheckbox(
-                    e.target.value === 'dropdown'
-                  );
-                },
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setShowIsMultipleSelectCheckbox(e.target.value === 'dropdown');
               }}
             />
             {showIsMultipleSelectCheckbox && (

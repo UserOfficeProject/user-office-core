@@ -111,7 +111,7 @@ context('User tests', () => {
 
     cy.get('[data-cy=submit]').click();
 
-    cy.contains('Your proposals');
+    cy.contains('My proposals');
 
     cy.logout();
 

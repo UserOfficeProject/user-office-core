@@ -41,7 +41,7 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
             id={proposalQuestionId}
             name={proposalQuestionId}
             onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-              onComplete(evt, evt.target.checked);
+              onComplete(evt.target.checked);
             }}
             value={stateValue}
             checked={stateValue}

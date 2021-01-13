@@ -22,17 +22,7 @@ context('Samples tests', () => {
   it('Should be able to create proposal template with sample', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Sample declaration templates');
-
-    cy.get('[data-cy=create-new-button]').click();
-
-    cy.get('[data-cy=name] input')
-      .type(sampleTemplateName)
-      .should('have.value', sampleTemplateName);
-
-    cy.get('[data-cy=description]').type(sampleTemplateDescription);
-
-    cy.get('[data-cy=submit]').click();
+    cy.createTemplate('sample', sampleTemplateName, sampleTemplateDescription);
 
     cy.contains('New sample');
 
@@ -48,36 +38,9 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=submit]').click();
 
-    cy.get('[data-cy=show-more-button]')
-      .last()
-      .click();
+    cy.createTopic('New topic');
 
-    cy.get('[data-cy=add-topic-menu-item]')
-      .last()
-      .click();
-
-    cy.get('[data-cy=show-more-button]')
-      .last()
-      .click();
-
-    cy.get('[data-cy=add-question-menu-item]')
-      .last()
-      .click();
-
-    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
-
-    cy.contains('Add Sample Declaration').click();
-
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(sampleQuestion)
-      .should('have.value', sampleQuestion);
-
-    cy.get('[data-cy=template-id]').click();
-
-    cy.contains(sampleTemplateName).click();
-
-    cy.contains('Save').click();
+    cy.createSampleQuestion(sampleQuestion, sampleTemplateName);
 
     cy.contains(sampleQuestion)
       .parent()

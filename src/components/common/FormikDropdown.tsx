@@ -1,6 +1,6 @@
 import MenuItem from '@material-ui/core/MenuItem';
 import MuiTextField from '@material-ui/core/TextField';
-import { Field } from 'formik';
+import { connect, Field, FormikContextType } from 'formik';
 import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
 import React, { PropsWithChildren } from 'react';
@@ -15,9 +15,12 @@ type TProps = {
   disabled?: boolean;
   InputProps?: object;
   value?: string;
+  onChange?: (e: React.ChangeEvent<any>) => void;
 };
 
-const FormikDropdown: React.FC<PropsWithChildren<TProps>> = ({
+const FormikDropdown: React.FC<PropsWithChildren<TProps> & {
+  formik: FormikContextType<any>;
+}> = ({
   name,
   label,
   required,
@@ -28,6 +31,8 @@ const FormikDropdown: React.FC<PropsWithChildren<TProps>> = ({
   items,
   value,
   InputProps,
+  formik,
+  onChange,
 }) => {
   const menuItems =
     items.length > 0 ? (
@@ -85,6 +90,10 @@ const FormikDropdown: React.FC<PropsWithChildren<TProps>> = ({
       InputLabelProps={{
         shrink: true,
       }}
+      onChange={(e: any) => {
+        onChange?.(e);
+        formik.handleChange(e);
+      }}
       fullWidth
       required={required}
       disabled={disabled}
@@ -118,4 +127,4 @@ FormikDropdown.propTypes = {
   InputProps: PropTypes.object,
 };
 
-export default FormikDropdown;
+export default connect<TProps>(FormikDropdown);

@@ -1,6 +1,6 @@
 import Button from '@material-ui/core/Button';
 import MaterialTable from 'material-table';
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { UserContext } from 'context/UserContextProvider';
@@ -89,7 +89,7 @@ export default function UpdateUserRoles(props: { id: number }) {
         }}
         editable={{
           onRowDelete: oldData =>
-            new Promise(async resolve => {
+            new Promise<void>(async resolve => {
               const newRoles = removeRole(oldData);
               await sendUpdateRoles(newRoles);
               resolve();
