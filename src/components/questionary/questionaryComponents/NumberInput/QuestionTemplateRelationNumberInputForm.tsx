@@ -82,7 +82,6 @@ export const QuestionTemplateRelationNumberForm: FormComponent<QuestionTemplateR
               data-cy="property"
               InputProps={{
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  formikProps.setFieldValue('config.property', e.target.value);
                   formikProps.setFieldValue('config.units', []); // reset units to empty array
                   setShowUnits(e.target.value !== IntervalPropertyId.UNITLESS);
                 },

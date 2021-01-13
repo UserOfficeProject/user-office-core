@@ -99,12 +99,11 @@ export const QuestionNumberForm: FormComponent<Question> = props => {
               name="config.property"
               label="Physical property"
               items={propertyDropdownEntries}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                formikProps.setFieldValue('config.units', []); // reset units to empty array
+                setShowUnits(e.target.value !== IntervalPropertyId.UNITLESS);
+              }}
               InputProps={{
-                onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  formikProps.setFieldValue('config.property', e.target.value);
-                  formikProps.setFieldValue('config.units', []); // reset units to empty array
-                  setShowUnits(e.target.value !== IntervalPropertyId.UNITLESS);
-                },
                 'data-cy': 'property',
               }}
             />
@@ -112,6 +111,7 @@ export const QuestionNumberForm: FormComponent<Question> = props => {
             <Field
               name="config.units"
               component={FormikUICustomSelect}
+              multiple
               label="Units"
               availableOptions={
                 allProperties.get(
