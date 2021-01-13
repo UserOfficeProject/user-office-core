@@ -79,7 +79,7 @@ const ProposalTableUser: React.FC = () => {
 
   return (
     <ProposalTable
-      title="Your proposals"
+      title="My proposals"
       search={false}
       searchQuery={sendUserProposalRequest}
       isLoading={loading}

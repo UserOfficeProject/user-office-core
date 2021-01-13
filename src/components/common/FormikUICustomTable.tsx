@@ -1,3 +1,4 @@
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import { FormikHelpers } from 'formik';
 import MaterialTable from 'material-table';
 import React, { forwardRef } from 'react';
@@ -34,14 +35,18 @@ export const FormikUICustomTable = ({
     <MaterialTable
       icons={{
         ...tableIcons,
-        Add: forwardRef((props, ref) => <>Add answer</>),
+        Add: forwardRef(() => (
+          <div data-cy="add-answer-button">
+            <AddCircleOutlineIcon />
+          </div>
+        )),
       }}
       columns={columns}
       data={state}
       options={{ search: false, paging: false }}
       editable={{
         onRowAdd: newData =>
-          new Promise(resolve => {
+          new Promise<void>(resolve => {
             const data = [...state];
             data.push(newData);
             setState(data);
@@ -49,7 +54,7 @@ export const FormikUICustomTable = ({
             resolve();
           }),
         onRowUpdate: (newData, oldData) =>
-          new Promise(resolve => {
+          new Promise<void>(resolve => {
             const data = [...state];
             data[data.indexOf(oldData!)] = newData;
             setState(data);
@@ -57,7 +62,7 @@ export const FormikUICustomTable = ({
             resolve();
           }),
         onRowDelete: oldData =>
-          new Promise(resolve => {
+          new Promise<void>(resolve => {
             const data = [...state];
             data.splice(data.indexOf(oldData), 1);
             setState(data);
@@ -66,7 +71,6 @@ export const FormikUICustomTable = ({
           }),
       }}
       {...props}
-      data-cy="options"
     />
   );
 };

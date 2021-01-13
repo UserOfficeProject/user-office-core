@@ -32,6 +32,16 @@ fragment fieldConfig on FieldConfig {
     tooltip
   }
 
+    ... on NumberInputConfig {
+    property
+    units
+
+    small_label
+    required
+    tooltip
+  }
+
+
   ... on ProposalBasisConfig {
     tooltip
   }
@@ -70,5 +80,11 @@ fragment fieldConfig on FieldConfig {
     htmlQuestion
     isHtmlQuestion
     isCounterHidden
+  }
+
+  ... on ShipmentBasisConfig {
+    small_label
+    required
+    tooltip
   }
 }

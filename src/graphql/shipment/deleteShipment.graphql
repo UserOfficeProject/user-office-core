@@ -1,0 +1,5 @@
+mutation deleteShipment($shipmentId: Int!) {
+  deleteShipment(shipmentId: $shipmentId) {
+    error
+  }
+}

@@ -1,0 +1,6 @@
+mutation checkExternalToken($externalToken: String!) {
+  checkExternalToken(externalToken: $externalToken) {
+    token
+    error
+  }
+}

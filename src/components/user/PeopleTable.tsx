@@ -3,10 +3,10 @@ import Email from '@material-ui/icons/Email';
 import makeStyles from '@material-ui/styles/makeStyles';
 import MaterialTable, { Query } from 'material-table';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { UserRole, GetUsersQuery, BasicUserDetails } from 'generated/sdk';
+import { BasicUserDetails, GetUsersQuery, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -111,8 +111,19 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
     BasicUserDetails[]
   >([]);
   const [searchText, setSearchText] = useState('');
+  const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
 
   const classes = useStyles();
+
+  const { data } = props;
+
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+
+    setCurrentPageIds(data.map(({ id }) => id));
+  }, [data]);
 
   if (sendUserEmail && props.invitationUserRole) {
     return (
@@ -150,15 +161,47 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
         icons={tableIcons}
         title={props.title}
         columns={columns}
-        onSelectionChange={selectedItems => {
-          const newData = selectedItems.map(selectedItem => ({
-            id: selectedItem.id,
-            firstname: selectedItem.firstname,
-            lastname: selectedItem.lastname,
-            organisation: selectedItem.organisation,
-          }));
+        onSelectionChange={(selectedItems, selectedItem) => {
+          // when the user wants to (un)select all items
+          // `selectedItem` will be undefined
+          if (!selectedItem) {
+            // first clear the current page because if any row was unselected
+            // the (un)select all option will select every rows
+            // which would result in duplicates
+            setSelectedParticipants(selectedParticipants =>
+              selectedParticipants.filter(
+                ({ id }) => !currentPageIds.includes(id)
+              )
+            );
 
-          setSelectedParticipants(newData as BasicUserDetails[]);
+            if (selectedItems.length > 0) {
+              setSelectedParticipants(selectedParticipants => [
+                ...selectedParticipants,
+                ...(selectedItems.map(selectedItem => ({
+                  id: selectedItem.id,
+                  firstname: selectedItem.firstname,
+                  lastname: selectedItem.lastname,
+                  organisation: selectedItem.organisation,
+                })) as BasicUserDetails[]),
+              ]);
+            }
+
+            return;
+          }
+
+          setSelectedParticipants(selectedParticipants =>
+            selectedItem.tableData.checked
+              ? ([
+                  ...selectedParticipants,
+                  {
+                    id: selectedItem.id,
+                    firstname: selectedItem.firstname,
+                    lastname: selectedItem.lastname,
+                    organisation: selectedItem.organisation,
+                  },
+                ] as BasicUserDetails[])
+              : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
+          );
         }}
         data={
           props.data
@@ -177,7 +220,13 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
                   props.selectedUsers,
                   props.userRole,
                   selectedParticipants.map(({ id }) => id)
-                );
+                ).then((users: any) => {
+                  setCurrentPageIds(
+                    users.data.map(({ id }: { id: number }) => id)
+                  );
+
+                  return users;
+                });
               }
         }
         isLoading={loading}
@@ -192,7 +241,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
           props.onRemove
             ? {
                 onRowDelete: oldData =>
-                  new Promise(resolve => {
+                  new Promise<void>(resolve => {
                     resolve();
                     (props.onRemove as any)(oldData);
                   }),

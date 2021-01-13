@@ -19,10 +19,10 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="user-menu-items"]')
       .find('.MuiListItem-root')
-      .should('have.length', 3);
+      .should('have.length', 4);
 
     cy.visit('/CallPage');
-    cy.contains('Your proposals');
+    cy.contains('My proposals');
   });
 
   it('A user-officer should not be able go to next step or create call if there is validation error', () => {

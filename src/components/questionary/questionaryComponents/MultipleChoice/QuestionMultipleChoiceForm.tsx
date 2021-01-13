@@ -1,10 +1,10 @@
+import { FormControlLabel } from '@material-ui/core';
 import { Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-material-ui';
+import { Checkbox, CheckboxWithLabel, TextField } from 'formik-material-ui';
 import React, { ChangeEvent, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
-import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
@@ -37,7 +37,7 @@ export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
         }),
       })}
     >
-      {formikProps => (
+      {() => (
         <>
           <Field
             name="naturalKey"
@@ -59,14 +59,17 @@ export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
           />
 
           <TitledContainer label="Constraints">
-            <Field
-              name="config.required"
+            <FormControlLabel
+              control={
+                <Field
+                  name="config.required"
+                  component={Checkbox}
+                  type="checkbox"
+                  margin="normal"
+                  inputProps={{ 'data-cy': 'required' }}
+                />
+              }
               label="Is required"
-              checked={config.required}
-              component={FormikUICustomCheckbox}
-              margin="normal"
-              fullWidth
-              inputProps={{ 'data-cy': 'required' }}
             />
           </TitledContainer>
 
@@ -79,13 +82,8 @@ export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
                 { text: 'Dropdown', value: 'dropdown' },
               ]}
               data-cy="variant"
-              InputProps={{
-                onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                  formikProps.setFieldValue('config.variant', e.target.value);
-                  setShowIsMultipleSelectCheckbox(
-                    e.target.value === 'dropdown'
-                  );
-                },
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setShowIsMultipleSelectCheckbox(e.target.value === 'dropdown');
               }}
             />
 

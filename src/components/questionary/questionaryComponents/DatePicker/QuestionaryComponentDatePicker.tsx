@@ -63,7 +63,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
                 format="yyyy-MM-dd"
                 onChange={date => {
                   setStateValue(date);
-                  onComplete(proposalQuestionId, date);
+                  onComplete(date);
                   form.setFieldValue(field.name, date, false);
                 }}
                 TextFieldComponent={props => (

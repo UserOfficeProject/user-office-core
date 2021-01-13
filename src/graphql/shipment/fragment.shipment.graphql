@@ -1,0 +1,10 @@
+fragment shipment on Shipment {
+  id
+  title
+  proposalId
+  status
+  externalRef
+  questionaryId
+  creatorId
+  created
+}
