@@ -20,6 +20,7 @@ import {
 } from 'generated/sdk';
 import { SampleBasic } from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm from 'utils/withConfirm';
 
 import { QuestionariesList, QuestionariesListRow } from '../QuestionariesList';
 import { SampleDeclarationContainer } from './SampleDeclarationContainer';
@@ -53,10 +54,13 @@ function createSampleStub(
   };
 }
 
-function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
+function QuestionaryComponentSampleDeclaration(
+  props: QuestionaryComponentSampleDeclarationProps
+) {
   const {
     answer,
     onComplete,
+    confirm,
     formikProps: { errors },
   } = props;
   const proposalQuestionId = answer.question.proposalQuestionId;
@@ -70,8 +74,6 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   const [stateValue, setStateValue] = useState<number[]>(answer.value || []); // ids of samples
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
-  const [openCopySample, setOpenCopySample] = useState(false);
-  const [openDeleteSample, setOpenDeleteSample] = useState(false);
   const [sampleToChange, setSampleToChange] = useState<number>(0);
   const copySample = () =>
     api()
@@ -126,20 +128,6 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
 
   return (
     <>
-      <DialogConfirmation
-        title="Copy Sample"
-        text="This action will copy the sample and all data associated with it"
-        open={openCopySample}
-        action={copySample}
-        handleOpen={setOpenCopySample}
-      />
-      <DialogConfirmation
-        title="Delete Sample"
-        text="This action will delete the sample and all data associated with it"
-        open={openDeleteSample}
-        action={deleteSample}
-        handleOpen={setOpenDeleteSample}
-      />
       <FormControl error={isError} required={config.required} fullWidth>
         <FormLabel error={isError}>{answer.question.question}</FormLabel>
         <span>{config.small_label}</span>
@@ -158,11 +146,19 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
           }
           onDeleteClick={item => {
             setSampleToChange(item.id);
-            setOpenDeleteSample(true);
+            confirm(deleteSample, {
+              title: 'Delete Sample',
+              description:
+                'This action will delete the sample and all data associated with it',
+            })();
           }}
           onCloneClick={item => {
             setSampleToChange(item.id);
-            setOpenCopySample(true);
+            confirm(copySample, {
+              title: 'Copy Sample',
+              description:
+                'This action will copy the sample and all data associated with it',
+            })();
           }}
           onAddNewClick={() => {
             if (!state) {
@@ -246,4 +242,9 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   );
 }
 
-export { QuestionaryComponentSampleDeclaration };
+interface QuestionaryComponentSampleDeclarationProps
+  extends BasicComponentProps {
+  confirm: Function;
+}
+
+export default withConfirm(QuestionaryComponentSampleDeclaration);
