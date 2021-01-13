@@ -23,7 +23,8 @@
     "start": "tsc && node ./build/index.js",
     "apitest": "newman run api_tests/tests.json --environment api_tests/environment.json",
     "debug": "rm -R -f ./build && tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere GRAYLOG_SERVER=127.0.0.1 GRAYLOG_PORT=12202 ts-node-dev --inspect --respawn -- ./index.ts",
-    "populate": "DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo env secret=qMyLZALzs229ybdQXNyzYRdju7X784TH env tokenLife=7d env baseURL=localhost:3000 env NODE_ENV=development ts-node-dev --respawn --transpileOnly ./src/populate/index.ts"
+    "populate": "DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo env secret=qMyLZALzs229ybdQXNyzYRdju7X784TH env tokenLife=7d env baseURL=localhost:3000 env NODE_ENV=development ts-node-dev --respawn --transpileOnly ./src/populate/index.ts",
+    "generate:uows-client:dev": "uows-client-generator https://devapis.facilities.rl.ac.uk/ws/UserOfficeWebService?wsdl src/datasources/stfc/UOWSSoapInterface.ts"
   },
   "lint-staged": {
     "**/*.{js,ts}": "npm run lint"
@@ -66,12 +67,14 @@
     "reflect-metadata": "^0.1.13",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
+    "soap": "^0.35.0",
     "sparkpost": "^2.1.4",
     "type-graphql": "^1.1.1",
     "typedi": "^0.8.0",
     "yup": "^0.31.1"
   },
   "devDependencies": {
+    "@stfc-user-programme/uows_client_generator": "^1.0.14",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.2",
     "@types/cron": "^1.7.2",
@@ -87,6 +90,7 @@
     "@types/pg-large-object": "^2.0.2",
     "@types/react-beautiful-dnd": "^11.0.5",
     "@types/request-promise": "^4.1.46",
+    "@types/sax": "^1.2.1",
     "@types/sinon": "^9.0.8",
     "@types/sparkpost": "^2.1.4",
     "@types/yup": "^0.29.8",
@@ -98,9 +102,9 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jest": "^24.1.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "faker": "^4.1.0",
     "husky": "^4.3.0",
     "jest": "^26.6.0",
-    "faker": "^4.1.0",
     "lint-staged": "^10.4.2",
     "newman": "^4.6.1",
     "nodemon": "^1.19.1",

@@ -1,16 +1,15 @@
 import { logger } from '@esss-swap/duo-logger';
 
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-import { QuestionaryStep, Questionary } from '../models/Questionary';
+import { Questionary, QuestionaryStep } from '../models/Questionary';
+import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 
 export default class QuestionaryQueries {
   constructor(
-    public dataSource: QuestionaryDataSource,
-    private templateDataSource: TemplateDataSource,
+    private dataSource: QuestionaryDataSource,
     private authorizer: QuestionaryAuthorization
   ) {}
 
@@ -48,6 +47,11 @@ export default class QuestionaryQueries {
     }
 
     return this.dataSource.getQuestionarySteps(questionaryId);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  getCount(user: UserWithRole | null, templateId: number): Promise<number> {
+    return this.dataSource.getCount(templateId);
   }
 
   async getBlankQuestionarySteps(

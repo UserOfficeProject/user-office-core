@@ -208,15 +208,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .where('title', 'ilike', `%${filter.text}%`)
             .orWhere('abstract', 'ilike', `%${filter.text}%`);
         }
-        if (filter?.templateIds) {
-          query
-            .leftJoin(
-              'questionaries',
-              'questionaries.questionary_id',
-              'proposals.questionary_id'
-            )
-            .whereIn('questionaries.template_id', filter.templateIds);
-        }
+
         if (filter?.questionaryIds) {
           query.whereIn('proposals.questionary_id', filter.questionaryIds);
         }

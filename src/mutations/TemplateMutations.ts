@@ -35,6 +35,7 @@ import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/Creat
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
+import { SetActiveTemplateArgs } from '../resolvers/mutations/SetActiveTemplateMutation';
 import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
 import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
@@ -66,6 +67,14 @@ export default class TemplateMutations {
           0,
           'New sample',
           'sample_basis'
+        );
+        break;
+      case TemplateCategoryId.SHIPMENT_DECLARATION:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New shipment',
+          'shipment_basis'
         );
         break;
     }
@@ -367,6 +376,30 @@ export default class TemplateMutations {
   async updateTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
     return this.dataSource.updateTemplate(args).catch(err => {
       logger.logException('Could not update topic order', err, {
+        user,
+      });
+
+      return rejection('INTERNAL_ERROR');
+    });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async setActiveTemplate(
+    user: UserWithRole | null,
+    args: SetActiveTemplateArgs
+  ) {
+    const template = await this.dataSource.getTemplate(args.templateId);
+    if (template?.categoryId !== args.templateCategoryId) {
+      logger.logError('TemplateId and TemplateCategoryId mismatch', {
+        args,
+        user,
+      });
+
+      return rejection('INTERNAL_ERROR');
+    }
+
+    return this.dataSource.setActiveTemplate(args).catch(err => {
+      logger.logException('Could not set active template', err, {
         user,
       });
 
