@@ -32,6 +32,7 @@ export enum IntervalPropertyId {
   TIME = 'TIME',
   UNITLESS = 'UNITLESS',
   VOLUME = 'VOLUME',
+  MASS_VOLUME = 'MASS_VOLUME',
 }
 
 export interface IntervalProperty {
@@ -431,6 +432,13 @@ propertyList.set(IntervalPropertyId.INFORMATION_RATE, {
   name: 'information speed',
   siUnit: null,
   units: ['bit/second', 'byte/second', 'megabyte/second', 'gigabyte/second'],
+});
+
+propertyList.set(IntervalPropertyId.MASS_VOLUME, {
+  id: IntervalPropertyId.MASS_VOLUME,
+  name: 'mass and volume',
+  siUnit: null,
+  units: ['µg', 'mg', 'g', 'kg', 'µL', 'mL', 'L'],
 });
 
 propertyList.set(IntervalPropertyId.UNITLESS, {
