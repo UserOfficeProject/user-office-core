@@ -3,8 +3,6 @@ import { print } from 'graphql';
 import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -17,12 +15,6 @@ export type Scalars = {
   DateTime: any;
   IntStringDateBoolArray: any;
 };
-
-
-
-
-
-
 
 
 export type Entity = Call | Instrument | Proposal | User;
@@ -204,6 +196,7 @@ export enum DataType {
   SAMPLE_BASIS = 'SAMPLE_BASIS',
   PROPOSAL_BASIS = 'PROPOSAL_BASIS',
   INTERVAL = 'INTERVAL',
+  NUMBER_INPUT = 'NUMBER_INPUT',
   SHIPMENT_BASIS = 'SHIPMENT_BASIS'
 }
 
@@ -300,7 +293,7 @@ export type FieldConditionInput = {
   params: Scalars['String'];
 };
 
-export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubtemplateConfig | ProposalBasisConfig | IntervalConfig | ShipmentBasisConfig;
+export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubtemplateConfig | ProposalBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig;
 
 export type FieldDependency = {
   __typename?: 'FieldDependency';
@@ -1092,6 +1085,15 @@ export type NextStatusEvent = {
   nextStatusEventId: Scalars['Int'];
   proposalWorkflowConnectionId: Scalars['Int'];
   nextStatusEvent: Scalars['String'];
+};
+
+export type NumberInputConfig = {
+  __typename?: 'NumberInputConfig';
+  small_label: Scalars['String'];
+  required: Scalars['Boolean'];
+  tooltip: Scalars['String'];
+  units: Maybe<Array<Scalars['String']>>;
+  property: Scalars['String'];
 };
 
 export type OrcIdInformation = {
@@ -3161,6 +3163,9 @@ export type AnswerFragment = (
     { __typename?: 'IntervalConfig' }
     & FieldConfigIntervalConfigFragment
   ) | (
+    { __typename?: 'NumberInputConfig' }
+    & FieldConfigNumberInputConfigFragment
+  ) | (
     { __typename?: 'ShipmentBasisConfig' }
     & FieldConfigShipmentBasisConfigFragment
   ), dependency: Maybe<(
@@ -4106,12 +4111,17 @@ type FieldConfigIntervalConfigFragment = (
   & Pick<IntervalConfig, 'property' | 'units' | 'small_label' | 'required' | 'tooltip'>
 );
 
+type FieldConfigNumberInputConfigFragment = (
+  { __typename?: 'NumberInputConfig' }
+  & Pick<NumberInputConfig, 'property' | 'units' | 'small_label' | 'required' | 'tooltip'>
+);
+
 type FieldConfigShipmentBasisConfigFragment = (
   { __typename?: 'ShipmentBasisConfig' }
   & Pick<ShipmentBasisConfig, 'small_label' | 'required' | 'tooltip'>
 );
 
-export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigShipmentBasisConfigFragment;
+export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment;
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
@@ -4146,6 +4156,9 @@ export type QuestionFragment = (
   ) | (
     { __typename?: 'IntervalConfig' }
     & FieldConfigIntervalConfigFragment
+  ) | (
+    { __typename?: 'NumberInputConfig' }
+    & FieldConfigNumberInputConfigFragment
   ) | (
     { __typename?: 'ShipmentBasisConfig' }
     & FieldConfigShipmentBasisConfigFragment
@@ -4188,6 +4201,9 @@ export type QuestionTemplateRelationFragment = (
   ) | (
     { __typename?: 'IntervalConfig' }
     & FieldConfigIntervalConfigFragment
+  ) | (
+    { __typename?: 'NumberInputConfig' }
+    & FieldConfigNumberInputConfigFragment
   ) | (
     { __typename?: 'ShipmentBasisConfig' }
     & FieldConfigShipmentBasisConfigFragment
@@ -4944,6 +4960,13 @@ export const FieldConfigFragmentDoc = gql`
     tooltip
   }
   ... on IntervalConfig {
+    property
+    units
+    small_label
+    required
+    tooltip
+  }
+  ... on NumberInputConfig {
     property
     units
     small_label

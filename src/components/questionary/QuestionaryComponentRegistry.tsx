@@ -17,6 +17,7 @@ import { embellishmentDefinition } from './questionaryComponents/Embellishment/E
 import { fileUploadDefinition } from './questionaryComponents/FileUpload/FileUploadDefinition';
 import { intervalDefinition } from './questionaryComponents/Interval/IntervalDefinition';
 import { multipleChoiceDefinition as multiChoiceDefinition } from './questionaryComponents/MultipleChoice/MultipleChoiceDefinition';
+import { numberInputDefinition } from './questionaryComponents/NumberInput/NumberInputDefinition';
 import { proposalBasisDefinition } from './questionaryComponents/ProposalBasis/ProposalBasisDefinition';
 import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/SampleBasisDefinition';
 import { sampleDeclarationDefinition } from './questionaryComponents/SampleDeclaration/SampleDeclaratonDefinition';
@@ -66,6 +67,7 @@ const registry = [
   proposalBasisDefinition,
   sampleBasisDefinition,
   intervalDefinition,
+  numberInputDefinition,
   shipmentBasisDefinition,
 ];
 

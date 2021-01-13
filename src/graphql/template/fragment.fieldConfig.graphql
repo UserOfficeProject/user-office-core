@@ -32,6 +32,16 @@ fragment fieldConfig on FieldConfig {
     tooltip
   }
 
+    ... on NumberInputConfig {
+    property
+    units
+
+    small_label
+    required
+    tooltip
+  }
+
+
   ... on ProposalBasisConfig {
     tooltip
   }
