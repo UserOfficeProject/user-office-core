@@ -39,7 +39,7 @@ export function QuestionaryComponentFileUpload(
         onChange={(fileMetaDataList: FileMetaData[]) => {
           const newStateValue = fileMetaDataList.map(file => file.fileId);
           setStateValue(newStateValue);
-          onComplete(proposalQuestionId, newStateValue); // letting Formik know that there was a change
+          onComplete(newStateValue);
         }}
         value={stateValue}
       />

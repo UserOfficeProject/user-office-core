@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import {
   DataType,
-  FieldDependency,
+  FieldDependencyInput,
   Question,
   QuestionTemplateRelation,
   Template,
@@ -38,7 +38,7 @@ export function usePersistQuestionaryEditorModel() {
 
   // Have this until GQL accepts Union types
   // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
-  const prepareDependencies = (dependency: FieldDependency) => {
+  const prepareDependencies = (dependency: FieldDependencyInput) => {
     return {
       ...dependency,
       condition: {
@@ -63,6 +63,13 @@ export function usePersistQuestionaryEditorModel() {
     templateId: number,
     field: QuestionTemplateRelation
   ) => {
+    const dependency: FieldDependencyInput | null = field.dependency
+      ? prepareDependencies({
+          condition: field.dependency.condition,
+          dependencyId: field.dependency.dependencyId,
+        })
+      : null;
+
     return api()
       .updateQuestionTemplateRelation({
         templateId,
@@ -70,9 +77,7 @@ export function usePersistQuestionaryEditorModel() {
         sortOrder: field.sortOrder,
         questionId: field.question.proposalQuestionId,
         config: field.config ? JSON.stringify(field.config) : undefined,
-        dependency: field.dependency
-          ? prepareDependencies(field.dependency)
-          : field.dependency,
+        dependency: dependency,
       })
       .then(data => data.updateQuestionTemplateRelation);
   };

@@ -21,6 +21,7 @@ import { numberInputDefinition } from './questionaryComponents/NumberInput/Numbe
 import { proposalBasisDefinition } from './questionaryComponents/ProposalBasis/ProposalBasisDefinition';
 import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/SampleBasisDefinition';
 import { sampleDeclarationDefinition } from './questionaryComponents/SampleDeclaration/SampleDeclaratonDefinition';
+import { shipmentBasisDefinition } from './questionaryComponents/ShipmentBasis/ShipmentBasisDefinition';
 import { textInputDefinition } from './questionaryComponents/TextInput/TextInputDefinition';
 
 export interface FormProps<ValueObjectType> {
@@ -67,6 +68,7 @@ const registry = [
   sampleBasisDefinition,
   intervalDefinition,
   numberInputDefinition,
+  shipmentBasisDefinition,
 ];
 
 Object.freeze(registry);

@@ -4,7 +4,7 @@ query getProposalTemplates($filter: ProposalTemplatesFilter) {
     name
     description
     isArchived
-    proposalCount
+    questionaryCount
     callCount
   }
 }

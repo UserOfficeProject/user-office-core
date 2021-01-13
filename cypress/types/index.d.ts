@@ -96,6 +96,40 @@ declare global {
           length: number;
         }[]
       ) => Cypress.Chainable<JQuery<HTMLElement>>;
+
+      /**
+       * Creates template
+       *
+       * @returns {typeof createTemplate}
+       * @memberof Chainable
+       * @example
+       *    cy.createTemplate('proposal')
+       */
+      createTemplate: (
+        type: string,
+        title?: string,
+        description?: string
+      ) => void;
+
+      /**
+       * Creates topic in template
+       *
+       * @returns {typeof createTopic}
+       * @memberof Chainable
+       * @example
+       *    cy.createTopic('New topic')
+       */
+      createTopic: (topic: string) => void;
+
+      /**
+       * Creates sample question
+       *
+       * @returns {typeof createSampleQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createSampleQuestion('Provide sample', 'default sample template')
+       */
+      createSampleQuestion: (question: string, template: string) => void;
     }
   }
 

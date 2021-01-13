@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
-import FormikUICustomMultipleSelect from 'components/common/FormikUICustomMultipleSelect';
+import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
@@ -111,7 +111,7 @@ export const QuestionNumberForm: FormComponent<Question> = props => {
 
             <Field
               name="config.units"
-              component={FormikUICustomMultipleSelect}
+              component={FormikUICustomSelect}
               label="Units"
               availableOptions={
                 allProperties.get(

@@ -144,6 +144,12 @@ export type CallsFilter = {
   isSEPReviewEnded?: Maybe<Scalars['Boolean']>;
 };
 
+export type CheckExternalTokenWrap = {
+  __typename?: 'CheckExternalTokenWrap';
+  error: Maybe<Scalars['String']>;
+  token: Maybe<Scalars['String']>;
+};
+
 export type CreateCallInput = {
   shortCode: Scalars['String'];
   startCall: Scalars['DateTime'];
@@ -190,7 +196,8 @@ export enum DataType {
   SAMPLE_BASIS = 'SAMPLE_BASIS',
   PROPOSAL_BASIS = 'PROPOSAL_BASIS',
   INTERVAL = 'INTERVAL',
-  NUMBER_INPUT = 'NUMBER_INPUT'
+  NUMBER_INPUT = 'NUMBER_INPUT',
+  SHIPMENT_BASIS = 'SHIPMENT_BASIS'
 }
 
 export type DateConfig = {
@@ -286,7 +293,7 @@ export type FieldConditionInput = {
   params: Scalars['String'];
 };
 
-export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubtemplateConfig | ProposalBasisConfig | IntervalConfig | NumberInputConfig;
+export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubtemplateConfig | ProposalBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig;
 
 export type FieldDependency = {
   __typename?: 'FieldDependency';
@@ -438,11 +445,14 @@ export type Mutation = {
   removeProposalAssignment: SepResponseWrap;
   createSEP: SepResponseWrap;
   updateSEP: SepResponseWrap;
+  createShipment: ShipmentResponseWrap;
+  updateShipment: ShipmentResponseWrap;
   createQuestion: QuestionResponseWrap;
   createQuestionTemplateRelation: TemplateResponseWrap;
   createTemplate: TemplateResponseWrap;
   createTopic: TemplateResponseWrap;
   deleteQuestionTemplateRelation: TemplateResponseWrap;
+  setActiveTemplate: SuccessResponseWrap;
   updateQuestion: QuestionResponseWrap;
   updateQuestionTemplateRelation: TemplateResponseWrap;
   updateTemplate: TemplateResponseWrap;
@@ -455,7 +465,9 @@ export type Mutation = {
   setUserEmailVerified: UserResponseWrap;
   setUserNotPlaceholder: UserResponseWrap;
   addClientLog: SuccessResponseWrap;
+  addSamplesToShipment: ShipmentResponseWrap;
   applyPatches: PrepareDbResponseWrap;
+  checkExternalToken: CheckExternalTokenWrap;
   cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   createProposal: ProposalResponseWrap;
@@ -464,6 +476,7 @@ export type Mutation = {
   deleteProposal: ProposalResponseWrap;
   deleteQuestion: QuestionResponseWrap;
   deleteSample: SampleResponseWrap;
+  deleteShipment: ShipmentResponseWrap;
   deleteTemplate: TemplateResponseWrap;
   deleteTopic: TemplateResponseWrap;
   deleteUser: UserResponseWrap;
@@ -751,6 +764,20 @@ export type MutationUpdateSepArgs = {
 };
 
 
+export type MutationCreateShipmentArgs = {
+  title: Scalars['String'];
+  proposalId: Scalars['Int'];
+};
+
+
+export type MutationUpdateShipmentArgs = {
+  shipmentId: Scalars['Int'];
+  proposalId?: Maybe<Scalars['Int']>;
+  title?: Maybe<Scalars['String']>;
+  status?: Maybe<ShipmentStatus>;
+};
+
+
 export type MutationCreateQuestionArgs = {
   categoryId: TemplateCategoryId;
   dataType: DataType;
@@ -781,6 +808,12 @@ export type MutationCreateTopicArgs = {
 
 export type MutationDeleteQuestionTemplateRelationArgs = {
   questionId: Scalars['String'];
+  templateId: Scalars['Int'];
+};
+
+
+export type MutationSetActiveTemplateArgs = {
+  templateCategoryId: TemplateCategoryId;
   templateId: Scalars['Int'];
 };
 
@@ -902,6 +935,17 @@ export type MutationAddClientLogArgs = {
 };
 
 
+export type MutationAddSamplesToShipmentArgs = {
+  shipmentId: Scalars['Int'];
+  sampleIds: Array<Scalars['Int']>;
+};
+
+
+export type MutationCheckExternalTokenArgs = {
+  externalToken: Scalars['String'];
+};
+
+
 export type MutationCloneSampleArgs = {
   sampleId: Scalars['Int'];
 };
@@ -939,6 +983,11 @@ export type MutationDeleteQuestionArgs = {
 
 export type MutationDeleteSampleArgs = {
   sampleId: Scalars['Int'];
+};
+
+
+export type MutationDeleteShipmentArgs = {
+  shipmentId: Scalars['Int'];
 };
 
 
@@ -1153,7 +1202,6 @@ export type ProposalResponseWrap = {
 
 export type ProposalsFilter = {
   text?: Maybe<Scalars['String']>;
-  templateIds?: Maybe<Array<Scalars['Int']>>;
   questionaryIds?: Maybe<Array<Scalars['Int']>>;
   callId?: Maybe<Scalars['Int']>;
   instrumentId?: Maybe<Scalars['Int']>;
@@ -1195,7 +1243,7 @@ export type ProposalTemplate = {
   isArchived: Scalars['Boolean'];
   steps: Array<TemplateStep>;
   complementaryQuestions: Array<Question>;
-  proposalCount: Scalars['Int'];
+  questionaryCount: Scalars['Int'];
   callCount: Scalars['Int'];
 };
 
@@ -1274,6 +1322,7 @@ export type Query = {
   proposals: Maybe<ProposalsQueryResult>;
   instrumentScientistProposals: Maybe<ProposalsQueryResult>;
   templates: Maybe<Array<Template>>;
+  activeTemplateId: Maybe<Scalars['Int']>;
   basicUserDetails: Maybe<BasicUserDetails>;
   blankQuestionarySteps: Maybe<Array<QuestionaryStep>>;
   call: Maybe<Call>;
@@ -1310,6 +1359,8 @@ export type Query = {
   sepProposals: Maybe<Array<SepProposal>>;
   sepProposalsByInstrument: Maybe<Array<SepProposal>>;
   seps: Maybe<SePsQueryResult>;
+  shipment: Maybe<Shipment>;
+  shipments: Maybe<Array<Shipment>>;
   version: Scalars['String'];
   factoryVersion: Scalars['String'];
   templateCategories: Maybe<Array<TemplateCategory>>;
@@ -1347,6 +1398,11 @@ export type QueryInstrumentScientistProposalsArgs = {
 
 export type QueryTemplatesArgs = {
   filter?: Maybe<TemplatesFilter>;
+};
+
+
+export type QueryActiveTemplateIdArgs = {
+  templateCategoryId: TemplateCategoryId;
 };
 
 
@@ -1506,6 +1562,16 @@ export type QuerySepsArgs = {
   filter?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryShipmentArgs = {
+  shipmentId: Scalars['Int'];
+};
+
+
+export type QueryShipmentsArgs = {
+  filter?: Maybe<ShipmentsFilter>;
 };
 
 
@@ -1732,10 +1798,52 @@ export type SePsQueryResult = {
   seps: Array<Sep>;
 };
 
+export type Shipment = {
+  __typename?: 'Shipment';
+  id: Scalars['Int'];
+  title: Scalars['String'];
+  proposalId: Scalars['Int'];
+  status: ShipmentStatus;
+  externalRef: Maybe<Scalars['String']>;
+  questionaryId: Scalars['Int'];
+  creatorId: Scalars['Int'];
+  created: Scalars['DateTime'];
+  questionary: Questionary;
+  samples: Array<Sample>;
+};
+
+export type ShipmentBasisConfig = {
+  __typename?: 'ShipmentBasisConfig';
+  small_label: Scalars['String'];
+  required: Scalars['Boolean'];
+  tooltip: Scalars['String'];
+};
+
+export type ShipmentResponseWrap = {
+  __typename?: 'ShipmentResponseWrap';
+  error: Maybe<Scalars['String']>;
+  shipment: Maybe<Shipment>;
+};
+
+export type ShipmentsFilter = {
+  title?: Maybe<Scalars['String']>;
+  creatorId?: Maybe<Scalars['Int']>;
+  proposalId?: Maybe<Scalars['Int']>;
+  questionaryId?: Maybe<Scalars['Int']>;
+  status?: Maybe<ShipmentStatus>;
+  externalRef?: Maybe<Scalars['String']>;
+  shipmentIds?: Maybe<Array<Scalars['Int']>>;
+};
+
+export enum ShipmentStatus {
+  DRAFT = 'DRAFT',
+  SUBMITTED = 'SUBMITTED'
+}
+
 export type SubtemplateConfig = {
   __typename?: 'SubtemplateConfig';
   maxEntries: Maybe<Scalars['Int']>;
-  templateId: Scalars['Int'];
+  templateId: Maybe<Scalars['Int']>;
   templateCategory: Scalars['String'];
   addEntryButtonLabel: Scalars['String'];
   small_label: Scalars['String'];
@@ -1780,6 +1888,7 @@ export type Template = {
   isArchived: Scalars['Boolean'];
   steps: Array<TemplateStep>;
   complementaryQuestions: Array<Question>;
+  questionaryCount: Scalars['Int'];
 };
 
 export type TemplateCategory = {
@@ -1790,7 +1899,8 @@ export type TemplateCategory = {
 
 export enum TemplateCategoryId {
   PROPOSAL_QUESTIONARY = 'PROPOSAL_QUESTIONARY',
-  SAMPLE_DECLARATION = 'SAMPLE_DECLARATION'
+  SAMPLE_DECLARATION = 'SAMPLE_DECLARATION',
+  SHIPMENT_DECLARATION = 'SHIPMENT_DECLARATION'
 }
 
 export type TemplateResponseWrap = {
@@ -3055,6 +3165,9 @@ export type AnswerFragment = (
   ) | (
     { __typename?: 'NumberInputConfig' }
     & FieldConfigNumberInputConfigFragment
+  ) | (
+    { __typename?: 'ShipmentBasisConfig' }
+    & FieldConfigShipmentBasisConfigFragment
   ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -3650,6 +3763,142 @@ export type UpdateProposalWorkflowMutation = (
   ) }
 );
 
+export type AddSamplesToShipmentMutationVariables = Exact<{
+  shipmentId: Scalars['Int'];
+  sampleIds: Array<Scalars['Int']>;
+}>;
+
+
+export type AddSamplesToShipmentMutation = (
+  { __typename?: 'Mutation' }
+  & { addSamplesToShipment: (
+    { __typename?: 'ShipmentResponseWrap' }
+    & Pick<ShipmentResponseWrap, 'error'>
+    & { shipment: Maybe<(
+      { __typename?: 'Shipment' }
+      & { samples: Array<(
+        { __typename?: 'Sample' }
+        & SampleFragment
+      )> }
+      & ShipmentFragment
+    )> }
+  ) }
+);
+
+export type CreateShipmentMutationVariables = Exact<{
+  title: Scalars['String'];
+  proposalId: Scalars['Int'];
+}>;
+
+
+export type CreateShipmentMutation = (
+  { __typename?: 'Mutation' }
+  & { createShipment: (
+    { __typename?: 'ShipmentResponseWrap' }
+    & Pick<ShipmentResponseWrap, 'error'>
+    & { shipment: Maybe<(
+      { __typename?: 'Shipment' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & QuestionaryFragment
+      ), samples: Array<(
+        { __typename?: 'Sample' }
+        & SampleFragment
+      )> }
+      & ShipmentFragment
+    )> }
+  ) }
+);
+
+export type DeleteShipmentMutationVariables = Exact<{
+  shipmentId: Scalars['Int'];
+}>;
+
+
+export type DeleteShipmentMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteShipment: (
+    { __typename?: 'ShipmentResponseWrap' }
+    & Pick<ShipmentResponseWrap, 'error'>
+  ) }
+);
+
+export type ShipmentFragment = (
+  { __typename?: 'Shipment' }
+  & Pick<Shipment, 'id' | 'title' | 'proposalId' | 'status' | 'externalRef' | 'questionaryId' | 'creatorId' | 'created'>
+);
+
+export type GetShipmentQueryVariables = Exact<{
+  shipmentId: Scalars['Int'];
+}>;
+
+
+export type GetShipmentQuery = (
+  { __typename?: 'Query' }
+  & { shipment: Maybe<(
+    { __typename?: 'Shipment' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & QuestionaryFragment
+    ), samples: Array<(
+      { __typename?: 'Sample' }
+      & SampleFragment
+    )> }
+    & ShipmentFragment
+  )> }
+);
+
+export type GetShipmentsQueryVariables = Exact<{
+  filter?: Maybe<ShipmentsFilter>;
+}>;
+
+
+export type GetShipmentsQuery = (
+  { __typename?: 'Query' }
+  & { shipments: Maybe<Array<(
+    { __typename?: 'Shipment' }
+    & ShipmentFragment
+  )>> }
+);
+
+export type SetActiveTemplateMutationVariables = Exact<{
+  templateCategoryId: TemplateCategoryId;
+  templateId: Scalars['Int'];
+}>;
+
+
+export type SetActiveTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { setActiveTemplate: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'isSuccess' | 'error'>
+  ) }
+);
+
+export type UpdateShipmentMutationVariables = Exact<{
+  shipmentId: Scalars['Int'];
+  title?: Maybe<Scalars['String']>;
+  proposalId?: Maybe<Scalars['Int']>;
+  status?: Maybe<ShipmentStatus>;
+}>;
+
+
+export type UpdateShipmentMutation = (
+  { __typename?: 'Mutation' }
+  & { updateShipment: (
+    { __typename?: 'ShipmentResponseWrap' }
+    & Pick<ShipmentResponseWrap, 'error'>
+    & { shipment: Maybe<(
+      { __typename?: 'Shipment' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & QuestionaryFragment
+      ) }
+      & ShipmentFragment
+    )> }
+  ) }
+);
+
 export type CloneTemplateMutationVariables = Exact<{
   templateId: Scalars['Int'];
 }>;
@@ -3867,7 +4116,12 @@ type FieldConfigNumberInputConfigFragment = (
   & Pick<NumberInputConfig, 'property' | 'units' | 'small_label' | 'required' | 'tooltip'>
 );
 
-export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment;
+type FieldConfigShipmentBasisConfigFragment = (
+  { __typename?: 'ShipmentBasisConfig' }
+  & Pick<ShipmentBasisConfig, 'small_label' | 'required' | 'tooltip'>
+);
+
+export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment;
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
@@ -3905,6 +4159,9 @@ export type QuestionFragment = (
   ) | (
     { __typename?: 'NumberInputConfig' }
     & FieldConfigNumberInputConfigFragment
+  ) | (
+    { __typename?: 'ShipmentBasisConfig' }
+    & FieldConfigShipmentBasisConfigFragment
   ) }
 );
 
@@ -3947,6 +4204,9 @@ export type QuestionTemplateRelationFragment = (
   ) | (
     { __typename?: 'NumberInputConfig' }
     & FieldConfigNumberInputConfigFragment
+  ) | (
+    { __typename?: 'ShipmentBasisConfig' }
+    & FieldConfigShipmentBasisConfigFragment
   ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -3996,6 +4256,16 @@ export type TopicFragment = (
   & Pick<Topic, 'title' | 'id' | 'templateId' | 'sortOrder' | 'isEnabled'>
 );
 
+export type GetActiveTemplateIdQueryVariables = Exact<{
+  templateCategoryId: TemplateCategoryId;
+}>;
+
+
+export type GetActiveTemplateIdQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'activeTemplateId'>
+);
+
 export type GetIsNaturalKeyPresentQueryVariables = Exact<{
   naturalKey: Scalars['String'];
 }>;
@@ -4015,7 +4285,7 @@ export type GetProposalTemplatesQuery = (
   { __typename?: 'Query' }
   & { proposalTemplates: Maybe<Array<(
     { __typename?: 'ProposalTemplate' }
-    & Pick<ProposalTemplate, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
+    & Pick<ProposalTemplate, 'templateId' | 'name' | 'description' | 'isArchived' | 'questionaryCount' | 'callCount'>
   )>> }
 );
 
@@ -4052,7 +4322,7 @@ export type GetTemplatesQuery = (
   { __typename?: 'Query' }
   & { templates: Maybe<Array<(
     { __typename?: 'Template' }
-    & Pick<Template, 'templateId' | 'name' | 'description' | 'isArchived'>
+    & Pick<Template, 'templateId' | 'name' | 'description' | 'isArchived' | 'questionaryCount'>
   )>> }
 );
 
@@ -4136,6 +4406,19 @@ export type UpdateTopicMutation = (
       { __typename?: 'Template' }
       & TemplateFragment
     )> }
+  ) }
+);
+
+export type CheckExternalTokenMutationVariables = Exact<{
+  externalToken: Scalars['String'];
+}>;
+
+
+export type CheckExternalTokenMutation = (
+  { __typename?: 'Mutation' }
+  & { checkExternalToken: (
+    { __typename?: 'CheckExternalTokenWrap' }
+    & Pick<CheckExternalTokenWrap, 'token' | 'error'>
   ) }
 );
 
@@ -4724,6 +5007,11 @@ export const FieldConfigFragmentDoc = gql`
     isHtmlQuestion
     isCounterHidden
   }
+  ... on ShipmentBasisConfig {
+    small_label
+    required
+    tooltip
+  }
 }
     `;
 export const QuestionFragmentDoc = gql`
@@ -4811,6 +5099,18 @@ export const SampleFragmentDoc = gql`
   created
   proposalId
   questionId
+}
+    `;
+export const ShipmentFragmentDoc = gql`
+    fragment shipment on Shipment {
+  id
+  title
+  proposalId
+  status
+  externalRef
+  questionaryId
+  creatorId
+  created
 }
     `;
 export const QuestionTemplateRelationFragmentDoc = gql`
@@ -6007,6 +6307,89 @@ export const UpdateProposalWorkflowDocument = gql`
   }
 }
     `;
+export const AddSamplesToShipmentDocument = gql`
+    mutation addSamplesToShipment($shipmentId: Int!, $sampleIds: [Int!]!) {
+  addSamplesToShipment(shipmentId: $shipmentId, sampleIds: $sampleIds) {
+    error
+    shipment {
+      ...shipment
+      samples {
+        ...sample
+      }
+    }
+  }
+}
+    ${ShipmentFragmentDoc}
+${SampleFragmentDoc}`;
+export const CreateShipmentDocument = gql`
+    mutation createShipment($title: String!, $proposalId: Int!) {
+  createShipment(title: $title, proposalId: $proposalId) {
+    shipment {
+      ...shipment
+      questionary {
+        ...questionary
+      }
+      samples {
+        ...sample
+      }
+    }
+    error
+  }
+}
+    ${ShipmentFragmentDoc}
+${QuestionaryFragmentDoc}
+${SampleFragmentDoc}`;
+export const DeleteShipmentDocument = gql`
+    mutation deleteShipment($shipmentId: Int!) {
+  deleteShipment(shipmentId: $shipmentId) {
+    error
+  }
+}
+    `;
+export const GetShipmentDocument = gql`
+    query getShipment($shipmentId: Int!) {
+  shipment(shipmentId: $shipmentId) {
+    ...shipment
+    questionary {
+      ...questionary
+    }
+    samples {
+      ...sample
+    }
+  }
+}
+    ${ShipmentFragmentDoc}
+${QuestionaryFragmentDoc}
+${SampleFragmentDoc}`;
+export const GetShipmentsDocument = gql`
+    query getShipments($filter: ShipmentsFilter) {
+  shipments(filter: $filter) {
+    ...shipment
+  }
+}
+    ${ShipmentFragmentDoc}`;
+export const SetActiveTemplateDocument = gql`
+    mutation setActiveTemplate($templateCategoryId: TemplateCategoryId!, $templateId: Int!) {
+  setActiveTemplate(templateId: $templateId, templateCategoryId: $templateCategoryId) {
+    isSuccess
+    error
+  }
+}
+    `;
+export const UpdateShipmentDocument = gql`
+    mutation updateShipment($shipmentId: Int!, $title: String, $proposalId: Int, $status: ShipmentStatus) {
+  updateShipment(shipmentId: $shipmentId, title: $title, status: $status, proposalId: $proposalId) {
+    error
+    shipment {
+      ...shipment
+      questionary {
+        ...questionary
+      }
+    }
+  }
+}
+    ${ShipmentFragmentDoc}
+${QuestionaryFragmentDoc}`;
 export const CloneTemplateDocument = gql`
     mutation cloneTemplate($templateId: Int!) {
   cloneTemplate(templateId: $templateId) {
@@ -6095,6 +6478,11 @@ export const DeleteTopicDocument = gql`
   }
 }
     `;
+export const GetActiveTemplateIdDocument = gql`
+    query getActiveTemplateId($templateCategoryId: TemplateCategoryId!) {
+  activeTemplateId(templateCategoryId: $templateCategoryId)
+}
+    `;
 export const GetIsNaturalKeyPresentDocument = gql`
     query getIsNaturalKeyPresent($naturalKey: String!) {
   isNaturalKeyPresent(naturalKey: $naturalKey)
@@ -6107,7 +6495,7 @@ export const GetProposalTemplatesDocument = gql`
     name
     description
     isArchived
-    proposalCount
+    questionaryCount
     callCount
   }
 }
@@ -6134,6 +6522,7 @@ export const GetTemplatesDocument = gql`
     name
     description
     isArchived
+    questionaryCount
   }
 }
     `;
@@ -6177,6 +6566,14 @@ export const UpdateTopicDocument = gql`
   }
 }
     ${TemplateFragmentDoc}`;
+export const CheckExternalTokenDocument = gql`
+    mutation checkExternalToken($externalToken: String!) {
+  checkExternalToken(externalToken: $externalToken) {
+    token
+    error
+  }
+}
+    `;
 export const CheckTokenDocument = gql`
     query checkToken($token: String!) {
   checkToken(token: $token) {
@@ -6704,6 +7101,27 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     updateProposalWorkflow(variables: UpdateProposalWorkflowMutationVariables): Promise<UpdateProposalWorkflowMutation> {
       return withWrapper(() => client.request<UpdateProposalWorkflowMutation>(print(UpdateProposalWorkflowDocument), variables));
     },
+    addSamplesToShipment(variables: AddSamplesToShipmentMutationVariables): Promise<AddSamplesToShipmentMutation> {
+      return withWrapper(() => client.request<AddSamplesToShipmentMutation>(print(AddSamplesToShipmentDocument), variables));
+    },
+    createShipment(variables: CreateShipmentMutationVariables): Promise<CreateShipmentMutation> {
+      return withWrapper(() => client.request<CreateShipmentMutation>(print(CreateShipmentDocument), variables));
+    },
+    deleteShipment(variables: DeleteShipmentMutationVariables): Promise<DeleteShipmentMutation> {
+      return withWrapper(() => client.request<DeleteShipmentMutation>(print(DeleteShipmentDocument), variables));
+    },
+    getShipment(variables: GetShipmentQueryVariables): Promise<GetShipmentQuery> {
+      return withWrapper(() => client.request<GetShipmentQuery>(print(GetShipmentDocument), variables));
+    },
+    getShipments(variables?: GetShipmentsQueryVariables): Promise<GetShipmentsQuery> {
+      return withWrapper(() => client.request<GetShipmentsQuery>(print(GetShipmentsDocument), variables));
+    },
+    setActiveTemplate(variables: SetActiveTemplateMutationVariables): Promise<SetActiveTemplateMutation> {
+      return withWrapper(() => client.request<SetActiveTemplateMutation>(print(SetActiveTemplateDocument), variables));
+    },
+    updateShipment(variables: UpdateShipmentMutationVariables): Promise<UpdateShipmentMutation> {
+      return withWrapper(() => client.request<UpdateShipmentMutation>(print(UpdateShipmentDocument), variables));
+    },
     cloneTemplate(variables: CloneTemplateMutationVariables): Promise<CloneTemplateMutation> {
       return withWrapper(() => client.request<CloneTemplateMutation>(print(CloneTemplateDocument), variables));
     },
@@ -6731,6 +7149,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     deleteTopic(variables: DeleteTopicMutationVariables): Promise<DeleteTopicMutation> {
       return withWrapper(() => client.request<DeleteTopicMutation>(print(DeleteTopicDocument), variables));
     },
+    getActiveTemplateId(variables: GetActiveTemplateIdQueryVariables): Promise<GetActiveTemplateIdQuery> {
+      return withWrapper(() => client.request<GetActiveTemplateIdQuery>(print(GetActiveTemplateIdDocument), variables));
+    },
     getIsNaturalKeyPresent(variables: GetIsNaturalKeyPresentQueryVariables): Promise<GetIsNaturalKeyPresentQuery> {
       return withWrapper(() => client.request<GetIsNaturalKeyPresentQuery>(print(GetIsNaturalKeyPresentDocument), variables));
     },
@@ -6757,6 +7178,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateTopic(variables: UpdateTopicMutationVariables): Promise<UpdateTopicMutation> {
       return withWrapper(() => client.request<UpdateTopicMutation>(print(UpdateTopicDocument), variables));
+    },
+    checkExternalToken(variables: CheckExternalTokenMutationVariables): Promise<CheckExternalTokenMutation> {
+      return withWrapper(() => client.request<CheckExternalTokenMutation>(print(CheckExternalTokenDocument), variables));
     },
     checkToken(variables: CheckTokenQueryVariables): Promise<CheckTokenQuery> {
       return withWrapper(() => client.request<CheckTokenQuery>(print(CheckTokenDocument), variables));

@@ -14,7 +14,6 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
     instrumentId,
     proposalStatusId,
     questionaryIds,
-    templateIds,
     text,
   } = filter;
 
@@ -27,7 +26,6 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
           instrumentId,
           proposalStatusId,
           questionaryIds,
-          templateIds,
           text,
         },
       })
@@ -48,15 +46,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
         }
         setLoading(false);
       });
-  }, [
-    callId,
-    instrumentId,
-    proposalStatusId,
-    questionaryIds,
-    templateIds,
-    text,
-    api,
-  ]);
+  }, [callId, instrumentId, proposalStatusId, questionaryIds, text, api]);
 
   return { loading, proposalsData, setProposalsData };
 }

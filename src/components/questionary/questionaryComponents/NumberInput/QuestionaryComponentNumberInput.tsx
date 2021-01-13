@@ -84,7 +84,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
           onChange={e => {
             const newState = { ...stateValue, unit: e.target.value as string };
             setStateValue(newState);
-            onComplete(e, newState);
+            onComplete(newState);
           }}
           name={unitFieldId}
           data-cy={unitFieldId}
@@ -117,7 +117,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
                 value: getNumberOrDefault(e.target.value, stateValue.value),
               })
             }
-            onBlur={e => onComplete(e, stateValue)}
+            onBlur={e => onComplete(stateValue)}
             value={stateValue.value}
             data-cy={valueFieldId}
             type="number"

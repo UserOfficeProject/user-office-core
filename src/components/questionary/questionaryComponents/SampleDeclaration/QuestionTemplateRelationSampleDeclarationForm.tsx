@@ -16,11 +16,15 @@ import { useTemplates } from 'hooks/template/useTemplates';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationSubtemplateForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationSampleDeclarationForm: FormComponent<QuestionTemplateRelation> = props => {
   const { templates } = useTemplates(
     false,
     TemplateCategoryId.SAMPLE_DECLARATION
   );
+
+  if (!templates) {
+    return null;
+  }
 
   return (
     <QuestionTemplateRelationFormShell
@@ -38,7 +42,7 @@ export const QuestionTemplateRelationSubtemplateForm: FormComponent<QuestionTemp
         }),
       })}
     >
-      {formikProps => (
+      {() => (
         <>
           <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Options">
@@ -68,25 +72,25 @@ export const QuestionTemplateRelationSubtemplateForm: FormComponent<QuestionTemp
 
           <TitledContainer label="Options">
             <FormControl fullWidth>
-              <InputLabel htmlFor="age-simple">Template name</InputLabel>
+              <InputLabel>Template name</InputLabel>
               <Field
                 name="config.templateId"
                 type="text"
                 component={Select}
                 margin="normal"
                 data-cy="templateId"
+                defaultValue={''}
               >
-                {templates &&
-                  templates.map(template => {
-                    return (
-                      <MenuItem
-                        value={template.templateId}
-                        key={template.templateId}
-                      >
-                        {template.name}
-                      </MenuItem>
-                    );
-                  })}
+                {templates.map(template => {
+                  return (
+                    <MenuItem
+                      value={template.templateId}
+                      key={template.templateId}
+                    >
+                      {template.name}
+                    </MenuItem>
+                  );
+                })}
               </Field>
               <Link href="/SampleDeclarationTemplates/" target="blank">
                 View all templates

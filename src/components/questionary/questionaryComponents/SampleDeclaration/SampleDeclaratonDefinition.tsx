@@ -6,16 +6,17 @@ import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { QuestionaryComponentSampleDeclaration } from './QuestionaryComponentSampleDeclaration';
-import { QuestionSubtemplateForm } from './QuestionSubtemplateForm';
-import { QuestionTemplateRelationSubtemplateForm } from './QuestionTemplateRelationSubtemplateForm';
+import { QuestionSampleDeclarationForm } from './QuestionSampleDeclarationForm';
+import { QuestionTemplateRelationSampleDeclarationForm } from './QuestionTemplateRelationSampleDeclarationForm';
 import SamplesAnswerRenderer from './SamplesAnswerRenderer';
 
 export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.SAMPLE_DECLARATION,
   name: 'Sample Declaration',
   questionaryComponent: QuestionaryComponentSampleDeclaration,
-  questionForm: () => QuestionSubtemplateForm,
-  questionTemplateRelationForm: () => QuestionTemplateRelationSubtemplateForm,
+  questionForm: () => QuestionSampleDeclarationForm,
+  questionTemplateRelationForm: () =>
+    QuestionTemplateRelationSampleDeclarationForm,
   readonly: false,
   creatable: true,
   icon: <AssignmentIcon />,

@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from 'components/common/FormikUICustomDependencySelector';
-import FormikUICustomMultipleSelect from 'components/common/FormikUICustomMultipleSelect';
+import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionExcerpt } from 'components/questionary/questionaryComponents/QuestionExcerpt';
@@ -91,7 +91,7 @@ export const QuestionTemplateRelationNumberForm: FormComponent<QuestionTemplateR
 
             <Field
               name="config.units"
-              component={FormikUICustomMultipleSelect}
+              component={FormikUICustomSelect}
               label="Units"
               margin="normal"
               availableOptions={

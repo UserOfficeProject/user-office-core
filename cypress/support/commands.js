@@ -134,6 +134,51 @@ const createProposal = (proposalTitle = '', proposalAbstract = '') => {
   cy.contains('Save and continue').click();
 };
 
+
+const createTopic = (title) => {
+  cy.get('[data-cy=show-more-button]').click();
+
+  cy.get('[data-cy=add-topic-menu-item]').click();
+
+  cy.get('[data-cy=topic-title]')
+    .last()
+    .click();
+
+  cy.get('[data-cy=topic-title-input]')
+    .last()
+    .clear()
+    .type(`${title}{enter}`);
+};
+
+function createTemplate(type, title, description) {
+  const templateTitle = title || faker.random.words(2);
+  const templateDescription = description || faker.random.words(3);
+
+  const typeToMenuTitle = new Map()
+  typeToMenuTitle.set('proposal', 'Proposal templates')
+  typeToMenuTitle.set('sample', 'Sample declaration templates')
+  typeToMenuTitle.set('shipment', 'Shipment declaration templates')
+
+  const menuTitle = typeToMenuTitle.get(type);
+  if(!menuTitle)
+  {
+    throw new Error(`Type ${type} not supported`)
+  }
+
+  cy.navigateToTemplatesSubmenu(menuTitle);
+
+  cy.get('[data-cy=create-new-button]').click();
+
+  cy.get('[data-cy=name] input')
+    .type(templateTitle)
+    .should('have.value', templateTitle);
+
+  cy.get('[data-cy=description]').type(templateDescription);
+
+  cy.get('[data-cy=submit]').click();
+}
+
+
 const dragElement = (element, moveArgs) => {
   const focusedElement = cy.get(element).focus();
 
@@ -153,6 +198,31 @@ const dragElement = (element, moveArgs) => {
   return element;
 };
 
+const createSampleQuestion = (question, templateName) => {
+  cy.get('[data-cy=show-more-button]')
+  .last()
+  .click();
+
+  cy.get('[data-cy=add-question-menu-item]')
+    .last()
+    .click();
+
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
+
+  cy.contains('Add Sample Declaration').click();
+
+  cy.get('[data-cy=question]')
+    .clear()
+    .type(question)
+    .should('have.value', question);
+
+  cy.get('[data-cy=template-id]').click();
+
+  cy.contains(templateName).click();
+
+  cy.contains('Save').click();
+};
+
 Cypress.Commands.add('resetDB', resetDB);
 
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
@@ -165,6 +235,8 @@ Cypress.Commands.add('notification', notification);
 
 Cypress.Commands.add('finishedLoading', finishedLoading);
 
+Cypress.Commands.add('createTemplate', createTemplate);
+
 Cypress.Commands.add('createProposal', createProposal);
 Cypress.Commands.add(
   'dragElement',
@@ -173,6 +245,10 @@ Cypress.Commands.add(
     dragElement(element, args);
   }
 );
+
+Cypress.Commands.add('createTopic', createTopic);
+
+Cypress.Commands.add('createSampleQuestion', createSampleQuestion);
 
 // call cy.presentationMode(); before your test to have delay between clicks.
 // Excellent for presentation purposes

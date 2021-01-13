@@ -81,4 +81,10 @@ fragment fieldConfig on FieldConfig {
     isHtmlQuestion
     isCounterHidden
   }
+
+  ... on ShipmentBasisConfig {
+    small_label
+    required
+    tooltip
+  }
 }

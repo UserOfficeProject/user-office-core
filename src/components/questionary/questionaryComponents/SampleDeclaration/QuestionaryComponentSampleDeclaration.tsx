@@ -5,8 +5,12 @@ import React, { useContext, useEffect, useState } from 'react';
 import StyledModal from 'components/common/StyledModal';
 import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { ProposalContext } from 'components/proposal/ProposalContainer';
+import { ProposalContextType } from 'components/proposal/ProposalContainer';
 import ProposalErrorLabel from 'components/proposal/ProposalErrorLabel';
+import {
+  createMissingContextErrorMessage,
+  QuestionaryContext,
+} from 'components/questionary/QuestionaryContext';
 import {
   QuestionaryStep,
   Sample,
@@ -56,7 +60,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   } = props;
   const proposalQuestionId = answer.question.proposalQuestionId;
   const config = answer.config as SubtemplateConfig;
-  const proposalContext = useContext(ProposalContext);
+  const { state } = useContext(QuestionaryContext) as ProposalContextType;
 
   const isError = errors[proposalQuestionId] ? true : false;
 
@@ -78,7 +82,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
         });
     };
 
-    const proposalId = proposalContext.state?.proposal.id;
+    const proposalId = state?.proposal.id;
     const questionId = answer.question.proposalQuestionId;
 
     if (proposalId && questionId) {
@@ -86,7 +90,11 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
         setRows(samples.map(sampleToListRow))
       );
     }
-  }, [answer.question.proposalQuestionId, proposalContext.state, api]);
+  }, [answer.question.proposalQuestionId, state, api]);
+
+  if (!state) {
+    throw new Error(createMissingContextErrorMessage());
+  }
 
   return (
     <>
@@ -116,7 +124,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
                   );
                   setStateValue(newStateValue);
                   setRows(rows.filter(row => row.id !== item.id));
-                  onComplete(proposalQuestionId, newStateValue);
+                  onComplete(newStateValue);
                 }
               });
           }}
@@ -129,12 +137,11 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
                   const newStateValue = [...stateValue, clonedSample.id];
                   setStateValue(newStateValue);
                   setRows([...rows, sampleToListRow(clonedSample)]);
-                  onComplete(proposalQuestionId, newStateValue);
+                  onComplete(newStateValue);
                 }
               });
           }}
           onAddNewClick={() => {
-            const state = proposalContext.state;
             if (!state) {
               throw new Error('Sample Declaration is missing proposal context');
             }
@@ -147,6 +154,11 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
               );
             }
             const templateId = config.templateId;
+
+            if (!templateId) {
+              throw new Error('Sample Declaration is missing templateId');
+            }
+
             api()
               .getBlankQuestionarySteps({ templateId })
               .then(result => {
@@ -196,7 +208,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
               const newStateValue = [...stateValue, newSample.id];
 
               setStateValue(newStateValue);
-              onComplete(proposalQuestionId, newStateValue);
+              onComplete(newStateValue);
 
               const newRows = [...rows, sampleToListRow(newSample)];
               setRows(newRows);
