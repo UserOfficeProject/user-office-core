@@ -218,7 +218,6 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
               setRows(newRows);
             }}
             sampleEditDone={() => {
-              setSelectedSample(null);
               const index = rows.findIndex(
                 sample => sample.id === selectedSample.id
               );
@@ -229,6 +228,7 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
               const newRows = [...rows];
               newRows[index].isCompleted = true;
               setRows(newRows);
+              setSelectedSample(null);
             }}
           ></SampleDeclarationContainer>
         ) : (

@@ -25,7 +25,7 @@ export function QuestionariesListItem(props: {
       <ListItemAvatar>
         <Avatar>
           <DescriptionIcon
-            color={props.record.isCompleted ? 'primary' : 'secondary'}
+            color={props.record.isCompleted ? undefined : 'error'}
           />
         </Avatar>
       </ListItemAvatar>
