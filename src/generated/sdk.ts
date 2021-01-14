@@ -3092,7 +3092,14 @@ export type UpdateProposalMutation = (
     & Pick<ProposalResponseWrap, 'error'>
     & { proposal: Maybe<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id'>
+      & Pick<Proposal, 'id' | 'title' | 'abstract'>
+      & { proposer: (
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      ), users: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )> }
     )> }
   ) }
 );
@@ -5917,11 +5924,19 @@ export const UpdateProposalDocument = gql`
   updateProposal(id: $id, title: $title, abstract: $abstract, users: $users, proposerId: $proposerId) {
     proposal {
       id
+      title
+      abstract
+      proposer {
+        ...basicUserDetails
+      }
+      users {
+        ...basicUserDetails
+      }
     }
     error
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const AnswerTopicDocument = gql`
     mutation answerTopic($questionaryId: Int!, $topicId: Int!, $answers: [AnswerInput!]!, $isPartialSave: Boolean) {
   answerTopic(questionaryId: $questionaryId, topicId: $topicId, answers: $answers, isPartialSave: $isPartialSave) {
