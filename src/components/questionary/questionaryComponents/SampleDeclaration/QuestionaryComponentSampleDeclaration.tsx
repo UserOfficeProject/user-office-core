@@ -74,10 +74,9 @@ function QuestionaryComponentSampleDeclaration(
   const [stateValue, setStateValue] = useState<number[]>(answer.value || []); // ids of samples
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
-  const [sampleToChange, setSampleToChange] = useState<number>(0);
-  const copySample = () =>
+  const copySample = (id: number) =>
     api()
-      .cloneSample({ sampleId: sampleToChange })
+      .cloneSample({ sampleId: id })
       .then(response => {
         const clonedSample = response.cloneSample.sample;
         if (clonedSample) {
@@ -87,16 +86,14 @@ function QuestionaryComponentSampleDeclaration(
           onComplete(newStateValue);
         }
       });
-  const deleteSample = () =>
+  const deleteSample = (id: number) =>
     api()
-      .deleteSample({ sampleId: sampleToChange })
+      .deleteSample({ sampleId: id })
       .then(response => {
         if (!response.deleteSample.error) {
-          const newStateValue = stateValue.filter(
-            sampleId => sampleId !== sampleToChange
-          );
+          const newStateValue = stateValue.filter(sampleId => sampleId !== id);
           setStateValue(newStateValue);
-          setRows(rows.filter(row => row.id !== sampleToChange));
+          setRows(rows.filter(row => row.id !== id));
           onComplete(newStateValue);
         }
       });
@@ -145,16 +142,14 @@ function QuestionaryComponentSampleDeclaration(
               })
           }
           onDeleteClick={item => {
-            setSampleToChange(item.id);
-            confirm(deleteSample, {
+            confirm(() => deleteSample(item.id), {
               title: 'Delete Sample',
               description:
                 'This action will delete the sample and all data associated with it',
             })();
           }}
           onCloneClick={item => {
-            setSampleToChange(item.id);
-            confirm(copySample, {
+            confirm(() => copySample(item.id), {
               title: 'Copy Sample',
               description:
                 'This action will copy the sample and all data associated with it',
