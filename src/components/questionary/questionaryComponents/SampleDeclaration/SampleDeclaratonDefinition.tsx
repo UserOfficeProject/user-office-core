@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
-import { QuestionaryComponentSampleDeclaration } from './QuestionaryComponentSampleDeclaration';
+import QuestionaryComponentSampleDeclaration from './QuestionaryComponentSampleDeclaration';
 import { QuestionSampleDeclarationForm } from './QuestionSampleDeclarationForm';
 import { QuestionTemplateRelationSampleDeclarationForm } from './QuestionTemplateRelationSampleDeclarationForm';
 import SamplesAnswerRenderer from './SamplesAnswerRenderer';
