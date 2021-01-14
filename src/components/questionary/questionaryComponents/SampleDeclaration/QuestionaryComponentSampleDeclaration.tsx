@@ -2,6 +2,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import React, { useContext, useEffect, useState } from 'react';
 
+import DialogConfirmation from 'components/common/DialogConfirmation';
 import StyledModal from 'components/common/StyledModal';
 import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -19,6 +20,7 @@ import {
 } from 'generated/sdk';
 import { SampleBasic } from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm from 'utils/withConfirm';
 
 import { QuestionariesList, QuestionariesListRow } from '../QuestionariesList';
 import { SampleDeclarationContainer } from './SampleDeclarationContainer';
@@ -56,10 +58,13 @@ function createSampleStub(
   };
 }
 
-function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
+function QuestionaryComponentSampleDeclaration(
+  props: QuestionaryComponentSampleDeclarationProps
+) {
   const {
     answer,
     onComplete,
+    confirm,
     formikProps: { errors },
   } = props;
   const proposalQuestionId = answer.question.proposalQuestionId;
@@ -73,7 +78,29 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   const [stateValue, setStateValue] = useState<number[]>(answer.value || []); // ids of samples
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
-
+  const copySample = (id: number) =>
+    api()
+      .cloneSample({ sampleId: id })
+      .then(response => {
+        const clonedSample = response.cloneSample.sample;
+        if (clonedSample) {
+          const newStateValue = [...stateValue, clonedSample.id];
+          setStateValue(newStateValue);
+          setRows([...rows, sampleToListRow(clonedSample)]);
+          onComplete(newStateValue);
+        }
+      });
+  const deleteSample = (id: number) =>
+    api()
+      .deleteSample({ sampleId: id })
+      .then(response => {
+        if (!response.deleteSample.error) {
+          const newStateValue = stateValue.filter(sampleId => sampleId !== id);
+          setStateValue(newStateValue);
+          setRows(rows.filter(row => row.id !== id));
+          onComplete(newStateValue);
+        }
+      });
   useEffect(() => {
     const getSamples = async (
       proposalId: number,
@@ -119,31 +146,18 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
               })
           }
           onDeleteClick={item => {
-            api()
-              .deleteSample({ sampleId: item.id })
-              .then(response => {
-                if (!response.deleteSample.error) {
-                  const newStateValue = stateValue.filter(
-                    sampleId => sampleId !== item.id
-                  );
-                  setStateValue(newStateValue);
-                  setRows(rows.filter(row => row.id !== item.id));
-                  onComplete(newStateValue);
-                }
-              });
+            confirm(() => deleteSample(item.id), {
+              title: 'Delete Sample',
+              description:
+                'This action will delete the sample and all data associated with it',
+            })();
           }}
           onCloneClick={item => {
-            api()
-              .cloneSample({ sampleId: item.id })
-              .then(response => {
-                const clonedSample = response.cloneSample.sample;
-                if (clonedSample) {
-                  const newStateValue = [...stateValue, clonedSample.id];
-                  setStateValue(newStateValue);
-                  setRows([...rows, sampleToListRow(clonedSample)]);
-                  onComplete(newStateValue);
-                }
-              });
+            confirm(() => copySample(item.id), {
+              title: 'Copy Sample',
+              description:
+                'This action will copy the sample and all data associated with it',
+            })();
           }}
           onAddNewClick={() => {
             if (!state) {
@@ -239,4 +253,9 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   );
 }
 
-export { QuestionaryComponentSampleDeclaration };
+interface QuestionaryComponentSampleDeclarationProps
+  extends BasicComponentProps {
+  confirm: Function;
+}
+
+export default withConfirm(QuestionaryComponentSampleDeclaration);
