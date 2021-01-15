@@ -2,14 +2,13 @@
 import { Container } from '@material-ui/core';
 import { default as React, useEffect } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import Questionary from 'components/questionary/Questionary';
 import {
   QuestionaryContext,
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
 import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
-import { Proposal, QuestionaryStep, UserRole } from 'generated/sdk';
+import { Proposal, QuestionaryStep } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import { usePersistProposalModel } from 'hooks/proposal/usePersistProposalModel';
 import {
@@ -116,8 +115,6 @@ export default function ProposalContainer(props: {
   proposalCreated?: (proposal: Proposal) => any;
   proposalUpdated?: (proposal: Proposal) => any;
 }) {
-  const isNonOfficer = !useCheckAccess([UserRole.USER_OFFICER]);
-
   const { api } = useDataApiWithFeedback();
   const { persistModel: persistProposalModel } = usePersistProposalModel();
   const previousInitialProposal = usePrevious(props.proposal);

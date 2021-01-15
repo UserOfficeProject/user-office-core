@@ -26,7 +26,7 @@ context('Proposal tests', () => {
     cy.contains('Title is required');
     cy.contains('Abstract is required');
     cy.contains(
-      'Specify youself as either principal investigator or co-proposer'
+      'You must be part of the proposal. Either add yourself as Principal Investigator or a Co-Proposer!'
     );
 
     const title = faker.lorem.words(2);

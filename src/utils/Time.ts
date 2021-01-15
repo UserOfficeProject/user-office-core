@@ -1,3 +1,5 @@
+import { Scalars } from 'generated/sdk';
+
 function paddZero(num: number): string {
   if (num < 10) {
     // Adding leading zero to minutes
@@ -49,9 +51,9 @@ function getFormattedDate(
 }
 
 // --- Main function
-export function timeAgo(dateParam: Date): string | null {
+export function timeAgo(dateParam: Date | Scalars['DateTime'] | null): string {
   if (!dateParam) {
-    return null;
+    return 'unknown';
   }
 
   const date = typeof dateParam === 'object' ? dateParam : new Date(dateParam);

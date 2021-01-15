@@ -180,7 +180,7 @@ function createTemplate(type, title, description) {
 
 
 const dragElement = (element, moveArgs) => {
-  const focusedElement = cy.get(element).focus();
+  const focusedElement = cy.get(element);
 
   focusedElement.trigger('keydown', { keyCode: KEY_CODES.space });
 

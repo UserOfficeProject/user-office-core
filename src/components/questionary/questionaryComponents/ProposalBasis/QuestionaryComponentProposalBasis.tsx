@@ -119,7 +119,6 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       />
       <ProposalParticipants
         className={classes.container}
-        error={false} // FIXME
         setUsers={(users: BasicUserDetails[]) => {
           formikProps.setFieldValue(
             `${proposalQuestionId}.users`,

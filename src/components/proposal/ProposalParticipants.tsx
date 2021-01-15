@@ -1,34 +1,17 @@
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import IconButton from '@material-ui/core/IconButton';
-import makeStyles from '@material-ui/core/styles/makeStyles';
 import Tooltip from '@material-ui/core/Tooltip';
 import People from '@material-ui/icons/People';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import PeopleTable from 'components/user/PeopleTable';
-import { UserRole, BasicUserDetails } from 'generated/sdk';
+import { BasicUserDetails, UserRole } from 'generated/sdk';
 
 import ParticipantModal from './ParticipantModal';
 
-const useStyles = makeStyles(theme => ({
-  errorText: {
-    color: theme.palette.error.main,
-  },
-  buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
-  },
-}));
-
 type ProposalParticipantsProps = {
-  /** Error flag */
-  error: boolean;
   /** Basic user details array to be shown in the modal. */
   users: BasicUserDetails[];
   /** Function for setting up the users. */
@@ -37,12 +20,10 @@ type ProposalParticipantsProps = {
 };
 
 const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
-  error,
   users,
   setUsers,
   className,
 }) => {
-  const classes = useStyles();
   const [modalOpen, setOpen] = useState(false);
 
   const addUsers = (addedUsers: BasicUserDetails[]) => {
@@ -96,19 +77,11 @@ const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
           onRemove={removeUser}
         />
       </FormControl>
-
-      {error && (
-        <p className={classes.errorText}>
-          You must be part of the proposal. Either add yourself as Principal
-          Investigator or a Co-Proposer!
-        </p>
-      )}
     </div>
   );
 };
 
 ProposalParticipants.propTypes = {
-  error: PropTypes.bool.isRequired,
   users: PropTypes.array.isRequired,
   setUsers: PropTypes.func.isRequired,
   className: PropTypes.string,

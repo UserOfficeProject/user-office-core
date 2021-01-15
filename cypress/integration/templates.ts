@@ -15,12 +15,12 @@ context('Template tests', () => {
   let multipleChoiceId: string;
   let intervalId: string;
   let numberId: string;
-  const booleanQuestion = faker.random.words(2);
-  const textQuestion = faker.random.words(2);
-  const dateQuestion = faker.random.words(2);
-  const fileQuestion = faker.random.words(2);
-  const intervalQuestion = faker.random.words(2);
-  const numberQuestion = faker.random.words(2);
+  const booleanQuestion = faker.lorem.words(2);
+  const textQuestion = faker.lorem.words(2);
+  const dateQuestion = faker.lorem.words(2);
+  const fileQuestion = faker.lorem.words(2);
+  const intervalQuestion = faker.lorem.words(2);
+  const numberQuestion = faker.lorem.words(3);
   const multipleChoiceQuestion = faker.lorem.words(2);
   const multipleChoiceAnswers = [
     faker.lorem.words(2),
@@ -274,6 +274,11 @@ context('Template tests', () => {
     cy.contains('Update').click();
 
     // Check reordering
+    cy.contains(textQuestion)
+      .parent()
+      .dragElement([{ direction: 'up', length: 1 }])
+      .wait(500); // Move item to top, in case it isn't
+
     cy.contains(topic)
       .closest('[data-rbd-draggable-context-id]') // new topic column
       .find('[data-rbd-drag-handle-draggable-id]') // all questions

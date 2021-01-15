@@ -12,10 +12,7 @@ export const createShipmentBasisValidationSchema: QuestionaryComponentDefinition
       )
       .required('Title is required'),
     proposalId: Yup.number().required('Proposal is required'),
-    samples: Yup.array()
-      .of(Yup.object())
-      .min(1, `Please add at least one sample`)
-      .required('This field is required'),
+    samples: Yup.array().of(Yup.object()),
   });
 
   return schema;

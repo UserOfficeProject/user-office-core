@@ -87,7 +87,7 @@ export function SampleDeclarationContainer(props: {
   sampleUpdated?: (sample: Sample) => any;
   sampleEditDone?: () => any;
 }) {
-  const { api, isExecutingCall: isApiInteracting } = useDataApiWithFeedback();
+  const { api } = useDataApiWithFeedback();
 
   const previousInitialSample = usePrevious(props.sample);
 

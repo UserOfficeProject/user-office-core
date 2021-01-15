@@ -15,15 +15,18 @@ import withConfirm from 'utils/withConfirm';
 
 import { ProposalContextType } from './ProposalContainer';
 
-// TODO remove data from argument here
-function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
-  const { dispatch } = useContext(QuestionaryContext) as ProposalContextType;
+function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
+  const { state, dispatch } = useContext(
+    QuestionaryContext
+  ) as ProposalContextType;
 
-  if (!dispatch) {
+  if (!dispatch || !state) {
     throw new Error(createMissingContextErrorMessage());
   }
+
+  const proposal = state.proposal;
+
   const downloadPDFProposal = useDownloadPDFProposal();
-  const proposal = data.proposal;
 
   const allStepsComplete =
     proposal.questionary &&

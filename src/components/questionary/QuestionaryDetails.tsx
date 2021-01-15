@@ -1,4 +1,4 @@
-import Table from '@material-ui/core/Table';
+import Table, { TableProps } from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
@@ -12,12 +12,16 @@ import {
   getAllFields,
 } from 'models/QuestionaryFunctions';
 
-import { formatQuestionaryComponentAnswer } from './QuestionaryComponentRegistry';
+import {
+  formatQuestionaryComponentAnswer,
+  getQuestionaryComponentDefinition,
+} from './QuestionaryComponentRegistry';
 
-function QuestionaryDetails(props: { questionaryId: number }) {
-  const { questionary, loadingQuestionary } = useQuestionary(
-    props.questionaryId
-  );
+function QuestionaryDetails(
+  props: { questionaryId: number } & TableProps<any>
+) {
+  const { questionaryId, ...restProps } = props;
+  const { questionary, loadingQuestionary } = useQuestionary(questionaryId);
 
   if (loadingQuestionary) {
     return <UOLoader />;
@@ -29,29 +33,29 @@ function QuestionaryDetails(props: { questionaryId: number }) {
 
   const allFields = getAllFields(questionary.steps) as Answer[];
   const completedFields = allFields.filter(field => {
-    return areDependenciesSatisfied(
-      questionary.steps,
-      field.question.proposalQuestionId
+    const definition = getQuestionaryComponentDefinition(
+      field.question.dataType
+    );
+
+    return (
+      areDependenciesSatisfied(
+        questionary.steps,
+        field.question.proposalQuestionId
+      ) && !definition.readonly
     );
   });
 
   return (
-    <>
-      <Table size="small">
-        <TableBody>
-          {completedFields.map(row => (
-            <TableRow
-              key={`answer-${row.answerId}-${row.question.proposalQuestionId}`}
-            >
-              <TableCell>{row.question.question}</TableCell>
-              <TableCell width="35%">
-                {formatQuestionaryComponentAnswer(row)}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </>
+    <Table size="small" {...restProps}>
+      <TableBody>
+        {completedFields.map(row => (
+          <TableRow key={`answer-${row.answerId}`}>
+            <TableCell width="65%">{row.question.question}</TableCell>
+            <TableCell>{formatQuestionaryComponentAnswer(row)}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }
 

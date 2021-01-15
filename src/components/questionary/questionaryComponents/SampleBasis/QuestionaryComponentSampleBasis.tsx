@@ -20,7 +20,7 @@ const TextFieldNoSubmit = withPreventSubmit(TextField);
 function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
   const {
     answer: {
-      question: { proposalQuestionId, question },
+      question: { proposalQuestionId },
     },
   } = props;
 
@@ -38,10 +38,7 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
     <>
       <Field
         name={proposalQuestionId}
-        label={question}
-        placeholder={
-          (props.answer.config as SampleBasisConfig).titlePlaceholder
-        }
+        label={(props.answer.config as SampleBasisConfig).titlePlaceholder}
         inputProps={{
           onChange: (event: ChangeEvent<HTMLInputElement>) => {
             setTitle(event.currentTarget.value);

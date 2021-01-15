@@ -48,11 +48,11 @@ export default function ProposalQuestionaryReview(
             <TableCell>Abstract</TableCell>
             <TableCell>{props.data.abstract}</TableCell>
           </TableRow>
-          <TableRow key="principalinvestigator">
+          <TableRow key="principal-investigator">
             <TableCell>Principal Investigator</TableCell>
             <TableCell>{`${props.data.proposer.firstname} ${props.data.proposer.lastname}`}</TableCell>
           </TableRow>
-          <TableRow key="coproposers">
+          <TableRow key="co-proposers">
             <TableCell>Co-Proposers</TableCell>
             <TableCell>
               {users

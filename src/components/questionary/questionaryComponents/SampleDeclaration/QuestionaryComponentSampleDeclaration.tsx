@@ -2,7 +2,6 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import React, { useContext, useEffect, useState } from 'react';
 
-import DialogConfirmation from 'components/common/DialogConfirmation';
 import StyledModal from 'components/common/StyledModal';
 import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';

@@ -30,7 +30,7 @@ export const createProposalBasisValidationSchema: QuestionaryComponentDefinition
           .of(Yup.number())
           .test(
             'is-co-proposer',
-            'Specify youself as either principal investigator or co-proposer',
+            'You must be part of the proposal. Either add yourself as Principal Investigator or a Co-Proposer!',
             value =>
               (currentUser?.user.id && value?.includes(currentUser.user.id)) ||
               false

@@ -4,9 +4,10 @@ import React, { useContext } from 'react';
 import { Prompt } from 'react-router';
 import * as Yup from 'yup';
 
+import { useCheckAccess } from 'components/common/Can';
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
-import { Answer, QuestionaryStep } from 'generated/sdk';
+import { Answer, QuestionaryStep, UserRole } from 'generated/sdk';
 import { usePreSubmitActions } from 'hooks/questionary/useSubmitActions';
 import {
   areDependenciesSatisfied,
@@ -88,6 +89,8 @@ export default function QuestionaryStepView(props: {
 
   const { state, dispatch } = useContext(QuestionaryContext);
 
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
@@ -153,7 +156,9 @@ export default function QuestionaryStepView(props: {
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={Yup.object().shape(validationSchema)}
+      validationSchema={
+        isUserOfficer ? null : Yup.object().shape(validationSchema)
+      }
       onSubmit={() => {}}
       enableReinitialize={true}
     >
