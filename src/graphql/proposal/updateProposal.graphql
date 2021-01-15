@@ -14,6 +14,14 @@ mutation updateProposal(
   ) {
     proposal {
       id
+      title
+      abstract
+      proposer {
+        ...basicUserDetails
+      }
+      users {
+        ...basicUserDetails
+      }
     }
     error
   }
