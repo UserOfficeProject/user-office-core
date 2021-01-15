@@ -10,6 +10,7 @@ import PostgresReviewDataSource from './postgres/ReviewDataSource';
 import PostgresSampleDataSource from './postgres/SampleDataSource';
 import PostgresSEPDataSource from './postgres/SEPDataSource';
 import PostgresShipmentDataSource from './postgres/ShipmentDataSource';
+import PostgresSystemDataSource from './postgres/SystemDataSource';
 import PostgresTemplateDataSource from './postgres/TemplateDataSource';
 import PostgresUserDataSource from './postgres/UserDataSource';
 
@@ -27,3 +28,4 @@ export const questionaryDataSource = new PostgresQuestionaryDataSource();
 export const sampleDataSource = new PostgresSampleDataSource();
 export const proposalSettingsDataSource = new PostgresProposalSettingsDataSource();
 export const shipmentDataSource = new PostgresShipmentDataSource();
+export const systemDataSource = new PostgresSystemDataSource();

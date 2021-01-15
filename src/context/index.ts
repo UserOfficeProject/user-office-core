@@ -24,6 +24,7 @@ import ReviewQueries from '../queries/ReviewQueries';
 import SampleQueries from '../queries/SampleQueries';
 import SEPQueries from '../queries/SEPQueries';
 import ShipmentQueries from '../queries/ShipmentQueries';
+import SystemQueries from '../queries/SystemQueries';
 import TemplateQueries from '../queries/TemplateQueries';
 import UserQueries from '../queries/UserQueries';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -43,6 +44,7 @@ interface ResolverContextQueries {
   sample: SampleQueries;
   proposalSettings: ProposalSettingsQueries;
   shipment: ShipmentQueries;
+  system: SystemQueries;
 }
 
 interface ResolverContextMutations {

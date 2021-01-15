@@ -15,6 +15,7 @@ import {
   sampleDataSource,
   sepDataSource,
   shipmentDataSource,
+  systemDataSource,
   templateDataSource,
   userDataSource,
 } from './datasources';
@@ -43,6 +44,7 @@ import ReviewQueries from './queries/ReviewQueries';
 import SampleQueries from './queries/SampleQueries';
 import SEPQueries from './queries/SEPQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
+import SystemQueries from './queries/SystemQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
 import { questionaryAuthorization } from './utils/QuestionaryAuthorization';
@@ -100,6 +102,8 @@ const eventLogQueries = new EventLogQueries(eventLogsDataSource);
 
 const sepQueries = new SEPQueries(sepDataSource);
 const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
+
+const systemQueries = new SystemQueries(systemDataSource);
 
 const instrumentQueries = new InstrumentQueries(
   instrumentDatasource,
@@ -174,6 +178,7 @@ const context: BasicResolverContext = {
     sample: sampleQueries,
     proposalSettings: proposalSettingsQueries,
     shipment: shipmentQueries,
+    system: systemQueries,
   },
   mutations: {
     user: userMutations,
