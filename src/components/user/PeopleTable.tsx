@@ -1,7 +1,7 @@
 import Button from '@material-ui/core/Button';
 import Email from '@material-ui/icons/Email';
 import makeStyles from '@material-ui/styles/makeStyles';
-import MaterialTable, { Query } from 'material-table';
+import MaterialTable, { Query, Options } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
@@ -52,12 +52,14 @@ function sendUserRequest(
 }
 
 type PeopleTableProps = {
-  title: string;
+  title?: string;
   userRole?: UserRole;
   invitationUserRole?: UserRole;
-  actionIcon: JSX.Element;
-  actionText: string;
-  action: (data: any) => void;
+  action?: {
+    fn: (data: any) => void;
+    actionIcon: JSX.Element;
+    actionText: string;
+  };
   selection: boolean;
   isFreeAction?: boolean;
   data?: BasicUserDetails[];
@@ -67,6 +69,7 @@ type PeopleTableProps = {
   emailInvite?: boolean;
   invitationButtons?: { title: string; action: Function }[];
   selectedUsers?: number[];
+  mtOptions?: Options;
 };
 
 const useStyles = makeStyles({
@@ -115,7 +118,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
 
   const classes = useStyles();
 
-  const { data } = props;
+  const { data, action } = props;
 
   useEffect(() => {
     if (!data) {
@@ -125,11 +128,11 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
     setCurrentPageIds(data.map(({ id }) => id));
   }, [data]);
 
-  if (sendUserEmail && props.invitationUserRole) {
+  if (sendUserEmail && props.invitationUserRole && action) {
     return (
       <InviteUserForm
         title={getTitle(props.invitationUserRole)}
-        action={props.action}
+        action={action.fn}
         close={() => setSendUserEmail(false)}
         userRole={props.invitationUserRole}
       />
@@ -138,14 +141,14 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
   const EmailIcon = (): JSX.Element => <Email />;
 
   const actionArray = [];
-  props.action &&
+  action &&
     !props.selection &&
     actionArray.push({
-      icon: () => props.actionIcon,
+      icon: () => action.actionIcon,
       isFreeAction: props.isFreeAction,
-      tooltip: props.actionText,
+      tooltip: action.actionText,
       onClick: (event: React.MouseEvent<JSX.Element>, rowData: any) =>
-        props.action(rowData),
+        action.fn(rowData),
     });
   props.emailInvite &&
     actionArray.push({
@@ -235,6 +238,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
           debounceInterval: 400,
           pageSize,
           selection: props.selection,
+          ...props.mtOptions,
         }}
         actions={actionArray}
         editable={
@@ -293,10 +297,12 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
 };
 
 PeopleTable.propTypes = {
-  title: PropTypes.string.isRequired,
-  actionIcon: PropTypes.element.isRequired,
-  actionText: PropTypes.string.isRequired,
-  action: PropTypes.func.isRequired,
+  title: PropTypes.string,
+  action: PropTypes.shape({
+    fn: PropTypes.func.isRequired,
+    actionIcon: PropTypes.element.isRequired,
+    actionText: PropTypes.string.isRequired,
+  }),
   selection: PropTypes.bool.isRequired,
   isFreeAction: PropTypes.bool,
   userRole: PropTypes.any,
@@ -308,6 +314,7 @@ PeopleTable.propTypes = {
   emailInvite: PropTypes.bool,
   invitationButtons: PropTypes.array,
   selectedUsers: PropTypes.array,
+  mtOptions: PropTypes.object,
 };
 
 export default PeopleTable;

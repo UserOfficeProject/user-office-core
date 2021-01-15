@@ -1,4 +1,3 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 
@@ -10,11 +9,6 @@ import { TextInputConfig } from 'generated/sdk';
 const TextFieldNoSubmit = withPreventSubmit(TextFieldWithCounter);
 
 export function QuestionaryComponentTextInput(props: BasicComponentProps) {
-  const classes = makeStyles({
-    textField: {
-      margin: '15px 0 10px 0',
-    },
-  })();
   const {
     answer,
     onComplete,
@@ -49,7 +43,7 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
         id={proposalQuestionId}
         name={proposalQuestionId}
         fullWidth
-        required={config.required ? true : false}
+        required={config.required}
         label={question.question}
         value={stateValue}
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -71,15 +65,12 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
         }}
         placeholder={config.placeholder}
         error={isError}
-        helperText={isError && errors[proposalQuestionId]}
+        helperText={isError && fieldError}
         multiline={config.multiline}
         rows={config.multiline ? 2 : 1}
         rowsMax={config.multiline ? 16 : undefined}
-        className={classes.textField}
-        InputLabelProps={{
-          shrink: true,
-        }}
         maxLen={config.max || undefined}
+        margin="dense"
       />
     </div>
   );

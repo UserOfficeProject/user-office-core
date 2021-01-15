@@ -1,13 +1,20 @@
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import ProposalErrorLabel from 'components/proposal/ProposalErrorLabel';
 import { BooleanConfig } from 'generated/sdk';
+
+const useStyles = makeStyles({
+  checkboxPadding: {
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+});
 
 export function QuestionaryComponentBoolean(props: BasicComponentProps) {
   const {
@@ -27,14 +34,15 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
     setStateValue(answer.value || false);
   }, [answer]);
 
-  const classes = makeStyles({
-    label: {
-      marginRight: '5px',
-    },
-  })();
+  const classes = useStyles();
 
   return (
-    <FormControl error={isError}>
+    <FormControl
+      error={isError}
+      margin="dense"
+      fullWidth
+      required={config.required}
+    >
       <FormControlLabel
         control={
           <Checkbox
@@ -48,16 +56,30 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
             inputProps={{
               'aria-label': 'primary checkbox',
             }}
-            required={config.required ? true : false}
+            className={classes.checkboxPadding}
           />
         }
-        label={question}
-        className={classes.label}
+        label={
+          <>
+            {question}
+            {config.small_label && (
+              <>
+                <br />
+                <small>{config.small_label}</small>
+              </>
+            )}
+            {config.required && (
+              <span
+                aria-hidden="true"
+                className="MuiFormLabel-asterisk MuiInputLabel-asterisk"
+              >
+                 *
+              </span>
+            )}
+          </>
+        }
       />
-      <span>{config.small_label}</span>
-      {isError && (
-        <ProposalErrorLabel>{errors[proposalQuestionId]}</ProposalErrorLabel>
-      )}
+      {isError && <FormHelperText>{fieldError}</FormHelperText>}
     </FormControl>
   );
 }

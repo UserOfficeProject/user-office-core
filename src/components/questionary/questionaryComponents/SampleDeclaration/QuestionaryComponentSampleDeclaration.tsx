@@ -22,10 +22,13 @@ import { SampleBasic } from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm from 'utils/withConfirm';
 
-import { QuestionariesList, QuestionariesListRow } from '../QuestionariesList';
+import {
+  QuestionnairesList,
+  QuestionnairesListRow,
+} from '../QuestionnairesList';
 import { SampleDeclarationContainer } from './SampleDeclarationContainer';
 
-const sampleToListRow = (sample: SampleBasic): QuestionariesListRow => {
+const sampleToListRow = (sample: SampleBasic): QuestionnairesListRow => {
   return { id: sample.id, label: sample.title };
 };
 
@@ -72,7 +75,7 @@ function QuestionaryComponentSampleDeclaration(
   const { api } = useDataApiWithFeedback();
 
   const [stateValue, setStateValue] = useState<number[]>(answer.value || []); // ids of samples
-  const [rows, setRows] = useState<QuestionariesListRow[]>([]);
+  const [rows, setRows] = useState<QuestionnairesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
   const copySample = (id: number) =>
     api()
@@ -125,11 +128,23 @@ function QuestionaryComponentSampleDeclaration(
 
   return (
     <>
-      <FormControl error={isError} required={config.required} fullWidth>
-        <FormLabel error={isError}>{answer.question.question}</FormLabel>
-        <span>{config.small_label}</span>
+      <FormControl
+        error={isError}
+        required={config.required}
+        fullWidth
+        margin="dense"
+      >
+        <FormLabel>
+          {answer.question.question}
+          {config.small_label && (
+            <>
+              <br />
+              <small>{config.small_label}</small>
+            </>
+          )}
+        </FormLabel>
 
-        <QuestionariesList
+        <QuestionnairesList
           addButtonLabel={config.addEntryButtonLabel}
           data={rows}
           onEditClick={item =>
@@ -228,7 +243,7 @@ function QuestionaryComponentSampleDeclaration(
               setRows(newRows);
             }}
             sampleEditDone={() => setSelectedSample(null)}
-          ></SampleDeclarationContainer>
+          />
         ) : (
           <UOLoader />
         )}

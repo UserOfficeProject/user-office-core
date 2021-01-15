@@ -1,5 +1,7 @@
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
 import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
+import Tooltip from '@material-ui/core/Tooltip';
 import EditIcon from '@material-ui/icons/Edit';
 import React, { useEffect, useState } from 'react';
 
@@ -11,7 +13,6 @@ import ParticipantModal from './ParticipantModal';
 export default function ProposalParticipant(props: {
   userId?: number;
   userChanged: (user: BasicUserDetails) => void;
-  title?: string;
   className?: string;
 }) {
   const [curUser, setCurUser] = useState<BasicUserData | null | undefined>(
@@ -43,17 +44,20 @@ export default function ProposalParticipant(props: {
           setIsPickerOpen(false);
         }}
       />
-      <Typography variant="h6" component="h6">
-        {props.title}
-      </Typography>
-      <div>
-        {curUser
-          ? `${curUser.firstname} ${curUser.lastname}; ${curUser.organisation}`
-          : ''}
-        <IconButton edge="end" onClick={() => setIsPickerOpen(true)}>
-          <EditIcon data-cy="edit-proposer-button" />
-        </IconButton>
-      </div>
+      <FormControl margin="dense" fullWidth>
+        <FormLabel component="div">
+          Principal Investigator
+          <Tooltip title="Edit Principal Investigator">
+            <IconButton onClick={() => setIsPickerOpen(true)}>
+              <EditIcon data-cy="edit-proposer-button" />
+            </IconButton>
+          </Tooltip>
+        </FormLabel>
+        <div>
+          {curUser &&
+            `${curUser.firstname} ${curUser.lastname}; ${curUser.organisation}`}
+        </div>
+      </FormControl>
     </div>
   );
 }

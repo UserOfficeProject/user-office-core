@@ -93,17 +93,21 @@ context('Samples tests', () => {
       '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
     ).click();
 
-    cy.get('[data-cy="questionaries-list-item"]').should('have.length', 1);
+    cy.finishedLoading();
+
+    cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
     cy.get('[data-cy="clone"]').click();
+
     cy.contains('OK').click();
-    cy.get('[data-cy="questionaries-list-item"]').should('have.length', 2);
+    cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
     cy.get('[data-cy="delete"]')
       .eq(1)
       .click();
+
     cy.contains('OK').click();
-    cy.get('[data-cy="questionaries-list-item"]').should('have.length', 1);
+    cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
     cy.contains('Save and continue').click();
 

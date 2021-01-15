@@ -22,6 +22,9 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.grey[700],
     textAlign: 'right',
   },
+  root: {
+    width: 'inherit',
+  },
 }));
 
 interface QuestionaryProps {
@@ -105,7 +108,7 @@ function Questionary({
   };
 
   return (
-    <div>
+    <div className={classes.root}>
       <Typography variant="h4" className={classes.header}>
         {title}
       </Typography>

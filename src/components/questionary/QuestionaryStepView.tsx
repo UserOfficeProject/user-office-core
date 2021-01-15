@@ -30,15 +30,15 @@ import {
   QuestionaryContext,
 } from './QuestionaryContext';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   componentWrapper: {
-    margin: '10px 0',
+    margin: theme.spacing(1, 0),
   },
   disabled: {
     pointerEvents: 'none',
     opacity: 0.7,
   },
-});
+}));
 
 export const createFormikConfigObjects = (
   answers: Answer[],

@@ -37,9 +37,11 @@ function ParticipantModal(props: {
       <DialogContent>
         <PeopleTable
           title={props.title}
-          actionText="Select user"
-          actionIcon={<AddBox data-cy="select-user" />}
-          action={addUser}
+          action={{
+            fn: addUser,
+            actionText: 'Select user',
+            actionIcon: <AddBox data-cy="select-user" />,
+          }}
           selectedUsers={props.selectedUsers}
           userRole={props.userRole || ('' as UserRole)}
           emailInvite={true}

@@ -1,4 +1,5 @@
 import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import FormLabel from '@material-ui/core/FormLabel';
 import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -9,7 +10,6 @@ import { Field, getIn } from 'formik';
 import React, { useState } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import ProposalErrorLabel from 'components/proposal/ProposalErrorLabel';
 import { IntervalConfig } from 'generated/sdk';
 
 const useStyles = makeStyles(theme => ({
@@ -21,20 +21,8 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'flex-end',
     display: 'flex',
     height: '100%',
-    fontSize: '17px',
+    fontSize: '1rem',
     padding: '0px 5px',
-  },
-  label: {
-    marginTop: '10px',
-    marginRight: '5px',
-  },
-  smallLabel: {
-    fontSize: '12px',
-    fontStyle: 'italic',
-    color: '#999',
-  },
-  container: {
-    paddingBottom: theme.spacing(2),
   },
 }));
 
@@ -77,7 +65,11 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
     if (config.units?.length === 0) {
       return <Field type="hidden" value="" name={unitFieldId} />;
     } else if (config.units?.length === 1) {
-      return <span className={`${classes.singleUnit}`}>{stateValue.unit}</span>;
+      return (
+        <span className={`${classes.singleUnit} MuiFormControl-marginNormal`}>
+          {stateValue.unit}
+        </span>
+      );
     } else {
       return (
         <Select
@@ -90,6 +82,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           }}
           name={unitFieldId}
           data-cy={unitFieldId}
+          className="MuiFormControl-marginDense"
         >
           {config.units!.map(unit => (
             <MenuItem value={unit} key={unit}>
@@ -102,15 +95,27 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
   };
 
   return (
-    <FormControl error={isError} required={config.required ? true : false}>
-      <Grid container className={classes.container}>
+    <FormControl
+      error={isError}
+      required={config.required}
+      margin="dense"
+      fullWidth
+    >
+      <Grid container>
         <Grid item xs={12}>
-          <FormLabel className={classes.label}>{question}</FormLabel>
-          {config.small_label ? (
-            <div className={classes.smallLabel}>{config.small_label}</div>
-          ) : null}
+          <FormLabel>
+            <>
+              {question}
+              {config.small_label && (
+                <>
+                  <br />
+                  <small>{config.small_label}</small>
+                </>
+              )}
+            </>
+          </FormLabel>
         </Grid>
-        <Grid item xs={3} className={classes.unitField}>
+        <Grid item xs={2} className={classes.unitField}>
           <TextField
             label="Min"
             onChange={e =>
@@ -124,10 +129,12 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
             data-cy={minFieldId}
             type="number"
             name={minFieldId}
+            margin="dense"
+            fullWidth
           />
         </Grid>
 
-        <Grid item xs={3} className={classes.unitField}>
+        <Grid item xs={2} className={classes.unitField}>
           <TextField
             label="Max"
             onChange={e =>
@@ -141,22 +148,22 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
             data-cy={maxFieldId}
             type="number"
             name={maxFieldId}
+            margin="dense"
+            fullWidth
           />
         </Grid>
-        <Grid item xs={6} className={classes.unitField}>
+        <Grid item xs={8} className={classes.unitField}>
           {getUnits()}
         </Grid>
 
-        <Grid item xs={3}>
-          {isError && <ProposalErrorLabel>{fieldError.min}</ProposalErrorLabel>}
+        <Grid item xs={2}>
+          {isError && <FormHelperText>{fieldError.min}</FormHelperText>}
         </Grid>
-        <Grid item xs={3}>
-          {isError && <ProposalErrorLabel>{fieldError.max}</ProposalErrorLabel>}
+        <Grid item xs={2}>
+          {isError && <FormHelperText>{fieldError.max}</FormHelperText>}
         </Grid>
-        <Grid item xs={6}>
-          {isError && (
-            <ProposalErrorLabel>{fieldError.unit}</ProposalErrorLabel>
-          )}
+        <Grid item xs={8}>
+          {isError && <FormHelperText>{fieldError.unit}</FormHelperText>}
         </Grid>
       </Grid>
     </FormControl>

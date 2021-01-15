@@ -1,4 +1,3 @@
-import Typography from '@material-ui/core/Typography';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { ChangeEvent, useContext, useState } from 'react';
@@ -37,10 +36,12 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
 
   return (
     <>
-      <Typography>{question}</Typography>
       <Field
         name={proposalQuestionId}
-        label={(props.answer.config as SampleBasisConfig).titlePlaceholder}
+        label={question}
+        placeholder={
+          (props.answer.config as SampleBasisConfig).titlePlaceholder
+        }
         inputProps={{
           onChange: (event: ChangeEvent<HTMLInputElement>) => {
             setTitle(event.currentTarget.value);
@@ -56,6 +57,7 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
         fullWidth
         component={TextFieldNoSubmit}
         data-cy="title-input"
+        margin="dense"
       />
     </>
   );

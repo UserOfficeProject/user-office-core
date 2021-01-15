@@ -9,9 +9,8 @@ import {
 import { Field, getIn } from 'formik';
 import React, { useEffect, useState } from 'react';
 
+import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { DateConfig } from 'generated/sdk';
-
-import { BasicComponentProps } from '../../../proposal/IBasicComponentProps';
 
 function TextFieldWithTooltip({
   title,
@@ -44,21 +43,30 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
   }, [answer]);
 
   return (
-    <FormControl error={isError}>
+    <FormControl error={isError} margin="dense">
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <Field
           data-cy={proposalQuestionId + '_field'}
           name={proposalQuestionId}
-          label={question}
+          label={
+            <>
+              {question}
+              {config.small_label && (
+                <>
+                  <br />
+                  <small>{config.small_label}</small>
+                </>
+              )}
+            </>
+          }
           component={({ field, form, ...other }: { field: any; form: any }) => {
             return (
               <KeyboardDatePicker
-                required={config.required ? true : false}
+                required={config.required}
                 clearable={true}
                 error={isError}
                 name={field.name}
-                helperText={isError && errors[proposalQuestionId]}
-                label={question}
+                helperText={isError && fieldError}
                 value={stateValue}
                 format="yyyy-MM-dd"
                 onChange={date => {
@@ -75,7 +83,6 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
           }}
         />
       </MuiPickersUtilsProvider>
-      <span>{config.small_label}</span>
     </FormControl>
   );
 }

@@ -14,7 +14,7 @@ import { usePrevious } from 'hooks/common/usePrevious';
 import { usePersistProposalModel } from 'hooks/proposal/usePersistProposalModel';
 import {
   ProposalSubmissionState,
-  ProposalSubsetSumbission,
+  ProposalSubsetSubmission,
 } from 'models/ProposalSubmissionState';
 import {
   Event,
@@ -112,7 +112,7 @@ const createReviewWizardStep = (): WizardStep => ({
 });
 
 export default function ProposalContainer(props: {
-  proposal: ProposalSubsetSumbission;
+  proposal: ProposalSubsetSubmission;
   proposalCreated?: (proposal: Proposal) => any;
   proposalUpdated?: (proposal: Proposal) => any;
 }) {

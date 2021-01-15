@@ -2,7 +2,7 @@ import { Proposal } from 'generated/sdk';
 
 import { QuestionarySubmissionState } from './QuestionarySubmissionState';
 
-export type ProposalSubsetSumbission = Pick<
+export type ProposalSubsetSubmission = Pick<
   Proposal,
   | 'id'
   | 'abstract'
@@ -18,5 +18,5 @@ export type ProposalSubsetSumbission = Pick<
 >;
 
 export interface ProposalSubmissionState extends QuestionarySubmissionState {
-  proposal: ProposalSubsetSumbission;
+  proposal: ProposalSubsetSubmission;
 }
