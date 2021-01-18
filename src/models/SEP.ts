@@ -21,7 +21,8 @@ export class SEPProposal {
   constructor(
     public proposalId: number,
     public sepId: number,
-    public dateAssigned: Date
+    public dateAssigned: Date,
+    public instrumentSubmitted?: boolean
   ) {}
 }
 

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { sepDataSource } from '..';
 import {
-  CallHasInstrument,
   Instrument,
+  InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
 import { ProposalIds } from '../../models/Proposal';
@@ -14,7 +15,7 @@ import {
   UserRecord,
   createBasicUserObject,
   InstrumentWithAvailabilityTimeRecord,
-  CallHasInstrumentRecord,
+  InstrumentHasProposalsRecord,
 } from './records';
 
 export default class PostgresInstrumentDataSource
@@ -268,6 +269,33 @@ export default class PostgresInstrumentDataSource
       });
   }
 
+  async checkIfAllProposalsOnInstrumentSubmitted(
+    instruments: InstrumentWithAvailabilityTimeRecord[],
+    sepId: number,
+    callId: number
+  ): Promise<InstrumentWithAvailabilityTimeRecord[]> {
+    const instrumentsWithSubmittedFlag: InstrumentWithAvailabilityTimeRecord[] = [];
+
+    for (const instrument of instruments) {
+      const allProposalsOnInstrument = await sepDataSource.getSEPProposalsByInstrument(
+        sepId,
+        instrument.instrument_id,
+        callId
+      );
+
+      const allProposalsOnInstrumentSubmitted = allProposalsOnInstrument.every(
+        item => item.instrumentSubmitted
+      );
+
+      instrumentsWithSubmittedFlag.push({
+        ...instrument,
+        submitted: allProposalsOnInstrumentSubmitted,
+      });
+    }
+
+    return instrumentsWithSubmittedFlag;
+  }
+
   async getInstrumentsBySepId(
     sepId: number,
     callId: number
@@ -305,7 +333,13 @@ export default class PostgresInstrumentDataSource
         )
       )
       .then(async (instruments: InstrumentWithAvailabilityTimeRecord[]) => {
-        const result = instruments.map(instrument => {
+        const instrumentsWithSubmittedFlag = await this.checkIfAllProposalsOnInstrumentSubmitted(
+          instruments,
+          sepId,
+          callId
+        );
+
+        const result = instrumentsWithSubmittedFlag.map(instrument => {
           const calculatedInstrumentAvailabilityTimePerSEP = Math.round(
             (instrument.proposal_count / instrument.full_count) *
               instrument.availability_time
@@ -396,11 +430,11 @@ export default class PostgresInstrumentDataSource
   }
 
   async submitInstrument(
-    callId: number,
+    proposalIds: number[],
     instrumentId: number
-  ): Promise<CallHasInstrument> {
-    const [record]: CallHasInstrumentRecord[] = await database(
-      'call_has_instruments'
+  ): Promise<InstrumentHasProposals> {
+    const records: [InstrumentHasProposalsRecord] = await database(
+      'instrument_has_proposals'
     )
       .update(
         {
@@ -408,24 +442,19 @@ export default class PostgresInstrumentDataSource
         },
         ['*']
       )
-      .where('instrument_id', instrumentId)
-      .andWhere('call_id', callId);
+      .whereIn('proposal_id', proposalIds)
+      .andWhere('instrument_id', instrumentId);
 
-    if (!record) {
+    if (!records?.length) {
       throw new Error(
-        `Record call_has_instruments not found with callId: ${callId} and instrumentId: ${instrumentId}`
+        `Some record from instrument_has_proposals not found with proposalIds: ${proposalIds} and instrumentId: ${instrumentId}`
       );
     }
 
-    return new CallHasInstrument(
-      record.call_id,
-      record.instrument_id,
-      record.availability_time,
-      record.submitted
-    );
+    return new InstrumentHasProposals(instrumentId, proposalIds, true);
   }
 
-  hasInstrumentScientistInstrument(
+  async hasInstrumentScientistInstrument(
     userId: number,
     instrumentId: number
   ): Promise<boolean> {
