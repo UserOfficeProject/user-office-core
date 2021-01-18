@@ -1,6 +1,5 @@
+import { logger } from '@esss-swap/duo-logger';
 import Knex from 'knex';
-
-import { logger } from '../../utils/Logger';
 
 const db = Knex({
   client: 'postgresql',

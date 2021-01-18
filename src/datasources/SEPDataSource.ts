@@ -3,6 +3,7 @@ import { Role } from '../models/Role';
 import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../models/SEP';
 import { User } from '../models/User';
 import { AddSEPMembersRole } from '../resolvers/mutations/AddSEPMembersRoleMutation';
+import { UpdateMemberSEPArgs } from '../resolvers/mutations/AssignMembersToSEP';
 
 export interface SEPDataSource {
   isMemberOfSEP(agent: User | null, sepId: number): Promise<boolean>;
@@ -41,11 +42,7 @@ export interface SEPDataSource {
   getMembers(sepId: number): Promise<SEPMember[]>;
   getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
   addSEPMembersRole(args: AddSEPMembersRole): Promise<SEP>;
-  removeSEPMemberRole(
-    memberId: number,
-    sepId: number,
-    roleId: number
-  ): Promise<SEP>;
+  removeSEPMemberRole(args: UpdateMemberSEPArgs): Promise<SEP>;
   assignProposal(proposalId: number, sepId: number): Promise<ProposalIds>;
   removeMemberFromSepProposal(
     proposalId: number,

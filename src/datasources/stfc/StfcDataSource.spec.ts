@@ -26,6 +26,6 @@ test('When getting roles for a user, STFC roles are translated into ESS roles', 
       Roles.INSTRUMENT_SCIENTIST,
       'Instrument Scientist'
     ),
-    new Role(userOfficerRoleDbId, Roles.USER_OFFICER, 'User Officer"'),
+    new Role(userOfficerRoleDbId, Roles.USER_OFFICER, 'User Officer'),
   ]);
 });

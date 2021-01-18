@@ -94,5 +94,9 @@ export function isMatchingConstraints(
     questionTemplateRelation.question.dataType
   );
 
+  if (!definition.validate) {
+    return true;
+  }
+
   return definition.validate(questionTemplateRelation, value);
 }

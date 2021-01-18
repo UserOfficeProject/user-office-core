@@ -82,12 +82,15 @@ export class TextInputConfig extends ConfigBase {
 }
 
 @ObjectType()
+export class ShipmentBasisConfig extends ConfigBase {}
+
+@ObjectType()
 export class SubtemplateConfig {
   @Field(() => Int, { nullable: true })
   maxEntries: number | null;
 
-  @Field(() => Int)
-  templateId: number;
+  @Field(() => Int, { nullable: true })
+  templateId: number | null;
 
   @Field(() => String)
   templateCategory: string;
@@ -104,6 +107,15 @@ export class SubtemplateConfig {
 
 @ObjectType()
 export class IntervalConfig extends ConfigBase {
+  @Field(() => [String], { nullable: true })
+  units: string[] | null;
+
+  @Field(() => String)
+  property: string;
+}
+
+@ObjectType()
+export class NumberInputConfig extends ConfigBase {
   @Field(() => [String], { nullable: true })
   units: string[] | null;
 
@@ -130,5 +142,7 @@ export const FieldConfigType = createUnionType({
     SubtemplateConfig,
     ProposalBasisConfig,
     IntervalConfig,
+    NumberInputConfig,
+    ShipmentBasisConfig,
   ], // function that returns array of object types classes
 });

@@ -139,8 +139,20 @@ export class StfcDataSource implements UserDataSource {
     throw new Error('Method not implemented.');
   }
 
-  setUserEmailVerified(id: number): Promise<void> {
+  setUserEmailVerified(id: number): Promise<User | null> {
     throw new Error('Method not implemented.');
+  }
+
+  async setUserNotPlaceholder(id: number): Promise<User | null> {
+    const [userRecord]: [UserRecord] = await database
+      .update({
+        placeholder: false,
+      })
+      .from('users')
+      .where('user_id', id)
+      .returning('*');
+
+    return userRecord ? createUserObject(userRecord) : null;
   }
 
   async setUserPassword(

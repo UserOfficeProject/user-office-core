@@ -1,7 +1,8 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { logger } from '../utils/Logger';
 
 export default function createHandler(
   eventLogsDataSource: EventLogsDataSource
@@ -60,7 +61,7 @@ export default function createHandler(
             event.loggedInUserId,
             event.type,
             json,
-            event.callhasinstrument.instrumentId.toString()
+            event.instrumenthasproposals.instrumentId.toString()
           );
           break;
         default:

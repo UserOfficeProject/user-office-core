@@ -13,6 +13,7 @@ import {
   createUserObject,
   createBasicUserObject,
   RoleRecord,
+  RoleUserRecord,
 } from './records';
 
 export default class PostgresUserDataSource implements UserDataSource {
@@ -185,11 +186,21 @@ export default class PostgresUserDataSource implements UserDataSource {
         .from('role_user')
         .where('user_id', id)
         .del()
+        .returning('*')
         .transacting(trx)
-        .then(() => {
+        .then((data: RoleUserRecord[]) => {
           return BluePromise.map(roles, (role_id: number) => {
+            // NOTE: If some removed roles have had sep_id we need to keep that info.
+            const foundRoleSepId = data.find(
+              roleItem => roleItem.role_id === role_id
+            )?.sep_id;
+
             return database
-              .insert({ user_id: id, role_id: role_id })
+              .insert({
+                user_id: id,
+                role_id: role_id,
+                sep_id: foundRoleSepId,
+              })
               .into('role_user')
               .transacting(trx);
           });
@@ -406,14 +417,31 @@ export default class PostgresUserDataSource implements UserDataSource {
         };
       });
   }
-  async setUserEmailVerified(id: number): Promise<void> {
-    return database
+
+  async setUserEmailVerified(id: number): Promise<User | null> {
+    const [userRecord]: [UserRecord] = await database
       .update({
         email_verified: true,
       })
       .from('users')
-      .where('user_id', id);
+      .where('user_id', id)
+      .returning('*');
+
+    return userRecord ? createUserObject(userRecord) : null;
   }
+
+  async setUserNotPlaceholder(id: number): Promise<User | null> {
+    const [userRecord]: [UserRecord] = await database
+      .update({
+        placeholder: false,
+      })
+      .from('users')
+      .where('user_id', id)
+      .returning('*');
+
+    return userRecord ? createUserObject(userRecord) : null;
+  }
+
   async getProposalUsersFull(proposalId: number): Promise<User[]> {
     return database
       .select()

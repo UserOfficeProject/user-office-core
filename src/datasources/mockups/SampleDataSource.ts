@@ -72,4 +72,8 @@ export class SampleDataSourceMock implements SampleDataSource {
 
     return { ...sample, id: sample.id++ };
   }
+
+  async getSamplesByShipmentId(shipmentId: number): Promise<Sample[]> {
+    return this.samples;
+  }
 }

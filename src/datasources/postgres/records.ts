@@ -7,6 +7,7 @@ import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import { Sample } from '../../models/Sample';
+import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import {
   DataType,
   FieldCondition,
@@ -270,6 +271,7 @@ export interface SEPProposalRecord {
   readonly proposal_id: number;
   readonly sep_id: number;
   readonly date_assigned: Date;
+  readonly instrument_submitted?: boolean;
 }
 
 export interface SEPAssignmentRecord {
@@ -282,7 +284,7 @@ export interface SEPAssignmentRecord {
   readonly email_sent: boolean;
 }
 
-export interface SEPMemberRecord {
+export interface RoleUserRecord {
   readonly role_user_id: number;
   readonly role_id: number;
   readonly user_id: number;
@@ -297,10 +299,9 @@ export interface InstrumentRecord {
   readonly full_count: number;
 }
 
-export interface CallHasInstrumentRecord {
-  readonly call_id: number;
+export interface InstrumentHasProposalsRecord {
   readonly instrument_id: number;
-  readonly availability_time: number;
+  readonly proposal_id: number;
   readonly submitted: boolean;
 }
 
@@ -329,6 +330,17 @@ export interface SampleRecord {
   readonly question_id: string;
   readonly safety_status: number;
   readonly safety_comment: string;
+  readonly created_at: Date;
+}
+
+export interface ShipmentRecord {
+  readonly shipment_id: number;
+  readonly title: string;
+  readonly creator_id: number;
+  readonly proposal_id: number;
+  readonly questionary_id: number;
+  readonly status: string;
+  readonly external_ref: string;
   readonly created_at: Date;
 }
 
@@ -621,5 +633,18 @@ export const createAnswerBasic = (answer: AnswerRecord) => {
     answer.question_id,
     answer.answer,
     answer.created_at
+  );
+};
+
+export const createShipmentObject = (shipment: ShipmentRecord) => {
+  return new Shipment(
+    shipment.shipment_id,
+    shipment.title,
+    shipment.creator_id,
+    shipment.proposal_id,
+    shipment.questionary_id,
+    shipment.status as ShipmentStatus,
+    shipment.external_ref,
+    shipment.created_at
   );
 };

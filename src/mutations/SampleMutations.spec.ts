@@ -9,18 +9,24 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Sample, SampleStatus } from '../models/Sample';
+import { SampleAuthorization } from '../utils/SampleAuthorization';
 import SampleMutations from './SampleMutations';
 
 const dummySampleDataSource = new SampleDataSourceMock();
 const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
 const dummyProposalDataSource = new ProposalDataSourceMock();
+const sampleAuthorization = new SampleAuthorization(
+  dummySampleDataSource,
+  dummyProposalDataSource
+);
 
 const sampleMutations = new SampleMutations(
   dummySampleDataSource,
   dummyQuestionaryDataSource,
   dummyTemplateDataSource,
-  dummyProposalDataSource
+  dummyProposalDataSource,
+  sampleAuthorization
 );
 
 beforeEach(() => {

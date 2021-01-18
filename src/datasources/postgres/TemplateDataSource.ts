@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
 import to from 'await-to-js';
 
 import {
@@ -15,10 +16,10 @@ import {
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
+import { SetActiveTemplateArgs } from '../../resolvers/mutations/SetActiveTemplateMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
-import { logger } from './../../utils/Logger';
 import database from './database';
 import {
   createProposalTemplateObject,
@@ -470,6 +471,35 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           config: resultItem.config,
         }));
       });
+  }
+
+  async getActiveTemplateId(
+    categoryId: TemplateCategoryId
+  ): Promise<number | null> {
+    return database('active_templates')
+      .select('template_id')
+      .where('category_id', categoryId)
+      .first()
+      .then((result: { template_id: number }) => {
+        if (!result) {
+          return null;
+        }
+
+        return result.template_id;
+      });
+  }
+
+  async setActiveTemplate(args: SetActiveTemplateArgs): Promise<boolean> {
+    await database('active_templates')
+      .delete('template_id')
+      .where('category_id', args.templateCategoryId);
+
+    await database('active_templates').insert({
+      category_id: args.templateCategoryId,
+      template_id: args.templateId,
+    });
+
+    return true;
   }
 
   async deleteQuestion(questionId: string): Promise<Question> {

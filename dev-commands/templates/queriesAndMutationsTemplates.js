@@ -23,7 +23,8 @@ export default class ${name.capitalize()}Queries {
 `;
 
 const mutationsTemplate = name =>
-  `import { create${name.capitalize()}ValidationSchema } from '@esss-swap/duo-validation';
+  `import { logger } from '@esss-swap/duo-logger';
+  import { create${name.capitalize()}ValidationSchema } from '@esss-swap/duo-validation';
 
 import { ${name.capitalize()}DataSource } from '../datasources/${name.capitalize()}DataSource';
 import { Authorized, ValidateArgs } from '../decorators';
@@ -33,7 +34,6 @@ import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { Create${name.capitalize()}Args } from '../resolvers/mutations/Create${name.capitalize()}Mutation';
 import { Update${name.capitalize()}Args } from '../resolvers/mutations/Update${name.capitalize()}Mutation';
-import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ${name.capitalize()}Mutations {

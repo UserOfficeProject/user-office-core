@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
+
 import {
   Answer,
   AnswerBasic,
@@ -6,7 +8,6 @@ import {
   QuestionaryStep,
 } from '../../models/Questionary';
 import { getDefaultAnswerValue } from '../../models/questionTypes/QuestionRegistry';
-import { logger } from '../../utils/Logger';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
@@ -23,6 +24,15 @@ import {
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
+  async getCount(templateId: number): Promise<number> {
+    return database('questionaries')
+      .count('questionary_id')
+      .where('template_id', templateId)
+      .first()
+      .then(({ count }: { count: string }) => {
+        return parseInt(count);
+      });
+  }
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
     return database('answers')
       .select('*')
@@ -32,7 +42,7 @@ export default class PostgresQuestionaryDataSource
       });
   }
 
-  create(creator_id: number, template_id: number): Promise<Questionary> {
+  async create(creator_id: number, template_id: number): Promise<Questionary> {
     return database('questionaries')
       .insert({ template_id, creator_id }, '*')
       .then((rows: QuestionaryRecord[]) => {

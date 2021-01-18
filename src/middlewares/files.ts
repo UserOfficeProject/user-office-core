@@ -1,11 +1,11 @@
 import { existsSync, unlink } from 'fs';
 
+import { logger } from '@esss-swap/duo-logger';
 import express, { Request, Response } from 'express';
 import multer from 'multer';
 
 import baseContext from '../buildContext';
 import { isRejection } from '../rejection';
-import { logger } from '../utils/Logger';
 
 const files = () => {
   const router = express.Router();
