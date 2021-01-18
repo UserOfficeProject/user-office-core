@@ -1,3 +1,5 @@
+import { existsSync, mkdirSync } from 'fs';
+
 import { logger } from '@esss-swap/duo-logger';
 
 import { FileDataSource } from '../datasources/IFileDataSource';
@@ -24,7 +26,11 @@ export default class FileMutations {
   }
 
   async prepare(fileId: string): Promise<string | Rejection> {
-    const filePath = `downloads/${fileId}`;
+    const DOWNLOADS_DIR = 'downloads';
+    if (!existsSync(DOWNLOADS_DIR)) {
+      mkdirSync(DOWNLOADS_DIR);
+    }
+    const filePath = `${DOWNLOADS_DIR}/${fileId}`;
 
     return this.dataSource
       .prepare(fileId, filePath)
