@@ -17,7 +17,7 @@ import { UserDataSource } from './UserDataSource';
 export let userDataSource: UserDataSource;
 userDataSource = new PostgresUserDataSource();
 if (process.env.EXTERNAL_AUTH_PROVIDER === 'stfc') {
-    userDataSource = new StfcDataSource();
+  userDataSource = new StfcDataSource();
 }
 export const proposalDataSource = new PostgresProposalDataSource();
 export const reviewDataSource = new PostgresReviewDataSource();

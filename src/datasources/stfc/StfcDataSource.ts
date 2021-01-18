@@ -3,24 +3,24 @@ import { Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { UserDataSource } from '../UserDataSource';
-import UOWSSoapClient from "./UOWSSoapInterface";
 import database from '../postgres/database';
 import {
   UserRecord,
   createUserObject,
   RoleRecord,
-  ProposalUserRecord
+  ProposalUserRecord,
 } from '../postgres/records';
+import { UserDataSource } from '../UserDataSource';
+import UOWSSoapClient from './UOWSSoapInterface';
 
 const client = new UOWSSoapClient();
 const token = process.env.EXTERNAL_AUTH_TOKEN;
 
 type stfcRole = {
-  name: String;
-}
+  name: string;
+};
 
-export interface stfcBasicPersonDetails {
+export interface StfcBasicPersonDetails {
   country: string;
   deptName: string;
   displayName: string;
@@ -37,19 +37,21 @@ export interface stfcBasicPersonDetails {
   workPhone: string;
 }
 
-function toEssBasicUserDetails(stfcUser: stfcBasicPersonDetails): BasicUserDetails {
+function toEssBasicUserDetails(
+  stfcUser: StfcBasicPersonDetails
+): BasicUserDetails {
   return new BasicUserDetails(
     Number(stfcUser.userNumber),
     stfcUser.givenName ?? '',
     stfcUser.familyName ?? '',
     stfcUser.orgName ?? '',
-    "",
+    '',
     new Date(),
     false
-  )
+  );
 }
 
-function toEssUser(stfcUser: stfcBasicPersonDetails): User {
+function toEssUser(stfcUser: StfcBasicPersonDetails): User {
   return new User(
     Number(stfcUser.userNumber),
     stfcUser.title ?? '',
@@ -58,26 +60,25 @@ function toEssUser(stfcUser: stfcBasicPersonDetails): User {
     stfcUser.familyName ?? '',
     stfcUser.email ?? '',
     stfcUser.firstNameKnownAs ?? '',
-    "",
-    "",
-    "",
+    '',
+    '',
+    '',
     0,
-    "",
+    '',
     0,
     stfcUser.deptName ?? '',
-    "",
+    '',
     stfcUser.email ?? '',
     true,
     stfcUser.workPhone ?? '',
     undefined,
     false,
-    "",
-    ""
-  )
+    '',
+    ''
+  );
 }
 
 export class StfcDataSource implements UserDataSource {
-
   async delete(id: number): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
@@ -85,7 +86,7 @@ export class StfcDataSource implements UserDataSource {
   async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
-  
+
   getByOrcID(orcID: string): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
@@ -100,22 +101,28 @@ export class StfcDataSource implements UserDataSource {
 
   async getProposalUsersFull(proposalId: number): Promise<User[]> {
     return database
-    .select()
-    .from('proposal_user as pc')
-    .join('proposals as p', { 'p.proposal_id': 'pc.proposal_id' })
-    .where('p.proposal_id', proposalId)
-    .then(async (proposalUsers: ProposalUserRecord[]) => {
-      let userNumbers: string[] = proposalUsers.map(proposalUser => String(proposalUser.user_id));
-      let stfcBasicPeople: stfcBasicPersonDetails[] = (await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)).return;
+      .select()
+      .from('proposal_user as pc')
+      .join('proposals as p', { 'p.proposal_id': 'pc.proposal_id' })
+      .where('p.proposal_id', proposalId)
+      .then(async (proposalUsers: ProposalUserRecord[]) => {
+        const userNumbers: string[] = proposalUsers.map(proposalUser =>
+          String(proposalUser.user_id)
+        );
+        const stfcBasicPeople: StfcBasicPersonDetails[] = (
+          await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+        ).return;
 
-      return stfcBasicPeople.map(person => toEssUser(person));
-    });
+        return stfcBasicPeople.map(person => toEssUser(person));
+      });
   }
 
   async getBasicUserInfo(
     id: number
   ): Promise<import('../../models/User').BasicUserDetails | null> {
-    return toEssBasicUserDetails((await client.getBasicPersonDetailsFromUserNumber(token, id)).return);
+    return toEssBasicUserDetails(
+      (await client.getBasicPersonDetailsFromUserNumber(token, id)).return
+    );
   }
 
   async checkOrcIDExist(orcID: string): Promise<boolean> {
@@ -123,11 +130,13 @@ export class StfcDataSource implements UserDataSource {
   }
 
   async checkEmailExist(email: string): Promise<boolean> {
-    return (await client.getBasicPersonDetailsFromEmail(token, email).return) != null;
+    return (
+      (await client.getBasicPersonDetailsFromEmail(token, email).return) != null
+    );
   }
 
   async getPasswordByEmail(email: string): Promise<string> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   setUserEmailVerified(id: number): Promise<void> {
@@ -138,44 +147,52 @@ export class StfcDataSource implements UserDataSource {
     id: number,
     password: string
   ): Promise<BasicUserDetails> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   async getByEmail(email: string): Promise<User | null> {
-    return toEssUser((await client.getBasicPersonDetailsFromEmail(token, email)).return);
+    return toEssUser(
+      (await client.getBasicPersonDetailsFromEmail(token, email)).return
+    );
   }
 
   async getByUsername(username: string): Promise<User | null> {
-    return toEssUser((await client.getBasicPersonDetailsFromEmail(token, username)).return);
+    return toEssUser(
+      (await client.getBasicPersonDetailsFromEmail(token, username)).return
+    );
   }
 
   async getPasswordByUsername(username: string): Promise<string | null> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   async setUserRoles(id: number, roles: number[]): Promise<void> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
-  
+
   async getUserRoles(id: number): Promise<Role[]> {
-    let stfcRoles: stfcRole[] = (await client.getRolesForUser(token, id)).return;
-    
-    let stfcRolesToEssRoles = new Map<String, Role>([
-        ["User Officer", new Role(2, Roles.USER_OFFICER, "User Officer")],
-        ["ISIS Instrument Scientist", new Role(7, Roles.INSTRUMENT_SCIENTIST, "Instrument Scientist")]
+    const stfcRoles: stfcRole[] = (await client.getRolesForUser(token, id))
+      .return;
+
+    const stfcRolesToEssRoles = new Map<string, Role>([
+      ['User Officer', new Role(2, Roles.USER_OFFICER, 'User Officer')],
+      [
+        'ISIS Instrument Scientist',
+        new Role(7, Roles.INSTRUMENT_SCIENTIST, 'Instrument Scientist'),
+      ],
     ]);
 
-    var roles: Role[] = [];
+    const roles: Role[] = [];
 
     // The User role must be the first item
-    roles.push(new Role(0, Roles.USER, "User"));
+    roles.push(new Role(0, Roles.USER, 'User'));
 
     stfcRoles.forEach((stfcRole: stfcRole) => {
-      let essRole: Role | undefined = stfcRolesToEssRoles.get(stfcRole.name);
+      const essRole: Role | undefined = stfcRolesToEssRoles.get(stfcRole.name);
       if (essRole && !roles.includes(essRole)) {
         roles.push(essRole);
       }
-    })
+    });
 
     return roles;
   }
@@ -190,7 +207,7 @@ export class StfcDataSource implements UserDataSource {
   }
 
   async update(user: User): Promise<User> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   async me(id: number) {
@@ -284,11 +301,18 @@ export class StfcDataSource implements UserDataSource {
         }
       })
       .then(async (usersRecord: UserRecord[]) => {
-        var users: BasicUserDetails[] = [];
+        let users: BasicUserDetails[] = [];
 
         if (usersRecord[0]) {
-          let userNumbers: string[] = usersRecord.map(record => String(record.user_id));
-          let stfcBasicPeople: stfcBasicPersonDetails[] = (await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)).return;
+          const userNumbers: string[] = usersRecord.map(record =>
+            String(record.user_id)
+          );
+          const stfcBasicPeople: StfcBasicPersonDetails[] = (
+            await client.getBasicPeopleDetailsFromUserNumbers(
+              token,
+              userNumbers
+            )
+          ).return;
           users = stfcBasicPeople.map(person => toEssBasicUserDetails(person));
         }
 
@@ -301,16 +325,20 @@ export class StfcDataSource implements UserDataSource {
 
   async getProposalUsers(proposalId: number): Promise<BasicUserDetails[]> {
     return database
-    .select()
-    .from('proposal_user as pc')
-    .join('proposals as p', { 'p.proposal_id': 'pc.proposal_id' })
-    .where('p.proposal_id', proposalId)
-    .then(async (proposalUsers: ProposalUserRecord[]) => {
-      let userNumbers: string[] = proposalUsers.map(proposalUser => String(proposalUser.user_id));
-      let stfcBasicPeople: stfcBasicPersonDetails[] = (await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)).return;
-        
-      return stfcBasicPeople.map(person => toEssBasicUserDetails(person));
-    });
+      .select()
+      .from('proposal_user as pc')
+      .join('proposals as p', { 'p.proposal_id': 'pc.proposal_id' })
+      .where('p.proposal_id', proposalId)
+      .then(async (proposalUsers: ProposalUserRecord[]) => {
+        const userNumbers: string[] = proposalUsers.map(proposalUser =>
+          String(proposalUser.user_id)
+        );
+        const stfcBasicPeople: StfcBasicPersonDetails[] = (
+          await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+        ).return;
+
+        return stfcBasicPeople.map(person => toEssBasicUserDetails(person));
+      });
   }
 
   async checkScientistToProposal(
@@ -352,7 +380,6 @@ export class StfcDataSource implements UserDataSource {
     telephone: string,
     telephone_alt: string | undefined
   ): Promise<User> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
-
 }
