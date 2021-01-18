@@ -61,7 +61,7 @@ export default function createHandler(
             event.loggedInUserId,
             event.type,
             json,
-            event.callhasinstrument.instrumentId.toString()
+            event.instrumenthasproposals.instrumentId.toString()
           );
           break;
         default:

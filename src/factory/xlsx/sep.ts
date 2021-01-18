@@ -53,11 +53,11 @@ const sortByRankOrAverageScore = (data: RowObj[]) => {
     .map(row => {
       const proposalAllocationTime = row.techReviewTimeAllocation || 0;
 
-      const isInAvailabilityZone =
+      const notInAvailabilityZone =
         allocationTimeSum + proposalAllocationTime > (row.instrAvailTime || 0);
       allocationTimeSum = allocationTimeSum + proposalAllocationTime;
 
-      row.inAvailZone = isInAvailabilityZone ? 'yes' : 'no';
+      row.inAvailZone = notInAvailabilityZone ? 'No' : 'Yes';
 
       return row;
     });

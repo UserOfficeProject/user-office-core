@@ -30,7 +30,8 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     return new SEPProposal(
       sepAssignment.proposal_id,
       sepAssignment.sep_id,
-      sepAssignment.date_assigned
+      sepAssignment.date_assigned,
+      sepAssignment.instrument_submitted
     );
   }
   private createSEPAssignmentObject(sepAssignment: SEPAssignmentRecord) {
@@ -220,7 +221,11 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     callId: number
   ): Promise<SEPProposal[]> {
     const sepProposals: SEPProposalRecord[] = await database
-      .select(['sp.proposal_id', 'sp.sep_id'])
+      .select([
+        'sp.proposal_id',
+        'sp.sep_id',
+        'ihp.submitted as instrument_submitted',
+      ])
       .from('SEP_Proposals as sp')
       .join('instrument_has_proposals as ihp', {
         'sp.proposal_id': 'ihp.proposal_id',
@@ -233,8 +238,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         'p.status_id': 'ps.proposal_status_id',
       })
       .where('sp.sep_id', sepId)
-      .andWhere('ihp.instrument_id', instrumentId)
-      .andWhere('ps.name', 'ilike', 'SEP_%');
+      .andWhere('ihp.instrument_id', instrumentId);
 
     return sepProposals.map(sepProposal =>
       this.createSEPProposalObject(sepProposal)

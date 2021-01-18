@@ -1,5 +1,5 @@
 import { Call } from '../models/Call';
-import { CallHasInstrument } from '../models/Instrument';
+import { InstrumentHasProposals } from '../models/Instrument';
 import { Proposal, ProposalIds } from '../models/Proposal';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
@@ -83,7 +83,7 @@ interface ProposalSEPSelectedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
-  callhasinstrument: CallHasInstrument;
+  instrumenthasproposals: InstrumentHasProposals;
 }
 
 interface ProposalSEPMeetingSubmittedEvent extends GeneralEvent {
