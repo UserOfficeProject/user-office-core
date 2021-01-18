@@ -591,7 +591,7 @@ context('Scientific evaluation panel tests', () => {
     ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
   });
 
-  it('Officer should be able to submit an instrument in existing SEP', () => {
+  it('Officer should not be able to submit an instrument if all proposals are not ranked in SEP', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
@@ -607,9 +607,57 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.contains('Yes').click();
+    cy.get('[data-cy="confirm-yes"]').click();
 
-    cy.contains('Yes');
+    cy.notification({
+      variant: 'error',
+      text: 'All proposals must have rankings',
+    });
+
+    cy.contains('Proposals and Assignments').click();
+
+    cy.finishedLoading();
+
+    cy.contains('Meeting Components').click();
+
+    cy.finishedLoading();
+
+    cy.get('[title="Submit instrument"]').should('not.be.disabled');
+  });
+
+  it('Officer should be able to submit an instrument if all proposals are ranked in existing SEP', () => {
+    cy.login('officer');
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit"]')
+      .eq(1)
+      .click();
+
+    cy.contains('Meeting Components').click();
+
+    cy.finishedLoading();
+
+    cy.get('[title="Show proposals"]')
+      .first()
+      .click();
+
+    cy.get('[title="View proposal details"]')
+      .first()
+      .click();
+
+    cy.get('#commentForUser').type('Test');
+    cy.get('#commentForManagement').type('Test');
+    cy.get('#rankOrder').type('1');
+
+    cy.get('[data-cy="saveAndContinue"]').click();
+
+    cy.notification({ variant: 'success', text: 'Saved' });
+
+    cy.get("[title='Submit instrument']")
+      .first()
+      .click();
+
+    cy.get('[data-cy="confirm-yes"]').click();
 
     cy.contains('Proposals and Assignments').click();
 

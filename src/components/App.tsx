@@ -1,6 +1,8 @@
 /* eslint-disable react/prop-types */
+import IconButton from '@material-ui/core/IconButton';
+import Close from '@material-ui/icons/Close';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
-import { SnackbarProvider } from 'notistack';
+import { ProviderContext, SnackbarProvider } from 'notistack';
 import React, { ErrorInfo } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import {
@@ -95,6 +97,12 @@ class App extends React.Component {
       ?.setAttribute('content', primaryColor);
   }
 
+  private notistackRef = React.createRef<ProviderContext>();
+
+  onClickDismiss = (key: string | number | undefined) => () => {
+    this.notistackRef.current?.closeSnackbar(key);
+  };
+
   render(): JSX.Element {
     let routes;
     if (process.env.REACT_APP_AUTH_TYPE === 'external') {
@@ -126,8 +134,14 @@ class App extends React.Component {
         <CookiesProvider>
           <UserContextProvider>
             <SnackbarProvider
+              ref={this.notistackRef}
               anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
               maxSnack={1}
+              action={key => (
+                <IconButton onClick={this.onClickDismiss(key)}>
+                  <Close htmlColor="white" />
+                </IconButton>
+              )}
             >
               <ReviewAndAssignmentContextProvider>
                 <Router>

@@ -3,7 +3,7 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { SepMember, UserRole } from 'generated/sdk';
+import { SepMember } from 'generated/sdk';
 import { useSEPMembersData } from 'hooks/SEP/useSEPMembersData';
 import { BasicUserDetails } from 'models/User';
 import { tableIcons } from 'utils/materialIcons';
@@ -31,25 +31,12 @@ const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
     { title: 'Organisation', field: 'user.organisation' },
   ];
 
-  const members = SEPMembersData?.filter(sepMember => {
-    if (
-      !sepMember.roles.some(
-        role => role.shortCode.toUpperCase() === UserRole.SEP_REVIEWER
-      )
-    ) {
-      return false;
-    }
-
-    if (
+  const members = SEPMembersData?.filter(
+    sepMember =>
       !assignedMembers?.find(
         assignedMember => assignedMember.id === sepMember.userId
       )
-    ) {
-      return true;
-    }
-
-    return false;
-  }) as SepMember[];
+  ) as SepMember[];
 
   const AddIcon = (): JSX.Element => <Add />;
 

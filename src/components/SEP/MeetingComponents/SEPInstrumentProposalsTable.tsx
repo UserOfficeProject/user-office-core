@@ -199,6 +199,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
               setOpenProposalId((data as SepProposal).proposal.id);
             },
             tooltip: 'View proposal details',
+            disabled: !!sepInstrument.submitted,
           },
         ]}
         options={{
