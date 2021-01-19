@@ -15,8 +15,10 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
-import { getQuestionaryComponentDefinitions } from 'components/questionary/QuestionaryComponentRegistry';
-import { getTemplateFieldIcon } from 'components/questionary/QuestionaryComponentRegistry';
+import {
+  getQuestionaryComponentDefinitions,
+  getTemplateFieldIcon,
+} from 'components/questionary/QuestionaryComponentRegistry';
 import {
   DataType,
   Question,
@@ -50,6 +52,9 @@ class QuestionItemAdapter implements TemplateTopicEditorData {
   }
   get config() {
     return this.source.config;
+  }
+  get categoryId() {
+    return this.source.categoryId;
   }
 }
 

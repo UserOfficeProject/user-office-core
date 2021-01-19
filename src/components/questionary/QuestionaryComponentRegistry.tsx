@@ -35,6 +35,13 @@ export type FormComponent<ValueObjectType> = FunctionComponent<
   FormProps<ValueObjectType>
 >;
 
+export interface Renderers {
+  readonly questionRenderer: (props: {
+    question: Question;
+  }) => JSX.Element | null;
+  readonly answerRenderer: (props: { answer: Answer }) => JSX.Element | null;
+}
+
 export interface QuestionaryComponentDefinition {
   readonly dataType: DataType;
   readonly name: string;
@@ -45,7 +52,7 @@ export interface QuestionaryComponentDefinition {
   readonly questionaryComponent: (
     props: BasicComponentProps
   ) => JSX.Element | null;
-  readonly answerRenderer: (props: { answer: Answer }) => JSX.Element | null;
+  readonly renderers?: Renderers;
   readonly createYupValidationSchema: ((field: Answer) => object) | null;
   readonly getYupInitialValue: (props: {
     answer: Answer;
@@ -115,13 +122,6 @@ export function createQuestionaryComponent(
   const definition = getQuestionaryComponentDefinition(dataType);
 
   return React.createElement(definition.questionaryComponent, props);
-}
-
-export function formatQuestionaryComponentAnswer(answer: Answer): JSX.Element {
-  const dataType = answer.question.dataType;
-  const definition = getQuestionaryComponentDefinition(dataType);
-
-  return React.createElement(definition.answerRenderer, { answer });
 }
 
 export const getTemplateFieldIcon = (dataType: DataType) => {

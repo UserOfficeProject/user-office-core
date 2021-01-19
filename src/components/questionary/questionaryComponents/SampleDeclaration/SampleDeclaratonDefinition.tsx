@@ -2,6 +2,7 @@ import AssignmentIcon from '@material-ui/icons/Assignment';
 import React from 'react';
 import * as Yup from 'yup';
 
+import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
@@ -20,7 +21,10 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
   readonly: false,
   creatable: true,
   icon: <AssignmentIcon />,
-  answerRenderer: ({ answer }) => <SamplesAnswerRenderer answer={answer} />,
+  renderers: {
+    answerRenderer: ({ answer }) => <SamplesAnswerRenderer answer={answer} />,
+    questionRenderer: defaultRenderer.questionRenderer,
+  },
   createYupValidationSchema: () => {
     const schema = Yup.array().of(Yup.number());
 

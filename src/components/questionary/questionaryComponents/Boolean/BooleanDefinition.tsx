@@ -1,6 +1,7 @@
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import React from 'react';
 
+import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
@@ -18,7 +19,10 @@ export const booleanDefinition: QuestionaryComponentDefinition = {
   readonly: false,
   creatable: true,
   icon: <CheckBoxOutlineBlankIcon />,
-  answerRenderer: ({ answer }) => <span>{answer.value ? 'Yes' : 'No'}</span>,
+  renderers: {
+    questionRenderer: defaultRenderer.questionRenderer,
+    answerRenderer: ({ answer }) => <span>{answer.value ? 'Yes' : 'No'}</span>,
+  },
   createYupValidationSchema: createBooleanValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || false,
 };

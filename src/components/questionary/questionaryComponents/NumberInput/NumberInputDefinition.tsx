@@ -1,6 +1,7 @@
 import ExposureZeroIcon from '@material-ui/icons/ExposureZero';
 import React from 'react';
 
+import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
@@ -19,10 +20,14 @@ export const numberInputDefinition: QuestionaryComponentDefinition = {
   readonly: false,
   creatable: true,
   icon: <ExposureZeroIcon />,
-  answerRenderer: ({ answer }) =>
-    answer.value.value !== null ? (
-      <span>{`${answer.value.value} ${answer.value.unit || ''}`}</span>
-    ) : null,
+  renderers: {
+    answerRenderer: ({ answer }) =>
+      answer.value.value !== null ? (
+        <span>{`${answer.value.value} ${answer.value.unit || ''}`}</span>
+      ) : null,
+    questionRenderer: defaultRenderer.questionRenderer,
+  },
+
   createYupValidationSchema: createNumberInputValidationSchema,
   getYupInitialValue: ({ answer }) =>
     answer.value || { value: '', unit: IntervalPropertyId.UNITLESS },

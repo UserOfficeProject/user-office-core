@@ -2,6 +2,7 @@ import AttachFileIcon from '@material-ui/icons/AttachFile';
 import React from 'react';
 import * as Yup from 'yup';
 
+import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
@@ -19,7 +20,10 @@ export const fileUploadDefinition: QuestionaryComponentDefinition = {
   readonly: false,
   creatable: true,
   icon: <AttachFileIcon />,
-  answerRenderer: ({ answer }) => <FilesAnswerRenderer answer={answer} />,
+  renderers: {
+    answerRenderer: ({ answer }) => <FilesAnswerRenderer answer={answer} />,
+    questionRenderer: defaultRenderer.questionRenderer,
+  },
   createYupValidationSchema: () => Yup.array().of(Yup.string()),
   getYupInitialValue: ({ answer }) => answer.value || [],
 };
