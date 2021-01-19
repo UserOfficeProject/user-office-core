@@ -22,7 +22,6 @@ export const shipmentBasisDefinition: QuestionaryComponentDefinition = {
   readonly: true,
   creatable: false,
   icon: <QuestionAnswerIcon />,
-  answerRenderer: () => null,
   createYupValidationSchema: createShipmentBasisValidationSchema,
   getYupInitialValue: ({ state }): ShipmentBasisFormikData => {
     const shipmentState = state as ShipmentSubmissionState;

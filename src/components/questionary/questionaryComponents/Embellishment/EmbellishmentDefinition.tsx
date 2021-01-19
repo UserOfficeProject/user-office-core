@@ -1,7 +1,7 @@
 import TextFieldsIcon from '@material-ui/icons/TextFields';
 import React from 'react';
 
-import { DataType } from 'generated/sdk';
+import { DataType, EmbellishmentConfig } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { QuestionaryComponentEmbellishment } from './QuestionaryComponentEmbellishment';
@@ -16,7 +16,12 @@ export const embellishmentDefinition: QuestionaryComponentDefinition = {
   questionTemplateRelationForm: () => QuestionTemplateRelationEmbellishmentForm,
   readonly: true,
   creatable: true,
-  answerRenderer: () => null,
+  renderers: {
+    questionRenderer: ({ question }) => (
+      <span>{(question.config as EmbellishmentConfig).plain}</span>
+    ),
+    answerRenderer: () => null,
+  },
   icon: <TextFieldsIcon />,
   createYupValidationSchema: null,
   getYupInitialValue: () => null,

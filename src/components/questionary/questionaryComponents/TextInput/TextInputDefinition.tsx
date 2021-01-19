@@ -1,6 +1,7 @@
 import ShortTextIcon from '@material-ui/icons/ShortText';
 import React from 'react';
 
+import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { DataType } from 'generated/sdk';
 
@@ -18,7 +19,7 @@ export const textInputDefinition: QuestionaryComponentDefinition = {
   readonly: false,
   creatable: true,
   icon: <ShortTextIcon />,
-  answerRenderer: ({ answer }) => <span>{answer.value}</span>,
+  renderers: defaultRenderer,
   createYupValidationSchema: createTextInputValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || '',
 };

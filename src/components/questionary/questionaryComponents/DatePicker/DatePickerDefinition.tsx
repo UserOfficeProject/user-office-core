@@ -1,6 +1,7 @@
 import TodayIcon from '@material-ui/icons/Today';
 import React from 'react';
 
+import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
@@ -18,7 +19,7 @@ export const dateDefinition: QuestionaryComponentDefinition = {
   readonly: false,
   creatable: true,
   icon: <TodayIcon />,
-  answerRenderer: ({ answer }) => <span>{answer.value}</span>,
+  renderers: defaultRenderer,
   createYupValidationSchema: createDateValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || '',
 };

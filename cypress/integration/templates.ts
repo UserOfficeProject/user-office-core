@@ -40,7 +40,7 @@ context('Template tests', () => {
 
   const minimumCharacters = 1000;
 
-  it('User officer can create sample declaration template', () => {
+  it('User officer should be able to create sample declaration template', () => {
     cy.login('officer');
 
     cy.navigateToTemplatesSubmenu('Sample declaration templates');
@@ -81,7 +81,8 @@ context('Template tests', () => {
     cy.contains('Save').click();
 
     cy.contains(textQuestion)
-      .siblings("[data-cy='proposal-question-id']")
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
       .invoke('html')
       .then(fieldId => {
         textId = fieldId;
@@ -123,7 +124,8 @@ context('Template tests', () => {
     cy.contains('Save').click();
 
     cy.contains(booleanQuestion)
-      .siblings("[data-cy='proposal-question-id']")
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
       .invoke('html')
       .then(fieldId => {
         boolId = fieldId;
@@ -161,7 +163,8 @@ context('Template tests', () => {
     cy.contains('Save').click();
 
     cy.contains(intervalQuestion)
-      .siblings("[data-cy='proposal-question-id']")
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
       .invoke('html')
       .then(fieldId => {
         intervalId = fieldId;
@@ -196,7 +199,8 @@ context('Template tests', () => {
     cy.contains('Save').click();
 
     cy.contains(numberQuestion)
-      .siblings("[data-cy='proposal-question-id']")
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
       .invoke('html')
       .then(fieldId => {
         numberId = fieldId;
@@ -227,7 +231,8 @@ context('Template tests', () => {
     cy.contains('Save').click();
 
     cy.contains(textQuestion)
-      .siblings("[data-cy='proposal-question-id']")
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
       .invoke('html')
       .then(fieldId => {
         textId = fieldId;
@@ -334,7 +339,8 @@ context('Template tests', () => {
     cy.contains('Save').click();
 
     cy.contains(multipleChoiceQuestion)
-      .siblings("[data-cy='proposal-question-id']")
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
       .invoke('html')
       .then(fieldId => {
         multipleChoiceId = fieldId;
@@ -362,7 +368,8 @@ context('Template tests', () => {
     cy.contains('Save').click();
 
     cy.contains(dateQuestion)
-      .siblings("[data-cy='proposal-question-id']")
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
       .invoke('html')
       .then(fieldId => {
         dateId = fieldId;

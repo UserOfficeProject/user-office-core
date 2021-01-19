@@ -12,10 +12,7 @@ import {
   getAllFields,
 } from 'models/QuestionaryFunctions';
 
-import {
-  formatQuestionaryComponentAnswer,
-  getQuestionaryComponentDefinition,
-} from './QuestionaryComponentRegistry';
+import { getQuestionaryComponentDefinition } from './QuestionaryComponentRegistry';
 
 function QuestionaryDetails(
   props: { questionaryId: number } & TableProps<any>
@@ -31,31 +28,51 @@ function QuestionaryDetails(
     return <span>Failed to load questionary details</span>;
   }
 
-  const allFields = getAllFields(questionary.steps) as Answer[];
-  const completedFields = allFields.filter(field => {
+  const allQuestions = getAllFields(questionary.steps) as Answer[];
+  const displayableQuestions = allQuestions.filter(field => {
     const definition = getQuestionaryComponentDefinition(
       field.question.dataType
     );
 
     return (
+      !definition.readonly &&
       areDependenciesSatisfied(
         questionary.steps,
         field.question.proposalQuestionId
-      ) && !definition.readonly
+      )
     );
   });
 
   return (
-    <Table size="small" {...restProps}>
-      <TableBody>
-        {completedFields.map(row => (
-          <TableRow key={`answer-${row.answerId}`}>
-            <TableCell width="65%">{row.question.question}</TableCell>
-            <TableCell>{formatQuestionaryComponentAnswer(row)}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <>
+      <Table size="small" {...restProps}>
+        <TableBody>
+          {displayableQuestions.map(question => {
+            const renderers = getQuestionaryComponentDefinition(
+              question.question.dataType
+            ).renderers;
+
+            if (!renderers) {
+              return null;
+            }
+
+            const questionElem = renderers.questionRenderer({
+              question: question.question,
+            });
+            const answerElem = renderers.answerRenderer({
+              answer: question,
+            });
+
+            return (
+              <TableRow key={`answer-${question.answerId}`}>
+                <TableCell>{questionElem}</TableCell>
+                <TableCell width="35%">{answerElem}</TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </>
   );
 }
 

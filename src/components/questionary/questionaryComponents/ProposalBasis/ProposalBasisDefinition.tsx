@@ -19,7 +19,6 @@ export const proposalBasisDefinition: QuestionaryComponentDefinition = {
   readonly: true,
   creatable: false,
   icon: <QuestionAnswerIcon />,
-  answerRenderer: () => null,
   createYupValidationSchema: createProposalBasisValidationSchema,
   getYupInitialValue: ({ state }) => {
     const proposalState = state as ProposalSubmissionState;

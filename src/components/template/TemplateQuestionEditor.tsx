@@ -9,12 +9,15 @@ import {
   NotDraggingStyle,
 } from 'react-beautiful-dnd';
 
-import { getTemplateFieldIcon } from 'components/questionary/QuestionaryComponentRegistry';
+import {
+  getQuestionaryComponentDefinition,
+  getTemplateFieldIcon,
+} from 'components/questionary/QuestionaryComponentRegistry';
 import {
   DataType,
-  EmbellishmentConfig,
   FieldConfig,
   FieldDependency,
+  TemplateCategoryId,
 } from 'generated/sdk';
 
 export default function TemplateQuestionEditor(props: {
@@ -95,6 +98,10 @@ export default function TemplateQuestionEditor(props: {
     </>
   ) : null;
 
+  const questionDefinition = getQuestionaryComponentDefinition(
+    props.data.dataType
+  );
+
   return (
     <Draggable
       key={props.data.proposalQuestionId}
@@ -117,6 +124,7 @@ export default function TemplateQuestionEditor(props: {
           onClick={() => {
             props.onClick(props.data);
           }}
+          data-cy="question-container"
         >
           <Grid
             item
@@ -131,8 +139,10 @@ export default function TemplateQuestionEditor(props: {
           </Grid>
 
           <Grid item xs={10} className={classes.question}>
-            {props.data.dataType === DataType.EMBELLISHMENT
-              ? (props.data.config as EmbellishmentConfig).plain
+            {questionDefinition.renderers
+              ? questionDefinition.renderers.questionRenderer({
+                  question: props.data,
+                })
               : props.data.question}
           </Grid>
 
@@ -151,5 +161,6 @@ export interface TemplateTopicEditorData {
   naturalKey: string;
   dataType: DataType;
   dependency?: FieldDependency | null;
-  config?: FieldConfig | null;
+  config: FieldConfig;
+  categoryId: TemplateCategoryId;
 }

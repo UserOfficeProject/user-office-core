@@ -19,7 +19,6 @@ export const sampleBasisDefinition: QuestionaryComponentDefinition = {
   readonly: true,
   creatable: false,
   icon: <QuestionAnswerIcon />,
-  answerRenderer: () => null,
   createYupValidationSchema: createSampleBasisValidationSchema,
   getYupInitialValue: ({ state }) => {
     const sampleState = state as SampleSubmissionState;

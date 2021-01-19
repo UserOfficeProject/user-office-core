@@ -1,6 +1,7 @@
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import React from 'react';
 
+import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
@@ -18,10 +19,25 @@ export const intervalDefinition: QuestionaryComponentDefinition = {
   readonly: false,
   creatable: true,
   icon: <ArrowForwardIosIcon />,
-  answerRenderer: ({ answer }) => (
-    <span>{`${answer.value.min} - ${answer.value.max} ${answer.value.unit ||
-      ''}`}</span>
-  ),
+  renderers: {
+    answerRenderer: ({ answer }) => {
+      const isAnswered = answer.value.min || answer.value.min; // at least one answer
+      if (isAnswered) {
+        const min = answer.value.min;
+        const max = answer.value.min;
+        const unit = answer.value.unit || '';
+
+        return (
+          <span>
+            ${min} - ${max} ${unit}
+          </span>
+        );
+      }
+
+      return <span>Left blank</span>;
+    },
+    questionRenderer: defaultRenderer.questionRenderer,
+  },
   createYupValidationSchema: createIntervalValidationSchema,
   getYupInitialValue: ({ answer }) =>
     answer.value || { min: '', max: '', unit: 'unitless' },
