@@ -1,4 +1,5 @@
 import { Delete } from '@material-ui/icons';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -8,9 +9,11 @@ import {
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
 import UOLoader from 'components/common/UOLoader';
+import { ShipmentStatus } from 'generated/sdk';
 import { useShipments } from 'hooks/shipment/useShipments';
 import { ShipmentBasic } from 'models/ShipmentSubmissionState';
 import { tableIcons } from 'utils/materialIcons';
+import { timeAgo } from 'utils/Time';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -30,8 +33,36 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
   const columns = [
     { title: 'Title', field: 'title' },
     { title: 'Status', field: 'status' },
-    { title: 'Created', field: 'created' },
+    {
+      title: 'Created',
+      field: 'created',
+      render: (rowData: ShipmentBasic): string => timeAgo(rowData.created),
+    },
   ];
+
+  const deleteHandler = (shipmentToDelete: ShipmentBasic) => {
+    props.confirm(
+      () => {
+        api()
+          .deleteShipment({
+            shipmentId: shipmentToDelete.id,
+          })
+          .then(data => {
+            if (!data.deleteShipment.error) {
+              setShipments(
+                shipments.filter(
+                  shipment => shipment.id !== shipmentToDelete.id
+                )
+              );
+            }
+          });
+      },
+      {
+        title: 'Are you sure?',
+        description: `Are you sure you want to delete "${shipmentToDelete.title}"`,
+      }
+    )();
+  };
 
   const createModal = (
     onUpdate: Function,
@@ -51,6 +82,7 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
       <SuperMaterialTable
         setData={setShipments}
         createModal={createModal}
+        hasAccess={{ update: true, create: true, remove: true }}
         icons={tableIcons}
         title="Shipments"
         columns={columns}
@@ -59,35 +91,19 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
         urlQueryParams={urlQueryParams}
         setUrlQueryParams={setUrlQueryParams}
         actions={[
-          {
-            icon: Delete,
-            tooltip: 'Delete shipment',
-            onClick: (_event, rowData) =>
-              props.confirm(
-                () => {
-                  const shpmentToDelete = rowData as ShipmentBasic;
-                  api()
-                    .deleteShipment({
-                      shipmentId: shpmentToDelete.id,
-                    })
-                    .then(data => {
-                      if (!data.deleteShipment.error) {
-                        setShipments(
-                          shipments.filter(
-                            shipment => shipment.id !== shpmentToDelete.id
-                          )
-                        );
-                      }
-                    });
-                },
-                {
-                  title: 'Are you sure?',
-                  description: `Are you sure you want to delete "${
-                    (rowData as ShipmentBasic).title
-                  }"`,
+          rowData =>
+            rowData.status === ShipmentStatus.DRAFT
+              ? {
+                  icon: Delete,
+                  tooltip: 'Delete shipment',
+                  onClick: (_event, rowData) =>
+                    deleteHandler(rowData as ShipmentBasic),
                 }
-              )(),
-          },
+              : {
+                  icon: GetAppIcon,
+                  tooltip: 'Download label',
+                  onClick: (_event, rowData) => console.log('Download'),
+                },
         ]}
       />
     </div>

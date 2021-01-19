@@ -1,6 +1,6 @@
 import { proposalBasisPreSubmit } from 'components/questionary/questionaryComponents/ProposalBasis/QuestionaryComponentProposalBasis';
 import { sampleBasisPreSubmit } from 'components/questionary/questionaryComponents/SampleBasis/QuestionaryComponentSampleBasis';
-import { shipmentBasisPresubmit } from 'components/questionary/questionaryComponents/ShipmentBasis/QuestionaryComponentShipmentBasis';
+import { shipmentBasisPreSubmit } from 'components/questionary/questionaryComponents/ShipmentBasis/QuestionaryComponentShipmentBasis';
 import { Answer, DataType, Sdk } from 'generated/sdk';
 import {
   Event,
@@ -25,7 +25,7 @@ export function usePreSubmitActions() {
         case DataType.PROPOSAL_BASIS:
           return proposalBasisPreSubmit(answer);
         case DataType.SHIPMENT_BASIS:
-          return shipmentBasisPresubmit(answer);
+          return shipmentBasisPreSubmit(answer);
       }
 
       return [];

@@ -4,13 +4,13 @@ import {
   makeStyles,
   Select,
   TextField,
-  Typography,
 } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import React, { useContext, useState } from 'react';
 
 import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import ProposalErrorLabel from 'components/proposal/ProposalErrorLabel';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
@@ -47,10 +47,12 @@ const samplesToSampleIds = (samples: Pick<Sample, 'id'>[]) =>
 function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
   const {
     answer: {
-      question: { question },
+      question: { proposalQuestionId },
     },
+    formikProps: { errors },
   } = props;
 
+  const fieldErrors = errors[proposalQuestionId] as any;
   const classes = useStyles();
   const { state, dispatch } = useContext(
     QuestionaryContext
@@ -85,13 +87,10 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
 
   return (
     <div className={classes.container}>
-      <Typography component="h2" className={classes.text}>
-        {question}
-      </Typography>
       <FormControl className={classes.formControl}>
         <TextFieldNoSubmit
           value={title}
-          label="Description"
+          label="Title"
           onBlur={event => {
             handleChange({ title: event.target.value });
           }}
@@ -100,6 +99,7 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
           fullWidth
           data-cy="title-input"
         />
+        <ProposalErrorLabel>{fieldErrors?.title}</ProposalErrorLabel>
       </FormControl>
 
       {!loadingProposals && (
@@ -123,11 +123,12 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
               </MenuItem>
             ))}
           </Select>
+          <ProposalErrorLabel>{fieldErrors?.proposalId}</ProposalErrorLabel>
         </FormControl>
       )}
 
       {!loadingSamples && samples.length > 0 && (
-        <FormControl className={classes.formControl} required>
+        <FormControl className={classes.formControl}>
           <InputLabel id="sample-ids">Select samples</InputLabel>
           <Select
             labelId="sample-ids"
@@ -150,13 +151,14 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
               </MenuItem>
             ))}
           </Select>
+          <ProposalErrorLabel>{fieldErrors?.samples}</ProposalErrorLabel>
         </FormControl>
       )}
     </div>
   );
 }
 
-const shipmentBasisPresubmit = (answer: Answer) => async ({
+const shipmentBasisPreSubmit = (answer: Answer) => async ({
   api,
   dispatch,
   state,
@@ -206,4 +208,4 @@ const shipmentBasisPresubmit = (answer: Answer) => async ({
   return returnValue;
 };
 
-export { QuestionaryComponentShipmentBasis, shipmentBasisPresubmit };
+export { QuestionaryComponentShipmentBasis, shipmentBasisPreSubmit };

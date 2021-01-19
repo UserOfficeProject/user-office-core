@@ -1,5 +1,6 @@
 import DoneAll from '@material-ui/icons/DoneAll';
 import MaterialTable, { Options } from 'material-table';
+import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
@@ -38,6 +39,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     UserRole.SEP_CHAIR,
     UserRole.SEP_SECRETARY,
   ]);
+  const { enqueueSnackbar } = useSnackbar();
 
   const columns = [
     { title: 'Name', field: 'name' },
@@ -67,26 +69,39 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
 
   const submitInstrument = async () => {
     if (instrumentToSubmit) {
-      const { submitInstrument } = await api(
-        'Instrument submitted!'
-      ).submitInstrument({
-        callId: selectedCallId,
+      const response = await api().sepProposalsByInstrument({
         instrumentId: instrumentToSubmit.id,
         sepId: sepId,
+        callId: selectedCallId,
       });
+      const allProposalsOnInstrumentHaveRankings = response.sepProposalsByInstrument?.every(
+        ({ proposal }) => !!proposal.rankOrder
+      );
 
-      const isError = submitInstrument.error || !submitInstrument.isSuccess;
-
-      if (!isError) {
-        const newInstrumentsData = instrumentsData.map(instrument => {
-          if (instrument.id === instrumentToSubmit.id) {
-            return { ...instrument, submitted: true };
-          }
-
-          return instrument;
+      if (allProposalsOnInstrumentHaveRankings) {
+        const { submitInstrument } = await api(
+          'Instrument submitted!'
+        ).submitInstrument({
+          callId: selectedCallId,
+          instrumentId: instrumentToSubmit.id,
+          sepId: sepId,
         });
+        const isError = submitInstrument.error || !submitInstrument.isSuccess;
+        if (!isError) {
+          const newInstrumentsData = instrumentsData.map(instrument => {
+            if (instrument.id === instrumentToSubmit.id) {
+              return { ...instrument, submitted: true };
+            }
 
-        setInstrumentsData(newInstrumentsData);
+            return instrument;
+          });
+          setInstrumentsData(newInstrumentsData);
+        }
+      } else {
+        enqueueSnackbar('All proposals must have rankings', {
+          variant: 'error',
+          className: 'snackbar-error',
+        });
       }
 
       setInstrumentToSubmit(null);

@@ -1,10 +1,13 @@
-import { Checkbox, Select } from '@material-ui/core';
+import Checkbox from '@material-ui/core/Checkbox';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import FormLabel from '@material-ui/core/FormLabel';
+import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
+import Select from '@material-ui/core/Select';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { useEffect, useState } from 'react';
@@ -20,26 +23,20 @@ const toArray = (input: string | string[]): string[] => {
   return input;
 };
 
+const useStyles = makeStyles(theme => ({
+  horizontalLayout: {
+    flexDirection: 'row',
+  },
+  verticalLayout: {
+    flexDirection: 'column',
+  },
+  radioGroupSpacing: {
+    marginBottom: -theme.spacing(1),
+  },
+}));
+
 export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
-  const classes = makeStyles({
-    horizontalLayout: {
-      flexDirection: 'row',
-    },
-    verticalLayout: {
-      flexDirection: 'column',
-    },
-    wrapper: {
-      margin: '18px 0 0 0',
-      display: 'inline-flex',
-    },
-    label: {
-      marginTop: '10px',
-      marginRight: '5px',
-    },
-    dropdown: {
-      width: 350,
-    },
-  })();
+  const classes = useStyles();
 
   const {
     answer,
@@ -72,20 +69,45 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     }
   };
 
+  const label = (
+    <>
+      {question}
+      {config.small_label && (
+        <>
+          <br />
+          <small>{config.small_label}</small>
+        </>
+      )}
+    </>
+  );
+
   switch (config.variant) {
     case 'dropdown':
       return (
-        <FormControl fullWidth>
+        <FormControl
+          fullWidth
+          required={config.required}
+          error={isError}
+          margin="dense"
+        >
+          <InputLabel id={`questionary-${proposalQuestionId}`}>
+            {label}
+          </InputLabel>
           <Select
-            className={classes.dropdown}
             id={proposalQuestionId}
-            value={config.isMultipleSelect ? stateValue : stateValue[0]}
+            value={
+              config.isMultipleSelect
+                ? stateValue
+                : stateValue.length > 0
+                ? stateValue[0]
+                : ''
+            }
             onChange={evt =>
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
             }
             multiple={config.isMultipleSelect}
-            label={question}
-            required={config.required ? true : false}
+            labelId={`questionary-${proposalQuestionId}`}
+            required={config.required}
             renderValue={item =>
               config.isMultipleSelect
                 ? (item as string[]).join(', ')
@@ -105,18 +127,19 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
               );
             })}
           </Select>
+          {isError && <FormHelperText>{fieldError}</FormHelperText>}
         </FormControl>
       );
 
     default:
       return (
         <FormControl
-          className={classes.wrapper}
-          required={config.required ? true : false}
+          required={config.required}
           error={isError}
+          margin="dense"
+          className={classes.radioGroupSpacing}
         >
-          <FormLabel className={classes.label}>{question}</FormLabel>
-          <span>{config.small_label}</span>
+          <FormLabel>{label}</FormLabel>
           <RadioGroup
             id={proposalQuestionId}
             name={proposalQuestionId}
@@ -141,6 +164,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
               );
             })}
           </RadioGroup>
+          {isError && <FormHelperText>{fieldError}</FormHelperText>}
         </FormControl>
       );
   }

@@ -70,9 +70,11 @@ export default function PeoplePage() {
               ) : (
                 <PeopleTable
                   title="Users"
-                  actionText="Edit user"
-                  actionIcon={<Edit />}
-                  action={setUserData}
+                  action={{
+                    fn: setUserData,
+                    actionText: 'Edit user',
+                    actionIcon: <Edit />,
+                  }}
                   selection={false}
                   invitationButtons={invitationButtons}
                   onRemove={(user: { id: number }) =>

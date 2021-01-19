@@ -5,41 +5,42 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
 import React from 'react';
 
-import { QuestionariesListItem } from './QuestionariesListItem';
+import { QuestionnairesListItem } from './QuestionnairesListItem';
 
-export interface QuestionariesListRow {
+export interface QuestionnairesListRow {
   id: number;
   label: string;
   isCompleted: boolean;
 }
-export interface QuestionariesListProps {
+export interface QuestionnairesListProps {
   onAddNewClick?: () => void;
-  onDeleteClick?: (record: QuestionariesListRow) => void;
-  onEditClick?: (record: QuestionariesListRow) => void;
-  onCloneClick?: (record: QuestionariesListRow) => void;
-  data: Array<QuestionariesListRow>;
+  onDeleteClick?: (record: QuestionnairesListRow) => void;
+  onEditClick?: (record: QuestionnairesListRow) => void;
+  onCloneClick?: (record: QuestionnairesListRow) => void;
+  data: Array<QuestionnairesListRow>;
   addButtonLabel?: string;
 }
 
 const useStyles = makeStyles(() => ({
-  questionariesList: {
-    maxWidth: '300px',
-    listStyle: 'none',
+  questionnairesList: {
+    maxWidth: '440px',
     padding: 0,
     marginBottom: 0,
     '& li': {
       paddingLeft: 0,
+      paddingRight: 0,
     },
   },
 }));
-export function QuestionariesList(props: QuestionariesListProps) {
+
+export function QuestionnairesList(props: QuestionnairesListProps) {
   const classes = useStyles();
 
   return (
-    <List component="ul" className={classes.questionariesList}>
+    <List component="ul" className={classes.questionnairesList}>
       {props.data.map(record => {
         return (
-          <QuestionariesListItem
+          <QuestionnairesListItem
             record={record}
             onEditClick={record => props.onEditClick?.(record)}
             onDeleteClick={record => props.onDeleteClick?.(record)}

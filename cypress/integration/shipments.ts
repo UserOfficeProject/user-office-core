@@ -88,6 +88,38 @@ context('Shipments tests', () => {
     cy.contains('OK').click();
   });
 
+  it('Should be able to delete shipment', () => {
+    cy.login('user');
+
+    cy.contains('My shipment').click();
+
+    cy.get('[data-cy=create-new-entry]').click();
+
+    cy.get('[data-cy=title-input] input')
+      .click()
+      .clear()
+      .type(shipmentTitle)
+      .should('have.value', shipmentTitle);
+
+    cy.get('[data-cy=select-proposal-dropdown]').click();
+
+    cy.contains(proposalTitle).click();
+
+    cy.get('[data-cy=save-and-continue-button]').click();
+
+    cy.reload();
+
+    cy.contains(shipmentTitle)
+      .parent()
+      .get("[title='Delete shipment']")
+      .first()
+      .click();
+
+    cy.contains('OK').click();
+
+    cy.should('not.contain', shipmentTitle);
+  });
+
   it('Should be able to declare shipment', () => {
     cy.login('user');
 
@@ -113,26 +145,10 @@ context('Shipments tests', () => {
 
     cy.get('[data-cy=save-and-continue-button]').click();
 
-    cy.contains('Finish').click();
+    cy.contains('Submit').click();
 
     cy.contains('OK').click();
 
-    cy.contains(shipmentTitle).click();
-  });
-
-  it('Should be able to delete shipment', () => {
-    cy.login('user');
-
-    cy.contains('My shipment').click();
-
-    cy.contains(shipmentTitle)
-      .parent()
-      .get("[title='Delete shipment']")
-      .first()
-      .click();
-
-    cy.contains('OK').click();
-
-    cy.get('[data-cy=shipments-table]').should('not.contain', shipmentTitle);
+    cy.contains(shipmentTitle);
   });
 });

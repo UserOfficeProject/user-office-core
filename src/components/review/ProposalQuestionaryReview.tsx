@@ -8,7 +8,7 @@ import React, { Fragment, HTMLAttributes } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
-import { ProposalSubsetSumbission } from 'models/ProposalSubmissionState';
+import { ProposalSubsetSubmission } from 'models/ProposalSubmissionState';
 
 const useStyles = makeStyles(theme => ({
   heading: {
@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function ProposalQuestionaryReview(
   props: HTMLAttributes<any> & {
-    data: ProposalSubsetSumbission;
+    data: ProposalSubsetSubmission;
   }
 ) {
   const classes = useStyles();
@@ -34,11 +34,11 @@ export default function ProposalQuestionaryReview(
       <Typography variant="h6" className={classes.heading} gutterBottom>
         Proposal information
       </Typography>
-      <Table>
+      <Table size="small">
         <TableBody>
           <TableRow key="proposal-id">
             <TableCell>Proposal ID</TableCell>
-            <TableCell>{props.data.shortCode}</TableCell>
+            <TableCell width="35%">{props.data.shortCode}</TableCell>
           </TableRow>
           <TableRow key="title">
             <TableCell>Title</TableCell>
@@ -48,11 +48,11 @@ export default function ProposalQuestionaryReview(
             <TableCell>Abstract</TableCell>
             <TableCell>{props.data.abstract}</TableCell>
           </TableRow>
-          <TableRow key="principalinvestigator">
+          <TableRow key="principal-investigator">
             <TableCell>Principal Investigator</TableCell>
             <TableCell>{`${props.data.proposer.firstname} ${props.data.proposer.lastname}`}</TableCell>
           </TableRow>
-          <TableRow key="coproposers">
+          <TableRow key="co-proposers">
             <TableCell>Co-Proposers</TableCell>
             <TableCell>
               {users

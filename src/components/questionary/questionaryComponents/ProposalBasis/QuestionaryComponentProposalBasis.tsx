@@ -1,4 +1,3 @@
-import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { ErrorMessage, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -25,9 +24,8 @@ const useStyles = makeStyles(theme => ({
     pointerEvents: 'none',
     opacity: 0.7,
   },
-  pi: {
-    marginTop: '30px',
-    marginBottom: '30px',
+  container: {
+    margin: theme.spacing(1, 0),
   },
   error: {
     color: theme.palette.error.main,
@@ -59,55 +57,55 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
 
   return (
     <div>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Field
-            name={`${proposalQuestionId}.title`}
-            label="Title"
-            inputProps={{
-              onChange: (event: ChangeEvent<HTMLInputElement>) =>
-                setLocalTitle(event.target.value),
-              onBlur: () => {
-                dispatch({
-                  type: EventType.PROPOSAL_MODIFIED,
-                  payload: {
-                    proposal: { ...state.proposal, title: localTitle },
-                  },
-                });
-              },
-            }}
-            required
-            fullWidth
-            component={TextField}
-            data-cy="title"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Field
-            name={`${proposalQuestionId}.abstract`}
-            label="Abstract"
-            inputProps={{
-              onChange: (event: ChangeEvent<HTMLInputElement>) =>
-                setLocalAbstract(event.target.value),
-              onBlur: () => {
-                dispatch({
-                  type: EventType.PROPOSAL_MODIFIED,
-                  payload: {
-                    proposal: { ...state.proposal, abstract: localAbstract },
-                  },
-                });
-              },
-            }}
-            required
-            multiline
-            rowsMax="16"
-            rows="4"
-            fullWidth
-            component={TextFieldNoSubmit}
-            data-cy="abstract"
-          />
-        </Grid>
-      </Grid>
+      <div className={classes.container}>
+        <Field
+          name={`${proposalQuestionId}.title`}
+          label="Title"
+          inputProps={{
+            onChange: (event: ChangeEvent<HTMLInputElement>) =>
+              setLocalTitle(event.target.value),
+            onBlur: () => {
+              dispatch({
+                type: EventType.PROPOSAL_MODIFIED,
+                payload: {
+                  proposal: { ...state.proposal, title: localTitle },
+                },
+              });
+            },
+          }}
+          required
+          fullWidth
+          component={TextField}
+          data-cy="title"
+          margin="dense"
+        />
+      </div>
+      <div className={classes.container}>
+        <Field
+          name={`${proposalQuestionId}.abstract`}
+          label="Abstract"
+          inputProps={{
+            onChange: (event: ChangeEvent<HTMLInputElement>) =>
+              setLocalAbstract(event.target.value),
+            onBlur: () => {
+              dispatch({
+                type: EventType.PROPOSAL_MODIFIED,
+                payload: {
+                  proposal: { ...state.proposal, abstract: localAbstract },
+                },
+              });
+            },
+          }}
+          required
+          multiline
+          rowsMax="16"
+          rows="4"
+          fullWidth
+          component={TextFieldNoSubmit}
+          data-cy="abstract"
+          margin="dense"
+        />
+      </div>
       <ProposalParticipant
         userChanged={(user: BasicUserDetails) => {
           formikProps.setFieldValue(`${proposalQuestionId}.proposer`, user.id);
@@ -116,12 +114,11 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             payload: { proposal: { ...state.proposal, proposer: user } },
           });
         }}
-        title="Principal investigator"
-        className={classes.pi}
+        className={classes.container}
         userId={proposer.id}
       />
       <ProposalParticipants
-        error={false} // FIXME
+        className={classes.container}
         setUsers={(users: BasicUserDetails[]) => {
           formikProps.setFieldValue(
             `${proposalQuestionId}.users`,
