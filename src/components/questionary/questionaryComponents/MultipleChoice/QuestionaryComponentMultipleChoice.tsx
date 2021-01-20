@@ -1,4 +1,3 @@
-import Checkbox from '@material-ui/core/Checkbox';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -12,6 +11,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { useEffect, useState } from 'react';
 
+import MultiMenuItem from 'components/common/MultiMenuItem';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { SelectionFromOptionsConfig } from 'generated/sdk';
 
@@ -61,14 +61,6 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     onComplete(newValue);
   };
 
-  const getCheckbox = (option: string) => {
-    if (config.isMultipleSelect) {
-      return <Checkbox checked={stateValue.includes(option)} />;
-    } else {
-      return null;
-    }
-  };
-
   const label = (
     <>
       {question}
@@ -80,6 +72,8 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
       )}
     </>
   );
+
+  const SelectMenuItem = config.isMultipleSelect ? MultiMenuItem : MenuItem;
 
   switch (config.variant) {
     case 'dropdown':
@@ -120,10 +114,9 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
           >
             {config.options.map(option => {
               return (
-                <MenuItem value={option} key={option}>
-                  {getCheckbox(option)}
+                <SelectMenuItem value={option} key={option}>
                   {option}
-                </MenuItem>
+                </SelectMenuItem>
               );
             })}
           </Select>

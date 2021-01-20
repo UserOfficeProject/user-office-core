@@ -8,6 +8,7 @@ import {
 import MenuItem from '@material-ui/core/MenuItem';
 import React, { useContext, useState } from 'react';
 
+import MultiMenuItem from 'components/common/MultiMenuItem';
 import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import ProposalErrorLabel from 'components/proposal/ProposalErrorLabel';
@@ -146,9 +147,9 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
             data-cy="samples-dropdown"
           >
             {samples.map(sample => (
-              <MenuItem key={sample.id} value={sample.id}>
+              <MultiMenuItem key={sample.id} value={sample.id}>
                 {sample.title}
-              </MenuItem>
+              </MultiMenuItem>
             ))}
           </Select>
           <ProposalErrorLabel>{fieldErrors?.samples}</ProposalErrorLabel>

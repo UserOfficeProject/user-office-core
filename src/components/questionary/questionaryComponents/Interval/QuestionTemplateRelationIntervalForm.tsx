@@ -89,6 +89,7 @@ export const QuestionTemplateRelationIntervalForm: FormComponent<QuestionTemplat
             <Field
               name="config.units"
               component={FormikUICustomSelect}
+              multiple
               label="Units"
               margin="normal"
               availableOptions={

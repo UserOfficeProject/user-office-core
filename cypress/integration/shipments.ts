@@ -52,6 +52,8 @@ context('Shipments tests', () => {
 
     cy.createTemplate('sample', sampleTemplateName, sampleTemplateDescription);
 
+    cy.visit('/');
+
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
     cy.contains('default template')
