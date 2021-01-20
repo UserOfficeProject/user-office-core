@@ -1,15 +1,11 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { Role } from '../../models/Role';
 import { Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import database from '../postgres/database';
-import {
-  UserRecord,
-  createUserObject,
-  RoleRecord,
-  ProposalUserRecord,
-} from '../postgres/records';
+import { UserRecord, createUserObject, RoleRecord } from '../postgres/records';
 import { UserDataSource } from '../UserDataSource';
 import UOWSSoapClient from './UOWSSoapInterface';
 
@@ -102,18 +98,22 @@ export class StfcDataSource implements UserDataSource {
   async getProposalUsersFull(proposalId: number): Promise<User[]> {
     return database
       .select()
-      .from('proposal_user as pc')
+      .from('users as u')
+      .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
       .join('proposals as p', { 'p.proposal_id': 'pc.proposal_id' })
       .where('p.proposal_id', proposalId)
-      .then(async (proposalUsers: ProposalUserRecord[]) => {
-        const userNumbers: string[] = proposalUsers.map(proposalUser =>
-          String(proposalUser.user_id)
-        );
-        const stfcBasicPeople: StfcBasicPersonDetails[] = (
-          await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
-        ).return;
+      .then(async (users: UserRecord[]) => {
+        const userNumbers: string[] = users.map(user => String(user.user_id));
 
-        return stfcBasicPeople.map(person => toEssUser(person));
+        const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
+          await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+        )?.return;
+
+        if (stfcBasicPeople) {
+          return stfcBasicPeople.map(person => toEssUser(person));
+        } else {
+          return Promise.resolve([]);
+        }
       });
   }
 
@@ -338,18 +338,22 @@ export class StfcDataSource implements UserDataSource {
   async getProposalUsers(proposalId: number): Promise<BasicUserDetails[]> {
     return database
       .select()
-      .from('proposal_user as pc')
+      .from('users as u')
+      .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
       .join('proposals as p', { 'p.proposal_id': 'pc.proposal_id' })
       .where('p.proposal_id', proposalId)
-      .then(async (proposalUsers: ProposalUserRecord[]) => {
-        const userNumbers: string[] = proposalUsers.map(proposalUser =>
-          String(proposalUser.user_id)
-        );
-        const stfcBasicPeople: StfcBasicPersonDetails[] = (
-          await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
-        ).return;
+      .then(async (users: UserRecord[]) => {
+        const userNumbers: string[] = users.map(user => String(user.user_id));
 
-        return stfcBasicPeople.map(person => toEssBasicUserDetails(person));
+        const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
+          await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+        )?.return;
+
+        if (stfcBasicPeople) {
+          return stfcBasicPeople.map(person => toEssBasicUserDetails(person));
+        } else {
+          return Promise.resolve([]);
+        }
       });
   }
 
