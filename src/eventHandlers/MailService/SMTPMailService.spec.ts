@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import * as path from 'path';
 
+import dotenv from 'dotenv';
+
 import EmailSettings from './EmailSettings';
 import { SMTPMailService } from './SMTPMailService';
 
-test('Return result should be void to indicate all emails successfully sent', async () => {
+jest.mock('email-templates');
+
+test('Return result should indicate all emails were successfully sent', async () => {
   const options: EmailSettings = {
     content: {
       template_id: path.resolve('src', 'eventHandlers', 'emails', 'submit'),
@@ -19,22 +23,21 @@ test('Return result should be void to indicate all emails successfully sent', as
     },
     recipients: [
       {
-        address: {
-          email: 'john.doe@email.com',
-          header_to: 'john.doe@email.com',
-        },
-      },
-      {
-        address: {
-          email: 'jane.doe@email.com',
-          header_to: 'jane.doe@email.com',
-        },
+        address: 'john.doe@email.com',
       },
     ],
   };
 
+  dotenv.config();
+
   const smtpMailService: SMTPMailService = new SMTPMailService();
   const result = await smtpMailService.sendMail(options);
 
-  return expect(result).toBe('Emails sent');
+  return expect(result).toStrictEqual({
+    results: {
+      id: 'test',
+      total_accepted_recipients: 1,
+      total_rejected_recipients: 0,
+    },
+  });
 });

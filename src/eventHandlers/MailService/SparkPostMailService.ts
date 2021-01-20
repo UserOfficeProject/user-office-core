@@ -2,7 +2,7 @@
 import SparkPost from 'sparkpost';
 
 import EmailSettings from './EmailSettings';
-import MailService from './MailService';
+import { MailService, SendMailResults } from './MailService';
 
 export class SparkPostMailService extends MailService {
   private client: SparkPost;
@@ -15,13 +15,9 @@ export class SparkPostMailService extends MailService {
 
   sendMail = (
     options: EmailSettings
-  ):
-    | Promise<void>
-    | SparkPost.ResultsPromise<{
-        total_rejected_recipients: number;
-        total_accepted_recipients: number;
-        id: string;
-      }> => {
+  ): Promise<{
+    results: SendMailResults;
+  }> => {
     options.content.template_id = this.template_id;
 
     return this.client.transmissions.send(options);

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import * as dotenv from 'dotenv';
-import SparkPost from 'sparkpost';
 
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -9,24 +8,22 @@ import { ProposalEndStatus } from '../models/Proposal';
 import { UserRole } from '../models/User';
 import { logger } from '../utils/Logger';
 import EmailSettings from './MailService/EmailSettings';
-import MailService from './MailService/MailService';
+import { MailService } from './MailService/MailService';
 import { SMTPMailService } from './MailService/SMTPMailService';
 import { SparkPostMailService } from './MailService/SparkPostMailService';
 
 const options = {
   endpoint: 'https://api.eu.sparkpost.com:443',
 };
-const client = new SparkPost(process.env.SPARKPOST_TOKEN, options);
 
-// Decide whether to use STFC's SMTP server to send mail or ESS's SparkPost solution
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
 
 const mailService: MailService =
-  process.env.EMAIL_PROTOCOL === 'SPARK'
-    ? new SparkPostMailService(options)
-    : new SMTPMailService();
+  process.env.EMAIL_PROTOCOL === 'SMTP'
+    ? new SMTPMailService()
+    : new SparkPostMailService(options);
 
 export default function createHandler(userDataSource: UserDataSource) {
   // Handler to send email to proposers in accepted proposal
@@ -40,8 +37,8 @@ export default function createHandler(userDataSource: UserDataSource) {
 
     switch (event.type) {
       case Event.USER_PASSWORD_RESET_EMAIL: {
-        client.transmissions
-          .send({
+        mailService
+          .sendMail({
             content: {
               template_id: 'user-office-account-reset-password',
             },
@@ -80,8 +77,8 @@ export default function createHandler(userDataSource: UserDataSource) {
           return;
         }
 
-        client.transmissions
-          .send({
+        mailService
+          .sendMail({
             content: {
               template_id:
                 event.emailinviteresponse.role === UserRole.USER
@@ -134,7 +131,7 @@ export default function createHandler(userDataSource: UserDataSource) {
             call: '',
           },
           recipients: [
-            { address: { email: principalInvestigator.email } },
+            { address: principalInvestigator.email },
             ...participants.map(partipant => {
               return {
                 address: {
@@ -145,7 +142,7 @@ export default function createHandler(userDataSource: UserDataSource) {
             }),
           ],
         };
-        /*
+
         mailService
           .sendMail(options)
           .then((res: any) => {
@@ -159,7 +156,7 @@ export default function createHandler(userDataSource: UserDataSource) {
               error: err,
               event,
             });
-          });*/
+          });
 
         return;
       }
@@ -171,8 +168,8 @@ export default function createHandler(userDataSource: UserDataSource) {
           );
           console.log('verify user without email in development');
         } else {
-          client.transmissions
-            .send({
+          mailService
+            .sendMail({
               content: {
                 template_id: 'user-office-account-verification',
               },
@@ -220,8 +217,8 @@ export default function createHandler(userDataSource: UserDataSource) {
           return;
         }
 
-        client.transmissions
-          .send({
+        mailService
+          .sendMail({
             content: {
               template_id,
             },

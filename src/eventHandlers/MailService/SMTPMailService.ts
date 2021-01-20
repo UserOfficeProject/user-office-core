@@ -3,11 +3,9 @@ import * as path from 'path';
 
 import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
-import SparkPost from 'sparkpost';
 
-import { logger } from '../../utils/Logger';
 import EmailSettings from './EmailSettings';
-import MailService from './MailService';
+import { MailService, SendMailResults } from './MailService';
 
 export class SMTPMailService extends MailService {
   private _email: EmailTemplates<any>;
@@ -18,58 +16,78 @@ export class SMTPMailService extends MailService {
 
     this._email = new EmailTemplates({
       message: {
-        from: 'user.office@stfc.ac.uk',
+        from: process.env.EMAIL_SENDER || 'user.office@stfc.ac.uk',
       },
       send: true,
       transport: nodemailer.createTransport({
-        host: 'smtp.mailtrap.io',
-        port: 2525,
-        auth: {
-          user: '4e566b2f85570d',
-          pass: '8db2bccf645b15',
-        },
+        host: process.env.EMAIL_AUTH_HOST || 'exchsmtp.stfc.ac.uk',
+        port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
+        ...(process.env.EMAIL_AUTH_USERNAME && process.env.EMAIL_AUTH_PASSWORD
+          ? {
+              auth: {
+                user: process.env.EMAIL_AUTH_USERNAME,
+                pass: process.env.EMAIL_AUTH_PASSWORD,
+              },
+            }
+          : {}),
       }),
     });
   }
 
   sendMail(
     options: EmailSettings
-  ):
-    | Promise<void>
-    | SparkPost.ResultsPromise<{
-        total_rejected_recipients: number;
-        total_accepted_recipients: number;
-        id: string;
-      }> {
+  ): Promise<{
+    results: SendMailResults;
+  }> {
+    const emailPromises: Promise<SendMailResults>[] = [];
+
+    const sendMailResults: SendMailResults = {
+      total_rejected_recipients: 0,
+      total_accepted_recipients: 0,
+      id: Math.random()
+        .toString(36)
+        .substring(7),
+    };
+
+    if (process.env.NODE_ENV !== 'production') {
+      sendMailResults.id = 'test';
+    }
+
     options.content.template_id = this.template_id;
 
-    // Resolve promise if all emails are successfully sent
-    return new Promise<void>(
-      (resolve: (msg: any) => void, reject: (err: Error) => void) => {
-        options.recipients.forEach((participant, index) => {
-          this._email
-            .send({
-              template: options.content.template_id,
-              message: {
-                to: participant.address.email,
-              },
-              locals: options.substitution_data,
-            })
-            .then(() => {
-              if (index === options.recipients.length - 1)
-                resolve('Emails sent');
-            })
-            .catch((err: Error) => {
-              reject(err);
-              logger.logError(
-                `Failed to send email to ${participant.address.email}`,
-                {
-                  error: err,
+    options.recipients.forEach(participant => {
+      emailPromises.push(
+        this._email.send({
+          template: options.content.template_id,
+          message: {
+            ...(typeof participant.address !== 'string'
+              ? {
+                  to: {
+                    address: participant.address.email,
+                    name: participant.address.header_to,
+                  },
                 }
-              );
-            });
-        });
-      }
-    );
+              : {
+                  to: participant.address,
+                }),
+          },
+          locals: options.substitution_data,
+        })
+      );
+    });
+
+    return Promise.allSettled(emailPromises).then(results => {
+      results.forEach(result => {
+        if (result.status === 'rejected') {
+          sendMailResults.total_rejected_recipients++;
+        } else {
+          sendMailResults.total_accepted_recipients++;
+        }
+      });
+
+      return sendMailResults.total_rejected_recipients > 0
+        ? Promise.reject({ results: sendMailResults })
+        : Promise.resolve({ results: sendMailResults });
+    });
   }
 }
