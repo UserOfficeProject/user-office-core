@@ -16,11 +16,11 @@ export class SMTPMailService extends MailService {
 
     this._email = new EmailTemplates({
       message: {
-        from: process.env.EMAIL_SENDER || 'user.office@stfc.ac.uk',
+        from: process.env.EMAIL_SENDER,
       },
       send: true,
       transport: nodemailer.createTransport({
-        host: process.env.EMAIL_AUTH_HOST || 'exchsmtp.stfc.ac.uk',
+        host: process.env.EMAIL_AUTH_HOST,
         port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
         ...(process.env.EMAIL_AUTH_USERNAME && process.env.EMAIL_AUTH_PASSWORD
           ? {
