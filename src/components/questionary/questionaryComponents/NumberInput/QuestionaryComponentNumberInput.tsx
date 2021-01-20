@@ -33,9 +33,6 @@ const useStyles = makeStyles(theme => ({
     fontStyle: 'italic',
     color: '#999',
   },
-  container: {
-    paddingBottom: theme.spacing(2),
-  },
 }));
 
 type AcceptableUserInput = number | '';
@@ -101,7 +98,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
 
   return (
     <FormControl error={isError} required={config.required ? true : false}>
-      <Grid container className={classes.container}>
+      <Grid container>
         <Grid item xs={12}>
           <FormLabel className={classes.label}>{question}</FormLabel>
           {config.small_label ? (
