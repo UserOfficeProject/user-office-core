@@ -290,6 +290,17 @@ export type EventLog = {
   changedBy: User;
 };
 
+export type Feature = {
+  __typename?: 'Feature';
+  id: FeatureId;
+  isEnabled: Scalars['Boolean'];
+  description: Scalars['String'];
+};
+
+export enum FeatureId {
+  SHIPPING = 'SHIPPING'
+}
+
 export type FieldCondition = {
   __typename?: 'FieldCondition';
   condition: EvaluatorOperator;
@@ -1336,6 +1347,7 @@ export type Query = {
   call: Maybe<Call>;
   checkEmailExist: Maybe<Scalars['Boolean']>;
   eventLogs: Maybe<Array<EventLog>>;
+  features: Array<Feature>;
   fileMetadata: Maybe<Array<FileMetadata>>;
   getFields: Maybe<Fields>;
   getOrcIDInformation: Maybe<OrcIdInformation>;
@@ -2416,6 +2428,17 @@ export type DeleteInstitutionMutation = (
       & Pick<Institution, 'id' | 'verified'>
     )> }
   ) }
+);
+
+export type GetFeaturesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetFeaturesQuery = (
+  { __typename?: 'Query' }
+  & { features: Array<(
+    { __typename?: 'Feature' }
+    & Pick<Feature, 'id' | 'isEnabled' | 'description'>
+  )> }
 );
 
 export type GetInstitutionsQueryVariables = Exact<{
@@ -5456,6 +5479,15 @@ export const DeleteInstitutionDocument = gql`
   }
 }
     `;
+export const GetFeaturesDocument = gql`
+    query getFeatures {
+  features {
+    id
+    isEnabled
+    description
+  }
+}
+    `;
 export const GetInstitutionsDocument = gql`
     query getInstitutions($filter: InstitutionsFilter) {
   institutions(filter: $filter) {
@@ -6931,6 +6963,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     deleteInstitution(variables: DeleteInstitutionMutationVariables): Promise<DeleteInstitutionMutation> {
       return withWrapper(() => client.request<DeleteInstitutionMutation>(print(DeleteInstitutionDocument), variables));
+    },
+    getFeatures(variables?: GetFeaturesQueryVariables): Promise<GetFeaturesQuery> {
+      return withWrapper(() => client.request<GetFeaturesQuery>(print(GetFeaturesDocument), variables));
     },
     getInstitutions(variables?: GetInstitutionsQueryVariables): Promise<GetInstitutionsQuery> {
       return withWrapper(() => client.request<GetInstitutionsQuery>(print(GetInstitutionsDocument), variables));
