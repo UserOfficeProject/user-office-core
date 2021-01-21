@@ -7,3 +7,7 @@ const adminQueries = new AdminQueries(new AdminDataSourceMock());
 test('A user can get page text', () => {
   return expect(adminQueries.getPageText(1)).resolves.toBe('HELLO WORLD');
 });
+
+test('A user can features', () => {
+  return expect(adminQueries.getFeatures()).resolves.toHaveLength(1);
+});

@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import { logger } from '@esss-swap/duo-logger';
 
 import { Page } from '../../models/Admin';
+import { Feature } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { BasicUserDetails } from '../../models/User';
 import { AdminDataSource, Entry } from '../AdminDataSource';
@@ -10,12 +11,15 @@ import { InstitutionsFilter } from './../../resolvers/queries/InstitutionsQuery'
 import database from './database';
 import {
   CountryRecord,
+  createBasicUserObject,
+  createFeatureObject,
   createPageObject,
+  FeatureRecord,
   InstitutionRecord,
   NationalityRecord,
   PagetextRecord,
+  UserRecord,
 } from './records';
-import { UserRecord, createBasicUserObject } from './records';
 
 export default class PostgresAdminDataSource implements AdminDataSource {
   async updateInstitution(
@@ -225,5 +229,14 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         resolve(log.join('\n'));
       });
     });
+  }
+
+  getFeatures(): Promise<Feature[]> {
+    return database
+      .select()
+      .from('features')
+      .then((features: FeatureRecord[]) =>
+        features.map(feature => createFeatureObject(feature))
+      );
   }
 }

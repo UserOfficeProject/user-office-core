@@ -2,6 +2,7 @@ import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { Call } from '../../models/Call';
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
+import { Feature, FeatureId } from '../../models/Feature';
 import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
@@ -397,6 +398,12 @@ export interface ProposalEventsRecord {
   readonly proposal_notified: boolean;
 }
 
+export interface FeatureRecord {
+  readonly feature_id: string;
+  readonly is_enabled: boolean;
+  readonly description: string;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
@@ -646,5 +653,13 @@ export const createShipmentObject = (shipment: ShipmentRecord) => {
     shipment.status as ShipmentStatus,
     shipment.external_ref,
     shipment.created_at
+  );
+};
+
+export const createFeatureObject = (record: FeatureRecord) => {
+  return new Feature(
+    record.feature_id as FeatureId,
+    record.is_enabled,
+    record.description
   );
 };
