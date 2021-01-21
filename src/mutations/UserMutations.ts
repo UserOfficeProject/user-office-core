@@ -404,7 +404,6 @@ export default class UserMutations {
         dummyUser = await this.dataSource.createDummyUser(userNumber);
       }
 
-      // TODO: this should get the user's roles rather than all roles
       const roles = await this.dataSource.getUserRoles(dummyUser.id);
 
       const proposalsToken = signToken<AuthJwtPayload>({
