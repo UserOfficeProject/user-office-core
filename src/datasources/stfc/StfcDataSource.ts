@@ -109,20 +109,18 @@ export class StfcDataSource implements UserDataSource {
           await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
         )?.return;
 
-        if (stfcBasicPeople) {
-          return stfcBasicPeople.map(person => toEssUser(person));
-        } else {
-          return Promise.resolve([]);
-        }
+        return stfcBasicPeople
+          ? stfcBasicPeople.map(person => toEssUser(person))
+          : Promise.resolve([]);
       });
   }
 
-  async getBasicUserInfo(
-    id: number
-  ): Promise<import('../../models/User').BasicUserDetails | null> {
-    return toEssBasicUserDetails(
-      (await client.getBasicPersonDetailsFromUserNumber(token, id)).return
-    );
+  async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
+    const stfcUser = (
+      await client.getBasicPersonDetailsFromUserNumber(token, id)
+    )?.return;
+
+    return stfcUser ? toEssBasicUserDetails(stfcUser) : null;
   }
 
   async checkOrcIDExist(orcID: string): Promise<boolean> {
@@ -130,9 +128,7 @@ export class StfcDataSource implements UserDataSource {
   }
 
   async checkEmailExist(email: string): Promise<boolean> {
-    return (
-      (await client.getBasicPersonDetailsFromEmail(token, email).return) != null
-    );
+    return (await client.getBasicPersonDetailsFromEmail(token, email)) != null;
   }
 
   async getPasswordByEmail(email: string): Promise<string> {
@@ -163,15 +159,18 @@ export class StfcDataSource implements UserDataSource {
   }
 
   async getByEmail(email: string): Promise<User | null> {
-    return toEssUser(
-      (await client.getBasicPersonDetailsFromEmail(token, email)).return
-    );
+    const stfcUser = (await client.getBasicPersonDetailsFromEmail(token, email))
+      ?.return;
+
+    return stfcUser ? toEssUser(stfcUser) : null;
   }
 
   async getByUsername(username: string): Promise<User | null> {
-    return toEssUser(
-      (await client.getBasicPersonDetailsFromEmail(token, username)).return
-    );
+    const stfcUser = (
+      await client.getBasicPersonDetailsFromEmail(token, username)
+    )?.return;
+
+    return stfcUser ? toEssUser(stfcUser) : null;
   }
 
   async getPasswordByUsername(username: string): Promise<string | null> {
@@ -183,8 +182,13 @@ export class StfcDataSource implements UserDataSource {
   }
 
   async getUserRoles(id: number): Promise<Role[]> {
-    const stfcRoles: stfcRole[] = (await client.getRolesForUser(token, id))
-      .return;
+    const stfcRoles: stfcRole[] | null = (
+      await client.getRolesForUser(token, id)
+    )?.return;
+
+    if (!stfcRoles) {
+      return [new Role(0, Roles.USER, 'User')];
+    }
 
     const stfcRolesToEssRoles = new Map<string, Role>([
       ['User Officer', new Role(2, Roles.USER_OFFICER, 'User Officer')],
@@ -319,13 +323,16 @@ export class StfcDataSource implements UserDataSource {
           const userNumbers: string[] = usersRecord.map(record =>
             String(record.user_id)
           );
-          const stfcBasicPeople: StfcBasicPersonDetails[] = (
+          const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
             await client.getBasicPeopleDetailsFromUserNumbers(
               token,
               userNumbers
             )
-          ).return;
-          users = stfcBasicPeople.map(person => toEssBasicUserDetails(person));
+          )?.return;
+
+          users = stfcBasicPeople
+            ? stfcBasicPeople.map(person => toEssBasicUserDetails(person))
+            : [];
         }
 
         return {
@@ -349,11 +356,9 @@ export class StfcDataSource implements UserDataSource {
           await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
         )?.return;
 
-        if (stfcBasicPeople) {
-          return stfcBasicPeople.map(person => toEssBasicUserDetails(person));
-        } else {
-          return Promise.resolve([]);
-        }
+        return stfcBasicPeople
+          ? stfcBasicPeople.map(person => toEssBasicUserDetails(person))
+          : Promise.resolve([]);
       });
   }
 
