@@ -99,6 +99,7 @@ export const QuestionTemplateRelationFormShell = (props: {
                   });
                   props.closeMe();
                 }}
+                disabled={definition.creatable === false}
               >
                 Remove from template
               </Button>

@@ -113,6 +113,7 @@ export default function TemplateQuestionEditor(props: {
       key={props.data.proposalQuestionId}
       draggableId={props.data.proposalQuestionId}
       index={props.index}
+      isDragDisabled={questionDefinition.creatable === false}
     >
       {(provided, snapshot) => (
         <Grid
