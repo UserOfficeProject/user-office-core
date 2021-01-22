@@ -4,6 +4,7 @@ import to from 'await-to-js';
 
 import {
   DataType,
+  FieldDependency,
   Question,
   QuestionTemplateRelation,
   Template,
@@ -17,6 +18,7 @@ import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMuta
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
 import { SetActiveTemplateArgs } from '../../resolvers/mutations/SetActiveTemplateMutation';
+import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
@@ -136,6 +138,36 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
+  async getQuestionsDependencies(
+    questionRecords: Array<
+      QuestionRecord &
+        QuestionTemplateRelRecord & { dependency_natural_key: string }
+    >,
+    templateId: number
+  ): Promise<FieldDependency[]> {
+    const questionDependencies = await database
+      .select('*')
+      .from('question_dependencies')
+      .where('template_id', templateId)
+      .whereIn(
+        'question_id',
+        questionRecords.map(questionRecord => questionRecord.question_id)
+      );
+
+    return questionDependencies.map((questionDependency: any) => {
+      const question = questionRecords.find(
+        field => field.question_id === questionDependency.dependency_question_id
+      );
+
+      return new FieldDependency(
+        questionDependency.question_id,
+        questionDependency.dependency_question_id,
+        question?.natural_key as string,
+        questionDependency.dependency_condition
+      );
+    });
+  }
+
   async getTemplateSteps(templateId: number): Promise<TemplateStep[]> {
     const topicRecords: TopicRecord[] = await database
       .select('*')
@@ -147,29 +179,33 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     const questionRecords: Array<QuestionRecord &
       QuestionTemplateRelRecord & { dependency_natural_key: string }> = (
       await database.raw(`
-      SELECT 
-        templates_has_questions.*, questions.*, dependency.natural_key as dependency_natural_key
-      FROM 
-        templates_has_questions
-      LEFT JOIN
-        questions 
-      ON 
-        templates_has_questions.question_id = 
-        questions.question_id
-      LEFT JOIN
-        questions dependency
-      ON 
-        dependency.question_id = 
-        templates_has_questions.dependency_question_id
-      WHERE
-        templates_has_questions.template_id = ${templateId}
-      ORDER BY
-       templates_has_questions.sort_order`)
+        SELECT 
+          templates_has_questions.*, questions.*, questions.natural_key as dependency_natural_key
+        FROM 
+          templates_has_questions
+        LEFT JOIN
+          questions 
+        ON 
+          templates_has_questions.question_id = 
+          questions.question_id
+        WHERE
+          templates_has_questions.template_id = ${templateId}
+        ORDER BY
+         templates_has_questions.sort_order`)
     ).rows;
 
-    const fields = questionRecords.map(record =>
-      createQuestionTemplateRelationObject(record)
+    const dependencies = await this.getQuestionsDependencies(
+      questionRecords,
+      templateId
     );
+
+    const fields = questionRecords.map(record => {
+      const questionDependencies = dependencies.filter(
+        dependency => dependency.questionId === record.question_id
+      );
+
+      return createQuestionTemplateRelationObject(record, questionDependencies);
+    });
 
     const steps = Array<TemplateStep>();
     topicRecords.forEach(topic => {
@@ -294,6 +330,39 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return question;
   }
 
+  async updateQuestionTemplateRelationSettings(
+    args: UpdateQuestionTemplateRelationSettingsArgs
+  ): Promise<Template> {
+    const { templateId, questionId, dependencies, config } = args;
+    await database('templates_has_questions')
+      .update({
+        config: config,
+      })
+      .where({ question_id: questionId, template_id: templateId });
+
+    await database('question_dependencies')
+      .where({ question_id: questionId })
+      .andWhere({ template_id: templateId })
+      .del();
+
+    if (dependencies?.length) {
+      const dataToInsert = dependencies.map(dependency => ({
+        question_id: questionId,
+        template_id: templateId,
+        dependency_question_id: dependency.dependencyId,
+        dependency_condition: dependency.condition,
+      }));
+
+      await database('question_dependencies').insert(dataToInsert);
+    }
+    const returnValue = await this.getTemplate(templateId);
+    if (!returnValue) {
+      throw new Error('Could not get template');
+    }
+
+    return returnValue;
+  }
+
   async upsertQuestionTemplateRelations(
     collection: TemplatesHasQuestions[]
   ): Promise<Template> {
@@ -312,8 +381,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         template_id: item.templateId,
         topic_id: item.topicId,
         sort_order: item.sortOrder,
-        dependency_question_id: item.dependency?.dependencyId || null,
-        dependency_condition: item.dependency?.condition || null,
         config: item.config,
       });
     }
@@ -323,8 +390,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           DO UPDATE SET
           sort_order = EXCLUDED.sort_order,
           topic_id = EXCLUDED.topic_id,
-          dependency_question_id = EXCLUDED.dependency_question_id,
-          dependency_condition = EXCLUDED.dependency_condition,
           config = EXCLUDED.config
         RETURNING *;`,
       [database('templates_has_questions').insert(dataToUpsert)]
@@ -400,7 +465,10 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     questionId: string,
     templateId: number
   ): Promise<QuestionTemplateRelation | null> {
-    return database({ templates_has_questions: 'templates_has_questions' })
+    const [questionRecord]: Array<QuestionTemplateRelRecord &
+      QuestionRecord & { dependency_natural_key: string }> = await database({
+      templates_has_questions: 'templates_has_questions',
+    })
       .where({
         'templates_has_questions.question_id': questionId,
       })
@@ -412,31 +480,22 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         'templates_has_questions.question_id',
         'questions.question_id'
       )
-      .leftJoin(
-        { dependency: 'questions' },
-        'templates_has_questions.dependency_question_id',
-        '=',
-        'dependency.question_id'
-      )
       .select(
         'templates_has_questions.*',
         'questions.*',
-        'dependency.natural_key as dependency_natural_key'
-      )
-      .then(
-        (
-          resultSet: Array<
-            QuestionTemplateRelRecord &
-              QuestionRecord & { dependency_natural_key: string }
-          >
-        ) => {
-          if (!resultSet || resultSet.length !== 1) {
-            return null;
-          }
-
-          return createQuestionTemplateRelationObject(resultSet[0]);
-        }
+        'questions.natural_key as dependency_natural_key'
       );
+
+    if (!questionRecord) {
+      return null;
+    }
+
+    const dependencies = await this.getQuestionsDependencies(
+      [questionRecord],
+      templateId
+    );
+
+    return createQuestionTemplateRelationObject(questionRecord, dependencies);
   }
 
   async getQuestionTemplateRelations(
@@ -461,13 +520,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           templateId: resultItem.template_id,
           topicId: resultItem.topic_id,
           sortOrder: resultItem.sort_order,
-          dependency:
-            resultItem.dependency_question_id && resultItem.dependency_condition
-              ? {
-                  dependencyId: resultItem.dependency_question_id,
-                  condition: resultItem.dependency_condition,
-                }
-              : null,
+          dependencies: [],
           config: resultItem.config,
         }));
       });
@@ -579,47 +632,75 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
     // Clone topics
     await database.raw(`
-      INSERT INTO topics(
-            topic_title
-          , is_enabled
-          , sort_order
-          , template_id
+      INSERT INTO topics
+      (
+        topic_title,
+        is_enabled,
+        sort_order,
+        template_id
       )
-      SELECT 
-            topic_title
-          , is_enabled
-          , sort_order
-          , ${newTemplate.templateId}
+      SELECT
+        topic_title,
+        is_enabled,
+        sort_order,
+        ${newTemplate.templateId}
       FROM 
-          topics
+        topics
       WHERE
-          template_id=${sourceTemplate.templateId}
+        template_id = ${sourceTemplate.templateId}
     `);
 
     // Clone templates_has_questions entries
     await database.raw(`
-      INSERT INTO templates_has_questions 
-                  (template_id, 
-                  question_id, 
-                  sort_order, 
-                  dependency_question_id, 
-                  dependency_condition,
-                  config, 
-                  topic_id) 
-      SELECT ${newTemplate.templateId}, 
-            question_id, 
-            sort_order, 
-            dependency_question_id, 
-            dependency_condition,
-            config, 
-            (SELECT topic_id 
-              FROM   topics AS newTopics 
-              WHERE  template_id = ${newTemplate.templateId} 
-                    AND sort_order = (SELECT sort_order 
-                                      FROM   topics 
-                                      WHERE  topic_id = source.topic_id)) 
-      FROM   templates_has_questions AS source  
-      WHERE template_id=${sourceTemplate.templateId}
+      INSERT INTO templates_has_questions
+      (
+        template_id,
+        question_id,
+        sort_order,
+        config,
+        topic_id
+      )
+      SELECT
+        ${newTemplate.templateId},
+        question_id,
+        sort_order,
+        config,
+        (
+          SELECT topic_id
+          FROM   topics AS newTopics
+          WHERE  template_id = ${newTemplate.templateId}
+          AND    sort_order =
+          (
+            SELECT sort_order
+            FROM   topics
+            WHERE  topic_id = source.topic_id
+          )
+        )
+      FROM templates_has_questions AS source
+      WHERE template_id = ${sourceTemplate.templateId}
+    `);
+
+    // Clone question_dependencies entries
+    await database.raw(`
+      INSERT INTO question_dependencies
+      (
+        template_id,
+        question_id,
+        dependency_question_id,
+        dependency_condition
+      )
+      SELECT
+        ${newTemplate.templateId},
+        question_id,
+	      dependency_question_id,
+	      dependency_condition
+      FROM  question_dependencies
+      WHERE question_id IN
+      (
+		    SELECT question_id
+		    FROM   templates_has_questions
+      )
+      AND template_id = ${sourceTemplate.templateId}
     `);
 
     return newTemplate;

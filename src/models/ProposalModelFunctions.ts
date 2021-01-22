@@ -79,11 +79,13 @@ export function areDependenciesSatisfied(
 ) {
   const field = getFieldById(questionary, fieldId);
 
-  if (!field) {
+  if (!field || !field.dependencies) {
     return true;
   }
 
-  return isDependencySatisfied(questionary, field.dependency);
+  return field.dependencies.every(dependency =>
+    isDependencySatisfied(questionary, dependency)
+  );
 }
 
 export function isMatchingConstraints(

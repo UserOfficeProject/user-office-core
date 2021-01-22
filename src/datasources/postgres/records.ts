@@ -132,8 +132,6 @@ export interface QuestionTemplateRelRecord {
   readonly topic_id: number;
   readonly sort_order: number;
   readonly config: string;
-  readonly dependency_question_id: string | null;
-  readonly dependency_condition: DependencyCondition | null;
 }
 
 export interface TemplateRecord {
@@ -513,7 +511,8 @@ export const createFileMetadata = (record: FileRecord) => {
 
 export const createQuestionTemplateRelationObject = (
   record: QuestionRecord &
-    QuestionTemplateRelRecord & { dependency_natural_key: string }
+    QuestionTemplateRelRecord & { dependency_natural_key: string },
+  dependencies: FieldDependency[]
 ) => {
   return new QuestionTemplateRelation(
     new Question(
@@ -527,14 +526,7 @@ export const createQuestionTemplateRelationObject = (
     record.topic_id,
     record.sort_order,
     createConfig<any>(record.data_type as DataType, record.config),
-    record.dependency_question_id && record.dependency_condition
-      ? new FieldDependency(
-          record.question_id,
-          record.dependency_question_id,
-          record.dependency_natural_key,
-          record.dependency_condition
-        )
-      : undefined
+    dependencies
   );
 };
 

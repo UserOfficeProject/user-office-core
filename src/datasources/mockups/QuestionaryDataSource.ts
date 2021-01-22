@@ -62,7 +62,7 @@ export const dummyQuestionFactory = (
 
 export const dummyQuestionTemplateRelationFactory = (
   values?: DeepPartial<QuestionTemplateRelation> &
-    Partial<Pick<QuestionTemplateRelation, 'config' | 'dependency'>> & {
+    Partial<Pick<QuestionTemplateRelation, 'config' | 'dependencies'>> & {
       question: Partial<Pick<Question, 'config'>>;
     }
 ): QuestionTemplateRelation => {
@@ -71,7 +71,7 @@ export const dummyQuestionTemplateRelationFactory = (
     values?.sortOrder || Math.round(Math.random() * 100),
     values?.topicId || Math.round(Math.random() * 10),
     values?.config || new BooleanConfig(),
-    values?.dependency
+    values?.dependencies as FieldDependency[]
   );
 
   return relation;
@@ -88,7 +88,7 @@ export const dummyTemplateHasQuestionRelationFactory = (
     Math.round(Math.random() * 10),
     sortOrder + 1,
     JSON.stringify(new BooleanConfig()),
-    null
+    []
   );
 };
 
@@ -149,12 +149,14 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
                 required: true,
               }),
             }),
-            dependency: new FieldDependency(
-              'links_with_industry',
-              'has_links_with_industry',
-              'has_links_with_industry',
-              new FieldCondition(EvaluatorOperator.eq, 'yes')
-            ),
+            dependencies: [
+              new FieldDependency(
+                'links_with_industry',
+                'has_links_with_industry',
+                'has_links_with_industry',
+                new FieldCondition(EvaluatorOperator.eq, 'yes')
+              ),
+            ],
           }),
           'https://example.com'
         ),
@@ -180,7 +182,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   }
 
   async getBlankQuestionarySteps(
-    template_id: number
+    templateId: number
   ): Promise<QuestionaryStep[]> {
     return dummyQuestionarySteps;
   }
