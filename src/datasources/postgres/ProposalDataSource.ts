@@ -187,6 +187,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             filter?.proposalStatusId
           );
         }
+
+        if (filter?.shortCodes) {
+          const filteredAndPreparedShortCodes = filter?.shortCodes
+            .filter(shortCode => shortCode)
+            .join('|');
+
+          query.whereRaw(
+            `proposal_table_view.short_code similar to '%(${filteredAndPreparedShortCodes})%'`
+          );
+        }
       })
       .then((proposals: ProposalViewRecord[]) => {
         return proposals.map(proposal => createProposalViewObject(proposal));
@@ -230,6 +240,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
         if (filter?.proposalStatusId) {
           query.where('proposals.status_id', filter?.proposalStatusId);
+        }
+
+        if (filter?.shortCodes) {
+          const filteredAndPreparedShortCodes = filter?.shortCodes
+            .filter(shortCode => shortCode)
+            .join('|');
+
+          query.whereRaw(
+            `proposal_table_view.short_code similar to '%(${filteredAndPreparedShortCodes})%'`
+          );
         }
 
         if (first) {
@@ -285,6 +305,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
         if (filter?.proposalStatusId) {
           query.where('proposals.status_id', filter?.proposalStatusId);
+        }
+
+        if (filter?.shortCodes) {
+          const filteredAndPreparedShortCodes = filter?.shortCodes
+            .filter(shortCode => shortCode)
+            .join('|');
+
+          query.whereRaw(
+            `proposal_table_view.short_code similar to '%(${filteredAndPreparedShortCodes})%'`
+          );
         }
 
         if (first) {
