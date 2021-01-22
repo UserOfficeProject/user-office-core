@@ -74,7 +74,7 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
   );
 }
 
-export class StfcDataSource implements UserDataSource {
+export class StfcUserDataSource implements UserDataSource {
   async delete(id: number): Promise<User | null> {
     throw new Error('Method not implemented.');
   }

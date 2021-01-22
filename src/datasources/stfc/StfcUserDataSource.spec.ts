@@ -1,10 +1,9 @@
-import { Role } from '../../models/Role';
-import { Roles } from '../../models/Role';
-import { StfcDataSource } from './StfcDataSource';
+import { Role, Roles } from '../../models/Role';
+import { StfcUserDataSource } from './StfcUserDataSource';
 
 jest.mock('./UOWSSoapInterface');
 
-const dataSource = new StfcDataSource();
+const dataSource = new StfcUserDataSource();
 const dummyUserNumber = 12345;
 const userRoleDbId = 0;
 const userOfficerRoleDbId = 2;

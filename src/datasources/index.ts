@@ -13,13 +13,13 @@ import PostgresShipmentDataSource from './postgres/ShipmentDataSource';
 import PostgresSystemDataSource from './postgres/SystemDataSource';
 import PostgresTemplateDataSource from './postgres/TemplateDataSource';
 import PostgresUserDataSource from './postgres/UserDataSource';
-import { StfcDataSource } from './stfc/StfcDataSource';
+import { StfcUserDataSource } from './stfc/StfcUserDataSource';
 import { UserDataSource } from './UserDataSource';
 
 export let userDataSource: UserDataSource;
 userDataSource = new PostgresUserDataSource();
 if (process.env.EXTERNAL_AUTH_PROVIDER === 'stfc') {
-  userDataSource = new StfcDataSource();
+  userDataSource = new StfcUserDataSource();
 }
 export const proposalDataSource = new PostgresProposalDataSource();
 export const reviewDataSource = new PostgresReviewDataSource();
