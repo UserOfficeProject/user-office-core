@@ -8,7 +8,7 @@ fragment answer on Answer {
   config {
     ...fieldConfig
   }
-  dependency {
+  dependencies {
     questionId
     dependencyId
     dependencyNaturalKey

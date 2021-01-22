@@ -1,17 +1,16 @@
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import ClearIcon from '@material-ui/icons/Clear';
 import { FormikHelpers } from 'formik';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import {
   DataType,
   EvaluatorOperator,
+  FieldDependency,
   QuestionTemplateRelation,
   SelectionFromOptionsConfig,
   Template,
@@ -22,12 +21,15 @@ const FormikUICustomDependencySelector = ({
   field,
   template,
   form,
-  templateField,
+  dependency,
+  currentQuestionId,
 }: {
   field: { name: string; onBlur: Function; onChange: Function; value: string };
   form: FormikHelpers<any>;
   template: Template;
   templateField: QuestionTemplateRelation;
+  dependency: FieldDependency;
+  currentQuestionId: string;
 }) => {
   const [dependencyId, setDependencyId] = useState<string>('');
   const [operator, setOperator] = useState<EvaluatorOperator>(
@@ -50,23 +52,17 @@ const FormikUICustomDependencySelector = ({
   }))();
 
   useEffect(() => {
-    if (!templateField) {
-      return;
-    }
-    if (templateField.dependency) {
-      const dependency = templateField.dependency;
-      setDependencyId(dependency.dependencyId);
-      setOperator(dependency.condition.condition);
-      setDependencyValue(dependency.condition.params);
-    }
-  }, [templateField]);
+    setDependencyId(dependency.dependencyId);
+    setOperator(dependency.condition.condition);
+    setDependencyValue(dependency.condition.params);
+  }, [
+    dependency.dependencyId,
+    dependency.condition.condition,
+    dependency.condition.params,
+  ]);
 
   const updateFormik = (): void => {
-    if (
-      dependencyId !== null &&
-      dependencyValue !== null &&
-      operator !== null
-    ) {
+    if (dependencyId && dependencyValue && operator) {
       const dependency = {
         dependencyId,
         condition: {
@@ -75,8 +71,6 @@ const FormikUICustomDependencySelector = ({
         },
       };
       form.setFieldValue(field.name, dependency);
-    } else {
-      form.setFieldValue(field.name, null);
     }
   };
 
@@ -117,7 +111,7 @@ const FormikUICustomDependencySelector = ({
 
   return (
     <Grid container>
-      <Grid item xs={5}>
+      <Grid item xs={6}>
         <FormControl fullWidth>
           <InputLabel htmlFor="dependency-id" shrink>
             Field
@@ -129,12 +123,14 @@ const FormikUICustomDependencySelector = ({
               const depFieldId = event.target.value as string;
               setDependencyId(depFieldId);
             }}
+            required
           >
             {getAllFields(template.steps)
-              .filter(option =>
-                [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
-                  option.question.dataType
-                )
+              .filter(
+                option =>
+                  [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
+                    option.question.dataType
+                  ) && currentQuestionId !== option.question.proposalQuestionId
               )
               .map(option => {
                 return (
@@ -184,6 +180,7 @@ const FormikUICustomDependencySelector = ({
             onChange={(event: React.ChangeEvent<{ value: any }>): void => {
               setDependencyValue(event.target.value);
             }}
+            required
           >
             {availableValues.map(option => {
               return (
@@ -194,16 +191,6 @@ const FormikUICustomDependencySelector = ({
             })}
           </Select>
         </FormControl>
-      </Grid>
-      <Grid item xs={1}>
-        <IconButton
-          onClick={(): void => {
-            setDependencyId('');
-            setDependencyValue('');
-          }}
-        >
-          <ClearIcon />
-        </IconButton>
       </Grid>
     </Grid>
   );

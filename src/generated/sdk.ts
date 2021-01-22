@@ -70,7 +70,7 @@ export type Answer = {
   sortOrder: Scalars['Int'];
   topicId: Scalars['Int'];
   config: FieldConfig;
-  dependency: Maybe<FieldDependency>;
+  dependencies: Array<FieldDependency>;
   answerId: Maybe<Scalars['Int']>;
   value: Maybe<Scalars['IntStringDateBoolArray']>;
 };
@@ -474,6 +474,7 @@ export type Mutation = {
   setActiveTemplate: SuccessResponseWrap;
   updateQuestion: QuestionResponseWrap;
   updateQuestionTemplateRelation: TemplateResponseWrap;
+  updateQuestionTemplateRelationSettings: TemplateResponseWrap;
   updateTemplate: TemplateResponseWrap;
   updateTopic: TemplateResponseWrap;
   addUserRole: AddUserRoleResponseWrap;
@@ -851,7 +852,14 @@ export type MutationUpdateQuestionTemplateRelationArgs = {
   topicId?: Maybe<Scalars['Int']>;
   sortOrder: Scalars['Int'];
   config?: Maybe<Scalars['String']>;
-  dependency?: Maybe<FieldDependencyInput>;
+};
+
+
+export type MutationUpdateQuestionTemplateRelationSettingsArgs = {
+  questionId: Scalars['String'];
+  templateId: Scalars['Int'];
+  config?: Maybe<Scalars['String']>;
+  dependencies: Array<FieldDependencyInput>;
 };
 
 
@@ -1667,7 +1675,7 @@ export type QuestionTemplateRelation = {
   sortOrder: Scalars['Int'];
   topicId: Scalars['Int'];
   config: FieldConfig;
-  dependency: Maybe<FieldDependency>;
+  dependencies: Array<FieldDependency>;
 };
 
 export type RemoveAssignedInstrumentFromCallInput = {
@@ -3206,7 +3214,7 @@ export type AnswerFragment = (
   ) | (
     { __typename?: 'ShipmentBasisConfig' }
     & FieldConfigShipmentBasisConfigFragment
-  ), dependency: Maybe<(
+  ), dependencies: Array<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
     & { condition: (
@@ -4245,7 +4253,7 @@ export type QuestionTemplateRelationFragment = (
   ) | (
     { __typename?: 'ShipmentBasisConfig' }
     & FieldConfigShipmentBasisConfigFragment
-  ), dependency: Maybe<(
+  ), dependencies: Array<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
     & { condition: (
@@ -4390,13 +4398,32 @@ export type UpdateQuestionTemplateRelationMutationVariables = Exact<{
   topicId?: Maybe<Scalars['Int']>;
   sortOrder: Scalars['Int'];
   config?: Maybe<Scalars['String']>;
-  dependency?: Maybe<FieldDependencyInput>;
 }>;
 
 
 export type UpdateQuestionTemplateRelationMutation = (
   { __typename?: 'Mutation' }
   & { updateQuestionTemplateRelation: (
+    { __typename?: 'TemplateResponseWrap' }
+    & Pick<TemplateResponseWrap, 'error'>
+    & { template: Maybe<(
+      { __typename?: 'Template' }
+      & TemplateFragment
+    )> }
+  ) }
+);
+
+export type UpdateQuestionTemplateRelationSettingsMutationVariables = Exact<{
+  questionId: Scalars['String'];
+  templateId: Scalars['Int'];
+  config?: Maybe<Scalars['String']>;
+  dependencies: Array<FieldDependencyInput>;
+}>;
+
+
+export type UpdateQuestionTemplateRelationSettingsMutation = (
+  { __typename?: 'Mutation' }
+  & { updateQuestionTemplateRelationSettings: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
     & { template: Maybe<(
@@ -5081,7 +5108,7 @@ export const AnswerFragmentDoc = gql`
   config {
     ...fieldConfig
   }
-  dependency {
+  dependencies {
     questionId
     dependencyId
     dependencyNaturalKey
@@ -5161,7 +5188,7 @@ export const QuestionTemplateRelationFragmentDoc = gql`
   config {
     ...fieldConfig
   }
-  dependency {
+  dependencies {
     questionId
     dependencyId
     dependencyNaturalKey
@@ -6592,8 +6619,18 @@ export const UpdateQuestionDocument = gql`
 }
     ${QuestionFragmentDoc}`;
 export const UpdateQuestionTemplateRelationDocument = gql`
-    mutation updateQuestionTemplateRelation($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int!, $config: String, $dependency: FieldDependencyInput) {
-  updateQuestionTemplateRelation(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, config: $config, dependency: $dependency) {
+    mutation updateQuestionTemplateRelation($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int!, $config: String) {
+  updateQuestionTemplateRelation(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, config: $config) {
+    template {
+      ...template
+    }
+    error
+  }
+}
+    ${TemplateFragmentDoc}`;
+export const UpdateQuestionTemplateRelationSettingsDocument = gql`
+    mutation updateQuestionTemplateRelationSettings($questionId: String!, $templateId: Int!, $config: String, $dependencies: [FieldDependencyInput!]!) {
+  updateQuestionTemplateRelationSettings(questionId: $questionId, templateId: $templateId, config: $config, dependencies: $dependencies) {
     template {
       ...template
     }
@@ -7230,6 +7267,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateQuestionTemplateRelation(variables: UpdateQuestionTemplateRelationMutationVariables): Promise<UpdateQuestionTemplateRelationMutation> {
       return withWrapper(() => client.request<UpdateQuestionTemplateRelationMutation>(print(UpdateQuestionTemplateRelationDocument), variables));
+    },
+    updateQuestionTemplateRelationSettings(variables: UpdateQuestionTemplateRelationSettingsMutationVariables): Promise<UpdateQuestionTemplateRelationSettingsMutation> {
+      return withWrapper(() => client.request<UpdateQuestionTemplateRelationSettingsMutation>(print(UpdateQuestionTemplateRelationSettingsDocument), variables));
     },
     updateTemplate(variables: UpdateTemplateMutationVariables): Promise<UpdateTemplateMutation> {
       return withWrapper(() => client.request<UpdateTemplateMutation>(print(UpdateTemplateDocument), variables));
