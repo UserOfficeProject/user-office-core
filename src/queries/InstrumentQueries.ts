@@ -50,7 +50,7 @@ export default class InstrumentQueries {
       return this.dataSource.getAll();
     }
 
-    const instruments = await this.dataSource.getUserInstruments(agent?.id!);
+    const instruments = await this.dataSource.getUserInstruments(agent!.id);
 
     return { totalCount: instruments.length, instruments };
   }

@@ -34,6 +34,9 @@ export const dummyInstrumentHasProposals = new InstrumentHasProposals(
 );
 
 export class InstrumentDataSourceMock implements InstrumentDataSource {
+  async isProposalInstrumentSubmitted(proposalId: number): Promise<boolean> {
+    return false;
+  }
   async create(args: CreateInstrumentArgs): Promise<Instrument> {
     return { ...dummyInstrument, ...args };
   }

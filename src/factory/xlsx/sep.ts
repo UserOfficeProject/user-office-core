@@ -14,6 +14,7 @@ type RowObj = {
   principalInv: string;
   instrAvailTime?: number;
   techReviewTimeAllocation?: number;
+  sepTimeAllocation: number | null;
   propReviewAvgScore?: number;
   propSEPRankOrder: number | null;
   inAvailZone?: string | null;
@@ -51,13 +52,16 @@ const sortByRankOrAverageScore = (data: RowObj[]) => {
     )
     .sort(sortByRankOrder)
     .map(row => {
-      const proposalAllocationTime = row.techReviewTimeAllocation || 0;
+      const proposalAllocationTime =
+        row.sepTimeAllocation !== null
+          ? row.sepTimeAllocation
+          : row.techReviewTimeAllocation || 0;
 
-      const notInAvailabilityZone =
-        allocationTimeSum + proposalAllocationTime > (row.instrAvailTime || 0);
+      const isInAvailabilityZone =
+        allocationTimeSum + proposalAllocationTime <= (row.instrAvailTime || 0);
       allocationTimeSum = allocationTimeSum + proposalAllocationTime;
 
-      row.inAvailZone = notInAvailabilityZone ? 'No' : 'Yes';
+      row.inAvailZone = isInAvailabilityZone ? 'yes' : 'no';
 
       return row;
     });
@@ -82,7 +86,7 @@ export const collectSEPlXLSXData = async (
     );
   }
 
-  const instrumentsSepsProposalIds = await Promise.all(
+  const instrumentsSepProposals = await Promise.all(
     instruments.map(instrument => {
       return baseContext.queries.sep.getSEPProposalsByInstrument(user, {
         sepId,
@@ -93,7 +97,7 @@ export const collectSEPlXLSXData = async (
   );
 
   const instrumentsProposals = await Promise.all(
-    instrumentsSepsProposalIds.map(sepProposalIds => {
+    instrumentsSepProposals.map(sepProposalIds => {
       if (!sepProposalIds) {
         const instrumentIds = instruments.map(({ id }) => id).join(', ');
 
@@ -159,12 +163,14 @@ export const collectSEPlXLSXData = async (
     const proposalPrincipalInvestigators =
       proposalsPrincipalInvestigators[indx];
     const technicalReviews = proposalsTechnicalReviews[indx];
+    const sepProposals = instrumentsSepProposals[indx];
 
     const rows = proposals.map((proposal, pIndx) => {
       const { firstname = '<missing>', lastname = '<missing>' } =
         proposalPrincipalInvestigators[pIndx] ?? {};
       const technicalReview = technicalReviews[pIndx];
       const reviews = proposalReviews[pIndx];
+      const sepProposal = sepProposals?.[pIndx];
 
       const proposalAverageScore = average(getGrades(reviews)) || 0;
 
@@ -174,6 +180,7 @@ export const collectSEPlXLSXData = async (
         principalInv: `${firstname} ${lastname}`,
         instrAvailTime: instrument.availabilityTime,
         techReviewTimeAllocation: technicalReview?.timeAllocation,
+        sepTimeAllocation: sepProposal?.sepTimeAllocation ?? null,
         propReviewAvgScore: proposalAverageScore,
         propSEPRankOrder: proposal?.rankOrder ?? null,
         inAvailZone: null,
@@ -191,6 +198,7 @@ export const collectSEPlXLSXData = async (
         row.principalInv,
         row.instrAvailTime ?? '<missing>',
         row.techReviewTimeAllocation ?? '<missing>',
+        row.sepTimeAllocation ?? '<missing>',
         row.propReviewAvgScore ?? '<missing>',
         row.propSEPRankOrder ?? '<missing>',
         row.inAvailZone ?? '<missing>',

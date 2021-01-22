@@ -15,7 +15,7 @@ export interface ReviewDataSource {
     sepId: number,
     proposalId: number,
     userId: number
-  ): Promise<Review>;
+  ): Promise<Review | null>;
   setTechnicalReview(args: AddTechnicalReviewArgs): Promise<TechnicalReview>;
   getTechnicalReview(proposalID: number): Promise<TechnicalReview | null>;
   addUserForReview(args: AddUserForReviewArgs): Promise<Review>;

@@ -22,6 +22,7 @@ export class SEPProposal {
     public proposalId: number,
     public sepId: number,
     public dateAssigned: Date,
+    public sepTimeAllocation: number | null,
     public instrumentSubmitted?: boolean
   ) {}
 }

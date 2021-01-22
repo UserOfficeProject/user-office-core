@@ -32,6 +32,18 @@ export class SEPQuery {
     return context.queries.sep.getSEPProposals(context.user, { sepId, callId });
   }
 
+  @Query(() => SEPProposal, { nullable: true })
+  async sepProposal(
+    @Arg('sepId', () => Int) sepId: number,
+    @Arg('proposalId', () => Int) proposalId: number,
+    @Ctx() context: ResolverContext
+  ): Promise<SEPProposal | null> {
+    return context.queries.sep.getSEPProposal(context.user, {
+      sepId,
+      proposalId,
+    });
+  }
+
   @Query(() => [SEPProposal], { nullable: true })
   async sepProposalsByInstrument(
     @Arg('sepId', () => Int) sepId: number,

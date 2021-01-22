@@ -169,17 +169,18 @@ export class ProposalResolver {
     return await context.queries.call.dataSource.get(proposal.callId);
   }
 
+  // TODO(asztalos): in long term make this nullable as it can return null
+  //                 but would require quite a number of changes on FE to
+  //                 to make TypeScript happy
   @FieldResolver(() => Questionary)
   async questionary(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Questionary | null> {
-    const questionary = await context.queries.questionary.getQuestionary(
+    return context.queries.questionary.getQuestionary(
       context.user,
       proposal.questionaryId
     );
-
-    return questionary;
   }
 }
 

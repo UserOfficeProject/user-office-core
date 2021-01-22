@@ -11,10 +11,14 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { userAuthorization } from '../utils/UserAuthorization';
 import SEPQueries from './SEPQueries';
 
 const dummySEPDataSource = new SEPDataSourceMock();
-const SEPQueriesInstance = new SEPQueries(dummySEPDataSource);
+const SEPQueriesInstance = new SEPQueries(
+  dummySEPDataSource,
+  userAuthorization
+);
 
 describe('Test SEPQueries', () => {
   test('A user cannot query all SEPs', () => {

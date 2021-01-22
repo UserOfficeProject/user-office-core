@@ -2,6 +2,7 @@
 import 'reflect-metadata';
 import { MutedLogger } from '@esss-swap/duo-logger';
 
+import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
@@ -22,6 +23,7 @@ const dummyLogger = new MutedLogger();
 const dummyProposalDataSource = new ProposalDataSourceMock();
 const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
 const dummyCallDataSource = new CallDataSourceMock();
+const dummyInstrumentDataSource = new InstrumentDataSourceMock();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock(),
@@ -31,6 +33,7 @@ const proposalMutations = new ProposalMutations(
   dummyProposalDataSource,
   dummyQuestionaryDataSource,
   dummyCallDataSource,
+  dummyInstrumentDataSource,
   userAuthorization,
   dummyLogger
 );

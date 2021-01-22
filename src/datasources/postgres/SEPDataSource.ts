@@ -31,6 +31,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       sepAssignment.proposal_id,
       sepAssignment.sep_id,
       sepAssignment.date_assigned,
+      sepAssignment.sep_time_allocation,
       sepAssignment.instrument_submitted
     );
   }
@@ -176,10 +177,16 @@ export default class PostgresSEPDataSource implements SEPDataSource {
 
   async getSEPProposalAssignments(
     sepId: number,
-    proposalId: number
+    proposalId: number,
+    reviewerId: number | null
   ): Promise<SEPAssignment[]> {
     const sepAssignments: SEPAssignmentRecord[] = await database
       .from('SEP_Assignments')
+      .modify(query => {
+        if (reviewerId !== null) {
+          query.where('sep_member_user_id', reviewerId);
+        }
+      })
       .where('sep_id', sepId)
       .andWhere('proposal_id', proposalId);
 
@@ -215,6 +222,29 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     );
   }
 
+  async getSEPProposal(
+    sepId: number,
+    proposalId: number
+  ): Promise<SEPProposal | null> {
+    const sepProposal: SEPProposalRecord = await database
+      .select(['sp.*'])
+      .from('SEP_Proposals as sp')
+      .join('proposals as p', {
+        'p.proposal_id': 'sp.proposal_id',
+      })
+      .join('proposal_statuses as ps', {
+        'p.status_id': 'ps.proposal_status_id',
+      })
+      .where(function() {
+        this.where('ps.name', 'ilike', 'SEP_%');
+      })
+      .where('sp.sep_id', sepId)
+      .where('sp.proposal_id', proposalId)
+      .first();
+
+    return sepProposal ? this.createSEPProposalObject(sepProposal) : null;
+  }
+
   async getSEPProposalsByInstrument(
     sepId: number,
     instrumentId: number,
@@ -224,6 +254,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .select([
         'sp.proposal_id',
         'sp.sep_id',
+        'sp.sep_time_allocation',
         'ihp.submitted as instrument_submitted',
       ])
       .from('SEP_Proposals as sp')
@@ -262,6 +293,23 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .join('users as u', { 'u.user_id': 'rc.user_id' })
       .where('u.user_id', id)
       .andWhere('rc.sep_id', sepId)
+      .then((roles: RoleRecord[]) =>
+        roles.map(role => new Role(role.role_id, role.short_code, role.title))
+      );
+  }
+
+  async getSEPProposalUserRoles(
+    id: number,
+    proposalId: number
+  ): Promise<Role[]> {
+    return database
+      .select()
+      .from('roles as r')
+      .join('role_user as rc', { 'r.role_id': 'rc.role_id' })
+      .join('users as u', { 'u.user_id': 'rc.user_id' })
+      .join('SEP_Proposals as sp', { 'sp.sep_id': 'rc.sep_id' })
+      .where('u.user_id', id)
+      .andWhere('sp.proposal_id', proposalId)
       .then((roles: RoleRecord[]) =>
         roles.map(role => new Role(role.role_id, role.short_code, role.title))
       );
@@ -400,5 +448,29 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     }
 
     throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async updateTimeAllocation(
+    sepId: number,
+    proposalId: number,
+    sepTimeAllocation: number | null
+  ): Promise<SEPProposal> {
+    const updatedRecord = await database('SEP_Proposals')
+      .update(
+        {
+          sep_time_allocation: sepTimeAllocation,
+        },
+        ['*']
+      )
+      .where('sep_id', sepId)
+      .where('proposal_id', proposalId);
+
+    if (updatedRecord === undefined || !updatedRecord.length) {
+      throw new Error(
+        `SEP_Proposal not found, sepId: ${sepId}, proposalId: ${proposalId}`
+      );
+    }
+
+    return this.createSEPProposalObject(updatedRecord);
   }
 }

@@ -9,6 +9,7 @@ import {
 } from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
 
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
@@ -27,6 +28,7 @@ export default class ProposalMutations {
     private proposalDataSource: ProposalDataSource,
     private questionaryDataSource: QuestionaryDataSource,
     private callDataSource: CallDataSource,
+    private instrumentDataSource: InstrumentDataSource,
     private userAuth: UserAuthorization,
     private logger: Logger
   ) {}
@@ -216,7 +218,7 @@ export default class ProposalMutations {
 
   @EventBus(Event.PROPOSAL_SEP_MEETING_SUBMITTED)
   @ValidateArgs(administrationProposalBEValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async admin(
     agent: UserWithRole | null,
     args: AdministrationProposalArgs
@@ -229,11 +231,30 @@ export default class ProposalMutations {
       commentForManagement,
       commentForUser,
     } = args;
+    const isChairOrSecretaryOfProposal = await this.userAuth.isChairOrSecretaryOfProposal(
+      agent!.id,
+      id
+    );
+    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+
+    if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
+      return rejection('NOT_ALLOWED');
+    }
+
     const proposal = await this.proposalDataSource.get(id);
 
     if (!proposal) {
       return rejection('INTERNAL_ERROR');
     }
+
+    const isProposalInstrumentSubmitted = await this.instrumentDataSource.isProposalInstrumentSubmitted(
+      id
+    );
+
+    if (isProposalInstrumentSubmitted && !isUserOfficer) {
+      return rejection('NOT_ALLOWED');
+    }
+
     if (rankOrder !== undefined) {
       proposal.rankOrder = rankOrder;
     }

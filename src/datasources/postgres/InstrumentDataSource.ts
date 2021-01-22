@@ -495,4 +495,18 @@ export default class PostgresInstrumentDataSource
         return result?.count === '1';
       });
   }
+
+  async isProposalInstrumentSubmitted(proposalId: number): Promise<boolean> {
+    return database('instrument_has_proposals')
+      .select()
+      .where('proposal_id', proposalId)
+      .first()
+      .then((result?: InstrumentHasProposalsRecord) => {
+        if (!result) {
+          return false;
+        }
+
+        return result.submitted;
+      });
+  }
 }

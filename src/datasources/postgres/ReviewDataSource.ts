@@ -101,7 +101,9 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .andWhere('proposal_id', proposalId)
       .andWhere('user_id', userId)
       .first()
-      .then((review: ReviewRecord) => this.createReviewObject(review));
+      .then((review?: ReviewRecord) =>
+        review ? this.createReviewObject(review) : null
+      );
   }
 
   async removeUserForReview(id: number): Promise<Review> {

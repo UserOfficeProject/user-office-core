@@ -24,13 +24,15 @@ const reviewQueries = new ReviewQueries(
 );
 
 test('A userofficer can get a review', () => {
-  return expect(reviewQueries.get(dummyUserOfficerWithRole, 10)).resolves.toBe(
-    dummyReview
-  );
+  return expect(
+    reviewQueries.get(dummyUserOfficerWithRole, { reviewId: 10 })
+  ).resolves.toBe(dummyReview);
 });
 
 test('A user can not get a review', () => {
-  return expect(reviewQueries.get(dummyUserWithRole, 1)).resolves.toBe(null);
+  return expect(
+    reviewQueries.get(dummyUserWithRole, { reviewId: 1 })
+  ).resolves.toBe(null);
 });
 
 test('A userofficer can get reviews for a proposal', () => {

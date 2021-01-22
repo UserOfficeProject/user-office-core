@@ -13,17 +13,21 @@ export default class ReviewQueries {
   ) {}
 
   @Authorized()
-  async get(agent: UserWithRole | null, id: number): Promise<Review | null> {
-    const review = await this.dataSource.get(id);
+  async get(
+    agent: UserWithRole | null,
+    { reviewId, sepId }: { reviewId: number; sepId?: number | null }
+  ): Promise<Review | null> {
+    const review = await this.dataSource.get(reviewId);
     if (!review) {
       return null;
     }
 
     if (
+      review.userID === agent!.id ||
       (await this.userAuth.isUserOfficer(agent)) ||
-      review.userID === (agent as UserWithRole).id
+      (sepId && (await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId)))
     ) {
-      return this.dataSource.get(id);
+      return this.dataSource.get(reviewId);
     } else {
       return null;
     }

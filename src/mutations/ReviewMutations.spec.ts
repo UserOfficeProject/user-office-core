@@ -73,13 +73,17 @@ test('A user can not add a reviewer for a proposal', () => {
 test('A userofficer can remove a reviewer for a proposal', () => {
   return expect(
     reviewMutations.removeUserForReview(dummyUserOfficerWithRole, {
-      reviewID: 1,
+      reviewId: 1,
+      sepId: 1,
     })
   ).resolves.toBeInstanceOf(Review);
 });
 
 test('A user can not remove a reviewer for a proposal', () => {
   return expect(
-    reviewMutations.removeUserForReview(dummyUserWithRole, { reviewID: 1 })
+    reviewMutations.removeUserForReview(dummyUserWithRole, {
+      reviewId: 1,
+      sepId: 1,
+    })
   ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });

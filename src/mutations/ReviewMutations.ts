@@ -9,7 +9,7 @@ import {
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Review } from '../models/Review';
+import { Review, ReviewStatus } from '../models/Review';
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
@@ -34,16 +34,28 @@ export default class ReviewMutations {
   ): Promise<Review | Rejection> {
     const { reviewID, comment, grade } = args;
     const review = await this.dataSource.get(reviewID);
+
+    if (!review) {
+      return rejection('NOT_FOUND');
+    }
+
     if (
-      review &&
       !(
         (await this.userAuth.isReviewerOfProposal(agent, review.proposalID)) ||
+        (await this.userAuth.isChairOrSecretaryOfSEP(
+          agent!.id,
+          review.sepID
+        )) ||
         (await this.userAuth.isUserOfficer(agent))
       )
     ) {
       logger.logWarn('Blocked submitting review', { agent, args });
 
       return rejection('NOT_REVIEWER_OF_PROPOSAL');
+    }
+
+    if (review.status === ReviewStatus.SUBMITTED) {
+      return rejection('NOT_ALLOWED');
     }
 
     return this.dataSource
@@ -91,19 +103,27 @@ export default class ReviewMutations {
       });
   }
 
-  @ValidateArgs(removeUserForReviewValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
+  // TODO: remove validation from lib, graphql validates the arguments already
+  // @ValidateArgs(removeUserForReviewValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   async removeUserForReview(
     agent: UserWithRole | null,
-    { reviewID }: { reviewID: number }
+    { reviewId, sepId }: { reviewId: number; sepId: number }
   ): Promise<Review | Rejection> {
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId))
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
+
     return this.dataSource
-      .removeUserForReview(reviewID)
+      .removeUserForReview(reviewId)
       .then(review => review)
       .catch(err => {
         logger.logException('Could not remove user for review', err, {
           agent,
-          reviewID,
+          reviewId,
         });
 
         return rejection('INTERNAL_ERROR');
@@ -111,12 +131,18 @@ export default class ReviewMutations {
   }
 
   @ValidateArgs(addUserForReviewValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   async addUserForReview(
     agent: UserWithRole | null,
     args: AddUserForReviewArgs
   ): Promise<Review | Rejection> {
-    const { proposalID, userID } = args;
+    const { proposalID, userID, sepID } = args;
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepID))
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
 
     return this.dataSource
       .addUserForReview(args)
