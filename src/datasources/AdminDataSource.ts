@@ -1,4 +1,5 @@
 import { Page } from '../models/Admin';
+import { Feature } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { BasicUserDetails } from '../models/User';
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
@@ -16,6 +17,7 @@ export interface AdminDataSource {
   setPageText(id: number, text: string): Promise<Page>;
   resetDB(): Promise<string>;
   applyPatches(): Promise<string>;
+  getFeatures(): Promise<Feature[]>;
 }
 export class Entry {
   constructor(public id: number, public value: string) {}

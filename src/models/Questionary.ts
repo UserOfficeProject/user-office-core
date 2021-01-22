@@ -21,7 +21,7 @@ export class Answer extends QuestionTemplateRelation {
       questionTemplateRelation.topicId,
       questionTemplateRelation.sortOrder,
       questionTemplateRelation.config,
-      questionTemplateRelation.dependency
+      questionTemplateRelation.dependencies
     );
   }
 }
