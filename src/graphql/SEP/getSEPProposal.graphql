@@ -1,0 +1,46 @@
+query getSEPProposal($sepId: Int!, $proposalId: Int!) {
+  sepProposal(sepId: $sepId, proposalId: $proposalId) {
+    proposalId
+    sepId
+    sepTimeAllocation
+
+    proposal {
+      ...proposal
+      proposer {
+        ...basicUserDetails
+      }
+      users {
+        ...basicUserDetails
+      }
+      questionary {
+        ...questionary
+      }
+      technicalReview {
+        ...coreTechnicalReview
+      }
+      reviews {
+        id
+        grade
+        comment
+        status
+        userID
+        sepID
+        reviewer {
+          firstname
+          lastname
+          username
+          id
+        }
+      }
+      instrument {
+        id
+        name
+        shortCode
+      }
+      call {
+        id
+        shortCode
+      }
+    }
+  }
+}

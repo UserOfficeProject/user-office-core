@@ -35,14 +35,16 @@ const Transition = React.forwardRef<unknown, TransitionProps>(SlideComponent);
 
 type ProposalReviewModalProps = {
   reviewModalOpen: boolean;
-  setReviewModalOpen: (isOpen: boolean) => void;
   editReviewID: number;
+  sepId?: number | null;
+  setReviewModalOpen: (isOpen: boolean) => void;
 };
 
 const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
   reviewModalOpen,
-  setReviewModalOpen,
   editReviewID,
+  sepId,
+  setReviewModalOpen,
 }) => {
   const classes = useStyles();
 
@@ -74,7 +76,7 @@ const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
           </Toolbar>
         </AppBar>
         <DialogContent>
-          <ProposalReview reviewId={editReviewID} />
+          <ProposalReview reviewId={editReviewID} sepId={sepId} />
         </DialogContent>
       </Dialog>
     </>
@@ -82,8 +84,9 @@ const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
 };
 
 ProposalReviewModal.propTypes = {
-  editReviewID: PropTypes.number.isRequired,
   reviewModalOpen: PropTypes.bool.isRequired,
+  editReviewID: PropTypes.number.isRequired,
+  sepId: PropTypes.number,
   setReviewModalOpen: PropTypes.func.isRequired,
 };
 

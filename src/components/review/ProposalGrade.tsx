@@ -1,4 +1,5 @@
 import { proposalGradeValidationSchema } from '@esss-swap/duo-validation/lib/Review';
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -28,9 +29,10 @@ const useStyles = makeStyles(() => ({
 export default function ProposalGrade(props: {
   reviewID: number;
   onChange: Function;
+  sepId?: number | null;
 }) {
   const classes = useStyles();
-  const { reviewData } = useReviewData(props.reviewID);
+  const { reviewData } = useReviewData(props.reviewID, props.sepId);
   const { api } = useDataApiWithFeedback();
   const [review, setReview] = useState<CoreReviewFragment | null | undefined>(
     null
@@ -53,7 +55,7 @@ export default function ProposalGrade(props: {
         saveOnly: true,
       }}
       onSubmit={async (values): Promise<void> => {
-        const data = await api('Updated').updateReview({
+        const data = await api('Updated').addReview({
           reviewID: props.reviewID,
           //This should be taken care of in validationSchema
           grade: +values.grade,
@@ -101,6 +103,11 @@ export default function ProposalGrade(props: {
             ))}
           </Field>
           <ButtonContainer>
+            {isSubmitting && (
+              <Box display="flex" alignItems="center" mx={1}>
+                <UOLoader buttonSized />
+              </Box>
+            )}
             <Button
               disabled={isSubmitting || review.status === 'SUBMITTED'}
               variant="contained"

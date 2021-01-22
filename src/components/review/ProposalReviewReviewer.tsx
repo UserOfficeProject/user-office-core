@@ -13,11 +13,12 @@ import TechnicalReviewInformation from './TechnicalReviewInformation';
 
 type ProposalReviewProps = {
   reviewId?: number;
+  sepId?: number | null;
 };
 
-const ProposalReview: React.FC<ProposalReviewProps> = ({ reviewId }) => {
+const ProposalReview: React.FC<ProposalReviewProps> = ({ reviewId, sepId }) => {
   const { id } = useParams();
-  const { reviewData } = useReviewData(reviewId || +(id as string));
+  const { reviewData } = useReviewData(reviewId || +(id as string), sepId);
   const { proposalData } = useProposalData(reviewData?.proposal?.id);
 
   if (!reviewData || !proposalData) {
@@ -33,6 +34,7 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ reviewId }) => {
       <ProposalGrade
         onChange={() => console.log('updated')}
         reviewID={reviewId || +(id as string)}
+        sepId={sepId}
       />
     </SimpleTabs>
   );
@@ -40,6 +42,7 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ reviewId }) => {
 
 ProposalReview.propTypes = {
   reviewId: PropTypes.number,
+  sepId: PropTypes.number,
 };
 
 export default ProposalReview;

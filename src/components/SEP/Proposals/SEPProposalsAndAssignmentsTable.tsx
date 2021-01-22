@@ -55,9 +55,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   const getGradesFromAssignments = (assignments: SepAssignment[]) =>
     assignments
       ?.filter(
-        assignment => assignment.review.status === ReviewStatus.SUBMITTED
+        assignment => assignment.review?.status === ReviewStatus.SUBMITTED
       )
-      .map(assignment => assignment.review.grade) ?? [];
+      .map(assignment => assignment.review?.grade) ?? [];
 
   const SEPProposalColumns = [
     { title: 'ID', field: 'proposal.shortCode' },
@@ -82,12 +82,15 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     },
     {
       title: 'Average grade',
-      render: (rowData: SepProposal): string =>
-        average(
+      render: (rowData: SepProposal): string => {
+        const avgGrade = average(
           getGradesFromAssignments(
             rowData.assignments as SepAssignment[]
           ) as number[]
-        ).toString(),
+        );
+
+        return isNaN(avgGrade) ? '-' : `${avgGrade}`;
+      },
     },
   ];
 
@@ -113,15 +116,21 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     assignedReviewer: SepAssignment,
     proposalId: number
   ): Promise<void> => {
+    /**
+     * TODO(asztalos): merge `removeMemberFromSEPProposal` and `removeUserForReview` (same goes for creation)
+     *                otherwise if one of them fails we may end up with an broken state
+     */
     await api('Reviewer removed').removeMemberFromSEPProposal({
       proposalId,
       sepId,
       memberId: assignedReviewer.sepMemberUserId as number,
     });
 
-    await api().removeUserForReview({
-      reviewID: assignedReviewer.review.id,
-    });
+    assignedReviewer.review &&
+      (await api().removeUserForReview({
+        reviewId: assignedReviewer.review.id,
+        sepId,
+      }));
 
     if (SEPProposalsData) {
       setSEPProposalsData(
@@ -219,7 +228,8 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
             assignments:
               editingProposalData.assignments?.map(proposalAssignment => {
                 if (
-                  proposalAssignment.review.id === currentAssignment?.review.id
+                  proposalAssignment?.review?.id ===
+                  currentAssignment?.review?.id
                 ) {
                   return currentAssignment;
                 } else {
@@ -302,6 +312,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
             editable={
               hasAccessRights
                 ? {
+                    deleteTooltip: () => 'Remove assigned proposal',
                     onRowDelete: (rowData: SepProposal): Promise<void> =>
                       removeProposalFromSEP(rowData),
                   }

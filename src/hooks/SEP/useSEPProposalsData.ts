@@ -17,13 +17,27 @@ export function useSEPProposalsData(
   >([]);
   const [loadingSEPProposals, setLoadingSEPProposals] = useState(true);
   useEffect(() => {
+    let cancelled = false;
+    setLoadingSEPProposals(true);
     api()
       .getSEPProposals({ sepId, callId })
       .then(data => {
+        if (cancelled) {
+          return;
+        }
+
         setSEPProposalsData(data.sepProposals as SepProposal[]);
         setLoadingSEPProposals(false);
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [sepId, api, callId]);
 
-  return { loadingSEPProposals, SEPProposalsData, setSEPProposalsData };
+  return {
+    loadingSEPProposals,
+    SEPProposalsData,
+    setSEPProposalsData,
+  } as const;
 }

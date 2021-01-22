@@ -75,21 +75,20 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
     {
       title: 'Grade',
       render: (rowData: SepAssignment) =>
-        rowData.review.grade ? rowData.review.grade : '-',
+        rowData.review?.grade ? rowData.review.grade : '-',
     },
   ];
-
-  const RateReviewIconComponent = (): JSX.Element => <RateReviewIcon />;
 
   return (
     <div className={classes.root} data-cy="sep-reviewer-assignments-table">
       {editReviewID && (
         <ProposalReviewModal
-          editReviewID={editReviewID as number}
+          editReviewID={editReviewID}
+          sepId={sepProposal.sepId}
           reviewModalOpen={reviewModalOpen}
           setReviewModalOpen={() => {
             setReviewModalOpen(false);
-            updateView(currentAssignment as SepAssignment);
+            currentAssignment && updateView(currentAssignment);
           }}
         />
       )}
@@ -101,6 +100,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
         editable={
           hasAccessRights
             ? {
+                deleteTooltip: () => 'Remove assignment',
                 onRowDelete: (
                   rowAssignmentsData: SepAssignment
                 ): Promise<void> =>
@@ -114,10 +114,14 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
         actions={[
           rowData => ({
             icon:
-              rowData.review.status === ReviewStatus.DRAFT
-                ? RateReviewIconComponent
+              rowData.review?.status === ReviewStatus.DRAFT
+                ? () => <RateReviewIcon />
                 : () => <Visibility />,
             onClick: () => {
+              if (!rowData.review) {
+                return;
+              }
+
               setEditReviewID(rowData.review.id);
               setCurrentAssignment({
                 ...rowData,
@@ -126,7 +130,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
               setReviewModalOpen(true);
             },
             tooltip:
-              rowData.review.status === ReviewStatus.DRAFT
+              rowData.review?.status === ReviewStatus.DRAFT
                 ? 'Review proposal'
                 : 'View review',
           }),

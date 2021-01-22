@@ -8,6 +8,7 @@ query sepProposalsByInstrument(
     sepId: $sepId
     callId: $callId
   ) {
+    sepTimeAllocation
     proposal {
       id
       title
@@ -27,6 +28,9 @@ query sepProposalsByInstrument(
         status
         timeAllocation
       }
+    }
+    assignments {
+      sepMemberUserId
     }
   }
 }

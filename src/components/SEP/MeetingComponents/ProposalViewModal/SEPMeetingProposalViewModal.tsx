@@ -14,10 +14,11 @@ import CloseIcon from '@material-ui/icons/Close';
 import PropTypes from 'prop-types';
 import React, { Ref } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
 import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
-import { TechnicalReview, Review } from 'generated/sdk';
-import { useProposalData } from 'hooks/proposal/useProposalData';
+import { TechnicalReview, Review, UserRole } from 'generated/sdk';
+import { useSEPProposalData } from 'hooks/SEP/useSEPProposalData';
 import { ContentContainer } from 'styles/StyledComponents';
 
 import ExternalReviews from './ExternalReviews';
@@ -45,26 +46,44 @@ const Transition = React.forwardRef<unknown, TransitionProps>(SlideComponent);
 
 type SEPMeetingProposalViewModalProps = {
   proposalViewModalOpen: boolean;
-  setProposalViewModalOpen: (isOpen: boolean) => void;
   proposalId: number;
+  sepId: number;
+  submitted: boolean;
   meetingSubmitted: (data: AdministrationFormData) => void;
+  setProposalViewModalOpen: (isOpen: boolean) => void;
 };
 
 const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = ({
-  setProposalViewModalOpen,
   proposalViewModalOpen,
   proposalId,
+  sepId,
+  submitted,
   meetingSubmitted,
+  setProposalViewModalOpen,
 }) => {
   const classes = useStyles();
-  const { proposalData, loading, setProposalData } = useProposalData(
+  const hasWriteAccess = useCheckAccess([
+    UserRole.USER_OFFICER,
+    UserRole.SEP_CHAIR,
+    UserRole.SEP_SECRETARY,
+  ]);
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+
+  const finalHasWriteAccess = submitted ? isUserOfficer : hasWriteAccess;
+
+  const { SEPProposalData, loading, setSEPProposalData } = useSEPProposalData(
+    sepId,
     proposalId
   );
 
+  const proposalData = SEPProposalData?.proposal ?? null;
+
   const handleClose = () => {
     setProposalViewModalOpen(false);
-    setProposalData(null);
+    setSEPProposalData(null);
   };
+
+  const sepTimeAllocation = SEPProposalData?.sepTimeAllocation ?? null;
 
   return (
     <>
@@ -94,7 +113,7 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <div data-cy="SEP-meeting-components-proposal-view">
-                  {loading || !proposalData ? (
+                  {loading || !SEPProposalData || !proposalData ? (
                     <UOLoader
                       style={{ marginLeft: '50%', marginTop: '20px' }}
                     />
@@ -102,21 +121,35 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
                     <>
                       <FinalRankingForm
                         closeModal={handleClose}
+                        hasWriteAccess={finalHasWriteAccess}
                         proposalData={proposalData}
                         meetingSubmitted={data => {
-                          setProposalData({
-                            ...proposalData,
-                            ...data,
-                            rankOrder: data.rankOrder as number,
+                          setSEPProposalData({
+                            ...SEPProposalData,
+                            proposal: {
+                              ...proposalData,
+                              ...data,
+                              rankOrder: data.rankOrder as number,
+                            },
                           });
                           meetingSubmitted(data);
                         }}
                       />
                       <ProposalDetails proposal={proposalData} />
                       <TechnicalReviewInfo
+                        hasWriteAccess={finalHasWriteAccess}
                         technicalReview={
                           proposalData.technicalReview as TechnicalReview
                         }
+                        sepTimeAllocation={sepTimeAllocation}
+                        onSepTimeAllocationEdit={sepTimeAllocation =>
+                          setSEPProposalData({
+                            ...SEPProposalData,
+                            sepTimeAllocation,
+                          })
+                        }
+                        proposalId={proposalData.id}
+                        sepId={sepId}
                       />
                       <ExternalReviews
                         reviews={proposalData.reviews as Review[]}
@@ -138,6 +171,8 @@ SEPMeetingProposalViewModal.propTypes = {
   proposalViewModalOpen: PropTypes.bool.isRequired,
   setProposalViewModalOpen: PropTypes.func.isRequired,
   meetingSubmitted: PropTypes.func.isRequired,
+  sepId: PropTypes.number.isRequired,
+  submitted: PropTypes.bool.isRequired,
 };
 
 export default SEPMeetingProposalViewModal;
