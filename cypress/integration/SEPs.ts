@@ -163,6 +163,8 @@ context('Scientific evaluation panel tests', () => {
       text: 'SEP secretary assigned successfully',
     });
 
+    cy.reload();
+
     cy.contains('Logs').click({ force: true });
 
     cy.contains('SEP_MEMBERS_ASSIGNED');

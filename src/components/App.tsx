@@ -14,6 +14,7 @@ import {
 } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 
+import { FeatureContextProvider } from 'context/FeatureContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
@@ -143,13 +144,15 @@ class App extends React.Component {
                 </IconButton>
               )}
             >
-              <ReviewAndAssignmentContextProvider>
-                <Router>
-                  <QueryParamProvider ReactRouterRoute={Route}>
-                    <div className="App">{routes}</div>
-                  </QueryParamProvider>
-                </Router>
-              </ReviewAndAssignmentContextProvider>
+              <FeatureContextProvider>
+                <ReviewAndAssignmentContextProvider>
+                  <Router>
+                    <QueryParamProvider ReactRouterRoute={Route}>
+                      <div className="App">{routes}</div>
+                    </QueryParamProvider>
+                  </Router>
+                </ReviewAndAssignmentContextProvider>
+              </FeatureContextProvider>
             </SnackbarProvider>
           </UserContextProvider>
         </CookiesProvider>

@@ -70,6 +70,7 @@ export const QuestionFileUploadForm: FormComponent<Question> = props => {
               label="Accepted file types (leave empty for any)"
               id="fileType"
               component={FormikUICustomSelect}
+              multiple
               availableOptions={[
                 '.pdf',
                 '.doc',

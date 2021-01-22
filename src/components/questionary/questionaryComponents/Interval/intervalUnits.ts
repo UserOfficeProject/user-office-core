@@ -280,7 +280,7 @@ propertyList.set(IntervalPropertyId.PRESSURE, {
 });
 propertyList.set(IntervalPropertyId.ENERGY, {
   id: IntervalPropertyId.ENERGY,
-  name: 'energy, work, quantity of heat',
+  name: 'energy, work, quantity of heat, wavelength',
   siUnit: 'joule',
   units: [
     'terajoule',
@@ -295,8 +295,11 @@ propertyList.set(IntervalPropertyId.ENERGY, {
     'btu',
     'calorie',
     'Calorie',
+    'millielectronvolt',
     'electronvolt',
     'megaelectronvolt',
+    'nanometer',
+    'angstrom',
   ],
 });
 propertyList.set(IntervalPropertyId.POWER, {

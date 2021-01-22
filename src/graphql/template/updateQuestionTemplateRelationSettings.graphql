@@ -1,16 +1,14 @@
-mutation updateQuestionTemplateRelation(
+mutation updateQuestionTemplateRelationSettings(
   $questionId: String!
   $templateId: Int!
-  $topicId: Int
-  $sortOrder: Int!
   $config: String
+  $dependencies: [FieldDependencyInput!]!
 ) {
-  updateQuestionTemplateRelation(
+  updateQuestionTemplateRelationSettings(
     questionId: $questionId
     templateId: $templateId
-    topicId: $topicId
-    sortOrder: $sortOrder
     config: $config
+    dependencies: $dependencies
   ) {
     template {
       ...template

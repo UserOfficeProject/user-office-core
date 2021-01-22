@@ -42,8 +42,8 @@ class TemplateTopicEditor implements TemplateTopicEditorData {
   get dataType() {
     return this.source.question.dataType;
   }
-  get dependency() {
-    return this.source.dependency;
+  get dependencies() {
+    return this.source.dependencies;
   }
   get config() {
     return this.source.config;
