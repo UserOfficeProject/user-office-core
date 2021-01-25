@@ -21,12 +21,12 @@ import {
   NotDraggingStyle,
 } from 'react-beautiful-dnd';
 
+import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
   DependenciesLogicOperator,
   QuestionTemplateRelation,
   TemplateStep,
 } from 'generated/sdk';
-import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { Event, EventType } from 'models/QuestionaryEditorModel';
 
 import TemplateQuestionEditor, {
