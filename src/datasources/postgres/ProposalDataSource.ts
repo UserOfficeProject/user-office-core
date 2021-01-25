@@ -248,7 +248,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .join('|');
 
           query.whereRaw(
-            `proposal_table_view.short_code similar to '%(${filteredAndPreparedShortCodes})%'`
+            `proposals.short_code similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
 
@@ -313,7 +313,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .join('|');
 
           query.whereRaw(
-            `proposal_table_view.short_code similar to '%(${filteredAndPreparedShortCodes})%'`
+            `proposals.short_code similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
 
