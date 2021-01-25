@@ -249,8 +249,11 @@ function QuestionaryComponentSampleDeclaration(
               const index = rows.findIndex(
                 sample => sample.id === selectedSample.id
               );
+
               if (index === -1) {
                 // unexpected
+                setSelectedSample(null);
+
                 return;
               }
               const newRows = [...rows];
