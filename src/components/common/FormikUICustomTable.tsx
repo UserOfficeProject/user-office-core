@@ -1,6 +1,7 @@
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import { FormikHelpers } from 'formik';
-import MaterialTable from 'material-table';
+import MaterialTable, { MTableToolbar, Options } from 'material-table';
 import React, { forwardRef } from 'react';
 
 import { tableIcons } from 'utils/materialIcons';
@@ -28,20 +29,41 @@ export const FormikUICustomTable = ({
   };
   form: FormikHelpers<any>;
 }) => {
+  const classes = makeStyles(() => ({
+    customToolbar: {
+      '& .MuiToolbar-root': {
+        minHeight: 'auto',
+        '& button': {
+          padding: 0,
+        },
+      },
+    },
+  }))();
   const transformedValues = dataTransforms.toTable(field.value);
   const [state, setState] = React.useState(transformedValues);
+
+  const AddNewItemIcon = () => (
+    <div data-cy="add-answer-button">
+      <AddCircleOutlineIcon />
+    </div>
+  );
+
+  const StyledToolbar = (props: Options) => (
+    <div className={classes.customToolbar}>
+      <MTableToolbar {...props} />
+    </div>
+  );
 
   return (
     <MaterialTable
       icons={{
         ...tableIcons,
-        Add: forwardRef(() => (
-          <div data-cy="add-answer-button">
-            <AddCircleOutlineIcon />
-          </div>
-        )),
+        Add: forwardRef(AddNewItemIcon),
       }}
       columns={columns}
+      components={{
+        Toolbar: StyledToolbar,
+      }}
       data={state}
       options={{ search: false, paging: false }}
       editable={{

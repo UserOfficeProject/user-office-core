@@ -94,7 +94,7 @@ const ProposalTableReviewer: React.FC = () => {
       const userDataUpdated = {
         ...userData,
         reviews: userData?.reviews.map(review => {
-          if (review.id === currentReview.id) {
+          if (review.id === currentReview?.id) {
             return {
               ...review,
               grade: currentReview.grade,

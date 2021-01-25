@@ -8,7 +8,7 @@ fragment answer on Answer {
   config {
     ...fieldConfig
   }
-  dependency {
+  dependencies {
     questionId
     dependencyId
     dependencyNaturalKey
@@ -16,5 +16,6 @@ fragment answer on Answer {
       ...fieldCondition
     }
   }
+  dependenciesOperator
   value
 }

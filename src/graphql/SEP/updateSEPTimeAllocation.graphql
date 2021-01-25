@@ -1,0 +1,13 @@
+mutation updateSEPTimeAllocation(
+  $sepId: Int!
+  $proposalId: Int!
+  $sepTimeAllocation: Int
+) {
+  updateSEPTimeAllocation(
+    sepId: $sepId
+    proposalId: $proposalId
+    sepTimeAllocation: $sepTimeAllocation
+  ) {
+    error
+  }
+}

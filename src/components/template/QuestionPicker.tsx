@@ -21,6 +21,7 @@ import {
 } from 'components/questionary/QuestionaryComponentRegistry';
 import {
   DataType,
+  DependenciesLogicOperator,
   Question,
   Template,
   TemplateCategoryId,
@@ -47,11 +48,14 @@ class QuestionItemAdapter implements TemplateTopicEditorData {
   get dataType() {
     return this.source.dataType;
   }
-  get dependency() {
-    return null;
+  get dependencies() {
+    return [];
   }
   get config() {
     return this.source.config;
+  }
+  get dependenciesOperator() {
+    return DependenciesLogicOperator.AND;
   }
   get categoryId() {
     return this.source.categoryId;

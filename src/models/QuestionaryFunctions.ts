@@ -3,6 +3,7 @@ import { getQuestionaryComponentDefinition } from 'components/questionary/Questi
 import {
   Answer,
   AnswerInput,
+  DependenciesLogicOperator,
   FieldDependency,
   QuestionaryStep,
   QuestionTemplateRelation,
@@ -89,11 +90,19 @@ export function areDependenciesSatisfied(
   fieldId: string
 ) {
   const field = getFieldById(questionary, fieldId);
-  if (!field) {
+  if (!field || !field.dependencies) {
     return true;
   }
 
-  return isDependencySatisfied(questionary, field.dependency);
+  if (field.dependenciesOperator === DependenciesLogicOperator.OR) {
+    return field.dependencies.some(dependency =>
+      isDependencySatisfied(questionary, dependency)
+    );
+  } else {
+    return field.dependencies.every(dependency =>
+      isDependencySatisfied(questionary, dependency)
+    );
+  }
 }
 
 export function prepareAnswers(answers?: Answer[]): AnswerInput[] {

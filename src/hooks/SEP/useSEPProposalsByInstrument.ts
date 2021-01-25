@@ -11,6 +11,7 @@ export function useSEPProposalsByInstrument(
   loadingInstrumentProposals: boolean;
   instrumentProposalsData: SepProposal[];
   setInstrumentProposalsData: Dispatch<SetStateAction<SepProposal[]>>;
+  refreshInstrumentProposalsData: () => void;
 } {
   const [instrumentProposalsData, setInstrumentProposalsData] = useState<
     SepProposal[]
@@ -18,14 +19,23 @@ export function useSEPProposalsByInstrument(
   const [loadingInstrumentProposals, setLoadingInstrumentProposals] = useState(
     true
   );
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   const api = useDataApi();
 
+  const refreshInstrumentProposalsData = () =>
+    setRefreshCounter(refreshCounter + 1);
+
   useEffect(() => {
+    let canceled = false;
     setLoadingInstrumentProposals(true);
     api()
       .sepProposalsByInstrument({ instrumentId, sepId, callId })
       .then(data => {
+        if (canceled) {
+          return;
+        }
+
         if (data.sepProposalsByInstrument) {
           setInstrumentProposalsData(
             data.sepProposalsByInstrument as SepProposal[]
@@ -33,11 +43,16 @@ export function useSEPProposalsByInstrument(
         }
         setLoadingInstrumentProposals(false);
       });
-  }, [api, sepId, instrumentId, callId]);
+
+    return () => {
+      canceled = true;
+    };
+  }, [api, sepId, instrumentId, callId, refreshCounter]);
 
   return {
     loadingInstrumentProposals,
     instrumentProposalsData,
     setInstrumentProposalsData,
+    refreshInstrumentProposalsData,
   };
 }

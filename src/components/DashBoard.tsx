@@ -11,8 +11,9 @@ import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
+import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { PageName, UserRole } from 'generated/sdk';
+import { FeatureId, PageName, UserRole } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { useCallsData } from 'hooks/call/useCallsData';
 
@@ -140,6 +141,10 @@ const Dashboard: React.FC = () => {
     UserRole.SAMPLE_SAFETY_REVIEWER,
   ]);
 
+  const featureContext = useContext(FeatureContext);
+  const isShipmentEnabled = !!featureContext.features.get(FeatureId.SHIPPING)
+    ?.isEnabled;
+
   const { currentRole } = useContext(UserContext);
   const { calls } = useCallsData({ isActive: true });
 
@@ -193,8 +198,12 @@ const Dashboard: React.FC = () => {
             path="/ProposalCreate/:callId/:templateId"
             component={ProposalCreate}
           />
-          <Route path="/ShipmentCreate" component={ShipmentCreate} />
-          <Route path="/MyShipments" component={MyShipments} />
+          {isShipmentEnabled && (
+            <Route path="/ShipmentCreate" component={ShipmentCreate} />
+          )}
+          {isShipmentEnabled && (
+            <Route path="/MyShipments" component={MyShipments} />
+          )}
           <Route path="/ProfilePage/:id" component={ProfilePage} />
           {isUserOfficer && (
             <Route path="/PeoplePage/:id" component={UserPage} />

@@ -1,0 +1,20 @@
+mutation updateQuestionTemplateRelationSettings(
+  $questionId: String!
+  $templateId: Int!
+  $config: String
+  $dependencies: [FieldDependencyInput!]!
+  $dependenciesOperator: DependenciesLogicOperator
+) {
+  updateQuestionTemplateRelationSettings(
+    questionId: $questionId
+    templateId: $templateId
+    config: $config
+    dependencies: $dependencies
+    dependenciesOperator: $dependenciesOperator
+  ) {
+    template {
+      ...template
+    }
+    error
+  }
+}

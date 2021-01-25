@@ -54,7 +54,7 @@ const navigateToTemplatesSubmenu = submenuName => {
     .click();
 };
 
-const login = role => {
+const login = roleOrCredentials => {
   const testCredentialStore = {
     user: {
       email: 'Javon4@hotmail.com',
@@ -66,7 +66,10 @@ const login = role => {
     },
   };
 
-  const credentials = testCredentialStore[role];
+  const credentials =
+    typeof roleOrCredentials === 'string'
+      ? testCredentialStore[roleOrCredentials]
+      : roleOrCredentials;
 
   cy.visit('/');
 
@@ -134,8 +137,7 @@ const createProposal = (proposalTitle = '', proposalAbstract = '') => {
   cy.contains('Save and continue').click();
 };
 
-
-const createTopic = (title) => {
+const createTopic = title => {
   cy.get('[data-cy=show-more-button]').click();
 
   cy.get('[data-cy=add-topic-menu-item]').click();
@@ -154,15 +156,14 @@ function createTemplate(type, title, description) {
   const templateTitle = title || faker.random.words(2);
   const templateDescription = description || faker.random.words(3);
 
-  const typeToMenuTitle = new Map()
-  typeToMenuTitle.set('proposal', 'Proposal templates')
-  typeToMenuTitle.set('sample', 'Sample declaration templates')
-  typeToMenuTitle.set('shipment', 'Shipment declaration templates')
+  const typeToMenuTitle = new Map();
+  typeToMenuTitle.set('proposal', 'Proposal templates');
+  typeToMenuTitle.set('sample', 'Sample declaration templates');
+  typeToMenuTitle.set('shipment', 'Shipment declaration templates');
 
   const menuTitle = typeToMenuTitle.get(type);
-  if(!menuTitle)
-  {
-    throw new Error(`Type ${type} not supported`)
+  if (!menuTitle) {
+    throw new Error(`Type ${type} not supported`);
   }
 
   cy.navigateToTemplatesSubmenu(menuTitle);
@@ -177,7 +178,6 @@ function createTemplate(type, title, description) {
 
   cy.get('[data-cy=submit]').click();
 }
-
 
 const dragElement = (element, moveArgs) => {
   const focusedElement = cy.get(element);
@@ -200,8 +200,8 @@ const dragElement = (element, moveArgs) => {
 
 const createSampleQuestion = (question, templateName) => {
   cy.get('[data-cy=show-more-button]')
-  .last()
-  .click();
+    .last()
+    .click();
 
   cy.get('[data-cy=add-question-menu-item]')
     .last()
@@ -222,6 +222,21 @@ const createSampleQuestion = (question, templateName) => {
 
   cy.contains('Save').click();
 };
+
+function changeActiveRole(role) {
+  cy.get('[data-cy="profile-page-btn"]').click();
+  cy.contains('Roles').click();
+
+  cy.finishedLoading();
+
+  cy.get("[data-cy='role-selection-table'] table tbody")
+    .contains(role)
+    .parent()
+    .contains('Use')
+    .click();
+
+  cy.notification({ variant: 'success', text: 'User role changed' });
+}
 
 Cypress.Commands.add('resetDB', resetDB);
 
@@ -249,6 +264,8 @@ Cypress.Commands.add(
 Cypress.Commands.add('createTopic', createTopic);
 
 Cypress.Commands.add('createSampleQuestion', createSampleQuestion);
+
+Cypress.Commands.add('changeActiveRole', changeActiveRole);
 
 // call cy.presentationMode(); before your test to have delay between clicks.
 // Excellent for presentation purposes

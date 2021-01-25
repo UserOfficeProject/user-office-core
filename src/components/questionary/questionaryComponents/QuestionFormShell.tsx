@@ -71,6 +71,7 @@ export const QuestionFormShell = (props: {
                   });
                   props.closeMe();
                 }}
+                disabled={definition.creatable === false}
               >
                 Delete
               </Button>

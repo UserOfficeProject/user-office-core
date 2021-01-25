@@ -6,17 +6,17 @@ import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
-import FormikUICustomDependencySelector from 'components/common/FormikUICustomDependencySelector';
 import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionExcerpt } from 'components/questionary/questionaryComponents/QuestionExcerpt';
 import { IntervalConfig, QuestionTemplateRelation } from 'generated/sdk';
 
+import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 import { allProperties, IntervalPropertyId } from './intervalUnits';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   units: {
     minWidth: '100%',
   },
@@ -89,6 +89,7 @@ export const QuestionTemplateRelationIntervalForm: FormComponent<QuestionTemplat
             <Field
               name="config.units"
               component={FormikUICustomSelect}
+              multiple
               label="Units"
               margin="normal"
               availableOptions={
@@ -103,14 +104,9 @@ export const QuestionTemplateRelationIntervalForm: FormComponent<QuestionTemplat
           </TitledContainer>
 
           <TitledContainer label="Dependencies">
-            <Field
-              name="dependency"
-              component={FormikUICustomDependencySelector}
-              templateField={props.field}
+            <QuestionDependencyList
+              form={formikProps}
               template={props.template}
-              margin="normal"
-              fullWidth
-              data-cy="dependencies"
             />
           </TitledContainer>
         </>

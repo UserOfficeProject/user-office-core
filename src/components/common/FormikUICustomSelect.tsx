@@ -1,11 +1,12 @@
-import Checkbox from '@material-ui/core/Checkbox';
+import { MenuItem } from '@material-ui/core';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import ListItemText from '@material-ui/core/ListItemText';
-import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import { FieldInputProps, FormikHelpers } from 'formik';
 import React from 'react';
+
+import MultiMenuItem from './MultiMenuItem';
 
 export type ValueType = string | number;
 type SelectedValueType = ValueType | ValueType[];
@@ -15,12 +16,19 @@ interface Option {
   value: ValueType;
 }
 
-// converts string|Option to Option
+/**
+ * Converts string|Option to Option
+ * @param option input
+ */
 const normalizeOption = (option: Option | string): Option => {
   return typeof option === 'string' ? { label: option, value: option } : option;
 };
 
-const normalizeOptions = (options: Array<any>): Option[] => {
+/**
+ * Converts array of string|Option to array of Option
+ * @param option input
+ */
+const normalizeOptions = (options: Array<Option | string>): Option[] => {
   return options.map(option => normalizeOption(option));
 };
 
@@ -55,12 +63,12 @@ const FormikUICustomSelect = ({
   multiple,
   ...props
 }: FormikUICustomMultipleSelectProps) => {
-  const abvailableOptionsNormalized: Option[] = normalizeOptions(
+  const availableOptionsNormalized: Option[] = normalizeOptions(
     availableOptions
   );
 
   const getOptionByValue = (value: ValueType) =>
-    abvailableOptionsNormalized.find(
+    availableOptionsNormalized.find(
       option => option.value === (value as ValueType)
     );
 
@@ -73,17 +81,7 @@ const FormikUICustomSelect = ({
     form.setFieldValue(field.name, newValue);
   };
 
-  const getCheckboxForOption = (option: Option) => {
-    if (multiple) {
-      return (
-        <Checkbox
-          checked={(field.value as ValueType[]).includes(option.value)}
-        />
-      );
-    } else {
-      return null;
-    }
-  };
+  const SelectMenuItem = multiple ? MultiMenuItem : MenuItem;
 
   return (
     <>
@@ -107,11 +105,10 @@ const FormikUICustomSelect = ({
         id={id}
         {...props}
       >
-        {abvailableOptionsNormalized.map(curOption => (
-          <MenuItem key={curOption.value} value={curOption.value}>
-            {getCheckboxForOption(curOption)}
+        {availableOptionsNormalized.map(curOption => (
+          <SelectMenuItem key={curOption.value} value={curOption.value}>
             <ListItemText primary={curOption.label} />
-          </MenuItem>
+          </SelectMenuItem>
         ))}
       </Select>
     </>

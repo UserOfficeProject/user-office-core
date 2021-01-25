@@ -266,6 +266,7 @@ context('Template tests', () => {
     cy.contains(textQuestion).click();
 
     // Updating dependencies
+    cy.get('[data-cy="add-dependency-button"]').click();
     cy.get('#dependency-id').click();
     cy.get('[data-cy=question-relation-dialogue]')
       .get('#menu- > .MuiPaper-root > .MuiList-root > [tabindex="0"]')
@@ -318,21 +319,23 @@ context('Template tests', () => {
 
     cy.contains('Is multiple select').click();
 
+    cy.contains('Items').click();
+
     cy.get('[data-cy=add-answer-button]')
       .closest('button')
-      .click({ force: true });
+      .click();
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[0]);
     cy.get('[title="Save"]').click();
 
     cy.get('[data-cy=add-answer-button]')
       .closest('button')
-      .click({ force: true });
+      .click();
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[1]);
     cy.get('[title="Save"]').click();
 
     cy.get('[data-cy=add-answer-button]')
       .closest('button')
-      .click({ force: true });
+      .click();
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[2]);
     cy.get('[title="Save"]').click();
 
@@ -597,7 +600,7 @@ context('Template tests', () => {
     cy.get("[data-cy='delete']").click();
   });
 
-  it('User officer can add multiple choice quesion as a dependency', () => {
+  it('User officer can add multiple choice question as a dependency', () => {
     cy.login('officer');
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
@@ -624,15 +627,17 @@ context('Template tests', () => {
       .clear()
       .type('Multichoice question');
 
+    cy.contains('Items').click();
+
     cy.get('[data-cy=add-answer-button]')
       .closest('button')
-      .click({ force: true });
+      .click();
     cy.get('input[placeholder="Answer"]').type('Answer 1');
     cy.get('[title="Save"]').click();
 
     cy.get('[data-cy=add-answer-button]')
       .closest('button')
-      .click({ force: true });
+      .click();
     cy.get('input[placeholder="Answer"]').type('Answer 2');
     cy.get('[title="Save"]').click();
 
@@ -670,6 +675,8 @@ context('Template tests', () => {
     cy.finishedLoading();
 
     cy.contains('Boolean question').click();
+
+    cy.get('[data-cy="add-dependency-button"]').click();
 
     cy.get('[id="dependency-id"]').click();
 
@@ -711,5 +718,158 @@ context('Template tests', () => {
     cy.contains('Boolean question').click();
     cy.contains('Answer 2').click();
     cy.get('main form').should('not.contain.text', 'Boolean question');
+  });
+
+  it('User officer can add multiple dependencies on a question', () => {
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    cy.get('[title="Edit"]')
+      .last()
+      .click();
+
+    cy.get('[data-cy=show-more-button]').click();
+
+    cy.contains('Add question').click();
+
+    cy.get('[data-cy=questionPicker] [data-cy="proposal-question-id"]')
+      .first()
+      .click();
+
+    cy.get('[data-cy="question"]')
+      .clear()
+      .type('Question with multiple dependencies');
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.contains('Question with multiple dependencies')
+      .parent()
+      .dragElement([
+        { direction: 'left', length: 1 },
+        { direction: 'down', length: 3 },
+      ]);
+
+    cy.finishedLoading();
+
+    cy.contains('Question with multiple dependencies').click();
+
+    cy.get('[data-cy="add-dependency-button"]').click();
+
+    cy.get('[id="dependency-id"]').click();
+
+    cy.get('[role="presentation"]')
+      .contains('Multichoice question')
+      .click();
+
+    cy.get('[id="dependencyValue"]').click();
+
+    cy.contains('Answer 1').click();
+
+    cy.get('[data-cy="add-dependency-button"]').click();
+
+    cy.get('[id="dependency-id"]')
+      .last()
+      .click();
+
+    cy.get('[role="presentation"]')
+      .contains('Boolean question')
+      .click();
+
+    cy.get('[id="dependencyValue"]')
+      .last()
+      .click();
+
+    cy.contains('true').click();
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.logout();
+
+    cy.login('user');
+
+    cy.contains('New Proposal').click();
+
+    cy.contains('Multichoice question');
+
+    cy.get('main form').should('not.contain.text', 'Boolean question');
+    cy.get('main form').should(
+      'not.contain.text',
+      'Question with multiple dependencies'
+    );
+
+    cy.contains('Answer 1').click();
+    cy.contains('Boolean question').click();
+    cy.get('main form').should(
+      'contain.text',
+      'Question with multiple dependencies'
+    );
+    cy.contains('Answer 2').click();
+    cy.get('main form').should('not.contain.text', 'Boolean question');
+    cy.get('main form').should(
+      'not.contain.text',
+      'Question with multiple dependencies'
+    );
+  });
+
+  it('User officer can can change dependency logic operator', () => {
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    cy.get('[title="Edit"]')
+      .last()
+      .click();
+
+    cy.contains('Question with multiple dependencies').click();
+
+    cy.get('[data-cy="dependencies-operator"]').click();
+
+    cy.get('[data-value="OR"]').click();
+
+    cy.get('[id="dependencyValue"]')
+      .first()
+      .click();
+
+    cy.contains('Answer 2').click();
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.logout();
+
+    cy.login('user');
+
+    cy.contains('New Proposal').click();
+
+    cy.contains('Multichoice question');
+
+    cy.get('main form').should('not.contain.text', 'Boolean question');
+    cy.get('main form').should(
+      'not.contain.text',
+      'Question with multiple dependencies'
+    );
+
+    cy.contains('Answer 1').click();
+    cy.contains('Boolean question');
+    cy.get('main form').should(
+      'not.contain.text',
+      'Question with multiple dependencies'
+    );
+    cy.contains('Boolean question').click();
+    cy.get('main form').should(
+      'contain.text',
+      'Question with multiple dependencies'
+    );
+    cy.contains('Boolean question').click();
+    cy.get('main form').should(
+      'not.contain.text',
+      'Question with multiple dependencies'
+    );
+    cy.contains('Answer 2').click();
+    cy.get('main form').should('not.contain.text', 'Boolean question');
+    cy.get('main form').should(
+      'contain.text',
+      'Question with multiple dependencies'
+    );
   });
 });

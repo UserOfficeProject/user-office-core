@@ -15,6 +15,7 @@ import {
 } from 'components/questionary/QuestionaryComponentRegistry';
 import {
   DataType,
+  DependenciesLogicOperator,
   FieldConfig,
   FieldDependency,
   TemplateCategoryId,
@@ -86,14 +87,30 @@ export default function TemplateQuestionEditor(props: {
     ...draggableStyle,
   });
 
-  const dependency = props.data.dependency;
-  const dependencyJsx = dependency ? (
+  const dependencies = props.data.dependencies;
+  let dependencyComparator =
+    props.data.dependenciesOperator === DependenciesLogicOperator.AND
+      ? '&&'
+      : '||';
+  const dependencyJsx = dependencies.length ? (
     <>
       <LockIcon className={classes.lockIcon} />
       <ul>
-        <li key={dependency.dependencyId + dependency.questionId}>
-          {dependency.dependencyNaturalKey}
-        </li>
+        {dependencies.map((dependency, i) => {
+          dependencyComparator =
+            i < dependencies.length - 1 ? dependencyComparator : '';
+
+          const dependenciesAreVisible = !!dependency.dependencyNaturalKey;
+
+          return (
+            dependenciesAreVisible && (
+              <li key={dependency.dependencyId + dependency.questionId}>
+                {`${dependency.dependencyNaturalKey} `}
+                <strong>{`${dependencyComparator}`}</strong>
+              </li>
+            )
+          );
+        })}
       </ul>
     </>
   ) : null;
@@ -107,6 +124,7 @@ export default function TemplateQuestionEditor(props: {
       key={props.data.proposalQuestionId}
       draggableId={props.data.proposalQuestionId}
       index={props.index}
+      isDragDisabled={questionDefinition.creatable === false}
     >
       {(provided, snapshot) => (
         <Grid
@@ -160,7 +178,8 @@ export interface TemplateTopicEditorData {
   question: string;
   naturalKey: string;
   dataType: DataType;
-  dependency?: FieldDependency | null;
+  dependencies: FieldDependency[];
+  dependenciesOperator: DependenciesLogicOperator;
   config: FieldConfig;
   categoryId: TemplateCategoryId;
 }

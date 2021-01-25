@@ -8,7 +8,7 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { Answer, SampleBasisConfig } from 'generated/sdk';
+import { Answer } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { EventType } from 'models/QuestionarySubmissionState';
 import { SampleSubmissionState } from 'models/SampleSubmissionState';
@@ -38,7 +38,7 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
     <>
       <Field
         name={proposalQuestionId}
-        label={(props.answer.config as SampleBasisConfig).titlePlaceholder}
+        label={props.answer.question.question}
         inputProps={{
           onChange: (event: ChangeEvent<HTMLInputElement>) => {
             setTitle(event.currentTarget.value);

@@ -118,6 +118,11 @@ context('Personal information tests', () => {
 
     cy.notification({ variant: 'success', text: 'successfully' });
 
+    // wait before trying to get profile button otherwise page
+    // might re-render and you could be trying to access element
+    // that is not attached to the DOM
+    cy.wait(2000);
+
     cy.get("[data-cy='profile-page-btn']").click();
 
     cy.get('.MuiPopover-root .MuiMenuItem-root')

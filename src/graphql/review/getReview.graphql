@@ -1,5 +1,5 @@
-query getReview($id: Int!) {
-  review(id: $id) {
+query getReview($reviewId: Int!, $sepId: Int) {
+  review(reviewId: $reviewId, sepId: $sepId) {
     ...coreReview
     proposal {
       id

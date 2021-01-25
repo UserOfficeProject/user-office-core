@@ -5,7 +5,6 @@ import React, { ChangeEvent, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
-import FormikUICustomDependencySelector from 'components/common/FormikUICustomDependencySelector';
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
@@ -14,6 +13,7 @@ import {
   SelectionFromOptionsConfig,
 } from 'generated/sdk';
 
+import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
@@ -102,14 +102,9 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
             />
           </TitledContainer>
           <TitledContainer label="Dependencies">
-            <Field
-              name="dependency"
-              component={FormikUICustomDependencySelector}
-              templateField={props.field}
+            <QuestionDependencyList
               template={props.template}
-              margin="normal"
-              fullWidth
-              inputProps={{ 'data-cy': 'dependencies' }}
+              form={formikProps}
             />
           </TitledContainer>
         </>

@@ -37,9 +37,13 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
         <Table>
           <TableBody>
             <TableRow key="titleAndShortCode">
-              <TableCell className={classes.textBold}>ID</TableCell>
-              <TableCell>{proposal.shortCode}</TableCell>
-              <TableCell className={classes.textBold}>Title</TableCell>
+              <TableCell width="25%" className={classes.textBold}>
+                ID
+              </TableCell>
+              <TableCell width="25%">{proposal.shortCode}</TableCell>
+              <TableCell width="25%" className={classes.textBold}>
+                Title
+              </TableCell>
               <TableCell>{proposal.title}</TableCell>
             </TableRow>
             <TableRow key="abstractAndScore">

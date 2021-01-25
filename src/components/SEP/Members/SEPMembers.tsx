@@ -68,6 +68,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     UserRole.SEP_CHAIR,
     UserRole.SEP_SECRETARY,
   ]);
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const initialValues: SEPMemberAssignments = {
     SEPChair: null,
@@ -285,7 +286,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                 initialValues.SEPChair ? classes.darkerDisabledTextField : ''
               }
               InputProps={{
-                endAdornment: hasAccessRights && (
+                endAdornment: isUserOfficer && (
                   <>
                     {!!initialValues.SEPChair && (
                       <Tooltip title="Remove SEP Chair">
@@ -337,7 +338,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                   : ''
               }
               InputProps={{
-                endAdornment: hasAccessRights && (
+                endAdornment: isUserOfficer && (
                   <>
                     {!!initialValues.SEPSecretary && (
                       <Tooltip title="Remove SEP Secretary">
@@ -378,6 +379,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
               editable={
                 hasAccessRights
                   ? {
+                      deleteTooltip: () => 'Remove reviewer',
                       onRowDelete: (rowData: BasicUserDetails): Promise<void> =>
                         removeMember({
                           ...rowData,

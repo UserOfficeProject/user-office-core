@@ -3,7 +3,6 @@ import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
 
-import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
 import { Question } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
@@ -47,18 +46,6 @@ export const QuestionSampleBasisForm: FormComponent<Question> = props => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
-          <TitledContainer label="Options">
-            <Field
-              name="config.titlePlaceholder"
-              label="Title input placeholder"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              inputProps={{ 'data-cy': 'titlePlaceholder' }}
-            />
-          </TitledContainer>
         </>
       )}
     </QuestionFormShell>

@@ -1,3 +1,4 @@
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -7,39 +8,35 @@ import { Formik, Form, Field } from 'formik';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import FormikDropdown from 'components/common/FormikDropdown';
+import UOLoader from 'components/common/UOLoader';
 import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
-import { Proposal, ProposalEndStatus, UserRole } from 'generated/sdk';
+import { Proposal, ProposalEndStatus } from 'generated/sdk';
 import { StyledPaper, ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   button: {
-    marginTop: '25px',
-    marginLeft: '10px',
+    margin: theme.spacing(2, 0, 1, 1),
   },
 }));
 
 type FinalRankingFormProps = {
-  closeModal: () => void;
   proposalData: Proposal;
+  hasWriteAccess: boolean;
+  closeModal: () => void;
   meetingSubmitted: (data: AdministrationFormData) => void;
 };
 
 const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
-  closeModal,
   proposalData,
+  hasWriteAccess,
+  closeModal,
   meetingSubmitted,
 }) => {
   const classes = useStyles();
   const [shouldClose, setShouldClose] = useState<boolean>(false);
   const { api } = useDataApiWithFeedback();
-  const hasAccessRights = useCheckAccess([
-    UserRole.USER_OFFICER,
-    UserRole.SEP_CHAIR,
-    UserRole.SEP_SECRETARY,
-  ]);
 
   const initialData = {
     finalStatus: proposalData.finalStatus || ProposalEndStatus.UNSET,
@@ -78,6 +75,10 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
           validateOnBlur={false}
           initialValues={initialData}
           onSubmit={async (values): Promise<void> => {
+            if (!hasWriteAccess) {
+              return;
+            }
+
             await handleSubmit({
               id: proposalData.id,
               ...values,
@@ -122,6 +123,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       errors.commentForUser
                     }
                     required
+                    disabled={!hasWriteAccess}
                   />
                   <FormikDropdown
                     name="finalStatus"
@@ -134,7 +136,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       { text: 'Rejected', value: ProposalEndStatus.REJECTED },
                     ]}
                     required
-                    disabled={false}
+                    disabled={!hasWriteAccess}
                   />
                 </Grid>
                 <Grid item xs={6}>
@@ -162,6 +164,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       errors.commentForManagement
                     }
                     required
+                    disabled={!hasWriteAccess}
                   />
                   <Field
                     id="rankOrder"
@@ -179,12 +182,22 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       touched.rankOrder && errors.rankOrder && errors.rankOrder
                     }
                     required
+                    disabled={!hasWriteAccess}
                   />
                 </Grid>
               </Grid>
               <ButtonContainer>
-                {hasAccessRights && (
+                {hasWriteAccess && (
                   <>
+                    {isSubmitting && (
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        className={classes.button}
+                      >
+                        <UOLoader buttonSized />
+                      </Box>
+                    )}
                     <Button
                       type="submit"
                       variant="contained"
@@ -235,6 +248,7 @@ FinalRankingForm.propTypes = {
   closeModal: PropTypes.func.isRequired,
   proposalData: PropTypes.any.isRequired,
   meetingSubmitted: PropTypes.func.isRequired,
+  hasWriteAccess: PropTypes.bool.isRequired,
 };
 
 export default FinalRankingForm;

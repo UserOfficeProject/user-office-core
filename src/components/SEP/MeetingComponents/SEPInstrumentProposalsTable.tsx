@@ -2,12 +2,19 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Visibility from '@material-ui/icons/Visibility';
+import clsx from 'clsx';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
-import { SepProposal, InstrumentWithAvailabilityTime } from 'generated/sdk';
+import { UserContext } from 'context/UserContextProvider';
+import {
+  SepProposal,
+  InstrumentWithAvailabilityTime,
+  UserRole,
+} from 'generated/sdk';
 import { useSEPProposalsByInstrument } from 'hooks/SEP/useSEPProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
 import { getGrades, average } from 'utils/mathFunctions';
@@ -15,7 +22,7 @@ import { getGrades, average } from 'utils/mathFunctions';
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';
 
 // NOTE: Some custom styles for row expand table.
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   root: {
     '& tr:last-child td': {
       border: 'none',
@@ -24,6 +31,9 @@ const useStyles = makeStyles(() => ({
       padding: '0 40px',
       backgroundColor: '#fafafa',
     },
+  },
+  disabled: {
+    color: theme.palette.text.disabled,
   },
 }));
 
@@ -42,10 +52,13 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     instrumentProposalsData,
     loadingInstrumentProposals,
     setInstrumentProposalsData,
+    refreshInstrumentProposalsData,
   } = useSEPProposalsByInstrument(sepInstrument.id, sepId, selectedCallId);
   const classes = useStyles();
   const theme = useTheme();
   const [openProposalId, setOpenProposalId] = useState<number | null>(null);
+  const isSEPReviewer = useCheckAccess([UserRole.SEP_REVIEWER]);
+  const { user } = useContext(UserContext);
 
   const sortByRankOrder = (a: SepProposal, b: SepProposal) => {
     if (a.proposal.rankOrder === b.proposal.rankOrder) {
@@ -78,7 +91,9 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
       .sort(sortByRankOrder)
       .map(proposalData => {
         const proposalAllocationTime =
-          proposalData.proposal.technicalReview?.timeAllocation || 0;
+          proposalData.sepTimeAllocation !== null
+            ? proposalData.sepTimeAllocation
+            : proposalData.proposal.technicalReview?.timeAllocation || 0;
 
         if (
           allocationTimeSum + proposalAllocationTime >
@@ -99,6 +114,38 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
           };
         }
       });
+  };
+
+  const proposalTimeAllocationColumn = (
+    rowData: SepProposal & {
+      proposalAverageScore: number;
+    }
+  ) => {
+    const timeAllocation =
+      rowData.proposal.technicalReview &&
+      rowData.proposal.technicalReview.timeAllocation
+        ? rowData.proposal.technicalReview.timeAllocation
+        : '-';
+
+    const sepTimeAllocation = rowData.sepTimeAllocation;
+
+    return (
+      <>
+        <span
+          className={clsx({
+            [classes.disabled]: sepTimeAllocation !== null,
+          })}
+        >
+          {timeAllocation}
+        </span>
+        {sepTimeAllocation && (
+          <>
+            <br />
+            {sepTimeAllocation}
+          </>
+        )}
+      </>
+    );
   };
 
   const assignmentColumns = [
@@ -130,11 +177,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         rowData: SepProposal & {
           proposalAverageScore: number;
         }
-      ) =>
-        rowData.proposal.technicalReview &&
-        rowData.proposal.technicalReview.timeAllocation
-          ? rowData.proposal.technicalReview.timeAllocation
-          : '-',
+      ) => proposalTimeAllocationColumn(rowData),
     },
     {
       title: 'Review meeting',
@@ -182,9 +225,14 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     <div className={classes.root} data-cy="sep-instrument-proposals-table">
       <SEPMeetingProposalViewModal
         proposalViewModalOpen={!!openProposalId}
-        setProposalViewModalOpen={() => setOpenProposalId(null)}
+        setProposalViewModalOpen={() => {
+          setOpenProposalId(null);
+          refreshInstrumentProposalsData();
+        }}
         proposalId={openProposalId || 0}
         meetingSubmitted={onMeetingSubmitted}
+        sepId={sepId}
+        submitted={!!sepInstrument.submitted}
       />
       <MaterialTable
         icons={tableIcons}
@@ -193,14 +241,18 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         data={sortedProposalsWithAverageScore}
         isLoading={loadingInstrumentProposals}
         actions={[
-          {
+          rowData => ({
             icon: ViewIcon,
             onClick: (event, data) => {
               setOpenProposalId((data as SepProposal).proposal.id);
             },
             tooltip: 'View proposal details',
-            disabled: !!sepInstrument.submitted,
-          },
+            hidden:
+              isSEPReviewer &&
+              !rowData.assignments?.some(
+                ({ sepMemberUserId }) => sepMemberUserId === user.id
+              ),
+          }),
         ]}
         options={{
           search: false,

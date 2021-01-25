@@ -1,4 +1,4 @@
-mutation updateReview(
+mutation addReview(
   $reviewID: Int!
   $grade: Int!
   $comment: String!

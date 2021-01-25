@@ -12,6 +12,7 @@ import Typography from '@material-ui/core/Typography';
 import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import {
   Draggable,
@@ -20,7 +21,12 @@ import {
   NotDraggingStyle,
 } from 'react-beautiful-dnd';
 
-import { QuestionTemplateRelation, TemplateStep } from 'generated/sdk';
+import {
+  DependenciesLogicOperator,
+  QuestionTemplateRelation,
+  TemplateStep,
+} from 'generated/sdk';
+import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { Event, EventType } from 'models/QuestionaryEditorModel';
 
 import TemplateQuestionEditor, {
@@ -42,8 +48,11 @@ class TemplateTopicEditor implements TemplateTopicEditorData {
   get dataType() {
     return this.source.question.dataType;
   }
-  get dependency() {
-    return this.source.dependency;
+  get dependencies() {
+    return this.source.dependencies;
+  }
+  get dependenciesOperator() {
+    return this.source.dependenciesOperator as DependenciesLogicOperator;
   }
   get config() {
     return this.source.config;
@@ -60,6 +69,7 @@ export default function QuestionaryEditorTopic(props: {
   dragMode: boolean;
 }) {
   const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
 
   const classes = makeStyles(theme => ({
     container: {
@@ -250,6 +260,26 @@ export default function QuestionaryEditorTopic(props: {
                     className={classes.addQuestionMenuItem}
                     data-cy="delete-topic-menu-item"
                     onClick={() => {
+                      const isAllQuestionsInTopicDeletable = data.fields.every(
+                        item => {
+                          const definition = getQuestionaryComponentDefinition(
+                            item.question.dataType
+                          );
+
+                          return definition.creatable;
+                        }
+                      );
+                      if (isAllQuestionsInTopicDeletable === false) {
+                        enqueueSnackbar(
+                          'This topic can not be deleted because it contains protected question(s)',
+                          {
+                            variant: 'warning',
+                          }
+                        );
+
+                        return;
+                      }
+
                       dispatch({
                         type: EventType.DELETE_TOPIC_REQUESTED,
                         payload: data.topic.id,
