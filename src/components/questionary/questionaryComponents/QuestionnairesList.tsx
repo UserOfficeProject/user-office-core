@@ -10,6 +10,7 @@ import { QuestionnairesListItem } from './QuestionnairesListItem';
 export interface QuestionnairesListRow {
   id: number;
   label: string;
+  isCompleted: boolean;
 }
 export interface QuestionnairesListProps {
   onAddNewClick?: () => void;

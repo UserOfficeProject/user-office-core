@@ -28,7 +28,11 @@ import {
 import { SampleDeclarationContainer } from './SampleDeclarationContainer';
 
 const sampleToListRow = (sample: SampleBasic): QuestionnairesListRow => {
-  return { id: sample.id, label: sample.title };
+  return {
+    id: sample.id,
+    label: sample.title,
+    isCompleted: sample.questionary!.steps.every(step => step.isCompleted),
+  };
 };
 
 function createSampleStub(
@@ -234,15 +238,30 @@ function QuestionaryComponentSampleDeclaration(
             }}
             sampleCreated={newSample => {
               const newStateValue = [...stateValue, newSample.id];
-
+              setSelectedSample(newSample);
               setStateValue(newStateValue);
               onComplete(newStateValue);
 
               const newRows = [...rows, sampleToListRow(newSample)];
               setRows(newRows);
             }}
-            sampleEditDone={() => setSelectedSample(null)}
-          />
+            sampleEditDone={() => {
+              const index = rows.findIndex(
+                sample => sample.id === selectedSample.id
+              );
+
+              if (index === -1) {
+                // unexpected
+                setSelectedSample(null);
+
+                return;
+              }
+              const newRows = [...rows];
+              newRows[index].isCompleted = true;
+              setRows(newRows);
+              setSelectedSample(null);
+            }}
+          ></SampleDeclarationContainer>
         ) : (
           <UOLoader />
         )}

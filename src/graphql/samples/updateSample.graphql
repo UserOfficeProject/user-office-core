@@ -12,6 +12,11 @@ mutation updateSample(
   ) {
     sample {
       ...sample
+      questionary{
+      steps{
+       isCompleted 
+      }
+    }
     }
     error
   }

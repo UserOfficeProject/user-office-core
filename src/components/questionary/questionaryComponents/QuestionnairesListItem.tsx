@@ -45,7 +45,9 @@ export function QuestionnairesListItem(props: {
     >
       <ListItemAvatar>
         <Avatar>
-          <DescriptionIcon />
+          <DescriptionIcon
+            color={props.record.isCompleted ? undefined : 'error'}
+          />
         </Avatar>
       </ListItemAvatar>
       <ListItemText

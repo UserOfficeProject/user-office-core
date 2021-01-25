@@ -2127,7 +2127,7 @@ export type AssignProposalToSepMutation = (
 );
 
 export type AssignMembersMutationVariables = Exact<{
-  memberIds: Array<Scalars['Int']>;
+  memberIds: Array<Scalars['Int']> | Scalars['Int'];
   sepId: Scalars['Int'];
 }>;
 
@@ -2606,7 +2606,7 @@ export type UpdateInstitutionMutation = (
 );
 
 export type AssignInstrumentsToCallMutationVariables = Exact<{
-  instrumentIds: Array<Scalars['Int']>;
+  instrumentIds: Array<Scalars['Int']> | Scalars['Int'];
   callId: Scalars['Int'];
 }>;
 
@@ -2765,7 +2765,7 @@ export type GetEventLogsQuery = (
 );
 
 export type AssignProposalsToInstrumentMutationVariables = Exact<{
-  proposals: Array<ProposalsToInstrumentArgs>;
+  proposals: Array<ProposalsToInstrumentArgs> | ProposalsToInstrumentArgs;
   instrumentId: Scalars['Int'];
 }>;
 
@@ -2779,7 +2779,7 @@ export type AssignProposalsToInstrumentMutation = (
 );
 
 export type AssignScientistsToInstrumentMutationVariables = Exact<{
-  scientistIds: Array<Scalars['Int']>;
+  scientistIds: Array<Scalars['Int']> | Scalars['Int'];
   instrumentId: Scalars['Int'];
 }>;
 
@@ -2829,7 +2829,7 @@ export type DeleteInstrumentMutation = (
 );
 
 export type GetInstrumentsQueryVariables = Exact<{
-  callIds?: Maybe<Array<Scalars['Int']>>;
+  callIds?: Maybe<Array<Scalars['Int']> | Scalars['Int']>;
 }>;
 
 
@@ -3207,7 +3207,7 @@ export type UpdateProposalMutationVariables = Exact<{
   id: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
   abstract?: Maybe<Scalars['String']>;
-  users?: Maybe<Array<Scalars['Int']>>;
+  users?: Maybe<Array<Scalars['Int']> | Scalars['Int']>;
   proposerId?: Maybe<Scalars['Int']>;
 }>;
 
@@ -3234,7 +3234,7 @@ export type UpdateProposalMutation = (
 export type AnswerTopicMutationVariables = Exact<{
   questionaryId: Scalars['Int'];
   topicId: Scalars['Int'];
-  answers: Array<AnswerInput>;
+  answers: Array<AnswerInput> | AnswerInput;
   isPartialSave?: Maybe<Scalars['Boolean']>;
 }>;
 
@@ -3355,7 +3355,7 @@ export type GetBlankQuestionaryStepsQuery = (
 );
 
 export type GetFileMetadataQueryVariables = Exact<{
-  fileIds: Array<Scalars['String']>;
+  fileIds: Array<Scalars['String']> | Scalars['String'];
 }>;
 
 
@@ -3594,6 +3594,13 @@ export type GetSamplesQuery = (
   { __typename?: 'Query' }
   & { samples: Maybe<Array<(
     { __typename?: 'Sample' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & { steps: Array<(
+        { __typename?: 'QuestionaryStep' }
+        & Pick<QuestionaryStep, 'isCompleted'>
+      )> }
+    ) }
     & SampleFragment
   )>> }
 );
@@ -3607,6 +3614,13 @@ export type GetSamplesByCallIdQuery = (
   { __typename?: 'Query' }
   & { samplesByCallId: Maybe<Array<(
     { __typename?: 'Sample' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & { steps: Array<(
+        { __typename?: 'QuestionaryStep' }
+        & Pick<QuestionaryStep, 'isCompleted'>
+      )> }
+    ) }
     & SampleFragment
   )>> }
 );
@@ -3626,6 +3640,13 @@ export type UpdateSampleMutation = (
     & Pick<SampleResponseWrap, 'error'>
     & { sample: Maybe<(
       { __typename?: 'Sample' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & { steps: Array<(
+          { __typename?: 'QuestionaryStep' }
+          & Pick<QuestionaryStep, 'isCompleted'>
+        )> }
+      ) }
       & SampleFragment
     )> }
   ) }
@@ -3633,7 +3654,7 @@ export type UpdateSampleMutation = (
 
 export type AddNextStatusEventsToConnectionMutationVariables = Exact<{
   proposalWorkflowConnectionId: Scalars['Int'];
-  nextStatusEvents: Array<Scalars['String']>;
+  nextStatusEvents: Array<Scalars['String']> | Scalars['String'];
 }>;
 
 
@@ -3909,7 +3930,7 @@ export type UpdateProposalWorkflowMutation = (
 
 export type AddSamplesToShipmentMutationVariables = Exact<{
   shipmentId: Scalars['Int'];
-  sampleIds: Array<Scalars['Int']>;
+  sampleIds: Array<Scalars['Int']> | Scalars['Int'];
 }>;
 
 
@@ -4515,7 +4536,7 @@ export type UpdateQuestionTemplateRelationSettingsMutationVariables = Exact<{
   questionId: Scalars['String'];
   templateId: Scalars['Int'];
   config?: Maybe<Scalars['String']>;
-  dependencies: Array<FieldDependencyInput>;
+  dependencies: Array<FieldDependencyInput> | FieldDependencyInput;
   dependenciesOperator?: Maybe<DependenciesLogicOperator>;
 }>;
 
@@ -4828,7 +4849,7 @@ export type GetUsersQueryVariables = Exact<{
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   userRole?: Maybe<UserRole>;
-  subtractUsers?: Maybe<Array<Scalars['Int']>>;
+  subtractUsers?: Maybe<Array<Scalars['Int']> | Scalars['Int']>;
 }>;
 
 
@@ -4972,7 +4993,7 @@ export type UpdateUserMutation = (
 
 export type UpdateUserRolesMutationVariables = Exact<{
   id: Scalars['Int'];
-  roles?: Maybe<Array<Scalars['Int']>>;
+  roles?: Maybe<Array<Scalars['Int']> | Scalars['Int']>;
 }>;
 
 
@@ -6330,6 +6351,11 @@ export const GetSamplesDocument = gql`
     query getSamples($filter: SamplesFilter) {
   samples(filter: $filter) {
     ...sample
+    questionary {
+      steps {
+        isCompleted
+      }
+    }
   }
 }
     ${SampleFragmentDoc}`;
@@ -6337,6 +6363,11 @@ export const GetSamplesByCallIdDocument = gql`
     query getSamplesByCallId($callId: Int!) {
   samplesByCallId(callId: $callId) {
     ...sample
+    questionary {
+      steps {
+        isCompleted
+      }
+    }
   }
 }
     ${SampleFragmentDoc}`;
@@ -6345,6 +6376,11 @@ export const UpdateSampleDocument = gql`
   updateSample(sampleId: $sampleId, title: $title, safetyComment: $safetyComment, safetyStatus: $safetyStatus) {
     sample {
       ...sample
+      questionary {
+        steps {
+          isCompleted
+        }
+      }
     }
     error
   }
