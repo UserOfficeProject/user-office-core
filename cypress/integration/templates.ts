@@ -339,6 +339,20 @@ context('Template tests', () => {
     cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[2]);
     cy.get('[title="Save"]').click();
 
+    cy.get('[index=0]').should('not.contain', multipleChoiceAnswers[1]);
+
+    cy.contains(multipleChoiceAnswers[1])
+      .closest('tr')
+      .find('[title=Up]')
+      .click();
+
+    cy.get('[index=0]').contains(multipleChoiceAnswers[1]);
+
+    cy.contains(multipleChoiceAnswers[1])
+      .closest('tr')
+      .find('[title=Down]')
+      .click();
+
     cy.contains('Save').click();
 
     cy.contains(multipleChoiceQuestion)
