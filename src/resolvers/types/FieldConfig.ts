@@ -87,6 +87,9 @@ export class ShipmentBasisConfig extends ConfigBase {}
 @ObjectType()
 export class SubtemplateConfig {
   @Field(() => Int, { nullable: true })
+  minEntries: number | null;
+
+  @Field(() => Int, { nullable: true })
   maxEntries: number | null;
 
   @Field(() => Int, { nullable: true })
