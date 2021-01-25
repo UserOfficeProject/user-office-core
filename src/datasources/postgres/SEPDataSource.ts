@@ -455,7 +455,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     proposalId: number,
     sepTimeAllocation: number | null
   ): Promise<SEPProposal> {
-    const updatedRecord = await database('SEP_Proposals')
+    const [updatedRecord]: SEPProposalRecord[] = await database('SEP_Proposals')
       .update(
         {
           sep_time_allocation: sepTimeAllocation,
@@ -465,7 +465,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .where('sep_id', sepId)
       .where('proposal_id', proposalId);
 
-    if (updatedRecord === undefined || !updatedRecord.length) {
+    if (!updatedRecord) {
       throw new Error(
         `SEP_Proposal not found, sepId: ${sepId}, proposalId: ${proposalId}`
       );

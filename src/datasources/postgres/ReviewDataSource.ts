@@ -107,12 +107,13 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   }
 
   async removeUserForReview(id: number): Promise<Review> {
-    return database
+    const [reviewRecord]: ReviewRecord[] = await database
       .from('SEP_Reviews')
       .where('review_id', id)
       .returning('*')
-      .del()
-      .then((record: ReviewRecord[]) => this.createReviewObject(record[0]));
+      .del();
+
+    return this.createReviewObject(reviewRecord);
   }
 
   async updateReview(args: AddReviewArgs): Promise<Review> {

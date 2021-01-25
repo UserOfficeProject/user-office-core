@@ -1,7 +1,10 @@
 import { registerEnumType } from 'type-graphql';
 
 import { Event } from '../events/event.enum';
-import { EvaluatorOperator } from '../models/ConditionEvaluator';
+import {
+  DependenciesLogicOperator,
+  EvaluatorOperator,
+} from '../models/ConditionEvaluator';
 import { FeatureId } from '../models/Feature';
 import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
@@ -25,5 +28,8 @@ export const registerEnums = () => {
   registerEnumType(SampleStatus, { name: 'SampleStatus' });
   registerEnumType(Event, { name: 'Event' });
   registerEnumType(ShipmentStatus, { name: 'ShipmentStatus' });
+  registerEnumType(DependenciesLogicOperator, {
+    name: 'DependenciesLogicOperator',
+  });
   registerEnumType(FeatureId, { name: 'FeatureId' });
 };

@@ -85,7 +85,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         template_id: args.templateId,
       })
       .into('call')
-      .returning(['*'])
+      .returning('*')
       .then((call: CallRecord[]) => {
         if (call.length !== 1) {
           throw new Error('Could not create call');

@@ -1,6 +1,9 @@
 import { Dependency } from '../datasources/postgres/records';
 import { FieldConfigType } from '../resolvers/types/FieldConfig';
-import { EvaluatorOperator } from './ConditionEvaluator';
+import {
+  DependenciesLogicOperator,
+  EvaluatorOperator,
+} from './ConditionEvaluator';
 
 export class FieldDependency {
   constructor(
@@ -55,7 +58,8 @@ export class TemplatesHasQuestions {
     public topicId: number,
     public sortOrder: number,
     public config: string,
-    public dependencies: Dependency[]
+    public dependencies: Dependency[],
+    public dependenciesOperator?: DependenciesLogicOperator
   ) {}
 }
 
@@ -65,7 +69,8 @@ export class QuestionTemplateRelation {
     public topicId: number,
     public sortOrder: number,
     public config: typeof FieldConfigType,
-    public dependencies: FieldDependency[]
+    public dependencies: FieldDependency[],
+    public dependenciesOperator?: DependenciesLogicOperator
   ) {}
 }
 
