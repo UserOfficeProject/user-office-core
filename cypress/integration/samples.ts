@@ -40,7 +40,7 @@ context('Samples tests', () => {
 
     cy.createTopic('New topic');
 
-    cy.createSampleQuestion(sampleQuestion, sampleTemplateName);
+    cy.createSampleQuestion(sampleQuestion, sampleTemplateName, '1', '2');
 
     cy.contains(sampleQuestion)
       .parent()
@@ -100,14 +100,20 @@ context('Samples tests', () => {
     cy.get('[data-cy="clone"]').click();
 
     cy.contains('OK').click();
+
     cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
+
+    cy.get('[data-cy=add-button]').should('be.disabled'); // Add button should be disabled because of max entry limit
 
     cy.get('[data-cy="delete"]')
       .eq(1)
       .click();
 
     cy.contains('OK').click();
+
     cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+    cy.get('[data-cy=add-button]').should('not.be.disabled');
 
     cy.contains('Save and continue').click();
 

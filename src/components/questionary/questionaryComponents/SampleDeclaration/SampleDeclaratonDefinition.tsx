@@ -3,7 +3,7 @@ import React from 'react';
 import * as Yup from 'yup';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
-import { DataType } from 'generated/sdk';
+import { DataType, SubtemplateConfig } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import QuestionaryComponentSampleDeclaration from './QuestionaryComponentSampleDeclaration';
@@ -25,8 +25,21 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
     answerRenderer: ({ answer }) => <SamplesAnswerRenderer answer={answer} />,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: () => {
-    const schema = Yup.array().of(Yup.number());
+  createYupValidationSchema: answer => {
+    const config = answer.config as SubtemplateConfig;
+    let schema = Yup.array().of(Yup.number());
+    if (config.minEntries) {
+      schema = schema.min(
+        config.minEntries,
+        `Please add at least ${config.minEntries} sample(s)`
+      );
+    }
+    if (config.maxEntries) {
+      schema = schema.max(
+        config.maxEntries,
+        `Please add at most ${config.maxEntries} sample(s)`
+      );
+    }
 
     return schema;
   },

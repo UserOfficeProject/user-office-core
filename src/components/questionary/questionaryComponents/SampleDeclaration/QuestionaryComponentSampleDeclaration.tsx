@@ -150,6 +150,7 @@ function QuestionaryComponentSampleDeclaration(
         <QuestionnairesList
           addButtonLabel={config.addEntryButtonLabel}
           data={rows}
+          maxEntries={config.maxEntries || undefined}
           onEditClick={item =>
             api()
               .getSample({ sampleId: item.id })

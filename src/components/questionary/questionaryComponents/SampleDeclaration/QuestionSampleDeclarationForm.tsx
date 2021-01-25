@@ -100,6 +100,16 @@ export const QuestionSampleDeclarationForm: FormComponent<Question> = props => {
               data-cy="addEntryButtonLabel"
             />
             <Field
+              name="config.minEntries"
+              label="Min entries"
+              placeholder="(e.g. 1, leave blank for unlimited)"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="min-entries"
+            />
+            <Field
               name="config.maxEntries"
               label="Max entries"
               placeholder="(e.g. 4, leave blank for unlimited)"
@@ -107,7 +117,7 @@ export const QuestionSampleDeclarationForm: FormComponent<Question> = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              data-cy="maxEntries"
+              data-cy="max-entries"
             />
           </TitledContainer>
         </>

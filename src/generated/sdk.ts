@@ -1903,6 +1903,7 @@ export enum ShipmentStatus {
 
 export type SubtemplateConfig = {
   __typename?: 'SubtemplateConfig';
+  minEntries: Maybe<Scalars['Int']>;
   maxEntries: Maybe<Scalars['Int']>;
   templateId: Maybe<Scalars['Int']>;
   templateCategory: Scalars['String'];
@@ -4263,7 +4264,7 @@ type FieldConfigSampleBasisConfigFragment = (
 
 type FieldConfigSubtemplateConfigFragment = (
   { __typename?: 'SubtemplateConfig' }
-  & Pick<SubtemplateConfig, 'addEntryButtonLabel' | 'maxEntries' | 'templateId' | 'templateCategory' | 'required' | 'small_label'>
+  & Pick<SubtemplateConfig, 'addEntryButtonLabel' | 'minEntries' | 'maxEntries' | 'templateId' | 'templateCategory' | 'required' | 'small_label'>
 );
 
 type FieldConfigProposalBasisConfigFragment = (
@@ -5166,6 +5167,7 @@ export const FieldConfigFragmentDoc = gql`
   }
   ... on SubtemplateConfig {
     addEntryButtonLabel
+    minEntries
     maxEntries
     templateId
     templateCategory

@@ -32,7 +32,7 @@ fragment fieldConfig on FieldConfig {
     tooltip
   }
 
-    ... on NumberInputConfig {
+  ... on NumberInputConfig {
     property
     units
 
@@ -40,7 +40,6 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
   }
-
 
   ... on ProposalBasisConfig {
     tooltip
@@ -52,6 +51,7 @@ fragment fieldConfig on FieldConfig {
 
   ... on SubtemplateConfig {
     addEntryButtonLabel
+    minEntries
     maxEntries
     templateId
     templateCategory

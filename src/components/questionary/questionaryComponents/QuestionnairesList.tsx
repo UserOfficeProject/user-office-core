@@ -19,6 +19,7 @@ export interface QuestionnairesListProps {
   onCloneClick?: (record: QuestionnairesListRow) => void;
   data: Array<QuestionnairesListRow>;
   addButtonLabel?: string;
+  maxEntries?: number;
 }
 
 const useStyles = makeStyles(() => ({
@@ -57,6 +58,7 @@ export function QuestionnairesList(props: QuestionnairesListProps) {
           fullWidth
           startIcon={<AddOutlinedIcon />}
           data-cy="add-button"
+          disabled={!!props.maxEntries && props.data.length >= props.maxEntries}
         >
           {props.addButtonLabel || 'Add'}
         </Button>
