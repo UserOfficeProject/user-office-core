@@ -16,5 +16,6 @@ fragment answer on Answer {
       ...fieldCondition
     }
   }
+  dependenciesOperator
   value
 }

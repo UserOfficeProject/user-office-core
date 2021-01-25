@@ -88,6 +88,7 @@ export function usePersistQuestionaryEditorModel() {
               prepareDependencies(dependency)
             )
           : [],
+        dependenciesOperator: field.dependenciesOperator,
       })
       .then(data => data.updateQuestionTemplateRelationSettings);
   };

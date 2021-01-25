@@ -100,7 +100,7 @@ export const QuestionTemplateRelationSampleDeclarationForm: FormComponent<Questi
 
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
-              field={formikProps.values}
+              form={formikProps}
               template={props.template}
             />
           </TitledContainer>

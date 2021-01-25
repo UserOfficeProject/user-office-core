@@ -15,6 +15,7 @@ import {
 } from 'components/questionary/QuestionaryComponentRegistry';
 import {
   DataType,
+  DependenciesLogicOperator,
   FieldConfig,
   FieldDependency,
   TemplateCategoryId,
@@ -87,17 +88,27 @@ export default function TemplateQuestionEditor(props: {
   });
 
   const dependencies = props.data.dependencies;
+  let dependencyComparator =
+    props.data.dependenciesOperator === DependenciesLogicOperator.AND
+      ? '&&'
+      : '||';
   const dependencyJsx = dependencies.length ? (
     <>
       <LockIcon className={classes.lockIcon} />
       <ul>
         {dependencies.map((dependency, i) => {
-          const dependencyOperator = i < dependencies.length - 1 ? '&' : '';
+          dependencyComparator =
+            i < dependencies.length - 1 ? dependencyComparator : '';
+
+          const dependenciesAreVisible = !!dependency.dependencyNaturalKey;
 
           return (
-            <li key={dependency.dependencyId + dependency.questionId}>
-              {`${dependency.dependencyNaturalKey} ${dependencyOperator}`}
-            </li>
+            dependenciesAreVisible && (
+              <li key={dependency.dependencyId + dependency.questionId}>
+                {`${dependency.dependencyNaturalKey} `}
+                <strong>{`${dependencyComparator}`}</strong>
+              </li>
+            )
           );
         })}
       </ul>
@@ -168,6 +179,7 @@ export interface TemplateTopicEditorData {
   naturalKey: string;
   dataType: DataType;
   dependencies: FieldDependency[];
+  dependenciesOperator: DependenciesLogicOperator;
   config: FieldConfig;
   categoryId: TemplateCategoryId;
 }

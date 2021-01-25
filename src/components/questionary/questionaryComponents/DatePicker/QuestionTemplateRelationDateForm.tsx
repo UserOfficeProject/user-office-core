@@ -45,7 +45,7 @@ export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRel
           </TitledContainer>
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
-              field={formikProps.values}
+              form={formikProps}
               template={props.template}
             />
           </TitledContainer>

@@ -811,4 +811,65 @@ context('Template tests', () => {
       'Question with multiple dependencies'
     );
   });
+
+  it('User officer can can change dependency logic operator', () => {
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    cy.get('[title="Edit"]')
+      .last()
+      .click();
+
+    cy.contains('Question with multiple dependencies').click();
+
+    cy.get('[data-cy="dependencies-operator"]').click();
+
+    cy.get('[data-value="OR"]').click();
+
+    cy.get('[id="dependencyValue"]')
+      .first()
+      .click();
+
+    cy.contains('Answer 2').click();
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.logout();
+
+    cy.login('user');
+
+    cy.contains('New Proposal').click();
+
+    cy.contains('Multichoice question');
+
+    cy.get('main form').should('not.contain.text', 'Boolean question');
+    cy.get('main form').should(
+      'not.contain.text',
+      'Question with multiple dependencies'
+    );
+
+    cy.contains('Answer 1').click();
+    cy.contains('Boolean question');
+    cy.get('main form').should(
+      'not.contain.text',
+      'Question with multiple dependencies'
+    );
+    cy.contains('Boolean question').click();
+    cy.get('main form').should(
+      'contain.text',
+      'Question with multiple dependencies'
+    );
+    cy.contains('Boolean question').click();
+    cy.get('main form').should(
+      'not.contain.text',
+      'Question with multiple dependencies'
+    );
+    cy.contains('Answer 2').click();
+    cy.get('main form').should('not.contain.text', 'Boolean question');
+    cy.get('main form').should(
+      'contain.text',
+      'Question with multiple dependencies'
+    );
+  });
 });

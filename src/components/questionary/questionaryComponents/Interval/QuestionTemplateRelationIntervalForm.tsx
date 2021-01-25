@@ -105,7 +105,7 @@ export const QuestionTemplateRelationIntervalForm: FormComponent<QuestionTemplat
 
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
-              field={formikProps.values}
+              form={formikProps}
               template={props.template}
             />
           </TitledContainer>

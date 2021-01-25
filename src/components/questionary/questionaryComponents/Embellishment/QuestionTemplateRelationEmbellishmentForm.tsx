@@ -67,7 +67,7 @@ export const QuestionTemplateRelationEmbellishmentForm: FormComponent<QuestionTe
 
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
-              field={formikProps.values}
+              form={formikProps}
               template={props.template}
             />
           </TitledContainer>

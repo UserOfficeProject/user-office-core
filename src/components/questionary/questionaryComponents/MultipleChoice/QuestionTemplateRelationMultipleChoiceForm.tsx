@@ -103,8 +103,8 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
           </TitledContainer>
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
-              field={formikProps.values}
               template={props.template}
+              form={formikProps}
             />
           </TitledContainer>
         </>

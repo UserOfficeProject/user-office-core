@@ -41,7 +41,7 @@ export const QuestionTemplateRelationBooleanForm: FormComponent<QuestionTemplate
           </TitledContainer>
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
-              field={formikProps.values}
+              form={formikProps}
               template={props.template}
             />
           </TitledContainer>
