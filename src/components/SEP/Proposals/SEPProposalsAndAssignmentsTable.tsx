@@ -102,14 +102,14 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
       sepId,
     });
 
-    if (SEPProposalsData) {
-      setSEPProposalsData(
-        SEPProposalsData.filter(
-          proposalItem =>
-            proposalItem.proposalId !== proposalToRemove.proposalId
-        )
-      );
-    }
+    setSEPProposalsData(sepProposalData =>
+      sepProposalData === null
+        ? null
+        : sepProposalData.filter(
+            proposalItem =>
+              proposalItem.proposalId !== proposalToRemove.proposalId
+          )
+    );
   };
 
   const removeAssignedReviewer = async (
@@ -132,27 +132,27 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
         sepId,
       }));
 
-    if (SEPProposalsData) {
-      setSEPProposalsData(
-        SEPProposalsData.map(proposalItem => {
-          if (proposalItem.proposalId === proposalId) {
-            const newAssignments =
-              proposalItem.assignments?.filter(
-                oldAssignment =>
-                  oldAssignment.sepMemberUserId !==
-                  assignedReviewer.sepMemberUserId
-              ) || [];
+    setSEPProposalsData(sepProposalData =>
+      sepProposalData === null
+        ? null
+        : sepProposalData.map(proposalItem => {
+            if (proposalItem.proposalId === proposalId) {
+              const newAssignments =
+                proposalItem.assignments?.filter(
+                  oldAssignment =>
+                    oldAssignment.sepMemberUserId !==
+                    assignedReviewer.sepMemberUserId
+                ) || [];
 
-            return {
-              ...proposalItem,
-              assignments: newAssignments,
-            };
-          } else {
-            return proposalItem;
-          }
-        })
-      );
-    }
+              return {
+                ...proposalItem,
+                assignments: newAssignments,
+              };
+            } else {
+              return proposalItem;
+            }
+          })
+    );
   };
 
   const assignMemberToSEPProposal = async (memberUser: SepMember) => {
@@ -174,35 +174,37 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
       ? (addUserForReviewResilt.addUserForReview.review as Review).id
       : 0;
 
-    if (!assignmentResult.assignMemberToSEPProposal.error && SEPProposalsData) {
-      setSEPProposalsData(
-        SEPProposalsData.map(proposalItem => {
-          if (proposalItem.proposalId === proposalId) {
-            const newAssignments: SepAssignment[] = [
-              ...(proposalItem.assignments || []),
-              {
-                user: memberUser.user,
-                roles: memberUser.roles,
-                review: {
-                  id: reviewId,
-                  status: ReviewStatus.DRAFT,
-                  comment: '',
-                  grade: 0,
-                  sepID: sepId,
-                },
-                dateAssigned: Date.now(),
-                sepMemberUserId: memberUser.userId,
-              } as SepAssignment,
-            ];
+    if (!assignmentResult.assignMemberToSEPProposal.error) {
+      setSEPProposalsData(sepProposalData =>
+        sepProposalData === null
+          ? null
+          : sepProposalData.map(proposalItem => {
+              if (proposalItem.proposalId === proposalId) {
+                const newAssignments: SepAssignment[] = [
+                  ...(proposalItem.assignments || []),
+                  {
+                    user: memberUser.user,
+                    roles: memberUser.roles,
+                    review: {
+                      id: reviewId,
+                      status: ReviewStatus.DRAFT,
+                      comment: '',
+                      grade: 0,
+                      sepID: sepId,
+                    },
+                    dateAssigned: Date.now(),
+                    sepMemberUserId: memberUser.userId,
+                  } as SepAssignment,
+                ];
 
-            return {
-              ...proposalItem,
-              assignments: newAssignments,
-            };
-          } else {
-            return proposalItem;
-          }
-        })
+                return {
+                  ...proposalItem,
+                  assignments: newAssignments,
+                };
+              } else {
+                return proposalItem;
+              }
+            })
       );
     }
 
@@ -217,11 +219,12 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   )?.assignments;
 
   const updateReviewStatusAndGrade = (
+    sepProposalData: SepProposal[] | null,
     editingProposalData: SepProposal,
     currentAssignment: SepAssignment
   ) => {
     const newProposalsData =
-      SEPProposalsData?.map(sepProposalsData => {
+      sepProposalData?.map(sepProposalsData => {
         if (sepProposalsData.proposalId === editingProposalData.proposalId) {
           return {
             ...editingProposalData,
@@ -250,11 +253,13 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
       sepProposal={rowData}
       removeAssignedReviewer={removeAssignedReviewer}
       updateView={currentAssignment => {
-        const newProposalsData = updateReviewStatusAndGrade(
-          rowData,
-          currentAssignment
+        setSEPProposalsData(sepProposalData =>
+          updateReviewStatusAndGrade(
+            sepProposalData,
+            rowData,
+            currentAssignment
+          )
         );
-        setSEPProposalsData(newProposalsData);
       }}
     />
   );

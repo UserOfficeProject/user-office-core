@@ -1417,15 +1417,32 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.get('[title="Remove assignment"]')
-      .first()
-      .click();
-    cy.get('[title="Save"]').click();
+    cy.get('[data-cy="sep-reviewer-assignments-table"] table tbody tr').as(
+      'rows'
+    );
 
-    cy.notification({
-      variant: 'success',
-      text: 'Reviewer removed',
-    });
+    // we testing a bug here, where the list didn't update
+    // properly after removing an assignment
+    function assertAndRemoveAssignment(length: number) {
+      cy.get('@rows').should('have.length', length);
+
+      cy.get('[title="Remove assignment"]')
+        .first()
+        .click();
+      cy.get('[title="Save"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Reviewer removed',
+      });
+    }
+
+    assertAndRemoveAssignment(2);
+    assertAndRemoveAssignment(1);
+
+    cy.get('@rows')
+      .parent()
+      .contains('No records to display');
 
     cy.contains('Logs').click();
 
