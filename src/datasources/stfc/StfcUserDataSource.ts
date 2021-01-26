@@ -167,7 +167,7 @@ export class StfcUserDataSource implements UserDataSource {
 
   async getByUsername(username: string): Promise<User | null> {
     const stfcUser = (
-      await client.getBasicPersonDetailsFromEmail(token, username)
+      await client.getBasicPersonDetailsFromUserNumber(token, username)
     )?.return;
 
     return stfcUser ? toEssUser(stfcUser) : null;
