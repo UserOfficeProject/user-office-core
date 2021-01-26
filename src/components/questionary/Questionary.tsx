@@ -24,6 +24,7 @@ const useStyles = makeStyles(theme => ({
   },
   root: {
     width: 'inherit',
+    minWidth: '500px',
   },
 }));
 

@@ -1,23 +1,33 @@
-import Typography from '@material-ui/core/Typography';
 import React from 'react';
 
-import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
+import QuestionaryDetails, {
+  TableRowData,
+} from 'components/questionary/QuestionaryDetails';
 import { useSample } from 'hooks/sample/useSample';
 
-interface SampleInformationProps {
+interface SampleDetailsProps {
   sampleId: number;
 }
-function SampleDetails(props: SampleInformationProps) {
+function SampleDetails(props: SampleDetailsProps) {
   const { sample } = useSample(props.sampleId);
 
   if (!sample) {
     return <span>loading...</span>;
   }
+  const additionalDetails: TableRowData[] = [
+    {
+      label: 'Title',
+      value: sample.title,
+    },
+  ];
 
   return (
     <>
-      <Typography variant="h6">{sample.title}</Typography>
-      <QuestionaryDetails questionaryId={sample.questionaryId} />
+      <QuestionaryDetails
+        questionaryId={sample.questionaryId}
+        additionalDetails={additionalDetails}
+        title="Sample information"
+      />
     </>
   );
 }

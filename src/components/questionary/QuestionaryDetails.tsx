@@ -1,3 +1,4 @@
+import { makeStyles, Typography } from '@material-ui/core';
 import Table, { TableProps } from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -14,11 +15,29 @@ import {
 
 import { getQuestionaryComponentDefinition } from './QuestionaryComponentRegistry';
 
+const useStyles = makeStyles(theme => ({
+  label: {
+    paddingLeft: 0,
+  },
+  value: {
+    width: '35%',
+  },
+}));
+
+export interface TableRowData {
+  label: JSX.Element | string | null;
+  value: JSX.Element | string | null;
+}
 function QuestionaryDetails(
-  props: { questionaryId: number } & TableProps<any>
+  props: {
+    questionaryId: number;
+    additionalDetails?: Array<TableRowData>;
+    title?: string;
+  } & TableProps<any>
 ) {
-  const { questionaryId, ...restProps } = props;
+  const { questionaryId, additionalDetails, title, ...restProps } = props;
   const { questionary, loadingQuestionary } = useQuestionary(questionaryId);
+  const classes = useStyles();
 
   if (loadingQuestionary) {
     return <UOLoader />;
@@ -43,10 +62,28 @@ function QuestionaryDetails(
     );
   });
 
+  const createTableRow = (key: string, rowData: TableRowData) => (
+    <TableRow key={key}>
+      <TableCell className={classes.label}>{rowData.label}</TableCell>
+      <TableCell className={classes.value}>{rowData.value}</TableCell>
+    </TableRow>
+  );
+
   return (
     <>
+      {title && (
+        <Typography variant="h6" gutterBottom>
+          {title}
+        </Typography>
+      )}
       <Table size="small" {...restProps}>
         <TableBody>
+          {/* Additional details */}
+          {additionalDetails?.map((row, index) =>
+            createTableRow(`additional-detail-${index}`, row)
+          )}
+
+          {/* questionary details */}
           {displayableQuestions.map(question => {
             const renderers = getQuestionaryComponentDefinition(
               question.question.dataType
@@ -63,12 +100,10 @@ function QuestionaryDetails(
               answer: question,
             });
 
-            return (
-              <TableRow key={`answer-${question.answerId}`}>
-                <TableCell>{questionElem}</TableCell>
-                <TableCell width="35%">{answerElem}</TableCell>
-              </TableRow>
-            );
+            return createTableRow(`answer-${question.answerId}`, {
+              label: questionElem,
+              value: answerElem,
+            });
           })}
         </TableBody>
       </Table>

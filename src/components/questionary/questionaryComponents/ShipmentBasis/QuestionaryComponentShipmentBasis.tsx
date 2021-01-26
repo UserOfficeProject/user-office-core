@@ -29,11 +29,10 @@ import {
 
 const useStyles = makeStyles(theme => ({
   formControl: {
-    margin: theme.spacing(1),
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
     width: '100%',
-  },
-  container: {
-    width: '550px',
+    boxSizing: 'border-box',
   },
   text: {
     margin: theme.spacing(1),
@@ -87,7 +86,7 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
   };
 
   return (
-    <div className={classes.container}>
+    <div>
       <FormControl className={classes.formControl}>
         <TextFieldNoSubmit
           value={title}
