@@ -22,7 +22,16 @@ export class SampleBasisConfig {
 export class BooleanConfig extends ConfigBase {}
 
 @ObjectType()
-export class DateConfig extends ConfigBase {}
+export class DateConfig extends ConfigBase {
+  @Field(() => String, { nullable: true })
+  minDate: string | null;
+
+  @Field(() => String, { nullable: true })
+  maxDate: string | null;
+
+  @Field(() => String, { nullable: true })
+  defaultDate: string | null;
+}
 
 @ObjectType()
 export class EmbellishmentConfig {
