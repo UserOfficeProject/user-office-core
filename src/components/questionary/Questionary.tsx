@@ -1,5 +1,5 @@
 import { makeStyles, Step, Stepper, Typography } from '@material-ui/core';
-import React, { useContext } from 'react';
+import React, { useContext, useRef, useEffect } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
@@ -47,6 +47,14 @@ function Questionary({
   const classes = useStyles();
   const { state, dispatch } = useContext(QuestionaryContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const titleRef = useRef<HTMLElement | null>(null);
+  const activeStep = state?.stepIndex;
+
+  useEffect(() => {
+    if (activeStep !== undefined && titleRef.current) {
+      titleRef.current.scrollIntoView();
+    }
+  }, [activeStep]);
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
@@ -110,7 +118,7 @@ function Questionary({
 
   return (
     <div className={classes.root}>
-      <Typography variant="h4" className={classes.header}>
+      <Typography variant="h4" className={classes.header} ref={titleRef}>
         {title}
       </Typography>
       <Typography className={classes.subHeader}>{info}</Typography>
