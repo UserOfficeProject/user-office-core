@@ -1,5 +1,8 @@
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
+import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import React from 'react';
 import * as Yup from 'yup';
 
@@ -42,6 +45,36 @@ export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRel
               fullWidth
               data-cy="required"
             />
+
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <Field
+                name="config.minDate"
+                label="Min"
+                format="yyyy-MM-dd"
+                component={KeyboardDatePicker}
+                margin="normal"
+                fullWidth
+                data-cy="minDate"
+              />
+              <Field
+                name="config.maxDate"
+                label="Max"
+                format="yyyy-MM-dd"
+                component={KeyboardDatePicker}
+                margin="normal"
+                fullWidth
+                data-cy="maxDate"
+              />
+              <Field
+                name="config.defaultDate"
+                label="Default"
+                format="yyyy-MM-dd"
+                component={KeyboardDatePicker}
+                margin="normal"
+                fullWidth
+                data-cy="defaultDate"
+              />
+            </MuiPickersUtilsProvider>
           </TitledContainer>
           <TitledContainer label="Dependencies">
             <QuestionDependencyList

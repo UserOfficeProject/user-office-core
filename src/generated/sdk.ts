@@ -214,6 +214,9 @@ export type DateConfig = {
   small_label: Scalars['String'];
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
+  minDate: Maybe<Scalars['String']>;
+  maxDate: Maybe<Scalars['String']>;
+  defaultDate: Maybe<Scalars['String']>;
 };
 
 
@@ -4234,7 +4237,7 @@ type FieldConfigBooleanConfigFragment = (
 
 type FieldConfigDateConfigFragment = (
   { __typename?: 'DateConfig' }
-  & Pick<DateConfig, 'small_label' | 'required' | 'tooltip'>
+  & Pick<DateConfig, 'small_label' | 'required' | 'tooltip' | 'minDate' | 'maxDate' | 'defaultDate'>
 );
 
 type FieldConfigEmbellishmentConfigFragment = (
@@ -5132,6 +5135,9 @@ export const FieldConfigFragmentDoc = gql`
     small_label
     required
     tooltip
+    minDate
+    maxDate
+    defaultDate
   }
   ... on EmbellishmentConfig {
     html

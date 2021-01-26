@@ -42,9 +42,11 @@ const resetDB = () => {
     }
   }`;
   const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
-  new GraphQLClient('/graphql', { headers: { authorization: authHeader } })
-    .rawRequest(query, null)
-    .then(data => console.log(data));
+  const request = new GraphQLClient('/graphql', {
+    headers: { authorization: authHeader },
+  }).rawRequest(query, null);
+
+  cy.wrap(request);
 };
 
 const navigateToTemplatesSubmenu = submenuName => {

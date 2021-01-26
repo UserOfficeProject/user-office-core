@@ -8,6 +8,9 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    minDate
+    maxDate
+    defaultDate
   }
   ... on EmbellishmentConfig {
     html

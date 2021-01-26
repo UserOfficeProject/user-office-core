@@ -15,10 +15,10 @@ import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import dateformat from 'dateformat';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
+import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import React, { useEffect, useState, useContext } from 'react';
 
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
-import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { UpdateUserMutationVariables, User, UserRole } from 'generated/sdk';
@@ -306,7 +306,8 @@ export default function UpdateUserInformation(props: { id: number }) {
                     <Field
                       name="birthdate"
                       label="Birthdate"
-                      component={FormikUICustomDatePicker}
+                      format="yyyy-MM-dd"
+                      component={KeyboardDatePicker}
                       margin="normal"
                       fullWidth
                       data-cy="birthdate"

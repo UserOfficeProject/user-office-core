@@ -2,9 +2,8 @@ import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
+import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import React from 'react';
-
-import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker';
 
 const CallReviewAndNotification: React.FC = () => (
   <>
@@ -12,7 +11,8 @@ const CallReviewAndNotification: React.FC = () => (
       <Field
         name="startReview"
         label="Start of review"
-        component={FormikUICustomDatePicker}
+        format="yyyy-MM-dd"
+        component={KeyboardDatePicker}
         margin="normal"
         fullWidth
         data-cy="start-review"
@@ -20,21 +20,24 @@ const CallReviewAndNotification: React.FC = () => (
       <Field
         name="endReview"
         label="End of review"
-        component={FormikUICustomDatePicker}
+        format="yyyy-MM-dd"
+        component={KeyboardDatePicker}
         margin="normal"
         fullWidth
       />
       <Field
         name="startSEPReview"
         label="Start of SEP review"
-        component={FormikUICustomDatePicker}
+        format="yyyy-MM-dd"
+        component={KeyboardDatePicker}
         margin="normal"
         fullWidth
       />
       <Field
         name="endSEPReview"
         label="End of SEP review"
-        component={FormikUICustomDatePicker}
+        format="yyyy-MM-dd"
+        component={KeyboardDatePicker}
         margin="normal"
         fullWidth
       />

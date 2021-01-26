@@ -2,11 +2,11 @@ import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
+import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import FormikDropdown from 'components/common/FormikDropdown';
-import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker';
 import { GetProposalTemplatesQuery, ProposalWorkflow } from 'generated/sdk';
 
 const CallGeneralInfo: React.FC<{
@@ -44,7 +44,8 @@ const CallGeneralInfo: React.FC<{
         <Field
           name="startCall"
           label="Start"
-          component={FormikUICustomDatePicker}
+          format="yyyy-MM-dd"
+          component={KeyboardDatePicker}
           margin="normal"
           fullWidth
           required
@@ -54,7 +55,8 @@ const CallGeneralInfo: React.FC<{
         <Field
           name="endCall"
           label="End"
-          component={FormikUICustomDatePicker}
+          format="yyyy-MM-dd"
+          component={KeyboardDatePicker}
           margin="normal"
           fullWidth
           required

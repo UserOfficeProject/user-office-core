@@ -4,6 +4,7 @@ context('Template tests', () => {
   before(() => {
     cy.resetDB();
   });
+
   beforeEach(() => {
     cy.viewport(1100, 1100);
     cy.visit('/');
@@ -548,6 +549,105 @@ context('Template tests', () => {
     cy.contains('Dashboard').click();
     cy.contains(title);
     cy.contains('submitted');
+  });
+
+  it('should render the Date field with default value and min max values when set', () => {
+    let dateFieldId: any;
+
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    cy.get("[title='Edit']")
+      .first()
+      .click();
+
+    cy.get('[data-cy=show-more-button]')
+      .first()
+      .click();
+
+    cy.get('[data-cy=add-question-menu-item]')
+      .first()
+      .click();
+
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+      .first()
+      .click();
+
+    cy.contains('Add Date').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(dateQuestion);
+
+    cy.get('[data-cy="minDate"] input').type('2020-01-01');
+    cy.get('[data-cy="maxDate"] input').type('2020-01-31');
+    cy.get('[data-cy="defaultDate"] input').type('2020-01-10');
+
+    cy.contains('Save').click();
+
+    cy.contains(dateQuestion)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        dateFieldId = fieldId;
+      });
+
+    cy.contains(dateQuestion)
+      .parent()
+      .dragElement([{ direction: 'left', length: 1 }]);
+
+    cy.wait(200);
+
+    cy.contains(dateQuestion).click();
+
+    cy.get('[data-cy="minDate"] input').should('have.value', '2020-01-01');
+    cy.get('[data-cy="maxDate"] input').should('have.value', '2020-01-31');
+    cy.get('[data-cy="defaultDate"] input').should('have.value', '2020-01-10');
+
+    cy.get('[data-cy="minDate"] input')
+      .clear()
+      .type('2021-01-01');
+    cy.get('[data-cy="maxDate"] input')
+      .clear()
+      .type('2021-01-31');
+    cy.get('[data-cy="defaultDate"] input')
+      .clear()
+      .type('2021-01-10');
+
+    cy.contains('Update').click();
+
+    cy.logout();
+
+    cy.login('user');
+
+    cy.contains('New Proposal').click();
+
+    cy.contains(dateQuestion);
+    cy.get('body').then(() => {
+      cy.get(`[data-cy="${dateFieldId}_field"] input`).as('dateField');
+
+      cy.get('@dateField').should('have.value', '2021-01-10');
+
+      cy.get('@dateField')
+        .clear()
+        .type('2020-01-01');
+      cy.contains('Save and continue').click();
+      cy.contains('Value must be a date at or after');
+
+      cy.get('@dateField')
+        .clear()
+        .type('2022-01-01');
+      cy.contains('Save and continue').click();
+      cy.contains('Value must be a date at or before');
+
+      cy.get('@dateField')
+        .clear()
+        .type('2021-01-15');
+      cy.contains('Save and continue').click();
+      cy.contains('Value must be a date at or').should('not.exist');
+    });
   });
 
   it('Officer can save proposal column selection', () => {

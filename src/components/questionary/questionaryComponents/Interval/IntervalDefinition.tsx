@@ -29,7 +29,7 @@ export const intervalDefinition: QuestionaryComponentDefinition = {
 
         return (
           <span>
-            ${min} - ${max} ${unit}
+            {min} - {max} {unit}
           </span>
         );
       }

@@ -1,10 +1,10 @@
 import DateFnsUtils from '@date-io/date-fns';
+import { DateType } from '@date-io/type';
 import FormControl from '@material-ui/core/FormControl';
-import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
-  KeyboardDatePicker,
   MuiPickersUtilsProvider,
+  KeyboardDatePicker,
 } from '@material-ui/pickers';
 import { Field, getIn } from 'formik';
 import React, { useEffect, useState } from 'react';
@@ -12,77 +12,95 @@ import React, { useEffect, useState } from 'react';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { DateConfig } from 'generated/sdk';
 
-function TextFieldWithTooltip({
+const TooltipWrapper = ({
+  children,
   title,
-  ...props
-}: TextFieldProps & { title: string }) {
-  return (
-    <Tooltip title={title}>
-      <TextField {...props} />
-    </Tooltip>
-  );
-}
+}: {
+  title?: string;
+  children: React.ReactElement;
+}) => {
+  if (!title) {
+    return children;
+  }
+
+  return <Tooltip title={title}>{children}</Tooltip>;
+};
 
 export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
   const {
     answer,
     onComplete,
-    formikProps: { errors, touched },
+    formikProps: { errors, touched, setFieldValue, values },
   } = props;
   const {
     question: { proposalQuestionId, question },
-    value,
+    answerId,
   } = answer;
-  const config = answer.config as DateConfig;
+  const {
+    defaultDate,
+    tooltip,
+    minDate,
+    maxDate,
+    small_label: smallLabel,
+    required,
+  } = answer.config as DateConfig;
   const fieldError = getIn(errors, proposalQuestionId);
+  const fieldValue = getIn(values, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
-  const [stateValue, setStateValue] = useState(value || '');
+  const [defaultInitialized, setDefaultInitialized] = useState(false);
 
+  // set default value only when creating new proposal,
+  // the user will either change it or keep it in the next step
+  // which will explicitly set the value of the field
+  // and we won't need to use the default value any longer
   useEffect(() => {
-    setStateValue(answer.value);
-  }, [answer]);
+    if (answerId === null && defaultDate && !defaultInitialized) {
+      onComplete(defaultDate);
+      setFieldValue(proposalQuestionId, defaultDate, false);
+      setDefaultInitialized(true);
+    }
+  }, [
+    defaultInitialized,
+    proposalQuestionId,
+    answerId,
+    defaultDate,
+    onComplete,
+    setFieldValue,
+  ]);
 
   return (
-    <FormControl error={isError} margin="dense">
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <Field
-          data-cy={proposalQuestionId + '_field'}
-          name={proposalQuestionId}
-          label={
-            <>
-              {question}
-              {config.small_label && (
-                <>
-                  <br />
-                  <small>{config.small_label}</small>
-                </>
-              )}
-            </>
-          }
-          component={({ field, form, ...other }: { field: any; form: any }) => {
-            return (
-              <KeyboardDatePicker
-                required={config.required}
-                clearable={true}
-                error={isError}
-                name={field.name}
-                helperText={isError && fieldError}
-                value={stateValue}
-                format="yyyy-MM-dd"
-                onChange={date => {
-                  setStateValue(date);
-                  onComplete(date);
-                  form.setFieldValue(field.name, date, false);
-                }}
-                TextFieldComponent={props => (
-                  <TextFieldWithTooltip {...props} title={config.tooltip} />
+    <TooltipWrapper title={tooltip}>
+      <FormControl error={isError} margin="dense">
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <Field
+            required={required}
+            error={isError}
+            helperText={isError && fieldError}
+            data-cy={proposalQuestionId + '_field'}
+            name={proposalQuestionId}
+            label={
+              <>
+                {question}
+                {smallLabel && (
+                  <>
+                    <br />
+                    <small>{smallLabel}</small>
+                  </>
                 )}
-                {...other}
-              />
-            );
-          }}
-        />
-      </MuiPickersUtilsProvider>
-    </FormControl>
+              </>
+            }
+            value={fieldValue || null} // date picker requires null for empty value
+            format="yyyy-MM-dd"
+            component={KeyboardDatePicker}
+            onChange={(date: DateType | null) => {
+              onComplete(date);
+              setFieldValue(proposalQuestionId, date, false);
+            }}
+            minDate={minDate}
+            maxDate={maxDate}
+          />
+        </MuiPickersUtilsProvider>
+      </FormControl>
+    </TooltipWrapper>
   );
 }

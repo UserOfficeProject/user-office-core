@@ -2,9 +2,8 @@ import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
+import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import React from 'react';
-
-import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker';
 
 const CallCycleInfo: React.FC = () => (
   <>
@@ -12,21 +11,24 @@ const CallCycleInfo: React.FC = () => (
       <Field
         name="startNotify"
         label="Start of notification period"
-        component={FormikUICustomDatePicker}
+        format="yyyy-MM-dd"
+        component={KeyboardDatePicker}
         margin="normal"
         fullWidth
       />
       <Field
         name="endNotify"
         label="End of notification period"
-        component={FormikUICustomDatePicker}
+        format="yyyy-MM-dd"
+        component={KeyboardDatePicker}
         margin="normal"
         fullWidth
       />
       <Field
         name="startCycle"
         label="Start of cycle"
-        component={FormikUICustomDatePicker}
+        format="yyyy-MM-dd"
+        component={KeyboardDatePicker}
         margin="normal"
         fullWidth
         data-cy="start-cycle"
@@ -34,7 +36,8 @@ const CallCycleInfo: React.FC = () => (
       <Field
         name="endCycle"
         label="End of cycle"
-        component={FormikUICustomDatePicker}
+        format="yyyy-MM-dd"
+        component={KeyboardDatePicker}
         margin="normal"
         fullWidth
         data-cy="end-cycle"

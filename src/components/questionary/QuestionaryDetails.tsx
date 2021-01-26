@@ -100,10 +100,13 @@ function QuestionaryDetails(
               answer: question,
             });
 
-            return createTableRow(`answer-${question.answerId}`, {
-              label: questionElem,
-              value: answerElem,
-            });
+            return createTableRow(
+              `answer-${question.answerId}-${question.question.proposalQuestionId}`,
+              {
+                label: questionElem,
+                value: answerElem,
+              }
+            );
           })}
         </TableBody>
       </Table>
