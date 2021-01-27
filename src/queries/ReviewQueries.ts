@@ -33,11 +33,18 @@ export default class ReviewQueries {
     }
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async reviewsForProposal(
     agent: UserWithRole | null,
     proposalId: number
   ): Promise<Review[] | null> {
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isChairOrSecretaryOfProposal(agent!.id, proposalId))
+    ) {
+      return null;
+    }
+
     return this.dataSource.getProposalReviews(proposalId);
   }
 
@@ -48,7 +55,8 @@ export default class ReviewQueries {
   ): Promise<TechnicalReview | null> {
     if (
       (await this.userAuth.isUserOfficer(user)) ||
-      (await this.userAuth.isScientistToProposal(user, proposalID))
+      (await this.userAuth.isScientistToProposal(user, proposalID)) ||
+      (await this.userAuth.isChairOrSecretaryOfProposal(user!.id, proposalID))
     ) {
       return this.dataSource.getTechnicalReview(proposalID);
     } else if (await this.userAuth.isReviewerOfProposal(user, proposalID)) {
