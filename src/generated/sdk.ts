@@ -1726,7 +1726,7 @@ export type Review = {
   grade: Maybe<Scalars['Int']>;
   status: ReviewStatus;
   sepID: Scalars['Int'];
-  reviewer: Maybe<User>;
+  reviewer: Maybe<BasicUserDetails>;
   proposal: Maybe<Proposal>;
 };
 
@@ -2298,8 +2298,8 @@ export type GetSepProposalQuery = (
         { __typename?: 'Review' }
         & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
         & { reviewer: Maybe<(
-          { __typename?: 'User' }
-          & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
+          { __typename?: 'BasicUserDetails' }
+          & Pick<BasicUserDetails, 'firstname' | 'lastname' | 'id'>
         )> }
       )>>, instrument: Maybe<(
         { __typename?: 'Instrument' }
@@ -3054,8 +3054,8 @@ export type GetInstrumentScientistProposalsQuery = (
         { __typename?: 'Review' }
         & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
         & { reviewer: Maybe<(
-          { __typename?: 'User' }
-          & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
+          { __typename?: 'BasicUserDetails' }
+          & Pick<BasicUserDetails, 'firstname' | 'lastname' | 'id'>
         )> }
       )>>, users: Array<(
         { __typename?: 'BasicUserDetails' }
@@ -3103,8 +3103,8 @@ export type GetProposalQuery = (
       { __typename?: 'Review' }
       & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
       & { reviewer: Maybe<(
-        { __typename?: 'User' }
-        & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
+        { __typename?: 'BasicUserDetails' }
+        & Pick<BasicUserDetails, 'firstname' | 'lastname' | 'id'>
       )> }
     )>>, instrument: Maybe<(
       { __typename?: 'Instrument' }
@@ -3136,8 +3136,8 @@ export type GetProposalsQuery = (
         { __typename?: 'Review' }
         & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
         & { reviewer: Maybe<(
-          { __typename?: 'User' }
-          & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
+          { __typename?: 'BasicUserDetails' }
+          & Pick<BasicUserDetails, 'firstname' | 'lastname' | 'id'>
         )> }
       )>>, users: Array<(
         { __typename?: 'BasicUserDetails' }
@@ -5515,7 +5515,6 @@ export const GetSepProposalDocument = gql`
         reviewer {
           firstname
           lastname
-          username
           id
         }
       }
@@ -5995,7 +5994,6 @@ export const GetInstrumentScientistProposalsDocument = gql`
         reviewer {
           firstname
           lastname
-          username
           id
         }
       }
@@ -6054,7 +6052,6 @@ export const GetProposalDocument = gql`
       reviewer {
         firstname
         lastname
-        username
         id
       }
     }
@@ -6091,7 +6088,6 @@ export const GetProposalsDocument = gql`
         reviewer {
           firstname
           lastname
-          username
           id
         }
       }

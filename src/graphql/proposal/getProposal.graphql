@@ -23,7 +23,6 @@ query getProposal($id: Int!) {
       reviewer {
         firstname
         lastname
-        username
         id
       }
     }

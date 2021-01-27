@@ -17,7 +17,7 @@ function readWriteReview() {
   cy.get('@dialog').contains('Technical Review');
   cy.get('@dialog')
     .contains('Grade')
-    .click();
+    .click({ force: true });
 
   cy.get('@dialog')
     .get('textarea[name="comment"]')
@@ -46,6 +46,7 @@ function readWriteReview() {
 function editFinalRankingForm() {
   cy.get('[role="dialog"]').should('exist');
 
+  cy.get('#commentForUser').scrollIntoView();
   cy.get('#commentForUser')
     .clear()
     .type(faker.lorem.words(3));
@@ -57,6 +58,14 @@ function editFinalRankingForm() {
   cy.get('#rankOrder')
     .clear()
     .type('5');
+
+  cy.contains('External reviews')
+    .parent()
+    .find('table')
+    .as('reviewsTable');
+
+  cy.get('@reviewsTable').contains('Carl Carlsson');
+  cy.get('@reviewsTable').contains('Benjamin Beckley');
 
   cy.get('[data-cy="save"]').click();
 
@@ -1093,6 +1102,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.get('[data-cy="save"]').should('not.exist');
     cy.get('[data-cy="saveAndContinue"]').should('not.exist');
+    cy.get('[role="presentation"]').should('not.contain', 'External reviews');
   });
 
   it('SEP Reviewer should not be able to access details proposal view if they are not assigned to the proposal', () => {
