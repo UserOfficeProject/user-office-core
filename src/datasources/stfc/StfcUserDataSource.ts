@@ -4,11 +4,11 @@ import { Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import database from '../postgres/database';
-import { UserRecord, createUserObject, RoleRecord } from '../postgres/records';
+import PostgresUserDataSource from '../postgres/UserDataSource';
 import { UserDataSource } from '../UserDataSource';
 import UOWSSoapClient from './UOWSSoapInterface';
 
+const postgresUserDataSource = new PostgresUserDataSource();
 const client = new UOWSSoapClient();
 const token = process.env.EXTERNAL_AUTH_TOKEN;
 
@@ -96,23 +96,16 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getProposalUsersFull(proposalId: number): Promise<User[]> {
-    return database
-      .select()
-      .from('users as u')
-      .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
-      .join('proposals as p', { 'p.proposal_id': 'pc.proposal_id' })
-      .where('p.proposal_id', proposalId)
-      .then(async (users: UserRecord[]) => {
-        const userNumbers: string[] = users.map(user => String(user.user_id));
+    const users: User[] = await postgresUserDataSource.getProposalUsersFull(proposalId);
+    const userNumbers: string[] = users.map(user => String(user.id));
 
-        const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
-          await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
-        )?.return;
+    const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
+      await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+    )?.return;
 
-        return stfcBasicPeople
-          ? stfcBasicPeople.map(person => toEssUser(person))
-          : Promise.resolve([]);
-      });
+    return stfcBasicPeople
+      ? stfcBasicPeople.map(person => toEssUser(person))
+      : Promise.resolve([]);
   }
 
   async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
@@ -140,15 +133,7 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async setUserNotPlaceholder(id: number): Promise<User | null> {
-    const [userRecord]: [UserRecord] = await database
-      .update({
-        placeholder: false,
-      })
-      .from('users')
-      .where('user_id', id)
-      .returning('*');
-
-    return userRecord ? createUserObject(userRecord) : null;
+    return await postgresUserDataSource.setUserNotPlaceholder(id);
   }
 
   async setUserPassword(
@@ -214,12 +199,7 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getRoles(): Promise<Role[]> {
-    return database
-      .select()
-      .from('roles')
-      .then((roles: RoleRecord[]) =>
-        roles.map(role => new Role(role.role_id, role.short_code, role.title))
-      );
+    return await postgresUserDataSource.getRoles();
   }
 
   async update(user: User): Promise<User> {
@@ -227,55 +207,15 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async me(id: number) {
-    return database
-      .select()
-      .from('users')
-      .where('user_id', id)
-      .first()
-      .then((user: UserRecord) => (!user ? null : createUserObject(user)));
+    return await postgresUserDataSource.me(id);
   }
 
   async get(id: number) {
-    return database
-      .select()
-      .from('users')
-      .where('user_id', id)
-      .first()
-      .then((user: UserRecord) => (!user ? null : createUserObject(user)));
+    return await postgresUserDataSource.get(id);
   }
 
   async createDummyUser(userId: number): Promise<User> {
-    return database
-      .insert({
-        user_id: userId,
-        user_title: '',
-        firstname: '',
-        middlename: '',
-        lastname: '',
-        username: userId.toString(),
-        password: '',
-        preferredname: '',
-        orcid: '',
-        orcid_refreshtoken: '',
-        gender: '',
-        nationality: 1,
-        birthdate: '2000-01-01',
-        organisation: 1,
-        department: '',
-        position: '',
-        email: userId.toString(),
-        telephone: '',
-        telephone_alt: '',
-      })
-      .returning(['*'])
-      .into('users')
-      .then((user: UserRecord[]) => {
-        if (!user || user.length == 0) {
-          throw new Error('Could not create user');
-        }
-
-        return createUserObject(user[0]);
-      });
+    return await postgresUserDataSource.createDummyUser(userId);
   }
 
   async getUsers(
@@ -285,100 +225,63 @@ export class StfcUserDataSource implements UserDataSource {
     userRole?: number,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
-    return database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .from('users')
-      .join('institutions as i', { organisation: 'i.institution_id' })
-      .orderBy('user_id', 'desc')
-      .modify(query => {
-        if (filter) {
-          query.andWhere(qb => {
-            qb.where('institution', 'ilike', `%${filter}%`)
-              .orWhere('firstname', 'ilike', `%${filter}%`)
-              .orWhere('preferredname', 'ilike', `%${filter}%`)
-              .orWhere('lastname', 'ilike', `%${filter}%`);
-          });
-        }
-        if (first) {
-          query.limit(first);
-        }
-        if (offset) {
-          query.offset(offset);
-        }
-        if (userRole) {
-          query.whereIn('user_id', function(this: any) {
-            this.select('user_id')
-              .from('role_user')
-              .where('role_id', userRole);
-          });
-        }
-        if (subtractUsers) {
-          query.whereNotIn('user_id', subtractUsers);
-        }
-      })
-      .then(async (usersRecord: UserRecord[]) => {
-        let users: BasicUserDetails[] = [];
+    const dbUsers: BasicUserDetails[] = (
+      await postgresUserDataSource.getUsers(
+        filter,
+        first,
+        offset,
+        userRole,
+        subtractUsers
+      )
+    ).users;
 
-        if (usersRecord[0]) {
-          const userNumbers: string[] = usersRecord.map(record =>
-            String(record.user_id)
-          );
-          const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
-            await client.getBasicPeopleDetailsFromUserNumbers(
-              token,
-              userNumbers
-            )
-          )?.return;
+    let users: BasicUserDetails[] = [];
 
-          users = stfcBasicPeople
-            ? stfcBasicPeople.map(person => toEssBasicUserDetails(person))
-            : [];
-        }
+    if (dbUsers[0]) {
+      const userNumbers: string[] = dbUsers.map(record =>
+        String(record.id)
+      );
+      const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
+        await client.getBasicPeopleDetailsFromUserNumbers(
+          token,
+          userNumbers
+        )
+      )?.return;
 
-        return {
-          totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
-          users,
-        };
-      });
+      users = stfcBasicPeople
+        ? stfcBasicPeople.map(person => toEssBasicUserDetails(person))
+        : [];
+    }
+
+    return {
+      totalCount: users.length,
+      users,
+    };
   }
 
-  async getProposalUsers(proposalId: number): Promise<BasicUserDetails[]> {
-    return database
-      .select()
-      .from('users as u')
-      .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
-      .join('proposals as p', { 'p.proposal_id': 'pc.proposal_id' })
-      .where('p.proposal_id', proposalId)
-      .then(async (users: UserRecord[]) => {
-        const userNumbers: string[] = users.map(user => String(user.user_id));
+  async getProposalUsers(proposalId: number): Promise<BasicUserDetails[]> {      
+    const users: BasicUserDetails[] = await postgresUserDataSource.getProposalUsers(
+      proposalId
+    );
+    const userNumbers: string[] = users.map(user => String(user.id));
 
-        const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
-          await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
-        )?.return;
+    const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
+      await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+    )?.return;
 
-        return stfcBasicPeople
-          ? stfcBasicPeople.map(person => toEssBasicUserDetails(person))
-          : Promise.resolve([]);
-      });
+    return stfcBasicPeople
+      ? stfcBasicPeople.map(person => toEssBasicUserDetails(person))
+      : Promise.resolve([]);
   }
 
   async checkScientistToProposal(
     scientistId: number,
     proposalId: number
   ): Promise<boolean> {
-    const proposal = await database
-      .select('*')
-      .from('proposals as p')
-      .join('instrument_has_scientists as ihs', {
-        'ihs.user_id': scientistId,
-      })
-      .join('instrument_has_proposals as ihp', {
-        'ihp.instrument_id': 'ihs.instrument_id',
-      })
-      .where('ihp.proposal_id', proposalId)
-      .first();
-
-    return !!proposal;
+    return await postgresUserDataSource.checkScientistToProposal(
+      scientistId,
+      proposalId
+    );
   }
 
   async create(
