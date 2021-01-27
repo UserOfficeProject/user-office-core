@@ -14,14 +14,19 @@ import {
   Question,
   QuestionaryStep,
   QuestionTemplateRelation,
+  Template,
 } from 'generated/sdk';
 import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
 import QuestionaryEditorModel, {
   Event,
   EventType,
 } from 'models/QuestionaryEditorModel';
-import { getQuestionaryStepByTopicId } from 'models/QuestionaryFunctions';
+import {
+  getFieldById,
+  getQuestionaryStepByTopicId,
+} from 'models/QuestionaryFunctions';
 import { StyledPaper } from 'styles/StyledComponents';
+import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 
 import QuestionEditor from './QuestionEditor';
 import { QuestionPicker } from './QuestionPicker';
@@ -38,10 +43,15 @@ export default function TemplateEditor() {
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
     null
   );
+
+  const [hoveredDependency, setHoveredDependency] = useState<string>('');
+
   const [questionPickerTopicId, setQuestionPickerTopicId] = useState<
     number | null
   >(null);
-  const reducerMiddleware = () => {
+  const handleEvents = ({
+    getState,
+  }: MiddlewareInputParams<Template, Event>) => {
     return (next: Function) => (action: Event) => {
       next(action);
       switch (action.type) {
@@ -62,11 +72,24 @@ export default function TemplateEditor() {
           break;
 
         case EventType.OPEN_QUESTIONREL_EDITOR:
-          setSelectedQuestionTemplateRelation(action.payload);
+          const templateRelation = getFieldById(
+            getState().steps,
+            action.payload.questionId
+          );
+          if (!templateRelation) {
+            return;
+          }
+
+          setSelectedQuestionTemplateRelation(
+            templateRelation as QuestionTemplateRelation
+          );
           break;
 
         case EventType.QUESTION_PICKER_NEW_QUESTION_CLICKED:
           setQuestionPickerTopicId(action.payload.topic.id);
+          break;
+        case EventType.DEPENDENCY_HOVER:
+          setHoveredDependency(action.payload.dependency);
           break;
       }
     };
@@ -74,7 +97,7 @@ export default function TemplateEditor() {
   const { persistModel, isLoading } = usePersistQuestionaryEditorModel();
   const { state, dispatch } = QuestionaryEditorModel([
     persistModel,
-    reducerMiddleware,
+    handleEvents,
   ]);
 
   const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
@@ -260,6 +283,7 @@ export default function TemplateEditor() {
                         dispatch={dispatch}
                         index={index}
                         dragMode={isTopicReorderMode}
+                        hoveredDependency={hoveredDependency}
                       />
                       {questionPicker}
                     </React.Fragment>
