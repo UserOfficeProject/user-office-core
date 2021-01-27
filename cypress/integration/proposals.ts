@@ -48,6 +48,18 @@ context('Proposal tests', () => {
 
     cy.contains('Save and continue').click();
 
+    cy.finishedLoading();
+
+    cy.contains('Dashboard').click();
+
+    cy.contains(title)
+      .parent()
+      .contains('draft');
+
+    cy.get('[title="Edit proposal"]')
+      .should('exist')
+      .click();
+
     cy.contains('Submit').click();
 
     cy.contains('OK').click();
@@ -55,5 +67,7 @@ context('Proposal tests', () => {
     cy.contains('Dashboard').click();
     cy.contains(title);
     cy.contains('submitted');
+
+    cy.get('[title="View proposal"]').should('exist');
   });
 });

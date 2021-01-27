@@ -72,14 +72,8 @@ const ProposalTable: React.FC<ProposalTableProps> = ({
       actions={[
         rowData => {
           return {
-            icon:
-              rowData.status === 'Submitted' || rowData.status === 'Accepted'
-                ? () => <Visibility />
-                : () => <Edit />,
-            tooltip:
-              rowData.status === 'Submitted' || rowData.status === 'Accepted'
-                ? 'View proposal'
-                : 'Edit proposal',
+            icon: rowData.submitted ? () => <Visibility /> : () => <Edit />,
+            tooltip: rowData.submitted ? 'View proposal' : 'Edit proposal',
             onClick: (event, rowData) =>
               setEditProposalID((rowData as PartialProposalsDataType).id),
           };
