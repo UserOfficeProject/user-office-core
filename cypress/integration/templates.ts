@@ -829,7 +829,19 @@ context('Template tests', () => {
     cy.get('main form').should('not.contain.text', 'Boolean question');
 
     cy.contains('Answer 1').click();
+
+    cy.on('window:confirm', str => {
+      expect(str).to.equal(
+        'Changes you recently made in this step will not be saved! Are you sure?'
+      );
+
+      return false;
+    });
+
+    cy.contains('Dashboard').click();
+
     cy.contains('Boolean question').click();
+
     cy.contains('Answer 2').click();
     cy.get('main form').should('not.contain.text', 'Boolean question');
   });
@@ -913,6 +925,17 @@ context('Template tests', () => {
     );
 
     cy.contains('Answer 1').click();
+
+    cy.on('window:confirm', str => {
+      expect(str).to.equal(
+        'Changes you recently made in this step will not be saved! Are you sure?'
+      );
+
+      return false;
+    });
+
+    cy.contains('Review').click();
+
     cy.contains('Boolean question').click();
     cy.get('main form').should(
       'contain.text',

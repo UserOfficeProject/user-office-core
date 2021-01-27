@@ -20,7 +20,12 @@ export const FeatureContextProvider: React.FC = props => {
   const { features, loadingFeatures } = useFeatures();
 
   if (loadingFeatures) {
-    return <UOLoader />;
+    return (
+      <UOLoader
+        size={40}
+        style={{ marginLeft: 'calc(50% - 20px)', marginTop: '40%' }}
+      />
+    );
   }
 
   const featuresMap = features.reduce(function(featuresMap, feature) {

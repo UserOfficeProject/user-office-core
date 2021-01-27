@@ -36,6 +36,7 @@ export enum EventType {
   SHIPMENT_MODIFIED = 'SHIPMENT_MODIFIED',
   SHIPMENT_UPDATED = 'SHIPMENT_UPDATED',
   SHIPMENT_DONE = 'SHIPMENT_DONE',
+  CLEAN_DIRTY_STATE = 'CLEAN_DIRTY_STATE',
 }
 export interface Event {
   type: EventType;
@@ -109,6 +110,10 @@ export function QuestionarySubmissionModel<
           ) as Answer;
           field.value = action.payload.newValue;
           draftState.isDirty = true;
+          break;
+
+        case EventType.CLEAN_DIRTY_STATE:
+          draftState.isDirty = false;
           break;
 
         case EventType.GO_STEP_BACK:

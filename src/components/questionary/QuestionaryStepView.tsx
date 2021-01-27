@@ -1,6 +1,6 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Formik, useFormikContext } from 'formik';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
 import * as Yup from 'yup';
 
@@ -65,12 +65,12 @@ export const createFormikConfigObjects = (
   return { initialValues, validationSchema };
 };
 
-const PromptIfDirty = () => {
+const PromptIfDirty = ({ isDirty }: { isDirty: boolean }) => {
   const formik = useFormikContext();
 
   return (
     <Prompt
-      when={formik.dirty && formik.submitCount === 0}
+      when={isDirty && formik.submitCount === 0}
       message="Changes you recently made in this step will not be saved! Are you sure?"
     />
   );
@@ -112,6 +112,48 @@ export default function QuestionaryStepView(props: {
     );
   });
 
+  const { initialValues, validationSchema } = createFormikConfigObjects(
+    activeFields,
+    state
+  );
+
+  const [lastSavedFormValues, setLastSavedFormValues] = useState(initialValues);
+
+  useEffect(() => {
+    setLastSavedFormValues(initialValues);
+    // NOTE: We need to update lastSavedFormValues when we change the topic so it has actual form initial values.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topicId]);
+
+  useEffect(() => {
+    const alertUserOnRouteLeave = (e: Event) => {
+      e.preventDefault();
+      if (
+        JSON.stringify(lastSavedFormValues) !== JSON.stringify(initialValues)
+      ) {
+        e.returnValue = true;
+      }
+    };
+
+    const cleanDirtyState = () => {
+      if (
+        state.isDirty &&
+        JSON.stringify(initialValues) === JSON.stringify(lastSavedFormValues)
+      ) {
+        dispatch({
+          type: EventType.CLEAN_DIRTY_STATE,
+        });
+      }
+    };
+
+    window.addEventListener('beforeunload', alertUserOnRouteLeave);
+    cleanDirtyState();
+
+    return () => {
+      window.removeEventListener('beforeunload', alertUserOnRouteLeave);
+    };
+  }, [initialValues, lastSavedFormValues, state.isDirty, dispatch]);
+
   const saveHandler = async (isPartialSave: boolean) => {
     const result =
       (
@@ -141,17 +183,14 @@ export default function QuestionaryStepView(props: {
           questionaryStep: answerTopicResult.answerTopic.questionaryStep,
         },
       });
+
+      setLastSavedFormValues(initialValues);
     }
   };
 
   if (state === null || !questionaryStep) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
-
-  const { initialValues, validationSchema } = createFormikConfigObjects(
-    activeFields,
-    state
-  );
 
   return (
     <Formik
@@ -172,7 +211,7 @@ export default function QuestionaryStepView(props: {
 
         return (
           <form className={props.readonly ? classes.disabled : undefined}>
-            <PromptIfDirty />
+            <PromptIfDirty isDirty={state.isDirty} />
             {activeFields.map(field => {
               return (
                 <div
@@ -206,7 +245,17 @@ export default function QuestionaryStepView(props: {
               disabled={props.readonly}
               back={{
                 callback: () => {
-                  dispatch({ type: EventType.BACK_CLICKED });
+                  if (state.isDirty) {
+                    if (
+                      window.confirm(
+                        'Changes you recently made in this step will not be saved! Are you sure?'
+                      )
+                    ) {
+                      dispatch({ type: EventType.BACK_CLICKED });
+                    }
+                  } else {
+                    dispatch({ type: EventType.BACK_CLICKED });
+                  }
                 },
                 disabled: state.stepIndex === 0,
               }}

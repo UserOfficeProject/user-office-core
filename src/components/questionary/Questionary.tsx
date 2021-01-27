@@ -82,11 +82,24 @@ function Questionary({
             <Step key={index}>
               <QuestionaryStepButton
                 onClick={async () => {
-                  if (!state.isDirty || (await handleReset())) {
+                  if (!state.isDirty) {
+                    await handleReset();
                     dispatch({
                       type: EventType.GO_TO_STEP,
                       payload: { stepIndex: index },
                     });
+                  } else {
+                    if (
+                      window.confirm(
+                        'Changes you recently made in this step will not be saved! Are you sure?'
+                      )
+                    ) {
+                      await handleReset();
+                      dispatch({
+                        type: EventType.GO_TO_STEP,
+                        payload: { stepIndex: index },
+                      });
+                    }
                   }
                 }}
                 completed={stepMetadata.isCompleted}
