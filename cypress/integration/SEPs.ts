@@ -1455,6 +1455,38 @@ context('Scientific evaluation panel tests', () => {
     cy.contains('SEP_MEMBER_REMOVED_FROM_PROPOSAL');
   });
 
+  it('SEP Chair should not be able to remove assigned proposal from existing SEP', () => {
+    cy.login(sepMembers.chair);
+    cy.changeActiveRole('SEP Chair');
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit"]')
+      .first()
+      .click();
+
+    cy.contains('Proposals and Assignments').click();
+
+    cy.finishedLoading();
+
+    cy.get('[title="Remove assigned proposal"]').should('not.exist');
+  });
+
+  it('SEP Secretary should not be able to remove assigned proposal from existing SEP', () => {
+    cy.login(sepMembers.secretary);
+    cy.changeActiveRole('SEP Secretary');
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit"]')
+      .first()
+      .click();
+
+    cy.contains('Proposals and Assignments').click();
+
+    cy.finishedLoading();
+
+    cy.get('[title="Remove assigned proposal"]').should('not.exist');
+  });
+
   it('Officer should be able to remove assigned proposal from existing SEP', () => {
     cy.login('officer');
 

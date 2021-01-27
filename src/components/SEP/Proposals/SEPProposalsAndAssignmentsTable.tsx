@@ -46,10 +46,13 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   } = useSEPProposalsData(sepId, selectedCallId);
   const { api } = useDataApiWithFeedback();
   const [proposalId, setProposalId] = useState<null | number>(null);
-  const hasAccessRights = useCheckAccess([
+  const hasRightToAssignReviewers = useCheckAccess([
     UserRole.USER_OFFICER,
     UserRole.SEP_CHAIR,
     UserRole.SEP_SECRETARY,
+  ]);
+  const hasRightToRemoveAssignedProposal = useCheckAccess([
+    UserRole.USER_OFFICER,
   ]);
 
   const getGradesFromAssignments = (assignments: SepAssignment[]) =>
@@ -304,7 +307,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
               },
             ]}
             actions={
-              hasAccessRights
+              hasRightToAssignReviewers
                 ? [
                     rowData => ({
                       icon: AssignmentIndIcon,
@@ -315,7 +318,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
                 : []
             }
             editable={
-              hasAccessRights
+              hasRightToRemoveAssignedProposal
                 ? {
                     deleteTooltip: () => 'Remove assigned proposal',
                     onRowDelete: (rowData: SepProposal): Promise<void> =>
