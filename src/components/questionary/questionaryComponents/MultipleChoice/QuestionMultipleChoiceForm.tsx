@@ -1,6 +1,6 @@
 import { FormControlLabel } from '@material-ui/core';
 import { Field } from 'formik';
-import { Checkbox, CheckboxWithLabel, TextField } from 'formik-material-ui';
+import { Checkbox, TextField } from 'formik-material-ui';
 import React, { ChangeEvent, useState } from 'react';
 import * as Yup from 'yup';
 
@@ -88,11 +88,17 @@ export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
             />
 
             {showIsMultipleSelectCheckbox && (
-              <Field
-                name="config.isMultipleSelect"
-                component={CheckboxWithLabel}
-                Label={{ label: 'Is multiple select' }}
-                margin="normal"
+              <FormControlLabel
+                control={
+                  <Field
+                    name="config.isMultipleSelect"
+                    component={Checkbox}
+                    margin="normal"
+                    type="checkbox"
+                    inputProps={{ 'data-cy': 'is-multiple-select' }}
+                  />
+                }
+                label="Is multiple select"
               />
             )}
           </TitledContainer>
