@@ -390,24 +390,30 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async removeProposalAssignment(proposalId: number, sepId: number) {
-    const proposalRemoved = await database('SEP_Proposals')
-      .del()
-      .where('sep_id', sepId)
-      .andWhere('proposal_id', proposalId);
+    await database.transaction(async trx => {
+      await trx('SEP_Proposals')
+        .where('sep_id', sepId)
+        .andWhere('proposal_id', proposalId)
+        .del();
+
+      await trx('SEP_Assignments')
+        .where('sep_id', sepId)
+        .andWhere('proposal_id', proposalId)
+        .del();
+
+      await trx('SEP_Reviews')
+        .where('sep_id', sepId)
+        .andWhere('proposal_id', proposalId)
+        .del();
+    });
 
     const sepUpdated = await this.get(sepId);
 
-    if (proposalRemoved && sepUpdated) {
-      // NOTE: Remove all member assignments to proposal when it is removed from SEP.
-      await database('SEP_Assignments')
-        .del()
-        .where('sep_id', sepId)
-        .andWhere('proposal_id', proposalId);
-
-      return sepUpdated;
+    if (!sepUpdated) {
+      throw new Error(`SEP not found ${sepId}`);
     }
 
-    throw new Error(`SEP not found ${sepId}`);
+    return sepUpdated;
   }
 
   async assignMemberToSEPProposal(
