@@ -14,6 +14,7 @@ import { ShipmentStatus } from '../models/Shipment';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { DataType, TemplateCategoryId } from '../models/Template';
 import { UserRole } from '../models/User';
+import { NumberValueConstraint } from './types/FieldConfig';
 
 export const registerEnums = () => {
   registerEnumType(TemplateCategoryId, { name: 'TemplateCategoryId' });
@@ -32,4 +33,5 @@ export const registerEnums = () => {
     name: 'DependenciesLogicOperator',
   });
   registerEnumType(FeatureId, { name: 'FeatureId' });
+  registerEnumType(NumberValueConstraint, { name: 'NumberValueConstraint' });
 };
