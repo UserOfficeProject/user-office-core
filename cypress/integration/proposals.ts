@@ -70,4 +70,24 @@ context('Proposal tests', () => {
 
     cy.get('[title="View proposal"]').should('exist');
   });
+
+  it('Should be able to delete proposal', () => {
+    const title = faker.lorem.words(2);
+    const abstract = faker.lorem.words(5);
+    cy.login('user');
+    cy.createProposal(title, abstract);
+
+    cy.contains('Submit');
+
+    cy.contains('Dashboard').click();
+
+    cy.contains(title)
+      .closest('tr')
+      .find('[title="Delete proposal"]')
+      .click();
+
+    cy.contains('OK').click();
+
+    cy.contains(title).should('not.exist');
+  });
 });

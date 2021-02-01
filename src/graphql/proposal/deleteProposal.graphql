@@ -3,5 +3,6 @@ mutation deleteProposal($id: Int!) {
     proposal {
       id
     }
+    error
   }
 }

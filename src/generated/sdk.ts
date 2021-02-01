@@ -3021,6 +3021,7 @@ export type DeleteProposalMutation = (
   { __typename?: 'Mutation' }
   & { deleteProposal: (
     { __typename?: 'ProposalResponseWrap' }
+    & Pick<ProposalResponseWrap, 'error'>
     & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id'>
@@ -4833,6 +4834,9 @@ export type GetUserProposalsQuery = (
       & { status: (
         { __typename?: 'ProposalStatus' }
         & ProposalStatusFragment
+      ), proposer: (
+        { __typename?: 'BasicUserDetails' }
+        & Pick<BasicUserDetails, 'id'>
       ) }
     )> }
   )> }
@@ -5981,6 +5985,7 @@ export const DeleteProposalDocument = gql`
     proposal {
       id
     }
+    error
   }
 }
     `;
@@ -7040,6 +7045,9 @@ export const GetUserProposalsDocument = gql`
       finalStatus
       notified
       submitted
+      proposer {
+        id
+      }
     }
   }
 }
