@@ -6,6 +6,7 @@ import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDat
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
+  dummyPrincipalInvestigatorWithRole,
   dummyUserNotOnProposal,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
@@ -158,6 +159,26 @@ test('User officer can delete a proposal', () => {
 test('User cannot delete a proposal', () => {
   return expect(
     proposalMutations.delete(dummyUserNotOnProposalWithRole, { proposalId: 1 })
+  ).resolves.not.toBeInstanceOf(Proposal);
+});
+
+test('Principal investigator can delete a proposal', () => {
+  return expect(
+    proposalMutations.delete(dummyPrincipalInvestigatorWithRole, {
+      proposalId: 1,
+    })
+  ).resolves.toBeInstanceOf(Proposal);
+});
+
+test('Principal investigator can delete submitted proposal', async () => {
+  await proposalMutations.submit(dummyPrincipalInvestigatorWithRole, {
+    proposalId: 1,
+  });
+
+  return expect(
+    proposalMutations.delete(dummyPrincipalInvestigatorWithRole, {
+      proposalId: 1,
+    })
   ).resolves.not.toBeInstanceOf(Proposal);
 });
 
