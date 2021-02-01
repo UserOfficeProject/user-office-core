@@ -1,5 +1,6 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import baseContext from '../../buildContext';
-import { questionaryDataSource } from '../../datasources';
 import { Proposal } from '../../models/Proposal';
 import {
   areDependenciesSatisfied,
@@ -110,7 +111,7 @@ export const collectProposalPDFData = async (
   // Information from each topic in proposal
   for (const step of questionarySteps) {
     if (!step) {
-      console.error('step not found', questionarySteps);
+      logger.logError('step not found', questionarySteps);
 
       throw 'Could not download generated PDF';
     }

@@ -1,25 +1,23 @@
 /* eslint-disable prettier/prettier */
 import 'reflect-metadata';
-import { MutedLogger } from '@esss-swap/duo-logger';
-
 import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
+  dummyPrincipalInvestigatorWithRole,
   dummyUserNotOnProposal,
-  UserDataSourceMock,
-  dummyUserWithRole,
-  dummyUserOfficerWithRole,
   dummyUserNotOnProposalWithRole,
+  dummyUserOfficerWithRole,
+  dummyUserWithRole,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
 import ProposalMutations from './ProposalMutations';
 
-const dummyLogger = new MutedLogger();
 const dummyProposalDataSource = new ProposalDataSourceMock();
 const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
 const dummyCallDataSource = new CallDataSourceMock();
@@ -34,8 +32,7 @@ const proposalMutations = new ProposalMutations(
   dummyQuestionaryDataSource,
   dummyCallDataSource,
   dummyInstrumentDataSource,
-  userAuthorization,
-  dummyLogger
+  userAuthorization
 );
 
 beforeEach(() => {
@@ -162,6 +159,26 @@ test('User officer can delete a proposal', () => {
 test('User cannot delete a proposal', () => {
   return expect(
     proposalMutations.delete(dummyUserNotOnProposalWithRole, { proposalId: 1 })
+  ).resolves.not.toBeInstanceOf(Proposal);
+});
+
+test('Principal investigator can delete a proposal', () => {
+  return expect(
+    proposalMutations.delete(dummyPrincipalInvestigatorWithRole, {
+      proposalId: 1,
+    })
+  ).resolves.toBeInstanceOf(Proposal);
+});
+
+test('Principal investigator can delete submitted proposal', async () => {
+  await proposalMutations.submit(dummyPrincipalInvestigatorWithRole, {
+    proposalId: 1,
+  });
+
+  return expect(
+    proposalMutations.delete(dummyPrincipalInvestigatorWithRole, {
+      proposalId: 1,
+    })
   ).resolves.not.toBeInstanceOf(Proposal);
 });
 

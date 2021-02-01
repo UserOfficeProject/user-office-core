@@ -1,4 +1,4 @@
-import { logger, Logger } from '@esss-swap/duo-logger';
+import { logger } from '@esss-swap/duo-logger';
 
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
@@ -15,8 +15,7 @@ export default class QuestionaryMutations {
   constructor(
     private dataSource: QuestionaryDataSource,
     private templateDataSource: TemplateDataSource,
-    private questionaryAuth: QuestionaryAuthorization,
-    private logger: Logger
+    private questionaryAuth: QuestionaryAuthorization
   ) {}
 
   @Authorized()
@@ -69,7 +68,7 @@ export default class QuestionaryMutations {
           !isPartialSave &&
           !isMatchingConstraints(questionTemplateRelation, value)
         ) {
-          this.logger.logError('User provided value not matching constraint', {
+          logger.logError('User provided value not matching constraint', {
             answer,
             questionTemplateRelation,
           });

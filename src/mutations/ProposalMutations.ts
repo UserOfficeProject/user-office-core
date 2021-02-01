@@ -1,4 +1,4 @@
-import { logger, Logger } from '@esss-swap/duo-logger';
+import { logger } from '@esss-swap/duo-logger';
 import {
   administrationProposalBEValidationSchema,
   createProposalValidationSchema,
@@ -29,8 +29,7 @@ export default class ProposalMutations {
     private questionaryDataSource: QuestionaryDataSource,
     private callDataSource: CallDataSource,
     private instrumentDataSource: InstrumentDataSource,
-    private userAuth: UserAuthorization,
-    private logger: Logger
+    private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -180,7 +179,7 @@ export default class ProposalMutations {
   }
 
   @ValidateArgs(deleteProposalValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized()
   async delete(
     agent: UserWithRole | null,
     { proposalId }: { proposalId: number }
@@ -188,7 +187,15 @@ export default class ProposalMutations {
     const proposal = await this.proposalDataSource.get(proposalId);
 
     if (!proposal) {
-      return rejection('INTERNAL_ERROR');
+      return rejection('NOT_FOUND');
+    }
+
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      if (
+        proposal.submitted ||
+        !this.userAuth.isPrincipalInvestigatorOfProposal(agent, proposal)
+      )
+        return rejection('NOT_ALLOWED');
     }
 
     const result = await this.proposalDataSource.deleteProposal(proposalId);

@@ -79,6 +79,12 @@ export const dummyUser = new User(
   '2019-07-17 08:25:12.23043+00'
 );
 
+export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
+  ...dummyUser,
+  id: 1,
+  currentRole: { id: 1, title: 'Principal investigator', shortCode: 'pi' },
+};
+
 export const dummyUserWithRole: UserWithRole = {
   ...dummyUser,
   currentRole: { id: 1, title: 'User', shortCode: 'user' },

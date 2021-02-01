@@ -50,11 +50,24 @@ export class UserAuthorization {
     });
   }
 
-  async isMemberOfProposal(agent: User | null, proposal: Proposal | null) {
+  isPrincipalInvestigatorOfProposal(
+    agent: User | null,
+    proposal: Proposal | null
+  ) {
     if (agent == null || proposal == null) {
       return false;
     }
     if (agent.id === proposal.proposerId) {
+      return true;
+    }
+  }
+
+  async isMemberOfProposal(agent: User | null, proposal: Proposal | null) {
+    if (agent == null || proposal == null) {
+      return false;
+    }
+
+    if (this.isPrincipalInvestigatorOfProposal(agent, proposal)) {
       return true;
     }
 
