@@ -1,4 +1,4 @@
-import { logger, Logger } from '@esss-swap/duo-logger';
+import { logger } from '@esss-swap/duo-logger';
 import {
   administrationProposalBEValidationSchema,
   createProposalValidationSchema,
@@ -29,8 +29,7 @@ export default class ProposalMutations {
     private questionaryDataSource: QuestionaryDataSource,
     private callDataSource: CallDataSource,
     private instrumentDataSource: InstrumentDataSource,
-    private userAuth: UserAuthorization,
-    private logger: Logger
+    private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)

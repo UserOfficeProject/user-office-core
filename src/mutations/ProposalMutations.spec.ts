@@ -1,7 +1,5 @@
 /* eslint-disable prettier/prettier */
 import 'reflect-metadata';
-import { MutedLogger } from '@esss-swap/duo-logger';
-
 import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
@@ -9,17 +7,16 @@ import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   dummyUserNotOnProposal,
-  UserDataSourceMock,
-  dummyUserWithRole,
-  dummyUserOfficerWithRole,
   dummyUserNotOnProposalWithRole,
+  dummyUserOfficerWithRole,
+  dummyUserWithRole,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
 import ProposalMutations from './ProposalMutations';
 
-const dummyLogger = new MutedLogger();
 const dummyProposalDataSource = new ProposalDataSourceMock();
 const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
 const dummyCallDataSource = new CallDataSourceMock();
@@ -34,8 +31,7 @@ const proposalMutations = new ProposalMutations(
   dummyQuestionaryDataSource,
   dummyCallDataSource,
   dummyInstrumentDataSource,
-  userAuthorization,
-  dummyLogger
+  userAuthorization
 );
 
 beforeEach(() => {
