@@ -11,7 +11,7 @@ import {
 } from 'generated/sdk';
 import { ConditionEvaluator } from 'models/ConditionEvaluator';
 
-type AbstractField = QuestionTemplateRelation | Answer;
+export type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 
 export function getTopicById(collection: AbstractCollection, topicId: number) {

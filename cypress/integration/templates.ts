@@ -1009,4 +1009,94 @@ context('Template tests', () => {
       'Question with multiple dependencies'
     );
   });
+
+  it('should not let you create circular dependency chain', () => {
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    const templateName = faker.lorem.words(3);
+
+    cy.contains('Create template').click();
+    cy.get('[data-cy="name"]').type(templateName);
+    cy.get('[data-cy="description"]').type(templateName);
+    cy.get('[data-cy="submit"]').click();
+    cy.contains(templateName);
+
+    cy.get('[data-cy=show-more-button]')
+      .last()
+      .click();
+
+    cy.get('[data-cy=add-question-menu-item]')
+      .last()
+      .click();
+
+    const field1 = 'boolean_1_' + Date.now();
+    const field2 = 'boolean_2_' + Date.now();
+    const field3 = 'boolean_3_' + Date.now();
+
+    function addBooleanField(fieldName: string) {
+      cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+        .last()
+        .click();
+      cy.contains('Add Boolean').click();
+
+      cy.get('[data-cy="natural_key"]')
+        .clear()
+        .type(fieldName);
+      cy.get('[data-cy="question"]')
+        .clear()
+        .type(fieldName);
+      cy.contains('Save').click();
+
+      cy.contains(fieldName)
+        .parent()
+        .dragElement([{ direction: 'left', length: 1 }]);
+    }
+
+    addBooleanField(field1);
+    addBooleanField(field2);
+    addBooleanField(field3);
+
+    cy.wait(200);
+
+    function addDependency(
+      fieldName: string,
+      contains: string[],
+      select?: string
+    ) {
+      cy.contains(fieldName).click();
+      cy.get('[data-cy="add-dependency-button"]').click();
+      cy.get('[id="dependency-id"]').click();
+
+      contains.forEach(field => {
+        cy.get('[role="listbox"]').contains(field);
+      });
+
+      if (contains.length === 0) {
+        cy.get('[role="listbox"]')
+          .children()
+          .should('have.length', 0);
+      }
+
+      if (select) {
+        cy.get('[role="listbox"]')
+          .contains(select)
+          .click();
+
+        cy.get('[id="dependencyValue"]').click();
+        cy.get('[role="listbox"]')
+          .contains('true')
+          .click();
+
+        cy.contains('Update').click();
+
+        cy.finishedLoading();
+      }
+    }
+
+    addDependency(field1, [field2, field3], field2);
+    addDependency(field2, [field3], field3);
+    addDependency(field3, []);
+  });
 });

@@ -5,7 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { FormikHelpers } from 'formik';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 
 import {
   DataType,
@@ -15,7 +15,11 @@ import {
   SelectionFromOptionsConfig,
   Template,
 } from 'generated/sdk';
-import { getAllFields, getFieldById } from 'models/QuestionaryFunctions';
+import {
+  getAllFields,
+  getFieldById,
+  AbstractField,
+} from 'models/QuestionaryFunctions';
 
 const FormikUICustomDependencySelector = ({
   field,
@@ -109,6 +113,42 @@ const FormikUICustomDependencySelector = ({
     updateFormikMemoized();
   }, [dependencyId, operator, dependencyValue, updateFormikMemoized]);
 
+  const { steps } = template;
+
+  const allAvailableFields = useMemo(() => {
+    const allFields = getAllFields(steps);
+
+    const hasCircularDependency = (
+      currentQuestionId: string,
+      option?: AbstractField
+    ): boolean => {
+      if (!option) {
+        return false;
+      }
+
+      return option.dependencies.some(
+        dependency =>
+          dependency.dependencyId === currentQuestionId ||
+          hasCircularDependency(
+            currentQuestionId,
+            allFields.find(
+              option =>
+                option.question.proposalQuestionId === dependency.dependencyId
+            )
+          )
+      );
+    };
+
+    return allFields
+      .filter(
+        option =>
+          [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
+            option.question.dataType
+          ) && currentQuestionId !== option.question.proposalQuestionId
+      )
+      .filter(option => !hasCircularDependency(currentQuestionId, option));
+  }, [steps, currentQuestionId]);
+
   return (
     <Grid container>
       <Grid item xs={6}>
@@ -125,24 +165,17 @@ const FormikUICustomDependencySelector = ({
             }}
             required
           >
-            {getAllFields(template.steps)
-              .filter(
-                option =>
-                  [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
-                    option.question.dataType
-                  ) && currentQuestionId !== option.question.proposalQuestionId
-              )
-              .map(option => {
-                return (
-                  <MenuItem
-                    value={option.question.proposalQuestionId}
-                    className={classes.menuItem}
-                    key={option.question.proposalQuestionId}
-                  >
-                    {option.question.question}
-                  </MenuItem>
-                );
-              })}
+            {allAvailableFields.map(option => {
+              return (
+                <MenuItem
+                  value={option.question.proposalQuestionId}
+                  className={classes.menuItem}
+                  key={option.question.proposalQuestionId}
+                >
+                  {option.question.question}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
       </Grid>
