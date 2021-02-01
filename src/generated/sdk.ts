@@ -1140,7 +1140,14 @@ export type NumberInputConfig = {
   tooltip: Scalars['String'];
   units: Maybe<Array<Scalars['String']>>;
   property: Scalars['String'];
+  numberValueConstraint: Maybe<NumberValueConstraint>;
 };
+
+export enum NumberValueConstraint {
+  NONE = 'NONE',
+  ONLY_POSITIVE = 'ONLY_POSITIVE',
+  ONLY_NEGATIVE = 'ONLY_NEGATIVE'
+}
 
 export type OrcIdInformation = {
   __typename?: 'OrcIDInformation';
@@ -3014,6 +3021,7 @@ export type DeleteProposalMutation = (
   { __typename?: 'Mutation' }
   & { deleteProposal: (
     { __typename?: 'ProposalResponseWrap' }
+    & Pick<ProposalResponseWrap, 'error'>
     & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id'>
@@ -4282,7 +4290,7 @@ type FieldConfigIntervalConfigFragment = (
 
 type FieldConfigNumberInputConfigFragment = (
   { __typename?: 'NumberInputConfig' }
-  & Pick<NumberInputConfig, 'property' | 'units' | 'small_label' | 'required' | 'tooltip'>
+  & Pick<NumberInputConfig, 'property' | 'units' | 'numberValueConstraint' | 'small_label' | 'required' | 'tooltip'>
 );
 
 type FieldConfigShipmentBasisConfigFragment = (
@@ -4826,6 +4834,9 @@ export type GetUserProposalsQuery = (
       & { status: (
         { __typename?: 'ProposalStatus' }
         & ProposalStatusFragment
+      ), proposer: (
+        { __typename?: 'BasicUserDetails' }
+        & Pick<BasicUserDetails, 'id'>
       ) }
     )> }
   )> }
@@ -5161,6 +5172,7 @@ export const FieldConfigFragmentDoc = gql`
   ... on NumberInputConfig {
     property
     units
+    numberValueConstraint
     small_label
     required
     tooltip
@@ -5973,6 +5985,7 @@ export const DeleteProposalDocument = gql`
     proposal {
       id
     }
+    error
   }
 }
     `;
@@ -7032,6 +7045,9 @@ export const GetUserProposalsDocument = gql`
       finalStatus
       notified
       submitted
+      proposer {
+        id
+      }
     }
   }
 }

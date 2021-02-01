@@ -157,7 +157,7 @@ context('Template tests', () => {
 
     cy.contains('btu').click();
 
-    cy.contains('joule').click();
+    cy.contains('terajoule').click();
 
     cy.get('body').type('{esc}');
 
@@ -193,7 +193,7 @@ context('Template tests', () => {
 
     cy.contains('btu').click();
 
-    cy.contains('joule').click();
+    cy.contains('terajoule').click();
 
     cy.get('body').type('{esc}');
 
@@ -647,6 +647,159 @@ context('Template tests', () => {
         .type('2021-01-15');
       cy.contains('Save and continue').click();
       cy.contains('Value must be a date at or').should('not.exist');
+    });
+  });
+
+  it('should render the Number field accepting only positive, negative numbers if set', () => {
+    let numberField1Id: any;
+    let numberField2Id: any;
+    const numberQuestion1 = faker.lorem.words(2);
+    const numberQuestion2 = faker.lorem.words(2);
+
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    cy.get("[title='Edit']")
+      .first()
+      .click();
+
+    cy.get('[data-cy=show-more-button]')
+      .first()
+      .click();
+
+    cy.get('[data-cy=add-question-menu-item]')
+      .first()
+      .click();
+
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+      .first()
+      .click();
+
+    cy.contains('Add Number').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(numberQuestion1);
+
+    cy.get('[data-cy=property]').click();
+
+    cy.contains('energy').click();
+
+    cy.get('[data-cy=units]>[role=button]').click();
+
+    cy.contains('btu').click();
+
+    cy.contains('terajoule').click();
+
+    cy.get('body').type('{esc}');
+
+    cy.get('[data-cy="numberValueConstraint"]').click();
+
+    cy.contains('Only positive numbers').click();
+
+    cy.contains('Save').click();
+
+    cy.contains(numberQuestion1)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        numberField1Id = fieldId;
+      });
+
+    cy.contains(numberQuestion1)
+      .parent()
+      .dragElement([{ direction: 'left', length: 1 }]);
+
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+      .first()
+      .click();
+
+    cy.contains('Add Number').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(numberQuestion2);
+
+    cy.get('[data-cy=property]').click();
+
+    cy.contains('energy').click();
+
+    cy.get('[data-cy=units]>[role=button]').click();
+
+    cy.contains('btu').click();
+
+    cy.contains('terajoule').click();
+
+    cy.get('body').type('{esc}');
+
+    cy.get('[data-cy="numberValueConstraint"]').click();
+
+    cy.contains('Only positive numbers').click();
+
+    cy.contains('Save').click();
+
+    cy.contains(numberQuestion2)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        numberField2Id = fieldId;
+      });
+
+    cy.contains(numberQuestion2)
+      .parent()
+      .dragElement([{ direction: 'left', length: 1 }]);
+
+    cy.wait(200);
+
+    cy.contains(numberQuestion2).click();
+
+    cy.get('[data-cy="property"] input').should('have.value', 'ENERGY');
+    cy.get('[data-cy=units] input').should('have.value', 'btu,terajoule');
+    cy.get('[data-cy="numberValueConstraint"] input').should(
+      'have.value',
+      'ONLY_POSITIVE'
+    );
+
+    cy.get('[data-cy="numberValueConstraint"]').click();
+
+    cy.contains('Only negative numbers').click();
+
+    cy.contains('Update').click();
+
+    cy.logout();
+
+    cy.login('user');
+
+    cy.contains('New Proposal').click();
+
+    cy.contains(numberQuestion1);
+    cy.contains(numberQuestion2);
+    cy.get('body').then(() => {
+      console.log(`[data-cy="${numberField1Id}.value"] input`);
+      console.log(`[data-cy="${numberField2Id}.value"] input`);
+
+      cy.get(`[data-cy="${numberField1Id}.value"] input`).as('numberField1');
+      cy.get(`[data-cy="${numberField2Id}.value"] input`).as('numberField2');
+
+      cy.get('@numberField1').type('1{leftarrow}-');
+      cy.get('@numberField2').type('1');
+
+      cy.contains('Save and continue').click();
+      cy.contains('Value must be a negative number');
+      cy.contains('Value must be a positive number');
+
+      cy.get('@numberField1')
+        .clear()
+        .type('1');
+      cy.get('@numberField2')
+        .clear()
+        .type('1{leftarrow}-');
+
+      cy.contains('Value must be a negative number').should('not.exist');
+      cy.contains('Value must be a positive number').should('not.exist');
     });
   });
 

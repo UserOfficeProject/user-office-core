@@ -1,17 +1,21 @@
+import DeleteIcon from '@material-ui/icons/Delete';
 import Edit from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Redirect } from 'react-router';
 
+import { UserContext } from 'context/UserContextProvider';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import {
-  UserProposalDataType,
   PartialProposalsDataType,
+  UserProposalDataType,
 } from './ProposalTableUser';
 
 type ProposalTableProps = {
@@ -23,22 +27,26 @@ type ProposalTableProps = {
   searchQuery: () => Promise<UserProposalDataType>;
   /** Loading data indicator */
   isLoading: boolean;
+  confirm: WithConfirmType;
 };
 
-const ProposalTable: React.FC<ProposalTableProps> = ({
+const ProposalTable = ({
   title,
   search,
   searchQuery,
   isLoading,
-}) => {
+  confirm,
+}: ProposalTableProps) => {
+  const userContext = useContext(UserContext);
+  const { api } = useDataApiWithFeedback();
   const downloadPDFProposal = useDownloadPDFProposal();
-  const [partialProposalsData, setPartialProposalsDataData] = useState<
+  const [partialProposalsData, setPartialProposalsData] = useState<
     PartialProposalsDataType[] | undefined
   >([]);
   useEffect(() => {
     searchQuery().then(data => {
       if (data) {
-        setPartialProposalsDataData(data.data);
+        setPartialProposalsData(data.data);
       }
     });
   }, [searchQuery]);
@@ -55,8 +63,6 @@ const ProposalTable: React.FC<ProposalTableProps> = ({
   if (editProposalID) {
     return <Redirect push to={`/ProposalEdit/${editProposalID}`} />;
   }
-
-  const GetAppIconCompopnent = (): JSX.Element => <GetAppIcon />;
 
   return (
     <MaterialTable
@@ -79,10 +85,48 @@ const ProposalTable: React.FC<ProposalTableProps> = ({
           };
         },
         {
-          icon: GetAppIconCompopnent,
+          icon: GetAppIcon,
           tooltip: 'Download proposal',
           onClick: (event, rowData) =>
             downloadPDFProposal((rowData as PartialProposalsDataType).id),
+        },
+        rowData => {
+          const isPI = rowData.proposerId === userContext.user.id;
+          const isSubmitted = rowData.submitted;
+          const canDelete = isPI && !isSubmitted;
+
+          return {
+            icon: DeleteIcon,
+            tooltip: isSubmitted
+              ? 'Only draft proposals can be deleted'
+              : !isPI
+              ? 'Only PI can delete proposal'
+              : 'Delete proposal',
+            disabled: !canDelete,
+            onClick: (_event, rowData) =>
+              confirm(
+                async () => {
+                  const deletedProposal = (
+                    await api().deleteProposal({
+                      id: (rowData as PartialProposalsDataType).id,
+                    })
+                  ).deleteProposal.proposal;
+                  if (deletedProposal) {
+                    setPartialProposalsData(
+                      partialProposalsData?.filter(
+                        item => item.id !== deletedProposal?.id
+                      )
+                    );
+                  }
+                },
+                {
+                  title: 'Are you sure?',
+                  description: `Are you sure you want to delete proposal '${
+                    (rowData as PartialProposalsDataType).title
+                  }'`,
+                }
+              )(),
+          };
         },
       ]}
     />
@@ -96,4 +140,4 @@ ProposalTable.propTypes = {
   isLoading: PropTypes.bool.isRequired,
 };
 
-export default ProposalTable;
+export default withConfirm(ProposalTable);

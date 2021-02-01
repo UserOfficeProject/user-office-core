@@ -85,7 +85,9 @@ const FormikUICustomSelect = ({
 
   return (
     <>
-      <InputLabel htmlFor={id}>{label}</InputLabel>
+      <InputLabel htmlFor={id} shrink>
+        {label}
+      </InputLabel>
       <Select
         value={field.value}
         multiple={multiple}

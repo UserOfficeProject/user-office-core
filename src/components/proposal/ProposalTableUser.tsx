@@ -21,6 +21,7 @@ export type PartialProposalsDataType = {
   submitted: boolean;
   shortCode: string;
   created: string | null;
+  proposerId: number;
 };
 
 export type UserProposalDataType = {
@@ -71,6 +72,7 @@ const ProposalTableUser: React.FC = () => {
                 shortCode: proposal.shortCode,
                 created: timeAgo(proposal.created),
                 notified: proposal.notified,
+                proposerId: proposal.proposer.id,
               };
             }),
         };

@@ -13,6 +13,9 @@ query getUserProposals {
       finalStatus
       notified
       submitted
+      proposer {
+        id
+      }
     }
   }
 }
