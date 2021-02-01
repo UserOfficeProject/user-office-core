@@ -38,6 +38,7 @@ fragment fieldConfig on FieldConfig {
   ... on NumberInputConfig {
     property
     units
+    numberValueConstraint
 
     small_label
     required

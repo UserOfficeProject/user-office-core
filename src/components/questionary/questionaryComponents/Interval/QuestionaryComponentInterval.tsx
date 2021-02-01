@@ -131,6 +131,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
             name={minFieldId}
             margin="dense"
             fullWidth
+            error={isError}
           />
         </Grid>
 
@@ -150,6 +151,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
             name={maxFieldId}
             margin="dense"
             fullWidth
+            error={isError}
           />
         </Grid>
         <Grid item xs={8} className={classes.unitField}>
