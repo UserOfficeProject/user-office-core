@@ -1,18 +1,18 @@
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
+
+import {
+  DownloadContext,
+  PREPARE_DOWNLOAD_TYPE,
+} from 'context/DownloadContextProvider';
 
 export function useDownloadPDFProposal() {
-  const downloadProposalPDF = useCallback(proposalId => {
-    const element = document.createElement('a');
-    element.setAttribute('href', '/download/pdf/proposal/' + proposalId);
-    element.setAttribute('download', 'download');
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
-  }, []);
+  const { prepareDownload } = useContext(DownloadContext);
+  const downloadProposalPDF = useCallback(
+    (proposalIds: number[], name: string) => {
+      prepareDownload(PREPARE_DOWNLOAD_TYPE.PDF_PROPOSAL, proposalIds, name);
+    },
+    [prepareDownload]
+  );
 
   return downloadProposalPDF;
 }

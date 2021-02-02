@@ -86,7 +86,7 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
         />
         <Button
           className={classes.button}
-          onClick={() => downloadPDFProposal(proposal.id)}
+          onClick={() => downloadPDFProposal([proposal.id], proposal.title)}
           variant="contained"
           disabled={!allStepsComplete}
         >
