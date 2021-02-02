@@ -118,7 +118,7 @@ export default function createHandler(userDataSource: UserDataSource) {
 
         const options: EmailSettings = {
           content: {
-            template_id: '',
+            template_id: 'proposal-submitted',
           },
           substitution_data: {
             piPreferredname: principalInvestigator.preferredname,

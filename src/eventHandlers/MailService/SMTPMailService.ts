@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import * as path from 'path';
+
+import * as fs from 'fs';
 
 import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
@@ -12,7 +13,6 @@ export class SMTPMailService extends MailService {
 
   constructor() {
     super();
-    this.template_id = path.resolve('src', 'eventHandlers', 'emails', 'submit');
 
     this._email = new EmailTemplates({
       message: {
@@ -53,7 +53,8 @@ export class SMTPMailService extends MailService {
       sendMailResults.id = 'test';
     }
 
-    options.content.template_id = this.template_id;
+    options.content.template_id =
+      process.env.EMAIL_TEMPLATE_PATH + options.content.template_id;
 
     options.recipients.forEach(participant => {
       emailPromises.push(
