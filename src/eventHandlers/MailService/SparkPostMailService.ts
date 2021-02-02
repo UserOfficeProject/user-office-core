@@ -10,7 +10,6 @@ export class SparkPostMailService extends MailService {
   constructor(options: { endpoint: string }) {
     super();
     this.client = new SparkPost(process.env.SPARKPOST_TOKEN, options);
-    this.template_id = 'proposal-submitted';
   }
 
   sendMail = (
@@ -18,8 +17,6 @@ export class SparkPostMailService extends MailService {
   ): Promise<{
     results: SendMailResults;
   }> => {
-    options.content.template_id = this.template_id;
-
     return this.client.transmissions.send(options);
   };
 }
