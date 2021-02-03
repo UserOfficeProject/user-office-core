@@ -18,6 +18,7 @@ import {
   createQuestionTemplateRelationObject,
   createTopicObject,
   QuestionaryRecord,
+  QuestionDependencyRecord,
   QuestionRecord,
   QuestionTemplateRelRecord,
   TopicRecord,
@@ -30,17 +31,17 @@ export default class PostgresQuestionaryDataSource
       .count('questionary_id')
       .where('template_id', templateId)
       .first()
-      .then(({ count }: { count: string }) => {
-        return parseInt(count);
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
       });
   }
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
-    return database('answers')
+    const answerRecord: AnswerRecord = await database('answers')
       .select('*')
       .where('answer_id', answer_id)
-      .then((record: AnswerRecord) => {
-        return createAnswerBasic(record);
-      });
+      .first();
+
+    return createAnswerBasic(answerRecord);
   }
 
   async create(creator_id: number, template_id: number): Promise<Questionary> {
@@ -63,7 +64,9 @@ export default class PostgresQuestionaryDataSource
     question_id: string,
     answer: string
   ): Promise<string> {
-    const results: { count: string } = await database
+    const results:
+      | { count?: string | number | undefined }
+      | undefined = await database
       .count()
       .from('answers')
       .where({
@@ -204,7 +207,7 @@ export default class PostgresQuestionaryDataSource
     >,
     templateId: number
   ): Promise<FieldDependency[]> {
-    const questionDependencies = await database
+    const questionDependencies: QuestionDependencyRecord[] = await database
       .select('*')
       .from('question_dependencies')
       .where('template_id', templateId)
@@ -213,7 +216,7 @@ export default class PostgresQuestionaryDataSource
         questionRecords.map(questionRecord => questionRecord.question_id)
       );
 
-    return questionDependencies.map((questionDependency: any) => {
+    return questionDependencies.map(questionDependency => {
       const question = questionRecords.find(
         field => field.question_id === questionDependency.dependency_question_id
       );

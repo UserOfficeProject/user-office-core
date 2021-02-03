@@ -2,7 +2,7 @@ import {
   userDataSource,
   eventLogsDataSource,
   reviewDataSource,
-  instrumentDatasource,
+  instrumentDataSource,
   proposalDataSource,
 } from '../datasources';
 import createEventHandlers from '../eventHandlers';
@@ -16,7 +16,7 @@ const eventHandlers = createEventHandlers({
   userDataSource,
   eventLogsDataSource,
   reviewDataSource,
-  instrumentDataSource: instrumentDatasource,
+  instrumentDataSource,
   proposalDataSource,
 });
 

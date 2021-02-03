@@ -10,7 +10,7 @@ const exceptionHandler = () => (
   res: Response,
   next: NextFunction
 ) => {
-  logger.logException('Unhandled exception', err, { req, res });
+  logger.logException('Unhandled exception', err);
   if (err.code === 'invalid_token') {
     return res.status(401).send('invalid token');
   }

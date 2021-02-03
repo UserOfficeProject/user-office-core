@@ -73,7 +73,7 @@ export class SEPUserResolver {
       : null;
   }
 
-  @FieldResolver(() => Review)
+  @FieldResolver(() => Review, { nullable: true })
   async review(
     @Root() sepAssignment: SEPAssignment,
     @Ctx() context: ResolverContext

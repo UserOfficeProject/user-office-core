@@ -9,6 +9,7 @@ import {
   assignSEPMemberToProposalValidationSchema,
 } from '@esss-swap/duo-validation';
 
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -31,6 +32,7 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 export default class SEPMutations {
   constructor(
     private dataSource: SEPDataSource,
+    private instrumentDataSource: InstrumentDataSource,
     private userAuth: UserAuthorization
   ) {}
 
@@ -168,14 +170,27 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     args: UpdateMemberSEPArgs
   ): Promise<SEP | Rejection> {
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(
-        (agent as UserWithRole).id,
-        args.sepId
-      ))
-    ) {
+    const isChairOrSecretaryOfSEP = await this.userAuth.isChairOrSecretaryOfSEP(
+      agent!.id,
+      args.sepId
+    );
+    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+
+    if (!isUserOfficer && !isChairOrSecretaryOfSEP) {
       return rejection('NOT_ALLOWED');
+    }
+
+    // SEP Chair and SEP Secretary can not
+    // modify SEP Chair and SEP Secretary members
+    if (isChairOrSecretaryOfSEP && !isUserOfficer) {
+      const isMemberChairOrSecretaryOfSEP = await this.userAuth.isChairOrSecretaryOfSEP(
+        args.memberId,
+        args.sepId
+      );
+
+      if (isMemberChairOrSecretaryOfSEP) {
+        return rejection('NOT_ALLOWED');
+      }
     }
 
     return this.dataSource
@@ -289,6 +304,47 @@ export default class SEPMutations {
         logger.logException('Could not remove member from SEP proposal', err, {
           agent,
         });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
+  async updateTimeAllocation(
+    agent: UserWithRole | null,
+    sepId: number,
+    proposalId: number,
+    sepTimeAllocation: number | null
+  ) {
+    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+    if (
+      !isUserOfficer &&
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId))
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    const isProposalInstrumentSubmitted = await this.instrumentDataSource.isProposalInstrumentSubmitted(
+      proposalId
+    );
+
+    if (isProposalInstrumentSubmitted && !isUserOfficer) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    return this.dataSource
+      .updateTimeAllocation(sepId, proposalId, sepTimeAllocation)
+      .catch(err => {
+        logger.logException(
+          'Could not update SEP proposal time allocation',
+          err,
+          {
+            agent,
+            sepId,
+            proposalId,
+            sepTimeAllocation,
+          }
+        );
 
         return rejection('INTERNAL_ERROR');
       });

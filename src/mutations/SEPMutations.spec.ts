@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
   SEPDataSourceMock,
@@ -23,8 +24,10 @@ const userAuthorization = new UserAuthorization(
   new SEPDataSourceMock()
 );
 const dummySEPDataSource = new SEPDataSourceMock();
+const dummyInstrumentDataSource = new InstrumentDataSourceMock();
 const SEPMutationsInstance = new SEPMutations(
   dummySEPDataSource,
+  dummyInstrumentDataSource,
   userAuthorization
 );
 

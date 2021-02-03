@@ -101,16 +101,19 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .andWhere('proposal_id', proposalId)
       .andWhere('user_id', userId)
       .first()
-      .then((review: ReviewRecord) => this.createReviewObject(review));
+      .then((review?: ReviewRecord) =>
+        review ? this.createReviewObject(review) : null
+      );
   }
 
   async removeUserForReview(id: number): Promise<Review> {
-    return database
+    const [reviewRecord]: ReviewRecord[] = await database
       .from('SEP_Reviews')
       .where('review_id', id)
       .returning('*')
-      .del()
-      .then((record: ReviewRecord[]) => this.createReviewObject(record[0]));
+      .del();
+
+    return this.createReviewObject(reviewRecord);
   }
 
   async updateReview(args: AddReviewArgs): Promise<Review> {

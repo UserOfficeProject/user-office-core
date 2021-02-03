@@ -20,6 +20,7 @@ import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 import { Review } from './Review';
 import { Sample } from './Sample';
 import { SEP } from './SEP';
+import { SEPProposal } from './SEPProposal';
 import { Shipment } from './Shipment';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
@@ -258,4 +259,11 @@ export class ShipmentResponseWrap extends ResponseWrapBase<Shipment> {
   @Response()
   @Field(() => Shipment, { nullable: true })
   public shipment: Shipment;
+}
+
+@ObjectType()
+export class SEPProposalResponseWrap extends ResponseWrapBase<SEPProposal> {
+  @Response()
+  @Field(() => SEPProposal, { nullable: true })
+  public sepProposal: SEPProposal;
 }

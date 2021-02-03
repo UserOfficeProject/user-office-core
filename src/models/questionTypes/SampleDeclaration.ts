@@ -8,7 +8,6 @@ export const sampleDeclarationDefinition: Question = {
   createBlankConfig: (): SubtemplateConfig => {
     const config = new SubtemplateConfig();
     config.addEntryButtonLabel = 'Add';
-    config.maxEntries = 0;
     config.templateCategory =
       TemplateCategoryId[TemplateCategoryId.SAMPLE_DECLARATION];
     config.templateId = null;

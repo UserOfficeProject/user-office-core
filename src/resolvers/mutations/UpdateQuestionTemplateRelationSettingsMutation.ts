@@ -10,7 +10,10 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { EvaluatorOperator } from '../../models/ConditionEvaluator';
+import {
+  DependenciesLogicOperator,
+  EvaluatorOperator,
+} from '../../models/ConditionEvaluator';
 import { FieldDependency as FieldDependencyOrigin } from '../../models/Template';
 import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { FieldCondition } from '../types/FieldCondition';
@@ -47,6 +50,9 @@ export class UpdateQuestionTemplateRelationSettingsArgs {
 
   @Field(() => [FieldDependencyInput])
   public dependencies: FieldDependencyInput[];
+
+  @Field(() => DependenciesLogicOperator, { nullable: true })
+  public dependenciesOperator?: DependenciesLogicOperator;
 }
 
 @Resolver()

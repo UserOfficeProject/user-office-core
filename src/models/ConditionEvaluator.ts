@@ -5,6 +5,11 @@ export enum EvaluatorOperator {
   neq = 'neq',
 }
 
+export enum DependenciesLogicOperator {
+  AND = 'AND',
+  OR = 'OR',
+}
+
 export class EqualityValidator implements FieldConditionEvaluator {
   isSatisfied(answer: Answer, params: object): boolean {
     return answer.value === params;

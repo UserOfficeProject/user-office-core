@@ -128,28 +128,27 @@ export default class PostgresProposalSettingsDataSource
   async createProposalWorkflow(
     args: CreateProposalWorkflowInput
   ): Promise<ProposalWorkflow> {
-    return database
+    const [proposalWorkflowRecord]: ProposalWorkflowRecord[] = await database
       .insert(args)
       .into('proposal_workflows')
-      .returning(['*'])
-      .then(async (proposalWorkflow: ProposalWorkflowRecord[]) => {
-        if (proposalWorkflow.length !== 1) {
-          throw new Error('Could not create proposal status');
-        }
+      .returning('*');
 
-        // NOTE: Add default DRAFT status to proposal workflow when it is created.
-        await this.addProposalWorkflowStatus({
-          sortOrder: 0,
-          droppableGroupId: 'proposalWorkflowConnections_0',
-          nextProposalStatusId: null,
-          prevProposalStatusId: null,
-          parentDroppableGroupId: null,
-          proposalStatusId: 1,
-          proposalWorkflowId: proposalWorkflow[0].proposal_workflow_id,
-        });
+    if (!proposalWorkflowRecord) {
+      throw new Error('Could not create proposal status');
+    }
 
-        return this.createProposalWorkflowObject(proposalWorkflow[0]);
-      });
+    // NOTE: Add default DRAFT status to proposal workflow when it is created.
+    await this.addProposalWorkflowStatus({
+      sortOrder: 0,
+      droppableGroupId: 'proposalWorkflowConnections_0',
+      nextProposalStatusId: null,
+      prevProposalStatusId: null,
+      parentDroppableGroupId: null,
+      proposalStatusId: 1,
+      proposalWorkflowId: proposalWorkflowRecord.proposal_workflow_id,
+    });
+
+    return this.createProposalWorkflowObject(proposalWorkflowRecord);
   }
 
   async getProposalWorkflow(
@@ -340,7 +339,10 @@ export default class PostgresProposalSettingsDataSource
   async addProposalWorkflowStatus(
     newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
   ): Promise<ProposalWorkflowConnection> {
-    return database
+    const [
+      proposalWorkflowConnectionRecord,
+    ]: (ProposalWorkflowConnectionRecord &
+      ProposalStatusRecord)[] = await database
       .insert({
         proposal_workflow_id: newProposalWorkflowStatusInput.proposalWorkflowId,
         proposal_status_id: newProposalWorkflowStatusInput.proposalStatusId,
@@ -354,25 +356,19 @@ export default class PostgresProposalSettingsDataSource
           newProposalWorkflowStatusInput.parentDroppableGroupId,
       })
       .into('proposal_workflow_connections as pwc')
-      .returning(['*'])
+      .returning('*')
       .join('proposal_statuses as ps', {
         'ps.proposal_status_id':
           newProposalWorkflowStatusInput.proposalStatusId,
-      })
-      .then(
-        (
-          proposalWorkflowConnections: (ProposalWorkflowConnectionRecord &
-            ProposalStatusRecord)[]
-        ) => {
-          if (proposalWorkflowConnections.length !== 1) {
-            throw new Error('Could not create proposal workflow status');
-          }
+      });
 
-          return this.createProposalWorkflowConnectionObject(
-            proposalWorkflowConnections[0]
-          );
-        }
-      );
+    if (!proposalWorkflowConnectionRecord) {
+      throw new Error('Could not create proposal workflow status');
+    }
+
+    return this.createProposalWorkflowConnectionObject(
+      proposalWorkflowConnectionRecord
+    );
   }
 
   async upsertProposalWorkflowStatuses(

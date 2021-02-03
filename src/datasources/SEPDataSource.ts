@@ -31,9 +31,14 @@ export interface SEPDataSource {
   ): Promise<{ totalCount: number; seps: SEP[] }>;
   getSEPProposalAssignments(
     sepId: number,
-    proposalId: number
+    proposalId: number,
+    reviewerId: number | null
   ): Promise<SEPAssignment[]>;
   getSEPProposals(sepId: number, callId: number): Promise<SEPProposal[]>;
+  getSEPProposal(
+    sepId: number,
+    proposalId: number
+  ): Promise<SEPProposal | null>;
   getSEPProposalsByInstrument(
     sepId: number,
     instrumentId: number,
@@ -41,6 +46,7 @@ export interface SEPDataSource {
   ): Promise<SEPProposal[]>;
   getMembers(sepId: number): Promise<SEPMember[]>;
   getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
+  getSEPProposalUserRoles(id: number, proposalId: number): Promise<Role[]>;
   addSEPMembersRole(args: AddSEPMembersRole): Promise<SEP>;
   removeSEPMemberRole(args: UpdateMemberSEPArgs): Promise<SEP>;
   assignProposal(proposalId: number, sepId: number): Promise<ProposalIds>;
@@ -55,4 +61,9 @@ export interface SEPDataSource {
     sepId: number,
     memberId: number
   ): Promise<SEP>;
+  updateTimeAllocation(
+    sepId: number,
+    proposalId: number,
+    sepTimeAllocation: number | null
+  ): Promise<SEPProposal>;
 }

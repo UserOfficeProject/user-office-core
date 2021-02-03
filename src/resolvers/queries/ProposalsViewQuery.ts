@@ -1,4 +1,4 @@
-import { Args, ArgsType, Ctx, Field, Int, Query, Resolver } from 'type-graphql';
+import { Args, ArgsType, Ctx, Field, Query, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { ProposalView } from '../types/ProposalView';

@@ -1,7 +1,10 @@
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { Call } from '../../models/Call';
-import { EvaluatorOperator } from '../../models/ConditionEvaluator';
+import {
+  DependenciesLogicOperator,
+  EvaluatorOperator,
+} from '../../models/ConditionEvaluator';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
@@ -125,6 +128,15 @@ export interface DependencyCondition {
   condition: EvaluatorOperator;
   params: string | boolean | number;
 }
+
+export interface QuestionDependencyRecord {
+  readonly question_dependency_id: number;
+  readonly question_id: string;
+  readonly template_id: number;
+  readonly dependency_question_id: string;
+  readonly dependency_condition: DependencyCondition;
+}
+
 export interface QuestionTemplateRelRecord {
   readonly id: number;
   readonly question_id: string;
@@ -132,6 +144,7 @@ export interface QuestionTemplateRelRecord {
   readonly topic_id: number;
   readonly sort_order: number;
   readonly config: string;
+  readonly dependencies_operator?: DependenciesLogicOperator;
 }
 
 export interface TemplateRecord {
@@ -218,7 +231,7 @@ export interface CallRecord {
   readonly template_id: number;
 }
 
-export interface PagetextRecord {
+export interface PageTextRecord {
   readonly pagetext_id: number;
   readonly content: string;
 }
@@ -270,6 +283,7 @@ export interface SEPProposalRecord {
   readonly proposal_id: number;
   readonly sep_id: number;
   readonly date_assigned: Date;
+  readonly sep_time_allocation: number | null;
   readonly instrument_submitted?: boolean;
 }
 
@@ -402,7 +416,7 @@ export interface FeatureRecord {
   readonly description: string;
 }
 
-export const createPageObject = (record: PagetextRecord) => {
+export const createPageObject = (record: PageTextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
 
@@ -526,7 +540,8 @@ export const createQuestionTemplateRelationObject = (
     record.topic_id,
     record.sort_order,
     createConfig<any>(record.data_type as DataType, record.config),
-    dependencies
+    dependencies,
+    record.dependencies_operator
   );
 };
 

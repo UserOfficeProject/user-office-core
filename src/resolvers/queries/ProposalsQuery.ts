@@ -29,6 +29,9 @@ export class ProposalsFilter {
 
   @Field(() => Int, { nullable: true })
   public proposalStatusId?: number;
+
+  @Field(() => [String], { nullable: true })
+  public shortCodes?: string[];
 }
 
 @ArgsType()

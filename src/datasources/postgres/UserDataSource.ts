@@ -83,7 +83,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (user ? user.password : null));
   }
 
-  update(user: User): Promise<User> {
+  async update(user: User): Promise<User> {
     const {
       firstname,
       user_title,
@@ -104,7 +104,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       refreshToken,
     } = user;
 
-    return database
+    const [userRecord]: UserRecord[] = await database
       .update({
         firstname,
         user_title,
@@ -126,8 +126,9 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .from('users')
       .where('user_id', user.id)
-      .returning(['*'])
-      .then((user: UserRecord[]) => createUserObject(user[0]));
+      .returning(['*']);
+
+    return createUserObject(userRecord);
   }
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     const { firstname, lastname, email } = args;
@@ -419,7 +420,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async setUserEmailVerified(id: number): Promise<User | null> {
-    const [userRecord]: [UserRecord] = await database
+    const [userRecord]: UserRecord[] = await database
       .update({
         email_verified: true,
       })
@@ -431,7 +432,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async setUserNotPlaceholder(id: number): Promise<User | null> {
-    const [userRecord]: [UserRecord] = await database
+    const [userRecord]: UserRecord[] = await database
       .update({
         placeholder: false,
       })
@@ -464,14 +465,15 @@ export default class PostgresUserDataSource implements UserDataSource {
       );
   }
   async createOrganisation(name: string, verified: boolean): Promise<number> {
-    return database
+    const [institutionId]: number[] = await database
       .insert({
         institution: name,
         verified,
       })
       .into('institutions')
-      .returning('institution_id')
-      .then((id: number[]) => id[0]);
+      .returning('institution_id');
+
+    return institutionId;
   }
 
   async checkScientistToProposal(
