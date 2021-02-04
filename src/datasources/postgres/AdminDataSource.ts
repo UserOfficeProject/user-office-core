@@ -5,6 +5,7 @@ import { logger } from '@esss-swap/duo-logger';
 import { Page } from '../../models/Admin';
 import { Feature } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
+import { Unit } from '../../models/Unit';
 import { BasicUserDetails } from '../../models/User';
 import { AdminDataSource, Entry } from '../AdminDataSource';
 import { InstitutionsFilter } from './../../resolvers/queries/InstitutionsQuery';
@@ -19,9 +20,59 @@ import {
   NationalityRecord,
   PageTextRecord,
   UserRecord,
+  UnitRecord,
 } from './records';
 
 export default class PostgresAdminDataSource implements AdminDataSource {
+  async createUnit(unit: Unit): Promise<Unit | null> {
+    const [unitRecord]: UnitRecord[] = await database
+      .insert({
+        unit: unit.name,
+      })
+      .into('units')
+      .returning('*');
+
+    if (!unitRecord) {
+      throw new Error('Could not create call');
+    }
+
+    return {
+      id: unitRecord.unit_id,
+      name: unitRecord.unit,
+    };
+  }
+
+  async deleteUnit(id: number): Promise<Unit> {
+    const [unitRecord]: UnitRecord[] = await database('units')
+      .where('units.unit_id', id)
+      .del()
+      .from('units')
+      .returning('*');
+
+    if (!unitRecord) {
+      throw new Error(`Could not delete institution with id:${id}`);
+    }
+
+    return {
+      id: unitRecord.unit_id,
+      name: unitRecord.unit,
+    };
+  }
+  async getUnits(): Promise<Unit[]> {
+    return database
+      .select()
+      .from('units')
+      .orderByRaw('unit_id=1 desc')
+      .orderBy('unit', 'asc')
+      .then((intDB: UnitRecord[]) =>
+        intDB.map(int => {
+          return {
+            id: int.unit_id,
+            name: int.unit,
+          };
+        })
+      );
+  }
   async updateInstitution(
     institution: Institution
   ): Promise<Institution | null> {

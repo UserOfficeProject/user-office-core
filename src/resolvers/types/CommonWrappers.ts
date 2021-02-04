@@ -25,6 +25,7 @@ import { Shipment } from './Shipment';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
 import { Topic } from './Topic';
+import { Unit } from './Unit';
 import { User } from './User';
 
 @ObjectType()
@@ -167,6 +168,13 @@ export class InstitutionResponseWrap extends ResponseWrapBase<Topic> {
   @Response()
   @Field(() => Institution, { nullable: true })
   public institution: Institution;
+}
+
+@ObjectType()
+export class UnitResponseWrap extends ResponseWrapBase<Topic> {
+  @Response()
+  @Field(() => Unit, { nullable: true })
+  public unit: Unit;
 }
 
 @ObjectType()

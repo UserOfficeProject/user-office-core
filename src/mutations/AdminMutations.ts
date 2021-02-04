@@ -6,9 +6,11 @@ import { Authorized, ValidateArgs } from '../decorators';
 import { Page } from '../models/Admin';
 import { Institution } from '../models/Institution';
 import { Roles } from '../models/Role';
+import { Unit } from '../models/Unit';
 import { UserWithRole } from '../models/User';
 import { Rejection, rejection } from '../rejection';
 import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
+import { CreateUnitArgs } from '../resolvers/mutations/CreateUnitMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
 
 export default class AdminMutations {
@@ -77,6 +79,19 @@ export default class AdminMutations {
     const institution = new Institution(0, args.name, args.verified);
 
     return await this.dataSource.createInstitution(institution);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async createUnit(agent: UserWithRole | null, args: CreateUnitArgs) {
+    const unit = new Unit(0, args.name);
+
+    return await this.dataSource.createUnit(unit);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async deleteUnit(agent: UserWithRole | null, id: number) {
+    //Do checks here to not delete a unit used
+    return await this.dataSource.deleteUnit(id);
   }
 
   @Authorized([Roles.USER_OFFICER])
