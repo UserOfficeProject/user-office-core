@@ -66,9 +66,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   );
   const [openEmailProposals, setOpenEmailProposals] = useState(false);
 
-  const initalSelectedProposals: ProposalsToInstrumentArgs[] = [];
+  const initialSelectedProposals: ProposalsToInstrumentArgs[] = [];
   const [selectedProposals, setSelectedProposals] = useState(
-    initalSelectedProposals
+    initialSelectedProposals
   );
   const downloadPDFProposal = useDownloadPDFProposal();
   const downloadXLSXProposal = useDownloadXLSXProposal();

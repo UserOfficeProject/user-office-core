@@ -1260,6 +1260,7 @@ export type ProposalsFilter = {
   instrumentId?: Maybe<Scalars['Int']>;
   proposalStatusId?: Maybe<Scalars['Int']>;
   shortCodes?: Maybe<Array<Scalars['String']>>;
+  questionFilter?: Maybe<QuestionFilterInput>;
 };
 
 export type ProposalsQueryResult = {
@@ -1696,6 +1697,20 @@ export type QuestionaryStepResponseWrap = {
   __typename?: 'QuestionaryStepResponseWrap';
   error: Maybe<Scalars['String']>;
   questionaryStep: Maybe<QuestionaryStep>;
+};
+
+export enum QuestionFilterCompareOperator {
+  GREATER_THAN = 'GREATER_THAN',
+  LESS_THAN = 'LESS_THAN',
+  EQUALS = 'EQUALS',
+  INCLUDES = 'INCLUDES'
+}
+
+export type QuestionFilterInput = {
+  questionId: Scalars['String'];
+  value: Scalars['String'];
+  compareOperator: QuestionFilterCompareOperator;
+  dataType: DataType;
 };
 
 export type QuestionResponseWrap = {

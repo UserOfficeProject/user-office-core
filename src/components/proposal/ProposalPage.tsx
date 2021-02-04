@@ -2,8 +2,8 @@ import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import {
   NumberParam,
-  useQueryParams,
   QueryParamConfig,
+  useQueryParams,
 } from 'use-query-params';
 
 import {
@@ -14,6 +14,7 @@ import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { useTemplate } from 'hooks/template/useTemplate';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
 import ProposalFilterBar from './ProposalFilterBar';
@@ -45,6 +46,9 @@ export default function ProposalPage() {
     proposalStatuses,
     loadingProposalStatuses,
   } = useProposalStatusesData();
+  const { template, loadingTemplate } = useTemplate(
+    calls.find(call => call.id === proposalFilter.callId)?.templateId || 0
+  );
 
   return (
     <>
@@ -62,6 +66,7 @@ export default function ProposalPage() {
                   data: proposalStatuses,
                   isLoading: loadingProposalStatuses,
                 }}
+                template={{ data: template, isLoading: loadingTemplate }}
                 setProposalFilter={setProposalFilter}
                 filter={proposalFilter}
               />
