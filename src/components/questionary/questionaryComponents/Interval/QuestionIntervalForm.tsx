@@ -1,19 +1,17 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { ChangeEvent, useState } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
-import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
-import { IntervalConfig, Question } from 'generated/sdk';
+import { Question } from 'generated/sdk';
+import { useUnitsData } from 'hooks/settings/useUnitData';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
-
-import { allProperties, IntervalPropertyId } from './intervalUnits';
 
 const useStyles = makeStyles(theme => ({
   units: {
@@ -21,21 +19,10 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const propertyDropdownEntries = Array.from(allProperties).map(
-  ([id, property]) => ({
-    text: property.name,
-    value: id,
-  })
-);
-
 export const QuestionIntervalForm: FormComponent<Question> = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
-
-  const [showUnits, setShowUnits] = useState(
-    (props.field.config as IntervalConfig).property !==
-      IntervalPropertyId.UNITLESS
-  );
+  const { units } = useUnitsData();
 
   const classes = useStyles();
 
@@ -95,31 +82,12 @@ export const QuestionIntervalForm: FormComponent<Question> = props => {
               InputProps={{ 'data-cy': 'required' }}
             />
 
-            <FormikDropdown
-              name="config.property"
-              label="Physical property"
-              items={propertyDropdownEntries}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                formikProps.setFieldValue('config.units', []); // reset units to empty array
-                setShowUnits(e.target.value !== IntervalPropertyId.UNITLESS);
-              }}
-              InputProps={{
-                'data-cy': 'property',
-              }}
-            />
-
             <Field
               name="config.units"
               component={FormikUICustomSelect}
               multiple
               label="Units"
-              availableOptions={
-                allProperties.get(
-                  (formikProps.values.config as IntervalConfig)
-                    .property as IntervalPropertyId
-                )?.units || []
-              }
-              disabled={!showUnits}
+              availableOptions={units.map(unit => unit.name)}
               className={classes.units}
               data-cy="units"
             />

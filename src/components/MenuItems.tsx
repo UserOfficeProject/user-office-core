@@ -240,6 +240,12 @@ const SettingsMenuListItem = () => {
         <ListItemText primary="Settings" />
       </ListItem>
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+        <ListItem component={NavLink} to="/Units" button>
+          <ListItemIcon>
+            <ProposalSettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary="Units" />
+        </ListItem>
         <ListItem component={NavLink} to="/ProposalStatuses" button>
           <ListItemIcon>
             <ProposalSettingsIcon />

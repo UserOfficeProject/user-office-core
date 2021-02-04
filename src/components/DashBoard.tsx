@@ -40,6 +40,7 @@ import SEPsPage from './SEP/SEPsPage';
 import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage';
 import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
+import UnitTablePage from './settings/unitList/UnitTablePage';
 import ShipmentCreate from './shipments/CreateUpdateShipment';
 import MyShipments from './shipments/MyShipments';
 import ShipmentsPage from './shipments/ShipmentsPage';
@@ -239,6 +240,7 @@ const Dashboard: React.FC = () => {
             path="/ProposalReviewUserOfficer/:id"
             component={ProposalReviewUserOfficer}
           />
+          {isUserOfficer && <Route path="/Units" component={UnitTablePage} />}
           {isUserOfficer && (
             <Route path="/ProposalStatuses" component={ProposalStatusesPage} />
           )}

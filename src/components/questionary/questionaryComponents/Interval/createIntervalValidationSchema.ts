@@ -9,10 +9,9 @@ export const createIntervalValidationSchema: QuestionaryComponentDefinition['cre
   let schema = Yup.object().shape({
     min: Yup.number().transform(value => (isNaN(value) ? undefined : value)),
     max: Yup.number().transform(value => (isNaN(value) ? undefined : value)),
-    unit:
-      config.property !== 'unitless'
-        ? Yup.string().required('Please specify unit')
-        : Yup.string().nullable(),
+    unit: Yup.string()
+      .required('Please specify unit')
+      .nullable(),
   });
   if (config.required) {
     schema = schema.shape({

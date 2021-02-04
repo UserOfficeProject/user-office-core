@@ -433,6 +433,7 @@ export type MoveProposalWorkflowStatusInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   createInstitution: InstitutionResponseWrap;
+  createUnit: UnitResponseWrap;
   updateInstitution: InstitutionResponseWrap;
   createCall: CallResponseWrap;
   updateCall: CallResponseWrap;
@@ -508,6 +509,7 @@ export type Mutation = {
   deleteShipment: ShipmentResponseWrap;
   deleteTemplate: TemplateResponseWrap;
   deleteTopic: TemplateResponseWrap;
+  deleteUnit: UnitResponseWrap;
   deleteUser: UserResponseWrap;
   emailVerification: EmailVerificationResponseWrap;
   getTokenForUser: TokenResponseWrap;
@@ -531,6 +533,11 @@ export type Mutation = {
 export type MutationCreateInstitutionArgs = {
   name: Scalars['String'];
   verified: Scalars['Boolean'];
+};
+
+
+export type MutationCreateUnitArgs = {
+  name: Scalars['String'];
 };
 
 
@@ -1039,6 +1046,11 @@ export type MutationDeleteTopicArgs = {
 };
 
 
+export type MutationDeleteUnitArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationDeleteUserArgs = {
   id: Scalars['Int'];
 };
@@ -1422,6 +1434,7 @@ export type Query = {
   templateCategories: Maybe<Array<TemplateCategory>>;
   template: Maybe<Template>;
   checkToken: TokenResult;
+  units: Maybe<Array<Unit>>;
   user: Maybe<User>;
   me: Maybe<User>;
   users: Maybe<UserQueryResult>;
@@ -2027,6 +2040,18 @@ export type Topic = {
   isEnabled: Scalars['Boolean'];
 };
 
+export type Unit = {
+  __typename?: 'Unit';
+  id: Scalars['Int'];
+  name: Scalars['String'];
+};
+
+export type UnitResponseWrap = {
+  __typename?: 'UnitResponseWrap';
+  error: Maybe<Scalars['String']>;
+  unit: Maybe<Unit>;
+};
+
 export type UpdateAnswerResponseWrap = {
   __typename?: 'UpdateAnswerResponseWrap';
   error: Maybe<Scalars['String']>;
@@ -2528,6 +2553,23 @@ export type CreateInstitutionMutation = (
   ) }
 );
 
+export type CreateUnitMutationVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+
+export type CreateUnitMutation = (
+  { __typename?: 'Mutation' }
+  & { createUnit: (
+    { __typename?: 'UnitResponseWrap' }
+    & Pick<UnitResponseWrap, 'error'>
+    & { unit: Maybe<(
+      { __typename?: 'Unit' }
+      & Pick<Unit, 'id' | 'name'>
+    )> }
+  ) }
+);
+
 export type DeleteInstitutionMutationVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -2541,6 +2583,23 @@ export type DeleteInstitutionMutation = (
     & { institution: Maybe<(
       { __typename?: 'Institution' }
       & Pick<Institution, 'id' | 'verified'>
+    )> }
+  ) }
+);
+
+export type DeleteUnitMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type DeleteUnitMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteUnit: (
+    { __typename?: 'UnitResponseWrap' }
+    & Pick<UnitResponseWrap, 'error'>
+    & { unit: Maybe<(
+      { __typename?: 'Unit' }
+      & Pick<Unit, 'id'>
     )> }
   ) }
 );
@@ -2577,6 +2636,17 @@ export type GetPageContentQueryVariables = Exact<{
 export type GetPageContentQuery = (
   { __typename?: 'Query' }
   & Pick<Query, 'getPageContent'>
+);
+
+export type GetUnitsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUnitsQuery = (
+  { __typename?: 'Query' }
+  & { units: Maybe<Array<(
+    { __typename?: 'Unit' }
+    & Pick<Unit, 'id' | 'name'>
+  )>> }
 );
 
 export type SetPageContentMutationVariables = Exact<{
@@ -5697,12 +5767,33 @@ export const CreateInstitutionDocument = gql`
   }
 }
     `;
+export const CreateUnitDocument = gql`
+    mutation createUnit($name: String!) {
+  createUnit(name: $name) {
+    unit {
+      id
+      name
+    }
+    error
+  }
+}
+    `;
 export const DeleteInstitutionDocument = gql`
     mutation deleteInstitution($id: Int!) {
   deleteInstitution(id: $id) {
     institution {
       id
       verified
+    }
+    error
+  }
+}
+    `;
+export const DeleteUnitDocument = gql`
+    mutation deleteUnit($id: Int!) {
+  deleteUnit(id: $id) {
+    unit {
+      id
     }
     error
   }
@@ -5729,6 +5820,14 @@ export const GetInstitutionsDocument = gql`
 export const GetPageContentDocument = gql`
     query getPageContent($id: PageName!) {
   getPageContent(id: $id)
+}
+    `;
+export const GetUnitsDocument = gql`
+    query getUnits {
+  units {
+    id
+    name
+  }
 }
     `;
 export const SetPageContentDocument = gql`
@@ -7222,8 +7321,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     createInstitution(variables: CreateInstitutionMutationVariables): Promise<CreateInstitutionMutation> {
       return withWrapper(() => client.request<CreateInstitutionMutation>(print(CreateInstitutionDocument), variables));
     },
+    createUnit(variables: CreateUnitMutationVariables): Promise<CreateUnitMutation> {
+      return withWrapper(() => client.request<CreateUnitMutation>(print(CreateUnitDocument), variables));
+    },
     deleteInstitution(variables: DeleteInstitutionMutationVariables): Promise<DeleteInstitutionMutation> {
       return withWrapper(() => client.request<DeleteInstitutionMutation>(print(DeleteInstitutionDocument), variables));
+    },
+    deleteUnit(variables: DeleteUnitMutationVariables): Promise<DeleteUnitMutation> {
+      return withWrapper(() => client.request<DeleteUnitMutation>(print(DeleteUnitDocument), variables));
     },
     getFeatures(variables?: GetFeaturesQueryVariables): Promise<GetFeaturesQuery> {
       return withWrapper(() => client.request<GetFeaturesQuery>(print(GetFeaturesDocument), variables));
@@ -7233,6 +7338,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getPageContent(variables: GetPageContentQueryVariables): Promise<GetPageContentQuery> {
       return withWrapper(() => client.request<GetPageContentQuery>(print(GetPageContentDocument), variables));
+    },
+    getUnits(variables?: GetUnitsQueryVariables): Promise<GetUnitsQuery> {
+      return withWrapper(() => client.request<GetUnitsQuery>(print(GetUnitsDocument), variables));
     },
     setPageContent(variables: SetPageContentMutationVariables): Promise<SetPageContentMutation> {
       return withWrapper(() => client.request<SetPageContentMutation>(print(SetPageContentDocument), variables));
