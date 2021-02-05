@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { NumberInputConfig } from '../../resolvers/types/FieldConfig';
+import * as Yup from 'yup';
+
+import {
+  NumberInputConfig,
+  NumberValueConstraint,
+} from '../../resolvers/types/FieldConfig';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
@@ -19,16 +24,34 @@ export const numberInputDefinition: Question = {
     if (field.question.dataType !== DataType.NUMBER_INPUT) {
       throw new Error('DataType should be NUMBER_INPUT');
     }
+
     const config = field.config as NumberInputConfig;
-    if (config.required && !value) {
-      return false;
+
+    let valueScheme = Yup.number().transform(value =>
+      isNaN(value) ? undefined : value
+    );
+
+    if (config.required) {
+      valueScheme = valueScheme.required();
     }
 
-    if (isNaN(value.value)) {
-      return false;
+    if (config.numberValueConstraint === NumberValueConstraint.ONLY_NEGATIVE) {
+      valueScheme = valueScheme.negative();
     }
 
-    return true;
+    if (config.numberValueConstraint === NumberValueConstraint.ONLY_POSITIVE) {
+      valueScheme = valueScheme.positive();
+    }
+
+    return Yup.object()
+      .shape({
+        value: valueScheme,
+        unit:
+          config.property !== 'UNITLESS'
+            ? Yup.string().required()
+            : Yup.string().nullable(),
+      })
+      .isValidSync(value);
   },
   createBlankConfig: (): NumberInputConfig => {
     const config = new NumberInputConfig();
