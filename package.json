@@ -37,8 +37,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@apollo/federation": "^0.20.7",
-    "@apollo/gateway": "^0.21.4",
+    "@apollo/federation": "^0.21.0",
+    "@apollo/gateway": "^0.22.0",
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-logger": "^1.0.4",
     "@esss-swap/duo-message-broker": "^1.0.2",
@@ -49,7 +49,7 @@
     "await-to-js": "^2.1.1",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
-    "class-validator": "^0.12.2",
+    "class-validator": "^0.13.1",
     "cookie-parser": "^1.4.5",
     "cron": "^1.8.2",
     "dotenv": "^8.2.0",
@@ -67,10 +67,10 @@
     "reflect-metadata": "^0.1.13",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
-    "soap": "^0.35.0",
+    "soap": "^0.36.0",
     "sparkpost": "^2.1.4",
     "type-graphql": "^1.1.1",
-    "typedi": "^0.8.0",
+    "typedi": "^0.9.1",
     "yup": "^0.31.1"
   },
   "devDependencies": {
