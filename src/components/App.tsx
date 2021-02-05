@@ -14,6 +14,7 @@ import {
 } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 
+import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
@@ -145,13 +146,15 @@ class App extends React.Component {
               )}
             >
               <FeatureContextProvider>
-                <ReviewAndAssignmentContextProvider>
-                  <Router>
-                    <QueryParamProvider ReactRouterRoute={Route}>
-                      <div className="App">{routes}</div>
-                    </QueryParamProvider>
-                  </Router>
-                </ReviewAndAssignmentContextProvider>
+                <DownloadContextProvider>
+                  <ReviewAndAssignmentContextProvider>
+                    <Router>
+                      <QueryParamProvider ReactRouterRoute={Route}>
+                        <div className="App">{routes}</div>
+                      </QueryParamProvider>
+                    </Router>
+                  </ReviewAndAssignmentContextProvider>
+                </DownloadContextProvider>
               </FeatureContextProvider>
             </SnackbarProvider>
           </UserContextProvider>

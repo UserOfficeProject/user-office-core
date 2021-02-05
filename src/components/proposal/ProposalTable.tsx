@@ -88,7 +88,10 @@ const ProposalTable = ({
           icon: GetAppIcon,
           tooltip: 'Download proposal',
           onClick: (event, rowData) =>
-            downloadPDFProposal((rowData as PartialProposalsDataType).id),
+            downloadPDFProposal(
+              [(rowData as PartialProposalsDataType).id],
+              (rowData as PartialProposalsDataType).title
+            ),
         },
         rowData => {
           const isPI = rowData.proposerId === userContext.user.id;

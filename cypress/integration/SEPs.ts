@@ -1360,7 +1360,7 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[data-cy="saveAndContinue"]').should('not.exist');
   });
 
-  it('Officer should be able to download SEP as Excel file', () => {
+  it('Download SEP is working with dialog window showing up', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
@@ -1370,32 +1370,14 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Meeting Components').click();
 
-    cy.document().then(document => {
-      const observer = new MutationObserver(function() {
-        const [mutationList] = arguments;
-        for (const mutation of mutationList) {
-          for (const child of mutation.addedNodes) {
-            if (child.nodeName === 'A') {
-              expect(child.href).to.contain('/download/xlsx/sep/2/call/1');
-              expect(child.download).to.contain('download');
-            }
-          }
-        }
-      });
-      observer.observe(document, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-      });
-
-      observer.disconnect();
-    });
-
     cy.finishedLoading();
 
     cy.wait(500);
 
     cy.get('[data-cy="download-sep-xlsx"]').click();
+
+    cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+    cy.get('[data-cy="preparing-download-dialog-item"]').contains('call 1');
   });
 
   it('Should be able to download SEP as Excel file', () => {

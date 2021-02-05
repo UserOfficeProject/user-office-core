@@ -80,7 +80,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           </Link>
         </IconButton>
         <IconButton
-          onClick={() => downloadPDFProposal(rowData.id)}
+          onClick={() => downloadPDFProposal([rowData.id], rowData.title)}
           style={iconButtonStyle}
         >
           <GetAppIcon />
