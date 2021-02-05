@@ -96,7 +96,9 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getProposalUsersFull(proposalId: number): Promise<User[]> {
-    const users: User[] = await postgresUserDataSource.getProposalUsersFull(proposalId);
+    const users: User[] = await postgresUserDataSource.getProposalUsersFull(
+      proposalId
+    );
     const userNumbers: string[] = users.map(user => String(user.id));
 
     const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
@@ -171,22 +173,43 @@ export class StfcUserDataSource implements UserDataSource {
       await client.getRolesForUser(token, id)
     )?.return;
 
+    const userRole = new Role(
+      (await this.getRoles()).find(role => role.shortCode == Roles.USER)?.id ||
+        1,
+      Roles.USER,
+      'User'
+    );
     if (!stfcRoles) {
-      return [new Role(0, Roles.USER, 'User')];
+      return [userRole];
     }
 
     const stfcRolesToEssRoles = new Map<string, Role>([
-      ['User Officer', new Role(2, Roles.USER_OFFICER, 'User Officer')],
+      [
+        'User Officer',
+        new Role(
+          (await this.getRoles()).find(
+            role => role.shortCode == Roles.USER_OFFICER
+          )?.id || 2,
+          Roles.USER_OFFICER,
+          'User Officer'
+        ),
+      ],
       [
         'ISIS Instrument Scientist',
-        new Role(7, Roles.INSTRUMENT_SCIENTIST, 'Instrument Scientist'),
+        new Role(
+          (await this.getRoles()).find(
+            role => role.shortCode == Roles.INSTRUMENT_SCIENTIST
+          )?.id || 3,
+          Roles.INSTRUMENT_SCIENTIST,
+          'Instrument Scientist'
+        ),
       ],
     ]);
 
     const roles: Role[] = [];
 
     // The User role must be the first item
-    roles.push(new Role(0, Roles.USER, 'User'));
+    roles.push(userRole);
 
     stfcRoles.forEach((stfcRole: stfcRole) => {
       const essRole: Role | undefined = stfcRolesToEssRoles.get(stfcRole.name);
@@ -238,14 +261,9 @@ export class StfcUserDataSource implements UserDataSource {
     let users: BasicUserDetails[] = [];
 
     if (dbUsers[0]) {
-      const userNumbers: string[] = dbUsers.map(record =>
-        String(record.id)
-      );
+      const userNumbers: string[] = dbUsers.map(record => String(record.id));
       const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
-        await client.getBasicPeopleDetailsFromUserNumbers(
-          token,
-          userNumbers
-        )
+        await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
       )?.return;
 
       users = stfcBasicPeople
@@ -259,7 +277,7 @@ export class StfcUserDataSource implements UserDataSource {
     };
   }
 
-  async getProposalUsers(proposalId: number): Promise<BasicUserDetails[]> {      
+  async getProposalUsers(proposalId: number): Promise<BasicUserDetails[]> {
     const users: BasicUserDetails[] = await postgresUserDataSource.getProposalUsers(
       proposalId
     );
