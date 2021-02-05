@@ -8,6 +8,7 @@ import {
 import { FeatureId } from '../models/Feature';
 import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
+import { QuestionFilterCompareOperator } from '../models/Questionary';
 import { ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
 import { ShipmentStatus } from '../models/Shipment';
@@ -34,4 +35,7 @@ export const registerEnums = () => {
   });
   registerEnumType(FeatureId, { name: 'FeatureId' });
   registerEnumType(NumberValueConstraint, { name: 'NumberValueConstraint' });
+  registerEnumType(QuestionFilterCompareOperator, {
+    name: 'QuestionFilterCompareOperator',
+  });
 };

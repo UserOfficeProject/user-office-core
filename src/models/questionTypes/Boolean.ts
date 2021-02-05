@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { BooleanConfig } from '../../resolvers/types/FieldConfig';
+import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
@@ -27,4 +28,15 @@ export const booleanDefinition: Question = {
   },
   isReadOnly: false,
   getDefaultAnswer: () => false,
+  filterQuery: (queryBuilder, filter) => {
+    const value = JSON.parse(filter.value).value;
+    switch (filter.compareOperator) {
+      case QuestionFilterCompareOperator.EQUALS:
+        return queryBuilder.andWhereRaw(`answers.answer->>'value'='${value}'`);
+      default:
+        throw new Error(
+          `Unsupported comparator for Boolean ${filter.compareOperator}`
+        );
+    }
+  },
 };
