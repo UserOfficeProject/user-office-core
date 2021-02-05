@@ -47,6 +47,7 @@ export function QuestionnairesListItem(props: {
         <Avatar>
           <DescriptionIcon
             color={props.record.isCompleted ? undefined : 'error'}
+            data-cy={`questionnaires-list-item-completed:${props.record.isCompleted}`}
           />
         </Avatar>
       </ListItemAvatar>

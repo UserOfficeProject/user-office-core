@@ -103,6 +103,11 @@ context('Samples tests', () => {
 
     cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
+    cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
+      'have.length',
+      2
+    );
+
     cy.get('[data-cy=add-button]').should('be.disabled'); // Add button should be disabled because of max entry limit
 
     cy.get('[data-cy="delete"]')
