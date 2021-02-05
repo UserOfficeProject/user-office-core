@@ -12,8 +12,7 @@ export default class UOWSSoapClient {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public getRolesForUser(token: any, userNumber: any): any {
+  public getRolesForUser(): any {
     return {
       return: [
         {
