@@ -286,16 +286,18 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   };
 
   const deleteProposals = (): void => {
-    selectedProposals.forEach(proposal => {
-      new Promise<void>(async resolve => {
-        await api().deleteProposal({ id: proposal.id });
-        proposalsData.splice(
-          proposalsData.findIndex(val => val.id === proposal.id),
-          1
-        );
-        setProposalsData([...proposalsData]);
-        resolve();
-      });
+    selectedProposals.forEach(async proposal => {
+      const {
+        deleteProposal: { error },
+      } = await api().deleteProposal({ id: proposal.id });
+
+      if (error) {
+        return;
+      }
+
+      setProposalsData(proposalsData =>
+        proposalsData.filter(({ id }) => id !== proposal.id)
+      );
     });
   };
 

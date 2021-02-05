@@ -42,5 +42,7 @@ const SamplesTable = (
 
 export default React.memo(
   SamplesTable,
-  (prevProps, nextProps) => prevProps.data === nextProps.data
+  (prevProps, nextProps) =>
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.data === nextProps.data
 );

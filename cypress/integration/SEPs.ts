@@ -782,6 +782,24 @@ context('Scientific evaluation panel tests', () => {
     readWriteReview();
   });
 
+  it('Officer should get error when trying to delete proposal which has dependencies (like reviews)', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.get('[type="checkbox"]')
+      .first()
+      .check();
+
+    cy.get('[title="Delete proposals"]').click();
+    cy.get('[data-cy="confirm-yes"]').click();
+
+    cy.notification({
+      variant: 'error',
+      text: /Failed to delete proposal with ID "([^"]+)", it has dependencies which need to be deleted first/i,
+    });
+  });
+
   it('Officer should be able to assign proposal to instrument and instrument to call to see it in meeting components', () => {
     const name = faker.random.words(2);
     const shortCode = faker.random.alphaNumeric(15);

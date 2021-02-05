@@ -113,7 +113,11 @@ const notification = ({ variant, text }) => {
     .and('have.css', 'background-color', bgColor);
 
   if (text) {
-    notification.and('contains.text', text);
+    if (text instanceof RegExp) {
+      notification.and($el => expect($el.text()).to.match(text));
+    } else {
+      notification.and('contains.text', text);
+    }
   }
 };
 
@@ -200,7 +204,12 @@ const dragElement = (element, moveArgs) => {
   return element;
 };
 
-const createSampleQuestion = (question, templateName, minEntries, maxEntries) => {
+const createSampleQuestion = (
+  question,
+  templateName,
+  minEntries,
+  maxEntries
+) => {
   cy.get('[data-cy=show-more-button]')
     .last()
     .click();
@@ -222,12 +231,16 @@ const createSampleQuestion = (question, templateName, minEntries, maxEntries) =>
 
   cy.contains(templateName).click();
 
-  if(minEntries) {
-    cy.get('[data-cy=min-entries] input').clear().type(minEntries);
+  if (minEntries) {
+    cy.get('[data-cy=min-entries] input')
+      .clear()
+      .type(minEntries);
   }
 
-  if(maxEntries) {
-    cy.get('[data-cy=max-entries] input').clear().type(maxEntries);
+  if (maxEntries) {
+    cy.get('[data-cy=max-entries] input')
+      .clear()
+      .type(maxEntries);
   }
 
   cy.contains('Save').click();
