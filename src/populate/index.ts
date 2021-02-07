@@ -6,6 +6,7 @@ import {
   callDataSource,
   instrumentDataSource,
   proposalDataSource,
+  proposalSettingsDataSource,
   questionaryDataSource,
   reviewDataSource,
   sepDataSource,
@@ -30,6 +31,7 @@ const MAX_INSTRUMENTS = 16;
 const MAX_PROPOSALS = 500;
 const MAX_SEPS = 10;
 const MAX_REVIEWS = 600;
+const MAX_WORKFLOWS = 1;
 
 const createUniqueIntArray = (size: number, max: number) => {
   if (size > max) {
@@ -112,6 +114,15 @@ const createUsers = async () => {
 
     return user;
   }, MAX_USERS);
+};
+
+const createWorkflows = async () => {
+  await execute(() => {
+    return proposalSettingsDataSource.createProposalWorkflow({
+      name: faker.lorem.word(),
+      description: faker.lorem.words(5),
+    });
+  }, MAX_WORKFLOWS);
 };
 
 const createCalls = async () => {
@@ -326,6 +337,7 @@ async function run() {
   await adminDataSource.resetDB();
   await createUsers();
   await createTemplates();
+  await createWorkflows();
   await createCalls();
   await createInstruments();
   await createProposals();
