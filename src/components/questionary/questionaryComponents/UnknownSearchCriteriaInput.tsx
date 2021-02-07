@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { SearchCriteriaInputProps } from '../../common/proposalFilters/QuestionaryFilter';
 
 function UnknownSearchCriteriaInput({ question }: SearchCriteriaInputProps) {

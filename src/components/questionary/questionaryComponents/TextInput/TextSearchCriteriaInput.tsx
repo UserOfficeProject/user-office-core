@@ -6,9 +6,10 @@ import {
   Select,
   TextField,
 } from '@material-ui/core';
+import React, { useState } from 'react';
+
 import { SearchCriteriaInputProps } from 'components/common/proposalFilters/QuestionaryFilter';
 import { QuestionFilterCompareOperator } from 'generated/sdk';
-import React, { useState } from 'react';
 
 function TextSearchCriteriaComponent({ onChange }: SearchCriteriaInputProps) {
   const [value, setValue] = useState('');

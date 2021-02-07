@@ -11,9 +11,10 @@ import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
+import React, { useState } from 'react';
+
 import { SearchCriteriaInputProps } from 'components/common/proposalFilters/QuestionaryFilter';
 import { QuestionFilterCompareOperator } from 'generated/sdk';
-import React, { useState } from 'react';
 
 function DateSearchCriteriaInput({ onChange }: SearchCriteriaInputProps) {
   const [value, setValue] = useState<string | null>(null);
