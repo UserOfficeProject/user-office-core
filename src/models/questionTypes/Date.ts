@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { DateConfig } from '../../resolvers/types/FieldConfig';
+import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
@@ -26,4 +27,23 @@ export const dateDefinition: Question = {
   },
   isReadOnly: false,
   getDefaultAnswer: () => '',
+  filterQuery: (queryBuilder, filter) => {
+    const value = JSON.parse(filter.value).value;
+    switch (filter.compareOperator) {
+      case QuestionFilterCompareOperator.EQUALS:
+        return queryBuilder.andWhereRaw(`answers.answer->>'value'='${value}'`);
+      case QuestionFilterCompareOperator.GREATER_THAN:
+        return queryBuilder.andWhereRaw(
+          `(answer->>'value')::timestamp > ('${value}')::timestamp`
+        );
+      case QuestionFilterCompareOperator.LESS_THAN:
+        return queryBuilder.andWhereRaw(
+          `(answer->>'value')::timestamp < ('${value}')::timestamp`
+        );
+      default:
+        throw new Error(
+          `Unsupported comparator for TextInput ${filter.compareOperator}`
+        );
+    }
+  },
 };
