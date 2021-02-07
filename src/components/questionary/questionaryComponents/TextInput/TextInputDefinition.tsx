@@ -1,6 +1,7 @@
 import ShortTextIcon from '@material-ui/icons/ShortText';
 import React from 'react';
 
+import TextSearchCriteriaComponent from 'components/common/proposalFilters/questionSearchCriteriaComponents/TextSearchCriteriaInput';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { DataType } from 'generated/sdk';
@@ -22,4 +23,5 @@ export const textInputDefinition: QuestionaryComponentDefinition = {
   renderers: defaultRenderer,
   createYupValidationSchema: createTextInputValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || '',
+  searchCriteriaComponent: TextSearchCriteriaComponent,
 };

@@ -1,6 +1,7 @@
 import TodayIcon from '@material-ui/icons/Today';
 import React from 'react';
 
+import DateSearchCriteriaInput from 'components/common/proposalFilters/questionSearchCriteriaComponents/DateSearchCriteriaInput';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
@@ -22,4 +23,5 @@ export const dateDefinition: QuestionaryComponentDefinition = {
   renderers: defaultRenderer,
   createYupValidationSchema: createDateValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || '',
+  searchCriteriaComponent: DateSearchCriteriaInput,
 };

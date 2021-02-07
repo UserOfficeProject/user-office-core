@@ -1,19 +1,11 @@
-import {
-  Button,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from '@material-ui/core';
+import { Button, Grid, TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import React, { FC, useState } from 'react';
+import { StringParam, useQueryParams } from 'use-query-params';
 
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
-  DataType,
   GetTemplateQuery,
   QuestionFilterCompareOperator,
   QuestionFilterInput,
@@ -22,15 +14,10 @@ import {
   QuestionTemplateRelationFragment,
 } from 'generated/sdk';
 
-import UOLoader from './UOLoader';
+import UOLoader from '../UOLoader';
+import UnknownSearchCriteriaInput from './questionSearchCriteriaComponents/UnknownSearchCriteriaInput';
 
-interface QuestionaryFilterProps {
-  template: GetTemplateQuery['template'];
-  isLoading: boolean;
-  onSubmit?: (questionFilter: QuestionFilterInput) => any;
-}
-
-interface SearchCriteriaComponentProps {
+export interface SearchCriteriaInputProps {
   onChange: (
     comparator: QuestionFilterCompareOperator,
     value: string | number | boolean | never[]
@@ -38,72 +25,23 @@ interface SearchCriteriaComponentProps {
   question: QuestionFragment;
 }
 
-function TextSearchCriteriaComponent({
-  onChange,
-}: SearchCriteriaComponentProps) {
-  const [value, setValue] = useState('');
-  const [comparator, setComparator] = useState<QuestionFilterCompareOperator>(
-    QuestionFilterCompareOperator.EQUALS
-  );
-
-  return (
-    <Grid container spacing={2}>
-      <Grid item xs={6}>
-        <FormControl style={{ width: '100%' }}>
-          <InputLabel shrink id="comparator">
-            Compare operator
-          </InputLabel>
-          <Select
-            onChange={event => {
-              const newComparator = event.target
-                .value as QuestionFilterCompareOperator;
-              setComparator(newComparator);
-              onChange(newComparator, value);
-            }}
-            value={comparator}
-            labelId="comparator"
-          >
-            <MenuItem key="eq" value={QuestionFilterCompareOperator.EQUALS}>
-              Equals
-            </MenuItem>
-            <MenuItem key="inc" value={QuestionFilterCompareOperator.INCLUDES}>
-              Contains
-            </MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item xs={6}>
-        <TextField
-          name="value"
-          label="Value"
-          value={value}
-          fullWidth
-          onChange={e => setValue(e.target.value)}
-          onBlur={() => onChange(comparator, value)}
-        />
-      </Grid>
-    </Grid>
-  );
-}
-
-function UnknownSearchCriteriaComponent({
-  question,
-}: SearchCriteriaComponentProps) {
-  return <span>{`Value input not implemented for ${question.dataType}`}</span>;
+interface QuestionaryFilterProps {
+  template: GetTemplateQuery['template'];
+  isLoading: boolean;
+  onSubmit?: (questionFilter: QuestionFilterInput) => any;
 }
 
 const getSearchCriteriaComponent = (
   question: QuestionFragment | undefined
-): FC<SearchCriteriaComponentProps> => {
+): FC<SearchCriteriaInputProps> => {
   if (!question) {
-    return UnknownSearchCriteriaComponent;
+    return UnknownSearchCriteriaInput;
   }
-  switch (question.dataType) {
-    case DataType.TEXT_INPUT:
-      return TextSearchCriteriaComponent;
-    default:
-      return UnknownSearchCriteriaComponent;
-  }
+
+  return (
+    getQuestionaryComponentDefinition(question.dataType)
+      .searchCriteriaComponent || UnknownSearchCriteriaInput
+  );
 };
 
 function QuestionaryFilter({
@@ -115,10 +53,18 @@ function QuestionaryFilter({
     selectedQuestion,
     setSelectedQuestion,
   ] = useState<QuestionTemplateRelationFragment | null>(null);
+
   const [searchCriteria, setSearchCriteria] = useState<{
     comparator: QuestionFilterCompareOperator;
     value: string;
   } | null>(null);
+
+  const [, setQuery] = useQueryParams({
+    questionId: StringParam,
+    compareOperator: StringParam,
+    value: StringParam,
+    dataType: StringParam,
+  });
 
   if (isLoading) {
     return <UOLoader />;
@@ -136,8 +82,8 @@ function QuestionaryFilter({
     .filter(
       question =>
         getQuestionaryComponentDefinition(question.question.dataType)
-          .readonly === false
-    ); // exclude readonly questions
+          .searchCriteriaComponent !== undefined
+    ); // only searchable questions
 
   const SearchCriteriaComponent = getSearchCriteriaComponent(
     selectedQuestion?.question
@@ -174,14 +120,22 @@ function QuestionaryFilter({
             color="primary"
             startIcon={<SearchIcon />}
             disabled={!selectedQuestion || !searchCriteria}
-            onClick={() =>
+            onClick={() => {
+              setQuery({
+                questionId:
+                  selectedQuestion.question.proposalQuestionId ?? undefined,
+                compareOperator: searchCriteria?.comparator ?? undefined,
+                value: searchCriteria?.value ?? undefined,
+                dataType: selectedQuestion.question.dataType ?? undefined,
+              });
+
               onSubmit?.({
                 questionId: selectedQuestion.question.proposalQuestionId,
                 compareOperator: searchCriteria!.comparator,
                 value: searchCriteria!.value,
                 dataType: selectedQuestion.question.dataType,
-              })
-            }
+              });
+            }}
           >
             Search
           </Button>

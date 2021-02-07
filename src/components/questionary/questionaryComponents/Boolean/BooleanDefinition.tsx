@@ -1,6 +1,7 @@
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import React from 'react';
 
+import BooleanSearchCriteriaInput from 'components/common/proposalFilters/questionSearchCriteriaComponents/BooleanSearchCriteriaInput';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
@@ -25,4 +26,5 @@ export const booleanDefinition: QuestionaryComponentDefinition = {
   },
   createYupValidationSchema: createBooleanValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || false,
+  searchCriteriaComponent: BooleanSearchCriteriaInput,
 };
