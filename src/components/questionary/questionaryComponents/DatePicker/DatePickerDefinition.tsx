@@ -1,12 +1,12 @@
 import TodayIcon from '@material-ui/icons/Today';
 import React from 'react';
 
-import DateSearchCriteriaInput from 'components/common/proposalFilters/questionSearchCriteriaComponents/DateSearchCriteriaInput';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createDateValidationSchema } from './createDateValidationSchema';
+import DateSearchCriteriaInput from './DateSearchCriteriaInput';
 import { QuestionaryComponentDatePicker } from './QuestionaryComponentDatePicker';
 import { QuestionDateForm } from './QuestionDateForm';
 import { QuestionTemplateRelationDateForm } from './QuestionTemplateRelationDateForm';

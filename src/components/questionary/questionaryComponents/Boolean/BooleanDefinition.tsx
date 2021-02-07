@@ -1,11 +1,11 @@
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import React from 'react';
 
-import BooleanSearchCriteriaInput from 'components/common/proposalFilters/questionSearchCriteriaComponents/BooleanSearchCriteriaInput';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
+import BooleanSearchCriteriaInput from './BooleanSearchCriteriaInput';
 import { createBooleanValidationSchema } from './createBooleanValidationSchema';
 import { QuestionaryComponentBoolean } from './QuestionaryComponentBoolean';
 import { QuestionBooleanForm } from './QuestionBooleanForm';

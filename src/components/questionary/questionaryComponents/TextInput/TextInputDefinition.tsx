@@ -1,7 +1,6 @@
 import ShortTextIcon from '@material-ui/icons/ShortText';
 import React from 'react';
 
-import TextSearchCriteriaComponent from 'components/common/proposalFilters/questionSearchCriteriaComponents/TextSearchCriteriaInput';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { DataType } from 'generated/sdk';
@@ -10,6 +9,7 @@ import { createTextInputValidationSchema } from './createTextInputValidationSche
 import { QuestionaryComponentTextInput } from './QuestionaryComponentTextInput';
 import { QuestionTemplateRelationTextInputForm } from './QuestionTemplateRelationTextInputForm';
 import { QuestionTextInputForm } from './QuestionTextInputForm';
+import TextSearchCriteriaComponent from './TextSearchCriteriaInput';
 
 export const textInputDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.TEXT_INPUT,

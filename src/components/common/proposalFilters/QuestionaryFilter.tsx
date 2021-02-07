@@ -13,8 +13,8 @@ import {
   QuestionTemplateRelationFragment,
 } from 'generated/sdk';
 
+import UnknownSearchCriteriaInput from '../../questionary/questionaryComponents/UnknownSearchCriteriaInput';
 import UOLoader from '../UOLoader';
-import UnknownSearchCriteriaInput from './questionSearchCriteriaComponents/UnknownSearchCriteriaInput';
 
 export interface SearchCriteriaInputProps {
   onChange: (
