@@ -2,7 +2,6 @@ import { Button, Grid, TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import React, { FC, useState } from 'react';
-import { StringParam, useQueryParams } from 'use-query-params';
 
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
@@ -59,13 +58,6 @@ function QuestionaryFilter({
     value: string;
   } | null>(null);
 
-  const [, setQuery] = useQueryParams({
-    questionId: StringParam,
-    compareOperator: StringParam,
-    value: StringParam,
-    dataType: StringParam,
-  });
-
   if (isLoading) {
     return <UOLoader />;
   }
@@ -121,14 +113,6 @@ function QuestionaryFilter({
             startIcon={<SearchIcon />}
             disabled={!selectedQuestion || !searchCriteria}
             onClick={() => {
-              setQuery({
-                questionId:
-                  selectedQuestion.question.proposalQuestionId ?? undefined,
-                compareOperator: searchCriteria?.comparator ?? undefined,
-                value: searchCriteria?.value ?? undefined,
-                dataType: selectedQuestion.question.dataType ?? undefined,
-              });
-
               onSubmit?.({
                 questionId: selectedQuestion.question.proposalQuestionId,
                 compareOperator: searchCriteria!.comparator,

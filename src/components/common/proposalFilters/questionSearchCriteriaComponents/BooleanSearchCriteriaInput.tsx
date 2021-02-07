@@ -1,6 +1,8 @@
 import { FormControl, InputLabel, MenuItem, Select } from '@material-ui/core';
-import { QuestionFilterCompareOperator } from 'generated/sdk';
 import React from 'react';
+
+import { QuestionFilterCompareOperator } from 'generated/sdk';
+
 import { SearchCriteriaInputProps } from '../QuestionaryFilter';
 
 function BooleanSearchCriteriaInput({ onChange }: SearchCriteriaInputProps) {
