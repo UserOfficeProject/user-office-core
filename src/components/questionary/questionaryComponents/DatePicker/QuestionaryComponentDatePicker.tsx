@@ -3,8 +3,8 @@ import { DateType } from '@date-io/type';
 import FormControl from '@material-ui/core/FormControl';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
-  MuiPickersUtilsProvider,
   KeyboardDatePicker,
+  MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
 import { Field, getIn } from 'formik';
 import React, { useEffect, useState } from 'react';
@@ -92,7 +92,11 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
             value={fieldValue || null} // date picker requires null for empty value
             format="yyyy-MM-dd"
             component={KeyboardDatePicker}
+            variant="inline"
+            disableToolbar
+            autoOk={true}
             onChange={(date: DateType | null) => {
+              date?.setUTCHours(0, 0, 0, 0); // omit time
               onComplete(date);
               setFieldValue(proposalQuestionId, date, false);
             }}

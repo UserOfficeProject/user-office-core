@@ -27,7 +27,7 @@ function DateSearchCriteriaInput({ onChange }: SearchCriteriaInputProps) {
       <Grid item xs={6}>
         <FormControl style={{ width: '100%' }}>
           <InputLabel shrink id="comparator">
-            Compare operator
+            Operator
           </InputLabel>
           <Select
             onChange={event => {

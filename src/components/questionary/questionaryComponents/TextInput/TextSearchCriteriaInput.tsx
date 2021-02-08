@@ -19,10 +19,10 @@ function TextSearchCriteriaComponent({ onChange }: SearchCriteriaInputProps) {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={6}>
+      <Grid item xs={4}>
         <FormControl style={{ width: '100%' }}>
           <InputLabel shrink id="comparator">
-            Compare operator
+            Operator
           </InputLabel>
           <Select
             onChange={event => {
@@ -43,7 +43,7 @@ function TextSearchCriteriaComponent({ onChange }: SearchCriteriaInputProps) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={8}>
         <TextField
           name="value"
           label="Value"

@@ -1,4 +1,4 @@
-import { Button, Grid, TextField } from '@material-ui/core';
+import { Button, Collapse, Grid, TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import React, { FC, useState } from 'react';
@@ -27,7 +27,7 @@ export interface SearchCriteriaInputProps {
 interface QuestionaryFilterProps {
   template: GetTemplateQuery['template'];
   isLoading: boolean;
-  onSubmit?: (questionFilter: QuestionFilterInput) => any;
+  onSubmit?: (questionFilter?: QuestionFilterInput) => any;
 }
 
 const getSearchCriteriaComponent = (
@@ -82,32 +82,41 @@ function QuestionaryFilter({
   );
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={4}>
+    <Grid container style={{ width: '400px', margin: '0 8px' }}>
+      <Grid item xs={12}>
         <Autocomplete
           id="question"
           options={questions}
           getOptionLabel={option => option.question.question}
           renderInput={params => <TextField {...params} label="Question" />}
-          onChange={(_event, newValue) => setSelectedQuestion(newValue)}
+          onChange={(_event, newValue) => {
+            setSelectedQuestion(newValue);
+            if (!newValue) {
+              onSubmit?.(undefined);
+            }
+          }}
+          style={{ flex: 1, marginBottom: '8px' }}
         />
       </Grid>
-      <Grid item xs={5}>
-        {selectedQuestion && (
-          <SearchCriteriaComponent
-            onChange={(comparator, value) => {
-              setSearchCriteria({
-                comparator: comparator,
-                value: JSON.stringify({ value: value }),
-              });
-            }}
-            question={selectedQuestion.question}
-          />
-        )}
+      <Grid item xs={12}>
+        <Collapse in={!!selectedQuestion}>
+          {selectedQuestion && (
+            <SearchCriteriaComponent
+              onChange={(comparator, value) => {
+                setSearchCriteria({
+                  comparator: comparator,
+                  value: JSON.stringify({ value: value }),
+                });
+              }}
+              question={selectedQuestion.question}
+            />
+          )}
+        </Collapse>
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={12} style={{ textAlign: 'right' }}>
         {selectedQuestion && (
           <Button
+            style={{ marginTop: '8px' }}
             variant="contained"
             color="primary"
             startIcon={<SearchIcon />}

@@ -15,7 +15,7 @@ function MultipleChoiceSearchCriteriaComponent({
 }: SearchCriteriaInputProps) {
   return (
     <Grid container spacing={2}>
-      <Grid item xs={6}>
+      <Grid item xs={12}>
         <FormControl style={{ width: '100%' }}>
           {/* TODO here it should me made clear that in case of multiple question, the answer will be "one of" */}
           <InputLabel shrink id="answer">

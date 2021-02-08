@@ -1,5 +1,8 @@
+import { Button, Collapse } from '@material-ui/core';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
@@ -30,6 +33,8 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
   setProposalFilter,
   filter,
 }) => {
+  const [showQuestionFilter, setShowQuestionFilter] = useState(false);
+
   return (
     <>
       <CallFilter
@@ -71,18 +76,43 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
         }}
       />
 
-      {template?.data && (
-        <QuestionaryFilter
-          template={template.data}
-          isLoading={template.isLoading}
-          onSubmit={questionFilter =>
+      <Button
+        variant="outlined"
+        endIcon={showQuestionFilter ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        style={{
+          margin: '17px 0 0 8px',
+          textTransform: 'none',
+          fontSize: '16px',
+        }}
+        onClick={() => {
+          const shouldShowQuestionFilter = !showQuestionFilter;
+          if (shouldShowQuestionFilter === false) {
             setProposalFilter({
               ...filter,
-              questionFilter,
-            })
+              questionFilter: undefined,
+            });
           }
-        />
-      )}
+          setShowQuestionFilter(!showQuestionFilter);
+        }}
+        disabled={!template?.data}
+      >
+        {showQuestionFilter ? 'close' : 'more'}
+      </Button>
+
+      <Collapse in={showQuestionFilter}>
+        {showQuestionFilter && template && (
+          <QuestionaryFilter
+            template={template.data}
+            isLoading={template.isLoading}
+            onSubmit={questionFilter =>
+              setProposalFilter({
+                ...filter,
+                questionFilter,
+              })
+            }
+          />
+        )}
+      </Collapse>
     </>
   );
 };
