@@ -11,7 +11,8 @@ BEGIN
             unit varchar(50) DEFAULT NULL
       ); 
 
-    INSERT INTO units (unit) values ('Second');
+    INSERT INTO units (unit) values ('kelvin');
+	INSERT INTO units (unit) values ('celsius');
 
     END;
 	END IF;
