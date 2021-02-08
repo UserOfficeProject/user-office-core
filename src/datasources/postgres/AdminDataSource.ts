@@ -59,7 +59,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     };
   }
   async getUnits(): Promise<Unit[]> {
-    return database
+    return await database
       .select()
       .from('units')
       .orderBy('unit', 'asc')
