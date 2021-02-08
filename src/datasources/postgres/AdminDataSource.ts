@@ -33,7 +33,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!unitRecord) {
-      throw new Error('Could not create call');
+      throw new Error('Could not create unit');
     }
 
     return {
@@ -50,7 +50,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!unitRecord) {
-      throw new Error(`Could not delete institution with id:${id}`);
+      throw new Error(`Could not delete unit with id:${id}`);
     }
 
     return {
@@ -62,7 +62,6 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return database
       .select()
       .from('units')
-      .orderByRaw('unit_id=1 desc')
       .orderBy('unit', 'asc')
       .then((intDB: UnitRecord[]) =>
         intDB.map(int => {

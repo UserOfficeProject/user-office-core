@@ -90,7 +90,6 @@ export default class AdminMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async deleteUnit(agent: UserWithRole | null, id: number) {
-    //Do checks here to not delete a unit used
     return await this.dataSource.deleteUnit(id);
   }
 
