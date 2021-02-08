@@ -70,7 +70,7 @@
     "soap": "^0.36.0",
     "sparkpost": "^2.1.4",
     "type-graphql": "^1.1.1",
-    "typedi": "^0.9.1",
+    "typedi": "^0.10.0",
     "yup": "^0.31.1"
   },
   "devDependencies": {
