@@ -36,7 +36,6 @@ export const QuestionIntervalForm: FormComponent<Question> = props => {
         question: Yup.string().required('Question is required'),
         config: Yup.object({
           required: Yup.bool(),
-          property: Yup.string().required('This property is required'),
           units: Yup.array().of(Yup.string()),
         }),
       })}
