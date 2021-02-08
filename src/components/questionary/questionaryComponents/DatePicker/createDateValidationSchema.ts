@@ -20,7 +20,10 @@ export const createDateValidationSchema: QuestionaryComponentDefinition['createY
     });
 
   const config = answer.config as DateConfig;
-  config.required && (schema = schema.required(`This date is required`));
+
+  if (config.required) {
+    schema = schema.required(`This date is required`);
+  }
 
   if (config.minDate) {
     const minDate = normalizeDate(new Date(config.minDate));

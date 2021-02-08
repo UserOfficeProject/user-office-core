@@ -52,7 +52,11 @@ const ProposalTableReviewer: React.FC = () => {
         </IconButton>
       </Tooltip>
       <Tooltip title="Download review">
-        <IconButton onClick={() => downloadPDFProposal(rowData.proposalId)}>
+        <IconButton
+          onClick={() =>
+            downloadPDFProposal([rowData.proposalId], rowData.title)
+          }
+        >
           <GetAppIcon />
         </IconButton>
       </Tooltip>
@@ -141,9 +145,8 @@ const ProposalTableReviewer: React.FC = () => {
             tooltip: 'Download proposals',
             onClick: (event, rowData) => {
               downloadPDFProposal(
-                (rowData as UserWithReview[])
-                  .map(row => row.proposalId)
-                  .join(',')
+                (rowData as UserWithReview[]).map(row => row.proposalId),
+                (rowData as UserWithReview[])[0].title
               );
             },
             position: 'toolbarOnSelect',

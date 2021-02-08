@@ -103,6 +103,11 @@ context('Samples tests', () => {
 
     cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
+    cy.get('[data-cy="questionnaires-list-item-completed:true"]').should(
+      'have.length',
+      2
+    );
+
     cy.get('[data-cy=add-button]').should('be.disabled'); // Add button should be disabled because of max entry limit
 
     cy.get('[data-cy="delete"]')
@@ -181,35 +186,17 @@ context('Samples tests', () => {
     cy.contains('HIGH_RISK'); // test if status has changed
   });
 
-  it('Check if link for download samples is created with the correct attributes', () => {
+  it('Download samples is working with dialog window showing up', () => {
     cy.login('officer');
 
     cy.contains('Sample safety').click();
 
-    cy.document().then(document => {
-      const observer = new MutationObserver(function() {
-        const [mutationList] = arguments;
-        for (const mutation of mutationList) {
-          for (const child of mutation.addedNodes) {
-            if (child.nodeName === 'A') {
-              expect(child.href).to.contain('/download/pdf/sample/1');
-              expect(child.download).to.contain('download');
-            }
-          }
-        }
-      });
-      observer.observe(document, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-      });
-
-      observer.disconnect();
-    });
-
     cy.get('[data-cy="download-sample"]')
       .first()
       .click();
+
+    cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+    cy.get('[data-cy="preparing-download-dialog-item"]').contains(sampleTitle);
   });
 
   it('Should be able to download sample pdf', () => {

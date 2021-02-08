@@ -149,15 +149,11 @@ context('Template tests', () => {
       .clear()
       .type(intervalQuestion);
 
-    cy.get('[data-cy=property]').click();
-
-    cy.contains('energy').click();
-
     cy.get('[data-cy=units]>[role=button]').click({ force: true });
 
-    cy.contains('btu').click();
+    cy.contains('celsius').click();
 
-    cy.contains('terajoule').click();
+    cy.contains('kelvin').click();
 
     cy.get('body').type('{esc}');
 
@@ -185,15 +181,11 @@ context('Template tests', () => {
       .clear()
       .type(numberQuestion);
 
-    cy.get('[data-cy=property]').click();
-
-    cy.contains('energy').click();
-
     cy.get('[data-cy=units]>[role=button]').click({ force: true });
 
-    cy.contains('btu').click();
+    cy.contains('celsius').click();
 
-    cy.contains('terajoule').click();
+    cy.contains('kelvin').click();
 
     cy.get('body').type('{esc}');
 
@@ -682,15 +674,11 @@ context('Template tests', () => {
       .clear()
       .type(numberQuestion1);
 
-    cy.get('[data-cy=property]').click();
-
-    cy.contains('energy').click();
-
     cy.get('[data-cy=units]>[role=button]').click();
 
-    cy.contains('btu').click();
+    cy.contains('celsius').click();
 
-    cy.contains('terajoule').click();
+    cy.contains('kelvin').click();
 
     cy.get('body').type('{esc}');
 
@@ -722,15 +710,11 @@ context('Template tests', () => {
       .clear()
       .type(numberQuestion2);
 
-    cy.get('[data-cy=property]').click();
-
-    cy.contains('energy').click();
-
     cy.get('[data-cy=units]>[role=button]').click();
 
-    cy.contains('btu').click();
+    cy.contains('celsius').click();
 
-    cy.contains('terajoule').click();
+    cy.contains('kelvin').click();
 
     cy.get('body').type('{esc}');
 
@@ -756,8 +740,7 @@ context('Template tests', () => {
 
     cy.contains(numberQuestion2).click();
 
-    cy.get('[data-cy="property"] input').should('have.value', 'ENERGY');
-    cy.get('[data-cy=units] input').should('have.value', 'btu,terajoule');
+    cy.get('[data-cy=units] input').should('have.value', 'celsius,kelvin');
     cy.get('[data-cy="numberValueConstraint"] input').should(
       'have.value',
       'ONLY_POSITIVE'

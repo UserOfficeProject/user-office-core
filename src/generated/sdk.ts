@@ -6081,6 +6081,7 @@ ${BasicUserDetailsFragmentDoc}`;
 export const DeleteProposalDocument = gql`
     mutation deleteProposal($id: Int!) {
   deleteProposal(id: $id) {
+    error
     proposal {
       id
     }

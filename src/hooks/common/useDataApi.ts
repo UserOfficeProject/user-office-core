@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import { Variables } from 'graphql-request/dist/src/types';
+import { Variables } from 'graphql-request/dist/types';
 import { decode } from 'jsonwebtoken';
 import { useSnackbar, WithSnackbarProps } from 'notistack';
 import { useCallback, useContext } from 'react';

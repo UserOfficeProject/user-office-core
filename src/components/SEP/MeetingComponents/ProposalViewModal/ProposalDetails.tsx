@@ -91,7 +91,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
               <TableCell className={classes.textBold}>PDF</TableCell>
               <TableCell>
                 <Button
-                  onClick={() => downloadPDFProposal(proposal.id)}
+                  onClick={() =>
+                    downloadPDFProposal([proposal.id], proposal.title)
+                  }
                   color="primary"
                 >
                   Click here to view pdf

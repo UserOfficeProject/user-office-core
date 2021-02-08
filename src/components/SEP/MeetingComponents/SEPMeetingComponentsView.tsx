@@ -45,7 +45,14 @@ const SEPMeetingComponentsView: React.FC<SEPMeetingComponentsViewProps> = ({
           aria-label="export in excel"
           className={classes.spacing}
           data-cy="download-sep-xlsx"
-          onClick={() => downloadSEPXLSX(sepId, selectedCallId)}
+          onClick={() =>
+            downloadSEPXLSX(
+              sepId,
+              selectedCallId,
+              calls.find(({ id }) => id === selectedCallId)?.shortCode ??
+                'unknown'
+            )
+          }
         >
           <GridOnIcon />
         </IconButton>

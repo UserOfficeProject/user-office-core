@@ -56,7 +56,7 @@ declare global {
        */
       notification: (options: {
         variant: 'success' | 'error' | 'info';
-        text: string;
+        text: string | RegExp;
       }) => void;
 
       /**
@@ -135,7 +135,6 @@ declare global {
         minEntries?: string,
         maxEntries?: string
       ) => void;
-
 
       /**
        * Lets you change the logged in user's active role

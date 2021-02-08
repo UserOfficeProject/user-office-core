@@ -140,19 +140,19 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     return (
       <>
         <Tooltip title="View proposal">
-          <IconButton data-cy="view-proposal" style={iconButtonStyle}>
-            <Link
-              to={`/ProposalReviewUserOfficer/${rowData.id}`}
-              style={{ color: 'inherit', textDecoration: 'inherit' }}
-            >
+          <Link
+            to={`/ProposalReviewUserOfficer/${rowData.id}`}
+            style={{ color: 'inherit', textDecoration: 'inherit' }}
+          >
+            <IconButton data-cy="view-proposal" style={iconButtonStyle}>
               <Visibility />
-            </Link>
-          </IconButton>
+            </IconButton>
+          </Link>
         </Tooltip>
         <Tooltip title="Download proposal as pdf">
           <IconButton
             data-cy="download-proposal"
-            onClick={() => downloadPDFProposal(rowData.id)}
+            onClick={() => downloadPDFProposal([rowData.id], rowData.title)}
             style={iconButtonStyle}
           >
             <GetAppIcon />
@@ -286,16 +286,18 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   };
 
   const deleteProposals = (): void => {
-    selectedProposals.forEach(proposal => {
-      new Promise<void>(async resolve => {
-        await api().deleteProposal({ id: proposal.id });
-        proposalsData.splice(
-          proposalsData.findIndex(val => val.id === proposal.id),
-          1
-        );
-        setProposalsData([...proposalsData]);
-        resolve();
-      });
+    selectedProposals.forEach(async proposal => {
+      const {
+        deleteProposal: { error },
+      } = await api().deleteProposal({ id: proposal.id });
+
+      if (error) {
+        return;
+      }
+
+      setProposalsData(proposalsData =>
+        proposalsData.filter(({ id }) => id !== proposal.id)
+      );
     });
   };
 
@@ -497,7 +499,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             tooltip: 'Download proposals in PDF',
             onClick: (event, rowData): void => {
               downloadPDFProposal(
-                (rowData as ProposalViewData[]).map(row => row.id).join(',')
+                (rowData as ProposalViewData[]).map(row => row.id),
+                (rowData as ProposalViewData[])[0].title
               );
             },
             position: 'toolbarOnSelect',
@@ -507,7 +510,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             tooltip: 'Export proposals in Excel',
             onClick: (event, rowData): void => {
               downloadXLSXProposal(
-                (rowData as ProposalViewData[]).map(row => row.id).join(',')
+                (rowData as ProposalViewData[]).map(row => row.id),
+                (rowData as ProposalViewData[])[0].title
               );
             },
             position: 'toolbarOnSelect',
