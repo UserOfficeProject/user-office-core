@@ -173,37 +173,21 @@ export class StfcUserDataSource implements UserDataSource {
       await client.getRolesForUser(token, id)
     )?.return;
 
-    const userRole = new Role(
-      (await this.getRoles()).find(role => role.shortCode == Roles.USER)?.id ||
-        1,
-      Roles.USER,
-      'User'
+    const roleDefinitions: Role[] = await this.getRoles();
+    const userRole: Role | undefined = roleDefinitions.find(
+      role => role.shortCode == Roles.USER
     );
-    if (!stfcRoles) {
+    if (!userRole) {
+      return Promise.resolve([]);
+    }
+
+    if (!stfcRoles || stfcRoles.length == 0) {
       return [userRole];
     }
 
-    const stfcRolesToEssRoles = new Map<string, Role>([
-      [
-        'User Officer',
-        new Role(
-          (await this.getRoles()).find(
-            role => role.shortCode == Roles.USER_OFFICER
-          )?.id || 2,
-          Roles.USER_OFFICER,
-          'User Officer'
-        ),
-      ],
-      [
-        'ISIS Instrument Scientist',
-        new Role(
-          (await this.getRoles()).find(
-            role => role.shortCode == Roles.INSTRUMENT_SCIENTIST
-          )?.id || 3,
-          Roles.INSTRUMENT_SCIENTIST,
-          'Instrument Scientist'
-        ),
-      ],
+    const stfcRolesToEssRoleDefinitions = new Map<string, Roles>([
+      ['User Officer', Roles.USER_OFFICER],
+      ['ISIS Instrument Scientist', Roles.INSTRUMENT_SCIENTIST],
     ]);
 
     const roles: Role[] = [];
@@ -212,9 +196,18 @@ export class StfcUserDataSource implements UserDataSource {
     roles.push(userRole);
 
     stfcRoles.forEach((stfcRole: stfcRole) => {
-      const essRole: Role | undefined = stfcRolesToEssRoles.get(stfcRole.name);
-      if (essRole && !roles.includes(essRole)) {
-        roles.push(essRole);
+      const essRoleDefinition:
+        | Roles
+        | undefined = stfcRolesToEssRoleDefinitions.get(stfcRole.name);
+      if (essRoleDefinition) {
+        const essRole: Role | undefined = roleDefinitions.find(
+          role => role.shortCode == essRoleDefinition
+        );
+
+        if (essRole && !roles.includes(essRole)) {
+          essRole.title = stfcRole.name;
+          roles.push(essRole);
+        }
       }
     });
 
