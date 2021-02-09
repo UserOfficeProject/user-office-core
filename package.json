@@ -67,10 +67,11 @@
     "reflect-metadata": "^0.1.13",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
+    "sanitize-html": "^2.3.2",
     "soap": "^0.36.0",
     "sparkpost": "^2.1.4",
     "type-graphql": "^1.1.1",
-    "typedi": "^0.9.1",
+    "typedi": "^0.10.0",
     "yup": "^0.31.1"
   },
   "devDependencies": {
@@ -90,6 +91,7 @@
     "@types/pg-large-object": "^2.0.2",
     "@types/react-beautiful-dnd": "^11.0.5",
     "@types/request-promise": "^4.1.46",
+    "@types/sanitize-html": "^1.27.1",
     "@types/sax": "^1.2.1",
     "@types/sinon": "^9.0.8",
     "@types/sparkpost": "^2.1.4",
