@@ -526,7 +526,6 @@ context('Template tests', () => {
     cy.wait(300);
     cy.get(`[data-cy='${dateId}_field'] button`).click({ force: true }); // click twice because ui hangs sometimes
     cy.contains('15').click({ force: true });
-    cy.contains('OK').click();
 
     cy.get(`#${multipleChoiceId}`).click();
     cy.contains(multipleChoiceAnswers[0]).click();
