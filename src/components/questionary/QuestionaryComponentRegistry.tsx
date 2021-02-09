@@ -20,6 +20,7 @@ import { intervalDefinition } from './questionaryComponents/Interval/IntervalDef
 import { multipleChoiceDefinition as multiChoiceDefinition } from './questionaryComponents/MultipleChoice/MultipleChoiceDefinition';
 import { numberInputDefinition } from './questionaryComponents/NumberInput/NumberInputDefinition';
 import { proposalBasisDefinition } from './questionaryComponents/ProposalBasis/ProposalBasisDefinition';
+import { richTextInputDefinition } from './questionaryComponents/RichTextInput/RichTextInputDefinition';
 import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/SampleBasisDefinition';
 import { sampleDeclarationDefinition } from './questionaryComponents/SampleDeclaration/SampleDeclaratonDefinition';
 import { shipmentBasisDefinition } from './questionaryComponents/ShipmentBasis/ShipmentBasisDefinition';
@@ -78,6 +79,7 @@ const registry = [
   intervalDefinition,
   numberInputDefinition,
   shipmentBasisDefinition,
+  richTextInputDefinition,
 ];
 
 Object.freeze(registry);

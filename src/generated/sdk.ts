@@ -206,7 +206,8 @@ export enum DataType {
   PROPOSAL_BASIS = 'PROPOSAL_BASIS',
   INTERVAL = 'INTERVAL',
   NUMBER_INPUT = 'NUMBER_INPUT',
-  SHIPMENT_BASIS = 'SHIPMENT_BASIS'
+  SHIPMENT_BASIS = 'SHIPMENT_BASIS',
+  RICH_TEXT_INPUT = 'RICH_TEXT_INPUT'
 }
 
 export type DateConfig = {
@@ -321,7 +322,7 @@ export type FieldConditionInput = {
   params: Scalars['String'];
 };
 
-export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubtemplateConfig | ProposalBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig;
+export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubtemplateConfig | ProposalBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig | RichTextInputConfig;
 
 export type FieldDependency = {
   __typename?: 'FieldDependency';
@@ -1762,6 +1763,13 @@ export enum ReviewStatus {
   DRAFT = 'DRAFT',
   SUBMITTED = 'SUBMITTED'
 }
+
+export type RichTextInputConfig = {
+  __typename?: 'RichTextInputConfig';
+  small_label: Scalars['String'];
+  required: Scalars['Boolean'];
+  tooltip: Scalars['String'];
+};
 
 export type Role = {
   __typename?: 'Role';
@@ -3337,6 +3345,9 @@ export type AnswerFragment = (
   ) | (
     { __typename?: 'ShipmentBasisConfig' }
     & FieldConfigShipmentBasisConfigFragment
+  ) | (
+    { __typename?: 'RichTextInputConfig' }
+    & FieldConfigRichTextInputConfigFragment
   ), dependencies: Array<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -4313,7 +4324,12 @@ type FieldConfigShipmentBasisConfigFragment = (
   & Pick<ShipmentBasisConfig, 'small_label' | 'required' | 'tooltip'>
 );
 
-export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment;
+type FieldConfigRichTextInputConfigFragment = (
+  { __typename?: 'RichTextInputConfig' }
+  & Pick<RichTextInputConfig, 'small_label' | 'required' | 'tooltip'>
+);
+
+export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment;
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
@@ -4354,6 +4370,9 @@ export type QuestionFragment = (
   ) | (
     { __typename?: 'ShipmentBasisConfig' }
     & FieldConfigShipmentBasisConfigFragment
+  ) | (
+    { __typename?: 'RichTextInputConfig' }
+    & FieldConfigRichTextInputConfigFragment
   ) }
 );
 
@@ -4399,6 +4418,9 @@ export type QuestionTemplateRelationFragment = (
   ) | (
     { __typename?: 'ShipmentBasisConfig' }
     & FieldConfigShipmentBasisConfigFragment
+  ) | (
+    { __typename?: 'RichTextInputConfig' }
+    & FieldConfigRichTextInputConfigFragment
   ), dependencies: Array<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -5232,6 +5254,11 @@ export const FieldConfigFragmentDoc = gql`
     required
     tooltip
   }
+  ... on RichTextInputConfig {
+    small_label
+    required
+    tooltip
+  }
 }
     `;
 export const QuestionFragmentDoc = gql`
@@ -5997,6 +6024,7 @@ ${BasicUserDetailsFragmentDoc}`;
 export const DeleteProposalDocument = gql`
     mutation deleteProposal($id: Int!) {
   deleteProposal(id: $id) {
+    error
     proposal {
       id
     }

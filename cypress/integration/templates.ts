@@ -16,13 +16,17 @@ context('Template tests', () => {
   let multipleChoiceId: string;
   let intervalId: string;
   let numberId: string;
+  let richTextInputId: string;
+
   const booleanQuestion = faker.lorem.words(2);
   const textQuestion = faker.lorem.words(2);
   const dateQuestion = faker.lorem.words(2);
   const fileQuestion = faker.lorem.words(2);
   const intervalQuestion = faker.lorem.words(2);
   const numberQuestion = faker.lorem.words(3);
+  const richTextInputQuestion = faker.lorem.words(3);
   const multipleChoiceQuestion = faker.lorem.words(2);
+
   const multipleChoiceAnswers = [
     faker.lorem.words(2),
     faker.lorem.words(2),
@@ -418,6 +422,35 @@ context('Template tests', () => {
       .dragElement([{ direction: 'left', length: 1 }]);
     /* --- */
 
+    /* Rich Text Input */
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+      .last()
+      .click();
+
+    cy.contains('Add Rich Text Input').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(richTextInputQuestion);
+
+    cy.contains('Save').click();
+
+    cy.contains(richTextInputQuestion);
+
+    cy.contains(richTextInputQuestion)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        richTextInputId = fieldId;
+      });
+
+    cy.contains(richTextInputQuestion)
+      .parent()
+      .dragElement([{ direction: 'left', length: 1 }]);
+
+    /* --- */
+
     /* --- Update templateQuestionRelation */
     cy.contains(dateQuestion).click();
     cy.get("[data-cy='tooltip'] input")
@@ -532,6 +565,24 @@ context('Template tests', () => {
     cy.contains(multipleChoiceAnswers[2]).click();
     cy.get('body').type('{esc}');
 
+    const richTextInputValue = faker.lorem.words(3);
+
+    cy.window().then(win => {
+      return new Cypress.Promise(resolve => {
+        console.log('richTextInputId', richTextInputId);
+
+        win.tinyMCE.editors[richTextInputId].setContent(richTextInputValue);
+        win.tinyMCE.editors[richTextInputId].fire('blur');
+
+        resolve();
+      });
+    });
+
+    cy.get(`#${richTextInputId}_ifr`)
+      .its('0.contentDocument.body')
+      .should('not.be.empty')
+      .contains(richTextInputValue);
+
     cy.contains('Save and continue').click();
 
     cy.contains('Submit').click();
@@ -544,6 +595,14 @@ context('Template tests', () => {
     cy.contains(multipleChoiceAnswers[0]);
     cy.contains(multipleChoiceAnswers[1]).should('not.exist');
     cy.contains(multipleChoiceAnswers[2]);
+
+    cy.contains(richTextInputQuestion);
+    cy.get(`[data-cy="${richTextInputId}_open"]`).click();
+    cy.get('[role="dialog"]').contains(richTextInputQuestion);
+    cy.get('[role="dialog"]').contains(richTextInputValue);
+    cy.get('[role="dialog"]')
+      .contains('Close')
+      .click();
 
     cy.contains('Dashboard').click();
     cy.contains(title);

@@ -56,7 +56,7 @@ declare global {
        */
       notification: (options: {
         variant: 'success' | 'error' | 'info';
-        text: string;
+        text: string | RegExp;
       }) => void;
 
       /**
