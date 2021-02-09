@@ -248,6 +248,30 @@ function changeActiveRole(role) {
   cy.notification({ variant: 'success', text: 'User role changed' });
 }
 
+function presentationMode() {
+  const COMMAND_DELAY = 300;
+
+  for (const command of [
+    'visit',
+    'click',
+    'trigger',
+    'type',
+    'clear',
+    'reload',
+    'contains',
+  ]) {
+    Cypress.Commands.overwrite(command, (originalFn, ...args) => {
+      const origVal = originalFn(...args);
+
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(origVal);
+        }, COMMAND_DELAY);
+      });
+    });
+  }
+}
+
 Cypress.Commands.add('resetDB', resetDB);
 
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
@@ -277,28 +301,4 @@ Cypress.Commands.add('createSampleQuestion', createSampleQuestion);
 
 Cypress.Commands.add('changeActiveRole', changeActiveRole);
 
-// call cy.presentationMode(); before your test to have delay between clicks.
-// Excellent for presentation purposes
-Cypress.Commands.add('presentationMode', () => {
-  const COMMAND_DELAY = 300;
-
-  for (const command of [
-    'visit',
-    'click',
-    'trigger',
-    'type',
-    'clear',
-    'reload',
-    'contains',
-  ]) {
-    Cypress.Commands.overwrite(command, (originalFn, ...args) => {
-      const origVal = originalFn(...args);
-
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(origVal);
-        }, COMMAND_DELAY);
-      });
-    });
-  }
-});
+Cypress.Commands.add('presentationMode', presentationMode);

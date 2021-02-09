@@ -136,7 +136,6 @@ declare global {
         maxEntries?: string
       ) => void;
 
-
       /**
        * Lets you change the logged in user's active role
        *
@@ -146,6 +145,17 @@ declare global {
        *    cy.changeActiveRole('User Officer')
        */
       changeActiveRole: (role: string) => void;
+
+      /**
+       * Call this method before your test to have delay between clicks
+       * Excellent for presentation purposes
+       *
+       * @returns {typeof presentationMode}
+       * @memberof Chainable
+       * @example
+       *    cy.presentationMode()
+       */
+      presentationMode: () => void;
     }
   }
 
