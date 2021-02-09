@@ -9,7 +9,7 @@ export function useTemplate(templateId: number) {
     null
   );
 
-  const [loadingTemplate, setLoadingTemplate] = useState(true);
+  const [isLoadingTemplate, setLoadingTemplate] = useState(true);
 
   useEffect(() => {
     setLoadingTemplate(true);
@@ -23,5 +23,5 @@ export function useTemplate(templateId: number) {
       });
   }, [api, templateId]);
 
-  return { template, loadingTemplate };
+  return { template, isLoadingTemplate };
 }

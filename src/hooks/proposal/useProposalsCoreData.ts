@@ -27,7 +27,11 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
           instrumentId,
           proposalStatusId,
           questionaryIds,
-          questionFilter,
+          questionFilter: questionFilter && {
+            ...questionFilter,
+            value:
+              JSON.stringify({ value: questionFilter?.value }) ?? undefined,
+          }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
           text,
         },
       })

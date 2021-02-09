@@ -1,6 +1,6 @@
 import { FormControl, Grid, InputLabel, TextField } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   QuestionFilterCompareOperator,
@@ -12,7 +12,10 @@ import { SearchCriteriaInputProps } from '../../../common/proposalFilters/Questi
 function MultipleChoiceSearchCriteriaComponent({
   onChange,
   question,
+  searchCriteria,
 }: SearchCriteriaInputProps) {
+  const [value, setValue] = useState(searchCriteria?.value ?? '');
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
@@ -26,12 +29,14 @@ function MultipleChoiceSearchCriteriaComponent({
             options={(question.config as SelectionFromOptionsConfig).options}
             getOptionLabel={option => option}
             renderInput={params => <TextField {...params} label="Answer" />}
-            onChange={(_event, newValue) =>
+            onChange={(_event, newValue) => {
+              setValue(newValue ?? '');
               onChange(
                 QuestionFilterCompareOperator.INCLUDES,
                 newValue as string
-              )
-            }
+              );
+            }}
+            value={value}
           />
         </FormControl>
       </Grid>

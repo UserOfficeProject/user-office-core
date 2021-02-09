@@ -7,10 +7,11 @@ import React, { useState } from 'react';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import ProposalStatusFilter from 'components/common/proposalFilters/ProposalStatusFilter';
-import QuestionaryFilter from 'components/common/proposalFilters/QuestionaryFilter';
+import QuestionaryFilter, {
+  useQuestionFilterQueryParams,
+} from 'components/common/proposalFilters/QuestionaryFilter';
 import {
   Call,
-  GetTemplateQuery,
   Instrument,
   ProposalsFilter,
   ProposalStatus,
@@ -20,7 +21,6 @@ type ProposalFilterBarProps = {
   calls?: { data: Call[]; isLoading: boolean };
   instruments?: { data: Instrument[]; isLoading: boolean };
   proposalStatuses?: { data: ProposalStatus[]; isLoading: boolean };
-  template?: { data: GetTemplateQuery['template']; isLoading: boolean };
   setProposalFilter: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;
 };
@@ -29,11 +29,17 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
   calls,
   instruments,
   proposalStatuses,
-  template,
   setProposalFilter,
   filter,
 }) => {
-  const [showQuestionFilter, setShowQuestionFilter] = useState(false);
+  const { setQuestionFilterQuery } = useQuestionFilterQueryParams();
+  const [showQuestionFilter, setShowQuestionFilter] = useState(
+    filter.questionFilter !== undefined
+  );
+
+  const selectedCallTemplateId = calls?.data.find(
+    call => call.id === filter.callId
+  )?.templateId;
 
   return (
     <>
@@ -80,39 +86,40 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
         variant="outlined"
         endIcon={showQuestionFilter ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         style={{
-          margin: '17px 0 0 8px',
+          marginTop: '17px',
+          marginLeft: '8px',
           textTransform: 'none',
           fontSize: '16px',
         }}
         onClick={() => {
           const shouldShowQuestionFilter = !showQuestionFilter;
-          if (shouldShowQuestionFilter === false) {
+          setShowQuestionFilter(shouldShowQuestionFilter);
+          if (!shouldShowQuestionFilter) {
+            setQuestionFilterQuery(undefined);
             setProposalFilter({
               ...filter,
               questionFilter: undefined,
-            });
+            }); // submitting because it feels intuitive that filter is cleared when menu is closed
           }
-          setShowQuestionFilter(!showQuestionFilter);
         }}
-        disabled={!template?.data}
+        disabled={!selectedCallTemplateId}
       >
         {showQuestionFilter ? 'close' : 'more'}
       </Button>
 
-      <Collapse in={showQuestionFilter}>
-        {showQuestionFilter && template && (
+      {selectedCallTemplateId && (
+        <Collapse in={showQuestionFilter}>
           <QuestionaryFilter
-            template={template.data}
-            isLoading={template.isLoading}
-            onSubmit={questionFilter =>
+            templateId={selectedCallTemplateId}
+            onSubmit={questionFilter => {
               setProposalFilter({
                 ...filter,
                 questionFilter,
-              })
-            }
+              });
+            }}
           />
-        )}
-      </Collapse>
+        </Collapse>
+      )}
     </>
   );
 };

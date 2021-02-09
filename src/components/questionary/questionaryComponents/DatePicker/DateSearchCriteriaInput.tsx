@@ -16,10 +16,13 @@ import React, { useState } from 'react';
 import { SearchCriteriaInputProps } from 'components/common/proposalFilters/QuestionaryFilter';
 import { QuestionFilterCompareOperator } from 'generated/sdk';
 
-function DateSearchCriteriaInput({ onChange }: SearchCriteriaInputProps) {
-  const [value, setValue] = useState<string | null>(null);
+function DateSearchCriteriaInput({
+  onChange,
+  searchCriteria,
+}: SearchCriteriaInputProps) {
+  const [value, setValue] = useState(searchCriteria?.value);
   const [comparator, setComparator] = useState<QuestionFilterCompareOperator>(
-    QuestionFilterCompareOperator.EQUALS
+    searchCriteria?.compareOperator ?? QuestionFilterCompareOperator.EQUALS
   );
 
   return (
@@ -64,7 +67,7 @@ function DateSearchCriteriaInput({ onChange }: SearchCriteriaInputProps) {
             variant="inline"
             autoOk={true}
             label="Date"
-            value={value}
+            value={value as string}
             onChange={(date: DateType | null) => {
               if (date) {
                 date.setUTCHours(0, 0, 0, 0);

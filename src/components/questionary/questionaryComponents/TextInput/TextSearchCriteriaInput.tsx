@@ -11,10 +11,14 @@ import React, { useState } from 'react';
 import { SearchCriteriaInputProps } from 'components/common/proposalFilters/QuestionaryFilter';
 import { QuestionFilterCompareOperator } from 'generated/sdk';
 
-function TextSearchCriteriaComponent({ onChange }: SearchCriteriaInputProps) {
-  const [value, setValue] = useState('');
+function TextSearchCriteriaComponent({
+  onChange,
+  searchCriteria,
+}: SearchCriteriaInputProps) {
+  const [value, setValue] = useState(searchCriteria?.value ?? '');
   const [comparator, setComparator] = useState<QuestionFilterCompareOperator>(
-    QuestionFilterCompareOperator.EQUALS
+    (searchCriteria?.compareOperator as QuestionFilterCompareOperator) ??
+      QuestionFilterCompareOperator.EQUALS
   );
 
   return (

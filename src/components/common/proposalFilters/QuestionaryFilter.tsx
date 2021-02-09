@@ -1,7 +1,8 @@
 import { Button, Collapse, Grid, TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
+import { StringParam, useQueryParams } from 'use-query-params';
 
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
@@ -12,21 +13,51 @@ import {
   QuestionTemplateRelation,
   QuestionTemplateRelationFragment,
 } from 'generated/sdk';
+import { useTemplate } from 'hooks/template/useTemplate';
 
 import UnknownSearchCriteriaInput from '../../questionary/questionaryComponents/UnknownSearchCriteriaInput';
 import UOLoader from '../UOLoader';
 
+export const useQuestionFilterQueryParams = () => {
+  const [query, setQuery] = useQueryParams({
+    questionId: StringParam,
+    compareOperator: StringParam,
+    value: StringParam,
+    dataType: StringParam,
+  });
+  const setQuestionFilterQuery = (filter?: {
+    questionId: string;
+    compareOperator: string;
+    value: string;
+    dataType: string;
+  }) => {
+    setQuery({
+      questionId: filter?.questionId,
+      compareOperator: filter?.compareOperator,
+      value: filter?.value,
+      dataType: filter?.dataType,
+    });
+  };
+
+  return { questionFilterQuery: query, setQuestionFilterQuery };
+};
+
 export interface SearchCriteriaInputProps {
+  searchCriteria: SearchCriteria | null;
   onChange: (
     comparator: QuestionFilterCompareOperator,
-    value: string | number | boolean | never[]
+    value: string | number | boolean | any[]
   ) => any;
   question: QuestionFragment;
 }
 
+interface SearchCriteria {
+  compareOperator: QuestionFilterCompareOperator;
+  value: string | number | boolean | any[];
+}
+
 interface QuestionaryFilterProps {
-  template: GetTemplateQuery['template'];
-  isLoading: boolean;
+  templateId: number;
   onSubmit?: (questionFilter?: QuestionFilterInput) => any;
 }
 
@@ -43,30 +74,14 @@ const getSearchCriteriaComponent = (
   );
 };
 
-function QuestionaryFilter({
-  template,
-  isLoading,
-  onSubmit,
-}: QuestionaryFilterProps) {
-  const [
-    selectedQuestion,
-    setSelectedQuestion,
-  ] = useState<QuestionTemplateRelationFragment | null>(null);
-
-  const [searchCriteria, setSearchCriteria] = useState<{
-    comparator: QuestionFilterCompareOperator;
-    value: string;
-  } | null>(null);
-
-  if (isLoading) {
-    return <UOLoader />;
+const extractSearchableQuestionsFromTemplate = (
+  template: GetTemplateQuery['template']
+) => {
+  if (!template) {
+    return [];
   }
 
-  if (template === null) {
-    return <span>Failed to load template</span>;
-  }
-
-  const questions = template.steps
+  return template.steps
     .reduce(
       (questions, step) => questions.concat(step.fields),
       new Array<QuestionTemplateRelation>()
@@ -76,6 +91,60 @@ function QuestionaryFilter({
         getQuestionaryComponentDefinition(question.question.dataType)
           .searchCriteriaComponent !== undefined
     ); // only searchable questions
+};
+
+function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
+  const { template, isLoadingTemplate } = useTemplate(templateId);
+
+  const {
+    questionFilterQuery,
+    setQuestionFilterQuery,
+  } = useQuestionFilterQueryParams();
+
+  const initialSearchCriteria =
+    questionFilterQuery.compareOperator && questionFilterQuery.value
+      ? {
+          compareOperator: questionFilterQuery.compareOperator as QuestionFilterCompareOperator,
+          value: questionFilterQuery.value,
+        }
+      : null;
+
+  const [
+    selectedQuestion,
+    setSelectedQuestion,
+  ] = useState<QuestionTemplateRelationFragment | null>(null);
+
+  const [searchCriteria, setSearchCriteria] = useState<SearchCriteria | null>(
+    initialSearchCriteria
+  );
+
+  useEffect(() => {
+    if (questionFilterQuery.questionId) {
+      const selectedQuestion = extractSearchableQuestionsFromTemplate(
+        template
+      ).find(
+        question =>
+          question.question.proposalQuestionId ===
+          questionFilterQuery.questionId
+      );
+      setSelectedQuestion(selectedQuestion ?? null);
+    }
+  }, [template, setSelectedQuestion, questionFilterQuery.questionId]);
+
+  const handleSubmit = (filter?: QuestionFilterInput) => {
+    setQuestionFilterQuery(filter);
+    onSubmit?.(filter);
+  };
+
+  if (isLoadingTemplate) {
+    return <UOLoader />;
+  }
+
+  if (template === null) {
+    return <span>Failed to load template</span>;
+  }
+
+  const questions = extractSearchableQuestionsFromTemplate(template);
 
   const SearchCriteriaComponent = getSearchCriteriaComponent(
     selectedQuestion?.question
@@ -92,20 +161,23 @@ function QuestionaryFilter({
           onChange={(_event, newValue) => {
             setSelectedQuestion(newValue);
             if (!newValue) {
-              onSubmit?.(undefined);
+              setSearchCriteria(null);
+              handleSubmit(undefined); // submitting because it feels intuitive that filter is cleared if no question is selected
             }
           }}
           style={{ flex: 1, marginBottom: '8px' }}
+          value={selectedQuestion}
         />
       </Grid>
       <Grid item xs={12}>
         <Collapse in={!!selectedQuestion}>
           {selectedQuestion && (
             <SearchCriteriaComponent
-              onChange={(comparator, value) => {
+              searchCriteria={searchCriteria}
+              onChange={(compareOperator, value) => {
                 setSearchCriteria({
-                  comparator: comparator,
-                  value: JSON.stringify({ value: value }),
+                  compareOperator,
+                  value,
                 });
               }}
               question={selectedQuestion.question}
@@ -122,10 +194,10 @@ function QuestionaryFilter({
             startIcon={<SearchIcon />}
             disabled={!selectedQuestion || !searchCriteria}
             onClick={() => {
-              onSubmit?.({
+              handleSubmit({
                 questionId: selectedQuestion.question.proposalQuestionId,
-                compareOperator: searchCriteria!.comparator,
-                value: searchCriteria!.value,
+                compareOperator: searchCriteria!.compareOperator,
+                value: searchCriteria!.value as any,
                 dataType: selectedQuestion.question.dataType,
               });
             }}

@@ -41,7 +41,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     ...DefaultQueryParams,
   });
 
-  // NOTE: proposalStatusId has default value 2 because for IS default view should be all proposals in FEASIBILITY_REVIEW status
+  // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
