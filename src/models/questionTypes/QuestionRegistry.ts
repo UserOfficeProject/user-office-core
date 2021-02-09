@@ -8,6 +8,7 @@ import { fileUploadDefinition } from './FileUpload';
 import { intervalDefinition } from './Interval';
 import { numberInputDefinition } from './NumberInput';
 import { proposalBasisDefinition } from './ProposalBasis';
+import { richTextInputDefinition } from './RichTextInput';
 import { sampleBasisDefinition } from './SampleBasis';
 import { sampleDeclarationDefinition } from './SampleDeclaration';
 import { selectionFromOptionsDefinition } from './SelectionFromOptions';
@@ -20,6 +21,7 @@ export interface Question {
   readonly createBlankConfig: () => any;
   readonly isReadOnly: boolean;
   readonly getDefaultAnswer: (field: QuestionTemplateRelation) => any;
+  readonly transform?: (field: QuestionTemplateRelation, value: any) => any;
 }
 
 // Add new component definitions here
@@ -36,6 +38,7 @@ const registry = [
   intervalDefinition,
   numberInputDefinition,
   shipmentBasis,
+  richTextInputDefinition,
 ];
 
 Object.freeze(registry);

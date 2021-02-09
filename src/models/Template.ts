@@ -27,6 +27,7 @@ export enum DataType {
   INTERVAL = 'INTERVAL',
   NUMBER_INPUT = 'NUMBER_INPUT',
   SHIPMENT_BASIS = 'SHIPMENT_BASIS',
+  RICH_TEXT_INPUT = 'RICH_TEXT_INPUT',
 }
 
 export class Topic {
