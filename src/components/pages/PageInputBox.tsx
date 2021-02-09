@@ -7,6 +7,9 @@ import 'tinymce/plugins/link';
 import 'tinymce/plugins/preview';
 import 'tinymce/plugins/image';
 import 'tinymce/plugins/code';
+import 'tinymce/plugins/advlist';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/charmap';
 import 'tinymce/icons/default/icons';
 
 import Button from '@material-ui/core/Button';

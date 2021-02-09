@@ -91,4 +91,10 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
   }
+
+  ... on RichTextInputConfig {
+    small_label
+    required
+    tooltip
+  }
 }

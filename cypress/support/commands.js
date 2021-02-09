@@ -141,6 +141,8 @@ const createProposal = (proposalTitle = '', proposalAbstract = '') => {
     .should('have.value', abstract);
 
   cy.contains('Save and continue').click();
+
+  cy.notification({ variant: 'success', text: 'Saved' });
 };
 
 const createTopic = title => {
