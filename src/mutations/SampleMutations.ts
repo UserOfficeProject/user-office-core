@@ -122,12 +122,17 @@ export default class SampleMutations {
     if (!agent) {
       return rejection('NOT_AUTHORIZED');
     }
-    if (!this.sampleAuthorization.hasWriteRights(agent, sampleId)) {
+    if (!(await this.sampleAuthorization.hasWriteRights(agent, sampleId))) {
       return rejection('NOT_AUTHORIZED');
     }
 
     try {
       const sourceSample = await this.sampleDataSource.getSample(sampleId);
+
+      if (!sourceSample) {
+        return rejection('NOT_FOUND');
+      }
+
       const clonedQuestionary = await this.questionaryDataSource.clone(
         sourceSample.questionaryId
       );

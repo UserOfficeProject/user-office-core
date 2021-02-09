@@ -150,6 +150,9 @@ export class ProposalBasisConfig {
   tooltip: string;
 }
 
+@ObjectType()
+export class RichTextInputConfig extends ConfigBase {}
+
 export const FieldConfigType = createUnionType({
   name: 'FieldConfig', // the name of the GraphQL union
   types: () => [
@@ -165,5 +168,6 @@ export const FieldConfigType = createUnionType({
     IntervalConfig,
     NumberInputConfig,
     ShipmentBasisConfig,
+    RichTextInputConfig,
   ], // function that returns array of object types classes
 });

@@ -328,21 +328,49 @@ export default class PostgresQuestionaryDataSource
     );
 
     // Clone answers
-    await database.raw(`
+    await database.raw(
+      `
       INSERT INTO answers(
           questionary_id
         , question_id
         , answer
       )
       SELECT 
-          ${clonedQuestionary.questionaryId}
+          :clonedQuestionaryId
         , question_id
         , answer
       FROM 
         answers
       WHERE
-          questionary_id=${sourceQuestionary.questionaryId}
-    `);
+        questionary_id = :sourceQuestionaryId
+    `,
+      {
+        clonedQuestionaryId: clonedQuestionary.questionaryId,
+        sourceQuestionaryId: sourceQuestionary.questionaryId,
+      }
+    );
+
+    await database.raw(
+      `
+      INSERT INTO topic_completenesses(
+          questionary_id
+        , topic_id
+        , is_complete
+      )
+      SELECT 
+          :clonedQuestionaryId
+        , topic_id
+        , is_complete
+      FROM
+        topic_completenesses
+      WHERE
+        questionary_id = :sourceQuestionaryId
+    `,
+      {
+        clonedQuestionaryId: clonedQuestionary.questionaryId,
+        sourceQuestionaryId: sourceQuestionary.questionaryId,
+      }
+    );
 
     return clonedQuestionary;
   }

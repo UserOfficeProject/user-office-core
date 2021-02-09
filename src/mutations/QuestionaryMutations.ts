@@ -3,7 +3,10 @@ import { logger } from '@esss-swap/duo-logger';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-import { isMatchingConstraints } from '../models/ProposalModelFunctions';
+import {
+  isMatchingConstraints,
+  transformAnswerValueIfNeeded,
+} from '../models/ProposalModelFunctions';
 import { User } from '../models/User';
 import { rejection } from '../rejection';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
@@ -63,7 +66,7 @@ export default class QuestionaryMutations {
 
           return rejection('INTERNAL_ERROR');
         }
-        const value = JSON.parse(answer.value).value;
+        const { value, ...parsedAnswerRest } = JSON.parse(answer.value);
         if (
           !isPartialSave &&
           !isMatchingConstraints(questionTemplateRelation, value)
@@ -75,6 +78,18 @@ export default class QuestionaryMutations {
 
           return rejection('VALUE_CONSTRAINT_REJECTION');
         }
+
+        const transformedValue = transformAnswerValueIfNeeded(
+          questionTemplateRelation,
+          value
+        );
+        if (transformedValue !== undefined) {
+          answer.value = JSON.stringify({
+            value: transformedValue,
+            ...parsedAnswerRest,
+          });
+        }
+
         await this.dataSource.updateAnswer(
           questionaryId,
           answer.questionId,
