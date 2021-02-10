@@ -1,6 +1,6 @@
+import { logger } from '@esss-swap/duo-logger';
 import { NextFunction, Request, Response } from 'express';
 
-import { logger } from '../utils/Logger';
 interface MiddlewareError extends Error {
   code: string | number;
 }
@@ -10,7 +10,7 @@ const exceptionHandler = () => (
   res: Response,
   next: NextFunction
 ) => {
-  logger.logException('Unhandled exception', err, { req, res });
+  logger.logException('Unhandled exception', err);
   if (err.code === 'invalid_token') {
     return res.status(401).send('invalid token');
   }

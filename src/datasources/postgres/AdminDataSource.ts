@@ -1,86 +1,90 @@
 import * as fs from 'fs';
 
+import { logger } from '@esss-swap/duo-logger';
+
 import { Page } from '../../models/Admin';
+import { Feature } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { BasicUserDetails } from '../../models/User';
-import { logger } from '../../utils/Logger';
 import { AdminDataSource, Entry } from '../AdminDataSource';
 import { InstitutionsFilter } from './../../resolvers/queries/InstitutionsQuery';
 import database from './database';
 import {
   CountryRecord,
+  createBasicUserObject,
+  createFeatureObject,
   createPageObject,
+  FeatureRecord,
   InstitutionRecord,
   NationalityRecord,
-  PagetextRecord,
+  PageTextRecord,
+  UserRecord,
 } from './records';
-import { UserRecord, createBasicUserObject } from './records';
 
 export default class PostgresAdminDataSource implements AdminDataSource {
   async updateInstitution(
     institution: Institution
   ): Promise<Institution | null> {
-    return database
+    const [institutionRecord]: InstitutionRecord[] = await database
       .update({
         institution: institution.name,
         verified: institution.verified,
       })
       .from('institutions')
       .where('institution_id', institution.id)
-      .returning('*')
-      .then((updatedRows: Array<InstitutionRecord>) => {
-        if (updatedRows.length === 0) {
-          throw new Error(`Could not update page with id:${institution.id}`);
-        }
+      .returning('*');
 
-        return {
-          id: updatedRows[0].institution_id,
-          name: updatedRows[0].institution,
-          verified: updatedRows[0].verified,
-        };
-      });
+    if (!institutionRecord) {
+      throw new Error(`Could not update page with id:${institution.id}`);
+    }
+
+    return {
+      id: institutionRecord.institution_id,
+      name: institutionRecord.institution,
+      verified: institutionRecord.verified,
+    };
   }
 
   async createInstitution(
     institution: Institution
   ): Promise<Institution | null> {
-    return database
+    const [institutionRecord]: InstitutionRecord[] = await database
       .insert({
         institution: institution.name,
         verified: institution.verified,
       })
       .into('institutions')
-      .returning(['*'])
-      .then((inst: InstitutionRecord[]) => {
-        if (inst.length !== 1) {
-          throw new Error('Could not create call');
-        }
+      .returning('*');
 
-        return {
-          id: inst[0].institution_id,
-          name: inst[0].institution,
-          verified: inst[0].verified,
-        };
-      });
+    if (!institutionRecord) {
+      throw new Error('Could not create call');
+    }
+
+    return {
+      id: institutionRecord.institution_id,
+      name: institutionRecord.institution,
+      verified: institutionRecord.verified,
+    };
   }
 
   async deleteInstitution(id: number): Promise<Institution> {
-    return database('institutions')
+    const [institutionRecord]: InstitutionRecord[] = await database(
+      'institutions'
+    )
       .where('institutions.institution_id', id)
       .del()
       .from('institutions')
-      .returning('*')
-      .then((inst: InstitutionRecord[]) => {
-        if (inst === undefined || inst.length !== 1) {
-          throw new Error(`Could not delete institution with id:${id}`);
-        }
+      .returning('*');
 
-        return {
-          id: inst[0].institution_id,
-          name: inst[0].institution,
-          verified: inst[0].verified,
-        };
-      });
+    if (!institutionRecord) {
+      throw new Error(`Could not delete institution with id:${id}`);
+    }
+
+    return {
+      id: institutionRecord.institution_id,
+      name: institutionRecord.institution,
+      verified: institutionRecord.verified,
+    };
   }
 
   async get(id: number): Promise<string | null> {
@@ -93,20 +97,19 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async setPageText(id: number, content: string): Promise<Page> {
-    return database
+    const [pagetextRecord]: PageTextRecord[] = await database
       .update({
         content,
       })
       .from('pagetext')
       .where('pagetext_id', id)
-      .returning('*')
-      .then((updatedRows: Array<PagetextRecord>) => {
-        if (updatedRows.length === 0) {
-          throw new Error(`Could not update page with id:${id}`);
-        }
+      .returning('*');
 
-        return createPageObject(updatedRows[0]);
-      });
+    if (!pagetextRecord) {
+      throw new Error(`Could not update page with id:${id}`);
+    }
+
+    return createPageObject(pagetextRecord);
   }
 
   async getNationalities(): Promise<Entry[]> {
@@ -224,5 +227,14 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         resolve(log.join('\n'));
       });
     });
+  }
+
+  getFeatures(): Promise<Feature[]> {
+    return database
+      .select()
+      .from('features')
+      .then((features: FeatureRecord[]) =>
+        features.map(feature => createFeatureObject(feature))
+      );
   }
 }

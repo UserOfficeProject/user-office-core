@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import {
   createProposalStatusValidationSchema,
   updateProposalStatusValidationSchema,
@@ -29,7 +30,6 @@ import { MoveProposalWorkflowStatusInput } from '../resolvers/mutations/settings
 import { UpdateProposalStatusInput } from '../resolvers/mutations/settings/UpdateProposalStatusMutation';
 import { UpdateProposalWorkflowInput } from '../resolvers/mutations/settings/UpdateProposalWorkflowMutation';
 import { omit } from '../utils/helperFunctions';
-import { logger } from '../utils/Logger';
 
 export default class ProposalSettingsMutations {
   constructor(private dataSource: ProposalSettingsDataSource) {}

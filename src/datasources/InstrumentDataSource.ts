@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
-  CallHasInstrument,
   Instrument,
+  InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../models/Instrument';
 import { ProposalIds } from '../models/Proposal';
@@ -53,9 +53,9 @@ export interface InstrumentDataSource {
     availabilityTime: number
   ): Promise<boolean>;
   submitInstrument(
-    callId: number,
+    proposalIds: number[],
     instrumentId: number
-  ): Promise<CallHasInstrument>;
+  ): Promise<InstrumentHasProposals>;
   hasInstrumentScientistInstrument(
     userId: number,
     instrumentId: number
@@ -65,4 +65,5 @@ export interface InstrumentDataSource {
     instrumentId: number,
     proposalId: number
   ): Promise<boolean>;
+  isProposalInstrumentSubmitted(proposalId: number): Promise<boolean>;
 }

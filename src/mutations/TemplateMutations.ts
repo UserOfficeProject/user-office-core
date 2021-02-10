@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
 import {
   cloneTemplateValidationSchema,
   createQuestionTemplateRelationValidationSchema,
@@ -34,11 +35,12 @@ import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/Creat
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
+import { SetActiveTemplateArgs } from '../resolvers/mutations/SetActiveTemplateMutation';
 import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
 import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
+import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
-import { logger } from '../utils/Logger';
 
 export default class TemplateMutations {
   constructor(private dataSource: TemplateDataSource) {}
@@ -66,6 +68,14 @@ export default class TemplateMutations {
           0,
           'New sample',
           'sample_basis'
+        );
+        break;
+      case TemplateCategoryId.SHIPMENT_DECLARATION:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New shipment',
+          'shipment_basis'
         );
         break;
     }
@@ -346,6 +356,24 @@ export default class TemplateMutations {
       });
   }
 
+  // @ValidateArgs(updateQuestionTemplateRelationValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async updateQuestionTemplateRelationSettings(
+    agent: UserWithRole | null,
+    args: UpdateQuestionTemplateRelationSettingsArgs
+  ): Promise<Template | Rejection | null> {
+    return this.dataSource
+      .updateQuestionTemplateRelationSettings(args)
+      .catch(err => {
+        logger.logException('Could not update question rel', err, {
+          agent,
+          args,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
   @ValidateArgs(deleteQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async deleteQuestionTemplateRelation(
@@ -374,6 +402,30 @@ export default class TemplateMutations {
     });
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  async setActiveTemplate(
+    user: UserWithRole | null,
+    args: SetActiveTemplateArgs
+  ) {
+    const template = await this.dataSource.getTemplate(args.templateId);
+    if (template?.categoryId !== args.templateCategoryId) {
+      logger.logError('TemplateId and TemplateCategoryId mismatch', {
+        args,
+        user,
+      });
+
+      return rejection('INTERNAL_ERROR');
+    }
+
+    return this.dataSource.setActiveTemplate(args).catch(err => {
+      logger.logException('Could not set active template', err, {
+        user,
+      });
+
+      return rejection('INTERNAL_ERROR');
+    });
+  }
+
   @ValidateArgs(createQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async createQuestionTemplateRelation(
@@ -384,7 +436,7 @@ export default class TemplateMutations {
     const dataToUpsert = await this.getQuestionsDataToUpsert({
       ...args,
       config: JSON.stringify(question?.config),
-    });
+    } as CreateQuestionTemplateRelationArgs);
 
     return this.dataSource
       .upsertQuestionTemplateRelations(dataToUpsert)

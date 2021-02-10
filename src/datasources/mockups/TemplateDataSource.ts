@@ -8,13 +8,14 @@ import {
   Template,
   TemplateCategory,
   TemplateCategoryId,
+  TemplatesHasQuestions,
   TemplateStep,
   Topic,
-  TemplatesHasQuestions,
 } from '../../models/Template';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
+import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
@@ -60,12 +61,14 @@ const dummyTemplateStepsFactory = () => {
       proposalQuestionId: 'links_to_field',
       dataType: DataType.TEXT_INPUT,
     }),
-    dependency: new FieldDependency(
-      'links_to_field',
-      'has_links_to_field',
-      'has_links_to_field',
-      new FieldCondition(EvaluatorOperator.eq, 'yes')
-    ),
+    dependencies: [
+      new FieldDependency(
+        'links_to_field',
+        'has_links_to_field',
+        'has_links_to_field',
+        new FieldCondition(EvaluatorOperator.eq, 'yes')
+      ),
+    ],
   });
 
   const enableCrystallization = dummyQuestionTemplateRelationFactory({
@@ -284,6 +287,12 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return topic;
   }
 
+  async updateQuestionTemplateRelationSettings(
+    args: UpdateQuestionTemplateRelationSettingsArgs
+  ): Promise<Template> {
+    return dummyProposalTemplate;
+  }
+
   async upsertQuestionTemplateRelations(
     collection: TemplatesHasQuestions[]
   ): Promise<Template> {
@@ -318,5 +327,15 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
   async getTemplateCategories(): Promise<TemplateCategory[]> {
     return [new TemplateCategory(1, 'Proposal Questionaries')];
+  }
+
+  async setActiveTemplate(args: any): Promise<boolean> {
+    return true;
+  }
+
+  async getActiveTemplateId(
+    categoryId: TemplateCategoryId
+  ): Promise<number | null> {
+    return 1;
   }
 }

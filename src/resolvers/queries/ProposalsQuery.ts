@@ -19,9 +19,6 @@ export class ProposalsFilter {
   public text?: string;
 
   @Field(() => [Int], { nullable: true })
-  public templateIds?: number[];
-
-  @Field(() => [Int], { nullable: true })
   public questionaryIds?: number[];
 
   @Field(() => Int, { nullable: true })
@@ -32,6 +29,9 @@ export class ProposalsFilter {
 
   @Field(() => Int, { nullable: true })
   public proposalStatusId?: number;
+
+  @Field(() => [String], { nullable: true })
+  public shortCodes?: string[];
 }
 
 @ArgsType()

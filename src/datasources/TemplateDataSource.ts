@@ -5,14 +5,16 @@ import {
   QuestionTemplateRelation,
   Template,
   TemplateCategory,
-  TemplateStep,
-  Topic,
   TemplateCategoryId,
   TemplatesHasQuestions,
+  TemplateStep,
+  Topic,
 } from '../models/Template';
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
+import { SetActiveTemplateArgs } from '../resolvers/mutations/SetActiveTemplateMutation';
+import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
@@ -26,6 +28,7 @@ export interface TemplateDataSource {
   deleteTemplate(id: number): Promise<Template>;
   cloneTemplate(templateId: number): Promise<Template>;
   getTemplateSteps(templateId: number): Promise<TemplateStep[]>;
+  setActiveTemplate(args: SetActiveTemplateArgs): Promise<boolean>;
   // TemplateField
   createQuestion(
     categoryId: TemplateCategoryId,
@@ -64,6 +67,10 @@ export interface TemplateDataSource {
     collection: TemplatesHasQuestions[]
   ): Promise<Template>;
 
+  updateQuestionTemplateRelationSettings(
+    args: UpdateQuestionTemplateRelationSettingsArgs
+  ): Promise<Template>;
+
   deleteQuestionTemplateRelation(
     args: DeleteQuestionTemplateRelationArgs
   ): Promise<Template>;
@@ -73,6 +80,7 @@ export interface TemplateDataSource {
     templateId: number,
     topicToExcludeId?: number
   ): Promise<Topic[] | null>;
+  getActiveTemplateId(categoryId: TemplateCategoryId): Promise<number | null>;
   upsertTopics(data: Topic[]): Promise<Template>;
   createTopic(args: CreateTopicArgs): Promise<Topic>;
   updateTopicTitle(topicId: number, title: string): Promise<Topic>;

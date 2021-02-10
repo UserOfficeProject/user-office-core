@@ -21,4 +21,8 @@ export default class AdminQueries {
   async getInstitution(id: number) {
     return await this.dataSource.getInstitution(id);
   }
+
+  async getFeatures() {
+    return await this.dataSource.getFeatures();
+  }
 }

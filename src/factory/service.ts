@@ -1,8 +1,10 @@
+import querystring from 'querystring';
+
+import { logger } from '@esss-swap/duo-logger';
 import contentDisposition from 'content-disposition';
 import { Response, NextFunction } from 'express';
 import request from 'request';
 
-import { logger } from '../utils/Logger';
 import { bufferRequestBody } from './util';
 
 export enum DownloadType {
@@ -68,13 +70,14 @@ export default function callFactoryService<TData, TMeta extends MetaBase>(
             : properties.meta.singleFilename;
 
         res.setHeader('Content-Disposition', contentDisposition(filename));
+        res.setHeader('x-download-filename', querystring.escape(filename));
 
         factoryResp.pipe(res);
       }
     })
     .on('error', err => {
       next({
-        error: err,
+        error: err.toString(),
         message: `Could not download generated ${downloadType}/${type}`,
       });
     });

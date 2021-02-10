@@ -9,18 +9,24 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Sample, SampleStatus } from '../models/Sample';
+import { SampleAuthorization } from '../utils/SampleAuthorization';
 import SampleMutations from './SampleMutations';
 
 const dummySampleDataSource = new SampleDataSourceMock();
 const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
 const dummyProposalDataSource = new ProposalDataSourceMock();
+const sampleAuthorization = new SampleAuthorization(
+  dummySampleDataSource,
+  dummyProposalDataSource
+);
 
 const sampleMutations = new SampleMutations(
   dummySampleDataSource,
   dummyQuestionaryDataSource,
   dummyTemplateDataSource,
-  dummyProposalDataSource
+  dummyProposalDataSource,
+  sampleAuthorization
 );
 
 beforeEach(() => {
@@ -45,7 +51,7 @@ test('User officer should be able to clone sample', () => {
 test('User should not be able to clone sample that does not exist', () => {
   return expect(
     sampleMutations.cloneSample(dummyUserOfficerWithRole, 100)
-  ).resolves.toHaveProperty('reason', 'INTERNAL_ERROR');
+  ).resolves.toHaveProperty('reason', 'NOT_FOUND');
 });
 
 test('User should be able to update title of the sample', () => {

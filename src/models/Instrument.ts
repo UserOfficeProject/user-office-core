@@ -20,11 +20,10 @@ export class InstrumentWithAvailabilityTime extends Instrument {
   }
 }
 
-export class CallHasInstrument {
+export class InstrumentHasProposals {
   constructor(
-    public callId: number,
     public instrumentId: number,
-    public availabilityTime: number,
+    public proposalIds: number[],
     public submitted: boolean
   ) {}
 }

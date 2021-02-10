@@ -12,7 +12,8 @@ export interface SampleDataSource {
     questionaryId: number,
     questionId: string
   ): Promise<Sample>;
-  getSample(sampleId: number): Promise<Sample>;
+  getSample(sampleId: number): Promise<Sample | null>;
   getSamplesByCallId(callId: number): Promise<Sample[]>;
   getSamples(args: SamplesArgs): Promise<Sample[]>;
+  getSamplesByShipmentId(shipmentId: number): Promise<Sample[]>;
 }

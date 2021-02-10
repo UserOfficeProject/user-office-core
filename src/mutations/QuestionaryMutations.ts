@@ -1,21 +1,24 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-import { isMatchingConstraints } from '../models/ProposalModelFunctions';
+import {
+  isMatchingConstraints,
+  transformAnswerValueIfNeeded,
+} from '../models/ProposalModelFunctions';
 import { User } from '../models/User';
 import { rejection } from '../rejection';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
 import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
-import { Logger, logger } from '../utils/Logger';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 
 export default class QuestionaryMutations {
   constructor(
     private dataSource: QuestionaryDataSource,
     private templateDataSource: TemplateDataSource,
-    private questionaryAuth: QuestionaryAuthorization,
-    private logger: Logger
+    private questionaryAuth: QuestionaryAuthorization
   ) {}
 
   @Authorized()
@@ -63,18 +66,30 @@ export default class QuestionaryMutations {
 
           return rejection('INTERNAL_ERROR');
         }
-        const value = JSON.parse(answer.value).value;
+        const { value, ...parsedAnswerRest } = JSON.parse(answer.value);
         if (
           !isPartialSave &&
           !isMatchingConstraints(questionTemplateRelation, value)
         ) {
-          this.logger.logError('User provided value not matching constraint', {
+          logger.logError('User provided value not matching constraint', {
             answer,
             questionTemplateRelation,
           });
 
           return rejection('VALUE_CONSTRAINT_REJECTION');
         }
+
+        const transformedValue = transformAnswerValueIfNeeded(
+          questionTemplateRelation,
+          value
+        );
+        if (transformedValue !== undefined) {
+          answer.value = JSON.stringify({
+            value: transformedValue,
+            ...parsedAnswerRest,
+          });
+        }
+
         await this.dataSource.updateAnswer(
           questionaryId,
           answer.questionId,

@@ -50,12 +50,14 @@ export interface UserDataSource {
     telephone: string,
     telephone_alt: string | undefined
   ): Promise<User>;
+  createDummyUser(userId: number): Promise<User>;
   createOrganisation(name: string, verified: boolean): Promise<number>;
   update(user: User): Promise<User>;
   setUserRoles(id: number, roles: number[]): Promise<void>;
   setUserPassword(id: number, password: string): Promise<BasicUserDetails>;
   getPasswordByUsername(username: string): Promise<string | null>;
-  setUserEmailVerified(id: number): Promise<void>;
+  setUserEmailVerified(id: number): Promise<User | null>;
+  setUserNotPlaceholder(id: number): Promise<User | null>;
   checkScientistToProposal(
     userId: number,
     proposalId: number

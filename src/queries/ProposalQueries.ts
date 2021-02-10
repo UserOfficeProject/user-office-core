@@ -66,12 +66,7 @@ export default class ProposalQueries {
       return true;
     }
 
-    return (
-      (await this.userAuth.isUserOfficer(agent)) ||
-      (await this.userAuth.isMemberOfProposal(agent, proposal)) ||
-      (await this.userAuth.isReviewerOfProposal(agent, proposal.id)) ||
-      (await this.userAuth.isScientistToProposal(agent, proposal.id))
-    );
+    return this.userAuth.hasAccessRights(agent, proposal);
   }
 
   @Authorized([Roles.USER_OFFICER])

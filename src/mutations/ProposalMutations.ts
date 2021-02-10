@@ -1,3 +1,5 @@
+import { ResourceId } from '@esss-swap/duo-localisation';
+import { logger } from '@esss-swap/duo-logger';
 import {
   administrationProposalBEValidationSchema,
   createProposalValidationSchema,
@@ -8,6 +10,7 @@ import {
 } from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
 
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
@@ -18,7 +21,6 @@ import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
-import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 
@@ -27,8 +29,8 @@ export default class ProposalMutations {
     private proposalDataSource: ProposalDataSource,
     private questionaryDataSource: QuestionaryDataSource,
     private callDataSource: CallDataSource,
-    private userAuth: UserAuthorization,
-    private logger: Logger
+    private instrumentDataSource: InstrumentDataSource,
+    private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -178,7 +180,7 @@ export default class ProposalMutations {
   }
 
   @ValidateArgs(deleteProposalValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized()
   async delete(
     agent: UserWithRole | null,
     { proposalId }: { proposalId: number }
@@ -186,14 +188,37 @@ export default class ProposalMutations {
     const proposal = await this.proposalDataSource.get(proposalId);
 
     if (!proposal) {
-      return rejection('INTERNAL_ERROR');
+      return rejection('NOT_FOUND');
     }
 
-    const result = await this.proposalDataSource.deleteProposal(proposalId);
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      if (
+        proposal.submitted ||
+        !this.userAuth.isPrincipalInvestigatorOfProposal(agent, proposal)
+      )
+        return rejection('NOT_ALLOWED');
+    }
 
-    await this.questionaryDataSource.delete(result.questionaryId);
+    try {
+      const result = await this.proposalDataSource.deleteProposal(proposalId);
 
-    return result || rejection('INTERNAL_ERROR');
+      await this.questionaryDataSource.delete(result.questionaryId);
+
+      return result;
+    } catch (e) {
+      if ('code' in e && e.code === '23503') {
+        return rejection(
+          `Failed to delete proposal with ID "${proposal.shortCode}", it has dependencies which need to be deleted first` as ResourceId
+        );
+      }
+
+      logger.logException('Failed to delete proposal', e, {
+        agent,
+        proposalId,
+      });
+
+      return rejection('INTERNAL_ERROR');
+    }
   }
 
   @ValidateArgs(proposalNotifyValidationSchema)
@@ -216,7 +241,7 @@ export default class ProposalMutations {
 
   @EventBus(Event.PROPOSAL_SEP_MEETING_SUBMITTED)
   @ValidateArgs(administrationProposalBEValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async admin(
     agent: UserWithRole | null,
     args: AdministrationProposalArgs
@@ -229,11 +254,30 @@ export default class ProposalMutations {
       commentForManagement,
       commentForUser,
     } = args;
+    const isChairOrSecretaryOfProposal = await this.userAuth.isChairOrSecretaryOfProposal(
+      agent!.id,
+      id
+    );
+    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+
+    if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
+      return rejection('NOT_ALLOWED');
+    }
+
     const proposal = await this.proposalDataSource.get(id);
 
     if (!proposal) {
       return rejection('INTERNAL_ERROR');
     }
+
+    const isProposalInstrumentSubmitted = await this.instrumentDataSource.isProposalInstrumentSubmitted(
+      id
+    );
+
+    if (isProposalInstrumentSubmitted && !isUserOfficer) {
+      return rejection('NOT_ALLOWED');
+    }
+
     if (rankOrder !== undefined) {
       proposal.rankOrder = rankOrder;
     }

@@ -2,9 +2,9 @@
 import { Call } from '../../models/Call';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
-  UpdateCallInput,
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
+  UpdateCallInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -85,7 +85,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         template_id: args.templateId,
       })
       .into('call')
-      .returning(['*'])
+      .returning('*')
       .then((call: CallRecord[]) => {
         if (call.length !== 1) {
           throw new Error('Could not create call');
@@ -165,5 +165,23 @@ export default class PostgresCallDataSource implements CallDataSource {
     }
 
     throw new Error(`Call not found ${args.callId}`);
+  }
+
+  async getCallsByInstrumentScientist(scientistId: number): Promise<Call[]> {
+    const records: CallRecord[] = await database('call')
+      .distinct(['call.*'])
+      .join(
+        'call_has_instruments',
+        'call_has_instruments.call_id',
+        'call.call_id'
+      )
+      .join(
+        'instrument_has_scientists',
+        'instrument_has_scientists.instrument_id',
+        'call_has_instruments.instrument_id'
+      )
+      .where('instrument_has_scientists.user_id', scientistId);
+
+    return records.map(createCallObject);
   }
 }

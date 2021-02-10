@@ -1,7 +1,10 @@
+import { existsSync, mkdirSync } from 'fs';
+
+import { logger } from '@esss-swap/duo-logger';
+
 import { FileDataSource } from '../datasources/IFileDataSource';
 import { FileMetadata } from '../models/Blob';
 import { Rejection, rejection } from '../rejection';
-import { logger } from '../utils/Logger';
 
 export default class FileMutations {
   constructor(private dataSource: FileDataSource) {}
@@ -23,7 +26,11 @@ export default class FileMutations {
   }
 
   async prepare(fileId: string): Promise<string | Rejection> {
-    const filePath = `downloads/${fileId}`;
+    const DOWNLOADS_DIR = 'downloads';
+    if (!existsSync(DOWNLOADS_DIR)) {
+      mkdirSync(DOWNLOADS_DIR);
+    }
+    const filePath = `${DOWNLOADS_DIR}/${fileId}`;
 
     return this.dataSource
       .prepare(fileId, filePath)

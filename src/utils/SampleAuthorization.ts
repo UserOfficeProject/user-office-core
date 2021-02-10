@@ -1,15 +1,14 @@
-import { proposalDataSource, sampleDataSource } from '../datasources';
+import { logger } from '@esss-swap/duo-logger';
+
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { UserWithRole } from '../models/User';
 import { userAuthorization } from '../utils/UserAuthorization';
-import { logger, Logger } from './Logger';
 
 export class SampleAuthorization {
   constructor(
     private sampleDataSource: SampleDataSource,
-    private proposalDataSource: ProposalDataSource,
-    private logger: Logger
+    private proposalDataSource: ProposalDataSource
   ) {}
 
   async hasReadRights(agent: UserWithRole | null, sampleId: number) {
@@ -27,10 +26,14 @@ export class SampleAuthorization {
 
     const sample = await this.sampleDataSource.getSample(sampleId);
 
+    if (!sample) {
+      return false;
+    }
+
     const proposal = await this.proposalDataSource.get(sample.proposalId);
 
     if (!proposal) {
-      this.logger.logError('Could not find proposal for sample', {
+      logger.logError('Could not find proposal for sample', {
         sampleId,
       });
 
@@ -40,9 +43,3 @@ export class SampleAuthorization {
     return userAuthorization.hasAccessRights(agent, proposal);
   }
 }
-
-export const sampleAuthorization = new SampleAuthorization(
-  sampleDataSource,
-  proposalDataSource,
-  logger
-);

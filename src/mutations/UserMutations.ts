@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import {
   deleteUserValidationSchema,
   createUserByEmailInviteValidationSchema,
@@ -13,6 +14,7 @@ import {
 } from '@esss-swap/duo-validation';
 import * as bcrypt from 'bcryptjs';
 
+import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -37,7 +39,6 @@ import {
   UpdateUserRolesArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
 import { signToken, verifyToken } from '../utils/jwt';
-import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class UserMutations {
@@ -380,6 +381,47 @@ export default class UserMutations {
     }
   }
 
+  async checkExternalToken(externalToken: string): Promise<string | Rejection> {
+    try {
+      const client = new UOWSSoapClient();
+
+      const rawStfcUser = await client.getPersonDetailsFromSessionId(
+        externalToken
+      );
+      if (!rawStfcUser) {
+        logger.logInfo('User not found for token', { externalToken });
+
+        return rejection('USER_DOES_NOT_EXIST');
+      }
+      const stfcUser = rawStfcUser.return;
+
+      // Create dummy user if one does not exist in the proposals DB.
+      // This is needed to satisfy the FOREIGN_KEY constraints
+      // in tables that link to a user (such as proposals)
+      const userNumber = parseInt(stfcUser.userNumber);
+      let dummyUser = await this.dataSource.get(userNumber);
+      if (!dummyUser) {
+        dummyUser = await this.dataSource.createDummyUser(userNumber);
+      }
+
+      const roles = await this.dataSource.getUserRoles(dummyUser.id);
+
+      const proposalsToken = signToken<AuthJwtPayload>({
+        user: dummyUser,
+        roles,
+        currentRole: roles[0], // User role
+      });
+
+      return proposalsToken;
+    } catch (error) {
+      logger.logError('Error occured during external authentication', {
+        error,
+      });
+
+      return rejection('INTERNAL_ERROR');
+    }
+  }
+
   async selectRole(
     token: string,
     selectedRoleId: number
@@ -544,5 +586,21 @@ export default class UserMutations {
 
       return rejection('INTERNAL_ERROR');
     }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  setUserEmailVerified(
+    _: UserWithRole | null,
+    id: number
+  ): Promise<User | null> {
+    return this.dataSource.setUserEmailVerified(id);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  setUserNotPlaceholder(
+    _: UserWithRole | null,
+    id: number
+  ): Promise<User | null> {
+    return this.dataSource.setUserNotPlaceholder(id);
   }
 }

@@ -20,6 +20,8 @@ import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 import { Review } from './Review';
 import { Sample } from './Sample';
 import { SEP } from './SEP';
+import { SEPProposal } from './SEPProposal';
+import { Shipment } from './Shipment';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
 import { Topic } from './Topic';
@@ -182,6 +184,13 @@ export class TokenResponseWrap extends ResponseWrapBase<string> {
 }
 
 @ObjectType()
+export class CheckExternalTokenWrap extends ResponseWrapBase<string> {
+  @Response()
+  @Field(() => String, { nullable: true })
+  public token: string;
+}
+
+@ObjectType()
 export class PrepareDBResponseWrap extends ResponseWrapBase<string> {
   @Response()
   @Field(() => String, { nullable: true })
@@ -243,4 +252,18 @@ export class ProposalNextStatusEventResponseWrap extends ResponseWrapBase<
   @Response()
   @Field(() => [NextStatusEvent], { nullable: true })
   public nextStatusEvents: NextStatusEvent[];
+}
+
+@ObjectType()
+export class ShipmentResponseWrap extends ResponseWrapBase<Shipment> {
+  @Response()
+  @Field(() => Shipment, { nullable: true })
+  public shipment: Shipment;
+}
+
+@ObjectType()
+export class SEPProposalResponseWrap extends ResponseWrapBase<SEPProposal> {
+  @Response()
+  @Field(() => SEPProposal, { nullable: true })
+  public sepProposal: SEPProposal;
 }

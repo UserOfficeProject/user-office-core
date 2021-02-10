@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { sepDataSource } from '..';
 import {
-  CallHasInstrument,
   Instrument,
+  InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
 import { ProposalIds } from '../../models/Proposal';
@@ -14,7 +15,7 @@ import {
   UserRecord,
   createBasicUserObject,
   InstrumentWithAvailabilityTimeRecord,
-  CallHasInstrumentRecord,
+  InstrumentHasProposalsRecord,
 } from './records';
 
 export default class PostgresInstrumentDataSource
@@ -42,21 +43,20 @@ export default class PostgresInstrumentDataSource
   }
 
   async create(args: CreateInstrumentArgs): Promise<Instrument> {
-    return database
+    const [instrumentRecord]: InstrumentRecord[] = await database
       .insert({
         name: args.name,
         short_code: args.shortCode,
         description: args.description,
       })
       .into('instruments')
-      .returning(['*'])
-      .then((instrument: InstrumentRecord[]) => {
-        if (instrument.length !== 1) {
-          throw new Error('Could not create instrument');
-        }
+      .returning('*');
 
-        return this.createInstrumentObject(instrument[0]);
-      });
+    if (!instrumentRecord) {
+      throw new Error('Could not create instrument');
+    }
+
+    return this.createInstrumentObject(instrumentRecord);
   }
 
   async get(instrumentId: number): Promise<Instrument | null> {
@@ -161,7 +161,7 @@ export default class PostgresInstrumentDataSource
   }
 
   async update(instrument: Instrument): Promise<Instrument> {
-    return database
+    const [instrumentRecord]: InstrumentRecord[] = await database
       .update(
         {
           name: instrument.name,
@@ -171,30 +171,26 @@ export default class PostgresInstrumentDataSource
         ['*']
       )
       .from('instruments')
-      .where('instrument_id', instrument.id)
-      .then((records: InstrumentRecord[]) => {
-        if (records === undefined || !records.length) {
-          throw new Error(`Instrument not found ${instrument.id}`);
-        }
+      .where('instrument_id', instrument.id);
 
-        return this.createInstrumentObject(records[0]);
-      });
+    if (!instrumentRecord) {
+      throw new Error(`Instrument not found ${instrument.id}`);
+    }
+
+    return this.createInstrumentObject(instrumentRecord);
   }
 
   async delete(instrumentId: number): Promise<Instrument> {
-    return database('instruments')
+    const [instrumentRecord]: InstrumentRecord[] = await database('instruments')
       .where('instrument_id', instrumentId)
       .del()
-      .returning('*')
-      .then((instrument: InstrumentRecord[]) => {
-        if (instrument === undefined || instrument.length !== 1) {
-          throw new Error(
-            `Could not delete instrument with id: ${instrumentId} `
-          );
-        }
+      .returning('*');
 
-        return this.createInstrumentObject(instrument[0]);
-      });
+    if (!instrumentRecord) {
+      throw new Error(`Could not delete instrument with id: ${instrumentId} `);
+    }
+
+    return this.createInstrumentObject(instrumentRecord);
   }
 
   async assignProposalsToInstrument(
@@ -268,6 +264,33 @@ export default class PostgresInstrumentDataSource
       });
   }
 
+  async checkIfAllProposalsOnInstrumentSubmitted(
+    instruments: InstrumentWithAvailabilityTimeRecord[],
+    sepId: number,
+    callId: number
+  ): Promise<InstrumentWithAvailabilityTimeRecord[]> {
+    const instrumentsWithSubmittedFlag: InstrumentWithAvailabilityTimeRecord[] = [];
+
+    for (const instrument of instruments) {
+      const allProposalsOnInstrument = await sepDataSource.getSEPProposalsByInstrument(
+        sepId,
+        instrument.instrument_id,
+        callId
+      );
+
+      const allProposalsOnInstrumentSubmitted = allProposalsOnInstrument.every(
+        item => item.instrumentSubmitted
+      );
+
+      instrumentsWithSubmittedFlag.push({
+        ...instrument,
+        submitted: allProposalsOnInstrumentSubmitted,
+      });
+    }
+
+    return instrumentsWithSubmittedFlag;
+  }
+
   async getInstrumentsBySepId(
     sepId: number,
     callId: number
@@ -305,7 +328,13 @@ export default class PostgresInstrumentDataSource
         )
       )
       .then(async (instruments: InstrumentWithAvailabilityTimeRecord[]) => {
-        const result = instruments.map(instrument => {
+        const instrumentsWithSubmittedFlag = await this.checkIfAllProposalsOnInstrumentSubmitted(
+          instruments,
+          sepId,
+          callId
+        );
+
+        const result = instrumentsWithSubmittedFlag.map(instrument => {
           const calculatedInstrumentAvailabilityTimePerSEP = Math.round(
             (instrument.proposal_count / instrument.full_count) *
               instrument.availability_time
@@ -396,11 +425,11 @@ export default class PostgresInstrumentDataSource
   }
 
   async submitInstrument(
-    callId: number,
+    proposalIds: number[],
     instrumentId: number
-  ): Promise<CallHasInstrument> {
-    const [record]: CallHasInstrumentRecord[] = await database(
-      'call_has_instruments'
+  ): Promise<InstrumentHasProposals> {
+    const records: InstrumentHasProposalsRecord[] = await database(
+      'instrument_has_proposals'
     )
       .update(
         {
@@ -408,39 +437,35 @@ export default class PostgresInstrumentDataSource
         },
         ['*']
       )
-      .where('instrument_id', instrumentId)
-      .andWhere('call_id', callId);
+      .whereIn('proposal_id', proposalIds)
+      .andWhere('instrument_id', instrumentId);
 
-    if (!record) {
+    if (!records?.length) {
       throw new Error(
-        `Record call_has_instruments not found with callId: ${callId} and instrumentId: ${instrumentId}`
+        `Some record from instrument_has_proposals not found with proposalIds: ${proposalIds} and instrumentId: ${instrumentId}`
       );
     }
 
-    return new CallHasInstrument(
-      record.call_id,
-      record.instrument_id,
-      record.availability_time,
-      record.submitted
-    );
+    return new InstrumentHasProposals(instrumentId, proposalIds, true);
   }
 
-  hasInstrumentScientistInstrument(
+  async hasInstrumentScientistInstrument(
     userId: number,
     instrumentId: number
   ): Promise<boolean> {
-    return database
-      .count('*')
+    const result:
+      | { count?: string | number | undefined }
+      | undefined = await database
+      .count({ count: '*' })
       .from('instruments as i')
       .join('instrument_has_scientists as ihs', {
         'i.instrument_id': 'ihs.instrument_id',
       })
       .where('ihs.user_id', userId)
       .where('i.instrument_id', instrumentId)
-      .first()
-      .then((result: undefined | { count: string }) => {
-        return result?.count === '1';
-      });
+      .first();
+
+    return result?.count === '1';
   }
 
   async hasInstrumentScientistAccess(
@@ -464,6 +489,20 @@ export default class PostgresInstrumentDataSource
       .first()
       .then((result: undefined | { count: string }) => {
         return result?.count === '1';
+      });
+  }
+
+  async isProposalInstrumentSubmitted(proposalId: number): Promise<boolean> {
+    return database('instrument_has_proposals')
+      .select()
+      .where('proposal_id', proposalId)
+      .first()
+      .then((result?: InstrumentHasProposalsRecord) => {
+        if (!result) {
+          return false;
+        }
+
+        return result.submitted;
       });
   }
 }

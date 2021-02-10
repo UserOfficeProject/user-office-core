@@ -1,6 +1,6 @@
 import {
-  CallHasInstrument,
   Instrument,
+  InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
 import { ProposalIds } from '../../models/Proposal';
@@ -27,9 +27,16 @@ export const dummyInstrumentWithAvailabilityTime = new InstrumentWithAvailabilit
 
 const dummyInstruments = [dummyInstrument];
 
-export const dummyCallHasInstrument = new CallHasInstrument(1, 1, 10, true);
+export const dummyInstrumentHasProposals = new InstrumentHasProposals(
+  1,
+  [1, 2],
+  true
+);
 
 export class InstrumentDataSourceMock implements InstrumentDataSource {
+  async isProposalInstrumentSubmitted(proposalId: number): Promise<boolean> {
+    return false;
+  }
   async create(args: CreateInstrumentArgs): Promise<Instrument> {
     return { ...dummyInstrument, ...args };
   }
@@ -129,10 +136,10 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   }
 
   async submitInstrument(
-    callId: number,
+    proposalIds: number[],
     instrumentId: number
-  ): Promise<CallHasInstrument> {
-    return dummyCallHasInstrument;
+  ): Promise<InstrumentHasProposals> {
+    return dummyInstrumentHasProposals;
   }
 
   hasInstrumentScientistInstrument(

@@ -6,11 +6,12 @@ import {
 } from '../models/Questionary';
 
 export interface QuestionaryDataSource {
+  getCount(templateId: number): Promise<number>;
   getAnswer(answer_id: number): Promise<AnswerBasic>;
   delete(questionary_id: number): Promise<Questionary>;
   getQuestionary(questionary_id: number): Promise<Questionary | null>;
   getQuestionarySteps(questionaryId: number): Promise<QuestionaryStep[]>;
-  getBlankQuestionarySteps(template_id: number): Promise<QuestionaryStep[]>;
+  getBlankQuestionarySteps(templateId: number): Promise<QuestionaryStep[]>;
   updateAnswer(
     questionary_id: number,
     question_id: string,

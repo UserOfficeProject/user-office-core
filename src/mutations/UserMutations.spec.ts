@@ -13,10 +13,13 @@ import {
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
-import { BasicUserDetails, UserRole } from '../models/User';
+import { AuthJwtPayload, BasicUserDetails, UserRole } from '../models/User';
 import { isRejection } from '../rejection';
+import { verifyToken } from '../utils/jwt';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import UserMutations from './UserMutations';
+
+jest.mock('../datasources/stfc/UOWSSoapInterface');
 
 const secret = process.env.secret as string;
 
@@ -317,4 +320,19 @@ test('A user officer can must be able to delete another user', async () => {
   return expect(
     userMutations.delete(dummyUserOfficerWithRole, { id: dummyUser.id })
   ).resolves.toBe(dummyUser);
+});
+
+test('When an invalid external token is supplied, no user is found', async () => {
+  return expect(
+    userMutations.checkExternalToken('invalid')
+  ).resolves.toHaveProperty('reason', 'USER_DOES_NOT_EXIST');
+});
+
+test('When a valid external token is supplied, a new JWT is returned', async () => {
+  const result = await userMutations.checkExternalToken('valid');
+
+  expect(typeof result).toBe('string');
+
+  const decoded = verifyToken<AuthJwtPayload>(result as string);
+  expect(decoded.user.id).toBe(dummyUser.id);
 });

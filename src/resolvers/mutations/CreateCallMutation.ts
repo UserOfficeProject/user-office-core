@@ -1,11 +1,11 @@
 import {
+  Arg,
   Ctx,
   Field,
+  InputType,
+  Int,
   Mutation,
   Resolver,
-  Int,
-  InputType,
-  Arg,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';

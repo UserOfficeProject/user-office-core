@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
+
 import { proposalDataSource } from '../datasources';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { eventBus } from '../events';
@@ -6,7 +8,6 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { SampleStatus } from '../models/Sample';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
-import { logger } from '../utils/Logger';
 import { workflowEngine, WorkflowEngineProposalType } from '../workflowEngine';
 
 export default function createHandler(proposalDatasource: ProposalDataSource) {
@@ -219,27 +220,21 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
 
       case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
         try {
-          const allProposalsOnCallWithInstrument = await proposalDataSource.getProposalsFromView(
-            {
-              callId: event.callhasinstrument.callId,
-              instrumentId: event.callhasinstrument.instrumentId,
-            }
-          );
+          await Promise.all(
+            event.instrumenthasproposals.proposalIds.map(async proposalId => {
+              const proposal = await proposalDataSource.get(proposalId);
 
-          if (allProposalsOnCallWithInstrument?.length) {
-            await Promise.all(
-              allProposalsOnCallWithInstrument.map(
-                async proposalOnCall =>
-                  await markProposalEventAsDoneAndCallWorkflowEngine(
-                    event.type,
-                    proposalOnCall
-                  )
-              )
-            );
-          }
+              if (proposal?.id) {
+                return await markProposalEventAsDoneAndCallWorkflowEngine(
+                  event.type,
+                  proposal
+                );
+              }
+            })
+          );
         } catch (error) {
           logger.logError(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine on proposals with callId = ${event.callhasinstrument.callId}: `,
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.instrumenthasproposals.proposalIds}: `,
             error
           );
         }

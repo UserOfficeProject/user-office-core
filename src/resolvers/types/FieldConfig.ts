@@ -22,7 +22,16 @@ export class SampleBasisConfig {
 export class BooleanConfig extends ConfigBase {}
 
 @ObjectType()
-export class DateConfig extends ConfigBase {}
+export class DateConfig extends ConfigBase {
+  @Field(() => String, { nullable: true })
+  minDate: string | null;
+
+  @Field(() => String, { nullable: true })
+  maxDate: string | null;
+
+  @Field(() => String, { nullable: true })
+  defaultDate: string | null;
+}
 
 @ObjectType()
 export class EmbellishmentConfig {
@@ -82,12 +91,18 @@ export class TextInputConfig extends ConfigBase {
 }
 
 @ObjectType()
+export class ShipmentBasisConfig extends ConfigBase {}
+
+@ObjectType()
 export class SubtemplateConfig {
+  @Field(() => Int, { nullable: true })
+  minEntries: number | null;
+
   @Field(() => Int, { nullable: true })
   maxEntries: number | null;
 
-  @Field(() => Int)
-  templateId: number;
+  @Field(() => Int, { nullable: true })
+  templateId: number | null;
 
   @Field(() => String)
   templateCategory: string;
@@ -111,11 +126,32 @@ export class IntervalConfig extends ConfigBase {
   property: string;
 }
 
+export enum NumberValueConstraint {
+  NONE = 'NONE',
+  ONLY_POSITIVE = 'ONLY_POSITIVE',
+  ONLY_NEGATIVE = 'ONLY_NEGATIVE',
+}
+
+@ObjectType()
+export class NumberInputConfig extends ConfigBase {
+  @Field(() => [String], { nullable: true })
+  units: string[] | null;
+
+  @Field(() => String)
+  property: string;
+
+  @Field(() => NumberValueConstraint, { nullable: true })
+  numberValueConstraint: NumberValueConstraint | null;
+}
+
 @ObjectType()
 export class ProposalBasisConfig {
   @Field(() => String)
   tooltip: string;
 }
+
+@ObjectType()
+export class RichTextInputConfig extends ConfigBase {}
 
 export const FieldConfigType = createUnionType({
   name: 'FieldConfig', // the name of the GraphQL union
@@ -130,5 +166,8 @@ export const FieldConfigType = createUnionType({
     SubtemplateConfig,
     ProposalBasisConfig,
     IntervalConfig,
+    NumberInputConfig,
+    ShipmentBasisConfig,
+    RichTextInputConfig,
   ], // function that returns array of object types classes
 });

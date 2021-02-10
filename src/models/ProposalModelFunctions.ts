@@ -79,11 +79,13 @@ export function areDependenciesSatisfied(
 ) {
   const field = getFieldById(questionary, fieldId);
 
-  if (!field) {
+  if (!field || !field.dependencies) {
     return true;
   }
 
-  return isDependencySatisfied(questionary, field.dependency);
+  return field.dependencies.every(dependency =>
+    isDependencySatisfied(questionary, dependency)
+  );
 }
 
 export function isMatchingConstraints(
@@ -94,5 +96,24 @@ export function isMatchingConstraints(
     questionTemplateRelation.question.dataType
   );
 
+  if (!definition.validate) {
+    return true;
+  }
+
   return definition.validate(questionTemplateRelation, value);
+}
+
+export function transformAnswerValueIfNeeded(
+  questionTemplateRelation: QuestionTemplateRelation,
+  value: any
+) {
+  const definition = getQuestionDefinition(
+    questionTemplateRelation.question.dataType
+  );
+
+  if (!definition.transform) {
+    return undefined;
+  }
+
+  return definition.transform(questionTemplateRelation, value);
 }

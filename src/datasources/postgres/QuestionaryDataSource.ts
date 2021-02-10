@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
+
 import {
   Answer,
   AnswerBasic,
@@ -6,7 +8,7 @@ import {
   QuestionaryStep,
 } from '../../models/Questionary';
 import { getDefaultAnswerValue } from '../../models/questionTypes/QuestionRegistry';
-import { logger } from '../../utils/Logger';
+import { FieldDependency } from '../../models/Template';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
@@ -16,6 +18,7 @@ import {
   createQuestionTemplateRelationObject,
   createTopicObject,
   QuestionaryRecord,
+  QuestionDependencyRecord,
   QuestionRecord,
   QuestionTemplateRelRecord,
   TopicRecord,
@@ -23,16 +26,25 @@ import {
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
-  async getAnswer(answer_id: number): Promise<AnswerBasic> {
-    return database('answers')
-      .select('*')
-      .where('answer_id', answer_id)
-      .then((record: AnswerRecord) => {
-        return createAnswerBasic(record);
+  async getCount(templateId: number): Promise<number> {
+    return database('questionaries')
+      .count('questionary_id')
+      .where('template_id', templateId)
+      .first()
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
       });
   }
+  async getAnswer(answer_id: number): Promise<AnswerBasic> {
+    const answerRecord: AnswerRecord = await database('answers')
+      .select('*')
+      .where('answer_id', answer_id)
+      .first();
 
-  create(creator_id: number, template_id: number): Promise<Questionary> {
+    return createAnswerBasic(answerRecord);
+  }
+
+  async create(creator_id: number, template_id: number): Promise<Questionary> {
     return database('questionaries')
       .insert({ template_id, creator_id }, '*')
       .then((rows: QuestionaryRecord[]) => {
@@ -52,7 +64,9 @@ export default class PostgresQuestionaryDataSource
     question_id: string,
     answer: string
   ): Promise<string> {
-    const results: { count: string } = await database
+    const results:
+      | { count?: string | number | undefined }
+      | undefined = await database
       .count()
       .from('answers')
       .where({
@@ -165,9 +179,9 @@ export default class PostgresQuestionaryDataSource
   }
 
   async getBlankQuestionarySteps(
-    template_id: number
+    templateId: number
   ): Promise<QuestionaryStep[]> {
-    return this.getQuestionaryStepsWithTemplateId(0, template_id);
+    return this.getQuestionaryStepsWithTemplateId(0, templateId);
   }
 
   async updateTopicCompleteness(
@@ -185,9 +199,40 @@ export default class PostgresQuestionaryDataSource
     });
   }
 
+  // TODO: This is repeated in template datasource. Find a way to reuse it.
+  async getQuestionsDependencies(
+    questionRecords: Array<
+      QuestionRecord &
+        QuestionTemplateRelRecord & { dependency_natural_key: string }
+    >,
+    templateId: number
+  ): Promise<FieldDependency[]> {
+    const questionDependencies: QuestionDependencyRecord[] = await database
+      .select('*')
+      .from('question_dependencies')
+      .where('template_id', templateId)
+      .whereIn(
+        'question_id',
+        questionRecords.map(questionRecord => questionRecord.question_id)
+      );
+
+    return questionDependencies.map(questionDependency => {
+      const question = questionRecords.find(
+        field => field.question_id === questionDependency.dependency_question_id
+      );
+
+      return new FieldDependency(
+        questionDependency.question_id,
+        questionDependency.dependency_question_id,
+        question?.natural_key as string,
+        questionDependency.dependency_condition
+      );
+    });
+  }
+
   private async getQuestionaryStepsWithTemplateId(
-    questionary_id: number,
-    template_id: number
+    questionaryId: number,
+    templateId: number
   ): Promise<QuestionaryStep[]> {
     const topicRecords: (TopicRecord & {
       is_complete: boolean;
@@ -201,9 +246,9 @@ export default class PostgresQuestionaryDataSource
               topic_completenesses
               ON 
                 topics.topic_id = topic_completenesses.topic_id
-                AND topic_completenesses.questionary_id = ${questionary_id}
+                AND topic_completenesses.questionary_id = ${questionaryId}
               WHERE
-                topics.template_id = ${template_id}
+                topics.template_id = ${templateId}
               ORDER BY
                 topics.sort_order`)
     ).rows;
@@ -213,34 +258,39 @@ export default class PostgresQuestionaryDataSource
         dependency_natural_key: string;
       }> = (
       await database.raw(`
-                SELECT 
-                  templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id, dependency.natural_key as dependency_natural_key
-                FROM 
-                  templates_has_questions
-                LEFT JOIN
-                  questions 
-                ON 
-                  templates_has_questions.question_id = 
-                  questions.question_id
-                LEFT JOIN
-                  answers
-                ON
-                  templates_has_questions.question_id = 
-                  answers.question_id
-                AND
-                  answers.questionary_id=${questionary_id}
-                LEFT JOIN
-                  questions dependency
-                ON 
-                  dependency.question_id = 
-                  templates_has_questions.dependency_question_id
-                ORDER BY
-                 templates_has_questions.sort_order`)
+        SELECT 
+          templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id, questions.natural_key as dependency_natural_key
+        FROM 
+          templates_has_questions
+        LEFT JOIN
+          questions 
+        ON 
+          templates_has_questions.question_id = 
+          questions.question_id
+        LEFT JOIN
+          answers
+        ON
+          templates_has_questions.question_id = 
+          answers.question_id
+        AND
+          answers.questionary_id=${questionaryId}
+        ORDER BY
+          templates_has_questions.sort_order`)
     ).rows;
 
+    const dependencies = await this.getQuestionsDependencies(
+      answerRecords,
+      templateId
+    );
+
     const fields = answerRecords.map(record => {
+      const questionDependencies = dependencies.filter(
+        dependency => dependency.questionId === record.question_id
+      );
+
       const questionTemplateRelation = createQuestionTemplateRelationObject(
-        record
+        record,
+        questionDependencies
       );
       const value =
         record.value?.value || getDefaultAnswerValue(questionTemplateRelation);
@@ -278,21 +328,49 @@ export default class PostgresQuestionaryDataSource
     );
 
     // Clone answers
-    await database.raw(`
+    await database.raw(
+      `
       INSERT INTO answers(
           questionary_id
         , question_id
         , answer
       )
       SELECT 
-          ${clonedQuestionary.questionaryId}
+          :clonedQuestionaryId
         , question_id
         , answer
       FROM 
         answers
       WHERE
-          questionary_id=${sourceQuestionary.questionaryId}
-    `);
+        questionary_id = :sourceQuestionaryId
+    `,
+      {
+        clonedQuestionaryId: clonedQuestionary.questionaryId,
+        sourceQuestionaryId: sourceQuestionary.questionaryId,
+      }
+    );
+
+    await database.raw(
+      `
+      INSERT INTO topic_completenesses(
+          questionary_id
+        , topic_id
+        , is_complete
+      )
+      SELECT 
+          :clonedQuestionaryId
+        , topic_id
+        , is_complete
+      FROM
+        topic_completenesses
+      WHERE
+        questionary_id = :sourceQuestionaryId
+    `,
+      {
+        clonedQuestionaryId: clonedQuestionary.questionaryId,
+        sourceQuestionaryId: sourceQuestionary.questionaryId,
+      }
+    );
 
     return clonedQuestionary;
   }

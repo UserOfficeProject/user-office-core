@@ -1,7 +1,8 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { eventBus } from '../../events';
 import { Event } from '../../events/event.enum';
-import { logger } from '../../utils/Logger';
 import { UserOfficeAsyncJob } from '../startAsyncJobs';
 
 const checkCallsEnded = async (dataSource: CallDataSource) => {

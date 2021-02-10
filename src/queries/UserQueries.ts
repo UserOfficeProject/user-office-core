@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
 import * as bcrypt from 'bcryptjs';
 // TODO: Try to replace request-promise with axios. request-promise depends on reqest which is deprecated.
 import { CoreOptions, UriOptions } from 'request';
@@ -14,7 +15,6 @@ import {
   AuthJwtPayload,
 } from '../models/User';
 import { signToken, verifyToken } from '../utils/jwt';
-import { logger } from '../utils/Logger';
 
 export default class UserQueries {
   constructor(public dataSource: UserDataSource) {}

@@ -79,6 +79,12 @@ export const dummyUser = new User(
   '2019-07-17 08:25:12.23043+00'
 );
 
+export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
+  ...dummyUser,
+  id: 1,
+  currentRole: { id: 1, title: 'Principal investigator', shortCode: 'pi' },
+};
+
 export const dummyUserWithRole: UserWithRole = {
   ...dummyUser,
   currentRole: { id: 1, title: 'User', shortCode: 'user' },
@@ -90,6 +96,16 @@ export const dummySampleReviewer: UserWithRole = {
     id: 1,
     title: 'Sample Reviewer',
     shortCode: 'sample_safety_reviewer',
+  },
+};
+
+export const dummyInstrumentScientist: UserWithRole = {
+  ...dummyUser,
+  id: 101,
+  currentRole: {
+    id: 1,
+    title: 'Instrument Scientist',
+    shortCode: 'instrument_scientist',
   },
 };
 
@@ -182,8 +198,12 @@ export class UserDataSourceMock implements UserDataSource {
   async getPasswordByEmail(email: string): Promise<string> {
     return '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm';
   }
-  async setUserEmailVerified(id: number): Promise<void> {
+  async setUserEmailVerified(id: number): Promise<User | null> {
+    return null;
     // Do something here or remove the function.
+  }
+  async setUserNotPlaceholder(id: number): Promise<User | null> {
+    return null;
   }
   async setUserPassword(
     id: number,
@@ -226,6 +246,14 @@ export class UserDataSourceMock implements UserDataSource {
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
       return [{ id: 1, shortCode: 'user_officer', title: 'User Officer' }];
+    } else if (id === dummyInstrumentScientist.id) {
+      return [
+        {
+          id: 1,
+          title: 'Instrument Scientist',
+          shortCode: 'instrument_scientist',
+        },
+      ];
     } else {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }
@@ -277,6 +305,10 @@ export class UserDataSourceMock implements UserDataSource {
   }
 
   async create(firstname: string, lastname: string) {
+    return dummyUser;
+  }
+
+  async createDummyUser(userId: number): Promise<User> {
     return dummyUser;
   }
 }

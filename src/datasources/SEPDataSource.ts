@@ -3,6 +3,7 @@ import { Role } from '../models/Role';
 import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../models/SEP';
 import { User } from '../models/User';
 import { AddSEPMembersRole } from '../resolvers/mutations/AddSEPMembersRoleMutation';
+import { UpdateMemberSEPArgs } from '../resolvers/mutations/AssignMembersToSEP';
 
 export interface SEPDataSource {
   isMemberOfSEP(agent: User | null, sepId: number): Promise<boolean>;
@@ -30,9 +31,14 @@ export interface SEPDataSource {
   ): Promise<{ totalCount: number; seps: SEP[] }>;
   getSEPProposalAssignments(
     sepId: number,
-    proposalId: number
+    proposalId: number,
+    reviewerId: number | null
   ): Promise<SEPAssignment[]>;
   getSEPProposals(sepId: number, callId: number): Promise<SEPProposal[]>;
+  getSEPProposal(
+    sepId: number,
+    proposalId: number
+  ): Promise<SEPProposal | null>;
   getSEPProposalsByInstrument(
     sepId: number,
     instrumentId: number,
@@ -40,12 +46,9 @@ export interface SEPDataSource {
   ): Promise<SEPProposal[]>;
   getMembers(sepId: number): Promise<SEPMember[]>;
   getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
+  getSEPProposalUserRoles(id: number, proposalId: number): Promise<Role[]>;
   addSEPMembersRole(args: AddSEPMembersRole): Promise<SEP>;
-  removeSEPMemberRole(
-    memberId: number,
-    sepId: number,
-    roleId: number
-  ): Promise<SEP>;
+  removeSEPMemberRole(args: UpdateMemberSEPArgs): Promise<SEP>;
   assignProposal(proposalId: number, sepId: number): Promise<ProposalIds>;
   removeMemberFromSepProposal(
     proposalId: number,
@@ -58,4 +61,9 @@ export interface SEPDataSource {
     sepId: number,
     memberId: number
   ): Promise<SEP>;
+  updateTimeAllocation(
+    sepId: number,
+    proposalId: number,
+    sepTimeAllocation: number | null
+  ): Promise<SEPProposal>;
 }

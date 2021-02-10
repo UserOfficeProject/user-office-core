@@ -1,12 +1,17 @@
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { Call } from '../../models/Call';
-import { EvaluatorOperator } from '../../models/ConditionEvaluator';
+import {
+  DependenciesLogicOperator,
+  EvaluatorOperator,
+} from '../../models/ConditionEvaluator';
+import { Feature, FeatureId } from '../../models/Feature';
 import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import { Sample } from '../../models/Sample';
+import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import {
   DataType,
   FieldCondition,
@@ -123,6 +128,15 @@ export interface DependencyCondition {
   condition: EvaluatorOperator;
   params: string | boolean | number;
 }
+
+export interface QuestionDependencyRecord {
+  readonly question_dependency_id: number;
+  readonly question_id: string;
+  readonly template_id: number;
+  readonly dependency_question_id: string;
+  readonly dependency_condition: DependencyCondition;
+}
+
 export interface QuestionTemplateRelRecord {
   readonly id: number;
   readonly question_id: string;
@@ -130,8 +144,7 @@ export interface QuestionTemplateRelRecord {
   readonly topic_id: number;
   readonly sort_order: number;
   readonly config: string;
-  readonly dependency_question_id: string | null;
-  readonly dependency_condition: DependencyCondition | null;
+  readonly dependencies_operator?: DependenciesLogicOperator;
 }
 
 export interface TemplateRecord {
@@ -218,7 +231,7 @@ export interface CallRecord {
   readonly template_id: number;
 }
 
-export interface PagetextRecord {
+export interface PageTextRecord {
   readonly pagetext_id: number;
   readonly content: string;
 }
@@ -270,6 +283,8 @@ export interface SEPProposalRecord {
   readonly proposal_id: number;
   readonly sep_id: number;
   readonly date_assigned: Date;
+  readonly sep_time_allocation: number | null;
+  readonly instrument_submitted?: boolean;
 }
 
 export interface SEPAssignmentRecord {
@@ -282,7 +297,7 @@ export interface SEPAssignmentRecord {
   readonly email_sent: boolean;
 }
 
-export interface SEPMemberRecord {
+export interface RoleUserRecord {
   readonly role_user_id: number;
   readonly role_id: number;
   readonly user_id: number;
@@ -297,10 +312,9 @@ export interface InstrumentRecord {
   readonly full_count: number;
 }
 
-export interface CallHasInstrumentRecord {
-  readonly call_id: number;
+export interface InstrumentHasProposalsRecord {
   readonly instrument_id: number;
-  readonly availability_time: number;
+  readonly proposal_id: number;
   readonly submitted: boolean;
 }
 
@@ -329,6 +343,17 @@ export interface SampleRecord {
   readonly question_id: string;
   readonly safety_status: number;
   readonly safety_comment: string;
+  readonly created_at: Date;
+}
+
+export interface ShipmentRecord {
+  readonly shipment_id: number;
+  readonly title: string;
+  readonly creator_id: number;
+  readonly proposal_id: number;
+  readonly questionary_id: number;
+  readonly status: string;
+  readonly external_ref: string;
   readonly created_at: Date;
 }
 
@@ -385,7 +410,13 @@ export interface ProposalEventsRecord {
   readonly proposal_notified: boolean;
 }
 
-export const createPageObject = (record: PagetextRecord) => {
+export interface FeatureRecord {
+  readonly feature_id: string;
+  readonly is_enabled: boolean;
+  readonly description: string;
+}
+
+export const createPageObject = (record: PageTextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
 
@@ -494,7 +525,8 @@ export const createFileMetadata = (record: FileRecord) => {
 
 export const createQuestionTemplateRelationObject = (
   record: QuestionRecord &
-    QuestionTemplateRelRecord & { dependency_natural_key: string }
+    QuestionTemplateRelRecord & { dependency_natural_key: string },
+  dependencies: FieldDependency[]
 ) => {
   return new QuestionTemplateRelation(
     new Question(
@@ -508,14 +540,8 @@ export const createQuestionTemplateRelationObject = (
     record.topic_id,
     record.sort_order,
     createConfig<any>(record.data_type as DataType, record.config),
-    record.dependency_question_id && record.dependency_condition
-      ? new FieldDependency(
-          record.question_id,
-          record.dependency_question_id,
-          record.dependency_natural_key,
-          record.dependency_condition
-        )
-      : undefined
+    dependencies,
+    record.dependencies_operator
   );
 };
 
@@ -621,5 +647,26 @@ export const createAnswerBasic = (answer: AnswerRecord) => {
     answer.question_id,
     answer.answer,
     answer.created_at
+  );
+};
+
+export const createShipmentObject = (shipment: ShipmentRecord) => {
+  return new Shipment(
+    shipment.shipment_id,
+    shipment.title,
+    shipment.creator_id,
+    shipment.proposal_id,
+    shipment.questionary_id,
+    shipment.status as ShipmentStatus,
+    shipment.external_ref,
+    shipment.created_at
+  );
+};
+
+export const createFeatureObject = (record: FeatureRecord) => {
+  return new Feature(
+    record.feature_id as FeatureId,
+    record.is_enabled,
+    record.description
   );
 };

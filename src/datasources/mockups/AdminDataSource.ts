@@ -1,4 +1,5 @@
 import { Page } from '../../models/Admin';
+import { Feature, FeatureId } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { AdminDataSource, Entry } from '../AdminDataSource';
 
@@ -58,5 +59,8 @@ export class AdminDataSourceMock implements AdminDataSource {
   }
   async setPageText(id: number, text: string) {
     return new Page(id, text);
+  }
+  async getFeatures(): Promise<Feature[]> {
+    return [{ id: FeatureId.SHIPPING, isEnabled: false, description: '' }];
   }
 }

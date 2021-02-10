@@ -17,7 +17,7 @@ export default class Postgres${name.capitalize()}DataSource implements ${name.ca
     return database
       .insert(args)
       .into('${name}s')
-      .returning(['*'])
+      .returning('*')
       .then((${name}: ${name.capitalize()}Record[]) => {
         if (${name}.length !== 1) {
           throw new Error('Could not create ${name}');

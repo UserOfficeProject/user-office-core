@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
+
 import { Sample } from '../../models/Sample';
 import { UpdateSampleArgs } from '../../resolvers/mutations/UpdateSampleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
-import { logger } from '../../utils/Logger';
 import { SampleDataSource } from '../SampleDataSource';
 import database from './database';
 import { createSampleObject, SampleRecord } from './records';
@@ -70,22 +71,23 @@ export default class PostgresSampleDataSource implements SampleDataSource {
       });
   }
 
-  getSample(sampleId: number): Promise<Sample> {
+  getSample(sampleId: number): Promise<Sample | null> {
     return database('samples')
       .select('*')
       .where('sample_id', sampleId)
-      .then((records: SampleRecord[]) => {
-        if (records.length !== 1) {
+      .first()
+      .then((sample?: SampleRecord) => {
+        if (!sample) {
           logger.logError('Sample does not exist', { sampleId });
         }
 
-        return createSampleObject(records[0]);
+        return sample ? createSampleObject(sample) : null;
       });
   }
 
   getSamplesByCallId(callId: number): Promise<Sample[]> {
     return database('proposals')
-      .leftJoin('samples', 'proposals.proposal_id', 'samples.proposal_id')
+      .join('samples', 'proposals.proposal_id', 'samples.proposal_id')
       .select('samples.*')
       .where(' proposals.call_id', callId)
       .then((records: SampleRecord[]) => {
@@ -121,8 +123,23 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         }
       })
       .select('*')
+      .orderBy('created_at', 'asc')
       .then((records: SampleRecord[]) =>
         records.map(record => createSampleObject(record))
       );
+  }
+
+  getSamplesByShipmentId(shipmentId: number): Promise<Sample[]> {
+    return database('shipments_has_samples')
+      .leftJoin(
+        'samples',
+        'shipments_has_samples.sample_id',
+        'samples.sample_id'
+      )
+      .select('samples.*')
+      .where(' shipments_has_samples.shipment_id', shipmentId)
+      .then((records: SampleRecord[]) => {
+        return records.map(record => createSampleObject(record)) || [];
+      });
   }
 }
