@@ -9,6 +9,7 @@ import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import FolderOpen from '@material-ui/icons/FolderOpen';
+import FunctionsIcon from '@material-ui/icons/Functions';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import Help from '@material-ui/icons/Help';
 import InboxIcon from '@material-ui/icons/Inbox';
@@ -242,7 +243,7 @@ const SettingsMenuListItem = () => {
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
         <ListItem component={NavLink} to="/Units" button>
           <ListItemIcon>
-            <ProposalSettingsIcon />
+            <FunctionsIcon />
           </ListItemIcon>
           <ListItemText primary="Units" />
         </ListItem>
