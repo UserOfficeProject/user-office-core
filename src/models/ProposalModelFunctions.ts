@@ -102,3 +102,18 @@ export function isMatchingConstraints(
 
   return definition.validate(questionTemplateRelation, value);
 }
+
+export function transformAnswerValueIfNeeded(
+  questionTemplateRelation: QuestionTemplateRelation,
+  value: any
+) {
+  const definition = getQuestionDefinition(
+    questionTemplateRelation.question.dataType
+  );
+
+  if (!definition.transform) {
+    return undefined;
+  }
+
+  return definition.transform(questionTemplateRelation, value);
+}

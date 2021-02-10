@@ -99,6 +99,16 @@ export const dummySampleReviewer: UserWithRole = {
   },
 };
 
+export const dummyInstrumentScientist: UserWithRole = {
+  ...dummyUser,
+  id: 101,
+  currentRole: {
+    id: 1,
+    title: 'Instrument Scientist',
+    shortCode: 'instrument_scientist',
+  },
+};
+
 export const dummyPlaceHolderUser = new User(
   2,
   'Dr.',
@@ -236,6 +246,14 @@ export class UserDataSourceMock implements UserDataSource {
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
       return [{ id: 1, shortCode: 'user_officer', title: 'User Officer' }];
+    } else if (id === dummyInstrumentScientist.id) {
+      return [
+        {
+          id: 1,
+          title: 'Instrument Scientist',
+          shortCode: 'instrument_scientist',
+        },
+      ];
     } else {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }

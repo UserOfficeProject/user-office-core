@@ -98,4 +98,8 @@ export class CallDataSourceMock implements CallDataSource {
   ) {
     return dummyCall;
   }
+
+  async getCallsByInstrumentScientist(scientistId: number): Promise<Call[]> {
+    return dummyCalls;
+  }
 }

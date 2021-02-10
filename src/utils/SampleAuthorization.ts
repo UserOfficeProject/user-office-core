@@ -26,6 +26,10 @@ export class SampleAuthorization {
 
     const sample = await this.sampleDataSource.getSample(sampleId);
 
+    if (!sample) {
+      return false;
+    }
+
     const proposal = await this.proposalDataSource.get(sample.proposalId);
 
     if (!proposal) {
