@@ -13,14 +13,16 @@ import {
 } from '@material-ui/pickers';
 import React, { useState } from 'react';
 
-import { SearchCriteriaInputProps } from 'components/common/proposalFilters/QuestionaryFilter';
+import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
 import { QuestionFilterCompareOperator } from 'generated/sdk';
 
 function DateSearchCriteriaInput({
   onChange,
   searchCriteria,
 }: SearchCriteriaInputProps) {
-  const [value, setValue] = useState(searchCriteria?.value);
+  const [value, setValue] = useState<Date | null>(
+    searchCriteria ? new Date(searchCriteria?.value as string) : null
+  );
   const [comparator, setComparator] = useState<QuestionFilterCompareOperator>(
     searchCriteria?.compareOperator ?? QuestionFilterCompareOperator.EQUALS
   );
@@ -38,11 +40,12 @@ function DateSearchCriteriaInput({
                 .value as QuestionFilterCompareOperator;
               setComparator(newComparator);
               if (value) {
-                onChange(newComparator, value);
+                onChange(newComparator, value.toISOString());
               }
             }}
             value={comparator}
             labelId="comparator"
+            data-cy="comparator"
           >
             <MenuItem key="eq" value={QuestionFilterCompareOperator.EQUALS}>
               Exact
@@ -67,18 +70,18 @@ function DateSearchCriteriaInput({
             variant="inline"
             autoOk={true}
             label="Date"
-            value={value as string}
+            value={value}
             onChange={(date: DateType | null) => {
-              if (date) {
+              if (date && !isNaN(date.getTime())) {
                 date.setUTCHours(0, 0, 0, 0);
-                const newDate = date.toISOString();
-                setValue(newDate);
-                onChange(comparator, newDate);
+                setValue(date);
+                onChange(comparator, date.toISOString());
               }
             }}
             InputLabelProps={{
               shrink: value ? true : undefined,
             }}
+            data-cy="value"
           />
         </MuiPickersUtilsProvider>
       </Grid>

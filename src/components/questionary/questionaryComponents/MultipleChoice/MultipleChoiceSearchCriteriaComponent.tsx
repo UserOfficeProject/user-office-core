@@ -7,7 +7,7 @@ import {
   SelectionFromOptionsConfig,
 } from 'generated/sdk';
 
-import { SearchCriteriaInputProps } from '../../../common/proposalFilters/QuestionaryFilter';
+import { SearchCriteriaInputProps } from '../../../proposal/SearchCriteriaInputProps';
 
 function MultipleChoiceSearchCriteriaComponent({
   onChange,
@@ -37,6 +37,7 @@ function MultipleChoiceSearchCriteriaComponent({
               );
             }}
             value={value}
+            data-cy="value"
           />
         </FormControl>
       </Grid>

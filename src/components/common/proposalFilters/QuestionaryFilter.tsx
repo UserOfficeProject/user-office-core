@@ -2,7 +2,6 @@ import { Button, Collapse, Grid, TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import React, { FC, useEffect, useState } from 'react';
-import { StringParam, useQueryParams } from 'use-query-params';
 
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
@@ -15,43 +14,12 @@ import {
 } from 'generated/sdk';
 import { useTemplate } from 'hooks/template/useTemplate';
 
+import { useQuestionFilterQueryParams } from '../../../hooks/proposal/useQuestionFilterQueryParams';
+import { SearchCriteriaInputProps } from '../../proposal/SearchCriteriaInputProps';
 import UnknownSearchCriteriaInput from '../../questionary/questionaryComponents/UnknownSearchCriteriaInput';
 import UOLoader from '../UOLoader';
 
-export const useQuestionFilterQueryParams = () => {
-  const [query, setQuery] = useQueryParams({
-    questionId: StringParam,
-    compareOperator: StringParam,
-    value: StringParam,
-    dataType: StringParam,
-  });
-  const setQuestionFilterQuery = (filter?: {
-    questionId: string;
-    compareOperator: string;
-    value: string;
-    dataType: string;
-  }) => {
-    setQuery({
-      questionId: filter?.questionId,
-      compareOperator: filter?.compareOperator,
-      value: filter?.value,
-      dataType: filter?.dataType,
-    });
-  };
-
-  return { questionFilterQuery: query, setQuestionFilterQuery };
-};
-
-export interface SearchCriteriaInputProps {
-  searchCriteria: SearchCriteria | null;
-  onChange: (
-    comparator: QuestionFilterCompareOperator,
-    value: string | number | boolean | any[]
-  ) => any;
-  question: QuestionFragment;
-}
-
-interface SearchCriteria {
+export interface SearchCriteria {
   compareOperator: QuestionFilterCompareOperator;
   value: string | number | boolean | any[];
 }
@@ -154,7 +122,7 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
     <Grid container style={{ width: '400px', margin: '0 8px' }}>
       <Grid item xs={12}>
         <Autocomplete
-          id="question"
+          id="question-list"
           options={questions}
           getOptionLabel={option => option.question.question}
           renderInput={params => <TextField {...params} label="Question" />}
@@ -167,6 +135,7 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
           }}
           style={{ flex: 1, marginBottom: '8px' }}
           value={selectedQuestion}
+          data-cy="question-list"
         />
       </Grid>
       <Grid item xs={12}>
@@ -192,8 +161,10 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
             variant="contained"
             color="primary"
             startIcon={<SearchIcon />}
-            disabled={!selectedQuestion || !searchCriteria}
             onClick={() => {
+              if (!selectedQuestion || !searchCriteria) {
+                return;
+              }
               handleSubmit({
                 questionId: selectedQuestion.question.proposalQuestionId,
                 compareOperator: searchCriteria!.compareOperator,

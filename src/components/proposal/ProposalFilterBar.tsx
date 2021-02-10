@@ -7,15 +7,14 @@ import React, { useState } from 'react';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import ProposalStatusFilter from 'components/common/proposalFilters/ProposalStatusFilter';
-import QuestionaryFilter, {
-  useQuestionFilterQueryParams,
-} from 'components/common/proposalFilters/QuestionaryFilter';
+import QuestionaryFilter from 'components/common/proposalFilters/QuestionaryFilter';
 import {
   Call,
   Instrument,
   ProposalsFilter,
   ProposalStatus,
 } from 'generated/sdk';
+import { useQuestionFilterQueryParams } from 'hooks/proposal/useQuestionFilterQueryParams';
 
 type ProposalFilterBarProps = {
   calls?: { data: Call[]; isLoading: boolean };
@@ -103,6 +102,7 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
           }
         }}
         disabled={!selectedCallTemplateId}
+        data-cy="question-search-toggle"
       >
         {showQuestionFilter ? 'close' : 'more'}
       </Button>

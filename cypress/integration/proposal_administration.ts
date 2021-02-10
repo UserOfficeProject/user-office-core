@@ -178,4 +178,216 @@ context('Proposal administration tests', () => {
       '.MuiTableSortLabel-active .MuiTableSortLabel-iconDirectionAsc'
     ).should('exist');
   });
+
+  const textQuestion = faker.random.words(3);
+  const dateQuestion = faker.random.words(3);
+  const boolQuestion = faker.random.words(3);
+  const multipleChoiceQuestion = faker.random.words(3);
+
+  let textQuestionId: string;
+  let dateQuestionId: string;
+  let boolQuestionId: string;
+  let multipleChoiceQuestionId: string;
+
+  it('Should be able to prepare proposal template', () => {
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    cy.contains('default template')
+      .parent()
+      .get("[title='Edit']")
+      .first()
+      .click();
+
+    cy.createTopic('Topic for questions');
+
+    cy.get('[data-cy=show-more-button]')
+      .last()
+      .click();
+
+    cy.get('[data-cy=add-question-menu-item]')
+      .last()
+      .click();
+
+    cy.createBooleanQuestion(boolQuestion);
+    cy.contains(boolQuestion)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        boolQuestionId = fieldId;
+      });
+
+    cy.createDateQuestion(dateQuestion);
+    cy.contains(dateQuestion)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        dateQuestionId = fieldId;
+      });
+
+    cy.createMultipleChoiceQuestion(
+      multipleChoiceQuestion,
+      'One',
+      'Two',
+      'Three'
+    );
+    cy.contains(multipleChoiceQuestion)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        multipleChoiceQuestionId = fieldId;
+      });
+
+    cy.createTextQuestion(textQuestion, false, false);
+    cy.contains(textQuestion)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        textQuestionId = fieldId;
+      });
+  });
+
+  const proposalTitle = 'visi te tusee'; // faker.random.words(3);
+  const answerDate = '2030-01-01';
+  const answerMultipleChoice = 'One';
+  const answerText = 'kamert vins klusee'; // faker.random.words(3);
+
+  it('Should be able to search by question', () => {
+    cy.login('user');
+
+    //Create test  proposal
+    cy.createProposal(proposalTitle);
+    cy.contains('Save and continue').click();
+
+    cy.get(`#${boolQuestionId}`).click();
+
+    cy.get(`[data-cy='${dateQuestionId}_field'] input`)
+      .clear()
+      .type(answerDate);
+
+    cy.get(`#${multipleChoiceQuestionId}`).click();
+
+    cy.contains(answerMultipleChoice).click();
+
+    cy.get('body').type('{esc}');
+
+    cy.get(`#${textQuestionId}`)
+      .clear()
+      .type(answerText);
+
+    cy.contains('Save and continue').click();
+
+    cy.logout();
+
+    // search proposals
+    cy.login('officer');
+
+    cy.get('[data-cy=call-filter]').click();
+
+    cy.get('[role=listbox]')
+      .contains('call 1')
+      .first()
+      .click();
+
+    // Boolean questions
+    cy.get('[data-cy=question-search-toggle]').click();
+
+    cy.get('[data-cy=question-list]').click();
+
+    cy.contains(boolQuestion).click();
+
+    cy.get('[data-cy=is-checked]').click();
+
+    cy.get('[role=listbox]')
+      .contains('No')
+      .click();
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalTitle).should('not.exist');
+
+    cy.get('[data-cy=is-checked]').click();
+
+    cy.get('[role=listbox]')
+      .contains('Yes')
+      .click();
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalTitle);
+
+    // Date questions
+    cy.get('[data-cy=question-list]').click();
+
+    cy.contains(dateQuestion).click();
+
+    cy.get('[data-cy=value] input')
+      .clear()
+      .type('2020-01-01');
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalTitle).should('not.exist');
+
+    cy.get('[data-cy=comparator]').click();
+
+    cy.get('[role=listbox]')
+      .contains('After')
+      .click();
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalTitle);
+
+    // Multiple choice questions
+    cy.get('[data-cy=question-list]').click();
+
+    cy.contains(multipleChoiceQuestion).click();
+
+    cy.get('[data-cy=value]').click();
+
+    cy.get('[role=listbox]')
+      .contains('Two')
+      .click();
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalTitle).should('not.exist');
+
+    cy.get('[data-cy=value]').click();
+
+    cy.get('[role=listbox]')
+      .contains('One')
+      .click();
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalTitle);
+
+    // Text questions
+    cy.get('[data-cy=question-list]').click();
+
+    cy.contains(textQuestion).click();
+
+    cy.get('[name=value]')
+      .clear()
+      .type(faker.random.words(3));
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalTitle).should('not.exist');
+
+    cy.get('[name=value]')
+      .clear()
+      .type(answerText);
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalTitle);
+  });
 });

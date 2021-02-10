@@ -7,14 +7,14 @@ import {
 } from '@material-ui/core';
 import React, { useState } from 'react';
 
-import { SearchCriteriaInputProps } from 'components/common/proposalFilters/QuestionaryFilter';
+import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
 import { QuestionFilterCompareOperator } from 'generated/sdk';
 
 function BooleanSearchCriteriaInput({
   onChange,
   searchCriteria,
 }: SearchCriteriaInputProps) {
-  const [value, setValue] = useState(searchCriteria?.value ?? false);
+  const [value, setValue] = useState(searchCriteria?.value ?? '');
 
   return (
     <Grid container>
@@ -27,10 +27,11 @@ function BooleanSearchCriteriaInput({
             value={value}
             onChange={event => {
               const newValue = event.target.value === 'yes';
-              setValue(newValue);
+              setValue(event.target.value as string);
               onChange(QuestionFilterCompareOperator.EQUALS, newValue);
             }}
             labelId="is-checked"
+            data-cy="is-checked"
           >
             <MenuItem key="yes" value={'yes'}>
               Yes

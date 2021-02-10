@@ -1,7 +1,7 @@
 import React, { FC, FunctionComponent } from 'react';
 
-import { SearchCriteriaInputProps } from 'components/common/proposalFilters/QuestionaryFilter';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
 import {
   Answer,
   DataType,

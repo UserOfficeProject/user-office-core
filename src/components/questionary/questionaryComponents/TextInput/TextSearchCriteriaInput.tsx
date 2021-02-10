@@ -8,7 +8,7 @@ import {
 } from '@material-ui/core';
 import React, { useState } from 'react';
 
-import { SearchCriteriaInputProps } from 'components/common/proposalFilters/QuestionaryFilter';
+import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
 import { QuestionFilterCompareOperator } from 'generated/sdk';
 
 function TextSearchCriteriaComponent({
