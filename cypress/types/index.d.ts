@@ -79,7 +79,8 @@ declare global {
        */
       createProposal: (
         proposalTitle?: string,
-        proposalAbstract?: string
+        proposalAbstract?: string,
+        call?: string
       ) => void;
       /**
        * Moves the element in the given direction with given length.

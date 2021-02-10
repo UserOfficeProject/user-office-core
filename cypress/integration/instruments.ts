@@ -1,9 +1,167 @@
 context('Instrument tests', () => {
   const faker = require('faker');
 
+  function createInstrument({
+    name,
+    shortCode,
+    description,
+  }: {
+    name: string;
+    shortCode: string;
+    description: string;
+  }) {
+    cy.contains('Create').click();
+    cy.get('#name').type(name);
+    cy.get('#shortCode').type(shortCode);
+    cy.get('#description').type(description);
+    cy.get('[data-cy="submit"]').click();
+
+    cy.contains(name);
+    cy.contains(shortCode);
+    cy.contains(description);
+
+    cy.notification({ variant: 'success', text: 'created successfully' });
+  }
+
+  function createCall({
+    shortCode,
+    startDate,
+    endDate,
+  }: {
+    shortCode: string;
+    startDate: string;
+    endDate: string;
+  }) {
+    cy.contains('Calls').click();
+
+    cy.contains('Create').click();
+
+    cy.get('[data-cy=short-code] input')
+      .type(shortCode)
+      .should('have.value', shortCode);
+
+    cy.get('[data-cy=start-date] input').clear();
+    cy.get('[data-cy=start-date] input')
+      .type(startDate)
+      .should('have.value', startDate);
+
+    cy.get('[data-cy=end-date] input').clear();
+    cy.get('[data-cy=end-date] input')
+      .type(endDate)
+      .should('have.value', endDate);
+
+    cy.get('[data-cy="call-template"]').click();
+    cy.contains('default template').click();
+
+    cy.get('[data-cy="next-step"]').click();
+
+    cy.get('[data-cy=survey-comment] input').type(
+      faker.random.word().split(' ')[0]
+    );
+
+    cy.get('[data-cy="next-step"]').click();
+
+    cy.get('[data-cy=cycle-comment] input').type(
+      faker.random.word().split(' ')[0]
+    );
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ variant: 'success', text: 'successfully' });
+
+    cy.contains(shortCode);
+  }
+
+  function assignInstrumentToCall(call: string, instrument: string) {
+    cy.contains(call)
+      .parent()
+      .find('[title="Assign Instrument"]')
+      .click();
+
+    cy.contains(instrument)
+      .parent()
+      .find('[type="checkbox"]')
+      .check();
+
+    cy.contains('Assign instrument').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Instrument/s assigned successfully',
+    });
+  }
+
+  function assignInstrumentToProposal(proposal: string, instrument: string) {
+    cy.contains(proposal)
+      .parent()
+      .find('[type="checkbox"]')
+      .as('checkbox');
+
+    cy.get('@checkbox').check();
+
+    cy.get("[title='Assign proposals to instrument']").click();
+
+    cy.get("[id='mui-component-select-selectedInstrumentId']")
+      .first()
+      .click();
+
+    cy.get("[id='menu-selectedInstrumentId'] li")
+      .contains(instrument)
+      .click();
+
+    cy.contains('Assign to Instrument').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Proposal/s assigned to the selected instrument',
+    });
+
+    cy.get('@checkbox').uncheck();
+
+    cy.contains(proposal)
+      .parent()
+      .find('[title="Remove assigned instrument"]')
+      .should('exist');
+  }
+
+  const instrument1 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+  };
+
+  const instrument2 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+  };
+
+  const proposal1 = {
+    title: faker.random.words(2),
+    abstract: faker.random.words(5),
+  };
+
+  const proposal2 = {
+    title: faker.random.words(2),
+    abstract: faker.random.words(5),
+  };
+
+  const call2 = {
+    shortCode: faker.random.alphaNumeric(10),
+    startDate: faker.date
+      .past()
+      .toISOString()
+      .slice(0, 10),
+    endDate: faker.date
+      .future()
+      .toISOString()
+      .slice(0, 10),
+  };
+
   before(() => {
     cy.resetDB();
   });
+
   beforeEach(() => {
     cy.visit('/');
     cy.viewport(1100, 1000);
@@ -20,104 +178,80 @@ context('Instrument tests', () => {
   });
 
   it('User Officer should be able to create Instrument', () => {
-    const name = faker.random.words(2);
-    const shortCode = faker.random.alphaNumeric(15);
-    const description = faker.random.words(5);
-
     cy.login('officer');
 
     cy.contains('Instruments').click();
-    cy.contains('Create').click();
-    cy.get('#name').type(name);
-    cy.get('#shortCode').type(shortCode);
-    cy.get('#description').type(description);
-    cy.get('[data-cy="submit"]').click();
 
-    cy.notification({ variant: 'success', text: 'created successfully' });
-
-    const instrumentsTable = cy.get('[data-cy="instruments-table"]');
-
-    instrumentsTable.should('contain', name);
-    instrumentsTable.should('contain', shortCode);
-    instrumentsTable.should('contain', description);
+    createInstrument(instrument1);
+    cy.wait(100);
+    createInstrument(instrument2);
   });
 
   it('User Officer should be able to update Instrument', () => {
-    const name = faker.random.words(2);
-    const shortCode = faker.random.alphaNumeric(15);
-    const description = faker.random.words(5);
+    const originalName = instrument1.name;
+    instrument1.name = faker.random.words(2);
+    instrument1.shortCode = faker.random.alphaNumeric(15);
+    instrument1.description = faker.random.words(5);
 
     cy.login('officer');
 
     cy.contains('Instruments').click();
-    cy.get('[title="Edit"]').click();
+    cy.contains(originalName)
+      .parent()
+      .find('[title="Edit"]')
+      .click();
     cy.get('#name').clear();
-    cy.get('#name').type(name);
+    cy.get('#name').type(instrument1.name);
     cy.get('#shortCode').clear();
-    cy.get('#shortCode').type(shortCode);
-    cy.get('#description').type(description);
+    cy.get('#shortCode').type(instrument1.shortCode);
+    cy.get('#description').type(instrument1.description);
     cy.get('[data-cy="submit"]').click();
 
     cy.notification({ variant: 'success', text: 'updated successfully' });
 
     const instrumentsTable = cy.get('[data-cy="instruments-table"]');
 
-    instrumentsTable.should('contain', name);
-    instrumentsTable.should('contain', shortCode);
-    instrumentsTable.should('contain', description);
+    instrumentsTable.should('contain', instrument1.name);
+    instrumentsTable.should('contain', instrument1.shortCode);
+    instrumentsTable.should('contain', instrument1.description);
   });
 
   it('User Officer should be able to assign proposal to existing instrument', () => {
+    cy.login('officer');
+
+    cy.contains('Calls').click();
+
+    createCall(call2);
+
+    cy.logout();
+
     cy.login('user');
-    cy.createProposal();
+
+    cy.createProposal(proposal1.title, proposal1.abstract, 'call 1');
     cy.contains('Submit').click();
     cy.contains('OK').click();
+
+    cy.createProposal(proposal2.title, proposal2.abstract, call2.shortCode);
+    cy.contains('Submit').click();
+    cy.contains('OK').click();
+
     cy.logout();
 
     cy.login('officer');
 
     cy.contains('Calls').click();
-    cy.get('[title="Assign Instrument"]')
-      .first()
-      .click();
 
-    cy.get('[type="checkbox"]')
-      .first()
-      .check();
+    assignInstrumentToCall('call 1', instrument1.shortCode);
 
-    cy.contains('Assign instrument').click();
+    cy.wait(100);
 
-    cy.notification({
-      variant: 'success',
-      text: 'Instrument/s assigned successfully',
-    });
+    assignInstrumentToCall(call2.shortCode, instrument2.shortCode);
 
     cy.contains('Proposals').click();
 
-    cy.get('tbody [type="checkbox"]')
-      .first()
-      .check();
-
-    cy.get("[title='Assign proposals to instrument']")
-      .first()
-      .click();
-
-    cy.get("[id='mui-component-select-selectedInstrumentId']")
-      .first()
-      .click();
-
-    cy.get("[id='menu-selectedInstrumentId'] li")
-      .first()
-      .click();
-
-    cy.contains('Assign to Instrument').click();
-
-    cy.notification({
-      variant: 'success',
-      text: 'Proposal/s assigned to the selected instrument',
-    });
-
-    cy.get('[title="Remove assigned instrument"]').should('exist');
+    assignInstrumentToProposal(proposal1.title, instrument1.name);
+    cy.wait(100);
+    assignInstrumentToProposal(proposal2.title, instrument2.name);
   });
 
   it('User Officer should be able to assign and unassign instrument to proposal without page refresh', () => {
@@ -229,36 +363,34 @@ context('Instrument tests', () => {
 
     cy.contains('Instruments').click();
 
-    cy.get('[title="Assign scientist"]').click();
+    function assignScientist(instrument: string) {
+      cy.contains(instrument)
+        .parent()
+        .find('[title="Assign scientist"]')
+        .click();
 
-    cy.get('[data-cy="co-proposers"] tbody input[type="checkbox"]')
-      .first()
-      .click();
+      cy.get('[data-cy="co-proposers"] tbody input[type="checkbox"]')
+        .first()
+        .click();
 
-    cy.get('.MuiDialog-root')
-      .contains('Update')
-      .click();
+      cy.get('.MuiDialog-root')
+        .contains('Update')
+        .click();
 
-    cy.notification({
-      variant: 'success',
-      text: 'Scientist assigned to instrument',
-    });
+      cy.notification({
+        variant: 'success',
+        text: 'Scientist assigned to instrument',
+      });
+    }
+
+    assignScientist(instrument1.shortCode);
+    cy.wait(100);
+    assignScientist(instrument2.shortCode);
 
     cy.logout();
 
     cy.login('user');
-
-    cy.get('[data-cy="profile-page-btn"]').click();
-    cy.contains('Roles').click();
-
-    cy.finishedLoading();
-
-    cy.get("[data-cy='role-selection-table'] table tbody tr")
-      .eq(1)
-      .contains('Use')
-      .click();
-
-    cy.notification({ variant: 'success', text: 'User role changed' });
+    cy.changeActiveRole('Instrument Scientist');
 
     cy.contains('Instruments').click();
 
@@ -267,48 +399,69 @@ context('Instrument tests', () => {
 
   it('Instrument scientist should be able to see proposals assigned to instrument where he is instrument scientist', () => {
     cy.login('user');
-
-    cy.get('[data-cy="profile-page-btn"]').click();
-    cy.contains('Roles').click();
-
-    cy.finishedLoading();
-
-    cy.get("[data-cy='role-selection-table'] table tbody tr")
-      .eq(1)
-      .contains('Use')
-      .click();
-
-    cy.notification({ variant: 'success', text: 'User role changed' });
+    cy.changeActiveRole('Instrument Scientist');
 
     cy.contains('Proposals');
 
     cy.get('[data-cy="status-filter"]').click();
     cy.get('[role="listbox"] [data-value="0"]').click();
 
-    cy.get('[data-cy="view-proposal"]').should('exist');
+    cy.contains(proposal1.title);
+    cy.contains(proposal2.title);
+  });
+
+  it('Instrument scientist should have a call and instrument filter', () => {
+    cy.login('officer');
+
+    cy.contains('Instruments').click();
+
+    cy.logout();
+
+    cy.login('user');
+    cy.changeActiveRole('Instrument Scientist');
+
+    cy.contains('Proposals');
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"] [data-value="0"]').click();
+
+    cy.contains(proposal1.title);
+    cy.contains(proposal2.title);
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy="call-filter"]').click();
+    cy.get('[role="listbox"]')
+      .contains('call 1')
+      .click();
+    cy.finishedLoading();
+
+    cy.contains(proposal1.title);
+    cy.contains(proposal2.title).should('not.exist');
+
+    cy.get('[data-cy="instrument-filter"]').click();
+    cy.get('[role="listbox"]')
+      .contains(instrument2.name)
+      .click();
+    cy.finishedLoading();
+
+    cy.contains('No records to display');
+    cy.contains(proposal1.title).should('not.exist');
+    cy.contains(proposal2.title).should('not.exist');
   });
 
   it('Instrument scientist should be able to do technical review on proposal where he is instrument scientist', () => {
     cy.login('user');
-
-    cy.get('[data-cy="profile-page-btn"]').click();
-    cy.contains('Roles').click();
-
-    cy.finishedLoading();
-
-    cy.get("[data-cy='role-selection-table'] table tbody tr")
-      .eq(1)
-      .contains('Use')
-      .click();
-
-    cy.notification({ variant: 'success', text: 'User role changed' });
+    cy.changeActiveRole('Instrument Scientist');
 
     cy.contains('Proposals');
 
     cy.get('[data-cy="status-filter"]').click();
     cy.get('[role="listbox"] [data-value="0"]').click();
 
-    cy.get('[data-cy="view-proposal"]').click();
+    cy.get('[data-cy="view-proposal"]')
+      .first()
+      .click();
     cy.contains('Technical').click();
 
     cy.get('[data-cy="timeAllocation"]').type('20');
@@ -331,7 +484,11 @@ context('Instrument tests', () => {
   it('User Officer should be able to remove assigned proposal from instrument', () => {
     cy.login('officer');
 
-    cy.get('[title="Remove assigned instrument"]').click();
+    cy.contains(proposal1.title)
+      .parent()
+      .find('[title="Remove assigned instrument"]')
+
+      .click();
 
     cy.get('.MuiDialog-root')
       .contains('Yes')
@@ -342,7 +499,7 @@ context('Instrument tests', () => {
       text: 'Proposal removed from the instrument',
     });
 
-    cy.get('[title="Remove assigned instrument"]').should('not.exist');
+    cy.get('[title="Remove assigned instrument"]').should('have.length', 1);
   });
 
   it('User Officer should be able to remove assigned scientist from instrument', () => {
@@ -350,8 +507,10 @@ context('Instrument tests', () => {
 
     cy.contains('Instruments').click();
 
-    cy.get('[title="Show Scientists"]')
-      .first()
+    cy.contains(instrument1.name)
+      .parent()
+      .find('[title="Show Scientists"]')
+
       .click();
 
     cy.get(
@@ -367,8 +526,8 @@ context('Instrument tests', () => {
       text: 'Scientist removed from instrument',
     });
 
-    cy.get('[data-cy="instruments-table"] table tbody tr')
-      .first()
+    cy.contains(instrument1.name)
+      .parent()
       .find('td')
       .last()
       .then(element => {
@@ -381,8 +540,10 @@ context('Instrument tests', () => {
 
     cy.contains('Calls').click();
 
-    cy.get('[title="Show Instruments"]')
-      .first()
+    cy.contains('call 1')
+      .parent()
+      .find('[title="Show Instruments"]')
+
       .click();
 
     cy.get('[title="Delete"]')
@@ -398,21 +559,17 @@ context('Instrument tests', () => {
 
     cy.contains('Instruments').click();
 
-    cy.get('[title="Delete"]').click();
+    cy.contains(instrument1.name)
+      .parent()
+      .find('[title="Delete"]')
+
+      .click();
 
     cy.get('[title="Save"]').click();
 
     cy.notification({ variant: 'success', text: 'Instrument removed' });
 
-    cy.get('[data-cy="instruments-table"]')
-      .find('tbody td')
-      .should('have.length', 1);
-
-    cy.get('[data-cy="instruments-table"]')
-      .find('tbody td')
-      .first()
-      .then(element => {
-        expect(element.text()).to.be.equal('No records to display');
-      });
+    cy.contains(instrument1.name).should('not.exist');
+    cy.contains(instrument2.name);
   });
 });
