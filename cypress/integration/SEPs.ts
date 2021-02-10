@@ -120,6 +120,13 @@ context('Scientific evaluation panel tests', () => {
     cy.contains('Create').click();
     cy.get('#code').type(code);
     cy.get('#description').type(description);
+
+    cy.get('[data-cy="sepActive"] input').should('be.checked');
+    cy.get('[data-cy="sepActive"] input').uncheck();
+    cy.get('[data-cy="sepActive"] input').should('not.be.checked');
+    cy.get('[data-cy="sepActive"] input').check();
+    cy.get('[data-cy="sepActive"] input').should('be.checked');
+
     cy.get('[data-cy="submit"]').click();
 
     cy.notification({ variant: 'success', text: 'SEP created successfully' });
