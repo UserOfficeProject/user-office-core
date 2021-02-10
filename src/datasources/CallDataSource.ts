@@ -16,4 +16,5 @@ export interface CallDataSource {
   removeAssignedInstrumentFromCall(
     args: RemoveAssignedInstrumentFromCallInput
   ): Promise<Call>;
+  getCallsByInstrumentScientist(scientistId: number): Promise<Call[]>;
 }

@@ -166,4 +166,22 @@ export default class PostgresCallDataSource implements CallDataSource {
 
     throw new Error(`Call not found ${args.callId}`);
   }
+
+  async getCallsByInstrumentScientist(scientistId: number): Promise<Call[]> {
+    const records: CallRecord[] = await database('call')
+      .distinct(['call.*'])
+      .join(
+        'call_has_instruments',
+        'call_has_instruments.call_id',
+        'call.call_id'
+      )
+      .join(
+        'instrument_has_scientists',
+        'instrument_has_scientists.instrument_id',
+        'call_has_instruments.instrument_id'
+      )
+      .where('instrument_has_scientists.user_id', scientistId);
+
+    return records.map(createCallObject);
+  }
 }
