@@ -44,6 +44,10 @@ const UnitTable: React.FC = () => {
             objectItem => objectItem.id !== id
           );
           setUnits(newObjectsArray);
+
+          return true;
+        } else {
+          return false;
         }
       });
   };
@@ -76,15 +80,7 @@ const UnitTable: React.FC = () => {
         }}
         urlQueryParams={urlQueryParams}
         setUrlQueryParams={setUrlQueryParams}
-        actions={[
-          rowActionData => {
-            return {
-              icon: Delete,
-              tooltip: 'Delete',
-              onClick: (event, rowData) => setUnitToRemove(rowData as Unit),
-            };
-          },
-        ]}
+        delete={deleteUnit}
       />
     </div>
   );
