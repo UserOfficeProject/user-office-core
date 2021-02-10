@@ -30,4 +30,15 @@ export class CallsQuery {
   ) {
     return context.queries.call.getAll(context.user, filter);
   }
+
+  @Query(() => [Call], { nullable: true })
+  callsByInstrumentScientist(
+    @Ctx() context: ResolverContext,
+    @Arg('scientistId', () => Int) scientistId: number
+  ) {
+    return context.queries.call.getCallsByInstrumentScientist(
+      context.user,
+      scientistId
+    );
+  }
 }
