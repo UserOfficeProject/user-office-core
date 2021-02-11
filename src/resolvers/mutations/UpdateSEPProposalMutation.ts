@@ -1,27 +1,39 @@
-import { Resolver, Mutation, Arg, Ctx, Int } from 'type-graphql';
+import {
+  Resolver,
+  Mutation,
+  Ctx,
+  Int,
+  Field,
+  ObjectType,
+  Args,
+  ArgsType,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { SEPProposalResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
+@ArgsType()
+export class UpdateSEPTimeAllocationArgs {
+  @Field(() => Int)
+  sepId: number;
+
+  @Field(() => Int)
+  proposalId: number;
+
+  @Field(() => Int, { nullable: true })
+  sepTimeAllocation?: number | null;
+}
+
 @Resolver()
 export class UpdateSEPProposalMutation {
   @Mutation(() => SEPProposalResponseWrap)
   async updateSEPTimeAllocation(
-    @Arg('sepId', () => Int) sepId: number,
-    @Arg('proposalId', () => Int) proposalId: number,
-
-    @Arg('sepTimeAllocation', () => Int, { nullable: true })
-    sepTimeAllocation: number | null,
+    @Args(() => UpdateSEPTimeAllocationArgs) args: UpdateSEPTimeAllocationArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sep.updateTimeAllocation(
-        context.user,
-        sepId,
-        proposalId,
-        sepTimeAllocation
-      ),
+      context.mutations.sep.updateTimeAllocation(context.user, args),
       SEPProposalResponseWrap
     );
   }

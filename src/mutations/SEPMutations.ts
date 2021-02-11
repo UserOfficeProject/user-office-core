@@ -7,6 +7,7 @@ import {
   assignProposalToSEPValidationSchema,
   assignSEPChairOrSecretaryValidationSchema,
   assignSEPMemberToProposalValidationSchema,
+  updateTimeAllocationValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -27,6 +28,7 @@ import {
 import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
+import { UpdateSEPTimeAllocationArgs } from '../resolvers/mutations/UpdateSEPProposalMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class SEPMutations {
@@ -309,12 +311,11 @@ export default class SEPMutations {
       });
   }
 
+  @ValidateArgs(updateTimeAllocationValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   async updateTimeAllocation(
     agent: UserWithRole | null,
-    sepId: number,
-    proposalId: number,
-    sepTimeAllocation: number | null
+    { sepId, proposalId, sepTimeAllocation = null }: UpdateSEPTimeAllocationArgs
   ) {
     const isUserOfficer = await this.userAuth.isUserOfficer(agent);
     if (
