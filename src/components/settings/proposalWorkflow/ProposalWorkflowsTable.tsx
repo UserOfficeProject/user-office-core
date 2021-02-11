@@ -44,10 +44,10 @@ const ProposalWorkflowsTable: React.FC = () => {
     />
   );
 
-  const deleteProposalWorkflow = async (id: number) => {
+  const deleteProposalWorkflow = async (id: number | string) => {
     return await api('Proposal workflow deleted successfully')
       .deleteProposalWorkflow({
-        id: id,
+        id: id as number,
       })
       .then(resp => {
         if (resp.deleteProposalWorkflow.error) {

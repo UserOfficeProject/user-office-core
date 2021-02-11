@@ -476,4 +476,150 @@ context('Settings tests', () => {
       cy.get('[data-cy="connection_FEASIBILITY_REVIEW_2"]').should('not.exist');
     });
   });
+
+  describe('API access tokens tests', () => {
+    before(() => {
+      cy.resetDB();
+    });
+
+    beforeEach(() => {
+      cy.visit('/');
+      cy.viewport(1100, 1000);
+    });
+
+    let removedAccessToken: string;
+
+    it('User Officer should be able to create api access token', () => {
+      const name = faker.lorem.words(2);
+
+      cy.login('officer');
+
+      cy.contains('Settings').click();
+      cy.contains('API access tokens').click();
+
+      cy.get('[data-cy="create-new-entry"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('#accessToken').should('be.empty');
+
+      cy.get('#name').type(name);
+
+      cy.contains('ProposalQueries.getAll').click();
+      cy.contains('ProposalQueries.getAllView').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.finishedLoading();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Api access token created successfully!',
+      });
+
+      cy.get('#accessToken').should('contain.value', 'Bearer ');
+
+      cy.get('[title="Copy"]').should('exist');
+
+      cy.get('#accessToken')
+        .invoke('val')
+        .then(accessToken => {
+          cy.request({
+            method: 'POST',
+            url: '/graphql',
+            body: {
+              query: 'query { proposalsView(filter: {}) { id title shortCode}}',
+            },
+            auth: {
+              bearer: (accessToken as string).split(' ')[1],
+            },
+          }).then(response => {
+            expect(response.headers['content-type']).to.contain(
+              'application/json'
+            );
+            expect(response.status).to.be.equal(200);
+            expect(response.body.data.proposalsView).to.be.an('array');
+          });
+        });
+    });
+
+    it('User Officer should be able to update api access token', () => {
+      cy.login('officer');
+
+      cy.contains('Settings').click();
+      cy.contains('API access tokens').click();
+
+      cy.get('[title="Edit"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains('ProposalQueries.getAllView').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.finishedLoading();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Api access token updated successfully!',
+      });
+
+      cy.get('[title="Copy"]').should('exist');
+
+      cy.get('#accessToken')
+        .invoke('val')
+        .then(accessToken => {
+          removedAccessToken = accessToken as string;
+          cy.request({
+            method: 'POST',
+            url: '/graphql',
+            body: {
+              query: 'query { proposalsView(filter: {}) { id title shortCode}}',
+            },
+            auth: {
+              bearer: removedAccessToken.split(' ')[1],
+            },
+          }).then(response => {
+            expect(response.headers['content-type']).to.contain(
+              'application/json'
+            );
+            expect(response.status).to.be.equal(200);
+            expect(response.body.data.proposalsView).to.be.equal(null);
+          });
+        });
+    });
+
+    it('User Officer should be able to delete api access token', () => {
+      cy.login('officer');
+
+      cy.contains('Settings').click();
+      cy.contains('API access tokens').click();
+
+      cy.get('[title="Delete"]').click();
+      cy.get('[title="Save"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Api access token deleted successfully',
+      });
+
+      cy.request({
+        method: 'POST',
+        url: '/graphql',
+        body: {
+          query:
+            'query { proposals(filter: {}) { totalCount proposals { id title shortCode }}}',
+        },
+        auth: {
+          bearer: removedAccessToken.split(' ')[1],
+        },
+        failOnStatusCode: false,
+      }).then(response => {
+        expect(response.status).to.be.equal(500);
+        expect(response.body.errors[0].message).to.contain(
+          'Could not find permission rules for access token key'
+        );
+      });
+    });
+  });
 });

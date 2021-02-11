@@ -1,10 +1,11 @@
+import { administrationProposalValidationSchema } from '@esss-swap/duo-validation';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { Formik, Form, Field } from 'formik';
+import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
@@ -39,10 +40,11 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
   const { api } = useDataApiWithFeedback();
 
   const initialData = {
-    finalStatus: proposalData.finalStatus || ProposalEndStatus.UNSET,
-    commentForUser: proposalData.commentForUser || '',
-    commentForManagement: proposalData.commentForManagement || '',
-    rankOrder: proposalData.rankOrder || '',
+    id: proposalData.id,
+    finalStatus: proposalData.finalStatus ?? ProposalEndStatus.UNSET,
+    commentForUser: proposalData.commentForUser ?? '',
+    commentForManagement: proposalData.commentForManagement ?? '',
+    rankOrder: proposalData.rankOrder ?? '',
   };
 
   const handleSubmit = async (values: AdministrationFormData) => {
@@ -74,25 +76,19 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
           validateOnChange={false}
           validateOnBlur={false}
           initialValues={initialData}
+          validationSchema={administrationProposalValidationSchema}
           onSubmit={async (values): Promise<void> => {
             if (!hasWriteAccess) {
               return;
             }
 
             await handleSubmit({
-              id: proposalData.id,
               ...values,
               rankOrder: +values.rankOrder,
             });
           }}
         >
-          {({
-            values,
-            errors,
-            touched,
-            isSubmitting,
-            handleChange,
-          }): JSX.Element => (
+          {({ isSubmitting }): JSX.Element => (
             <Form>
               <Typography variant="h6" gutterBottom>
                 SEP Meeting form
@@ -104,8 +100,6 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                     id="commentForUser"
                     label="Comment for user"
                     type="text"
-                    value={values.commentForUser}
-                    onChange={handleChange}
                     component={TextField}
                     margin="normal"
                     fullWidth
@@ -113,15 +107,6 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                     rowsMax="16"
                     rows="3"
                     data-cy="commentForUser"
-                    error={
-                      touched.commentForUser &&
-                      errors.commentForUser !== undefined
-                    }
-                    helperText={
-                      touched.commentForUser &&
-                      errors.commentForUser &&
-                      errors.commentForUser
-                    }
                     required
                     disabled={!hasWriteAccess}
                   />
@@ -151,18 +136,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                     multiline
                     rowsMax="16"
                     rows="3"
-                    onChange={handleChange}
-                    value={values.commentForManagement}
                     data-cy="commentForManagement"
-                    error={
-                      touched.commentForManagement &&
-                      errors.commentForManagement !== undefined
-                    }
-                    helperText={
-                      touched.commentForManagement &&
-                      errors.commentForManagement &&
-                      errors.commentForManagement
-                    }
                     required
                     disabled={!hasWriteAccess}
                   />
@@ -174,13 +148,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                     component={TextField}
                     margin="normal"
                     fullWidth
-                    onChange={handleChange}
-                    value={values.rankOrder}
                     data-cy="rankOrder"
-                    error={touched.rankOrder && errors.rankOrder !== undefined}
-                    helperText={
-                      touched.rankOrder && errors.rankOrder && errors.rankOrder
-                    }
                     required
                     disabled={!hasWriteAccess}
                   />

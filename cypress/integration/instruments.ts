@@ -464,7 +464,20 @@ context('Instrument tests', () => {
       .click();
     cy.contains('Technical').click();
 
-    cy.get('[data-cy="timeAllocation"]').type('20');
+    cy.get('[data-cy="timeAllocation"] input')
+      .type('-123')
+      .trigger('blur');
+    cy.contains('Must be greater than or equal to');
+
+    cy.get('[data-cy="timeAllocation"] input')
+      .clear()
+      .type('987654321')
+      .trigger('blur');
+    cy.contains('Must be less than or equal to');
+
+    cy.get('[data-cy="timeAllocation"] input')
+      .clear()
+      .type('20');
 
     cy.contains('Update').click();
 

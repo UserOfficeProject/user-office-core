@@ -34,6 +34,7 @@ export default function ProposalAdmin(props: {
   } = useProposalStatusesData();
 
   const initialValues = {
+    id: props.data.id,
     finalStatus: props.data.finalStatus || ProposalEndStatus.UNSET,
     proposalStatus: props.data.statusId,
     commentForUser: props.data.commentForUser || '',

@@ -403,8 +403,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             ...proposalData,
             tableData: {
               checked: urlQueryParams.selection?.some(
-                (selectedItem: number | null) =>
-                  selectedItem === proposalData.id
+                (selectedItem: string | null) =>
+                  selectedItem === proposalData.id.toString()
               ),
             },
           };
@@ -482,7 +482,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           setUrlQueryParams({
             selection:
               selectedItems.length > 0
-                ? selectedItems.map(selectedItem => selectedItem.id)
+                ? selectedItems.map(selectedItem => selectedItem.id.toString())
                 : undefined,
           });
         }}
