@@ -1,5 +1,4 @@
 import DateFnsUtils from '@date-io/date-fns';
-import { DateType } from '@date-io/type';
 import {
   FormControl,
   Grid,
@@ -71,12 +70,12 @@ function DateSearchCriteriaInput({
             autoOk={true}
             label="Date"
             value={value}
-            onChange={(date: DateType | null) => {
+            onChange={(date: Date | null) => {
               if (date && !isNaN(date.getTime())) {
                 date.setUTCHours(0, 0, 0, 0);
-                setValue(date);
                 onChange(comparator, date.toISOString());
               }
+              setValue(date);
             }}
             InputLabelProps={{
               shrink: value ? true : undefined,
