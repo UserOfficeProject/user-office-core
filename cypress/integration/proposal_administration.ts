@@ -252,10 +252,10 @@ context('Proposal administration tests', () => {
       });
   });
 
-  const proposalTitle = 'visi te tusee'; // faker.random.words(3);
+  const proposalTitle = faker.random.words(3);
   const answerDate = '2030-01-01';
   const answerMultipleChoice = 'One';
-  const answerText = 'kamert vins klusee'; // faker.random.words(3);
+  const answerText = faker.random.words(3);
 
   it('Should be able to search by question', () => {
     cy.login('user');
