@@ -24,10 +24,10 @@ const InstitutionPage: React.FC = () => {
     UrlQueryParamsType
   >(DefaultQueryParams);
 
-  const deleteInstitution = async (id: number) => {
+  const deleteInstitution = async (id: number | string) => {
     return await api('Institution removed successfully!')
       .deleteInstitution({
-        id: id,
+        id: id as number,
       })
       .then(resp => {
         if (resp.deleteInstitution.error) {

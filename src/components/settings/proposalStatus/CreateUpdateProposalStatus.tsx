@@ -10,7 +10,6 @@ import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { DarkerDisabledTextField } from 'components/common/DarkerDisabledTextField';
 import UOLoader from 'components/common/UOLoader';
 import { ProposalStatus } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -18,6 +17,11 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
+  },
+  darkerDisabledTextField: {
+    '& .MuiInputBase-root.Mui-disabled': {
+      color: 'rgba(0, 0, 0, 0.7) !important',
+    },
   },
 }));
 
@@ -84,8 +88,9 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             id="shortCode"
             label="Short code"
             type="text"
-            component={
-              initialValues.shortCode ? DarkerDisabledTextField : TextField
+            component={TextField}
+            className={
+              !!initialValues.shortCode ? classes.darkerDisabledTextField : ''
             }
             margin="normal"
             fullWidth
