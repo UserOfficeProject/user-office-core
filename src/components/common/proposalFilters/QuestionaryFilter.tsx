@@ -8,7 +8,6 @@ import {
   GetTemplateQuery,
   QuestionFilterCompareOperator,
   QuestionFilterInput,
-  QuestionFragment,
   QuestionTemplateRelation,
   QuestionTemplateRelationFragment,
 } from 'generated/sdk';
@@ -30,15 +29,16 @@ interface QuestionaryFilterProps {
 }
 
 const getSearchCriteriaComponent = (
-  question: QuestionFragment | undefined
+  questionTemplateRelation: QuestionTemplateRelationFragment | null
 ): FC<SearchCriteriaInputProps> => {
-  if (!question) {
+  if (!questionTemplateRelation) {
     return UnknownSearchCriteriaInput;
   }
 
   return (
-    getQuestionaryComponentDefinition(question.dataType)
-      .searchCriteriaComponent || UnknownSearchCriteriaInput
+    getQuestionaryComponentDefinition(
+      questionTemplateRelation.question.dataType
+    ).searchCriteriaComponent || UnknownSearchCriteriaInput
   );
 };
 
@@ -114,9 +114,7 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
 
   const questions = extractSearchableQuestionsFromTemplate(template);
 
-  const SearchCriteriaComponent = getSearchCriteriaComponent(
-    selectedQuestion?.question
-  );
+  const SearchCriteriaComponent = getSearchCriteriaComponent(selectedQuestion);
 
   return (
     <Grid container style={{ width: '400px', margin: '0 8px' }}>
@@ -149,7 +147,7 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
                   value,
                 });
               }}
-              question={selectedQuestion.question}
+              questionTemplateRelation={selectedQuestion}
             />
           )}
         </Collapse>

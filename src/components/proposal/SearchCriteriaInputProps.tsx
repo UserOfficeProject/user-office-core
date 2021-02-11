@@ -1,4 +1,7 @@
-import { QuestionFilterCompareOperator, QuestionFragment } from 'generated/sdk';
+import {
+  QuestionFilterCompareOperator,
+  QuestionTemplateRelationFragment,
+} from 'generated/sdk';
 
 import { SearchCriteria } from '../common/proposalFilters/QuestionaryFilter';
 
@@ -8,5 +11,5 @@ export interface SearchCriteriaInputProps {
     comparator: QuestionFilterCompareOperator,
     value: string | number | boolean | any[]
   ) => any;
-  question: QuestionFragment;
+  questionTemplateRelation: QuestionTemplateRelationFragment;
 }

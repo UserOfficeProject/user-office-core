@@ -11,7 +11,7 @@ import { SearchCriteriaInputProps } from '../../../proposal/SearchCriteriaInputP
 
 function MultipleChoiceSearchCriteriaComponent({
   onChange,
-  question,
+  questionTemplateRelation,
   searchCriteria,
 }: SearchCriteriaInputProps) {
   const [value, setValue] = useState(searchCriteria?.value ?? '');
@@ -26,7 +26,10 @@ function MultipleChoiceSearchCriteriaComponent({
           </InputLabel>
           <Autocomplete
             id="answer"
-            options={(question.config as SelectionFromOptionsConfig).options}
+            options={
+              (questionTemplateRelation.config as SelectionFromOptionsConfig)
+                .options
+            }
             getOptionLabel={option => option}
             renderInput={params => <TextField {...params} label="Answer" />}
             onChange={(_event, newValue) => {
