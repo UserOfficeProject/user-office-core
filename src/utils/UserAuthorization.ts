@@ -8,6 +8,7 @@ import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
+import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
@@ -163,6 +164,12 @@ if (process.env.NODE_ENV === 'test') {
   userDataSourceInstance = new UserDataSourceMock();
   reviewDataSourceInstance = new ReviewDataSourceMock();
   sepDataSourceInstance = new SEPDataSourceMock();
+}
+
+if (process.env.EXTERNAL_AUTH_PROVIDER) {
+  if (process.env.EXTERNAL_AUTH_PROVIDER === 'stfc') {
+    userDataSourceInstance = new StfcUserDataSource();
+  }
 }
 
 export const userAuthorization = new UserAuthorization(

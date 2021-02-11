@@ -42,7 +42,7 @@
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-logger": "^1.0.4",
     "@esss-swap/duo-message-broker": "^1.0.2",
-    "@esss-swap/duo-validation": "1.1.42",
+    "@esss-swap/duo-validation": "^1.1.45",
     "apollo-server": "^2.19.1",
     "apollo-server-core": "^2.19.1",
     "apollo-server-express": "^2.19.1",
@@ -75,7 +75,7 @@
     "yup": "^0.31.1"
   },
   "devDependencies": {
-    "@stfc-user-programme/uows_client_generator": "^1.0.14",
+    "@stfc-user-programme/uows_client_generator": "^1.0.15",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.2",
     "@types/cron": "^1.7.2",
@@ -104,9 +104,9 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jest": "^24.1.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "faker": "^4.1.0",
     "husky": "^4.3.0",
     "jest": "^26.6.0",
+    "faker": "^4.1.0",
     "lint-staged": "^10.4.2",
     "newman": "^4.6.1",
     "nodemon": "^1.19.1",
