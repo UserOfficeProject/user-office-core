@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable quotes */
 import { SelectionFromOptionsConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -43,8 +44,14 @@ export const selectionFromOptionsDefinition: Question = {
     const value = JSON.parse(filter.value).value;
     switch (filter.compareOperator) {
       case QuestionFilterCompareOperator.INCLUDES:
+        /* 
+        "\\?" is escaping question mark for JSONB lookup 
+        (read more here https://www.postgresql.org/docs/9.5/functions-json.html),  
+        but "?" is used for binding 
+        */
         return queryBuilder.andWhereRaw(
-          `(answers.answer->>'value')::jsonb \\? '${value}'`
+          "(answers.answer->>'value')::jsonb \\? ?",
+          value
         );
       default:
         throw new Error(

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable quotes */
 import * as Yup from 'yup';
 
 import { DateConfig } from '../../resolvers/types/FieldConfig';
@@ -57,14 +58,16 @@ export const dateDefinition: Question = {
     const value = JSON.parse(filter.value).value;
     switch (filter.compareOperator) {
       case QuestionFilterCompareOperator.EQUALS:
-        return queryBuilder.andWhereRaw(`answers.answer->>'value'='${value}'`);
+        return queryBuilder.andWhereRaw("answers.answer->>'value'=?", value);
       case QuestionFilterCompareOperator.GREATER_THAN:
         return queryBuilder.andWhereRaw(
-          `(answer->>'value')::timestamp > ('${value}')::timestamp`
+          "(answer->>'value')::timestamp > (?)::timestamp",
+          value
         );
       case QuestionFilterCompareOperator.LESS_THAN:
         return queryBuilder.andWhereRaw(
-          `(answer->>'value')::timestamp < ('${value}')::timestamp`
+          "(answer->>'value')::timestamp < (?)::timestamp",
+          value
         );
       default:
         throw new Error(
