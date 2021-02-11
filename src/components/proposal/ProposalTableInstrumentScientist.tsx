@@ -4,12 +4,14 @@ import Edit from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column } from 'material-table';
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
+import { UserContext } from 'context/UserContextProvider';
 import { Proposal, ProposalsFilter } from 'generated/sdk';
+import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -28,6 +30,7 @@ import ProposalFilterBar from './ProposalFilterBar';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
 
 const ProposalTableInstrumentScientist: React.FC = () => {
+  const { user } = useContext(UserContext);
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
     ProposalUrlQueryParamsType
   >({
@@ -48,6 +51,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     proposalStatusId: urlQueryParams.proposalStatus || 2,
   });
   const { instruments, loadingInstruments } = useInstrumentsData();
+  const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
   const {
     proposalStatuses,
     loadingProposalStatuses,
@@ -55,6 +59,8 @@ const ProposalTableInstrumentScientist: React.FC = () => {
 
   const { loading, proposalsData } = useProposalsData({
     proposalStatusId: proposalFilter.proposalStatusId,
+    instrumentId: proposalFilter.instrumentId,
+    callId: proposalFilter.callId,
   });
 
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -200,6 +206,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   return (
     <>
       <ProposalFilterBar
+        calls={{ data: calls, isLoading: loadingCalls }}
         instruments={{ data: instruments, isLoading: loadingInstruments }}
         proposalStatuses={{
           data: proposalStatuses,

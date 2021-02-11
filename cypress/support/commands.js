@@ -125,11 +125,19 @@ const finishedLoading = () => {
   cy.get('[role="progressbar"]').should('not.exist');
 };
 
-const createProposal = (proposalTitle = '', proposalAbstract = '') => {
+const createProposal = (
+  proposalTitle = '',
+  proposalAbstract = '',
+  call = ''
+) => {
   const title = proposalTitle || faker.random.words(3);
   const abstract = proposalAbstract || faker.random.words(8);
 
   cy.contains('New Proposal').click();
+
+  if (call) {
+    cy.contains(call).click();
+  }
 
   cy.get('[data-cy=title] input')
     .type(title)
