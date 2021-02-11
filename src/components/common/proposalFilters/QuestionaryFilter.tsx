@@ -126,8 +126,8 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
           renderInput={params => <TextField {...params} label="Question" />}
           onChange={(_event, newValue) => {
             setSelectedQuestion(newValue);
+            setSearchCriteria(null);
             if (!newValue) {
-              setSearchCriteria(null);
               handleSubmit(undefined); // submitting because it feels intuitive that filter is cleared if no question is selected
             }
           }}
