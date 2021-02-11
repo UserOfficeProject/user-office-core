@@ -44,8 +44,8 @@ const proposalReducer = (
       draftState.isDirty = false;
       draftState.questionaryId = proposal.questionaryId;
       draftState.proposal = proposal;
-      draftState.steps = proposal.questionary.steps;
-      draftState.templateId = proposal.questionary.templateId;
+      draftState.steps = proposal.questionary?.steps || [];
+      draftState.templateId = proposal.questionary?.templateId || 0;
       break;
     case EventType.PROPOSAL_MODIFIED:
       draftState.proposal = {
@@ -55,15 +55,19 @@ const proposalReducer = (
       draftState.isDirty = true;
       break;
     case EventType.QUESTIONARY_STEPS_LOADED: {
-      draftState.proposal.questionary.steps = action.payload.questionarySteps;
+      if (draftState.proposal.questionary) {
+        draftState.proposal.questionary.steps = action.payload.questionarySteps;
+      }
       break;
     }
     case EventType.QUESTIONARY_STEP_ANSWERED:
       const updatedStep = action.payload.questionaryStep as QuestionaryStep;
-      const stepIndex = draftState.proposal.questionary.steps.findIndex(
-        step => step.topic.id === updatedStep.topic.id
-      );
-      draftState.proposal.questionary.steps[stepIndex] = updatedStep;
+      if (draftState.proposal.questionary) {
+        const stepIndex = draftState.proposal.questionary.steps.findIndex(
+          step => step.topic.id === updatedStep.topic.id
+        );
+        draftState.proposal.questionary.steps[stepIndex] = updatedStep;
+      }
 
       break;
   }
@@ -121,9 +125,9 @@ export default function ProposalContainer(props: {
 
   const createProposalWizardSteps = (): WizardStep[] => {
     const wizardSteps: WizardStep[] = [];
-    const questionarySteps = props.proposal.questionary.steps;
+    const questionarySteps = props.proposal.questionary?.steps;
 
-    questionarySteps.forEach((step, index) =>
+    questionarySteps?.forEach((step, index) =>
       wizardSteps.push(createQuestionaryWizardStep(step, index))
     );
 
@@ -164,7 +168,7 @@ export default function ProposalContainer(props: {
       await api()
         .getProposal({ id: proposalState.proposal.id }) // or load blankQuestionarySteps if sample is null
         .then(data => {
-          if (data.proposal && data.proposal.questionary.steps) {
+          if (data.proposal && data.proposal.questionary?.steps) {
             dispatch({
               type: EventType.PROPOSAL_LOADED,
               payload: { proposal: data.proposal },
@@ -211,11 +215,11 @@ export default function ProposalContainer(props: {
   };
   const initialState: ProposalSubmissionState = {
     proposal: props.proposal,
-    templateId: props.proposal.questionary.templateId,
+    templateId: props.proposal.questionary?.templateId || 0,
     isDirty: false,
-    questionaryId: props.proposal.questionary.questionaryId,
+    questionaryId: props.proposal.questionary?.questionaryId || null,
     stepIndex: 0,
-    steps: props.proposal.questionary.steps,
+    steps: props.proposal.questionary?.steps || [],
     wizardSteps: createProposalWizardSteps(),
   };
 
@@ -233,7 +237,7 @@ export default function ProposalContainer(props: {
       });
       dispatch({
         type: EventType.QUESTIONARY_STEPS_LOADED,
-        payload: { questionarySteps: props.proposal.questionary.steps },
+        payload: { questionarySteps: props.proposal.questionary?.steps },
       });
     }
   }, [previousInitialProposal, props.proposal, dispatch]);
