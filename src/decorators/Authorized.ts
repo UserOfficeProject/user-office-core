@@ -20,6 +20,14 @@ const Authorized = (roles: Roles[] = []) => {
       const [agent] = args;
       const isMutation = target.constructor.name.includes('Mutation');
 
+      if (agent?.isApiAccessToken) {
+        if (agent?.accessPermissions?.[`${target.constructor.name}.${name}`]) {
+          return await originalMethod?.apply(this, args);
+        } else {
+          return isMutation ? rejection('INSUFFICIENT_PERMISSIONS') : null;
+        }
+      }
+
       if (!agent) {
         return isMutation ? rejection('NOT_LOGGED_IN') : null;
       }

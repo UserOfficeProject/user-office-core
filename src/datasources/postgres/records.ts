@@ -420,6 +420,13 @@ export const createPageObject = (record: PageTextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
 
+export interface TokensAndPermissionsRecord {
+  readonly access_token_id: string;
+  readonly name: string;
+  readonly access_token: string;
+  readonly access_permissions: string;
+}
+
 export const createTopicObject = (record: TopicRecord) => {
   return new Topic(
     record.topic_id,

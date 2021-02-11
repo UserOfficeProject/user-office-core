@@ -45,6 +45,8 @@ export class User {
 
 export interface UserWithRole extends User {
   currentRole: Role | undefined;
+  accessPermissions?: any;
+  isApiAccessToken?: boolean;
 }
 
 export enum UserRole {

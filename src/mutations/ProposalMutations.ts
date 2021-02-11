@@ -1,7 +1,7 @@
 import { ResourceId } from '@esss-swap/duo-localisation';
 import { logger } from '@esss-swap/duo-logger';
 import {
-  administrationProposalBEValidationSchema,
+  administrationProposalValidationSchema,
   createProposalValidationSchema,
   deleteProposalValidationSchema,
   proposalNotifyValidationSchema,
@@ -240,7 +240,7 @@ export default class ProposalMutations {
   }
 
   @EventBus(Event.PROPOSAL_SEP_MEETING_SUBMITTED)
-  @ValidateArgs(administrationProposalBEValidationSchema)
+  @ValidateArgs(administrationProposalValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async admin(
     agent: UserWithRole | null,
