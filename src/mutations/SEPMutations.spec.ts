@@ -215,12 +215,12 @@ describe('Test SEPMutations', () => {
   });
 
   test('A user can not assign SEP member to proposal', async () => {
-    const result = (await SEPMutationsInstance.assignMemberToSEPProposal(
+    const result = (await SEPMutationsInstance.assignSepReviewersToProposal(
       dummyUserWithRole,
       {
         proposalId: 1,
         sepId: 1,
-        memberId: 1,
+        memberIds: [1],
       }
     )) as Rejection;
 
@@ -229,11 +229,14 @@ describe('Test SEPMutations', () => {
 
   test('A userofficer can assign SEP member to proposal', () => {
     return expect(
-      SEPMutationsInstance.assignMemberToSEPProposal(dummyUserOfficerWithRole, {
-        proposalId: 1,
-        sepId: 1,
-        memberId: 1,
-      })
+      SEPMutationsInstance.assignSepReviewersToProposal(
+        dummyUserOfficerWithRole,
+        {
+          proposalId: 1,
+          sepId: 1,
+          memberIds: [1],
+        }
+      )
     ).resolves.toStrictEqual(dummySEP);
   });
 });

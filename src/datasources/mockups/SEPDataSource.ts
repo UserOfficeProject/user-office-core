@@ -249,7 +249,7 @@ export class SEPDataSourceMock implements SEPDataSource {
   async assignMemberToSEPProposal(
     proposalId: number,
     sepId: number,
-    memberId: number
+    memberIds: number[]
   ) {
     const sep = dummySEPs.find(element => element.id === sepId);
 

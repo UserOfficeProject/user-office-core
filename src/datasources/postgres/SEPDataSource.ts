@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { ProposalIds } from '../../models/Proposal';
+import { ReviewStatus } from '../../models/Review';
 import { Role } from '../../models/Role';
 import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../../models/SEP';
 import { User } from '../../models/User';
@@ -13,6 +14,7 @@ import {
   RoleUserRecord,
   RoleRecord,
   SEPProposalRecord,
+  ReviewRecord,
 } from './records';
 
 export default class PostgresSEPDataSource implements SEPDataSource {
@@ -419,18 +421,35 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   async assignMemberToSEPProposal(
     proposalId: number,
     sepId: number,
-    memberId: number
+    memberIds: number[]
   ) {
-    const assignmentAdded = await database('SEP_Assignments').insert({
-      proposal_id: proposalId,
-      sep_member_user_id: memberId,
-      sep_id: sepId,
+    await database.transaction(async trx => {
+      await trx<SEPAssignmentRecord>('SEP_Assignments')
+        .insert(
+          memberIds.map(memberId => ({
+            proposal_id: proposalId,
+            sep_member_user_id: memberId,
+            sep_id: sepId,
+          }))
+        )
+        .returning<SEPAssignmentRecord[]>(['*']);
+
+      await trx<ReviewRecord>('SEP_Reviews')
+        .insert(
+          memberIds.map(memberId => ({
+            user_id: memberId,
+            proposal_id: proposalId,
+            status: ReviewStatus.DRAFT,
+            sep_id: sepId,
+          }))
+        )
+        .returning<ReviewRecord[]>(['*']);
     });
 
-    const sepUpdated = await this.get(sepId);
+    const updatedSep = await this.get(sepId);
 
-    if (assignmentAdded && sepUpdated) {
-      return sepUpdated;
+    if (updatedSep) {
+      return updatedSep;
     }
 
     throw new Error(`SEP not found ${sepId}`);
