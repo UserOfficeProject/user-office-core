@@ -1,10 +1,10 @@
-mutation assignMemberToSEPProposal(
-  $memberId: Int!
+mutation assignSepReviewersToProposal(
+  $memberIds: [Int!]!
   $sepId: Int!
   $proposalId: Int!
 ) {
-  assignMemberToSEPProposal(
-    memberId: $memberId
+  assignSepReviewersToProposal(
+    memberIds: $memberIds
     sepId: $sepId
     proposalId: $proposalId
   ) {
