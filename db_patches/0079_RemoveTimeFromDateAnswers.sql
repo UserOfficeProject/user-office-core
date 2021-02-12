@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-	IF register_patch('RemoveTimeFromDateAnswers.sql', 'jekabskarklins', 'Removing time from date answers, so exact date lookups can be made', '2020-11-27') THEN
+	IF register_patch('RemoveTimeFromDateAnswers.sql', 'jekabskarklins', 'Removing time from date answers, so exact date lookups can be made', '2021-02-12') THEN
 
         CREATE OR REPLACE FUNCTION updateDateAnswers() RETURNS SETOF answers AS
         $BODY$
