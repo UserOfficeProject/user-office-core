@@ -1159,7 +1159,7 @@ context('Template tests', () => {
     );
   });
 
-  it('User officer can can change dependency logic operator', () => {
+  it('User officer can change dependency logic operator', () => {
     cy.login('officer');
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
@@ -1218,6 +1218,89 @@ context('Template tests', () => {
       'contain.text',
       'Question with multiple dependencies'
     );
+  });
+
+  it('User can add captions after uploading image/* file', () => {
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    cy.get('[title="Edit"]')
+      .last()
+      .click();
+
+    cy.get('[data-cy=show-more-button]').click();
+
+    cy.contains('Add question').click();
+
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+      .last()
+      .click();
+
+    cy.contains('Add File Upload').click();
+
+    cy.get('[data-cy="question"]')
+      .clear()
+      .type('File upload question');
+
+    cy.get('[data-cy="max_files"] input')
+      .clear()
+      .type('5');
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.contains('File upload question')
+      .parent()
+      .dragElement([
+        { direction: 'left', length: 1 },
+        { direction: 'down', length: 3 },
+      ])
+      .wait(500);
+
+    cy.finishedLoading();
+
+    cy.logout();
+
+    cy.login('user');
+
+    cy.contains('New Proposal').click();
+
+    cy.contains('File upload question');
+
+    cy.get('[data-cy="title"] input').type('Test title');
+    cy.get('[data-cy="abstract"] textarea')
+      .first()
+      .type('Test abstract');
+
+    cy.fixture('file_upload_test.png').then(fileContent => {
+      // NOTE: Using "cypress-file-upload" version "^3.5.3" because this(https://github.com/abramenal/cypress-file-upload/issues/179) should be fixed before upgrading to the latest
+      cy.get('input[type="file"]').upload({
+        fileContent: fileContent.toString(),
+        fileName: 'file_upload_test.png',
+        mimeType: 'image/png',
+      });
+
+      cy.contains('file_upload_test');
+      cy.get('[title="Add image caption"]').click();
+
+      cy.get('[data-cy="image-caption"] input').type('Test caption');
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Proposal information');
+
+      cy.contains('file_upload_test');
+
+      cy.contains('New proposal').click();
+
+      cy.contains('file_upload_test');
+      cy.get('[data-cy="image-caption"] input').should(
+        'have.value',
+        'Test caption'
+      );
+    });
   });
 
   it('should not let you create circular dependency chain', () => {

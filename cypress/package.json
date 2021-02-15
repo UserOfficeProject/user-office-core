@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "http://localhost:4000",
   "dependencies": {
+    "cypress-file-upload": "^3.5.3",
     "dateformat": "^3.0.3",
     "faker": "^4.1.0",
     "graphql-request": "^1.8.2",

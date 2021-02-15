@@ -7,14 +7,17 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import withStyles from '@material-ui/core/styles/withStyles';
+import TextField from '@material-ui/core/TextField';
+import Tooltip from '@material-ui/core/Tooltip';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import CancelIcon from '@material-ui/icons/Cancel';
+import ClosedCaption from '@material-ui/icons/ClosedCaption';
+import ClosedCaptionOutlinedIcon from '@material-ui/icons/ClosedCaptionOutlined';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import ErrorIcon from '@material-ui/icons/Error';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 
 import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
 import { useFileMetadata } from 'hooks/file/useFileMetadata';
@@ -22,14 +25,17 @@ import { FileMetaData } from 'models/FileUpload';
 
 import UOLoader from './UOLoader';
 
+export type FileIdWithCaption = { id: string; caption?: string | null };
+
 export function FileUploadComponent(props: {
   maxFiles?: number;
   id?: string;
   fileType?: string;
-  value: string[];
-  onChange: (files: FileMetaData[]) => any;
+  value: FileIdWithCaption[];
+  onChange: (files: FileIdWithCaption[]) => void;
 }) {
-  const { files, setFiles } = useFileMetadata(props.value);
+  const fileIds = props.value.map(fileItem => fileItem.id);
+  const { files, setFiles } = useFileMetadata(fileIds);
 
   const classes = makeStyles(() => ({
     questionnairesList: {
@@ -45,7 +51,14 @@ export function FileUploadComponent(props: {
   const onUploadComplete = (newFile: FileMetaData): void => {
     const newValue = files.concat(newFile);
     setFiles(newValue);
-    props.onChange(newValue);
+    props.onChange(
+      newValue.map(item => ({
+        id: item.fileId,
+        caption: props.value.find(
+          fileAnswerItem => fileAnswerItem.id === item.fileId
+        )?.caption,
+      }))
+    );
   };
 
   const onDeleteClicked = (deleteFile: FileMetaData): void => {
@@ -53,7 +66,26 @@ export function FileUploadComponent(props: {
       fileId => fileId.fileId !== deleteFile.fileId
     );
     setFiles(newValue);
-    props.onChange(newValue);
+    props.onChange(
+      newValue.map(item => ({
+        id: item.fileId,
+        caption: props.value.find(
+          fileAnswerItem => fileAnswerItem.id === item.fileId
+        )?.caption,
+      }))
+    );
+  };
+
+  const onImageCaptionAdded = (fileId: string, caption: string) => {
+    props.onChange(
+      props.value.map(item => {
+        if (item.id === fileId) {
+          return { id: item.id, caption };
+        } else {
+          return { id: item.id, caption: item.caption };
+        }
+      })
+    );
   };
 
   const { fileType } = props;
@@ -81,6 +113,11 @@ export function FileUploadComponent(props: {
                   key={metaData.fileId}
                   onDeleteClicked={onDeleteClicked}
                   metaData={metaData}
+                  caption={
+                    props.value.find(item => item.id === metaData.fileId)
+                      ?.caption
+                  }
+                  onImageCaptionAdded={onImageCaptionAdded}
                 />
               </ListItem>
             );
@@ -91,22 +128,16 @@ export function FileUploadComponent(props: {
   );
 }
 
-const ListItemWithWiderSecondaryAction = withStyles({
-  secondaryAction: {
-    paddingRight: 96,
-    width: 400,
-    maxWidth: 400,
-  },
-})(ListItem);
-
 export function FileEntry(props: {
   onDeleteClicked: Function;
   metaData: FileMetaData;
+  onImageCaptionAdded: Function;
+  caption: string | null | undefined;
 }) {
   const classes = makeStyles(theme => ({
     fileListWrapper: {
       marginTop: theme.spacing(2),
-      marginBottim: theme.spacing(2),
+      marginBottom: theme.spacing(2),
     },
     avatar: {
       backgroundColor: theme.palette.primary.main,
@@ -116,7 +147,15 @@ export function FileEntry(props: {
       display: 'inline-flex',
       color: 'rgba(0, 0, 0, 0.54)',
     },
+    fileText: {
+      maxWidth: '60%',
+    },
+    captionInput: {
+      marginLeft: theme.spacing(2),
+    },
   }))();
+
+  const [showCaption, setShowCaption] = useState(false);
 
   const downloadLink = `/files/download/${props.metaData.fileId}`;
 
@@ -133,7 +172,7 @@ export function FileEntry(props: {
   };
 
   return (
-    <ListItemWithWiderSecondaryAction button>
+    <>
       <ListItemAvatar>
         <Avatar className={classes.avatar}>
           <AttachFileIcon />
@@ -142,13 +181,30 @@ export function FileEntry(props: {
       <ListItemText
         primary={props.metaData.originalFileName}
         secondary={formatBytes(props.metaData.sizeInBytes)}
+        className={classes.fileText}
       />
-      <ListItemSecondaryAction>
+      {props.metaData.mimeType.startsWith('image') && (
+        <Tooltip title="Add image caption">
+          <IconButton
+            edge="end"
+            onClick={(): void => setShowCaption(!showCaption)}
+          >
+            {showCaption || props.caption ? (
+              <ClosedCaption />
+            ) : (
+              <ClosedCaptionOutlinedIcon />
+            )}
+          </IconButton>
+        </Tooltip>
+      )}
+      <Tooltip title="Download file">
         <IconButton edge="end">
           <a href={downloadLink} className={classes.downloadLink} download>
             <GetAppIcon />
           </a>
         </IconButton>
+      </Tooltip>
+      <Tooltip title="Remove file">
         <IconButton
           edge="end"
           onClick={(): void => {
@@ -157,19 +213,30 @@ export function FileEntry(props: {
         >
           <DeleteOutlineIcon />
         </IconButton>
-      </ListItemSecondaryAction>
-    </ListItemWithWiderSecondaryAction>
+      </Tooltip>
+      {(showCaption || props.caption) && (
+        <TextField
+          label="Image caption"
+          data-cy="image-caption"
+          defaultValue={props.caption || ''}
+          className={classes.captionInput}
+          onBlur={e =>
+            props.onImageCaptionAdded(props.metaData.fileId, e.target.value)
+          }
+        />
+      )}
+    </>
   );
 }
 
 export function NewFileEntry(props: {
   filetype: string | undefined;
-  onUploadComplete: (data: FileMetaData) => any;
+  onUploadComplete: (data: FileMetaData) => void;
 }) {
   const classes = makeStyles(theme => ({
     fileListWrapper: {
       marginTop: theme.spacing(2),
-      marginBottim: theme.spacing(2),
+      marginBottom: theme.spacing(2),
     },
     addIcon: {
       marginRight: theme.spacing(1),
@@ -237,7 +304,7 @@ export function NewFileEntry(props: {
       return (
         <>
           <ListItemAvatar>
-            <UOLoader variant="static" value={progress} />
+            <UOLoader variant="determinate" value={progress} />
           </ListItemAvatar>
           <ListItemText
             primary="Uploading..."

@@ -79,7 +79,6 @@ export const QuestionFileUploadForm: FormComponent<Question> = props => {
                 'video/*',
                 'image/*',
               ]}
-              margin="normal"
               fullWidth
               data-cy="file_type"
             />
