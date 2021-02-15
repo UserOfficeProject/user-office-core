@@ -5,7 +5,8 @@ export class TechnicalReview {
     public comment: string,
     public publicComment: string,
     public timeAllocation: number,
-    public status: number
+    public status: number,
+    public submitted: boolean
   ) {}
 }
 
