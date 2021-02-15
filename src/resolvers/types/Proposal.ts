@@ -91,7 +91,7 @@ export class ProposalResolver {
     return isRejection(users) ? [] : users;
   }
 
-  @FieldResolver(() => BasicUserDetails)
+  @FieldResolver(() => BasicUserDetails, { nullable: true })
   async proposer(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
@@ -102,7 +102,7 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => ProposalStatus)
+  @FieldResolver(() => ProposalStatus, { nullable: true })
   async status(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
@@ -169,10 +169,7 @@ export class ProposalResolver {
     return await context.queries.call.dataSource.get(proposal.callId);
   }
 
-  // TODO(asztalos): in long term make this nullable as it can return null
-  //                 but would require quite a number of changes on FE to
-  //                 to make TypeScript happy
-  @FieldResolver(() => Questionary)
+  @FieldResolver(() => Questionary, { nullable: true })
   async questionary(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext

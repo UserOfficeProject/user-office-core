@@ -36,7 +36,19 @@ export class AssignMembersSEPArgs {
 }
 
 @ArgsType()
-export class AssignSEPProposalToMemberArgs {
+export class AssignSepReviewersToProposalArgs {
+  @Field(() => [Int])
+  public memberIds: number[];
+
+  @Field(() => Int)
+  public sepId: number;
+
+  @Field(() => Int)
+  public proposalId: number;
+}
+
+@ArgsType()
+export class RemoveSepReviewerFromProposalArgs {
   @Field(() => Int)
   public memberId: number;
 
@@ -92,19 +104,19 @@ export class AssignMembersToSEPMutation {
   }
 
   @Mutation(() => SEPResponseWrap)
-  async assignMemberToSEPProposal(
-    @Args() args: AssignSEPProposalToMemberArgs,
+  async assignSepReviewersToProposal(
+    @Args() args: AssignSepReviewersToProposalArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sep.assignMemberToSEPProposal(context.user, args),
+      context.mutations.sep.assignSepReviewersToProposal(context.user, args),
       SEPResponseWrap
     );
   }
 
   @Mutation(() => SEPResponseWrap)
   async removeMemberFromSEPProposal(
-    @Args() args: AssignSEPProposalToMemberArgs,
+    @Args() args: RemoveSepReviewerFromProposalArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(

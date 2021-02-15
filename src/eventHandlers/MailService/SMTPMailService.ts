@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
-import * as fs from 'fs';
-
 import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
 

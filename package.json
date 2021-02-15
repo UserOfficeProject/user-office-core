@@ -42,7 +42,7 @@
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-logger": "^1.0.4",
     "@esss-swap/duo-message-broker": "^1.0.2",
-    "@esss-swap/duo-validation": "^1.1.45",
+    "@esss-swap/duo-validation": "^1.1.46",
     "apollo-server": "^2.19.1",
     "apollo-server-core": "^2.19.1",
     "apollo-server-express": "^2.19.1",
@@ -116,7 +116,7 @@
     "nodemon": "^1.19.1",
     "prettier": "^1.19.1",
     "sinon": "^9.2.1",
-    "ts-jest": "^26.4.4",
+    "ts-jest": "^26.4.1",
     "ts-node-dev": "^1.1.1",
     "typescript": "^3.9.7"
   }
