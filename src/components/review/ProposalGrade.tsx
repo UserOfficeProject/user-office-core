@@ -126,7 +126,7 @@ export default function ProposalGrade(props: {
               color="secondary"
               onClick={() => {
                 const confirmed = window.confirm(
-                  'I am aware that no futhure changes to the grade is possible after submission.'
+                  'I am aware that no further changes to the grade are possible after submission.'
                 );
                 if (confirmed) {
                   setFieldValue('saveOnly', false, false);

@@ -2,11 +2,11 @@ import TextField from '@material-ui/core/TextField';
 import React, { useState } from 'react';
 
 export default function RankInput(props: {
-  defaultvalue: number | null | undefined;
+  defaultValue: number | null | undefined;
   proposalID: number;
   onChange: (proposalID: number, ranking: number) => void;
 }) {
-  const [value, setValue] = useState(props.defaultvalue);
+  const [value, setValue] = useState(props.defaultValue);
   const [editable, setEditable] = useState(false);
 
   if (!editable) {
@@ -19,7 +19,7 @@ export default function RankInput(props: {
       label="Rank"
       type="number"
       autoFocus
-      defaultValue={props.defaultvalue}
+      defaultValue={props.defaultValue}
       onChange={event => setValue(parseInt(event.target.value))}
       onKeyPress={ev => {
         console.log(`Pressed keyCode ${ev.key}`);

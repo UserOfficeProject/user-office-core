@@ -1,17 +1,19 @@
-mutation addTechnicalReview(
+mutation submitTechnicalReview(
   $proposalID: Int!
   $timeAllocation: Int
   $comment: String
   $publicComment: String
   $status: TechnicalReviewStatus
+  $submitted: Boolean!
 ) {
-  addTechnicalReview(
-    addTechnicalReviewInput: {
+  submitTechnicalReview(
+    submitTechnicalReviewInput: {
       proposalID: $proposalID
       timeAllocation: $timeAllocation
       comment: $comment
       publicComment: $publicComment
       status: $status
+      submitted: $submitted
     }
   ) {
     error

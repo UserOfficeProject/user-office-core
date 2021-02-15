@@ -2,14 +2,14 @@ import DoneAll from '@material-ui/icons/DoneAll';
 import MaterialTable, { Options } from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
-import DialogConfirmation from 'components/common/DialogConfirmation';
 import { InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useInstrumentsBySEPData } from 'hooks/instrument/useInstrumentsBySEPData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
 
@@ -17,12 +17,14 @@ type SEPMeetingInstrumentsTableProps = {
   sepId: number;
   Toolbar: (data: Options) => JSX.Element;
   selectedCallId: number;
+  confirm: WithConfirmType;
 };
 
 const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
   sepId,
   selectedCallId,
   Toolbar,
+  confirm,
 }) => {
   const {
     loadingInstruments,
@@ -30,10 +32,6 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     setInstrumentsData,
   } = useInstrumentsBySEPData(sepId, selectedCallId);
   const { api } = useDataApiWithFeedback();
-  const [
-    instrumentToSubmit,
-    setInstrumentToSubmit,
-  ] = useState<InstrumentWithAvailabilityTime | null>(null);
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
     UserRole.SEP_CHAIR,
@@ -67,7 +65,9 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     />
   );
 
-  const submitInstrument = async () => {
+  const submitInstrument = async (
+    instrumentToSubmit: InstrumentWithAvailabilityTime
+  ) => {
     if (instrumentToSubmit) {
       const response = await api().sepProposalsByInstrument({
         instrumentId: instrumentToSubmit.id,
@@ -103,8 +103,6 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
           className: 'snackbar-error',
         });
       }
-
-      setInstrumentToSubmit(null);
     }
   };
 
@@ -121,9 +119,22 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
       ) => ({
         icon: DoneAllIcon,
         disabled: !!(rowData as InstrumentWithAvailabilityTime).submitted,
-        onClick: () => {
-          setInstrumentToSubmit(rowData as InstrumentWithAvailabilityTime);
-        },
+        onClick: (
+          event: Event,
+          rowData:
+            | InstrumentWithAvailabilityTime
+            | InstrumentWithAvailabilityTime[]
+        ) =>
+          confirm(
+            () => {
+              submitInstrument(rowData as InstrumentWithAvailabilityTime);
+            },
+            {
+              title: 'Submit instrument',
+              description: 'Are you sure you want to submit the instrument?',
+            }
+          )(),
+        // setInstrumentToSubmit(rowData as InstrumentWithAvailabilityTime);
         tooltip: 'Submit instrument',
       })
     );
@@ -131,13 +142,6 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
 
   return (
     <div data-cy="SEP-meeting-components-table">
-      <DialogConfirmation
-        title="Submit instrument"
-        text="Are you sure you want to submit the instrument?"
-        open={!!instrumentToSubmit}
-        action={submitInstrument}
-        handleOpen={() => setInstrumentToSubmit(null)}
-      />
       <MaterialTable
         icons={tableIcons}
         title={'Instruments with proposals'}
@@ -167,6 +171,7 @@ SEPMeetingInstrumentsTable.propTypes = {
   sepId: PropTypes.number.isRequired,
   selectedCallId: PropTypes.number.isRequired,
   Toolbar: PropTypes.func.isRequired,
+  confirm: PropTypes.func.isRequired,
 };
 
-export default SEPMeetingInstrumentsTable;
+export default withConfirm(SEPMeetingInstrumentsTable);
