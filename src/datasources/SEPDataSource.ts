@@ -59,7 +59,7 @@ export interface SEPDataSource {
   assignMemberToSEPProposal(
     proposalId: number,
     sepId: number,
-    memberId: number
+    memberIds: number[]
   ): Promise<SEP>;
   updateTimeAllocation(
     sepId: number,
