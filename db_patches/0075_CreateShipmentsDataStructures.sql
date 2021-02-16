@@ -3,7 +3,7 @@ $$
 DECLARE
     shipmentCategoryId int;
 BEGIN
-	IF register_patch('CreateShipmentsTable.sql', 'jekabskarklins', 'Create shipments table', '2020-12-08') THEN
+	IF register_patch('CreateShipmentsTable.sql', 'jekabskarklins', 'Create shipments table', '2021-01-11') THEN
 	BEGIN
 
       CREATE TABLE shipments (

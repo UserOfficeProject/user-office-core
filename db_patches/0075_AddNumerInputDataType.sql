@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-	IF register_patch('AddNumberInputDataType.sql', 'fredrikbolmsten', 'Adding new question type', '2020-12-17') THEN
+	IF register_patch('AddNumberInputDataType.sql', 'fredrikbolmsten', 'Adding new question type', '2021-01-04') THEN
 	BEGIN
 
     INSERT INTO question_datatypes VALUES('NUMBER_INPUT');
