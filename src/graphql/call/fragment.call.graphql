@@ -31,4 +31,5 @@ fragment call on Call {
     name
     description
   }
+  proposalCount
 }
