@@ -5,7 +5,6 @@ import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
-import { IntervalPropertyId } from '../Interval/intervalUnits';
 import { createNumberInputValidationSchema } from './createNumberInputValidationSchema';
 import { QuestionaryComponentNumber } from './QuestionaryComponentNumberInput';
 import { QuestionNumberForm } from './QuestionNumberInputForm';
@@ -23,12 +22,11 @@ export const numberInputDefinition: QuestionaryComponentDefinition = {
   renderers: {
     answerRenderer: ({ answer }) =>
       answer.value.value !== null ? (
-        <span>{`${answer.value.value} ${answer.value.unit || ''}`}</span>
+        <span>{`${answer.value.value} ${answer.value.unit}`}</span>
       ) : null,
     questionRenderer: defaultRenderer.questionRenderer,
   },
 
   createYupValidationSchema: createNumberInputValidationSchema,
-  getYupInitialValue: ({ answer }) =>
-    answer.value || { value: '', unit: IntervalPropertyId.UNITLESS },
+  getYupInitialValue: ({ answer }) => answer.value || { value: '', unit: '' },
 };
