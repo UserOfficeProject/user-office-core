@@ -2,6 +2,7 @@ import { Page } from '../models/Admin';
 import { Feature } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { Permissions } from '../models/Permissions';
+import { Unit } from '../models/Unit';
 import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
@@ -21,6 +22,9 @@ export interface AdminDataSource {
   resetDB(): Promise<string>;
   applyPatches(): Promise<string>;
   getFeatures(): Promise<Feature[]>;
+  createUnit(unit: Unit): Promise<Unit | null>;
+  deleteUnit(id: number): Promise<Unit>;
+  getUnits(): Promise<Unit[]>;
   createApiAccessToken(
     args: CreateApiAccessTokenInput,
     accessTokenId: string,
