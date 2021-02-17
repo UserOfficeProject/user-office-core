@@ -207,6 +207,7 @@ export interface TechnicalReviewRecord {
   readonly public_comment: string;
   readonly time_allocation: number;
   readonly status: number;
+  readonly submitted: boolean;
 }
 
 export interface CallRecord {
@@ -245,6 +246,11 @@ export interface InstitutionRecord {
   readonly institution_id: number;
   readonly institution: string;
   readonly verified: boolean;
+}
+
+export interface UnitRecord {
+  readonly unit_id: number;
+  readonly unit: string;
 }
 
 export interface CountryRecord {

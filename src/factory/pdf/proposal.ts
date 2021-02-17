@@ -11,7 +11,7 @@ import { TechnicalReview } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
 import { isRejection } from '../../rejection';
-import { getFileAttachmentIds } from '../util';
+import { getFileAttachments, Attachment } from '../util';
 import { collectSamplePDFData, SamplePDFData } from './sample';
 
 type ProposalPDFData = {
@@ -19,7 +19,7 @@ type ProposalPDFData = {
   principalInvestigator: BasicUserDetails;
   coProposers: BasicUserDetails[];
   questionarySteps: QuestionaryStep[];
-  attachmentIds: string[];
+  attachments: Attachment[];
   technicalReview?: TechnicalReview;
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
 };
@@ -77,7 +77,7 @@ export const collectProposalPDFData = async (
     throw new Error('User was not PI or co-proposer');
   }
 
-  const sampleAttachmentIds: string[] = [];
+  const sampleAttachments: Attachment[] = [];
 
   const samples = await baseContext.queries.sample.getSamples(user, {
     filter: { proposalId },
@@ -87,8 +87,8 @@ export const collectProposalPDFData = async (
     await Promise.all(
       samples.map(sample => collectSamplePDFData(sample.id, user))
     )
-  ).map(({ sample, sampleQuestionaryFields, attachmentIds }) => {
-    sampleAttachmentIds.push(...attachmentIds);
+  ).map(({ sample, sampleQuestionaryFields, attachments }) => {
+    sampleAttachments.push(...attachments);
 
     return { sample, sampleQuestionaryFields };
   });
@@ -104,7 +104,7 @@ export const collectProposalPDFData = async (
     principalInvestigator,
     coProposers,
     questionarySteps: [],
-    attachmentIds: [],
+    attachments: [],
     samples: samplePDFData,
   };
 
@@ -128,12 +128,12 @@ export const collectProposalPDFData = async (
       continue;
     }
 
-    const questionaryAttachmentIds = [];
+    const questionaryAttachments: Attachment[] = [];
 
     for (let i = 0; i < answers.length; i++) {
       const answer = answers[i];
 
-      questionaryAttachmentIds.push(...getFileAttachmentIds(answer));
+      questionaryAttachments.push(...getFileAttachments(answer));
 
       if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
         answer.value = samples
@@ -148,8 +148,8 @@ export const collectProposalPDFData = async (
       ...step,
       fields: answers,
     });
-    out.attachmentIds.push(...questionaryAttachmentIds);
-    out.attachmentIds.push(...sampleAttachmentIds);
+    out.attachments.push(...questionaryAttachments);
+    out.attachments.push(...sampleAttachments);
   }
 
   if (userAuthorization.isReviewerOfProposal(user, proposal.id)) {

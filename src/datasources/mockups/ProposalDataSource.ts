@@ -173,4 +173,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       proposal_notified: false,
     };
   }
+
+  async getCount(callId: number): Promise<number> {
+    return 1;
+  }
 }
