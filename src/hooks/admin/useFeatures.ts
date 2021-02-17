@@ -19,6 +19,10 @@ export function useFeatures(): {
       .then(data => {
         setFeatures(data.features);
         setLoadingFeatures(false);
+      })
+      .catch(() => {
+        setFeatures([]);
+        setLoadingFeatures(false);
       });
   }, [api]);
 

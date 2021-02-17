@@ -11,11 +11,10 @@ import GroupWork from '@material-ui/icons/GroupWork';
 import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
-import DialogConfirmation from 'components/common/DialogConfirmation';
 import ScienceIconAdd from 'components/common/icons/ScienceIconAdd';
 import ScienceIconRemove from 'components/common/icons/ScienceIconRemove';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
@@ -36,6 +35,7 @@ import {
 import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ProposalUrlQueryParamsType } from './ProposalPage';
 import RankInput from './RankInput';
@@ -44,32 +44,26 @@ type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
   urlQueryParams: DecodedValueMap<ProposalUrlQueryParamsType>;
   setUrlQueryParams: SetQuery<ProposalUrlQueryParamsType>;
+  confirm: WithConfirmType;
 };
 
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
   urlQueryParams,
   setUrlQueryParams,
+  confirm,
 }) => {
-  const [openDeleteProposals, setOpenDeleteProposals] = useState(false);
-  const [openRemoveInstrument, setOpenRemoveInstrument] = useState(false);
   const [openAssignment, setOpenAssignment] = useState(false);
-  const [proposalAndInstrumentId, setProposalAndInstrumentId] = useState<{
-    proposalId: number | null;
-    instrumentId: number | null;
-  }>({
-    proposalId: null,
-    instrumentId: null,
-  });
   const [openInstrumentAssignment, setOpenInstrumentAssignment] = useState(
     false
   );
-  const [openEmailProposals, setOpenEmailProposals] = useState(false);
+  const [selectedProposals, setSelectedProposals] = useState<
+    ProposalsToInstrumentArgs[]
+  >([]);
+  const [preselectedProposalsData, setPreselectedProposalsData] = useState<
+    ProposalViewData[]
+  >([]);
 
-  const initialSelectedProposals: ProposalsToInstrumentArgs[] = [];
-  const [selectedProposals, setSelectedProposals] = useState(
-    initialSelectedProposals
-  );
   const downloadPDFProposal = useDownloadPDFProposal();
   const downloadXLSXProposal = useDownloadXLSXProposal();
   const { api } = useDataApiWithFeedback();
@@ -80,6 +74,35 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const { loading, setProposalsData, proposalsData } = useProposalsCoreData(
     proposalFilter
   );
+
+  useEffect(() => {
+    if (urlQueryParams.selection.length > 0) {
+      const proposalsWithTableDataCheckedProperty = proposalsData.map(
+        proposal => {
+          return {
+            ...proposal,
+            tableData: {
+              checked: urlQueryParams.selection?.some(
+                (selectedItem: string | null) =>
+                  selectedItem === proposal.id.toString()
+              ),
+            },
+          };
+        }
+      );
+
+      const onlySelectedProposals = proposalsWithTableDataCheckedProperty.filter(
+        proposal => proposal.tableData.checked
+      );
+
+      setPre
+      
+      Data(proposalsWithTableDataCheckedProperty);
+      setSelectedProposals(onlySelectedProposals);
+    } else {
+      setPreselectedProposalsData(proposalsData);
+    }
+  }, [proposalsData, urlQueryParams.selection]);
 
   const setNewRanking = (proposalID: number, ranking: number) => {
     api().administrationProposal({
@@ -95,19 +118,19 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     );
   };
 
-  const removeProposalFromInstrument = async () => {
-    if (
-      !proposalAndInstrumentId.instrumentId ||
-      !proposalAndInstrumentId.proposalId
-    ) {
+  const removeProposalFromInstrument = async (
+    proposalId: number,
+    instrumentId: number | null
+  ) => {
+    if (!instrumentId || !proposalId) {
       return;
     }
 
     const result = await api(
       'Proposal removed from the instrument successfully!'
     ).removeProposalFromInstrument({
-      proposalId: proposalAndInstrumentId.proposalId,
-      instrumentId: proposalAndInstrumentId.instrumentId,
+      proposalId,
+      instrumentId,
     });
 
     const isError = !!result.removeProposalFromInstrument.error;
@@ -115,7 +138,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     if (!isError) {
       setProposalsData(
         proposalsData.map(prop => {
-          if (prop.id === proposalAndInstrumentId.proposalId) {
+          if (prop.id === proposalId) {
             prop.instrumentName = null;
             prop.instrumentId = null;
           }
@@ -124,8 +147,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         })
       );
     }
-
-    setProposalAndInstrumentId({ proposalId: null, instrumentId: null });
   };
 
   const RemoveScienceIcon = (): JSX.Element => <ScienceIconRemove />;
@@ -164,11 +185,19 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             <IconButton
               style={iconButtonStyle}
               onClick={() => {
-                setProposalAndInstrumentId({
-                  proposalId: rowData.id,
-                  instrumentId: rowData.instrumentId,
-                });
-                setOpenRemoveInstrument(true);
+                confirm(
+                  async () => {
+                    await removeProposalFromInstrument(
+                      rowData.id,
+                      rowData.instrumentId
+                    );
+                  },
+                  {
+                    title: 'Remove assigned instrument',
+                    description:
+                      'This action will remove assigned instrument from proposal.',
+                  }
+                )();
               }}
             >
               <RemoveScienceIcon />
@@ -181,7 +210,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const RankComponent = (rowData: ProposalViewData) => (
     <RankInput
       proposalID={rowData.id}
-      defaultvalue={rowData.rankOrder}
+      defaultValue={rowData.rankOrder}
       onChange={setNewRanking}
     />
   );
@@ -259,29 +288,23 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     }));
   }
 
+  // TODO: Maybe it will be good to make notifyProposal and deleteProposal bulk functions where we can sent array of proposal ids.
   const emailProposals = (): void => {
-    selectedProposals.forEach(proposal => {
-      new Promise<void>(async resolve => {
-        await api()
-          .notifyProposal({ id: proposal.id })
-          .then(data => {
-            if (data.notifyProposal.error) {
-              enqueueSnackbar(
-                `Could not send email to all selected proposals`,
-                {
-                  variant: 'error',
-                }
-              );
-            } else {
-              proposalsData[
-                proposalsData.findIndex(val => val.id === proposal.id)
-              ].notified = true;
-              setProposalsData([...proposalsData]);
-            }
-          });
-
-        resolve();
+    selectedProposals.forEach(async proposal => {
+      const {
+        notifyProposal: { error },
+      } = await api('Notification sent successfully').notifyProposal({
+        id: proposal.id,
       });
+
+      if (error) {
+        return;
+      }
+
+      proposalsData[
+        proposalsData.findIndex(val => val.id === proposal.id)
+      ].notified = true;
+      setProposalsData([...proposalsData]);
     });
   };
 
@@ -396,21 +419,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   );
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
 
-  const preselectedProposalsData =
-    urlQueryParams.selection.length > 0
-      ? proposalsData.map(proposalData => {
-          return {
-            ...proposalData,
-            tableData: {
-              checked: urlQueryParams.selection?.some(
-                (selectedItem: string | null) =>
-                  selectedItem === proposalData.id.toString()
-              ),
-            },
-          };
-        })
-      : proposalsData;
-
   columns = setSortDirectionOnSortColumn(
     columns,
     urlQueryParams.sortColumn,
@@ -419,27 +427,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   return (
     <>
-      <DialogConfirmation
-        title="Delete proposals"
-        text="This action will delete proposals and all data associated with them"
-        open={openDeleteProposals}
-        action={deleteProposals}
-        handleOpen={setOpenDeleteProposals}
-      />
-      <DialogConfirmation
-        title="Remove assigned instrument"
-        text="This action will remove assigned instrument from proposal"
-        open={openRemoveInstrument}
-        action={removeProposalFromInstrument}
-        handleOpen={setOpenRemoveInstrument}
-      />
-      <DialogConfirmation
-        title="Notify results"
-        text="This action will trigger emails to be sent to principal investigators"
-        open={openEmailProposals}
-        action={emailProposals}
-        handleOpen={setOpenEmailProposals}
-      />
       <Dialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
@@ -485,6 +472,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
                 ? selectedItems.map(selectedItem => selectedItem.id.toString())
                 : undefined,
           });
+          setSelectedProposals(selectedItems);
         }}
         options={{
           search: true,
@@ -520,7 +508,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             icon: DeleteIcon,
             tooltip: 'Delete proposals',
             onClick: (event, rowData): void => {
-              setOpenDeleteProposals(true);
               setSelectedProposals(
                 (rowData as ProposalViewData[]).map(
                   (row: ProposalViewData) => ({
@@ -529,6 +516,17 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
                   })
                 )
               );
+
+              confirm(
+                () => {
+                  deleteProposals();
+                },
+                {
+                  title: 'Delete proposals',
+                  description:
+                    'This action will delete proposals and all data associated with them.',
+                }
+              )();
             },
             position: 'toolbarOnSelect',
           },
@@ -570,7 +568,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             icon: EmailIcon,
             tooltip: 'Notify users final result',
             onClick: (event, rowData): void => {
-              setOpenEmailProposals(true);
               setSelectedProposals(
                 (rowData as ProposalViewData[]).map(
                   (row: ProposalViewData) => ({
@@ -579,6 +576,17 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
                   })
                 )
               );
+
+              confirm(
+                () => {
+                  emailProposals();
+                },
+                {
+                  title: 'Notify results',
+                  description:
+                    'This action will trigger emails to be sent to principal investigators.',
+                }
+              )();
             },
             position: 'toolbarOnSelect',
           },
@@ -609,7 +617,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 };
 
 export default React.memo(
-  ProposalTableOfficer,
+  withConfirm(ProposalTableOfficer),
   (prevProps, nextProps) =>
     JSON.stringify(prevProps.proposalFilter) ===
     JSON.stringify(nextProps.proposalFilter)

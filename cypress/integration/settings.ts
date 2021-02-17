@@ -117,7 +117,7 @@ context('Settings tests', () => {
         .last()
         .click();
 
-      cy.get('[data-cy="confirm-yes"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({ variant: 'success', text: 'deleted successfully' });
     });

@@ -10,19 +10,19 @@ import React, { useState } from 'react';
 import { useCheckAccess } from 'components/common/Can';
 import {
   SepProposal,
-  SepMember,
   SepAssignment,
   ReviewStatus,
-  Review,
   UserRole,
+  BasicUserDetails,
 } from 'generated/sdk';
 import { useSEPProposalsData } from 'hooks/SEP/useSEPProposalsData';
-import { BasicUserDetails } from 'models/User';
 import { tableIcons } from 'utils/materialIcons';
 import { average } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
+import AssignSEPMemberToProposal, {
+  SepAssignedMember,
+} from './AssignSEPMemberToProposal';
 import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
 
 type SEPProposalsAndAssignmentsTableProps = {
@@ -158,60 +158,65 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     );
   };
 
-  const assignMemberToSEPProposal = async (memberUser: SepMember) => {
-    const assignmentResult = await api(
-      'Member assigned'
-    ).assignMemberToSEPProposal({
-      memberId: memberUser.userId,
-      proposalId: proposalId as number,
+  const assignMemberToSEPProposal = async (
+    assignedMembers: SepAssignedMember[]
+  ) => {
+    setProposalId(null);
+
+    if (!proposalId) {
+      return;
+    }
+
+    const {
+      assignSepReviewersToProposal: { error },
+    } = await api('Members assigned').assignSepReviewersToProposal({
+      memberIds: assignedMembers.map(({ id }) => id),
+      proposalId: proposalId,
       sepId,
     });
 
-    const addUserForReviewResilt = await api().addUserForReview({
-      proposalID: proposalId as number,
-      userID: memberUser.userId,
-      sepID: sepId,
-    });
-
-    const reviewId = !addUserForReviewResilt.addUserForReview.error
-      ? (addUserForReviewResilt.addUserForReview.review as Review).id
-      : 0;
-
-    if (!assignmentResult.assignMemberToSEPProposal.error) {
-      setSEPProposalsData(sepProposalData =>
-        sepProposalData === null
-          ? null
-          : sepProposalData.map(proposalItem => {
-              if (proposalItem.proposalId === proposalId) {
-                const newAssignments: SepAssignment[] = [
-                  ...(proposalItem.assignments || []),
-                  {
-                    user: memberUser.user,
-                    roles: memberUser.roles,
-                    review: {
-                      id: reviewId,
-                      status: ReviewStatus.DRAFT,
-                      comment: '',
-                      grade: 0,
-                      sepID: sepId,
-                    },
-                    dateAssigned: Date.now(),
-                    sepMemberUserId: memberUser.userId,
-                  } as SepAssignment,
-                ];
-
-                return {
-                  ...proposalItem,
-                  assignments: newAssignments,
-                };
-              } else {
-                return proposalItem;
-              }
-            })
-      );
+    if (error) {
+      return;
     }
 
-    setProposalId(null);
+    const { proposalReviews } = await api().getProposalReviews({
+      proposalId,
+    });
+
+    if (!proposalReviews) {
+      return;
+    }
+
+    setSEPProposalsData(sepProposalData =>
+      sepProposalData === null
+        ? null
+        : sepProposalData.map(proposalItem => {
+            if (proposalItem.proposalId === proposalId) {
+              const newAssignments: SepAssignment[] = [
+                ...(proposalItem.assignments ?? []),
+                ...assignedMembers.map(
+                  ({ roles, roleId, ...user }) =>
+                    ({
+                      user: user,
+                      roles: roles,
+                      review: proposalReviews.find(
+                        ({ userID }) => userID === user.id
+                      ),
+                      dateAssigned: Date.now(),
+                      sepMemberUserId: user.id,
+                    } as SepAssignment)
+                ),
+              ];
+
+              return {
+                ...proposalItem,
+                assignments: newAssignments,
+              };
+            } else {
+              return proposalItem;
+            }
+          })
+    );
   };
 
   const initialValues = SEPProposalsData as SepProposal[];
@@ -270,6 +275,8 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   return (
     <React.Fragment>
       <Dialog
+        maxWidth="sm"
+        fullWidth
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={!!proposalId}

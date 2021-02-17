@@ -1,16 +1,16 @@
-import Add from '@material-ui/icons/Add';
-import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { SepMember } from 'generated/sdk';
+import PeopleTable from 'components/user/PeopleTable';
+import { SepMember, BasicUserDetails } from 'generated/sdk';
 import { useSEPMembersData } from 'hooks/SEP/useSEPMembersData';
-import { BasicUserDetails } from 'models/User';
-import { tableIcons } from 'utils/materialIcons';
+
+export type SepAssignedMember = BasicUserDetails &
+  Pick<SepMember, 'roles' | 'roleId'>;
 
 type AssignSEPMemberToProposalProps = {
   sepId: number;
-  assignMemberToSEPProposal: (user: SepMember) => void;
+  assignMemberToSEPProposal: (assignedMembers: SepAssignedMember[]) => void;
   assignedMembers?: BasicUserDetails[] | null;
 };
 
@@ -21,43 +21,42 @@ const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
 }) => {
   const { loadingMembers, SEPMembersData } = useSEPMembersData(sepId, false);
 
-  const memberRole = (member: SepMember) =>
+  const memberRole = (member: SepAssignedMember) =>
     `${member.roles.find(role => role.id === member.roleId)?.title}`;
 
+  const members: SepAssignedMember[] = SEPMembersData
+    ? SEPMembersData.filter(
+        sepMember =>
+          !assignedMembers?.find(
+            assignedMember => assignedMember.id === sepMember.userId
+          )
+      ).map(sepMember => ({
+        ...sepMember.user,
+        roleId: sepMember.roleId,
+        roles: sepMember.roles,
+      }))
+    : [];
+
   const columns = [
-    { title: 'Name', field: 'user.firstname' },
-    { title: 'Surname', field: 'user.lastname' },
-    { title: 'Role', render: (rowData: SepMember) => memberRole(rowData) },
-    { title: 'Organisation', field: 'user.organisation' },
+    { title: 'Name', field: 'firstname' },
+    { title: 'Surname', field: 'lastname' },
+    {
+      title: 'Role',
+      render: (rowData: SepAssignedMember) => memberRole(rowData),
+    },
+    { title: 'Organisation', field: 'organisation' },
   ];
 
-  const members = SEPMembersData?.filter(
-    sepMember =>
-      !assignedMembers?.find(
-        assignedMember => assignedMember.id === sepMember.userId
-      )
-  ) as SepMember[];
-
-  const AddIcon = (): JSX.Element => <Add />;
-
   return (
-    <MaterialTable
-      icons={tableIcons}
-      columns={columns}
-      title={'Select reviewers'}
+    <PeopleTable
+      title="Select reviewers"
+      selection
       data={members}
       isLoading={loadingMembers}
-      actions={[
-        {
-          icon: AddIcon,
-          tooltip: 'Add reviewer',
-          onClick: (event, rowData) =>
-            assignMemberToSEPProposal(rowData as SepMember),
-        },
-      ]}
-      options={{
-        search: false,
-      }}
+      columns={columns}
+      onUpdate={(members: SepAssignedMember[]) =>
+        assignMemberToSEPProposal(members)
+      }
     />
   );
 };

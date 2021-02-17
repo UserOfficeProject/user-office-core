@@ -59,7 +59,6 @@ export const QuestionTemplateRelationFileUploadForm: FormComponent<QuestionTempl
                 'video/*',
                 'image/*',
               ]}
-              margin="normal"
               fullWidth
               data-cy="file_type"
             />

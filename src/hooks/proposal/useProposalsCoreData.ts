@@ -19,6 +19,8 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
   } = filter;
 
   useEffect(() => {
+    let unmounted = false;
+
     setLoading(true);
     api()
       .getProposalsCore({
@@ -36,6 +38,10 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
         },
       })
       .then(data => {
+        if (unmounted) {
+          return;
+        }
+
         if (data.proposalsView) {
           setProposalsData(
             data.proposalsView.map(proposal => {
@@ -51,6 +57,10 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
           );
         }
         setLoading(false);
+
+        return () => {
+          unmounted = true;
+        };
       });
   }, [
     callId,

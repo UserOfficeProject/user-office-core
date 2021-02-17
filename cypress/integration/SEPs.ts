@@ -566,12 +566,14 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[role="dialog"]')
       .contains(sepMembers.reviewer.surname)
       .parent()
-      .find('[title="Add reviewer"]')
+      .find('input[type="checkbox"]')
       .click();
+    cy.contains('1 user(s) selected');
+    cy.contains('Update').click();
 
     cy.notification({
       variant: 'success',
-      text: 'assigned',
+      text: 'Members assigned',
     });
 
     cy.get('[role="dialog"]').should('not.exist');
@@ -612,12 +614,14 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[role="dialog"]')
       .contains(sepMembers.chair.surname)
       .parent()
-      .find('[title="Add reviewer"]')
+      .find('input[type="checkbox"]')
       .click();
+    cy.contains('1 user(s) selected');
+    cy.contains('Update').click();
 
     cy.notification({
       variant: 'success',
-      text: 'assigned',
+      text: 'Members assigned',
     });
 
     cy.get('[role="dialog"]').should('not.exist');
@@ -649,12 +653,14 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[role="dialog"]')
       .contains(sepMembers.secretary.surname)
       .parent()
-      .find('[title="Add reviewer"]')
+      .find('input[type="checkbox"]')
       .click();
+    cy.contains('1 user(s) selected');
+    cy.contains('Update').click();
 
     cy.notification({
       variant: 'success',
-      text: 'assigned',
+      text: 'Members assigned',
     });
 
     cy.get('[role="dialog"]').should('not.exist');
@@ -812,7 +818,7 @@ context('Scientific evaluation panel tests', () => {
       .check();
 
     cy.get('[title="Delete proposals"]').click();
-    cy.get('[data-cy="confirm-yes"]').click();
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.notification({
       variant: 'error',
@@ -921,7 +927,7 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.get('[data-cy="confirm-yes"]').click();
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.notification({
       variant: 'error',
@@ -1026,6 +1032,8 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Technical').click();
     cy.get('[data-cy="timeAllocation"]').type('51');
+    cy.get('[data-cy="technical-review-status"]').click();
+    cy.contains('Feasible').click();
 
     cy.contains('Update').click();
 
@@ -1323,7 +1331,7 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.get('[data-cy="confirm-yes"]').click();
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.contains('Proposals and Assignments').click();
 
@@ -1583,7 +1591,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.get('[title="Remove SEP Chair"]').click();
 
-    cy.get('[data-cy="confirm-yes"]').click();
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.notification({
       variant: 'success',
@@ -1592,7 +1600,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.get('[title="Remove SEP Secretary"]').click();
 
-    cy.get('[data-cy="confirm-yes"]').click();
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.notification({
       variant: 'success',
