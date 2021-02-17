@@ -450,6 +450,48 @@ context('Instrument tests', () => {
     cy.contains(proposal2.title).should('not.exist');
   });
 
+  it('Instrument scientist should be able to download multiple proposals as PDF', () => {
+    cy.login('user');
+    cy.changeActiveRole('Instrument Scientist');
+
+    cy.contains('Proposals');
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"] [data-value="0"]').click();
+
+    cy.contains(proposal1.title);
+    cy.contains(proposal2.title);
+
+    cy.finishedLoading();
+
+    cy.contains(proposal1.title)
+      .parent()
+      .find('input[type="checkbox"]')
+      .check();
+    cy.contains(proposal2.title)
+      .parent()
+      .find('input[type="checkbox"]')
+      .check();
+
+    cy.get('[title="Download proposals in PDF"]').click();
+
+    cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+    cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+      '2 selected items'
+    );
+
+    cy.contains(proposal1.title)
+      .parent()
+      .find('[data-cy="download-proposal"]')
+
+      .click();
+
+    cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+    cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+      proposal1.title
+    );
+  });
+
   it('Instrument scientist should be able to save technical review on proposal where he is instrument scientist', () => {
     cy.login('user');
     cy.changeActiveRole('Instrument Scientist');

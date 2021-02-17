@@ -3,8 +3,6 @@ import * as Yup from 'yup';
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { NumberInputConfig, NumberValueConstraint } from 'generated/sdk';
 
-import { IntervalPropertyId } from '../Interval/intervalUnits';
-
 export const createNumberInputValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = answer => {
   const config = answer.config as NumberInputConfig;
 
@@ -26,9 +24,8 @@ export const createNumberInputValidationSchema: QuestionaryComponentDefinition['
 
   return Yup.object().shape({
     value: valueScheme,
-    unit:
-      config.property !== IntervalPropertyId.UNITLESS
-        ? Yup.string().required('Please specify unit')
-        : Yup.string().nullable(),
+    unit: Yup.string()
+      .required('Please specify unit')
+      .nullable(),
   });
 };
