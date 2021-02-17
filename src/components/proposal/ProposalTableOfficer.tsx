@@ -95,9 +95,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         proposal => proposal.tableData.checked
       );
 
-      setPre
-      
-      Data(proposalsWithTableDataCheckedProperty);
+      setPreselectedProposalsData(proposalsWithTableDataCheckedProperty);
       setSelectedProposals(onlySelectedProposals);
     } else {
       setPreselectedProposalsData(proposalsData);
