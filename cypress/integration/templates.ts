@@ -16,13 +16,17 @@ context('Template tests', () => {
   let multipleChoiceId: string;
   let intervalId: string;
   let numberId: string;
+  let richTextInputId: string;
+
   const booleanQuestion = faker.lorem.words(2);
   const textQuestion = faker.lorem.words(2);
   const dateQuestion = faker.lorem.words(2);
   const fileQuestion = faker.lorem.words(2);
   const intervalQuestion = faker.lorem.words(2);
   const numberQuestion = faker.lorem.words(3);
+  const richTextInputQuestion = faker.lorem.words(3);
   const multipleChoiceQuestion = faker.lorem.words(2);
+
   const multipleChoiceAnswers = [
     faker.lorem.words(2),
     faker.lorem.words(2),
@@ -418,6 +422,35 @@ context('Template tests', () => {
       .dragElement([{ direction: 'left', length: 1 }]);
     /* --- */
 
+    /* Rich Text Input */
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+      .last()
+      .click();
+
+    cy.contains('Add Rich Text Input').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(richTextInputQuestion);
+
+    cy.contains('Save').click();
+
+    cy.contains(richTextInputQuestion);
+
+    cy.contains(richTextInputQuestion)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        richTextInputId = fieldId;
+      });
+
+    cy.contains(richTextInputQuestion)
+      .parent()
+      .dragElement([{ direction: 'left', length: 1 }]);
+
+    /* --- */
+
     /* --- Update templateQuestionRelation */
     cy.contains(dateQuestion).click();
     cy.get("[data-cy='tooltip'] input")
@@ -533,6 +566,24 @@ context('Template tests', () => {
     cy.contains(multipleChoiceAnswers[2]).click();
     cy.get('body').type('{esc}');
 
+    const richTextInputValue = faker.lorem.words(3);
+
+    cy.window().then(win => {
+      return new Cypress.Promise(resolve => {
+        console.log('richTextInputId', richTextInputId);
+
+        win.tinyMCE.editors[richTextInputId].setContent(richTextInputValue);
+        win.tinyMCE.editors[richTextInputId].fire('blur');
+
+        resolve();
+      });
+    });
+
+    cy.get(`#${richTextInputId}_ifr`)
+      .its('0.contentDocument.body')
+      .should('not.be.empty')
+      .contains(richTextInputValue);
+
     cy.contains('Save and continue').click();
 
     cy.contains('Submit').click();
@@ -545,6 +596,14 @@ context('Template tests', () => {
     cy.contains(multipleChoiceAnswers[0]);
     cy.contains(multipleChoiceAnswers[1]).should('not.exist');
     cy.contains(multipleChoiceAnswers[2]);
+
+    cy.contains(richTextInputQuestion);
+    cy.get(`[data-cy="${richTextInputId}_open"]`).click();
+    cy.get('[role="dialog"]').contains(richTextInputQuestion);
+    cy.get('[role="dialog"]').contains(richTextInputValue);
+    cy.get('[role="dialog"]')
+      .contains('Close')
+      .click();
 
     cy.contains('Dashboard').click();
     cy.contains(title);
@@ -840,9 +899,7 @@ context('Template tests', () => {
     cy.get("[title='Delete proposals']")
       .first()
       .click();
-    cy.get('.MuiDialog-root')
-      .contains('Yes')
-      .click();
+    cy.get('[data-cy="confirm-ok"]').click();
   });
 
   it('Officer can delete proposal questions', () => {
@@ -1102,7 +1159,7 @@ context('Template tests', () => {
     );
   });
 
-  it('User officer can can change dependency logic operator', () => {
+  it('User officer can change dependency logic operator', () => {
     cy.login('officer');
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
@@ -1161,6 +1218,94 @@ context('Template tests', () => {
       'contain.text',
       'Question with multiple dependencies'
     );
+  });
+
+  it('User can add captions after uploading image/* file', () => {
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    cy.get('[title="Edit"]')
+      .last()
+      .click();
+
+    cy.get('[data-cy=show-more-button]').click();
+
+    cy.contains('Add question').click();
+
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+      .last()
+      .click();
+
+    cy.contains('Add File Upload').click();
+
+    cy.get('[data-cy="question"]')
+      .clear()
+      .type('File upload question');
+
+    cy.get('[data-cy="max_files"] input')
+      .clear()
+      .type('5');
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.contains('File upload question')
+      .parent()
+      .dragElement([
+        { direction: 'left', length: 1 },
+        { direction: 'down', length: 3 },
+      ])
+      .wait(500);
+
+    cy.finishedLoading();
+
+    cy.logout();
+
+    cy.login('user');
+
+    cy.contains('New Proposal').click();
+
+    cy.contains('File upload question');
+
+    cy.get('[data-cy="title"] input').type('Test title');
+    cy.get('[data-cy="abstract"] textarea')
+      .first()
+      .type('Test abstract');
+
+    cy.fixture('file_upload_test.png').then(fileContent => {
+      // NOTE: Using "cypress-file-upload" version "^3.5.3" because this(https://github.com/abramenal/cypress-file-upload/issues/179) should be fixed before upgrading to the latest
+      cy.get('input[type="file"]').upload({
+        fileContent: fileContent.toString(),
+        fileName: 'file_upload_test.png',
+        mimeType: 'image/png',
+      });
+
+      cy.contains('file_upload_test');
+      cy.get('[title="Add image caption"]').click();
+
+      cy.get('[data-cy="image-figure"] input').type('Fig_test');
+      cy.get('[data-cy="image-caption"] input').type('Test caption');
+
+      cy.contains('Save and continue').click();
+
+      cy.finishedLoading();
+
+      cy.contains('Proposal information');
+
+      cy.contains('file_upload_test');
+
+      cy.contains('New proposal').click();
+
+      cy.contains('file_upload_test');
+      cy.get('[data-cy="image-caption"] input').should(
+        'have.value',
+        'Test caption'
+      );
+      cy.get('[data-cy="image-figure"] input').should(
+        'have.value',
+        'Fig_test'
+      );
+    });
   });
 
   it('should not let you create circular dependency chain', () => {

@@ -79,7 +79,7 @@ function SampleSafetyPage() {
         <Tooltip title="Download sample as pdf">
           <IconButton
             data-cy="download-sample"
-            onClick={() => downloadPDFSample(rowData.id)}
+            onClick={() => downloadPDFSample([rowData.id], rowData.title)}
             style={iconButtonStyle}
           >
             <GetAppIcon />
@@ -129,7 +129,8 @@ function SampleSafetyPage() {
                     tooltip: 'Download sample',
                     onClick: (event, rowData) =>
                       downloadPDFSample(
-                        (rowData as SampleBasic[]).map(({ id }) => id).join(',')
+                        (rowData as SampleBasic[]).map(({ id }) => id),
+                        (rowData as SampleBasic[])[0].title
                       ),
                   },
                 ]}

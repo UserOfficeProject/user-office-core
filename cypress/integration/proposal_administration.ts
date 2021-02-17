@@ -10,13 +10,14 @@ context('Proposal administration tests', () => {
     cy.visit('/');
   });
 
+  const proposalName = faker.random.words(3);
   const textUser = faker.random.words(5);
 
   const textManager = faker.random.words(5);
 
   it('Should be able to set comment for user/manager and final status', () => {
     cy.login('user');
-    cy.createProposal();
+    cy.createProposal(proposalName);
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();
@@ -66,33 +67,15 @@ context('Proposal administration tests', () => {
     cy.contains('DRAFT');
   });
 
-  it('Check if link for download proposal is created with the correct attributes', () => {
+  it('Download proposal is working with dialog window showing up', () => {
     cy.login('officer');
-
-    cy.document().then(document => {
-      const observer = new MutationObserver(function() {
-        const [mutationList] = arguments;
-        for (const mutation of mutationList) {
-          for (const child of mutation.addedNodes) {
-            if (child.nodeName === 'A') {
-              expect(child.href).to.contain('/download/pdf/proposal/1');
-              expect(child.download).to.contain('download');
-            }
-          }
-        }
-      });
-      observer.observe(document, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-      });
-
-      observer.disconnect();
-    });
 
     cy.get('[data-cy="download-proposal"]')
       .first()
       .click();
+
+    cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+    cy.get('[data-cy="preparing-download-dialog-item"]').contains(proposalName);
   });
 
   it('Should be able to download proposal pdf', () => {

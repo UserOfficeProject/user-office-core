@@ -25,6 +25,7 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 import faker from 'faker';
 import { GraphQLClient } from 'graphql-request';
+import 'cypress-file-upload';
 
 const KEY_CODES = {
   space: 32,
@@ -113,7 +114,11 @@ const notification = ({ variant, text }) => {
     .and('have.css', 'background-color', bgColor);
 
   if (text) {
-    notification.and('contains.text', text);
+    if (text instanceof RegExp) {
+      notification.and($el => expect($el.text()).to.match(text));
+    } else {
+      notification.and('contains.text', text);
+    }
   }
 };
 
@@ -121,11 +126,19 @@ const finishedLoading = () => {
   cy.get('[role="progressbar"]').should('not.exist');
 };
 
-const createProposal = (proposalTitle = '', proposalAbstract = '') => {
+const createProposal = (
+  proposalTitle = '',
+  proposalAbstract = '',
+  call = ''
+) => {
   const title = proposalTitle || faker.random.words(3);
   const abstract = proposalAbstract || faker.random.words(8);
 
   cy.contains('New Proposal').click();
+
+  if (call) {
+    cy.contains(call).click();
+  }
 
   cy.get('[data-cy=title] input')
     .type(title)
@@ -137,6 +150,8 @@ const createProposal = (proposalTitle = '', proposalAbstract = '') => {
     .should('have.value', abstract);
 
   cy.contains('Save and continue').click();
+
+  cy.notification({ variant: 'success', text: 'Saved' });
 };
 
 const createTopic = title => {
@@ -200,7 +215,12 @@ const dragElement = (element, moveArgs) => {
   return element;
 };
 
-const createSampleQuestion = (question, templateName, minEntries, maxEntries) => {
+const createSampleQuestion = (
+  question,
+  templateName,
+  minEntries,
+  maxEntries
+) => {
   cy.get('[data-cy=show-more-button]')
     .last()
     .click();
@@ -222,12 +242,16 @@ const createSampleQuestion = (question, templateName, minEntries, maxEntries) =>
 
   cy.contains(templateName).click();
 
-  if(minEntries) {
-    cy.get('[data-cy=min-entries] input').clear().type(minEntries);
+  if (minEntries) {
+    cy.get('[data-cy=min-entries] input')
+      .clear()
+      .type(minEntries);
   }
 
-  if(maxEntries) {
-    cy.get('[data-cy=max-entries] input').clear().type(maxEntries);
+  if (maxEntries) {
+    cy.get('[data-cy=max-entries] input')
+      .clear()
+      .type(maxEntries);
   }
 
   cy.contains('Save').click();

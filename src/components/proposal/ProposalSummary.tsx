@@ -42,7 +42,7 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
       opacity: 0.7,
     },
     button: {
-      marginTop: proposal.status.id === 0 ? '40px' : 'auto',
+      marginTop: proposal.status?.id === 0 ? '40px' : 'auto',
       marginLeft: '10px',
       backgroundColor: theme.palette.secondary.main,
       color: '#ffff',
@@ -82,11 +82,11 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
           }}
           reset={undefined}
           isLoading={false}
-          disabled={proposal.status.id === 0}
+          disabled={proposal.status?.id === 0}
         />
         <Button
           className={classes.button}
-          onClick={() => downloadPDFProposal(proposal.id)}
+          onClick={() => downloadPDFProposal([proposal.id], proposal.title)}
           variant="contained"
           disabled={!allStepsComplete}
         >

@@ -55,6 +55,10 @@ const CallsTable: React.FC = () => {
           ? rowData.proposalWorkflow.name
           : '-',
     },
+    {
+      title: '#proposals',
+      field: 'proposalCount',
+    },
   ];
 
   const assignInstrumentsToCall = (

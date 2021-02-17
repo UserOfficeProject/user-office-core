@@ -1,9 +1,8 @@
 import Delete from '@material-ui/icons/DeleteOutline';
-import React, { useState } from 'react';
+import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
-import DialogConfirmation from 'components/common/DialogConfirmation';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
@@ -12,20 +11,19 @@ import { UserRole, ProposalStatus } from 'generated/sdk';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CreateUpdateProposalStatus from './CreateUpdateProposalStatus';
 
-const ProposalStatusesTable: React.FC = () => {
+const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
+  confirm,
+}) => {
   const { api } = useDataApiWithFeedback();
   const {
     loadingProposalStatuses,
     proposalStatuses,
     setProposalStatusesWithLoading: setProposalStatuses,
   } = useProposalStatusesData();
-  const [
-    proposalStatusToRemove,
-    setProposalStatusToRemove,
-  ] = useState<ProposalStatus | null>(null);
   const columns = [
     { title: 'Short code', field: 'shortCode' },
     { title: 'Name', field: 'name' },
@@ -68,15 +66,6 @@ const ProposalStatusesTable: React.FC = () => {
 
   return (
     <div data-cy="proposal-statuses-table">
-      <DialogConfirmation
-        title="Remove proposal status"
-        text="Are you sure you want to remove this proposal status?"
-        open={!!proposalStatusToRemove}
-        action={() =>
-          deleteProposalStatus((proposalStatusToRemove as ProposalStatus).id)
-        }
-        handleOpen={() => setProposalStatusToRemove(null)}
-      />
       <SuperMaterialTable
         createModal={createModal}
         hasAccess={{
@@ -102,7 +91,16 @@ const ProposalStatusesTable: React.FC = () => {
               icon: Delete,
               tooltip: 'Delete',
               onClick: (event, rowData) =>
-                setProposalStatusToRemove(rowData as ProposalStatus),
+                confirm(
+                  async () => {
+                    await deleteProposalStatus((rowData as ProposalStatus).id);
+                  },
+                  {
+                    title: 'Remove proposal status',
+                    description:
+                      'Are you sure you want to remove this proposal status?',
+                  }
+                )(),
               hidden: rowActionData.isDefault,
             };
           },
@@ -112,4 +110,4 @@ const ProposalStatusesTable: React.FC = () => {
   );
 };
 
-export default ProposalStatusesTable;
+export default withConfirm(ProposalStatusesTable);

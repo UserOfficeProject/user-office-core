@@ -54,15 +54,15 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
                 {average(getGrades(proposal.reviews)) || '-'}
               </TableCell>
             </TableRow>
-            <TableRow key="principalinvestigatorAndStatus">
+            <TableRow key="principalInvestigatorAndStatus">
               <TableCell className={classes.textBold}>
                 Principal Investigator
               </TableCell>
-              <TableCell>{`${proposal.proposer.firstname} ${proposal.proposer.lastname}`}</TableCell>
+              <TableCell>{`${proposal.proposer?.firstname} ${proposal.proposer?.lastname}`}</TableCell>
               <TableCell className={classes.textBold}>Status</TableCell>
-              <TableCell>{proposal.status.name}</TableCell>
+              <TableCell>{proposal.status?.name}</TableCell>
             </TableRow>
-            <TableRow key="coproposersAndCall">
+            <TableRow key="coProposersAndCall">
               <TableCell className={classes.textBold}>Co-Proposers</TableCell>
               <TableCell>
                 {proposal.users
@@ -91,7 +91,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
               <TableCell className={classes.textBold}>PDF</TableCell>
               <TableCell>
                 <Button
-                  onClick={() => downloadPDFProposal(proposal.id)}
+                  onClick={() =>
+                    downloadPDFProposal([proposal.id], proposal.title)
+                  }
                   color="primary"
                 >
                   Click here to view pdf

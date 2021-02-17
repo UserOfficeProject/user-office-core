@@ -19,6 +19,10 @@ export function useProposalsData(filter: ProposalsFilter) {
   } = filter;
 
   useEffect(() => {
+    let unmounted = false;
+
+    setLoading(true);
+
     if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
       api()
         .getInstrumentScientistProposals({
@@ -31,6 +35,10 @@ export function useProposalsData(filter: ProposalsFilter) {
           },
         })
         .then(data => {
+          if (unmounted) {
+            return;
+          }
+
           if (data.instrumentScientistProposals) {
             setProposalsData(
               data.instrumentScientistProposals.proposals as Proposal[]
@@ -50,12 +58,20 @@ export function useProposalsData(filter: ProposalsFilter) {
           },
         })
         .then(data => {
+          if (unmounted) {
+            return;
+          }
+
           if (data.proposals) {
             setProposalsData(data.proposals.proposals as Proposal[]);
           }
           setLoading(false);
         });
     }
+
+    return () => {
+      unmounted = true;
+    };
   }, [
     callId,
     instrumentId,

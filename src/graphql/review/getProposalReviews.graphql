@@ -1,0 +1,10 @@
+query getProposalReviews($proposalId: Int!) {
+  proposalReviews(proposalId: $proposalId) {
+    id
+    userID
+    comment
+    grade
+    status
+    sepID
+  }
+}

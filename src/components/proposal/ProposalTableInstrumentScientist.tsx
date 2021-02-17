@@ -1,15 +1,18 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
 import Edit from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column } from 'material-table';
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
+import { UserContext } from 'context/UserContextProvider';
 import { Proposal, ProposalsFilter } from 'generated/sdk';
+import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -28,6 +31,7 @@ import ProposalFilterBar from './ProposalFilterBar';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
 
 const ProposalTableInstrumentScientist: React.FC = () => {
+  const { user } = useContext(UserContext);
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
     ProposalUrlQueryParamsType
   >({
@@ -44,6 +48,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     proposalStatusId: urlQueryParams.proposalStatus || 2,
   });
   const { instruments, loadingInstruments } = useInstrumentsData();
+  const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
   const {
     proposalStatuses,
     loadingProposalStatuses,
@@ -51,6 +56,8 @@ const ProposalTableInstrumentScientist: React.FC = () => {
 
   const { loading, proposalsData } = useProposalsData({
     proposalStatusId: proposalFilter.proposalStatusId,
+    instrumentId: proposalFilter.instrumentId,
+    callId: proposalFilter.callId,
   });
 
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -65,26 +72,36 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   const RowActionButtons = (rowData: Proposal) => {
     const iconButtonStyle = { padding: '7px' };
 
+    const showEdit = rowData.technicalReview && rowData.technicalReview.status;
+
     return (
       <>
-        <IconButton data-cy="view-proposal" style={iconButtonStyle}>
+        <Tooltip
+          title={
+            showEdit
+              ? 'Edit technical review'
+              : 'View proposal and technical review'
+          }
+        >
           <Link
             to={`/ProposalReviewUserOfficer/${rowData.id}`}
             style={{ color: 'inherit', textDecoration: 'inherit' }}
           >
-            {rowData.technicalReview && rowData.technicalReview.status ? (
-              <Visibility />
-            ) : (
-              <Edit />
-            )}
+            <IconButton data-cy="view-proposal" style={iconButtonStyle}>
+              {showEdit ? <Edit /> : <Visibility />}
+            </IconButton>
           </Link>
-        </IconButton>
-        <IconButton
-          onClick={() => downloadPDFProposal(rowData.id)}
-          style={iconButtonStyle}
-        >
-          <GetAppIcon />
-        </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Download proposal as pdf">
+          <IconButton
+            data-cy="download-proposal"
+            onClick={() => downloadPDFProposal([rowData.id], rowData.title)}
+            style={iconButtonStyle}
+          >
+            <GetAppIcon />
+          </IconButton>
+        </Tooltip>
       </>
     );
   };
@@ -193,9 +210,12 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     urlQueryParams.sortDirection
   );
 
+  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
+
   return (
     <>
       <ProposalFilterBar
+        calls={{ data: calls, isLoading: loadingCalls }}
         instruments={{ data: instruments, isLoading: loadingInstruments }}
         proposalStatuses={{
           data: proposalStatuses,
@@ -213,6 +233,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         options={{
           search: true,
           searchText: urlQueryParams.search || undefined,
+          selection: true,
           debounceInterval: 400,
           columnsButton: true,
         }}
@@ -239,6 +260,19 @@ const ProposalTableInstrumentScientist: React.FC = () => {
               sortDirection: orderDirection ? orderDirection : undefined,
             });
         }}
+        actions={[
+          {
+            icon: GetAppIconComponent,
+            tooltip: 'Download proposals in PDF',
+            onClick: (event, rowData): void => {
+              downloadPDFProposal(
+                (rowData as Proposal[]).map(row => row.id),
+                (rowData as Proposal[])[0].title
+              );
+            },
+            position: 'toolbarOnSelect',
+          },
+        ]}
       />
     </>
   );

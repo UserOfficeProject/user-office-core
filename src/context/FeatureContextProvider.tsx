@@ -39,7 +39,7 @@ export const FeatureContextProvider: React.FC = props => {
     );
   }
 
-  const featuresMap = features.reduce(function(featuresMap, feature) {
+  const featuresMap = features?.reduce(function(featuresMap, feature) {
     featuresMap.set(feature.id, feature);
 
     return featuresMap;

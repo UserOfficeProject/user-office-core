@@ -14,14 +14,14 @@ import ProposalTable from './ProposalTable';
 export type PartialProposalsDataType = {
   id: number;
   title: string;
-  status: string;
+  status: string | null;
   publicStatus: ProposalPublicStatus;
   finalStatus?: string;
   notified?: boolean;
   submitted: boolean;
   shortCode: string;
   created: string | null;
-  proposerId: number;
+  proposerId?: number;
 };
 
 export type UserProposalDataType = {
@@ -34,14 +34,14 @@ const ProposalTableUser: React.FC = () => {
   const api = useDataApi();
   const [loading, setLoading] = useState<boolean>(false);
   const getProposalStatus = (proposal: {
-    status: ProposalStatus;
+    status: ProposalStatus | null;
     finalStatus?: ProposalEndStatus | null | undefined;
     notified: boolean;
-  }): string => {
+  }): string | null => {
     if (proposal.notified) {
       return getTranslation(proposal.finalStatus as ResourceId);
     } else {
-      return proposal.status.name;
+      return proposal.status?.name || null;
     }
   };
 
@@ -72,7 +72,7 @@ const ProposalTableUser: React.FC = () => {
                 shortCode: proposal.shortCode,
                 created: timeAgo(proposal.created),
                 notified: proposal.notified,
-                proposerId: proposal.proposer.id,
+                proposerId: proposal.proposer?.id,
               };
             }),
         };

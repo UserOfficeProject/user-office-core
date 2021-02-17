@@ -115,7 +115,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           });
         }}
         className={classes.container}
-        userId={proposer.id}
+        userId={proposer?.id}
       />
       <ProposalParticipants
         className={classes.container}
@@ -158,7 +158,7 @@ const proposalBasisPreSubmit = (answer: Answer) => async ({
       title: title,
       abstract: abstract,
       users: users.map(user => user.id),
-      proposerId: proposer.id,
+      proposerId: proposer?.id,
     });
 
     if (result.updateProposal.proposal) {
@@ -180,7 +180,7 @@ const proposalBasisPreSubmit = (answer: Answer) => async ({
         title: title,
         abstract: abstract,
         users: users.map(user => user.id),
-        proposerId: proposer.id,
+        proposerId: proposer?.id,
       });
       dispatch({
         type: EventType.PROPOSAL_CREATED,
