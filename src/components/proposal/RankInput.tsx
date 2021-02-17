@@ -22,7 +22,6 @@ export default function RankInput(props: {
       defaultValue={props.defaultValue}
       onChange={event => setValue(parseInt(event.target.value))}
       onKeyPress={ev => {
-        console.log(`Pressed keyCode ${ev.key}`);
         if (ev.key === 'Enter' && typeof value === 'number') {
           props.onChange(props.proposalID, value);
           setEditable(false);

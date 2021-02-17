@@ -1,6 +1,9 @@
 import Avatar from '@material-ui/core/Avatar';
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
@@ -17,6 +20,7 @@ import ClosedCaptionOutlinedIcon from '@material-ui/icons/ClosedCaptionOutlined'
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import ErrorIcon from '@material-ui/icons/Error';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import InfoOutlined from '@material-ui/icons/InfoOutlined';
 import React, { ChangeEvent, useState } from 'react';
 
 import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
@@ -25,14 +29,18 @@ import { FileMetaData } from 'models/FileUpload';
 
 import UOLoader from './UOLoader';
 
-export type FileIdWithCaption = { id: string; caption?: string | null };
+export type FileIdWithCaptionAndFigure = {
+  id: string;
+  caption?: string | null;
+  figure?: string | null;
+};
 
 export function FileUploadComponent(props: {
   maxFiles?: number;
   id?: string;
   fileType?: string;
-  value: FileIdWithCaption[];
-  onChange: (files: FileIdWithCaption[]) => void;
+  value: FileIdWithCaptionAndFigure[];
+  onChange: (files: FileIdWithCaptionAndFigure[]) => void;
 }) {
   const fileIds = props.value.map(fileItem => fileItem.id);
   const { files, setFiles } = useFileMetadata(fileIds);
@@ -76,13 +84,17 @@ export function FileUploadComponent(props: {
     );
   };
 
-  const onImageCaptionAdded = (fileId: string, caption: string) => {
+  const onImageCaptionOrFigureAdded = ({
+    id: fileId,
+    caption,
+    figure,
+  }: FileIdWithCaptionAndFigure) => {
     props.onChange(
       props.value.map(item => {
         if (item.id === fileId) {
-          return { id: item.id, caption };
+          return { id: item.id, caption, figure };
         } else {
-          return { id: item.id, caption: item.caption };
+          return { id: item.id, caption: item.caption, figure: item.figure };
         }
       })
     );
@@ -107,17 +119,19 @@ export function FileUploadComponent(props: {
       <List component="ul" className={classes.questionnairesList}>
         {files.map &&
           files.map((metaData: FileMetaData) => {
+            const currentFileAnswerValues = props.value.find(
+              item => item.id === metaData.fileId
+            );
+
             return (
               <ListItem key={metaData.fileId}>
                 <FileEntry
                   key={metaData.fileId}
                   onDeleteClicked={onDeleteClicked}
                   metaData={metaData}
-                  caption={
-                    props.value.find(item => item.id === metaData.fileId)
-                      ?.caption
-                  }
-                  onImageCaptionAdded={onImageCaptionAdded}
+                  caption={currentFileAnswerValues?.caption}
+                  figure={currentFileAnswerValues?.figure}
+                  onImageCaptionOrFigureAdded={onImageCaptionOrFigureAdded}
                 />
               </ListItem>
             );
@@ -131,8 +145,9 @@ export function FileUploadComponent(props: {
 export function FileEntry(props: {
   onDeleteClicked: Function;
   metaData: FileMetaData;
-  onImageCaptionAdded: Function;
+  onImageCaptionOrFigureAdded: Function;
   caption: string | null | undefined;
+  figure: string | null | undefined;
 }) {
   const classes = makeStyles(theme => ({
     fileListWrapper: {
@@ -143,15 +158,33 @@ export function FileEntry(props: {
       backgroundColor: theme.palette.primary.main,
       color: 'white',
     },
+    avatarWrapper: {
+      maxWidth: '50px',
+    },
     downloadLink: {
       display: 'inline-flex',
       color: 'rgba(0, 0, 0, 0.54)',
     },
     fileText: {
-      maxWidth: '60%',
+      display: 'inline-flex',
+      maxWidth: '70%',
+      '& span': {
+        width: '80%',
+        overflow: 'hidden',
+      },
+      '& p': {
+        paddingLeft: theme.spacing(1),
+        display: 'flex',
+        alignItems: 'center',
+      },
     },
     captionInput: {
       marginLeft: theme.spacing(2),
+    },
+    infoIcon: {
+      fill: 'rgba(0, 0, 0, 0.54)',
+      width: '20px',
+      cursor: 'auto',
     },
   }))();
 
@@ -172,60 +205,110 @@ export function FileEntry(props: {
   };
 
   return (
-    <>
-      <ListItemAvatar>
-        <Avatar className={classes.avatar}>
-          <AttachFileIcon />
-        </Avatar>
-      </ListItemAvatar>
-      <ListItemText
-        primary={props.metaData.originalFileName}
-        secondary={formatBytes(props.metaData.sizeInBytes)}
-        className={classes.fileText}
-      />
-      {props.metaData.mimeType.startsWith('image') && (
-        <Tooltip title="Add image caption">
-          <IconButton
-            edge="end"
-            onClick={(): void => setShowCaption(!showCaption)}
-          >
-            {showCaption || props.caption ? (
-              <ClosedCaption />
-            ) : (
-              <ClosedCaptionOutlinedIcon />
+    <Grid container alignItems="center">
+      <Grid item xs={1} className={classes.avatarWrapper}>
+        <ListItemAvatar>
+          <Avatar className={classes.avatar}>
+            <AttachFileIcon />
+          </Avatar>
+        </ListItemAvatar>
+      </Grid>
+      <Grid item xs={6}>
+        <Box display="flex" alignItems="center">
+          <ListItemText
+            primary={props.metaData.originalFileName}
+            secondary={formatBytes(props.metaData.sizeInBytes)}
+            className={classes.fileText}
+          />
+
+          <Box display="inline-flex">
+            {props.metaData.mimeType.startsWith('image') && (
+              <Tooltip title="Add image caption">
+                <IconButton
+                  edge="end"
+                  onClick={(): void => setShowCaption(!showCaption)}
+                >
+                  {showCaption || props.caption ? (
+                    <ClosedCaption />
+                  ) : (
+                    <ClosedCaptionOutlinedIcon />
+                  )}
+                </IconButton>
+              </Tooltip>
             )}
-          </IconButton>
-        </Tooltip>
-      )}
-      <Tooltip title="Download file">
-        <IconButton edge="end">
-          <a href={downloadLink} className={classes.downloadLink} download>
-            <GetAppIcon />
-          </a>
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Remove file">
-        <IconButton
-          edge="end"
-          onClick={(): void => {
-            props.onDeleteClicked(props.metaData);
-          }}
-        >
-          <DeleteOutlineIcon />
-        </IconButton>
-      </Tooltip>
-      {(showCaption || props.caption) && (
-        <TextField
-          label="Image caption"
-          data-cy="image-caption"
-          defaultValue={props.caption || ''}
-          className={classes.captionInput}
-          onBlur={e =>
-            props.onImageCaptionAdded(props.metaData.fileId, e.target.value)
-          }
-        />
-      )}
-    </>
+            <Tooltip title="Download file">
+              <IconButton edge="end">
+                <a
+                  href={downloadLink}
+                  className={classes.downloadLink}
+                  download
+                >
+                  <GetAppIcon />
+                </a>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Remove file">
+              <IconButton
+                edge="end"
+                onClick={(): void => {
+                  props.onDeleteClicked(props.metaData);
+                }}
+              >
+                <DeleteOutlineIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Box>
+      </Grid>
+
+      <Grid item xs={5}>
+        <Grid container spacing={1}>
+          <Grid item xs={6}>
+            <TextField
+              label="Figure"
+              data-cy="image-figure"
+              defaultValue={props.figure || ''}
+              className={classes.captionInput}
+              onBlur={e =>
+                props.onImageCaptionOrFigureAdded({
+                  id: props.metaData.fileId,
+                  caption: props.caption,
+                  figure: e.target.value,
+                })
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Tooltip title="Use figure to reference the image inside the rich text editor">
+                      <InfoOutlined className={classes.infoIcon} />
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              }}
+              fullWidth
+            />
+          </Grid>
+          {(showCaption || props.caption) && (
+            <Grid item xs={6}>
+              <TextField
+                label="Image caption"
+                data-cy="image-caption"
+                defaultValue={props.caption || ''}
+                className={classes.captionInput}
+                onBlur={e =>
+                  props.onImageCaptionOrFigureAdded({
+                    id: props.metaData.fileId,
+                    caption: e.target.value,
+                    figure: props.figure,
+                  })
+                }
+                fullWidth
+              />
+            </Grid>
+          )}
+        </Grid>
+      </Grid>
+    </Grid>
   );
 }
 

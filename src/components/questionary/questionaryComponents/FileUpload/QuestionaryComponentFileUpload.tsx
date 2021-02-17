@@ -4,7 +4,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import React, { useEffect, useState } from 'react';
 
 import {
-  FileIdWithCaption,
+  FileIdWithCaptionAndFigure,
   FileUploadComponent,
 } from 'components/common/FileUploadComponent';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -24,14 +24,21 @@ export function QuestionaryComponentFileUpload(
   } = answer;
   const isError = errors[proposalQuestionId] ? true : false;
   const config = answer.config as FileUploadConfig;
-  const [stateValue, setStateValue] = useState<FileIdWithCaption[]>(value);
+  const [stateValue, setStateValue] = useState<FileIdWithCaptionAndFigure[]>(
+    value
+  );
 
   useEffect(() => {
     setStateValue(answer.value);
   }, [answer]);
 
   return (
-    <FormControl error={isError} required={config.required} margin="dense">
+    <FormControl
+      error={isError}
+      required={config.required}
+      margin="dense"
+      fullWidth
+    >
       <FormLabel>
         {answer.question.question}
         {config.small_label && (
@@ -45,10 +52,11 @@ export function QuestionaryComponentFileUpload(
         maxFiles={config.max_files}
         id={answer.question.proposalQuestionId}
         fileType={config.file_type ? config.file_type.join(',') : ''}
-        onChange={(fileMetaDataList: FileIdWithCaption[]) => {
+        onChange={(fileMetaDataList: FileIdWithCaptionAndFigure[]) => {
           const newStateValue = fileMetaDataList.map(file => ({
             id: file.id,
             caption: file.caption,
+            figure: file.figure,
           }));
 
           setStateValue(newStateValue);
