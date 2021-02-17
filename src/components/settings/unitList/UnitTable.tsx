@@ -1,9 +1,7 @@
-import Delete from '@material-ui/icons/DeleteOutline';
-import React, { useState } from 'react';
+import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
-import DialogConfirmation from 'components/common/DialogConfirmation';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
@@ -18,7 +16,6 @@ import CreateUnit from './CreateUnit';
 const UnitTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
   const { loadingUnits, units, setUnitsWithLoading: setUnits } = useUnitsData();
-  const [unitToRemove, setUnitToRemove] = useState<Unit | null>(null);
   const columns = [{ title: 'Unit', field: 'name' }];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
@@ -33,10 +30,10 @@ const UnitTable: React.FC = () => {
     <CreateUnit unit={editUnit} close={(unit: Unit | null) => onCreate(unit)} />
   );
 
-  const deleteUnit = async (id: number) => {
+  const deleteUnit = async (id: number | string) => {
     return await api('Unit deleted successfully')
       .deleteUnit({
-        id: id,
+        id: id as number,
       })
       .then(resp => {
         if (!resp.deleteUnit.error) {
@@ -54,13 +51,6 @@ const UnitTable: React.FC = () => {
 
   return (
     <div data-cy="unit-table">
-      <DialogConfirmation
-        title="Remove unit"
-        text="Are you sure you want to remove this unit?"
-        open={!!unitToRemove}
-        action={() => deleteUnit((unitToRemove as Unit).id)}
-        handleOpen={() => setUnitToRemove(null)}
-      />
       <SuperMaterialTable
         createModal={createModal}
         hasAccess={{

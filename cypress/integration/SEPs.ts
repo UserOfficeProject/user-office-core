@@ -1,5 +1,4 @@
 import faker from 'faker';
-import { curry } from 'cypress/types/lodash';
 
 function searchUser(search: string) {
   cy.get('[aria-label="Search"]').type(search);
@@ -54,6 +53,20 @@ function editFinalRankingForm() {
   cy.get('#commentForManagement')
     .clear()
     .type(faker.lorem.words(3));
+
+  cy.get('#rankOrder')
+    .clear()
+    .type('-123')
+    .trigger('blur');
+  cy.get('[data-cy="save"]').click();
+  cy.contains('Must be greater than or equal to');
+
+  cy.get('#rankOrder')
+    .clear()
+    .type('987654321')
+    .trigger('blur');
+  cy.get('[data-cy="save"]').click();
+  cy.contains('Must be less than or equal to');
 
   cy.get('#rankOrder')
     .clear()
@@ -553,12 +566,14 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[role="dialog"]')
       .contains(sepMembers.reviewer.surname)
       .parent()
-      .find('[title="Add reviewer"]')
+      .find('input[type="checkbox"]')
       .click();
+    cy.contains('1 user(s) selected');
+    cy.contains('Update').click();
 
     cy.notification({
       variant: 'success',
-      text: 'assigned',
+      text: 'Members assigned',
     });
 
     cy.get('[role="dialog"]').should('not.exist');
@@ -599,12 +614,14 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[role="dialog"]')
       .contains(sepMembers.chair.surname)
       .parent()
-      .find('[title="Add reviewer"]')
+      .find('input[type="checkbox"]')
       .click();
+    cy.contains('1 user(s) selected');
+    cy.contains('Update').click();
 
     cy.notification({
       variant: 'success',
-      text: 'assigned',
+      text: 'Members assigned',
     });
 
     cy.get('[role="dialog"]').should('not.exist');
@@ -636,12 +653,14 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[role="dialog"]')
       .contains(sepMembers.secretary.surname)
       .parent()
-      .find('[title="Add reviewer"]')
+      .find('input[type="checkbox"]')
       .click();
+    cy.contains('1 user(s) selected');
+    cy.contains('Update').click();
 
     cy.notification({
       variant: 'success',
-      text: 'assigned',
+      text: 'Members assigned',
     });
 
     cy.get('[role="dialog"]').should('not.exist');
@@ -799,7 +818,7 @@ context('Scientific evaluation panel tests', () => {
       .check();
 
     cy.get('[title="Delete proposals"]').click();
-    cy.get('[data-cy="confirm-yes"]').click();
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.notification({
       variant: 'error',
@@ -908,7 +927,7 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.get('[data-cy="confirm-yes"]').click();
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.notification({
       variant: 'error',
@@ -1013,6 +1032,8 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Technical').click();
     cy.get('[data-cy="timeAllocation"]').type('51');
+    cy.get('[data-cy="technical-review-status"]').click();
+    cy.contains('Feasible').click();
 
     cy.contains('Update').click();
 
@@ -1194,18 +1215,32 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[data-cy="edit-sep-time-allocation"]').scrollIntoView();
     cy.get('[data-cy="edit-sep-time-allocation"]').click();
 
-    cy.get('[data-cy="timeAllocation"] input').as('timeAllocation');
+    cy.get('[data-cy="sepTimeAllocation"] input').as('timeAllocation');
 
     cy.get('@timeAllocation').should('have.value', '');
-    cy.get('@timeAllocation').type('987654321');
+
+    cy.get('@timeAllocation')
+      .type('-1')
+      .trigger('blur');
+    cy.contains('Must be greater than or equal to');
+
+    cy.get('@timeAllocation')
+      .clear()
+      .type('987654321')
+      .trigger('blur');
+    cy.contains('Must be less than or equal to');
+
+    cy.get('@timeAllocation')
+      .clear()
+      .type('9999');
     cy.get('[data-cy="save-time-allocation"]').click();
 
     cy.finishedLoading();
 
-    cy.contains('987654321 (Overwritten)');
+    cy.contains('9999 (Overwritten)');
 
     cy.get('[aria-label="close"]').click();
-    cy.contains('987654321');
+    cy.contains('9999');
 
     cy.reload();
     cy.contains('Meeting Components').click();
@@ -1214,13 +1249,13 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[title="View proposal details"]').click();
 
     cy.get('[data-cy="edit-sep-time-allocation"]').click();
-    cy.get('@timeAllocation').should('have.value', '987654321');
+    cy.get('@timeAllocation').should('have.value', '9999');
     cy.get('@timeAllocation').clear();
     cy.get('[data-cy="save-time-allocation"]').click();
 
     cy.finishedLoading();
 
-    cy.get('body').should('not.contain', '987654321 (Overwritten)');
+    cy.get('body').should('not.contain', '9999 (Overwritten)');
   });
 
   it('should use SEP time allocation (if set) when calculating if they fit in available time', () => {
@@ -1246,7 +1281,7 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[data-cy="edit-sep-time-allocation"]').scrollIntoView();
     cy.get('[data-cy="edit-sep-time-allocation"]').click();
 
-    cy.get('[data-cy="timeAllocation"] input').as('timeAllocation');
+    cy.get('[data-cy="sepTimeAllocation"] input').as('timeAllocation');
 
     cy.get('@timeAllocation').should('be.empty');
     cy.get('@timeAllocation').type('15');
@@ -1296,7 +1331,7 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.get('[data-cy="confirm-yes"]').click();
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.contains('Proposals and Assignments').click();
 
@@ -1556,7 +1591,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.get('[title="Remove SEP Chair"]').click();
 
-    cy.get('[data-cy="confirm-yes"]').click();
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.notification({
       variant: 'success',
@@ -1565,7 +1600,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.get('[title="Remove SEP Secretary"]').click();
 
-    cy.get('[data-cy="confirm-yes"]').click();
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.notification({
       variant: 'success',

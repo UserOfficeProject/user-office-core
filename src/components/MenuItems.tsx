@@ -20,6 +20,7 @@ import People from '@material-ui/icons/People';
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import Settings from '@material-ui/icons/Settings';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
+import VpnKey from '@material-ui/icons/VpnKey';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
@@ -253,6 +254,7 @@ const SettingsMenuListItem = () => {
           </ListItemIcon>
           <ListItemText primary="Proposal statuses" />
         </ListItem>
+
         <ListItem
           component={NavLink}
           isActive={() =>
@@ -266,6 +268,13 @@ const SettingsMenuListItem = () => {
             <ProposalWorkflowIcon />
           </ListItemIcon>
           <ListItemText primary="Proposal workflows" />
+        </ListItem>
+
+        <ListItem component={NavLink} to="/ApiAccessTokens" button>
+          <ListItemIcon>
+            <VpnKey />
+          </ListItemIcon>
+          <ListItemText primary="API access tokens" />
         </ListItem>
       </Collapse>
     </>

@@ -25,6 +25,7 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 import faker from 'faker';
 import { GraphQLClient } from 'graphql-request';
+import 'cypress-file-upload';
 
 const KEY_CODES = {
   space: 32,

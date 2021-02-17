@@ -1,7 +1,7 @@
 import Button from '@material-ui/core/Button';
 import Email from '@material-ui/icons/Email';
 import makeStyles from '@material-ui/styles/makeStyles';
-import MaterialTable, { Query, Options } from 'material-table';
+import MaterialTable, { Query, Options, Column } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
@@ -51,7 +51,9 @@ function sendUserRequest(
     });
 }
 
-type PeopleTableProps = {
+type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
+  selection: boolean;
+  isLoading?: boolean;
   title?: string;
   userRole?: UserRole;
   invitationUserRole?: UserRole;
@@ -60,16 +62,16 @@ type PeopleTableProps = {
     actionIcon: JSX.Element;
     actionText: string;
   };
-  selection: boolean;
   isFreeAction?: boolean;
-  data?: BasicUserDetails[];
+  data?: T[];
   search?: boolean;
-  onRemove?: (user: BasicUserDetails) => void;
-  onUpdate?: (user: BasicUserDetails[]) => void;
+  onRemove?: (user: T) => void;
+  onUpdate?: (user: T[]) => void;
   emailInvite?: boolean;
   invitationButtons?: { title: string; action: Function }[];
   selectedUsers?: number[];
   mtOptions?: Options;
+  columns?: Column<any>[];
 };
 
 const useStyles = makeStyles({
@@ -105,20 +107,27 @@ const getTitle = (invitationUserRole?: UserRole): string => {
   }
 };
 
-const PeopleTable: React.FC<PeopleTableProps> = props => {
+const PeopleTable = <T extends BasicUserDetails>(
+  props: PeopleTableProps<T>
+) => {
+  const { isLoading } = props;
   const sendRequest = useDataApi();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(props.isLoading ?? false);
   const [pageSize, setPageSize] = useState(5);
   const [sendUserEmail, setSendUserEmail] = useState(false);
-  const [selectedParticipants, setSelectedParticipants] = useState<
-    BasicUserDetails[]
-  >([]);
+  const [selectedParticipants, setSelectedParticipants] = useState<T[]>([]);
   const [searchText, setSearchText] = useState('');
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
 
   const classes = useStyles();
 
   const { data, action } = props;
+
+  useEffect(() => {
+    if (isLoading !== undefined) {
+      setLoading(isLoading);
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     if (!data) {
@@ -163,7 +172,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
       <MaterialTable
         icons={tableIcons}
         title={props.title}
-        columns={columns}
+        columns={props.columns ?? columns}
         onSelectionChange={(selectedItems, selectedItem) => {
           // when the user wants to (un)select all items
           // `selectedItem` will be undefined
@@ -185,7 +194,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
                   firstname: selectedItem.firstname,
                   lastname: selectedItem.lastname,
                   organisation: selectedItem.organisation,
-                })) as BasicUserDetails[]),
+                })) as T[]),
               ]);
             }
 
@@ -202,7 +211,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
                     lastname: selectedItem.lastname,
                     organisation: selectedItem.organisation,
                   },
-                ] as BasicUserDetails[])
+                ] as T[])
               : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
           );
         }}
@@ -315,6 +324,8 @@ PeopleTable.propTypes = {
   invitationButtons: PropTypes.array,
   selectedUsers: PropTypes.array,
   mtOptions: PropTypes.object,
+  isLoading: PropTypes.bool,
+  columns: PropTypes.array,
 };
 
 export default PeopleTable;

@@ -37,6 +37,7 @@ import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
+import ApiAccessTokensPage from './settings/apiAccessTokens/ApiAccessTokensPage';
 import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage';
 import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
@@ -261,6 +262,9 @@ const Dashboard: React.FC = () => {
           )}
           {isUserOfficer && (
             <Route path="/Shipments" component={ShipmentsPage} />
+          )}
+          {isUserOfficer && (
+            <Route path="/ApiAccessTokens" component={ApiAccessTokensPage} />
           )}
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}

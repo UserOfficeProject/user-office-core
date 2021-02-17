@@ -73,18 +73,18 @@ const ProposalTableInstrumentScientist: React.FC = () => {
 
     return (
       <>
-        <IconButton data-cy="view-proposal" style={iconButtonStyle}>
-          <Link
-            to={`/ProposalReviewUserOfficer/${rowData.id}`}
-            style={{ color: 'inherit', textDecoration: 'inherit' }}
-          >
+        <Link
+          to={`/ProposalReviewUserOfficer/${rowData.id}`}
+          style={{ color: 'inherit', textDecoration: 'inherit' }}
+        >
+          <IconButton data-cy="view-proposal" style={iconButtonStyle}>
             {rowData.technicalReview && rowData.technicalReview.status ? (
               <Visibility />
             ) : (
               <Edit />
             )}
-          </Link>
-        </IconButton>
+          </IconButton>
+        </Link>
         <IconButton
           onClick={() => downloadPDFProposal([rowData.id], rowData.title)}
           style={iconButtonStyle}

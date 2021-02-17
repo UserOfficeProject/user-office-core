@@ -41,10 +41,10 @@ const InstrumentTable: React.FC = () => {
     UrlQueryParamsType
   >(DefaultQueryParams);
 
-  const onInstrumentDelete = async (instrumentDeletedId: number) => {
+  const onInstrumentDelete = async (instrumentDeletedId: number | string) => {
     return await api('Instrument removed successfully!')
       .deleteInstrument({
-        id: instrumentDeletedId,
+        id: instrumentDeletedId as number,
       })
       .then(data => {
         if (data.deleteInstrument.error) {

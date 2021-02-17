@@ -4,7 +4,7 @@ import MaterialTable, { MaterialTableProps } from 'material-table';
 import React, { useState } from 'react';
 import {
   DecodedValueMap,
-  DelimitedNumericArrayParam,
+  DelimitedArrayParam,
   NumberParam,
   QueryParamConfig,
   SetQuery,
@@ -19,7 +19,7 @@ import { tableIcons } from 'utils/materialIcons';
 
 export type UrlQueryParamsType = {
   search: QueryParamConfig<string | null | undefined>;
-  selection: QueryParamConfig<(number | null | never)[]>;
+  selection: QueryParamConfig<(string | null | never)[]>;
   sortColumn: QueryParamConfig<number | null | undefined>;
   sortDirection: QueryParamConfig<string | null | undefined>;
 };
@@ -28,7 +28,7 @@ export const DefaultQueryParams = {
   sortColumn: NumberParam,
   sortDirection: StringParam,
   search: StringParam,
-  selection: withDefault(DelimitedNumericArrayParam, []),
+  selection: withDefault(DelimitedArrayParam, []),
 };
 
 export type SortDirectionType = 'asc' | 'desc' | undefined;
@@ -41,14 +41,15 @@ interface SuperProps<RowData extends object> {
   ) => React.ReactNode;
   setData: Function;
   data: RowData[];
-  delete?: (id: number) => Promise<boolean>;
+  createModalSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
+  delete?: (id: number | string) => Promise<boolean>;
   hasAccess?: { create?: boolean; update?: boolean; remove?: boolean };
   urlQueryParams?: DecodedValueMap<UrlQueryParamsType>;
   setUrlQueryParams?: SetQuery<UrlQueryParamsType>;
 }
 
 interface EntryID {
-  id: number;
+  id: number | string;
 }
 
 export function SuperMaterialTable<Entry extends EntryID>({
@@ -79,7 +80,8 @@ export function SuperMaterialTable<Entry extends EntryID>({
         ...objectItem,
         tableData: {
           checked: urlQueryParams?.selection?.some(
-            (selectedItem: number | null) => selectedItem === objectItem.id
+            (selectedItem: number | string | null) =>
+              selectedItem === objectItem.id
           ),
         },
       };
@@ -112,7 +114,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
     setShow(false);
   };
 
-  const onDeleted = async (deletedId: number) => {
+  const onDeleted = async (deletedId: number | string) => {
     const deleteResult = await (props.delete as Function)(deletedId);
 
     if (deleteResult) {
@@ -138,6 +140,8 @@ export function SuperMaterialTable<Entry extends EntryID>({
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={show}
+        maxWidth={props.createModalSize}
+        fullWidth={!!props.createModalSize}
         onClose={() => {
           setShow(false);
           setEditObject(null);
@@ -188,7 +192,9 @@ export function SuperMaterialTable<Entry extends EntryID>({
             setUrlQueryParams({
               selection:
                 selectedItems.length > 0
-                  ? selectedItems.map(selectedItem => selectedItem.id)
+                  ? selectedItems.map(selectedItem =>
+                      selectedItem.id.toString()
+                    )
                   : undefined,
             });
         }}
