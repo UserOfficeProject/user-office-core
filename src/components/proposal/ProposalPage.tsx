@@ -1,16 +1,23 @@
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import {
+  DecodedValueMap,
   NumberParam,
-  useQueryParams,
   QueryParamConfig,
+  StringParam,
+  useQueryParams,
 } from 'use-query-params';
 
 import {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
-import { ProposalsFilter } from 'generated/sdk';
+import {
+  DataType,
+  ProposalsFilter,
+  QuestionFilterCompareOperator,
+  QuestionFilterInput,
+} from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
@@ -23,7 +30,29 @@ export type ProposalUrlQueryParamsType = {
   call: QueryParamConfig<number | null | undefined>;
   instrument: QueryParamConfig<number | null | undefined>;
   proposalStatus: QueryParamConfig<number | null | undefined>;
+  compareOperator: QueryParamConfig<string | null | undefined>;
+  questionId: QueryParamConfig<string | null | undefined>;
+  value: QueryParamConfig<string | null | undefined>;
+  dataType: QueryParamConfig<string | null | undefined>;
 } & UrlQueryParamsType;
+
+const questionaryFilterFromUrlQuery = (
+  urlQuery: DecodedValueMap<ProposalUrlQueryParamsType>
+): QuestionFilterInput | undefined => {
+  if (
+    urlQuery.questionId &&
+    urlQuery.compareOperator &&
+    urlQuery.value &&
+    urlQuery.dataType
+  ) {
+    return {
+      questionId: urlQuery.questionId,
+      compareOperator: urlQuery.compareOperator as QuestionFilterCompareOperator,
+      value: urlQuery.value,
+      dataType: urlQuery.dataType as DataType,
+    };
+  }
+};
 
 export default function ProposalPage() {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
@@ -33,11 +62,16 @@ export default function ProposalPage() {
     call: NumberParam,
     instrument: NumberParam,
     proposalStatus: NumberParam,
+    questionId: StringParam,
+    compareOperator: StringParam,
+    value: StringParam,
+    dataType: StringParam,
   });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
     proposalStatusId: urlQueryParams.proposalStatus,
+    questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
   });
   const { calls, loadingCalls } = useCallsData();
   const { instruments, loadingInstruments } = useInstrumentsData();

@@ -146,6 +146,67 @@ declare global {
        *    cy.changeActiveRole('User Officer')
        */
       changeActiveRole: (role: string) => void;
+
+      /**
+       * Call this method before your test to have delay between clicks
+       * Excellent for presentation purposes
+       *
+       * @returns {typeof presentationMode}
+       * @memberof Chainable
+       * @example
+       *    cy.presentationMode()
+       */
+      presentationMode: () => void;
+
+      /**
+       * Creates boolean question. You have to be in edit template view to call this method
+       *
+       * @returns {typeof createBooleanQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createBooleanQuestion('Is dangerous')
+       */
+      createBooleanQuestion: (title: string) => void;
+
+      /**
+       * Creates Text question. You have to be in edit template view to call this method
+       *
+       * @returns {typeof createTextQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createTextQuestion()
+       */
+      createTextQuestion: (
+        title: string,
+        isRequired: boolean,
+        isMultipleLines: boolean,
+        minimumCharacters?: number
+      ) => void;
+
+      /**
+       * Creates date question. You have to be in edit template view to call this method
+       *
+       * @returns {typeof createDateQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createDateQuestion('Is dangerous')
+       */
+      createDateQuestion: (title: string) => void;
+
+      /**
+       * Creates multiple choice question. You have to be in edit template view to call this method
+       *
+       * @returns {typeof createMultipleChoiceQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createMultipleChoiceQuestion('Is dangerous')
+       */
+      createMultipleChoiceQuestion: (
+        title: string,
+        option1: string,
+        option2: string,
+        option3: string
+      ) => void;
     }
   }
 

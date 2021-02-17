@@ -9,6 +9,7 @@ import { createTextInputValidationSchema } from './createTextInputValidationSche
 import { QuestionaryComponentTextInput } from './QuestionaryComponentTextInput';
 import { QuestionTemplateRelationTextInputForm } from './QuestionTemplateRelationTextInputForm';
 import { QuestionTextInputForm } from './QuestionTextInputForm';
+import TextSearchCriteriaComponent from './TextSearchCriteriaInput';
 
 export const textInputDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.TEXT_INPUT,
@@ -22,4 +23,5 @@ export const textInputDefinition: QuestionaryComponentDefinition = {
   renderers: defaultRenderer,
   createYupValidationSchema: createTextInputValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || '',
+  searchCriteriaComponent: TextSearchCriteriaComponent,
 };

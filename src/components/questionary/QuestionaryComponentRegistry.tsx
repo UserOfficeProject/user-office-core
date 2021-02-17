@@ -1,6 +1,7 @@
-import React, { FunctionComponent } from 'react';
+import React, { FC, FunctionComponent } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
 import {
   Answer,
   DataType,
@@ -62,6 +63,7 @@ export interface QuestionaryComponentDefinition {
   readonly readonly: boolean; // if true then no answer will be produced
   readonly creatable: boolean; // if true then the question can be added to a questionary
   readonly icon: JSX.Element;
+  readonly searchCriteriaComponent?: FC<SearchCriteriaInputProps>;
 }
 
 const registry = [
