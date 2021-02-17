@@ -34,6 +34,9 @@ export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
 
   @Field(() => TechnicalReviewStatus, { nullable: true })
   public status: TechnicalReviewStatus;
+
+  @Field(() => Boolean)
+  public submitted: boolean;
 }
 
 @Resolver(() => TechnicalReview)

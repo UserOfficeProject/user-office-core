@@ -9,6 +9,7 @@ import { Call } from './Call';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
 import { NextStatusEvent } from './NextStatusEvent';
+import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
 import { Proposal } from './Proposal';
 import { ProposalStatus } from './ProposalStatus';
 import { ProposalWorkflow } from './ProposalWorkflow';
@@ -274,4 +275,13 @@ export class SEPProposalResponseWrap extends ResponseWrapBase<SEPProposal> {
   @Response()
   @Field(() => SEPProposal, { nullable: true })
   public sepProposal: SEPProposal;
+}
+
+@ObjectType()
+export class ApiAccessTokenResponseWrap extends ResponseWrapBase<
+  PermissionsWithAccessToken
+> {
+  @Response()
+  @Field(() => PermissionsWithAccessToken, { nullable: true })
+  public apiAccessToken: PermissionsWithAccessToken;
 }

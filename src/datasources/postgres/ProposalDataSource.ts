@@ -372,4 +372,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       return null;
     }
   }
+
+  async getCount(callId: number): Promise<number> {
+    return database('proposals')
+      .count('call_id')
+      .where('call_id', callId)
+      .first()
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
+      });
+  }
 }

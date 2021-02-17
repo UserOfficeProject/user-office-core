@@ -41,4 +41,5 @@ export interface ProposalDataSource {
     event: Event,
     proposalId: number
   ): Promise<ProposalEventsRecord | null>;
+  getCount(callId: number): Promise<number>;
 }

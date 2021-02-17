@@ -1,11 +1,22 @@
 import { Page } from '../../models/Admin';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
+import { Permissions } from '../../models/Permissions';
 import { Unit } from '../../models/Unit';
+import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
+import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource, Entry } from '../AdminDataSource';
+export const dummyUnit = new Unit(1, 'Second');
 
 export const dummyInstitution = new Institution(1, 'ESS', true);
-export const dummyUnit = new Unit(1, 'Second');
+export const dummyApiAccessToken = new Permissions(
+  'kkmgdyzpj26uxubxoyl',
+  'ESS access token',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NUb2tlbklkIjoia2twNmNjeTRraGF6em9keWx4cyIsImlhdCI6MTYxMjM0MTIzNywiZXhwIjoxNjEyOTQ2MDM3fQ.C_x6WTWD_Jr7_UH4ff_oJGPNnhAJhOFW-EfOMppUTbc',
+  '{"ProposalQueries.getAll": true}'
+);
+
+export const dummyApiAccessTokens = [dummyApiAccessToken];
 
 export class AdminDataSourceMock implements AdminDataSource {
   updateUnit(unit: Unit): Promise<Unit | null> {
@@ -74,5 +85,51 @@ export class AdminDataSourceMock implements AdminDataSource {
   }
   async getFeatures(): Promise<Feature[]> {
     return [{ id: FeatureId.SHIPPING, isEnabled: false, description: '' }];
+  }
+
+  async getTokenAndPermissionsById(
+    accessTokenId: string
+  ): Promise<Permissions> {
+    return dummyApiAccessToken;
+  }
+
+  async getAllTokensAndPermissions(): Promise<Permissions[]> {
+    return dummyApiAccessTokens;
+  }
+
+  async createApiAccessToken(
+    args: CreateApiAccessTokenInput,
+    accessTokenId: string,
+    accessToken: string
+  ): Promise<Permissions> {
+    return new Permissions(
+      accessTokenId,
+      args.name,
+      accessToken,
+      args.accessPermissions
+    );
+  }
+
+  async updateApiAccessToken(
+    args: UpdateApiAccessTokenInput
+  ): Promise<Permissions> {
+    const apiAccessToken = dummyApiAccessTokens.find(
+      accessToken => accessToken.id === args.accessTokenId
+    );
+
+    if (!apiAccessToken) {
+      throw new Error(
+        `Could not update permission rules with access token key: ${args.accessTokenId}`
+      );
+    }
+
+    apiAccessToken.accessPermissions = args.accessPermissions;
+    apiAccessToken.name = args.name;
+
+    return apiAccessToken;
+  }
+
+  async deleteApiAccessToken(accessTokenId: string): Promise<boolean> {
+    return true;
   }
 }

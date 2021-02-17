@@ -307,11 +307,9 @@ const createSeps = async () => {
     for (const proposalId of proposalIds) {
       const tmpUserId = dummy.positiveNumber(MAX_USERS);
       await sepDataSource.assignProposal(proposalId, sep.id);
-      await sepDataSource.assignMemberToSEPProposal(
-        proposalId,
-        sep.id,
-        tmpUserId
-      );
+      await sepDataSource.assignMemberToSEPProposal(proposalId, sep.id, [
+        tmpUserId,
+      ]);
       await reviewDataSource.addUserForReview({
         proposalID: proposalId,
         sepID: sep.id,

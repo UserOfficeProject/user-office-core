@@ -78,7 +78,7 @@ export class UserAuthorization {
   }
 
   async isReviewerOfProposal(agent: User | null, proposalID: number) {
-    if (agent == null) {
+    if (agent == null || !agent.id) {
       return false;
     }
 
@@ -88,7 +88,7 @@ export class UserAuthorization {
   }
 
   async isScientistToProposal(agent: User | null, proposalID: number) {
-    if (agent == null) {
+    if (agent == null || !agent.id) {
       return false;
     }
 
@@ -120,7 +120,8 @@ export class UserAuthorization {
       (await this.isMemberOfProposal(agent, proposal)) ||
       (await this.isReviewerOfProposal(agent, proposal.id)) ||
       (await this.isScientistToProposal(agent, proposal.id)) ||
-      (await this.isChairOrSecretaryOfProposal(agent.id, proposal.id))
+      (await this.isChairOrSecretaryOfProposal(agent.id, proposal.id)) ||
+      this.hasGetAccessByToken(agent)
     );
   }
 
@@ -153,6 +154,10 @@ export class UserAuthorization {
             role.id === UserRole.SEP_CHAIR || role.id === UserRole.SEP_SECRETARY
         );
       });
+  }
+
+  hasGetAccessByToken(agent: UserWithRole) {
+    return !!agent.accessPermissions?.['ProposalQueries']?.get;
   }
 }
 
