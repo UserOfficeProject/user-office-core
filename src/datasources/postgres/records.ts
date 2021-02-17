@@ -248,6 +248,11 @@ export interface InstitutionRecord {
   readonly verified: boolean;
 }
 
+export interface UnitRecord {
+  readonly unit_id: number;
+  readonly unit: string;
+}
+
 export interface CountryRecord {
   readonly country_id: number;
   readonly country: string;
