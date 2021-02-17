@@ -1,5 +1,6 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
 import Edit from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import Visibility from '@material-ui/icons/Visibility';
@@ -71,26 +72,36 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   const RowActionButtons = (rowData: Proposal) => {
     const iconButtonStyle = { padding: '7px' };
 
+    const showEdit = rowData.technicalReview && rowData.technicalReview.status;
+
     return (
       <>
-        <Link
-          to={`/ProposalReviewUserOfficer/${rowData.id}`}
-          style={{ color: 'inherit', textDecoration: 'inherit' }}
+        <Tooltip
+          title={
+            showEdit
+              ? 'Edit technical review'
+              : 'View proposal and technical review'
+          }
         >
-          <IconButton data-cy="view-proposal" style={iconButtonStyle}>
-            {rowData.technicalReview && rowData.technicalReview.status ? (
-              <Visibility />
-            ) : (
-              <Edit />
-            )}
+          <Link
+            to={`/ProposalReviewUserOfficer/${rowData.id}`}
+            style={{ color: 'inherit', textDecoration: 'inherit' }}
+          >
+            <IconButton data-cy="view-proposal" style={iconButtonStyle}>
+              {showEdit ? <Edit /> : <Visibility />}
+            </IconButton>
+          </Link>
+        </Tooltip>
+
+        <Tooltip title="Download proposal as pdf">
+          <IconButton
+            data-cy="download-proposal"
+            onClick={() => downloadPDFProposal([rowData.id], rowData.title)}
+            style={iconButtonStyle}
+          >
+            <GetAppIcon />
           </IconButton>
-        </Link>
-        <IconButton
-          onClick={() => downloadPDFProposal([rowData.id], rowData.title)}
-          style={iconButtonStyle}
-        >
-          <GetAppIcon />
-        </IconButton>
+        </Tooltip>
       </>
     );
   };
@@ -199,6 +210,8 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     urlQueryParams.sortDirection
   );
 
+  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
+
   return (
     <>
       <ProposalFilterBar
@@ -220,6 +233,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         options={{
           search: true,
           searchText: urlQueryParams.search || undefined,
+          selection: true,
           debounceInterval: 400,
           columnsButton: true,
         }}
@@ -246,6 +260,19 @@ const ProposalTableInstrumentScientist: React.FC = () => {
               sortDirection: orderDirection ? orderDirection : undefined,
             });
         }}
+        actions={[
+          {
+            icon: GetAppIconComponent,
+            tooltip: 'Download proposals in PDF',
+            onClick: (event, rowData): void => {
+              downloadPDFProposal(
+                (rowData as Proposal[]).map(row => row.id),
+                (rowData as Proposal[])[0].title
+              );
+            },
+            position: 'toolbarOnSelect',
+          },
+        ]}
       />
     </>
   );
