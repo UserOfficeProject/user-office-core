@@ -10,7 +10,7 @@
   "dependencies": {
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-validation": "^1.1.46",
-    "@graphql-codegen/cli": "^1.20.0",
+    "@graphql-codegen/cli": "^1.20.1",
     "@graphql-codegen/typescript": "^1.20.0",
     "@graphql-codegen/typescript-graphql-request": "^1.17.7",
     "@graphql-codegen/typescript-operations": "^1.17.14",
