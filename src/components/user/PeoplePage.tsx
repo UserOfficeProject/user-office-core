@@ -44,7 +44,7 @@ export default function PeoplePage() {
       setSendUserEmail({
         show: true,
         title: 'Invite Reviewer',
-        userRole: UserRole.REVIEWER,
+        userRole: UserRole.SEP_REVIEWER,
       }),
   });
 

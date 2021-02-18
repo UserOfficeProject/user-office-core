@@ -6,6 +6,12 @@ query getSEPs($filter: String!, $active: Boolean!) {
       description
       numberRatingsRequired
       active
+      sepChair {
+        ...basicUserDetails
+      }
+      sepSecretary {
+        ...basicUserDetails
+      }
     }
     totalCount
   }

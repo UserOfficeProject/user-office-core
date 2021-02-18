@@ -21,7 +21,7 @@ query getSEPProposals($sepId: Int!, $callId: Int!) {
         organisation
         position
       }
-      roles {
+      role {
         id
         shortCode
         title

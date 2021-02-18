@@ -347,7 +347,9 @@ context('Instrument tests', () => {
 
     cy.finishedLoading();
 
-    cy.get('[data-cy="role-modal"] [title="Last Page"]').click();
+    cy.get('[data-cy="role-modal"] [aria-label="Search"]').type(
+      'Instrument Scientist'
+    );
 
     cy.get('[data-cy="role-modal"]')
       .contains('Instrument Scientist')

@@ -195,10 +195,10 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
               const newAssignments: SepAssignment[] = [
                 ...(proposalItem.assignments ?? []),
                 ...assignedMembers.map(
-                  ({ roles, roleId, ...user }) =>
+                  ({ role, ...user }) =>
                     ({
-                      user: user,
-                      roles: roles,
+                      user,
+                      role,
                       review: proposalReviews.find(
                         ({ userID }) => userID === user.id
                       ),

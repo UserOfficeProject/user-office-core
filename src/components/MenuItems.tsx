@@ -139,17 +139,6 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     </div>
   );
 
-  const reviewer = (
-    <div data-cy="reviewer-menu-items">
-      <ListItem component={NavLink} to="/" exact button>
-        <ListItemIcon>
-          <FolderOpen />
-        </ListItemIcon>
-        <ListItemText primary="Review Proposals" />
-      </ListItem>
-    </div>
-  );
-
   const SEPRoles = (
     <div data-cy="SEPRoles-menu-items">
       <ListItem component={NavLink} to="/" exact button>
@@ -197,8 +186,6 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
       return user;
     case UserRole.USER_OFFICER:
       return userOfficer;
-    case UserRole.REVIEWER:
-      return reviewer;
     case UserRole.INSTRUMENT_SCIENTIST:
       return instrumentScientist;
     case UserRole.SEP_CHAIR:

@@ -33,6 +33,8 @@ function ParticipantModal(props: {
       aria-describedby="simple-modal-description"
       open={props.show}
       onClose={() => props.close()}
+      maxWidth="sm"
+      fullWidth
     >
       <DialogContent>
         <PeopleTable

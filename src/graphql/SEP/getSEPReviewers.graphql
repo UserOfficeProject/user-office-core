@@ -1,5 +1,5 @@
-query getSEPMembers($sepId: Int!) {
-  sepMembers(sepId: $sepId) {
+query getSEPReviewers($sepId: Int!) {
+  sepReviewers(sepId: $sepId) {
     userId
     sepId
     role {

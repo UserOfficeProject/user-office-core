@@ -461,8 +461,6 @@ context('Scientific evaluation panel tests', () => {
   it('SEP Reviewer should not be able to modify SEP members', () => {
     cy.login(sepMembers.reviewer);
 
-    cy.changeActiveRole('SEP Reviewer');
-
     cy.contains('SEPs').click();
 
     cy.get('button[title="Edit"]')
@@ -673,7 +671,6 @@ context('Scientific evaluation panel tests', () => {
 
   it('SEP Reviewer should not be able to assign SEP member to proposal', () => {
     cy.login(sepMembers.reviewer);
-    cy.changeActiveRole('SEP Reviewer');
 
     cy.contains('SEPs').click();
     cy.get('button[title="Edit"]')
@@ -786,7 +783,6 @@ context('Scientific evaluation panel tests', () => {
 
   it('SEP Reviewers should only be able to access their own reviews', () => {
     cy.login(sepMembers.reviewer);
-    cy.changeActiveRole('SEP Reviewer');
 
     cy.contains('SEPs').click();
     cy.get('button[title="Edit"]')
@@ -1124,7 +1120,6 @@ context('Scientific evaluation panel tests', () => {
 
   it('SEP Reviewer should not be able to edit SEP Meeting form', () => {
     cy.login(sepMembers.reviewer);
-    cy.changeActiveRole('SEP Reviewer');
 
     cy.contains('SEPs').click();
     cy.get('button[title="Edit"]')
@@ -1179,7 +1174,6 @@ context('Scientific evaluation panel tests', () => {
 
     // Check as a SEP Reviewer
     cy.login(sepMembers.reviewer);
-    cy.changeActiveRole('SEP Reviewer');
 
     cy.contains('SEPs').click();
     cy.get('button[title="Edit"]')

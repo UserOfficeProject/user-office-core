@@ -59,7 +59,11 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
             data={sep}
             onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
           />
-          <SEPMembers sepId={sep.id} />
+          <SEPMembers
+            data={sep}
+            sepId={sep.id}
+            onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
+          />
           <SEPProposalsAndAssignmentsView sepId={sep.id} />
           <SEPMeetingComponentsView sepId={sep.id} />
           {hasAccessRights && (

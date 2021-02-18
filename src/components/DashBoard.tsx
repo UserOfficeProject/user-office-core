@@ -137,7 +137,9 @@ const useStyles = makeStyles(theme => ({
 
 const Dashboard: React.FC = () => {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(
+    localStorage.drawerOpen ? localStorage.drawerOpen === '1' : true
+  );
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isSampleSafetyReviewer = useCheckAccess([
     UserRole.SAMPLE_SAFETY_REVIEWER,
@@ -151,11 +153,14 @@ const Dashboard: React.FC = () => {
   const { calls } = useCallsData({ isActive: true });
 
   const handleDrawerOpen = () => {
+    localStorage.setItem('drawerOpen', '1');
     setOpen(true);
   };
   const handleDrawerClose = () => {
+    localStorage.setItem('drawerOpen', '0');
     setOpen(false);
   };
+
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
 
@@ -282,7 +287,6 @@ const Dashboard: React.FC = () => {
                 no={() => (
                   <Can
                     allowedRoles={[
-                      UserRole.REVIEWER,
                       UserRole.SEP_REVIEWER,
                       UserRole.SEP_CHAIR,
                       UserRole.SEP_SECRETARY,
