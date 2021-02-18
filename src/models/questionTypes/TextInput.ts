@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable quotes */
 import { ConfigBase, TextInputConfig } from '../../resolvers/types/FieldConfig';
+import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
@@ -40,4 +42,19 @@ export const textInputDefinition: Question = {
   },
   isReadOnly: false,
   getDefaultAnswer: () => '',
+  filterQuery: (queryBuilder, filter) => {
+    const value = JSON.parse(filter.value).value;
+    switch (filter.compareOperator) {
+      case QuestionFilterCompareOperator.EQUALS:
+        return queryBuilder.andWhereRaw("answers.answer->>'value'=?", value);
+      case QuestionFilterCompareOperator.INCLUDES:
+        return queryBuilder.andWhereRaw("answers.answer->>'value' like ?", [
+          `%${value}%`,
+        ]);
+      default:
+        throw new Error(
+          `Unsupported comparator for TextInput ${filter.compareOperator}`
+        );
+    }
+  },
 };
