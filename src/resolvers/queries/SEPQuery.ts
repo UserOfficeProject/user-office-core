@@ -2,8 +2,8 @@ import { Query, Ctx, Resolver, Arg, Int } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { SEP } from '../types/SEP';
-import { SEPMember } from '../types/SEPMembers';
 import { SEPProposal } from '../types/SEPProposal';
+import { SEPReviewer } from '../types/SEPReviwers';
 
 @Resolver()
 export class SEPQuery {
@@ -15,12 +15,20 @@ export class SEPQuery {
     return context.queries.sep.get(context.user, id);
   }
 
-  @Query(() => [SEPMember], { nullable: true })
+  @Query(() => [SEPReviewer], { nullable: true })
   async sepMembers(
     @Arg('sepId', () => Int) sepId: number,
     @Ctx() context: ResolverContext
-  ): Promise<SEPMember[] | null> {
+  ): Promise<SEPReviewer[] | null> {
     return context.queries.sep.getMembers(context.user, sepId);
+  }
+
+  @Query(() => [SEPReviewer], { nullable: true })
+  async sepReviewers(
+    @Arg('sepId', () => Int) sepId: number,
+    @Ctx() context: ResolverContext
+  ): Promise<SEPReviewer[] | null> {
+    return context.queries.sep.getReviewers(context.user, sepId);
   }
 
   @Query(() => [SEPProposal], { nullable: true })
