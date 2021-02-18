@@ -56,12 +56,7 @@ export default class InstrumentQueries {
     return { totalCount: instruments.length, instruments };
   }
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
-    Roles.SEP_REVIEWER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getInstrumentsBySepId(
     agent: UserWithRole | null,
     { sepId, callId }: { sepId: number; callId: number }

@@ -10,12 +10,7 @@ export default class SEPQueries {
     private userAuth: UserAuthorization
   ) {}
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
-    Roles.SEP_REVIEWER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async get(agent: UserWithRole | null, id: number) {
     const sep = await this.dataSource.get(id);
 
@@ -44,32 +39,17 @@ export default class SEPQueries {
     return this.dataSource.getAll(active, filter, first, offset);
   }
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
-    Roles.SEP_REVIEWER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getMembers(agent: UserWithRole | null, sepId: number) {
     return this.dataSource.getMembers(sepId);
   }
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
-    Roles.SEP_REVIEWER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getReviewers(agent: UserWithRole | null, sepId: number) {
     return this.dataSource.getReviewers(sepId);
   }
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
-    Roles.SEP_REVIEWER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getSEPProposals(
     agent: UserWithRole | null,
     { sepId, callId }: { sepId: number; callId: number }
@@ -84,12 +64,7 @@ export default class SEPQueries {
     }
   }
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
-    Roles.SEP_REVIEWER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getSEPProposal(
     agent: UserWithRole | null,
     { sepId, proposalId }: { sepId: number; proposalId: number }
@@ -132,12 +107,7 @@ export default class SEPQueries {
     }
   }
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
-    Roles.SEP_REVIEWER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getSEPProposalAssignments(
     agent: UserWithRole | null,
     {

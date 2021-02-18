@@ -23,7 +23,7 @@ export interface SEPDataSource {
   ): Promise<SEP>;
   get(id: number): Promise<SEP | null>;
   getUserSepBySepId(userId: number, sepId: number): Promise<SEP | null>;
-  getUserSeps(id: number): Promise<SEP[]>;
+  getUserSeps(id: number, role: Role): Promise<SEP[]>;
   getSEPByProposalId(proposalId: number): Promise<SEP | null>;
   getAll(
     active: boolean,

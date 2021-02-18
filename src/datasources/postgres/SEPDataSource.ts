@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
+
 import { ProposalIds } from '../../models/Proposal';
 import { ReviewStatus } from '../../models/Review';
 import { Role, Roles } from '../../models/Role';
@@ -101,13 +103,31 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     return sepRecords ? createSEPObject(sepRecords) : null;
   }
 
-  async getUserSeps(userId: number): Promise<SEP[]> {
-    const sepRecords = await database<SEPRecord>('SEPs')
-      .select<SEPRecord[]>('SEPs.*')
-      .leftJoin('SEP_Reviewers', 'SEP_Reviewers.sep_id', '=', 'SEPs.sep_id')
-      .where('sep_chair_user_id', userId)
-      .orWhere('sep_secretary_user_id', userId)
-      .orWhere('SEP_Reviewers.user_id', userId);
+  async getUserSeps(userId: number, role: Role): Promise<SEP[]> {
+    const qb = database<SEPRecord>('SEPs').select<SEPRecord[]>('SEPs.*');
+
+    if (role.shortCode === Roles.SEP_CHAIR) {
+      qb.where('sep_chair_user_id', userId);
+    } else if (role.shortCode === Roles.SEP_SECRETARY) {
+      qb.where('sep_secretary_user_id', userId);
+      // Note: keep it in case we need it in the future
+      // } else if (role.shortCode === Roles.SEP_REVIEWER) {
+      //   qb.join(
+      //     'SEP_Reviewers',
+      //     'SEP_Reviewers.sep_id',
+      //     '=',
+      //     'SEPs.sep_id'
+      //   ).where('SEP_Reviewers.user_id', userId);
+    } else {
+      logger.logWarn('User tried to list its SEPs but has invalid role', {
+        userId,
+        role,
+      });
+
+      return [];
+    }
+
+    const sepRecords = await qb;
 
     return sepRecords.map(createSEPObject);
   }
