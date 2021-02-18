@@ -103,6 +103,16 @@ const sepMembers = {
   },
 };
 
+const sep1 = {
+  code: faker.random.words(3),
+  description: faker.random.words(8),
+};
+
+const sep2 = {
+  code: faker.random.words(3),
+  description: faker.random.words(8),
+};
+
 context('Scientific evaluation panel tests', () => {
   before(() => {
     cy.resetDB();
@@ -123,9 +133,18 @@ context('Scientific evaluation panel tests', () => {
     userMenuItems.should('not.contain', 'SEPs');
   });
 
+  it('SEP REviewer should not able to see SEPs page', () => {
+    cy.login(sepMembers.reviewer);
+
+    cy.get('[data-cy="profile-page-btn"]').should('exist');
+
+    let userMenuItems = cy.get('[data-cy="SEPReviewer-menu-items"]');
+
+    userMenuItems.should('not.contain', 'SEPs');
+  });
+
   it('Officer should be able to create SEP', () => {
-    const code = faker.random.words(3);
-    const description = faker.random.words(8);
+    const { code, description } = sep1;
 
     cy.login('officer');
 
@@ -458,29 +477,6 @@ context('Scientific evaluation panel tests', () => {
     cy.contains('SEP_MEMBERS_ASSIGNED');
   });
 
-  it('SEP Reviewer should not be able to modify SEP members', () => {
-    cy.login(sepMembers.reviewer);
-
-    cy.contains('SEPs').click();
-
-    cy.get('button[title="Edit"]')
-      .first()
-      .click();
-
-    cy.contains('Members').click();
-
-    cy.finishedLoading();
-
-    cy.get('[title="Set SEP Chair"]').should('not.exist');
-    cy.get('[title="Set SEP Secretary"]').should('not.exist');
-
-    cy.get('[title="Remove SEP Chair"]').should('not.exist');
-    cy.get('[title="Remove SEP Secretary"]').should('not.exist');
-
-    cy.get('[data-cy="add-member"]').should('not.exist');
-    cy.get('[title="Remove reviewer"]').should('not.exist');
-  });
-
   it('Officer should be able to assign proposal to existing SEP', () => {
     cy.login('user');
     cy.createProposal();
@@ -669,20 +665,6 @@ context('Scientific evaluation panel tests', () => {
     cy.contains(sepMembers.secretary.surname);
   });
 
-  it('SEP Reviewer should not be able to assign SEP member to proposal', () => {
-    cy.login(sepMembers.reviewer);
-
-    cy.contains('SEPs').click();
-    cy.get('button[title="Edit"]')
-      .first()
-      .click();
-
-    cy.contains('Proposals and Assignments').click();
-    cy.finishedLoading();
-
-    cy.get("[title='Assign SEP Member']").should('not.exist');
-  });
-
   it('Officer should be able to read/write reviews', () => {
     cy.login('officer');
 
@@ -773,29 +755,6 @@ context('Scientific evaluation panel tests', () => {
       .find('[title="Review proposal"]')
       .click();
     readWriteReview();
-
-    cy.contains(sepMembers.reviewer.surname)
-      .parent()
-      .find('[title="Review proposal"]')
-      .click();
-    readWriteReview();
-  });
-
-  it('SEP Reviewers should only be able to access their own reviews', () => {
-    cy.login(sepMembers.reviewer);
-
-    cy.contains('SEPs').click();
-    cy.get('button[title="Edit"]')
-      .first()
-      .click();
-
-    cy.contains('Proposals and Assignments').click();
-    cy.finishedLoading();
-
-    cy.get('[title="Show Reviewers"]').click();
-
-    cy.get('body').should('not.contain', sepMembers.chair.surname);
-    cy.get('body').should('not.contain', sepMembers.secretary.surname);
 
     cy.contains(sepMembers.reviewer.surname)
       .parent()
@@ -942,8 +901,7 @@ context('Scientific evaluation panel tests', () => {
   });
 
   it('Officer should be able to see calculated availability time on instrument per SEP inside meeting components', () => {
-    const code = faker.random.words(3);
-    const description = faker.random.words(8);
+    const { code, description } = sep2;
 
     cy.login('user');
     cy.createProposal();
@@ -960,6 +918,38 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[data-cy="submit"]').click();
 
     cy.notification({ variant: 'success', text: 'SEP created successfully' });
+
+    cy.contains('Members').click();
+
+    cy.get('[title="Set SEP Chair"]').click();
+
+    cy.finishedLoading();
+
+    searchUser(sepMembers.secretary.surname);
+
+    cy.get('[title="Select user"]')
+      .first()
+      .click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'SEP chair assigned successfully',
+    });
+
+    cy.get('[title="Set SEP Secretary"]').click();
+
+    cy.finishedLoading();
+
+    searchUser(sepMembers.chair.surname);
+
+    cy.get('[title="Select user"]')
+      .first()
+      .click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'SEP secretary assigned successfully',
+    });
 
     cy.contains('Proposals').click();
 
@@ -1017,6 +1007,28 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[data-cy="SEP-meeting-components-table"] tbody tr:first-child td')
       .eq(5)
       .should('have.text', '25');
+  });
+
+  it('SEP Chair should only see SEPs where they have SEP Chair role', () => {
+    cy.login(sepMembers.chair);
+
+    cy.changeActiveRole('SEP Chair');
+
+    cy.contains('SEPs').click();
+
+    cy.contains(sep1.code);
+    cy.contains(sep2.code).should('not.exist');
+  });
+
+  it('SEP Secretary should only see SEPs where they have SEP Secretary role', () => {
+    cy.login(sepMembers.secretary);
+
+    cy.changeActiveRole('SEP Secretary');
+
+    cy.contains('SEPs').click();
+
+    cy.contains(sep1.code);
+    cy.contains(sep2.code).should('not.exist');
   });
 
   it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
@@ -1116,78 +1128,6 @@ context('Scientific evaluation panel tests', () => {
     cy.get('[title="View proposal details"]').click();
 
     editFinalRankingForm();
-  });
-
-  it('SEP Reviewer should not be able to edit SEP Meeting form', () => {
-    cy.login(sepMembers.reviewer);
-
-    cy.contains('SEPs').click();
-    cy.get('button[title="Edit"]')
-      .first()
-      .click();
-
-    cy.contains('Meeting Components').click();
-    cy.finishedLoading();
-
-    cy.get('[title="Show proposals"]').click();
-
-    cy.finishedLoading();
-
-    cy.get('[title="View proposal details"]').click();
-
-    cy.get('#commentForUser').should('be.disabled');
-
-    cy.get('#commentForManagement').should('be.disabled');
-
-    cy.get('#rankOrder').should('be.disabled');
-
-    cy.get('[data-cy="save"]').should('not.exist');
-    cy.get('[data-cy="saveAndContinue"]').should('not.exist');
-    cy.get('[role="presentation"]').should('not.contain', 'External reviews');
-  });
-
-  it('SEP Reviewer should not be able to access details proposal view if they are not assigned to the proposal', () => {
-    // remove SEP Reviewer
-    cy.login(sepMembers.chair);
-    cy.changeActiveRole('SEP Chair');
-
-    cy.contains('SEPs').click();
-    cy.get('button[title="Edit"]')
-      .first()
-      .click();
-
-    cy.contains('Proposals and Assignments').click();
-    cy.finishedLoading();
-
-    cy.get('[title="Show Reviewers"').click();
-
-    cy.contains(sepMembers.reviewer.surname)
-      .parent()
-      .find('[title="Remove assignment"]')
-      .click();
-
-    cy.get('[title="Save"]').click();
-
-    cy.notification({ variant: 'success', text: 'Reviewer removed' });
-
-    cy.logout();
-
-    // Check as a SEP Reviewer
-    cy.login(sepMembers.reviewer);
-
-    cy.contains('SEPs').click();
-    cy.get('button[title="Edit"]')
-      .first()
-      .click();
-
-    cy.contains('Meeting Components').click();
-    cy.finishedLoading();
-
-    cy.get('[title="Show proposals"]').click();
-
-    cy.finishedLoading();
-
-    cy.get('[title="View proposal details"]').should('not.exist');
   });
 
   it('Officer should be able to set SEP time allocation', () => {
@@ -1483,6 +1423,7 @@ context('Scientific evaluation panel tests', () => {
       });
     }
 
+    assertAndRemoveAssignment(3);
     assertAndRemoveAssignment(2);
     assertAndRemoveAssignment(1);
 

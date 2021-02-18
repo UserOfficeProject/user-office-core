@@ -9,12 +9,8 @@ import React, { useState, useContext } from 'react';
 import { useCheckAccess } from 'components/common/Can';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
-import {
-  SepProposal,
-  SepAssignment,
-  ReviewStatus,
-  UserRole,
-} from 'generated/sdk';
+import { SepAssignment, ReviewStatus, UserRole } from 'generated/sdk';
+import { SEPProposalType } from 'hooks/SEP/useSEPProposalsData';
 import { tableIcons } from 'utils/materialIcons';
 
 // NOTE: Some custom styles for row expand table.
@@ -31,7 +27,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 type SEPAssignedReviewersTableProps = {
-  sepProposal: SepProposal;
+  sepProposal: SEPProposalType;
   removeAssignedReviewer: (
     assignedReviewer: SepAssignment,
     proposalId: number

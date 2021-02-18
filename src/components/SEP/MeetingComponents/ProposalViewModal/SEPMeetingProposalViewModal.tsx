@@ -68,7 +68,6 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
     UserRole.SEP_SECRETARY,
   ]);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const isSepReviewer = useCheckAccess([UserRole.SEP_REVIEWER]);
 
   const finalHasWriteAccess = submitted ? isUserOfficer : hasWriteAccess;
 
@@ -152,11 +151,9 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
                         proposalId={proposalData.id}
                         sepId={sepId}
                       />
-                      {!isSepReviewer && (
-                        <ExternalReviews
-                          reviews={proposalData.reviews as Review[]}
-                        />
-                      )}
+                      <ExternalReviews
+                        reviews={proposalData.reviews as Review[]}
+                      />
                     </>
                   )}
                 </div>

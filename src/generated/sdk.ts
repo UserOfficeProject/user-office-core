@@ -2498,7 +2498,7 @@ export type GetSepProposalsQuery = (
   { __typename?: 'Query' }
   & { sepProposals: Maybe<Array<(
     { __typename?: 'SEPProposal' }
-    & Pick<SepProposal, 'proposalId' | 'dateAssigned' | 'sepId'>
+    & Pick<SepProposal, 'proposalId' | 'dateAssigned' | 'sepId' | 'sepTimeAllocation'>
     & { proposal: (
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'title' | 'id' | 'shortCode'>
@@ -2511,7 +2511,7 @@ export type GetSepProposalsQuery = (
       & Pick<SepAssignment, 'sepMemberUserId' | 'dateAssigned'>
       & { user: Maybe<(
         { __typename?: 'BasicUserDetails' }
-        & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
+        & BasicUserDetailsFragment
       )>, role: Maybe<(
         { __typename?: 'Role' }
         & Pick<Role, 'id' | 'shortCode' | 'title'>
@@ -5952,6 +5952,7 @@ export const GetSepProposalsDocument = gql`
     proposalId
     dateAssigned
     sepId
+    sepTimeAllocation
     proposal {
       title
       id
@@ -5964,11 +5965,7 @@ export const GetSepProposalsDocument = gql`
       sepMemberUserId
       dateAssigned
       user {
-        id
-        firstname
-        lastname
-        organisation
-        position
+        ...basicUserDetails
       }
       role {
         id
@@ -5985,7 +5982,8 @@ export const GetSepProposalsDocument = gql`
     }
   }
 }
-    ${ProposalStatusFragmentDoc}`;
+    ${ProposalStatusFragmentDoc}
+${BasicUserDetailsFragmentDoc}`;
 export const SepProposalsByInstrumentDocument = gql`
     query sepProposalsByInstrument($instrumentId: Int!, $sepId: Int!, $callId: Int!) {
   sepProposalsByInstrument(instrumentId: $instrumentId, sepId: $sepId, callId: $callId) {

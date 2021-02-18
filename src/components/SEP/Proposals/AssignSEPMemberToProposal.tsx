@@ -9,7 +9,7 @@ export type SepAssignedMember = BasicUserDetails & Pick<SepReviewer, 'role'>;
 type AssignSEPMemberToProposalProps = {
   sepId: number;
   assignMemberToSEPProposal: (assignedMembers: SepAssignedMember[]) => void;
-  assignedMembers?: BasicUserDetails[] | null;
+  assignedMembers?: Array<BasicUserDetails | null>;
 };
 
 const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
@@ -25,7 +25,7 @@ const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
     ? SEPMembersData.filter(
         sepMember =>
           !assignedMembers?.find(
-            assignedMember => assignedMember.id === sepMember.userId
+            assignedMember => assignedMember?.id === sepMember.userId
           )
       ).map(sepMember => ({
         ...sepMember.user,

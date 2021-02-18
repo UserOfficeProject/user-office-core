@@ -1,20 +1,29 @@
 import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 
-import { SepProposal } from 'generated/sdk';
+import { GetSepProposalsQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { Unpacked, NotNull } from 'utils/utilTypes';
+
+export type SEPProposalType = Unpacked<
+  NotNull<GetSepProposalsQuery['sepProposals']>
+>;
+
+export type SEPProposalAssignmentType = Unpacked<
+  NotNull<SEPProposalType['assignments']>
+>;
 
 export function useSEPProposalsData(
   sepId: number,
   callId: number
 ): {
   loadingSEPProposals: boolean;
-  SEPProposalsData: SepProposal[] | null;
-  setSEPProposalsData: Dispatch<SetStateAction<SepProposal[] | null>>;
+  SEPProposalsData: SEPProposalType[];
+  setSEPProposalsData: Dispatch<SetStateAction<SEPProposalType[]>>;
 } {
   const api = useDataApi();
-  const [SEPProposalsData, setSEPProposalsData] = useState<
-    SepProposal[] | null
-  >([]);
+  const [SEPProposalsData, setSEPProposalsData] = useState<SEPProposalType[]>(
+    []
+  );
   const [loadingSEPProposals, setLoadingSEPProposals] = useState(true);
   useEffect(() => {
     let cancelled = false;
@@ -26,7 +35,9 @@ export function useSEPProposalsData(
           return;
         }
 
-        setSEPProposalsData(data.sepProposals as SepProposal[]);
+        if (data.sepProposals) {
+          setSEPProposalsData(data.sepProposals);
+        }
         setLoadingSEPProposals(false);
       });
 

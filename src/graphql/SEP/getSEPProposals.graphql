@@ -3,6 +3,7 @@ query getSEPProposals($sepId: Int!, $callId: Int!) {
     proposalId
     dateAssigned
     sepId
+    sepTimeAllocation
     proposal {
       title
       id
@@ -15,11 +16,7 @@ query getSEPProposals($sepId: Int!, $callId: Int!) {
       sepMemberUserId
       dateAssigned
       user {
-        id
-        firstname
-        lastname
-        organisation
-        position
+        ...basicUserDetails
       }
       role {
         id

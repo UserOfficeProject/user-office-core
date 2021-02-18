@@ -8,14 +8,12 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
+import { SepAssignment, ReviewStatus, UserRole } from 'generated/sdk';
 import {
-  SepProposal,
-  SepAssignment,
-  ReviewStatus,
-  UserRole,
-  BasicUserDetails,
-} from 'generated/sdk';
-import { useSEPProposalsData } from 'hooks/SEP/useSEPProposalsData';
+  useSEPProposalsData,
+  SEPProposalType,
+  SEPProposalAssignmentType,
+} from 'hooks/SEP/useSEPProposalsData';
 import { tableIcons } from 'utils/materialIcons';
 import { average } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -55,12 +53,12 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     UserRole.USER_OFFICER,
   ]);
 
-  const getGradesFromAssignments = (assignments: SepAssignment[]) =>
+  const getGradesFromAssignments = (assignments: SEPProposalAssignmentType[]) =>
     assignments
       ?.filter(
         assignment => assignment.review?.status === ReviewStatus.SUBMITTED
       )
-      .map(assignment => assignment.review?.grade) ?? [];
+      .map(assignment => assignment.review?.grade!) ?? [];
 
   const SEPProposalColumns = [
     { title: 'ID', field: 'proposal.shortCode' },
@@ -75,21 +73,19 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     {
       title: 'Date assigned',
       field: 'dateAssigned',
-      render: (rowData: SepProposal): string =>
+      render: (rowData: SEPProposalType): string =>
         dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
     },
     {
       title: 'Reviewers',
-      render: (rowData: SepProposal): string =>
+      render: (rowData: SEPProposalType): string =>
         rowData.assignments ? rowData.assignments.length.toString() : '-',
     },
     {
       title: 'Average grade',
-      render: (rowData: SepProposal): string => {
+      render: (rowData: SEPProposalType): string => {
         const avgGrade = average(
-          getGradesFromAssignments(
-            rowData.assignments as SepAssignment[]
-          ) as number[]
+          getGradesFromAssignments(rowData.assignments ?? [])
         );
 
         return isNaN(avgGrade) ? '-' : `${avgGrade}`;
@@ -98,7 +94,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   ];
 
   const removeProposalFromSEP = async (
-    proposalToRemove: SepProposal
+    proposalToRemove: SEPProposalType
   ): Promise<void> => {
     await api('Assignment removed').removeProposalAssignment({
       proposalId: proposalToRemove.proposalId,
@@ -106,12 +102,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     });
 
     setSEPProposalsData(sepProposalData =>
-      sepProposalData === null
-        ? null
-        : sepProposalData.filter(
-            proposalItem =>
-              proposalItem.proposalId !== proposalToRemove.proposalId
-          )
+      sepProposalData.filter(
+        proposalItem => proposalItem.proposalId !== proposalToRemove.proposalId
+      )
     );
   };
 
@@ -136,25 +129,23 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
       }));
 
     setSEPProposalsData(sepProposalData =>
-      sepProposalData === null
-        ? null
-        : sepProposalData.map(proposalItem => {
-            if (proposalItem.proposalId === proposalId) {
-              const newAssignments =
-                proposalItem.assignments?.filter(
-                  oldAssignment =>
-                    oldAssignment.sepMemberUserId !==
-                    assignedReviewer.sepMemberUserId
-                ) || [];
+      sepProposalData.map(proposalItem => {
+        if (proposalItem.proposalId === proposalId) {
+          const newAssignments =
+            proposalItem.assignments?.filter(
+              oldAssignment =>
+                oldAssignment.sepMemberUserId !==
+                assignedReviewer.sepMemberUserId
+            ) || [];
 
-              return {
-                ...proposalItem,
-                assignments: newAssignments,
-              };
-            } else {
-              return proposalItem;
-            }
-          })
+          return {
+            ...proposalItem,
+            assignments: newAssignments,
+          };
+        } else {
+          return proposalItem;
+        }
+      })
     );
   };
 
@@ -188,38 +179,33 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     }
 
     setSEPProposalsData(sepProposalData =>
-      sepProposalData === null
-        ? null
-        : sepProposalData.map(proposalItem => {
-            if (proposalItem.proposalId === proposalId) {
-              const newAssignments: SepAssignment[] = [
-                ...(proposalItem.assignments ?? []),
-                ...assignedMembers.map(
-                  ({ role, ...user }) =>
-                    ({
-                      user,
-                      role,
-                      review: proposalReviews.find(
-                        ({ userID }) => userID === user.id
-                      ),
-                      dateAssigned: Date.now(),
-                      sepMemberUserId: user.id,
-                    } as SepAssignment)
-                ),
-              ];
+      sepProposalData.map(proposalItem => {
+        if (proposalItem.proposalId === proposalId) {
+          const newAssignments: SEPProposalAssignmentType[] = [
+            ...(proposalItem.assignments ?? []),
+            ...assignedMembers.map(({ role, ...user }) => ({
+              sepMemberUserId: user.id,
+              dateAssigned: Date.now(),
+              user,
+              role,
+              review:
+                proposalReviews.find(({ userID }) => userID === user.id) ??
+                null,
+            })),
+          ];
 
-              return {
-                ...proposalItem,
-                assignments: newAssignments,
-              };
-            } else {
-              return proposalItem;
-            }
-          })
+          return {
+            ...proposalItem,
+            assignments: newAssignments,
+          };
+        } else {
+          return proposalItem;
+        }
+      })
     );
   };
 
-  const initialValues = SEPProposalsData as SepProposal[];
+  const initialValues: SEPProposalType[] = SEPProposalsData;
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
 
   const proposalAssignments = initialValues.find(
@@ -227,8 +213,8 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   )?.assignments;
 
   const updateReviewStatusAndGrade = (
-    sepProposalData: SepProposal[] | null,
-    editingProposalData: SepProposal,
+    sepProposalData: SEPProposalType[],
+    editingProposalData: SEPProposalType,
     currentAssignment: SepAssignment
   ) => {
     const newProposalsData =
@@ -256,7 +242,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     return newProposalsData;
   };
 
-  const ReviewersTable = (rowData: SepProposal) => (
+  const ReviewersTable = (rowData: SEPProposalType) => (
     <SEPAssignedReviewersTable
       sepProposal={rowData}
       removeAssignedReviewer={removeAssignedReviewer}
@@ -286,9 +272,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
           <AssignSEPMemberToProposal
             sepId={sepId}
             assignedMembers={
-              proposalAssignments?.map(
-                assignment => assignment.user
-              ) as BasicUserDetails[]
+              proposalAssignments?.map(assignment => assignment.user) ?? []
             }
             assignMemberToSEPProposal={memberUser =>
               assignMemberToSEPProposal(memberUser)
@@ -328,7 +312,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
               hasRightToRemoveAssignedProposal
                 ? {
                     deleteTooltip: () => 'Remove assigned proposal',
-                    onRowDelete: (rowData: SepProposal): Promise<void> =>
+                    onRowDelete: (rowData: SEPProposalType): Promise<void> =>
                       removeProposalFromSEP(rowData),
                   }
                 : {}
