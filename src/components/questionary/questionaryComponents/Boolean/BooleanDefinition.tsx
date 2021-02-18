@@ -5,6 +5,7 @@ import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
+import BooleanSearchCriteriaInput from './BooleanSearchCriteriaInput';
 import { createBooleanValidationSchema } from './createBooleanValidationSchema';
 import { QuestionaryComponentBoolean } from './QuestionaryComponentBoolean';
 import { QuestionBooleanForm } from './QuestionBooleanForm';
@@ -25,4 +26,5 @@ export const booleanDefinition: QuestionaryComponentDefinition = {
   },
   createYupValidationSchema: createBooleanValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || false,
+  searchCriteriaComponent: BooleanSearchCriteriaInput,
 };

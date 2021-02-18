@@ -116,17 +116,8 @@ context('Template tests', () => {
       .click();
 
     /* Boolean */
-    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-      .last()
-      .click();
 
-    cy.contains('Add Boolean').click();
-
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(booleanQuestion);
-
-    cy.contains('Save').click();
+    cy.createBooleanQuestion(booleanQuestion);
 
     cy.contains(booleanQuestion)
       .closest('[data-cy=question-container]')
@@ -135,10 +126,6 @@ context('Template tests', () => {
       .then(fieldId => {
         boolId = fieldId;
       });
-
-    cy.contains(booleanQuestion)
-      .parent()
-      .dragElement([{ direction: 'left', length: 1 }]);
 
     /* --- */
 
@@ -209,23 +196,7 @@ context('Template tests', () => {
     /* --- */
 
     /* Text input */
-    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-      .last()
-      .click();
-
-    cy.contains('Add Text Input').click();
-
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(textQuestion);
-
-    cy.contains('Is required').click();
-
-    cy.contains('Multiple lines').click();
-
-    cy.get('[data-cy=max]').type(minimumCharacters.toString());
-
-    cy.contains('Save').click();
+    cy.createTextQuestion(textQuestion, true, true, minimumCharacters);
 
     cy.contains(textQuestion)
       .closest('[data-cy=question-container]')
@@ -244,6 +215,8 @@ context('Template tests', () => {
 
     cy.contains(textQuestion).click();
 
+    cy.get('[data-cy="natural-key"]').click();
+
     cy.get("[data-cy='natural_key']")
       .clear()
       .type(newKey);
@@ -254,11 +227,6 @@ context('Template tests', () => {
 
     cy.contains(newKey);
     /* --- */
-
-    cy.contains(textQuestion)
-      .parent()
-      .dragElement([{ direction: 'left', length: 1 }])
-      .wait(500);
 
     cy.contains(textQuestion).click();
 
@@ -300,41 +268,26 @@ context('Template tests', () => {
       .should('not.contain', textQuestion);
 
     /* Selection from options */
-    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-      .last()
-      .click();
+    cy.createMultipleChoiceQuestion(
+      multipleChoiceQuestion,
+      multipleChoiceAnswers[0],
+      multipleChoiceAnswers[1],
+      multipleChoiceAnswers[2]
+    );
 
-    cy.contains('Add Multiple choice').click();
+    cy.contains(multipleChoiceQuestion)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        multipleChoiceId = fieldId;
+      });
 
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(multipleChoiceQuestion);
+    cy.wait(200);
 
-    cy.contains('Radio').click();
+    cy.contains(multipleChoiceQuestion).click();
 
-    cy.contains('Dropdown').click();
-
-    cy.contains('Is multiple select').click();
-
-    cy.contains('Items').click();
-
-    cy.get('[data-cy=add-answer-button]')
-      .closest('button')
-      .click();
-    cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[0]);
-    cy.get('[title="Save"]').click();
-
-    cy.get('[data-cy=add-answer-button]')
-      .closest('button')
-      .click();
-    cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[1]);
-    cy.get('[title="Save"]').click();
-
-    cy.get('[data-cy=add-answer-button]')
-      .closest('button')
-      .click();
-    cy.get('[placeholder=Answer]').type(multipleChoiceAnswers[2]);
-    cy.get('[title="Save"]').click();
+    cy.get('[data-cy=natural-key]').click();
 
     cy.get('[index=0]').should('not.contain', multipleChoiceAnswers[1]);
 
@@ -352,34 +305,10 @@ context('Template tests', () => {
 
     cy.contains('Save').click();
 
-    cy.contains(multipleChoiceQuestion)
-      .closest('[data-cy=question-container]')
-      .find("[data-cy='proposal-question-id']")
-      .invoke('html')
-      .then(fieldId => {
-        multipleChoiceId = fieldId;
-      });
-
-    cy.contains(multipleChoiceQuestion)
-      .parent()
-      .dragElement([{ direction: 'left', length: 1 }]);
-
     /* --- */
 
     /* Date */
-    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-      .last()
-      .click();
-
-    cy.contains('Add Date').click();
-
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(dateQuestion);
-
-    cy.contains('Is required').click();
-
-    cy.contains('Save').click();
+    cy.createDateQuestion(dateQuestion);
 
     cy.contains(dateQuestion)
       .closest('[data-cy=question-container]')
@@ -389,9 +318,6 @@ context('Template tests', () => {
         dateId = fieldId;
       });
 
-    cy.contains(dateQuestion)
-      .parent()
-      .dragElement([{ direction: 'left', length: 1 }]);
     /* --- */
 
     /* File */
@@ -551,7 +477,6 @@ context('Template tests', () => {
     cy.wait(300);
     cy.get(`[data-cy='${dateId}_field'] button`).click({ force: true }); // click twice because ui hangs sometimes
     cy.contains('15').click({ force: true });
-    cy.contains('OK').click();
 
     cy.get(`#${multipleChoiceId}`).click();
     cy.contains(multipleChoiceAnswers[0]).click();

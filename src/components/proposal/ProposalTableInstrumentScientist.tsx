@@ -7,7 +7,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column } from 'material-table';
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { useQueryParams, NumberParam } from 'use-query-params';
+import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import { UserContext } from 'context/UserContextProvider';
@@ -21,10 +21,10 @@ import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData'
 import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import {
-  average,
   absoluteDifference,
-  standardDeviation,
+  average,
   getGrades,
+  standardDeviation,
 } from 'utils/mathFunctions';
 
 import ProposalFilterBar from './ProposalFilterBar';
@@ -38,10 +38,14 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     call: NumberParam,
     instrument: NumberParam,
     proposalStatus: NumberParam,
+    questionId: StringParam,
+    compareOperator: StringParam,
+    value: StringParam,
+    dataType: StringParam,
     ...DefaultQueryParams,
   });
 
-  // NOTE: proposalStatusId has default value 2 because for IS default view should be all proposals in FEASIBILITY_REVIEW status
+  // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
@@ -240,12 +244,12 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         onSearchChange={searchText => {
           setUrlQueryParams({ search: searchText ? searchText : undefined });
         }}
-        onChangeColumnHidden={collumnChange => {
+        onChangeColumnHidden={columnChange => {
           const proposalColumns = columns.map(
             (proposalColumn: Column<Proposal>) => ({
               hidden:
-                proposalColumn.title === collumnChange.title
-                  ? collumnChange.hidden
+                proposalColumn.title === columnChange.title
+                  ? columnChange.hidden
                   : proposalColumn.hidden,
               title: proposalColumn.title,
             })

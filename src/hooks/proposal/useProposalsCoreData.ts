@@ -15,6 +15,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
     proposalStatusId,
     questionaryIds,
     text,
+    questionFilter,
   } = filter;
 
   useEffect(() => {
@@ -28,6 +29,11 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
           instrumentId,
           proposalStatusId,
           questionaryIds,
+          questionFilter: questionFilter && {
+            ...questionFilter,
+            value:
+              JSON.stringify({ value: questionFilter?.value }) ?? undefined,
+          }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
           text,
         },
       })
@@ -56,7 +62,15 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
           unmounted = true;
         };
       });
-  }, [callId, instrumentId, proposalStatusId, questionaryIds, text, api]);
+  }, [
+    callId,
+    instrumentId,
+    proposalStatusId,
+    questionaryIds,
+    text,
+    questionFilter,
+    api,
+  ]);
 
   return { loading, proposalsData, setProposalsData };
 }

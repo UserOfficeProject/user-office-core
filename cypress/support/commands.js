@@ -159,6 +159,8 @@ const createTopic = title => {
 
   cy.get('[data-cy=add-topic-menu-item]').click();
 
+  cy.wait(500);
+  
   cy.get('[data-cy=topic-title]')
     .last()
     .click();
@@ -272,6 +274,156 @@ function changeActiveRole(role) {
   cy.notification({ variant: 'success', text: 'User role changed' });
 }
 
+function createBooleanQuestion(title) {
+  let questionId
+
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+    .last()
+    .click();
+
+  cy.contains('Add Boolean').click();
+
+  cy.get('[data-cy=question]')
+    .clear()
+    .type(title);
+
+  cy.contains('Save').click();
+
+  cy.contains(title)
+    .parent()
+    .dragElement([{ direction: 'left', length: 1 }]);
+}
+
+function createTextQuestion(title, isRequired, isMultipleLines, minimumCharacters) {
+  let questionId
+
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+      .last()
+      .click();
+
+    cy.contains('Add Text Input').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(title);
+
+    if(isRequired) {
+      cy.contains('Is required').click();
+    }
+
+    if(isMultipleLines) {
+      cy.contains('Multiple lines').click();
+    }
+
+    if(minimumCharacters !== undefined) {
+      cy.get('[data-cy=max]').type(minimumCharacters.toString());
+    }
+
+    cy.contains('Save').click();
+
+    cy.contains(title)
+    .parent()
+    .dragElement([{ direction: 'left', length: 1 }])
+    .wait(500);
+
+}
+
+function createDateQuestion(title) {
+  let questionId
+
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+  .last()
+  .click();
+
+cy.contains('Add Date').click();
+
+cy.get('[data-cy=question]')
+  .clear()
+  .type(title);
+
+cy.contains('Is required').click();
+
+cy.contains('Save').click();
+
+cy.contains(title)
+  .parent()
+  .dragElement([{ direction: 'left', length: 1 }]);
+
+
+}
+
+function createMultipleChoiceQuestion(title, option1, option2, option3) {
+  let questionId
+  
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
+      .last()
+      .click();
+
+    cy.contains('Add Multiple choice').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(title);
+
+    cy.contains('Radio').click();
+
+    cy.contains('Dropdown').click();
+
+    cy.contains('Is multiple select').click();
+
+    cy.contains('Items').click();
+
+    cy.get('[data-cy=add-answer-button]')
+      .closest('button')
+      .click();
+    cy.get('[placeholder=Answer]').type(option1);
+    cy.get('[title="Save"]').click();
+
+    cy.get('[data-cy=add-answer-button]')
+      .closest('button')
+      .click();
+    cy.get('[placeholder=Answer]').type(option2);
+    cy.get('[title="Save"]').click();
+
+    cy.get('[data-cy=add-answer-button]')
+      .closest('button')
+      .click();
+    cy.get('[placeholder=Answer]').type(option3);
+    cy.get('[title="Save"]').click();
+
+    cy.contains('Save').click();
+
+    cy.contains(title)
+      .parent()
+      .dragElement([{ direction: 'left', length: 1 }]);
+
+
+}
+
+function presentationMode() {
+  const COMMAND_DELAY = 300;
+
+  for (const command of [
+    'visit',
+    'click',
+    'trigger',
+    'type',
+    'clear',
+    'reload',
+    'contains',
+  ]) {
+    Cypress.Commands.overwrite(command, (originalFn, ...args) => {
+      const origVal = originalFn(...args);
+
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(origVal);
+        }, COMMAND_DELAY);
+      });
+    });
+  }
+}
+
 Cypress.Commands.add('resetDB', resetDB);
 
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
@@ -301,28 +453,13 @@ Cypress.Commands.add('createSampleQuestion', createSampleQuestion);
 
 Cypress.Commands.add('changeActiveRole', changeActiveRole);
 
-// call cy.presentationMode(); before your test to have delay between clicks.
-// Excellent for presentation purposes
-Cypress.Commands.add('presentationMode', () => {
-  const COMMAND_DELAY = 300;
+Cypress.Commands.add('presentationMode', presentationMode);
 
-  for (const command of [
-    'visit',
-    'click',
-    'trigger',
-    'type',
-    'clear',
-    'reload',
-    'contains',
-  ]) {
-    Cypress.Commands.overwrite(command, (originalFn, ...args) => {
-      const origVal = originalFn(...args);
 
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(origVal);
-        }, COMMAND_DELAY);
-      });
-    });
-  }
-});
+Cypress.Commands.add('createBooleanQuestion', createBooleanQuestion);
+
+Cypress.Commands.add('createTextQuestion', createTextQuestion);
+
+Cypress.Commands.add('createDateQuestion', createDateQuestion);
+
+Cypress.Commands.add('createMultipleChoiceQuestion', createMultipleChoiceQuestion);

@@ -54,6 +54,7 @@ export const QuestionTemplateRelationFormShell = (props: {
         {definition.name}
       </Typography>
       <Link
+        data-cy="natural-key"
         href="#"
         onClick={() => {
           props.dispatch({
