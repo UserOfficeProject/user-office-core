@@ -47,7 +47,7 @@ export class SMTPMailService extends MailService {
         .substring(7),
     };
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV === 'test') {
       sendMailResults.id = 'test';
     }
 

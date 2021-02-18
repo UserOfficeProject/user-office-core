@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import * as path from 'path';
 
-import dotenv from 'dotenv';
-
 import EmailSettings from './EmailSettings';
 import { SMTPMailService } from './SMTPMailService';
 
@@ -27,8 +25,6 @@ test('Return result should indicate all emails were successfully sent', async ()
       },
     ],
   };
-
-  dotenv.config();
 
   const smtpMailService: SMTPMailService = new SMTPMailService();
   const result = await smtpMailService.sendMail(options);

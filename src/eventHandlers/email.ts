@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
 import { logger } from '@esss-swap/duo-logger';
-import * as dotenv from 'dotenv';
 
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -16,10 +15,6 @@ import { SparkPostMailService } from './MailService/SparkPostMailService';
 const options = {
   endpoint: 'https://api.eu.sparkpost.com:443',
 };
-
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
-}
 
 const mailService: MailService =
   process.env.EMAIL_PROTOCOL === 'SMTP'
