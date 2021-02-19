@@ -523,7 +523,6 @@ context('Instrument tests', () => {
       .clear()
       .type('20');
 
-    cy.get('[data-cy="timeAllocation"]').type('20');
     cy.get('[data-cy="technical-review-status"]').click();
     cy.contains('Feasible').click();
 

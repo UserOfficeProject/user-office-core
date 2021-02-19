@@ -497,7 +497,7 @@ export type Mutation = {
   removeMemberFromSep: SepResponseWrap;
   assignSepReviewersToProposal: SepResponseWrap;
   removeMemberFromSEPProposal: SepResponseWrap;
-  assignProposalToSEP: SuccessResponseWrap;
+  assignProposalToSEP: NextProposalStatusResponseWrap;
   removeProposalAssignment: SepResponseWrap;
   createSEP: SepResponseWrap;
   updateSEP: SepResponseWrap;
@@ -1181,6 +1181,19 @@ export type MutationSelectRoleArgs = {
 export type MutationUpdatePasswordArgs = {
   id: Scalars['Int'];
   password: Scalars['String'];
+};
+
+export type NextProposalStatus = {
+  __typename?: 'NextProposalStatus';
+  proposalNextStatusId: Maybe<Scalars['Int']>;
+  proposalNextStatusShortCode: Maybe<Scalars['String']>;
+  proposalNextStatusName: Maybe<Scalars['String']>;
+};
+
+export type NextProposalStatusResponseWrap = {
+  __typename?: 'NextProposalStatusResponseWrap';
+  error: Maybe<Scalars['String']>;
+  nextProposalStatus: Maybe<NextProposalStatus>;
 };
 
 export type NextStatusEvent = {
@@ -2279,8 +2292,12 @@ export type AssignProposalToSepMutationVariables = Exact<{
 export type AssignProposalToSepMutation = (
   { __typename?: 'Mutation' }
   & { assignProposalToSEP: (
-    { __typename?: 'SuccessResponseWrap' }
-    & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
+    { __typename?: 'NextProposalStatusResponseWrap' }
+    & Pick<NextProposalStatusResponseWrap, 'error'>
+    & { nextProposalStatus: Maybe<(
+      { __typename?: 'NextProposalStatus' }
+      & Pick<NextProposalStatus, 'proposalNextStatusId' | 'proposalNextStatusShortCode' | 'proposalNextStatusName'>
+    )> }
   ) }
 );
 
@@ -5770,7 +5787,11 @@ export const AssignProposalToSepDocument = gql`
     mutation assignProposalToSEP($proposalId: Int!, $sepId: Int!) {
   assignProposalToSEP(proposalId: $proposalId, sepId: $sepId) {
     error
-    isSuccess
+    nextProposalStatus {
+      proposalNextStatusId
+      proposalNextStatusShortCode
+      proposalNextStatusName
+    }
   }
 }
     `;

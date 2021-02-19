@@ -323,18 +323,22 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   };
 
   const assignProposalToSEP = async (sep: Sep): Promise<void> => {
-    const assignmentsErrors = await Promise.all(
+    const responses = await Promise.all(
       selectedProposals.map(async selectedProposal => {
         const result = await api().assignProposalToSEP({
           proposalId: selectedProposal.id,
           sepId: sep.id,
         });
 
-        return result.assignProposalToSEP.error;
+        return {
+          result: result.assignProposalToSEP,
+          proposalId: selectedProposal.id,
+        };
       })
     );
 
-    const isError = !!assignmentsErrors.join('');
+    const errors = responses.map(item => item.result.error);
+    const isError = !!errors.join('');
 
     enqueueSnackbar(
       isError
@@ -342,7 +346,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         : 'Proposal/s assigned to SEP',
       {
         variant: isError ? 'error' : 'success',
-        className: isError ? 'snackbar-success' : 'snackbar-error',
+        className: isError ? 'snackbar-error' : 'snackbar-success',
       }
     );
 
@@ -355,6 +359,18 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             )
           ) {
             prop.sepCode = sep.code;
+
+            const proposalNextStatusResponse = responses.find(
+              item => item.proposalId === prop.id
+            );
+
+            if (
+              proposalNextStatusResponse?.result?.nextProposalStatus
+                ?.proposalNextStatusShortCode
+            ) {
+              prop.statusName =
+                proposalNextStatusResponse.result.nextProposalStatus.proposalNextStatusShortCode;
+            }
           }
 
           return prop;
