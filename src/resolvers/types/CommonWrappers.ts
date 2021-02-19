@@ -8,6 +8,7 @@ import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
+import { NextProposalStatus } from './NextProposalStatus';
 import { NextStatusEvent } from './NextStatusEvent';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
 import { Proposal } from './Proposal';
@@ -63,6 +64,15 @@ export class SEPResponseWrap extends ResponseWrapBase<SEP> {
   @Response()
   @Field(() => SEP, { nullable: true })
   public sep: SEP;
+}
+
+@ObjectType()
+export class NextProposalStatusResponseWrap extends ResponseWrapBase<
+  ProposalStatus
+> {
+  @Response()
+  @Field(() => NextProposalStatus, { nullable: true })
+  public nextProposalStatus: NextProposalStatus;
 }
 
 @ObjectType()

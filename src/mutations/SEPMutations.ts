@@ -14,7 +14,7 @@ import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { ProposalIds } from '../models/Proposal';
+import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
 import { UserWithRole, UserRole } from '../models/User';
@@ -191,10 +191,22 @@ export default class SEPMutations {
   async assignProposalToSEP(
     agent: UserWithRole | null,
     args: AssignProposalToSEPArgs
-  ): Promise<ProposalIds | Rejection> {
+  ): Promise<ProposalIdsWithNextStatus | Rejection> {
     return this.dataSource
       .assignProposal(args.proposalId, args.sepId)
-      .then(result => result)
+      .then(async result => {
+        const nextProposalStatus = await this.dataSource.getProposalNextStatus(
+          args.proposalId,
+          Event.PROPOSAL_SEP_SELECTED
+        );
+
+        return new ProposalIdsWithNextStatus(
+          result.proposalIds,
+          nextProposalStatus?.id,
+          nextProposalStatus?.shortCode,
+          nextProposalStatus?.name
+        );
+      })
       .catch(err => {
         logger.logException(
           'Could not assign proposal to scientific evaluation panel',
@@ -218,7 +230,7 @@ export default class SEPMutations {
       .then(result => result)
       .catch(err => {
         logger.logException(
-          'Could not assign proposal to scientific evaluation panel',
+          'Could not remove assigned proposal from scientific evaluation panel',
           err,
           { agent }
         );

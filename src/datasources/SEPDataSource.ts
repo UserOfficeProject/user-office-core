@@ -1,4 +1,6 @@
-import { ProposalIds } from '../models/Proposal';
+import { Event } from '../events/event.enum';
+import { ProposalIdsWithNextStatus } from '../models/Proposal';
+import { ProposalStatus } from '../models/ProposalStatus';
 import { Role } from '../models/Role';
 import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../models/SEP';
 import {
@@ -57,7 +59,14 @@ export interface SEPDataSource {
     args: UpdateMemberSEPArgs,
     isMemberChairOrSecretaryOfSEP: boolean
   ): Promise<SEP>;
-  assignProposal(proposalId: number, sepId: number): Promise<ProposalIds>;
+  assignProposal(
+    proposalId: number,
+    sepId: number
+  ): Promise<ProposalIdsWithNextStatus>;
+  getProposalNextStatus(
+    proposalId: number,
+    event: Event
+  ): Promise<ProposalStatus | null>;
   removeMemberFromSepProposal(
     proposalId: number,
     sepId: number,

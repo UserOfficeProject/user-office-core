@@ -5,7 +5,7 @@ import {
   InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
-import { ProposalIds } from '../../models/Proposal';
+import { ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
@@ -196,7 +196,7 @@ export default class PostgresInstrumentDataSource
   async assignProposalsToInstrument(
     proposalIds: number[],
     instrumentId: number
-  ): Promise<ProposalIds> {
+  ): Promise<ProposalIdsWithNextStatus> {
     const dataToInsert = proposalIds.map(proposalId => ({
       instrument_id: instrumentId,
       proposal_id: proposalId,
@@ -218,7 +218,7 @@ export default class PostgresInstrumentDataSource
        * NOTE: We need to return changed proposalIds because we listen to events and
        * we need to do some changes on proposals based on what is changed.
        */
-      return new ProposalIds(returnedProposalIds);
+      return new ProposalIdsWithNextStatus(returnedProposalIds);
     }
 
     throw new Error(

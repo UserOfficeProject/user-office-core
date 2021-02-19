@@ -1,4 +1,5 @@
-import { ProposalIds } from '../../models/Proposal';
+import { ProposalIdsWithNextStatus } from '../../models/Proposal';
+import { ProposalStatus } from '../../models/ProposalStatus';
 import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../../models/SEP';
 import { User } from '../../models/User';
 import {
@@ -290,10 +291,23 @@ export class SEPDataSourceMock implements SEPDataSource {
     const sep = dummySEPs.find(element => element.id === sepId);
 
     if (sep) {
-      return new ProposalIds([1]);
+      return new ProposalIdsWithNextStatus([1]);
     }
 
     throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async getProposalNextStatus(
+    proposalId: number,
+    event: Event
+  ): Promise<ProposalStatus | null> {
+    return new ProposalStatus(
+      5,
+      'SEP_REVIEW',
+      'SEP Review',
+      'Sep review status description',
+      true
+    );
   }
 
   async removeProposalAssignment(proposalId: number, sepId: number) {
