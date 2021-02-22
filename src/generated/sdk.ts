@@ -530,6 +530,7 @@ export type Mutation = {
   cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   createProposal: ProposalResponseWrap;
+  deleteCall: CallResponseWrap;
   deleteInstitution: InstitutionResponseWrap;
   deleteInstrument: InstrumentResponseWrap;
   deleteProposal: ProposalResponseWrap;
@@ -1050,6 +1051,11 @@ export type MutationCloneTemplateArgs = {
 
 export type MutationCreateProposalArgs = {
   callId: Scalars['Int'];
+};
+
+
+export type MutationDeleteCallArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -2990,6 +2996,23 @@ export type CreateCallMutation = (
     & { call: Maybe<(
       { __typename?: 'Call' }
       & CallFragment
+    )> }
+  ) }
+);
+
+export type DeleteCallMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type DeleteCallMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteCall: (
+    { __typename?: 'CallResponseWrap' }
+    & Pick<CallResponseWrap, 'error'>
+    & { call: Maybe<(
+      { __typename?: 'Call' }
+      & Pick<Call, 'id'>
     )> }
   ) }
 );
@@ -6302,6 +6325,17 @@ export const CreateCallDocument = gql`
   }
 }
     ${CallFragmentDoc}`;
+export const DeleteCallDocument = gql`
+    mutation deleteCall($id: Int!) {
+  deleteCall(id: $id) {
+    error
+    call {
+      id
+    }
+    error
+  }
+}
+    `;
 export const GetCallDocument = gql`
     query getCall($id: Int!) {
   call(id: $id) {
@@ -7830,6 +7864,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     createCall(variables: CreateCallMutationVariables): Promise<CreateCallMutation> {
       return withWrapper(() => client.request<CreateCallMutation>(print(CreateCallDocument), variables));
+    },
+    deleteCall(variables: DeleteCallMutationVariables): Promise<DeleteCallMutation> {
+      return withWrapper(() => client.request<DeleteCallMutation>(print(DeleteCallDocument), variables));
     },
     getCall(variables: GetCallQueryVariables): Promise<GetCallQuery> {
       return withWrapper(() => client.request<GetCallQuery>(print(GetCallDocument), variables));

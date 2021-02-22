@@ -308,7 +308,7 @@ context('Calls tests', () => {
       .click();
 
     cy.get('[title="Delete"]')
-      .first()
+      .eq(1)
       .click();
 
     cy.get('[title="Save"]').click();
@@ -406,5 +406,19 @@ context('Calls tests', () => {
       .find('td')
       .eq(6)
       .should('have.text', '-');
+  });
+
+  it('A user-officer should be able to remove a call', () => {
+    cy.login('officer');
+
+    cy.contains('Calls').click();
+
+    cy.get('[title="Delete"]')
+      .last()
+      .click();
+
+    cy.get('[title="Save"]').click();
+
+    cy.notification({ variant: 'success', text: 'Call deleted successfully' });
   });
 });

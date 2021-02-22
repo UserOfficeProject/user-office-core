@@ -12,12 +12,14 @@ import SuperMaterialTable, {
 import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CreateUpdateCall from './CreateUpdateCall';
 
 const CallsTable: React.FC = () => {
+  const { api } = useDataApiWithFeedback();
   const { loadingCalls, calls, setCallsWithLoading: setCalls } = useCallsData();
   const [assigningInstrumentsCallId, setAssigningInstrumentsCallId] = useState<
     number | null
@@ -102,6 +104,25 @@ const CallsTable: React.FC = () => {
     }
   };
 
+  const deleteCall = async (id: number | string) => {
+    return await api('Call deleted successfully')
+      .deleteCall({
+        id: id as number,
+      })
+      .then(resp => {
+        if (!resp.deleteCall.error) {
+          const newObjectsArray = calls.filter(
+            objectItem => objectItem.id !== id
+          );
+          setCalls(newObjectsArray);
+
+          return true;
+        } else {
+          return false;
+        }
+      });
+  };
+
   const setInstrumentAvailabilityTime = (
     updatedInstruments: InstrumentWithAvailabilityTime[],
     updatingCallId: number
@@ -171,6 +192,7 @@ const CallsTable: React.FC = () => {
       <SuperMaterialTable
         createModal={createModal}
         setData={setCalls}
+        delete={deleteCall}
         hasAccess={{
           create: isUserOfficer,
           update: isUserOfficer,
