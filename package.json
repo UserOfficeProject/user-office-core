@@ -23,7 +23,7 @@
     "start": "tsc && node ./build/index.js",
     "apitest": "newman run api_tests/tests.json --environment api_tests/environment.json",
     "debug": "rm -R -f ./build && tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere ts-node-dev --inspect --respawn -- ./index.ts",
-    "populate": "DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo env secret=qMyLZALzs229ybdQXNyzYRdju7X784TH env tokenLife=7d env baseURL=localhost:3000 env NODE_ENV=development ts-node-dev --respawn --transpileOnly ./src/populate/index.ts",
+    "populate": "DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo env secret=qMyLZALzs229ybdQXNyzYRdju7X784TH env tokenLife=7d env baseURL=localhost:3000 env NODE_ENV=development ts-node-dev --respawn -T ./src/populate/index.ts",
     "generate:uows-client:dev": "uows-client-generator https://devapis.facilities.rl.ac.uk/ws/UserOfficeWebService?wsdl src/datasources/stfc/UOWSSoapInterface.ts"
   },
   "lint-staged": {
@@ -42,10 +42,10 @@
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-logger": "^1.0.4",
     "@esss-swap/duo-message-broker": "^1.0.2",
-    "apollo-server": "^2.19.2",
-    "apollo-server-core": "^2.19.2",
-    "apollo-server-express": "^2.19.2",
-    "@esss-swap/duo-validation": "^1.1.46",
+    "@esss-swap/duo-validation": "^1.1.47",
+    "apollo-server": "^2.21.0",
+    "apollo-server-core": "^2.21.0",
+    "apollo-server-express": "^2.21.0",
     "await-to-js": "^2.1.1",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
@@ -53,7 +53,7 @@
     "cookie-parser": "^1.4.5",
     "cron": "^1.8.2",
     "dotenv": "^8.2.0",
-    "express": "^4.16.4",
+    "express": "^4.17.1",
     "express-jwt": "^6.0.0",
     "gelf-pro": "^1.3.4",
     "graphql": "^15.5.0",
@@ -86,8 +86,8 @@
     "@types/jest": "^26.0.20",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/multer": "^1.4.5",
-    "@types/node": "^12.19.15",
-    "@types/pg": "^7.14.9",
+    "@types/node": "^12.20.1",
+    "@types/pg": "^7.14.10",
     "@types/pg-large-object": "^2.0.2",
     "@types/react-beautiful-dnd": "^11.0.5",
     "@types/request-promise": "^4.1.47",
@@ -102,7 +102,7 @@
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jest": "^24.1.3",
+    "eslint-plugin-jest": "^24.1.5",
     "eslint-plugin-prettier": "^3.3.1",
     "faker": "^4.1.0",
     "husky": "^4.3.8",
@@ -114,6 +114,6 @@
     "sinon": "^9.2.4",
     "ts-jest": "^26.5.0",
     "ts-node-dev": "^1.1.1",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.9"
   }
 }

@@ -12,7 +12,7 @@ import {
   dummyUserWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { ProposalIds } from '../models/Proposal';
+import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { UserRole } from '../models/User';
 import { Rejection } from '../rejection';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -72,10 +72,10 @@ describe('Test SEPMutations', () => {
     const result = (await SEPMutationsInstance.assignChairOrSecretaryToSEP(
       dummyUserWithRole,
       {
-        addSEPMembersRole: {
-          SEPID: 1,
-          roleID: UserRole.SEP_CHAIR,
-          userIDs: [1],
+        assignChairOrSecretaryToSEPInput: {
+          sepId: 1,
+          roleId: UserRole.SEP_CHAIR,
+          userId: 1,
         },
       }
     )) as Rejection;
@@ -87,10 +87,10 @@ describe('Test SEPMutations', () => {
     const result = (await SEPMutationsInstance.assignChairOrSecretaryToSEP(
       dummyUserOfficerWithRole,
       {
-        addSEPMembersRole: {
-          SEPID: 1,
-          roleID: UserRole.SEP_CHAIR,
-          userIDs: [1],
+        assignChairOrSecretaryToSEPInput: {
+          sepId: 1,
+          roleId: UserRole.SEP_CHAIR,
+          userId: 1,
         },
       }
     )) as Rejection;
@@ -102,10 +102,10 @@ describe('Test SEPMutations', () => {
     const result = (await SEPMutationsInstance.assignChairOrSecretaryToSEP(
       dummyUserOfficerWithRole,
       {
-        addSEPMembersRole: {
-          SEPID: 1,
-          roleID: UserRole.SEP_SECRETARY,
-          userIDs: [2],
+        assignChairOrSecretaryToSEPInput: {
+          sepId: 1,
+          roleId: UserRole.SEP_SECRETARY,
+          userId: 2,
         },
       }
     )) as Rejection;
@@ -117,10 +117,10 @@ describe('Test SEPMutations', () => {
     const result = (await SEPMutationsInstance.assignChairOrSecretaryToSEP(
       dummyUserOfficerWithRole,
       {
-        addSEPMembersRole: {
-          SEPID: 1,
-          roleID: UserRole.USER_OFFICER,
-          userIDs: [2],
+        assignChairOrSecretaryToSEPInput: {
+          sepId: 1,
+          roleId: UserRole.USER_OFFICER,
+          userId: 2,
         },
       }
     )) as Rejection;
@@ -128,8 +128,8 @@ describe('Test SEPMutations', () => {
     return expect(result.reason).toBe('BAD_REQUEST');
   });
 
-  test('A user can not assign members to SEP', async () => {
-    const result = (await SEPMutationsInstance.assignMemberToSEP(
+  test('A user can not assign reviewers to SEP', async () => {
+    const result = (await SEPMutationsInstance.assignReviewersToSEP(
       dummyUserWithRole,
       {
         memberIds: [1],
@@ -140,9 +140,9 @@ describe('Test SEPMutations', () => {
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
   });
 
-  test('A userofficer can assign members to SEP', () => {
+  test('A userofficer can assign reviewers to SEP', () => {
     return expect(
-      SEPMutationsInstance.assignMemberToSEP(dummyUserOfficerWithRole, {
+      SEPMutationsInstance.assignReviewersToSEP(dummyUserOfficerWithRole, {
         memberIds: [1],
         sepId: 1,
       })
@@ -190,7 +190,9 @@ describe('Test SEPMutations', () => {
         proposalId: 1,
         sepId: 1,
       })
-    ).resolves.toStrictEqual(new ProposalIds([1]));
+    ).resolves.toStrictEqual(
+      new ProposalIdsWithNextStatus([1], 5, 'SEP_REVIEW', 'SEP Review')
+    );
   });
 
   test('A user can not remove proposal from SEP', async () => {

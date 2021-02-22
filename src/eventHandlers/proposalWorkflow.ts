@@ -53,20 +53,22 @@ export default function createHandler(proposalDatasource: ProposalDataSource) {
       case Event.PROPOSAL_SEP_SELECTED:
         try {
           await Promise.all(
-            event.proposalids.proposalIds.map(async proposalId => {
-              const proposal = await proposalDataSource.get(proposalId);
+            event.proposalidswithnextstatus.proposalIds.map(
+              async proposalId => {
+                const proposal = await proposalDataSource.get(proposalId);
 
-              if (proposal?.id) {
-                return await markProposalEventAsDoneAndCallWorkflowEngine(
-                  event.type,
-                  proposal
-                );
+                if (proposal?.id) {
+                  return await markProposalEventAsDoneAndCallWorkflowEngine(
+                    event.type,
+                    proposal
+                  );
+                }
               }
-            })
+            )
           );
         } catch (error) {
           logger.logError(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposalids.proposalIds}: `,
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposalidswithnextstatus.proposalIds}: `,
             error
           );
         }

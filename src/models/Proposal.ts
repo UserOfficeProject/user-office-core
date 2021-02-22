@@ -48,6 +48,11 @@ export class Proposal {
   ) {}
 }
 
-export class ProposalIds {
-  constructor(public proposalIds: number[]) {}
+export class ProposalIdsWithNextStatus {
+  constructor(
+    public proposalIds: number[],
+    public proposalNextStatusId?: number,
+    public proposalNextStatusShortCode?: string,
+    public proposalNextStatusName?: string
+  ) {}
 }

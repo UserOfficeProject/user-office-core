@@ -112,7 +112,7 @@ test('A user officer can invite a reviewer by email', () => {
   const emailInviteResponse = new EmailInviteResponse(
     dummyPlaceHolderUser.id,
     dummyUserOfficer.id,
-    UserRole.REVIEWER
+    UserRole.SEP_REVIEWER
   );
 
   return expect(
@@ -120,7 +120,7 @@ test('A user officer can invite a reviewer by email', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: dummyPlaceHolderUser.email,
-      userRole: UserRole.REVIEWER,
+      userRole: UserRole.SEP_REVIEWER,
     })
   ).resolves.toStrictEqual(emailInviteResponse);
 });
@@ -131,7 +131,7 @@ test('A user cannot invite a reviewer by email', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: 'email@google.com',
-      userRole: UserRole.REVIEWER,
+      userRole: UserRole.SEP_REVIEWER,
     })
   ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
 });
