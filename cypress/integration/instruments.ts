@@ -644,7 +644,7 @@ context('Instrument tests', () => {
       .click();
 
     cy.get('[title="Delete"]')
-      .first()
+      .eq(1)
       .click();
 
     cy.get('[title="Save"]').click();
