@@ -193,7 +193,7 @@ export default class SEPMutations {
     args: AssignProposalToSEPArgs
   ): Promise<ProposalIdsWithNextStatus | Rejection> {
     const SEP = await this.dataSource.getSEPByProposalId(args.proposalId);
-    if (SEP !== null) {
+    if (SEP) {
       if (
         isRejection(
           await this.removeProposalAssignment(agent, {
