@@ -228,12 +228,6 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .join('proposals as p', {
         'p.proposal_id': 'sp.proposal_id',
       })
-      .join('proposal_statuses as ps', {
-        'p.status_id': 'ps.proposal_status_id',
-      })
-      .where(function() {
-        this.where('ps.name', 'ilike', 'SEP_%');
-      })
       .where('sp.sep_id', sepId)
       .where('sp.proposal_id', proposalId)
       .first();
