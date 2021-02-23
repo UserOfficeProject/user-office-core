@@ -254,6 +254,8 @@ export class UserDataSourceMock implements UserDataSource {
           shortCode: 'instrument_scientist',
         },
       ];
+    } else if (id === 1001) {
+      return [{ id: 2, shortCode: 'SEP_Reviewer', title: 'User' }];
     } else {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }
