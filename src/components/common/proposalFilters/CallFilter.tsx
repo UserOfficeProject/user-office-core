@@ -67,7 +67,7 @@ const CallFilter: React.FC<CallFilterProps> = ({
               });
               onChange?.(call.target.value as number);
             }}
-            value={callId}
+            value={callId || 0}
             defaultValue={0}
             data-cy="call-filter"
           >
