@@ -18,7 +18,7 @@ import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
 import { UserWithRole, UserRole } from '../models/User';
-import { rejection, Rejection } from '../rejection';
+import { rejection, Rejection, isRejection } from '../rejection';
 import {
   UpdateMemberSEPArgs,
   AssignSepReviewersToProposalArgs,
@@ -192,6 +192,20 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     args: AssignProposalToSEPArgs
   ): Promise<ProposalIdsWithNextStatus | Rejection> {
+    const SEP = await this.dataSource.getSEPByProposalId(args.proposalId);
+    if (SEP) {
+      if (
+        isRejection(
+          await this.removeProposalAssignment(agent, {
+            proposalId: args.proposalId,
+            sepId: SEP.id,
+          })
+        )
+      ) {
+        return rejection('INTERNAL_ERROR');
+      }
+    }
+
     return this.dataSource
       .assignProposal(args.proposalId, args.sepId)
       .then(async result => {
@@ -301,7 +315,7 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     { sepId, proposalId, sepTimeAllocation = null }: UpdateSEPTimeAllocationArgs
   ) {
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (
       !isUserOfficer &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId))
