@@ -12,6 +12,7 @@ import {
 
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
@@ -36,7 +37,8 @@ export default class SEPMutations {
   constructor(
     private dataSource: SEPDataSource,
     private instrumentDataSource: InstrumentDataSource,
-    private userAuth: UserAuthorization
+    private userAuth: UserAuthorization,
+    private userDataSource: UserDataSource
   ) {}
 
   @ValidateArgs(createSEPValidationSchema)
@@ -99,6 +101,18 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     args: AssignChairOrSecretaryToSEPArgs
   ): Promise<SEP | Rejection> {
+    const userRoles = await this.userDataSource.getUserRoles(
+      args.assignChairOrSecretaryToSEPInput.userId
+    );
+
+    // only users with sep reviewer role can be chair or secretary
+    const isSepReviewer = userRoles.some(
+      role => role.shortCode === Roles.SEP_REVIEWER
+    );
+    if (!isSepReviewer) {
+      return rejection('NOT_ALLOWED');
+    }
+
     return this.dataSource
       .assignChairOrSecretaryToSEP(args.assignChairOrSecretaryToSEPInput)
       .then(result => result)
