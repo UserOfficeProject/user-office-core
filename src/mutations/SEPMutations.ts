@@ -301,7 +301,7 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     { sepId, proposalId, sepTimeAllocation = null }: UpdateSEPTimeAllocationArgs
   ) {
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (
       !isUserOfficer &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId))

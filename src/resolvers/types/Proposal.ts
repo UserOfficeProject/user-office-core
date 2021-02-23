@@ -18,7 +18,7 @@ import {
 import { isRejection } from '../../rejection';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
-import { Instrument } from './Instrument';
+import { Instrument, InstrumentWithAvailabilityTime } from './Instrument';
 import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
 import { Review } from './Review';

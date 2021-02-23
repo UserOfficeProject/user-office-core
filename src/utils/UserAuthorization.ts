@@ -12,7 +12,7 @@ import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
-import { User, UserRole, UserWithRole } from '../models/User';
+import { User, UserWithRole } from '../models/User';
 
 export class UserAuthorization {
   constructor(
@@ -21,7 +21,7 @@ export class UserAuthorization {
     private sepDataSource: SEPDataSource
   ) {}
 
-  async isUserOfficer(agent: UserWithRole | null) {
+  isUserOfficer(agent: UserWithRole | null) {
     if (agent == null) {
       return false;
     }
@@ -30,7 +30,7 @@ export class UserAuthorization {
   }
 
   // NOTE: This is not a good check if it is a user or not. It should do the same check as isUserOfficer.
-  async isUser(agent: User | null, id: number) {
+  isUser(agent: User | null, id: number) {
     if (agent == null) {
       return false;
     }
@@ -116,7 +116,7 @@ export class UserAuthorization {
     }
 
     return (
-      (await this.isUserOfficer(agent)) ||
+      this.isUserOfficer(agent) ||
       (await this.isMemberOfProposal(agent, proposal)) ||
       (await this.isReviewerOfProposal(agent, proposal.id)) ||
       (await this.isScientistToProposal(agent, proposal.id)) ||
