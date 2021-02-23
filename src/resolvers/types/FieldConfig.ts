@@ -151,7 +151,10 @@ export class ProposalBasisConfig {
 }
 
 @ObjectType()
-export class RichTextInputConfig extends ConfigBase {}
+export class RichTextInputConfig extends ConfigBase {
+  @Field(() => Int, { nullable: true })
+  max: number | null;
+}
 
 export const FieldConfigType = createUnionType({
   name: 'FieldConfig', // the name of the GraphQL union
