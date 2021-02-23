@@ -7,7 +7,10 @@ import {
   getQuestionaryStepByTopicId,
 } from '../../models/ProposalModelFunctions';
 import { Answer, QuestionaryStep } from '../../models/Questionary';
-import { TechnicalReview } from '../../models/TechnicalReview';
+import {
+  TechnicalReview,
+  TechnicalReviewStatus,
+} from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
 import { isRejection } from '../../rejection';
@@ -20,8 +23,23 @@ type ProposalPDFData = {
   coProposers: BasicUserDetails[];
   questionarySteps: QuestionaryStep[];
   attachments: Attachment[];
-  technicalReview?: TechnicalReview;
+  technicalReview?: Omit<TechnicalReview, 'status'> & { status: string };
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
+};
+
+const getTechnicalReviewHumanReadableStatus = (
+  status: TechnicalReviewStatus
+): string => {
+  switch (status) {
+    case TechnicalReviewStatus.FEASIBLE:
+      return 'Feasible';
+    case TechnicalReviewStatus.PARTIALLY_FEASIBLE:
+      return 'Partially feasible';
+    case TechnicalReviewStatus.UNFEASIBLE:
+      return 'Unfeasible';
+    default:
+      return `Unknown status: ${status}`;
+  }
 };
 
 const getTopicActiveAnswers = (
@@ -158,7 +176,10 @@ export const collectProposalPDFData = async (
       proposal.id
     );
     if (technicalReview) {
-      out.technicalReview = technicalReview;
+      out.technicalReview = {
+        ...technicalReview,
+        status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
+      };
     }
   }
 
