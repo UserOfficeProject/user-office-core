@@ -1885,6 +1885,7 @@ export type RichTextInputConfig = {
   small_label: Scalars['String'];
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
+  max: Maybe<Scalars['Int']>;
 };
 
 export type Role = {
@@ -4703,7 +4704,7 @@ type FieldConfigShipmentBasisConfigFragment = (
 
 type FieldConfigRichTextInputConfigFragment = (
   { __typename?: 'RichTextInputConfig' }
-  & Pick<RichTextInputConfig, 'small_label' | 'required' | 'tooltip'>
+  & Pick<RichTextInputConfig, 'small_label' | 'required' | 'tooltip' | 'max'>
 );
 
 export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment;
@@ -5637,6 +5638,7 @@ export const FieldConfigFragmentDoc = gql`
     small_label
     required
     tooltip
+    max
   }
 }
     `;

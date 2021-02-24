@@ -44,6 +44,7 @@ context('Template tests', () => {
   const sampleDeclarationDescription = faker.lorem.words(5);
 
   const minimumCharacters = 1000;
+  const richTextEditorMaxChars = 200;
 
   it('User officer should be able to create sample declaration template', () => {
     cy.login('officer');
@@ -283,7 +284,7 @@ context('Template tests', () => {
         multipleChoiceId = fieldId;
       });
 
-    cy.wait(200);
+    cy.finishedLoading();
 
     cy.contains(multipleChoiceQuestion).click();
 
@@ -367,6 +368,14 @@ context('Template tests', () => {
       .parent()
       .dragElement([{ direction: 'left', length: 1 }]);
 
+    cy.finishedLoading();
+    cy.contains(richTextInputQuestion).click();
+
+    cy.get('[data-cy="max"] input')
+      .clear()
+      .type(`${richTextEditorMaxChars}`);
+
+    cy.contains('Update').click();
     /* --- */
 
     /* --- Update templateQuestionRelation */
@@ -501,6 +510,12 @@ context('Template tests', () => {
       .should('not.be.empty')
       .contains(richTextInputValue);
 
+    cy.get('[data-cy="rich-text-char-count"]').then(element => {
+      expect(element.text()).to.be.equal(
+        `Characters: ${richTextInputValue.length} / ${richTextEditorMaxChars}`
+      );
+    });
+
     cy.contains('Save and continue').click();
 
     cy.contains('Submit').click();
@@ -574,7 +589,7 @@ context('Template tests', () => {
       .parent()
       .dragElement([{ direction: 'left', length: 1 }]);
 
-    cy.wait(200);
+    cy.finishedLoading();
 
     cy.contains(dateQuestion).click();
 
@@ -720,7 +735,7 @@ context('Template tests', () => {
       .parent()
       .dragElement([{ direction: 'left', length: 1 }]);
 
-    cy.wait(200);
+    cy.finishedLoading();
 
     cy.contains(numberQuestion2).click();
 
@@ -901,8 +916,7 @@ context('Template tests', () => {
       .dragElement([
         { direction: 'left', length: 1 },
         { direction: 'down', length: 2 },
-      ])
-      .wait(500);
+      ]);
 
     cy.finishedLoading();
 
@@ -1162,8 +1176,7 @@ context('Template tests', () => {
       .dragElement([
         { direction: 'left', length: 1 },
         { direction: 'down', length: 3 },
-      ])
-      .wait(500);
+      ]);
 
     cy.finishedLoading();
 
@@ -1209,10 +1222,7 @@ context('Template tests', () => {
         'have.value',
         'Test caption'
       );
-      cy.get('[data-cy="image-figure"] input').should(
-        'have.value',
-        'Fig_test'
-      );
+      cy.get('[data-cy="image-figure"] input').should('have.value', 'Fig_test');
     });
   });
 
@@ -1264,7 +1274,7 @@ context('Template tests', () => {
     addBooleanField(field2);
     addBooleanField(field3);
 
-    cy.wait(200);
+    cy.finishedLoading();
 
     function addDependency(
       fieldName: string,

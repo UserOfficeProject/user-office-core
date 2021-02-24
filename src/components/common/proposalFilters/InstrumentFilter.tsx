@@ -67,7 +67,7 @@ const InstrumentFilter: React.FC<InstrumentFilterProps> = ({
               });
               onChange?.(instrument.target.value as number);
             }}
-            value={instrumentId}
+            value={instrumentId || 0}
             defaultValue={0}
             data-cy="instrument-filter"
           >
