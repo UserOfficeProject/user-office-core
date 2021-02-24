@@ -27,7 +27,6 @@ fragment fieldConfig on FieldConfig {
   }
 
   ... on IntervalConfig {
-    property
     units
 
     small_label
@@ -36,7 +35,6 @@ fragment fieldConfig on FieldConfig {
   }
 
   ... on NumberInputConfig {
-    property
     units
     numberValueConstraint
 
