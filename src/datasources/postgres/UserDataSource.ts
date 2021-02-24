@@ -3,7 +3,12 @@ import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
 
 import { Role } from '../../models/Role';
-import { User, BasicUserDetails } from '../../models/User';
+import {
+  User,
+  BasicUserDetails,
+  UserRole,
+  UserRoleShortCodeMap,
+} from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UserDataSource } from '../UserDataSource';
@@ -182,37 +187,19 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async setUserRoles(id: number, roles: number[]): Promise<void> {
-    return database.transaction(function(trx: Transaction) {
-      return database
-        .from('role_user')
+    return database.transaction(async trx => {
+      await trx<RoleUserRecord>('role_user')
         .where('user_id', id)
-        .del()
-        .returning('*')
-        .transacting(trx)
-        .then((data: RoleUserRecord[]) => {
-          return BluePromise.map(roles, (role_id: number) => {
-            // NOTE: If some removed roles have had sep_id we need to keep that info.
-            const foundRoleSepId = data.find(
-              roleItem => roleItem.role_id === role_id
-            )?.sep_id;
+        .del();
 
-            return database
-              .insert({
-                user_id: id,
-                role_id: role_id,
-                sep_id: foundRoleSepId,
-              })
-              .into('role_user')
-              .transacting(trx);
-          });
-        })
-        .then(() => {
-          trx.commit; // TODO call commit
-        })
-        .catch(error => {
-          trx.rollback; // TODO call rollback
-          throw error;
-        });
+      await trx<RoleUserRecord>('role_user')
+        .insert(
+          roles.map(roleId => ({
+            user_id: id,
+            role_id: roleId,
+          }))
+        )
+        .into('role_user');
     });
   }
 
@@ -375,14 +362,14 @@ export default class PostgresUserDataSource implements UserDataSource {
     filter?: string,
     first?: number,
     offset?: number,
-    userRole?: number,
+    userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { organisation: 'i.institution_id' })
-      .orderBy('user_id', 'desc')
+      .orderBy('users.user_id', 'desc')
       .modify(query => {
         if (filter) {
           query.andWhere(qb => {
@@ -399,14 +386,12 @@ export default class PostgresUserDataSource implements UserDataSource {
           query.offset(offset);
         }
         if (userRole) {
-          query.whereIn('user_id', function(this: any) {
-            this.select('user_id')
-              .from('role_user')
-              .where('role_id', userRole);
-          });
+          query.join('role_user', 'role_user.user_id', '=', 'users.user_id');
+          query.join('roles', 'roles.role_id', '=', 'role_user.role_id');
+          query.where('roles.short_code', UserRoleShortCodeMap[userRole]);
         }
         if (subtractUsers) {
-          query.whereNotIn('user_id', subtractUsers);
+          query.whereNotIn('users.user_id', subtractUsers);
         }
       })
       .then((usersRecord: UserRecord[]) => {

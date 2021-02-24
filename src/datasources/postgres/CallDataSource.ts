@@ -12,6 +12,20 @@ import database from './database';
 import { CallRecord, createCallObject } from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
+  async delete(id: number): Promise<Call> {
+    return database
+      .where('call.call_id', id)
+      .del()
+      .from('call')
+      .returning('*')
+      .then((call: CallRecord[]) => {
+        if (call === undefined || call.length !== 1) {
+          throw new Error(`Could not delete call with id:${id}`);
+        }
+
+        return createCallObject(call[0]);
+      });
+  }
   async get(id: number): Promise<Call | null> {
     return database
       .select()

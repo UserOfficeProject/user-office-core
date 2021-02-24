@@ -11,7 +11,24 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { QuestionFilterCompareOperator } from '../../models/Questionary';
+import { DataType } from '../../models/Template';
 import { Proposal } from '../types/Proposal';
+
+@InputType()
+export class QuestionFilterInput {
+  @Field(() => String)
+  public questionId: string;
+
+  @Field(() => String)
+  public value: string;
+
+  @Field(() => QuestionFilterCompareOperator)
+  public compareOperator: QuestionFilterCompareOperator;
+
+  @Field(() => DataType)
+  public dataType: DataType;
+}
 
 @InputType()
 export class ProposalsFilter {
@@ -32,6 +49,9 @@ export class ProposalsFilter {
 
   @Field(() => [String], { nullable: true })
   public shortCodes?: string[];
+
+  @Field(() => QuestionFilterInput, { nullable: true })
+  public questionFilter?: QuestionFilterInput;
 }
 
 @ArgsType()

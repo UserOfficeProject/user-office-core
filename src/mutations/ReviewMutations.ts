@@ -15,8 +15,9 @@ import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
-import { AddTechnicalReviewArgs } from '../resolvers/mutations/AddTechnicalReviewMutation';
+import { AddTechnicalReviewInput } from '../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
+import { SubmitTechnicalReviewInput } from '../resolvers/mutations/SubmitTechnicalReviewMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ReviewMutations {
@@ -78,7 +79,7 @@ export default class ReviewMutations {
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async setTechnicalReview(
     agent: UserWithRole | null,
-    args: AddTechnicalReviewArgs
+    args: AddTechnicalReviewInput | SubmitTechnicalReviewInput
   ): Promise<TechnicalReview | Rejection> {
     if (
       !(
@@ -91,8 +92,10 @@ export default class ReviewMutations {
       return rejection('INSUFFICIENT_PERMISSIONS');
     }
 
+    const shouldSubmitTechnicalReview = 'submitted' in args && args.submitted;
+
     return this.dataSource
-      .setTechnicalReview(args)
+      .setTechnicalReview(args, shouldSubmitTechnicalReview)
       .then(review => review)
       .catch(err => {
         logger.logException('Could not set technicalReview', err, {

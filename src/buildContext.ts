@@ -102,7 +102,8 @@ const sepQueries = new SEPQueries(sepDataSource, userAuthorization);
 const sepMutations = new SEPMutations(
   sepDataSource,
   instrumentDataSource,
-  userAuthorization
+  userAuthorization,
+  userDataSource
 );
 
 const systemQueries = new SystemQueries(systemDataSource);

@@ -8,6 +8,7 @@ import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
+import { NextProposalStatus } from './NextProposalStatus';
 import { NextStatusEvent } from './NextStatusEvent';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
 import { Proposal } from './Proposal';
@@ -26,6 +27,7 @@ import { Shipment } from './Shipment';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
 import { Topic } from './Topic';
+import { Unit } from './Unit';
 import { User } from './User';
 
 @ObjectType()
@@ -62,6 +64,15 @@ export class SEPResponseWrap extends ResponseWrapBase<SEP> {
   @Response()
   @Field(() => SEP, { nullable: true })
   public sep: SEP;
+}
+
+@ObjectType()
+export class NextProposalStatusResponseWrap extends ResponseWrapBase<
+  ProposalStatus
+> {
+  @Response()
+  @Field(() => NextProposalStatus, { nullable: true })
+  public nextProposalStatus: NextProposalStatus;
 }
 
 @ObjectType()
@@ -168,6 +179,13 @@ export class InstitutionResponseWrap extends ResponseWrapBase<Topic> {
   @Response()
   @Field(() => Institution, { nullable: true })
   public institution: Institution;
+}
+
+@ObjectType()
+export class UnitResponseWrap extends ResponseWrapBase<Topic> {
+  @Response()
+  @Field(() => Unit, { nullable: true })
+  public unit: Unit;
 }
 
 @ObjectType()

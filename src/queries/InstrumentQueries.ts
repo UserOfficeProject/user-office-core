@@ -4,6 +4,7 @@ import { Authorized } from '../decorators';
 import { Instrument } from '../models/Instrument';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { userAuthorization } from '../utils/UserAuthorization';
 
 export default class InstrumentQueries {
   constructor(
@@ -55,19 +56,14 @@ export default class InstrumentQueries {
     return { totalCount: instruments.length, instruments };
   }
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
-    Roles.SEP_REVIEWER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getInstrumentsBySepId(
     agent: UserWithRole | null,
     { sepId, callId }: { sepId: number; callId: number }
   ) {
     if (
       this.isUserOfficer(agent) ||
-      (await this.sepDataSource.isMemberOfSEP(agent, sepId))
+      (await userAuthorization.isMemberOfSEP(agent, sepId))
     ) {
       const instruments = await this.dataSource.getInstrumentsBySepId(
         sepId,

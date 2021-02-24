@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import * as Yup from 'yup';
+
 import { IntervalConfig } from '../../resolvers/types/FieldConfig';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
@@ -21,22 +23,39 @@ export const intervalDefinition: Question = {
       throw new Error('DataType should be INTERVAL');
     }
     const config = field.config as IntervalConfig;
-    if (config.required && !value) {
-      return false;
+
+    let minSchema = Yup.number().transform(value =>
+      isNaN(value) ? undefined : value
+    );
+    let maxSchema = Yup.number().transform(value =>
+      isNaN(value) ? undefined : value
+    );
+
+    if (config.required) {
+      minSchema = minSchema.required();
+      maxSchema = maxSchema.required();
     }
 
-    if (isNaN(value.min) || isNaN(value.max)) {
-      return false;
+    let unitSchema = Yup.string().nullable();
+
+    // available units are specified and the field is required
+    if (config.units?.length && config.required) {
+      unitSchema = unitSchema.required();
     }
 
-    return true;
+    return Yup.object()
+      .shape({
+        min: minSchema,
+        max: maxSchema,
+        unit: unitSchema,
+      })
+      .isValidSync(value);
   },
   createBlankConfig: (): IntervalConfig => {
     const config = new IntervalConfig();
     config.small_label = '';
     config.required = false;
     config.tooltip = '';
-    config.property = '';
     config.units = [];
 
     return config;

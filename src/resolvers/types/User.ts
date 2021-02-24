@@ -106,7 +106,14 @@ export class UserResolver {
 
   @FieldResolver(() => [SEP])
   async seps(@Root() user: User, @Ctx() context: ResolverContext) {
-    return context.queries.sep.dataSource.getUserSeps(user.id);
+    if (!context.user || !context.user.currentRole) {
+      return [];
+    }
+
+    return context.queries.sep.dataSource.getUserSeps(
+      user.id,
+      context.user.currentRole
+    );
   }
 
   @FieldResolver(() => [Instrument])

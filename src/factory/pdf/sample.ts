@@ -6,12 +6,12 @@ import {
 import { Answer } from '../../models/Questionary';
 import { Sample, SampleStatus } from '../../models/Sample';
 import { UserWithRole } from '../../models/User';
-import { getFileAttachmentIds } from '../util';
+import { getFileAttachments, Attachment } from '../util';
 
 export type SamplePDFData = {
   sample: Sample & { status: string };
   sampleQuestionaryFields: Answer[];
-  attachmentIds: string[];
+  attachments: Attachment[];
 };
 
 const getHumanReadableStatus = (safetyStatus: SampleStatus): string => {
@@ -74,22 +74,21 @@ export async function collectSamplePDFData(
     )
   );
 
-  const attachmentIds: string[] = [];
+  const attachments: Attachment[] = [];
 
   completedFields.forEach(answer => {
-    attachmentIds.push(...getFileAttachmentIds(answer));
+    attachments.push(...getFileAttachments(answer));
   });
 
   const status = getHumanReadableStatus(sample.safetyStatus);
 
-  const out = {
+  const out: SamplePDFData = {
     sample: {
       ...sample,
       status, //  human readable version of status
     },
     sampleQuestionaryFields: completedFields,
-
-    attachmentIds,
+    attachments,
   };
 
   return out;

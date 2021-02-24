@@ -48,17 +48,17 @@ export class SEPUserResolver {
     return context.queries.proposal.dataSource.get(sepAssignment.proposalId);
   }
 
-  @FieldResolver(() => [Role])
-  async roles(
+  @FieldResolver(() => Role, { nullable: true })
+  async role(
     @Root() sepAssignment: SEPAssignment,
     @Ctx() context: ResolverContext
   ) {
     return sepAssignment.sepMemberUserId
-      ? context.queries.sep.dataSource.getSEPUserRoles(
+      ? context.queries.sep.dataSource.getSEPUserRole(
           sepAssignment.sepMemberUserId,
           sepAssignment.sepId
         )
-      : [];
+      : null;
   }
 
   @FieldResolver(() => BasicUserDetails, { nullable: true })

@@ -7,6 +7,7 @@ import { Page } from '../../models/Admin';
 import { Feature } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
+import { Unit } from '../../models/Unit';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
@@ -24,9 +25,58 @@ import {
   PageTextRecord,
   TokensAndPermissionsRecord,
   UserRecord,
+  UnitRecord,
 } from './records';
 
 export default class PostgresAdminDataSource implements AdminDataSource {
+  async createUnit(unit: Unit): Promise<Unit | null> {
+    const [unitRecord]: UnitRecord[] = await database
+      .insert({
+        unit: unit.name,
+      })
+      .into('units')
+      .returning('*');
+
+    if (!unitRecord) {
+      throw new Error('Could not create unit');
+    }
+
+    return {
+      id: unitRecord.unit_id,
+      name: unitRecord.unit,
+    };
+  }
+
+  async deleteUnit(id: number): Promise<Unit> {
+    const [unitRecord]: UnitRecord[] = await database('units')
+      .where('units.unit_id', id)
+      .del()
+      .from('units')
+      .returning('*');
+
+    if (!unitRecord) {
+      throw new Error(`Could not delete unit with id:${id}`);
+    }
+
+    return {
+      id: unitRecord.unit_id,
+      name: unitRecord.unit,
+    };
+  }
+  async getUnits(): Promise<Unit[]> {
+    return await database
+      .select()
+      .from('units')
+      .orderBy('unit', 'asc')
+      .then((intDB: UnitRecord[]) =>
+        intDB.map(int => {
+          return {
+            id: int.unit_id,
+            name: int.unit,
+          };
+        })
+      );
+  }
   async updateInstitution(
     institution: Institution
   ): Promise<Institution | null> {

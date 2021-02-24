@@ -12,7 +12,7 @@ import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
-import { User, UserRole, UserWithRole } from '../models/User';
+import { User, UserWithRole } from '../models/User';
 
 export class UserAuthorization {
   constructor(
@@ -21,7 +21,7 @@ export class UserAuthorization {
     private sepDataSource: SEPDataSource
   ) {}
 
-  async isUserOfficer(agent: UserWithRole | null) {
+  isUserOfficer(agent: UserWithRole | null) {
     if (agent == null) {
       return false;
     }
@@ -30,7 +30,7 @@ export class UserAuthorization {
   }
 
   // NOTE: This is not a good check if it is a user or not. It should do the same check as isUserOfficer.
-  async isUser(agent: User | null, id: number) {
+  isUser(agent: User | null, id: number) {
     if (agent == null) {
       return false;
     }
@@ -116,7 +116,7 @@ export class UserAuthorization {
     }
 
     return (
-      (await this.isUserOfficer(agent)) ||
+      this.isUserOfficer(agent) ||
       (await this.isMemberOfProposal(agent, proposal)) ||
       (await this.isReviewerOfProposal(agent, proposal.id)) ||
       (await this.isScientistToProposal(agent, proposal.id)) ||
@@ -133,12 +133,7 @@ export class UserAuthorization {
       return false;
     }
 
-    return this.sepDataSource.getSEPUserRoles(userId, sepId).then(roles => {
-      return roles.some(
-        role =>
-          role.id === UserRole.SEP_CHAIR || role.id === UserRole.SEP_SECRETARY
-      );
-    });
+    return this.sepDataSource.isChairOrSecretaryOfSEP(userId, sepId);
   }
 
   async isChairOrSecretaryOfProposal(userId: number, proposalId: number) {
@@ -146,18 +141,21 @@ export class UserAuthorization {
       return false;
     }
 
-    return this.sepDataSource
-      .getSEPProposalUserRoles(userId, proposalId)
-      .then(roles => {
-        return roles.some(
-          role =>
-            role.id === UserRole.SEP_CHAIR || role.id === UserRole.SEP_SECRETARY
-        );
-      });
+    return this.sepDataSource.isChairOrSecretaryOfProposal(userId, proposalId);
   }
 
   hasGetAccessByToken(agent: UserWithRole) {
-    return !!agent.accessPermissions?.['ProposalQueries']?.get;
+    return !!agent.accessPermissions?.['ProposalQueries.get'];
+  }
+
+  async isMemberOfSEP(agent: User | null, sepId: number): Promise<boolean> {
+    if (agent == null) {
+      return false;
+    }
+
+    const sep = await this.sepDataSource.getUserSepBySepId(agent.id, sepId);
+
+    return sep !== null;
   }
 }
 

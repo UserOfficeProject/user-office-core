@@ -6,6 +6,7 @@ import {
   callDataSource,
   instrumentDataSource,
   proposalDataSource,
+  proposalSettingsDataSource,
   questionaryDataSource,
   reviewDataSource,
   sepDataSource,
@@ -30,6 +31,7 @@ const MAX_INSTRUMENTS = 16;
 const MAX_PROPOSALS = 500;
 const MAX_SEPS = 10;
 const MAX_REVIEWS = 600;
+const MAX_WORKFLOWS = 1;
 
 const createUniqueIntArray = (size: number, max: number) => {
   if (size > max) {
@@ -76,7 +78,7 @@ const createUsers = async () => {
     if (Math.random() > 0.8) {
       userDataSource.addUserRole({
         userID: user.id,
-        roleID: UserRole.REVIEWER,
+        roleID: UserRole.SEP_REVIEWER,
       });
     }
     if (Math.random() > 0.8) {
@@ -112,6 +114,15 @@ const createUsers = async () => {
 
     return user;
   }, MAX_USERS);
+};
+
+const createWorkflows = async () => {
+  await execute(() => {
+    return proposalSettingsDataSource.createProposalWorkflow({
+      name: faker.lorem.word(),
+      description: faker.lorem.words(5),
+    });
+  }, MAX_WORKFLOWS);
 };
 
 const createCalls = async () => {
@@ -283,25 +294,19 @@ const createSeps = async () => {
       dummy.positiveNumber(5),
       true
     );
-    await sepDataSource.addSEPMembersRole({
-      SEPID: sep.id,
-      roleID: UserRole.INSTRUMENT_SCIENTIST,
-      userIDs: [dummy.positiveNumber(MAX_USERS)],
+    await sepDataSource.assignChairOrSecretaryToSEP({
+      sepId: sep.id,
+      roleId: UserRole.SEP_CHAIR,
+      userId: dummy.positiveNumber(MAX_USERS),
     });
-    await sepDataSource.addSEPMembersRole({
-      SEPID: sep.id,
-      roleID: UserRole.SEP_CHAIR,
-      userIDs: [dummy.positiveNumber(MAX_USERS)],
+    await sepDataSource.assignChairOrSecretaryToSEP({
+      sepId: sep.id,
+      roleId: UserRole.SEP_SECRETARY,
+      userId: dummy.positiveNumber(MAX_USERS),
     });
-    await sepDataSource.addSEPMembersRole({
-      SEPID: sep.id,
-      roleID: UserRole.SEP_SECRETARY,
-      userIDs: [dummy.positiveNumber(MAX_USERS)],
-    });
-    await sepDataSource.addSEPMembersRole({
-      SEPID: sep.id,
-      roleID: UserRole.USER,
-      userIDs: [dummy.positiveNumber(MAX_USERS)],
+    await sepDataSource.assignReviewersToSEP({
+      sepId: sep.id,
+      memberIds: [dummy.positiveNumber(MAX_USERS)],
     });
     const proposalIds = createUniqueIntArray(5, MAX_PROPOSALS);
     for (const proposalId of proposalIds) {
@@ -324,6 +329,7 @@ async function run() {
   await adminDataSource.resetDB();
   await createUsers();
   await createTemplates();
+  await createWorkflows();
   await createCalls();
   await createInstruments();
   await createProposals();

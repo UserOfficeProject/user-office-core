@@ -5,6 +5,7 @@ import { Transaction } from 'knex';
 import { Event } from '../../events/event.enum';
 import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
+import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
@@ -197,6 +198,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             `proposal_table_view.short_code similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
+        if (filter?.questionFilter) {
+          const questionFilter = filter.questionFilter;
+          const questionFilterQuery = getQuestionDefinition(
+            questionFilter.dataType
+          ).filterQuery;
+          if (questionFilterQuery) {
+            query
+              .leftJoin(
+                'answers',
+                'answers.questionary_id',
+                'proposal_table_view.questionary_id'
+              )
+              .andWhere('answers.question_id', questionFilter.questionId)
+              .modify(questionFilterQuery, questionFilter);
+          }
+        }
       })
       .then((proposals: ProposalViewRecord[]) => {
         return proposals.map(proposal => createProposalViewObject(proposal));
@@ -209,7 +226,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
     return database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select(['proposals.*', database.raw('count(*) OVER() AS full_count')])
       .from('proposals')
       .orderBy('proposals.proposal_id', 'desc')
       .modify(query => {
@@ -371,5 +388,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     } else {
       return null;
     }
+  }
+
+  async getCount(callId: number): Promise<number> {
+    return database('proposals')
+      .count('call_id')
+      .where('call_id', callId)
+      .first()
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
+      });
   }
 }

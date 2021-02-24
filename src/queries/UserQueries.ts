@@ -13,6 +13,7 @@ import {
   User,
   UserWithRole,
   AuthJwtPayload,
+  UserRole,
 } from '../models/User';
 import { signToken, verifyToken } from '../utils/jwt';
 
@@ -156,7 +157,7 @@ export default class UserQueries {
     filter?: string,
     first?: number,
     offset?: number,
-    userRole?: number,
+    userRole?: UserRole,
     subtractUsers?: [number]
   ) {
     return this.dataSource.getUsers(

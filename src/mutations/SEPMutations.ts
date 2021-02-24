@@ -12,19 +12,20 @@ import {
 
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { ProposalIds } from '../models/Proposal';
+import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
-import { UserRole, UserWithRole } from '../models/User';
+import { UserWithRole, UserRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
-import { AddSEPMembersRoleArgs } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 import {
   UpdateMemberSEPArgs,
   AssignSepReviewersToProposalArgs,
-  AssignMembersSEPArgs,
+  AssignReviewersToSEPArgs,
   RemoveSepReviewerFromProposalArgs,
+  AssignChairOrSecretaryToSEPArgs,
 } from '../resolvers/mutations/AssignMembersToSEP';
 import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
@@ -36,7 +37,8 @@ export default class SEPMutations {
   constructor(
     private dataSource: SEPDataSource,
     private instrumentDataSource: InstrumentDataSource,
-    private userAuth: UserAuthorization
+    private userAuth: UserAuthorization,
+    private userDataSource: UserDataSource
   ) {}
 
   @ValidateArgs(createSEPValidationSchema)
@@ -97,28 +99,22 @@ export default class SEPMutations {
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignChairOrSecretaryToSEP(
     agent: UserWithRole | null,
-    args: AddSEPMembersRoleArgs
+    args: AssignChairOrSecretaryToSEPArgs
   ): Promise<SEP | Rejection> {
-    const allSEPMembers = await this.dataSource.getMembers(
-      args.addSEPMembersRole.SEPID
+    const userRoles = await this.userDataSource.getUserRoles(
+      args.assignChairOrSecretaryToSEPInput.userId
     );
 
-    const [existingChairOrSecretary] = allSEPMembers.filter(
-      member =>
-        member.roleId === args.addSEPMembersRole.roleID &&
-        member.sepId === args.addSEPMembersRole.SEPID
+    // only users with sep reviewer role can be chair or secretary
+    const isSepReviewer = userRoles.some(
+      role => role.shortCode === Roles.SEP_REVIEWER
     );
-
-    if (existingChairOrSecretary) {
-      await this.dataSource.removeSEPMemberRole({
-        memberId: existingChairOrSecretary.userId,
-        sepId: existingChairOrSecretary.sepId,
-        roleId: existingChairOrSecretary.roleId,
-      });
+    if (!isSepReviewer) {
+      return rejection('NOT_ALLOWED');
     }
 
     return this.dataSource
-      .addSEPMembersRole(args.addSEPMembersRole)
+      .assignChairOrSecretaryToSEP(args.assignChairOrSecretaryToSEPInput)
       .then(result => result)
       .catch(err => {
         logger.logException(
@@ -134,26 +130,19 @@ export default class SEPMutations {
   @ValidateArgs(assignSEPMembersValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
-  async assignMemberToSEP(
+  async assignReviewersToSEP(
     agent: UserWithRole | null,
-    args: AssignMembersSEPArgs
+    args: AssignReviewersToSEPArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(
-        (agent as UserWithRole).id,
-        args.sepId
-      ))
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, args.sepId))
     ) {
       return rejection('NOT_ALLOWED');
     }
 
     return this.dataSource
-      .addSEPMembersRole({
-        userIDs: args.memberIds,
-        SEPID: args.sepId,
-        roleID: UserRole.SEP_REVIEWER,
-      })
+      .assignReviewersToSEP(args)
       .then(result => result)
       .catch(err => {
         logger.logException(
@@ -183,21 +172,21 @@ export default class SEPMutations {
       return rejection('NOT_ALLOWED');
     }
 
+    const isMemberChairOrSecretaryOfSEP = await this.userAuth.isChairOrSecretaryOfSEP(
+      args.memberId,
+      args.sepId
+    );
+
     // SEP Chair and SEP Secretary can not
     // modify SEP Chair and SEP Secretary members
     if (isChairOrSecretaryOfSEP && !isUserOfficer) {
-      const isMemberChairOrSecretaryOfSEP = await this.userAuth.isChairOrSecretaryOfSEP(
-        args.memberId,
-        args.sepId
-      );
-
       if (isMemberChairOrSecretaryOfSEP) {
         return rejection('NOT_ALLOWED');
       }
     }
 
     return this.dataSource
-      .removeSEPMemberRole(args)
+      .removeMemberFromSEP(args, isMemberChairOrSecretaryOfSEP)
       .then(result => result)
       .catch(err => {
         logger.logException(
@@ -216,10 +205,22 @@ export default class SEPMutations {
   async assignProposalToSEP(
     agent: UserWithRole | null,
     args: AssignProposalToSEPArgs
-  ): Promise<ProposalIds | Rejection> {
+  ): Promise<ProposalIdsWithNextStatus | Rejection> {
     return this.dataSource
       .assignProposal(args.proposalId, args.sepId)
-      .then(result => result)
+      .then(async result => {
+        const nextProposalStatus = await this.dataSource.getProposalNextStatus(
+          args.proposalId,
+          Event.PROPOSAL_SEP_SELECTED
+        );
+
+        return new ProposalIdsWithNextStatus(
+          result.proposalIds,
+          nextProposalStatus?.id,
+          nextProposalStatus?.shortCode,
+          nextProposalStatus?.name
+        );
+      })
       .catch(err => {
         logger.logException(
           'Could not assign proposal to scientific evaluation panel',
@@ -243,7 +244,7 @@ export default class SEPMutations {
       .then(result => result)
       .catch(err => {
         logger.logException(
-          'Could not assign proposal to scientific evaluation panel',
+          'Could not remove assigned proposal from scientific evaluation panel',
           err,
           { agent }
         );
@@ -314,7 +315,7 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     { sepId, proposalId, sepTimeAllocation = null }: UpdateSEPTimeAllocationArgs
   ) {
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (
       !isUserOfficer &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId))

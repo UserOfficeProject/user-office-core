@@ -97,12 +97,12 @@ export default class UserMutations {
     }
 
     if (
-      args.userRole === UserRole.REVIEWER &&
+      args.userRole === UserRole.SEP_REVIEWER &&
       (await this.userAuth.isUserOfficer(agent))
     ) {
       userId = await this.dataSource.createInviteUser(args);
-      await this.dataSource.setUserRoles(userId, [UserRole.REVIEWER]);
-      role = UserRole.REVIEWER;
+      await this.dataSource.setUserRoles(userId, [UserRole.SEP_REVIEWER]);
+      role = UserRole.SEP_REVIEWER;
     } else if (args.userRole === UserRole.USER) {
       userId = await this.dataSource.createInviteUser(args);
       await this.dataSource.setUserRoles(userId, [UserRole.USER]);
@@ -296,13 +296,14 @@ export default class UserMutations {
       return rejection('INTERNAL_ERROR');
     }
 
-    await this.dataSource.setUserRoles(args.id, args.roles).catch(err => {
-      logger.logException('Could not update user', err);
+    return this.dataSource
+      .setUserRoles(args.id, args.roles)
+      .then(() => user)
+      .catch(err => {
+        logger.logException('Could not update user', err);
 
-      return rejection('INTERNAL_ERROR');
-    });
-
-    return user;
+        return rejection('INTERNAL_ERROR');
+      });
   }
 
   @ValidateArgs(signInValidationSchema)
