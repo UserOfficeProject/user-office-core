@@ -643,9 +643,7 @@ context('Instrument tests', () => {
       .find('[title="Show Instruments"]')
       .click();
 
-    cy.get('[title="Delete"]')
-      .eq(1)
-      .click();
+    cy.get('[data-cy="call-instrument-assignments-table"] [title="Delete"]').first().click()
 
     cy.get('[title="Save"]').click();
 
