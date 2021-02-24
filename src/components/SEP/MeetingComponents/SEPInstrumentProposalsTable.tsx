@@ -232,7 +232,6 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         proposalId={openProposalId || 0}
         meetingSubmitted={onMeetingSubmitted}
         sepId={sepId}
-        submitted={!!sepInstrument.submitted}
       />
       <MaterialTable
         icons={tableIcons}

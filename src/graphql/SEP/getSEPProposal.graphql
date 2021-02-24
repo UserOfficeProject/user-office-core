@@ -4,6 +4,7 @@ query getSEPProposal($sepId: Int!, $proposalId: Int!) {
     sepId
     sepTimeAllocation
 
+    instrumentSubmitted
     proposal {
       ...proposal
       proposer {
