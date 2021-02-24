@@ -40,5 +40,5 @@ export const intervalDefinition: QuestionaryComponentDefinition = {
   },
   createYupValidationSchema: createIntervalValidationSchema,
   getYupInitialValue: ({ answer }) =>
-    answer.value || { min: '', max: '', unit: 'unitless' },
+    answer.value || { min: '', max: '', unit: null },
 };

@@ -48,6 +48,10 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
         isLoading={calls?.isLoading}
         shouldShowAll={true}
         onChange={callId => {
+          if (!callId) {
+            setShowQuestionFilter(false);
+          }
+
           setProposalFilter({
             ...filter,
             callId,

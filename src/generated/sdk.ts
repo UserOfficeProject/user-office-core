@@ -445,7 +445,6 @@ export type IntervalConfig = {
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
   units: Maybe<Array<Scalars['String']>>;
-  property: Scalars['String'];
 };
 
 
@@ -1215,7 +1214,6 @@ export type NumberInputConfig = {
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
   units: Maybe<Array<Scalars['String']>>;
-  property: Scalars['String'];
   numberValueConstraint: Maybe<NumberValueConstraint>;
 };
 
@@ -1885,6 +1883,7 @@ export type RichTextInputConfig = {
   small_label: Scalars['String'];
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
+  max: Maybe<Scalars['Int']>;
 };
 
 export type Role = {
@@ -1980,6 +1979,7 @@ export type SepProposal = {
   sepTimeAllocation: Maybe<Scalars['Int']>;
   proposal: Proposal;
   assignments: Maybe<Array<SepAssignment>>;
+  instrumentSubmitted: Scalars['Boolean'];
 };
 
 export type SepProposalResponseWrap = {
@@ -2477,7 +2477,7 @@ export type GetSepProposalQuery = (
   { __typename?: 'Query' }
   & { sepProposal: Maybe<(
     { __typename?: 'SEPProposal' }
-    & Pick<SepProposal, 'proposalId' | 'sepId' | 'sepTimeAllocation'>
+    & Pick<SepProposal, 'proposalId' | 'sepId' | 'sepTimeAllocation' | 'instrumentSubmitted'>
     & { proposal: (
       { __typename?: 'Proposal' }
       & { proposer: Maybe<(
@@ -4688,12 +4688,12 @@ type FieldConfigProposalBasisConfigFragment = (
 
 type FieldConfigIntervalConfigFragment = (
   { __typename?: 'IntervalConfig' }
-  & Pick<IntervalConfig, 'property' | 'units' | 'small_label' | 'required' | 'tooltip'>
+  & Pick<IntervalConfig, 'units' | 'small_label' | 'required' | 'tooltip'>
 );
 
 type FieldConfigNumberInputConfigFragment = (
   { __typename?: 'NumberInputConfig' }
-  & Pick<NumberInputConfig, 'property' | 'units' | 'numberValueConstraint' | 'small_label' | 'required' | 'tooltip'>
+  & Pick<NumberInputConfig, 'units' | 'numberValueConstraint' | 'small_label' | 'required' | 'tooltip'>
 );
 
 type FieldConfigShipmentBasisConfigFragment = (
@@ -4703,7 +4703,7 @@ type FieldConfigShipmentBasisConfigFragment = (
 
 type FieldConfigRichTextInputConfigFragment = (
   { __typename?: 'RichTextInputConfig' }
-  & Pick<RichTextInputConfig, 'small_label' | 'required' | 'tooltip'>
+  & Pick<RichTextInputConfig, 'small_label' | 'required' | 'tooltip' | 'max'>
 );
 
 export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment;
@@ -5579,14 +5579,12 @@ export const FieldConfigFragmentDoc = gql`
     tooltip
   }
   ... on IntervalConfig {
-    property
     units
     small_label
     required
     tooltip
   }
   ... on NumberInputConfig {
-    property
     units
     numberValueConstraint
     small_label
@@ -5637,6 +5635,7 @@ export const FieldConfigFragmentDoc = gql`
     small_label
     required
     tooltip
+    max
   }
 }
     `;
@@ -5947,6 +5946,7 @@ export const GetSepProposalDocument = gql`
     proposalId
     sepId
     sepTimeAllocation
+    instrumentSubmitted
     proposal {
       ...proposal
       proposer {

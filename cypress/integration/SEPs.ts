@@ -1,6 +1,6 @@
 import faker from 'faker';
 
-function searchUser(search: string) {
+function searchMuiTableAsync(search: string) {
   cy.get('[aria-label="Search"]').type(search);
 
   cy.get('[role="progressbar"]').should('exist');
@@ -8,7 +8,7 @@ function searchUser(search: string) {
 }
 
 function readWriteReview() {
-  cy.get('[role="dialog"').as('dialog');
+  cy.get('[role="dialog"]').as('dialog');
 
   cy.finishedLoading();
 
@@ -143,6 +143,48 @@ context('Scientific evaluation panel tests', () => {
     userMenuItems.should('not.contain', 'SEPs');
   });
 
+  it('Officer should be able to assign SEP Reviewer role', () => {
+    cy.login('officer');
+
+    cy.contains('People').click();
+    searchMuiTableAsync(sepMembers.chair.surname);
+    cy.get('[title="Edit user"]').click();
+    cy.get('[cy-data="user-page"]')
+      .contains('Settings')
+      .click();
+    cy.contains('Add role').click();
+
+    cy.get('[aria-label="Search"]').type('SEP Reviewer');
+    cy.get('[role="dialog"] input[type="checkbox"]')
+      .first()
+      .click();
+
+    cy.contains('Update').click();
+    cy.notification({
+      text: 'Roles updated successfully!',
+      variant: 'success',
+    });
+    cy.contains('People').click();
+
+    searchMuiTableAsync(sepMembers.secretary.surname);
+    cy.get('[title="Edit user"]').click();
+    cy.get('[cy-data="user-page"]')
+      .contains('Settings')
+      .click();
+    cy.contains('Add role').click();
+
+    cy.get('[aria-label="Search"]').type('SEP Reviewer');
+    cy.get('[role="dialog"] input[type="checkbox"]')
+      .first()
+      .click();
+
+    cy.contains('Update').click();
+    cy.notification({
+      text: 'Roles updated successfully!',
+      variant: 'success',
+    });
+  });
+
   it('Officer should be able to create SEP', () => {
     const { code, description } = sep1;
 
@@ -212,7 +254,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.finishedLoading();
 
-    searchUser(sepMembers.chair.surname);
+    searchMuiTableAsync(sepMembers.chair.surname);
 
     cy.get('[role="dialog"] table tbody tr')
       .first()
@@ -269,7 +311,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.finishedLoading();
 
-    searchUser(sepMembers.secretary.surname);
+    searchMuiTableAsync(sepMembers.secretary.surname);
 
     cy.get('[role="dialog"] table tbody tr')
       .first()
@@ -350,9 +392,9 @@ context('Scientific evaluation panel tests', () => {
 
     cy.finishedLoading();
 
-    searchUser(sepMembers.reviewer.surname);
+    searchMuiTableAsync(sepMembers.reviewer.surname);
 
-    cy.get('input[type="checkbox"')
+    cy.get('input[type="checkbox"]')
       .eq(1)
       .click();
 
@@ -416,9 +458,9 @@ context('Scientific evaluation panel tests', () => {
 
     cy.finishedLoading();
 
-    searchUser(sepMembers.reviewer.surname);
+    searchMuiTableAsync(sepMembers.reviewer.surname);
 
-    cy.get('input[type="checkbox"')
+    cy.get('input[type="checkbox"]')
       .eq(1)
       .click();
 
@@ -457,9 +499,9 @@ context('Scientific evaluation panel tests', () => {
 
     cy.finishedLoading();
 
-    searchUser(sepMembers.reviewer.surname);
+    searchMuiTableAsync(sepMembers.reviewer.surname);
 
-    cy.get('input[type="checkbox"')
+    cy.get('input[type="checkbox"]')
       .eq(1)
       .click();
 
@@ -925,7 +967,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.finishedLoading();
 
-    searchUser(sepMembers.secretary.surname);
+    searchMuiTableAsync(sepMembers.secretary.surname);
 
     cy.get('[title="Select user"]')
       .first()
@@ -940,7 +982,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.finishedLoading();
 
-    searchUser(sepMembers.chair.surname);
+    searchMuiTableAsync(sepMembers.chair.surname);
 
     cy.get('[title="Select user"]')
       .first()
