@@ -5,7 +5,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 
 export type SepProposalBasics = Pick<
   SepProposal,
-  'proposalId' | 'sepId' | 'sepTimeAllocation'
+  'proposalId' | 'sepId' | 'sepTimeAllocation' | 'instrumentSubmitted'
 > & {
   proposal: Proposal;
 };
