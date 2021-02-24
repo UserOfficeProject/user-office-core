@@ -30,7 +30,7 @@ function UserPage(props: { match: { params: { id: string } } }) {
   const classes = useStyles();
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" cy-data="user-page">
       <SimpleTabs tabNames={['General', 'Settings', 'Logs']}>
         <UpdateUserInformation id={userId} />
         <React.Fragment>

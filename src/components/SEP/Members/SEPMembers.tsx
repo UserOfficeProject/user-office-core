@@ -236,6 +236,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
         selectedUsers={alreadySelectedMembers}
         title={'SEP Chair'}
         invitationUserRole={UserRole.SEP_CHAIR}
+        userRole={UserRole.SEP_REVIEWER}
       />
       <ParticipantModal
         show={sepSecretaryModalOpen}
@@ -244,6 +245,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
         selectedUsers={alreadySelectedMembers}
         title={'SEP Secretary'}
         invitationUserRole={UserRole.SEP_SECRETARY}
+        userRole={UserRole.SEP_REVIEWER}
       />
       <>
         <Typography variant="h6" gutterBottom>
