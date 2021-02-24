@@ -33,6 +33,16 @@ describe('Test Call Mutations', () => {
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
 
+  describe('Test Call Mutations', () => {
+    test('A user can not delete a call', () => {
+      return expect(
+        callMutations.delete(dummyUserWithRole, {
+          callId: dummyCall.id,
+        })
+      ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+    });
+  });
+
   test('A not logged in user can not create a call', () => {
     return expect(
       callMutations.create(null, {

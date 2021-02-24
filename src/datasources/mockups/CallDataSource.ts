@@ -55,6 +55,9 @@ export const anotherDummyCall = new Call(
 export const dummyCalls = [dummyCall, anotherDummyCall];
 
 export class CallDataSourceMock implements CallDataSource {
+  async delete(id: number): Promise<Call> {
+    return dummyCall;
+  }
   async get(id: number): Promise<Call | null> {
     const call = dummyCalls.find(dummyCallItem => dummyCallItem.id === id);
 
