@@ -53,6 +53,12 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => Date)
   public endCycle: Date;
 
+  @Field({ nullable: true })
+  public referenceNumberFormat: string;
+
+  @Field(() => Int, { nullable: true })
+  public proposalSequence: number;
+
   @Field()
   public cycleComment: string;
 

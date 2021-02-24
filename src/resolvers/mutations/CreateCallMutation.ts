@@ -10,6 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { CallResponseWrap } from '../types/CommonWrappers';
+import { FieldCondition } from '../types/FieldCondition';
 import { wrapResponse } from '../wrapResponse';
 
 @InputType()
@@ -46,6 +47,12 @@ export class CreateCallInput {
 
   @Field()
   public endCycle: Date;
+
+  @Field({ nullable: true })
+  public referenceNumberFormat: string;
+
+  @Field(() => Int, { nullable: true })
+  public proposalSequence: number;
 
   @Field()
   public cycleComment: string;

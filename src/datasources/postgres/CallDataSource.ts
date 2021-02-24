@@ -81,6 +81,8 @@ export default class PostgresCallDataSource implements CallDataSource {
         end_cycle: args.endCycle,
         cycle_comment: args.cycleComment,
         survey_comment: args.surveyComment,
+        reference_number_format: args.referenceNumberFormat,
+        proposal_sequence: args.proposalSequence,
         proposal_workflow_id: args.proposalWorkflowId,
         template_id: args.templateId,
       })
@@ -102,6 +104,7 @@ export default class PostgresCallDataSource implements CallDataSource {
           call_short_code: args.shortCode,
           start_call: args.startCall,
           end_call: args.endCall,
+          reference_number_format: args.referenceNumberFormat,
           start_review: args.startReview,
           end_review: args.endReview,
           start_sep_review: args.startSEPReview,

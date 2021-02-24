@@ -128,6 +128,11 @@ const createCalls = async () => {
       endCycle: faker.date.future(1),
       endReview: faker.date.future(1),
       endSEPReview: faker.date.future(1),
+      referenceNumberFormat: faker.random.words(8),
+      proposalSequence: faker.random.number({
+        min: 0,
+        max: 100,
+      }),
       shortCode: `${dummy.word().substr(0, 15)}${dummy.positiveNumber(100)}`,
       surveyComment: faker.random.words(5),
       proposalWorkflowId: 1,
