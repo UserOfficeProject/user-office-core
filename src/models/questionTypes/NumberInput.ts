@@ -43,13 +43,17 @@ export const numberInputDefinition: Question = {
       valueScheme = valueScheme.positive();
     }
 
+    let unitScheme = Yup.string().nullable();
+
+    // available units are specified and the field is required
+    if (config.units?.length && config.required) {
+      unitScheme = unitScheme.required('Please specify unit');
+    }
+
     return Yup.object()
       .shape({
         value: valueScheme,
-        unit:
-          config.property !== 'UNITLESS'
-            ? Yup.string().required()
-            : Yup.string().nullable(),
+        unit: unitScheme,
       })
       .isValidSync(value);
   },
@@ -58,7 +62,6 @@ export const numberInputDefinition: Question = {
     config.small_label = '';
     config.required = false;
     config.tooltip = '';
-    config.property = '';
     config.units = [];
 
     return config;

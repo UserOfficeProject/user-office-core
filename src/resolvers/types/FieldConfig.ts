@@ -121,9 +121,6 @@ export class SubtemplateConfig {
 export class IntervalConfig extends ConfigBase {
   @Field(() => [String], { nullable: true })
   units: string[] | null;
-
-  @Field(() => String)
-  property: string;
 }
 
 export enum NumberValueConstraint {
@@ -136,9 +133,6 @@ export enum NumberValueConstraint {
 export class NumberInputConfig extends ConfigBase {
   @Field(() => [String], { nullable: true })
   units: string[] | null;
-
-  @Field(() => String)
-  property: string;
 
   @Field(() => NumberValueConstraint, { nullable: true })
   numberValueConstraint: NumberValueConstraint | null;
