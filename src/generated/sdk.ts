@@ -445,7 +445,6 @@ export type IntervalConfig = {
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
   units: Maybe<Array<Scalars['String']>>;
-  property: Scalars['String'];
 };
 
 
@@ -530,6 +529,7 @@ export type Mutation = {
   cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   createProposal: ProposalResponseWrap;
+  deleteCall: CallResponseWrap;
   deleteInstitution: InstitutionResponseWrap;
   deleteInstrument: InstrumentResponseWrap;
   deleteProposal: ProposalResponseWrap;
@@ -1053,6 +1053,11 @@ export type MutationCreateProposalArgs = {
 };
 
 
+export type MutationDeleteCallArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationDeleteInstitutionArgs = {
   id: Scalars['Int'];
 };
@@ -1209,7 +1214,6 @@ export type NumberInputConfig = {
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
   units: Maybe<Array<Scalars['String']>>;
-  property: Scalars['String'];
   numberValueConstraint: Maybe<NumberValueConstraint>;
 };
 
@@ -4667,12 +4671,12 @@ type FieldConfigProposalBasisConfigFragment = (
 
 type FieldConfigIntervalConfigFragment = (
   { __typename?: 'IntervalConfig' }
-  & Pick<IntervalConfig, 'property' | 'units' | 'small_label' | 'required' | 'tooltip'>
+  & Pick<IntervalConfig, 'units' | 'small_label' | 'required' | 'tooltip'>
 );
 
 type FieldConfigNumberInputConfigFragment = (
   { __typename?: 'NumberInputConfig' }
-  & Pick<NumberInputConfig, 'property' | 'units' | 'numberValueConstraint' | 'small_label' | 'required' | 'tooltip'>
+  & Pick<NumberInputConfig, 'units' | 'numberValueConstraint' | 'small_label' | 'required' | 'tooltip'>
 );
 
 type FieldConfigShipmentBasisConfigFragment = (
@@ -5558,14 +5562,12 @@ export const FieldConfigFragmentDoc = gql`
     tooltip
   }
   ... on IntervalConfig {
-    property
     units
     small_label
     required
     tooltip
   }
   ... on NumberInputConfig {
-    property
     units
     numberValueConstraint
     small_label
