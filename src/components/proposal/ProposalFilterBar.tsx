@@ -37,7 +37,7 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
   );
 
   const selectedCallTemplateId = calls?.data.find(
-    call => call.id === filter.callId
+    (call) => call.id === filter.callId
   )?.templateId;
 
   return (
@@ -47,7 +47,7 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
         calls={calls?.data}
         isLoading={calls?.isLoading}
         shouldShowAll={true}
-        onChange={callId => {
+        onChange={(callId) => {
           if (!callId) {
             setShowQuestionFilter(false);
           }
@@ -64,7 +64,7 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
         instruments={instruments?.data}
         isLoading={instruments?.isLoading}
         shouldShowAll={true}
-        onChange={instrumentId => {
+        onChange={(instrumentId) => {
           setProposalFilter({
             ...filter,
             instrumentId,
@@ -77,7 +77,7 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
         proposalStatuses={proposalStatuses?.data}
         isLoading={proposalStatuses?.isLoading}
         shouldShowAll={true}
-        onChange={proposalStatusId => {
+        onChange={(proposalStatusId) => {
           setProposalFilter({
             ...filter,
             proposalStatusId,
@@ -115,7 +115,7 @@ const ProposalFilterBar: React.FC<ProposalFilterBarProps> = ({
         <Collapse in={showQuestionFilter}>
           <QuestionaryFilter
             templateId={selectedCallTemplateId}
-            onSubmit={questionFilter => {
+            onSubmit={(questionFilter) => {
               setProposalFilter({
                 ...filter,
                 questionFilter,

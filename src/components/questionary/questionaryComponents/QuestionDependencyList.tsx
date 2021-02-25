@@ -56,7 +56,7 @@ const QuestionDependencyList: React.FC<QuestionDependencyListProps> = ({
   const allAvailableDependenciesAdded =
     field.dependencies.length >=
     getAllFields(template.steps).filter(
-      option =>
+      (option) =>
         [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
           option.question.dataType
         ) && currentQuestionId !== option.question.proposalQuestionId

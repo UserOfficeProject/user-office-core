@@ -15,7 +15,7 @@ export function useFileMetadata(ids: string[]) {
   useEffect(() => {
     api()
       .getFileMetadata({ fileIds })
-      .then(data => {
+      .then((data) => {
         if (data.fileMetadata) {
           setFiles(data.fileMetadata);
         }

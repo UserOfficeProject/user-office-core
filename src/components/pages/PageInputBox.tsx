@@ -65,7 +65,7 @@ export default function PageInputBox(props: {
             branding: false,
           }}
           id={props.pageName}
-          onEditorChange={content => setPageContent(content)}
+          onEditorChange={(content) => setPageContent(content)}
         />
       )}
       <div className={classes.buttons}>

@@ -16,7 +16,7 @@ import AccountActionButton from './AccountActionButton';
 
 const drawerWidth = 250;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   toolbar: {
     paddingRight: 24, // keep right padding when drawer closed
   },

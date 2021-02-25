@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 
 import { useDataApi } from 'hooks/common/useDataApi';
 
-const isMutationResult = (result: object) => {
+const isMutationResult = (result: Record<string, unknown>) => {
   return result.hasOwnProperty('error');
 };
 
@@ -16,10 +16,10 @@ function useDataApiWithFeedback() {
     (successToastMessage?: string) =>
       new Proxy(dataApi(), {
         get(target, prop) {
-          return async (args: any) => {
+          return async (args: unknown) => {
             setIsExecutingCall(true);
 
-            // @ts-ignore-line
+            // @ts-expect-error TODO: Resolve this when there is some time for better investigation in the types.
             const serverResponse = await target[prop](args);
             const result = serverResponse[prop];
 

@@ -17,7 +17,9 @@ import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionTemplateRelation> = (
+  props
+) => {
   const config = props.field.config as SelectionFromOptionsConfig;
   const [
     showIsMultipleSelectCheckbox,
@@ -39,7 +41,7 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
         }),
       })}
     >
-      {formikProps => (
+      {(formikProps) => (
         <>
           <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Constraints">
@@ -94,12 +96,12 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
               columns={[{ title: 'Answer', field: 'answer' }]}
               dataTransforms={{
                 toTable: (options: string[]) => {
-                  return options.map(option => {
+                  return options.map((option) => {
                     return { answer: option };
                   });
                 },
-                fromTable: (rows: any[]) => {
-                  return rows.map(row => row.answer);
+                fromTable: (rows: Record<string, unknown>[]) => {
+                  return rows.map((row) => row.answer);
                 },
               }}
               margin="normal"

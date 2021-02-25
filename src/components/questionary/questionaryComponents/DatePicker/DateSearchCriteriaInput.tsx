@@ -34,7 +34,7 @@ function DateSearchCriteriaInput({
             Operator
           </InputLabel>
           <Select
-            onChange={event => {
+            onChange={(event) => {
               const newComparator = event.target
                 .value as QuestionFilterCompareOperator;
               setComparator(newComparator);

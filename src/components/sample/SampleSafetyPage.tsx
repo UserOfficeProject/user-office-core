@@ -50,13 +50,13 @@ function SampleSafetyPage() {
     if (selectedCallId === 0) {
       api()
         .getSamples()
-        .then(result => {
+        .then((result) => {
           setSamples(result.samples || []);
         });
     } else {
       api()
         .getSamplesByCallId({ callId: selectedCallId })
-        .then(result => {
+        .then((result) => {
           setSamples(result.samplesByCallId || []);
         });
     }
@@ -111,7 +111,7 @@ function SampleSafetyPage() {
                 callId={selectedCallId}
                 calls={calls}
                 isLoading={loadingCalls}
-                onChange={callId => {
+                onChange={(callId) => {
                   setSelectedCallId(callId);
                 }}
                 shouldShowAll={true}
@@ -142,9 +142,9 @@ function SampleSafetyPage() {
       {selectedSample && (
         <SampleEvaluationDialog
           sample={selectedSample}
-          onClose={newSample => {
+          onClose={(newSample) => {
             if (newSample) {
-              const newSamples = samples.map(sample =>
+              const newSamples = samples.map((sample) =>
                 sample.id === newSample.id ? newSample : sample
               );
 

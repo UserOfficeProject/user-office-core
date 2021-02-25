@@ -5,7 +5,7 @@ import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
 import ShipmentsTable from './ShipmentsTable';
 
-function MyShipments(props: any) {
+function MyShipments() {
   return (
     <ContentContainer>
       <Grid container spacing={3}>

@@ -15,7 +15,9 @@ import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRelation> = (
+  props
+) => {
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
@@ -24,7 +26,7 @@ export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRel
       template={props.template}
       validationSchema={Yup.object().shape({})}
     >
-      {formikProps => (
+      {(formikProps) => (
         <>
           <QuestionExcerpt question={props.field.question} />
           <Field

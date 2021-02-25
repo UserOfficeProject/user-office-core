@@ -108,7 +108,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
             : {}
         }
         actions={[
-          rowData => ({
+          (rowData) => ({
             icon:
               rowData.review?.status === ReviewStatus.DRAFT
                 ? () => <RateReviewIcon />

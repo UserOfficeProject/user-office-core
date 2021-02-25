@@ -15,7 +15,7 @@ export function useGetPageContent(pageName: PageName) {
       .getPageContent({
         id: pageName,
       })
-      .then(data => {
+      .then((data) => {
         if (data.getPageContent) {
           setPageContent(data.getPageContent);
         }

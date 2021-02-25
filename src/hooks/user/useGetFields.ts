@@ -13,7 +13,7 @@ export function useGetFields() {
   useEffect(() => {
     api()
       .getFields()
-      .then(data => {
+      .then((data) => {
         setFieldContent(data.getFields);
       });
   }, [api]);

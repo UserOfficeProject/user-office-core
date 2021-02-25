@@ -21,7 +21,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export const QuestionTemplateRelationIntervalForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationIntervalForm: FormComponent<QuestionTemplateRelation> = (
+  props
+) => {
   const classes = useStyles();
   const { units } = useUnitsData();
 
@@ -40,7 +42,7 @@ export const QuestionTemplateRelationIntervalForm: FormComponent<QuestionTemplat
         }),
       })}
     >
-      {formikProps => (
+      {(formikProps) => (
         <>
           <QuestionExcerpt question={props.field.question} />
           <Field
@@ -68,7 +70,7 @@ export const QuestionTemplateRelationIntervalForm: FormComponent<QuestionTemplat
               multiple
               label="Units"
               margin="normal"
-              availableOptions={units.map(unit => unit.name)}
+              availableOptions={units.map((unit) => unit.name)}
               className={classes.units}
             />
           </TitledContainer>

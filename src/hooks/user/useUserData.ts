@@ -13,7 +13,7 @@ export function useUserWithReviewsData() {
     setLoading(true);
     api()
       .userWithReviews()
-      .then(data => {
+      .then((data) => {
         setUserData(data.me);
         setLoading(false);
       });
@@ -29,7 +29,7 @@ export function useBasicUserData() {
     async (id: number) => {
       return sendRequest()
         .getBasicUserDetails({ id })
-        .then(data => data.basicUserDetails);
+        .then((data) => data.basicUserDetails);
     },
     [sendRequest]
   );

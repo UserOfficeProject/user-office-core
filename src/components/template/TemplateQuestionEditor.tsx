@@ -30,7 +30,7 @@ export default function TemplateQuestionEditor(props: {
   isHighlighted?: boolean;
 }) {
   const theme = useTheme();
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     icon: {
       color: theme.palette.grey[400],
       justifyItems: 'flex-end',
@@ -136,7 +136,7 @@ export default function TemplateQuestionEditor(props: {
                     payload: { dependency: '' },
                   })
                 }
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   props.dispatch({
                     type: EventType.OPEN_QUESTIONREL_EDITOR,

@@ -28,8 +28,10 @@ const stripHtmlTagsAndCleanText = (htmlString: string) => {
   return strippedCleanedText;
 };
 
-export const createRichTextInputValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = answer => {
-  let schema = Yup.string().transform(function(value: string) {
+export const createRichTextInputValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = (
+  answer
+) => {
+  let schema = Yup.string().transform(function (value: string) {
     return stripHtmlTagsAndCleanText(value);
   });
 

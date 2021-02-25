@@ -11,7 +11,9 @@ import { QuestionTemplateRelation } from 'generated/sdk';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationBooleanForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationBooleanForm: FormComponent<QuestionTemplateRelation> = (
+  props
+) => {
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
@@ -26,7 +28,7 @@ export const QuestionTemplateRelationBooleanForm: FormComponent<QuestionTemplate
         }),
       })}
     >
-      {formikProps => (
+      {(formikProps) => (
         <>
           <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Constraints">

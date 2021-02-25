@@ -1,6 +1,7 @@
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
+import { FunctionType } from 'utils/utilTypes';
 
 import {
   Event,
@@ -15,7 +16,7 @@ export function usePersistProposalModel() {
     getState,
     dispatch,
   }: MiddlewareInputParams<QuestionarySubmissionState, Event>) => {
-    return (next: Function) => async (action: Event) => {
+    return (next: FunctionType) => async (action: Event) => {
       next(action);
       switch (action.type) {
         case EventType.PROPOSAL_SUBMIT_CLICKED: {
@@ -23,7 +24,7 @@ export function usePersistProposalModel() {
             .submitProposal({
               id: action.payload.proposalId,
             })
-            .then(result => {
+            .then((result) => {
               const state = getState() as ProposalSubmissionState;
               dispatch({
                 type: EventType.PROPOSAL_LOADED,

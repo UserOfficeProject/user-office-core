@@ -55,9 +55,10 @@ const questionaryFilterFromUrlQuery = (
 };
 
 export default function ProposalPage() {
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    ProposalUrlQueryParamsType
-  >({
+  const [
+    urlQueryParams,
+    setUrlQueryParams,
+  ] = useQueryParams<ProposalUrlQueryParamsType>({
     ...DefaultQueryParams,
     call: NumberParam,
     instrument: NumberParam,

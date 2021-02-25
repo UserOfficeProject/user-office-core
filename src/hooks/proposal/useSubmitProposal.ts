@@ -12,7 +12,7 @@ export function useSubmitProposal() {
 
     return api()
       .submitProposal({ id })
-      .then(data => {
+      .then((data) => {
         setIsLoading(false);
 
         return !data.submitProposal.error;

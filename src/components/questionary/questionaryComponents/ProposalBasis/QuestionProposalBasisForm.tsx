@@ -9,7 +9,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionProposalBasisForm: FormComponent<Question> = props => {
+export const QuestionProposalBasisForm: FormComponent<Question> = (props) => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 

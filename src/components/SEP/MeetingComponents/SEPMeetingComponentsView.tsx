@@ -16,7 +16,7 @@ type SEPMeetingComponentsViewProps = {
   sepId: number;
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   spacing: {
     margin: theme.spacing(1),
   },

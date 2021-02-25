@@ -12,7 +12,9 @@ import { QuestionTemplateRelation } from 'generated/sdk';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationEmbellishmentForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationEmbellishmentForm: FormComponent<QuestionTemplateRelation> = (
+  props
+) => {
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
@@ -28,7 +30,7 @@ export const QuestionTemplateRelationEmbellishmentForm: FormComponent<QuestionTe
         }),
       })}
     >
-      {formikProps => (
+      {(formikProps) => (
         <>
           <Field
             name="config.html"

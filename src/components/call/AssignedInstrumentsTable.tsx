@@ -97,7 +97,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
 
     if (!result.removeAssignedInstrumentFromCall.error) {
       const dataUpdate = call.instruments.filter(
-        instrumentItem => instrumentItem.id !== instrumentId
+        (instrumentItem) => instrumentItem.id !== instrumentId
       );
       removeAssignedInstrumentFromCall(dataUpdate, call.id);
     }

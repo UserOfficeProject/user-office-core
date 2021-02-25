@@ -78,7 +78,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   useEffect(() => {
     if (urlQueryParams.selection.length > 0) {
       const proposalsWithTableDataCheckedProperty = proposalsData.map(
-        proposal => {
+        (proposal) => {
           return {
             ...proposal,
             tableData: {
@@ -92,7 +92,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       );
 
       const onlySelectedProposals = proposalsWithTableDataCheckedProperty.filter(
-        proposal => proposal.tableData.checked
+        (proposal) => proposal.tableData.checked
       );
 
       setPreselectedProposalsData(proposalsWithTableDataCheckedProperty);
@@ -108,7 +108,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       rankOrder: ranking,
     });
     setProposalsData(
-      proposalsData.map(prop => {
+      proposalsData.map((prop) => {
         if (prop.id === proposalID) prop.rankOrder = ranking;
 
         return prop;
@@ -135,7 +135,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
     if (!isError) {
       setProposalsData(
-        proposalsData.map(prop => {
+        proposalsData.map((prop) => {
           if (prop.id === proposalId) {
             prop.instrumentName = null;
             prop.instrumentId = null;
@@ -238,7 +238,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     },
     {
       title: 'Submitted',
-      render: rowData => (rowData.submitted ? 'Yes' : 'No'),
+      render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
     },
     {
       title: 'Status',
@@ -278,17 +278,17 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.
   if (localStorageValue) {
-    columns = columns.map(column => ({
+    columns = columns.map((column) => ({
       ...column,
       hidden: localStorageValue?.find(
-        localStorageValueItem => localStorageValueItem.title === column.title
+        (localStorageValueItem) => localStorageValueItem.title === column.title
       )?.hidden,
     }));
   }
 
   // TODO: Maybe it will be good to make notifyProposal and deleteProposal bulk functions where we can sent array of proposal ids.
   const emailProposals = (): void => {
-    selectedProposals.forEach(async proposal => {
+    selectedProposals.forEach(async (proposal) => {
       const {
         notifyProposal: { error },
       } = await api('Notification sent successfully').notifyProposal({
@@ -300,14 +300,14 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       }
 
       proposalsData[
-        proposalsData.findIndex(val => val.id === proposal.id)
+        proposalsData.findIndex((val) => val.id === proposal.id)
       ].notified = true;
       setProposalsData([...proposalsData]);
     });
   };
 
   const deleteProposals = (): void => {
-    selectedProposals.forEach(async proposal => {
+    selectedProposals.forEach(async (proposal) => {
       const {
         deleteProposal: { error },
       } = await api().deleteProposal({ id: proposal.id });
@@ -316,7 +316,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         return;
       }
 
-      setProposalsData(proposalsData =>
+      setProposalsData((proposalsData) =>
         proposalsData.filter(({ id }) => id !== proposal.id)
       );
     });
@@ -324,7 +324,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const assignProposalToSEP = async (sep: Sep): Promise<void> => {
     const responses = await Promise.all(
-      selectedProposals.map(async selectedProposal => {
+      selectedProposals.map(async (selectedProposal) => {
         const result = await api().assignProposalToSEP({
           proposalId: selectedProposal.id,
           sepId: sep.id,
@@ -337,7 +337,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       })
     );
 
-    const errors = responses.map(item => item.result.error);
+    const errors = responses.map((item) => item.result.error);
     const isError = !!errors.join('');
 
     enqueueSnackbar(
@@ -352,16 +352,16 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
     if (!isError) {
       setProposalsData(
-        proposalsData.map(prop => {
+        proposalsData.map((prop) => {
           if (
             selectedProposals.find(
-              selectedProposal => selectedProposal.id === prop.id
+              (selectedProposal) => selectedProposal.id === prop.id
             )
           ) {
             prop.sepCode = sep.code;
 
             const proposalNextStatusResponse = responses.find(
-              item => item.proposalId === prop.id
+              (item) => item.proposalId === prop.id
             );
 
             if (
@@ -383,9 +383,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     instrument: Instrument
   ): Promise<void> => {
     const selectedProposalsWithInstrument = proposalsData.filter(
-      proposalDataItem =>
+      (proposalDataItem) =>
         selectedProposals.some(
-          selectedProposal => selectedProposal.id === proposalDataItem.id
+          (selectedProposal) => selectedProposal.id === proposalDataItem.id
         ) && proposalDataItem.instrumentId
     );
 
@@ -400,10 +400,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
       if (!isError) {
         setProposalsData(
-          proposalsData.map(prop => {
+          proposalsData.map((prop) => {
             if (
               selectedProposals.find(
-                selectedProposal => selectedProposal.id === prop.id
+                (selectedProposal) => selectedProposal.id === prop.id
               )
             ) {
               prop.instrumentName = instrument.name;
@@ -465,7 +465,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             assignProposalsToInstrument={assignProposalsToInstrument}
             close={(): void => setOpenInstrumentAssignment(false)}
             callIds={selectedProposals.map(
-              selectedProposal => selectedProposal.callId
+              (selectedProposal) => selectedProposal.callId
             )}
           />
         </DialogContent>
@@ -476,14 +476,16 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         columns={columns}
         data={preselectedProposalsData}
         isLoading={loading}
-        onSearchChange={searchText => {
+        onSearchChange={(searchText) => {
           setUrlQueryParams({ search: searchText ? searchText : undefined });
         }}
-        onSelectionChange={selectedItems => {
+        onSelectionChange={(selectedItems) => {
           setUrlQueryParams({
             selection:
               selectedItems.length > 0
-                ? selectedItems.map(selectedItem => selectedItem.id.toString())
+                ? selectedItems.map((selectedItem) =>
+                    selectedItem.id.toString()
+                  )
                 : undefined,
           });
           setSelectedProposals(selectedItems);
@@ -501,7 +503,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             tooltip: 'Download proposals in PDF',
             onClick: (event, rowData): void => {
               downloadPDFProposal(
-                (rowData as ProposalViewData[]).map(row => row.id),
+                (rowData as ProposalViewData[]).map((row) => row.id),
                 (rowData as ProposalViewData[])[0].title
               );
             },
@@ -512,7 +514,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             tooltip: 'Export proposals in Excel',
             onClick: (event, rowData): void => {
               downloadXLSXProposal(
-                (rowData as ProposalViewData[]).map(row => row.id),
+                (rowData as ProposalViewData[]).map((row) => row.id),
                 (rowData as ProposalViewData[])[0].title
               );
             },
@@ -605,7 +607,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             position: 'toolbarOnSelect',
           },
         ]}
-        onChangeColumnHidden={collumnChange => {
+        onChangeColumnHidden={(collumnChange) => {
           const proposalColumns = columns.map(
             (proposalColumn: Column<ProposalViewData>) => ({
               hidden:

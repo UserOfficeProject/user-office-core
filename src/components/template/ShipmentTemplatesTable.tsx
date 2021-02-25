@@ -11,13 +11,23 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
-type SampleTemplateRowDataType = TemplateRowDataType & {};
+type SampleTemplateRowDataType = TemplateRowDataType & Record<string, unknown>;
 
-const useStyles = makeStyles(thene => ({
+const useStyles = makeStyles((theme) => ({
   inactive: {
-    color: thene.palette.grey.A100,
+    color: theme.palette.grey.A100,
   },
 }));
+
+type ShipmentTemplatesTableProps = {
+  dataProvider: () => Promise<
+    Pick<
+      ProposalTemplate,
+      'templateId' | 'name' | 'description' | 'isArchived' | 'questionaryCount'
+    >[]
+  >;
+  confirm: WithConfirmType;
+};
 
 function ShipmentTemplatesTable(props: ShipmentTemplatesTableProps) {
   const { api } = useDataApiWithFeedback();
@@ -47,7 +57,7 @@ function ShipmentTemplatesTable(props: ShipmentTemplatesTableProps) {
         dataProvider={props.dataProvider}
         confirm={props.confirm}
         actions={[
-          rowData => ({
+          (rowData) => ({
             icon: () =>
               rowData.templateId === activeTemplateId ? (
                 <DoneIcon />
@@ -69,16 +79,6 @@ function ShipmentTemplatesTable(props: ShipmentTemplatesTableProps) {
       />
     </>
   );
-}
-
-interface ShipmentTemplatesTableProps {
-  dataProvider: () => Promise<
-    Pick<
-      ProposalTemplate,
-      'templateId' | 'name' | 'description' | 'isArchived' | 'questionaryCount'
-    >[]
-  >;
-  confirm: WithConfirmType;
 }
 
 export default withConfirm(ShipmentTemplatesTable);

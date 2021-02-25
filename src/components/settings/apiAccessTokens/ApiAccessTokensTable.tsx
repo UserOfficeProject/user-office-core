@@ -10,6 +10,7 @@ import { UserRole, PermissionsWithAccessToken } from 'generated/sdk';
 import { useApiAccessTokensData } from 'hooks/admin/useApiAccessTokensData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 
 import CreateUpdateApiAccessToken from './CreateUpdateApiAccessToken';
 
@@ -20,15 +21,16 @@ const ApiAccessTokensTable: React.FC = () => {
     apiAccessTokens,
     setApiAccessTokensWithLoading: setApiAccessTokens,
   } = useApiAccessTokensData();
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType
-  >(DefaultQueryParams);
+  const [
+    urlQueryParams,
+    setUrlQueryParams,
+  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
   const columns = [{ title: 'Name', field: 'name' }];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const createModal = (
-    onUpdate: Function,
-    onCreate: Function,
+    onUpdate: FunctionType<void, [PermissionsWithAccessToken | null]>,
+    onCreate: FunctionType<void, [PermissionsWithAccessToken | null]>,
     editApiAccessToken: PermissionsWithAccessToken | null
   ) => (
     <CreateUpdateApiAccessToken
@@ -46,7 +48,7 @@ const ApiAccessTokensTable: React.FC = () => {
       .deleteApiAccessToken({
         accessTokenId: id as string,
       })
-      .then(resp => {
+      .then((resp) => {
         if (resp.deleteApiAccessToken.error) {
           return false;
         } else {

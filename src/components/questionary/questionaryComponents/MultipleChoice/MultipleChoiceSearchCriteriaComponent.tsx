@@ -30,10 +30,10 @@ function MultipleChoiceSearchCriteriaComponent({
               (questionTemplateRelation.config as SelectionFromOptionsConfig)
                 .options
             }
-            getOptionLabel={option => option}
-            renderInput={params => <TextField {...params} label="Answer" />}
+            getOptionLabel={(option) => option as string}
+            renderInput={(params) => <TextField {...params} label="Answer" />}
             onChange={(_event, newValue) => {
-              setValue(newValue ?? '');
+              setValue((newValue as string) ?? '');
               onChange(
                 QuestionFilterCompareOperator.INCLUDES,
                 newValue as string

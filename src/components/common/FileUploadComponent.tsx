@@ -26,6 +26,7 @@ import React, { ChangeEvent, useState } from 'react';
 import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
 import { useFileMetadata } from 'hooks/file/useFileMetadata';
 import { FileMetaData } from 'models/FileUpload';
+import { FunctionType } from 'utils/utilTypes';
 
 import UOLoader from './UOLoader';
 
@@ -42,7 +43,7 @@ export function FileUploadComponent(props: {
   value: FileIdWithCaptionAndFigure[];
   onChange: (files: FileIdWithCaptionAndFigure[]) => void;
 }) {
-  const fileIds = props.value.map(fileItem => fileItem.id);
+  const fileIds = props.value.map((fileItem) => fileItem.id);
   const { files, setFiles } = useFileMetadata(fileIds);
 
   const classes = makeStyles(() => ({
@@ -60,10 +61,10 @@ export function FileUploadComponent(props: {
     const newValue = files.concat(newFile);
     setFiles(newValue);
     props.onChange(
-      newValue.map(item => ({
+      newValue.map((item) => ({
         id: item.fileId,
         caption: props.value.find(
-          fileAnswerItem => fileAnswerItem.id === item.fileId
+          (fileAnswerItem) => fileAnswerItem.id === item.fileId
         )?.caption,
       }))
     );
@@ -71,14 +72,14 @@ export function FileUploadComponent(props: {
 
   const onDeleteClicked = (deleteFile: FileMetaData): void => {
     const newValue = files.filter(
-      fileId => fileId.fileId !== deleteFile.fileId
+      (fileId) => fileId.fileId !== deleteFile.fileId
     );
     setFiles(newValue);
     props.onChange(
-      newValue.map(item => ({
+      newValue.map((item) => ({
         id: item.fileId,
         caption: props.value.find(
-          fileAnswerItem => fileAnswerItem.id === item.fileId
+          (fileAnswerItem) => fileAnswerItem.id === item.fileId
         )?.caption,
       }))
     );
@@ -90,7 +91,7 @@ export function FileUploadComponent(props: {
     figure,
   }: FileIdWithCaptionAndFigure) => {
     props.onChange(
-      props.value.map(item => {
+      props.value.map((item) => {
         if (item.id === fileId) {
           return { id: item.id, caption, figure };
         } else {
@@ -120,7 +121,7 @@ export function FileUploadComponent(props: {
         {files.map &&
           files.map((metaData: FileMetaData) => {
             const currentFileAnswerValues = props.value.find(
-              item => item.id === metaData.fileId
+              (item) => item.id === metaData.fileId
             );
 
             return (
@@ -143,13 +144,13 @@ export function FileUploadComponent(props: {
 }
 
 export function FileEntry(props: {
-  onDeleteClicked: Function;
+  onDeleteClicked: FunctionType<void, FileMetaData>;
   metaData: FileMetaData;
-  onImageCaptionOrFigureAdded: Function;
+  onImageCaptionOrFigureAdded: FunctionType<void, FileIdWithCaptionAndFigure>;
   caption: string | null | undefined;
   figure: string | null | undefined;
 }) {
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     fileListWrapper: {
       marginTop: theme.spacing(2),
       marginBottom: theme.spacing(2),
@@ -269,7 +270,7 @@ export function FileEntry(props: {
               data-cy="image-figure"
               defaultValue={props.figure || ''}
               className={classes.captionInput}
-              onBlur={e =>
+              onBlur={(e) =>
                 props.onImageCaptionOrFigureAdded({
                   id: props.metaData.fileId,
                   caption: props.caption,
@@ -295,7 +296,7 @@ export function FileEntry(props: {
                 data-cy="image-caption"
                 defaultValue={props.caption || ''}
                 className={classes.captionInput}
-                onBlur={e =>
+                onBlur={(e) =>
                   props.onImageCaptionOrFigureAdded({
                     id: props.metaData.fileId,
                     caption: e.target.value,
@@ -316,7 +317,7 @@ export function NewFileEntry(props: {
   filetype: string | undefined;
   onUploadComplete: (data: FileMetaData) => void;
 }) {
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     fileListWrapper: {
       marginTop: theme.spacing(2),
       marginBottom: theme.spacing(2),

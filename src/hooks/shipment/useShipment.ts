@@ -13,7 +13,7 @@ export function useShipment(shipmentId: number) {
   useEffect(() => {
     api()
       .getShipment({ shipmentId })
-      .then(data => {
+      .then((data) => {
         if (data.shipment) {
           setShipment(data.shipment);
         }

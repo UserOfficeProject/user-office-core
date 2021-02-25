@@ -3,7 +3,7 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import ListItemText from '@material-ui/core/ListItemText';
 import Select from '@material-ui/core/Select';
-import { FieldInputProps, FormikHelpers } from 'formik';
+import { FieldInputProps, FormikHelpers, FormikValues } from 'formik';
 import React from 'react';
 
 import MultiMenuItem from './MultiMenuItem';
@@ -29,7 +29,7 @@ const normalizeOption = (option: Option | string): Option => {
  * @param option input
  */
 const normalizeOptions = (options: Array<Option | string>): Option[] => {
-  return options.map(option => normalizeOption(option));
+  return options.map((option) => normalizeOption(option));
 };
 
 export interface FormikUICustomMultipleSelectProps {
@@ -39,7 +39,7 @@ export interface FormikUICustomMultipleSelectProps {
   multiple?: boolean;
   // props below are injected by Field
   field: FieldInputProps<SelectedValueType>;
-  form: FormikHelpers<any>;
+  form: FormikHelpers<FormikValues>;
 }
 
 const ITEM_HEIGHT = 48;
@@ -69,7 +69,7 @@ const FormikUICustomSelect = ({
 
   const getOptionByValue = (value: ValueType) =>
     availableOptionsNormalized.find(
-      option => option.value === (value as ValueType)
+      (option) => option.value === (value as ValueType)
     );
 
   const handleChange = (
@@ -91,13 +91,13 @@ const FormikUICustomSelect = ({
       <Select
         value={field.value}
         multiple={multiple}
-        // @ts-ignore-line seems to have wrong typedefinition for onChange signature
+        // @ts-expect-error seems to have wrong typedefinition for onChange signature
         onChange={handleChange}
         input={<Input />}
-        renderValue={value => {
+        renderValue={(value) => {
           if (multiple) {
             return (value as ValueType[])
-              .map(item => getOptionByValue(item)?.label)
+              .map((item) => getOptionByValue(item)?.label)
               .join(', ');
           } else {
             return getOptionByValue(value as ValueType)?.label;
@@ -107,7 +107,7 @@ const FormikUICustomSelect = ({
         id={id}
         {...props}
       >
-        {availableOptionsNormalized.map(curOption => (
+        {availableOptionsNormalized.map((curOption) => (
           <SelectMenuItem key={curOption.value} value={curOption.value}>
             <ListItemText primary={curOption.label} />
           </SelectMenuItem>

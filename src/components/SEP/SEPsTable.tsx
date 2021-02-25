@@ -12,6 +12,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { Sep, UserRole } from 'generated/sdk';
 import { useSEPsData } from 'hooks/SEP/useSEPsData';
 import { tableIcons } from 'utils/materialIcons';
+import { FunctionType } from 'utils/utilTypes';
 
 import AddSEP from './General/AddSEP';
 
@@ -33,9 +34,10 @@ const SEPsTable: React.FC = () => {
     },
   ];
   const [editSEPID, setEditSEPID] = useState(0);
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType
-  >(DefaultQueryParams);
+  const [
+    urlQueryParams,
+    setUrlQueryParams,
+  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   if (editSEPID) {
@@ -45,8 +47,8 @@ const SEPsTable: React.FC = () => {
   const EditIcon = (): JSX.Element => <Edit />;
 
   const createModal = (
-    onUpdate: Function,
-    onCreate: Function,
+    onUpdate: FunctionType<void, [Sep | null]>,
+    onCreate: FunctionType<void, [Sep | null]>,
     editSep: Sep | null
   ) => {
     if (!!editSep) {
@@ -56,7 +58,7 @@ const SEPsTable: React.FC = () => {
     } else {
       return (
         <AddSEP
-          close={(sepAdded: Sep | null | undefined) => {
+          close={(sepAdded: Sep | null) => {
             setTimeout(() => {
               history.push(`/SEPPage/${sepAdded?.id}`);
             });

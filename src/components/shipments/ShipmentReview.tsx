@@ -13,17 +13,18 @@ import QuestionaryDetails, {
 import { ShipmentStatus } from 'generated/sdk';
 import { useProposalData } from 'hooks/proposal/useProposalData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ShipmentContextType } from './ShipmentContainer';
 
-interface ShipmentReviewProps {
+type ShipmentReviewProps = {
   isReadonly: boolean;
-  onComplete?: () => any;
+  onComplete?: FunctionType<void>;
   confirm: WithConfirmType;
-}
+};
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   sampleList: {
     listStyle: 'none',
     padding: 0,
@@ -65,7 +66,7 @@ function ShipmentReview({
       label: 'Samples',
       value: (
         <ul className={classes.sampleList}>
-          {state.shipment.samples.map(sample => (
+          {state.shipment.samples.map((sample) => (
             <li key={sample.id}>{sample.title}</li>
           ))}
         </ul>

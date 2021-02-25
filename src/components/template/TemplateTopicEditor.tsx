@@ -72,7 +72,7 @@ export default function QuestionaryEditorTopic(props: {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     container: {
       alignItems: 'flex-start',
       alignContent: 'flex-start',
@@ -153,7 +153,7 @@ export default function QuestionaryEditorTopic(props: {
       value={title}
       data-cy="topic-title-input"
       className={classes.inputHeading}
-      onChange={event => setTitle(event.target.value)}
+      onChange={(event) => setTitle(event.target.value)}
       onBlur={() => {
         setIsEditMode(false);
         dispatch({
@@ -190,7 +190,7 @@ export default function QuestionaryEditorTopic(props: {
             props.hoveredDependency === item.question.proposalQuestionId
           }
           dispatch={dispatch}
-          onClick={item =>
+          onClick={(item) =>
             dispatch({
               type: EventType.OPEN_QUESTIONREL_EDITOR,
               payload: { questionId: item.proposalQuestionId },
@@ -209,7 +209,7 @@ export default function QuestionaryEditorTopic(props: {
       index={index}
       isDragDisabled={!props.dragMode}
     >
-      {provided => (
+      {(provided) => (
         <Grid
           container
           className={`${classes.container} ${
@@ -266,7 +266,7 @@ export default function QuestionaryEditorTopic(props: {
                     data-cy="delete-topic-menu-item"
                     onClick={() => {
                       const isAllQuestionsInTopicDeletable = data.fields.every(
-                        item => {
+                        (item) => {
                           const definition = getQuestionaryComponentDefinition(
                             item.question.dataType
                           );

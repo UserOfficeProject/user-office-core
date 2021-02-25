@@ -12,7 +12,7 @@ export function useCreateProposal(callId: number) {
 
     return api()
       .createProposal({ callId })
-      .then(data => {
+      .then((data) => {
         setLoading(false);
 
         return data.createProposal;
