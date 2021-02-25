@@ -2,7 +2,6 @@ import { logger } from '@esss-swap/duo-logger';
 import {
   proposalGradeValidationSchema,
   proposalTechnicalReviewValidationSchema,
-  removeUserForReviewValidationSchema,
   addUserForReviewValidationSchema,
 } from '@esss-swap/duo-validation';
 
@@ -26,7 +25,7 @@ export default class ReviewMutations {
     private userAuth: UserAuthorization
   ) {}
 
-  @EventBus(Event.PROPOSAL_SEP_REVIEW_SUBMITTED)
+  @EventBus(Event.PROPOSAL_SEP_REVIEW_UPDATED)
   @ValidateArgs(proposalGradeValidationSchema)
   @Authorized()
   async updateReview(
@@ -47,7 +46,7 @@ export default class ReviewMutations {
           agent!.id,
           review.sepID
         )) ||
-        (await this.userAuth.isUserOfficer(agent))
+        this.userAuth.isUserOfficer(agent)
       )
     ) {
       logger.logWarn('Blocked submitting review', { agent, args });
@@ -83,7 +82,7 @@ export default class ReviewMutations {
   ): Promise<TechnicalReview | Rejection> {
     if (
       !(
-        (await this.userAuth.isUserOfficer(agent)) ||
+        this.userAuth.isUserOfficer(agent) ||
         (await this.userAuth.isScientistToProposal(agent, args.proposalID))
       )
     ) {
@@ -106,8 +105,6 @@ export default class ReviewMutations {
       });
   }
 
-  // TODO: remove validation from lib, graphql validates the arguments already
-  // @ValidateArgs(removeUserForReviewValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   async removeUserForReview(
     agent: UserWithRole | null,
@@ -141,7 +138,7 @@ export default class ReviewMutations {
   ): Promise<Review | Rejection> {
     const { proposalID, userID, sepID } = args;
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
+      !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepID))
     ) {
       return rejection('NOT_ALLOWED');

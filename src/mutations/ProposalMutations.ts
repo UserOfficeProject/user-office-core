@@ -239,7 +239,7 @@ export default class ProposalMutations {
     return result || rejection('INTERNAL_ERROR');
   }
 
-  @EventBus(Event.PROPOSAL_SEP_MEETING_SUBMITTED)
+  @EventBus(Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED)
   @ValidateArgs(administrationProposalValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async admin(

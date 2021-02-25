@@ -1,13 +1,12 @@
 import { proposalDataSource, proposalSettingsDataSource } from '../datasources';
 import { ProposalEventsRecord } from '../datasources/postgres/records';
 import { NextStatusEvent } from '../models/NextStatusEvent';
-import { Proposal } from '../models/Proposal';
 
 const getProposalWorkflowByCallId = (callId: number) => {
   return proposalSettingsDataSource.getProposalWorkflowByCall(callId);
 };
 
-const getProposalWorklfowConnectionByStatusId = (
+const getProposalWorkflowConnectionByStatusId = (
   proposalWorkflowId: number,
   proposalStatusId: number
 ) => {
@@ -56,6 +55,7 @@ export type WorkflowEngineProposalType = {
 export const workflowEngine = async (
   proposal: WorkflowEngineProposalType & {
     proposalEvents: ProposalEventsRecord | null;
+    currentEvent: Event;
   }
 ) => {
   if (!proposal.proposalEvents) {
@@ -68,7 +68,7 @@ export const workflowEngine = async (
     return;
   }
 
-  const currentWorkflowConnection = await getProposalWorklfowConnectionByStatusId(
+  const currentWorkflowConnection = await getProposalWorkflowConnectionByStatusId(
     proposalWorkflow.id,
     proposal.statusId
   );
@@ -80,7 +80,7 @@ export const workflowEngine = async (
     return;
   }
 
-  const nextWorkflowConnection = await getProposalWorklfowConnectionByStatusId(
+  const nextWorkflowConnection = await getProposalWorkflowConnectionByStatusId(
     proposalWorkflow.id,
     currentWorkflowConnection.nextProposalStatusId
   );
@@ -90,6 +90,14 @@ export const workflowEngine = async (
   );
 
   if (!nextStatusEvents || !nextWorkflowConnection) {
+    return;
+  }
+
+  const eventThatTriggeredStatusChangeIsNextStatusEvent = nextStatusEvents.find(
+    nextStatusEvent => proposal.currentEvent === nextStatusEvent.nextStatusEvent
+  );
+
+  if (!eventThatTriggeredStatusChangeIsNextStatusEvent) {
     return;
   }
 
