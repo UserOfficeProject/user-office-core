@@ -43,7 +43,10 @@ function createProposalStub(
 
 export default function ProposalCreate() {
   const { user } = useContext(UserContext);
-  const { callId, templateId } = useParams<any>();
+  const { callId, templateId } = useParams<{
+    callId: string;
+    templateId: string;
+  }>();
   const { questionarySteps } = useBlankQuestionaryStepsData(
     parseInt(templateId as string)
   );

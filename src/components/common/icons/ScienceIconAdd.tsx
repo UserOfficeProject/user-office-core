@@ -1,7 +1,7 @@
 import SvgIcon from '@material-ui/core/SvgIcon';
 import React from 'react';
 
-const ScienceIconAdd: React.FC = props => {
+const ScienceIconAdd: React.FC = (props) => {
   return (
     <SvgIcon {...props}>
       <g>

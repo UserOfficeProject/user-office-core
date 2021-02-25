@@ -3,13 +3,15 @@ import * as Yup from 'yup';
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { IntervalConfig } from 'generated/sdk';
 
-export const createIntervalValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = answer => {
+export const createIntervalValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = (
+  answer
+) => {
   const config = answer.config as IntervalConfig;
 
-  let minSchema = Yup.number().transform(value =>
+  let minSchema = Yup.number().transform((value) =>
     isNaN(value) ? undefined : value
   );
-  let maxSchema = Yup.number().transform(value =>
+  let maxSchema = Yup.number().transform((value) =>
     isNaN(value) ? undefined : value
   );
 

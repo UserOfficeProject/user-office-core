@@ -8,12 +8,13 @@ import React from 'react';
 
 import { UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { FunctionType } from 'utils/utilTypes';
 
 export function InviteUserForm(props: {
-  action: Function;
+  action: FunctionType;
   title: string;
   userRole: UserRole;
-  close: Function;
+  close: FunctionType;
 }) {
   const api = useDataApi();
   const classes = makeStyles({
@@ -51,7 +52,7 @@ export function InviteUserForm(props: {
       }}
       validationSchema={createUserByEmailInviteValidationSchema(UserRole)}
     >
-      {subformik => (
+      {(subformik) => (
         <Form>
           <Typography component="h1" variant="h5">
             {props.title}

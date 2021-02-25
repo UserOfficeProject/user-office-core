@@ -5,7 +5,7 @@ import { Event } from 'models/QuestionarySubmissionState';
 
 export const useSampleEditorReducer = (dispatch: React.Dispatch<Event>) => {
   const sampleEditorReducer: React.Reducer<Sample, Event> = (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       switch (action.type) {
       }
     });

@@ -9,7 +9,7 @@ export default function StyledModal(
   props: Omit<ModalProps, 'Backdrop' | 'BackdropProps' | 'className'>
 ) {
   const { children, ...restOfTheProps } = props;
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     container: {
       backgroundColor: 'white',
       padding: theme.spacing(3),

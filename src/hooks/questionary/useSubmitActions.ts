@@ -18,7 +18,7 @@ export type SubmitAction = (
 
 export function usePreSubmitActions() {
   return (answers: Answer[]): SubmitAction[] => {
-    const actions = answers.flatMap(answer => {
+    const actions = answers.flatMap((answer) => {
       switch (answer.question.dataType) {
         case DataType.SAMPLE_BASIS:
           return sampleBasisPreSubmit(answer);
@@ -38,7 +38,7 @@ export function usePreSubmitActions() {
 export function usePostSubmitActions() {
   return (answers: Answer[]): SubmitAction[] => {
     const actions = answers
-      .flatMap(answer => {
+      .flatMap((answer) => {
         switch (
           answer.question.dataType
           // nothing here for now
@@ -47,7 +47,7 @@ export function usePostSubmitActions() {
 
         return [];
       })
-      .filter(promise => promise !== null);
+      .filter((promise) => promise !== null);
 
     return actions;
   };

@@ -27,7 +27,7 @@ import {
   ShipmentSubmissionState,
 } from 'models/ShipmentSubmissionState';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formControl: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
 const TextFieldNoSubmit = withPreventSubmit(TextField);
 
 const samplesToSampleIds = (samples: Pick<Sample, 'id'>[]) =>
-  samples.map(sample => sample.id);
+  samples.map((sample) => sample.id);
 
 function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
   const {
@@ -63,7 +63,7 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
     state?.shipment.proposalId || null
   );
   const [sampleIds, setSampleIds] = useState<number[]>(
-    state?.shipment.samples.map(sample => sample.id) || []
+    state?.shipment.samples.map((sample) => sample.id) || []
   );
 
   const { proposals, loadingProposals } = useUserProposals();
@@ -91,10 +91,12 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
         <TextFieldNoSubmit
           value={title}
           label="Title"
-          onBlur={event => {
+          onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
             handleChange({ title: event.target.value });
           }}
-          onChange={event => setTitle(event.target.value)}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setTitle(event.target.value)
+          }
           required
           fullWidth
           data-cy="title-input"
@@ -107,7 +109,7 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
           <InputLabel id="proposal-id">Select proposal</InputLabel>
           <Select
             labelId="proposal-id"
-            onChange={event => {
+            onChange={(event) => {
               const newProposalId = event.target.value as number;
               setProposalId(newProposalId);
               setSampleIds([]);
@@ -117,7 +119,7 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
             fullWidth
             data-cy="select-proposal-dropdown"
           >
-            {proposals.map(proposal => (
+            {proposals.map((proposal) => (
               <MenuItem key={proposal.id} value={proposal.id}>
                 {proposal.title}
               </MenuItem>
@@ -133,9 +135,9 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
           <Select
             labelId="sample-ids"
             multiple
-            onChange={event => {
+            onChange={(event) => {
               const newSampleIds = event.target.value as number[];
-              const newSamples = samples.filter(sample =>
+              const newSamples = samples.filter((sample) =>
                 newSampleIds.includes(sample.id)
               );
               setSampleIds(newSampleIds);
@@ -145,7 +147,7 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
             fullWidth
             data-cy="samples-dropdown"
           >
-            {samples.map(sample => (
+            {samples.map((sample) => (
               <MultiMenuItem key={sample.id} value={sample.id}>
                 {sample.title}
               </MultiMenuItem>

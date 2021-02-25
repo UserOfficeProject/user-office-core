@@ -13,7 +13,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
+export const QuestionMultipleChoiceForm: FormComponent<Question> = (props) => {
   const field = props.field;
   const config = field.config as SelectionFromOptionsConfig;
 
@@ -111,12 +111,12 @@ export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
               columns={[{ title: 'Answer', field: 'answer' }]}
               dataTransforms={{
                 toTable: (options: string[]) => {
-                  return options.map(option => {
+                  return options.map((option) => {
                     return { answer: option };
                   });
                 },
-                fromTable: (rows: any[]) => {
-                  return rows.map(row => row.answer);
+                fromTable: (rows: Record<string, unknown>[]) => {
+                  return rows.map((row) => row.answer);
                 },
               }}
               margin="normal"

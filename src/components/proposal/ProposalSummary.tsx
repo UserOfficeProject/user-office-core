@@ -11,9 +11,15 @@ import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryRevi
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import { EventType } from 'models/QuestionarySubmissionState';
-import withConfirm from 'utils/withConfirm';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ProposalContextType } from './ProposalContainer';
+
+type ProposalSummaryProps = {
+  data: ProposalSubmissionState;
+  readonly: boolean;
+  confirm: WithConfirmType;
+};
 
 function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
   const { state, dispatch } = useContext(
@@ -30,9 +36,9 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
 
   const allStepsComplete =
     proposal.questionary &&
-    proposal.questionary.steps.every(step => step.isCompleted);
+    proposal.questionary.steps.every((step) => step.isCompleted);
 
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     buttons: {
       display: 'flex',
       justifyContent: 'flex-end',
@@ -97,9 +103,4 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
   );
 }
 
-interface ProposalSummaryProps {
-  data: ProposalSubmissionState;
-  readonly: boolean;
-  confirm: Function;
-}
 export default withConfirm(ProposalReview);

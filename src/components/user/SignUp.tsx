@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { createUserValidationSchema } from '@esss-swap/duo-validation';
 import Avatar from '@material-ui/core/Avatar';
@@ -34,7 +33,7 @@ import { useGetFields } from 'hooks/user/useGetFields';
 import { useOrcIDInformation } from 'hooks/user/useOrcIDInformation';
 import orcid from 'images/orcid.png';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   '@global': {
     body: {
       backgroundColor: theme.palette.common.white,
@@ -128,7 +127,7 @@ const SignUpPropTypes = {
 
 type SignUpProps = PropTypes.InferProps<typeof SignUpPropTypes>;
 
-const SignUp: React.FC<SignUpProps> = props => {
+const SignUp: React.FC<SignUpProps> = (props) => {
   const classes = useStyles();
   const [userID, setUserID] = useState<number | null>(null);
 
@@ -179,7 +178,7 @@ const SignUp: React.FC<SignUpProps> = props => {
 
   if (!institutionsList.length) {
     setInstitutionsList(
-      institutions.map(institution => {
+      institutions.map((institution) => {
         return { text: institution.name, value: institution.id };
       })
     );
@@ -187,7 +186,7 @@ const SignUp: React.FC<SignUpProps> = props => {
 
   if (!nationalitiesList.length) {
     setNationalitiesList(
-      fieldsContent.nationalities.map(nationality => {
+      fieldsContent.nationalities.map((nationality) => {
         return { text: nationality.value, value: nationality.id };
       })
     );
@@ -198,7 +197,7 @@ const SignUp: React.FC<SignUpProps> = props => {
       .createUser({
         ...values,
       })
-      .then(data => {
+      .then((data) => {
         if (data.createUser.error) {
           enqueueSnackbar(getTranslation(data.createUser.error as ResourceId), {
             variant: 'error',

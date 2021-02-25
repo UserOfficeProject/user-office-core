@@ -29,7 +29,7 @@ function TextSearchCriteriaComponent({
             Operator
           </InputLabel>
           <Select
-            onChange={event => {
+            onChange={(event) => {
               const newComparator = event.target
                 .value as QuestionFilterCompareOperator;
               setComparator(newComparator);
@@ -53,7 +53,7 @@ function TextSearchCriteriaComponent({
           label="Value"
           value={value}
           fullWidth
-          onChange={e => setValue(e.target.value)}
+          onChange={(e) => setValue(e.target.value)}
           onBlur={() => onChange(comparator, value)}
         />
       </Grid>

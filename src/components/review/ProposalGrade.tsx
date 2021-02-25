@@ -15,6 +15,7 @@ import { ReviewStatus, CoreReviewFragment } from 'generated/sdk';
 import { useReviewData } from 'hooks/review/useReviewData';
 import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 
 const useStyles = makeStyles(() => ({
   buttons: {
@@ -28,7 +29,7 @@ const useStyles = makeStyles(() => ({
 
 export default function ProposalGrade(props: {
   reviewID: number;
-  onChange: Function;
+  onChange: FunctionType;
   sepId?: number | null;
 }) {
   const classes = useStyles();

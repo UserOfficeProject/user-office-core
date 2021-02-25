@@ -19,6 +19,7 @@ import {
 import { SampleSubmissionState } from 'models/SampleSubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
+import { FunctionType } from 'utils/utilTypes';
 
 export interface SampleContextType extends QuestionaryContextType {
   state: SampleSubmissionState | null;
@@ -54,7 +55,7 @@ const samplesReducer = (
     case EventType.QUESTIONARY_STEP_ANSWERED:
       const updatedStep = action.payload.questionaryStep as QuestionaryStep;
       const stepIndex = draftState.sample.questionary.steps.findIndex(
-        step => step.topic.id === updatedStep.topic.id
+        (step) => step.topic.id === updatedStep.topic.id
       );
       draftState.sample.questionary.steps[stepIndex] = updatedStep;
 
@@ -134,7 +135,7 @@ export function SampleDeclarationContainer(props: {
     } else {
       await api()
         .getSample({ sampleId: sampleState.sample.id }) // or load blankQuestionarySteps if sample is null
-        .then(data => {
+        .then((data) => {
           if (data.sample && data.sample.questionary.steps) {
             dispatch({
               type: EventType.SAMPLE_LOADED,
@@ -158,7 +159,7 @@ export function SampleDeclarationContainer(props: {
     getState,
     dispatch,
   }: MiddlewareInputParams<QuestionarySubmissionState, Event>) => {
-    return (next: Function) => async (action: Event) => {
+    return (next: FunctionType) => async (action: Event) => {
       next(action);
       const state = getState() as SampleSubmissionState;
       switch (action.type) {

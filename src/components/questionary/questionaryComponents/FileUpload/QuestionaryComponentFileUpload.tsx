@@ -53,7 +53,7 @@ export function QuestionaryComponentFileUpload(
         id={answer.question.proposalQuestionId}
         fileType={config.file_type ? config.file_type.join(',') : ''}
         onChange={(fileMetaDataList: FileIdWithCaptionAndFigure[]) => {
-          const newStateValue = fileMetaDataList.map(file => ({
+          const newStateValue = fileMetaDataList.map((file) => ({
             id: file.id,
             caption: file.caption,
             figure: file.figure,

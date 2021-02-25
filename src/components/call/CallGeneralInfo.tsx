@@ -23,7 +23,7 @@ const CallGeneralInfo: React.FC<{
   const proposalWorkflowsWithInjectedSelectionRemoval = [
     { id: '', name: 'None (remove selection)' },
     ...proposalWorkflows,
-  ].map(proposalWorkflow => ({
+  ].map((proposalWorkflow) => ({
     text: proposalWorkflow.name,
     value: proposalWorkflow.id,
   }));
@@ -68,7 +68,7 @@ const CallGeneralInfo: React.FC<{
         label="Call template"
         loading={loadingTemplates}
         noOptionsText="No templates"
-        items={templates.map(template => ({
+        items={templates.map((template) => ({
           text: template.name,
           value: template.templateId,
         }))}

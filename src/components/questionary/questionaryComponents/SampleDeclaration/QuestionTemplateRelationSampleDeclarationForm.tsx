@@ -16,7 +16,9 @@ import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationSampleDeclarationForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationSampleDeclarationForm: FormComponent<QuestionTemplateRelation> = (
+  props
+) => {
   const { templates } = useTemplates(
     false,
     TemplateCategoryId.SAMPLE_DECLARATION
@@ -42,7 +44,7 @@ export const QuestionTemplateRelationSampleDeclarationForm: FormComponent<Questi
         }),
       })}
     >
-      {formikProps => (
+      {(formikProps) => (
         <>
           <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Options">
@@ -91,7 +93,7 @@ export const QuestionTemplateRelationSampleDeclarationForm: FormComponent<Questi
                 data-cy="templateId"
                 defaultValue={''}
               >
-                {templates.map(template => {
+                {templates.map((template) => {
                   return (
                     <MenuItem
                       value={template.templateId}

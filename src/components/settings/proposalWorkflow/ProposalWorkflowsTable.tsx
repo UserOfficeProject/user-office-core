@@ -12,6 +12,7 @@ import { UserRole, ProposalWorkflow } from 'generated/sdk';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 
 import CreateProposalWorkflow from './CreateProposalWorkflow';
 
@@ -22,9 +23,10 @@ const ProposalWorkflowsTable: React.FC = () => {
     proposalWorkflows,
     setProposalWorkflowsWithLoading: setProposalWorkflows,
   } = useProposalWorkflowsData();
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType
-  >(DefaultQueryParams);
+  const [
+    urlQueryParams,
+    setUrlQueryParams,
+  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
   const columns = [
     { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },
@@ -32,7 +34,10 @@ const ProposalWorkflowsTable: React.FC = () => {
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const history = useHistory();
 
-  const createModal = (onUpdate: Function, onCreate: Function) => (
+  const createModal = (
+    onUpdate: FunctionType<void, [ProposalWorkflow | null]>,
+    onCreate: FunctionType<void, [ProposalWorkflow | null]>
+  ) => (
     <CreateProposalWorkflow
       close={(proposalWorkflow: ProposalWorkflow | null) => {
         onCreate(proposalWorkflow);
@@ -49,7 +54,7 @@ const ProposalWorkflowsTable: React.FC = () => {
       .deleteProposalWorkflow({
         id: id as number,
       })
-      .then(resp => {
+      .then((resp) => {
         if (resp.deleteProposalWorkflow.error) {
           return false;
         } else {

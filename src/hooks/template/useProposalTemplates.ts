@@ -14,7 +14,7 @@ export function useProposalsTemplates(isArchived = false) {
     setLoadingTemplates(true);
     api()
       .getProposalTemplates({ filter: { isArchived } })
-      .then(data => {
+      .then((data) => {
         if (data.proposalTemplates) {
           setTemplates(data.proposalTemplates);
         }

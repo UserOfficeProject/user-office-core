@@ -14,7 +14,7 @@ export function useProposalData(id: number | null | undefined) {
       setLoading(true);
       api()
         .getProposal({ id })
-        .then(data => {
+        .then((data) => {
           setProposalData(data.proposal as Proposal);
           setLoading(false);
         });

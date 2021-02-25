@@ -47,6 +47,7 @@ const createDevelopTheme = (): Theme =>
     })
   );
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const developHosts: any = {
   localhost: true,
   'useroffice-test.esss.lu.se': true,

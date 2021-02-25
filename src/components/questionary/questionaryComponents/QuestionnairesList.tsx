@@ -39,13 +39,13 @@ export function QuestionnairesList(props: QuestionnairesListProps) {
 
   return (
     <List component="ul" className={classes.questionnairesList}>
-      {props.data.map(record => {
+      {props.data.map((record) => {
         return (
           <QuestionnairesListItem
             record={record}
-            onEditClick={record => props.onEditClick?.(record)}
-            onDeleteClick={record => props.onDeleteClick?.(record)}
-            onCloneClick={record => props.onCloneClick?.(record)}
+            onEditClick={(record) => props.onEditClick?.(record)}
+            onDeleteClick={(record) => props.onDeleteClick?.(record)}
+            onCloneClick={(record) => props.onCloneClick?.(record)}
             key={record.id}
           />
         );

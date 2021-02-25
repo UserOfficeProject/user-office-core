@@ -19,7 +19,7 @@ const ProposalWorkflowMetadataEditor: React.FC<{
 }> = ({ proposalWorkflow, dispatch }) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     workflowName: {
       fontSize: '24px',
       fontWeight: 'bold',

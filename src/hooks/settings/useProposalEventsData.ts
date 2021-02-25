@@ -25,7 +25,7 @@ export function useProposalEventsData(): {
     setLoadingProposalEvents(true);
     api()
       .getProposalEvents()
-      .then(data => {
+      .then((data) => {
         if (data.proposalEvents) {
           setProposalEvents(data.proposalEvents);
         }

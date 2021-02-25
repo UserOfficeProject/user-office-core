@@ -139,7 +139,7 @@ class App extends React.Component {
               ref={this.notistackRef}
               anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
               maxSnack={1}
-              action={key => (
+              action={(key) => (
                 <IconButton onClick={this.onClickDismiss(key)}>
                   <Close htmlColor="white" />
                 </IconButton>

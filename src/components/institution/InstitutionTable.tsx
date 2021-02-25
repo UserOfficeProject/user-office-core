@@ -9,6 +9,7 @@ import { Institution } from 'generated/sdk';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 
 import CreateUpdateInstitution from './CreateUpdateInstitution';
 
@@ -20,16 +21,17 @@ const InstitutionPage: React.FC = () => {
     institutions,
     setInstitutionsWithLoading: setInstitutions,
   } = useInstitutionsData();
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType
-  >(DefaultQueryParams);
+  const [
+    urlQueryParams,
+    setUrlQueryParams,
+  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const deleteInstitution = async (id: number | string) => {
     return await api('Institution removed successfully!')
       .deleteInstitution({
         id: id as number,
       })
-      .then(resp => {
+      .then((resp) => {
         if (resp.deleteInstitution.error) {
           return false;
         } else {
@@ -48,8 +50,8 @@ const InstitutionPage: React.FC = () => {
   ];
 
   const createModal = (
-    onUpdate: Function,
-    onCreate: Function,
+    onUpdate: FunctionType<void, [Institution | null]>,
+    onCreate: FunctionType<void, [Institution | null]>,
     editInstitution: Institution | null
   ) => (
     <CreateUpdateInstitution

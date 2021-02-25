@@ -12,10 +12,10 @@ export const Query = <T extends unknown>(props: {
     async function loadData() {
       props
         .serviceCall()
-        .then(serviceData => {
+        .then((serviceData) => {
           setData(serviceData);
         })
-        .catch(err => {
+        .catch((err) => {
           setError(true);
         })
         .finally(() => {

@@ -35,50 +35,50 @@ const NavigationFragment = (props: {
     },
   })();
 
-  const backbutton = props.back ? (
+  const backButton = props.back ? (
     <NavigButton
-      onClick={() => props.back!.callback()}
+      onClick={() => props.back?.callback()}
       className={`${classes.button} ${classes.lastLeftButton}`}
       type="button"
       disabled={props.back.disabled}
-      isbusy={props.back.isBusy}
+      isBusy={props.back.isBusy}
     >
       {props.back.label || 'Back'}
     </NavigButton>
   ) : null;
   const resetButton = props.reset ? (
     <NavigButton
-      onClick={() => props.reset!.callback()}
+      onClick={() => props.reset?.callback()}
       className={classes.button}
       type="button"
       disabled={props.reset.disabled}
-      isbusy={props.reset.isBusy}
+      isBusy={props.reset.isBusy}
     >
       {props.reset.label || 'Reset'}
     </NavigButton>
   ) : null;
   const saveButton = props.save ? (
     <NavigButton
-      onClick={() => props.save!.callback()}
+      onClick={() => props.save?.callback()}
       className={classes.button}
       type="button"
       variant="contained"
       color="primary"
       disabled={props.save.disabled}
-      isbusy={props.save.isBusy}
+      isBusy={props.save.isBusy}
     >
       {props.save.label || 'Save'}
     </NavigButton>
   ) : null;
   const saveAndNextButton = props.saveAndNext ? (
     <NavigButton
-      onClick={() => props.saveAndNext!.callback()}
+      onClick={() => props.saveAndNext?.callback()}
       className={classes.button}
       type="button"
       variant="contained"
       color="primary"
       disabled={props.saveAndNext.disabled}
-      isbusy={props.saveAndNext.isBusy}
+      isBusy={props.saveAndNext.isBusy}
       data-cy="save-and-continue-button"
     >
       {props.saveAndNext.label || 'Save and continue'}
@@ -88,7 +88,7 @@ const NavigationFragment = (props: {
     <UOLoader />
   ) : (
     <Fragment>
-      {backbutton}
+      {backButton}
       {resetButton}
       {saveButton}
       {saveAndNextButton}

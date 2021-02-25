@@ -29,7 +29,7 @@ import { PermissionsWithAccessToken } from 'generated/sdk';
 import { useQueriesAndMutationsData } from 'hooks/admin/useQueriesAndMutationsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   container: {
     minHeight: '350px',
     marginTop: theme.spacing(1),
@@ -108,7 +108,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
     if (data) {
       const parsedPermissions = JSON.parse(data);
 
-      Object.keys(parsedPermissions).forEach(key => {
+      Object.keys(parsedPermissions).forEach((key) => {
         permissionsArray.push(key);
       });
     }
@@ -155,7 +155,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
                   checked={formValues.accessPermissions.includes(item)}
                   color="primary"
                   data-cy={`permission-${title.toLowerCase()}`}
-                  onChange={e => {
+                  onChange={(e) => {
                     if (e.target.checked) fieldArrayHelpers.push(item);
                     else {
                       const idx = formValues.accessPermissions.indexOf(item);
@@ -181,7 +181,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
       onSubmit={async (values, formikHelpers): Promise<void> => {
         const accessPermissions: { [key: string]: boolean } = {};
 
-        values.accessPermissions.forEach(element => {
+        values.accessPermissions.forEach((element) => {
           if (element) {
             accessPermissions[element] = true;
           }
@@ -248,7 +248,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
           ) : (
             <FieldArray
               name="accessPermissions"
-              render={arrayHelpers => (
+              render={(arrayHelpers) => (
                 <div className={classes.tabsContainer}>
                   <SimpleTabs tabNames={['Queries', 'Mutations']}>
                     {allAccessPermissions(

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLClient } from 'graphql-request';
 import { Variables } from 'graphql-request/dist/types';
 import { decode } from 'jsonwebtoken';
@@ -41,7 +42,7 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
     query: string,
     variables?: Variables
   ): Promise<T> {
-    return super.request(query, variables).catch(error => {
+    return super.request(query, variables).catch((error) => {
       // if the `notificationWithClientLog` fails
       // and it fails while reporting an error, it can
       // easily cause an infinite loop
@@ -97,7 +98,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
       }
     }
 
-    return super.request(query, variables).catch(error => {
+    return super.request(query, variables).catch((error) => {
       if (
         error.response.error &&
         error.response.error.includes('ECONNREFUSED')
@@ -136,7 +137,7 @@ export function useDataApi() {
               endpoint,
               token,
               enqueueSnackbar,
-              reason => {
+              (reason) => {
                 console.log(reason);
                 handleLogout();
               },

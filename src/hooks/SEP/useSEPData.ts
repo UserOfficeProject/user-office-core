@@ -14,7 +14,7 @@ export function useSEPData(id: number) {
     setLoading(true);
     api()
       .getSEP({ id })
-      .then(data => {
+      .then((data) => {
         if (unmounted) {
           return;
         }
