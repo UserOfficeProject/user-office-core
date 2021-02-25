@@ -1,4 +1,5 @@
 import { Field } from 'formik';
+import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
 
@@ -38,6 +39,16 @@ export const QuestionTemplateRelationRichTextInputForm: FormComponent<QuestionTe
               margin="normal"
               fullWidth
               data-cy="required"
+            />
+
+            <Field
+              name="config.max"
+              label="Max"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="max"
             />
           </TitledContainer>
 

@@ -67,7 +67,7 @@ const ProposalStatusFilter: React.FC<ProposalStatusFilterProps> = ({
               });
               onChange?.(proposalStatus.target.value as number);
             }}
-            value={proposalStatusId}
+            value={proposalStatusId || 0}
             defaultValue={0}
             data-cy="status-filter"
           >
