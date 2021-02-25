@@ -5,18 +5,26 @@ import RateReviewIcon from '@material-ui/icons/RateReview';
 import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable from 'material-table';
 import React, { useState, useContext } from 'react';
+import { useQueryParams, NumberParam } from 'use-query-params';
 
+import CallFilter from 'components/common/proposalFilters/CallFilter';
+import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import {
   ReviewStatus,
   SepAssignment,
   UserWithReviewsQuery,
 } from 'generated/sdk';
+import { useCallsData } from 'hooks/call/useCallsData';
+import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
 import { tableIcons } from 'utils/materialIcons';
 
 import ProposalReviewModal from './ProposalReviewModal';
+import ReviewStatusFilter, {
+  defaultReviewStatusQueryFilter,
+} from './ReviewStatusFilter';
 
 type UserWithReview = {
   shortCode: string;
@@ -28,12 +36,51 @@ type UserWithReview = {
   status: ReviewStatus;
 };
 
+const getFilterStatus = (selected: string | ReviewStatus) =>
+  selected === ReviewStatus.SUBMITTED
+    ? ReviewStatus.SUBMITTED
+    : selected === ReviewStatus.DRAFT
+    ? ReviewStatus.DRAFT
+    : undefined; // if the selected status is not a valid status assume we want to see everything
+
 const ProposalTableReviewer: React.FC = () => {
-  const { loading, userData, setUserData } = useUserWithReviewsData();
   const downloadPDFProposal = useDownloadPDFProposal();
   const [editReviewID, setEditReviewID] = useState(0);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const { currentAssignment } = useContext(ReviewAndAssignmentContext);
+  const { calls, loadingCalls } = useCallsData();
+  const { instruments, loadingInstruments } = useInstrumentsData();
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
+    call: NumberParam,
+    instrument: NumberParam,
+    reviewStatus: defaultReviewStatusQueryFilter,
+  });
+
+  const [selectedCallId, setSelectedCallId] = useState<number>(
+    urlQueryParams.call ? urlQueryParams.call : 0
+  );
+  const [selectedInstrumentId, setSelectedInstrumentId] = useState<number>(
+    urlQueryParams.instrument ? urlQueryParams.instrument : 0
+  );
+
+  const {
+    loading,
+    userData,
+    setUserData,
+    setUserWithReviewsFilter,
+  } = useUserWithReviewsData({
+    callId: selectedCallId,
+    instrumentId: selectedInstrumentId,
+    status: getFilterStatus(urlQueryParams.reviewStatus),
+  });
+
+  const handleStatusFilterChange = (reviewStatus: ReviewStatus) => {
+    setUrlQueryParams(queries => ({ ...queries, reviewStatus }));
+    setUserWithReviewsFilter(filter => ({
+      ...filter,
+      status: getFilterStatus(reviewStatus),
+    }));
+  };
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -116,6 +163,30 @@ const ProposalTableReviewer: React.FC = () => {
 
   return (
     <>
+      <ReviewStatusFilter
+        reviewStatus={urlQueryParams.reviewStatus}
+        onChange={handleStatusFilterChange}
+      />
+      <CallFilter
+        shouldShowAll
+        calls={calls}
+        isLoading={loadingCalls}
+        callId={selectedCallId}
+        onChange={callId => {
+          setSelectedCallId(callId);
+          setUserWithReviewsFilter(filters => ({ ...filters, callId }));
+        }}
+      />
+      <InstrumentFilter
+        shouldShowAll
+        instruments={instruments}
+        isLoading={loadingInstruments}
+        instrumentId={selectedInstrumentId}
+        onChange={instrumentId => {
+          setSelectedInstrumentId(instrumentId);
+          setUserWithReviewsFilter(filters => ({ ...filters, instrumentId }));
+        }}
+      />
       <ProposalReviewModal
         editReviewID={editReviewID}
         reviewModalOpen={reviewModalOpen}

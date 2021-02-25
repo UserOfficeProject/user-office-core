@@ -22,6 +22,11 @@ import CallStatusFilter, {
 } from './CallStatusFilter';
 import CreateUpdateCall from './CreateUpdateCall';
 
+const getFilterStatus = (callStatus: string | CallStatus) =>
+  callStatus === CallStatus.ALL
+    ? undefined // if set to ALL we don't filter by status
+    : callStatus === CallStatus.ACTIVE;
+
 const CallsTable: React.FC = () => {
   const [assigningInstrumentsCallId, setAssigningInstrumentsCallId] = useState<
     number | null
@@ -40,20 +45,14 @@ const CallsTable: React.FC = () => {
     setCallsWithLoading: setCalls,
     setCallsFilter,
   } = useCallsData({
-    isActive:
-      urlQueryParams.callStatus === CallStatus.ALL
-        ? undefined // if set to ALL we don't filter by status
-        : urlQueryParams.callStatus === CallStatus.ACTIVE,
+    isActive: getFilterStatus(urlQueryParams.callStatus),
   });
 
   const handleStatusFilterChange = (callStatus: CallStatus) => {
     setUrlQueryParams(queries => ({ ...queries, callStatus }));
     setCallsFilter(filter => ({
       ...filter,
-      isActive:
-        callStatus === CallStatus.ALL
-          ? undefined // if set to ALL we don't filter by status
-          : callStatus === CallStatus.ACTIVE,
+      isActive: getFilterStatus(callStatus),
     }));
   };
 
@@ -182,7 +181,7 @@ const CallsTable: React.FC = () => {
     <div data-cy="calls-table">
       <CallStatusFilter
         callStatus={urlQueryParams.callStatus}
-        onStatusChange={handleStatusFilterChange}
+        onChange={handleStatusFilterChange}
       />
       {assigningInstrumentsCallId && (
         <InputDialog
