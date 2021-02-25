@@ -51,6 +51,7 @@ export const QuestionTemplateRelationFileUploadForm: FormComponent<QuestionTempl
               label="Accepted file types (leave empty for any)"
               id="fileType"
               component={FormikUICustomSelect}
+              multiple
               availableOptions={[
                 '.pdf',
                 '.doc',
