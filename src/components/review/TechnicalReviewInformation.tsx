@@ -14,7 +14,7 @@ export default function TechnicalReviewInformation(
     data: TechnicalReview | null | undefined;
   }
 ) {
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     heading: {
       marginTop: theme.spacing(2),
     },

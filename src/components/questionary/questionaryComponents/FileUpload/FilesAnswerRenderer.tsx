@@ -7,7 +7,7 @@ import { Answer } from 'generated/sdk';
 import { useFileMetadata } from 'hooks/file/useFileMetadata';
 import { FileMetaData } from 'models/FileUpload';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   list: {
     padding: 0,
     margin: 0,
@@ -32,7 +32,7 @@ function DownloadableFileList(props: { fileIds: string[] }) {
 
   return (
     <ul className={classes.list}>
-      {files.map(file => (
+      {files.map((file) => (
         <li key={`file-id-${file.fileId}`}>{downloadLink(file)}</li>
       ))}
     </ul>

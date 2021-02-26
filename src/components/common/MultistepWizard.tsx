@@ -100,7 +100,7 @@ export const Wizard: React.FC<WizardProps> = ({
       onSubmit={handleSubmit}
       validationSchema={step.props.validationSchema}
     >
-      {formik => (
+      {(formik) => (
         <Form>
           <Stepper
             nonLinear

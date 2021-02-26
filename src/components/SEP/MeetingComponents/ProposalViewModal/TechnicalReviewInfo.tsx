@@ -38,7 +38,7 @@ type TechnicalReviewInfoProps = {
   onSepTimeAllocationEdit: (sepTimeAllocation: number | null) => void;
 } & SEPProposalProps;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   heading: {
     marginTop: theme.spacing(2),
   },
@@ -85,7 +85,7 @@ const OverwriteTimeAllocationDialog = ({
     >
       <Formik
         initialValues={initialValues}
-        onSubmit={async values => {
+        onSubmit={async (values) => {
           const result = await api('Updated').updateSEPTimeAllocation(values);
 
           if (result.updateSEPTimeAllocation.error) {
@@ -108,7 +108,7 @@ const OverwriteTimeAllocationDialog = ({
                 name="sepTimeAllocation"
                 label="Time Allocation(Days)"
                 value={values.sepTimeAllocation ?? ''}
-                onChange={(e: any) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue(
                     'sepTimeAllocation',
                     e.target.value === '' ? null : +e.target.value

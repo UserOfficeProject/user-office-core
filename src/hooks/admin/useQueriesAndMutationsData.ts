@@ -7,9 +7,10 @@ export function useQueriesAndMutationsData(): {
   loadingQueriesAndMutations: boolean;
   queriesAndMutations: QueriesAndMutations;
 } {
-  const [queriesAndMutations, setQueriesAndMutations] = useState<
-    QueriesAndMutations
-  >({ queries: [], mutations: [] });
+  const [
+    queriesAndMutations,
+    setQueriesAndMutations,
+  ] = useState<QueriesAndMutations>({ queries: [], mutations: [] });
   const [loadingQueriesAndMutations, setLoadingQueriesAndMutations] = useState(
     true
   );
@@ -22,7 +23,7 @@ export function useQueriesAndMutationsData(): {
     setLoadingQueriesAndMutations(true);
     api()
       .getAllQueriesAndMutations()
-      .then(data => {
+      .then((data) => {
         if (unmounted) {
           return;
         }

@@ -37,7 +37,7 @@ export class ConditionEvaluator {
   }
 
   getConditionEvaluator(id: EvaluatorOperator): FieldConditionEvaluator {
-    return this.getMappings().get(id)!;
+    return this.getMappings().get(id) as FieldConditionEvaluator;
   }
 }
 

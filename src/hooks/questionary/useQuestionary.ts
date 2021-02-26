@@ -15,7 +15,7 @@ export function useQuestionary(questionaryId: number) {
     setLoadingQuestionary(true);
     api()
       .getQuestionary({ questionaryId })
-      .then(data => {
+      .then((data) => {
         if (data.questionary) {
           setQuestionary(data.questionary);
         }

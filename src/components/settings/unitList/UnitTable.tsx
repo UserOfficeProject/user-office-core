@@ -10,6 +10,7 @@ import { UserRole, Unit } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 
 import CreateUnit from './CreateUnit';
 
@@ -18,13 +19,14 @@ const UnitTable: React.FC = () => {
   const { loadingUnits, units, setUnitsWithLoading: setUnits } = useUnitsData();
   const columns = [{ title: 'Unit', field: 'name' }];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType
-  >(DefaultQueryParams);
+  const [
+    urlQueryParams,
+    setUrlQueryParams,
+  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const createModal = (
-    onUpdate: Function,
-    onCreate: Function,
+    onUpdate: FunctionType<void, [Unit | null]>,
+    onCreate: FunctionType<void, [Unit | null]>,
     editUnit: Unit | null
   ) => (
     <CreateUnit unit={editUnit} close={(unit: Unit | null) => onCreate(unit)} />
@@ -35,10 +37,10 @@ const UnitTable: React.FC = () => {
       .deleteUnit({
         id: id as number,
       })
-      .then(resp => {
+      .then((resp) => {
         if (!resp.deleteUnit.error) {
           const newObjectsArray = units.filter(
-            objectItem => objectItem.id !== id
+            (objectItem) => objectItem.id !== id
           );
           setUnits(newObjectsArray);
 

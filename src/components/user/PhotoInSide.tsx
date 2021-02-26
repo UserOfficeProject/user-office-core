@@ -18,7 +18,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const PhotoInSide: React.FC = props => {
+const PhotoInSide: React.FC = (props) => {
   const classes = useStyles();
 
   return (

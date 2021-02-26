@@ -9,7 +9,7 @@ import { useQueryParams, NumberParam } from 'use-query-params';
 
 import { Call } from 'generated/sdk';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
@@ -59,7 +59,7 @@ const CallFilter: React.FC<CallFilterProps> = ({
           <div className={classes.loadingText}>Loading...</div>
         ) : (
           <Select
-            onChange={call => {
+            onChange={(call) => {
               setQuery({
                 call: call.target.value
                   ? (call.target.value as number)
@@ -72,7 +72,7 @@ const CallFilter: React.FC<CallFilterProps> = ({
             data-cy="call-filter"
           >
             {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
-            {calls.map(call => (
+            {calls.map((call) => (
               <MenuItem key={call.id} value={call.id}>
                 {call.shortCode}
               </MenuItem>

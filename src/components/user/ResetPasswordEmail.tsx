@@ -16,7 +16,7 @@ import { FormWrapper } from 'styles/StyledComponents';
 
 import PhotoInSide from './PhotoInSide';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   avatar: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
@@ -43,7 +43,7 @@ export default function ResetPasswordEmail() {
   const requestResetEmail = async (values: { email: string }) => {
     await unauthorizedApi()
       .resetPasswordEmail({ email: values.email })
-      .then(data => setEmailSuccess(!!data.resetPasswordEmail));
+      .then((data) => setEmailSuccess(!!data.resetPasswordEmail));
   };
 
   return (

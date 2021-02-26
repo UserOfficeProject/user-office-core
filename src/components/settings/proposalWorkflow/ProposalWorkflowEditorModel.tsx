@@ -52,7 +52,7 @@ const ProposalWorkflowEditorModel = (
     groupId: string
   ) =>
     workflowConnectionGroups.findIndex(
-      workflowConnectionGroup => workflowConnectionGroup.groupId === groupId
+      (workflowConnectionGroup) => workflowConnectionGroup.groupId === groupId
     );
 
   const findGroupAndAddNewStatusConnection = (
@@ -129,7 +129,7 @@ const ProposalWorkflowEditorModel = (
 
     const connectionToUpdate = workflowConnectionGroups[
       groupIndexWhereConnectionShouldBeUpdated
-    ].connections.find(connection => connection.id === workflowConnection.id);
+    ].connections.find((connection) => connection.id === workflowConnection.id);
 
     if (connectionToUpdate) {
       connectionToUpdate.nextStatusEvents = nextStatusEvents;
@@ -139,7 +139,7 @@ const ProposalWorkflowEditorModel = (
   };
 
   function reducer(state: ProposalWorkflow, action: Event): ProposalWorkflow {
-    return produce(state, draft => {
+    return produce(state, (draft) => {
       switch (action.type) {
         case EventType.READY:
           return action.payload;
@@ -257,7 +257,7 @@ const ProposalWorkflowEditorModel = (
   useEffect(() => {
     api()
       .getProposalWorkflow({ id: parseInt(workflowId) })
-      .then(data => {
+      .then((data) => {
         // NOTE: Push at least one group to have initial droppable if new proposal workflow
         if (
           data.proposalWorkflow?.proposalWorkflowConnectionGroups.length === 0

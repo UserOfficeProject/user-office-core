@@ -15,7 +15,7 @@ export function useReviewData(reviewId: number, sepId?: number | null) {
     setLoading(true);
     api()
       .getReview({ reviewId, sepId })
-      .then(data => {
+      .then((data) => {
         if (cancelled) {
           return;
         }

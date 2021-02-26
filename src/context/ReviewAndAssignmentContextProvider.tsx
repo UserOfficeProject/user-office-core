@@ -11,8 +11,8 @@ interface ReviewAndAssignmentData {
 
 const initialState: ReviewAndAssignmentData = {
   currentAssignment: null,
-  setCurrentAssignment: data => data,
-  setAssignmentReview: data => data,
+  setCurrentAssignment: (data) => data,
+  setAssignmentReview: (data) => data,
 };
 
 enum ActionType {
@@ -48,9 +48,9 @@ const reducer = (
   }
 };
 
-export const ReviewAndAssignmentContext = React.createContext<
-  ReviewAndAssignmentData
->(initialState);
+export const ReviewAndAssignmentContext = React.createContext<ReviewAndAssignmentData>(
+  initialState
+);
 
 export const ReviewAndAssignmentContextProvider: React.FC = (
   props

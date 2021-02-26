@@ -30,7 +30,7 @@ export function useSEPProposalData(
 
     api()
       .getSEPProposal({ sepId, proposalId })
-      .then(data => {
+      .then((data) => {
         if (canceled) {
           return;
         }

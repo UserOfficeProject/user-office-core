@@ -8,7 +8,7 @@ import { StringParam, withDefault, QueryParamConfig } from 'use-query-params';
 
 import { ReviewStatus } from 'generated/sdk';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
@@ -38,7 +38,7 @@ const ReviewStatusFilter: React.FC<ReviewStatusFilterProps> = ({
     <FormControl className={classes.formControl}>
       <InputLabel shrink>Status</InputLabel>
       <Select
-        onChange={e => onChange(e.target.value as ReviewStatus)}
+        onChange={(e) => onChange(e.target.value as ReviewStatus)}
         value={reviewStatus}
         data-cy="review-status-filter"
       >

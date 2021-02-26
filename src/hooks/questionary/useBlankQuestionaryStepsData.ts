@@ -14,7 +14,7 @@ export function useBlankQuestionaryStepsData(templateId: number) {
   useEffect(() => {
     api()
       .getBlankQuestionarySteps({ templateId })
-      .then(data => {
+      .then((data) => {
         setQuestionarySteps(data.blankQuestionarySteps);
         setLoading(false);
       });

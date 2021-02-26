@@ -16,7 +16,7 @@ const assignProposalToInstrumentValidationSchema = yup.object().shape({
   selectedInstrumentId: yup.string().required('You must select instrument'),
 });
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   cardHeader: {
     fontSize: '18px',
     padding: '22px 0 0',
@@ -48,7 +48,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const selectedInstrument = instruments.find(
-            instrument => instrument.id === +values.selectedInstrumentId
+            (instrument) => instrument.id === +values.selectedInstrumentId
           );
 
           if (!selectedInstrument) {
@@ -73,7 +73,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
                 <FormikDropdown
                   name="selectedInstrumentId"
                   label="Select instrument"
-                  items={instruments.map(instrument => ({
+                  items={instruments.map((instrument) => ({
                     value: instrument.id.toString(),
                     text: instrument.name,
                   }))}

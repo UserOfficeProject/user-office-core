@@ -46,7 +46,7 @@ const RichTextInputAnswerRenderer = ({ answer }: { answer: Answer }) => {
 };
 
 const richTextInputRenderer: Renderers = {
-  answerRenderer: props => <RichTextInputAnswerRenderer {...props} />,
+  answerRenderer: (props) => <RichTextInputAnswerRenderer {...props} />,
   questionRenderer: ({ question }) => <span>{question.question}</span>,
 };
 

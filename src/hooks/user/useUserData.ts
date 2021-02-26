@@ -21,7 +21,7 @@ export function useUserWithReviewsData(filters?: {
     setLoading(true);
     api()
       .userWithReviews(userWithReviewsFilter)
-      .then(data => {
+      .then((data) => {
         if (unmounted) {
           return;
         }
@@ -45,7 +45,7 @@ export function useBasicUserData() {
     async (id: number) => {
       return sendRequest()
         .getBasicUserDetails({ id })
-        .then(data => data.basicUserDetails);
+        .then((data) => data.basicUserDetails);
     },
     [sendRequest]
   );

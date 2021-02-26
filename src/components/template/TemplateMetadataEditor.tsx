@@ -19,7 +19,7 @@ export function TemplateMetadataEditor(props: {
   const { template, dispatch } = props;
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     templateName: {
       fontSize: '24px',
       fontWeight: 'bold',

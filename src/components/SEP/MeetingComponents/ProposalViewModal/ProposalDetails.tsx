@@ -19,7 +19,7 @@ type ProposalDetailsProps = {
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
   const downloadPDFProposal = useDownloadPDFProposal();
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     heading: {
       marginTop: theme.spacing(2),
     },

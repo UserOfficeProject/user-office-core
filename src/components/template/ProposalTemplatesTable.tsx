@@ -62,6 +62,21 @@ export type ProposalTemplateRowDataType = TemplateRowDataType & {
   questionaryCount?: number;
 };
 
+type ProposalTemplatesTableProps = {
+  dataProvider: () => Promise<
+    Pick<
+      ProposalTemplate,
+      | 'templateId'
+      | 'name'
+      | 'description'
+      | 'isArchived'
+      | 'callCount'
+      | 'questionaryCount'
+    >[]
+  >;
+  confirm: WithConfirmType;
+};
+
 function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number>();
 
@@ -93,7 +108,7 @@ function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
       <TemplatesTable
         columns={columns}
         templateCategory={TemplateCategoryId.PROPOSAL_QUESTIONARY}
-        isRowRemovable={rowData => {
+        isRowRemovable={(rowData) => {
           const proposalTemplateRowData = rowData as ProposalTemplateRowDataType;
 
           return (
@@ -110,21 +125,6 @@ function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
       ></CallsModal>
     </>
   );
-}
-
-interface ProposalTemplatesTableProps {
-  dataProvider: () => Promise<
-    Pick<
-      ProposalTemplate,
-      | 'templateId'
-      | 'name'
-      | 'description'
-      | 'isArchived'
-      | 'callCount'
-      | 'questionaryCount'
-    >[]
-  >;
-  confirm: WithConfirmType;
 }
 
 export default withConfirm(ProposalTemplatesTable);

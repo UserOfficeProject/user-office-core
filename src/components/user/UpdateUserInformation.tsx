@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import DateFnsUtils from '@date-io/date-fns'; // choose your lib
 import { updateUserValidationSchema } from '@esss-swap/duo-validation';
 import Box from '@material-ui/core/Box';
@@ -28,7 +27,7 @@ import orcid from 'images/orcid.png';
 import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   button: {
     marginTop: '25px',
     marginLeft: '10px',
@@ -66,13 +65,13 @@ export default function UpdateUserInformation(props: { id: number }) {
       if (user.id !== props.id) {
         api()
           .getUser({ id })
-          .then(data => {
+          .then((data) => {
             setUserData({ ...(data.user as User) });
           });
       } else {
         api()
           .getUserMe()
-          .then(data => {
+          .then((data) => {
             setUserData({ ...(data.me as User) });
           });
       }
@@ -86,7 +85,7 @@ export default function UpdateUserInformation(props: { id: number }) {
 
   if (!institutionsList.length) {
     setInstitutionsList(
-      institutions.map(institution => {
+      institutions.map((institution) => {
         return { text: institution.name, value: institution.id };
       })
     );
@@ -94,7 +93,7 @@ export default function UpdateUserInformation(props: { id: number }) {
 
   if (!nationalitiesList.length) {
     setNationalitiesList(
-      fieldsContent.nationalities.map(nationality => {
+      fieldsContent.nationalities.map((nationality) => {
         return { text: nationality.value, value: nationality.id };
       })
     );
@@ -112,7 +111,7 @@ export default function UpdateUserInformation(props: { id: number }) {
     } = await api('Email verified').setUserEmailVerified({ id: props.id });
 
     if (!error) {
-      setUserData(userData =>
+      setUserData((userData) =>
         userData
           ? {
               ...userData,
@@ -131,7 +130,7 @@ export default function UpdateUserInformation(props: { id: number }) {
     });
 
     if (!error) {
-      setUserData(userData =>
+      setUserData((userData) =>
         userData
           ? {
               ...userData,

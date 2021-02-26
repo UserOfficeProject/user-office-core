@@ -14,7 +14,7 @@ export function useUsersData(filter: string) {
     setLoading(true);
     api()
       .getUsers({ filter })
-      .then(data => {
+      .then((data) => {
         setUsersData(data.users);
         setLoading(false);
       });

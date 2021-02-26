@@ -3,7 +3,9 @@ import * as Yup from 'yup';
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { TextInputConfig } from 'generated/sdk';
 
-export const createTextInputValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = answer => {
+export const createTextInputValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = (
+  answer
+) => {
   let schema = Yup.string();
   const config = answer.config as TextInputConfig;
   config.required && (schema = schema.required(`This is a required field`));

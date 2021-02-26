@@ -75,8 +75,8 @@ const ProposalTableReviewer: React.FC = () => {
   });
 
   const handleStatusFilterChange = (reviewStatus: ReviewStatus) => {
-    setUrlQueryParams(queries => ({ ...queries, reviewStatus }));
-    setUserWithReviewsFilter(filter => ({
+    setUrlQueryParams((queries) => ({ ...queries, reviewStatus }));
+    setUserWithReviewsFilter((filter) => ({
       ...filter,
       status: getFilterStatus(reviewStatus),
     }));
@@ -125,7 +125,7 @@ const ProposalTableReviewer: React.FC = () => {
   ];
 
   const reviewData = userData
-    ? (userData.reviews.map(review => {
+    ? (userData.reviews.map((review) => {
         return {
           shortCode: review?.proposal?.shortCode,
           proposalId: review?.proposal?.id,
@@ -144,7 +144,7 @@ const ProposalTableReviewer: React.FC = () => {
 
       const userDataUpdated = {
         ...userData,
-        reviews: userData?.reviews.map(review => {
+        reviews: userData?.reviews.map((review) => {
           if (review.id === currentReview?.id) {
             return {
               ...review,
@@ -172,9 +172,9 @@ const ProposalTableReviewer: React.FC = () => {
         calls={calls}
         isLoading={loadingCalls}
         callId={selectedCallId}
-        onChange={callId => {
+        onChange={(callId) => {
           setSelectedCallId(callId);
-          setUserWithReviewsFilter(filters => ({ ...filters, callId }));
+          setUserWithReviewsFilter((filters) => ({ ...filters, callId }));
         }}
       />
       <InstrumentFilter
@@ -182,9 +182,9 @@ const ProposalTableReviewer: React.FC = () => {
         instruments={instruments}
         isLoading={loadingInstruments}
         instrumentId={selectedInstrumentId}
-        onChange={instrumentId => {
+        onChange={(instrumentId) => {
           setSelectedInstrumentId(instrumentId);
-          setUserWithReviewsFilter(filters => ({ ...filters, instrumentId }));
+          setUserWithReviewsFilter((filters) => ({ ...filters, instrumentId }));
         }}
       />
       <ProposalReviewModal
@@ -216,7 +216,7 @@ const ProposalTableReviewer: React.FC = () => {
             tooltip: 'Download proposals',
             onClick: (event, rowData) => {
               downloadPDFProposal(
-                (rowData as UserWithReview[]).map(row => row.proposalId),
+                (rowData as UserWithReview[]).map((row) => row.proposalId),
                 (rowData as UserWithReview[])[0].title
               );
             },

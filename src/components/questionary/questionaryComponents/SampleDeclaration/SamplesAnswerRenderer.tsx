@@ -10,7 +10,7 @@ import { Answer } from 'generated/sdk';
 import { useSamples } from 'hooks/sample/useSamples';
 import { SampleBasic } from 'models/Sample';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   list: {
     padding: 0,
     margin: 0,
@@ -35,7 +35,7 @@ function SampleList(props: {
 
   return (
     <ul className={classes.list}>
-      {props.samples.map(sample => (
+      {props.samples.map((sample) => (
         <li key={`sample-${sample.id}`}>{sampleLink(sample)}</li>
       ))}
     </ul>
@@ -53,7 +53,7 @@ function SamplesAnswerRenderer(props: { answer: Answer }) {
     <div>
       <SampleList
         samples={samples}
-        onClick={sample => setSelectedSampleId(sample.id)}
+        onClick={(sample) => setSelectedSampleId(sample.id)}
       />
       <InputDialog
         maxWidth="sm"

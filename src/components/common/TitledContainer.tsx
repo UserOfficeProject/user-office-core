@@ -4,11 +4,13 @@ import Typography from '@material-ui/core/Typography';
 import PropTypes from 'prop-types';
 import React, { PropsWithChildren } from 'react';
 
-const TitledContainer: React.FC<PropsWithChildren<{
-  children: NonNullable<React.ReactNode>;
-  label?: string;
-}>> = ({ children, label }) => {
-  const classes = makeStyles(theme => ({
+const TitledContainer: React.FC<
+  PropsWithChildren<{
+    children: NonNullable<React.ReactNode>;
+    label?: string;
+  }>
+> = ({ children, label }) => {
+  const classes = makeStyles((theme) => ({
     container: {
       marginTop: '35px',
       position: 'relative',

@@ -6,7 +6,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import React from 'react';
 import { StringParam, withDefault, QueryParamConfig } from 'use-query-params';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
@@ -40,7 +40,7 @@ const CallStatusFilter: React.FC<CallStatusFilterProps> = ({
     <FormControl className={classes.formControl}>
       <InputLabel shrink>Status</InputLabel>
       <Select
-        onChange={e => onChange(e.target.value as CallStatus)}
+        onChange={(e) => onChange(e.target.value as CallStatus)}
         value={callStatus}
         data-cy="call-status-filter"
       >

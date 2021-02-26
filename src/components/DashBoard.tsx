@@ -81,7 +81,7 @@ BottomNavItem.propTypes = {
 
 const drawerWidth = 250;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
@@ -279,7 +279,7 @@ const Dashboard: React.FC = () => {
                 allowedRoles={[UserRole.USER]}
                 yes={() => (
                   <Route
-                    render={props => (
+                    render={(props) => (
                       <OverviewPage {...props} userRole={UserRole.USER} />
                     )}
                   />
@@ -294,7 +294,7 @@ const Dashboard: React.FC = () => {
                     ]}
                     yes={() => (
                       <Route
-                        render={props => (
+                        render={(props) => (
                           <OverviewPage
                             {...props}
                             userRole={currentRole as UserRole}

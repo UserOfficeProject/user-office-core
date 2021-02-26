@@ -11,7 +11,7 @@ export function useActiveTemplateId(templateCategoryId: TemplateCategoryId) {
   useEffect(() => {
     api()
       .getActiveTemplateId({ templateCategoryId })
-      .then(data => {
+      .then((data) => {
         setActiveTemplateId(data.activeTemplateId);
       });
   }, [api, templateCategoryId]);

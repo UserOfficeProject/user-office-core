@@ -22,7 +22,7 @@ export function useCallsData(filter?: CallsFilter) {
     setLoadingCalls(true);
     api()
       .getCalls({ filter: callsFilter })
-      .then(data => {
+      .then((data) => {
         if (unmounted) {
           return;
         }

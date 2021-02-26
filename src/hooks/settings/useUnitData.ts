@@ -23,7 +23,7 @@ export function useUnitsData(): {
     setLoadingUnits(true);
     api()
       .getUnits()
-      .then(data => {
+      .then((data) => {
         if (data.units) {
           setUnits(data.units as Unit[]);
         }

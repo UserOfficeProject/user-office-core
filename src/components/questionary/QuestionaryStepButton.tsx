@@ -11,7 +11,7 @@ export function QuestionaryStepButton(
     readonly: boolean;
   }>
 ) {
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     active: {
       '& SVG': {
         color: theme.palette.secondary.main + '!important',

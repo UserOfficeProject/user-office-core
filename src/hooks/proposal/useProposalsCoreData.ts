@@ -37,14 +37,14 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
           text,
         },
       })
-      .then(data => {
+      .then((data) => {
         if (unmounted) {
           return;
         }
 
         if (data.proposalsView) {
           setProposalsData(
-            data.proposalsView.map(proposal => {
+            data.proposalsView.map((proposal) => {
               return {
                 ...proposal,
                 status: proposal.submitted ? 'Submitted' : 'Open',

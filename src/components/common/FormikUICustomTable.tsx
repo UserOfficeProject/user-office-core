@@ -1,15 +1,21 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import { FormikHelpers } from 'formik';
+import { FormikHelpers, FormikValues } from 'formik';
 import MaterialTable, { MTableToolbar, Options } from 'material-table';
 import React, { forwardRef } from 'react';
 
 import { tableIcons } from 'utils/materialIcons';
 import { clamp } from 'utils/Math';
+import { FunctionType } from 'utils/utilTypes';
 
-function move(array: Array<any>, element: any, direction: 'UP' | 'DOWN') {
+function move(
+  array: Record<string, unknown>[],
+  element: Record<string, unknown>,
+  direction: 'UP' | 'DOWN'
+) {
   const currentIndex = array.indexOf(element);
   const delta = direction === 'DOWN' ? 1 : -1;
   const newIndex = clamp(currentIndex + delta, 0, array.length - 1);
@@ -47,16 +53,16 @@ export const FormikUICustomTable = ({
     field: string;
   }[];
   dataTransforms: {
-    toTable: (input: any) => any[];
-    fromTable: (input: any[]) => any;
+    toTable: (input: unknown) => Record<string, unknown>[];
+    fromTable: (input: Record<string, unknown>[]) => unknown;
   };
   field: {
     name: string;
-    onBlur: Function;
-    onChange: Function;
+    onBlur: FunctionType;
+    onChange: FunctionType;
     value: string | undefined;
   };
-  form: FormikHelpers<any>;
+  form: FormikHelpers<FormikValues>;
 }) => {
   const transformedValues = dataTransforms.toTable(field.value);
   const [state, setState] = React.useState(transformedValues);
@@ -92,36 +98,40 @@ export const FormikUICustomTable = ({
       data={state}
       options={{ search: false, paging: false }}
       actions={[
-        rowData => ({
+        (rowData) => ({
           icon: ArrowUpwardIcon,
           disabled: state.indexOf(rowData) === 0,
           tooltip: 'Up',
           onClick: (event, rowData): void =>
-            handleChange(move(state, rowData, 'UP')),
+            handleChange(move(state, rowData as Record<string, unknown>, 'UP')),
         }),
-        rowData => ({
+        (rowData) => ({
           icon: ArrowDownwardIcon,
           disabled: state.indexOf(rowData) === state.length - 1,
           tooltip: 'Down',
           onClick: (event, rowData): void =>
-            handleChange(move(state, rowData, 'DOWN')),
+            handleChange(
+              move(state, rowData as Record<string, unknown>, 'DOWN')
+            ),
         }),
       ]}
       editable={{
-        onRowAdd: newData =>
-          new Promise<void>(resolve => {
+        onRowAdd: (newData) =>
+          new Promise<void>((resolve) => {
             handleChange([...state, newData]);
             resolve();
           }),
         onRowUpdate: (newData, oldData) =>
-          new Promise<void>(resolve => {
+          new Promise<void>((resolve) => {
             const newState = [...state];
-            newState[state.indexOf(oldData)] = newData;
+            newState[
+              state.indexOf(oldData as Record<string, unknown>)
+            ] = newData;
             handleChange(newState);
             resolve();
           }),
-        onRowDelete: oldData =>
-          new Promise<void>(resolve => {
+        onRowDelete: (oldData) =>
+          new Promise<void>((resolve) => {
             const newState = [...state];
             newState.splice(state.indexOf(oldData), 1);
             handleChange(newState);
