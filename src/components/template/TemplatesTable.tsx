@@ -43,7 +43,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
   const [loadingTemplates, setLoadingTemplates] = useState(true);
 
   useEffect(() => {
-    props.dataProvider().then(data => {
+    props.dataProvider().then((data) => {
       data && setTemplates(data);
       setLoadingTemplates(false);
     });
@@ -64,11 +64,11 @@ export function TemplatesTable(props: TemplatesTableProps) {
                 templateId: (data as TemplateRowDataType).templateId,
                 isArchived: false,
               })
-              .then(response => {
+              .then((response) => {
                 const data = [...templates];
                 data.splice(
                   templates.findIndex(
-                    elem =>
+                    (elem) =>
                       elem.templateId ===
                       response.updateTemplate.template?.templateId
                   ),
@@ -106,11 +106,11 @@ export function TemplatesTable(props: TemplatesTableProps) {
                 templateId: (data as TemplateRowDataType).templateId,
                 isArchived: true,
               })
-              .then(response => {
+              .then((response) => {
                 const data = [...templates];
                 data.splice(
                   templates.findIndex(
-                    elem =>
+                    (elem) =>
                       elem.templateId ===
                       response.updateTemplate.template?.templateId
                   ),
@@ -147,11 +147,11 @@ export function TemplatesTable(props: TemplatesTableProps) {
               .deleteTemplate({
                 id: (data as TemplateRowDataType).templateId,
               })
-              .then(response => {
+              .then((response) => {
                 const data = [...templates];
                 data.splice(
                   templates.findIndex(
-                    elem =>
+                    (elem) =>
                       elem.templateId ===
                       response.deleteTemplate.template?.templateId
                   ),
@@ -196,7 +196,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
     <>
       <InputDialog open={show} onClose={() => setShow(false)}>
         <CreateTemplate
-          onComplete={template => {
+          onComplete={(template) => {
             if (template) {
               setTemplates([...templates, template]);
 
@@ -234,7 +234,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
                     .cloneTemplate({
                       templateId: (data as TemplateRowDataType).templateId,
                     })
-                    .then(result => {
+                    .then((result) => {
                       const clonedTemplate = result.cloneTemplate.template;
                       if (clonedTemplate) {
                         const newTemplates = [...templates];
@@ -254,7 +254,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
               )();
             },
           },
-          rowData => getMaintenanceButton(rowData),
+          (rowData) => getMaintenanceButton(rowData),
           ...customActions,
         ]}
       />

@@ -88,7 +88,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         });
         const isError = submitInstrument.error || !submitInstrument.isSuccess;
         if (!isError) {
-          const newInstrumentsData = instrumentsData.map(instrument => {
+          const newInstrumentsData = instrumentsData.map((instrument) => {
             if (instrument.id === instrumentToSubmit.id) {
               return { ...instrument, submitted: true };
             }

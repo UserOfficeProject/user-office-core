@@ -15,6 +15,7 @@ import {
 import { usePersistProposalWorkflowEditorModel } from 'hooks/settings/usePersistProposalWorkflowEditorModel';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { StyledPaper } from 'styles/StyledComponents';
+import { FunctionType } from 'utils/utilTypes';
 
 import ProposalStatusPicker from './ProposalStatusPicker';
 import ProposalWorkflowConnectionsEditor from './ProposalWorkflowConnectionsEditor';
@@ -31,7 +32,7 @@ const ProposalWorkflowEditor: React.FC = () => {
     loadingProposalStatuses,
   } = useProposalStatusesData();
   const reducerMiddleware = () => {
-    return (next: Function) => (action: Event) => {
+    return (next: FunctionType) => (action: Event) => {
       next(action);
       switch (action.type) {
         case EventType.SERVICE_ERROR_OCCURRED:
@@ -51,21 +52,21 @@ const ProposalWorkflowEditor: React.FC = () => {
   const proposalWorkflowConnectionsPartOfWorkflow: ProposalWorkflowConnection[] = [];
 
   state.proposalWorkflowConnectionGroups.forEach(
-    proposalWorkflowConnectionGroup =>
+    (proposalWorkflowConnectionGroup) =>
       proposalWorkflowConnectionsPartOfWorkflow.push(
         ...proposalWorkflowConnectionGroup.connections
       )
   );
 
   const proposalStatusesPartOfWorkflow = proposalWorkflowConnectionsPartOfWorkflow.map(
-    proposalWorkflowConnection => proposalWorkflowConnection.proposalStatus
+    (proposalWorkflowConnection) => proposalWorkflowConnection.proposalStatus
   );
 
   const proposalStatusesInThePicker = state.id
     ? proposalStatuses.filter(
-        proposalStatus =>
+        (proposalStatus) =>
           !proposalStatusesPartOfWorkflow.find(
-            proposalStatusPartOfWorkflow =>
+            (proposalStatusPartOfWorkflow) =>
               proposalStatusPartOfWorkflow.id === proposalStatus.id
           )
       )
@@ -76,7 +77,7 @@ const ProposalWorkflowEditor: React.FC = () => {
     currentDroppableGroup: ProposalWorkflowConnectionGroup
   ) => {
     const parentDroppableGroup = state.proposalWorkflowConnectionGroups.find(
-      proposalWorkflowConnectionGroup =>
+      (proposalWorkflowConnectionGroup) =>
         proposalWorkflowConnectionGroup.groupId ===
         currentDroppableGroup.parentGroupId
     );
@@ -106,7 +107,7 @@ const ProposalWorkflowEditor: React.FC = () => {
     const isLastInTheCurrentGroup =
       destination.index === currentDroppableGroup.connections.length;
     const childGroup = state.proposalWorkflowConnectionGroups.find(
-      proposalWorkflowConnectionGroup =>
+      (proposalWorkflowConnectionGroup) =>
         proposalWorkflowConnectionGroup.parentGroupId ===
         currentDroppableGroup.groupId
     );
@@ -136,7 +137,7 @@ const ProposalWorkflowEditor: React.FC = () => {
       destination?.droppableId.startsWith('proposalWorkflowConnections')
     ) {
       const currentDroppableGroup = state.proposalWorkflowConnectionGroups.find(
-        proposalWorkflowConnectionGroup =>
+        (proposalWorkflowConnectionGroup) =>
           proposalWorkflowConnectionGroup.groupId === destination.droppableId
       );
 

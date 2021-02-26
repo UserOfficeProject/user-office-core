@@ -9,8 +9,9 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionTemplateRelation, Template } from 'generated/sdk';
 import { Event, EventType } from 'models/QuestionaryEditorModel';
+import { FunctionType } from 'utils/utilTypes';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   container: {
     width: '100%',
   },
@@ -33,10 +34,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const QuestionTemplateRelationFormShell = (props: {
-  validationSchema?: any;
+  validationSchema?: unknown;
   questionRel: QuestionTemplateRelation;
   dispatch: React.Dispatch<Event>;
-  closeMe: Function;
+  closeMe: FunctionType;
   template: Template;
   children?: (
     formikProps: FormikProps<QuestionTemplateRelation>
@@ -81,7 +82,7 @@ export const QuestionTemplateRelationFormShell = (props: {
         }}
         validationSchema={props.validationSchema}
       >
-        {formikProps => (
+        {(formikProps) => (
           <Form style={{ flexGrow: 1 }}>
             {props.children?.(formikProps)}
             <ActionButtonContainer>

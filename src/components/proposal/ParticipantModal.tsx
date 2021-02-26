@@ -48,7 +48,7 @@ function ParticipantModal(props: {
           userRole={props.userRole || ('' as UserRole)}
           emailInvite={true}
           selection={!!props.selection}
-          onUpdate={data => props.addParticipants(data as BasicUserDetails[])}
+          onUpdate={(data) => props.addParticipants(data as BasicUserDetails[])}
           invitationUserRole={props.invitationUserRole || props.userRole}
         />
       </DialogContent>

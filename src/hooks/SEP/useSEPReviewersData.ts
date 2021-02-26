@@ -23,7 +23,7 @@ export function useSEPReviewersData(
 
     api()
       .getSEPReviewers({ sepId })
-      .then(data => {
+      .then((data) => {
         if (unmounted) {
           return;
         }

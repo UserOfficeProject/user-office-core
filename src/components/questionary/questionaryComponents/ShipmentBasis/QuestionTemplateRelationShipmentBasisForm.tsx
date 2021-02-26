@@ -5,7 +5,9 @@ import { QuestionTemplateRelation } from 'generated/sdk';
 
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationShipmentBasisForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationShipmentBasisForm: FormComponent<QuestionTemplateRelation> = (
+  props
+) => {
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}

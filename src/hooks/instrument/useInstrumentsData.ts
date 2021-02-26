@@ -36,7 +36,7 @@ export function useInstrumentsData(
     if (currentRole === UserRole.USER_OFFICER) {
       api()
         .getInstruments({ callIds })
-        .then(data => {
+        .then((data) => {
           if (unmounted) {
             return;
           }
@@ -49,7 +49,7 @@ export function useInstrumentsData(
     } else {
       api()
         .getUserInstruments()
-        .then(data => {
+        .then((data) => {
           if (unmounted) {
             return;
           }

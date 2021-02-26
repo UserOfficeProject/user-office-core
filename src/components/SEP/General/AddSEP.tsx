@@ -12,14 +12,14 @@ import UOLoader from 'components/common/UOLoader';
 import { Sep } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
 }));
 
 type AddSEPProps = {
-  close: (sepAdded: Sep | null | undefined) => void;
+  close: (sepAdded: Sep | null) => void;
 };
 
 const AddSEP: React.FC<AddSEPProps> = ({ close }) => {

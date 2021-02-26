@@ -34,7 +34,7 @@ export function Impersonate(props: { id: number }) {
           onClick={() =>
             api()
               .getTokenForUser({ userId: props.id })
-              .then(data => {
+              .then((data) => {
                 const { token, error } = data.getTokenForUser;
                 if (error) {
                   enqueueSnackbar(error, { variant: 'error' });

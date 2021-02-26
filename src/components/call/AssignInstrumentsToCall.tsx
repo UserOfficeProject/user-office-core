@@ -34,10 +34,10 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
     { title: 'Description', field: 'description' },
   ];
 
-  const notAssignedInstruments = instruments.filter(instrument => {
+  const notAssignedInstruments = instruments.filter((instrument) => {
     if (
       !assignedInstruments?.find(
-        assignedInstrument => assignedInstrument.id === instrument.id
+        (assignedInstrument) => assignedInstrument.id === instrument.id
       )
     ) {
       return instrument;
@@ -52,7 +52,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
     ).assignInstrumentsToCall({
       callId,
       instrumentIds: selectedInstruments.map(
-        instrumentToAssign => instrumentToAssign.id
+        (instrumentToAssign) => instrumentToAssign.id
       ),
     });
 
@@ -69,7 +69,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
         columns={columns}
         data={notAssignedInstruments}
         isLoading={loadingInstruments}
-        onSelectionChange={data =>
+        onSelectionChange={(data) =>
           setSelectedInstruments(data as InstrumentWithAvailabilityTime[])
         }
         options={{

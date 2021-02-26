@@ -4,7 +4,7 @@ import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import clsx from 'clsx';
 import React, { ChangeEvent, useState } from 'react';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   error: {
     color: theme.palette.error.main,
   },

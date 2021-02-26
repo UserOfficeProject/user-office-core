@@ -11,7 +11,7 @@ import {
 } from './QuestionaryContext';
 import { QuestionaryStepButton } from './QuestionaryStepButton';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   stepper: {
     margin: theme.spacing(3, 0),
     overflowX: 'auto',

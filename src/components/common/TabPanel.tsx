@@ -7,12 +7,13 @@ import Typography from '@material-ui/core/Typography';
 import React from 'react';
 
 import { StyledPaper } from 'styles/StyledComponents';
+import { FunctionType } from 'utils/utilTypes';
 
 interface TabPanelProps {
   children?: React.ReactNode;
   dir?: string;
-  index: any;
-  value: any;
+  index: number;
+  value: number;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -32,7 +33,7 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-function a11yProps(index: any) {
+function a11yProps(index: number) {
   return {
     id: `full-width-tab-${index}`,
     'aria-controls': `full-width-tabpanel-${index}`,
@@ -43,12 +44,15 @@ export default function FullWidthTabs(props: {
   children: React.ReactNode[];
   tabNames: string[];
   shouldPreventTabChange?: boolean;
-  setShouldPreventTabChange?: Function;
+  setShouldPreventTabChange?: FunctionType<void, boolean>;
 }) {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+  const handleChange = (
+    event: React.ChangeEvent<Record<string, unknown>>,
+    newValue: number
+  ) => {
     if (props.shouldPreventTabChange && value !== newValue) {
       if (
         window.confirm(

@@ -20,12 +20,12 @@ import UOLoader from '../UOLoader';
 
 export interface SearchCriteria {
   compareOperator: QuestionFilterCompareOperator;
-  value: string | number | boolean | any[];
+  value: string | number | boolean | unknown[];
 }
 
 interface QuestionaryFilterProps {
   templateId: number;
-  onSubmit?: (questionFilter?: QuestionFilterInput) => any;
+  onSubmit?: (questionFilter?: QuestionFilterInput) => void;
 }
 
 const getSearchCriteriaComponent = (
@@ -55,7 +55,7 @@ const extractSearchableQuestionsFromTemplate = (
       new Array<QuestionTemplateRelation>()
     ) // create array of questions from template
     .filter(
-      question =>
+      (question) =>
         getQuestionaryComponentDefinition(question.question.dataType)
           .searchCriteriaComponent !== undefined
     ); // only searchable questions
@@ -91,7 +91,7 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
       const selectedQuestion = extractSearchableQuestionsFromTemplate(
         template
       ).find(
-        question =>
+        (question) =>
           question.question.proposalQuestionId ===
           questionFilterQuery.questionId
       );
@@ -122,8 +122,8 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
         <Autocomplete
           id="question-list"
           options={questions}
-          getOptionLabel={option => option.question.question}
-          renderInput={params => <TextField {...params} label="Question" />}
+          getOptionLabel={(option) => option.question.question}
+          renderInput={(params) => <TextField {...params} label="Question" />}
           onChange={(_event, newValue) => {
             setSelectedQuestion(newValue);
             setSearchCriteria(null);
@@ -165,10 +165,10 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
               }
               handleSubmit({
                 questionId: selectedQuestion.question.proposalQuestionId,
-                compareOperator: searchCriteria!.compareOperator,
-                value: searchCriteria!.value as any,
+                compareOperator: searchCriteria.compareOperator,
+                value: searchCriteria.value,
                 dataType: selectedQuestion.question.dataType,
-              });
+              } as QuestionFilterInput);
             }}
           >
             Search

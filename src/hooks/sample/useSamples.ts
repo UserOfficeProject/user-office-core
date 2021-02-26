@@ -16,7 +16,7 @@ export function useSamples(filter?: SamplesFilter) {
     setLoadingSamples(true);
     api()
       .getSamples({ filter: samplesFilter })
-      .then(data => {
+      .then((data) => {
         if (data.samples) {
           setSamples(data.samples);
         }

@@ -19,7 +19,7 @@ import { EventType } from 'models/QuestionarySubmissionState';
 
 const TextFieldNoSubmit = withPreventSubmit(TextField);
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   disabled: {
     pointerEvents: 'none',
     opacity: 0.7,
@@ -122,14 +122,14 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         setUsers={(users: BasicUserDetails[]) => {
           formikProps.setFieldValue(
             `${proposalQuestionId}.users`,
-            users.map(user => user.id)
+            users.map((user) => user.id)
           );
           dispatch({
             type: EventType.PROPOSAL_MODIFIED,
             payload: { proposal: { ...state.proposal, users: users } },
           });
         }}
-        // quickfix for material table changing immutable state
+        // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
       />
@@ -157,7 +157,7 @@ const proposalBasisPreSubmit = (answer: Answer) => async ({
       id: id,
       title: title,
       abstract: abstract,
-      users: users.map(user => user.id),
+      users: users.map((user) => user.id),
       proposerId: proposer?.id,
     });
 
@@ -179,7 +179,7 @@ const proposalBasisPreSubmit = (answer: Answer) => async ({
         id: createResult.createProposal.proposal.id,
         title: title,
         abstract: abstract,
-        users: users.map(user => user.id),
+        users: users.map((user) => user.id),
         proposerId: proposer?.id,
       });
       dispatch({

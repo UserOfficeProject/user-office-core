@@ -11,7 +11,7 @@ export function useTemplateCategories(isArchived = false) {
   useEffect(() => {
     api()
       .getTemplateCategories()
-      .then(data => {
+      .then((data) => {
         if (data.templateCategories) {
           setCategories(data.templateCategories);
         }

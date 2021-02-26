@@ -9,7 +9,7 @@ import { useQueryParams, NumberParam } from 'use-query-params';
 
 import { Instrument } from 'generated/sdk';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
@@ -59,7 +59,7 @@ const InstrumentFilter: React.FC<InstrumentFilterProps> = ({
           <div className={classes.loadingText}>Loading...</div>
         ) : (
           <Select
-            onChange={instrument => {
+            onChange={(instrument) => {
               setQuery({
                 instrument: instrument.target.value
                   ? (instrument.target.value as number)
@@ -72,7 +72,7 @@ const InstrumentFilter: React.FC<InstrumentFilterProps> = ({
             data-cy="instrument-filter"
           >
             {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
-            {instruments.map(instrument => (
+            {instruments.map((instrument) => (
               <MenuItem key={instrument.id} value={instrument.id}>
                 {instrument.name}
               </MenuItem>

@@ -23,7 +23,7 @@ export function useSEPMembersData(
 
     api()
       .getSEPMembers({ sepId })
-      .then(data => {
+      .then((data) => {
         if (unmounted) {
           return;
         }

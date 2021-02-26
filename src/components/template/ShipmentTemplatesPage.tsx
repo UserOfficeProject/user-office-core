@@ -22,7 +22,7 @@ export default function ShipmentTemplatesPage() {
                   category: TemplateCategoryId.SHIPMENT_DECLARATION,
                 },
               })
-              .then(data => data.templates || [])
+              .then((data) => data.templates || [])
           }
         />
         <ShipmentTemplatesTable
@@ -34,7 +34,7 @@ export default function ShipmentTemplatesPage() {
                   category: TemplateCategoryId.SAMPLE_DECLARATION,
                 },
               })
-              .then(data => data.templates || [])
+              .then((data) => data.templates || [])
           }
         />
       </SimpleTabs>

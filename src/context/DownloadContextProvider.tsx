@@ -16,7 +16,7 @@ import React, { useState, useContext, useRef } from 'react';
 
 import { UserContext } from './UserContextProvider';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     position: 'fixed',
     bottom: 0,
@@ -56,7 +56,7 @@ const DownloadMonitorDialog = ({
   const classes = useStyles();
   const [open, setOpen] = useState(true);
 
-  const handleToggle = () => setOpen(open => !open);
+  const handleToggle = () => setOpen((open) => !open);
 
   return (
     <Paper elevation={3} className={classes.root}>
@@ -70,7 +70,7 @@ const DownloadMonitorDialog = ({
         </ListItem>
         <Collapse in={open} timeout="auto">
           <List component="div" disablePadding>
-            {items.map(item => {
+            {items.map((item) => {
               return (
                 <ListItem key={item.id} className={classes.nestedItem}>
                   <ListItemIcon>
@@ -153,7 +153,7 @@ function generateLink(
 
 async function delayInTest() {
   if ('Cypress' in window) {
-    return new Promise(resolve => setTimeout(resolve, 250));
+    return new Promise((resolve) => setTimeout(resolve, 250));
   }
 }
 
@@ -167,7 +167,7 @@ export const DownloadContextProvider: React.FC = ({ children }) => {
 
   const cleanUpDownload = (id: string) => {
     pendingRequests.current.delete(id);
-    setInProgress(inProgress => inProgress.filter(item => item.id !== id));
+    setInProgress((inProgress) => inProgress.filter((item) => item.id !== id));
   };
 
   const cancelDownload = (id: string) => {
@@ -208,7 +208,7 @@ export const DownloadContextProvider: React.FC = ({ children }) => {
     const req = crossFetch(generateLink(type, ids), {
       signal: controller.signal,
     })
-      .then(async response => {
+      .then(async (response) => {
         await delayInTest();
         if (response.status !== 200) {
           return Promise.reject(await response.text());
@@ -217,7 +217,7 @@ export const DownloadContextProvider: React.FC = ({ children }) => {
         await promptDownload(response);
         cleanUpDownload(id);
       })
-      .catch(e => {
+      .catch((e) => {
         if (e.name !== 'AbortError') {
           enqueueSnackbar('Failed to download file', { variant: 'error' });
           console.error('Request failed:', e);
@@ -227,7 +227,7 @@ export const DownloadContextProvider: React.FC = ({ children }) => {
       });
 
     pendingRequests.current.set(id, { controller, req });
-    setInProgress(inProgress => [
+    setInProgress((inProgress) => [
       ...inProgress,
       { id, name, total: ids.length },
     ]);

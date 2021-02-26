@@ -16,9 +16,10 @@ import {
 } from 'generated/sdk';
 import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   submitButton: {
     marginLeft: theme.spacing(1),
   },
@@ -35,7 +36,7 @@ type ProposalTechnicalReviewProps = {
   data: CoreTechnicalReviewFragment | null | undefined;
   setReview: (data: CoreTechnicalReviewFragment) => void;
   id: number;
-  setFormDirty: (dirty: boolean) => void;
+  setFormDirty: FunctionType<void, boolean>;
   confirm: WithConfirmType;
 };
 

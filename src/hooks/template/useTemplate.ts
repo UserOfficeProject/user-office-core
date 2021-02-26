@@ -15,7 +15,7 @@ export function useTemplate(templateId: number) {
     setLoadingTemplate(true);
     api()
       .getTemplate({ templateId })
-      .then(data => {
+      .then((data) => {
         if (data.template) {
           setTemplate(data.template);
         }

@@ -30,7 +30,7 @@ export interface FormProps<ValueObjectType> {
   field: ValueObjectType;
   template: Template;
   dispatch: React.Dispatch<Event>;
-  closeMe: () => any;
+  closeMe: () => void;
 }
 
 export type FormComponent<ValueObjectType> = FunctionComponent<
@@ -47,14 +47,13 @@ export interface Renderers {
 export interface QuestionaryComponentDefinition {
   readonly dataType: DataType;
   readonly name: string;
-  readonly questionTemplateRelationForm: () => FormComponent<
-    QuestionTemplateRelation
-  >;
+  readonly questionTemplateRelationForm: () => FormComponent<QuestionTemplateRelation>;
   readonly questionForm: () => FormComponent<Question>;
   readonly questionaryComponent: (
     props: BasicComponentProps
   ) => JSX.Element | null;
   readonly renderers?: Renderers;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   readonly createYupValidationSchema: ((field: Answer) => object) | null;
   readonly getYupInitialValue: (props: {
     answer: Answer;
@@ -85,7 +84,7 @@ const registry = [
 Object.freeze(registry);
 
 const componentMap = new Map<DataType, QuestionaryComponentDefinition>();
-registry.forEach(definition =>
+registry.forEach((definition) =>
   componentMap.set(definition.dataType, definition)
 );
 

@@ -11,6 +11,7 @@ import { UserRole, ProposalStatus } from 'generated/sdk';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CreateUpdateProposalStatus from './CreateUpdateProposalStatus';
@@ -30,13 +31,14 @@ const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
     { title: 'Description', field: 'description' },
   ];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType
-  >(DefaultQueryParams);
+  const [
+    urlQueryParams,
+    setUrlQueryParams,
+  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const createModal = (
-    onUpdate: Function,
-    onCreate: Function,
+    onUpdate: FunctionType<void, [ProposalStatus | null]>,
+    onCreate: FunctionType<void, [ProposalStatus | null]>,
     editProposalStatus: ProposalStatus | null
   ) => (
     <CreateUpdateProposalStatus
@@ -54,10 +56,10 @@ const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
       .deleteProposalStatus({
         id: id,
       })
-      .then(resp => {
+      .then((resp) => {
         if (!resp.deleteProposalStatus.error) {
           const newObjectsArray = proposalStatuses.filter(
-            objectItem => objectItem.id !== id
+            (objectItem) => objectItem.id !== id
           );
           setProposalStatuses(newObjectsArray);
         }
@@ -86,7 +88,7 @@ const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
         urlQueryParams={urlQueryParams}
         setUrlQueryParams={setUrlQueryParams}
         actions={[
-          rowActionData => {
+          (rowActionData) => {
             return {
               icon: Delete,
               tooltip: 'Delete',

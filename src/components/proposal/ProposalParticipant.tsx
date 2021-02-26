@@ -24,7 +24,7 @@ export default function ProposalParticipant(props: {
   useEffect(() => {
     let unmounted = false;
     if (props.userId) {
-      loadBasicUserData(props.userId).then(user => {
+      loadBasicUserData(props.userId).then((user) => {
         if (unmounted) {
           return;
         }

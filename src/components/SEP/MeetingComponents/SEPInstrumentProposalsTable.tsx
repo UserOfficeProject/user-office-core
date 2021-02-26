@@ -22,7 +22,7 @@ import { getGrades, average } from 'utils/mathFunctions';
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';
 
 // NOTE: Some custom styles for row expand table.
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     '& tr:last-child td': {
       border: 'none',
@@ -76,7 +76,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     let allocationTimeSum = 0;
 
     return data
-      .map(proposalData => {
+      .map((proposalData) => {
         const proposalAverageScore =
           average(getGrades(proposalData.proposal.reviews) as number[]) || 0;
 
@@ -89,7 +89,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         a.proposalAverageScore > b.proposalAverageScore ? 1 : -1
       )
       .sort(sortByRankOrder)
-      .map(proposalData => {
+      .map((proposalData) => {
         const proposalAllocationTime =
           proposalData.sepTimeAllocation !== null
             ? proposalData.sepTimeAllocation
@@ -188,7 +188,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
 
   const onMeetingSubmitted = (data: AdministrationFormData) => {
     const newInstrumentProposalsData = instrumentProposalsData.map(
-      proposalData => {
+      (proposalData) => {
         if (proposalData.proposal.id === data.id) {
           return {
             ...proposalData,
@@ -240,7 +240,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         data={sortedProposalsWithAverageScore}
         isLoading={loadingInstrumentProposals}
         actions={[
-          rowData => ({
+          (rowData) => ({
             icon: ViewIcon,
             onClick: (event, data) => {
               setOpenProposalId((data as SepProposal).proposal.id);

@@ -20,7 +20,7 @@ export function useOrcIDInformation(authorizationCode?: string | null) {
     }
     api()
       .getOrcIDInformation({ authorizationCode })
-      .then(data => {
+      .then((data) => {
         setOrcData(data.getOrcIDInformation);
         setLoading(false);
       });

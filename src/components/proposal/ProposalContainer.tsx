@@ -25,6 +25,7 @@ import {
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
+import { FunctionType } from 'utils/utilTypes';
 
 import ProposalSummary from './ProposalSummary';
 
@@ -64,7 +65,7 @@ const proposalReducer = (
       const updatedStep = action.payload.questionaryStep as QuestionaryStep;
       if (draftState.proposal.questionary) {
         const stepIndex = draftState.proposal.questionary.steps.findIndex(
-          step => step.topic.id === updatedStep.topic.id
+          (step) => step.topic.id === updatedStep.topic.id
         );
         draftState.proposal.questionary.steps[stepIndex] = updatedStep;
       }
@@ -100,7 +101,7 @@ const createQuestionaryWizardStep = (
 
 const createReviewWizardStep = (): WizardStep => ({
   type: 'ProposalReview',
-  getMetadata: state => {
+  getMetadata: (state) => {
     const proposalState = state as ProposalSubmissionState;
     const lastProposalStep = proposalState.steps[state.steps.length - 1];
 
@@ -116,8 +117,8 @@ const createReviewWizardStep = (): WizardStep => ({
 
 export default function ProposalContainer(props: {
   proposal: ProposalSubsetSubmission;
-  proposalCreated?: (proposal: Proposal) => any;
-  proposalUpdated?: (proposal: Proposal) => any;
+  proposalCreated?: (proposal: Proposal) => void;
+  proposalUpdated?: (proposal: Proposal) => void;
 }) {
   const { api } = useDataApiWithFeedback();
   const { persistModel: persistProposalModel } = usePersistProposalModel();
@@ -167,7 +168,7 @@ export default function ProposalContainer(props: {
     } else {
       await api()
         .getProposal({ id: proposalState.proposal.id }) // or load blankQuestionarySteps if sample is null
-        .then(data => {
+        .then((data) => {
           if (data.proposal && data.proposal.questionary?.steps) {
             dispatch({
               type: EventType.PROPOSAL_LOADED,
@@ -191,7 +192,7 @@ export default function ProposalContainer(props: {
     getState,
     dispatch,
   }: MiddlewareInputParams<QuestionarySubmissionState, Event>) => {
-    return (next: Function) => async (action: Event) => {
+    return (next: FunctionType) => async (action: Event) => {
       next(action); // first update state/model
       const state = getState() as ProposalSubmissionState;
       switch (action.type) {
@@ -223,9 +224,14 @@ export default function ProposalContainer(props: {
     wizardSteps: createProposalWizardSteps(),
   };
 
-  const { state, dispatch } = QuestionarySubmissionModel<
-    ProposalSubmissionState
-  >(initialState, [handleEvents, persistProposalModel], proposalReducer);
+  const {
+    state,
+    dispatch,
+  } = QuestionarySubmissionModel<ProposalSubmissionState>(
+    initialState,
+    [handleEvents, persistProposalModel],
+    proposalReducer
+  );
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =

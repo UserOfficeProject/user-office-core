@@ -10,7 +10,7 @@ import { QuestionFormShell } from 'components/questionary/questionaryComponents/
 import { Question } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-export const QuestionBooleanForm: FormComponent<Question> = props => {
+export const QuestionBooleanForm: FormComponent<Question> = (props) => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
@@ -27,7 +27,7 @@ export const QuestionBooleanForm: FormComponent<Question> = props => {
         }),
       })}
     >
-      {formikProps => (
+      {() => (
         <>
           <Field
             name="naturalKey"

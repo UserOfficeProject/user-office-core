@@ -117,7 +117,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
         index={index}
         data={new QuestionItemAdapter(question)}
         dispatch={dispatch}
-        onClick={item => {
+        onClick={(item) => {
           const isAltDown = (window.event as MouseEvent)?.altKey;
 
           // NOTE: sortOrder is always 0 because we add at that position using alt key and after that you can reorder if you want.
@@ -181,8 +181,8 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             TransitionComponent={Fade}
           >
             {getQuestionaryComponentDefinitions()
-              .filter(definition => definition.creatable)
-              .map(definition => {
+              .filter((definition) => definition.creatable)
+              .map((definition) => {
                 return (
                   <MenuItem
                     className={classes.addQuestionMenuItem}

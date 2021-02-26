@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { FileMetaData } from 'models/FileUpload';
+import { FunctionType } from 'utils/utilTypes';
 
 export enum UPLOAD_STATE {
   PRISTINE,
@@ -30,7 +31,7 @@ export function useFileUpload() {
 
   const uploadFile = (
     file: File,
-    completeHandler: (data: FileMetaData) => any
+    completeHandler: FunctionType<void, FileMetaData>
   ) => {
     setState(UPLOAD_STATE.UPLOADING);
     const formData = new FormData();
@@ -39,7 +40,7 @@ export function useFileUpload() {
 
     xhr.upload.addEventListener(
       'progress',
-      event => {
+      (event) => {
         const percent = (event.loaded / event.total) * 100;
         setProgress(percent);
       },
@@ -48,7 +49,7 @@ export function useFileUpload() {
 
     xhr.addEventListener(
       'load',
-      event => {
+      (event) => {
         const { responseText, status } = event.currentTarget as XMLHttpRequest;
         try {
           if (status === 200 && responseText) {

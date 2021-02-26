@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import * as Yup from 'yup';
 
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -10,7 +9,7 @@ export function useNaturalKeySchema(initialValue: string) {
     .matches(/^[A-Za-z\d_]*$/, 'You can use letters, numbers and underscore')
     .max(128)
     .required('This field is required')
-    .test('checkDuplNaturalKey', 'This key is already used', function(value) {
+    .test('checkDuplNaturalKey', 'This key is already used', function (value) {
       if (!value) {
         return this.createError({ message: 'Please specify key' });
       }
@@ -21,7 +20,7 @@ export function useNaturalKeySchema(initialValue: string) {
       return new Promise((resolve, reject) => {
         api()
           .getIsNaturalKeyPresent({ naturalKey: value })
-          .then(responseWrap => {
+          .then((responseWrap) => {
             const response = responseWrap.isNaturalKeyPresent;
             if (response === null) {
               reject();

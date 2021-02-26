@@ -510,13 +510,13 @@ context('Instrument tests', () => {
 
     cy.get('[data-cy="timeAllocation"] input')
       .type('-123')
-      .trigger('blur');
+      .blur();
     cy.contains('Must be greater than or equal to');
 
     cy.get('[data-cy="timeAllocation"] input')
       .clear()
       .type('987654321')
-      .trigger('blur');
+      .blur();
     cy.contains('Must be less than or equal to');
 
     cy.get('[data-cy="timeAllocation"] input')
@@ -643,7 +643,9 @@ context('Instrument tests', () => {
       .find('[title="Show Instruments"]')
       .click();
 
-    cy.get('[data-cy="call-instrument-assignments-table"] [title="Delete"]').first().click()
+    cy.get('[data-cy="call-instrument-assignments-table"] [title="Delete"]')
+      .first()
+      .click();
 
     cy.get('[title="Save"]').click();
 

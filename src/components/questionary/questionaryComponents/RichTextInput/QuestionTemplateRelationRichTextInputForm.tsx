@@ -12,7 +12,9 @@ import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationRichTextInputForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationRichTextInputForm: FormComponent<QuestionTemplateRelation> = (
+  props
+) => {
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
@@ -27,7 +29,7 @@ export const QuestionTemplateRelationRichTextInputForm: FormComponent<QuestionTe
         }),
       })}
     >
-      {formikProps => (
+      {(formikProps) => (
         <>
           <QuestionExcerpt question={props.field.question} />
 

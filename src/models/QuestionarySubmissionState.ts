@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import produce from 'immer';
 import { Reducer } from 'react';
 
@@ -81,7 +82,7 @@ function getInitialStepIndex(state: QuestionarySubmissionState): number {
   const lastFinishedStep = state.wizardSteps
     .slice()
     .reverse()
-    .find(step => step.getMetadata(state, step.payload).isCompleted === true);
+    .find((step) => step.getMetadata(state, step.payload).isCompleted === true);
 
   if (!lastFinishedStep) {
     return 0;
@@ -101,7 +102,7 @@ export function QuestionarySubmissionModel<
   reducers?: (state: T, draftState: T, action: Event) => T
 ) {
   function reducer(state: T, action: Event) {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       switch (action.type) {
         case EventType.FIELD_CHANGED:
           const field = getFieldById(
@@ -152,7 +153,7 @@ export function QuestionarySubmissionModel<
         case EventType.QUESTIONARY_STEP_ANSWERED:
           const updatedStep = action.payload.questionaryStep as QuestionaryStep;
           const stepIndex = draftState.steps.findIndex(
-            step => step.topic.id === updatedStep.topic.id
+            (step) => step.topic.id === updatedStep.topic.id
           );
           draftState.steps[stepIndex] = updatedStep;
 
@@ -161,7 +162,7 @@ export function QuestionarySubmissionModel<
           break;
       }
 
-      // @ts-ignore-line
+      // @ts-expect-error
       draftState = reducers?.(state, draftState, action) || draftState;
     });
   }

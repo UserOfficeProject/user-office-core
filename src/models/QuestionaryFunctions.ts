@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
   Answer,
@@ -15,8 +14,8 @@ export type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 
 export function getTopicById(collection: AbstractCollection, topicId: number) {
-  // @ts-ignore-line
-  const step = collection.find(step => step.topic.id === topicId);
+  // @ts-expect-error
+  const step = collection.find((step) => step.topic.id === topicId);
 
   return step ? step : undefined;
 }
@@ -25,8 +24,8 @@ export function getQuestionaryStepByTopicId(
   collection: AbstractCollection,
   topicId: number
 ) {
-  // @ts-ignore-line
-  return collection.find(step => step.topic.id === topicId);
+  // @ts-expect-error
+  return collection.find((step) => step.topic.id === topicId);
 }
 
 export function getFieldById(
@@ -34,11 +33,11 @@ export function getFieldById(
   questionId: string
 ) {
   let needle: AbstractField | undefined;
-  // @ts-ignore-line
-  collection.every(step => {
+  // @ts-expect-error
+  collection.every((step) => {
     needle = step.fields.find(
-      // @ts-ignore-line
-      field => field.question.proposalQuestionId === questionId
+      // @ts-expect-error
+      (field) => field.question.proposalQuestionId === questionId
     );
 
     return needle === undefined;
@@ -49,8 +48,8 @@ export function getFieldById(
 
 export function getAllFields(collection: AbstractCollection) {
   let allFields = new Array<AbstractField>();
-  // @ts-ignore-line
-  collection.forEach(step => {
+  // @ts-expect-error
+  collection.forEach((step) => {
     allFields = allFields.concat(step.fields);
   });
 
@@ -95,11 +94,11 @@ export function areDependenciesSatisfied(
   }
 
   if (field.dependenciesOperator === DependenciesLogicOperator.OR) {
-    return field.dependencies.some(dependency =>
+    return field.dependencies.some((dependency) =>
       isDependencySatisfied(questionary, dependency)
     );
   } else {
-    return field.dependencies.every(dependency =>
+    return field.dependencies.every((dependency) =>
       isDependencySatisfied(questionary, dependency)
     );
   }
@@ -107,14 +106,14 @@ export function areDependenciesSatisfied(
 
 export function prepareAnswers(answers?: Answer[]): AnswerInput[] {
   if (answers) {
-    answers = answers.filter(answer => {
+    answers = answers.filter((answer) => {
       const definition = getQuestionaryComponentDefinition(
         answer.question.dataType
       );
 
       return !definition.readonly;
     });
-    const preparedAnswers = answers.map(answer => {
+    const preparedAnswers = answers.map((answer) => {
       return {
         questionId: answer.question.proposalQuestionId,
         value: JSON.stringify({ value: answer.value }),

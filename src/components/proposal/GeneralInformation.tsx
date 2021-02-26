@@ -11,7 +11,7 @@ import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 
 import ProposalContainer from './ProposalContainer';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end',

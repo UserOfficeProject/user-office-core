@@ -34,7 +34,7 @@ export function useProposalsData(filter: ProposalsFilter) {
             text,
           },
         })
-        .then(data => {
+        .then((data) => {
           if (unmounted) {
             return;
           }
@@ -57,7 +57,7 @@ export function useProposalsData(filter: ProposalsFilter) {
             text,
           },
         })
-        .then(data => {
+        .then((data) => {
           if (unmounted) {
             return;
           }

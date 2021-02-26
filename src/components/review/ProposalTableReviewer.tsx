@@ -78,7 +78,7 @@ const ProposalTableReviewer: React.FC = () => {
   ];
 
   const reviewData = userData
-    ? (userData.reviews.map(review => {
+    ? (userData.reviews.map((review) => {
         return {
           shortCode: review?.proposal?.shortCode,
           proposalId: review?.proposal?.id,
@@ -97,7 +97,7 @@ const ProposalTableReviewer: React.FC = () => {
 
       const userDataUpdated = {
         ...userData,
-        reviews: userData?.reviews.map(review => {
+        reviews: userData?.reviews.map((review) => {
           if (review.id === currentReview?.id) {
             return {
               ...review,
@@ -145,7 +145,7 @@ const ProposalTableReviewer: React.FC = () => {
             tooltip: 'Download proposals',
             onClick: (event, rowData) => {
               downloadPDFProposal(
-                (rowData as UserWithReview[]).map(row => row.proposalId),
+                (rowData as UserWithReview[]).map((row) => row.proposalId),
                 (rowData as UserWithReview[])[0].title
               );
             },

@@ -24,7 +24,7 @@ export default function UpdateUserRoles(props: { id: number }) {
   const sendUpdateRoles = async (newRoles: Role[]) => {
     const variables = {
       id: props.id,
-      roles: newRoles.map(role => role.id),
+      roles: newRoles.map((role) => role.id),
     };
 
     await api('Roles updated successfully!').updateUserRoles(variables);
@@ -44,7 +44,7 @@ export default function UpdateUserRoles(props: { id: number }) {
   const removeRole = (role: Pick<Role, 'id' | 'title'>) => {
     const newRoles = [...roles];
     newRoles.splice(
-      newRoles.findIndex(element => role.id === element.id),
+      newRoles.findIndex((element) => role.id === element.id),
       1
     );
     setRoles(newRoles);
@@ -56,7 +56,7 @@ export default function UpdateUserRoles(props: { id: number }) {
     const getUserInformation = () => {
       api()
         .getUserWithRoles({ id: props.id })
-        .then(data => {
+        .then((data) => {
           if (data?.user) {
             setUserData({ ...data.user });
             setRoles(data.user.roles);
@@ -88,8 +88,8 @@ export default function UpdateUserRoles(props: { id: number }) {
           search: false,
         }}
         editable={{
-          onRowDelete: oldData =>
-            new Promise<void>(async resolve => {
+          onRowDelete: (oldData) =>
+            new Promise<void>(async (resolve) => {
               const newRoles = removeRole(oldData);
               await sendUpdateRoles(newRoles);
               resolve();

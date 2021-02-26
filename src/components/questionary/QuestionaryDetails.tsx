@@ -15,7 +15,7 @@ import {
 
 import { getQuestionaryComponentDefinition } from './QuestionaryComponentRegistry';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   label: {
     paddingLeft: 0,
   },
@@ -48,7 +48,7 @@ function QuestionaryDetails(
   }
 
   const allQuestions = getAllFields(questionary.steps) as Answer[];
-  const displayableQuestions = allQuestions.filter(field => {
+  const displayableQuestions = allQuestions.filter((field) => {
     const definition = getQuestionaryComponentDefinition(
       field.question.dataType
     );
@@ -84,7 +84,7 @@ function QuestionaryDetails(
           )}
 
           {/* questionary details */}
-          {displayableQuestions.map(question => {
+          {displayableQuestions.map((question) => {
             const renderers = getQuestionaryComponentDefinition(
               question.question.dataType
             ).renderers;

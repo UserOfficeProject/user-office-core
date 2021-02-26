@@ -12,7 +12,7 @@ import React, { useState } from 'react';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { NumberInputConfig } from 'generated/sdk';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   unitField: {
     paddingRight: theme.spacing(1),
     alignSelf: 'flex-end',
@@ -51,7 +51,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
   const unitFieldId = `${proposalQuestionId}.unit`;
 
   const getNumberOrDefault = (
-    input: any,
+    input: string,
     defaultValue: AcceptableUserInput
   ) => {
     const maybeNumber = parseFloat(input);
@@ -73,7 +73,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
         <Select
           label="Unit"
           value={stateValue.unit}
-          onChange={e => {
+          onChange={(e) => {
             const newState = { ...stateValue, unit: e.target.value as string };
             setStateValue(newState);
             onComplete(newState);
@@ -82,7 +82,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
           data-cy={unitFieldId}
           className="MuiFormControl-marginDense"
         >
-          {config.units!.map(unit => (
+          {config.units?.map((unit) => (
             <MenuItem value={unit} key={unit}>
               {unit}
             </MenuItem>
@@ -116,7 +116,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
         <Grid item xs={2} className={classes.unitField}>
           <TextField
             label="Value"
-            onChange={e =>
+            onChange={(e) =>
               setStateValue({
                 ...stateValue,
                 value: getNumberOrDefault(e.target.value, stateValue.value),
