@@ -44,7 +44,8 @@ export class Proposal {
     public commentForUser: string,
     public commentForManagement: string,
     public notified: boolean,
-    public submitted: boolean
+    public submitted: boolean,
+    public referenceNumberSequence: number
   ) {}
 }
 

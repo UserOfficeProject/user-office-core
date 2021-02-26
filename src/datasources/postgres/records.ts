@@ -60,6 +60,7 @@ export interface ProposalRecord {
   readonly comment_for_management: string;
   readonly notified: boolean;
   readonly submitted: boolean;
+  readonly reference_number_sequence: number;
 }
 
 export interface ProposalViewRecord {
@@ -478,7 +479,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.comment_for_user,
     proposal.comment_for_management,
     proposal.notified,
-    proposal.submitted
+    proposal.submitted,
+    proposal.reference_number_sequence
   );
 };
 

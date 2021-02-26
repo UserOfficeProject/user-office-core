@@ -36,7 +36,8 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.commentForUser || 'comment for user',
     values?.commentForManagement || 'comment for management',
     values?.notified || false,
-    values?.submitted || false
+    values?.submitted || false,
+    values?.referenceNumberSequence || 0
   );
 };
 
