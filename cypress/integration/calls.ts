@@ -313,7 +313,9 @@ context('Calls tests', () => {
       .first()
       .click();
 
-    cy.get('[data-cy="call-instrument-assignments-table"] [title="Delete"]').first().click()
+    cy.get('[data-cy="call-instrument-assignments-table"] [title="Delete"]')
+      .first()
+      .click();
 
     cy.get('[title="Save"]').click();
 
@@ -424,39 +426,40 @@ context('Calls tests', () => {
     cy.get('[title="Save"]').click();
 
     cy.notification({ variant: 'success', text: 'Call deleted successfully' });
-  it('User officer can filter calls by their status', () => {
-    cy.login('officer');
-    cy.contains('Calls').click();
+    it('User officer can filter calls by their status', () => {
+      cy.login('officer');
+      cy.contains('Calls').click();
 
-    cy.get('[data-cy="call-status-filter"]').click();
-    cy.get('[role="listbox"]')
-      .contains('Active')
-      .click();
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]')
+        .contains('Active')
+        .click();
 
-    cy.finishedLoading();
+      cy.finishedLoading();
 
-    cy.contains(call1.shortCode);
-    cy.contains(call2.shortCode);
+      cy.contains(call1.shortCode);
+      cy.contains(call2.shortCode);
 
-    cy.get('[data-cy="call-status-filter"]').click();
-    cy.get('[role="listbox"]')
-      .contains('Inactive')
-      .click();
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]')
+        .contains('Inactive')
+        .click();
 
-    cy.finishedLoading();
+      cy.finishedLoading();
 
-    cy.contains('No records to display');
-    cy.contains(call1.shortCode).should('not.exist');
-    cy.contains(call2.shortCode).should('not.exist');
+      cy.contains('No records to display');
+      cy.contains(call1.shortCode).should('not.exist');
+      cy.contains(call2.shortCode).should('not.exist');
 
-    cy.get('[data-cy="call-status-filter"]').click();
-    cy.get('[role="listbox"]')
-      .contains('All')
-      .click();
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]')
+        .contains('All')
+        .click();
 
-    cy.finishedLoading();
+      cy.finishedLoading();
 
-    cy.contains(call1.shortCode);
-    cy.contains(call2.shortCode);
+      cy.contains(call1.shortCode);
+      cy.contains(call2.shortCode);
+    });
   });
 });
