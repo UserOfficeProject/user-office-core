@@ -75,9 +75,7 @@ context('Settings tests', () => {
 
       lastPageButtonElement.click({ force: true });
 
-      cy.get('[title="Edit"]')
-        .last()
-        .click();
+      cy.get('[title="Edit"]').last().click();
 
       cy.get('#shortCode').should('be.disabled');
 
@@ -113,9 +111,7 @@ context('Settings tests', () => {
 
       lastPageButtonElement.click({ force: true });
 
-      cy.get('[title="Delete"]')
-        .last()
-        .click();
+      cy.get('[title="Delete"]').last().click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -164,18 +160,12 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.get('[title="Edit"]')
-        .last()
-        .click();
+      cy.get('[title="Edit"]').last().click();
 
       cy.contains('Edit').click();
 
-      cy.get('#name')
-        .clear()
-        .type(name);
-      cy.get('#description')
-        .clear()
-        .type(description);
+      cy.get('#name').clear().type(name);
+      cy.get('#description').clear().type(description);
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({ variant: 'success', text: 'updated successfully' });
@@ -191,9 +181,7 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.get('[title="Edit"]')
-        .last()
-        .click();
+      cy.get('[title="Edit"]').last().click();
 
       cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').dragElement([
         { direction: 'left', length: 1 },
@@ -219,9 +207,7 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.get('[title="Edit"]')
-        .last()
-        .click();
+      cy.get('[title="Edit"]').last().click();
 
       cy.get('[data-cy="connection_DRAFT_1"]').click();
 
@@ -281,7 +267,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="status_SEP_SELECTION_4"]').dragElement([
         { direction: 'left', length: 1 },
-        { direction: 'down', length: 1 },
+        { direction: 'down', length: 2 },
       ]);
 
       cy.get('[data-cy="connection_SEP_SELECTION_4"]').should(
@@ -298,7 +284,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="status_SEP_REVIEW_5"]').dragElement([
         { direction: 'left', length: 1 },
-        { direction: 'down', length: 1 },
+        { direction: 'down', length: 3 },
       ]);
 
       cy.get('[data-cy="connection_SEP_REVIEW_5"]').should(
@@ -358,17 +344,13 @@ context('Settings tests', () => {
 
       cy.contains('Calls').click();
 
-      cy.get('[title="Edit"]')
-        .first()
-        .click();
+      cy.get('[title="Edit"]').first().click();
 
       cy.get('#mui-component-select-proposalWorkflowId').click();
 
       cy.contains('Loading...').should('not.exist');
 
-      cy.get('[role="presentation"] [role="listbox"] li')
-        .last()
-        .click();
+      cy.get('[role="presentation"] [role="listbox"] li').last().click();
 
       cy.get('[data-cy="next-step"]').click();
 
@@ -393,7 +375,7 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then(element => expect(element.text()).to.contain('draft'));
+        .then((element) => expect(element.text()).to.contain('draft'));
 
       cy.get('.MuiTable-root tbody tr')
         .first()
@@ -410,7 +392,7 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then(element => expect(element.text()).to.contain('submitted'));
+        .then((element) => expect(element.text()).to.contain('submitted'));
 
       cy.logout();
       cy.login('officer');
@@ -419,28 +401,20 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then(element =>
+        .then((element) =>
           expect(element.text()).to.contain('FEASIBILITY_REVIEW')
         );
 
-      cy.get('[data-cy="view-proposal"]')
-        .first()
-        .click();
+      cy.get('[data-cy="view-proposal"]').first().click();
       cy.contains('Technical').click();
 
-      cy.get('[data-cy="timeAllocation"] input')
-        .clear()
-        .type('20');
+      cy.get('[data-cy="timeAllocation"] input').clear().type('20');
 
       cy.get('[data-cy="technical-review-status"]').click();
       cy.contains('Feasible').click();
 
-      cy.get('[data-cy="comment"] textarea')
-        .first()
-        .type(internalComment);
-      cy.get('[data-cy="publicComment"] textarea')
-        .first()
-        .type(publicComment);
+      cy.get('[data-cy="comment"] textarea').first().type(internalComment);
+      cy.get('[data-cy="publicComment"] textarea').first().type(publicComment);
 
       cy.contains('Submit').click();
 
@@ -461,21 +435,13 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[type="checkbox"]')
-        .first()
-        .check();
+      cy.get('[type="checkbox"]').first().check();
 
-      cy.get("[title='Assign proposals to SEP']")
-        .first()
-        .click();
+      cy.get("[title='Assign proposals to SEP']").first().click();
 
-      cy.get("[id='mui-component-select-selectedSEPId']")
-        .first()
-        .click();
+      cy.get("[id='mui-component-select-selectedSEPId']").first().click();
 
-      cy.get("[id='menu-selectedSEPId'] li")
-        .first()
-        .click();
+      cy.get("[id='menu-selectedSEPId'] li").first().click();
 
       cy.contains('Assign to SEP').click();
 
@@ -501,11 +467,11 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody')
         .first()
-        .then(element => expect(element.text()).to.contain('DRAFT'));
+        .then((element) => expect(element.text()).to.contain('DRAFT'));
 
       cy.get('.MuiTable-root tbody')
         .first()
-        .then(element => expect(element.text()).to.contain('SEP_REVIEW'));
+        .then((element) => expect(element.text()).to.contain('SEP_REVIEW'));
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="5"]').click();
@@ -514,7 +480,7 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then(element => expect(element.text()).to.contain('SEP_REVIEW'));
+        .then((element) => expect(element.text()).to.contain('SEP_REVIEW'));
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="1"]').click();
@@ -523,7 +489,7 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then(element => expect(element.text()).to.contain('DRAFT'));
+        .then((element) => expect(element.text()).to.contain('DRAFT'));
     });
 
     it('User Officer should be able to split workflow into two or more paths', () => {
@@ -532,9 +498,7 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.get('[title="Edit"]')
-        .last()
-        .click();
+      cy.get('[title="Edit"]').last().click();
 
       cy.contains('Add multicolumn row').click();
 
@@ -583,13 +547,9 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.get('[title="Edit"]')
-        .last()
-        .click();
+      cy.get('[title="Edit"]').last().click();
 
-      cy.get('[data-cy="remove-workflow-status-button"]')
-        .first()
-        .click();
+      cy.get('[data-cy="remove-workflow-status-button"]').first().click();
 
       cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').should(
         'contain.text',
@@ -651,7 +611,7 @@ context('Settings tests', () => {
 
       cy.get('#accessToken')
         .invoke('val')
-        .then(accessToken => {
+        .then((accessToken) => {
           cy.request({
             method: 'POST',
             url: '/graphql',
@@ -661,7 +621,7 @@ context('Settings tests', () => {
             auth: {
               bearer: (accessToken as string).split(' ')[1],
             },
-          }).then(response => {
+          }).then((response) => {
             expect(response.headers['content-type']).to.contain(
               'application/json'
             );
@@ -696,7 +656,7 @@ context('Settings tests', () => {
 
       cy.get('#accessToken')
         .invoke('val')
-        .then(accessToken => {
+        .then((accessToken) => {
           removedAccessToken = accessToken as string;
           cy.request({
             method: 'POST',
@@ -707,7 +667,7 @@ context('Settings tests', () => {
             auth: {
               bearer: removedAccessToken.split(' ')[1],
             },
-          }).then(response => {
+          }).then((response) => {
             expect(response.headers['content-type']).to.contain(
               'application/json'
             );
@@ -742,7 +702,7 @@ context('Settings tests', () => {
           bearer: removedAccessToken.split(' ')[1],
         },
         failOnStatusCode: false,
-      }).then(response => {
+      }).then((response) => {
         expect(response.status).to.be.equal(500);
         expect(response.body.errors[0].message).to.contain(
           'Could not find permission rules for access token key'
