@@ -1,0 +1,47 @@
+mutation cloneProposal($proposalToCloneId: Int!, $callId: Int!) {
+  cloneProposal(
+    cloneProposalInput: {
+      proposalToCloneId: $proposalToCloneId
+      callId: $callId
+    }
+  ) {
+    proposal {
+      ...proposal
+      proposer {
+        ...basicUserDetails
+      }
+      users {
+        ...basicUserDetails
+      }
+      questionary {
+        ...questionary
+      }
+      technicalReview {
+        ...coreTechnicalReview
+      }
+      reviews {
+        id
+        grade
+        comment
+        status
+        userID
+        sepID
+        reviewer {
+          firstname
+          lastname
+          id
+        }
+      }
+      instrument {
+        id
+        name
+        shortCode
+      }
+      call {
+        id
+        shortCode
+      }
+    }
+    error
+  }
+}

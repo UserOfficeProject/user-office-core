@@ -5,6 +5,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Delete from '@material-ui/icons/Delete';
 import Email from '@material-ui/icons/Email';
+import FileCopy from '@material-ui/icons/FileCopy';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import GridOnIcon from '@material-ui/icons/GridOn';
 import GroupWork from '@material-ui/icons/GroupWork';
@@ -20,9 +21,11 @@ import ScienceIconRemove from 'components/common/icons/ScienceIconRemove';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
 import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
 import {
+  Call,
   Instrument,
   ProposalsFilter,
   ProposalsToInstrumentArgs,
+  Review,
   Sep,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -34,9 +37,11 @@ import {
 } from 'hooks/proposal/useProposalsCoreData';
 import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
+import { average, getGrades, standardDeviation } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
+import CallSelectModalOnProposalClone from './CallSelectModalOnProposalClone';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
 import RankInput from './RankInput';
 
@@ -63,6 +68,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
     ProposalViewData[]
   >([]);
+  const [openCallSelection, setOpenCallSelection] = useState(false);
+  const [proposalToCloneId, setProposalToCloneId] = useState<number | null>(
+    null
+  );
 
   const downloadPDFProposal = useDownloadPDFProposal();
   const downloadXLSXProposal = useDownloadXLSXProposal();
@@ -167,6 +176,18 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               <Visibility />
             </IconButton>
           </Link>
+        </Tooltip>
+        <Tooltip title="Clone proposal">
+          <IconButton
+            data-cy="clone-proposal"
+            onClick={() => {
+              setProposalToCloneId(rowData.id);
+              setOpenCallSelection(true);
+            }}
+            style={iconButtonStyle}
+          >
+            <FileCopy />
+          </IconButton>
         </Tooltip>
         <Tooltip title="Download proposal as pdf">
           <IconButton
@@ -424,13 +445,63 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     }
   };
 
+  const cloneProposalToCall = async (call: Call) => {
+    setProposalToCloneId(null);
+
+    if (!call?.id || !proposalToCloneId) {
+      return;
+    }
+
+    const result = await api('Proposal cloned successfully').cloneProposal({
+      callId: call.id,
+      proposalToCloneId,
+    });
+
+    const resultProposal = result.cloneProposal.proposal;
+
+    if (!result.cloneProposal.error && proposalsData && resultProposal) {
+      const newClonedProposal: ProposalViewData = {
+        id: resultProposal.id,
+        title: resultProposal.title,
+        status: resultProposal.status?.name || '',
+        statusId: resultProposal.status?.id || 1,
+        statusName: resultProposal.status?.name || '',
+        statusDescription: resultProposal.status?.description || '',
+        submitted: resultProposal.submitted,
+        shortCode: resultProposal.shortCode,
+        rankOrder: resultProposal.rankOrder,
+        finalStatus: resultProposal.finalStatus,
+        timeAllocation: resultProposal.technicalReview?.timeAllocation || null,
+        technicalStatus: resultProposal.technicalReview?.status || '',
+        instrumentName: resultProposal.instrument?.name || null,
+        instrumentId: resultProposal.instrument?.id || null,
+        reviewAverage:
+          average(getGrades(resultProposal.reviews as Review[])) || null,
+        reviewDeviation:
+          standardDeviation(getGrades(resultProposal.reviews as Review[])) ||
+          null,
+        sepCode: '',
+        callShortCode: resultProposal.call?.shortCode || null,
+        notified: resultProposal.notified,
+        callId: resultProposal.callId,
+      };
+
+      const newProposalsData = [newClonedProposal, ...proposalsData];
+
+      setProposalsData(newProposalsData);
+    }
+  };
+
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
   const DeleteIcon = (): JSX.Element => <Delete />;
   const GroupWorkIcon = (): JSX.Element => <GroupWork />;
   const EmailIcon = (): JSX.Element => <Email />;
-  const AddScienceIcon = (props?: any): JSX.Element => (
-    <ScienceIconAdd {...props} />
-  );
+  const AddScienceIcon = (
+    props: JSX.IntrinsicAttributes & {
+      children?: React.ReactNode;
+      'data-cy'?: string;
+    }
+  ): JSX.Element => <ScienceIconAdd {...props} />;
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
 
   columns = setSortDirectionOnSortColumn(
@@ -467,6 +538,19 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             callIds={selectedProposals.map(
               (selectedProposal) => selectedProposal.callId
             )}
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openCallSelection}
+        onClose={(): void => setOpenCallSelection(false)}
+      >
+        <DialogContent>
+          <CallSelectModalOnProposalClone
+            cloneProposalToCall={cloneProposalToCall}
+            close={(): void => setOpenCallSelection(false)}
           />
         </DialogContent>
       </Dialog>
@@ -607,12 +691,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             position: 'toolbarOnSelect',
           },
         ]}
-        onChangeColumnHidden={(collumnChange) => {
+        onChangeColumnHidden={(columnChange) => {
           const proposalColumns = columns.map(
             (proposalColumn: Column<ProposalViewData>) => ({
               hidden:
-                proposalColumn.title === collumnChange.title
-                  ? collumnChange.hidden
+                proposalColumn.title === columnChange.title
+                  ? columnChange.hidden
                   : proposalColumn.hidden,
               title: proposalColumn.title,
             })
