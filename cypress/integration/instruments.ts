@@ -23,55 +23,6 @@ context('Instrument tests', () => {
     cy.notification({ variant: 'success', text: 'created successfully' });
   }
 
-  function createCall({
-    shortCode,
-    startDate,
-    endDate,
-  }: {
-    shortCode: string;
-    startDate: string;
-    endDate: string;
-  }) {
-    cy.contains('Calls').click();
-
-    cy.contains('Create').click();
-
-    cy.get('[data-cy=short-code] input')
-      .type(shortCode)
-      .should('have.value', shortCode);
-
-    cy.get('[data-cy=start-date] input').clear();
-    cy.get('[data-cy=start-date] input')
-      .type(startDate)
-      .should('have.value', startDate);
-
-    cy.get('[data-cy=end-date] input').clear();
-    cy.get('[data-cy=end-date] input')
-      .type(endDate)
-      .should('have.value', endDate);
-
-    cy.get('[data-cy="call-template"]').click();
-    cy.contains('default template').click();
-
-    cy.get('[data-cy="next-step"]').click();
-
-    cy.get('[data-cy=survey-comment] input').type(
-      faker.random.word().split(' ')[0]
-    );
-
-    cy.get('[data-cy="next-step"]').click();
-
-    cy.get('[data-cy=cycle-comment] input').type(
-      faker.random.word().split(' ')[0]
-    );
-
-    cy.get('[data-cy="submit"]').click();
-
-    cy.notification({ variant: 'success', text: 'successfully' });
-
-    cy.contains(shortCode);
-  }
-
   function assignInstrumentToCall(call: string, instrument: string) {
     cy.contains(call).parent().find('[title="Assign Instrument"]').click();
 
@@ -137,6 +88,7 @@ context('Instrument tests', () => {
     shortCode: faker.random.alphaNumeric(10),
     startDate: faker.date.past().toISOString().slice(0, 10),
     endDate: faker.date.future().toISOString().slice(0, 10),
+    template: 'default template',
   };
 
   before(() => {
@@ -199,7 +151,7 @@ context('Instrument tests', () => {
 
     cy.contains('Calls').click();
 
-    createCall(call2);
+    cy.createCall(call2);
 
     cy.logout();
 
@@ -456,10 +408,7 @@ context('Instrument tests', () => {
     cy.get('[data-cy="timeAllocation"] input').type('-123').blur();
     cy.contains('Must be greater than or equal to');
 
-    cy.get('[data-cy="timeAllocation"] input')
-      .clear()
-      .type('987654321')
-      .blur();
+    cy.get('[data-cy="timeAllocation"] input').clear().type('987654321').blur();
     cy.contains('Must be less than or equal to');
 
     cy.get('[data-cy="timeAllocation"] input').clear().type('20');

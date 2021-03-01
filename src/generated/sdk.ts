@@ -174,6 +174,11 @@ export type CheckExternalTokenWrap = {
   token: Maybe<Scalars['String']>;
 };
 
+export type CloneProposalInput = {
+  callId: Scalars['Int'];
+  proposalToCloneId: Scalars['Int'];
+};
+
 export type CreateApiAccessTokenInput = {
   name: Scalars['String'];
   accessPermissions: Scalars['String'];
@@ -311,7 +316,8 @@ export enum Event {
   SEP_PROPOSAL_REMOVED = 'SEP_PROPOSAL_REMOVED',
   SEP_MEMBER_ASSIGNED_TO_PROPOSAL = 'SEP_MEMBER_ASSIGNED_TO_PROPOSAL',
   SEP_MEMBER_REMOVED_FROM_PROPOSAL = 'SEP_MEMBER_REMOVED_FROM_PROPOSAL',
-  PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED'
+  PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED',
+  PROPOSAL_CLONED = 'PROPOSAL_CLONED'
 }
 
 export type EventLog = {
@@ -475,6 +481,7 @@ export type Mutation = {
   setInstrumentAvailabilityTime: SuccessResponseWrap;
   submitInstrument: SuccessResponseWrap;
   administrationProposal: ProposalResponseWrap;
+  cloneProposal: ProposalResponseWrap;
   updateProposal: ProposalResponseWrap;
   addNextStatusEventsToConnection: ProposalNextStatusEventResponseWrap;
   addProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
@@ -672,6 +679,11 @@ export type MutationAdministrationProposalArgs = {
   finalStatus?: Maybe<ProposalEndStatus>;
   statusId?: Maybe<Scalars['Int']>;
   rankOrder?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationCloneProposalArgs = {
+  cloneProposalInput: CloneProposalInput;
 };
 
 
@@ -1311,7 +1323,7 @@ export enum ProposalEndStatus {
 export type ProposalEvent = {
   __typename?: 'ProposalEvent';
   name: Event;
-  description: Scalars['String'];
+  description: Maybe<Scalars['String']>;
 };
 
 export type ProposalNextStatusEventResponseWrap = {
@@ -3337,6 +3349,50 @@ export type AdministrationProposalMutation = (
   ) }
 );
 
+export type CloneProposalMutationVariables = Exact<{
+  proposalToCloneId: Scalars['Int'];
+  callId: Scalars['Int'];
+}>;
+
+
+export type CloneProposalMutation = (
+  { __typename?: 'Mutation' }
+  & { cloneProposal: (
+    { __typename?: 'ProposalResponseWrap' }
+    & Pick<ProposalResponseWrap, 'error'>
+    & { proposal: Maybe<(
+      { __typename?: 'Proposal' }
+      & { proposer: Maybe<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )>, users: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )>, questionary: Maybe<(
+        { __typename?: 'Questionary' }
+        & QuestionaryFragment
+      )>, technicalReview: Maybe<(
+        { __typename?: 'TechnicalReview' }
+        & CoreTechnicalReviewFragment
+      )>, reviews: Maybe<Array<(
+        { __typename?: 'Review' }
+        & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
+        & { reviewer: Maybe<(
+          { __typename?: 'BasicUserDetails' }
+          & Pick<BasicUserDetails, 'firstname' | 'lastname' | 'id'>
+        )> }
+      )>>, instrument: Maybe<(
+        { __typename?: 'Instrument' }
+        & Pick<Instrument, 'id' | 'name' | 'shortCode'>
+      )>, call: Maybe<(
+        { __typename?: 'Call' }
+        & Pick<Call, 'id' | 'shortCode'>
+      )> }
+      & ProposalFragment
+    )> }
+  ) }
+);
+
 export type CreateProposalMutationVariables = Exact<{
   callId: Scalars['Int'];
 }>;
@@ -5245,6 +5301,9 @@ export type GetUserProposalsQuery = (
       )>, proposer: Maybe<(
         { __typename?: 'BasicUserDetails' }
         & Pick<BasicUserDetails, 'id'>
+      )>, call: Maybe<(
+        { __typename?: 'Call' }
+        & Pick<Call, 'id' | 'shortCode'>
       )> }
     )> }
   )> }
@@ -6505,6 +6564,53 @@ export const AdministrationProposalDocument = gql`
   }
 }
     `;
+export const CloneProposalDocument = gql`
+    mutation cloneProposal($proposalToCloneId: Int!, $callId: Int!) {
+  cloneProposal(cloneProposalInput: {proposalToCloneId: $proposalToCloneId, callId: $callId}) {
+    proposal {
+      ...proposal
+      proposer {
+        ...basicUserDetails
+      }
+      users {
+        ...basicUserDetails
+      }
+      questionary {
+        ...questionary
+      }
+      technicalReview {
+        ...coreTechnicalReview
+      }
+      reviews {
+        id
+        grade
+        comment
+        status
+        userID
+        sepID
+        reviewer {
+          firstname
+          lastname
+          id
+        }
+      }
+      instrument {
+        id
+        name
+        shortCode
+      }
+      call {
+        id
+        shortCode
+      }
+    }
+    error
+  }
+}
+    ${ProposalFragmentDoc}
+${BasicUserDetailsFragmentDoc}
+${QuestionaryFragmentDoc}
+${CoreTechnicalReviewFragmentDoc}`;
 export const CreateProposalDocument = gql`
     mutation createProposal($callId: Int!) {
   createProposal(callId: $callId) {
@@ -7623,6 +7729,10 @@ export const GetUserProposalsDocument = gql`
       proposer {
         id
       }
+      call {
+        id
+        shortCode
+      }
     }
   }
 }
@@ -7901,6 +8011,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     administrationProposal(variables: AdministrationProposalMutationVariables): Promise<AdministrationProposalMutation> {
       return withWrapper(() => client.request<AdministrationProposalMutation>(print(AdministrationProposalDocument), variables));
+    },
+    cloneProposal(variables: CloneProposalMutationVariables): Promise<CloneProposalMutation> {
+      return withWrapper(() => client.request<CloneProposalMutation>(print(CloneProposalDocument), variables));
     },
     createProposal(variables: CreateProposalMutationVariables): Promise<CreateProposalMutation> {
       return withWrapper(() => client.request<CreateProposalMutation>(print(CreateProposalDocument), variables));

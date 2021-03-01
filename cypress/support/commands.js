@@ -50,14 +50,12 @@ const resetDB = () => {
   cy.wrap(request);
 };
 
-const navigateToTemplatesSubmenu = submenuName => {
+const navigateToTemplatesSubmenu = (submenuName) => {
   cy.contains('Templates').click();
-  cy.get(`[title='${submenuName}']`)
-    .first()
-    .click();
+  cy.get(`[title='${submenuName}']`).first().click();
 };
 
-const login = roleOrCredentials => {
+const login = (roleOrCredentials) => {
   const testCredentialStore = {
     user: {
       email: 'Javon4@hotmail.com',
@@ -115,7 +113,7 @@ const notification = ({ variant, text }) => {
 
   if (text) {
     if (text instanceof RegExp) {
-      notification.and($el => expect($el.text()).to.match(text));
+      notification.and(($el) => expect($el.text()).to.match(text));
     } else {
       notification.and('contains.text', text);
     }
@@ -129,7 +127,8 @@ const finishedLoading = () => {
 const createProposal = (
   proposalTitle = '',
   proposalAbstract = '',
-  call = ''
+  call = '',
+  proposer = ''
 ) => {
   const title = proposalTitle || faker.random.words(3);
   const abstract = proposalAbstract || faker.random.words(8);
@@ -140,35 +139,33 @@ const createProposal = (
     cy.contains(call).click();
   }
 
-  cy.get('[data-cy=title] input')
-    .type(title)
-    .should('have.value', title);
+  cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
   cy.get('[data-cy=abstract] textarea')
     .first()
     .type(abstract)
     .should('have.value', abstract);
 
+  if (proposer) {
+    cy.get('[data-cy=edit-proposer-button]').click();
+    cy.contains(proposer).parent().find("[title='Select user']").click();
+  }
+
   cy.contains('Save and continue').click();
 
   cy.notification({ variant: 'success', text: 'Saved' });
 };
 
-const createTopic = title => {
+const createTopic = (title) => {
   cy.get('[data-cy=show-more-button]').click();
 
   cy.get('[data-cy=add-topic-menu-item]').click();
 
   cy.wait(500);
 
-  cy.get('[data-cy=topic-title]')
-    .last()
-    .click();
+  cy.get('[data-cy=topic-title]').last().click();
 
-  cy.get('[data-cy=topic-title-input]')
-    .last()
-    .clear()
-    .type(`${title}{enter}`);
+  cy.get('[data-cy=topic-title-input]').last().clear().type(`${title}{enter}`);
 };
 
 function createTemplate(type, title, description) {
@@ -223,13 +220,9 @@ const createSampleQuestion = (
   minEntries,
   maxEntries
 ) => {
-  cy.get('[data-cy=show-more-button]')
-    .last()
-    .click();
+  cy.get('[data-cy=show-more-button]').last().click();
 
-  cy.get('[data-cy=add-question-menu-item]')
-    .last()
-    .click();
+  cy.get('[data-cy=add-question-menu-item]').last().click();
 
   cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
@@ -245,25 +238,81 @@ const createSampleQuestion = (
   cy.contains(templateName).click();
 
   if (minEntries) {
-    cy.get('[data-cy=min-entries] input')
-      .clear()
-      .type(minEntries);
+    cy.get('[data-cy=min-entries] input').clear().type(minEntries);
   }
 
   if (maxEntries) {
-    cy.get('[data-cy=max-entries] input')
-      .clear()
-      .type(maxEntries);
+    cy.get('[data-cy=max-entries] input').clear().type(maxEntries);
   }
 
   cy.contains('Save').click();
 };
 
+const createCall = ({
+  shortCode,
+  startDate,
+  endDate,
+  template,
+  workflow,
+  surveyComment,
+  cycleComment,
+}) => {
+  const callShortCode = shortCode || faker.random.word().split(' ')[0]; // faker random word is buggy, it ofter returns phrases
+  const callStartDate =
+    startDate || faker.date.past().toISOString().slice(0, 10);
+  const callEndDate = endDate || faker.date.future().toISOString().slice(0, 10);
+  const callSurveyComment = surveyComment || faker.random.word().split(' ')[0];
+  const callCycleComment = cycleComment || faker.random.word().split(' ')[0];
+
+  cy.contains('Calls').click();
+
+  cy.contains('Create').click();
+
+  cy.get('[data-cy=short-code] input')
+    .type(callShortCode)
+    .should('have.value', callShortCode);
+
+  cy.get('[data-cy=start-date] input')
+    .clear()
+    .type(callStartDate)
+    .should('have.value', callStartDate);
+
+  cy.get('[data-cy=end-date] input')
+    .clear()
+    .type(callEndDate)
+    .should('have.value', callEndDate);
+
+  if (template) {
+    cy.get('[data-cy="call-template"]').click();
+    cy.contains(template).click();
+  }
+
+  if (workflow) {
+    cy.get('#mui-component-select-proposalWorkflowId').click();
+
+    cy.contains('Loading...').should('not.exist');
+
+    cy.contains(workflow).click();
+  }
+
+  cy.get('[data-cy="next-step"]').click();
+
+  cy.get('[data-cy=survey-comment] input').clear().type(callSurveyComment);
+
+  cy.get('[data-cy="next-step"]').click();
+
+  cy.get('[data-cy=cycle-comment] input').clear().type(callCycleComment);
+
+  cy.get('[data-cy="submit"]').click();
+
+  cy.notification({ variant: 'success', text: 'successfully' });
+
+  cy.contains(callShortCode);
+};
+
 function changeActiveRole(role) {
   cy.get('[data-cy="profile-page-btn"]').click();
-  cy.get('[role="presentation"]')
-    .contains('Roles')
-    .click();
+  cy.get('[role="presentation"]').contains('Roles').click();
 
   cy.finishedLoading();
 
@@ -277,17 +326,11 @@ function changeActiveRole(role) {
 }
 
 function createBooleanQuestion(title) {
-  let questionId;
-
-  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-    .last()
-    .click();
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').last().click();
 
   cy.contains('Add Boolean').click();
 
-  cy.get('[data-cy=question]')
-    .clear()
-    .type(title);
+  cy.get('[data-cy=question]').clear().type(title);
 
   cy.contains('Save').click();
 
@@ -302,17 +345,11 @@ function createTextQuestion(
   isMultipleLines,
   minimumCharacters
 ) {
-  let questionId;
-
-  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-    .last()
-    .click();
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').last().click();
 
   cy.contains('Add Text Input').click();
 
-  cy.get('[data-cy=question]')
-    .clear()
-    .type(title);
+  cy.get('[data-cy=question]').clear().type(title);
 
   if (isRequired) {
     cy.contains('Is required').click();
@@ -335,17 +372,11 @@ function createTextQuestion(
 }
 
 function createDateQuestion(title) {
-  let questionId;
-
-  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-    .last()
-    .click();
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').last().click();
 
   cy.contains('Add Date').click();
 
-  cy.get('[data-cy=question]')
-    .clear()
-    .type(title);
+  cy.get('[data-cy=question]').clear().type(title);
 
   cy.contains('Is required').click();
 
@@ -357,17 +388,11 @@ function createDateQuestion(title) {
 }
 
 function createMultipleChoiceQuestion(title, option1, option2, option3) {
-  let questionId;
-
-  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-    .last()
-    .click();
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').last().click();
 
   cy.contains('Add Multiple choice').click();
 
-  cy.get('[data-cy=question]')
-    .clear()
-    .type(title);
+  cy.get('[data-cy=question]').clear().type(title);
 
   cy.contains('Radio').click();
 
@@ -377,21 +402,15 @@ function createMultipleChoiceQuestion(title, option1, option2, option3) {
 
   cy.contains('Items').click();
 
-  cy.get('[data-cy=add-answer-button]')
-    .closest('button')
-    .click();
+  cy.get('[data-cy=add-answer-button]').closest('button').click();
   cy.get('[placeholder=Answer]').type(option1);
   cy.get('[title="Save"]').click();
 
-  cy.get('[data-cy=add-answer-button]')
-    .closest('button')
-    .click();
+  cy.get('[data-cy=add-answer-button]').closest('button').click();
   cy.get('[placeholder=Answer]').type(option2);
   cy.get('[title="Save"]').click();
 
-  cy.get('[data-cy=add-answer-button]')
-    .closest('button')
-    .click();
+  cy.get('[data-cy=add-answer-button]').closest('button').click();
   cy.get('[placeholder=Answer]').type(option3);
   cy.get('[title="Save"]').click();
 
@@ -417,7 +436,7 @@ function presentationMode() {
     Cypress.Commands.overwrite(command, (originalFn, ...args) => {
       const origVal = originalFn(...args);
 
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve(origVal);
         }, COMMAND_DELAY);
@@ -441,6 +460,9 @@ Cypress.Commands.add('finishedLoading', finishedLoading);
 Cypress.Commands.add('createTemplate', createTemplate);
 
 Cypress.Commands.add('createProposal', createProposal);
+
+Cypress.Commands.add('createCall', createCall);
+
 Cypress.Commands.add(
   'dragElement',
   { prevSubject: 'element' },
