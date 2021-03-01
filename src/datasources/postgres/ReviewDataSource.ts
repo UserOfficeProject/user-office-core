@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { Review, ReviewStatus } from '../../models/Review';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { AddReviewArgs } from '../../resolvers/mutations/AddReviewMutation';
@@ -159,7 +158,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .from('SEP_Reviews')
       .where('proposal_id', id)
       .then((reviews: ReviewRecord[]) => {
-        return reviews.map(review => this.createReviewObject(review));
+        return reviews.map((review) => this.createReviewObject(review));
       });
   }
 
@@ -184,7 +183,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .from('SEP_Reviews')
       .where('user_id', id)
       .then((reviews: ReviewRecord[]) => {
-        return reviews.map(review => this.createReviewObject(review));
+        return reviews.map((review) => this.createReviewObject(review));
       });
   }
 }

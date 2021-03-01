@@ -114,7 +114,7 @@ export class AdminDataSourceMock implements AdminDataSource {
     args: UpdateApiAccessTokenInput
   ): Promise<Permissions> {
     const apiAccessToken = dummyApiAccessTokens.find(
-      accessToken => accessToken.id === args.accessTokenId
+      (accessToken) => accessToken.id === args.accessTokenId
     );
 
     if (!apiAccessToken) {

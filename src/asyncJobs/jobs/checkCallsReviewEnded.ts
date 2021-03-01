@@ -16,7 +16,7 @@ const checkCallsReviewEnded = async (dataSource: CallDataSource) => {
     const currentDate = new Date();
 
     const callsThatShouldEndReview = reviewNotEndedCalls.filter(
-      reviewNotEndedCall =>
+      (reviewNotEndedCall) =>
         reviewNotEndedCall.endReview.getTime() <= currentDate.getTime()
     );
 

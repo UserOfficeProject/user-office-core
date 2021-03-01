@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { randomBytes } from 'crypto';
 
 import * as Yup from 'yup';

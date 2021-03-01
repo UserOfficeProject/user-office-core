@@ -58,7 +58,7 @@ export default function factory() {
 
       baseContext.queries.user
         .getAgent(decoded.user.id)
-        .then(user => {
+        .then((user) => {
           if (!user) {
             return res.status(401).send('Unauthorized');
           }
@@ -69,7 +69,7 @@ export default function factory() {
           };
           next();
         })
-        .catch(e => {
+        .catch((e) => {
           logger.logException(defaultErrorMessage, e);
           res.status(500).send(defaultErrorMessage);
         });

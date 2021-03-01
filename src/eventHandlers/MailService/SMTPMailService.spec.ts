@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import * as path from 'path';
 
 import EmailSettings from './EmailSettings';

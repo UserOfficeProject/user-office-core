@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { Call } from '../../models/Call';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
@@ -75,7 +74,7 @@ export default class PostgresCallDataSource implements CallDataSource {
     }
 
     return query.then((callDB: CallRecord[]) =>
-      callDB.map(call => createCallObject(call))
+      callDB.map((call) => createCallObject(call))
     );
   }
 
@@ -148,7 +147,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   async assignInstrumentsToCall(
     args: AssignInstrumentsToCallInput
   ): Promise<Call> {
-    const valuesToInsert = args.instrumentIds.map(instrumentId => ({
+    const valuesToInsert = args.instrumentIds.map((instrumentId) => ({
       instrument_id: instrumentId,
       call_id: args.callId,
     }));

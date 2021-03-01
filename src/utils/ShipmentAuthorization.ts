@@ -39,7 +39,7 @@ export class ShipmentAuthorization {
 
     if (Array.isArray(shipmentId)) {
       return Promise.all(
-        shipmentId.map(id => this.hasAccessToShipment(agent, id))
+        shipmentId.map((id) => this.hasAccessToShipment(agent, id))
       );
     }
 

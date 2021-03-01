@@ -90,7 +90,7 @@ export const dummySEPMembers = [dummySEPMember, anotherDummySEPMember];
 
 export class SEPDataSourceMock implements SEPDataSource {
   async getMembers(sepId: number): Promise<SEPReviewer[]> {
-    return dummySEPMembers.filter(member => member.sepId === sepId);
+    return dummySEPMembers.filter((member) => member.sepId === sepId);
   }
 
   getUserSepBySepId(userId: number, sepId: number): Promise<SEP | null> {
@@ -100,7 +100,7 @@ export class SEPDataSourceMock implements SEPDataSource {
   async assignChairOrSecretaryToSEP(
     args: AssignChairOrSecretaryToSEPInput
   ): Promise<SEP> {
-    const sep = dummySEPs.find(element => element.id === args.sepId);
+    const sep = dummySEPs.find((element) => element.id === args.sepId);
 
     if (sep) {
       return sep;
@@ -110,7 +110,7 @@ export class SEPDataSourceMock implements SEPDataSource {
   }
 
   async assignReviewersToSEP(args: AssignReviewersToSEPArgs): Promise<SEP> {
-    const sep = dummySEPs.find(element => element.id === args.sepId);
+    const sep = dummySEPs.find((element) => element.id === args.sepId);
 
     if (sep) {
       return sep;
@@ -123,7 +123,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     args: UpdateMemberSEPArgs,
     isMemberChairOrSecretaryOfSEP: boolean
   ): Promise<SEP> {
-    const sep = dummySEPs.find(element => element.id === args.sepId);
+    const sep = dummySEPs.find((element) => element.id === args.sepId);
 
     if (sep) {
       return sep;
@@ -231,7 +231,7 @@ export class SEPDataSourceMock implements SEPDataSource {
 
     if (filter) {
       dummySEPsCopy = dummySEPsCopy.filter(
-        sep => sep.code.includes(filter) || sep.description.includes(filter)
+        (sep) => sep.code.includes(filter) || sep.description.includes(filter)
       );
     }
 
@@ -243,14 +243,14 @@ export class SEPDataSourceMock implements SEPDataSource {
     }
 
     if (active) {
-      dummySEPsCopy = dummySEPsCopy.filter(sep => sep.active);
+      dummySEPsCopy = dummySEPsCopy.filter((sep) => sep.active);
     }
 
     return { totalCount: dummySEPsCopy.length, seps: dummySEPsCopy };
   }
 
   async getSEPProposals(sepId: number, callId: number) {
-    return dummySEPProposals.filter(proposal => proposal.sepId === sepId);
+    return dummySEPProposals.filter((proposal) => proposal.sepId === sepId);
   }
 
   async getSEPProposalsByInstrument(
@@ -258,7 +258,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     instrumentId: number,
     callId: number
   ) {
-    return dummySEPProposals.filter(proposal => proposal.sepId === sepId);
+    return dummySEPProposals.filter((proposal) => proposal.sepId === sepId);
   }
 
   async getSEPByProposalId(proposalId: number) {
@@ -271,13 +271,13 @@ export class SEPDataSourceMock implements SEPDataSource {
     reviewerId: number | null
   ) {
     return dummySEPAssignments.filter(
-      assignment =>
+      (assignment) =>
         assignment.sepId === sepId && assignment.proposalId === proposalId
     );
   }
 
   async getReviewers(sepId: number) {
-    return dummySEPMembers.filter(member => member.sepId === sepId);
+    return dummySEPMembers.filter((member) => member.sepId === sepId);
   }
 
   async getSEPUserRole(id: number, sepId: number) {
@@ -289,7 +289,7 @@ export class SEPDataSourceMock implements SEPDataSource {
   }
 
   async assignProposal(proposalId: number, sepId: number) {
-    const sep = dummySEPs.find(element => element.id === sepId);
+    const sep = dummySEPs.find((element) => element.id === sepId);
 
     if (sep) {
       return new ProposalIdsWithNextStatus([1]);
@@ -312,7 +312,7 @@ export class SEPDataSourceMock implements SEPDataSource {
   }
 
   async removeProposalAssignment(proposalId: number, sepId: number) {
-    const sep = dummySEPs.find(element => element.id === sepId);
+    const sep = dummySEPs.find((element) => element.id === sepId);
 
     if (sep) {
       return sep;
@@ -326,7 +326,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     sepId: number,
     memberIds: number[]
   ) {
-    const sep = dummySEPs.find(element => element.id === sepId);
+    const sep = dummySEPs.find((element) => element.id === sepId);
 
     if (sep) {
       return sep;
@@ -340,7 +340,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     sepId: number,
     memberId: number
   ) {
-    const sep = dummySEPs.find(element => element.id === sepId);
+    const sep = dummySEPs.find((element) => element.id === sepId);
 
     if (sep) {
       return sep;

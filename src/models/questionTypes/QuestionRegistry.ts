@@ -50,7 +50,7 @@ const registry = [
 Object.freeze(registry);
 
 const componentMap = new Map<DataType, Question>();
-registry.forEach(definition =>
+registry.forEach((definition) =>
   componentMap.set(definition.dataType, definition)
 );
 

@@ -67,7 +67,7 @@ export async function collectSamplePDFData(
 
   const completedFields = (getAllFields(
     questionarySteps
-  ) as Answer[]).filter(field =>
+  ) as Answer[]).filter((field) =>
     areDependenciesSatisfied(
       questionarySteps,
       field.question.proposalQuestionId
@@ -76,7 +76,7 @@ export async function collectSamplePDFData(
 
   const attachments: Attachment[] = [];
 
-  completedFields.forEach(answer => {
+  completedFields.forEach((answer) => {
     attachments.push(...getFileAttachments(answer));
   });
 

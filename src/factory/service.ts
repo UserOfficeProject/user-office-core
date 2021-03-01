@@ -41,16 +41,16 @@ export default function callFactoryService<TData, TMeta extends MetaBase>(
 ) {
   const factoryReq = request
     .post(`${ENDPOINT}/${downloadType}/${type}`, { json: properties })
-    .on('response', factoryResp => {
+    .on('response', (factoryResp) => {
       if (factoryResp.statusCode !== 200) {
         bufferRequestBody(factoryReq)
-          .then(body => {
+          .then((body) => {
             logger.logError(`Failed to generate ${downloadType}/${type}`, {
               response: body,
               type,
             });
           })
-          .catch(err => {
+          .catch((err) => {
             logger.logException(
               `Failed to generate ${downloadType}/${type} and read response body`,
               err,
@@ -75,7 +75,7 @@ export default function callFactoryService<TData, TMeta extends MetaBase>(
         factoryResp.pipe(res);
       }
     })
-    .on('error', err => {
+    .on('error', (err) => {
       next({
         error: err.toString(),
         message: `Could not download generated ${downloadType}/${type}`,

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import sanitizeHtml, { IOptions } from 'sanitize-html';
 
 import {

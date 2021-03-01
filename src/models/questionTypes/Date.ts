@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable quotes */
 import * as Yup from 'yup';
 
@@ -22,7 +21,7 @@ export const dateDefinition: Question = {
       throw new Error('DataType should be DATE');
     }
 
-    let scheme = Yup.date().transform(function(value: Date) {
+    let scheme = Yup.date().transform(function (value: Date) {
       return normalizeDate(value);
     });
 

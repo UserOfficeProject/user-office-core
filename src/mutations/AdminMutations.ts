@@ -53,10 +53,10 @@ export default class AdminMutations {
   ): Promise<Page | Rejection> {
     return this.dataSource
       .setPageText(id, text)
-      .then(page => {
+      .then((page) => {
         return page;
       })
-      .catch(error => {
+      .catch((error) => {
         logger.logException('Could not set page text', error, {
           agent,
           id,

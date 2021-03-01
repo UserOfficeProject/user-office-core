@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { NextStatusEvent } from '../../models/NextStatusEvent';
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
@@ -67,7 +66,7 @@ export default class PostgresProposalSettingsDataSource
       .from('proposal_statuses')
       .orderBy('proposal_status_id', 'asc');
 
-    return proposalStatuses.map(proposalStatus =>
+    return proposalStatuses.map((proposalStatus) =>
       this.createProposalStatusObject(proposalStatus)
     );
   }
@@ -128,7 +127,9 @@ export default class PostgresProposalSettingsDataSource
   async createProposalWorkflow(
     args: CreateProposalWorkflowInput
   ): Promise<ProposalWorkflow> {
-    const [proposalWorkflowRecord]: ProposalWorkflowRecord[] = await database
+    const [
+      proposalWorkflowRecord,
+    ]: ProposalWorkflowRecord[] = await database
       .insert(args)
       .into('proposal_workflows')
       .returning('*');
@@ -190,7 +191,7 @@ export default class PostgresProposalSettingsDataSource
       .from('proposal_workflows')
       .orderBy('proposal_workflow_id', 'asc')
       .then((proposalWorkflows: ProposalWorkflowRecord[]) => {
-        return proposalWorkflows.map(proposalWorkflow =>
+        return proposalWorkflows.map((proposalWorkflow) =>
           this.createProposalWorkflowObject(proposalWorkflow)
         );
       });
@@ -301,7 +302,7 @@ export default class PostgresProposalSettingsDataSource
     ).rows;
 
     return proposalWorkflowConnections
-      ? proposalWorkflowConnections.map(proposalWorkflowConnection =>
+      ? proposalWorkflowConnections.map((proposalWorkflowConnection) =>
           this.createProposalWorkflowConnectionObject(
             proposalWorkflowConnection
           )
@@ -374,7 +375,7 @@ export default class PostgresProposalSettingsDataSource
   async upsertProposalWorkflowStatuses(
     collection: ProposalWorkflowConnection[]
   ) {
-    const dataToInsert = collection.map(item => ({
+    const dataToInsert = collection.map((item) => ({
       proposal_workflow_connection_id: item.id,
       proposal_workflow_id: item.proposalWorkflowId,
       proposal_status_id: item.proposalStatusId,
@@ -409,7 +410,7 @@ export default class PostgresProposalSettingsDataSource
 
     if (connectionsResult) {
       // NOTE: Return result as ProposalWorkflowConnection[] but do not care about name and description.
-      return connectionsResult.map(connection =>
+      return connectionsResult.map((connection) =>
         this.createProposalWorkflowConnectionObject({
           ...connection,
           short_code: '',
@@ -480,7 +481,7 @@ export default class PostgresProposalSettingsDataSource
     proposalWorkflowConnectionId: number,
     nextStatusEvents: string[]
   ): Promise<NextStatusEvent[]> {
-    const eventsToInsert = nextStatusEvents.map(nextStatusEvent => ({
+    const eventsToInsert = nextStatusEvents.map((nextStatusEvent) => ({
       proposal_workflow_connection_id: proposalWorkflowConnectionId,
       next_status_event: nextStatusEvent,
     }));
@@ -496,7 +497,7 @@ export default class PostgresProposalSettingsDataSource
       .returning(['*']);
 
     return (
-      nextStatusEventsResult?.map(nextStatusEventResult =>
+      nextStatusEventsResult?.map((nextStatusEventResult) =>
         this.createNextStatusEventObject(nextStatusEventResult)
       ) || []
     );
@@ -510,7 +511,7 @@ export default class PostgresProposalSettingsDataSource
       .from('next_status_events')
       .where('proposal_workflow_connection_id', proposalWorkflowConnectionId)
       .then((nextStatusEvents: NextStatusEventRecord[]) => {
-        return nextStatusEvents.map(nextStatusEvent =>
+        return nextStatusEvents.map((nextStatusEvent) =>
           this.createNextStatusEventObject(nextStatusEvent)
         );
       });

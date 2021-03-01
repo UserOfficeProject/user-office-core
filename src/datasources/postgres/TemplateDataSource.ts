@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { logger } from '@esss-swap/duo-logger';
 
 import {
@@ -41,7 +40,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return database('template_categories')
       .select('*')
       .then((records: TemplateCategoryRecord[]) =>
-        records.map(record => createTemplateCategoryObject(record))
+        records.map((record) => createTemplateCategoryObject(record))
       );
   }
   async getComplementaryQuestions(
@@ -69,7 +68,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       return [];
     }
 
-    return questionRecords.map(value => createQuestionObject(value));
+    return questionRecords.map((value) => createQuestionObject(value));
   }
 
   async createTemplate(args: CreateTemplateArgs): Promise<Template> {
@@ -111,7 +110,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return database('templates')
       .select('*')
       .where({ is_archived: args.filter?.isArchived || false })
-      .modify(query => {
+      .modify((query) => {
         if (args.filter?.category) {
           query.where({ category_id: args.filter?.category || undefined });
         }
@@ -121,7 +120,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           return [];
         }
 
-        return resultSet.map(value => createProposalTemplateObject(value));
+        return resultSet.map((value) => createProposalTemplateObject(value));
       });
   }
 
@@ -151,12 +150,13 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .where('template_id', templateId)
       .whereIn(
         'question_id',
-        questionRecords.map(questionRecord => questionRecord.question_id)
+        questionRecords.map((questionRecord) => questionRecord.question_id)
       );
 
-    return questionDependencies.map(questionDependency => {
+    return questionDependencies.map((questionDependency) => {
       const question = questionRecords.find(
-        field => field.question_id === questionDependency.dependency_question_id
+        (field) =>
+          field.question_id === questionDependency.dependency_question_id
       );
 
       return new FieldDependency(
@@ -176,8 +176,10 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .andWhere('is_enabled', true)
       .orderBy('sort_order');
 
-    const questionRecords: Array<QuestionRecord &
-      QuestionTemplateRelRecord & { dependency_natural_key: string }> = (
+    const questionRecords: Array<
+      QuestionRecord &
+        QuestionTemplateRelRecord & { dependency_natural_key: string }
+    > = (
       await database.raw(`
         SELECT 
           templates_has_questions.*, questions.*, questions.natural_key as dependency_natural_key
@@ -199,20 +201,20 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       templateId
     );
 
-    const fields = questionRecords.map(record => {
+    const fields = questionRecords.map((record) => {
       const questionDependencies = dependencies.filter(
-        dependency => dependency.questionId === record.question_id
+        (dependency) => dependency.questionId === record.question_id
       );
 
       return createQuestionTemplateRelationObject(record, questionDependencies);
     });
 
     const steps = Array<TemplateStep>();
-    topicRecords.forEach(topic => {
+    topicRecords.forEach((topic) => {
       steps.push(
         new TemplateStep(
           createTopicObject(topic),
-          fields.filter(field => field.topicId === topic.topic_id)
+          fields.filter((field) => field.topicId === topic.topic_id)
         )
       );
     });
@@ -234,12 +236,12 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           return null;
         }
 
-        return resultSet.map(resultItem => createTopicObject(resultItem));
+        return resultSet.map((resultItem) => createTopicObject(resultItem));
       });
   }
 
   async upsertTopics(data: Topic[]): Promise<Template> {
-    const dataToUpsert = data.map(item => ({
+    const dataToUpsert = data.map((item) => ({
       topic_id: item.id,
       topic_title: item.title,
       template_id: item.templateId,
@@ -354,7 +356,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .del();
 
     if (dependencies?.length) {
-      const dataToInsert = dependencies.map(dependency => ({
+      const dataToInsert = dependencies.map((dependency) => ({
         question_id: questionId,
         template_id: templateId,
         dependency_question_id: dependency.dependencyId,
@@ -473,8 +475,10 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     questionId: string,
     templateId: number
   ): Promise<QuestionTemplateRelation | null> {
-    const [questionRecord]: Array<QuestionTemplateRelRecord &
-      QuestionRecord & { dependency_natural_key: string }> = await database({
+    const [questionRecord]: Array<
+      QuestionTemplateRelRecord &
+        QuestionRecord & { dependency_natural_key: string }
+    > = await database({
       templates_has_questions: 'templates_has_questions',
     })
       .where({
@@ -522,7 +526,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           return null;
         }
 
-        return resultSet.map(resultItem => ({
+        return resultSet.map((resultItem) => ({
           id: resultItem.id,
           questionId: resultItem.question_id,
           templateId: resultItem.template_id,

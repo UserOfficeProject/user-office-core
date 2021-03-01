@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
-
 import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
 
@@ -42,9 +40,7 @@ export class SMTPMailService extends MailService {
     const sendMailResults: SendMailResults = {
       total_rejected_recipients: 0,
       total_accepted_recipients: 0,
-      id: Math.random()
-        .toString(36)
-        .substring(7),
+      id: Math.random().toString(36).substring(7),
     };
 
     if (process.env.NODE_ENV === 'test') {
@@ -54,7 +50,7 @@ export class SMTPMailService extends MailService {
     options.content.template_id =
       process.env.EMAIL_TEMPLATE_PATH + options.content.template_id;
 
-    options.recipients.forEach(participant => {
+    options.recipients.forEach((participant) => {
       emailPromises.push(
         this._email.send({
           template: options.content.template_id,
@@ -75,8 +71,8 @@ export class SMTPMailService extends MailService {
       );
     });
 
-    return Promise.allSettled(emailPromises).then(results => {
-      results.forEach(result => {
+    return Promise.allSettled(emailPromises).then((results) => {
+      results.forEach((result) => {
         if (result.status === 'rejected') {
           sendMailResults.total_rejected_recipients++;
         } else {

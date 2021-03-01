@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
-
 import { logger } from '@esss-swap/duo-logger';
 
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -129,13 +127,13 @@ export default function createHandler(userDataSource: UserDataSource) {
             proposalNumber: event.proposal.shortCode,
             proposalTitle: event.proposal.title,
             coProposers: participants.map(
-              partipant => `${partipant.preferredname} ${partipant.lastname} `
+              (partipant) => `${partipant.preferredname} ${partipant.lastname} `
             ),
             call: '',
           },
           recipients: [
             { address: principalInvestigator.email },
-            ...participants.map(partipant => {
+            ...participants.map((partipant) => {
               return {
                 address: {
                   email: partipant.email,
@@ -207,13 +205,13 @@ export default function createHandler(userDataSource: UserDataSource) {
           return;
         }
         const { finalStatus } = event.proposal;
-        let template_id = '';
+        let templateId = '';
         if (finalStatus === ProposalEndStatus.ACCEPTED) {
-          template_id = 'Accepted-Proposal';
+          templateId = 'Accepted-Proposal';
         } else if (finalStatus === ProposalEndStatus.REJECTED) {
-          template_id = 'Rejected-Proposal';
+          templateId = 'Rejected-Proposal';
         } else if (finalStatus === ProposalEndStatus.RESERVED) {
-          template_id = 'Reserved-Proposal';
+          templateId = 'Reserved-Proposal';
         } else {
           logger.logError('Failed email notification', { event });
 
@@ -223,7 +221,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         mailService
           .sendMail({
             content: {
-              template_id,
+              template_id: templateId,
             },
             substitution_data: {
               piPreferredname: principalInvestigator.preferredname,

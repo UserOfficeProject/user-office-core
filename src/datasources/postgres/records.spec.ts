@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import 'reflect-metadata';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import { DataType } from '../../models/Template';

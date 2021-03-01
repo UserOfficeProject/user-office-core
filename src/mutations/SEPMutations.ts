@@ -55,8 +55,8 @@ export default class SEPMutations {
         args.numberRatingsRequired,
         args.active
       )
-      .then(sep => sep)
-      .catch(err => {
+      .then((sep) => sep)
+      .catch((err) => {
         logger.logException(
           'Could not create scientific evaluation panel',
           err,
@@ -82,8 +82,8 @@ export default class SEPMutations {
         args.numberRatingsRequired,
         args.active
       )
-      .then(sep => sep)
-      .catch(err => {
+      .then((sep) => sep)
+      .catch((err) => {
         logger.logException(
           'Could not update scientific evaluation panel',
           err,
@@ -107,7 +107,7 @@ export default class SEPMutations {
 
     // only users with sep reviewer role can be chair or secretary
     const isSepReviewer = userRoles.some(
-      role => role.shortCode === Roles.SEP_REVIEWER
+      (role) => role.shortCode === Roles.SEP_REVIEWER
     );
     if (!isSepReviewer) {
       return rejection('NOT_ALLOWED');
@@ -115,8 +115,8 @@ export default class SEPMutations {
 
     return this.dataSource
       .assignChairOrSecretaryToSEP(args.assignChairOrSecretaryToSEPInput)
-      .then(result => result)
-      .catch(err => {
+      .then((result) => result)
+      .catch((err) => {
         logger.logException(
           'Could not assign chair and secretary to scientific evaluation panel',
           err,
@@ -143,8 +143,8 @@ export default class SEPMutations {
 
     return this.dataSource
       .assignReviewersToSEP(args)
-      .then(result => result)
-      .catch(err => {
+      .then((result) => result)
+      .catch((err) => {
         logger.logException(
           'Could not assign member to scientific evaluation panel',
           err,
@@ -187,8 +187,8 @@ export default class SEPMutations {
 
     return this.dataSource
       .removeMemberFromSEP(args, isMemberChairOrSecretaryOfSEP)
-      .then(result => result)
-      .catch(err => {
+      .then((result) => result)
+      .catch((err) => {
         logger.logException(
           'Could not remove member from scientific evaluation panel',
           err,
@@ -208,7 +208,7 @@ export default class SEPMutations {
   ): Promise<ProposalIdsWithNextStatus | Rejection> {
     return this.dataSource
       .assignProposal(args.proposalId, args.sepId)
-      .then(async result => {
+      .then(async (result) => {
         const nextProposalStatus = await this.dataSource.getProposalNextStatus(
           args.proposalId,
           Event.PROPOSAL_SEP_SELECTED
@@ -221,7 +221,7 @@ export default class SEPMutations {
           nextProposalStatus?.name
         );
       })
-      .catch(err => {
+      .catch((err) => {
         logger.logException(
           'Could not assign proposal to scientific evaluation panel',
           err,
@@ -241,8 +241,8 @@ export default class SEPMutations {
   ): Promise<SEP | Rejection> {
     return this.dataSource
       .removeProposalAssignment(args.proposalId, args.sepId)
-      .then(result => result)
-      .catch(err => {
+      .then((result) => result)
+      .catch((err) => {
         logger.logException(
           'Could not remove assigned proposal from scientific evaluation panel',
           err,
@@ -268,8 +268,8 @@ export default class SEPMutations {
 
     return this.dataSource
       .assignMemberToSEPProposal(args.proposalId, args.sepId, args.memberIds)
-      .then(result => result)
-      .catch(err => {
+      .then((result) => result)
+      .catch((err) => {
         logger.logException(
           'Could not assign proposal to scientific evaluation panel',
           err,
@@ -299,8 +299,8 @@ export default class SEPMutations {
 
     return this.dataSource
       .removeMemberFromSepProposal(args.proposalId, args.sepId, args.memberId)
-      .then(result => result)
-      .catch(err => {
+      .then((result) => result)
+      .catch((err) => {
         logger.logException('Could not remove member from SEP proposal', err, {
           agent,
         });
@@ -333,7 +333,7 @@ export default class SEPMutations {
 
     return this.dataSource
       .updateTimeAllocation(sepId, proposalId, sepTimeAllocation)
-      .catch(err => {
+      .catch((err) => {
         logger.logException(
           'Could not update SEP proposal time allocation',
           err,

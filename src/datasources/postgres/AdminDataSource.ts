@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import * as fs from 'fs';
 
 import { logger } from '@esss-swap/duo-logger';
@@ -69,7 +68,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from('units')
       .orderBy('unit', 'asc')
       .then((intDB: UnitRecord[]) =>
-        intDB.map(int => {
+        intDB.map((int) => {
           return {
             id: int.unit_id,
             name: int.unit,
@@ -148,7 +147,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from('pagetext')
       .where('pagetext_id', id)
       .first()
-      .then(res => (res ? res.content : null));
+      .then((res) => (res ? res.content : null));
   }
 
   async setPageText(id: number, content: string): Promise<Page> {
@@ -172,7 +171,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .select()
       .from('nationalities')
       .then((natDB: NationalityRecord[]) =>
-        natDB.map(nat => {
+        natDB.map((nat) => {
           return { id: nat.nationality_id, value: nat.nationality };
         })
       );
@@ -184,13 +183,13 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from('institutions')
       .orderByRaw('institution_id=1 desc')
       .orderBy('institution', 'asc')
-      .modify(query => {
+      .modify((query) => {
         if (filter?.isVerified) {
           query.where('verified', filter.isVerified);
         }
       })
       .then((intDB: InstitutionRecord[]) =>
-        intDB.map(int => {
+        intDB.map((int) => {
           return {
             id: int.institution_id,
             name: int.institution,
@@ -218,7 +217,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from('users')
       .where('organisation', id)
       .then((users: UserRecord[]) =>
-        users.map(user => createBasicUserObject(user))
+        users.map((user) => createBasicUserObject(user))
       );
   }
 
@@ -227,7 +226,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .select()
       .from('countries')
       .then((countDB: CountryRecord[]) =>
-        countDB.map(count => {
+        countDB.map((count) => {
           return { id: count.country_id, value: count.country };
         })
       );
@@ -251,7 +250,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return new Promise<string>(async (resolve, reject) => {
       const log = [`Upgrade started: ${Date.now()}`];
       const directoryPath = './db_patches';
-      fs.readdir(directoryPath, async function(err, files) {
+      fs.readdir(directoryPath, async function (err, files) {
         if (err) {
           logger.logError(err.message, err);
           log.push(err.message);
@@ -267,11 +266,11 @@ export default class PostgresAdminDataSource implements AdminDataSource {
           const contents = fs.readFileSync(`${directoryPath}/${file}`, 'utf8');
           await database
             .raw(contents)
-            .then(result => {
+            .then((result) => {
               const msg = `${file} executed. ${result.command || ''}\n`;
               log.push(msg);
             })
-            .catch(err => {
+            .catch((err) => {
               const msg = `${file} failed. ${err}`;
               log.push(msg);
               reject(log.join('\n'));
@@ -289,14 +288,16 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .select()
       .from('features')
       .then((features: FeatureRecord[]) =>
-        features.map(feature => createFeatureObject(feature))
+        features.map((feature) => createFeatureObject(feature))
       );
   }
 
   async getTokenAndPermissionsById(
     accessTokenId: string
   ): Promise<Permissions> {
-    const [permissionRules]: TokensAndPermissionsRecord[] = await database
+    const [
+      permissionRules,
+    ]: TokensAndPermissionsRecord[] = await database
       .select()
       .from('api_permissions')
       .where('access_token_id', accessTokenId);
@@ -321,7 +322,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from('api_permissions');
 
     return accessTokensWithPermissions.map(
-      accessTokenWithPermissions =>
+      (accessTokenWithPermissions) =>
         new Permissions(
           accessTokenWithPermissions.access_token_id,
           accessTokenWithPermissions.name,

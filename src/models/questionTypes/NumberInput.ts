@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import * as Yup from 'yup';
 
 import {
@@ -11,7 +10,7 @@ import { Question } from './QuestionRegistry';
 export const numberInputDefinition: Question = {
   dataType: DataType.NUMBER_INPUT,
   isReadOnly: false,
-  getDefaultAnswer: field => {
+  getDefaultAnswer: (field) => {
     return {
       value: '',
       unit: (field.config as NumberInputConfig).units?.[0] || null,
@@ -27,7 +26,7 @@ export const numberInputDefinition: Question = {
 
     const config = field.config as NumberInputConfig;
 
-    let valueScheme = Yup.number().transform(value =>
+    let valueScheme = Yup.number().transform((value) =>
       isNaN(value) ? undefined : value
     );
 

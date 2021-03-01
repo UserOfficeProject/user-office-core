@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import SparkPost from 'sparkpost';
 
 import EmailSettings from './EmailSettings';

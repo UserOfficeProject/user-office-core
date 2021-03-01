@@ -70,8 +70,8 @@ export default class CallMutations {
   ): Promise<Call | Rejection> {
     return this.dataSource
       .create(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not create call', error, {
           agent,
           shortCode: args.shortCode,
@@ -89,8 +89,8 @@ export default class CallMutations {
   ): Promise<Call | Rejection> {
     return this.dataSource
       .update(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not create call', error, {
           agent,
           shortCode: args.shortCode,
@@ -108,8 +108,8 @@ export default class CallMutations {
   ): Promise<Call | Rejection> {
     return this.dataSource
       .assignInstrumentsToCall(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not assign instruments to call', error, {
           agent,
           args,
@@ -127,8 +127,8 @@ export default class CallMutations {
   ): Promise<Call | Rejection> {
     return this.dataSource
       .removeAssignedInstrumentFromCall(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not remove assigned instrument from call',
           error,

@@ -24,7 +24,7 @@ export class Questionary implements Partial<QuestionaryOrigin> {
   public created: Date;
 }
 
-@Resolver(of => Questionary)
+@Resolver((of) => Questionary)
 export class QuestionaryResolver {
   @FieldResolver(() => [QuestionaryStep])
   async steps(

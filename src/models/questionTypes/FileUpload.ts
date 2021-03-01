@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { FileUploadConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionTemplateRelation } from '../../resolvers/types/QuestionTemplateRelation';
 import { DataType } from '../Template';

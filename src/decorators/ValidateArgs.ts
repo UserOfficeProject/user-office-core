@@ -17,7 +17,7 @@ const schemaValidation = async (schema: Yup.ObjectSchema, inputArgs: any) => {
 
 const ValidateArgs = (schema: Yup.ObjectSchema) => {
   return (
-    target: object,
+    target: any,
     name: string,
     descriptor: {
       value?: (
@@ -28,7 +28,7 @@ const ValidateArgs = (schema: Yup.ObjectSchema) => {
   ) => {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function(...args) {
+    descriptor.value = async function (...args) {
       const [, inputArgs] = args;
 
       const errors = await schemaValidation(schema, inputArgs);

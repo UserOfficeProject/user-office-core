@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import * as Yup from 'yup';
 
 import { IntervalConfig } from '../../resolvers/types/FieldConfig';
@@ -8,7 +7,7 @@ import { Question } from './QuestionRegistry';
 export const intervalDefinition: Question = {
   dataType: DataType.INTERVAL,
   isReadOnly: false,
-  getDefaultAnswer: field => {
+  getDefaultAnswer: (field) => {
     return {
       min: '',
       max: '',
@@ -24,10 +23,10 @@ export const intervalDefinition: Question = {
     }
     const config = field.config as IntervalConfig;
 
-    let minSchema = Yup.number().transform(value =>
+    let minSchema = Yup.number().transform((value) =>
       isNaN(value) ? undefined : value
     );
-    let maxSchema = Yup.number().transform(value =>
+    let maxSchema = Yup.number().transform((value) =>
       isNaN(value) ? undefined : value
     );
 

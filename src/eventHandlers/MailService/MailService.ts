@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
-
 import EmailSettings from './EmailSettings';
 
 export abstract class MailService {

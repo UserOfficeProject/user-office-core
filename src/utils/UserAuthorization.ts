@@ -46,8 +46,8 @@ export class UserAuthorization {
       return false;
     }
 
-    return this.userDataSource.getUserRoles(agent.id).then(roles => {
-      return roles.some(roleItem => roleItem.shortCode === role);
+    return this.userDataSource.getUserRoles(agent.id).then((roles) => {
+      return roles.some((roleItem) => roleItem.shortCode === role);
     });
   }
 
@@ -72,8 +72,8 @@ export class UserAuthorization {
       return true;
     }
 
-    return this.userDataSource.getProposalUsers(proposal.id).then(users => {
-      return users.some(user => user.id === agent.id);
+    return this.userDataSource.getProposalUsers(proposal.id).then((users) => {
+      return users.some((user) => user.id === agent.id);
     });
   }
 
@@ -82,8 +82,8 @@ export class UserAuthorization {
       return false;
     }
 
-    return this.reviewDataSource.getUserReviews(agent.id).then(reviews => {
-      return reviews.some(review => review.proposalID === proposalID);
+    return this.reviewDataSource.getUserReviews(agent.id).then((reviews) => {
+      return reviews.some((review) => review.proposalID === proposalID);
     });
   }
 
@@ -94,7 +94,7 @@ export class UserAuthorization {
 
     return this.userDataSource
       .checkScientistToProposal(agent.id, proposalID)
-      .then(result => {
+      .then((result) => {
         return result;
       });
   }

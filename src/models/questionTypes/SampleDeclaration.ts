@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { SubtemplateConfig } from '../../resolvers/types/FieldConfig';
 import { DataType, TemplateCategoryId } from '../Template';
 import { Question } from './QuestionRegistry';

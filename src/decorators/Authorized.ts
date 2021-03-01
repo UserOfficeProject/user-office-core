@@ -5,7 +5,7 @@ import { userAuthorization } from '../utils/UserAuthorization';
 
 const Authorized = (roles: Roles[] = []) => {
   return (
-    target: object,
+    target: any,
     name: string,
     descriptor: {
       value?: (
@@ -16,7 +16,7 @@ const Authorized = (roles: Roles[] = []) => {
   ) => {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function(...args) {
+    descriptor.value = async function (...args) {
       const [agent] = args;
       const isMutation = target.constructor.name.includes('Mutation');
 
@@ -40,7 +40,7 @@ const Authorized = (roles: Roles[] = []) => {
         (await userAuthorization.hasRole(
           agent,
           agent.currentRole?.shortCode as string
-        )) && roles.some(role => role === agent.currentRole?.shortCode);
+        )) && roles.some((role) => role === agent.currentRole?.shortCode);
 
       if (hasAccessRights) {
         return await originalMethod?.apply(this, args);

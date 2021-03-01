@@ -2,8 +2,8 @@ import 'reflect-metadata';
 
 const metadataKey = Symbol('Response');
 
-export function Response(): (target: object, propertyKey: string) => void {
-  return (target: object, propertyKey: string) => {
+export function Response(): (target: any, propertyKey: string) => void {
+  return (target: any, propertyKey: string) => {
     let properties: string[] = Reflect.getMetadata(metadataKey, target);
 
     if (properties) {
@@ -15,10 +15,10 @@ export function Response(): (target: object, propertyKey: string) => void {
   };
 }
 
-function getResponseFields(origin: any): object {
+function getResponseFields(origin: any): any {
   const properties: string[] = Reflect.getMetadata(metadataKey, origin) || [];
   const result: any = {};
-  properties.forEach(key => (result[key] = origin[key]));
+  properties.forEach((key) => (result[key] = origin[key]));
 
   return result;
 }

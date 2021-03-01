@@ -51,8 +51,8 @@ export default class InstrumentMutations {
   ): Promise<Instrument | Rejection> {
     return this.dataSource
       .create(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not create instrument', error, {
           agent,
           shortCode: args.shortCode,
@@ -70,8 +70,8 @@ export default class InstrumentMutations {
   ): Promise<Instrument | Rejection> {
     return this.dataSource
       .update(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not update instrument', error, {
           agent,
           instrumentId: args.id,
@@ -89,8 +89,8 @@ export default class InstrumentMutations {
   ): Promise<Instrument | Rejection> {
     return this.dataSource
       .delete(args.id)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not delete instrument', error, {
           agent,
           instrumentId: args.id,
@@ -104,7 +104,7 @@ export default class InstrumentMutations {
     inputArguments: AssignProposalsToInstrumentArgs
   ) {
     const proposalCallIds = inputArguments.proposals.map(
-      proposal => proposal.callId
+      (proposal) => proposal.callId
     );
     const proposalCallsWithInstrument = await this.dataSource.getCallsByInstrumentId(
       inputArguments.instrumentId,
@@ -112,9 +112,9 @@ export default class InstrumentMutations {
     );
 
     const proposalsOnSameCallAsInstrument = inputArguments.proposals.filter(
-      proposal =>
+      (proposal) =>
         proposalCallsWithInstrument.some(
-          call => call.callId === proposal.callId
+          (call) => call.callId === proposal.callId
         )
     );
 
@@ -140,11 +140,11 @@ export default class InstrumentMutations {
 
     return this.dataSource
       .assignProposalsToInstrument(
-        args.proposals.map(proposal => proposal.id),
+        args.proposals.map((proposal) => proposal.id),
         args.instrumentId
       )
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not assign proposal/s to instrument',
           error,
@@ -167,8 +167,8 @@ export default class InstrumentMutations {
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .removeProposalFromInstrument(args.proposalId, args.instrumentId)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not remove assigned proposal/s from instrument',
           error,
@@ -191,8 +191,8 @@ export default class InstrumentMutations {
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .assignScientistsToInstrument(args.scientistIds, args.instrumentId)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not assign scientist/s to instrument',
           error,
@@ -214,8 +214,8 @@ export default class InstrumentMutations {
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .removeScientistFromInstrument(args.scientistId, args.instrumentId)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not remove assigned scientist/s from instrument',
           error,
@@ -241,8 +241,8 @@ export default class InstrumentMutations {
         args.instrumentId,
         args.availabilityTime
       )
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not set availability time on instrument',
           error,
@@ -279,12 +279,12 @@ export default class InstrumentMutations {
         args.instrumentId,
         args.callId
       )
-    ).map(sepInstrumentProposal => sepInstrumentProposal.proposalId);
+    ).map((sepInstrumentProposal) => sepInstrumentProposal.proposalId);
 
     return this.dataSource
       .submitInstrument(submittedInstrumentProposalIds, args.instrumentId)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not submit instrument', error, {
           agent,
           args,

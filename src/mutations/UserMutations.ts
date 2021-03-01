@@ -275,8 +275,8 @@ export default class UserMutations {
 
     return this.dataSource
       .update(user)
-      .then(user => user)
-      .catch(err => {
+      .then((user) => user)
+      .catch((err) => {
         logger.logException('Could not update user', err, { user });
 
         return rejection('INTERNAL_ERROR');
@@ -299,7 +299,7 @@ export default class UserMutations {
     return this.dataSource
       .setUserRoles(args.id, args.roles)
       .then(() => user)
-      .catch(err => {
+      .catch((err) => {
         logger.logException('Could not update user', err);
 
         return rejection('INTERNAL_ERROR');
@@ -510,7 +510,7 @@ export default class UserMutations {
     return this.dataSource
       .addUserRole(args)
       .then(() => true)
-      .catch(err => {
+      .catch((err) => {
         logger.logException('Could not add user role', err, { agent });
 
         return rejection('INTERNAL_ERROR');
@@ -569,8 +569,8 @@ export default class UserMutations {
       ) {
         return this.dataSource
           .setUserPassword(user.id, hash)
-          .then(user => user)
-          .catch(err => {
+          .then((user) => user)
+          .catch((err) => {
             logger.logError('Could not reset password', { err });
 
             return rejection('INTERNAL_ERROR');

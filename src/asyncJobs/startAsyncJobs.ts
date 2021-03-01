@@ -14,7 +14,7 @@ export const runAsyncJobs = (
   allJobs: UserOfficeAsyncJob[],
   dataSources: { callDataSource: CallDataSource }
 ) => {
-  allJobs.forEach(job => {
+  allJobs.forEach((job) => {
     const cronJob = new CronJob(
       job.options.timeToRun,
       async () => await job.functionToRun(dataSources.callDataSource),

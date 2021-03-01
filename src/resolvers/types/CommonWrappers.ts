@@ -37,9 +37,7 @@ export class ResponseWrapBase<T> {
 }
 
 @ObjectType()
-export class BasicUserDetailsResponseWrap extends ResponseWrapBase<
-  BasicUserDetails
-> {
+export class BasicUserDetailsResponseWrap extends ResponseWrapBase<BasicUserDetails> {
   @Response()
   @Field(() => BasicUserDetails, { nullable: true })
   public user: BasicUserDetails;
@@ -67,9 +65,7 @@ export class SEPResponseWrap extends ResponseWrapBase<SEP> {
 }
 
 @ObjectType()
-export class NextProposalStatusResponseWrap extends ResponseWrapBase<
-  ProposalStatus
-> {
+export class NextProposalStatusResponseWrap extends ResponseWrapBase<ProposalStatus> {
   @Response()
   @Field(() => NextProposalStatus, { nullable: true })
   public nextProposalStatus: NextProposalStatus;
@@ -90,9 +86,7 @@ export class SEPMembersRoleResponseWrap extends ResponseWrapBase<boolean> {
 }
 
 @ObjectType()
-export class TechnicalReviewResponseWrap extends ResponseWrapBase<
-  TechnicalReview
-> {
+export class TechnicalReviewResponseWrap extends ResponseWrapBase<TechnicalReview> {
   @Response()
   @Field(() => TechnicalReview, { nullable: true })
   public technicalReview: TechnicalReview;
@@ -120,9 +114,7 @@ export class SamplesResponseWrap extends ResponseWrapBase<Questionary[]> {
 }
 
 @ObjectType()
-export class QuestionaryStepResponseWrap extends ResponseWrapBase<
-  QuestionaryStep
-> {
+export class QuestionaryStepResponseWrap extends ResponseWrapBase<QuestionaryStep> {
   @Response()
   @Field(() => QuestionaryStep, { nullable: true })
   public questionaryStep: QuestionaryStep;
@@ -143,18 +135,14 @@ export class ProposalResponseWrap extends ResponseWrapBase<Proposal> {
 }
 
 @ObjectType()
-export class QuestionTemplateRelationResponseWrap extends ResponseWrapBase<
-  QuestionTemplateRelation
-> {
+export class QuestionTemplateRelationResponseWrap extends ResponseWrapBase<QuestionTemplateRelation> {
   @Response()
   @Field(() => QuestionTemplateRelation, { nullable: true })
   public questionTemplateRelation: QuestionTemplateRelation;
 }
 
 @ObjectType()
-export class QuestionResponseWrap extends ResponseWrapBase<
-  QuestionTemplateRelation
-> {
+export class QuestionResponseWrap extends ResponseWrapBase<QuestionTemplateRelation> {
   @Response()
   @Field(() => Question, { nullable: true })
   public question: Question;
@@ -238,36 +226,28 @@ export class SampleResponseWrap extends ResponseWrapBase<Sample> {
 }
 
 @ObjectType()
-export class ProposalStatusResponseWrap extends ResponseWrapBase<
-  ProposalStatus
-> {
+export class ProposalStatusResponseWrap extends ResponseWrapBase<ProposalStatus> {
   @Response()
   @Field(() => ProposalStatus, { nullable: true })
   public proposalStatus: ProposalStatus;
 }
 
 @ObjectType()
-export class ProposalWorkflowResponseWrap extends ResponseWrapBase<
-  ProposalWorkflow
-> {
+export class ProposalWorkflowResponseWrap extends ResponseWrapBase<ProposalWorkflow> {
   @Response()
   @Field(() => ProposalWorkflow, { nullable: true })
   public proposalWorkflow: ProposalWorkflow;
 }
 
 @ObjectType()
-export class ProposalWorkflowConnectionResponseWrap extends ResponseWrapBase<
-  ProposalWorkflowConnection
-> {
+export class ProposalWorkflowConnectionResponseWrap extends ResponseWrapBase<ProposalWorkflowConnection> {
   @Response()
   @Field(() => ProposalWorkflowConnection, { nullable: true })
   public proposalWorkflowConnection: ProposalWorkflowConnection;
 }
 
 @ObjectType()
-export class ProposalNextStatusEventResponseWrap extends ResponseWrapBase<
-  NextStatusEvent
-> {
+export class ProposalNextStatusEventResponseWrap extends ResponseWrapBase<NextStatusEvent> {
   @Response()
   @Field(() => [NextStatusEvent], { nullable: true })
   public nextStatusEvents: NextStatusEvent[];
@@ -288,9 +268,7 @@ export class SEPProposalResponseWrap extends ResponseWrapBase<SEPProposal> {
 }
 
 @ObjectType()
-export class ApiAccessTokenResponseWrap extends ResponseWrapBase<
-  PermissionsWithAccessToken
-> {
+export class ApiAccessTokenResponseWrap extends ResponseWrapBase<PermissionsWithAccessToken> {
   @Response()
   @Field(() => PermissionsWithAccessToken, { nullable: true })
   public apiAccessToken: PermissionsWithAccessToken;

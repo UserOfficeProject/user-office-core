@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { ProposalBasisConfig } from '../../resolvers/types/FieldConfig';
 import { DataType } from '../Template';
 import { Question } from './QuestionRegistry';

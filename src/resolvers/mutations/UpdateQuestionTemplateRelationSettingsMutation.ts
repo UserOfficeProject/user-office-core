@@ -80,7 +80,7 @@ export class UpdateQuestionTemplateRelationSettingsMutation {
       return dependencies;
     }
 
-    return dependencies.map(dependency => ({
+    return dependencies.map((dependency) => ({
       ...dependency,
       condition: {
         ...dependency.condition,

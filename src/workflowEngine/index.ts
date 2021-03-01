@@ -22,12 +22,12 @@ const shouldMoveToNextStatus = (
 ): boolean => {
   const proposalEventsKeys = Object.keys(proposalEvents);
   const allProposalIncompleteEvents = proposalEventsKeys.filter(
-    proposalEventsKey =>
+    (proposalEventsKey) =>
       !proposalEvents[proposalEventsKey as keyof ProposalEventsRecord]
   );
 
   const allNextStatusRulesFulfilled = !nextStatusEvents.some(
-    nextStatusEvent =>
+    (nextStatusEvent) =>
       allProposalIncompleteEvents.indexOf(
         nextStatusEvent.nextStatusEvent.toLowerCase()
       ) >= 0

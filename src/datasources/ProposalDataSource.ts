@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';

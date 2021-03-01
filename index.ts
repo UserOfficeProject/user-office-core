@@ -30,7 +30,7 @@ async function bootstrap() {
 
   app.listen(PORT);
 
-  process.on('uncaughtException', error => {
+  process.on('uncaughtException', (error) => {
     logger.logException('Unhandled NODE exception', error);
   });
 

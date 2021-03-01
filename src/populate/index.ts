@@ -49,7 +49,7 @@ const createUniqueIntArray = (size: number, max: number) => {
 };
 
 const createIntArray = (size: number, max: number) => {
-  return new Array(size).fill(0).map(el => dummy.positiveNumber(max));
+  return new Array(size).fill(0).map((el) => dummy.positiveNumber(max));
 };
 
 const createUsers = async () => {

@@ -160,8 +160,8 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   async deleteQuestionTemplateRelation(
     args: DeleteQuestionTemplateRelationArgs
   ): Promise<Template> {
-    dummyTemplateSteps.forEach(function(step) {
-      step.fields = step.fields.filter(field => {
+    dummyTemplateSteps.forEach(function (step) {
+      step.fields = step.fields.filter((field) => {
         return field.question.proposalQuestionId !== args.questionId;
       });
     });
@@ -222,10 +222,10 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   async getQuestion(questionId: string): Promise<Question | null> {
     const steps = await this.getTemplateSteps();
     const allQuestions = steps.reduce((accumulated, current) => {
-      return accumulated.concat(current.fields.map(field => field.question));
+      return accumulated.concat(current.fields.map((field) => field.question));
     }, new Array<Question>());
     const question = allQuestions.find(
-      question => question.proposalQuestionId === questionId
+      (question) => question.proposalQuestionId === questionId
     );
     if (!question) {
       return null;
@@ -258,7 +258,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       return accumulated.concat(current.fields);
     }, new Array<QuestionTemplateRelation>());
     const questionTemplateRelation = allQuestions.find(
-      curQuestion => curQuestion.question.proposalQuestionId === questionId
+      (curQuestion) => curQuestion.question.proposalQuestionId === questionId
     );
 
     if (questionTemplateRelation) {
@@ -277,7 +277,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       return accumulated.concat(current.topic);
     }, new Array<Topic>());
 
-    const topic = allTopics.find(topic => topic.id === topicId);
+    const topic = allTopics.find((topic) => topic.id === topicId);
 
     if (!topic) {
       throw new Error('Topic not found');

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import {
   Answer,
@@ -200,8 +199,8 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     questionId: string,
     answer: string
   ): Promise<string> {
-    const updated = dummyQuestionarySteps.some(step =>
-      step.fields.some(field => {
+    const updated = dummyQuestionarySteps.some((step) =>
+      step.fields.some((field) => {
         if (field.question.proposalQuestionId === questionId) {
           field.value = answer;
 
@@ -248,7 +247,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   ): Promise<void> {
     if (dummyQuestionary.questionaryId === questionary_id) {
       dummyQuestionarySteps.find(
-        step => step.topic.id === topic_id
+        (step) => step.topic.id === topic_id
       )!.isCompleted = isComplete;
     }
   }

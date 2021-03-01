@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { logger } from '@esss-swap/duo-logger';
 
 import { Event } from '../../events/event.enum';
@@ -96,7 +95,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .select<SEPRecord>('SEPs.*')
       .leftJoin('SEP_Reviewers', 'SEP_Reviewers.sep_id', '=', 'SEPs.sep_id')
       .where('SEPs.sep_id', sepId)
-      .andWhere(qb => {
+      .andWhere((qb) => {
         qb.where('sep_chair_user_id', userId);
         qb.orWhere('sep_secretary_user_id', userId);
         qb.orWhere('SEP_Reviewers.user_id', userId);
@@ -145,7 +144,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('SEPs')
       .orderBy('sep_id', 'desc')
-      .modify(query => {
+      .modify((query) => {
         if (filter) {
           query
             .where('code', 'ilike', `%${filter}%`)
@@ -162,7 +161,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         }
       })
       .then((allSeps: SEPRecord[]) => {
-        const seps = allSeps.map(sep => createSEPObject(sep));
+        const seps = allSeps.map((sep) => createSEPObject(sep));
 
         return {
           totalCount: allSeps[0] ? allSeps[0].full_count : 0,
@@ -178,7 +177,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   ): Promise<SEPAssignment[]> {
     const sepAssignments: SEPAssignmentRecord[] = await database
       .from('SEP_Assignments')
-      .modify(query => {
+      .modify((query) => {
         if (reviewerId !== null) {
           query.where('sep_member_user_id', reviewerId);
         }
@@ -186,7 +185,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .where('sep_id', sepId)
       .andWhere('proposal_id', proposalId);
 
-    return sepAssignments.map(sepAssignment =>
+    return sepAssignments.map((sepAssignment) =>
       createSEPAssignmentObject(sepAssignment)
     );
   }
@@ -195,7 +194,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     const sepProposals: SEPProposalRecord[] = await database
       .select(['sp.*'])
       .from('SEP_Proposals as sp')
-      .modify(query => {
+      .modify((query) => {
         query
           .join('proposals as p', {
             'p.proposal_id': 'sp.proposal_id',
@@ -203,7 +202,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
           .join('proposal_statuses as ps', {
             'p.status_id': 'ps.proposal_status_id',
           })
-          .where(function() {
+          .where(function () {
             this.where('ps.name', 'ilike', 'SEP_%');
           });
 
@@ -213,7 +212,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       })
       .where('sp.sep_id', sepId);
 
-    return sepProposals.map(sepProposal =>
+    return sepProposals.map((sepProposal) =>
       createSEPProposalObject(sepProposal)
     );
   }
@@ -261,7 +260,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .where('sp.sep_id', sepId)
       .andWhere('ihp.instrument_id', instrumentId);
 
-    return sepProposals.map(sepProposal =>
+    return sepProposals.map((sepProposal) =>
       createSEPProposalObject(sepProposal)
     );
   }
@@ -361,7 +360,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   async assignChairOrSecretaryToSEP(
     args: AssignChairOrSecretaryToSEPInput
   ): Promise<SEP> {
-    await database.transaction(async trx => {
+    await database.transaction(async (trx) => {
       const isChairAssignment = args.roleId === UserRole.SEP_CHAIR;
 
       await trx<SEPRecord>('SEPs')
@@ -404,7 +403,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
 
   async assignReviewersToSEP(args: AssignReviewersToSEPArgs): Promise<SEP> {
     await database<SEPReviewerRecord>('SEP_Reviewers').insert(
-      args.memberIds.map(userId => ({
+      args.memberIds.map((userId) => ({
         sep_id: args.sepId,
         user_id: userId,
       }))
@@ -515,7 +514,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async removeProposalAssignment(proposalId: number, sepId: number) {
-    await database.transaction(async trx => {
+    await database.transaction(async (trx) => {
       await trx('SEP_Proposals')
         .where('sep_id', sepId)
         .andWhere('proposal_id', proposalId)
@@ -546,10 +545,10 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     sepId: number,
     memberIds: number[]
   ) {
-    await database.transaction(async trx => {
+    await database.transaction(async (trx) => {
       await trx<SEPAssignmentRecord>('SEP_Assignments')
         .insert(
-          memberIds.map(memberId => ({
+          memberIds.map((memberId) => ({
             proposal_id: proposalId,
             sep_member_user_id: memberId,
             sep_id: sepId,
@@ -559,7 +558,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
 
       await trx<ReviewRecord>('SEP_Reviews')
         .insert(
-          memberIds.map(memberId => ({
+          memberIds.map((memberId) => ({
             user_id: memberId,
             proposal_id: proposalId,
             status: ReviewStatus.DRAFT,
@@ -629,7 +628,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     const record = await database<SEPRecord>('SEPs')
       .select('*')
       .where('sep_id', sepId)
-      .where(qb => {
+      .where((qb) => {
         qb.where('sep_chair_user_id', userId);
         qb.orWhere('sep_secretary_user_id', userId);
       })
@@ -646,7 +645,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .select<SEPRecord>(['SEPs.*'])
       .join('SEP_Proposals', 'SEP_Proposals.sep_id', '=', 'SEPs.sep_id')
       .where('SEP_Proposals.proposal_id', proposalId)
-      .where(qb => {
+      .where((qb) => {
         qb.where('sep_chair_user_id', userId);
         qb.orWhere('sep_secretary_user_id', userId);
       })

@@ -16,7 +16,7 @@ const files = () => {
       const path = await baseContext.mutations.file.prepare(fileId);
       const metaData = await baseContext.queries.file.getFileMetadata([fileId]);
       if (!isRejection(path) && metaData) {
-        res.download(path, metaData[0].originalFileName, err => {
+        res.download(path, metaData[0].originalFileName, (err) => {
           if (err) {
             throw err;
           }

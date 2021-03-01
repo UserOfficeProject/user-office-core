@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { logger } from '@esss-swap/duo-logger';
 
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -71,7 +70,7 @@ export default function createHandler(
         try {
           await Promise.all(
             event.proposalidswithnextstatus.proposalIds.map(
-              async proposalId => {
+              async (proposalId) => {
                 const proposal = await proposalDataSource.get(proposalId);
 
                 if (proposal?.id) {
@@ -305,7 +304,7 @@ export default function createHandler(
           if (allProposalsOnCall && allProposalsOnCall.length) {
             await Promise.all(
               allProposalsOnCall.map(
-                async proposalOnCall =>
+                async (proposalOnCall) =>
                   await markProposalEventAsDoneAndCallWorkflowEngine(
                     event.type,
                     proposalOnCall
@@ -325,7 +324,7 @@ export default function createHandler(
       case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
         try {
           await Promise.all(
-            event.instrumenthasproposals.proposalIds.map(async proposalId => {
+            event.instrumenthasproposals.proposalIds.map(async (proposalId) => {
               const proposal = await proposalDataSource.get(proposalId);
 
               if (proposal?.id) {

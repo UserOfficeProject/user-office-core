@@ -60,23 +60,23 @@ export default class AdminQueries {
     const allQueryMethods: string[] = [];
     const allMutationMethods: string[] = [];
 
-    Object.keys(context.queries).forEach(queryKey => {
+    Object.keys(context.queries).forEach((queryKey) => {
       const element =
         context.queries[queryKey as keyof BasicResolverContext['queries']];
 
       const proto = Object.getPrototypeOf(element);
-      const names = Object.getOwnPropertyNames(proto).filter(item =>
+      const names = Object.getOwnPropertyNames(proto).filter((item) =>
         item.startsWith('get')
       );
 
       const classNamesWithMethod = names.map(
-        item => `${proto.constructor.name}.${item}`
+        (item) => `${proto.constructor.name}.${item}`
       );
 
       allQueryMethods.push(...classNamesWithMethod);
     });
 
-    Object.keys(context.mutations).forEach(mutationKey => {
+    Object.keys(context.mutations).forEach((mutationKey) => {
       const element =
         context.mutations[
           mutationKey as keyof BasicResolverContext['mutations']
@@ -84,11 +84,11 @@ export default class AdminQueries {
 
       const proto = Object.getPrototypeOf(element);
       const names = Object.getOwnPropertyNames(proto).filter(
-        item => item !== 'constructor'
+        (item) => item !== 'constructor'
       );
 
       const classNamesWithMethod = names.map(
-        item => `${proto.constructor.name}.${item}`
+        (item) => `${proto.constructor.name}.${item}`
       );
 
       allMutationMethods.push(...classNamesWithMethod);

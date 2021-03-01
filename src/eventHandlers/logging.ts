@@ -48,7 +48,7 @@ export default function createHandler(
         case Event.PROPOSAL_INSTRUMENT_SELECTED:
         case Event.PROPOSAL_SEP_SELECTED:
           event.proposalidswithnextstatus.proposalIds.forEach(
-            async proposalId => {
+            async (proposalId) => {
               await eventLogsDataSource.set(
                 event.loggedInUserId,
                 event.type,

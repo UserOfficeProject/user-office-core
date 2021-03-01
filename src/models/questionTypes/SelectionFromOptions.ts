@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable quotes */
 import { SelectionFromOptionsConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
@@ -21,7 +20,7 @@ export const selectionFromOptionsDefinition: Question = {
       return false;
     }
 
-    if (value.every(val => config.options.includes(val)) !== true) {
+    if (value.every((val) => config.options.includes(val)) !== true) {
       return false;
     }
 

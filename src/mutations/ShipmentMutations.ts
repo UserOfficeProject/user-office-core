@@ -67,7 +67,7 @@ export default class ShipmentMutations {
 
     return this.questionaryDataSource
       .create(agent.id, template.templateId)
-      .then(questionary => {
+      .then((questionary) => {
         return this.shipmentDataSource.create(
           args.title,
           agent.id,
@@ -75,7 +75,7 @@ export default class ShipmentMutations {
           questionary.questionaryId
         );
       })
-      .catch(error => {
+      .catch((error) => {
         logger.logException('Could not create shipment', error, {
           agent,
           args,
@@ -103,8 +103,8 @@ export default class ShipmentMutations {
 
     return this.shipmentDataSource
       .update(args)
-      .then(shipment => shipment)
-      .catch(error => {
+      .then((shipment) => shipment)
+      .catch((error) => {
         logger.logException('Could not update shipment', error, {
           agent,
           args,
@@ -121,8 +121,8 @@ export default class ShipmentMutations {
 
     return this.shipmentDataSource
       .delete(shipmentId)
-      .then(shipment => shipment)
-      .catch(error => {
+      .then((shipment) => shipment)
+      .catch((error) => {
         logger.logException('Could not delete shipment', error, {
           agent,
           shipmentId,
