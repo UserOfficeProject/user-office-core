@@ -35,6 +35,7 @@ export enum Event {
   SEP_MEMBER_ASSIGNED_TO_PROPOSAL = 'SEP_MEMBER_ASSIGNED_TO_PROPOSAL',
   SEP_MEMBER_REMOVED_FROM_PROPOSAL = 'SEP_MEMBER_REMOVED_FROM_PROPOSAL',
   PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED',
+  PROPOSAL_CLONED = 'PROPOSAL_CLONED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -139,4 +140,5 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when SEP member is removed from proposal for review',
   ],
   [Event.PROPOSAL_NOTIFIED, 'Event occurs when proposal is notified'],
+  [Event.PROPOSAL_CLONED, 'Event occurs when proposal is cloned'],
 ]);

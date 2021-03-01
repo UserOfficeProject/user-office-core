@@ -20,6 +20,6 @@ export class ProposalEvent {
   @Field(() => Event)
   public name: Event;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public description: string;
 }

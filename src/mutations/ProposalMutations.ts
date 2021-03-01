@@ -20,6 +20,7 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
+import { CloneProposalInput } from '../resolvers/mutations/CloneProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
@@ -301,5 +302,41 @@ export default class ProposalMutations {
     const result = await this.proposalDataSource.update(proposal);
 
     return result || rejection('INTERNAL_ERROR');
+  }
+
+  @Authorized()
+  @EventBus(Event.PROPOSAL_CLONED)
+  async clone(
+    agent: UserWithRole | null,
+    { callId, proposalToCloneId }: CloneProposalInput
+  ): Promise<Proposal | Rejection> {
+    // Check if there is an open call
+    if (!(await this.proposalDataSource.checkActiveCall(callId))) {
+      return rejection('NO_ACTIVE_CALL_FOUND');
+    }
+
+    const call = await this.callDataSource.get(callId);
+
+    if (!call || !call.templateId) {
+      logger.logError('User tried to clone proposal on bad call', {
+        call,
+      });
+
+      return rejection('NOT_FOUND');
+    }
+
+    return this.proposalDataSource
+      .cloneProposal(
+        (agent as UserWithRole).id,
+        proposalToCloneId,
+        callId,
+        call.templateId
+      )
+      .then((proposal) => proposal)
+      .catch((err) => {
+        logger.logException('Could not clone proposal', err, { agent });
+
+        return rejection('INTERNAL_ERROR');
+      });
   }
 }

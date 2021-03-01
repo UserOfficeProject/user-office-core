@@ -176,4 +176,13 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async getCount(callId: number): Promise<number> {
     return 1;
   }
+
+  async cloneProposal(
+    clonerId: number,
+    proposalId: number,
+    callId: number,
+    templateId: number
+  ): Promise<Proposal> {
+    return dummyProposal;
+  }
 }

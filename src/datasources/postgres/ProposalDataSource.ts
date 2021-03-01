@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
 
@@ -15,6 +16,7 @@ import {
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
+  QuestionaryRecord,
 } from './records';
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
@@ -401,5 +403,90 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((result: { count?: string | undefined } | undefined) => {
         return parseInt(result?.count || '0');
       });
+  }
+
+  async cloneProposal(
+    clonerId: number,
+    proposalId: number,
+    callId: number,
+    templateId: number
+  ): Promise<Proposal> {
+    const sourceProposal = await this.get(proposalId);
+
+    if (!sourceProposal) {
+      logger.logError(
+        'Could not clone proposal because source proposal does not exist',
+        { proposalId }
+      );
+
+      throw new Error('Could not clone proposal');
+    }
+
+    const [newQuestionary]: QuestionaryRecord[] = (
+      await database.raw(`
+      INSERT INTO questionaries
+      (
+        template_id,
+        creator_id
+      )
+      SELECT
+        ${templateId},
+        ${clonerId}
+      FROM 
+        questionaries
+      WHERE
+        questionary_id = ${sourceProposal.questionaryId}
+      RETURNING *
+    `)
+    ).rows;
+
+    await database.raw(`
+      INSERT INTO answers
+      (
+        questionary_id,
+        question_id,
+        answer
+      )
+      SELECT
+        ${newQuestionary.questionary_id},
+        question_id,
+        answer
+      FROM 
+        answers
+      WHERE
+        questionary_id = ${sourceProposal.questionaryId}
+    `);
+
+    const [newProposal]: ProposalRecord[] = (
+      await database.raw(`
+      INSERT INTO proposals
+      (
+        title,
+        abstract,
+        status_id,
+        proposer_id,
+        call_id,
+        questionary_id,
+        notified,
+        submitted
+      )
+      SELECT
+        'Copy of ${sourceProposal.title}',
+        abstract,
+        1,
+        proposer_id,
+        ${callId},
+        ${newQuestionary.questionary_id},
+        false,
+        false
+      FROM 
+        proposals
+      WHERE
+        proposal_id = ${sourceProposal.id}
+      RETURNING *
+    `)
+    ).rows;
+
+    return createProposalObject(newProposal);
   }
 }

@@ -94,7 +94,8 @@ export const workflowEngine = async (
   }
 
   const eventThatTriggeredStatusChangeIsNextStatusEvent = nextStatusEvents.find(
-    nextStatusEvent => proposal.currentEvent === nextStatusEvent.nextStatusEvent
+    (nextStatusEvent) =>
+      proposal.currentEvent === nextStatusEvent.nextStatusEvent
   );
 
   if (!eventThatTriggeredStatusChangeIsNextStatusEvent) {

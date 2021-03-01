@@ -45,8 +45,8 @@ export default function createHandler(
       currentSubmittedReview: Review
     ) => {
       const allOtherReviewsSubmitted = allReviews
-        .filter(review => review.id !== currentSubmittedReview.id)
-        .every(review => review.status === ReviewStatus.SUBMITTED);
+        .filter((review) => review.id !== currentSubmittedReview.id)
+        .every((review) => review.status === ReviewStatus.SUBMITTED);
 
       return allOtherReviewsSubmitted;
     };
