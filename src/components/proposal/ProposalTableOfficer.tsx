@@ -237,7 +237,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
+      cellStyle: { padding: 0, minWidth: 152 },
       sorting: false,
       removable: false,
       render: RowActionButtons,
