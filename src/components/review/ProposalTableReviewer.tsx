@@ -98,7 +98,7 @@ const ProposalTableReviewer: React.FC = () => {
           {rowData.status === 'SUBMITTED' ? <Visibility /> : <RateReviewIcon />}
         </IconButton>
       </Tooltip>
-      <Tooltip title="Download review">
+      <Tooltip title="Download Proposal">
         <IconButton
           onClick={() =>
             downloadPDFProposal([rowData.proposalId], rowData.title)
