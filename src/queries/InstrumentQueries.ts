@@ -27,7 +27,12 @@ export default class InstrumentQueries {
     return instrument;
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.SEP_REVIEWER,
+    Roles.SEP_CHAIR,
+    Roles.SEP_SECRETARY,
+  ])
   async getAll(agent: UserWithRole | null, callIds: number[]) {
     if (!callIds || callIds.length === 0) {
       return await this.dataSource.getAll();

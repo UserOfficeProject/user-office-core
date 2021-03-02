@@ -10,7 +10,12 @@ export interface ReviewDataSource {
   updateReview(args: AddReviewArgs): Promise<Review>;
 
   getProposalReviews(id: number): Promise<Review[]>;
-  getUserReviews(id: number): Promise<Review[]>;
+  getUserReviews(
+    id: number,
+    callId?: number,
+    instrumentId?: number,
+    submitted?: number
+  ): Promise<Review[]>;
   getAssignmentReview(
     sepId: number,
     proposalId: number,

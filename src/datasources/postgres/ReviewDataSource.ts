@@ -177,10 +177,34 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .then((records: ReviewRecord[]) => this.createReviewObject(records[0]));
   }
 
-  async getUserReviews(id: number): Promise<Review[]> {
+  async getUserReviews(
+    id: number,
+    callId?: number,
+    instrumentId?: number,
+    status?: ReviewStatus
+  ): Promise<Review[]> {
     return database
       .select()
       .from('SEP_Reviews')
+      .modify(qb => {
+        if (callId) {
+          qb.join('proposals', {
+            'proposals.proposal_id': 'SEP_Reviews.proposal_id',
+          });
+          qb.where('proposals.call_id', callId);
+        }
+
+        if (instrumentId) {
+          qb.join('instrument_has_proposals', {
+            'instrument_has_proposals.proposal_id': 'SEP_Reviews.proposal_id',
+          });
+          qb.where('instrument_has_proposals.instrument_id', instrumentId);
+        }
+
+        if (status) {
+          qb.where('SEP_Reviews.status', status);
+        }
+      })
       .where('user_id', id)
       .then((reviews: ReviewRecord[]) => {
         return reviews.map((review) => this.createReviewObject(review));
