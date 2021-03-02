@@ -17,6 +17,39 @@ import {
   ProposalViewRecord,
 } from './records';
 
+export async function calculateReferenceNumber(
+  format: string,
+  sequence: number | null
+): Promise<string> {
+  const prefix: string = format.slice(0, format.indexOf('{'));
+  const formatParameters: { [param: string]: string } = {};
+  format.match(/(\w+:\w+)/g)?.forEach((el: string) => {
+    const [k, v] = el.split(':');
+    formatParameters[k] = v;
+  });
+
+  if (!prefix || !('digits' in formatParameters)) {
+    return Promise.reject(
+      new Error(`The reference number format ('${format}') is invalid`)
+    );
+  }
+
+  sequence = sequence ?? 0;
+  if (String(sequence).length > Number(formatParameters['digits'])) {
+    return Promise.reject(
+      new Error(
+        `The sequence number provided ('${formatParameters['digits']}') exceeds the format's digits parameter`
+      )
+    );
+  }
+  const paddedSequence: string = String(sequence).padStart(
+    Number(formatParameters['digits']),
+    '0'
+  );
+
+  return prefix + paddedSequence;
+}
+
 export default class PostgresProposalDataSource implements ProposalDataSource {
   // TODO move this function to callDataSource
   public async checkActiveCall(callId: number): Promise<boolean> {
@@ -33,22 +66,80 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async submitProposal(id: number): Promise<Proposal> {
-    return database
-      .update(
-        {
-          submitted: true,
-        },
-        ['*']
-      )
-      .from('proposals')
-      .where('proposal_id', id)
-      .then((proposal: ProposalRecord[]) => {
-        if (proposal === undefined || proposal.length !== 1) {
-          throw new Error(`Failed to submit proposal with id '${id}'`);
+    const proposal: ProposalRecord[] = await database.transaction(async trx => {
+      try {
+        const call = await database
+          .select(
+            'c.call_id',
+            'c.reference_number_format',
+            'c.proposal_sequence'
+          )
+          .from('call as c')
+          .join('proposals as p', { 'p.call_id': 'c.call_id' })
+          .where('p.proposal_id', id)
+          .first()
+          .forUpdate()
+          .transacting(trx);
+
+        let referenceNumber: string | null;
+        if (call.reference_number_format) {
+          referenceNumber = await calculateReferenceNumber(
+            call.reference_number_format,
+            call.proposal_sequence
+          );
+
+          if (!referenceNumber) {
+            throw new Error(
+              `Failed to calculate reference number for proposal with id '${id}' using format '${call.reference_number_format}'`
+            );
+          } else if (referenceNumber.length > 16) {
+            throw new Error(
+              `The reference number calculated is too long ('${referenceNumber.length} characters)`
+            );
+          }
         }
 
-        return createProposalObject(proposal[0]);
-      });
+        await database
+          .update({
+            proposal_sequence: (call.proposal_sequence ?? 0) + 1,
+          })
+          .from('call as c')
+          .where('c.call_id', call.call_id)
+          .transacting(trx);
+
+        const proposalUpdate = await database
+          .from('proposals')
+          .returning('*')
+          .where('proposal_id', id)
+          .modify(query => {
+            if (referenceNumber) {
+              query.update({
+                short_code: referenceNumber,
+                reference_number_sequence: call.proposal_sequence ?? 0,
+                submitted: true,
+              });
+            } else {
+              query.update({
+                reference_number_sequence: call.proposal_sequence ?? 0,
+                submitted: true,
+              });
+            }
+          })
+          .transacting(trx);
+
+        return await trx.commit(proposalUpdate);
+      } catch (error) {
+        throw new Error(
+          `Failed to submit proposal with id '${id}' because: '${error.message}'`
+        );
+      }
+    });
+
+    if (proposal === undefined || proposal.length !== 1) {
+      throw new Error(`Failed to submit proposal with id '${id}'`);
+    }
+
+    return createProposalObject(proposal[0]);
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
