@@ -1,25 +1,41 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { UserWithReviewsQuery } from 'generated/sdk';
+import { UserWithReviewsQuery, ReviewStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useUserWithReviewsData() {
+export function useUserWithReviewsData(filters?: {
+  callId?: number;
+  instrumentId?: number;
+  status?: ReviewStatus;
+}) {
   const api = useDataApi();
+  const [userWithReviewsFilter, setUserWithReviewsFilter] = useState(filters);
   const [userData, setUserData] = useState<UserWithReviewsQuery['me'] | null>(
     null
   );
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
+    let unmounted = false;
+
     setLoading(true);
     api()
-      .userWithReviews()
+      .userWithReviews(userWithReviewsFilter)
       .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         setUserData(data.me);
         setLoading(false);
       });
-  }, [api]);
 
-  return { loading, userData, setUserData };
+    return () => {
+      unmounted = true;
+    };
+  }, [userWithReviewsFilter, api]);
+
+  return { loading, userData, setUserData, setUserWithReviewsFilter } as const;
 }
 
 export function useBasicUserData() {

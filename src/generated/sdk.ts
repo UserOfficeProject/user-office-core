@@ -2279,6 +2279,13 @@ export type User = {
   instruments: Array<Instrument>;
 };
 
+
+export type UserReviewsArgs = {
+  status?: Maybe<ReviewStatus>;
+  instrumentId?: Maybe<Scalars['Int']>;
+  callId?: Maybe<Scalars['Int']>;
+};
+
 export type UserQueryResult = {
   __typename?: 'UserQueryResult';
   users: Array<BasicUserDetails>;
@@ -3936,7 +3943,11 @@ export type AddReviewMutation = (
   ) }
 );
 
-export type UserWithReviewsQueryVariables = Exact<{ [key: string]: never; }>;
+export type UserWithReviewsQueryVariables = Exact<{
+  callId?: Maybe<Scalars['Int']>;
+  instrumentId?: Maybe<Scalars['Int']>;
+  status?: Maybe<ReviewStatus>;
+}>;
 
 
 export type UserWithReviewsQuery = (
@@ -6964,13 +6975,13 @@ export const AddReviewDocument = gql`
 }
     ${CoreReviewFragmentDoc}`;
 export const UserWithReviewsDocument = gql`
-    query userWithReviews {
+    query userWithReviews($callId: Int, $instrumentId: Int, $status: ReviewStatus) {
   me {
     id
     firstname
     lastname
     organisation
-    reviews {
+    reviews(callId: $callId, instrumentId: $instrumentId, status: $status) {
       id
       grade
       comment

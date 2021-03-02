@@ -27,12 +27,12 @@ export const defaultCallStatusQueryFilter = withDefault(
 
 type CallStatusFilterProps = {
   callStatus: string;
-  onStatusChange: (callStatus: CallStatus) => void;
+  onChange: (callStatus: CallStatus) => void;
 };
 
 const CallStatusFilter: React.FC<CallStatusFilterProps> = ({
   callStatus,
-  onStatusChange,
+  onChange,
 }) => {
   const classes = useStyles();
 
@@ -40,7 +40,7 @@ const CallStatusFilter: React.FC<CallStatusFilterProps> = ({
     <FormControl className={classes.formControl}>
       <InputLabel shrink>Status</InputLabel>
       <Select
-        onChange={(e) => onStatusChange(e.target.value as CallStatus)}
+        onChange={(e) => onChange(e.target.value as CallStatus)}
         value={callStatus}
         data-cy="call-status-filter"
       >
