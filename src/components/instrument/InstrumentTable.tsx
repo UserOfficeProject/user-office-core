@@ -76,8 +76,8 @@ const InstrumentTable: React.FC = () => {
         return scientist;
       });
 
-      if (instruments) {
-        const newInstrumentsData = instruments.map((instrumentItem) => {
+      setInstruments((instruments) =>
+        instruments.map((instrumentItem) => {
           if (instrumentItem.id === assigningInstrumentId) {
             return {
               ...instrumentItem,
@@ -86,10 +86,8 @@ const InstrumentTable: React.FC = () => {
           } else {
             return instrumentItem;
           }
-        });
-
-        setInstruments(newInstrumentsData);
-      }
+        })
+      );
     }
 
     setAssigningInstrumentId(null);
@@ -99,8 +97,8 @@ const InstrumentTable: React.FC = () => {
     scientistToRemoveId: number,
     instrumentToRemoveFromId: number
   ) => {
-    if (instruments) {
-      const newInstrumentsData = instruments.map((instrumentItem) => {
+    setInstruments((instruments) =>
+      instruments.map((instrumentItem) => {
         if (instrumentItem.id === instrumentToRemoveFromId) {
           const newScientists = instrumentItem.scientists.filter(
             (scientistItem) => scientistItem.id !== scientistToRemoveId
@@ -113,11 +111,9 @@ const InstrumentTable: React.FC = () => {
         } else {
           return instrumentItem;
         }
-      });
-
-      setInstruments(newInstrumentsData);
-      setAssigningInstrumentId(null);
-    }
+      })
+    );
+    setAssigningInstrumentId(null);
   };
 
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
