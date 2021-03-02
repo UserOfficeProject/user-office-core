@@ -23,15 +23,15 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
   const {
     answer,
     onComplete,
-    formikProps: { errors, touched, initialValues },
+    formikProps: { errors, touched },
   } = props;
   const {
+    value,
     question: { proposalQuestionId, question },
   } = answer;
 
   const fieldError = getIn(errors, proposalQuestionId);
-  const initialValue = getIn(initialValues, proposalQuestionId);
-  const [stateValue, setStateValue] = useState(initialValue);
+  const [stateValue, setStateValue] = useState(value);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
   const config = answer.config as RichTextInputConfig;
   const classes = useStyles();
@@ -52,7 +52,7 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
       <FormLabel className={classes.label}>{question}</FormLabel>
       <Editor
         id={proposalQuestionId}
-        initialValue={initialValue}
+        initialValue={value}
         init={{
           skin: false,
           content_css: false,
