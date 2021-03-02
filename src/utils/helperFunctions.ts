@@ -1,6 +1,8 @@
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { Column } from 'material-table';
 
 import { SortDirectionType } from 'components/common/SuperMaterialTable';
+import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const getUniqueArrayBy = (roles: any[], uniqueBy: string): any[] => {
@@ -26,4 +28,18 @@ export const setSortDirectionOnSortColumn = (
   }
 
   return columns;
+};
+
+export const getProposalStatus = (
+  proposal: {
+    status: ProposalStatus | null;
+    finalStatus?: ProposalEndStatus | null | undefined;
+    notified: boolean;
+  } | null
+): string | null => {
+  if (proposal?.notified) {
+    return getTranslation(proposal.finalStatus as ResourceId);
+  } else {
+    return proposal?.status?.name || null;
+  }
 };

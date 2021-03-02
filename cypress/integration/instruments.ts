@@ -23,65 +23,10 @@ context('Instrument tests', () => {
     cy.notification({ variant: 'success', text: 'created successfully' });
   }
 
-  function createCall({
-    shortCode,
-    startDate,
-    endDate,
-  }: {
-    shortCode: string;
-    startDate: string;
-    endDate: string;
-  }) {
-    cy.contains('Calls').click();
-
-    cy.contains('Create').click();
-
-    cy.get('[data-cy=short-code] input')
-      .type(shortCode)
-      .should('have.value', shortCode);
-
-    cy.get('[data-cy=start-date] input').clear();
-    cy.get('[data-cy=start-date] input')
-      .type(startDate)
-      .should('have.value', startDate);
-
-    cy.get('[data-cy=end-date] input').clear();
-    cy.get('[data-cy=end-date] input')
-      .type(endDate)
-      .should('have.value', endDate);
-
-    cy.get('[data-cy="call-template"]').click();
-    cy.contains('default template').click();
-
-    cy.get('[data-cy="next-step"]').click();
-
-    cy.get('[data-cy=survey-comment] input').type(
-      faker.random.word().split(' ')[0]
-    );
-
-    cy.get('[data-cy="next-step"]').click();
-
-    cy.get('[data-cy=cycle-comment] input').type(
-      faker.random.word().split(' ')[0]
-    );
-
-    cy.get('[data-cy="submit"]').click();
-
-    cy.notification({ variant: 'success', text: 'successfully' });
-
-    cy.contains(shortCode);
-  }
-
   function assignInstrumentToCall(call: string, instrument: string) {
-    cy.contains(call)
-      .parent()
-      .find('[title="Assign Instrument"]')
-      .click();
+    cy.contains(call).parent().find('[title="Assign Instrument"]').click();
 
-    cy.contains(instrument)
-      .parent()
-      .find('[type="checkbox"]')
-      .check();
+    cy.contains(instrument).parent().find('[type="checkbox"]').check();
 
     cy.contains('Assign instrument').click();
 
@@ -92,22 +37,15 @@ context('Instrument tests', () => {
   }
 
   function assignInstrumentToProposal(proposal: string, instrument: string) {
-    cy.contains(proposal)
-      .parent()
-      .find('[type="checkbox"]')
-      .as('checkbox');
+    cy.contains(proposal).parent().find('[type="checkbox"]').as('checkbox');
 
     cy.get('@checkbox').check();
 
     cy.get("[title='Assign proposals to instrument']").click();
 
-    cy.get("[id='mui-component-select-selectedInstrumentId']")
-      .first()
-      .click();
+    cy.get("[id='mui-component-select-selectedInstrumentId']").first().click();
 
-    cy.get("[id='menu-selectedInstrumentId'] li")
-      .contains(instrument)
-      .click();
+    cy.get("[id='menu-selectedInstrumentId'] li").contains(instrument).click();
 
     cy.contains('Assign to Instrument').click();
 
@@ -148,14 +86,9 @@ context('Instrument tests', () => {
 
   const call2 = {
     shortCode: faker.random.alphaNumeric(10),
-    startDate: faker.date
-      .past()
-      .toISOString()
-      .slice(0, 10),
-    endDate: faker.date
-      .future()
-      .toISOString()
-      .slice(0, 10),
+    startDate: faker.date.past().toISOString().slice(0, 10),
+    endDate: faker.date.future().toISOString().slice(0, 10),
+    template: 'default template',
   };
 
   before(() => {
@@ -196,10 +129,7 @@ context('Instrument tests', () => {
     cy.login('officer');
 
     cy.contains('Instruments').click();
-    cy.contains(originalName)
-      .parent()
-      .find('[title="Edit"]')
-      .click();
+    cy.contains(originalName).parent().find('[title="Edit"]').click();
     cy.get('#name').clear();
     cy.get('#name').type(instrument1.name);
     cy.get('#shortCode').clear();
@@ -221,7 +151,7 @@ context('Instrument tests', () => {
 
     cy.contains('Calls').click();
 
-    createCall(call2);
+    cy.createCall(call2);
 
     cy.logout();
 
@@ -261,13 +191,9 @@ context('Instrument tests', () => {
 
     cy.finishedLoading();
 
-    cy.get('tbody [type="checkbox"]')
-      .first()
-      .check();
+    cy.get('tbody [type="checkbox"]').first().check();
 
-    cy.get('[title="Remove assigned instrument"]')
-      .first()
-      .click();
+    cy.get('[title="Remove assigned instrument"]').first().click();
 
     cy.get('[data-cy="confirm-ok"]').click();
 
@@ -276,17 +202,11 @@ context('Instrument tests', () => {
       text: 'Proposal removed from the instrument successfully!',
     });
 
-    cy.get('[data-cy="assign-proposals-to-instrument"]')
-      .first()
-      .click();
+    cy.get('[data-cy="assign-proposals-to-instrument"]').first().click();
 
-    cy.get("[id='mui-component-select-selectedInstrumentId']")
-      .first()
-      .click();
+    cy.get("[id='mui-component-select-selectedInstrumentId']").first().click();
 
-    cy.get("[id='menu-selectedInstrumentId'] li")
-      .first()
-      .click();
+    cy.get("[id='menu-selectedInstrumentId'] li").first().click();
 
     cy.contains('Assign to Instrument').click();
 
@@ -295,9 +215,7 @@ context('Instrument tests', () => {
       text: 'Proposal/s assigned to the selected instrument',
     });
 
-    cy.get('[title="Remove assigned instrument"]')
-      .first()
-      .click();
+    cy.get('[title="Remove assigned instrument"]').first().click();
 
     cy.get('[data-cy="confirm-ok"]').click();
 
@@ -306,17 +224,11 @@ context('Instrument tests', () => {
       text: 'Proposal removed from the instrument successfully!',
     });
 
-    cy.get('[data-cy="assign-proposals-to-instrument"]')
-      .first()
-      .click();
+    cy.get('[data-cy="assign-proposals-to-instrument"]').first().click();
 
-    cy.get("[id='mui-component-select-selectedInstrumentId']")
-      .first()
-      .click();
+    cy.get("[id='mui-component-select-selectedInstrumentId']").first().click();
 
-    cy.get("[id='menu-selectedInstrumentId'] li")
-      .first()
-      .click();
+    cy.get("[id='menu-selectedInstrumentId'] li").first().click();
 
     cy.contains('Assign to Instrument').click();
 
@@ -333,17 +245,12 @@ context('Instrument tests', () => {
 
     cy.contains('People').click();
 
-    cy.contains('Carlsson')
-      .parent()
-      .find('button[title="Edit user"]')
-      .click();
+    cy.contains('Carlsson').parent().find('button[title="Edit user"]').click();
 
     const mainContentElement = cy.get('main');
     mainContentElement.contains('Settings').click();
 
-    cy.get('[data-cy="add-role-button"]')
-      .should('not.be.disabled')
-      .click();
+    cy.get('[data-cy="add-role-button"]').should('not.be.disabled').click();
 
     cy.finishedLoading();
 
@@ -357,9 +264,7 @@ context('Instrument tests', () => {
       .find('input[type="checkbox"]')
       .click();
 
-    cy.get('[data-cy="role-modal"]')
-      .contains('Update')
-      .click();
+    cy.get('[data-cy="role-modal"]').contains('Update').click();
 
     cy.notification({ variant: 'success', text: 'successfully' });
 
@@ -375,9 +280,7 @@ context('Instrument tests', () => {
         .first()
         .click();
 
-      cy.get('.MuiDialog-root')
-        .contains('Update')
-        .click();
+      cy.get('.MuiDialog-root').contains('Update').click();
 
       cy.notification({
         variant: 'success',
@@ -433,18 +336,14 @@ context('Instrument tests', () => {
     cy.finishedLoading();
 
     cy.get('[data-cy="call-filter"]').click();
-    cy.get('[role="listbox"]')
-      .contains('call 1')
-      .click();
+    cy.get('[role="listbox"]').contains('call 1').click();
     cy.finishedLoading();
 
     cy.contains(proposal1.title);
     cy.contains(proposal2.title).should('not.exist');
 
     cy.get('[data-cy="instrument-filter"]').click();
-    cy.get('[role="listbox"]')
-      .contains(instrument2.name)
-      .click();
+    cy.get('[role="listbox"]').contains(instrument2.name).click();
     cy.finishedLoading();
 
     cy.contains('No records to display');
@@ -503,30 +402,21 @@ context('Instrument tests', () => {
     cy.get('[data-cy="status-filter"]').click();
     cy.get('[role="listbox"] [data-value="0"]').click();
 
-    cy.get('[data-cy="view-proposal"]')
-      .first()
-      .click();
+    cy.get('[data-cy="view-proposal"]').first().click();
     cy.contains('Technical').click();
 
-    cy.get('[data-cy="timeAllocation"] input')
-      .type('-123')
-      .blur();
+    cy.get('[data-cy="timeAllocation"] input').type('-123').blur();
     cy.contains('Must be greater than or equal to');
 
-    cy.get('[data-cy="timeAllocation"] input')
-      .clear()
-      .type('987654321')
-      .blur();
+    cy.get('[data-cy="timeAllocation"] input').clear().type('987654321').blur();
     cy.contains('Must be less than or equal to');
 
-    cy.get('[data-cy="timeAllocation"] input')
-      .clear()
-      .type('20');
+    cy.get('[data-cy="timeAllocation"] input').clear().type('20');
 
     cy.get('[data-cy="technical-review-status"]').click();
     cy.contains('Feasible').click();
 
-    cy.on('window:confirm', str => {
+    cy.on('window:confirm', (str) => {
       expect(str).to.equal(
         'Changes you recently made in this tab will be lost! Are you sure?'
       );
@@ -562,17 +452,11 @@ context('Instrument tests', () => {
     cy.get('[data-cy="status-filter"]').click();
     cy.get('[role="listbox"] [data-value="0"]').click();
 
-    cy.get('[data-cy="view-proposal"]')
-      .first()
-      .click();
+    cy.get('[data-cy="view-proposal"]').first().click();
     cy.contains('Technical').click();
 
-    cy.get('[data-cy="comment"] textarea')
-      .first()
-      .type(internalComment);
-    cy.get('[data-cy="publicComment"] textarea')
-      .first()
-      .type(publicComment);
+    cy.get('[data-cy="comment"] textarea').first().type(internalComment);
+    cy.get('[data-cy="publicComment"] textarea').first().type(publicComment);
 
     cy.contains('Submit').click();
 
@@ -628,7 +512,7 @@ context('Instrument tests', () => {
       .parent()
       .find('td')
       .last()
-      .then(element => {
+      .then((element) => {
         expect(element.text()).to.be.equal('-');
       });
   });
@@ -638,10 +522,7 @@ context('Instrument tests', () => {
 
     cy.contains('Calls').click();
 
-    cy.contains('call 1')
-      .parent()
-      .find('[title="Show Instruments"]')
-      .click();
+    cy.contains('call 1').parent().find('[title="Show Instruments"]').click();
 
     cy.get('[data-cy="call-instrument-assignments-table"] [title="Delete"]')
       .first()
@@ -656,10 +537,7 @@ context('Instrument tests', () => {
 
     cy.contains('Instruments').click();
 
-    cy.contains(instrument1.name)
-      .parent()
-      .find('[title="Delete"]')
-      .click();
+    cy.contains(instrument1.name).parent().find('[title="Delete"]').click();
 
     cy.get('[title="Save"]').click();
 
