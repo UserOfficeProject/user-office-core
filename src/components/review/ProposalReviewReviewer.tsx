@@ -17,8 +17,8 @@ type ProposalReviewProps = {
 };
 
 const ProposalReview: React.FC<ProposalReviewProps> = ({ reviewId, sepId }) => {
-  const { id } = useParams();
-  const { reviewData } = useReviewData(reviewId || +(id as string), sepId);
+  const { id } = useParams<{ id: string }>();
+  const { reviewData } = useReviewData(reviewId || +id, sepId);
   const { proposalData } = useProposalData(reviewData?.proposal?.id);
 
   if (!reviewData || !proposalData) {
@@ -32,8 +32,8 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ reviewId, sepId }) => {
       <ProposalQuestionaryReview data={proposalData} />
       <TechnicalReviewInformation data={proposalData.technicalReview} />
       <ProposalGrade
-        onChange={() => console.log('updated')}
-        reviewID={reviewId || +(id as string)}
+        onChange={() => {}}
+        reviewID={reviewId || +id}
         sepId={sepId}
       />
     </SimpleTabs>

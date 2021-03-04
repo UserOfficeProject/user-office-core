@@ -38,7 +38,7 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
 }) => {
   const classes = useStyles();
   const { currentRole } = useContext(UserContext);
-  const { SEPs } = useSEPsData('', true, currentRole as UserRole);
+  const { SEPs, loadingSEPs } = useSEPsData('', true, currentRole as UserRole);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -77,6 +77,7 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
                     value: sep.id.toString(),
                     text: sep.code,
                   }))}
+                  disabled={loadingSEPs}
                   required
                 />
               </Grid>

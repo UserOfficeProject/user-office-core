@@ -43,6 +43,11 @@ context('Instrument tests', () => {
 
     cy.get("[title='Assign proposals to instrument']").click();
 
+    cy.get("[id='mui-component-select-selectedInstrumentId']").should(
+      'not.have.class',
+      'Mui-disabled'
+    );
+
     cy.get("[id='mui-component-select-selectedInstrumentId']").first().click();
 
     cy.get("[id='menu-selectedInstrumentId'] li").contains(instrument).click();
@@ -207,6 +212,11 @@ context('Instrument tests', () => {
 
     cy.get('[data-cy="assign-proposals-to-instrument"]').first().click();
 
+    cy.get("[id='mui-component-select-selectedInstrumentId']").should(
+      'not.have.class',
+      'Mui-disabled'
+    );
+
     cy.get("[id='mui-component-select-selectedInstrumentId']").first().click();
 
     cy.get("[id='menu-selectedInstrumentId'] li").first().click();
@@ -228,6 +238,11 @@ context('Instrument tests', () => {
     });
 
     cy.get('[data-cy="assign-proposals-to-instrument"]').first().click();
+
+    cy.get("[id='mui-component-select-selectedInstrumentId']").should(
+      'not.have.class',
+      'Mui-disabled'
+    );
 
     cy.get("[id='mui-component-select-selectedInstrumentId']").first().click();
 
@@ -571,6 +586,8 @@ context('Instrument tests', () => {
       variant: 'success',
       text: 'Scientist removed from instrument',
     });
+
+    cy.finishedLoading();
 
     cy.contains(scientist1).should('not.exist');
     cy.contains(scientist2).should('not.exist');

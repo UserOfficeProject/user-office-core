@@ -103,6 +103,8 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
 
+      cy.finishedLoading();
+
       let proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
 
       const lastPageButtonElement = proposalStatusesTable.find(
@@ -299,6 +301,23 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="status_SEP_REVIEW_5"]').should('not.exist');
 
+      cy.get('[data-cy="status_SEP_MEETING_12"]').dragElement([
+        { direction: 'left', length: 1 },
+        { direction: 'down', length: 4 },
+      ]);
+
+      cy.get('[data-cy="connection_SEP_MEETING_12"]').should(
+        'contain.text',
+        'SEP Meeting'
+      );
+
+      cy.notification({
+        variant: 'success',
+        text: 'Workflow status added successfully',
+      });
+
+      cy.get('[data-cy="status_SEP_MEETING_12"]').should('not.exist');
+
       cy.get('[data-cy="connection_DRAFT_1"]').click();
 
       cy.get('[data-cy="next-status-events-modal"]').should('exist');
@@ -341,6 +360,19 @@ context('Settings tests', () => {
       });
 
       cy.contains('PROPOSAL_SEP_SELECTED');
+
+      cy.get('[data-cy="connection_SEP_REVIEW_5"]').click();
+
+      cy.get('[data-cy="next-status-events-modal"]').should('exist');
+
+      cy.contains('PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Next status events added successfully!',
+      });
 
       cy.contains('Calls').click();
 
@@ -437,6 +469,11 @@ context('Settings tests', () => {
 
       cy.get("[title='Assign proposals to SEP']").first().click();
 
+      cy.get("[id='mui-component-select-selectedSEPId']").should(
+        'not.have.class',
+        'Mui-disabled'
+      );
+
       cy.get("[id='mui-component-select-selectedSEPId']").first().click();
 
       cy.get("[id='menu-selectedSEPId'] li").first().click();
@@ -450,6 +487,73 @@ context('Settings tests', () => {
 
       cy.should('not.contain', 'SEP_SELECTION');
       cy.contains('SEP_REVIEW');
+    });
+
+    it('Proposal status should update immediately after all SEP reviews submitted', () => {
+      cy.login('officer');
+
+      cy.finishedLoading();
+
+      cy.contains('SEPs').click();
+
+      cy.get("[title='Edit']").first().click();
+
+      cy.contains('Members').click();
+
+      cy.get('[title="Set SEP Chair"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[title="Select user"]').first().click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'SEP chair assigned successfully!',
+      });
+
+      cy.contains('Proposals and Assignments').click();
+
+      cy.finishedLoading();
+
+      cy.get("[title='Assign SEP Member']").first().click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]')
+        .contains('Nilsson')
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+      cy.contains('1 user(s) selected');
+      cy.contains('Update').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Members assigned',
+      });
+
+      cy.get('[role="dialog"]').should('not.exist');
+      cy.get("[title='Show Reviewers']").first().click();
+      cy.contains('Nilsson').parent().find('[title="Review proposal"]').click();
+
+      cy.get('[role="dialog"]').contains('Grade').click({ force: true });
+
+      cy.get('textarea[name="comment"]').clear().type(faker.lorem.words(3));
+      cy.get('[id="mui-component-select-grade"]').click();
+
+      cy.get('[role="listbox"] > [role="option"]').first().click();
+
+      cy.contains('Submit').click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({ variant: 'success', text: 'Submitted' });
+
+      cy.get('[aria-label="close"]').click();
+
+      cy.get('[role="dialog"]').should('not.exist');
+      cy.wait(100);
+      cy.contains('SEP Meeting');
     });
 
     it('User Officer should be able to filter proposals based on statuses', () => {
@@ -469,16 +573,16 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody')
         .first()
-        .then((element) => expect(element.text()).to.contain('SEP_REVIEW'));
+        .then((element) => expect(element.text()).to.contain('SEP Meeting'));
 
       cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="5"]').click();
+      cy.get('[role="listbox"] [data-value="12"]').click();
 
       cy.finishedLoading();
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then((element) => expect(element.text()).to.contain('SEP_REVIEW'));
+        .then((element) => expect(element.text()).to.contain('SEP Meeting'));
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="1"]').click();

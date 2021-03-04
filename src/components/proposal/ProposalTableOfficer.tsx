@@ -385,12 +385,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               (item) => item.proposalId === prop.id
             );
 
-            if (
-              proposalNextStatusResponse?.result?.nextProposalStatus
-                ?.proposalNextStatusShortCode
-            ) {
+            if (proposalNextStatusResponse?.result.nextProposalStatus?.name) {
               prop.statusName =
-                proposalNextStatusResponse.result.nextProposalStatus.proposalNextStatusShortCode;
+                proposalNextStatusResponse.result.nextProposalStatus.name;
             }
           }
 
