@@ -66,6 +66,14 @@ export default function createHandler(
             event.instrumenthasproposals.instrumentId.toString()
           );
           break;
+        case Event.PROPOSAL_SEP_REVIEW_UPDATED:
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            event.reviewwithnextproposalstatus.id.toString()
+          );
+          break;
         default:
           await eventLogsDataSource.set(
             event.loggedInUserId,

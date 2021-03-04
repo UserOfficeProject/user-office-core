@@ -9,9 +9,11 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ReviewStatus } from '../../models/Review';
-import { ReviewResponseWrap } from '../types/CommonWrappers';
-import { Review } from '../types/Review';
+import {
+  ReviewStatus,
+  ReviewWithNextProposalStatus,
+} from '../../models/Review';
+import { ReviewWithNextStatusResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
@@ -34,11 +36,11 @@ export class AddReviewArgs {
 
 @Resolver()
 export class UpdateReviewMutation {
-  @Mutation(() => ReviewResponseWrap)
+  @Mutation(() => ReviewWithNextStatusResponseWrap)
   addReview(@Args() args: AddReviewArgs, @Ctx() context: ResolverContext) {
-    return wrapResponse<Review>(
+    return wrapResponse<ReviewWithNextProposalStatus>(
       context.mutations.review.updateReview(context.user, args),
-      ReviewResponseWrap
+      ReviewWithNextStatusResponseWrap
     );
   }
 }

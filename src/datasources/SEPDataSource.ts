@@ -63,10 +63,6 @@ export interface SEPDataSource {
     proposalId: number,
     sepId: number
   ): Promise<ProposalIdsWithNextStatus>;
-  getProposalNextStatus(
-    proposalId: number,
-    event: Event
-  ): Promise<ProposalStatus | null>;
   removeMemberFromSepProposal(
     proposalId: number,
     sepId: number,

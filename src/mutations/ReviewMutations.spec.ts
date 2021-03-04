@@ -1,7 +1,8 @@
 import 'reflect-metadata';
+import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
 import {
   ReviewDataSourceMock,
-  dummyReview,
+  dummyReviewWithNextProposalStatus,
 } from '../datasources/mockups/ReviewDataSource';
 import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
@@ -21,7 +22,8 @@ const userAuthorization = new UserAuthorization(
 );
 const reviewMutations = new ReviewMutations(
   new ReviewDataSourceMock(),
-  userAuthorization
+  userAuthorization,
+  new ProposalSettingsDataSourceMock()
 );
 
 //Update
@@ -35,7 +37,7 @@ test('A reviewer can submit a review on a proposal he is on', () => {
       status: ReviewStatus.DRAFT,
       sepID: 1,
     })
-  ).resolves.toBe(dummyReview);
+  ).resolves.toEqual(dummyReviewWithNextProposalStatus);
 });
 
 test('A user can not submit a review on a proposal', () => {

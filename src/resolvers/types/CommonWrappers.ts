@@ -8,7 +8,6 @@ import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
-import { NextProposalStatus } from './NextProposalStatus';
 import { NextStatusEvent } from './NextStatusEvent';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
 import { Proposal } from './Proposal';
@@ -19,6 +18,7 @@ import { Question } from './Question';
 import { Questionary } from './Questionary';
 import { QuestionaryStep } from './QuestionaryStep';
 import { QuestionTemplateRelation } from './QuestionTemplateRelation';
+import { ReviewWithNextProposalStatus } from './Review';
 import { Review } from './Review';
 import { Sample } from './Sample';
 import { SEP } from './SEP';
@@ -58,6 +58,13 @@ export class ReviewResponseWrap extends ResponseWrapBase<Review> {
 }
 
 @ObjectType()
+export class ReviewWithNextStatusResponseWrap extends ResponseWrapBase<ReviewWithNextProposalStatus> {
+  @Response()
+  @Field(() => ReviewWithNextProposalStatus, { nullable: true })
+  public review: ReviewWithNextProposalStatus;
+}
+
+@ObjectType()
 export class SEPResponseWrap extends ResponseWrapBase<SEP> {
   @Response()
   @Field(() => SEP, { nullable: true })
@@ -67,8 +74,8 @@ export class SEPResponseWrap extends ResponseWrapBase<SEP> {
 @ObjectType()
 export class NextProposalStatusResponseWrap extends ResponseWrapBase<ProposalStatus> {
   @Response()
-  @Field(() => NextProposalStatus, { nullable: true })
-  public nextProposalStatus: NextProposalStatus;
+  @Field(() => ProposalStatus, { nullable: true })
+  public nextProposalStatus: ProposalStatus;
 }
 
 @ObjectType()

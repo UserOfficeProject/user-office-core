@@ -9,6 +9,7 @@ import { ProposalEndStatus } from '../models/Proposal';
 import { Review, ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
+import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
 import { workflowEngine, WorkflowEngineProposalType } from '../workflowEngine';
 
 export default function createHandler(
@@ -38,17 +39,6 @@ export default function createHandler(
         proposalEvents: allProposalEvents,
         currentEvent: eventType,
       });
-    };
-
-    const checkAllReviewsSubmitted = (
-      allReviews: Review[],
-      currentSubmittedReview: Review
-    ) => {
-      const allOtherReviewsSubmitted = allReviews
-        .filter((review) => review.id !== currentSubmittedReview.id)
-        .every((review) => review.status === ReviewStatus.SUBMITTED);
-
-      return allOtherReviewsSubmitted;
     };
 
     switch (event.type) {
@@ -226,19 +216,21 @@ export default function createHandler(
       case Event.PROPOSAL_SEP_REVIEW_UPDATED:
         try {
           const proposal = await proposalDataSource.get(
-            event.review.proposalID
+            event.reviewwithnextproposalstatus.proposalID
           );
 
           if (!proposal || !proposal.id) {
             throw new Error(
-              `Proposal with id ${event.review.proposalID} not found`
+              `Proposal with id ${event.reviewwithnextproposalstatus.proposalID} not found`
             );
           }
 
-          if (event.review.status === ReviewStatus.SUBMITTED) {
+          if (
+            event.reviewwithnextproposalstatus.status === ReviewStatus.SUBMITTED
+          ) {
             eventBus.publish({
               type: Event.PROPOSAL_SEP_REVIEW_SUBMITTED,
-              review: event.review,
+              review: event.reviewwithnextproposalstatus,
               isRejection: false,
               key: 'review',
               loggedInUserId: event.loggedInUserId,
@@ -251,7 +243,7 @@ export default function createHandler(
           );
         } catch (error) {
           logger.logError(
-            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.review.proposalID}: `,
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.reviewwithnextproposalstatus.proposalID}: `,
             error
           );
         }
@@ -272,7 +264,7 @@ export default function createHandler(
             proposal?.id
           );
 
-          const allOtherReviewsSubmitted = checkAllReviewsSubmitted(
+          const allOtherReviewsSubmitted = checkAllReviewsSubmittedOnProposal(
             allProposalReviews,
             event.review
           );
@@ -286,6 +278,11 @@ export default function createHandler(
               loggedInUserId: event.loggedInUserId,
             });
           }
+
+          await markProposalEventAsDoneAndCallWorkflowEngine(
+            event.type,
+            proposal
+          );
         } catch (error) {
           logger.logError(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.review.proposalID}: `,

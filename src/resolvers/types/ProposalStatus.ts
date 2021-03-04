@@ -4,18 +4,18 @@ import { ProposalStatus as ProposalStatusOrigin } from '../../models/ProposalSta
 
 @ObjectType()
 export class ProposalStatus implements Partial<ProposalStatusOrigin> {
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   public id: number;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public shortCode: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public name: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public description: string;
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { nullable: true })
   public isDefault: boolean;
 }
