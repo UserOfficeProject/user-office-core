@@ -77,15 +77,18 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   const RowActionButtons = (rowData: Proposal) => {
     const iconButtonStyle = { padding: '7px' };
 
-    const showEdit = rowData.technicalReview && rowData.technicalReview.status;
+    const showView =
+      rowData.technicalReview && rowData.technicalReview.submitted;
+
+    console.log(showView);
 
     return (
       <>
         <Tooltip
           title={
-            showEdit
-              ? 'Edit technical review'
-              : 'View proposal and technical review'
+            showView
+              ? 'View proposal and technical review'
+              : 'Edit technical review'
           }
         >
           <Link
@@ -93,7 +96,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
             style={{ color: 'inherit', textDecoration: 'inherit' }}
           >
             <IconButton data-cy="view-proposal" style={iconButtonStyle}>
-              {showEdit ? <Edit /> : <Visibility />}
+              {showView ? <Visibility /> : <Edit />}
             </IconButton>
           </Link>
         </Tooltip>

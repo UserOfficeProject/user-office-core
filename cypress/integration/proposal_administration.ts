@@ -38,9 +38,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Loading...').should('not.exist');
 
-    cy.get('[id="menu-proposalStatus"] [role="option"]')
-      .first()
-      .click();
+    cy.get('[id="menu-proposalStatus"] [role="option"]').first().click();
 
     cy.get('[data-cy=commentForUser]').type(textUser);
 
@@ -67,12 +65,30 @@ context('Proposal administration tests', () => {
     cy.contains('DRAFT');
   });
 
+  it('If you select a tab in tabular view and reload the page it should stay on specific selected tab', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.get('[data-cy=view-proposal]').click();
+
+    cy.contains('Admin').click();
+
+    cy.reload();
+
+    cy.get('[data-cy="commentForUser"]').should('exist');
+
+    cy.contains('Technical').click();
+
+    cy.reload();
+
+    cy.get('[data-cy="timeAllocation"]').should('exist');
+  });
+
   it('Download proposal is working with dialog window showing up', () => {
     cy.login('officer');
 
-    cy.get('[data-cy="download-proposal"]')
-      .first()
-      .click();
+    cy.get('[data-cy="download-proposal"]').first().click();
 
     cy.get('[data-cy="preparing-download-dialog"]').should('exist');
     cy.get('[data-cy="preparing-download-dialog-item"]').contains(proposalName);
@@ -83,7 +99,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Proposals').click();
 
-    cy.request('GET', '/download/pdf/proposal/1').then(response => {
+    cy.request('GET', '/download/pdf/proposal/1').then((response) => {
       expect(response.headers['content-type']).to.be.equal('application/pdf');
       expect(response.status).to.be.equal(200);
     });
@@ -96,9 +112,7 @@ context('Proposal administration tests', () => {
 
     cy.finishedLoading();
 
-    cy.get('[type="checkbox"]')
-      .eq(1)
-      .click();
+    cy.get('[type="checkbox"]').eq(1).click();
 
     cy.url().should('contain', 'selection=');
 
@@ -141,13 +155,13 @@ context('Proposal administration tests', () => {
 
     cy.finishedLoading();
 
-    cy.get('[data-cy="officer-proposals-table"] table').then(element => {
+    cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
       officerProposalsTableAsTextBeforeSort = element.text();
     });
 
     cy.contains('Title').dblclick();
 
-    cy.get('[data-cy="officer-proposals-table"] table').then(element => {
+    cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
       officerProposalsTableAsTextAfterSort = element.text();
     });
 
@@ -155,7 +169,7 @@ context('Proposal administration tests', () => {
 
     cy.finishedLoading();
 
-    cy.get('[data-cy="officer-proposals-table"] table').then(element => {
+    cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
       expect(element.text()).to.be.equal(officerProposalsTableAsTextAfterSort);
       expect(element.text()).not.equal(officerProposalsTableAsTextBeforeSort);
     });
@@ -202,20 +216,16 @@ context('Proposal administration tests', () => {
 
     cy.createTopic('Topic for questions');
 
-    cy.get('[data-cy=show-more-button]')
-      .last()
-      .click();
+    cy.get('[data-cy=show-more-button]').last().click();
 
-    cy.get('[data-cy=add-question-menu-item]')
-      .last()
-      .click();
+    cy.get('[data-cy=add-question-menu-item]').last().click();
 
     cy.createBooleanQuestion(boolQuestion);
     cy.contains(boolQuestion)
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         boolQuestionId = fieldId;
       });
 
@@ -224,7 +234,7 @@ context('Proposal administration tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         dateQuestionId = fieldId;
       });
 
@@ -238,7 +248,7 @@ context('Proposal administration tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         multipleChoiceQuestionId = fieldId;
       });
 
@@ -247,7 +257,7 @@ context('Proposal administration tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         textQuestionId = fieldId;
       });
   });
@@ -276,9 +286,7 @@ context('Proposal administration tests', () => {
 
     cy.get('body').type('{esc}');
 
-    cy.get(`#${textQuestionId}`)
-      .clear()
-      .type(answerText);
+    cy.get(`#${textQuestionId}`).clear().type(answerText);
 
     cy.contains('Save and continue').click();
 
@@ -289,10 +297,7 @@ context('Proposal administration tests', () => {
 
     cy.get('[data-cy=call-filter]').click();
 
-    cy.get('[role=listbox]')
-      .contains('call 1')
-      .first()
-      .click();
+    cy.get('[role=listbox]').contains('call 1').first().click();
 
     // Boolean questions
     cy.get('[data-cy=question-search-toggle]').click();
@@ -303,9 +308,7 @@ context('Proposal administration tests', () => {
 
     cy.get('[data-cy=is-checked]').click();
 
-    cy.get('[role=listbox]')
-      .contains('No')
-      .click();
+    cy.get('[role=listbox]').contains('No').click();
 
     cy.contains('Search').click();
 
@@ -313,9 +316,7 @@ context('Proposal administration tests', () => {
 
     cy.get('[data-cy=is-checked]').click();
 
-    cy.get('[role=listbox]')
-      .contains('Yes')
-      .click();
+    cy.get('[role=listbox]').contains('Yes').click();
 
     cy.contains('Search').click();
 
@@ -326,9 +327,7 @@ context('Proposal administration tests', () => {
 
     cy.contains(dateQuestion).click();
 
-    cy.get('[data-cy=value] input')
-      .clear()
-      .type('2020-01-01');
+    cy.get('[data-cy=value] input').clear().type('2020-01-01');
 
     cy.contains('Search').click();
 
@@ -336,9 +335,7 @@ context('Proposal administration tests', () => {
 
     cy.get('[data-cy=comparator]').click();
 
-    cy.get('[role=listbox]')
-      .contains('After')
-      .click();
+    cy.get('[role=listbox]').contains('After').click();
 
     cy.contains('Search').click();
 
@@ -351,9 +348,7 @@ context('Proposal administration tests', () => {
 
     cy.get('[data-cy=value]').click();
 
-    cy.get('[role=listbox]')
-      .contains('Two')
-      .click();
+    cy.get('[role=listbox]').contains('Two').click();
 
     cy.contains('Search').click();
 
@@ -361,9 +356,7 @@ context('Proposal administration tests', () => {
 
     cy.get('[data-cy=value]').click();
 
-    cy.get('[role=listbox]')
-      .contains('One')
-      .click();
+    cy.get('[role=listbox]').contains('One').click();
 
     cy.contains('Search').click();
 
@@ -374,17 +367,13 @@ context('Proposal administration tests', () => {
 
     cy.contains(textQuestion).click();
 
-    cy.get('[name=value]')
-      .clear()
-      .type(faker.random.words(3));
+    cy.get('[name=value]').clear().type(faker.random.words(3));
 
     cy.contains('Search').click();
 
     cy.contains(proposalTitle).should('not.exist');
 
-    cy.get('[name=value]')
-      .clear()
-      .type(answerText);
+    cy.get('[name=value]').clear().type(answerText);
 
     cy.contains('Search').click();
 

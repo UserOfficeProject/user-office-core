@@ -474,6 +474,44 @@ context('Instrument tests', () => {
     cy.get('[data-cy="timeAllocation"] input').should('be.disabled');
   });
 
+  it('User Officer should be able to re-open submitted technical review', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals');
+
+    cy.get('[data-cy="view-proposal"]').first().click();
+    cy.contains('Technical').click();
+
+    cy.get('[data-cy="is-review-submitted"] input')
+      .should('have.value', 'true')
+      .click()
+      .should('have.value', 'false');
+
+    cy.get('[data-cy="update-technical-review"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Technical review updated successfully',
+    });
+
+    cy.logout();
+
+    cy.login('user');
+    cy.changeActiveRole('Instrument Scientist');
+
+    cy.contains('Proposals');
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"] [data-value="0"]').click();
+
+    cy.get('[data-cy="view-proposal"]').first().click();
+    cy.contains('Technical').click();
+
+    cy.get('[data-cy="update-technical-review"]').should('not.be.disabled');
+    cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');
+    cy.get('[data-cy="timeAllocation"] input').should('not.be.disabled');
+  });
+
   it('User Officer should be able to remove assigned proposal from instrument', () => {
     cy.login('officer');
 

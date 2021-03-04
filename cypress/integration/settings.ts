@@ -416,13 +416,11 @@ context('Settings tests', () => {
       cy.get('[data-cy="comment"] textarea').first().type(internalComment);
       cy.get('[data-cy="publicComment"] textarea').first().type(publicComment);
 
-      cy.contains('Submit').click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="update-technical-review"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review submitted successfully',
+        text: 'Technical review updated successfully',
       });
 
       cy.contains('Proposals').click();

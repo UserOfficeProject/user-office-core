@@ -5,6 +5,7 @@ import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
+import { NumberParam, useQueryParams, withDefault } from 'use-query-params';
 
 import { StyledPaper } from 'styles/StyledComponents';
 import { FunctionType } from 'utils/utilTypes';
@@ -40,55 +41,53 @@ function a11yProps(index: number) {
   };
 }
 
-export default function FullWidthTabs(props: {
+type FullWidthTabsProps = {
   children: React.ReactNode[];
   tabNames: string[];
   shouldPreventTabChange?: boolean;
   setShouldPreventTabChange?: FunctionType<void, boolean>;
-}) {
+};
+
+const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
+  tabNames,
+  children,
+}) => {
   const theme = useTheme();
-  const [value, setValue] = React.useState(0);
+  const [query, setQuery] = useQueryParams({
+    tab: withDefault(NumberParam, 0),
+  });
 
   const handleChange = (
     event: React.ChangeEvent<Record<string, unknown>>,
     newValue: number
   ) => {
-    if (props.shouldPreventTabChange && value !== newValue) {
-      if (
-        window.confirm(
-          'Changes you recently made in this tab will be lost! Are you sure?'
-        )
-      ) {
-        setValue(newValue);
-        props.setShouldPreventTabChange?.(false);
-      }
-    } else {
-      setValue(newValue);
-    }
+    setQuery({ tab: newValue > 0 ? newValue : undefined });
   };
 
   return (
     <StyledPaper>
       <AppBar position="static" color="default">
         <Tabs
-          value={value}
+          value={query.tab}
           onChange={handleChange}
           indicatorColor="primary"
           textColor="primary"
           variant="fullWidth"
           aria-label="full width tabs example"
         >
-          {props.tabNames.map((tabName, i) => (
+          {tabNames.map((tabName, i) => (
             <Tab key={i} label={tabName} {...a11yProps(i)} />
           ))}
         </Tabs>
       </AppBar>
 
-      {props.children.map((tabContent, i) => (
-        <TabPanel key={i} value={value} index={i} dir={theme.direction}>
+      {children.map((tabContent, i) => (
+        <TabPanel key={i} value={query.tab} index={i} dir={theme.direction}>
           {tabContent}
         </TabPanel>
       ))}
     </StyledPaper>
   );
-}
+};
+
+export default FullWidthTabs;

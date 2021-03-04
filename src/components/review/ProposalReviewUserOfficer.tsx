@@ -10,7 +10,12 @@ import GeneralInformation from 'components/proposal/GeneralInformation';
 import ProposalAdmin, {
   AdministrationFormData,
 } from 'components/proposal/ProposalAdmin';
-import { CoreTechnicalReviewFragment, Proposal, UserRole } from 'generated/sdk';
+import {
+  CoreTechnicalReviewFragment,
+  Proposal,
+  TechnicalReview,
+  UserRole,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 import ProposalTechnicalReview from './ProposalTechnicalReview';
@@ -45,8 +50,6 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
       });
   }, [api, match.params.id]);
 
-  const [formDirty, setFormDirty] = useState<boolean | undefined>(false);
-
   useEffect(() => {
     loadProposal();
   }, [loadProposal]);
@@ -64,20 +67,23 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
 
   return (
     <Container maxWidth="lg">
-      <SimpleTabs
-        tabNames={tabNames}
-        shouldPreventTabChange={formDirty}
-        setShouldPreventTabChange={setFormDirty}
-      >
+      <SimpleTabs tabNames={tabNames}>
         <GeneralInformation
           data={proposal}
           onProposalChanged={(newProposal): void => setProposal(newProposal)}
         />
         <ProposalTechnicalReview
           id={proposal.id}
-          data={techReview}
-          setReview={setTechReview}
-          setFormDirty={setFormDirty}
+          data={proposal.technicalReview}
+          setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
+            setProposal({
+              ...proposal,
+              technicalReview: {
+                ...proposal.technicalReview,
+                ...data,
+              } as TechnicalReview,
+            })
+          }
         />
         {isUserOfficer && (
           <ProposalAdmin
@@ -85,7 +91,6 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
             setAdministration={(data: AdministrationFormData) =>
               setProposal({ ...proposal, ...data })
             }
-            setFormDirty={setFormDirty}
           />
         )}
         {isUserOfficer && (
