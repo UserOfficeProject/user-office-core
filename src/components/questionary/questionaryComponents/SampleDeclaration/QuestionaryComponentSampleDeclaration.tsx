@@ -63,7 +63,7 @@ function createSampleStub(
 
 type QuestionaryComponentSampleDeclarationProps = {
   answer: Answer;
-  formikProps: FormikProps<any>;
+  formikProps: FormikProps<Record<string, unknown>>;
   onComplete: (newValue: Answer['value']) => void;
   confirm: WithConfirmType;
 };

@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';

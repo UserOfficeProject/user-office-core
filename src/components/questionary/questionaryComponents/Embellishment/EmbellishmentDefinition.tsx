@@ -17,9 +17,9 @@ export const embellishmentDefinition: QuestionaryComponentDefinition = {
   readonly: true,
   creatable: true,
   renderers: {
-    questionRenderer: ({ question }) => (
-      <span>{(question.config as EmbellishmentConfig).plain}</span>
-    ),
+    questionRenderer: function QuestionRendererComponent({ question }) {
+      return <span>{(question.config as EmbellishmentConfig).plain}</span>;
+    },
     answerRenderer: () => null,
   },
   icon: <TextFieldsIcon />,

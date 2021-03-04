@@ -103,7 +103,7 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
               : {
                   icon: GetAppIcon,
                   tooltip: 'Download label',
-                  onClick: (_event, rowData) => console.log('Download'),
+                  onClick: () => console.log('Download'),
                 },
         ]}
       />

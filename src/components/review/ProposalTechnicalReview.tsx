@@ -92,6 +92,7 @@ const ProposalTechnicalReview = ({
       submitted: shouldSubmit,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!(result as any)[method].error) {
       setReview({
         proposalID: data?.proposalID,

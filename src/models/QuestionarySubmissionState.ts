@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import produce from 'immer';
+import produce, { Draft } from 'immer';
 import { Reducer } from 'react';
 
 import { Answer, QuestionaryStep } from 'generated/sdk';
@@ -162,8 +162,8 @@ export function QuestionarySubmissionModel<
           break;
       }
 
-      // @ts-expect-error
-      draftState = reducers?.(state, draftState, action) || draftState;
+      (draftState as T | Draft<T>) =
+        reducers?.(state, draftState as T, action) || draftState;
     });
   }
 

@@ -1,4 +1,4 @@
-// TODO: Do not disable this! Find a good solution. For now it is not a big problem.
+/* eslint-disable react/display-name */
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import Check from '@material-ui/icons/Check';

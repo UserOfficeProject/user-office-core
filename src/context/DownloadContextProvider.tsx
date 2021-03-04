@@ -119,7 +119,7 @@ export interface DownloadContextData {
 }
 
 type InProgressItem = { id: string; name: string | null; total: number };
-type PendingRequest = { req: Promise<any>; controller: AbortController };
+type PendingRequest = { req: Promise<unknown>; controller: AbortController };
 
 export const DownloadContext = React.createContext<DownloadContextData>({
   prepareDownload: () => void 0,

@@ -346,7 +346,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
               parentDroppableId
             ) =>
               dispatch({
-                type: EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS,
+                type: EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLUMNS,
                 payload: { numberOfColumns, parentDroppableId },
               })
             }
