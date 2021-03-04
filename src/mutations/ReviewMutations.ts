@@ -91,10 +91,18 @@ export default class ReviewMutations {
       return rejection('INSUFFICIENT_PERMISSIONS');
     }
 
-    const shouldSubmitTechnicalReview = 'submitted' in args && args.submitted;
+    const technicalReview = await this.dataSource.getTechnicalReview(
+      args.proposalID
+    );
+
+    const shouldUpdateReview = !!technicalReview?.id;
+
+    if (!this.userAuth.isUserOfficer(agent) && technicalReview?.submitted) {
+      return rejection('NOT_ALLOWED');
+    }
 
     return this.dataSource
-      .setTechnicalReview(args, shouldSubmitTechnicalReview)
+      .setTechnicalReview(args, shouldUpdateReview)
       .then((review) => review)
       .catch((err) => {
         logger.logException('Could not set technicalReview', err, {

@@ -23,7 +23,7 @@ export interface ReviewDataSource {
   ): Promise<Review | null>;
   setTechnicalReview(
     args: AddTechnicalReviewInput,
-    submitted?: boolean
+    shouldUpdateReview: boolean
   ): Promise<TechnicalReview>;
   getTechnicalReview(proposalID: number): Promise<TechnicalReview | null>;
   addUserForReview(args: AddUserForReviewArgs): Promise<Review>;

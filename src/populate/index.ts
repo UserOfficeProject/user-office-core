@@ -273,16 +273,20 @@ const createProposals = async () => {
 
 const createReviews = async () => {
   await execute(() => {
-    return reviewDataSource.setTechnicalReview({
-      proposalID: dummy.positiveNumber(MAX_PROPOSALS),
-      comment: faker.random.words(50),
-      publicComment: faker.random.words(25),
-      status:
-        Math.random() > 0.5
-          ? TechnicalReviewStatus.FEASIBLE
-          : TechnicalReviewStatus.UNFEASIBLE,
-      timeAllocation: dummy.positiveNumber(10),
-    });
+    return reviewDataSource.setTechnicalReview(
+      {
+        proposalID: dummy.positiveNumber(MAX_PROPOSALS),
+        comment: faker.random.words(50),
+        publicComment: faker.random.words(25),
+        status:
+          Math.random() > 0.5
+            ? TechnicalReviewStatus.FEASIBLE
+            : TechnicalReviewStatus.UNFEASIBLE,
+        timeAllocation: dummy.positiveNumber(10),
+        submitted: faker.random.boolean(),
+      },
+      false
+    );
   }, MAX_REVIEWS);
 };
 
