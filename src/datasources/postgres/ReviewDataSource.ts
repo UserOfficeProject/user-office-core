@@ -186,22 +186,22 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     return database
       .select()
       .from('SEP_Reviews')
-      .modify(qb => {
-        if (callId) {
+      .modify((qb) => {
+        if (callId !== undefined) {
           qb.join('proposals', {
             'proposals.proposal_id': 'SEP_Reviews.proposal_id',
           });
           qb.where('proposals.call_id', callId);
         }
 
-        if (instrumentId) {
+        if (instrumentId !== undefined) {
           qb.join('instrument_has_proposals', {
             'instrument_has_proposals.proposal_id': 'SEP_Reviews.proposal_id',
           });
           qb.where('instrument_has_proposals.instrument_id', instrumentId);
         }
 
-        if (status) {
+        if (status !== undefined) {
           qb.where('SEP_Reviews.status', status);
         }
       })
