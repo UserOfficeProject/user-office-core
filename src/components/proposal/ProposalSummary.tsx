@@ -2,6 +2,7 @@ import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useContext } from 'react';
 
+import { NavigButton } from 'components/common/NavigButton';
 import NavigationFragment from 'components/questionary/NavigationFragment';
 import {
   createMissingContextErrorMessage,
@@ -65,10 +66,9 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
         className={readonly ? classes.disabled : undefined}
       />
       <div className={classes.buttons}>
-        <NavigationFragment
-          back={undefined}
-          saveAndNext={{
-            callback: () => {
+        <NavigationFragment disabled={proposal.status?.id === 0}>
+          <NavigButton
+            onClick={() => {
               confirm(
                 () => {
                   dispatch({
@@ -82,22 +82,22 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
                     'I am aware that no further edits can be done after proposal submission.',
                 }
               )();
-            },
-            label: proposal.submitted ? '✔ Submitted' : 'Submit',
-            disabled: !allStepsComplete || proposal.submitted,
-          }}
-          reset={undefined}
-          isLoading={false}
-          disabled={proposal.status?.id === 0}
-        />
-        <Button
-          className={classes.button}
-          onClick={() => downloadPDFProposal([proposal.id], proposal.title)}
-          variant="contained"
-          disabled={!allStepsComplete}
-        >
-          Download PDF
-        </Button>
+            }}
+            disabled={!allStepsComplete || proposal.submitted}
+            variant="contained"
+            color="primary"
+          >
+            {proposal.submitted ? '✔ Submitted' : 'Submit'}
+          </NavigButton>
+          <Button
+            onClick={() => downloadPDFProposal([proposal.id], proposal.title)}
+            disabled={!allStepsComplete}
+            className={classes.button}
+            variant="contained"
+          >
+            Download PDF
+          </Button>
+        </NavigationFragment>
       </div>
     </>
   );

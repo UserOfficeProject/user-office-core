@@ -1,6 +1,7 @@
 import { Link, makeStyles } from '@material-ui/core';
 import React, { useContext } from 'react';
 
+import { NavigButton } from 'components/common/NavigButton';
 import UOLoader from 'components/common/UOLoader';
 import NavigationFragment from 'components/questionary/NavigationFragment';
 import {
@@ -82,29 +83,29 @@ function ShipmentReview({
         title="Shipment information"
       />
       <div>
-        <NavigationFragment
-          disabled={isReadonly}
-          back={undefined}
-          saveAndNext={{
-            callback: () =>
+        <NavigationFragment disabled={isReadonly} isLoading={isExecutingCall}>
+          <NavigButton
+            onClick={() =>
               confirm(
                 async () => {
                   await api().updateShipment({
                     shipmentId: state.shipment.id,
                     status: ShipmentStatus.SUBMITTED,
                   });
-                  onComplete?.();
                 },
                 {
                   title: 'Confirmation',
                   description:
                     'I am aware that no further edits can be done after shipment submission.',
                 }
-              )(),
-            label: 'Submit',
-          }}
-          isLoading={isExecutingCall}
-        />
+              )()
+            }
+            variant="contained"
+            color="primary"
+          >
+            Submit
+          </NavigButton>
+        </NavigationFragment>
       </div>
     </div>
   );
