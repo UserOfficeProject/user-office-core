@@ -66,6 +66,11 @@ interface ProposalManagementDecisionSubmittedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalFeasibilityReviewUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FEASIBILITY_REVIEW_UPDATED;
+  technicalreview: TechnicalReview;
+}
+
 interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED;
   technicalreview: TechnicalReview;
@@ -228,6 +233,7 @@ export type ApplicationEvent =
   | CallEndedEvent
   | CallReviewEndedEvent
   | CallSEPReviewEndedEvent
+  | ProposalFeasibilityReviewUpdatedEvent
   | ProposalFeasibilityReviewSubmittedEvent
   | ProposalSEPReviewUpdatedEvent
   | ProposalSEPReviewSubmittedEvent

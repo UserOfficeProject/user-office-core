@@ -120,7 +120,7 @@ export default class ReviewMutations {
       });
   }
 
-  @EventBus(Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED)
+  @EventBus(Event.PROPOSAL_FEASIBILITY_REVIEW_UPDATED)
   @ValidateArgs(proposalTechnicalReviewValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async setTechnicalReview(

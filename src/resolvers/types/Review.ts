@@ -12,7 +12,7 @@ import { ResolverContext } from '../../context';
 import { Review as ReviewOrigin, ReviewStatus } from '../../models/Review';
 import { Proposal } from '../types/Proposal';
 import { BasicUserDetails } from './BasicUserDetails';
-import { ProposalStatus } from './ProposalStatus';
+import { NextProposalStatus } from './ProposalStatus';
 
 @ObjectType()
 export class Review implements Partial<ReviewOrigin> {
@@ -39,8 +39,8 @@ export class Review implements Partial<ReviewOrigin> {
 
 @ObjectType()
 export class ReviewWithNextProposalStatus extends Review {
-  @Field(() => ProposalStatus, { nullable: true })
-  public nextProposalStatus: ProposalStatus;
+  @Field(() => NextProposalStatus, { nullable: true })
+  public nextProposalStatus: NextProposalStatus;
 }
 
 @Resolver(() => Review)

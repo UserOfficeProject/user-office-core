@@ -4,6 +4,24 @@ import { ProposalStatus as ProposalStatusOrigin } from '../../models/ProposalSta
 
 @ObjectType()
 export class ProposalStatus implements Partial<ProposalStatusOrigin> {
+  @Field(() => Int)
+  public id: number;
+
+  @Field(() => String)
+  public shortCode: string;
+
+  @Field(() => String)
+  public name: string;
+
+  @Field(() => String)
+  public description: string;
+
+  @Field(() => Boolean)
+  public isDefault: boolean;
+}
+
+@ObjectType()
+export class NextProposalStatus implements Partial<ProposalStatusOrigin> {
   @Field(() => Int, { nullable: true })
   public id: number;
 

@@ -11,7 +11,7 @@ import { Instrument } from './Instrument';
 import { NextStatusEvent } from './NextStatusEvent';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
 import { Proposal } from './Proposal';
-import { ProposalStatus } from './ProposalStatus';
+import { NextProposalStatus, ProposalStatus } from './ProposalStatus';
 import { ProposalWorkflow } from './ProposalWorkflow';
 import { ProposalWorkflowConnection } from './ProposalWorkflowConnection';
 import { Question } from './Question';
@@ -74,8 +74,8 @@ export class SEPResponseWrap extends ResponseWrapBase<SEP> {
 @ObjectType()
 export class NextProposalStatusResponseWrap extends ResponseWrapBase<ProposalStatus> {
   @Response()
-  @Field(() => ProposalStatus, { nullable: true })
-  public nextProposalStatus: ProposalStatus;
+  @Field(() => NextProposalStatus, { nullable: true })
+  public nextProposalStatus: NextProposalStatus;
 }
 
 @ObjectType()
