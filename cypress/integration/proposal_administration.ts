@@ -10,14 +10,30 @@ context('Proposal administration tests', () => {
     cy.visit('/');
   });
 
-  const proposalName = faker.random.words(3);
-  const textUser = faker.random.words(5);
+  const proposalName1 = faker.random.words(3);
+  const proposalName2 = faker.random.words(3);
+  const proposalFixedName = 'Aaaaaaaaa test proposal title';
 
+  const textUser = faker.random.words(5);
   const textManager = faker.random.words(5);
+
+  const answerDate = '2030-01-01';
+  const answerMultipleChoice = 'One';
+  const answerText = faker.random.words(3);
+
+  const textQuestion = faker.random.words(3);
+  const dateQuestion = faker.random.words(3);
+  const boolQuestion = faker.random.words(3);
+  const multipleChoiceQuestion = faker.random.words(3);
+
+  let textQuestionId: string;
+  let dateQuestionId: string;
+  let boolQuestionId: string;
+  let multipleChoiceQuestionId: string;
 
   it('Should be able to set comment for user/manager and final status', () => {
     cy.login('user');
-    cy.createProposal(proposalName);
+    cy.createProposal(proposalName1);
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();
@@ -91,7 +107,9 @@ context('Proposal administration tests', () => {
     cy.get('[data-cy="download-proposal"]').first().click();
 
     cy.get('[data-cy="preparing-download-dialog"]').should('exist');
-    cy.get('[data-cy="preparing-download-dialog-item"]').contains(proposalName);
+    cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+      proposalName1
+    );
   });
 
   it('Should be able to download proposal pdf', () => {
@@ -141,10 +159,7 @@ context('Proposal administration tests', () => {
 
     cy.login('user');
     // Create a proposal with title that will be always last if sort order by title is 'desc'
-    cy.createProposal(
-      'Aaaaaaaaa test proposal title',
-      'Test proposal descrtiption'
-    );
+    cy.createProposal(proposalFixedName);
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();
@@ -192,16 +207,6 @@ context('Proposal administration tests', () => {
       '.MuiTableSortLabel-active .MuiTableSortLabel-iconDirectionAsc'
     ).should('exist');
   });
-
-  const textQuestion = faker.random.words(3);
-  const dateQuestion = faker.random.words(3);
-  const boolQuestion = faker.random.words(3);
-  const multipleChoiceQuestion = faker.random.words(3);
-
-  let textQuestionId: string;
-  let dateQuestionId: string;
-  let boolQuestionId: string;
-  let multipleChoiceQuestionId: string;
 
   it('Should be able to prepare proposal template', () => {
     cy.login('officer');
@@ -262,16 +267,11 @@ context('Proposal administration tests', () => {
       });
   });
 
-  const proposalTitle = faker.random.words(3);
-  const answerDate = '2030-01-01';
-  const answerMultipleChoice = 'One';
-  const answerText = faker.random.words(3);
-
   it('Should be able to search by question', () => {
     cy.login('user');
 
     //Create test  proposal
-    cy.createProposal(proposalTitle);
+    cy.createProposal(proposalName2);
     cy.contains('Save and continue').click();
 
     cy.get(`#${boolQuestionId}`).click();
@@ -312,7 +312,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Search').click();
 
-    cy.contains(proposalTitle).should('not.exist');
+    cy.contains(proposalName2).should('not.exist');
 
     cy.get('[data-cy=is-checked]').click();
 
@@ -320,7 +320,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Search').click();
 
-    cy.contains(proposalTitle);
+    cy.contains(proposalName2);
 
     // Date questions
     cy.get('[data-cy=question-list]').click();
@@ -331,7 +331,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Search').click();
 
-    cy.contains(proposalTitle).should('not.exist');
+    cy.contains(proposalName2).should('not.exist');
 
     cy.get('[data-cy=comparator]').click();
 
@@ -339,7 +339,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Search').click();
 
-    cy.contains(proposalTitle);
+    cy.contains(proposalName2);
 
     // Multiple choice questions
     cy.get('[data-cy=question-list]').click();
@@ -352,7 +352,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Search').click();
 
-    cy.contains(proposalTitle).should('not.exist');
+    cy.contains(proposalName2).should('not.exist');
 
     cy.get('[data-cy=value]').click();
 
@@ -360,7 +360,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Search').click();
 
-    cy.contains(proposalTitle);
+    cy.contains(proposalName2);
 
     // Text questions
     cy.get('[data-cy=question-list]').click();
@@ -371,12 +371,28 @@ context('Proposal administration tests', () => {
 
     cy.contains('Search').click();
 
-    cy.contains(proposalTitle).should('not.exist');
+    cy.contains(proposalName2).should('not.exist');
 
     cy.get('[name=value]').clear().type(answerText);
 
     cy.contains('Search').click();
 
-    cy.contains(proposalTitle);
+    cy.contains(proposalName2);
+  });
+
+  it('Should preserve the ordering when row is selected', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.finishedLoading();
+
+    cy.get('table tbody tr').eq(0).contains(proposalFixedName);
+    cy.contains('Title').dblclick();
+    cy.get('table tbody tr').eq(2).contains(proposalFixedName);
+
+    cy.get('table tbody tr input[type="checkbox"]').first().click();
+
+    cy.get('table tbody tr').eq(2).contains(proposalFixedName);
   });
 });
