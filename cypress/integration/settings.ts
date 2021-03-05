@@ -448,6 +448,8 @@ context('Settings tests', () => {
       cy.get('[data-cy="comment"] textarea').first().type(internalComment);
       cy.get('[data-cy="publicComment"] textarea').first().type(publicComment);
 
+      cy.get('[data-cy="is-review-submitted"]').click();
+
       cy.get('[data-cy="update-technical-review"]').click();
 
       cy.notification({

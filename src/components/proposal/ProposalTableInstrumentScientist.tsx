@@ -80,8 +80,6 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     const showView =
       rowData.technicalReview && rowData.technicalReview.submitted;
 
-    console.log(showView);
-
     return (
       <>
         <Tooltip

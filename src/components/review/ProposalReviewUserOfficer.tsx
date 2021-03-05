@@ -31,10 +31,6 @@ const ProposalReviewPropTypes = {
 type ProposalReviewProps = PropTypes.InferProps<typeof ProposalReviewPropTypes>;
 
 const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
-  const [techReview, setTechReview] = useState<
-    CoreTechnicalReviewFragment | null | undefined
-  >(null);
-
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const api = useDataApi();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
@@ -44,9 +40,6 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
       .getProposal({ id: parseInt(match.params.id) })
       .then((data) => {
         setProposal(data.proposal as Proposal);
-        if (data.proposal) {
-          setTechReview(data.proposal.technicalReview);
-        }
       });
   }, [api, match.params.id]);
 

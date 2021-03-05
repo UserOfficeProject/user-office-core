@@ -13,6 +13,7 @@ import {
   ReviewStatus,
   UserRole,
   ReviewWithNextProposalStatus,
+  ProposalStatus,
 } from 'generated/sdk';
 import {
   useSEPProposalsData,
@@ -228,8 +229,8 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
         if (sepProposalsData.proposalId === editingProposalData.proposalId) {
           const editingProposalStatus = (currentAssignment.review as ReviewWithNextProposalStatus)
             .nextProposalStatus
-            ? (currentAssignment.review as ReviewWithNextProposalStatus)
-                .nextProposalStatus
+            ? ((currentAssignment.review as ReviewWithNextProposalStatus)
+                .nextProposalStatus as ProposalStatus)
             : editingProposalData.proposal.status;
 
           return {
