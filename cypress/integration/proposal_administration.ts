@@ -25,6 +25,7 @@ context('Proposal administration tests', () => {
   const dateQuestion = faker.random.words(3);
   const boolQuestion = faker.random.words(3);
   const multipleChoiceQuestion = faker.random.words(3);
+  const fileUploadQuestion = faker.random.words(3);
 
   let textQuestionId: string;
   let dateQuestionId: string;
@@ -249,6 +250,8 @@ context('Proposal administration tests', () => {
       'Two',
       'Three'
     );
+
+    cy.createFileUploadQuestion(fileUploadQuestion);
     cy.contains(multipleChoiceQuestion)
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
@@ -374,6 +377,27 @@ context('Proposal administration tests', () => {
     cy.contains(proposalName2).should('not.exist');
 
     cy.get('[name=value]').clear().type(answerText);
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalName2);
+
+    // File upload questions
+    cy.get('[data-cy=question-list]').click();
+
+    cy.contains(fileUploadQuestion).click();
+
+    cy.get('[data-cy=has-attachments]').click();
+
+    cy.get('[role=listbox]').contains('Yes').click();
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalName2).should('not.exist');
+
+    cy.get('[data-cy=has-attachments]').click();
+
+    cy.get('[role=listbox]').contains('No').click();
 
     cy.contains('Search').click();
 

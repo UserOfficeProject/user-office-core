@@ -32,11 +32,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function ShipmentReview({
-  isReadonly,
-  onComplete,
-  confirm,
-}: ShipmentReviewProps) {
+function ShipmentReview({ isReadonly, confirm }: ShipmentReviewProps) {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { state, dispatch } = useContext(
     QuestionaryContext
