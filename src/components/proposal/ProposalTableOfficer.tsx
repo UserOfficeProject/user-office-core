@@ -618,7 +618,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           {
             icon: DeleteIcon,
             tooltip: 'Delete proposals',
-            onClick: (event, rowData): void => {
+            onClick: (): void => {
               confirm(
                 () => {
                   deleteProposals();
@@ -635,7 +635,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           {
             icon: GroupWorkIcon,
             tooltip: 'Assign proposals to SEP',
-            onClick: (event, rowData): void => {
+            onClick: (): void => {
               setOpenAssignment(true);
             },
             position: 'toolbarOnSelect',
@@ -645,7 +645,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               'data-cy': 'assign-proposals-to-instrument',
             }),
             tooltip: 'Assign proposals to instrument',
-            onClick: (event, rowData): void => {
+            onClick: (): void => {
               setOpenInstrumentAssignment(true);
             },
             position: 'toolbarOnSelect',
@@ -653,7 +653,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           {
             icon: EmailIcon,
             tooltip: 'Notify users final result',
-            onClick: (event, rowData): void => {
+            onClick: (): void => {
               confirm(
                 () => {
                   emailProposals();
