@@ -105,6 +105,7 @@ const DownloadMonitorDialog = ({
 export enum PREPARE_DOWNLOAD_TYPE {
   PDF_PROPOSAL,
   PDF_SAMPLE,
+  PDF_SHIPMENT_LABEL,
 
   XLSX_PROPOSAL,
   XLSX_SEP,
@@ -134,6 +135,8 @@ function generateLink(
       return '/download/pdf/proposal/' + ids;
     case PREPARE_DOWNLOAD_TYPE.PDF_SAMPLE:
       return '/download/pdf/sample/' + ids;
+    case PREPARE_DOWNLOAD_TYPE.PDF_SHIPMENT_LABEL:
+      return '/download/pdf/shipment-label/' + ids;
     case PREPARE_DOWNLOAD_TYPE.XLSX_PROPOSAL:
       return '/download/xlsx/proposal/' + ids;
     case PREPARE_DOWNLOAD_TYPE.XLSX_SEP:

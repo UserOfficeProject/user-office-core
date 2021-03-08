@@ -550,6 +550,7 @@ export type Mutation = {
   deleteProposalStatus: ProposalStatusResponseWrap;
   deleteProposalWorkflow: ProposalWorkflowResponseWrap;
   submitProposal: ProposalResponseWrap;
+  submitShipment: ShipmentResponseWrap;
   submitTechnicalReview: TechnicalReviewResponseWrap;
   token: TokenResponseWrap;
   selectRole: TokenResponseWrap;
@@ -857,6 +858,7 @@ export type MutationUpdateShipmentArgs = {
   proposalId?: Maybe<Scalars['Int']>;
   title?: Maybe<Scalars['String']>;
   status?: Maybe<ShipmentStatus>;
+  externalRef?: Maybe<Scalars['String']>;
 };
 
 
@@ -1167,6 +1169,11 @@ export type MutationDeleteProposalWorkflowArgs = {
 
 export type MutationSubmitProposalArgs = {
   id: Scalars['Int'];
+};
+
+
+export type MutationSubmitShipmentArgs = {
+  shipmentId: Scalars['Int'];
 };
 
 
@@ -4548,6 +4555,23 @@ export type SetActiveTemplateMutation = (
   ) }
 );
 
+export type SubmitShipmentMutationVariables = Exact<{
+  shipmentId: Scalars['Int'];
+}>;
+
+
+export type SubmitShipmentMutation = (
+  { __typename?: 'Mutation' }
+  & { submitShipment: (
+    { __typename?: 'ShipmentResponseWrap' }
+    & Pick<ShipmentResponseWrap, 'error'>
+    & { shipment: Maybe<(
+      { __typename?: 'Shipment' }
+      & ShipmentFragment
+    )> }
+  ) }
+);
+
 export type UpdateShipmentMutationVariables = Exact<{
   shipmentId: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
@@ -7528,6 +7552,16 @@ export const SetActiveTemplateDocument = gql`
   }
 }
     `;
+export const SubmitShipmentDocument = gql`
+    mutation submitShipment($shipmentId: Int!) {
+  submitShipment(shipmentId: $shipmentId) {
+    error
+    shipment {
+      ...shipment
+    }
+  }
+}
+    ${ShipmentFragmentDoc}`;
 export const UpdateShipmentDocument = gql`
     mutation updateShipment($shipmentId: Int!, $title: String, $proposalId: Int, $status: ShipmentStatus) {
   updateShipment(
@@ -8423,6 +8457,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     setActiveTemplate(variables: SetActiveTemplateMutationVariables): Promise<SetActiveTemplateMutation> {
       return withWrapper(() => client.request<SetActiveTemplateMutation>(print(SetActiveTemplateDocument), variables));
+    },
+    submitShipment(variables: SubmitShipmentMutationVariables): Promise<SubmitShipmentMutation> {
+      return withWrapper(() => client.request<SubmitShipmentMutation>(print(SubmitShipmentDocument), variables));
     },
     updateShipment(variables: UpdateShipmentMutationVariables): Promise<UpdateShipmentMutation> {
       return withWrapper(() => client.request<UpdateShipmentMutation>(print(UpdateShipmentDocument), variables));

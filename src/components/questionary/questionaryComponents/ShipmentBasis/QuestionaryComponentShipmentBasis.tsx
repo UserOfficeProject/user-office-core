@@ -181,7 +181,7 @@ const shipmentBasisPreSubmit = (answer: Answer) => async ({
     });
     if (result.updateShipment.shipment) {
       dispatch({
-        type: EventType.SHIPMENT_UPDATED,
+        type: EventType.SHIPMENT_MODIFIED,
         payload: {
           shipment: result.updateShipment.shipment,
         },
