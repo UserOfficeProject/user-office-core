@@ -186,7 +186,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     return database
       .select()
       .from('SEP_Reviews')
-      .modify(qb => {
+      .modify((qb) => {
         if (callId) {
           qb.join('proposals', {
             'proposals.proposal_id': 'SEP_Reviews.proposal_id',
