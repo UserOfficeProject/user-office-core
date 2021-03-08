@@ -227,6 +227,17 @@ declare global {
         option2: string,
         option3: string
       ) => void;
+
+      /**
+       * Creates FileUpload question.
+       * You have to be in edit template view to call this method
+       *
+       * @returns {typeof createFileUploadQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createFileUploadQuestion('Provide a file')
+       */
+      createFileUploadQuestion: (title: string) => void;
     }
   }
 
