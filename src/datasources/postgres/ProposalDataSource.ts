@@ -204,16 +204,19 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           const questionFilterQuery = getQuestionDefinition(
             questionFilter.dataType
           ).filterQuery;
-          if (questionFilterQuery) {
-            query
-              .leftJoin(
-                'answers',
-                'answers.questionary_id',
-                'proposal_table_view.questionary_id'
-              )
-              .andWhere('answers.question_id', questionFilter.questionId)
-              .modify(questionFilterQuery, questionFilter);
+          if (!questionFilterQuery) {
+            throw new Error(
+              `Filter query not implemented for ${filter.questionFilter.dataType}`
+            );
           }
+          query
+            .leftJoin(
+              'answers',
+              'answers.questionary_id',
+              'proposal_table_view.questionary_id'
+            )
+            .andWhere('answers.question_id', questionFilter.questionId)
+            .modify(questionFilterQuery, questionFilter);
         }
       })
       .then((proposals: ProposalViewRecord[]) => {
