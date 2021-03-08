@@ -1,6 +1,6 @@
+import 'dotenv/config'; // Adding environmental variables. NB: keep this import first
 import { logger } from '@esss-swap/duo-logger';
 import cookieParser from 'cookie-parser';
-import 'dotenv/config';
 import express from 'express';
 
 import 'reflect-metadata';

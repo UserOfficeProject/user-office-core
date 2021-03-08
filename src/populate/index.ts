@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import faker from 'faker';
 
 import 'reflect-metadata';
