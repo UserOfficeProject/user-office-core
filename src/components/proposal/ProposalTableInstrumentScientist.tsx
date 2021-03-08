@@ -32,9 +32,10 @@ import { ProposalUrlQueryParamsType } from './ProposalPage';
 
 const ProposalTableInstrumentScientist: React.FC = () => {
   const { user } = useContext(UserContext);
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    ProposalUrlQueryParamsType
-  >({
+  const [
+    urlQueryParams,
+    setUrlQueryParams,
+  ] = useQueryParams<ProposalUrlQueryParamsType>({
     call: NumberParam,
     instrument: NumberParam,
     proposalStatus: NumberParam,
@@ -76,15 +77,16 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   const RowActionButtons = (rowData: Proposal) => {
     const iconButtonStyle = { padding: '7px' };
 
-    const showEdit = rowData.technicalReview && rowData.technicalReview.status;
+    const showView =
+      rowData.technicalReview && rowData.technicalReview.submitted;
 
     return (
       <>
         <Tooltip
           title={
-            showEdit
-              ? 'Edit technical review'
-              : 'View proposal and technical review'
+            showView
+              ? 'View proposal and technical review'
+              : 'Edit technical review'
           }
         >
           <Link
@@ -92,7 +94,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
             style={{ color: 'inherit', textDecoration: 'inherit' }}
           >
             <IconButton data-cy="view-proposal" style={iconButtonStyle}>
-              {showEdit ? <Edit /> : <Visibility />}
+              {showView ? <Visibility /> : <Edit />}
             </IconButton>
           </Link>
         </Tooltip>
@@ -131,14 +133,14 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     },
     {
       title: 'Technical status',
-      render: rowData =>
+      render: (rowData) =>
         rowData.technicalReview
           ? getTranslation(rowData.technicalReview.status as ResourceId)
           : '',
     },
     {
       title: 'Submitted',
-      render: rowData => (rowData.submitted ? 'Yes' : 'No'),
+      render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
     },
     { title: 'Status', field: 'status.name' },
     {
@@ -200,10 +202,10 @@ const ProposalTableInstrumentScientist: React.FC = () => {
 
   // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.
   if (localStorageValue) {
-    columns = columns.map(column => ({
+    columns = columns.map((column) => ({
       ...column,
       hidden: localStorageValue.find(
-        localStorageValueItem => localStorageValueItem.title === column.title
+        (localStorageValueItem) => localStorageValueItem.title === column.title
       )?.hidden,
     }));
   }
@@ -241,10 +243,10 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           debounceInterval: 400,
           columnsButton: true,
         }}
-        onSearchChange={searchText => {
+        onSearchChange={(searchText) => {
           setUrlQueryParams({ search: searchText ? searchText : undefined });
         }}
-        onChangeColumnHidden={columnChange => {
+        onChangeColumnHidden={(columnChange) => {
           const proposalColumns = columns.map(
             (proposalColumn: Column<Proposal>) => ({
               hidden:
@@ -270,7 +272,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
             tooltip: 'Download proposals in PDF',
             onClick: (event, rowData): void => {
               downloadPDFProposal(
-                (rowData as Proposal[]).map(row => row.id),
+                (rowData as Proposal[]).map((row) => row.id),
                 (rowData as Proposal[])[0].title
               );
             },

@@ -27,7 +27,7 @@ export const proposalBasisDefinition: QuestionaryComponentDefinition = {
       title: proposalState.proposal.title,
       abstract: proposalState.proposal.abstract,
       proposer: proposalState.proposal.proposer?.id,
-      users: proposalState.proposal.users.map(user => user.id),
+      users: proposalState.proposal.users.map((user) => user.id),
     };
   },
 };

@@ -27,6 +27,7 @@ import {
 } from 'models/QuestionaryFunctions';
 import { StyledPaper } from 'styles/StyledComponents';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
+import { FunctionType } from 'utils/utilTypes';
 
 import QuestionEditor from './QuestionEditor';
 import { QuestionPicker } from './QuestionPicker';
@@ -52,7 +53,7 @@ export default function TemplateEditor() {
   const handleEvents = ({
     getState,
   }: MiddlewareInputParams<Template, Event>) => {
-    return (next: Function) => (action: Event) => {
+    return (next: FunctionType) => (action: Event) => {
       next(action);
       switch (action.type) {
         case EventType.SERVICE_ERROR_OCCURRED:

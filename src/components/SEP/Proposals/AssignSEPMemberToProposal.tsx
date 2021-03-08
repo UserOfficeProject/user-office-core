@@ -23,11 +23,11 @@ const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
 
   const members: SepAssignedMember[] = SEPMembersData
     ? SEPMembersData.filter(
-        sepMember =>
+        (sepMember) =>
           !assignedMembers?.find(
-            assignedMember => assignedMember?.id === sepMember.userId
+            (assignedMember) => assignedMember?.id === sepMember.userId
           )
-      ).map(sepMember => ({
+      ).map((sepMember) => ({
         ...sepMember.user,
         role: sepMember.role ?? null,
       }))

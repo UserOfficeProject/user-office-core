@@ -2,8 +2,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MuiTextField from '@material-ui/core/TextField';
 import { connect, Field, FormikContextType } from 'formik';
 import { TextField } from 'formik-material-ui';
-import PropTypes from 'prop-types';
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
 
 type TProps = {
   items: Option[];
@@ -13,14 +12,16 @@ type TProps = {
   noOptionsText?: string;
   required?: boolean;
   disabled?: boolean;
-  InputProps?: object;
+  InputProps?: Record<string, unknown>;
   value?: string;
-  onChange?: (e: React.ChangeEvent<any>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-const FormikDropdown: React.FC<PropsWithChildren<TProps> & {
-  formik: FormikContextType<any>;
-}> = ({
+const FormikDropdown: React.FC<
+  TProps & {
+    formik: FormikContextType<Record<string, unknown>>;
+  }
+> = ({
   name,
   label,
   required,
@@ -36,7 +37,7 @@ const FormikDropdown: React.FC<PropsWithChildren<TProps> & {
 }) => {
   const menuItems =
     items.length > 0 ? (
-      items.map(option => {
+      items.map((option) => {
         return (
           <MenuItem key={option.value} value={option.value}>
             {option.text}
@@ -90,7 +91,7 @@ const FormikDropdown: React.FC<PropsWithChildren<TProps> & {
       InputLabelProps={{
         shrink: true,
       }}
-      onChange={(e: any) => {
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
         onChange?.(e);
         formik.handleChange(e);
       }}
@@ -110,21 +111,5 @@ export interface Option {
   text: string;
   value: string | number;
 }
-
-FormikDropdown.propTypes = {
-  items: PropTypes.array.isRequired,
-  name: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  loading: PropTypes.bool,
-  noOptionsText: PropTypes.string,
-  required: PropTypes.bool,
-  disabled: PropTypes.bool,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
-  value: PropTypes.string,
-  InputProps: PropTypes.object,
-};
 
 export default connect<TProps>(FormikDropdown);

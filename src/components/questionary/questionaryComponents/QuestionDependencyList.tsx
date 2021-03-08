@@ -45,6 +45,7 @@ const QuestionDependencyList: React.FC<QuestionDependencyListProps> = ({
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const updateFormikMemoized = useCallback(updateFormik, [logicOperator]);
 
   useEffect(() => {
@@ -56,7 +57,7 @@ const QuestionDependencyList: React.FC<QuestionDependencyListProps> = ({
   const allAvailableDependenciesAdded =
     field.dependencies.length >=
     getAllFields(template.steps).filter(
-      option =>
+      (option) =>
         [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
           option.question.dataType
         ) && currentQuestionId !== option.question.proposalQuestionId

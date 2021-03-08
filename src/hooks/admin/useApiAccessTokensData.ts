@@ -31,7 +31,7 @@ export function useApiAccessTokensData(): {
     setLoadingApiAccessTokens(true);
     api()
       .getAllApiAccessTokensAndPermissions()
-      .then(data => {
+      .then((data) => {
         if (unmounted) {
           return;
         }

@@ -15,7 +15,9 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionSampleDeclarationForm: FormComponent<Question> = props => {
+export const QuestionSampleDeclarationForm: FormComponent<Question> = (
+  props
+) => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
   const { templates } = useTemplates(
@@ -73,7 +75,7 @@ export const QuestionSampleDeclarationForm: FormComponent<Question> = props => {
                 component={Select}
                 data-cy="template-id"
               >
-                {templates.map(template => {
+                {templates.map((template) => {
                   return (
                     <MenuItem
                       value={template.templateId}

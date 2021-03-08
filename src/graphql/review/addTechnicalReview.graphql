@@ -4,6 +4,7 @@ mutation addTechnicalReview(
   $comment: String
   $publicComment: String
   $status: TechnicalReviewStatus
+  $submitted: Boolean!
 ) {
   addTechnicalReview(
     addTechnicalReviewInput: {
@@ -12,6 +13,7 @@ mutation addTechnicalReview(
       comment: $comment
       publicComment: $publicComment
       status: $status
+      submitted: $submitted
     }
   ) {
     error

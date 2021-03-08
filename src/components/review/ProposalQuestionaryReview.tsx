@@ -1,16 +1,17 @@
 import { TableProps } from '@material-ui/core';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import QuestionaryDetails, {
   TableRowData,
 } from 'components/questionary/QuestionaryDetails';
+import { BasicUserDetails } from 'generated/sdk';
 import { ProposalSubsetSubmission } from 'models/ProposalSubmissionState';
 
 export default function ProposalQuestionaryReview(
   props: {
     data: ProposalSubsetSubmission;
-  } & TableProps<any>
+  } & TableProps<FunctionComponent<unknown>>
 ) {
   const { data, ...restProps } = props;
 
@@ -31,7 +32,7 @@ export default function ProposalQuestionaryReview(
     {
       label: 'Co-Proposers',
       value: users
-        .map((user: any) => `${user.firstname} ${user.lastname}`)
+        .map((user: BasicUserDetails) => `${user.firstname} ${user.lastname}`)
         .join(', '),
     },
   ];

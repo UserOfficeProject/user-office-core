@@ -38,6 +38,164 @@ type MenuItemsProps = {
   callsData: Call[];
 };
 
+const SettingsMenuListItem = () => {
+  const history = useHistory();
+  const shouldExpand =
+    history.location.pathname === '/ProposalStatuses' ||
+    history.location.pathname === '/ProposalWorkflows' ||
+    history.location.pathname.includes('ProposalWorkflowEditor');
+  const [isExpanded, setIsExpanded] = useState(shouldExpand);
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  return (
+    <>
+      <ListItem button onClick={toggleExpand}>
+        <ListItemIcon>
+          {isExpanded ? (
+            <>
+              <Settings />
+              <ExpandLess fontSize="small" />
+            </>
+          ) : (
+            <>
+              <Settings />
+              <ExpandMore fontSize="small" />
+            </>
+          )}
+        </ListItemIcon>
+        <ListItemText primary="Settings" />
+      </ListItem>
+      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+        <ListItem component={NavLink} to="/Units" button>
+          <ListItemIcon>
+            <FunctionsIcon />
+          </ListItemIcon>
+          <ListItemText primary="Units" />
+        </ListItem>
+        <ListItem component={NavLink} to="/ProposalStatuses" button>
+          <ListItemIcon>
+            <ProposalSettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary="Proposal statuses" />
+        </ListItem>
+
+        <ListItem
+          component={NavLink}
+          isActive={() =>
+            history.location.pathname.includes('/ProposalWorkflows') ||
+            history.location.pathname.includes('ProposalWorkflowEditor')
+          }
+          to="/ProposalWorkflows"
+          button
+        >
+          <ListItemIcon>
+            <ProposalWorkflowIcon />
+          </ListItemIcon>
+          <ListItemText primary="Proposal workflows" />
+        </ListItem>
+
+        <ListItem component={NavLink} to="/ApiAccessTokens" button>
+          <ListItemIcon>
+            <VpnKey />
+          </ListItemIcon>
+          <ListItemText primary="API access tokens" />
+        </ListItem>
+      </Collapse>
+    </>
+  );
+};
+
+const TemplateMenuListItem = () => {
+  const history = useHistory();
+  const shouldExpand =
+    history.location.pathname === '/ProposalTemplates' ||
+    history.location.pathname === '/SampleDeclarationTemplates';
+  const [isExpanded, setIsExpanded] = useState(shouldExpand);
+  const context = useContext(FeatureContext);
+  const isShipmentFeatureEnabled = !!context.features.get(FeatureId.SHIPPING)
+    ?.isEnabled;
+  function toggleExpand() {
+    setIsExpanded(!isExpanded);
+  }
+
+  return (
+    <>
+      <ListItem button onClick={toggleExpand}>
+        <ListItemIcon>
+          {isExpanded ? (
+            <>
+              <LibraryBooksIcon />
+              <ExpandLess fontSize="small" />
+            </>
+          ) : (
+            <>
+              <LibraryBooksIcon />
+              <ExpandMore fontSize="small" />
+            </>
+          )}
+        </ListItemIcon>
+        <ListItemText primary="Templates" />
+      </ListItem>
+      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+        <ListItem component={NavLink} to="/ProposalTemplates" button>
+          <ListItemIcon>
+            <QuestionAnswerIcon />
+          </ListItemIcon>
+          <ListItemText primary="Proposal" title="Proposal templates" />
+        </ListItem>
+        <ListItem component={NavLink} to="/SampleDeclarationTemplates" button>
+          <ListItemIcon>
+            <InboxIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary="Sample declaration"
+            title="Sample declaration templates"
+          />
+        </ListItem>
+        {isShipmentFeatureEnabled && (
+          <ListItem
+            component={NavLink}
+            to="/ShipmentDeclarationTemplates"
+            button
+          >
+            <ListItemIcon>
+              <LocalShippingIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Shipment declaration"
+              title="Shipment declaration templates"
+            />
+          </ListItem>
+        )}
+      </Collapse>
+    </>
+  );
+};
+
+const SamplesMenuListItem = () => {
+  return (
+    <ListItem component={NavLink} to="/SampleSafety" button>
+      <ListItemIcon>
+        <BoxIcon />
+      </ListItemIcon>
+      <ListItemText primary="Sample safety" />
+    </ListItem>
+  );
+};
+
+const ShipmentMenuListItem = () => {
+  return (
+    <ListItem component={NavLink} to="/Shipments" button>
+      <ListItemIcon>
+        <LocalShippingIcon />
+      </ListItemIcon>
+      <ListItemText primary="Sample shipments" />
+    </ListItem>
+  );
+};
+
 const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const proposalDisabled = callsData.length === 0;
   const multipleCalls = callsData.length > 1;
@@ -209,164 +367,6 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     default:
       return null;
   }
-};
-
-const SettingsMenuListItem = () => {
-  const history = useHistory();
-  const shouldExpand =
-    history.location.pathname === '/ProposalStatuses' ||
-    history.location.pathname === '/ProposalWorkflows' ||
-    history.location.pathname.includes('ProposalWorkflowEditor');
-  const [isExpanded, setIsExpanded] = useState(shouldExpand);
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  return (
-    <>
-      <ListItem button onClick={toggleExpand}>
-        <ListItemIcon>
-          {isExpanded ? (
-            <>
-              <Settings />
-              <ExpandLess fontSize="small" />
-            </>
-          ) : (
-            <>
-              <Settings />
-              <ExpandMore fontSize="small" />
-            </>
-          )}
-        </ListItemIcon>
-        <ListItemText primary="Settings" />
-      </ListItem>
-      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-        <ListItem component={NavLink} to="/Units" button>
-          <ListItemIcon>
-            <FunctionsIcon />
-          </ListItemIcon>
-          <ListItemText primary="Units" />
-        </ListItem>
-        <ListItem component={NavLink} to="/ProposalStatuses" button>
-          <ListItemIcon>
-            <ProposalSettingsIcon />
-          </ListItemIcon>
-          <ListItemText primary="Proposal statuses" />
-        </ListItem>
-
-        <ListItem
-          component={NavLink}
-          isActive={() =>
-            history.location.pathname.includes('/ProposalWorkflows') ||
-            history.location.pathname.includes('ProposalWorkflowEditor')
-          }
-          to="/ProposalWorkflows"
-          button
-        >
-          <ListItemIcon>
-            <ProposalWorkflowIcon />
-          </ListItemIcon>
-          <ListItemText primary="Proposal workflows" />
-        </ListItem>
-
-        <ListItem component={NavLink} to="/ApiAccessTokens" button>
-          <ListItemIcon>
-            <VpnKey />
-          </ListItemIcon>
-          <ListItemText primary="API access tokens" />
-        </ListItem>
-      </Collapse>
-    </>
-  );
-};
-
-const TemplateMenuListItem = () => {
-  const history = useHistory();
-  const shouldExpand =
-    history.location.pathname === '/ProposalTemplates' ||
-    history.location.pathname === '/SampleDeclarationTemplates';
-  const [isExpanded, setIsExpanded] = useState(shouldExpand);
-  const context = useContext(FeatureContext);
-  const isShipmentFeatureEnabled = !!context.features.get(FeatureId.SHIPPING)
-    ?.isEnabled;
-  function toggleExpand() {
-    setIsExpanded(!isExpanded);
-  }
-
-  return (
-    <>
-      <ListItem button onClick={toggleExpand}>
-        <ListItemIcon>
-          {isExpanded ? (
-            <>
-              <LibraryBooksIcon />
-              <ExpandLess fontSize="small" />
-            </>
-          ) : (
-            <>
-              <LibraryBooksIcon />
-              <ExpandMore fontSize="small" />
-            </>
-          )}
-        </ListItemIcon>
-        <ListItemText primary="Templates" />
-      </ListItem>
-      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-        <ListItem component={NavLink} to="/ProposalTemplates" button>
-          <ListItemIcon>
-            <QuestionAnswerIcon />
-          </ListItemIcon>
-          <ListItemText primary="Proposal" title="Proposal templates" />
-        </ListItem>
-        <ListItem component={NavLink} to="/SampleDeclarationTemplates" button>
-          <ListItemIcon>
-            <InboxIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary="Sample declaration"
-            title="Sample declaration templates"
-          />
-        </ListItem>
-        {isShipmentFeatureEnabled && (
-          <ListItem
-            component={NavLink}
-            to="/ShipmentDeclarationTemplates"
-            button
-          >
-            <ListItemIcon>
-              <LocalShippingIcon />
-            </ListItemIcon>
-            <ListItemText
-              primary="Shipment declaration"
-              title="Shipment declaration templates"
-            />
-          </ListItem>
-        )}
-      </Collapse>
-    </>
-  );
-};
-
-const SamplesMenuListItem = () => {
-  return (
-    <ListItem component={NavLink} to="/SampleSafety" button>
-      <ListItemIcon>
-        <BoxIcon />
-      </ListItemIcon>
-      <ListItemText primary="Sample safety" />
-    </ListItem>
-  );
-};
-
-const ShipmentMenuListItem = () => {
-  return (
-    <ListItem component={NavLink} to="/Shipments" button>
-      <ListItemIcon>
-        <LocalShippingIcon />
-      </ListItemIcon>
-      <ListItemText primary="Sample shipments" />
-    </ListItem>
-  );
 };
 
 export default MenuItems;

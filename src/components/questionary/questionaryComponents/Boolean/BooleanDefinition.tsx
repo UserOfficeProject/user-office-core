@@ -22,7 +22,9 @@ export const booleanDefinition: QuestionaryComponentDefinition = {
   icon: <CheckBoxOutlineBlankIcon />,
   renderers: {
     questionRenderer: defaultRenderer.questionRenderer,
-    answerRenderer: ({ answer }) => <span>{answer.value ? 'Yes' : 'No'}</span>,
+    answerRenderer: function AnswerRendererComponent({ answer }) {
+      return <span>{answer.value ? 'Yes' : 'No'}</span>;
+    },
   },
   createYupValidationSchema: createBooleanValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || false,

@@ -7,7 +7,9 @@ import { QuestionTemplateRelation } from 'generated/sdk';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationProposalBasisForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationProposalBasisForm: FormComponent<QuestionTemplateRelation> = (
+  props
+) => {
   return (
     <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
@@ -16,7 +18,7 @@ export const QuestionTemplateRelationProposalBasisForm: FormComponent<QuestionTe
       template={props.template}
       validationSchema={Yup.object().shape({})}
     >
-      {formikProps => (
+      {() => (
         <>
           <QuestionExcerpt question={props.field.question} />
         </>

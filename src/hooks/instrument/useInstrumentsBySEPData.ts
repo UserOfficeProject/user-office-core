@@ -24,7 +24,7 @@ export function useInstrumentsBySEPData(
     setLoadingInstruments(true);
     api()
       .getInstrumentsBySEP({ sepId, callId })
-      .then(data => {
+      .then((data) => {
         if (data.instrumentsBySep) {
           setInstrumentsData(
             data.instrumentsBySep as InstrumentWithAvailabilityTime[]

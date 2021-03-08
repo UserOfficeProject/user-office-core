@@ -29,7 +29,7 @@ export function useProposalWorkflowsData(): {
     setLoadingProposalWorkflows(true);
     api()
       .getProposalWorkflows()
-      .then(data => {
+      .then((data) => {
         if (data.proposalWorkflows) {
           setProposalWorkflows(data.proposalWorkflows as ProposalWorkflow[]);
         }

@@ -47,7 +47,7 @@ const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
         show={modalOpen}
         close={() => setOpen(false)}
         addParticipants={addUsers}
-        selectedUsers={users.map(user => user.id)}
+        selectedUsers={users.map((user) => user.id)}
         title={'Add Co-Proposer'}
         selection={true}
         userRole={UserRole.USER}

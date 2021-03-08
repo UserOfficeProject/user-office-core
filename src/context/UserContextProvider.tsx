@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { decode } from 'jsonwebtoken';
 import PropTypes from 'prop-types';
 import React, { useCallback, useEffect } from 'react';
@@ -36,10 +37,10 @@ const initUserData: UserContextData = {
   token: '',
   roles: [],
   currentRole: null,
-  handleLogin: value => value,
-  handleNewToken: value => value,
+  handleLogin: (value) => value,
+  handleNewToken: (value) => value,
   handleLogout: () => null,
-  handleRole: value => value,
+  handleRole: (value) => value,
 };
 
 export const getCurrentUser = () =>
@@ -174,7 +175,7 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
         handleRole: (role: string): void =>
           dispatch({ type: ActionType.SELECTROLE, payload: role }),
         handleNewToken: useCallback(
-          token => dispatch({ type: ActionType.SETTOKEN, payload: token }),
+          (token) => dispatch({ type: ActionType.SETTOKEN, payload: token }),
           []
         ),
       }}

@@ -14,7 +14,7 @@ import UOLoader from 'components/common/UOLoader';
 import { Instrument } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },

@@ -47,8 +47,8 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         endCall: currentDayEnd,
         startReview: currentDayStart,
         endReview: currentDayEnd,
-        startSEPReview: null,
-        endSEPReview: null,
+        startSEPReview: currentDayStart,
+        endSEPReview: currentDayEnd,
         startNotify: currentDayStart,
         endNotify: currentDayEnd,
         startCycle: currentDayStart,
@@ -72,7 +72,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       </Typography>
       <Wizard
         initialValues={initialValues}
-        onSubmit={async values => {
+        onSubmit={async (values) => {
           const {
             id,
             templateId,

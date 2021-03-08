@@ -1,4 +1,5 @@
-import produce from 'immer';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import produce, { Draft } from 'immer';
 import { Reducer } from 'react';
 
 import { Answer, QuestionaryStep } from 'generated/sdk';
@@ -34,7 +35,6 @@ export enum EventType {
   SHIPMENT_LOADED = 'SHIPMENT_LOADED',
   SHIPMENT_SUBMIT_CLICKED = 'SHIPMENT_SUBMIT_CLICKED',
   SHIPMENT_MODIFIED = 'SHIPMENT_MODIFIED',
-  SHIPMENT_UPDATED = 'SHIPMENT_UPDATED',
   SHIPMENT_DONE = 'SHIPMENT_DONE',
   CLEAN_DIRTY_STATE = 'CLEAN_DIRTY_STATE',
 }
@@ -81,7 +81,7 @@ function getInitialStepIndex(state: QuestionarySubmissionState): number {
   const lastFinishedStep = state.wizardSteps
     .slice()
     .reverse()
-    .find(step => step.getMetadata(state, step.payload).isCompleted === true);
+    .find((step) => step.getMetadata(state, step.payload).isCompleted === true);
 
   if (!lastFinishedStep) {
     return 0;
@@ -101,7 +101,7 @@ export function QuestionarySubmissionModel<
   reducers?: (state: T, draftState: T, action: Event) => T
 ) {
   function reducer(state: T, action: Event) {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       switch (action.type) {
         case EventType.FIELD_CHANGED:
           const field = getFieldById(
@@ -152,7 +152,7 @@ export function QuestionarySubmissionModel<
         case EventType.QUESTIONARY_STEP_ANSWERED:
           const updatedStep = action.payload.questionaryStep as QuestionaryStep;
           const stepIndex = draftState.steps.findIndex(
-            step => step.topic.id === updatedStep.topic.id
+            (step) => step.topic.id === updatedStep.topic.id
           );
           draftState.steps[stepIndex] = updatedStep;
 
@@ -161,8 +161,8 @@ export function QuestionarySubmissionModel<
           break;
       }
 
-      // @ts-ignore-line
-      draftState = reducers?.(state, draftState, action) || draftState;
+      (draftState as T | Draft<T>) =
+        reducers?.(state, draftState as T, action) || draftState;
     });
   }
 

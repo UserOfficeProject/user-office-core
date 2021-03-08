@@ -29,10 +29,10 @@ export function useSEPsData(
           filter: filter,
           active,
         })
-        .then(data => {
+        .then((data) => {
           if (data.seps) {
             setSEPs(
-              data.seps.seps.map(sep => {
+              data.seps.seps.map((sep) => {
                 return {
                   ...sep,
                 };
@@ -44,10 +44,10 @@ export function useSEPsData(
     } else {
       api()
         .getUserSeps()
-        .then(data => {
+        .then((data) => {
           if (data.me?.seps) {
             setSEPs(
-              data.me.seps.map(sep => {
+              data.me.seps.map((sep) => {
                 return {
                   ...sep,
                 };

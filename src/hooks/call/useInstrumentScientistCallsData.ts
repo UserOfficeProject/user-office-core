@@ -15,7 +15,7 @@ export function useInstrumentScientistCallsData(scientistId: number) {
     setLoadingCalls(true);
     api()
       .getCallsByInstrumentScientist({ scientistId })
-      .then(data => {
+      .then((data) => {
         if (unmounted) {
           return;
         }

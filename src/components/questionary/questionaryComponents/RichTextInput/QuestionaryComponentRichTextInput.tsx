@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { FormLabel, FormHelperText, makeStyles } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import { Editor } from '@tinymce/tinymce-react';
@@ -9,7 +8,7 @@ import { Editor as TinyMCEEditor } from 'tinymce';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { RichTextInputConfig } from 'generated/sdk';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   label: {
     marginBottom: theme.spacing(2),
   },
@@ -24,15 +23,15 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
   const {
     answer,
     onComplete,
-    formikProps: { errors, touched, initialValues },
+    formikProps: { errors, touched },
   } = props;
   const {
+    value,
     question: { proposalQuestionId, question },
   } = answer;
 
   const fieldError = getIn(errors, proposalQuestionId);
-  const initialValue = getIn(initialValues, proposalQuestionId);
-  const [stateValue, setStateValue] = useState(initialValue);
+  const [stateValue, setStateValue] = useState(value);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
   const config = answer.config as RichTextInputConfig;
   const classes = useStyles();
@@ -53,7 +52,7 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
       <FormLabel className={classes.label}>{question}</FormLabel>
       <Editor
         id={proposalQuestionId}
-        initialValue={initialValue}
+        initialValue={value}
         init={{
           skin: false,
           content_css: false,
@@ -69,7 +68,7 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
             'bullist numlist | outdent indent | charmap removeformat preview',
           branding: false,
           menubar: false,
-          init_instance_callback: editor => {
+          init_instance_callback: (editor) => {
             handleCharacterCount(editor);
           },
         }}

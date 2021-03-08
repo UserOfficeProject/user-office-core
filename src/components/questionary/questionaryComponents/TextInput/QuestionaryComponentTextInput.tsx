@@ -33,7 +33,7 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
       {config.htmlQuestion && (
         <div
           dangerouslySetInnerHTML={{
-            __html: config.htmlQuestion!,
+            __html: config.htmlQuestion,
           }}
         ></div>
       )}
@@ -60,7 +60,7 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
 
           return undefined;
         }}
-        onBlur={event => {
+        onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
           onComplete(event.currentTarget.value);
         }}
         placeholder={config.placeholder}

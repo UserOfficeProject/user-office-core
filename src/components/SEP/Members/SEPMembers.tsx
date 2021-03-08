@@ -74,7 +74,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
       field: 'user.lastname',
     },
     {
-      title: 'Organisation',
+      title: 'Organization',
       field: 'user.organisation',
     },
   ];
@@ -148,7 +148,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     const {
       assignReviewersToSEP: { error },
     } = await api('SEP member assigned successfully!').assignReviewersToSEP({
-      memberIds: users.map(user => user.id),
+      memberIds: users.map((user) => user.id),
       sepId,
     });
 
@@ -158,9 +158,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
       return;
     }
 
-    setSEPReviewersData(sepReviewers => [
+    setSEPReviewersData((sepReviewers) => [
       ...sepReviewers,
-      ...users.map(user => ({ userId: user.id, sepId, user })),
+      ...users.map((user) => ({ userId: user.id, sepId, user })),
     ]);
   };
 
@@ -180,7 +180,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     }
 
     if (user.roleId === UserRole.SEP_REVIEWER) {
-      setSEPReviewersData(sepReviewers =>
+      setSEPReviewersData((sepReviewers) =>
         sepReviewers.filter(({ userId }) => userId !== user.id)
       );
     } else {
@@ -282,7 +282,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                             confirm(
                               () => {
                                 removeMember({
-                                  ...sepData.sepChair!,
+                                  ...(sepData.sepChair as BasicUserDetails),
                                   roleId: UserRole.SEP_CHAIR,
                                 });
                               },
@@ -340,7 +340,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                             confirm(
                               () => {
                                 removeMember({
-                                  ...sepData.sepSecretary!,
+                                  ...(sepData.sepSecretary as BasicUserDetails),
                                   roleId: UserRole.SEP_SECRETARY,
                                 });
                               },

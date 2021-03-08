@@ -1,10 +1,10 @@
-query userWithReviews {
+query userWithReviews($callId: Int, $instrumentId: Int, $status: ReviewStatus) {
   me {
     id
     firstname
     lastname
     organisation
-    reviews {
+    reviews(callId: $callId, instrumentId: $instrumentId, status: $status) {
       id
       grade
       comment

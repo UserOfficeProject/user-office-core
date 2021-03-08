@@ -9,6 +9,7 @@ import SuperMaterialTable, {
 } from 'components/common/SuperMaterialTable';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 
 import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
 import ParticipantModal from '../proposal/ParticipantModal';
@@ -37,16 +38,17 @@ const InstrumentTable: React.FC = () => {
     number | null
   >(null);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType
-  >(DefaultQueryParams);
+  const [
+    urlQueryParams,
+    setUrlQueryParams,
+  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const onInstrumentDelete = async (instrumentDeletedId: number | string) => {
     return await api('Instrument removed successfully!')
       .deleteInstrument({
         id: instrumentDeletedId as number,
       })
-      .then(data => {
+      .then((data) => {
         if (data.deleteInstrument.error) {
           return false;
         } else {
@@ -62,11 +64,11 @@ const InstrumentTable: React.FC = () => {
       'Scientist assigned to instrument successfully!'
     ).assignScientistsToInstrument({
       instrumentId: assigningInstrumentId as number,
-      scientistIds: scientists.map(scientist => scientist.id),
+      scientistIds: scientists.map((scientist) => scientist.id),
     });
 
     if (!assignScientistToInstrumentResult.assignScientistsToInstrument.error) {
-      scientists = scientists.map(scientist => {
+      scientists = scientists.map((scientist) => {
         if (!scientist.organisation) {
           scientist.organisation = 'Other';
         }
@@ -74,8 +76,8 @@ const InstrumentTable: React.FC = () => {
         return scientist;
       });
 
-      if (instruments) {
-        const newInstrumentsData = instruments.map(instrumentItem => {
+      setInstruments((instruments) =>
+        instruments.map((instrumentItem) => {
           if (instrumentItem.id === assigningInstrumentId) {
             return {
               ...instrumentItem,
@@ -84,10 +86,8 @@ const InstrumentTable: React.FC = () => {
           } else {
             return instrumentItem;
           }
-        });
-
-        setInstruments(newInstrumentsData);
-      }
+        })
+      );
     }
 
     setAssigningInstrumentId(null);
@@ -97,11 +97,11 @@ const InstrumentTable: React.FC = () => {
     scientistToRemoveId: number,
     instrumentToRemoveFromId: number
   ) => {
-    if (instruments) {
-      const newInstrumentsData = instruments.map(instrumentItem => {
+    setInstruments((instruments) =>
+      instruments.map((instrumentItem) => {
         if (instrumentItem.id === instrumentToRemoveFromId) {
           const newScientists = instrumentItem.scientists.filter(
-            scientistItem => scientistItem.id !== scientistToRemoveId
+            (scientistItem) => scientistItem.id !== scientistToRemoveId
           );
 
           return {
@@ -111,11 +111,9 @@ const InstrumentTable: React.FC = () => {
         } else {
           return instrumentItem;
         }
-      });
-
-      setInstruments(newInstrumentsData);
-      setAssigningInstrumentId(null);
-    }
+      })
+    );
+    setAssigningInstrumentId(null);
   };
 
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
@@ -130,8 +128,8 @@ const InstrumentTable: React.FC = () => {
   );
 
   const createModal = (
-    onUpdate: Function,
-    onCreate: Function,
+    onUpdate: FunctionType<void, [Instrument | null]>,
+    onCreate: FunctionType<void, [Instrument | null]>,
     editInstrument: Instrument | null
   ) => (
     <CreateUpdateInstrument
@@ -142,7 +140,7 @@ const InstrumentTable: React.FC = () => {
     />
   );
   const instrumentAssignments = instruments?.find(
-    instrumentItem => instrumentItem.id === assigningInstrumentId
+    (instrumentItem) => instrumentItem.id === assigningInstrumentId
   );
 
   return (
@@ -152,7 +150,7 @@ const InstrumentTable: React.FC = () => {
         close={(): void => setAssigningInstrumentId(null)}
         addParticipants={assignScientistsToInstrument}
         selectedUsers={instrumentAssignments?.scientists.map(
-          scientist => scientist.id
+          (scientist) => scientist.id
         )}
         selection={true}
         userRole={UserRole.INSTRUMENT_SCIENTIST}

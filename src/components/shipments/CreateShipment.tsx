@@ -53,16 +53,16 @@ function CreateShipment({ close }: CreateShipmentProps) {
       .getActiveTemplateId({
         templateCategoryId: TemplateCategoryId.SHIPMENT_DECLARATION,
       })
-      .then(data => {
+      .then((data) => {
         if (data.activeTemplateId) {
           api()
             .getBlankQuestionarySteps({ templateId: data.activeTemplateId })
-            .then(result => {
+            .then((result) => {
               if (result.blankQuestionarySteps) {
                 const blankShipment = createShipmentStub(
                   user,
                   result.blankQuestionarySteps,
-                  data.activeTemplateId!
+                  data.activeTemplateId as number
                 );
                 setBlankShipment(blankShipment);
               }
@@ -78,7 +78,7 @@ function CreateShipment({ close }: CreateShipmentProps) {
   return (
     <ShipmentContainer
       shipment={blankShipment}
-      done={shipment => close({ ...shipment })} // because of immer immutable object we clone it before sending out
+      done={(shipment) => close({ ...shipment })} // because of immer immutable object we clone it before sending out
     />
   );
 }

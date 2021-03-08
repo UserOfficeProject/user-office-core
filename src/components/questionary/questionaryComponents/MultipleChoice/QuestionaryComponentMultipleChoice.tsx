@@ -23,7 +23,7 @@ const toArray = (input: string | string[]): string[] => {
   return input;
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   horizontalLayout: {
     flexDirection: 'row',
   },
@@ -56,7 +56,13 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     setStateValue(answer.value);
   }, [answer]);
 
-  const handleOnChange = (_evt: any, value: string | string[]) => {
+  const handleOnChange = (
+    _evt: React.ChangeEvent<{
+      name?: string | undefined;
+      value: unknown;
+    }>,
+    value: string | string[]
+  ) => {
     const newValue = toArray(value);
     onComplete(newValue);
   };
@@ -96,13 +102,13 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
                 ? stateValue[0]
                 : ''
             }
-            onChange={evt =>
+            onChange={(evt) =>
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
             }
             multiple={config.isMultipleSelect}
             labelId={`questionary-${proposalQuestionId}`}
             required={config.required}
-            renderValue={item =>
+            renderValue={(item) =>
               config.isMultipleSelect
                 ? (item as string[]).join(', ')
                 : (item as string)
@@ -112,7 +118,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
               getContentAnchorEl: null,
             }}
           >
-            {config.options.map(option => {
+            {config.options.map((option) => {
               return (
                 <SelectMenuItem value={option} key={option}>
                   {option}
@@ -137,16 +143,16 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
             id={proposalQuestionId}
             name={proposalQuestionId}
             value={stateValue[0] || ''}
-            onChange={evt =>
+            onChange={(evt) =>
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
             }
             className={
-              config.options!.length < 3
+              config.options.length < 3
                 ? classes.horizontalLayout
                 : classes.verticalLayout
             }
           >
-            {config.options.map(option => {
+            {config.options.map((option) => {
               return (
                 <FormControlLabel
                   value={option}

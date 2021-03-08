@@ -13,13 +13,13 @@ import { Question } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   units: {
     minWidth: '100%',
   },
 }));
 
-export const QuestionIntervalForm: FormComponent<Question> = props => {
+export const QuestionIntervalForm: FormComponent<Question> = (props) => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
   const { units } = useUnitsData();
@@ -40,7 +40,7 @@ export const QuestionIntervalForm: FormComponent<Question> = props => {
         }),
       })}
     >
-      {formikProps => (
+      {() => (
         <>
           <Field
             name="naturalKey"
@@ -86,7 +86,7 @@ export const QuestionIntervalForm: FormComponent<Question> = props => {
               component={FormikUICustomSelect}
               multiple
               label="Units"
-              availableOptions={units.map(unit => unit.name)}
+              availableOptions={units.map((unit) => unit.name)}
               className={classes.units}
               data-cy="units"
             />

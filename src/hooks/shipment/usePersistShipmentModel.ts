@@ -2,6 +2,7 @@ import { ShipmentStatus } from 'generated/sdk';
 import { ShipmentSubmissionState } from 'models/ShipmentSubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
+import { FunctionType } from 'utils/utilTypes';
 
 import {
   Event,
@@ -16,7 +17,7 @@ export function usePersistShipmentModel() {
     getState,
     dispatch,
   }: MiddlewareInputParams<QuestionarySubmissionState, Event>) => {
-    return (next: Function) => async (action: Event) => {
+    return (next: FunctionType) => async (action: Event) => {
       next(action);
       switch (action.type) {
         case EventType.SHIPMENT_SUBMIT_CLICKED: {
@@ -25,7 +26,7 @@ export function usePersistShipmentModel() {
               shipmentId: (getState() as ShipmentSubmissionState).shipment.id,
               status: ShipmentStatus.SUBMITTED,
             })
-            .then(result => {
+            .then((result) => {
               const state = getState() as ShipmentSubmissionState;
               dispatch({
                 type: EventType.SHIPMENT_LOADED,

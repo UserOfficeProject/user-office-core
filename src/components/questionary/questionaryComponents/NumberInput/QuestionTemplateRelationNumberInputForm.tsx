@@ -16,13 +16,15 @@ import { useUnitsData } from 'hooks/settings/useUnitData';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   units: {
     minWidth: '100%',
   },
 }));
 
-export const QuestionTemplateRelationNumberForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationNumberForm: FormComponent<QuestionTemplateRelation> = (
+  props
+) => {
   const classes = useStyles();
   const { units } = useUnitsData();
 
@@ -41,7 +43,7 @@ export const QuestionTemplateRelationNumberForm: FormComponent<QuestionTemplateR
         }),
       })}
     >
-      {formikProps => {
+      {(formikProps) => {
         if (!getIn(formikProps.values, 'config.numberValueConstraint')) {
           formikProps.setFieldValue(
             'config.numberValueConstraint',
@@ -77,7 +79,7 @@ export const QuestionTemplateRelationNumberForm: FormComponent<QuestionTemplateR
                 multiple
                 label="Units"
                 margin="normal"
-                availableOptions={units.map(unit => unit.name)}
+                availableOptions={units.map((unit) => unit.name)}
                 className={classes.units}
                 data-cy="units"
               />

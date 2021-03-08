@@ -21,7 +21,7 @@ function UpdateShipment({ close, shipment: { id } }: UpdateShipmentProps) {
   return (
     <ShipmentContainer
       shipment={shipment}
-      done={shipment => close({ ...shipment })}
+      done={(shipment) => close({ ...shipment })}
     />
   );
 }

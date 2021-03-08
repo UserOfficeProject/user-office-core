@@ -30,7 +30,7 @@ export function useSEPProposalsData(
     setLoadingSEPProposals(true);
     api()
       .getSEPProposals({ sepId, callId })
-      .then(data => {
+      .then((data) => {
         if (cancelled) {
           return;
         }

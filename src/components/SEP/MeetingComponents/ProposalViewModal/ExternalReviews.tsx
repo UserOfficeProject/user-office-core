@@ -10,7 +10,7 @@ import React from 'react';
 import { Review } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   heading: {
     marginTop: theme.spacing(2),
   },
@@ -43,7 +43,7 @@ const ExternalReviews: React.FC<ExternalReviewsProps> = ({ reviews }) => {
               </TableCell>
               <TableCell className={classes.textBold}>Comment</TableCell>
             </TableRow>
-            {reviews?.map(review => (
+            {reviews?.map((review) => (
               <TableRow key={`externalReviews_${review.id}_${review.userID}`}>
                 <TableCell>{`${review.reviewer?.firstname} ${review.reviewer?.lastname}`}</TableCell>
                 <TableCell>{review.grade || '-'}</TableCell>

@@ -20,8 +20,8 @@ export default function RankInput(props: {
       type="number"
       autoFocus
       defaultValue={props.defaultValue}
-      onChange={event => setValue(parseInt(event.target.value))}
-      onKeyPress={ev => {
+      onChange={(event) => setValue(parseInt(event.target.value))}
+      onKeyPress={(ev) => {
         if (ev.key === 'Enter' && typeof value === 'number') {
           props.onChange(props.proposalID, value);
           setEditable(false);

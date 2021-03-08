@@ -7,6 +7,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useCallback, useState } from 'react';
 
+import { FunctionType } from './utilTypes';
+
 const defaultOptions = {
   title: '',
   description: '',
@@ -17,7 +19,7 @@ const defaultOptions = {
   onCancel: (): void => {},
 };
 
-const withConfirm = <T extends object>(
+const withConfirm = <T extends Record<string, unknown>>(
   WrappedComponent: React.ComponentType<T>
 ) => {
   return function WithConfirmComponent(props: Omit<T, 'confirm'>): JSX.Element {
@@ -26,7 +28,7 @@ const withConfirm = <T extends object>(
         marginTop: '12px',
       },
     }))();
-    const [onConfirm, setOnConfirm] = useState<Function | null>(null);
+    const [onConfirm, setOnConfirm] = useState<FunctionType | null>(null);
     const [options, setOptions] = useState(defaultOptions);
     const {
       title,
@@ -101,14 +103,14 @@ interface Options {
   description: string;
   confirmationText?: string;
   cancellationText?: string;
-  dialogProps?: object;
-  onClose?: () => void;
-  onCancel?: () => void;
+  dialogProps?: Record<string, unknown>;
+  onClose?: FunctionType;
+  onCancel?: FunctionType;
 }
 
 export type WithConfirmType = (
-  callback: () => void,
+  callback: FunctionType,
   params: Options
-) => Function;
+) => FunctionType;
 
 export default withConfirm;

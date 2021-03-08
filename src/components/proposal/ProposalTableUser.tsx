@@ -1,12 +1,8 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import React, { useCallback, useState } from 'react';
 
-import {
-  ProposalEndStatus,
-  ProposalPublicStatus,
-  ProposalStatus,
-} from 'generated/sdk';
+import { Call, Maybe, ProposalPublicStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { getProposalStatus } from 'utils/helperFunctions';
 import { timeAgo } from 'utils/Time';
 
 import ProposalTable from './ProposalTable';
@@ -21,6 +17,7 @@ export type PartialProposalsDataType = {
   submitted: boolean;
   shortCode: string;
   created: string | null;
+  call: Maybe<Pick<Call, 'shortCode' | 'id'>>;
   proposerId?: number;
 };
 
@@ -33,24 +30,13 @@ export type UserProposalDataType = {
 const ProposalTableUser: React.FC = () => {
   const api = useDataApi();
   const [loading, setLoading] = useState<boolean>(false);
-  const getProposalStatus = (proposal: {
-    status: ProposalStatus | null;
-    finalStatus?: ProposalEndStatus | null | undefined;
-    notified: boolean;
-  }): string | null => {
-    if (proposal.notified) {
-      return getTranslation(proposal.finalStatus as ResourceId);
-    } else {
-      return proposal.status?.name || null;
-    }
-  };
 
   const sendUserProposalRequest = useCallback(async () => {
     setLoading(true);
 
     return api()
       .getUserProposals()
-      .then(data => {
+      .then((data) => {
         setLoading(false);
 
         return {
@@ -62,7 +48,7 @@ const ProposalTableUser: React.FC = () => {
                 new Date(b.created).getTime() - new Date(a.created).getTime()
               );
             })
-            .map(proposal => {
+            .map((proposal) => {
               return {
                 id: proposal.id,
                 title: proposal.title,
@@ -73,6 +59,7 @@ const ProposalTableUser: React.FC = () => {
                 created: timeAgo(proposal.created),
                 notified: proposal.notified,
                 proposerId: proposal.proposer?.id,
+                call: proposal.call,
               };
             }),
         };

@@ -10,7 +10,12 @@ import GeneralInformation from 'components/proposal/GeneralInformation';
 import ProposalAdmin, {
   AdministrationFormData,
 } from 'components/proposal/ProposalAdmin';
-import { CoreTechnicalReviewFragment, Proposal, UserRole } from 'generated/sdk';
+import {
+  CoreTechnicalReviewFragment,
+  Proposal,
+  TechnicalReview,
+  UserRole,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 import ProposalTechnicalReview from './ProposalTechnicalReview';
@@ -26,10 +31,6 @@ const ProposalReviewPropTypes = {
 type ProposalReviewProps = PropTypes.InferProps<typeof ProposalReviewPropTypes>;
 
 const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
-  const [techReview, setTechReview] = useState<
-    CoreTechnicalReviewFragment | null | undefined
-  >(null);
-
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const api = useDataApi();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
@@ -37,15 +38,10 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   const loadProposal = useCallback(async () => {
     return api()
       .getProposal({ id: parseInt(match.params.id) })
-      .then(data => {
+      .then((data) => {
         setProposal(data.proposal as Proposal);
-        if (data.proposal) {
-          setTechReview(data.proposal.technicalReview);
-        }
       });
   }, [api, match.params.id]);
-
-  const [formDirty, setFormDirty] = useState(false);
 
   useEffect(() => {
     loadProposal();
@@ -64,20 +60,23 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
 
   return (
     <Container maxWidth="lg">
-      <SimpleTabs
-        tabNames={tabNames}
-        shouldPreventTabChange={formDirty}
-        setShouldPreventTabChange={setFormDirty}
-      >
+      <SimpleTabs tabNames={tabNames}>
         <GeneralInformation
           data={proposal}
           onProposalChanged={(newProposal): void => setProposal(newProposal)}
         />
         <ProposalTechnicalReview
           id={proposal.id}
-          data={techReview}
-          setReview={setTechReview}
-          setFormDirty={setFormDirty}
+          data={proposal.technicalReview}
+          setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
+            setProposal({
+              ...proposal,
+              technicalReview: {
+                ...proposal.technicalReview,
+                ...data,
+              } as TechnicalReview,
+            })
+          }
         />
         {isUserOfficer && (
           <ProposalAdmin
@@ -85,7 +84,6 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
             setAdministration={(data: AdministrationFormData) =>
               setProposal({ ...proposal, ...data })
             }
-            setFormDirty={setFormDirty}
           />
         )}
         {isUserOfficer && (
