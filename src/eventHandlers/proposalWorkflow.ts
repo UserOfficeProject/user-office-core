@@ -6,7 +6,7 @@ import { eventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { ProposalEndStatus } from '../models/Proposal';
-import { Review, ReviewStatus } from '../models/Review';
+import { ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';

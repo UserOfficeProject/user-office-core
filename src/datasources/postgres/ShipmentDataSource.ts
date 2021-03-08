@@ -98,6 +98,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
           title: args.title,
           status: args.status,
           proposal_id: args.proposalId,
+          external_ref: args.externalRef,
         },
         '*'
       )

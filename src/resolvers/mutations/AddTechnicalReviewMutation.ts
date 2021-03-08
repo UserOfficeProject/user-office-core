@@ -1,7 +1,5 @@
 import {
   Arg,
-  Args,
-  ArgsType,
   Ctx,
   Field,
   InputType,

@@ -1,6 +1,4 @@
-import { Event } from '../events/event.enum';
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
-import { ProposalStatus } from '../models/ProposalStatus';
 import { Role } from '../models/Role';
 import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../models/SEP';
 import {
