@@ -31,7 +31,7 @@ export default class SEPQueries {
   @Authorized([Roles.USER_OFFICER])
   async getAll(
     agent: UserWithRole | null,
-    active = true,
+    active?: boolean,
     filter?: string,
     first?: number,
     offset?: number

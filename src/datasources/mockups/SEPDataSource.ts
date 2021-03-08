@@ -89,6 +89,9 @@ export const dummySEPProposals = [dummySEPProposal, anotherDummySEPProposal];
 export const dummySEPMembers = [dummySEPMember, anotherDummySEPMember];
 
 export class SEPDataSourceMock implements SEPDataSource {
+  async delete(id: number): Promise<SEP> {
+    return dummySEP;
+  }
   async getMembers(sepId: number): Promise<SEPReviewer[]> {
     return dummySEPMembers.filter((member) => member.sepId === sepId);
   }
