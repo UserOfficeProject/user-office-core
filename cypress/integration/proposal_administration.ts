@@ -21,6 +21,8 @@ context('Proposal administration tests', () => {
   const answerMultipleChoice = 'One';
   const answerText = faker.random.words(3);
   const answerNumberInput = 99.9;
+  const answerIntervalMin = 1;
+  const answerIntervalMax = 100;
 
   const textQuestion = faker.random.words(3);
   const dateQuestion = faker.random.words(3);
@@ -28,6 +30,7 @@ context('Proposal administration tests', () => {
   const multipleChoiceQuestion = faker.random.words(3);
   const numberInputQuestion = faker.random.words(3);
   const fileUploadQuestion = faker.random.words(3);
+  const intervalQuestion = faker.random.words(3);
 
   let textQuestionId: string;
   let dateQuestionId: string;
@@ -35,6 +38,7 @@ context('Proposal administration tests', () => {
   let multipleChoiceQuestionId: string;
   let fileUploadQuestionId: string;
   let numberInputQuestionId: string;
+  let intervalQuestionId: string;
 
   it('Should be able to set comment for user/manager and final status', () => {
     cy.login('user');
@@ -230,6 +234,15 @@ context('Proposal administration tests', () => {
 
     cy.get('[data-cy=add-question-menu-item]').last().click();
 
+    cy.createIntervalQuestion(intervalQuestion);
+    cy.contains(intervalQuestion)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then((fieldId) => {
+        intervalQuestionId = fieldId;
+      });
+
     cy.createBooleanQuestion(boolQuestion);
     cy.contains(boolQuestion)
       .closest('[data-cy=question-container]')
@@ -262,6 +275,15 @@ context('Proposal administration tests', () => {
         multipleChoiceQuestionId = fieldId;
       });
 
+    cy.createTextQuestion(textQuestion, false, false);
+    cy.contains(textQuestion)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then((fieldId) => {
+        textQuestionId = fieldId;
+      });
+
     cy.createFileUploadQuestion(fileUploadQuestion);
     cy.contains(fileUploadQuestion)
       .closest('[data-cy=question-container]')
@@ -278,15 +300,6 @@ context('Proposal administration tests', () => {
       .invoke('html')
       .then((fieldId) => {
         numberInputQuestionId = fieldId;
-      });
-
-    cy.createTextQuestion(textQuestion, false, false);
-    cy.contains(textQuestion)
-      .closest('[data-cy=question-container]')
-      .find("[data-cy='proposal-question-id']")
-      .invoke('html')
-      .then((fieldId) => {
-        textQuestionId = fieldId;
       });
   });
 
@@ -314,6 +327,14 @@ context('Proposal administration tests', () => {
     cy.get(`[data-cy='${numberInputQuestionId}.value'] input`)
       .clear()
       .type(answerNumberInput.toString());
+
+    cy.get(`[data-cy='${intervalQuestionId}.min'] input`)
+      .clear()
+      .type(answerIntervalMin.toString());
+
+    cy.get(`[data-cy='${intervalQuestionId}.max'] input`)
+      .clear()
+      .type(answerIntervalMax.toString());
 
     cy.contains('Save and continue').click();
 
@@ -488,6 +509,49 @@ context('Proposal administration tests', () => {
     cy.get('[data-cy=value] input')
       .clear()
       .type((answerNumberInput + 1).toString());
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalName2).should('exist');
+
+    // Interval question
+    cy.get('[data-cy=question-list]').click();
+
+    cy.contains(intervalQuestion).click();
+
+    // Interval question - Less than
+    cy.get('[data-cy=comparator]').click();
+
+    cy.get('[role=listbox]').contains('Less than').click();
+
+    cy.get('[data-cy=value] input').clear().type(answerIntervalMax.toString());
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalName2).should('not.exist');
+
+    cy.get('[data-cy=value] input')
+      .clear()
+      .type((answerIntervalMax + 1).toString());
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalName2).should('exist');
+
+    // Interval question -  Greater than
+    cy.get('[data-cy=comparator]').click();
+
+    cy.get('[role=listbox]').contains('Greater than').click();
+
+    cy.get('[data-cy=value] input').clear().type(answerIntervalMin.toString());
+
+    cy.contains('Search').click();
+
+    cy.contains(proposalName2).should('not.exist');
+
+    cy.get('[data-cy=value] input')
+      .clear()
+      .type((answerIntervalMin - 1).toString());
 
     cy.contains('Search').click();
 

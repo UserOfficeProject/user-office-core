@@ -249,6 +249,17 @@ declare global {
        *    cy.createNumberInputQuestion('Specify temperature')
        */
       createNumberInputQuestion: (title: string) => void;
+
+      /**
+       * Creates interval question.
+       * You have to be in edit template view to call this method
+       *
+       * @returns {typeof createIntervalQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createIntervalQuestion('Specify temperature interval')
+       */
+      createIntervalQuestion: (title: string) => void;
     }
   }
 

@@ -461,6 +461,22 @@ function createNumberInputQuestion(title) {
     cy.finishedLoading();
 }
 
+function createIntervalQuestion(title) {
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').last().click();
+
+  cy.contains('Add Interval').click();
+
+  cy.get('[data-cy=question]').clear().type(title);
+
+  cy.contains('Save').click();
+
+  cy.contains(title)
+    .parent()
+    .dragElement([{ direction: 'left', length: 1 }]);
+
+  cy.finishedLoading();
+}
+
 function presentationMode() {
   const COMMAND_DELAY = 300;
 
@@ -538,4 +554,9 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   'createNumberInputQuestion',
   createNumberInputQuestion
+);
+
+Cypress.Commands.add(
+  'createIntervalQuestion',
+  createIntervalQuestion
 );
