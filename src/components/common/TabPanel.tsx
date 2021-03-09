@@ -4,11 +4,15 @@ import useTheme from '@material-ui/core/styles/useTheme';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';
-import React from 'react';
-import { NumberParam, useQueryParams, withDefault } from 'use-query-params';
+import React, { useEffect } from 'react';
+import {
+  NumberParam,
+  StringParam,
+  useQueryParams,
+  withDefault,
+} from 'use-query-params';
 
 import { StyledPaper } from 'styles/StyledComponents';
-import { FunctionType } from 'utils/utilTypes';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -44,31 +48,49 @@ function a11yProps(index: number) {
 type FullWidthTabsProps = {
   children: React.ReactNode[];
   tabNames: string[];
-  shouldPreventTabChange?: boolean;
-  setShouldPreventTabChange?: FunctionType<void, boolean>;
+  isInsideModal?: boolean;
 };
 
 const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
   tabNames,
   children,
+  isInsideModal,
 }) => {
   const theme = useTheme();
   const [query, setQuery] = useQueryParams({
     tab: withDefault(NumberParam, 0),
+    modalTab: withDefault(NumberParam, 0),
+    modal: StringParam,
   });
 
   const handleChange = (
     event: React.ChangeEvent<Record<string, unknown>>,
     newValue: number
   ) => {
-    setQuery({ tab: newValue > 0 ? newValue : undefined });
+    const tabValue = newValue > 0 ? newValue : undefined;
+
+    if (isInsideModal) {
+      setQuery({ modalTab: tabValue });
+    } else {
+      setQuery({ tab: tabValue });
+    }
   };
+
+  useEffect(() => {
+    return () => {
+      if (isInsideModal) {
+        setQuery({ modalTab: undefined });
+      } else {
+        setQuery({ tab: undefined });
+      }
+    };
+  }, [setQuery, isInsideModal]);
 
   return (
     <StyledPaper>
       <AppBar position="static" color="default">
         <Tabs
-          value={query.tab}
+          value={isInsideModal ? query.modalTab : query.tab}
           onChange={handleChange}
           indicatorColor="primary"
           textColor="primary"
@@ -82,7 +104,12 @@ const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
       </AppBar>
 
       {children.map((tabContent, i) => (
-        <TabPanel key={i} value={query.tab} index={i} dir={theme.direction}>
+        <TabPanel
+          key={i}
+          value={isInsideModal ? query.modalTab : query.tab}
+          index={i}
+          dir={theme.direction}
+        >
           {tabContent}
         </TabPanel>
       ))}

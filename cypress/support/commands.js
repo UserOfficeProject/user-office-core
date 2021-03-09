@@ -120,6 +120,20 @@ const notification = ({ variant, text }) => {
   }
 };
 
+const closeNotification = () => {
+  cy.get('body').then((body) => {
+    if (body.has('[aria-describedby="client-snackbar"]')) {
+      cy.get('.MuiSnackbarContent-action button').click();
+    }
+  });
+};
+
+const closeModal = () => {
+  cy.get('[role="dialog"] [data-cy="close-modal"]').click();
+  // NOTE: Need to wait for modal to close with animation.
+  cy.wait(100);
+};
+
 const finishedLoading = () => {
   cy.get('[role="progressbar"]').should('not.exist');
 };
@@ -510,6 +524,9 @@ Cypress.Commands.add('login', login);
 Cypress.Commands.add('logout', logout);
 
 Cypress.Commands.add('notification', notification);
+Cypress.Commands.add('closeNotification', closeNotification);
+
+Cypress.Commands.add('closeModal', closeModal);
 
 Cypress.Commands.add('finishedLoading', finishedLoading);
 
@@ -546,10 +563,7 @@ Cypress.Commands.add(
   createMultipleChoiceQuestion
 );
 
-Cypress.Commands.add(
-  'createFileUploadQuestion',
-  createFileUploadQuestion
-);
+Cypress.Commands.add('createFileUploadQuestion', createFileUploadQuestion);
 
 Cypress.Commands.add(
   'createNumberInputQuestion',

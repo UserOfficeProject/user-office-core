@@ -371,6 +371,8 @@ context(
 
       cy.contains(sepMembers.reviewer.surname);
 
+      cy.closeNotification();
+
       cy.get('[title="Remove reviewer"]').click();
       cy.get('[title="Save"]').click();
 
@@ -434,6 +436,8 @@ context(
       });
 
       cy.contains(sepMembers.reviewer.surname);
+
+      cy.closeNotification();
 
       cy.get('[title="Remove reviewer"]').click();
       cy.get('[title="Save"]').click();
@@ -512,6 +516,8 @@ context(
 
       cy.get('[type="submit"]').click();
       // <------------------------------------------
+
+      cy.closeModal();
 
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
@@ -1009,7 +1015,7 @@ context(
 
       cy.get('[data-cy="view-proposal"]').first().click();
 
-      cy.contains('Technical').click();
+      cy.get('[role="dialog"]').contains('Technical').click();
       cy.get('[data-cy="timeAllocation"]').type('51');
       cy.get('[data-cy="technical-review-status"]').click();
       cy.contains('Feasible').click();
@@ -1020,6 +1026,8 @@ context(
         variant: 'success',
         text: 'Technical review updated successfully',
       });
+
+      cy.closeModal();
 
       cy.contains('SEPs').click();
 
@@ -1361,8 +1369,11 @@ context(
       }
 
       assertAndRemoveAssignment(3);
+      cy.finishedLoading();
       assertAndRemoveAssignment(2);
+      cy.finishedLoading();
       assertAndRemoveAssignment(1);
+      cy.finishedLoading();
 
       cy.get('@rows').parent().contains('No records to display');
 
@@ -1424,6 +1435,8 @@ context(
         variant: 'success',
         text: 'Assignment removed',
       });
+
+      cy.closeNotification();
 
       cy.contains('Logs').click({ force: true });
 
@@ -1489,11 +1502,13 @@ context(
         text: 'SEP member removed successfully',
       });
 
+      cy.closeNotification();
+
       cy.contains('Logs').click({ force: true });
 
       cy.finishedLoading();
 
-      cy.get("[title='Last Page'] button").first().click({ force: true });
+      cy.get("[title='Last Page'] button").first().click();
 
       cy.contains('SEP_MEMBER_REMOVED');
 

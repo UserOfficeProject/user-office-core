@@ -2,7 +2,10 @@ import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { Column } from 'material-table';
 
 import { SortDirectionType } from 'components/common/SuperMaterialTable';
-import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
+import { Proposal, ProposalEndStatus, ProposalStatus } from 'generated/sdk';
+import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
+
+import { average, getGrades, standardDeviation } from './mathFunctions';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const getUniqueArrayBy = (roles: any[], uniqueBy: string): any[] => {
@@ -42,4 +45,29 @@ export const getProposalStatus = (
   } else {
     return proposal?.status?.name || null;
   }
+};
+
+export const fromProposalToProposalView = (proposal: Proposal) => {
+  return {
+    id: proposal.id,
+    title: proposal.title,
+    status: proposal.status?.name || '',
+    statusId: proposal.status?.id || 1,
+    statusName: proposal.status?.name || '',
+    statusDescription: proposal.status?.description || '',
+    submitted: proposal.submitted,
+    shortCode: proposal.shortCode,
+    rankOrder: proposal.rankOrder,
+    finalStatus: proposal.finalStatus,
+    timeAllocation: proposal.technicalReview?.timeAllocation || null,
+    technicalStatus: proposal.technicalReview?.status || '',
+    instrumentName: proposal.instrument?.name || null,
+    instrumentId: proposal.instrument?.id || null,
+    reviewAverage: average(getGrades(proposal.reviews)) || null,
+    reviewDeviation: standardDeviation(getGrades(proposal.reviews)) || null,
+    sepCode: '',
+    callShortCode: proposal.call?.shortCode || null,
+    notified: proposal.notified,
+    callId: proposal.callId,
+  } as ProposalViewData;
 };

@@ -52,7 +52,8 @@ context('Proposal administration tests', () => {
     cy.contains('Proposals').click();
 
     cy.get('[data-cy=view-proposal]').click();
-
+    cy.get('[role="dialog"]').as('dialog');
+    cy.finishedLoading();
     cy.contains('Admin').click();
 
     cy.get('#mui-component-select-finalStatus').click();
@@ -81,6 +82,8 @@ context('Proposal administration tests', () => {
 
     cy.contains(textManager);
 
+    cy.closeModal();
+
     cy.contains('Accepted');
 
     cy.contains('DRAFT');
@@ -97,13 +100,16 @@ context('Proposal administration tests', () => {
 
     cy.get('[data-cy=view-proposal]').click();
 
+    cy.get('[role="dialog"]').as('dialog');
+    cy.finishedLoading();
+
     cy.contains('Admin').click();
 
     cy.reload();
 
     cy.get('[data-cy="commentForUser"]').should('exist');
 
-    cy.contains('Technical').click();
+    cy.get('[role="dialog"]').contains('Technical').click();
 
     cy.reload();
 

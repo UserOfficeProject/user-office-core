@@ -425,7 +425,9 @@ context('Instrument tests', () => {
     cy.get('[role="listbox"] [data-value="0"]').click();
 
     cy.get('[data-cy="view-proposal"]').first().click();
-    cy.contains('Technical').click();
+    cy.get('[role="dialog"]').as('dialog');
+    cy.finishedLoading();
+    cy.get('@dialog').contains('Technical').click();
 
     cy.get('[data-cy="timeAllocation"] input').type('-123').blur();
     cy.contains('Must be greater than or equal to');
@@ -455,6 +457,8 @@ context('Instrument tests', () => {
       text: 'Technical review updated successfully',
     });
 
+    cy.closeModal();
+
     cy.contains('Proposals').click();
 
     cy.get('[data-cy="status-filter"]').click();
@@ -475,12 +479,14 @@ context('Instrument tests', () => {
     cy.get('[role="listbox"] [data-value="0"]').click();
 
     cy.get('[data-cy="view-proposal"]').first().click();
-    cy.contains('Technical').click();
+    cy.get('[role="dialog"]').as('dialog');
+    cy.finishedLoading();
+    cy.get('@dialog').contains('Technical').click();
 
     cy.get('[data-cy="comment"] textarea').first().type(internalComment);
     cy.get('[data-cy="publicComment"] textarea').first().type(publicComment);
 
-    cy.contains('Submit').click();
+    cy.get('[data-cy="submit-technical-review"]').click();
 
     cy.get('[data-cy="confirm-ok"]').click();
 
@@ -495,7 +501,9 @@ context('Instrument tests', () => {
     cy.contains('Proposals');
 
     cy.get('[data-cy="view-proposal"]').first().click();
-    cy.contains('Technical').click();
+    cy.get('[role="dialog"]').as('dialog');
+    cy.finishedLoading();
+    cy.get('@dialog').contains('Technical').click();
 
     cy.get('[data-cy="is-review-submitted"] input')
       .should('have.value', 'true')
@@ -509,6 +517,8 @@ context('Instrument tests', () => {
       text: 'Technical review updated successfully',
     });
 
+    cy.closeModal();
+
     cy.logout();
 
     cy.login('user');
@@ -520,7 +530,7 @@ context('Instrument tests', () => {
     cy.get('[role="listbox"] [data-value="0"]').click();
 
     cy.get('[data-cy="view-proposal"]').first().click();
-    cy.contains('Technical').click();
+    cy.get('[role="dialog"]').contains('Technical').click();
 
     cy.get('[data-cy="update-technical-review"]').should('not.be.disabled');
     cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');

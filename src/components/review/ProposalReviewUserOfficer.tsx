@@ -1,6 +1,6 @@
-import Container from '@material-ui/core/Container';
-import PropTypes from 'prop-types';
-import React, { useCallback, useEffect, useState } from 'react';
+import { Button } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/TabPanel';
@@ -12,43 +12,38 @@ import ProposalAdmin, {
 } from 'components/proposal/ProposalAdmin';
 import {
   CoreTechnicalReviewFragment,
-  Proposal,
   TechnicalReview,
   UserRole,
 } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import { useProposalData } from 'hooks/proposal/useProposalData';
 
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 
-const ProposalReviewPropTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+type ProposalReviewProps = {
+  proposalId: number;
+  isInsideModal?: boolean;
 };
 
-type ProposalReviewProps = PropTypes.InferProps<typeof ProposalReviewPropTypes>;
-
-const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
-  const [proposal, setProposal] = useState<Proposal | null>(null);
-  const api = useDataApi();
+const ProposalReview: React.FC<ProposalReviewProps> = ({
+  proposalId,
+  isInsideModal,
+}) => {
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const { proposalData, setProposalData, loading } = useProposalData(
+    proposalId
+  );
 
-  const loadProposal = useCallback(async () => {
-    return api()
-      .getProposal({ id: parseInt(match.params.id) })
-      .then((data) => {
-        setProposal(data.proposal as Proposal);
-      });
-  }, [api, match.params.id]);
-
-  useEffect(() => {
-    loadProposal();
-  }, [loadProposal]);
-
-  if (!proposal) {
+  if (loading) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
+  }
+
+  if (!proposalData) {
+    return (
+      <Box display="flex" flexDirection="column" alignItems="center">
+        <h2>Proposal not found</h2>
+        <Button onClick={() => console.log('Not implemented')}>Retry</Button>
+      </Box>
+    );
   }
 
   const tabNames = ['General', 'Technical'];
@@ -59,41 +54,37 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   }
 
   return (
-    <Container maxWidth="lg">
-      <SimpleTabs tabNames={tabNames}>
-        <GeneralInformation
-          data={proposal}
-          onProposalChanged={(newProposal): void => setProposal(newProposal)}
-        />
-        <ProposalTechnicalReview
-          id={proposal.id}
-          data={proposal.technicalReview}
-          setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
-            setProposal({
-              ...proposal,
-              technicalReview: {
-                ...proposal.technicalReview,
-                ...data,
-              } as TechnicalReview,
-            })
+    <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
+      <GeneralInformation
+        data={proposalData}
+        onProposalChanged={(newProposal): void => setProposalData(newProposal)}
+      />
+      <ProposalTechnicalReview
+        id={proposalData.id}
+        data={proposalData.technicalReview}
+        setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
+          setProposalData({
+            ...proposalData,
+            technicalReview: {
+              ...proposalData.technicalReview,
+              ...data,
+            } as TechnicalReview,
+          })
+        }
+      />
+      {isUserOfficer && (
+        <ProposalAdmin
+          data={proposalData}
+          setAdministration={(data: AdministrationFormData) =>
+            setProposalData({ ...proposalData, ...data })
           }
         />
-        {isUserOfficer && (
-          <ProposalAdmin
-            data={proposal}
-            setAdministration={(data: AdministrationFormData) =>
-              setProposal({ ...proposal, ...data })
-            }
-          />
-        )}
-        {isUserOfficer && (
-          <EventLogList changedObjectId={proposal.id} eventType="PROPOSAL" />
-        )}
-      </SimpleTabs>
-    </Container>
+      )}
+      {isUserOfficer && (
+        <EventLogList changedObjectId={proposalData.id} eventType="PROPOSAL" />
+      )}
+    </SimpleTabs>
   );
 };
-
-ProposalReview.propTypes = ProposalReviewPropTypes;
 
 export default ProposalReview;

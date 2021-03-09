@@ -438,7 +438,7 @@ context('Settings tests', () => {
         );
 
       cy.get('[data-cy="view-proposal"]').first().click();
-      cy.contains('Technical').click();
+      cy.get('[role="dialog"]').contains('Technical').click();
 
       cy.get('[data-cy="timeAllocation"] input').clear().type('20');
 
@@ -456,6 +456,8 @@ context('Settings tests', () => {
         variant: 'success',
         text: 'Technical review updated successfully',
       });
+
+      cy.closeModal();
 
       cy.contains('Proposals').click();
 
