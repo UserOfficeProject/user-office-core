@@ -26,8 +26,8 @@ context('Proposal administration tests', () => {
   const dateQuestion = faker.random.words(3);
   const boolQuestion = faker.random.words(3);
   const multipleChoiceQuestion = faker.random.words(3);
-  const fileUploadQuestion = faker.random.words(3);
   const numberInputQuestion = faker.random.words(3);
+  const fileUploadQuestion = faker.random.words(3);
 
   let textQuestionId: string;
   let dateQuestionId: string;
@@ -254,6 +254,8 @@ context('Proposal administration tests', () => {
       'Two',
       'Three'
     );
+
+    cy.createFileUploadQuestion(fileUploadQuestion);
     cy.contains(multipleChoiceQuestion)
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
