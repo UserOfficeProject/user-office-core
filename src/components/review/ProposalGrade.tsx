@@ -7,17 +7,16 @@ import MenuItem from '@material-ui/core/MenuItem';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Field, Form, Formik, useFormikContext } from 'formik';
 import { TextField, Select } from 'formik-material-ui';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { Prompt } from 'react-router';
 
 import UOLoader from 'components/common/UOLoader';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import {
   ReviewStatus,
-  CoreReviewFragment,
   ReviewWithNextProposalStatus,
+  Review,
 } from 'generated/sdk';
-import { useReviewData } from 'hooks/review/useReviewData';
 import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -34,7 +33,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 type ProposalGradeProps = {
-  reviewID: number;
+  review: Review | null;
+  setReview: React.Dispatch<React.SetStateAction<Review | null>>;
   onChange: FunctionType;
   sepId?: number | null;
   confirm: WithConfirmType;
@@ -47,23 +47,15 @@ type GradeFormType = {
 };
 
 const ProposalGrade: React.FC<ProposalGradeProps> = ({
-  reviewID,
+  review,
+  setReview,
   onChange,
-  sepId,
   confirm,
 }) => {
   const classes = useStyles();
-  const { reviewData } = useReviewData(reviewID, sepId);
   const { api } = useDataApiWithFeedback();
-  const [review, setReview] = useState<CoreReviewFragment | null | undefined>(
-    null
-  );
   const { setAssignmentReview } = useContext(ReviewAndAssignmentContext);
   const [shouldSubmit, setShouldSubmit] = useState(false);
-
-  useEffect(() => {
-    setReview(reviewData);
-  }, [reviewData]);
 
   if (!review) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -85,7 +77,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
 
   const handleSubmit = async (values: GradeFormType) => {
     const data = await api(shouldSubmit ? 'Submitted' : 'Updated').addReview({
-      reviewID: reviewID,
+      reviewID: review.id,
       //This should be taken care of in validationSchema
       grade: +values.grade,
       comment: values.comment ? values.comment : '',
@@ -93,8 +85,13 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
       sepID: review.sepID,
     });
 
-    if (!data.addReview.error) {
-      setReview(data.addReview.review as CoreReviewFragment);
+    if (!data.addReview.error && data.addReview.review) {
+      setReview({
+        ...review,
+        comment: data.addReview.review.comment,
+        grade: data.addReview.review.grade,
+        status: data.addReview.review.status,
+      });
       setAssignmentReview(
         data.addReview.review as ReviewWithNextProposalStatus
       );

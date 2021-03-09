@@ -12,22 +12,24 @@ export function useReviewData(reviewId: number, sepId?: number | null) {
   useEffect(() => {
     let cancelled = false;
 
-    setLoading(true);
-    api()
-      .getReview({ reviewId, sepId })
-      .then((data) => {
-        if (cancelled) {
-          return;
-        }
+    if (reviewId) {
+      setLoading(true);
+      api()
+        .getReview({ reviewId, sepId })
+        .then((data) => {
+          if (cancelled) {
+            return;
+          }
 
-        setReviewData(data.review as Review);
-        setLoading(false);
-      });
+          setReviewData(data.review as Review);
+          setLoading(false);
+        });
+    }
 
     return () => {
       cancelled = true;
     };
   }, [reviewId, sepId, api]);
 
-  return { loading, reviewData };
+  return { loading, reviewData, setReviewData };
 }

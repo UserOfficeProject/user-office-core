@@ -6,10 +6,11 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column } from 'material-table';
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
+import ProposalReviewModal from 'components/review/ProposalReviewModal';
+import ProposalReview from 'components/review/ProposalReviewUserOfficer';
 import { UserContext } from 'context/UserContextProvider';
 import { Proposal, ProposalsFilter } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
@@ -43,6 +44,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     compareOperator: StringParam,
     value: StringParam,
     dataType: StringParam,
+    reviewModal: NumberParam,
     ...DefaultQueryParams,
   });
 
@@ -59,7 +61,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     loadingProposalStatuses,
   } = useProposalStatusesData();
 
-  const { loading, proposalsData } = useProposalsData({
+  const { loading, proposalsData, setProposalsData } = useProposalsData({
     proposalStatusId: proposalFilter.proposalStatusId,
     instrumentId: proposalFilter.instrumentId,
     callId: proposalFilter.callId,
@@ -89,14 +91,15 @@ const ProposalTableInstrumentScientist: React.FC = () => {
               : 'Edit technical review'
           }
         >
-          <Link
-            to={`/ProposalReviewUserOfficer/${rowData.id}`}
-            style={{ color: 'inherit', textDecoration: 'inherit' }}
+          <IconButton
+            data-cy="view-proposal"
+            onClick={() => {
+              setUrlQueryParams({ reviewModal: rowData.id });
+            }}
+            style={iconButtonStyle}
           >
-            <IconButton data-cy="view-proposal" style={iconButtonStyle}>
-              {showView ? <Visibility /> : <Edit />}
-            </IconButton>
-          </Link>
+            {showView ? <Visibility /> : <Edit />}
+          </IconButton>
         </Tooltip>
 
         <Tooltip title="Download proposal as pdf">
@@ -218,8 +221,31 @@ const ProposalTableInstrumentScientist: React.FC = () => {
 
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
 
+  const proposalToReview = proposalsData.find(
+    (proposal) => proposal.id === urlQueryParams.reviewModal
+  );
+
   return (
     <>
+      <ProposalReviewModal
+        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.shortCode})`}
+        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
+        setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
+          setProposalsData(
+            proposalsData.map((proposal) => {
+              if (proposal.id === updatedProposal?.id) {
+                return updatedProposal;
+              } else {
+                return proposal;
+              }
+            })
+          );
+          setUrlQueryParams({ reviewModal: undefined });
+        }}
+        reviewItemId={urlQueryParams.reviewModal}
+      >
+        <ProposalReview proposalId={urlQueryParams.reviewModal as number} />
+      </ProposalReviewModal>
       <ProposalFilterBar
         calls={{ data: calls, isLoading: loadingCalls }}
         instruments={{ data: instruments, isLoading: loadingInstruments }}

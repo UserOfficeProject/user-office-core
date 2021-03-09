@@ -226,7 +226,7 @@ const ProposalTechnicalReview = ({
                 type="submit"
                 onClick={() => setShouldSubmit(false)}
                 variant="contained"
-                color="secondary"
+                color={isUserOfficer ? 'primary' : 'secondary'}
                 data-cy="update-technical-review"
               >
                 Update
