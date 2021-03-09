@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import BluePromise from 'bluebird';
+
 import { Call } from '../../models/Call';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
@@ -9,6 +11,7 @@ import {
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 import database from './database';
+import { calculateReferenceNumber } from './ProposalDataSource';
 import { CallRecord, createCallObject } from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
@@ -98,40 +101,91 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async update(args: UpdateCallInput): Promise<Call> {
-    return database
-      .update(
-        {
-          call_short_code: args.shortCode,
-          start_call: args.startCall,
-          end_call: args.endCall,
-          reference_number_format: args.referenceNumberFormat,
-          start_review: args.startReview,
-          end_review: args.endReview,
-          start_sep_review: args.startSEPReview,
-          end_sep_review: args.endSEPReview,
-          start_notify: args.startNotify,
-          end_notify: args.endNotify,
-          start_cycle: args.startCycle,
-          end_cycle: args.endCycle,
-          cycle_comment: args.cycleComment,
-          survey_comment: args.surveyComment,
-          proposal_workflow_id: args.proposalWorkflowId,
-          call_ended: args.callEnded,
-          call_review_ended: args.callReviewEnded,
-          call_sep_review_ended: args.callSEPReviewEnded,
-          template_id: args.templateId,
-        },
-        ['*']
-      )
-      .from('call')
-      .where('call_id', args.id)
-      .then((call: CallRecord[]) => {
-        if (call.length !== 1) {
-          throw new Error('Could not update call');
+    const call: CallRecord[] = await database.transaction(async trx => {
+      try {
+        /*
+         * Check if the reference number format has been changed,
+         * in which case all proposals in the call need to be updated.
+         */
+        const preUpdateCall = await database
+          .select('c.call_id', 'c.reference_number_format')
+          .from('call as c')
+          .where('c.call_id', args.id)
+          .first()
+          .forUpdate()
+          .transacting(trx);
+
+        if (
+          args.referenceNumberFormat &&
+          args.referenceNumberFormat !== preUpdateCall.reference_number_format
+        ) {
+          const proposals = await database
+            .select('p.proposal_id', 'p.reference_number_sequence')
+            .from('proposals as p')
+            .where({ 'p.call_id': preUpdateCall.call_id, 'p.submitted': true })
+            .forUpdate()
+            .transacting(trx);
+
+          await BluePromise.map(
+            proposals,
+            async p => {
+              await database
+                .update({
+                  short_code: await calculateReferenceNumber(
+                    args.referenceNumberFormat,
+                    p.reference_number_sequence
+                  ),
+                })
+                .from('proposals')
+                .where('proposal_id', p.proposal_id)
+                .transacting(trx);
+            },
+            { concurrency: 50 }
+          );
         }
 
-        return createCallObject(call[0]);
-      });
+        const callUpdate = await database
+          .update(
+            {
+              call_short_code: args.shortCode,
+              start_call: args.startCall,
+              end_call: args.endCall,
+              reference_number_format: args.referenceNumberFormat,
+              start_review: args.startReview,
+              end_review: args.endReview,
+              start_sep_review: args.startSEPReview,
+              end_sep_review: args.endSEPReview,
+              start_notify: args.startNotify,
+              end_notify: args.endNotify,
+              start_cycle: args.startCycle,
+              end_cycle: args.endCycle,
+              cycle_comment: args.cycleComment,
+              survey_comment: args.surveyComment,
+              proposal_workflow_id: args.proposalWorkflowId,
+              call_ended: args.callEnded,
+              call_review_ended: args.callReviewEnded,
+              call_sep_review_ended: args.callSEPReviewEnded,
+              template_id: args.templateId,
+            },
+            ['*']
+          )
+          .from('call')
+          .where('call_id', args.id)
+          .transacting(trx);
+
+        return await trx.commit(callUpdate);
+      } catch (error) {
+        throw new Error(
+          `Could not update call with id '${args.id}' because: '${error.message}'`
+        );
+      }
+    });
+
+    if (call.length !== 1) {
+      throw new Error('Could not update call');
+    }
+
+    return createCallObject(call[0]);
   }
 
   async assignInstrumentsToCall(
