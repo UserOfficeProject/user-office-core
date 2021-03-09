@@ -78,9 +78,7 @@ context('Template tests', () => {
 
     cy.contains('Add Text Input').click();
 
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(textQuestion);
+    cy.get('[data-cy=question]').clear().type(textQuestion);
 
     cy.contains('Is required').click();
 
@@ -90,7 +88,7 @@ context('Template tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         textId = fieldId;
       });
   });
@@ -108,13 +106,9 @@ context('Template tests', () => {
 
     cy.createTopic(topic);
 
-    cy.get('[data-cy=show-more-button]')
-      .last()
-      .click();
+    cy.get('[data-cy=show-more-button]').last().click();
 
-    cy.get('[data-cy=add-question-menu-item]')
-      .last()
-      .click();
+    cy.get('[data-cy=add-question-menu-item]').last().click();
 
     /* Boolean */
 
@@ -124,7 +118,7 @@ context('Template tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         boolId = fieldId;
       });
 
@@ -137,9 +131,7 @@ context('Template tests', () => {
 
     cy.contains('Add Interval').click();
 
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(intervalQuestion);
+    cy.get('[data-cy=question]').clear().type(intervalQuestion);
 
     cy.get('[data-cy=units]>[role=button]').click({ force: true });
 
@@ -155,7 +147,7 @@ context('Template tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         intervalId = fieldId;
       });
 
@@ -169,9 +161,7 @@ context('Template tests', () => {
 
     cy.contains('Add Number').click();
 
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(numberQuestion);
+    cy.get('[data-cy=question]').clear().type(numberQuestion);
 
     cy.get('[data-cy=units]>[role=button]').click({ force: true });
 
@@ -187,7 +177,7 @@ context('Template tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         numberId = fieldId;
       });
 
@@ -203,7 +193,7 @@ context('Template tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         textId = fieldId;
       });
 
@@ -218,9 +208,7 @@ context('Template tests', () => {
 
     cy.get('[data-cy="natural-key"]').click();
 
-    cy.get("[data-cy='natural_key']")
-      .clear()
-      .type(newKey);
+    cy.get("[data-cy='natural_key']").clear().type(newKey);
 
     cy.contains('Save').click();
 
@@ -280,7 +268,7 @@ context('Template tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         multipleChoiceId = fieldId;
       });
 
@@ -315,7 +303,7 @@ context('Template tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         dateId = fieldId;
       });
 
@@ -328,9 +316,7 @@ context('Template tests', () => {
 
     cy.contains('Add File Upload').click();
 
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(fileQuestion);
+    cy.get('[data-cy=question]').clear().type(fileQuestion);
 
     cy.contains('Save').click();
 
@@ -348,9 +334,7 @@ context('Template tests', () => {
 
     cy.contains('Add Rich Text Input').click();
 
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(richTextInputQuestion);
+    cy.get('[data-cy=question]').clear().type(richTextInputQuestion);
 
     cy.contains('Save').click();
 
@@ -360,7 +344,7 @@ context('Template tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         richTextInputId = fieldId;
       });
 
@@ -371,18 +355,14 @@ context('Template tests', () => {
     cy.finishedLoading();
     cy.contains(richTextInputQuestion).click();
 
-    cy.get('[data-cy="max"] input')
-      .clear()
-      .type(`${richTextEditorMaxChars}`);
+    cy.get('[data-cy="max"] input').clear().type(`${richTextEditorMaxChars}`);
 
     cy.contains('Update').click();
     /* --- */
 
     /* --- Update templateQuestionRelation */
     cy.contains(dateQuestion).click();
-    cy.get("[data-cy='tooltip'] input")
-      .clear()
-      .type(dateTooltip);
+    cy.get("[data-cy='tooltip'] input").clear().type(dateTooltip);
 
     cy.contains('Update').click();
 
@@ -464,27 +444,17 @@ context('Template tests', () => {
     cy.login('user');
 
     cy.createProposal(title, abstract);
-    cy.get(`[data-cy="${intervalId}.min"]`)
-      .click()
-      .type('1');
-    cy.get(`[data-cy="${intervalId}.max"]`)
-      .click()
-      .type('2');
-    cy.get(`[data-cy="${numberId}.value"]`)
-      .click()
-      .type('1');
+    cy.get(`[data-cy="${intervalId}.min"]`).click().type('1');
+    cy.get(`[data-cy="${intervalId}.max"]`).click().type('2');
+    cy.get(`[data-cy="${numberId}.value"]`).click().type('1');
     cy.get(`#${boolId}`).click();
-    cy.get(`#${textId}`)
-      .clear()
-      .type('this_word_{enter}should_be_multiline');
+    cy.get(`#${textId}`).clear().type('this_word_{enter}should_be_multiline');
     cy.contains('this_word_should_be_multiline').should('not.exist');
-    cy.get(`#${textId}`)
-      .clear()
-      .type(textAnswer);
+    cy.get(`#${textId}`).clear().type(textAnswer);
     cy.contains(`${textAnswer.length}/${minimumCharacters}`);
-    cy.get(`[data-cy='${dateId}_field'] button`).click();
+    cy.get(`[data-cy='${dateId}.value'] button`).click();
     cy.wait(300);
-    cy.get(`[data-cy='${dateId}_field'] button`).click({ force: true }); // click twice because ui hangs sometimes
+    cy.get(`[data-cy='${dateId}.value'] button`).click({ force: true }); // click twice because ui hangs sometimes
     cy.contains('15').click({ force: true });
 
     cy.get(`#${multipleChoiceId}`).click();
@@ -494,8 +464,8 @@ context('Template tests', () => {
 
     const richTextInputValue = faker.lorem.words(3);
 
-    cy.window().then(win => {
-      return new Cypress.Promise(resolve => {
+    cy.window().then((win) => {
+      return new Cypress.Promise((resolve) => {
         console.log('richTextInputId', richTextInputId);
 
         win.tinyMCE.editors[richTextInputId].setContent(richTextInputValue);
@@ -510,7 +480,7 @@ context('Template tests', () => {
       .should('not.be.empty')
       .contains(richTextInputValue);
 
-    cy.get('[data-cy="rich-text-char-count"]').then(element => {
+    cy.get('[data-cy="rich-text-char-count"]').then((element) => {
       expect(element.text()).to.be.equal(
         `Characters: ${richTextInputValue.length} / ${richTextEditorMaxChars}`
       );
@@ -533,9 +503,7 @@ context('Template tests', () => {
     cy.get(`[data-cy="${richTextInputId}_open"]`).click();
     cy.get('[role="dialog"]').contains(richTextInputQuestion);
     cy.get('[role="dialog"]').contains(richTextInputValue);
-    cy.get('[role="dialog"]')
-      .contains('Close')
-      .click();
+    cy.get('[role="dialog"]').contains('Close').click();
 
     cy.contains('Dashboard').click();
     cy.contains(title);
@@ -549,17 +517,11 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get("[title='Edit']")
-      .first()
-      .click();
+    cy.get("[title='Edit']").first().click();
 
-    cy.get('[data-cy=show-more-button]')
-      .first()
-      .click();
+    cy.get('[data-cy=show-more-button]').first().click();
 
-    cy.get('[data-cy=add-question-menu-item]')
-      .first()
-      .click();
+    cy.get('[data-cy=add-question-menu-item]').first().click();
 
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
       .first()
@@ -567,9 +529,7 @@ context('Template tests', () => {
 
     cy.contains('Add Date').click();
 
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(dateQuestion);
+    cy.get('[data-cy=question]').clear().type(dateQuestion);
 
     cy.get('[data-cy="minDate"] input').type('2020-01-01');
     cy.get('[data-cy="maxDate"] input').type('2020-01-31');
@@ -581,7 +541,7 @@ context('Template tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         dateFieldId = fieldId;
       });
 
@@ -597,15 +557,9 @@ context('Template tests', () => {
     cy.get('[data-cy="maxDate"] input').should('have.value', '2020-01-31');
     cy.get('[data-cy="defaultDate"] input').should('have.value', '2020-01-10');
 
-    cy.get('[data-cy="minDate"] input')
-      .clear()
-      .type('2021-01-01');
-    cy.get('[data-cy="maxDate"] input')
-      .clear()
-      .type('2021-01-31');
-    cy.get('[data-cy="defaultDate"] input')
-      .clear()
-      .type('2021-01-10');
+    cy.get('[data-cy="minDate"] input').clear().type('2021-01-01');
+    cy.get('[data-cy="maxDate"] input').clear().type('2021-01-31');
+    cy.get('[data-cy="defaultDate"] input').clear().type('2021-01-10');
 
     cy.contains('Update').click();
 
@@ -621,21 +575,15 @@ context('Template tests', () => {
 
       cy.get('@dateField').should('have.value', '2021-01-10');
 
-      cy.get('@dateField')
-        .clear()
-        .type('2020-01-01');
+      cy.get('@dateField').clear().type('2020-01-01');
       cy.contains('Save and continue').click();
       cy.contains('Value must be a date at or after');
 
-      cy.get('@dateField')
-        .clear()
-        .type('2022-01-01');
+      cy.get('@dateField').clear().type('2022-01-01');
       cy.contains('Save and continue').click();
       cy.contains('Value must be a date at or before');
 
-      cy.get('@dateField')
-        .clear()
-        .type('2021-01-15');
+      cy.get('@dateField').clear().type('2021-01-15');
       cy.contains('Save and continue').click();
       cy.contains('Value must be a date at or').should('not.exist');
     });
@@ -651,17 +599,11 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get("[title='Edit']")
-      .first()
-      .click();
+    cy.get("[title='Edit']").first().click();
 
-    cy.get('[data-cy=show-more-button]')
-      .first()
-      .click();
+    cy.get('[data-cy=show-more-button]').first().click();
 
-    cy.get('[data-cy=add-question-menu-item]')
-      .first()
-      .click();
+    cy.get('[data-cy=add-question-menu-item]').first().click();
 
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
       .first()
@@ -669,9 +611,7 @@ context('Template tests', () => {
 
     cy.contains('Add Number').click();
 
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(numberQuestion1);
+    cy.get('[data-cy=question]').clear().type(numberQuestion1);
 
     cy.get('[data-cy=units]>[role=button]').click();
 
@@ -691,7 +631,7 @@ context('Template tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         numberField1Id = fieldId;
       });
 
@@ -705,9 +645,7 @@ context('Template tests', () => {
 
     cy.contains('Add Number').click();
 
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(numberQuestion2);
+    cy.get('[data-cy=question]').clear().type(numberQuestion2);
 
     cy.get('[data-cy=units]>[role=button]').click();
 
@@ -727,7 +665,7 @@ context('Template tests', () => {
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
       .invoke('html')
-      .then(fieldId => {
+      .then((fieldId) => {
         numberField2Id = fieldId;
       });
 
@@ -773,12 +711,8 @@ context('Template tests', () => {
       cy.contains('Value must be a negative number');
       cy.contains('Value must be a positive number');
 
-      cy.get('@numberField1')
-        .clear()
-        .type('1');
-      cy.get('@numberField2')
-        .clear()
-        .type('1{leftarrow}-');
+      cy.get('@numberField1').clear().type('1');
+      cy.get('@numberField2').clear().type('1{leftarrow}-');
 
       cy.contains('Value must be a negative number').should('not.exist');
       cy.contains('Value must be a positive number').should('not.exist');
@@ -790,15 +724,9 @@ context('Template tests', () => {
 
     cy.contains('Proposals').click();
 
-    cy.get("[title='Show Columns']")
-      .first()
-      .click();
-    cy.get('.MuiPopover-paper')
-      .contains('Call')
-      .click();
-    cy.get('.MuiPopover-paper')
-      .contains('SEP')
-      .click();
+    cy.get("[title='Show Columns']").first().click();
+    cy.get('.MuiPopover-paper').contains('Call').click();
+    cy.get('.MuiPopover-paper').contains('SEP').click();
 
     cy.get('body').click();
 
@@ -816,12 +744,8 @@ context('Template tests', () => {
     cy.login('officer');
 
     cy.contains('Proposals').click();
-    cy.get('[type="checkbox"]')
-      .first()
-      .check();
-    cy.get("[title='Delete proposals']")
-      .first()
-      .click();
+    cy.get('[type="checkbox"]').first().check();
+    cy.get("[title='Delete proposals']").first().click();
     cy.get('[data-cy="confirm-ok"]').click();
   });
 
@@ -830,9 +754,7 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get("[title='Edit']")
-      .first()
-      .click();
+    cy.get("[title='Edit']").first().click();
 
     cy.contains(textQuestion).click();
     cy.get("[data-cy='delete']").click();
@@ -870,21 +792,15 @@ context('Template tests', () => {
 
     cy.contains('Add Multiple choice').click();
 
-    cy.get('[data-cy="question"]')
-      .clear()
-      .type('Multichoice question');
+    cy.get('[data-cy="question"]').clear().type('Multichoice question');
 
     cy.contains('Items').click();
 
-    cy.get('[data-cy=add-answer-button]')
-      .closest('button')
-      .click();
+    cy.get('[data-cy=add-answer-button]').closest('button').click();
     cy.get('input[placeholder="Answer"]').type('Answer 1');
     cy.get('[title="Save"]').click();
 
-    cy.get('[data-cy=add-answer-button]')
-      .closest('button')
-      .click();
+    cy.get('[data-cy=add-answer-button]').closest('button').click();
     cy.get('input[placeholder="Answer"]').type('Answer 2');
     cy.get('[title="Save"]').click();
 
@@ -905,9 +821,7 @@ context('Template tests', () => {
 
     cy.contains('Add Boolean').click();
 
-    cy.get('[data-cy=question]')
-      .clear()
-      .type('Boolean question');
+    cy.get('[data-cy=question]').clear().type('Boolean question');
 
     cy.contains('Save').click();
 
@@ -926,9 +840,7 @@ context('Template tests', () => {
 
     cy.get('[id="dependency-id"]').click();
 
-    cy.get('[role="presentation"]')
-      .contains('Multichoice question')
-      .click();
+    cy.get('[role="presentation"]').contains('Multichoice question').click();
 
     cy.get('[id="dependencyValue"]').click();
 
@@ -937,9 +849,7 @@ context('Template tests', () => {
     cy.get('[data-cy="submit"]').click();
 
     cy.contains('Calls').click();
-    cy.get('[title="Edit"]')
-      .first()
-      .click();
+    cy.get('[title="Edit"]').first().click();
 
     cy.finishedLoading();
 
@@ -962,7 +872,7 @@ context('Template tests', () => {
 
     cy.contains('Answer 1').click();
 
-    cy.on('window:confirm', str => {
+    cy.on('window:confirm', (str) => {
       expect(str).to.equal(
         'Changes you recently made in this step will not be saved! Are you sure?'
       );
@@ -983,9 +893,7 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get('[title="Edit"]')
-      .last()
-      .click();
+    cy.get('[title="Edit"]').last().click();
 
     cy.get('[data-cy=show-more-button]').click();
 
@@ -1016,9 +924,7 @@ context('Template tests', () => {
 
     cy.get('[id="dependency-id"]').click();
 
-    cy.get('[role="presentation"]')
-      .contains('Multichoice question')
-      .click();
+    cy.get('[role="presentation"]').contains('Multichoice question').click();
 
     cy.get('[id="dependencyValue"]').click();
 
@@ -1026,17 +932,11 @@ context('Template tests', () => {
 
     cy.get('[data-cy="add-dependency-button"]').click();
 
-    cy.get('[id="dependency-id"]')
-      .last()
-      .click();
+    cy.get('[id="dependency-id"]').last().click();
 
-    cy.get('[role="presentation"]')
-      .contains('Boolean question')
-      .click();
+    cy.get('[role="presentation"]').contains('Boolean question').click();
 
-    cy.get('[id="dependencyValue"]')
-      .last()
-      .click();
+    cy.get('[id="dependencyValue"]').last().click();
 
     cy.contains('true').click();
 
@@ -1058,7 +958,7 @@ context('Template tests', () => {
 
     cy.contains('Answer 1').click();
 
-    cy.on('window:confirm', str => {
+    cy.on('window:confirm', (str) => {
       expect(str).to.equal(
         'Changes you recently made in this step will not be saved! Are you sure?'
       );
@@ -1086,9 +986,7 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get('[title="Edit"]')
-      .last()
-      .click();
+    cy.get('[title="Edit"]').last().click();
 
     cy.contains('Question with multiple dependencies').click();
 
@@ -1096,9 +994,7 @@ context('Template tests', () => {
 
     cy.get('[data-value="OR"]').click();
 
-    cy.get('[id="dependencyValue"]')
-      .first()
-      .click();
+    cy.get('[id="dependencyValue"]').first().click();
 
     cy.contains('Answer 2').click();
 
@@ -1147,9 +1043,7 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get('[title="Edit"]')
-      .last()
-      .click();
+    cy.get('[title="Edit"]').last().click();
 
     cy.get('[data-cy=show-more-button]').click();
 
@@ -1161,13 +1055,9 @@ context('Template tests', () => {
 
     cy.contains('Add File Upload').click();
 
-    cy.get('[data-cy="question"]')
-      .clear()
-      .type('File upload question');
+    cy.get('[data-cy="question"]').clear().type('File upload question');
 
-    cy.get('[data-cy="max_files"] input')
-      .clear()
-      .type('5');
+    cy.get('[data-cy="max_files"] input').clear().type('5');
 
     cy.get('[data-cy="submit"]').click();
 
@@ -1189,11 +1079,9 @@ context('Template tests', () => {
     cy.contains('File upload question');
 
     cy.get('[data-cy="title"] input').type('Test title');
-    cy.get('[data-cy="abstract"] textarea')
-      .first()
-      .type('Test abstract');
+    cy.get('[data-cy="abstract"] textarea').first().type('Test abstract');
 
-    cy.fixture('file_upload_test.png').then(fileContent => {
+    cy.fixture('file_upload_test.png').then((fileContent) => {
       // NOTE: Using "cypress-file-upload" version "^3.5.3" because this(https://github.com/abramenal/cypress-file-upload/issues/179) should be fixed before upgrading to the latest
       cy.get('input[type="file"]').upload({
         fileContent: fileContent.toString(),
@@ -1239,13 +1127,9 @@ context('Template tests', () => {
     cy.get('[data-cy="submit"]').click();
     cy.contains(templateName);
 
-    cy.get('[data-cy=show-more-button]')
-      .last()
-      .click();
+    cy.get('[data-cy=show-more-button]').last().click();
 
-    cy.get('[data-cy=add-question-menu-item]')
-      .last()
-      .click();
+    cy.get('[data-cy=add-question-menu-item]').last().click();
 
     const field1 = 'boolean_1_' + Date.now();
     const field2 = 'boolean_2_' + Date.now();
@@ -1257,12 +1141,8 @@ context('Template tests', () => {
         .click();
       cy.contains('Add Boolean').click();
 
-      cy.get('[data-cy="natural_key"]')
-        .clear()
-        .type(fieldName);
-      cy.get('[data-cy="question"]')
-        .clear()
-        .type(fieldName);
+      cy.get('[data-cy="natural_key"]').clear().type(fieldName);
+      cy.get('[data-cy="question"]').clear().type(fieldName);
       cy.contains('Save').click();
 
       cy.contains(fieldName)
@@ -1285,25 +1165,19 @@ context('Template tests', () => {
       cy.get('[data-cy="add-dependency-button"]').click();
       cy.get('[id="dependency-id"]').click();
 
-      contains.forEach(field => {
+      contains.forEach((field) => {
         cy.get('[role="listbox"]').contains(field);
       });
 
       if (contains.length === 0) {
-        cy.get('[role="listbox"]')
-          .children()
-          .should('have.length', 0);
+        cy.get('[role="listbox"]').children().should('have.length', 0);
       }
 
       if (select) {
-        cy.get('[role="listbox"]')
-          .contains(select)
-          .click();
+        cy.get('[role="listbox"]').contains(select).click();
 
         cy.get('[id="dependencyValue"]').click();
-        cy.get('[role="listbox"]')
-          .contains('true')
-          .click();
+        cy.get('[role="listbox"]').contains('true').click();
 
         cy.contains('Update').click();
 
