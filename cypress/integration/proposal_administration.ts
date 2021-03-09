@@ -254,8 +254,6 @@ context('Proposal administration tests', () => {
       'Two',
       'Three'
     );
-
-    cy.createFileUploadQuestion(fileUploadQuestion);
     cy.contains(multipleChoiceQuestion)
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
