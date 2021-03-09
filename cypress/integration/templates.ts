@@ -571,7 +571,7 @@ context('Template tests', () => {
 
     cy.contains(dateQuestion);
     cy.get('body').then(() => {
-      cy.get(`[data-cy="${dateFieldId}_field"] input`).as('dateField');
+      cy.get(`[data-cy="${dateFieldId}.value"] input`).as('dateField');
 
       cy.get('@dateField').should('have.value', '2021-01-10');
 
