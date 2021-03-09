@@ -49,4 +49,5 @@ export enum QuestionFilterCompareOperator {
   LESS_THAN = 'LESS_THAN',
   EQUALS = 'EQUALS',
   INCLUDES = 'INCLUDES',
+  EXISTS = 'EXISTS',
 }
