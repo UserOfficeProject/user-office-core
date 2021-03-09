@@ -8,7 +8,13 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
-import { SepAssignment, ReviewStatus, UserRole } from 'generated/sdk';
+import {
+  SepAssignment,
+  ReviewStatus,
+  UserRole,
+  ReviewWithNextProposalStatus,
+  ProposalStatus,
+} from 'generated/sdk';
 import {
   useSEPProposalsData,
   SEPProposalType,
@@ -221,8 +227,18 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     const newProposalsData =
       sepProposalData?.map((sepProposalsData) => {
         if (sepProposalsData.proposalId === editingProposalData.proposalId) {
+          const editingProposalStatus = (currentAssignment.review as ReviewWithNextProposalStatus)
+            .nextProposalStatus
+            ? ((currentAssignment.review as ReviewWithNextProposalStatus)
+                .nextProposalStatus as ProposalStatus)
+            : editingProposalData.proposal.status;
+
           return {
             ...editingProposalData,
+            proposal: {
+              ...editingProposalData.proposal,
+              status: editingProposalStatus,
+            },
             assignments:
               editingProposalData.assignments?.map((proposalAssignment) => {
                 if (

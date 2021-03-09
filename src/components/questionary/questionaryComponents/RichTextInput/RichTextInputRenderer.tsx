@@ -8,7 +8,7 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import React, { useState } from 'react';
 
 import { Renderers } from 'components/questionary/QuestionaryComponentRegistry';
-import { Answer } from 'generated/sdk';
+import { Answer, Question } from 'generated/sdk';
 
 const RichTextInputAnswerRenderer = ({ answer }: { answer: Answer }) => {
   const [open, setOpen] = useState(false);
@@ -45,9 +45,17 @@ const RichTextInputAnswerRenderer = ({ answer }: { answer: Answer }) => {
   );
 };
 
+const RichTextInputAnswerRendererComponent = (props: { answer: Answer }) => (
+  <RichTextInputAnswerRenderer {...props} />
+);
+
+const questionRendererComponent = ({ question }: { question: Question }) => (
+  <span>{question.question}</span>
+);
+
 const richTextInputRenderer: Renderers = {
-  answerRenderer: (props) => <RichTextInputAnswerRenderer {...props} />,
-  questionRenderer: ({ question }) => <span>{question.question}</span>,
+  answerRenderer: RichTextInputAnswerRendererComponent,
+  questionRenderer: questionRendererComponent,
 };
 
 export default richTextInputRenderer;

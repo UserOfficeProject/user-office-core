@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
@@ -26,7 +27,7 @@ export enum EventType {
   SERVICE_ERROR_OCCURRED,
   UPDATE_WORKFLOW_METADATA_REQUESTED,
   WORKFLOW_METADATA_UPDATED,
-  ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS,
+  ADD_NEW_ROW_WITH_MULTIPLE_COLUMNS,
   NEXT_STATUS_EVENTS_ADDED,
   ADD_NEXT_STATUS_EVENTS_REQUESTED,
 }
@@ -224,7 +225,7 @@ const ProposalWorkflowEditorModel = (
 
           return draft;
         }
-        case EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS: {
+        case EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLUMNS: {
           const groupsToAdd: ProposalWorkflowConnectionGroup[] = [];
           const lastGroupId = parseInt(
             draft.proposalWorkflowConnectionGroups[
@@ -251,7 +252,10 @@ const ProposalWorkflowEditorModel = (
   const [state, dispatch] = useReducerWithMiddleWares<
     Reducer<ProposalWorkflow, Event>
   >(reducer, blankInitTemplate, middlewares || []);
-  const memoizedDispatch = useCallback(dispatch, []); // required to avoid infinite re-render because dispatch function is recreated
+
+  // NOTE: required to avoid infinite re-render because dispatch function is recreated
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const memoizedDispatch = useCallback(dispatch, []);
   const api = useDataApi();
 
   useEffect(() => {

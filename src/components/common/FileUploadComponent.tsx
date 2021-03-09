@@ -36,113 +36,6 @@ export type FileIdWithCaptionAndFigure = {
   figure?: string | null;
 };
 
-export function FileUploadComponent(props: {
-  maxFiles?: number;
-  id?: string;
-  fileType?: string;
-  value: FileIdWithCaptionAndFigure[];
-  onChange: (files: FileIdWithCaptionAndFigure[]) => void;
-}) {
-  const fileIds = props.value.map((fileItem) => fileItem.id);
-  const { files, setFiles } = useFileMetadata(fileIds);
-
-  const classes = makeStyles(() => ({
-    questionnairesList: {
-      listStyle: 'none',
-      padding: 0,
-      marginBottom: 0,
-      '& li': {
-        paddingLeft: 0,
-      },
-    },
-  }))();
-
-  const onUploadComplete = (newFile: FileMetaData): void => {
-    const newValue = files.concat(newFile);
-    setFiles(newValue);
-    props.onChange(
-      newValue.map((item) => ({
-        id: item.fileId,
-        caption: props.value.find(
-          (fileAnswerItem) => fileAnswerItem.id === item.fileId
-        )?.caption,
-      }))
-    );
-  };
-
-  const onDeleteClicked = (deleteFile: FileMetaData): void => {
-    const newValue = files.filter(
-      (fileId) => fileId.fileId !== deleteFile.fileId
-    );
-    setFiles(newValue);
-    props.onChange(
-      newValue.map((item) => ({
-        id: item.fileId,
-        caption: props.value.find(
-          (fileAnswerItem) => fileAnswerItem.id === item.fileId
-        )?.caption,
-      }))
-    );
-  };
-
-  const onImageCaptionOrFigureAdded = ({
-    id: fileId,
-    caption,
-    figure,
-  }: FileIdWithCaptionAndFigure) => {
-    props.onChange(
-      props.value.map((item) => {
-        if (item.id === fileId) {
-          return { id: item.id, caption, figure };
-        } else {
-          return { id: item.id, caption: item.caption, figure: item.figure };
-        }
-      })
-    );
-  };
-
-  const { fileType } = props;
-  const maxFiles = props.maxFiles || 1;
-
-  let newFileEntry;
-  if (files.length < maxFiles) {
-    newFileEntry = (
-      <NewFileEntry filetype={fileType} onUploadComplete={onUploadComplete} />
-    );
-  }
-
-  const amountFilesInfo =
-    maxFiles > 1 ? <span>Max: {maxFiles} file(s)</span> : null;
-
-  return (
-    <>
-      {amountFilesInfo}
-      <List component="ul" className={classes.questionnairesList}>
-        {files.map &&
-          files.map((metaData: FileMetaData) => {
-            const currentFileAnswerValues = props.value.find(
-              (item) => item.id === metaData.fileId
-            );
-
-            return (
-              <ListItem key={metaData.fileId}>
-                <FileEntry
-                  key={metaData.fileId}
-                  onDeleteClicked={onDeleteClicked}
-                  metaData={metaData}
-                  caption={currentFileAnswerValues?.caption}
-                  figure={currentFileAnswerValues?.figure}
-                  onImageCaptionOrFigureAdded={onImageCaptionOrFigureAdded}
-                />
-              </ListItem>
-            );
-          })}
-        <ListItem key="addNew">{newFileEntry}</ListItem>
-      </List>
-    </>
-  );
-}
-
 export function FileEntry(props: {
   onDeleteClicked: FunctionType<void, FileMetaData>;
   metaData: FileMetaData;
@@ -402,4 +295,111 @@ export function NewFileEntry(props: {
   }
 
   return <div>Unknown state</div>;
+}
+
+export function FileUploadComponent(props: {
+  maxFiles?: number;
+  id?: string;
+  fileType?: string;
+  value: FileIdWithCaptionAndFigure[];
+  onChange: (files: FileIdWithCaptionAndFigure[]) => void;
+}) {
+  const fileIds = props.value.map((fileItem) => fileItem.id);
+  const { files, setFiles } = useFileMetadata(fileIds);
+
+  const classes = makeStyles(() => ({
+    questionnairesList: {
+      listStyle: 'none',
+      padding: 0,
+      marginBottom: 0,
+      '& li': {
+        paddingLeft: 0,
+      },
+    },
+  }))();
+
+  const onUploadComplete = (newFile: FileMetaData): void => {
+    const newValue = files.concat(newFile);
+    setFiles(newValue);
+    props.onChange(
+      newValue.map((item) => ({
+        id: item.fileId,
+        caption: props.value.find(
+          (fileAnswerItem) => fileAnswerItem.id === item.fileId
+        )?.caption,
+      }))
+    );
+  };
+
+  const onDeleteClicked = (deleteFile: FileMetaData): void => {
+    const newValue = files.filter(
+      (fileId) => fileId.fileId !== deleteFile.fileId
+    );
+    setFiles(newValue);
+    props.onChange(
+      newValue.map((item) => ({
+        id: item.fileId,
+        caption: props.value.find(
+          (fileAnswerItem) => fileAnswerItem.id === item.fileId
+        )?.caption,
+      }))
+    );
+  };
+
+  const onImageCaptionOrFigureAdded = ({
+    id: fileId,
+    caption,
+    figure,
+  }: FileIdWithCaptionAndFigure) => {
+    props.onChange(
+      props.value.map((item) => {
+        if (item.id === fileId) {
+          return { id: item.id, caption, figure };
+        } else {
+          return { id: item.id, caption: item.caption, figure: item.figure };
+        }
+      })
+    );
+  };
+
+  const { fileType } = props;
+  const maxFiles = props.maxFiles || 1;
+
+  let newFileEntry;
+  if (files.length < maxFiles) {
+    newFileEntry = (
+      <NewFileEntry filetype={fileType} onUploadComplete={onUploadComplete} />
+    );
+  }
+
+  const amountFilesInfo =
+    maxFiles > 1 ? <span>Max: {maxFiles} file(s)</span> : null;
+
+  return (
+    <>
+      {amountFilesInfo}
+      <List component="ul" className={classes.questionnairesList}>
+        {files.map &&
+          files.map((metaData: FileMetaData) => {
+            const currentFileAnswerValues = props.value.find(
+              (item) => item.id === metaData.fileId
+            );
+
+            return (
+              <ListItem key={metaData.fileId}>
+                <FileEntry
+                  key={metaData.fileId}
+                  onDeleteClicked={onDeleteClicked}
+                  metaData={metaData}
+                  caption={currentFileAnswerValues?.caption}
+                  figure={currentFileAnswerValues?.figure}
+                  onImageCaptionOrFigureAdded={onImageCaptionOrFigureAdded}
+                />
+              </ListItem>
+            );
+          })}
+        <ListItem key="addNew">{newFileEntry}</ListItem>
+      </List>
+    </>
+  );
 }

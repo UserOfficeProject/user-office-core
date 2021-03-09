@@ -60,6 +60,7 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sampleBasisPreSubmit = (answer: Answer) => async ({
   api,
   dispatch,

@@ -12,7 +12,7 @@ function readWriteReview() {
 
   cy.finishedLoading();
 
-  cy.get('@dialog').contains('Proposal information');
+  cy.get('@dialog').contains('Proposal information', { matchCase: false });
   cy.get('@dialog').contains('Technical Review');
   cy.get('@dialog').contains('Grade').click({ force: true });
 
@@ -324,6 +324,8 @@ context(
 
       cy.changeActiveRole('SEP Chair');
 
+      cy.finishedLoading();
+
       cy.contains('SEPs').click();
 
       cy.get('button[title="Edit"]').first().click();
@@ -343,6 +345,8 @@ context(
       cy.login(sepMembers.chair);
 
       cy.changeActiveRole('SEP Chair');
+
+      cy.finishedLoading();
 
       cy.contains('SEPs').click();
 
@@ -367,6 +371,8 @@ context(
 
       cy.contains(sepMembers.reviewer.surname);
 
+      cy.closeNotification();
+
       cy.get('[title="Remove reviewer"]').click();
       cy.get('[title="Save"]').click();
 
@@ -383,6 +389,8 @@ context(
       cy.login(sepMembers.secretary);
 
       cy.changeActiveRole('SEP Secretary');
+
+      cy.finishedLoading();
 
       cy.contains('SEPs').click();
 
@@ -404,6 +412,8 @@ context(
 
       cy.changeActiveRole('SEP Secretary');
 
+      cy.finishedLoading();
+
       cy.contains('SEPs').click();
 
       cy.get('button[title="Edit"]').first().click();
@@ -426,6 +436,8 @@ context(
       });
 
       cy.contains(sepMembers.reviewer.surname);
+
+      cy.closeNotification();
 
       cy.get('[title="Remove reviewer"]').click();
       cy.get('[title="Save"]').click();
@@ -482,6 +494,11 @@ context(
 
       cy.get("[title='Assign proposals to SEP']").first().click();
 
+      cy.get("[id='mui-component-select-selectedSEPId']").should(
+        'not.have.class',
+        'Mui-disabled'
+      );
+
       cy.get("[id='mui-component-select-selectedSEPId']").first().click();
 
       cy.get("[id='menu-selectedSEPId'] li").first().click();
@@ -499,6 +516,8 @@ context(
 
       cy.get('[type="submit"]').click();
       // <------------------------------------------
+
+      cy.closeModal();
 
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
@@ -659,6 +678,8 @@ context(
       cy.login(sepMembers.chair);
       cy.changeActiveRole('SEP Chair');
 
+      cy.finishedLoading();
+
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
 
@@ -689,6 +710,8 @@ context(
     it('SEP Secretary should be able to read/write reviews', () => {
       cy.login(sepMembers.secretary);
       cy.changeActiveRole('SEP Secretary');
+
+      cy.finishedLoading();
 
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
@@ -789,6 +812,11 @@ context(
       cy.get('table tbody [type="checkbox"]').first().check();
 
       cy.get("[title='Assign proposals to instrument']").first().click();
+
+      cy.get("[id='mui-component-select-selectedInstrumentId']").should(
+        'not.have.class',
+        'Mui-disabled'
+      );
 
       cy.get("[id='mui-component-select-selectedInstrumentId']")
         .first()
@@ -915,6 +943,11 @@ context(
 
       cy.get("[title='Assign proposals to SEP']").first().click();
 
+      cy.get("[id='mui-component-select-selectedSEPId']").should(
+        'not.have.class',
+        'Mui-disabled'
+      );
+
       cy.get("[id='mui-component-select-selectedSEPId']").first().click();
 
       cy.get("[id='menu-selectedSEPId'] li").first().click();
@@ -956,6 +989,8 @@ context(
 
       cy.changeActiveRole('SEP Chair');
 
+      cy.finishedLoading();
+
       cy.contains('SEPs').click();
 
       cy.contains(sep1.code);
@@ -966,6 +1001,8 @@ context(
       cy.login(sepMembers.secretary);
 
       cy.changeActiveRole('SEP Secretary');
+
+      cy.finishedLoading();
 
       cy.contains('SEPs').click();
 
@@ -978,7 +1015,7 @@ context(
 
       cy.get('[data-cy="view-proposal"]').first().click();
 
-      cy.contains('Technical').click();
+      cy.get('[role="dialog"]').contains('Technical').click();
       cy.get('[data-cy="timeAllocation"]').type('51');
       cy.get('[data-cy="technical-review-status"]').click();
       cy.contains('Feasible').click();
@@ -989,6 +1026,8 @@ context(
         variant: 'success',
         text: 'Technical review updated successfully',
       });
+
+      cy.closeModal();
 
       cy.contains('SEPs').click();
 
@@ -1026,6 +1065,8 @@ context(
       cy.login(sepMembers.chair);
       cy.changeActiveRole('SEP Chair');
 
+      cy.finishedLoading();
+
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
 
@@ -1044,6 +1085,8 @@ context(
     it('SEP Secretary should be able to edit SEP Meeting form', () => {
       cy.login(sepMembers.secretary);
       cy.changeActiveRole('SEP Secretary');
+
+      cy.finishedLoading();
 
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
@@ -1212,6 +1255,8 @@ context(
       cy.login(sepMembers.chair);
       cy.changeActiveRole('SEP Chair');
 
+      cy.finishedLoading();
+
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
 
@@ -1237,6 +1282,8 @@ context(
     it('SEP Secretary should be able to edit SEP Meeting form after instrument is submitted', () => {
       cy.login(sepMembers.secretary);
       cy.changeActiveRole('SEP Secretary');
+
+      cy.finishedLoading();
 
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
@@ -1322,8 +1369,11 @@ context(
       }
 
       assertAndRemoveAssignment(3);
+      cy.finishedLoading();
       assertAndRemoveAssignment(2);
+      cy.finishedLoading();
       assertAndRemoveAssignment(1);
+      cy.finishedLoading();
 
       cy.get('@rows').parent().contains('No records to display');
 
@@ -1340,6 +1390,8 @@ context(
       cy.login(sepMembers.chair);
       cy.changeActiveRole('SEP Chair');
 
+      cy.finishedLoading();
+
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
 
@@ -1353,6 +1405,8 @@ context(
     it('SEP Secretary should not be able to remove assigned proposal from existing SEP', () => {
       cy.login(sepMembers.secretary);
       cy.changeActiveRole('SEP Secretary');
+
+      cy.finishedLoading();
 
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
@@ -1381,6 +1435,8 @@ context(
         variant: 'success',
         text: 'Assignment removed',
       });
+
+      cy.closeNotification();
 
       cy.contains('Logs').click({ force: true });
 
@@ -1446,11 +1502,13 @@ context(
         text: 'SEP member removed successfully',
       });
 
+      cy.closeNotification();
+
       cy.contains('Logs').click({ force: true });
 
       cy.finishedLoading();
 
-      cy.get("[title='Last Page'] button").first().click({ force: true });
+      cy.get("[title='Last Page'] button").first().click();
 
       cy.contains('SEP_MEMBER_REMOVED');
 

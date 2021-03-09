@@ -38,7 +38,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
   callIds,
 }) => {
   const classes = useStyles();
-  const { instruments } = useInstrumentsData(callIds);
+  const { instruments, loadingInstruments } = useInstrumentsData(callIds);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -77,6 +77,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
                     value: instrument.id.toString(),
                     text: instrument.name,
                   }))}
+                  disabled={loadingInstruments}
                   required
                 />
               </Grid>

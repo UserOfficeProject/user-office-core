@@ -59,6 +59,7 @@
     ],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
+    "@typescript-eslint/no-use-before-define": ["error"],
     "padding-line-between-statements": [
       "error",
       { "blankLine": "always", "prev": "*", "next": "return" }

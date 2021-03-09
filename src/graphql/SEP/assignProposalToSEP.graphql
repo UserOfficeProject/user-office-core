@@ -2,9 +2,9 @@ mutation assignProposalToSEP($proposalId: Int!, $sepId: Int!) {
   assignProposalToSEP(proposalId: $proposalId, sepId: $sepId) {
     error
     nextProposalStatus {
-      proposalNextStatusId
-      proposalNextStatusShortCode
-      proposalNextStatusName
+      id
+      shortCode
+      name
     }
   }
 }

@@ -1,6 +1,6 @@
-import Container from '@material-ui/core/Container';
-import PropTypes from 'prop-types';
-import React, { useCallback, useEffect, useState } from 'react';
+import { Button } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/TabPanel';
@@ -10,49 +10,40 @@ import GeneralInformation from 'components/proposal/GeneralInformation';
 import ProposalAdmin, {
   AdministrationFormData,
 } from 'components/proposal/ProposalAdmin';
-import { CoreTechnicalReviewFragment, Proposal, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import {
+  CoreTechnicalReviewFragment,
+  TechnicalReview,
+  UserRole,
+} from 'generated/sdk';
+import { useProposalData } from 'hooks/proposal/useProposalData';
 
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 
-const ProposalReviewPropTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+type ProposalReviewProps = {
+  proposalId: number;
+  isInsideModal?: boolean;
 };
 
-type ProposalReviewProps = PropTypes.InferProps<typeof ProposalReviewPropTypes>;
-
-const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
-  const [techReview, setTechReview] = useState<
-    CoreTechnicalReviewFragment | null | undefined
-  >(null);
-
-  const [proposal, setProposal] = useState<Proposal | null>(null);
-  const api = useDataApi();
+const ProposalReview: React.FC<ProposalReviewProps> = ({
+  proposalId,
+  isInsideModal,
+}) => {
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const { proposalData, setProposalData, loading } = useProposalData(
+    proposalId
+  );
 
-  const loadProposal = useCallback(async () => {
-    return api()
-      .getProposal({ id: parseInt(match.params.id) })
-      .then((data) => {
-        setProposal(data.proposal as Proposal);
-        if (data.proposal) {
-          setTechReview(data.proposal.technicalReview);
-        }
-      });
-  }, [api, match.params.id]);
-
-  const [formDirty, setFormDirty] = useState<boolean | undefined>(false);
-
-  useEffect(() => {
-    loadProposal();
-  }, [loadProposal]);
-
-  if (!proposal) {
+  if (loading) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
+  }
+
+  if (!proposalData) {
+    return (
+      <Box display="flex" flexDirection="column" alignItems="center">
+        <h2>Proposal not found</h2>
+        <Button onClick={() => console.log('Not implemented')}>Retry</Button>
+      </Box>
+    );
   }
 
   const tabNames = ['General', 'Technical'];
@@ -63,39 +54,37 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   }
 
   return (
-    <Container maxWidth="lg">
-      <SimpleTabs
-        tabNames={tabNames}
-        shouldPreventTabChange={formDirty}
-        setShouldPreventTabChange={setFormDirty}
-      >
-        <GeneralInformation
-          data={proposal}
-          onProposalChanged={(newProposal): void => setProposal(newProposal)}
+    <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
+      <GeneralInformation
+        data={proposalData}
+        onProposalChanged={(newProposal): void => setProposalData(newProposal)}
+      />
+      <ProposalTechnicalReview
+        id={proposalData.id}
+        data={proposalData.technicalReview}
+        setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
+          setProposalData({
+            ...proposalData,
+            technicalReview: {
+              ...proposalData.technicalReview,
+              ...data,
+            } as TechnicalReview,
+          })
+        }
+      />
+      {isUserOfficer && (
+        <ProposalAdmin
+          data={proposalData}
+          setAdministration={(data: AdministrationFormData) =>
+            setProposalData({ ...proposalData, ...data })
+          }
         />
-        <ProposalTechnicalReview
-          id={proposal.id}
-          data={techReview}
-          setReview={setTechReview}
-          setFormDirty={setFormDirty}
-        />
-        {isUserOfficer && (
-          <ProposalAdmin
-            data={proposal}
-            setAdministration={(data: AdministrationFormData) =>
-              setProposal({ ...proposal, ...data })
-            }
-            setFormDirty={setFormDirty}
-          />
-        )}
-        {isUserOfficer && (
-          <EventLogList changedObjectId={proposal.id} eventType="PROPOSAL" />
-        )}
-      </SimpleTabs>
-    </Container>
+      )}
+      {isUserOfficer && (
+        <EventLogList changedObjectId={proposalData.id} eventType="PROPOSAL" />
+      )}
+    </SimpleTabs>
   );
 };
-
-ProposalReview.propTypes = ProposalReviewPropTypes;
 
 export default ProposalReview;

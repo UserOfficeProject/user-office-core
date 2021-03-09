@@ -20,7 +20,7 @@ export const numberInputDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <ExposureZeroIcon />,
   renderers: {
-    answerRenderer: ({ answer }) => {
+    answerRenderer: function AnswerRendererComponent({ answer }) {
       if (!answer.value.value) {
         return <span>Left blank</span>;
       }
