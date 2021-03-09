@@ -254,8 +254,6 @@ context('Proposal administration tests', () => {
       'Two',
       'Three'
     );
-
-    cy.createFileUploadQuestion(fileUploadQuestion);
     cy.contains(multipleChoiceQuestion)
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
@@ -434,7 +432,7 @@ context('Proposal administration tests', () => {
 
     cy.contains(numberInputQuestion).click();
 
-    // Less than
+    // NumberInput questions - Less than
     cy.get('[data-cy=comparator]').click();
 
     cy.get('[role=listbox]').contains('Less than').click();
@@ -455,7 +453,7 @@ context('Proposal administration tests', () => {
 
     cy.contains(proposalName2).should('exist');
 
-    // Equals
+    // NumberInput questions - Equals
     cy.get('[data-cy=comparator]').click();
 
     cy.get('[role=listbox]').contains('Equals').click();
@@ -474,7 +472,7 @@ context('Proposal administration tests', () => {
 
     cy.contains(proposalName2).should('exist');
 
-    // Less than
+    // NumberInput questions - Less than
     cy.get('[data-cy=comparator]').click();
 
     cy.get('[role=listbox]').contains('Less than').click();
