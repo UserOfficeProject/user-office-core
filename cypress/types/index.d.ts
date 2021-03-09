@@ -238,6 +238,17 @@ declare global {
        *    cy.createFileUploadQuestion('Provide a file')
        */
       createFileUploadQuestion: (title: string) => void;
+
+      /**
+       * Creates NumberImput question.
+       * You have to be in edit template view to call this method
+       *
+       * @returns {typeof createNumberInputQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createNumberInputQuestion('Specify temperature')
+       */
+      createNumberInputQuestion: (title: string) => void;
     }
   }
 

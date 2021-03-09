@@ -29,7 +29,7 @@ function NumberSearchCriteriaComponent({
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={4}>
+      <Grid item xs={5}>
         <FormControl style={{ width: '100%' }}>
           <InputLabel shrink id="comparator">
             Operator
@@ -42,24 +42,24 @@ function NumberSearchCriteriaComponent({
               onChange(newComparator, value);
             }}
             value={comparator}
-            labelId="comparator"
+            data-cy="comparator"
           >
             <MenuItem key="lt" value={QuestionFilterCompareOperator.LESS_THAN}>
-              Less than (&lt;)
+              Less than
             </MenuItem>
             <MenuItem key="eq" value={QuestionFilterCompareOperator.EQUALS}>
-              Equals (=)
+              Equals
             </MenuItem>
             <MenuItem
               key="gt"
               value={QuestionFilterCompareOperator.GREATER_THAN}
             >
-              Greater than (&gt;)
+              Greater than
             </MenuItem>
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={4}>
+      <Grid item xs={3}>
         <TextField
           name="value"
           label="Value"
@@ -68,6 +68,7 @@ function NumberSearchCriteriaComponent({
           fullWidth
           onChange={(e) => setValue(e.target.value)}
           onBlur={() => onChange(comparator, value)}
+          data-cy="value"
         />
       </Grid>
       <Grid item xs={4} style={{ marginTop: 'auto' }}>

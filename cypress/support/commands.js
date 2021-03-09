@@ -337,6 +337,8 @@ function createBooleanQuestion(title) {
   cy.contains(title)
     .parent()
     .dragElement([{ direction: 'left', length: 1 }]);
+  
+    cy.finishedLoading();
 }
 
 function createTextQuestion(
@@ -369,6 +371,8 @@ function createTextQuestion(
     .parent()
     .dragElement([{ direction: 'left', length: 1 }])
     .wait(500);
+
+    cy.finishedLoading();
 }
 
 function createDateQuestion(title) {
@@ -385,6 +389,8 @@ function createDateQuestion(title) {
   cy.contains(title)
     .parent()
     .dragElement([{ direction: 'left', length: 1 }]);
+
+    cy.finishedLoading();
 }
 
 function createMultipleChoiceQuestion(title, option1, option2, option3) {
@@ -419,6 +425,8 @@ function createMultipleChoiceQuestion(title, option1, option2, option3) {
   cy.contains(title)
     .parent()
     .dragElement([{ direction: 'left', length: 1 }]);
+
+    cy.finishedLoading();
 }
 
 function createFileUploadQuestion(title) {
@@ -433,6 +441,24 @@ function createFileUploadQuestion(title) {
   cy.contains(title)
     .parent()
     .dragElement([{ direction: 'left', length: 1 }]);
+
+    cy.finishedLoading();
+}
+
+function createNumberInputQuestion(title) {
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').last().click();
+
+  cy.contains('Add Number').click();
+
+  cy.get('[data-cy=question]').clear().type(title);
+
+  cy.contains('Save').click();
+
+  cy.contains(title)
+    .parent()
+    .dragElement([{ direction: 'left', length: 1 }]);
+
+    cy.finishedLoading();
 }
 
 function presentationMode() {
@@ -487,13 +513,13 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('createTopic', createTopic);
 
-Cypress.Commands.add('createSampleQuestion', createSampleQuestion);
-
 Cypress.Commands.add('changeActiveRole', changeActiveRole);
 
 Cypress.Commands.add('presentationMode', presentationMode);
 
 Cypress.Commands.add('createBooleanQuestion', createBooleanQuestion);
+
+Cypress.Commands.add('createSampleQuestion', createSampleQuestion);
 
 Cypress.Commands.add('createTextQuestion', createTextQuestion);
 
@@ -507,4 +533,9 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   'createFileUploadQuestion',
   createFileUploadQuestion
+);
+
+Cypress.Commands.add(
+  'createNumberInputQuestion',
+  createNumberInputQuestion
 );

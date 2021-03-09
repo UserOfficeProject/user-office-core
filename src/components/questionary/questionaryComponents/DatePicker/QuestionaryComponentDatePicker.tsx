@@ -76,7 +76,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
             required={required}
             error={isError}
             helperText={isError && fieldError}
-            data-cy={proposalQuestionId + '_field'}
+            data-cy={`${proposalQuestionId}.value`}
             name={proposalQuestionId}
             label={
               <>
