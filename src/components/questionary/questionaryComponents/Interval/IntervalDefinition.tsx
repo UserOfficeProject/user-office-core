@@ -6,6 +6,7 @@ import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createIntervalValidationSchema } from './createIntervalValidationSchema';
+import IntervalSearchCriteriaComponent from './IntervalSearchCriteriaComponent';
 import { QuestionaryComponentInterval } from './QuestionaryComponentInterval';
 import { QuestionIntervalForm } from './QuestionIntervalForm';
 import { QuestionTemplateRelationIntervalForm } from './QuestionTemplateRelationIntervalForm';
@@ -41,4 +42,5 @@ export const intervalDefinition: QuestionaryComponentDefinition = {
   createYupValidationSchema: createIntervalValidationSchema,
   getYupInitialValue: ({ answer }) =>
     answer.value || { min: '', max: '', unit: null },
+  searchCriteriaComponent: IntervalSearchCriteriaComponent,
 };
