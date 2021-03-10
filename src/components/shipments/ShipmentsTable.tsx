@@ -9,7 +9,8 @@ import {
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
 import UOLoader from 'components/common/UOLoader';
-import { ShipmentStatus } from 'generated/sdk';
+import { ShipmentFragment, ShipmentStatus } from 'generated/sdk';
+import { useDownloadPDFShipmentLabel } from 'hooks/proposal/useDownloadPDFShipmentLabel';
 import { useShipments } from 'hooks/shipment/useShipments';
 import { ShipmentBasic } from 'models/ShipmentSubmissionState';
 import { tableIcons } from 'utils/materialIcons';
@@ -21,6 +22,7 @@ import CreateUpdateShipment from './CreateUpdateShipment';
 
 const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
   const { loadingShipments, shipments, setShipments } = useShipments();
+  const downloadShipmentLabel = useDownloadPDFShipmentLabel();
   const [
     urlQueryParams,
     setUrlQueryParams,
@@ -103,7 +105,13 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
               : {
                   icon: GetAppIcon,
                   tooltip: 'Download label',
-                  onClick: (_event, rowData) => console.log('Download'),
+                  onClick: (_event, rowData) => {
+                    const clickedEntry = rowData as ShipmentFragment;
+                    downloadShipmentLabel(
+                      [clickedEntry.id],
+                      clickedEntry.title
+                    );
+                  },
                 },
         ]}
       />

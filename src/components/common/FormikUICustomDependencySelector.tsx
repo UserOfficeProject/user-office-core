@@ -109,6 +109,7 @@ const FormikUICustomDependencySelector = ({
     }
   }, [dependencyId, template]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const updateFormikMemoized = useCallback(updateFormik, [
     dependencyId,
     operator,

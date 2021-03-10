@@ -34,12 +34,13 @@ export function useInstrumentsData(
 
     setLoadingInstruments(true);
     if (
+      currentRole &&
       [
         UserRole.USER_OFFICER,
         UserRole.SEP_REVIEWER,
         UserRole.SEP_CHAIR,
         UserRole.SEP_SECRETARY,
-      ].includes(currentRole!)
+      ].includes(currentRole)
     ) {
       api()
         .getInstruments({ callIds })

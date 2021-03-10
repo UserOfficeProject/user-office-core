@@ -44,6 +44,7 @@ export type AddTechnicalReviewInput = {
   publicComment?: Maybe<Scalars['String']>;
   timeAllocation?: Maybe<Scalars['Int']>;
   status?: Maybe<TechnicalReviewStatus>;
+  submitted?: Maybe<Scalars['Boolean']>;
 };
 
 export type AddUserRoleResponseWrap = {
@@ -277,6 +278,7 @@ export enum Event {
   PROPOSAL_FEASIBLE = 'PROPOSAL_FEASIBLE',
   PROPOSAL_SEP_SELECTED = 'PROPOSAL_SEP_SELECTED',
   PROPOSAL_INSTRUMENT_SELECTED = 'PROPOSAL_INSTRUMENT_SELECTED',
+  PROPOSAL_FEASIBILITY_REVIEW_UPDATED = 'PROPOSAL_FEASIBILITY_REVIEW_UPDATED',
   PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED = 'PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED',
   PROPOSAL_SAMPLE_REVIEW_SUBMITTED = 'PROPOSAL_SAMPLE_REVIEW_SUBMITTED',
   PROPOSAL_SAMPLE_SAFE = 'PROPOSAL_SAMPLE_SAFE',
@@ -483,7 +485,7 @@ export type Mutation = {
   answerTopic: QuestionaryStepResponseWrap;
   createQuestionary: QuestionaryResponseWrap;
   updateAnswer: UpdateAnswerResponseWrap;
-  addReview: ReviewResponseWrap;
+  addReview: ReviewWithNextStatusResponseWrap;
   addUserForReview: ReviewResponseWrap;
   createSample: SampleResponseWrap;
   updateSample: SampleResponseWrap;
@@ -549,6 +551,7 @@ export type Mutation = {
   deleteProposalStatus: ProposalStatusResponseWrap;
   deleteProposalWorkflow: ProposalWorkflowResponseWrap;
   submitProposal: ProposalResponseWrap;
+  submitShipment: ShipmentResponseWrap;
   submitTechnicalReview: TechnicalReviewResponseWrap;
   token: TokenResponseWrap;
   selectRole: TokenResponseWrap;
@@ -856,6 +859,7 @@ export type MutationUpdateShipmentArgs = {
   proposalId?: Maybe<Scalars['Int']>;
   title?: Maybe<Scalars['String']>;
   status?: Maybe<ShipmentStatus>;
+  externalRef?: Maybe<Scalars['String']>;
 };
 
 
@@ -1174,6 +1178,11 @@ export type MutationSubmitProposalArgs = {
 };
 
 
+export type MutationSubmitShipmentArgs = {
+  shipmentId: Scalars['Int'];
+};
+
+
 export type MutationSubmitTechnicalReviewArgs = {
   submitTechnicalReviewInput: SubmitTechnicalReviewInput;
 };
@@ -1197,9 +1206,11 @@ export type MutationUpdatePasswordArgs = {
 
 export type NextProposalStatus = {
   __typename?: 'NextProposalStatus';
-  proposalNextStatusId: Maybe<Scalars['Int']>;
-  proposalNextStatusShortCode: Maybe<Scalars['String']>;
-  proposalNextStatusName: Maybe<Scalars['String']>;
+  id: Maybe<Scalars['Int']>;
+  shortCode: Maybe<Scalars['String']>;
+  name: Maybe<Scalars['String']>;
+  description: Maybe<Scalars['String']>;
+  isDefault: Maybe<Scalars['Boolean']>;
 };
 
 export type NextProposalStatusResponseWrap = {
@@ -1834,7 +1845,8 @@ export enum QuestionFilterCompareOperator {
   GREATER_THAN = 'GREATER_THAN',
   LESS_THAN = 'LESS_THAN',
   EQUALS = 'EQUALS',
-  INCLUDES = 'INCLUDES'
+  INCLUDES = 'INCLUDES',
+  EXISTS = 'EXISTS'
 }
 
 export type QuestionFilterInput = {
@@ -1893,6 +1905,25 @@ export enum ReviewStatus {
   DRAFT = 'DRAFT',
   SUBMITTED = 'SUBMITTED'
 }
+
+export type ReviewWithNextProposalStatus = {
+  __typename?: 'ReviewWithNextProposalStatus';
+  id: Scalars['Int'];
+  userID: Scalars['Int'];
+  comment: Maybe<Scalars['String']>;
+  grade: Maybe<Scalars['Int']>;
+  status: ReviewStatus;
+  sepID: Scalars['Int'];
+  reviewer: Maybe<BasicUserDetails>;
+  proposal: Maybe<Proposal>;
+  nextProposalStatus: Maybe<NextProposalStatus>;
+};
+
+export type ReviewWithNextStatusResponseWrap = {
+  __typename?: 'ReviewWithNextStatusResponseWrap';
+  error: Maybe<Scalars['String']>;
+  review: Maybe<ReviewWithNextProposalStatus>;
+};
 
 export type RichTextInputConfig = {
   __typename?: 'RichTextInputConfig';
@@ -2325,7 +2356,7 @@ export type AssignProposalToSepMutation = (
     & Pick<NextProposalStatusResponseWrap, 'error'>
     & { nextProposalStatus: Maybe<(
       { __typename?: 'NextProposalStatus' }
-      & Pick<NextProposalStatus, 'proposalNextStatusId' | 'proposalNextStatusShortCode' | 'proposalNextStatusName'>
+      & Pick<NextProposalStatus, 'id' | 'shortCode' | 'name'>
     )> }
   ) }
 );
@@ -3519,7 +3550,7 @@ export type GetInstrumentScientistProposalsQuery = (
         & BasicUserDetailsFragment
       )>, technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
-        & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
+        & CoreTechnicalReviewFragment
       )>, instrument: Maybe<(
         { __typename?: 'Instrument' }
         & Pick<Instrument, 'id' | 'name'>
@@ -3601,7 +3632,7 @@ export type GetProposalsQuery = (
         & BasicUserDetailsFragment
       )>, technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
-        & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
+        & CoreTechnicalReviewFragment
       )>, instrument: Maybe<(
         { __typename?: 'Instrument' }
         & Pick<Instrument, 'id' | 'name'>
@@ -3850,6 +3881,7 @@ export type AddTechnicalReviewMutationVariables = Exact<{
   comment?: Maybe<Scalars['String']>;
   publicComment?: Maybe<Scalars['String']>;
   status?: Maybe<TechnicalReviewStatus>;
+  submitted: Scalars['Boolean'];
 }>;
 
 
@@ -3972,11 +4004,15 @@ export type AddReviewMutationVariables = Exact<{
 export type AddReviewMutation = (
   { __typename?: 'Mutation' }
   & { addReview: (
-    { __typename?: 'ReviewResponseWrap' }
-    & Pick<ReviewResponseWrap, 'error'>
+    { __typename?: 'ReviewWithNextStatusResponseWrap' }
+    & Pick<ReviewWithNextStatusResponseWrap, 'error'>
     & { review: Maybe<(
-      { __typename?: 'Review' }
-      & CoreReviewFragment
+      { __typename?: 'ReviewWithNextProposalStatus' }
+      & Pick<ReviewWithNextProposalStatus, 'id' | 'userID' | 'status' | 'comment' | 'grade' | 'sepID'>
+      & { nextProposalStatus: Maybe<(
+        { __typename?: 'NextProposalStatus' }
+        & Pick<NextProposalStatus, 'id' | 'shortCode' | 'name'>
+      )> }
     )> }
   ) }
 );
@@ -4540,6 +4576,23 @@ export type SetActiveTemplateMutation = (
   & { setActiveTemplate: (
     { __typename?: 'SuccessResponseWrap' }
     & Pick<SuccessResponseWrap, 'isSuccess' | 'error'>
+  ) }
+);
+
+export type SubmitShipmentMutationVariables = Exact<{
+  shipmentId: Scalars['Int'];
+}>;
+
+
+export type SubmitShipmentMutation = (
+  { __typename?: 'Mutation' }
+  & { submitShipment: (
+    { __typename?: 'ShipmentResponseWrap' }
+    & Pick<ShipmentResponseWrap, 'error'>
+    & { shipment: Maybe<(
+      { __typename?: 'Shipment' }
+      & ShipmentFragment
+    )> }
   ) }
 );
 
@@ -5901,9 +5954,9 @@ export const AssignProposalToSepDocument = gql`
   assignProposalToSEP(proposalId: $proposalId, sepId: $sepId) {
     error
     nextProposalStatus {
-      proposalNextStatusId
-      proposalNextStatusShortCode
-      proposalNextStatusName
+      id
+      shortCode
+      name
     }
   }
 }
@@ -6799,12 +6852,7 @@ export const GetInstrumentScientistProposalsDocument = gql`
         ...basicUserDetails
       }
       technicalReview {
-        id
-        comment
-        publicComment
-        timeAllocation
-        status
-        proposalID
+        ...coreTechnicalReview
       }
       instrument {
         id
@@ -6823,7 +6871,8 @@ export const GetInstrumentScientistProposalsDocument = gql`
   }
 }
     ${ProposalFragmentDoc}
-${BasicUserDetailsFragmentDoc}`;
+${BasicUserDetailsFragmentDoc}
+${CoreTechnicalReviewFragmentDoc}`;
 export const GetProposalDocument = gql`
     query getProposal($id: Int!) {
   proposal(id: $id) {
@@ -6893,12 +6942,7 @@ export const GetProposalsDocument = gql`
         ...basicUserDetails
       }
       technicalReview {
-        id
-        comment
-        publicComment
-        timeAllocation
-        status
-        proposalID
+        ...coreTechnicalReview
       }
       instrument {
         id
@@ -6917,7 +6961,8 @@ export const GetProposalsDocument = gql`
   }
 }
     ${ProposalFragmentDoc}
-${BasicUserDetailsFragmentDoc}`;
+${BasicUserDetailsFragmentDoc}
+${CoreTechnicalReviewFragmentDoc}`;
 export const GetProposalsCoreDocument = gql`
     query getProposalsCore($filter: ProposalsFilter) {
   proposalsView(filter: $filter) {
@@ -7038,9 +7083,9 @@ export const GetQuestionaryDocument = gql`
 }
     ${QuestionaryFragmentDoc}`;
 export const AddTechnicalReviewDocument = gql`
-    mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus) {
+    mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus, $submitted: Boolean!) {
   addTechnicalReview(
-    addTechnicalReviewInput: {proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, publicComment: $publicComment, status: $status}
+    addTechnicalReviewInput: {proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, publicComment: $publicComment, status: $status, submitted: $submitted}
   ) {
     error
     technicalReview {
@@ -7116,11 +7161,21 @@ export const AddReviewDocument = gql`
   ) {
     error
     review {
-      ...coreReview
+      id
+      userID
+      status
+      comment
+      grade
+      sepID
+      nextProposalStatus {
+        id
+        shortCode
+        name
+      }
     }
   }
 }
-    ${CoreReviewFragmentDoc}`;
+    `;
 export const UserWithReviewsDocument = gql`
     query userWithReviews($callId: Int, $instrumentId: Int, $status: ReviewStatus) {
   me {
@@ -7530,6 +7585,16 @@ export const SetActiveTemplateDocument = gql`
   }
 }
     `;
+export const SubmitShipmentDocument = gql`
+    mutation submitShipment($shipmentId: Int!) {
+  submitShipment(shipmentId: $shipmentId) {
+    error
+    shipment {
+      ...shipment
+    }
+  }
+}
+    ${ShipmentFragmentDoc}`;
 export const UpdateShipmentDocument = gql`
     mutation updateShipment($shipmentId: Int!, $title: String, $proposalId: Int, $status: ShipmentStatus) {
   updateShipment(
@@ -8428,6 +8493,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     setActiveTemplate(variables: SetActiveTemplateMutationVariables): Promise<SetActiveTemplateMutation> {
       return withWrapper(() => client.request<SetActiveTemplateMutation>(print(SetActiveTemplateDocument), variables));
+    },
+    submitShipment(variables: SubmitShipmentMutationVariables): Promise<SubmitShipmentMutation> {
+      return withWrapper(() => client.request<SubmitShipmentMutation>(print(SubmitShipmentDocument), variables));
     },
     updateShipment(variables: UpdateShipmentMutationVariables): Promise<UpdateShipmentMutation> {
       return withWrapper(() => client.request<UpdateShipmentMutation>(print(UpdateShipmentDocument), variables));

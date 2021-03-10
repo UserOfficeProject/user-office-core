@@ -22,7 +22,9 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <AssignmentIcon />,
   renderers: {
-    answerRenderer: ({ answer }) => <SamplesAnswerRenderer answer={answer} />,
+    answerRenderer: function SamplesAnswerRendererComponent({ answer }) {
+      return <SamplesAnswerRenderer answer={answer} />;
+    },
     questionRenderer: defaultRenderer.questionRenderer,
   },
   createYupValidationSchema: (answer) => {

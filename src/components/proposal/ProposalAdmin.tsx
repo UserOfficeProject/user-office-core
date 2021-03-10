@@ -9,13 +9,11 @@ import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
 import FormikDropdown from 'components/common/FormikDropdown';
-import PreventTabChangeIfFormDirty from 'components/common/PreventTabChangeIfFormDirty';
 import { Proposal, UserRole } from 'generated/sdk';
 import { ProposalEndStatus } from 'generated/sdk';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { FunctionType } from 'utils/utilTypes';
 
 export type AdministrationFormData = {
   id: number;
@@ -28,7 +26,6 @@ export type AdministrationFormData = {
 export default function ProposalAdmin(props: {
   data: Proposal;
   setAdministration: (data: AdministrationFormData) => void;
-  setFormDirty: FunctionType<void, boolean>;
 }) {
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
@@ -85,10 +82,6 @@ export default function ProposalAdmin(props: {
         {({ isSubmitting }) => (
           <Form>
             <PromptIfDirty />
-            <PreventTabChangeIfFormDirty
-              setFormDirty={props.setFormDirty}
-              initialValues={initialValues}
-            />
             <Grid container spacing={3}>
               <Grid item xs={6}>
                 <FormikDropdown

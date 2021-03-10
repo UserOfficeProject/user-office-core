@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
   },
   root: {
     width: 'inherit',
+    minWidth: '500px', // Giving some minimum width for questionaries with short entries
   },
 }));
 

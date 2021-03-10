@@ -14,7 +14,17 @@ mutation addReview(
   ) {
     error
     review {
-      ...coreReview
+      id
+      userID
+      status
+      comment
+      grade
+      sepID
+      nextProposalStatus {
+        id
+        shortCode
+        name
+      }
     }
   }
 }

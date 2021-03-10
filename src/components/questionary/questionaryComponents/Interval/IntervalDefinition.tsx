@@ -20,7 +20,7 @@ export const intervalDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <ArrowForwardIosIcon />,
   renderers: {
-    answerRenderer: ({ answer }) => {
+    answerRenderer: function AnswerRendererComponent({ answer }) {
       const isAnswered = answer.value.min || answer.value.min; // at least one answer
       if (isAnswered) {
         const min = answer.value.min;

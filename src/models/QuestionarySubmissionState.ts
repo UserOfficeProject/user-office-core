@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import produce from 'immer';
+import produce, { Draft } from 'immer';
 import { Reducer } from 'react';
 
 import { Answer, QuestionaryStep } from 'generated/sdk';
@@ -35,7 +35,6 @@ export enum EventType {
   SHIPMENT_LOADED = 'SHIPMENT_LOADED',
   SHIPMENT_SUBMIT_CLICKED = 'SHIPMENT_SUBMIT_CLICKED',
   SHIPMENT_MODIFIED = 'SHIPMENT_MODIFIED',
-  SHIPMENT_UPDATED = 'SHIPMENT_UPDATED',
   SHIPMENT_DONE = 'SHIPMENT_DONE',
   CLEAN_DIRTY_STATE = 'CLEAN_DIRTY_STATE',
 }
@@ -162,8 +161,8 @@ export function QuestionarySubmissionModel<
           break;
       }
 
-      // @ts-expect-error
-      draftState = reducers?.(state, draftState, action) || draftState;
+      (draftState as T | Draft<T>) =
+        reducers?.(state, draftState as T, action) || draftState;
     });
   }
 

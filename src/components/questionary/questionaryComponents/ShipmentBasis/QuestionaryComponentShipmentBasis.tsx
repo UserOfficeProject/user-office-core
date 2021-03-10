@@ -6,6 +6,7 @@ import {
   TextField,
 } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
+import { FormikErrors } from 'formik';
 import React, { useContext, useState } from 'react';
 
 import MultiMenuItem from 'components/common/MultiMenuItem';
@@ -52,7 +53,9 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
     formikProps: { errors },
   } = props;
 
-  const fieldErrors = errors[proposalQuestionId] as any;
+  const fieldErrors = errors[proposalQuestionId] as FormikErrors<
+    Record<string, unknown>
+  >;
   const classes = useStyles();
   const { state, dispatch } = useContext(
     QuestionaryContext
@@ -160,6 +163,7 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const shipmentBasisPreSubmit = (answer: Answer) => async ({
   api,
   dispatch,
@@ -177,7 +181,7 @@ const shipmentBasisPreSubmit = (answer: Answer) => async ({
     });
     if (result.updateShipment.shipment) {
       dispatch({
-        type: EventType.SHIPMENT_UPDATED,
+        type: EventType.SHIPMENT_MODIFIED,
         payload: {
           shipment: result.updateShipment.shipment,
         },

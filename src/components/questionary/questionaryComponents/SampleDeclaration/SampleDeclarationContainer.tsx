@@ -84,9 +84,9 @@ const createQuestionaryWizardStep = (
 
 export function SampleDeclarationContainer(props: {
   sample: Sample;
-  sampleCreated?: (sample: Sample) => any;
-  sampleUpdated?: (sample: Sample) => any;
-  sampleEditDone?: () => any;
+  sampleCreated?: (sample: Sample) => void;
+  sampleUpdated?: (sample: Sample) => void;
+  sampleEditDone?: () => void;
 }) {
   const { api } = useDataApiWithFeedback();
 

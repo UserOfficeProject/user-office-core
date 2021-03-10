@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 
 function SampleList(props: {
   samples: SampleBasic[];
-  onClick?: (sample: SampleBasic) => any;
+  onClick?: (sample: SampleBasic) => void;
 }) {
   const classes = useStyles();
 

@@ -26,6 +26,127 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import SampleDetails from './SampleDetails';
 import SamplesTable from './SamplesTable';
 
+function SampleEvaluationDialog(props: {
+  sample: SampleBasic;
+  onClose: (sample: Maybe<SampleBasic>) => void;
+}) {
+  const { sample, onClose } = props;
+  const { api } = useDataApiWithFeedback();
+
+  const initialValues: SampleBasic = {
+    ...sample,
+  };
+
+  return (
+    <InputDialog
+      open={sample !== null}
+      onClose={() => onClose(null)}
+      fullWidth={true}
+    >
+      <SampleDetails sampleId={sample.id} />
+      <Formik
+        initialValues={initialValues}
+        onSubmit={async (values): Promise<void> => {
+          if (!values) {
+            return;
+          }
+
+          const { id, safetyComment, safetyStatus } = values;
+          const result = await api(
+            `Review for '${sample?.title}' submitted`
+          ).updateSample({ sampleId: id, safetyComment, safetyStatus });
+
+          const newSample = result.updateSample.sample;
+          onClose(newSample || null);
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <Field
+              type="text"
+              name="safetyStatus"
+              label="Status"
+              select
+              margin="normal"
+              component={TextField}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              InputProps={{ 'data-cy': 'safety-status' }}
+              fullWidth
+              required={true}
+              disabled={isSubmitting}
+            >
+              <MenuItem
+                key={SampleStatus.PENDING_EVALUATION}
+                value={SampleStatus.PENDING_EVALUATION}
+              >
+                <ListItemIcon>
+                  <Avatar style={{ backgroundColor: '#CCC' }}>&nbsp;</Avatar>
+                </ListItemIcon>
+                <Typography variant="inherit">Not evaluated</Typography>
+              </MenuItem>
+
+              <MenuItem
+                key={SampleStatus.LOW_RISK}
+                value={SampleStatus.LOW_RISK}
+              >
+                <ListItemIcon>
+                  <Avatar style={{ backgroundColor: '#88C100' }}>&nbsp;</Avatar>
+                </ListItemIcon>
+                <Typography variant="inherit">Low risk</Typography>
+              </MenuItem>
+
+              <MenuItem
+                key={SampleStatus.ELEVATED_RISK}
+                value={SampleStatus.ELEVATED_RISK}
+              >
+                <ListItemIcon>
+                  <Avatar style={{ backgroundColor: '#FF8A00' }}>&nbsp;</Avatar>
+                </ListItemIcon>
+                <Typography variant="inherit">Elevated risk</Typography>
+              </MenuItem>
+
+              <MenuItem
+                key={SampleStatus.HIGH_RISK}
+                value={SampleStatus.HIGH_RISK}
+              >
+                <ListItemIcon>
+                  <Avatar style={{ backgroundColor: '#FF003C' }}>&nbsp;</Avatar>
+                </ListItemIcon>
+                <Typography variant="inherit">High risk</Typography>
+              </MenuItem>
+            </Field>
+
+            <Field
+              name="safetyComment"
+              id="safetyComment"
+              label="Comment"
+              type="text"
+              component={TextField}
+              multiline
+              fullWidth
+              disabled={isSubmitting}
+              InputProps={{ rows: 4, rowsMax: 10, 'data-cy': 'safety-comment' }}
+            />
+
+            <ActionButtonContainer>
+              <Button
+                variant="contained"
+                type="submit"
+                color="primary"
+                data-cy="submit"
+              >
+                Submit
+              </Button>
+            </ActionButtonContainer>
+          </Form>
+        )}
+      </Formik>
+    </InputDialog>
+  );
+}
+
 function SampleSafetyPage() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { calls, loadingCalls } = useCallsData({ isActive: true });
@@ -155,127 +276,6 @@ function SampleSafetyPage() {
         />
       )}
     </>
-  );
-}
-
-function SampleEvaluationDialog(props: {
-  sample: SampleBasic;
-  onClose: (sample: Maybe<SampleBasic>) => any;
-}) {
-  const { sample, onClose } = props;
-  const { api } = useDataApiWithFeedback();
-
-  const initialValues: SampleBasic = {
-    ...sample,
-  };
-
-  return (
-    <InputDialog
-      open={sample !== null}
-      onClose={() => onClose(null)}
-      fullWidth={true}
-    >
-      <SampleDetails sampleId={sample.id} />
-      <Formik
-        initialValues={initialValues}
-        onSubmit={async (values): Promise<void> => {
-          if (!values) {
-            return;
-          }
-
-          const { id, safetyComment, safetyStatus } = values;
-          const result = await api(
-            `Review for '${sample?.title}' submitted`
-          ).updateSample({ sampleId: id, safetyComment, safetyStatus });
-
-          const newSample = result.updateSample.sample;
-          onClose(newSample || null);
-        }}
-      >
-        {({ isSubmitting }) => (
-          <Form>
-            <Field
-              type="text"
-              name="safetyStatus"
-              label="Status"
-              select
-              margin="normal"
-              component={TextField}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              InputProps={{ 'data-cy': 'safety-status' }}
-              fullWidth
-              required={true}
-              disabled={isSubmitting}
-            >
-              <MenuItem
-                key={SampleStatus.PENDING_EVALUATION}
-                value={SampleStatus.PENDING_EVALUATION}
-              >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#CCC' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Not evaluated</Typography>
-              </MenuItem>
-
-              <MenuItem
-                key={SampleStatus.LOW_RISK}
-                value={SampleStatus.LOW_RISK}
-              >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#88C100' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Low risk</Typography>
-              </MenuItem>
-
-              <MenuItem
-                key={SampleStatus.ELEVATED_RISK}
-                value={SampleStatus.ELEVATED_RISK}
-              >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#FF8A00' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Elevated risk</Typography>
-              </MenuItem>
-
-              <MenuItem
-                key={SampleStatus.HIGH_RISK}
-                value={SampleStatus.HIGH_RISK}
-              >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#FF003C' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">High risk</Typography>
-              </MenuItem>
-            </Field>
-
-            <Field
-              name="safetyComment"
-              id="safetyComment"
-              label="Comment"
-              type="text"
-              component={TextField}
-              multiline
-              fullWidth
-              disabled={isSubmitting}
-              InputProps={{ rows: 4, rowsMax: 10, 'data-cy': 'safety-comment' }}
-            />
-
-            <ActionButtonContainer>
-              <Button
-                variant="contained"
-                type="submit"
-                color="primary"
-                data-cy="submit"
-              >
-                Submit
-              </Button>
-            </ActionButtonContainer>
-          </Form>
-        )}
-      </Formik>
-    </InputDialog>
   );
 }
 
