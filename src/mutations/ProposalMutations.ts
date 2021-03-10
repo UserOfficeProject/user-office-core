@@ -287,6 +287,19 @@ export default class ProposalMutations {
       proposal.finalStatus = finalStatus;
     }
 
+    if (proposal.statusId !== statusId && statusId) {
+      /**
+       * NOTE: Reset proposal events that are coming after given status.
+       * For example if proposal had SEP_REVIEW status and we manually reset to FEASIBILITY_REVIEW then events like:
+       * proposal_feasible, proposal_feasibility_review_submitted and proposal_sep_selected should be reset to false in the proposal_events table
+       */
+      await this.proposalDataSource.resetProposalEvents(
+        proposal.id,
+        proposal.callId,
+        statusId
+      );
+    }
+
     if (statusId !== undefined) {
       proposal.statusId = statusId;
     }

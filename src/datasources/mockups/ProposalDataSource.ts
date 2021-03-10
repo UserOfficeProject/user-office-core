@@ -185,4 +185,12 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   ): Promise<Proposal> {
     return dummyProposal;
   }
+
+  async resetProposalEvents(
+    proposalId: number,
+    callId: number,
+    statusId: number
+  ): Promise<boolean> {
+    return true;
+  }
 }

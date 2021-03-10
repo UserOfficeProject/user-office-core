@@ -13,6 +13,7 @@ import {
   CallRecord,
   createProposalObject,
   createProposalViewObject,
+  NextStatusEventRecord,
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
@@ -488,5 +489,69 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     ).rows;
 
     return createProposalObject(newProposal);
+  }
+
+  async resetProposalEvents(
+    proposalId: number,
+    callId: number,
+    statusId: number
+  ): Promise<boolean> {
+    const proposalCall: CallRecord = await database('call')
+      .select('*')
+      .where('call_id', callId)
+      .first();
+
+    if (!proposalCall) {
+      logger.logError(
+        'Could not reset proposal events because proposal call does not exist',
+        { callId }
+      );
+
+      throw new Error('Could not reset proposal events');
+    }
+
+    const proposalEventsToReset: NextStatusEventRecord[] = (
+      await database.raw(`
+        SELECT 
+          *
+        FROM 
+          proposal_workflow_connections AS pwc
+        JOIN
+          next_status_events
+        ON
+          next_status_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
+        WHERE pwc.proposal_workflow_connection_id >= (
+          SELECT proposal_workflow_connection_id
+          FROM proposal_workflow_connections
+          WHERE proposal_workflow_id = ${proposalCall.proposal_workflow_id}
+          AND proposal_status_id = ${statusId}
+        )
+        AND pwc.proposal_workflow_id = ${proposalCall.proposal_workflow_id};
+      `)
+    ).rows;
+
+    if (proposalEventsToReset?.length) {
+      const dataToUpdate = proposalEventsToReset
+        .map(
+          (event) => `${event.next_status_event.toLocaleLowerCase()} = false`
+        )
+        .join(', ');
+
+      const [updatedProposalEvents]: ProposalEventsRecord[] = (
+        await database.raw(`
+        UPDATE proposal_events SET ${dataToUpdate}
+        WHERE proposal_id = ${proposalId}
+        RETURNING *
+      `)
+      ).rows;
+
+      if (!updatedProposalEvents) {
+        logger.logError('Could not reset proposal events', { dataToUpdate });
+
+        throw new Error('Could not reset proposal events');
+      }
+    }
+
+    return true;
   }
 }
