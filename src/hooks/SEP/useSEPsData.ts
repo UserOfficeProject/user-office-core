@@ -23,6 +23,8 @@ export function useSEPsData(
   };
 
   useEffect(() => {
+    setLoadingSEPs(true);
+
     if (role === UserRole.USER_OFFICER) {
       api()
         .getSEPs({
