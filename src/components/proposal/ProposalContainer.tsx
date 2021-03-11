@@ -8,7 +8,7 @@ import {
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
 import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
-import { Proposal, QuestionaryStep } from 'generated/sdk';
+import { Proposal, ProposalStatus, QuestionaryStep } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import { usePersistProposalModel } from 'hooks/proposal/usePersistProposalModel';
 import {
@@ -71,8 +71,22 @@ const proposalReducer = (
   return draftState;
 };
 
+//Option 1: Change isProposalSubmitted to isProposalEditable and have this be true when proposal status is either DRAFT or EDITABLE_SUBMISSION
+//Option 2: Have the isProposalSubmitted bypassed if the proposal status is EDITABLE_SUBMISSION
 const isProposalSubmitted = (proposal: { submitted: boolean }) =>
   proposal.submitted;
+
+//Is the proposal in draft or edited state? If so set read only to false.
+function isProposalEditable(proposal: { status: ProposalStatus }) {
+  if (
+    proposal.status.shortCode.toString() === 'DRAFT' ||
+    proposal.status.shortCode.toString() === 'EDITABLE_SUBMISSION'
+  ) {
+    return false;
+  } else {
+    return true;
+  }
+}
 
 const createQuestionaryWizardStep = (
   step: QuestionaryStep,
@@ -87,9 +101,7 @@ const createQuestionaryWizardStep = (
     return {
       title: questionaryStep.topic.title,
       isCompleted: questionaryStep.isCompleted,
-      isReadonly:
-        isProposalSubmitted(proposalState.proposal) ||
-        (index > 0 && state.steps[index - 1].isCompleted === false),
+      isReadonly: isProposalEditable(proposalState.proposal),
     };
   },
 });
@@ -104,7 +116,7 @@ const createReviewWizardStep = (): WizardStep => ({
       title: 'Review',
       isCompleted: isProposalSubmitted(proposalState.proposal),
       isReadonly:
-        isProposalSubmitted(proposalState.proposal) ||
+        isProposalEditable(proposalState.proposal) &&
         lastProposalStep.isCompleted === false,
     };
   },
@@ -142,7 +154,7 @@ export default function ProposalContainer(props: {
           />
         );
       case 'ProposalReview':
-        return <ProposalSummary data={state} readonly={false} />;
+        return <ProposalSummary data={state} readonly={isReadonly} />;
 
       default:
         throw new Error(`Unknown step type ${metadata.type}`);
