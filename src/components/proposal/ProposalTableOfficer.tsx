@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
@@ -13,19 +13,21 @@ import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import isEqual from 'react-fast-compare';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
 import ScienceIconAdd from 'components/common/icons/ScienceIconAdd';
 import ScienceIconRemove from 'components/common/icons/ScienceIconRemove';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
+import ProposalReviewModal from 'components/review/ProposalReviewModal';
+import ProposalReview from 'components/review/ProposalReviewUserOfficer';
 import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
 import {
   Call,
   Instrument,
+  Proposal,
   ProposalsFilter,
   ProposalsToInstrumentArgs,
-  Review,
   Sep,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -35,9 +37,11 @@ import {
   ProposalViewData,
   useProposalsCoreData,
 } from 'hooks/proposal/useProposalsCoreData';
-import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
+import {
+  fromProposalToProposalView,
+  setSortDirectionOnSortColumn,
+} from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
-import { average, getGrades, standardDeviation } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -85,29 +89,40 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   );
 
   useEffect(() => {
+    setPreselectedProposalsData(proposalsData);
+  }, [proposalsData]);
+
+  useEffect(() => {
     if (urlQueryParams.selection.length > 0) {
-      const proposalsWithTableDataCheckedProperty = proposalsData.map(
-        (proposal) => {
+      const selection = new Set(urlQueryParams.selection);
+
+      setPreselectedProposalsData((preselectedProposalsData) => {
+        const selected: ProposalsToInstrumentArgs[] = [];
+        const preselected = preselectedProposalsData.map((proposal) => {
+          if (selection.has(proposal.id.toString())) {
+            selected.push({ id: proposal.id, callId: proposal.callId });
+          }
+
           return {
             ...proposal,
             tableData: {
-              checked: urlQueryParams.selection?.some(
-                (selectedItem: string | null) =>
-                  selectedItem === proposal.id.toString()
-              ),
+              checked: selection.has(proposal.id.toString()),
             },
           };
-        }
-      );
+        });
 
-      const onlySelectedProposals = proposalsWithTableDataCheckedProperty.filter(
-        (proposal) => proposal.tableData.checked
-      );
+        setSelectedProposals(selected);
 
-      setPreselectedProposalsData(proposalsWithTableDataCheckedProperty);
-      setSelectedProposals(onlySelectedProposals);
+        return preselected;
+      });
     } else {
-      setPreselectedProposalsData(proposalsData);
+      setPreselectedProposalsData((proposalsData) =>
+        proposalsData.map((proposal) => ({
+          ...proposal,
+          tableData: { ...(proposal as any).tableData, checked: false },
+        }))
+      );
+      setSelectedProposals([]);
     }
   }, [proposalsData, urlQueryParams.selection]);
 
@@ -116,7 +131,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       id: proposalID,
       rankOrder: ranking,
     });
-    setProposalsData(
+    setProposalsData((proposalsData) =>
       proposalsData.map((prop) => {
         if (prop.id === proposalID) prop.rankOrder = ranking;
 
@@ -143,7 +158,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     const isError = !!result.removeProposalFromInstrument.error;
 
     if (!isError) {
-      setProposalsData(
+      setProposalsData((proposalsData) =>
         proposalsData.map((prop) => {
           if (prop.id === proposalId) {
             prop.instrumentName = null;
@@ -168,14 +183,15 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     return (
       <>
         <Tooltip title="View proposal">
-          <Link
-            to={`/ProposalReviewUserOfficer/${rowData.id}`}
-            style={{ color: 'inherit', textDecoration: 'inherit' }}
+          <IconButton
+            data-cy="view-proposal"
+            onClick={() => {
+              setUrlQueryParams({ reviewModal: rowData.id });
+            }}
+            style={iconButtonStyle}
           >
-            <IconButton data-cy="view-proposal" style={iconButtonStyle}>
-              <Visibility />
-            </IconButton>
-          </Link>
+            <Visibility />
+          </IconButton>
         </Tooltip>
         <Tooltip title="Clone proposal">
           <IconButton
@@ -226,6 +242,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       </>
     );
   };
+
   const RankComponent = (rowData: ProposalViewData) => (
     <RankInput
       proposalID={rowData.id}
@@ -320,10 +337,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         return;
       }
 
-      proposalsData[
-        proposalsData.findIndex((val) => val.id === proposal.id)
-      ].notified = true;
-      setProposalsData([...proposalsData]);
+      setProposalsData((proposalsData) =>
+        proposalsData.map((prop) => ({
+          ...prop,
+          notified: prop.id === proposal.id,
+        }))
+      );
     });
   };
 
@@ -372,7 +391,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     );
 
     if (!isError) {
-      setProposalsData(
+      setProposalsData((proposalsData) =>
         proposalsData.map((prop) => {
           if (
             selectedProposals.find(
@@ -385,12 +404,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               (item) => item.proposalId === prop.id
             );
 
-            if (
-              proposalNextStatusResponse?.result?.nextProposalStatus
-                ?.proposalNextStatusShortCode
-            ) {
+            if (proposalNextStatusResponse?.result.nextProposalStatus?.name) {
               prop.statusName =
-                proposalNextStatusResponse.result.nextProposalStatus.proposalNextStatusShortCode;
+                proposalNextStatusResponse.result.nextProposalStatus.name;
             }
           }
 
@@ -420,7 +436,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const isError = !!result.assignProposalsToInstrument.error;
 
       if (!isError) {
-        setProposalsData(
+        setProposalsData((proposalsData) =>
           proposalsData.map((prop) => {
             if (
               selectedProposals.find(
@@ -460,31 +476,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     const resultProposal = result.cloneProposal.proposal;
 
     if (!result.cloneProposal.error && proposalsData && resultProposal) {
-      const newClonedProposal: ProposalViewData = {
-        id: resultProposal.id,
-        title: resultProposal.title,
-        status: resultProposal.status?.name || '',
-        statusId: resultProposal.status?.id || 1,
-        statusName: resultProposal.status?.name || '',
-        statusDescription: resultProposal.status?.description || '',
-        submitted: resultProposal.submitted,
-        shortCode: resultProposal.shortCode,
-        rankOrder: resultProposal.rankOrder,
-        finalStatus: resultProposal.finalStatus,
-        timeAllocation: resultProposal.technicalReview?.timeAllocation || null,
-        technicalStatus: resultProposal.technicalReview?.status || '',
-        instrumentName: resultProposal.instrument?.name || null,
-        instrumentId: resultProposal.instrument?.id || null,
-        reviewAverage:
-          average(getGrades(resultProposal.reviews as Review[])) || null,
-        reviewDeviation:
-          standardDeviation(getGrades(resultProposal.reviews as Review[])) ||
-          null,
-        sepCode: '',
-        callShortCode: resultProposal.call?.shortCode || null,
-        notified: resultProposal.notified,
-        callId: resultProposal.callId,
-      };
+      const newClonedProposal = fromProposalToProposalView(
+        resultProposal as Proposal
+      );
 
       const newProposalsData = [newClonedProposal, ...proposalsData];
 
@@ -508,6 +502,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     columns,
     urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
+  );
+
+  const proposalToReview = proposalsData.find(
+    (proposal) => proposal.id === urlQueryParams.reviewModal
   );
 
   return (
@@ -554,6 +552,25 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           />
         </DialogContent>
       </Dialog>
+      <ProposalReviewModal
+        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.shortCode})`}
+        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
+        setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
+          setProposalsData(
+            proposalsData.map((proposal) => {
+              if (proposal.id === updatedProposal?.id) {
+                return fromProposalToProposalView(updatedProposal);
+              } else {
+                return proposal;
+              }
+            })
+          );
+          setUrlQueryParams({ reviewModal: undefined });
+        }}
+        reviewItemId={proposalToReview?.id}
+      >
+        <ProposalReview proposalId={proposalToReview?.id as number} />
+      </ProposalReviewModal>
       <MaterialTable
         icons={tableIcons}
         title={'Proposals'}
@@ -564,15 +581,15 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           setUrlQueryParams({ search: searchText ? searchText : undefined });
         }}
         onSelectionChange={(selectedItems) => {
-          setUrlQueryParams({
+          setUrlQueryParams((params) => ({
+            ...params,
             selection:
               selectedItems.length > 0
                 ? selectedItems.map((selectedItem) =>
                     selectedItem.id.toString()
                   )
                 : undefined,
-          });
-          setSelectedProposals(selectedItems);
+          }));
         }}
         options={{
           search: true,
@@ -607,16 +624,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           {
             icon: DeleteIcon,
             tooltip: 'Delete proposals',
-            onClick: (event, rowData): void => {
-              setSelectedProposals(
-                (rowData as ProposalViewData[]).map(
-                  (row: ProposalViewData) => ({
-                    id: row.id,
-                    callId: row.callId,
-                  })
-                )
-              );
-
+            onClick: () => {
               confirm(
                 () => {
                   deleteProposals();
@@ -633,16 +641,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           {
             icon: GroupWorkIcon,
             tooltip: 'Assign proposals to SEP',
-            onClick: (event, rowData): void => {
+            onClick: () => {
               setOpenAssignment(true);
-              setSelectedProposals(
-                (rowData as ProposalViewData[]).map(
-                  (row: ProposalViewData) => ({
-                    id: row.id,
-                    callId: row.callId,
-                  })
-                )
-              );
             },
             position: 'toolbarOnSelect',
           },
@@ -651,32 +651,15 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               'data-cy': 'assign-proposals-to-instrument',
             }),
             tooltip: 'Assign proposals to instrument',
-            onClick: (event, rowData): void => {
+            onClick: () => {
               setOpenInstrumentAssignment(true);
-              setSelectedProposals(
-                (rowData as ProposalViewData[]).map(
-                  (row: ProposalViewData) => ({
-                    id: row.id,
-                    callId: row.callId,
-                  })
-                )
-              );
             },
             position: 'toolbarOnSelect',
           },
           {
             icon: EmailIcon,
             tooltip: 'Notify users final result',
-            onClick: (event, rowData): void => {
-              setSelectedProposals(
-                (rowData as ProposalViewData[]).map(
-                  (row: ProposalViewData) => ({
-                    id: row.id,
-                    callId: row.callId,
-                  })
-                )
-              );
-
+            onClick: () => {
               confirm(
                 () => {
                   emailProposals();
@@ -706,19 +689,15 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         }}
         onOrderChange={(orderedColumnId, orderDirection) => {
           setUrlQueryParams &&
-            setUrlQueryParams({
+            setUrlQueryParams((params) => ({
+              ...params,
               sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
               sortDirection: orderDirection ? orderDirection : undefined,
-            });
+            }));
         }}
       />
     </>
   );
 };
 
-export default React.memo(
-  withConfirm(ProposalTableOfficer),
-  (prevProps, nextProps) =>
-    JSON.stringify(prevProps.proposalFilter) ===
-    JSON.stringify(nextProps.proposalFilter)
-);
+export default React.memo(withConfirm(ProposalTableOfficer), isEqual);

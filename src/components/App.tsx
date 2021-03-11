@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';

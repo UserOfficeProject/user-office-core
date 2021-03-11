@@ -11,10 +11,9 @@ import {
 import { ConditionEvaluator } from 'models/ConditionEvaluator';
 
 export type AbstractField = QuestionTemplateRelation | Answer;
-type AbstractCollection = TemplateStep[] | QuestionaryStep[];
+type AbstractCollection = Array<TemplateStep | QuestionaryStep>;
 
 export function getTopicById(collection: AbstractCollection, topicId: number) {
-  // @ts-expect-error
   const step = collection.find((step) => step.topic.id === topicId);
 
   return step ? step : undefined;
@@ -24,7 +23,6 @@ export function getQuestionaryStepByTopicId(
   collection: AbstractCollection,
   topicId: number
 ) {
-  // @ts-expect-error
   return collection.find((step) => step.topic.id === topicId);
 }
 
@@ -33,10 +31,8 @@ export function getFieldById(
   questionId: string
 ) {
   let needle: AbstractField | undefined;
-  // @ts-expect-error
   collection.every((step) => {
-    needle = step.fields.find(
-      // @ts-expect-error
+    needle = (step.fields as Array<QuestionTemplateRelation | Answer>).find(
       (field) => field.question.proposalQuestionId === questionId
     );
 
@@ -48,7 +44,6 @@ export function getFieldById(
 
 export function getAllFields(collection: AbstractCollection) {
   let allFields = new Array<AbstractField>();
-  // @ts-expect-error
   collection.forEach((step) => {
     allFields = allFields.concat(step.fields);
   });
@@ -70,6 +65,7 @@ export function isDependencySatisfied(
   if (!field) {
     return true;
   }
+
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const isParentSatisfied = areDependenciesSatisfied(
     collection,

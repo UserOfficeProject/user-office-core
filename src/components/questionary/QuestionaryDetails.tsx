@@ -3,7 +3,7 @@ import Table, { TableProps } from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { Answer } from 'generated/sdk';
@@ -33,7 +33,7 @@ function QuestionaryDetails(
     questionaryId: number;
     additionalDetails?: Array<TableRowData>;
     title?: string;
-  } & TableProps<any>
+  } & TableProps<FunctionComponent<unknown>>
 ) {
   const { questionaryId, additionalDetails, title, ...restProps } = props;
   const { questionary, loadingQuestionary } = useQuestionary(questionaryId);

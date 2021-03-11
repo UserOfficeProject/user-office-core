@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { SepAssignment, CoreReviewFragment } from 'generated/sdk';
+import { SepAssignment, ReviewWithNextProposalStatus } from 'generated/sdk';
 
 interface ReviewAndAssignmentData {
   currentAssignment: SepAssignment | null;
   setCurrentAssignment: React.Dispatch<SepAssignment | null>;
-  setAssignmentReview: React.Dispatch<CoreReviewFragment | null | undefined>;
+  setAssignmentReview: React.Dispatch<
+    ReviewWithNextProposalStatus | null | undefined
+  >;
 }
 
 const initialState: ReviewAndAssignmentData = {
@@ -24,7 +26,7 @@ const reducer = (
   previousState = initialState,
   action: {
     type: ActionType;
-    payload: SepAssignment | CoreReviewFragment | null | undefined;
+    payload: SepAssignment | ReviewWithNextProposalStatus | null | undefined;
   }
 ): ReviewAndAssignmentData => {
   switch (action.type) {
@@ -39,7 +41,7 @@ const reducer = (
         ...previousState,
         currentAssignment: {
           ...previousState.currentAssignment,
-          review: action.payload as CoreReviewFragment,
+          review: action.payload as ReviewWithNextProposalStatus,
         } as SepAssignment,
       };
 
@@ -68,7 +70,7 @@ export const ReviewAndAssignmentContextProvider: React.FC = (
           });
         },
         setAssignmentReview: (
-          payload: CoreReviewFragment | null | undefined
+          payload: ReviewWithNextProposalStatus | null | undefined
         ) => {
           dispatch({ type: ActionType.SET_REVIEW, payload });
         },

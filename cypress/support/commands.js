@@ -120,6 +120,20 @@ const notification = ({ variant, text }) => {
   }
 };
 
+const closeNotification = () => {
+  cy.get('body').then((body) => {
+    if (body.has('[aria-describedby="client-snackbar"]')) {
+      cy.get('.MuiSnackbarContent-action button').click();
+    }
+  });
+};
+
+const closeModal = () => {
+  cy.get('[role="dialog"] [data-cy="close-modal"]').click();
+  // NOTE: Need to wait for modal to close with animation.
+  cy.wait(100);
+};
+
 const finishedLoading = () => {
   cy.get('[role="progressbar"]').should('not.exist');
 };
@@ -421,6 +435,20 @@ function createMultipleChoiceQuestion(title, option1, option2, option3) {
     .dragElement([{ direction: 'left', length: 1 }]);
 }
 
+function createFileUploadQuestion(title) {
+  cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').last().click();
+
+  cy.contains('Add File Upload').click();
+
+  cy.get('[data-cy=question]').clear().type(title);
+
+  cy.contains('Save').click();
+
+  cy.contains(title)
+    .parent()
+    .dragElement([{ direction: 'left', length: 1 }]);
+}
+
 function presentationMode() {
   const COMMAND_DELAY = 300;
 
@@ -454,6 +482,9 @@ Cypress.Commands.add('login', login);
 Cypress.Commands.add('logout', logout);
 
 Cypress.Commands.add('notification', notification);
+Cypress.Commands.add('closeNotification', closeNotification);
+
+Cypress.Commands.add('closeModal', closeModal);
 
 Cypress.Commands.add('finishedLoading', finishedLoading);
 
@@ -489,3 +520,5 @@ Cypress.Commands.add(
   'createMultipleChoiceQuestion',
   createMultipleChoiceQuestion
 );
+
+Cypress.Commands.add('createFileUploadQuestion', createFileUploadQuestion);

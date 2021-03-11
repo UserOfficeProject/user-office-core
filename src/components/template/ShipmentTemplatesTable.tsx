@@ -58,12 +58,13 @@ function ShipmentTemplatesTable(props: ShipmentTemplatesTableProps) {
         confirm={props.confirm}
         actions={[
           (rowData) => ({
-            icon: () =>
-              rowData.templateId === activeTemplateId ? (
+            icon: function DoneIconComponent() {
+              return rowData.templateId === activeTemplateId ? (
                 <DoneIcon />
               ) : (
                 <DoneIcon className={classes.inactive} />
-              ),
+              );
+            },
             tooltip: 'Mark as active',
             onClick: async (event, data) => {
               const newActiveTemplateId = (data as Pick<Template, 'templateId'>)

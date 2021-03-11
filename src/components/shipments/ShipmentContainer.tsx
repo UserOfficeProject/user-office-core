@@ -97,14 +97,11 @@ const createReviewWizardStep = (): WizardStep => ({
   type: 'ShipmentReview',
   getMetadata: (state) => {
     const shipmentState = state as ShipmentSubmissionState;
-    const lastShipmentStep = shipmentState.steps[state.steps.length - 1];
 
     return {
       title: 'Review',
       isCompleted: isShipmentSubmitted(shipmentState.shipment),
-      isReadonly:
-        isShipmentSubmitted(shipmentState.shipment) ||
-        lastShipmentStep.isCompleted === false,
+      isReadonly: false,
     };
   },
 });
@@ -141,10 +138,7 @@ export default function ShipmentContainer(props: {
         );
       case 'ShipmentReview':
         return (
-          <ShipmentReview
-            isReadonly={isReadonly}
-            onComplete={() => props.done?.(state.shipment)}
-          />
+          <ShipmentReview onComplete={() => props.done?.(state.shipment)} />
         );
 
       default:

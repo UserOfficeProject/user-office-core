@@ -108,8 +108,10 @@ export default function QuestionaryEditorModel(
           return draft;
         }
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
-          getTopicById(draft.steps, action.payload.topicId).topic.title =
-            action.payload.title;
+          const topicById = getTopicById(draft.steps, action.payload.topicId);
+          if (topicById) {
+            topicById.topic.title = action.payload.title;
+          }
 
           return draft;
         case EventType.UPDATE_QUESTION_REL_REQUESTED: {
@@ -141,7 +143,7 @@ export default function QuestionaryEditorModel(
           const stepToDelete = getQuestionaryStepByTopicId(
             draft.steps,
             action.payload
-          );
+          ) as TemplateStep;
           if (!stepToDelete) {
             return;
           }
@@ -198,7 +200,10 @@ export default function QuestionaryEditorModel(
     blankInitTemplate,
     middlewares || []
   );
-  const memoizedDispatch = useCallback(dispatch, []); // required to avoid infinite re-render because dispatch function is recreated
+
+  // NOTE: required to avoid infinite re-render because dispatch function is recreated
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const memoizedDispatch = useCallback(dispatch, []);
   const api = useDataApi();
 
   useEffect(() => {

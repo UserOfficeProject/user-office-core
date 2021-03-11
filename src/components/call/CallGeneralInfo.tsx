@@ -1,13 +1,18 @@
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import FormikDropdown from 'components/common/FormikDropdown';
-import { GetProposalTemplatesQuery, ProposalWorkflow } from 'generated/sdk';
+import {
+  CreateCallMutationVariables,
+  GetProposalTemplatesQuery,
+  ProposalWorkflow,
+  UpdateCallMutationVariables,
+} from 'generated/sdk';
 
 const CallGeneralInfo: React.FC<{
   templates: Exclude<GetProposalTemplatesQuery['proposalTemplates'], null>;
@@ -27,6 +32,21 @@ const CallGeneralInfo: React.FC<{
     text: proposalWorkflow.name,
     value: proposalWorkflow.id,
   }));
+
+  const formik = useFormikContext<
+    CreateCallMutationVariables | UpdateCallMutationVariables
+  >();
+  const { startCall, endCall } = formik.values;
+
+  useEffect(() => {
+    if (endCall && endCall < startCall) {
+      formik.setFieldValue('endCall', startCall);
+      /** NOTE: Set field untouched because if we try to update the endCall before startCall and then
+       *  set startCall after endCall it can show error message even though we update the endCall automatically.
+       */
+      formik.setFieldTouched('endCall', false);
+    }
+  }, [startCall, endCall, formik]);
 
   return (
     <>
@@ -59,6 +79,7 @@ const CallGeneralInfo: React.FC<{
           component={KeyboardDatePicker}
           margin="normal"
           fullWidth
+          minDate={startCall}
           required
           data-cy="end-date"
         />

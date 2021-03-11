@@ -45,6 +45,7 @@ const QuestionDependencyList: React.FC<QuestionDependencyListProps> = ({
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const updateFormikMemoized = useCallback(updateFormik, [logicOperator]);
 
   useEffect(() => {

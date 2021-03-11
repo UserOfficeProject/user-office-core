@@ -49,9 +49,10 @@ export function TemplatesTable(props: TemplatesTableProps) {
     });
   }, [props]);
 
+  const UnarchiveIconComponent = () => <UnarchiveIcon />;
   const getUnarchiveButton = () => {
     return {
-      icon: () => <UnarchiveIcon />,
+      icon: UnarchiveIconComponent,
       tooltip: 'Unarchive',
       onClick: (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -91,9 +92,10 @@ export function TemplatesTable(props: TemplatesTableProps) {
     };
   };
 
+  const ArchiveIconComponent = () => <Archive />;
   const getArchiveButton = () => {
     return {
-      icon: () => <Archive />,
+      icon: ArchiveIconComponent,
       tooltip: 'Archive',
       onClick: (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -133,9 +135,10 @@ export function TemplatesTable(props: TemplatesTableProps) {
     };
   };
 
+  const DeleteIconComponent = () => <Delete />;
   const getDeleteButton = () => {
     return {
-      icon: () => <Delete />,
+      icon: DeleteIconComponent,
       tooltip: 'Delete',
       onClick: (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -191,6 +194,8 @@ export function TemplatesTable(props: TemplatesTableProps) {
   };
 
   const customActions = props.actions || [];
+  const EditIconComponent = () => <Edit />;
+  const FileCopyIconComponent = () => <FileCopy />;
 
   return (
     <>
@@ -217,14 +222,14 @@ export function TemplatesTable(props: TemplatesTableProps) {
         data={templates}
         actions={[
           {
-            icon: () => <Edit />,
+            icon: EditIconComponent,
             tooltip: 'Edit',
             onClick: (event, data) => {
               editTemplate((data as TemplateRowDataType).templateId);
             },
           },
           {
-            icon: () => <FileCopy />,
+            icon: FileCopyIconComponent,
             hidden: false,
             tooltip: 'Clone',
             onClick: (event, data) => {

@@ -14,7 +14,8 @@ import {
   SepAssignment,
   ReviewStatus,
   UserRole,
-  SepProposal,
+  ReviewWithNextProposalStatus,
+  ProposalStatus,
 } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import {
@@ -235,8 +236,18 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     const newProposalsData =
       sepProposalData?.map((sepProposalsData) => {
         if (sepProposalsData.proposalId === editingProposalData.proposalId) {
+          const editingProposalStatus = (currentAssignment.review as ReviewWithNextProposalStatus)
+            .nextProposalStatus
+            ? ((currentAssignment.review as ReviewWithNextProposalStatus)
+                .nextProposalStatus as ProposalStatus)
+            : editingProposalData.proposal.status;
+
           return {
             ...editingProposalData,
+            proposal: {
+              ...editingProposalData.proposal,
+              status: editingProposalStatus,
+            },
             assignments:
               editingProposalData.assignments?.map((proposalAssignment) => {
                 if (
