@@ -53,4 +53,8 @@ export interface ProposalSettingsDataSource {
   getNextStatusEventsByConnectionId(
     proposalWorkflowConnectionId: number
   ): Promise<NextStatusEvent[]>;
+  getProposalNextStatus(
+    proposalId: number,
+    event: Event
+  ): Promise<ProposalStatus | null>;
 }

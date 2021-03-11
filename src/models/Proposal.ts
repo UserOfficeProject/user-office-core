@@ -51,8 +51,8 @@ export class Proposal {
 export class ProposalIdsWithNextStatus {
   constructor(
     public proposalIds: number[],
-    public proposalNextStatusId?: number,
-    public proposalNextStatusShortCode?: string,
-    public proposalNextStatusName?: string
+    public id?: number,
+    public shortCode?: string,
+    public name?: string
   ) {}
 }

@@ -3,6 +3,8 @@ import { randomBytes } from 'crypto';
 
 import * as Yup from 'yup';
 
+import { Review, ReviewStatus } from '../models/Review';
+
 interface Omit {
   <T extends object, K extends [...(keyof T)[]]>(obj: T, ...keys: K): {
     [K2 in Exclude<keyof T, K[number]>]: T[K2];
@@ -38,4 +40,15 @@ export const generateUniqueId = () => {
   const numberOfBytes = 16;
 
   return randomBytes(numberOfBytes).toString('hex');
+};
+
+export const checkAllReviewsSubmittedOnProposal = (
+  allReviews: Review[],
+  currentSubmittedReview: Review
+) => {
+  const allOtherReviewsSubmitted = allReviews
+    .filter((review) => review.id !== currentSubmittedReview.id)
+    .every((review) => review.status === ReviewStatus.SUBMITTED);
+
+  return allOtherReviewsSubmitted;
 };

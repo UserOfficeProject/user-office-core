@@ -12,6 +12,7 @@ import {
 } from '@esss-swap/duo-validation';
 
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
@@ -39,7 +40,8 @@ export default class SEPMutations {
     private dataSource: SEPDataSource,
     private instrumentDataSource: InstrumentDataSource,
     private userAuth: UserAuthorization,
-    private userDataSource: UserDataSource
+    private userDataSource: UserDataSource,
+    private proposalSettingsDataSource: ProposalSettingsDataSource
   ) {}
 
   @ValidateArgs(createSEPValidationSchema)
@@ -224,7 +226,7 @@ export default class SEPMutations {
     return this.dataSource
       .assignProposal(args.proposalId, args.sepId)
       .then(async (result) => {
-        const nextProposalStatus = await this.dataSource.getProposalNextStatus(
+        const nextProposalStatus = await this.proposalSettingsDataSource.getProposalNextStatus(
           args.proposalId,
           Event.PROPOSAL_SEP_SELECTED
         );

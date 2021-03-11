@@ -1,6 +1,4 @@
-import { Event } from '../events/event.enum';
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
-import { ProposalStatus } from '../models/ProposalStatus';
 import { Role } from '../models/Role';
 import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../models/SEP';
 import {
@@ -64,10 +62,6 @@ export interface SEPDataSource {
     proposalId: number,
     sepId: number
   ): Promise<ProposalIdsWithNextStatus>;
-  getProposalNextStatus(
-    proposalId: number,
-    event: Event
-  ): Promise<ProposalStatus | null>;
   removeMemberFromSepProposal(
     proposalId: number,
     sepId: number,

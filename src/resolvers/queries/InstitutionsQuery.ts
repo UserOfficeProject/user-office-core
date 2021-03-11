@@ -1,4 +1,4 @@
-import { Query, Arg, Ctx, Resolver, Int, InputType, Field } from 'type-graphql';
+import { Query, Arg, Ctx, Resolver, InputType, Field } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { Institution } from '../types/Institution';

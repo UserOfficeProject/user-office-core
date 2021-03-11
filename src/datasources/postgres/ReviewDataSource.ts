@@ -3,6 +3,7 @@ import { TechnicalReview } from '../../models/TechnicalReview';
 import { AddReviewArgs } from '../../resolvers/mutations/AddReviewMutation';
 import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReviewMutation';
+import { SubmitTechnicalReviewInput } from '../../resolvers/mutations/SubmitTechnicalReviewMutation';
 import { ReviewDataSource } from '../ReviewDataSource';
 import database from './database';
 import { ReviewRecord, TechnicalReviewRecord } from './records';
@@ -33,33 +34,34 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   }
 
   async setTechnicalReview(
-    args: AddTechnicalReviewInput,
-    submitted: boolean = false
+    args: AddTechnicalReviewInput | SubmitTechnicalReviewInput,
+    shouldUpdateReview: boolean
   ): Promise<TechnicalReview> {
-    const { proposalID, comment, publicComment, timeAllocation, status } = args;
+    const {
+      proposalID,
+      comment,
+      publicComment,
+      timeAllocation,
+      status,
+      submitted = false,
+    } = args;
 
-    const technicalReview = await this.getTechnicalReview(proposalID);
-
-    if (technicalReview) {
-      if (!technicalReview.submitted) {
-        return database
-          .update({
-            proposal_id: proposalID,
-            comment,
-            public_comment: publicComment,
-            time_allocation: timeAllocation,
-            status,
-            submitted,
-          })
-          .from('technical_review')
-          .where('proposal_id', proposalID)
-          .returning('*')
-          .then((records: TechnicalReviewRecord[]) =>
-            this.createTechnicalReviewObject(records[0])
-          );
-      } else {
-        throw new Error('Technical review already submitted');
-      }
+    if (shouldUpdateReview) {
+      return database
+        .update({
+          proposal_id: proposalID,
+          comment,
+          public_comment: publicComment,
+          time_allocation: timeAllocation,
+          status,
+          submitted,
+        })
+        .from('technical_review')
+        .where('proposal_id', proposalID)
+        .returning('*')
+        .then((records: TechnicalReviewRecord[]) =>
+          this.createTechnicalReviewObject(records[0])
+        );
     }
 
     return database
@@ -187,6 +189,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .select()
       .from('SEP_Reviews')
       .modify((qb) => {
+        // sometimes the ID 0 is sent as a equivalent of all
         if (callId) {
           qb.join('proposals', {
             'proposals.proposal_id': 'SEP_Reviews.proposal_id',
@@ -194,6 +197,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           qb.where('proposals.call_id', callId);
         }
 
+        // sometimes the ID 0 is sent as a equivalent of all
         if (instrumentId) {
           qb.join('instrument_has_proposals', {
             'instrument_has_proposals.proposal_id': 'SEP_Reviews.proposal_id',
@@ -201,7 +205,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           qb.where('instrument_has_proposals.instrument_id', instrumentId);
         }
 
-        if (status) {
+        if (status !== undefined && status !== null) {
           qb.where('SEP_Reviews.status', status);
         }
       })

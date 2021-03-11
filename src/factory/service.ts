@@ -2,7 +2,7 @@ import querystring from 'querystring';
 
 import { logger } from '@esss-swap/duo-logger';
 import contentDisposition from 'content-disposition';
-import { Response, NextFunction } from 'express';
+import { NextFunction, Response } from 'express';
 import request from 'request';
 
 import { bufferRequestBody } from './util';
@@ -20,6 +20,7 @@ export enum XLSXType {
 export enum PDFType {
   PROPOSAL = 'proposal',
   SAMPLE = 'sample',
+  SHIPMENT_LABEL = 'shipment-label',
 }
 
 export type MetaBase = { collectionFilename: string; singleFilename: string };

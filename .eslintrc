@@ -8,11 +8,13 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
     "plugin:jest/recommended"
+    
   ],
   "plugins": [
     "@typescript-eslint", // Let's us override rules below.
     "jest",
-    "import"
+    "import",
+    "unused-imports"
   ],
   "rules": {
     "semi": ["error", "always"],
@@ -68,6 +70,7 @@
     "padding-line-between-statements": [
       "error",
       { "blankLine": "always", "prev": "*", "next": "return" }
-    ]
+    ],
+    "unused-imports/no-unused-imports-ts": 2
   }
 }

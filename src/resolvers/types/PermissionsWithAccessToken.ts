@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int } from 'type-graphql';
+import { ObjectType, Field } from 'type-graphql';
 
 import { Permissions } from '../../models/Permissions';
 

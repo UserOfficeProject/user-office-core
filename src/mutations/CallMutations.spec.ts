@@ -33,14 +33,12 @@ describe('Test Call Mutations', () => {
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
 
-  describe('Test Call Mutations', () => {
-    test('A user can not delete a call', () => {
-      return expect(
-        callMutations.delete(dummyUserWithRole, {
-          callId: dummyCall.id,
-        })
-      ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
-    });
+  test('A user can not delete a call', () => {
+    return expect(
+      callMutations.delete(dummyUserWithRole, {
+        callId: dummyCall.id,
+      })
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
 
   test('A not logged in user can not create a call', () => {
@@ -62,6 +60,29 @@ describe('Test Call Mutations', () => {
         proposalWorkflowId: 1,
       })
     ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
+  });
+
+  test('A logged in user officer can not create a call with invalid dates', () => {
+    const callToCreate = {
+      shortCode: '2019-02-19',
+      startCall: new Date('2019-02-19'),
+      endCall: new Date('2019-02-18'),
+      startReview: new Date('2019-02-19'),
+      endReview: new Date('2019-02-18'),
+      startSEPReview: new Date('2019-02-19'),
+      endSEPReview: new Date('2019-02-19'),
+      startNotify: new Date('2019-02-19'),
+      endNotify: new Date('2019-02-19'),
+      startCycle: new Date('2019-02-19'),
+      endCycle: new Date('2019-02-19'),
+      cycleComment: 'Comment review',
+      surveyComment: 'Comment feedback',
+      proposalWorkflowId: 1,
+    };
+
+    return expect(
+      callMutations.create(dummyUserOfficerWithRole, callToCreate)
+    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
   });
 
   test('A logged in user officer can create a call', () => {

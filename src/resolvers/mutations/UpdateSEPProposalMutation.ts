@@ -4,7 +4,6 @@ import {
   Ctx,
   Int,
   Field,
-  ObjectType,
   Args,
   ArgsType,
 } from 'type-graphql';

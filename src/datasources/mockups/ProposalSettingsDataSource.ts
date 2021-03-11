@@ -182,4 +182,17 @@ export class ProposalSettingsDataSourceMock
   ): Promise<NextStatusEvent[]> {
     return [dummyNextStatusEvent];
   }
+
+  async getProposalNextStatus(
+    proposalId: number,
+    event: Event
+  ): Promise<ProposalStatus | null> {
+    return new ProposalStatus(
+      5,
+      'SEP_REVIEW',
+      'SEP Review',
+      'Sep review status description',
+      true
+    );
+  }
 }
