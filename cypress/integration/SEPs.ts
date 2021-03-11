@@ -528,6 +528,13 @@ context(
       cy.contains('SEP_REVIEW').click();
 
       cy.get('[type="submit"]').click();
+
+      cy.get('[role="dialog"]').contains('Technical').click();
+      cy.get('[data-cy="timeAllocation"]').type('51');
+      cy.get('[data-cy="technical-review-status"]').click();
+      cy.contains('Feasible').click();
+
+      cy.get('[data-cy=update-technical-review] > .MuiButton-label').click();
       // <------------------------------------------
 
       cy.closeModal();
@@ -975,6 +982,11 @@ context(
 
       cy.get("[title='Assign proposals to instrument']").first().click();
 
+      cy.get("[id='mui-component-select-selectedInstrumentId']").should(
+        'not.have.class',
+        'Mui-disabled'
+      );
+
       cy.get("[id='mui-component-select-selectedInstrumentId']")
         .first()
         .click();
@@ -985,7 +997,7 @@ context(
 
       cy.get('[title="View proposal"]').first().click();
 
-      cy.contains('Admin').click();
+      cy.get('[role="dialog"]').contains('Admin').click();
 
       cy.get('#mui-component-select-proposalStatus').click();
 
@@ -993,13 +1005,13 @@ context(
 
       cy.get('[type="submit"]').click();
 
-      cy.contains('Technical').click();
+      cy.get('[role="dialog"]').contains('Technical').click();
       cy.get('[data-cy="timeAllocation"]').type('51');
       cy.get('[data-cy="technical-review-status"]').click();
       cy.contains('Feasible').click();
 
-      cy.contains('Update').click();
-
+      cy.get('[data-cy=update-technical-review] > .MuiButton-label').click();
+      cy.closeModal();
       // <------------------------------------------
 
       cy.contains('Calls').click();
@@ -1060,22 +1072,6 @@ context(
 
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
       cy.login('officer');
-
-      cy.get('[data-cy="view-proposal"]').first().click();
-
-      cy.get('[role="dialog"]').contains('Technical').click();
-      cy.get('[data-cy="timeAllocation"]').type('51');
-      cy.get('[data-cy="technical-review-status"]').click();
-      cy.contains('Feasible').click();
-
-      cy.contains('Update').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Technical review updated successfully',
-      });
-
-      cy.closeModal();
 
       cy.contains('SEPs').click();
 
