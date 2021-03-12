@@ -8,6 +8,7 @@ import React, { useState, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
+import ProposalReview from 'components/review/ProposalReviewReviewer';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import { SepAssignment, ReviewStatus, UserRole } from 'generated/sdk';
 import { SEPProposalType } from 'hooks/SEP/useSEPProposalsData';
@@ -77,17 +78,17 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
 
   return (
     <div className={classes.root} data-cy="sep-reviewer-assignments-table">
-      {editReviewID && (
-        <ProposalReviewModal
-          editReviewID={editReviewID}
-          sepId={sepProposal.sepId}
-          reviewModalOpen={reviewModalOpen}
-          setReviewModalOpen={() => {
-            setReviewModalOpen(false);
-            currentAssignment && updateView(currentAssignment);
-          }}
-        />
-      )}
+      <ProposalReviewModal
+        title="Review"
+        proposalReviewModalOpen={reviewModalOpen}
+        setProposalReviewModalOpen={() => {
+          setReviewModalOpen(false);
+          currentAssignment && updateView(currentAssignment);
+        }}
+      >
+        <ProposalReview reviewId={editReviewID} sepId={sepProposal.sepId} />
+      </ProposalReviewModal>
+
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}

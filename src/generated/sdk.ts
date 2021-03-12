@@ -1839,7 +1839,8 @@ export enum QuestionFilterCompareOperator {
   GREATER_THAN = 'GREATER_THAN',
   LESS_THAN = 'LESS_THAN',
   EQUALS = 'EQUALS',
-  INCLUDES = 'INCLUDES'
+  INCLUDES = 'INCLUDES',
+  EXISTS = 'EXISTS'
 }
 
 export type QuestionFilterInput = {

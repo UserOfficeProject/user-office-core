@@ -22,6 +22,7 @@ import { useUserWithReviewsData } from 'hooks/user/useUserData';
 import { tableIcons } from 'utils/materialIcons';
 
 import ProposalReviewModal from './ProposalReviewModal';
+import ProposalReview from './ProposalReviewReviewer';
 import ReviewStatusFilter, {
   defaultReviewStatusQueryFilter,
 } from './ReviewStatusFilter';
@@ -45,8 +46,6 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
 
 const ProposalTableReviewer: React.FC = () => {
   const downloadPDFProposal = useDownloadPDFProposal();
-  const [editReviewID, setEditReviewID] = useState(0);
-  const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const { currentAssignment } = useContext(ReviewAndAssignmentContext);
   const { calls, loadingCalls } = useCallsData();
   const { instruments, loadingInstruments } = useInstrumentsData();
@@ -54,6 +53,7 @@ const ProposalTableReviewer: React.FC = () => {
     call: NumberParam,
     instrument: NumberParam,
     reviewStatus: defaultReviewStatusQueryFilter,
+    reviewModal: NumberParam,
   });
 
   const [selectedCallId, setSelectedCallId] = useState<number>(
@@ -91,14 +91,13 @@ const ProposalTableReviewer: React.FC = () => {
       <Tooltip title="Review proposal">
         <IconButton
           onClick={() => {
-            setEditReviewID(rowData.reviewId);
-            setReviewModalOpen(true);
+            setUrlQueryParams({ reviewModal: rowData.reviewId });
           }}
         >
           {rowData.status === 'SUBMITTED' ? <Visibility /> : <RateReviewIcon />}
         </IconButton>
       </Tooltip>
-      <Tooltip title="Download review">
+      <Tooltip title="Download Proposal">
         <IconButton
           onClick={() =>
             downloadPDFProposal([rowData.proposalId], rowData.title)
@@ -188,13 +187,15 @@ const ProposalTableReviewer: React.FC = () => {
         }}
       />
       <ProposalReviewModal
-        editReviewID={editReviewID}
-        reviewModalOpen={reviewModalOpen}
-        setReviewModalOpen={() => {
-          setReviewModalOpen(false);
+        title="Review"
+        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
+        setProposalReviewModalOpen={() => {
+          setUrlQueryParams({ reviewModal: undefined });
           updateView();
         }}
-      />
+      >
+        <ProposalReview reviewId={urlQueryParams.reviewModal} />
+      </ProposalReviewModal>
       <MaterialTable
         icons={tableIcons}
         title={'Proposals to review'}

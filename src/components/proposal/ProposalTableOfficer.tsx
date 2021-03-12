@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
@@ -13,19 +14,20 @@ import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
-import { Link } from 'react-router-dom';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
 import ScienceIconAdd from 'components/common/icons/ScienceIconAdd';
 import ScienceIconRemove from 'components/common/icons/ScienceIconRemove';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
+import ProposalReviewModal from 'components/review/ProposalReviewModal';
+import ProposalReview from 'components/review/ProposalReviewUserOfficer';
 import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
 import {
   Call,
   Instrument,
+  Proposal,
   ProposalsFilter,
   ProposalsToInstrumentArgs,
-  Review,
   Sep,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -35,9 +37,11 @@ import {
   ProposalViewData,
   useProposalsCoreData,
 } from 'hooks/proposal/useProposalsCoreData';
-import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
+import {
+  fromProposalToProposalView,
+  setSortDirectionOnSortColumn,
+} from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
-import { average, getGrades, standardDeviation } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -179,14 +183,15 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     return (
       <>
         <Tooltip title="View proposal">
-          <Link
-            to={`/ProposalReviewUserOfficer/${rowData.id}`}
-            style={{ color: 'inherit', textDecoration: 'inherit' }}
+          <IconButton
+            data-cy="view-proposal"
+            onClick={() => {
+              setUrlQueryParams({ reviewModal: rowData.id });
+            }}
+            style={iconButtonStyle}
           >
-            <IconButton data-cy="view-proposal" style={iconButtonStyle}>
-              <Visibility />
-            </IconButton>
-          </Link>
+            <Visibility />
+          </IconButton>
         </Tooltip>
         <Tooltip title="Clone proposal">
           <IconButton
@@ -471,31 +476,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     const resultProposal = result.cloneProposal.proposal;
 
     if (!result.cloneProposal.error && proposalsData && resultProposal) {
-      const newClonedProposal: ProposalViewData = {
-        id: resultProposal.id,
-        title: resultProposal.title,
-        status: resultProposal.status?.name || '',
-        statusId: resultProposal.status?.id || 1,
-        statusName: resultProposal.status?.name || '',
-        statusDescription: resultProposal.status?.description || '',
-        submitted: resultProposal.submitted,
-        shortCode: resultProposal.shortCode,
-        rankOrder: resultProposal.rankOrder,
-        finalStatus: resultProposal.finalStatus,
-        timeAllocation: resultProposal.technicalReview?.timeAllocation || null,
-        technicalStatus: resultProposal.technicalReview?.status || '',
-        instrumentName: resultProposal.instrument?.name || null,
-        instrumentId: resultProposal.instrument?.id || null,
-        reviewAverage:
-          average(getGrades(resultProposal.reviews as Review[])) || null,
-        reviewDeviation:
-          standardDeviation(getGrades(resultProposal.reviews as Review[])) ||
-          null,
-        sepCode: '',
-        callShortCode: resultProposal.call?.shortCode || null,
-        notified: resultProposal.notified,
-        callId: resultProposal.callId,
-      };
+      const newClonedProposal = fromProposalToProposalView(
+        resultProposal as Proposal
+      );
 
       const newProposalsData = [newClonedProposal, ...proposalsData];
 
@@ -519,6 +502,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     columns,
     urlQueryParams.sortColumn,
     urlQueryParams.sortDirection
+  );
+
+  const proposalToReview = proposalsData.find(
+    (proposal) => proposal.id === urlQueryParams.reviewModal
   );
 
   return (
@@ -565,6 +552,25 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           />
         </DialogContent>
       </Dialog>
+      <ProposalReviewModal
+        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.shortCode})`}
+        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
+        setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
+          setProposalsData(
+            proposalsData.map((proposal) => {
+              if (proposal.id === updatedProposal?.id) {
+                return fromProposalToProposalView(updatedProposal);
+              } else {
+                return proposal;
+              }
+            })
+          );
+          setUrlQueryParams({ reviewModal: undefined });
+        }}
+        reviewItemId={proposalToReview?.id}
+      >
+        <ProposalReview proposalId={proposalToReview?.id as number} />
+      </ProposalReviewModal>
       <MaterialTable
         icons={tableIcons}
         title={'Proposals'}
@@ -618,7 +624,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           {
             icon: DeleteIcon,
             tooltip: 'Delete proposals',
-            onClick: (event, rowData): void => {
+            onClick: () => {
               confirm(
                 () => {
                   deleteProposals();
@@ -635,7 +641,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           {
             icon: GroupWorkIcon,
             tooltip: 'Assign proposals to SEP',
-            onClick: (event, rowData): void => {
+            onClick: () => {
               setOpenAssignment(true);
             },
             position: 'toolbarOnSelect',
@@ -645,7 +651,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               'data-cy': 'assign-proposals-to-instrument',
             }),
             tooltip: 'Assign proposals to instrument',
-            onClick: (event, rowData): void => {
+            onClick: () => {
               setOpenInstrumentAssignment(true);
             },
             position: 'toolbarOnSelect',
@@ -653,7 +659,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           {
             icon: EmailIcon,
             tooltip: 'Notify users final result',
-            onClick: (event, rowData): void => {
+            onClick: () => {
               confirm(
                 () => {
                   emailProposals();

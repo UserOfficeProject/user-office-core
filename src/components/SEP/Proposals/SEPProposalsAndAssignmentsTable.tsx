@@ -2,6 +2,8 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import Grid from '@material-ui/core/Grid';
 import AssignmentInd from '@material-ui/icons/AssignmentInd';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import Visibility from '@material-ui/icons/Visibility';
 import dateformat from 'dateformat';
 import MaterialTable, { Options } from 'material-table';
 import PropTypes from 'prop-types';
@@ -15,6 +17,7 @@ import {
   ReviewWithNextProposalStatus,
   ProposalStatus,
 } from 'generated/sdk';
+import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import {
   useSEPProposalsData,
   SEPProposalType,
@@ -24,6 +27,7 @@ import { tableIcons } from 'utils/materialIcons';
 import { average } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import SEPProposalViewModal from '../MeetingComponents/ProposalViewModal/SEPProposalViewModal';
 import AssignSEPMemberToProposal, {
   SepAssignedMember,
 } from './AssignSEPMemberToProposal';
@@ -50,6 +54,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   } = useSEPProposalsData(sepId, selectedCallId);
   const { api } = useDataApiWithFeedback();
   const [proposalId, setProposalId] = useState<null | number>(null);
+  const [openProposalId, setOpenProposalId] = useState<number | null>(null);
+  const downloadPDFProposal = useDownloadPDFProposal();
+
   const hasRightToAssignReviewers = useCheckAccess([
     UserRole.USER_OFFICER,
     UserRole.SEP_CHAIR,
@@ -214,6 +221,8 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
 
   const initialValues: SEPProposalType[] = SEPProposalsData;
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
+  const ViewIcon = (): JSX.Element => <Visibility />;
+  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
 
   const proposalAssignments = initialValues.find(
     (assignment) => assignment.proposalId === proposalId
@@ -277,6 +286,13 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
 
   return (
     <React.Fragment>
+      <SEPProposalViewModal
+        proposalViewModalOpen={!!openProposalId}
+        setProposalViewModalOpen={() => {
+          setOpenProposalId(null);
+        }}
+        proposalId={openProposalId || 0}
+      />
       <Dialog
         maxWidth="sm"
         fullWidth
@@ -308,6 +324,11 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
             title={'SEP Proposals'}
             data={initialValues}
             isLoading={loadingSEPProposals}
+            localization={{
+              toolbar: {
+                nRowsSelected: '{0} proposal(s) selected',
+              },
+            }}
             detailPanel={[
               {
                 tooltip: 'Show Reviewers',
@@ -322,6 +343,21 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
                       onClick: () => setProposalId(rowData.proposalId),
                       tooltip: 'Assign SEP Member',
                     }),
+                    (rowData) => ({
+                      icon: ViewIcon,
+                      onClick: () => setOpenProposalId(rowData.proposalId),
+                      tooltip: ' View Proposal',
+                    }),
+                    {
+                      icon: GetAppIconComponent,
+                      tooltip: 'Download proposal',
+                      onClick: (rowData) => {
+                        downloadPDFProposal(
+                          [rowData.proposalId],
+                          rowData.title
+                        );
+                      },
+                    },
                   ]
                 : []
             }

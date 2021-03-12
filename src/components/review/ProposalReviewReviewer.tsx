@@ -12,13 +12,18 @@ import ProposalGrade from './ProposalGrade';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
 
 type ProposalReviewProps = {
-  reviewId?: number;
+  reviewId?: number | null;
   sepId?: number | null;
+  isInsideModal?: boolean;
 };
 
-const ProposalReview: React.FC<ProposalReviewProps> = ({ reviewId, sepId }) => {
+const ProposalReview: React.FC<ProposalReviewProps> = ({
+  reviewId,
+  sepId,
+  isInsideModal,
+}) => {
   const { id } = useParams<{ id: string }>();
-  const { reviewData } = useReviewData(reviewId || +id, sepId);
+  const { reviewData, setReviewData } = useReviewData(reviewId || +id, sepId);
   const { proposalData } = useProposalData(reviewData?.proposal?.id);
 
   if (!reviewData || !proposalData) {
@@ -28,12 +33,14 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ reviewId, sepId }) => {
   return (
     <SimpleTabs
       tabNames={['Proposal Information', 'Technical Review', 'Grade']}
+      isInsideModal={isInsideModal}
     >
       <ProposalQuestionaryReview data={proposalData} />
       <TechnicalReviewInformation data={proposalData.technicalReview} />
       <ProposalGrade
         onChange={() => {}}
-        reviewID={reviewId || +id}
+        review={reviewData}
+        setReview={setReviewData}
         sepId={sepId}
       />
     </SimpleTabs>

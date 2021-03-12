@@ -60,6 +60,26 @@ declare global {
       }) => void;
 
       /**
+       * Closes notification.
+       *
+       * @returns {typeof notification}
+       * @memberof Chainable
+       * @example
+       *    cy.closeNotification()
+       */
+      closeNotification: () => void;
+
+      /**
+       * Closes modal.
+       *
+       * @returns {typeof closeModal}
+       * @memberof Chainable
+       * @example
+       *    cy.closeModal()
+       */
+      closeModal: () => void;
+
+      /**
        * Checks if the progressbar does not exist in the dom anymore.
        *
        * @returns {typeof finishedLoading}
@@ -227,6 +247,17 @@ declare global {
         option2: string,
         option3: string
       ) => void;
+
+      /**
+       * Creates FileUpload question.
+       * You have to be in edit template view to call this method
+       *
+       * @returns {typeof createFileUploadQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createFileUploadQuestion('Provide a file')
+       */
+      createFileUploadQuestion: (title: string) => void;
     }
   }
 

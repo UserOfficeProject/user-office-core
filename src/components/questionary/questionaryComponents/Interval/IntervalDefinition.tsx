@@ -24,7 +24,7 @@ export const intervalDefinition: QuestionaryComponentDefinition = {
       const isAnswered = answer.value.min || answer.value.min; // at least one answer
       if (isAnswered) {
         const min = answer.value.min;
-        const max = answer.value.min;
+        const max = answer.value.max;
         const unit = answer.value.unit || '';
 
         return (
