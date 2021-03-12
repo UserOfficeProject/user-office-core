@@ -1,34 +1,46 @@
+import { logger } from '@esss-swap/duo-logger';
 import {
   createSEPValidationSchema,
   updateSEPValidationSchema,
-  updateSEPMemberValidationSchema,
+  assignSEPMembersValidationSchema,
+  removeSEPMemberValidationSchema,
   assignProposalToSEPValidationSchema,
   assignSEPChairOrSecretaryValidationSchema,
   assignSEPMemberToProposalValidationSchema,
+  updateTimeAllocationValidationSchema,
 } from '@esss-swap/duo-validation';
 
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
+import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
-import { UserRole, UserWithRole } from '../models/User';
+import { UserWithRole, UserRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
-import { AddSEPMembersRoleArgs } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 import {
   UpdateMemberSEPArgs,
-  AssignSEPProposalToMemberArgs,
+  AssignSepReviewersToProposalArgs,
+  AssignReviewersToSEPArgs,
+  RemoveSepReviewerFromProposalArgs,
+  AssignChairOrSecretaryToSEPArgs,
 } from '../resolvers/mutations/AssignMembersToSEP';
 import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
-import { logger } from '../utils/Logger';
+import { UpdateSEPTimeAllocationArgs } from '../resolvers/mutations/UpdateSEPProposalMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class SEPMutations {
   constructor(
     private dataSource: SEPDataSource,
-    private userAuth: UserAuthorization
+    private instrumentDataSource: InstrumentDataSource,
+    private userAuth: UserAuthorization,
+    private userDataSource: UserDataSource,
+    private proposalSettingsDataSource: ProposalSettingsDataSource
   ) {}
 
   @ValidateArgs(createSEPValidationSchema)
@@ -45,8 +57,8 @@ export default class SEPMutations {
         args.numberRatingsRequired,
         args.active
       )
-      .then(sep => sep)
-      .catch(err => {
+      .then((sep) => sep)
+      .catch((err) => {
         logger.logException(
           'Could not create scientific evaluation panel',
           err,
@@ -72,8 +84,8 @@ export default class SEPMutations {
         args.numberRatingsRequired,
         args.active
       )
-      .then(sep => sep)
-      .catch(err => {
+      .then((sep) => sep)
+      .catch((err) => {
         logger.logException(
           'Could not update scientific evaluation panel',
           err,
@@ -89,12 +101,24 @@ export default class SEPMutations {
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignChairOrSecretaryToSEP(
     agent: UserWithRole | null,
-    args: AddSEPMembersRoleArgs
+    args: AssignChairOrSecretaryToSEPArgs
   ): Promise<SEP | Rejection> {
+    const userRoles = await this.userDataSource.getUserRoles(
+      args.assignChairOrSecretaryToSEPInput.userId
+    );
+
+    // only users with sep reviewer role can be chair or secretary
+    const isSepReviewer = userRoles.some(
+      (role) => role.shortCode === Roles.SEP_REVIEWER
+    );
+    if (!isSepReviewer) {
+      return rejection('NOT_ALLOWED');
+    }
+
     return this.dataSource
-      .addSEPMembersRole(args.addSEPMembersRole)
-      .then(result => result)
-      .catch(err => {
+      .assignChairOrSecretaryToSEP(args.assignChairOrSecretaryToSEPInput)
+      .then((result) => result)
+      .catch((err) => {
         logger.logException(
           'Could not assign chair and secretary to scientific evaluation panel',
           err,
@@ -105,47 +129,24 @@ export default class SEPMutations {
       });
   }
 
-  async isChairOrSecretaryOfSEP(
-    userId: number,
-    sepId: number
-  ): Promise<boolean> {
-    if (!userId || !sepId) {
-      return false;
-    }
-
-    return this.dataSource.getSEPUserRoles(userId, sepId).then(roles => {
-      return roles.some(
-        role =>
-          role.id === UserRole.SEP_CHAIR || role.id === UserRole.SEP_SECRETARY
-      );
-    });
-  }
-
-  @ValidateArgs(updateSEPMemberValidationSchema)
+  @ValidateArgs(assignSEPMembersValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
-  async assignMemberToSEP(
+  async assignReviewersToSEP(
     agent: UserWithRole | null,
-    args: UpdateMemberSEPArgs
+    args: AssignReviewersToSEPArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP(
-        (agent as UserWithRole).id,
-        args.sepId
-      ))
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, args.sepId))
     ) {
       return rejection('NOT_ALLOWED');
     }
 
     return this.dataSource
-      .addSEPMembersRole({
-        userID: args.memberId,
-        SEPID: args.sepId,
-        roleID: UserRole.SEP_REVIEWER,
-      })
-      .then(result => result)
-      .catch(err => {
+      .assignReviewersToSEP(args)
+      .then((result) => result)
+      .catch((err) => {
         logger.logException(
           'Could not assign member to scientific evaluation panel',
           err,
@@ -156,27 +157,40 @@ export default class SEPMutations {
       });
   }
 
-  @ValidateArgs(updateSEPMemberValidationSchema)
+  @ValidateArgs(removeSEPMemberValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBER_REMOVED)
   async removeMemberFromSEP(
     agent: UserWithRole | null,
     args: UpdateMemberSEPArgs
   ): Promise<SEP | Rejection> {
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP(
-        (agent as UserWithRole).id,
-        args.sepId
-      ))
-    ) {
+    const isChairOrSecretaryOfSEP = await this.userAuth.isChairOrSecretaryOfSEP(
+      agent!.id,
+      args.sepId
+    );
+    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+
+    if (!isUserOfficer && !isChairOrSecretaryOfSEP) {
       return rejection('NOT_ALLOWED');
     }
 
+    const isMemberChairOrSecretaryOfSEP = await this.userAuth.isChairOrSecretaryOfSEP(
+      args.memberId,
+      args.sepId
+    );
+
+    // SEP Chair and SEP Secretary can not
+    // modify SEP Chair and SEP Secretary members
+    if (isChairOrSecretaryOfSEP && !isUserOfficer) {
+      if (isMemberChairOrSecretaryOfSEP) {
+        return rejection('NOT_ALLOWED');
+      }
+    }
+
     return this.dataSource
-      .removeSEPMemberRole(args.memberId, args.sepId)
-      .then(result => result)
-      .catch(err => {
+      .removeMemberFromSEP(args, isMemberChairOrSecretaryOfSEP)
+      .then((result) => result)
+      .catch((err) => {
         logger.logException(
           'Could not remove member from scientific evaluation panel',
           err,
@@ -189,15 +203,27 @@ export default class SEPMutations {
 
   @ValidateArgs(assignProposalToSEPValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  @EventBus(Event.SEP_PROPOSAL_ASSIGNED)
+  @EventBus(Event.PROPOSAL_SEP_SELECTED)
   async assignProposalToSEP(
     agent: UserWithRole | null,
     args: AssignProposalToSEPArgs
-  ): Promise<SEP | Rejection> {
+  ): Promise<ProposalIdsWithNextStatus | Rejection> {
     return this.dataSource
       .assignProposal(args.proposalId, args.sepId)
-      .then(result => result)
-      .catch(err => {
+      .then(async (result) => {
+        const nextProposalStatus = await this.proposalSettingsDataSource.getProposalNextStatus(
+          args.proposalId,
+          Event.PROPOSAL_SEP_SELECTED
+        );
+
+        return new ProposalIdsWithNextStatus(
+          result.proposalIds,
+          nextProposalStatus?.id,
+          nextProposalStatus?.shortCode,
+          nextProposalStatus?.name
+        );
+      })
+      .catch((err) => {
         logger.logException(
           'Could not assign proposal to scientific evaluation panel',
           err,
@@ -217,10 +243,10 @@ export default class SEPMutations {
   ): Promise<SEP | Rejection> {
     return this.dataSource
       .removeProposalAssignment(args.proposalId, args.sepId)
-      .then(result => result)
-      .catch(err => {
+      .then((result) => result)
+      .catch((err) => {
         logger.logException(
-          'Could not assign proposal to scientific evaluation panel',
+          'Could not remove assigned proposal from scientific evaluation panel',
           err,
           { agent }
         );
@@ -229,27 +255,23 @@ export default class SEPMutations {
       });
   }
 
-  @ValidateArgs(assignSEPMemberToProposalValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBER_ASSIGNED_TO_PROPOSAL)
-  async assignMemberToSEPProposal(
+  async assignSepReviewersToProposal(
     agent: UserWithRole | null,
-    args: AssignSEPProposalToMemberArgs
+    args: AssignSepReviewersToProposalArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP(
-        (agent as UserWithRole).id,
-        args.sepId
-      ))
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, args.sepId))
     ) {
       return rejection('NOT_ALLOWED');
     }
 
     return this.dataSource
-      .assignMemberToSEPProposal(args.proposalId, args.sepId, args.memberId)
-      .then(result => result)
-      .catch(err => {
+      .assignMemberToSEPProposal(args.proposalId, args.sepId, args.memberIds)
+      .then((result) => result)
+      .catch((err) => {
         logger.logException(
           'Could not assign proposal to scientific evaluation panel',
           err,
@@ -265,11 +287,11 @@ export default class SEPMutations {
   @EventBus(Event.SEP_MEMBER_REMOVED_FROM_PROPOSAL)
   async removeMemberFromSepProposal(
     agent: UserWithRole | null,
-    args: AssignSEPProposalToMemberArgs
+    args: RemoveSepReviewerFromProposalArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP(
+      !(await this.userAuth.isChairOrSecretaryOfSEP(
         (agent as UserWithRole).id,
         args.sepId
       ))
@@ -279,11 +301,51 @@ export default class SEPMutations {
 
     return this.dataSource
       .removeMemberFromSepProposal(args.proposalId, args.sepId, args.memberId)
-      .then(result => result)
-      .catch(err => {
+      .then((result) => result)
+      .catch((err) => {
         logger.logException('Could not remove member from SEP proposal', err, {
           agent,
         });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @ValidateArgs(updateTimeAllocationValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
+  async updateTimeAllocation(
+    agent: UserWithRole | null,
+    { sepId, proposalId, sepTimeAllocation = null }: UpdateSEPTimeAllocationArgs
+  ) {
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    if (
+      !isUserOfficer &&
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId))
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    const isProposalInstrumentSubmitted = await this.instrumentDataSource.isProposalInstrumentSubmitted(
+      proposalId
+    );
+
+    if (isProposalInstrumentSubmitted && !isUserOfficer) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    return this.dataSource
+      .updateTimeAllocation(sepId, proposalId, sepTimeAllocation)
+      .catch((err) => {
+        logger.logException(
+          'Could not update SEP proposal time allocation',
+          err,
+          {
+            agent,
+            sepId,
+            proposalId,
+            sepTimeAllocation,
+          }
+        );
 
         return rejection('INTERNAL_ERROR');
       });

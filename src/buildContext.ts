@@ -5,22 +5,29 @@ import {
   callDataSource,
   eventLogsDataSource,
   fileDataSource,
+  instrumentDataSource,
   proposalDataSource,
+  proposalSettingsDataSource,
+  questionaryDataSource,
   reviewDataSource,
+  sampleDataSource,
   sepDataSource,
+  shipmentDataSource,
+  systemDataSource,
   templateDataSource,
   userDataSource,
-  instrumentDatasource,
-  questionaryDataSource,
 } from './datasources';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import FileMutations from './mutations/FileMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
 import ProposalMutations from './mutations/ProposalMutations';
+import ProposalSettingsMutations from './mutations/ProposalSettingsMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import ReviewMutations from './mutations/ReviewMutations';
+import SampleMutations from './mutations/SampleMutations';
 import SEPMutations from './mutations/SEPMutations';
+import ShipmentMutations from './mutations/ShipmentMutations';
 import TemplateMutations from './mutations/TemplateMutations';
 import UserMutations from './mutations/UserMutations';
 import AdminQueries from './queries/AdminQueries';
@@ -29,16 +36,32 @@ import EventLogQueries from './queries/EventLogQueries';
 import FileQueries from './queries/FileQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
 import ProposalQueries from './queries/ProposalQueries';
+import ProposalSettingsQueries from './queries/ProposalSettingsQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
+import SampleQueries from './queries/SampleQueries';
 import SEPQueries from './queries/SEPQueries';
+import ShipmentQueries from './queries/ShipmentQueries';
+import SystemQueries from './queries/SystemQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
-import { logger } from './utils/Logger';
 import { questionaryAuthorization } from './utils/QuestionaryAuthorization';
+import { SampleAuthorization } from './utils/SampleAuthorization';
+import { ShipmentAuthorization } from './utils/ShipmentAuthorization';
 import { userAuthorization } from './utils/UserAuthorization';
 
 // From this point nothing is site-specific
+
+const sampleAuthorization = new SampleAuthorization(
+  sampleDataSource,
+  proposalDataSource
+);
+
+const shipmentAuthorization = new ShipmentAuthorization(
+  shipmentDataSource,
+  proposalDataSource
+);
+
 const userQueries = new UserQueries(userDataSource);
 const userMutations = new UserMutations(userDataSource, userAuthorization);
 
@@ -51,14 +74,15 @@ const proposalMutations = new ProposalMutations(
   proposalDataSource,
   questionaryDataSource,
   callDataSource,
-  userAuthorization,
-  logger
+  instrumentDataSource,
+  userAuthorization
 );
 
 const reviewQueries = new ReviewQueries(reviewDataSource, userAuthorization);
 const reviewMutations = new ReviewMutations(
   reviewDataSource,
-  userAuthorization
+  userAuthorization,
+  proposalSettingsDataSource
 );
 
 const callQueries = new CallQueries(callDataSource);
@@ -75,22 +99,71 @@ const templateMutations = new TemplateMutations(templateDataSource);
 
 const eventLogQueries = new EventLogQueries(eventLogsDataSource);
 
-const sepQueries = new SEPQueries(sepDataSource);
-const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
+const sepQueries = new SEPQueries(sepDataSource, userAuthorization);
+const sepMutations = new SEPMutations(
+  sepDataSource,
+  instrumentDataSource,
+  userAuthorization,
+  userDataSource,
+  proposalSettingsDataSource
+);
 
-const instrumentQueries = new InstrumentQueries(instrumentDatasource);
-const instrumentMutations = new InstrumentMutations(instrumentDatasource);
+const systemQueries = new SystemQueries(systemDataSource);
+
+const instrumentQueries = new InstrumentQueries(
+  instrumentDataSource,
+  sepDataSource
+);
+const instrumentMutations = new InstrumentMutations(
+  instrumentDataSource,
+  sepDataSource,
+  userAuthorization
+);
 
 const questionaryQueries = new QuestionaryQueries(
   questionaryDataSource,
-  templateDataSource,
   questionaryAuthorization
 );
 const questionaryMutations = new QuestionaryMutations(
   questionaryDataSource,
   templateDataSource,
-  questionaryAuthorization,
-  logger
+  questionaryAuthorization
+);
+
+const sampleQueries = new SampleQueries(
+  sampleDataSource,
+  sampleAuthorization,
+  shipmentAuthorization
+);
+
+const sampleMutations = new SampleMutations(
+  sampleDataSource,
+  questionaryDataSource,
+  templateDataSource,
+  proposalDataSource,
+  sampleAuthorization
+);
+
+const proposalSettingsQueries = new ProposalSettingsQueries(
+  proposalSettingsDataSource
+);
+
+const proposalSettingsMutations = new ProposalSettingsMutations(
+  proposalSettingsDataSource
+);
+
+const shipmentQueries = new ShipmentQueries(
+  shipmentDataSource,
+  shipmentAuthorization
+);
+
+const shipmentMutations = new ShipmentMutations(
+  shipmentDataSource,
+  questionaryDataSource,
+  templateDataSource,
+  proposalDataSource,
+  sampleAuthorization,
+  shipmentAuthorization
 );
 
 const context: BasicResolverContext = {
@@ -107,6 +180,10 @@ const context: BasicResolverContext = {
     sep: sepQueries,
     instrument: instrumentQueries,
     questionary: questionaryQueries,
+    sample: sampleQueries,
+    proposalSettings: proposalSettingsQueries,
+    shipment: shipmentQueries,
+    system: systemQueries,
   },
   mutations: {
     user: userMutations,
@@ -119,6 +196,9 @@ const context: BasicResolverContext = {
     template: templateMutations,
     instrument: instrumentMutations,
     questionary: questionaryMutations,
+    sample: sampleMutations,
+    proposalSettings: proposalSettingsMutations,
+    shipment: shipmentMutations,
   },
 };
 

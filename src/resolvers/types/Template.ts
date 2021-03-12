@@ -1,18 +1,18 @@
 import {
-  Field,
-  ObjectType,
-  Int,
-  FieldResolver,
-  Root,
   Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  ObjectType,
   Resolver,
+  Root,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import {
   Template as TemplateOrigin,
   TemplateCategoryId,
-} from '../../models/ProposalModel';
+} from '../../models/Template';
 import { Question } from './Question';
 import { TemplateStep } from './TemplateStep';
 
@@ -34,7 +34,7 @@ export class Template implements Partial<TemplateOrigin> {
   public isArchived: boolean;
 }
 
-@Resolver(of => Template)
+@Resolver((of) => Template)
 export class TemplateResolver {
   @FieldResolver(() => [TemplateStep])
   async steps(
@@ -53,6 +53,17 @@ export class TemplateResolver {
     @Ctx() context: ResolverContext
   ): Promise<Question[] | null> {
     return context.queries.template.getComplementaryQuestions(
+      context.user,
+      template.templateId
+    );
+  }
+
+  @FieldResolver(() => Int)
+  async questionaryCount(
+    @Root() template: Template,
+    @Ctx() context: ResolverContext
+  ): Promise<number> {
+    return context.queries.questionary.getCount(
       context.user,
       template.templateId
     );

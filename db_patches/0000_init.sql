@@ -206,6 +206,58 @@ BEGIN
 
     INSERT INTO roles (short_code, title) VALUES ('reviewer', 'Reviewer');
 
+
+INSERT INTO users (
+                      user_id,
+                      user_title, 
+                      firstname, 
+                      middlename, 
+                      lastname, 
+                      username, 
+                      password,
+                      preferredname,
+                      orcid,
+                      orcid_refreshToken,
+                      gender,
+                      nationality,
+                      birthdate,
+                      organisation,
+                      department,
+                      organisation_address,
+                      position,
+                      email,
+                      email_verified,
+                      telephone,
+                      telephone_alt
+                      ) 
+    VALUES 
+                    (
+                      0,
+                      'Mr.', 
+                      'Service account',
+                      '', 
+                      '', 
+                      'service', 
+                      '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
+                      'Service account',
+                      '',
+                      '',
+                      'male',
+                      'Danish',
+                      '2000-04-02',
+                      '',
+                      '',
+                      '',
+                      '',
+                      'service@useroffice.ess.eu',
+                      true,
+                      '',
+                      ''
+                      );
+
+    INSERT INTO role_user (role_id, user_id) VALUES (2, 0);
+
+
     INSERT INTO users (
                       user_title, 
                       firstname, 
@@ -236,7 +288,7 @@ BEGIN
                       'Carlsson', 
                       'testuser', 
                       '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
-                      '123123123',
+                      'Carl',
                       '123123123',
                       '581459604',
                       'male',
@@ -256,26 +308,6 @@ BEGIN
 
 
 
-    INSERT INTO call(
-              call_short_code 
-            , start_call 
-            , end_call 
-            , start_review 
-            , end_review 
-            , start_notify
-            , end_notify
-            , cycle_comment 
-            , survey_comment )
-    VALUES(
-            'call 1', 
-            '2019-01-01', 
-            '2023-01-01',
-            '2019-01-01', 
-            '2023-01-01',
-            '2019-01-01', 
-            '2023-01-01', 
-            'This is cycle comment', 
-            'This is survey comment');
 
 
     INSERT INTO users (
@@ -307,7 +339,7 @@ BEGIN
                     'Andersson', 
                     'testofficer', 
                     '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
-                    'Rhiannon',
+                    'Alexander',
                     '878321897',
                     '123123123',
                     'male',
@@ -350,11 +382,11 @@ BEGIN
     VALUES (
                     'Mr.', 
                     'Nils', 
-                    'Adam',
+                    'Noah',
                     'Nilsson', 
                     'testreviewer', 
                     '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
-                    'Rhiannon',
+                    'Nicolas',
                     '878321897',
                     '123123123',
                     'male',
@@ -372,6 +404,124 @@ BEGIN
 
     INSERT INTO role_user (role_id, user_id) VALUES (3, 3);
 
+    INSERT INTO users (
+                      user_title, 
+                      firstname, 
+                      middlename, 
+                      lastname, 
+                      username, 
+                      password,
+                      preferredname,
+                      orcid,
+                      orcid_refreshToken,
+                      gender,
+                      nationality,
+                      birthdate,
+                      organisation,
+                      department,
+                      organisation_address,
+                      position,
+                      email,
+                      email_verified,
+                      telephone,
+                      telephone_alt
+                      ) 
+    VALUES 
+                    (
+                      'Mr.', 
+                      'Benjamin',
+                      'Bryson', 
+                      'Beckley', 
+                      'testuser2', 
+                      '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
+                      'Benjamin',
+                      '123123123',
+                      '581459604',
+                      'male',
+                      'Danish',
+                      '2000-04-02',
+                      'Roberts, Reilly and Gutkowski',
+                      'IT deparment',
+                      'Denmark, Carlton Road, 2100 Riverside Avenue',
+                      'Management',
+                      'ben@inbox.com',
+                      true,
+                      '(288) 221-4533',
+                      '(370) 555-4432'
+                      );
+
+    INSERT INTO role_user (role_id, user_id) VALUES (1, 4);
+
+    -- this user is used for testing manual email verification and to remove the placeholder flag
+    INSERT INTO users (
+                      user_title, 
+                      firstname, 
+                      middlename, 
+                      lastname, 
+                      username, 
+                      password,
+                      preferredname,
+                      orcid,
+                      orcid_refreshToken,
+                      gender,
+                      nationality,
+                      birthdate,
+                      organisation,
+                      department,
+                      organisation_address,
+                      position,
+                      email,
+                      email_verified,
+                      telephone,
+                      telephone_alt
+                      ) 
+    VALUES 
+                    (
+                      'Mr.', 
+                      'Unverified email',
+                      '', 
+                      'Placeholder', 
+                      'testuser3', 
+                      '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
+                      '',
+                      '123123123',
+                      '581459604',
+                      'male',
+                      'Danish',
+                      '2000-04-02',
+                      'Roberts, Reilly and Gutkowski',
+                      'IT deparment',
+                      'Denmark, Carlton Road, 2100 Riverside Avenue',
+                      'Management',
+                      'unverified-user@example.com',
+                      false,
+                      '(288) 221-4533',
+                      '(370) 555-4432'
+                      );
+
+    INSERT INTO role_user (role_id, user_id) VALUES (1, 5);
+
+
+    INSERT INTO call(
+              call_short_code 
+            , start_call 
+            , end_call 
+            , start_review 
+            , end_review 
+            , start_notify
+            , end_notify
+            , cycle_comment 
+            , survey_comment )
+    VALUES(
+            'call 1', 
+            '2019-01-01', 
+            '2023-01-01',
+            '2019-01-01', 
+            '2023-01-01',
+            '2019-01-01', 
+            '2023-01-01', 
+            'This is cycle comment', 
+            'This is survey comment');
 
     INSERT INTO proposal_question_datatypes VALUES ('TEXT_INPUT');
     INSERT INTO proposal_question_datatypes VALUES ('SELECTION_FROM_OPTIONS');

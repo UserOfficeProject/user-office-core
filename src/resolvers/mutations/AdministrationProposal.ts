@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalEndStatus, ProposalStatus } from '../../models/ProposalModel';
+import { ProposalEndStatus } from '../../models/Proposal';
 import { ProposalResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
@@ -27,8 +27,8 @@ export class AdministrationProposalArgs {
   @Field(() => ProposalEndStatus, { nullable: true })
   public finalStatus?: ProposalEndStatus;
 
-  @Field(() => ProposalStatus, { nullable: true })
-  public status?: ProposalStatus;
+  @Field(() => Int, { nullable: true })
+  public statusId?: number;
 
   @Field(() => Int, { nullable: true })
   public rankOrder?: number;

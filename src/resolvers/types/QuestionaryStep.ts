@@ -1,6 +1,6 @@
 import { ObjectType, Field } from 'type-graphql';
 
-import { QuestionaryStep as QuestionaryStepOrigin } from '../../models/ProposalModel';
+import { QuestionaryStep as QuestionaryStepOrigin } from '../../models/Questionary';
 import { Answer } from './Answer';
 import { Topic } from './Topic';
 
@@ -12,6 +12,6 @@ export class QuestionaryStep implements Partial<QuestionaryStepOrigin> {
   @Field()
   public isCompleted: boolean;
 
-  @Field(() => Answer)
+  @Field(() => [Answer])
   public fields: Answer[];
 }

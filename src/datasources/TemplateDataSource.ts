@@ -1,19 +1,19 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import {
   DataType,
   Question,
   QuestionTemplateRelation,
   Template,
   TemplateCategory,
+  TemplateCategoryId,
+  TemplatesHasQuestions,
   TemplateStep,
   Topic,
-  TemplateCategoryId,
-} from '../models/ProposalModel';
-import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/CreateQuestionTemplateRelationMutation';
+} from '../models/Template';
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
-import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
+import { SetActiveTemplateArgs } from '../resolvers/mutations/SetActiveTemplateMutation';
+import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
@@ -27,6 +27,7 @@ export interface TemplateDataSource {
   deleteTemplate(id: number): Promise<Template>;
   cloneTemplate(templateId: number): Promise<Template>;
   getTemplateSteps(templateId: number): Promise<TemplateStep[]>;
+  setActiveTemplate(args: SetActiveTemplateArgs): Promise<boolean>;
   // TemplateField
   createQuestion(
     categoryId: TemplateCategoryId,
@@ -51,16 +52,22 @@ export interface TemplateDataSource {
   getComplementaryQuestions(templateId: number): Promise<Question[] | null>;
 
   // TemplateField rel
-  createQuestionTemplateRelation(
-    args: CreateQuestionTemplateRelationArgs
-  ): Promise<Template>;
   getQuestionTemplateRelation(
     questionId: string,
     templateId: number
   ): Promise<QuestionTemplateRelation | null>;
+  getQuestionTemplateRelations(
+    templateId: number,
+    topicId: number,
+    questionToExcludeId?: string
+  ): Promise<TemplatesHasQuestions[] | null>;
 
-  updateQuestionTemplateRelation(
-    args: UpdateQuestionTemplateRelationArgs
+  upsertQuestionTemplateRelations(
+    collection: TemplatesHasQuestions[]
+  ): Promise<Template>;
+
+  updateQuestionTemplateRelationSettings(
+    args: UpdateQuestionTemplateRelationSettingsArgs
   ): Promise<Template>;
 
   deleteQuestionTemplateRelation(
@@ -68,14 +75,15 @@ export interface TemplateDataSource {
   ): Promise<Template>;
 
   // Topic
-  createTopic(args: CreateTopicArgs): Promise<Template>;
-  updateTopic(
-    topicId: number,
-    values: { title?: string; isEnabled?: boolean; sortOrder?: number }
-  ): Promise<Topic>;
+  getTopics(
+    templateId: number,
+    topicToExcludeId?: number
+  ): Promise<Topic[] | null>;
+  getActiveTemplateId(categoryId: TemplateCategoryId): Promise<number | null>;
+  upsertTopics(data: Topic[]): Promise<Template>;
+  createTopic(args: CreateTopicArgs): Promise<Topic>;
+  updateTopicTitle(topicId: number, title: string): Promise<Topic>;
   deleteTopic(id: number): Promise<Topic>;
-
-  updateTopicOrder(topicOrder: number[]): Promise<number[]>;
 
   isNaturalKeyPresent(naturalKey: string): Promise<boolean>;
 }

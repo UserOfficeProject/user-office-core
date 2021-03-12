@@ -9,7 +9,10 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { SEPResponseWrap } from '../types/CommonWrappers';
+import {
+  NextProposalStatusResponseWrap,
+  SEPResponseWrap,
+} from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
@@ -23,14 +26,14 @@ export class AssignProposalToSEPArgs {
 
 @Resolver()
 export class AssignProposalToSEPMutation {
-  @Mutation(() => SEPResponseWrap)
-  async assignProposal(
+  @Mutation(() => NextProposalStatusResponseWrap)
+  async assignProposalToSEP(
     @Args() args: AssignProposalToSEPArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
       context.mutations.sep.assignProposalToSEP(context.user, args),
-      SEPResponseWrap
+      NextProposalStatusResponseWrap
     );
   }
 

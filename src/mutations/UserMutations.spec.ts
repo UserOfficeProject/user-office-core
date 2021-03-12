@@ -1,6 +1,7 @@
 import jsonwebtoken from 'jsonwebtoken';
 
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   dummyPlaceHolderUser,
   dummyUser,
@@ -12,10 +13,13 @@ import {
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
-import { BasicUserDetails, UserRole } from '../models/User';
+import { AuthJwtPayload, BasicUserDetails, UserRole } from '../models/User';
 import { isRejection } from '../rejection';
+import { verifyToken } from '../utils/jwt';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import UserMutations from './UserMutations';
+
+jest.mock('../datasources/stfc/UOWSSoapInterface');
 
 const secret = process.env.secret as string;
 
@@ -40,7 +44,8 @@ const badToken = jsonwebtoken.sign(
 
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
-  new ReviewDataSourceMock()
+  new ReviewDataSourceMock(),
+  new SEPDataSourceMock()
 );
 const userMutations = new UserMutations(
   new UserDataSourceMock(),
@@ -107,7 +112,7 @@ test('A user officer can invite a reviewer by email', () => {
   const emailInviteResponse = new EmailInviteResponse(
     dummyPlaceHolderUser.id,
     dummyUserOfficer.id,
-    UserRole.REVIEWER
+    UserRole.SEP_REVIEWER
   );
 
   return expect(
@@ -115,7 +120,7 @@ test('A user officer can invite a reviewer by email', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: dummyPlaceHolderUser.email,
-      userRole: UserRole.REVIEWER,
+      userRole: UserRole.SEP_REVIEWER,
     })
   ).resolves.toStrictEqual(emailInviteResponse);
 });
@@ -126,7 +131,7 @@ test('A user cannot invite a reviewer by email', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: 'email@google.com',
-      userRole: UserRole.REVIEWER,
+      userRole: UserRole.SEP_REVIEWER,
     })
   ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
 });
@@ -134,7 +139,7 @@ test('A user cannot invite a reviewer by email', () => {
 test('A user can update its own name', () => {
   return expect(
     userMutations.update(dummyUserWithRole, {
-      id: 2,
+      ...dummyUser,
       firstname: 'klara',
       lastname: 'undefined',
     })
@@ -144,7 +149,7 @@ test('A user can update its own name', () => {
 test('A user cannot update another users name', () => {
   return expect(
     userMutations.update(dummyUserNotOnProposalWithRole, {
-      id: 2,
+      ...dummyUser,
       firstname: 'klara',
       lastname: 'undefined',
     })
@@ -154,7 +159,7 @@ test('A user cannot update another users name', () => {
 test('A not logged in user cannot update another users name', () => {
   return expect(
     userMutations.update(null, {
-      id: 2,
+      ...dummyUser,
       firstname: 'klara',
       lastname: 'undefined',
     })
@@ -164,7 +169,7 @@ test('A not logged in user cannot update another users name', () => {
 test('A userofficer can update another users name', () => {
   return expect(
     userMutations.update(dummyUserOfficerWithRole, {
-      id: 2,
+      ...dummyUser,
       firstname: 'klara',
       lastname: 'undefined',
     })
@@ -173,10 +178,8 @@ test('A userofficer can update another users name', () => {
 
 test('A user cannot update its roles', () => {
   return expect(
-    userMutations.update(dummyUserWithRole, {
+    userMutations.updateRoles(dummyUserWithRole, {
       id: 2,
-      firstname: 'klara',
-      lastname: 'undefined',
       roles: [1, 2],
     })
   ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
@@ -184,10 +187,8 @@ test('A user cannot update its roles', () => {
 
 test('A userofficer can update users roles', () => {
   return expect(
-    userMutations.update(dummyUserOfficerWithRole, {
+    userMutations.updateRoles(dummyUserOfficerWithRole, {
       id: 2,
-      firstname: 'klara',
-      lastname: 'undefined',
       roles: [1, 2],
     })
   ).resolves.toBe(dummyUser);
@@ -197,7 +198,7 @@ test('A user should be able to login with credentials and get a token', () => {
   return expect(
     userMutations
       .login(null, { email: dummyUser.email, password: 'Test1234!' })
-      .then(data => typeof data)
+      .then((data) => typeof data)
   ).resolves.toBe('string');
 });
 
@@ -225,7 +226,7 @@ test('A user should not be able to update a token if it is expired', () => {
 
 test('A user should be able to update a token if valid', () => {
   return expect(
-    userMutations.token(goodToken).then(data => typeof data)
+    userMutations.token(goodToken).then((data) => typeof data)
   ).resolves.toBe('string');
 });
 
@@ -259,7 +260,7 @@ test('A user can not update its password if it has a bad token', () => {
   ).resolves.toHaveProperty('reason');
 });
 
-test('A user can update its password ', () => {
+test('A user can update its password', () => {
   return expect(
     userMutations.updatePassword(dummyUserWithRole, {
       id: dummyUser.id,
@@ -268,7 +269,7 @@ test('A user can update its password ', () => {
   ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 
-test('A user can not update another users password ', () => {
+test('A user can not update another users password', () => {
   return expect(
     userMutations.updatePassword(dummyUserNotOnProposalWithRole, {
       id: dummyUser.id,
@@ -277,7 +278,7 @@ test('A user can not update another users password ', () => {
   ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });
 
-test('A not logged in users can not update passwords ', () => {
+test('A not logged in users can not update passwords', () => {
   return expect(
     userMutations.updatePassword(null, {
       id: dummyUser.id,
@@ -286,7 +287,7 @@ test('A not logged in users can not update passwords ', () => {
   ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
 });
 
-test('A user officer can update any password ', () => {
+test('A user officer can update any password', () => {
   return expect(
     userMutations.updatePassword(dummyUserOfficerWithRole, {
       id: dummyUser.id,
@@ -319,4 +320,19 @@ test('A user officer can must be able to delete another user', async () => {
   return expect(
     userMutations.delete(dummyUserOfficerWithRole, { id: dummyUser.id })
   ).resolves.toBe(dummyUser);
+});
+
+test('When an invalid external token is supplied, no user is found', async () => {
+  return expect(
+    userMutations.checkExternalToken('invalid')
+  ).resolves.toHaveProperty('reason', 'USER_DOES_NOT_EXIST');
+});
+
+test('When a valid external token is supplied, a new JWT is returned', async () => {
+  const result = await userMutations.checkExternalToken('valid');
+
+  expect(typeof result).toBe('string');
+
+  const decoded = verifyToken<AuthJwtPayload>(result as string);
+  expect(decoded.user.id).toBe(dummyUser.id);
 });

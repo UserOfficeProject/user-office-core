@@ -5,20 +5,28 @@ import { userAuthorization } from '../utils/UserAuthorization';
 
 const Authorized = (roles: Roles[] = []) => {
   return (
-    target: object,
+    target: any,
     name: string,
     descriptor: {
       value?: (
         agent: UserWithRole | null,
-        args: any
+        ...args: any[]
       ) => Promise<Rejection | any>;
     }
   ) => {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function(...args) {
+    descriptor.value = async function (...args) {
       const [agent] = args;
       const isMutation = target.constructor.name.includes('Mutation');
+
+      if (agent?.isApiAccessToken) {
+        if (agent?.accessPermissions?.[`${target.constructor.name}.${name}`]) {
+          return await originalMethod?.apply(this, args);
+        } else {
+          return isMutation ? rejection('INSUFFICIENT_PERMISSIONS') : null;
+        }
+      }
 
       if (!agent) {
         return isMutation ? rejection('NOT_LOGGED_IN') : null;
@@ -32,7 +40,7 @@ const Authorized = (roles: Roles[] = []) => {
         (await userAuthorization.hasRole(
           agent,
           agent.currentRole?.shortCode as string
-        )) && roles.some(role => role === agent.currentRole?.shortCode);
+        )) && roles.some((role) => role === agent.currentRole?.shortCode);
 
       if (hasAccessRights) {
         return await originalMethod?.apply(this, args);

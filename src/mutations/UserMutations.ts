@@ -1,8 +1,10 @@
+import { logger } from '@esss-swap/duo-logger';
 import {
   deleteUserValidationSchema,
   createUserByEmailInviteValidationSchema,
   createUserValidationSchema,
   updateUserValidationSchema,
+  updateUserRolesValidationSchema,
   signInValidationSchema,
   getTokenForUserValidationSchema,
   resetPasswordByEmailValidationSchema,
@@ -10,24 +12,33 @@ import {
   updatePasswordValidationSchema,
   userPasswordFieldBEValidationSchema,
 } from '@esss-swap/duo-validation';
-import { to } from 'await-to-js';
 import * as bcrypt from 'bcryptjs';
-import jsonwebtoken from 'jsonwebtoken';
 
+import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { Roles, Role } from '../models/Role';
-import { User, BasicUserDetails, UserWithRole } from '../models/User';
+import {
+  User,
+  BasicUserDetails,
+  UserWithRole,
+  EmailVerificationJwtPayload,
+  AuthJwtPayload,
+  PasswordResetJwtPayload,
+} from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
 import { isRejection, rejection, Rejection } from '../rejection';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
-import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
-import { logger } from '../utils/Logger';
+import {
+  UpdateUserArgs,
+  UpdateUserRolesArgs,
+} from '../resolvers/mutations/UpdateUserMutation';
+import { signToken, verifyToken } from '../utils/jwt';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class UserMutations {
@@ -35,8 +46,6 @@ export default class UserMutations {
     private dataSource: UserDataSource,
     private userAuth: UserAuthorization
   ) {}
-
-  private secret = process.env.secret as string;
 
   createHash(password: string): string {
     //Check that password follows rules
@@ -88,12 +97,12 @@ export default class UserMutations {
     }
 
     if (
-      args.userRole === UserRole.REVIEWER &&
+      args.userRole === UserRole.SEP_REVIEWER &&
       (await this.userAuth.isUserOfficer(agent))
     ) {
       userId = await this.dataSource.createInviteUser(args);
-      await this.dataSource.setUserRoles(userId, [UserRole.REVIEWER]);
-      role = UserRole.REVIEWER;
+      await this.dataSource.setUserRoles(userId, [UserRole.SEP_REVIEWER]);
+      role = UserRole.SEP_REVIEWER;
     } else if (args.userRole === UserRole.USER) {
       userId = await this.dataSource.createInviteUser(args);
       await this.dataSource.setUserRoles(userId, [UserRole.USER]);
@@ -174,27 +183,35 @@ export default class UserMutations {
         return rejection('INTERNAL_ERROR');
       }
       user = updatedUser;
+    } else if (user) {
+      return rejection('ACCOUNT_EXIST');
     } else {
-      user = (await this.dataSource.create(
-        args.user_title,
-        args.firstname,
-        args.middlename,
-        args.lastname,
-        `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
-        hash,
-        args.preferredname,
-        args.orcid,
-        args.refreshToken,
-        args.gender,
-        args.nationality,
-        args.birthdate,
-        organisationId,
-        args.department,
-        args.position,
-        args.email,
-        args.telephone,
-        args.telephone_alt
-      )) as UserWithRole;
+      try {
+        user = (await this.dataSource.create(
+          args.user_title,
+          args.firstname,
+          args.middlename,
+          args.lastname,
+          `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
+          hash,
+          args.preferredname,
+          args.orcid,
+          args.refreshToken,
+          args.gender,
+          args.nationality,
+          args.birthdate,
+          organisationId,
+          args.department,
+          args.position,
+          args.email,
+          args.telephone,
+          args.telephone_alt
+        )) as UserWithRole;
+      } catch (err) {
+        if ('code' in err && err.code === '23505') {
+          return rejection('ACCOUNT_EXIST');
+        }
+      }
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
@@ -210,13 +227,12 @@ export default class UserMutations {
       return rejection('INTERNAL_ERROR');
     }
 
-    const token = jsonwebtoken.sign(
+    const token = signToken<EmailVerificationJwtPayload>(
       {
         id: user.id,
         type: 'emailVerification',
         updated: user.updated,
       },
-      this.secret,
       { expiresIn: '24h' }
     );
 
@@ -229,7 +245,6 @@ export default class UserMutations {
     return userLinkResponse;
   }
 
-  // TODO: We should have separate endpoint for updating user roles. Not to do it on general user update. Like this we will have separation of concerns and permissions are better managable.
   @ValidateArgs(updateUserValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.USER])
   @EventBus(Event.USER_UPDATED)
@@ -249,28 +264,43 @@ export default class UserMutations {
     if (!user) {
       return rejection('INTERNAL_ERROR');
     }
+
+    delete args.orcid;
+    delete args.refreshToken;
+
     user = {
       ...user,
       ...args,
     };
 
-    if (args.roles !== undefined) {
-      if (!(await this.userAuth.isUserOfficer(agent))) {
-        return rejection('INSUFFICIENT_PERMISSIONS');
-      }
-      const [err] = await to(this.dataSource.setUserRoles(args.id, args.roles));
-      if (err) {
-        logger.logError('Could not set user roles', { err });
+    return this.dataSource
+      .update(user)
+      .then((user) => user)
+      .catch((err) => {
+        logger.logException('Could not update user', err, { user });
 
         return rejection('INTERNAL_ERROR');
-      }
+      });
+  }
+
+  @ValidateArgs(updateUserRolesValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.USER_ROLE_UPDATED)
+  async updateRoles(
+    agent: UserWithRole | null,
+    args: UpdateUserRolesArgs
+  ): Promise<User | Rejection> {
+    const user = await this.dataSource.get(args.id);
+
+    if (!user) {
+      return rejection('INTERNAL_ERROR');
     }
 
     return this.dataSource
-      .update(user)
-      .then(user => user)
-      .catch(err => {
-        logger.logException('Could not update user', err, { user });
+      .setUserRoles(args.id, args.roles)
+      .then(() => user)
+      .catch((err) => {
+        logger.logException('Could not update user', err);
 
         return rejection('INTERNAL_ERROR');
       });
@@ -302,13 +332,12 @@ export default class UserMutations {
     if (!user.emailVerified) {
       return rejection('EMAIL_NOT_VERIFIED');
     }
-    const token = jsonwebtoken.sign(
-      { user, roles, currentRole: roles[0] },
-      this.secret,
-      {
-        expiresIn: process.env.tokenLife,
-      }
-    );
+
+    const token = signToken<AuthJwtPayload>({
+      user,
+      roles,
+      currentRole: roles[0],
+    });
 
     return token;
   }
@@ -326,8 +355,10 @@ export default class UserMutations {
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
-    const token = jsonwebtoken.sign({ user, roles }, this.secret, {
-      expiresIn: process.env.tokenLife,
+    const token = signToken<AuthJwtPayload>({
+      user,
+      roles,
+      currentRole: roles[0],
     });
 
     return token;
@@ -335,19 +366,13 @@ export default class UserMutations {
 
   async token(token: string): Promise<string | Rejection> {
     try {
-      const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const decoded = verifyToken<AuthJwtPayload>(token);
       const roles = await this.dataSource.getUserRoles(decoded.user.id);
-      const freshToken = jsonwebtoken.sign(
-        {
-          user: decoded.user,
-          roles,
-          currentRole: decoded.currentRole,
-        },
-        this.secret,
-        {
-          expiresIn: process.env.tokenLife,
-        }
-      );
+      const freshToken = signToken<AuthJwtPayload>({
+        user: decoded.user,
+        roles,
+        currentRole: decoded.currentRole,
+      });
 
       return freshToken;
     } catch (error) {
@@ -357,22 +382,64 @@ export default class UserMutations {
     }
   }
 
+  async checkExternalToken(externalToken: string): Promise<string | Rejection> {
+    try {
+      const client = new UOWSSoapClient();
+
+      const rawStfcUser = await client.getPersonDetailsFromSessionId(
+        externalToken
+      );
+      if (!rawStfcUser) {
+        logger.logInfo('User not found for token', { externalToken });
+
+        return rejection('USER_DOES_NOT_EXIST');
+      }
+      const stfcUser = rawStfcUser.return;
+
+      // Create dummy user if one does not exist in the proposals DB.
+      // This is needed to satisfy the FOREIGN_KEY constraints
+      // in tables that link to a user (such as proposals)
+      const userNumber = parseInt(stfcUser.userNumber);
+      let dummyUser = await this.dataSource.get(userNumber);
+      if (!dummyUser) {
+        dummyUser = await this.dataSource.createDummyUser(userNumber);
+      }
+
+      const roles = await this.dataSource.getUserRoles(dummyUser.id);
+
+      const proposalsToken = signToken<AuthJwtPayload>({
+        user: dummyUser,
+        roles,
+        currentRole: roles[0], // User role
+      });
+
+      return proposalsToken;
+    } catch (error) {
+      logger.logError('Error occured during external authentication', {
+        error,
+      });
+
+      return rejection('INTERNAL_ERROR');
+    }
+  }
+
   async selectRole(
     token: string,
     selectedRoleId: number
   ): Promise<string | Rejection> {
     try {
-      const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const decoded = verifyToken<AuthJwtPayload>(token);
+
+      // TODO: fixme
       const currentRole = decoded.roles.find(
         (role: Role) => role.id === selectedRoleId
-      );
-      const tokenWithRole = jsonwebtoken.sign(
-        { user: decoded.user, roles: decoded.roles, currentRole },
-        this.secret,
-        {
-          expiresIn: process.env.tokenLife,
-        }
-      );
+      )!;
+
+      const tokenWithRole = signToken<AuthJwtPayload>({
+        user: decoded.user,
+        roles: decoded.roles,
+        currentRole,
+      });
 
       return tokenWithRole;
     } catch (error) {
@@ -396,13 +463,12 @@ export default class UserMutations {
       return rejection('COULD_NOT_FIND_USER_BY_EMAIL');
     }
 
-    const token = jsonwebtoken.sign(
+    const token = signToken<PasswordResetJwtPayload>(
       {
         id: user.id,
         type: 'passwordReset',
         updated: user.updated,
       },
-      this.secret,
       { expiresIn: '24h' }
     );
 
@@ -417,7 +483,7 @@ export default class UserMutations {
   async emailVerification(token: string) {
     // Check that token is valid
     try {
-      const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const decoded = verifyToken<EmailVerificationJwtPayload>(token);
       const user = await this.dataSource.get(decoded.id);
       //Check that user exist and that it has not been updated since token creation
       if (
@@ -444,7 +510,7 @@ export default class UserMutations {
     return this.dataSource
       .addUserRole(args)
       .then(() => true)
-      .catch(err => {
+      .catch((err) => {
         logger.logException('Could not add user role', err, { agent });
 
         return rejection('INTERNAL_ERROR');
@@ -492,8 +558,7 @@ export default class UserMutations {
     // Check that token is valid
     try {
       const hash = this.createHash(password);
-      // TODO: Define verify responce type and use that instead of any.
-      const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const decoded = verifyToken<PasswordResetJwtPayload>(token);
       const user = await this.dataSource.get(decoded.id);
 
       //Check that user exist and that it has not been updated since token creation
@@ -504,8 +569,8 @@ export default class UserMutations {
       ) {
         return this.dataSource
           .setUserPassword(user.id, hash)
-          .then(user => user)
-          .catch(err => {
+          .then((user) => user)
+          .catch((err) => {
             logger.logError('Could not reset password', { err });
 
             return rejection('INTERNAL_ERROR');
@@ -522,5 +587,21 @@ export default class UserMutations {
 
       return rejection('INTERNAL_ERROR');
     }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  setUserEmailVerified(
+    _: UserWithRole | null,
+    id: number
+  ): Promise<User | null> {
+    return this.dataSource.setUserEmailVerified(id);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  setUserNotPlaceholder(
+    _: UserWithRole | null,
+    id: number
+  ): Promise<User | null> {
+    return this.dataSource.setUserNotPlaceholder(id);
   }
 }

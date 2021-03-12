@@ -1,7 +1,7 @@
 import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { DataType, TemplateCategoryId } from '../../models/ProposalModel';
+import { DataType, TemplateCategoryId } from '../../models/Template';
 import { QuestionResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 

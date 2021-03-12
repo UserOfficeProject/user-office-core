@@ -1,37 +1,38 @@
 /* eslint-disable prettier/prettier */
 import 'reflect-metadata';
+import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
-import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
+import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
+  dummyPrincipalInvestigatorWithRole,
   dummyUserNotOnProposal,
-  UserDataSourceMock,
-  dummyUserWithRole,
-  dummyUserOfficerWithRole,
   dummyUserNotOnProposalWithRole,
+  dummyUserOfficerWithRole,
+  dummyUserWithRole,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
-import { ProposalStatus } from '../models/ProposalModel';
-import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
 import ProposalMutations from './ProposalMutations';
 
-const dummyLogger = new MutedLogger();
 const dummyProposalDataSource = new ProposalDataSourceMock();
 const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
 const dummyCallDataSource = new CallDataSourceMock();
+const dummyInstrumentDataSource = new InstrumentDataSourceMock();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
-  new ReviewDataSourceMock()
+  new ReviewDataSourceMock(),
+  new SEPDataSourceMock()
 );
 const proposalMutations = new ProposalMutations(
   dummyProposalDataSource,
   dummyQuestionaryDataSource,
   dummyCallDataSource,
-  userAuthorization,
-  dummyLogger
+  dummyInstrumentDataSource,
+  userAuthorization
 );
 
 beforeEach(() => {
@@ -119,10 +120,10 @@ test('A user officer can not reject a proposal that does not exist', () => {
   ).resolves.toHaveProperty('reason', 'INTERNAL_ERROR');
 });
 
-test('A user officer can submit a proposal ', () => {
+test('A user officer can submit a proposal', () => {
   return expect(
     proposalMutations.submit(dummyUserOfficerWithRole, { proposalId: 1 })
-  ).resolves.toHaveProperty('status', ProposalStatus.SUBMITTED);
+  ).resolves.toHaveProperty('submitted', true);
 });
 
 test('A user officer can not submit a proposal that does not exist', () => {
@@ -131,13 +132,13 @@ test('A user officer can not submit a proposal that does not exist', () => {
   ).resolves.toHaveProperty('reason', 'INTERNAL_ERROR');
 });
 
-test('A user on the proposal can submit a proposal ', () => {
+test('A user on the proposal can submit a proposal', () => {
   return expect(
     proposalMutations.submit(dummyUserWithRole, { proposalId: 1 })
-  ).resolves.toHaveProperty('status', ProposalStatus.SUBMITTED);
+  ).resolves.toHaveProperty('submitted', true);
 });
 
-test('A user not on the proposal cannot submit a proposal ', () => {
+test('A user not on the proposal cannot submit a proposal', () => {
   return expect(
     proposalMutations.submit(dummyUserNotOnProposalWithRole, { proposalId: 1 })
   ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
@@ -158,6 +159,26 @@ test('User officer can delete a proposal', () => {
 test('User cannot delete a proposal', () => {
   return expect(
     proposalMutations.delete(dummyUserNotOnProposalWithRole, { proposalId: 1 })
+  ).resolves.not.toBeInstanceOf(Proposal);
+});
+
+test('Principal investigator can delete a proposal', () => {
+  return expect(
+    proposalMutations.delete(dummyPrincipalInvestigatorWithRole, {
+      proposalId: 1,
+    })
+  ).resolves.toBeInstanceOf(Proposal);
+});
+
+test('Principal investigator can delete submitted proposal', async () => {
+  await proposalMutations.submit(dummyPrincipalInvestigatorWithRole, {
+    proposalId: 1,
+  });
+
+  return expect(
+    proposalMutations.delete(dummyPrincipalInvestigatorWithRole, {
+      proposalId: 1,
+    })
   ).resolves.not.toBeInstanceOf(Proposal);
 });
 

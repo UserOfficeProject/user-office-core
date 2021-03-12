@@ -6,16 +6,27 @@ import {
   Mutation,
   Resolver,
   Int,
+  InputType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { isRejection } from '../../rejection';
 import { SuccessResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
+@InputType()
+export class ProposalsToInstrumentArgs {
+  @Field(() => Int)
+  public id: number;
+
+  @Field(() => Int)
+  public callId: number;
+}
+
 @ArgsType()
 export class AssignProposalsToInstrumentArgs {
-  @Field(() => [Int])
-  public proposalIds: number[];
+  @Field(() => [ProposalsToInstrumentArgs])
+  public proposals: ProposalsToInstrumentArgs[];
 
   @Field(() => Int)
   public instrumentId: number;
@@ -37,11 +48,13 @@ export class AssignProposalsToInstrumentMutation {
     @Args() args: AssignProposalsToInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
+    const res = await context.mutations.instrument.assignProposalsToInstrument(
+      context.user,
+      args
+    );
+
     return wrapResponse(
-      context.mutations.instrument.assignProposalsToInstrument(
-        context.user,
-        args
-      ),
+      isRejection(res) ? Promise.resolve(res) : Promise.resolve(true),
       SuccessResponseWrap
     );
   }

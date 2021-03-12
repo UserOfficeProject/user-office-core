@@ -1,7 +1,9 @@
 import {
   Instrument,
+  InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
+import { ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
@@ -19,19 +21,29 @@ export const dummyInstrumentWithAvailabilityTime = new InstrumentWithAvailabilit
   'Dummy instrument 1',
   'instrument_1',
   'This is test instrument.',
-  10
+  10,
+  false
 );
 
 const dummyInstruments = [dummyInstrument];
 
+export const dummyInstrumentHasProposals = new InstrumentHasProposals(
+  1,
+  [1, 2],
+  true
+);
+
 export class InstrumentDataSourceMock implements InstrumentDataSource {
+  async isProposalInstrumentSubmitted(proposalId: number): Promise<boolean> {
+    return false;
+  }
   async create(args: CreateInstrumentArgs): Promise<Instrument> {
     return { ...dummyInstrument, ...args };
   }
 
   async get(instrumentId: number): Promise<Instrument | null> {
     const instrument = dummyInstruments.find(
-      dummyInstrumentItem => dummyInstrumentItem.id === instrumentId
+      (dummyInstrumentItem) => dummyInstrumentItem.id === instrumentId
     );
 
     if (instrument) {
@@ -56,17 +68,25 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return dummyInstrument;
   }
 
+  async getUserInstruments(userId: number): Promise<Instrument[]> {
+    return [dummyInstrument];
+  }
+
   async getInstrumentsByCallId(
-    callId: number
+    callIds: number[]
   ): Promise<InstrumentWithAvailabilityTime[]> {
     return [dummyInstrumentWithAvailabilityTime];
+  }
+
+  async getCallsByInstrumentId(instrumentId: number, callIds: number[]) {
+    return [{ callId: 1, instrumentId: 1 }];
   }
 
   async assignProposalsToInstrument(
     proposalIds: number[],
     instrumentId: number
-  ): Promise<boolean> {
-    return true;
+  ): Promise<ProposalIdsWithNextStatus> {
+    return { proposalIds };
   }
 
   async removeProposalFromInstrument(
@@ -113,5 +133,27 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     availabilityTime: number
   ): Promise<boolean> {
     return true;
+  }
+
+  async submitInstrument(
+    proposalIds: number[],
+    instrumentId: number
+  ): Promise<InstrumentHasProposals> {
+    return dummyInstrumentHasProposals;
+  }
+
+  hasInstrumentScientistInstrument(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  hasInstrumentScientistAccess(
+    userId: number,
+    instrumentId: number,
+    proposalId: number
+  ): Promise<boolean> {
+    throw new Error('Method not implemented.');
   }
 }

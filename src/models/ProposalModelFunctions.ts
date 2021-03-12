@@ -1,30 +1,16 @@
-import {
-  SelectionFromOptionsConfig,
-  TextInputConfig,
-} from '../resolvers/types/FieldConfig';
-import JSDict from '../utils/Dictionary';
 import { ConditionEvaluator } from './ConditionEvaluator';
+import { Answer, QuestionaryStep } from './Questionary';
+import { getQuestionDefinition } from './questionTypes/QuestionRegistry';
 import {
-  Answer,
-  DataType,
-  DataTypeSpec,
   FieldDependency,
-  QuestionaryStep,
   QuestionTemplateRelation,
   TemplateStep,
-} from './ProposalModel';
+} from './Template';
 type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
-export function getDataTypeSpec(type: DataType): DataTypeSpec {
-  switch (type) {
-    case DataType.EMBELLISHMENT:
-      return { readonly: true };
-    default:
-      return { readonly: false };
-  }
-}
+
 export function getTopicById(collection: AbstractCollection, topicId: number) {
-  const step = collection.find(step => step.topic.id === topicId);
+  const step = collection.find((step) => step.topic.id === topicId);
 
   return step ? step.topic : undefined;
 }
@@ -32,16 +18,16 @@ export function getQuestionaryStepByTopicId(
   collection: AbstractCollection,
   topicId: number
 ) {
-  return collection.find(step => step.topic.id === topicId);
+  return collection.find((step) => step.topic.id === topicId);
 }
 export function getFieldById(
   collection: AbstractCollection,
   questionId: string
 ) {
   let needle: AbstractField | undefined;
-  collection.every(step => {
+  collection.every((step) => {
     needle = step.fields.find(
-      field => field.question.proposalQuestionId === questionId
+      (field) => field.question.proposalQuestionId === questionId
     );
 
     return needle === undefined;
@@ -51,12 +37,13 @@ export function getFieldById(
 }
 export function getAllFields(collection: AbstractCollection) {
   let allFields = new Array<AbstractField>();
-  collection.forEach(step => {
+  collection.forEach((step) => {
     allFields = allFields.concat(step.fields);
   });
 
   return allFields;
 }
+
 export function isDependencySatisfied(
   collection: QuestionaryStep[],
   dependency: FieldDependency | undefined
@@ -64,6 +51,7 @@ export function isDependencySatisfied(
   if (!dependency?.condition) {
     return true;
   }
+
   const { condition, params } = dependency.condition;
   const field = getFieldById(collection, dependency.dependencyId) as
     | Answer
@@ -84,89 +72,48 @@ export function isDependencySatisfied(
       .isSatisfied(field, params)
   );
 }
+
 export function areDependenciesSatisfied(
   questionary: QuestionaryStep[],
   fieldId: string
 ) {
   const field = getFieldById(questionary, fieldId);
-  if (!field) {
+
+  if (!field || !field.dependencies) {
     return true;
   }
 
-  return isDependencySatisfied(questionary, field.dependency);
+  return field.dependencies.every((dependency) =>
+    isDependencySatisfied(questionary, dependency)
+  );
 }
-
-class BaseValidator implements ConstraintValidator {
-  constructor(private dataType?: DataType | undefined) {}
-
-  validate(value: any, field: Answer) {
-    if (this.dataType && field.question.dataType !== this.dataType) {
-      throw new Error('Field validator ');
-    }
-    if (field.question.config.required && !value) {
-      return false;
-    }
-
-    return true;
-  }
-}
-
-class TextInputValidator extends BaseValidator {
-  constructor() {
-    super(DataType.TEXT_INPUT);
-  }
-  validate(value: any, field: Answer) {
-    if (!super.validate(value, field)) {
-      return false;
-    }
-    const config = field.question.config as TextInputConfig;
-    if (config.min && value && value.length < config.min) {
-      return false;
-    }
-    if (config.max && value && value.length > config.max) {
-      return false;
-    }
-
-    return true;
-  }
-}
-
-class SelectFromOptionsInputValidator extends BaseValidator {
-  constructor() {
-    super(DataType.SELECTION_FROM_OPTIONS);
-  }
-  validate(value: any, field: Answer) {
-    const config = field.question.config as SelectionFromOptionsConfig;
-    if (!super.validate(value, field)) {
-      return false;
-    }
-
-    if (config.required && config.options!.indexOf(value) === -1) {
-      return false;
-    }
-
-    return true;
-  }
-}
-
-const validatorMap = JSDict.Create<DataType, ConstraintValidator>();
-validatorMap.put(DataType.TEXT_INPUT, new TextInputValidator());
-validatorMap.put(
-  DataType.SELECTION_FROM_OPTIONS,
-  new SelectFromOptionsInputValidator()
-);
 
 export function isMatchingConstraints(
-  value: any,
-  field: QuestionTemplateRelation
+  questionTemplateRelation: QuestionTemplateRelation,
+  value: any
 ): boolean {
-  const val = JSON.parse(value).value;
-  const validator =
-    validatorMap.get(field.question.dataType) || new BaseValidator();
+  const definition = getQuestionDefinition(
+    questionTemplateRelation.question.dataType
+  );
 
-  return validator.validate(val, field);
+  if (!definition.validate) {
+    return true;
+  }
+
+  return definition.validate(questionTemplateRelation, value);
 }
 
-interface ConstraintValidator {
-  validate(value: any, field: QuestionTemplateRelation): boolean;
+export function transformAnswerValueIfNeeded(
+  questionTemplateRelation: QuestionTemplateRelation,
+  value: any
+) {
+  const definition = getQuestionDefinition(
+    questionTemplateRelation.question.dataType
+  );
+
+  if (!definition.transform) {
+    return undefined;
+  }
+
+  return definition.transform(questionTemplateRelation, value);
 }

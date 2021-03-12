@@ -8,21 +8,21 @@ import {
   Template,
   TemplateCategory,
   TemplateCategoryId,
+  TemplatesHasQuestions,
   TemplateStep,
   Topic,
-} from '../../models/ProposalModel';
-import { getFieldById } from '../../models/ProposalModelFunctions';
-import { CreateQuestionTemplateRelationArgs } from '../../resolvers/mutations/CreateQuestionTemplateRelationMutation';
+} from '../../models/Template';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
-import { UpdateQuestionTemplateRelationArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
+import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import {
   dummyQuestionFactory,
   dummyQuestionTemplateRelationFactory,
+  dummyTemplateHasQuestionRelationFactory,
 } from './QuestionaryDataSource';
 
 export let dummyProposalTemplate: Template;
@@ -43,6 +43,7 @@ const dummyTopicFactory = (values?: Partial<Topic>) => {
   return new Topic(
     values?.id || 1,
     values?.title || 'General information',
+    values?.templateId || 1,
     values?.sortOrder || 0,
     values?.isEnabled || true
   );
@@ -60,12 +61,14 @@ const dummyTemplateStepsFactory = () => {
       proposalQuestionId: 'links_to_field',
       dataType: DataType.TEXT_INPUT,
     }),
-    dependency: new FieldDependency(
-      'links_to_field',
-      'has_links_to_field',
-      'has_links_to_field',
-      new FieldCondition(EvaluatorOperator.eq, 'yes')
-    ),
+    dependencies: [
+      new FieldDependency(
+        'links_to_field',
+        'has_links_to_field',
+        'has_links_to_field',
+        new FieldCondition(EvaluatorOperator.eq, 'yes')
+      ),
+    ],
   });
 
   const enableCrystallization = dummyQuestionTemplateRelationFactory({
@@ -86,12 +89,21 @@ const dummyTemplateStepsFactory = () => {
     }),
   });
 
+  const proposalBasis = dummyQuestionTemplateRelationFactory({
+    question: dummyQuestionFactory({
+      proposalQuestionId: 'proposal_basis',
+      naturalKey: 'proposal_basis',
+      dataType: DataType.PROPOSAL_BASIS,
+    }),
+  });
+
   return [
-    new TemplateStep(new Topic(1, 'General information', 1, true), [
+    new TemplateStep(new Topic(1, 'General information', 1, 1, true), [
       hasLinksToField,
       linksToField,
       hasLinksWithIndustry,
       enableCrystallization,
+      proposalBasis,
     ]),
   ];
 };
@@ -113,22 +125,21 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   ): Promise<Question[] | null> {
     return [dummyQuestionFactory()];
   }
+
   async cloneTemplate(templateId: number): Promise<Template> {
     return dummyProposalTemplateFactory({ templateId: templateId + 1 });
   }
+
   async getTemplate(templateId: number): Promise<Template | null> {
     return dummyProposalTemplate;
   }
+
   async updateTemplate(values: UpdateTemplateArgs): Promise<Template | null> {
     dummyProposalTemplate = { ...dummyProposalTemplate, ...values };
 
     return dummyProposalTemplate;
   }
-  async createQuestionTemplateRelation(
-    args: CreateQuestionTemplateRelationArgs
-  ): Promise<Template> {
-    return dummyProposalTemplate;
-  }
+
   async getQuestionTemplateRelation(
     questionId: string,
     templateId: number
@@ -137,34 +148,33 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       question: { proposalQuestionId: questionId },
     });
   }
+
+  async getQuestionTemplateRelations(
+    sortOrder: number,
+    templateId: number,
+    questionToExcludeId?: string
+  ): Promise<TemplatesHasQuestions[] | null> {
+    return [dummyTemplateHasQuestionRelationFactory(sortOrder, templateId)];
+  }
+
   async deleteQuestionTemplateRelation(
     args: DeleteQuestionTemplateRelationArgs
   ): Promise<Template> {
-    dummyTemplateSteps.forEach(function(step) {
-      step.fields = step.fields.filter(field => {
+    dummyTemplateSteps.forEach(function (step) {
+      step.fields = step.fields.filter((field) => {
         return field.question.proposalQuestionId !== args.questionId;
       });
     });
 
     return dummyProposalTemplate;
   }
-  async updateQuestionTemplateRelation(
-    args: UpdateQuestionTemplateRelationArgs
-  ): Promise<Template> {
-    const question = getFieldById(
-      dummyTemplateSteps,
-      args.questionId
-    ) as QuestionTemplateRelation;
-    question.sortOrder = args.sortOrder || 0;
-    question.topicId = args.topicId || 1;
 
-    return dummyProposalTemplate;
-  }
   async createTemplate(args: CreateTemplateArgs): Promise<Template> {
     dummyProposalTemplate = dummyProposalTemplateFactory({ ...args });
 
     return dummyProposalTemplate;
   }
+
   async deleteTemplate(templateId: number): Promise<Template> {
     if (dummyProposalTemplate.templateId !== templateId) {
       throw new Error(`Template with ID ${templateId} does not exist`);
@@ -191,9 +201,6 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return true;
   }
 
-  async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
-    return topicOrder;
-  }
   async deleteTopic(id: number): Promise<Topic> {
     return dummyTopicFactory({ id });
   }
@@ -215,13 +222,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   async getQuestion(questionId: string): Promise<Question | null> {
     const steps = await this.getTemplateSteps();
     const allQuestions = steps.reduce((accumulated, current) => {
-      return accumulated.concat(current.fields.map(field => field.question));
+      return accumulated.concat(current.fields.map((field) => field.question));
     }, new Array<Question>());
     const question = allQuestions.find(
-      question => question.proposalQuestionId === questionId
+      (question) => question.proposalQuestionId === questionId
     );
     if (!question) {
-      throw new Error('Question does not exist');
+      return null;
     }
 
     return question;
@@ -230,7 +237,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   async deleteQuestion(questionId: string): Promise<Question> {
     const question = await this.getQuestion(questionId);
     if (!question) {
-      throw new Error('Question does not exist');
+      throw new Error(`Question ${questionId} does not exist`);
     }
     const copy = dummyQuestionFactory(question);
     question.proposalQuestionId = 'deleted_question'; //works for mocking purposes
@@ -251,7 +258,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       return accumulated.concat(current.fields);
     }, new Array<QuestionTemplateRelation>());
     const questionTemplateRelation = allQuestions.find(
-      curQuestion => curQuestion.question.proposalQuestionId === questionId
+      (curQuestion) => curQuestion.question.proposalQuestionId === questionId
     );
 
     if (questionTemplateRelation) {
@@ -264,33 +271,54 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     }
   }
 
-  async updateTopic(
-    topicId: number,
-    values: { title?: string; isEnabled?: boolean }
-  ): Promise<Topic> {
+  async updateTopicTitle(topicId: number, title: string): Promise<Topic> {
     const steps = await this.getTemplateSteps();
     const allTopics = steps.reduce((accumulated, current) => {
       return accumulated.concat(current.topic);
     }, new Array<Topic>());
 
-    const topic = allTopics.find(topic => topic.id === topicId);
+    const topic = allTopics.find((topic) => topic.id === topicId);
 
     if (!topic) {
       throw new Error('Topic not found');
     }
-    Object.assign(topic, values);
+    Object.assign(topic, { title });
 
     return topic;
   }
 
-  async createTopic(args: CreateTopicArgs): Promise<Template> {
+  async updateQuestionTemplateRelationSettings(
+    args: UpdateQuestionTemplateRelationSettingsArgs
+  ): Promise<Template> {
+    return dummyProposalTemplate;
+  }
+
+  async upsertQuestionTemplateRelations(
+    collection: TemplatesHasQuestions[]
+  ): Promise<Template> {
+    return dummyProposalTemplate;
+  }
+
+  async createTopic(args: CreateTopicArgs): Promise<Topic> {
+    const newTopic = new Topic(2, 'New Topic', 1, args.sortOrder, false);
     dummyTemplateSteps.splice(
       args.sortOrder,
       0,
-      new TemplateStep(new Topic(2, 'New Topic', args.sortOrder, false), [])
+      new TemplateStep(newTopic, [])
     );
 
+    return newTopic;
+  }
+
+  async upsertTopics(data: Topic[]): Promise<Template> {
     return dummyProposalTemplate;
+  }
+
+  async getTopics(
+    templateId: number,
+    topicToExcludeId?: number
+  ): Promise<Topic[]> {
+    return [dummyTopicFactory()];
   }
 
   async getTemplateSteps(): Promise<TemplateStep[]> {
@@ -299,5 +327,15 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
   async getTemplateCategories(): Promise<TemplateCategory[]> {
     return [new TemplateCategory(1, 'Proposal Questionaries')];
+  }
+
+  async setActiveTemplate(args: any): Promise<boolean> {
+    return true;
+  }
+
+  async getActiveTemplateId(
+    categoryId: TemplateCategoryId
+  ): Promise<number | null> {
+    return 1;
   }
 }

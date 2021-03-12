@@ -32,8 +32,11 @@ export class InstrumentQuery {
   }
 
   @Query(() => InstrumentsQueryResult, { nullable: true })
-  instruments(@Ctx() context: ResolverContext) {
-    return context.queries.instrument.getAll(context.user);
+  instruments(
+    @Arg('callIds', () => [Int], { nullable: true }) callIds: number[],
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.instrument.getAll(context.user, callIds);
   }
 
   @Query(() => [InstrumentWithAvailabilityTime], { nullable: true })
@@ -46,5 +49,34 @@ export class InstrumentQuery {
       sepId,
       callId,
     });
+  }
+
+  @Query(() => InstrumentsQueryResult, { nullable: true })
+  userInstruments(@Ctx() context: ResolverContext) {
+    return context.queries.instrument.getUserInstruments(context.user);
+  }
+
+  @Query(() => Boolean, { nullable: true })
+  async instrumentScientistHasInstrument(
+    @Arg('instrumentId', () => Int) instrumentId: number,
+    @Ctx() context: ResolverContext
+  ): Promise<boolean> {
+    return context.queries.instrument.hasInstrumentScientistInstrument(
+      context.user,
+      instrumentId
+    );
+  }
+
+  @Query(() => Boolean, { nullable: true })
+  async instrumentScientistHasAccess(
+    @Arg('instrumentId', () => Int) instrumentId: number,
+    @Arg('proposalId', () => Int) proposalId: number,
+    @Ctx() context: ResolverContext
+  ): Promise<boolean> {
+    return context.queries.instrument.hasInstrumentScientistAccess(
+      context.user,
+      instrumentId,
+      proposalId
+    );
   }
 }

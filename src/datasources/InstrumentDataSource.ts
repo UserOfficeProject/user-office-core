@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import {
   Instrument,
+  InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../models/Instrument';
+import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { BasicUserDetails } from '../models/User';
 import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMutation';
 
@@ -13,15 +14,20 @@ export interface InstrumentDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }>;
+  getUserInstruments(userId: number): Promise<Instrument[]>;
   getInstrumentsByCallId(
-    callId: number
+    callIds: number[]
   ): Promise<InstrumentWithAvailabilityTime[]>;
+  getCallsByInstrumentId(
+    instrumentId: number,
+    callIds: number[]
+  ): Promise<{ callId: number; instrumentId: number }[]>;
   update(instrument: Instrument): Promise<Instrument>;
   delete(instrumentId: number): Promise<Instrument>;
   assignProposalsToInstrument(
     proposalIds: number[],
     instrumentId: number
-  ): Promise<boolean>;
+  ): Promise<ProposalIdsWithNextStatus>;
   removeProposalFromInstrument(
     proposalId: number,
     instrumentId: number
@@ -45,4 +51,18 @@ export interface InstrumentDataSource {
     instrumentId: number,
     availabilityTime: number
   ): Promise<boolean>;
+  submitInstrument(
+    proposalIds: number[],
+    instrumentId: number
+  ): Promise<InstrumentHasProposals>;
+  hasInstrumentScientistInstrument(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean>;
+  hasInstrumentScientistAccess(
+    userId: number,
+    instrumentId: number,
+    proposalId: number
+  ): Promise<boolean>;
+  isProposalInstrumentSubmitted(proposalId: number): Promise<boolean>;
 }

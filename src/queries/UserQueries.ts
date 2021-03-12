@@ -1,15 +1,20 @@
-/* eslint-disable @typescript-eslint/camelcase */
+import { logger } from '@esss-swap/duo-logger';
 import * as bcrypt from 'bcryptjs';
-import jsonwebtoken from 'jsonwebtoken';
 // TODO: Try to replace request-promise with axios. request-promise depends on reqest which is deprecated.
 import { CoreOptions, UriOptions } from 'request';
 import rp from 'request-promise';
 
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
-import { Roles } from '../models/Role';
-import { BasicUserDetails, UserWithRole } from '../models/User';
-import { logger } from '../utils/Logger';
+import { Role, Roles } from '../models/Role';
+import {
+  BasicUserDetails,
+  User,
+  UserWithRole,
+  AuthJwtPayload,
+  UserRole,
+} from '../models/User';
+import { signToken, verifyToken } from '../utils/jwt';
 
 export default class UserQueries {
   constructor(public dataSource: UserDataSource) {}
@@ -20,6 +25,11 @@ export default class UserQueries {
 
   @Authorized([Roles.USER_OFFICER])
   async get(agent: UserWithRole | null, id: number) {
+    return this.dataSource.get(id);
+  }
+
+  @Authorized()
+  async byRef(agent: UserWithRole | null, id: number) {
     return this.dataSource.get(id);
   }
 
@@ -67,12 +77,12 @@ export default class UserQueries {
     };
 
     return rp(options)
-      .then(function(resp: any) {
+      .then(function (resp: any) {
         return {
           ...resp,
         };
       })
-      .catch(function(err: any) {
+      .catch(function (err: any) {
         logger.logException('Could not get getOrcIDAccessToken', err);
 
         return null;
@@ -99,10 +109,10 @@ export default class UserQueries {
     const user = await this.dataSource.getByOrcID(orcData.orcid);
     if (user) {
       const roles = await this.dataSource.getUserRoles(user.id);
-      const secret = process.env.secret as string;
-      const token = jsonwebtoken.sign({ user, roles }, secret, {
-        expiresIn: process.env.tokenLife,
-      });
+
+      const token = signToken<{ user: User; roles: Role[]; currentRole: Role }>(
+        { user, roles, currentRole: roles[0] }
+      );
 
       return { token };
     }
@@ -116,7 +126,7 @@ export default class UserQueries {
     };
 
     return rp(options)
-      .then(function(resp: any) {
+      .then(function (resp: any) {
         // Generate hash for OrcID inorder to prevent user from change OrcID when sending back
         const salt = '$2a$10$1svMW3/FwE5G1BpE7/CPW.';
         const hash = bcrypt.hashSync(resp.name.path, salt);
@@ -133,7 +143,7 @@ export default class UserQueries {
             : null,
         };
       })
-      .catch(function(err: any) {
+      .catch(function (err: any) {
         logger.logException('Could not get getOrcIDInformation', err);
 
         return null;
@@ -146,7 +156,7 @@ export default class UserQueries {
     filter?: string,
     first?: number,
     offset?: number,
-    userRole?: number,
+    userRole?: UserRole,
     subtractUsers?: [number]
   ) {
     return this.dataSource.getUsers(
@@ -169,5 +179,28 @@ export default class UserQueries {
 
   async getProposers(agent: UserWithRole | null, proposalId: number) {
     return this.dataSource.getProposalUsers(proposalId);
+  }
+
+  async checkToken(
+    token: string
+  ): Promise<{
+    isValid: boolean;
+    payload: AuthJwtPayload | null;
+  }> {
+    try {
+      const payload = verifyToken<AuthJwtPayload>(token);
+
+      return {
+        isValid: true,
+        payload,
+      };
+    } catch (error) {
+      logger.logError('Bad token', { error });
+
+      return {
+        isValid: false,
+        payload: null,
+      };
+    }
   }
 }

@@ -1,15 +1,19 @@
-import { JSDict } from '@esss-swap/duo-localisation';
+import { logger } from '@esss-swap/duo-logger';
 
 import {
   proposalDataSource,
   questionaryDataSource,
+  sampleDataSource,
+  shipmentDataSource,
   templateDataSource,
 } from '../datasources';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
+import { SampleDataSource } from '../datasources/SampleDataSource';
+import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { TemplateCategoryId } from '../models/ProposalModel';
-import { User } from '../models/User';
+import { TemplateCategoryId } from '../models/Template';
+import { User, UserWithRole } from '../models/User';
 import { userAuthorization } from '../utils/UserAuthorization';
 
 interface QuestionaryAuthorizer {
@@ -19,14 +23,14 @@ interface QuestionaryAuthorizer {
 
 class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
   constructor(private proposalDataSource: ProposalDataSource) {}
-  async hasReadRights(agent: User | null, questionaryId: number) {
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
   }
-  async hasWriteRights(agent: User | null, questionaryId: number) {
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
   }
 
-  private async hasRights(agent: User | null, questionaryId: number) {
+  private async hasRights(agent: UserWithRole | null, questionaryId: number) {
     if (!agent) {
       return false;
     }
@@ -44,58 +48,129 @@ class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
 class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
   constructor(
     private proposalDataSource: ProposalDataSource,
-    private questionaryDataSource: QuestionaryDataSource
+    private sampleDataSource: SampleDataSource
   ) {}
-  async hasReadRights(agent: User | null, questionaryId: number) {
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
   }
-  async hasWriteRights(agent: User | null, questionaryId: number) {
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
   }
 
-  private async hasRights(agent: User | null, questionaryId: number) {
+  private async hasRights(agent: UserWithRole | null, questionaryId: number) {
     if (!agent) {
       return false;
     }
 
-    const sampleDeclarationQuestionary = await this.questionaryDataSource.getQuestionary(
-      questionaryId
-    );
-    if (sampleDeclarationQuestionary?.creator_id === agent.id) {
+    if (await userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
-    const proposalQuestionary = await this.questionaryDataSource.getParentQuestionary(
-      questionaryId
-    );
-    if (!proposalQuestionary?.questionaryId) return false;
-    const proposal = (
-      await this.proposalDataSource.getProposals({
-        questionaryIds: [proposalQuestionary.questionaryId],
-      })
-    ).proposals[0];
+    const queryResult = await this.sampleDataSource.getSamples({
+      filter: { questionaryId },
+    });
+
+    if (queryResult.length !== 1) {
+      logger.logError(
+        'Expected to find exactly one sample with questionaryId',
+        { questionaryId }
+      );
+
+      return false;
+    }
+
+    const sample = queryResult[0];
+
+    const proposal = await this.proposalDataSource.get(sample.proposalId);
+
+    if (!proposal) {
+      logger.logError('Could not find proposal for questionary', {
+        questionaryId,
+      });
+
+      return false;
+    }
+
+    return userAuthorization.hasAccessRights(agent, proposal);
+  }
+}
+
+class ShipmentDeclarationQuestionaryAuthorizer
+  implements QuestionaryAuthorizer {
+  constructor(
+    private proposalDataSource: ProposalDataSource,
+    private shipmentDataSource: ShipmentDataSource
+  ) {}
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
+    return this.hasRights(agent, questionaryId);
+  }
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
+    return this.hasRights(agent, questionaryId);
+  }
+
+  private async hasRights(agent: UserWithRole | null, questionaryId: number) {
+    if (!agent) {
+      return false;
+    }
+
+    if (await userAuthorization.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const queryResult = await this.shipmentDataSource.getAll({
+      filter: { questionaryId },
+    });
+
+    if (queryResult.length !== 1) {
+      logger.logError(
+        'Expected to find exactly one sample with questionaryId',
+        { questionaryId }
+      );
+
+      return false;
+    }
+
+    const shipment = queryResult[0];
+
+    const proposal = await this.proposalDataSource.get(shipment.proposalId);
+
+    if (!proposal) {
+      logger.logError('Could not find proposal for questionary', {
+        questionaryId,
+      });
+
+      return false;
+    }
 
     return userAuthorization.hasAccessRights(agent, proposal);
   }
 }
 
 export class QuestionaryAuthorization {
-  private authorizers: JSDict<number, QuestionaryAuthorizer> = JSDict.Create();
+  private authorizers = new Map<number, QuestionaryAuthorizer>();
   constructor(
     private proposalDataSource: ProposalDataSource,
     private questionaryDataSource: QuestionaryDataSource,
-    private templateDataSource: TemplateDataSource
+    private templateDataSource: TemplateDataSource,
+    private sampleDataSource: SampleDataSource,
+    private shipmentDataSource: ShipmentDataSource
   ) {
-    this.authorizers = JSDict.Create();
-    this.authorizers.put(
+    this.authorizers.set(
       TemplateCategoryId.PROPOSAL_QUESTIONARY,
       new ProposalQuestionaryAuthorizer(this.proposalDataSource)
     );
-    this.authorizers.put(
+    this.authorizers.set(
       TemplateCategoryId.SAMPLE_DECLARATION,
       new SampleDeclarationQuestionaryAuthorizer(
-        proposalDataSource,
-        questionaryDataSource
+        this.proposalDataSource,
+        this.sampleDataSource
+      )
+    );
+    this.authorizers.set(
+      TemplateCategoryId.SHIPMENT_DECLARATION,
+      new ShipmentDeclarationQuestionaryAuthorizer(
+        this.proposalDataSource,
+        this.shipmentDataSource
       )
     );
   }
@@ -144,5 +219,7 @@ export class QuestionaryAuthorization {
 export const questionaryAuthorization = new QuestionaryAuthorization(
   proposalDataSource,
   questionaryDataSource,
-  templateDataSource
+  templateDataSource,
+  sampleDataSource,
+  shipmentDataSource
 );

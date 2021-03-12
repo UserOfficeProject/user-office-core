@@ -1,13 +1,23 @@
-/* eslint-disable @typescript-eslint/camelcase */
-import { Questionary, QuestionaryStep } from '../../models/ProposalModel';
+import { logger } from '@esss-swap/duo-logger';
+
+import {
+  Answer,
+  AnswerBasic,
+  Questionary,
+  QuestionaryStep,
+} from '../../models/Questionary';
+import { getDefaultAnswerValue } from '../../models/questionTypes/QuestionRegistry';
+import { FieldDependency } from '../../models/Template';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
-import { Answer } from './../../models/ProposalModel';
 import database from './database';
 import {
+  AnswerRecord,
+  createAnswerBasic,
   createQuestionaryObject,
   createQuestionTemplateRelationObject,
   createTopicObject,
   QuestionaryRecord,
+  QuestionDependencyRecord,
   QuestionRecord,
   QuestionTemplateRelRecord,
   TopicRecord,
@@ -15,25 +25,25 @@ import {
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
-  getParentQuestionary(
-    child_questionary_id: number
-  ): Promise<Questionary | null> {
-    const subquery = database('answer_has_questionaries')
-      .select('answer_id')
-      .where({ questionary_id: child_questionary_id });
-
+  async getCount(templateId: number): Promise<number> {
     return database('questionaries')
-      .select('*')
-      .whereIn('questionary_id', subquery)
-      .then((rows: QuestionaryRecord[]) => {
-        if (rows.length !== 1) {
-          return null;
-        }
-
-        return createQuestionaryObject(rows[0]);
+      .count('questionary_id')
+      .where('template_id', templateId)
+      .first()
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
       });
   }
-  create(creator_id: number, template_id: number): Promise<Questionary> {
+  async getAnswer(answer_id: number): Promise<AnswerBasic> {
+    const answerRecord: AnswerRecord = await database('answers')
+      .select('*')
+      .where('answer_id', answer_id)
+      .first();
+
+    return createAnswerBasic(answerRecord);
+  }
+
+  async create(creator_id: number, template_id: number): Promise<Questionary> {
     return database('questionaries')
       .insert({ template_id, creator_id }, '*')
       .then((rows: QuestionaryRecord[]) => {
@@ -53,7 +63,9 @@ export default class PostgresQuestionaryDataSource
     question_id: string,
     answer: string
   ): Promise<string> {
-    const results: { count: string } = await database
+    const results:
+      | { count?: string | number | undefined }
+      | undefined = await database
       .count()
       .from('answers')
       .where({
@@ -97,7 +109,7 @@ export default class PostgresQuestionaryDataSource
     }
 
     await database('answer_has_files').insert(
-      files.map(file => ({ answer_id: answerId, file_id: file }))
+      files.map((file) => ({ answer_id: answerId, file_id: file }))
     );
 
     return files;
@@ -139,12 +151,6 @@ export default class PostgresQuestionaryDataSource
     return selectResult[0].answer_id;
   }
 
-  async getBlankQuestionarySteps(
-    template_id: number
-  ): Promise<QuestionaryStep[]> {
-    return this.getQuestionaryStepsWithTemplateId(0, template_id);
-  }
-
   async getQuestionary(questionary_id: number): Promise<Questionary | null> {
     return database('questionaries')
       .select('*')
@@ -171,12 +177,18 @@ export default class PostgresQuestionaryDataSource
     );
   }
 
-  async updateTopicCompletenes(
+  async getBlankQuestionarySteps(
+    templateId: number
+  ): Promise<QuestionaryStep[]> {
+    return this.getQuestionaryStepsWithTemplateId(0, templateId);
+  }
+
+  async updateTopicCompleteness(
     questionary_id: number,
     topic_id: number,
     is_complete: boolean
   ): Promise<void> {
-    return database.transaction(async trx => {
+    return database.transaction(async (trx) => {
       await database
         .raw(
           `INSERT into topic_completenesses(questionary_id, topic_id, is_complete) VALUES(?,?,?) ON CONFLICT (questionary_id, topic_id)  DO UPDATE set is_complete=${is_complete}`,
@@ -186,9 +198,41 @@ export default class PostgresQuestionaryDataSource
     });
   }
 
+  // TODO: This is repeated in template datasource. Find a way to reuse it.
+  async getQuestionsDependencies(
+    questionRecords: Array<
+      QuestionRecord &
+        QuestionTemplateRelRecord & { dependency_natural_key: string }
+    >,
+    templateId: number
+  ): Promise<FieldDependency[]> {
+    const questionDependencies: QuestionDependencyRecord[] = await database
+      .select('*')
+      .from('question_dependencies')
+      .where('template_id', templateId)
+      .whereIn(
+        'question_id',
+        questionRecords.map((questionRecord) => questionRecord.question_id)
+      );
+
+    return questionDependencies.map((questionDependency) => {
+      const question = questionRecords.find(
+        (field) =>
+          field.question_id === questionDependency.dependency_question_id
+      );
+
+      return new FieldDependency(
+        questionDependency.question_id,
+        questionDependency.dependency_question_id,
+        question?.natural_key as string,
+        questionDependency.dependency_condition
+      );
+    });
+  }
+
   private async getQuestionaryStepsWithTemplateId(
-    questionary_id: number,
-    template_id: number
+    questionaryId: number,
+    templateId: number
   ): Promise<QuestionaryStep[]> {
     const topicRecords: (TopicRecord & {
       is_complete: boolean;
@@ -202,53 +246,134 @@ export default class PostgresQuestionaryDataSource
               topic_completenesses
               ON 
                 topics.topic_id = topic_completenesses.topic_id
-                AND topic_completenesses.questionary_id = ${questionary_id}
+                AND topic_completenesses.questionary_id = ${questionaryId}
               WHERE
-                topics.template_id = ${template_id}
+                topics.template_id = ${templateId}
               ORDER BY
                 topics.sort_order`)
     ).rows;
 
-    const answerRecords: Array<QuestionRecord &
-      QuestionTemplateRelRecord & { value: any }> = (
+    const answerRecords: Array<
+      QuestionRecord &
+        QuestionTemplateRelRecord & { value: any; answer_id: number } & {
+          dependency_natural_key: string;
+        }
+    > = (
       await database.raw(`
-                SELECT 
-                  templates_has_questions.*, questions.*, answers.answer as value
-                FROM 
-                  templates_has_questions
-                LEFT JOIN
-                  questions 
-                ON 
-                  templates_has_questions.question_id = 
-                  questions.question_id
-                LEFT JOIN
-                  answers
-                ON
-                  templates_has_questions.question_id = 
-                  answers.question_id
-                AND
-                  answers.questionary_id=${questionary_id}
-                ORDER BY
-                 templates_has_questions.sort_order`)
+        SELECT 
+          templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id, questions.natural_key as dependency_natural_key
+        FROM 
+          templates_has_questions
+        LEFT JOIN
+          questions 
+        ON 
+          templates_has_questions.question_id = 
+          questions.question_id
+        LEFT JOIN
+          answers
+        ON
+          templates_has_questions.question_id = 
+          answers.question_id
+        AND
+          answers.questionary_id=${questionaryId}
+        ORDER BY
+          templates_has_questions.sort_order`)
     ).rows;
 
-    const fields = answerRecords.map(record => {
-      const value = record.value ? JSON.parse(record.value).value : '';
+    const dependencies = await this.getQuestionsDependencies(
+      answerRecords,
+      templateId
+    );
 
-      return new Answer(createQuestionTemplateRelationObject(record), value);
+    const fields = answerRecords.map((record) => {
+      const questionDependencies = dependencies.filter(
+        (dependency) => dependency.questionId === record.question_id
+      );
+
+      const questionTemplateRelation = createQuestionTemplateRelationObject(
+        record,
+        questionDependencies
+      );
+      const value =
+        record.value?.value || getDefaultAnswerValue(questionTemplateRelation);
+
+      return new Answer(record.answer_id, questionTemplateRelation, value);
     });
 
     const steps = Array<QuestionaryStep>();
-    topicRecords.forEach(topic => {
+    topicRecords.forEach((topic) => {
       steps.push(
         new QuestionaryStep(
           createTopicObject(topic),
           topic.is_complete || false,
-          fields.filter(field => field.topicId === topic.topic_id)
+          fields.filter((field) => field.topicId === topic.topic_id)
         )
       );
     });
 
     return steps;
+  }
+
+  async clone(questionaryId: number): Promise<Questionary> {
+    const sourceQuestionary = await this.getQuestionary(questionaryId);
+    if (!sourceQuestionary) {
+      logger.logError(
+        'Could not clone questionary because source questionary does not exist',
+        { questionaryId }
+      );
+
+      throw new Error('Could not clone questionary');
+    }
+    const clonedQuestionary = await this.create(
+      sourceQuestionary.creatorId,
+      sourceQuestionary.templateId
+    );
+
+    // Clone answers
+    await database.raw(
+      `
+      INSERT INTO answers(
+          questionary_id
+        , question_id
+        , answer
+      )
+      SELECT 
+          :clonedQuestionaryId
+        , question_id
+        , answer
+      FROM 
+        answers
+      WHERE
+        questionary_id = :sourceQuestionaryId
+    `,
+      {
+        clonedQuestionaryId: clonedQuestionary.questionaryId,
+        sourceQuestionaryId: sourceQuestionary.questionaryId,
+      }
+    );
+
+    await database.raw(
+      `
+      INSERT INTO topic_completenesses(
+          questionary_id
+        , topic_id
+        , is_complete
+      )
+      SELECT 
+          :clonedQuestionaryId
+        , topic_id
+        , is_complete
+      FROM
+        topic_completenesses
+      WHERE
+        questionary_id = :sourceQuestionaryId
+    `,
+      {
+        clonedQuestionaryId: clonedQuestionary.questionaryId,
+        sourceQuestionaryId: sourceQuestionary.questionaryId,
+      }
+    );
+
+    return clonedQuestionary;
   }
 }

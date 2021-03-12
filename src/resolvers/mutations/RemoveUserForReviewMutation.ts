@@ -8,11 +8,15 @@ import { wrapResponse } from '../wrapResponse';
 export class RemoveUserForReviewMutation {
   @Mutation(() => ReviewResponseWrap)
   removeUserForReview(
-    @Arg('reviewID', () => Int) reviewID: number,
+    @Arg('reviewId', () => Int) reviewId: number,
+    @Arg('sepId', () => Int) sepId: number,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.review.removeUserForReview(context.user, { reviewID }),
+      context.mutations.review.removeUserForReview(context.user, {
+        reviewId,
+        sepId,
+      }),
       ReviewResponseWrap
     );
   }

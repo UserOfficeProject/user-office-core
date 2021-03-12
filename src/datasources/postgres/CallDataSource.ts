@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { Call } from '../../models/Call';
-import { CreateCallArgs } from '../../resolvers/mutations/CreateCallMutation';
+import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
-  UpdateCallArgs,
-  AssignInstrumentToCallArgs,
-  RemoveAssignedInstrumentFromCallArgs,
+  AssignInstrumentsToCallInput,
+  RemoveAssignedInstrumentFromCallInput,
+  UpdateCallInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -12,6 +11,20 @@ import database from './database';
 import { CallRecord, createCallObject } from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
+  async delete(id: number): Promise<Call> {
+    return database
+      .where('call.call_id', id)
+      .del()
+      .from('call')
+      .returning('*')
+      .then((call: CallRecord[]) => {
+        if (call === undefined || call.length !== 1) {
+          throw new Error(`Could not delete call with id:${id}`);
+        }
+
+        return createCallObject(call[0]);
+      });
+  }
   async get(id: number): Promise<Call | null> {
     return database
       .select()
@@ -42,12 +55,30 @@ export default class PostgresCallDataSource implements CallDataSource {
         .orWhere('end_call', '<=', currentDate);
     }
 
+    if (filter?.isEnded === true) {
+      query.where('call_ended', true);
+    } else if (filter?.isEnded === false) {
+      query.where('call_ended', false);
+    }
+
+    if (filter?.isReviewEnded === true) {
+      query.where('call_review_ended', true);
+    } else if (filter?.isReviewEnded === false) {
+      query.where('call_review_ended', false);
+    }
+
+    if (filter?.isSEPReviewEnded === true) {
+      query.where('call_sep_review_ended', true);
+    } else if (filter?.isSEPReviewEnded === false) {
+      query.where('call_sep_review_ended', false);
+    }
+
     return query.then((callDB: CallRecord[]) =>
-      callDB.map(call => createCallObject(call))
+      callDB.map((call) => createCallObject(call))
     );
   }
 
-  async create(args: CreateCallArgs): Promise<Call> {
+  async create(args: CreateCallInput): Promise<Call> {
     return database
       .insert({
         call_short_code: args.shortCode,
@@ -55,16 +86,19 @@ export default class PostgresCallDataSource implements CallDataSource {
         end_call: args.endCall,
         start_review: args.startReview,
         end_review: args.endReview,
+        start_sep_review: args.startSEPReview,
+        end_sep_review: args.endSEPReview,
         start_notify: args.startNotify,
         end_notify: args.endNotify,
         start_cycle: args.startCycle,
         end_cycle: args.endCycle,
         cycle_comment: args.cycleComment,
         survey_comment: args.surveyComment,
+        proposal_workflow_id: args.proposalWorkflowId,
         template_id: args.templateId,
       })
       .into('call')
-      .returning(['*'])
+      .returning('*')
       .then((call: CallRecord[]) => {
         if (call.length !== 1) {
           throw new Error('Could not create call');
@@ -74,7 +108,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       });
   }
 
-  async update(args: UpdateCallArgs): Promise<Call> {
+  async update(args: UpdateCallInput): Promise<Call> {
     return database
       .update(
         {
@@ -83,12 +117,18 @@ export default class PostgresCallDataSource implements CallDataSource {
           end_call: args.endCall,
           start_review: args.startReview,
           end_review: args.endReview,
+          start_sep_review: args.startSEPReview,
+          end_sep_review: args.endSEPReview,
           start_notify: args.startNotify,
           end_notify: args.endNotify,
           start_cycle: args.startCycle,
           end_cycle: args.endCycle,
           cycle_comment: args.cycleComment,
           survey_comment: args.surveyComment,
+          proposal_workflow_id: args.proposalWorkflowId,
+          call_ended: args.callEnded,
+          call_review_ended: args.callReviewEnded,
+          call_sep_review_ended: args.callSEPReviewEnded,
           template_id: args.templateId,
         },
         ['*']
@@ -97,17 +137,17 @@ export default class PostgresCallDataSource implements CallDataSource {
       .where('call_id', args.id)
       .then((call: CallRecord[]) => {
         if (call.length !== 1) {
-          throw new Error('Could not create call');
+          throw new Error('Could not update call');
         }
 
         return createCallObject(call[0]);
       });
   }
 
-  async assignInstrumentToCall(
-    args: AssignInstrumentToCallArgs
+  async assignInstrumentsToCall(
+    args: AssignInstrumentsToCallInput
   ): Promise<Call> {
-    const valuesToInsert = args.instrumentIds.map(instrumentId => ({
+    const valuesToInsert = args.instrumentIds.map((instrumentId) => ({
       instrument_id: instrumentId,
       call_id: args.callId,
     }));
@@ -124,7 +164,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async removeAssignedInstrumentFromCall(
-    args: RemoveAssignedInstrumentFromCallArgs
+    args: RemoveAssignedInstrumentFromCallInput
   ): Promise<Call> {
     await database('call_has_instruments')
       .del()
@@ -138,5 +178,23 @@ export default class PostgresCallDataSource implements CallDataSource {
     }
 
     throw new Error(`Call not found ${args.callId}`);
+  }
+
+  async getCallsByInstrumentScientist(scientistId: number): Promise<Call[]> {
+    const records: CallRecord[] = await database('call')
+      .distinct(['call.*'])
+      .join(
+        'call_has_instruments',
+        'call_has_instruments.call_id',
+        'call.call_id'
+      )
+      .join(
+        'instrument_has_scientists',
+        'instrument_has_scientists.instrument_id',
+        'call_has_instruments.instrument_id'
+      )
+      .where('instrument_has_scientists.user_id', scientistId);
+
+    return records.map(createCallObject);
   }
 }

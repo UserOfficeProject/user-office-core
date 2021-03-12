@@ -1,5 +1,5 @@
 import { Role } from '../../models/Role';
-import { User, BasicUserDetails, UserWithRole } from '../../models/User';
+import { BasicUserDetails, User, UserWithRole } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UserDataSource } from '../UserDataSource';
@@ -42,8 +42,8 @@ export const dummyUserOfficer = new User(
   'Producer',
   'Dorris83@gmail.com',
   true,
-  '(012) 325-1151',
-  '1-316-182-3694',
+  '+46700568256',
+  '',
   false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
@@ -56,9 +56,9 @@ export const dummyUserOfficerWithRole: UserWithRole = {
 
 export const dummyUser = new User(
   2,
-  '',
+  'Dr.',
   'Jane',
-  null,
+  '',
   'Doe',
   'JaDa',
   'Meta',
@@ -72,23 +72,48 @@ export const dummyUser = new User(
   'Architect',
   'Cleve30@yahoo.com',
   true,
-  '045-272-7984 x34539',
-  '028-065-8228 x08367',
+  '+38978414058',
+  '+46700568256',
   false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
 );
+
+export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
+  ...dummyUser,
+  id: 1,
+  currentRole: { id: 1, title: 'Principal investigator', shortCode: 'pi' },
+};
 
 export const dummyUserWithRole: UserWithRole = {
   ...dummyUser,
   currentRole: { id: 1, title: 'User', shortCode: 'user' },
 };
 
+export const dummySampleReviewer: UserWithRole = {
+  ...dummyUser,
+  currentRole: {
+    id: 1,
+    title: 'Sample Reviewer',
+    shortCode: 'sample_safety_reviewer',
+  },
+};
+
+export const dummyInstrumentScientist: UserWithRole = {
+  ...dummyUser,
+  id: 101,
+  currentRole: {
+    id: 1,
+    title: 'Instrument Scientist',
+    shortCode: 'instrument_scientist',
+  },
+};
+
 export const dummyPlaceHolderUser = new User(
   2,
-  '',
+  'Dr.',
   'Jane',
-  null,
+  '',
   'Doe',
   'JaDa',
   'Meta',
@@ -102,8 +127,8 @@ export const dummyPlaceHolderUser = new User(
   'Architect',
   'placeholder@ess.se',
   true,
-  '045-272-7984 x34539',
-  '028-065-8228 x08367',
+  '+46700568256',
+  '',
   true,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
@@ -113,7 +138,7 @@ export const dummyUserNotOnProposal = new User(
   3,
   'Dr.',
   'Noel',
-  null,
+  '',
   'Doe',
   'NoDO',
   'Damion',
@@ -127,8 +152,8 @@ export const dummyUserNotOnProposal = new User(
   'Facilitator',
   'Tyrique41@hotmail.com',
   true,
-  '1-272-760-1466 x03877',
-  '174-603-1024',
+  '+46700568256',
+  '',
   false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
@@ -173,8 +198,12 @@ export class UserDataSourceMock implements UserDataSource {
   async getPasswordByEmail(email: string): Promise<string> {
     return '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm';
   }
-  async setUserEmailVerified(id: number): Promise<void> {
+  async setUserEmailVerified(id: number): Promise<User | null> {
+    return null;
     // Do something here or remove the function.
+  }
+  async setUserNotPlaceholder(id: number): Promise<User | null> {
+    return null;
   }
   async setUserPassword(
     id: number,
@@ -217,6 +246,16 @@ export class UserDataSourceMock implements UserDataSource {
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
       return [{ id: 1, shortCode: 'user_officer', title: 'User Officer' }];
+    } else if (id === dummyInstrumentScientist.id) {
+      return [
+        {
+          id: 1,
+          title: 'Instrument Scientist',
+          shortCode: 'instrument_scientist',
+        },
+      ];
+    } else if (id === 1001) {
+      return [{ id: 2, shortCode: 'SEP_Reviewer', title: 'User' }];
     } else {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }
@@ -256,7 +295,22 @@ export class UserDataSourceMock implements UserDataSource {
     return [basicDummyUser];
   }
 
+  async checkScientistToProposal(
+    scientsitId: number,
+    proposalId: number
+  ): Promise<boolean> {
+    if (scientsitId === dummyUserNotOnProposalWithRole.id) {
+      return false;
+    }
+
+    return true;
+  }
+
   async create(firstname: string, lastname: string) {
+    return dummyUser;
+  }
+
+  async createDummyUser(userId: number): Promise<User> {
     return dummyUser;
   }
 }

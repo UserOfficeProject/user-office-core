@@ -8,5 +8,7 @@ coverage/*
 /src/public/
 # custom definition files
 /src/types/
+# auto-generated SOAP client for the STFC UserOfficeWebService
+/src/datasources/stfc/UOWSSoapInterface.ts
 
 /dev-commands/*

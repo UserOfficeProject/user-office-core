@@ -1,13 +1,21 @@
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
-import { Proposal } from '../models/Proposal';
-import { ProposalEndStatus, ProposalStatus } from '../models/ProposalModel';
+import {
+  Proposal,
+  ProposalEndStatus,
+  ProposalPublicStatus,
+} from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { logger } from '../utils/Logger';
+import { omit } from '../utils/helperFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
+
+const statusMap = new Map<ProposalEndStatus, ProposalPublicStatus>();
+statusMap.set(ProposalEndStatus.ACCEPTED, ProposalPublicStatus.accepted);
+statusMap.set(ProposalEndStatus.REJECTED, ProposalPublicStatus.rejected);
+statusMap.set(ProposalEndStatus.RESERVED, ProposalPublicStatus.reserved);
 
 export default class ProposalQueries {
   constructor(
@@ -18,22 +26,24 @@ export default class ProposalQueries {
 
   @Authorized()
   async get(agent: UserWithRole | null, id: number) {
-    const proposal = await this.dataSource.get(id);
+    let proposal = await this.dataSource.get(id);
 
     if (!proposal) {
       return null;
     }
 
-    //If not a user officer remove excellence, technical and safety score
+    // If not a user officer remove excellence, technical and safety score
     if (!(await this.userAuth.isUserOfficer(agent))) {
-      delete proposal.rankOrder;
-      delete proposal.commentForManagement;
+      proposal = omit(
+        proposal,
+        'rankOrder',
+        'commentForManagement'
+      ) as Proposal;
     }
 
-    //If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer
+    // If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer
     if (!(await this.userAuth.isUserOfficer(agent)) && !proposal.notified) {
-      delete proposal.finalStatus;
-      delete proposal.commentForUser;
+      proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
     }
 
     if ((await this.hasAccessRights(agent, proposal)) === true) {
@@ -41,6 +51,11 @@ export default class ProposalQueries {
     } else {
       return null;
     }
+  }
+
+  @Authorized()
+  async byRef(agent: UserWithRole | null, id: number) {
+    return this.dataSource.get(id);
   }
 
   private async hasAccessRights(
@@ -51,11 +66,7 @@ export default class ProposalQueries {
       return true;
     }
 
-    return (
-      (await this.userAuth.isUserOfficer(agent)) ||
-      (await this.userAuth.isMemberOfProposal(agent, proposal)) ||
-      (await this.userAuth.isReviewerOfProposal(agent, proposal.id))
-    );
+    return this.userAuth.hasAccessRights(agent, proposal);
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -68,51 +79,38 @@ export default class ProposalQueries {
     return this.dataSource.getProposals(filter, first, offset);
   }
 
-  @Authorized()
-  async getBlank(agent: UserWithRole | null, callId: number) {
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.dataSource.checkActiveCall(callId))
-    ) {
-      return null;
-    }
+  @Authorized([Roles.USER_OFFICER])
+  async getAllView(agent: UserWithRole | null, filter?: ProposalsFilter) {
+    return this.dataSource.getProposalsFromView(filter);
+  }
 
-    const call = await this.callDataSource.get(callId);
-    if (!call) {
-      logger.logError('User tried accessing non existing call', {
-        callId,
-        agent,
-      });
-
-      return null;
-    }
-
-    if (!call.templateId) {
-      logger.logError('User tried to getBlank for misconfigured call', {
-        call,
-      });
-
-      return null;
-    }
-
-    const blankProposal = new Proposal(
-      0,
-      '',
-      '',
-      (agent as UserWithRole).id,
-      ProposalStatus.BLANK,
-      new Date(),
-      new Date(),
-      '',
-      0,
-      ProposalEndStatus.UNSET,
-      call?.id,
-      -1,
-      '',
-      '',
-      false
+  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  async getInstrumentScientistProposals(
+    agent: UserWithRole | null,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ) {
+    return this.dataSource.getInstrumentScientistProposals(
+      agent?.id as number,
+      filter,
+      first,
+      offset
     );
+  }
 
-    return blankProposal;
+  async getPublicStatus(agent: UserWithRole | null, id: number) {
+    const proposal = await this.get(agent, id);
+    if (!proposal) {
+      return ProposalPublicStatus.unknown;
+    }
+
+    if (proposal.submitted) {
+      return (
+        statusMap.get(proposal.finalStatus) || ProposalPublicStatus.submitted
+      );
+    } else {
+      return ProposalPublicStatus.draft;
+    }
   }
 }

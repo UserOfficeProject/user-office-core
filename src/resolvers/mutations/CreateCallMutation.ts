@@ -1,19 +1,19 @@
 import {
-  Args,
-  ArgsType,
+  Arg,
   Ctx,
   Field,
+  InputType,
+  Int,
   Mutation,
   Resolver,
-  Int,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { CallResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
-@ArgsType()
-export class CreateCallArgs {
+@InputType()
+export class CreateCallInput {
   @Field()
   public shortCode: string;
 
@@ -28,6 +28,12 @@ export class CreateCallArgs {
 
   @Field()
   public endReview: Date;
+
+  @Field(() => Date, { nullable: true })
+  public startSEPReview?: Date;
+
+  @Field(() => Date, { nullable: true })
+  public endSEPReview?: Date;
 
   @Field()
   public startNotify: Date;
@@ -48,15 +54,22 @@ export class CreateCallArgs {
   public surveyComment: string;
 
   @Field(() => Int, { nullable: true })
+  public proposalWorkflowId: number;
+
+  @Field(() => Int, { nullable: true })
   public templateId?: number;
 }
 
 @Resolver()
 export class CreateCallMutation {
   @Mutation(() => CallResponseWrap)
-  createCall(@Args() args: CreateCallArgs, @Ctx() context: ResolverContext) {
+  createCall(
+    @Arg('createCallInput')
+    createCallInput: CreateCallInput,
+    @Ctx() context: ResolverContext
+  ) {
     return wrapResponse(
-      context.mutations.call.create(context.user, args),
+      context.mutations.call.create(context.user, createCallInput),
       CallResponseWrap
     );
   }

@@ -10,6 +10,15 @@ export class CallsFilter {
 
   @Field(() => Boolean, { nullable: true })
   public isActive?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isEnded?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isReviewEnded?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isSEPReviewEnded?: boolean;
 }
 
 @Resolver()
@@ -20,5 +29,16 @@ export class CallsQuery {
     @Arg('filter', () => CallsFilter, { nullable: true }) filter: CallsFilter
   ) {
     return context.queries.call.getAll(context.user, filter);
+  }
+
+  @Query(() => [Call], { nullable: true })
+  callsByInstrumentScientist(
+    @Ctx() context: ResolverContext,
+    @Arg('scientistId', () => Int) scientistId: number
+  ) {
+    return context.queries.call.getCallsByInstrumentScientist(
+      context.user,
+      scientistId
+    );
   }
 }

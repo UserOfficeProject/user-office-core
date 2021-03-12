@@ -1,22 +1,9 @@
 import { GraphQLScalarType, Kind } from 'graphql';
 
-const MAX_INT = 2147483647;
-const MIN_INT = -2147483648;
-const coerce = (value: number | string | Date | boolean) => {
-  if (Array.isArray(value)) {
-    throw new TypeError(
-      `IntString cannot represent an array value: [${String(value)}]`
-    );
-  }
-  if (typeof value === 'number' && Number.isInteger(value)) {
-    if (value < MIN_INT || value > MAX_INT) {
-      throw new TypeError(
-        `Value is integer but outside of valid range for 32-bit signed integer: ${String(
-          value
-        )}`
-      );
-    }
+export type AnswerType = number | string | Date | boolean | number[];
 
+const coerce = (value: AnswerType) => {
+  if (typeof value === 'number' && Number.isInteger(value)) {
     return value;
   }
 
@@ -24,14 +11,19 @@ const coerce = (value: number | string | Date | boolean) => {
     return Boolean(value);
   }
 
+  if (Array.isArray(value)) {
+    return value;
+  }
+
   if (value instanceof Date) {
     return value;
   }
 
-  return String(value);
+  return value;
 };
-export const IntStringDateBool = new GraphQLScalarType({
-  name: 'IntStringDateBool',
+
+export const IntStringDateBoolArray = new GraphQLScalarType({
+  name: 'IntStringDateBoolArray',
   serialize: coerce,
   parseValue: coerce,
   parseLiteral(ast) {

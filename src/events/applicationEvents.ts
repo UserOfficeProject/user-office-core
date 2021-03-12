@@ -1,5 +1,10 @@
-import { Proposal } from '../models/Proposal';
+import { Call } from '../models/Call';
+import { InstrumentHasProposals } from '../models/Instrument';
+import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
+import { Review, ReviewWithNextProposalStatus } from '../models/Review';
+import { Sample } from '../models/Sample';
 import { SEP } from '../models/SEP';
+import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
 
@@ -17,6 +22,16 @@ interface ProposalAcceptedEvent extends GeneralEvent {
 
 interface ProposalSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface ProposalFeasibleEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FEASIBLE;
+  proposal: Proposal;
+}
+
+interface ProposalSampleSafeEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SAMPLE_SAFE;
   proposal: Proposal;
 }
 
@@ -41,6 +56,66 @@ interface ProposalNotifiedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalClonedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_CLONED;
+  proposal: Proposal;
+}
+
+interface ProposalManagementDecisionSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface ProposalFeasibilityReviewUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FEASIBILITY_REVIEW_UPDATED;
+  technicalreview: TechnicalReview;
+}
+
+interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED;
+  technicalreview: TechnicalReview;
+}
+
+interface ProposalSEPReviewSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_REVIEW_SUBMITTED;
+  review: Review;
+}
+
+interface ProposalSEPReviewUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_REVIEW_UPDATED;
+  reviewwithnextproposalstatus: ReviewWithNextProposalStatus;
+}
+
+interface ProposalAllSEPReviewsSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED;
+  sample: Sample;
+}
+
+interface ProposalInstrumentSelectedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_INSTRUMENT_SELECTED;
+  proposalidswithnextstatus: ProposalIdsWithNextStatus;
+}
+
+interface ProposalSEPSelectedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_SELECTED;
+  proposalidswithnextstatus: ProposalIdsWithNextStatus;
+}
+
+interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
+  instrumenthasproposals: InstrumentHasProposals;
+}
+
+interface ProposalSEPMeetingSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_SUBMITTED;
+  proposal: Proposal;
+}
+
 interface UserResetPasswordEmailEvent extends GeneralEvent {
   type: Event.USER_PASSWORD_RESET_EMAIL;
   userlinkresponse: {
@@ -51,6 +126,11 @@ interface UserResetPasswordEmailEvent extends GeneralEvent {
 
 interface UserUpdateEvent extends GeneralEvent {
   type: Event.USER_UPDATED;
+  user: User;
+}
+
+interface UserRoleUpdateEvent extends GeneralEvent {
+  type: Event.USER_ROLE_UPDATED;
   user: User;
 }
 
@@ -91,11 +171,6 @@ interface SEPMembersAssignedEvent extends GeneralEvent {
   sep: SEP;
 }
 
-interface SEPProposalAssignedEvent extends GeneralEvent {
-  type: Event.SEP_PROPOSAL_ASSIGNED;
-  sep: SEP;
-}
-
 interface SEPMemberAssignedToProposalEvent extends GeneralEvent {
   type: Event.SEP_MEMBER_ASSIGNED_TO_PROPOSAL;
   sep: SEP;
@@ -116,23 +191,55 @@ interface SEPMemberRemovedEvent extends GeneralEvent {
   sep: SEP;
 }
 
+interface CallEndedEvent extends GeneralEvent {
+  type: Event.CALL_ENDED;
+  call: Call;
+}
+
+interface CallReviewEndedEvent extends GeneralEvent {
+  type: Event.CALL_REVIEW_ENDED;
+  call: Call;
+}
+
+interface CallSEPReviewEndedEvent extends GeneralEvent {
+  type: Event.CALL_SEP_REVIEW_ENDED;
+  call: Call;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
   | ProposalSubmittedEvent
+  | ProposalFeasibleEvent
+  | ProposalSampleSafeEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
+  | ProposalClonedEvent
+  | ProposalManagementDecisionSubmittedEvent
   | UserCreateEvent
   | EmailInvite
   | UserResetPasswordEmailEvent
   | UserUpdateEvent
+  | UserRoleUpdateEvent
   | SEPCreatedEvent
   | SEPUpdatedEvent
   | SEPMembersAssignedEvent
-  | SEPProposalAssignedEvent
   | SEPProposalRemovedEvent
   | SEPMemberRemovedEvent
   | SEPMemberAssignedToProposalEvent
   | SEPMemberRemovedFromProposalEvent
   | UserDeletedEvent
-  | ProposalNotifiedEvent;
+  | ProposalNotifiedEvent
+  | CallEndedEvent
+  | CallReviewEndedEvent
+  | CallSEPReviewEndedEvent
+  | ProposalFeasibilityReviewUpdatedEvent
+  | ProposalFeasibilityReviewSubmittedEvent
+  | ProposalSEPReviewUpdatedEvent
+  | ProposalSEPReviewSubmittedEvent
+  | ProposalAllSEPReviewsSubmittedEvent
+  | ProposalSampleReviewSubmittedEvent
+  | ProposalInstrumentSelectedEvent
+  | ProposalSEPSelectedEvent
+  | ProposalInstrumentSubmittedEvent
+  | ProposalSEPMeetingSubmittedEvent;

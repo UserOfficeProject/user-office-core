@@ -1,6 +1,11 @@
+import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Role } from '../models/Role';
-import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../models/SEP';
-import { AddSEPMembersRole } from '../resolvers/mutations/AddSEPMembersRoleMutation';
+import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../models/SEP';
+import {
+  UpdateMemberSEPArgs,
+  AssignReviewersToSEPArgs,
+  AssignChairOrSecretaryToSEPInput,
+} from '../resolvers/mutations/AssignMembersToSEP';
 
 export interface SEPDataSource {
   create(
@@ -17,7 +22,8 @@ export interface SEPDataSource {
     active: boolean
   ): Promise<SEP>;
   get(id: number): Promise<SEP | null>;
-  getUserSeps(id: number): Promise<SEP[]>;
+  getUserSepBySepId(userId: number, sepId: number): Promise<SEP | null>;
+  getUserSeps(id: number, role: Role): Promise<SEP[]>;
   getSEPByProposalId(proposalId: number): Promise<SEP | null>;
   getAll(
     active: boolean,
@@ -27,19 +33,34 @@ export interface SEPDataSource {
   ): Promise<{ totalCount: number; seps: SEP[] }>;
   getSEPProposalAssignments(
     sepId: number,
-    proposalId: number
+    proposalId: number,
+    reviewerId: number | null
   ): Promise<SEPAssignment[]>;
   getSEPProposals(sepId: number, callId: number): Promise<SEPProposal[]>;
+  getSEPProposal(
+    sepId: number,
+    proposalId: number
+  ): Promise<SEPProposal | null>;
   getSEPProposalsByInstrument(
     sepId: number,
     instrumentId: number,
     callId: number
   ): Promise<SEPProposal[]>;
-  getMembers(sepId: number): Promise<SEPMember[]>;
-  getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
-  addSEPMembersRole(args: AddSEPMembersRole): Promise<SEP>;
-  removeSEPMemberRole(memberId: number, sepId: number): Promise<SEP>;
-  assignProposal(proposalId: number, sepId: number): Promise<SEP>;
+  getMembers(sepId: number): Promise<SEPReviewer[]>;
+  getReviewers(sepId: number): Promise<SEPReviewer[]>;
+  getSEPUserRole(id: number, sepId: number): Promise<Role | null>;
+  assignChairOrSecretaryToSEP(
+    args: AssignChairOrSecretaryToSEPInput
+  ): Promise<SEP>;
+  assignReviewersToSEP(args: AssignReviewersToSEPArgs): Promise<SEP>;
+  removeMemberFromSEP(
+    args: UpdateMemberSEPArgs,
+    isMemberChairOrSecretaryOfSEP: boolean
+  ): Promise<SEP>;
+  assignProposal(
+    proposalId: number,
+    sepId: number
+  ): Promise<ProposalIdsWithNextStatus>;
   removeMemberFromSepProposal(
     proposalId: number,
     sepId: number,
@@ -49,6 +70,16 @@ export interface SEPDataSource {
   assignMemberToSEPProposal(
     proposalId: number,
     sepId: number,
-    memberId: number
+    memberIds: number[]
   ): Promise<SEP>;
+  updateTimeAllocation(
+    sepId: number,
+    proposalId: number,
+    sepTimeAllocation: number | null
+  ): Promise<SEPProposal>;
+  isChairOrSecretaryOfSEP(userId: number, sepId: number): Promise<boolean>;
+  isChairOrSecretaryOfProposal(
+    userId: number,
+    proposalId: number
+  ): Promise<boolean>;
 }

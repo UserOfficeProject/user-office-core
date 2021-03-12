@@ -13,27 +13,38 @@ export default class ReviewQueries {
   ) {}
 
   @Authorized()
-  async get(agent: UserWithRole | null, id: number): Promise<Review | null> {
-    const review = await this.dataSource.get(id);
+  async get(
+    agent: UserWithRole | null,
+    { reviewId, sepId }: { reviewId: number; sepId?: number | null }
+  ): Promise<Review | null> {
+    const review = await this.dataSource.get(reviewId);
     if (!review) {
       return null;
     }
 
     if (
+      review.userID === agent!.id ||
       (await this.userAuth.isUserOfficer(agent)) ||
-      review.userID === (agent as UserWithRole).id
+      (sepId && (await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId)))
     ) {
-      return this.dataSource.get(id);
+      return this.dataSource.get(reviewId);
     } else {
       return null;
     }
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async reviewsForProposal(
     agent: UserWithRole | null,
     proposalId: number
   ): Promise<Review[] | null> {
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isChairOrSecretaryOfProposal(agent!.id, proposalId))
+    ) {
+      return null;
+    }
+
     return this.dataSource.getProposalReviews(proposalId);
   }
 
@@ -42,7 +53,11 @@ export default class ReviewQueries {
     user: UserWithRole | null,
     proposalID: number
   ): Promise<TechnicalReview | null> {
-    if (await this.userAuth.isUserOfficer(user)) {
+    if (
+      (await this.userAuth.isUserOfficer(user)) ||
+      (await this.userAuth.isScientistToProposal(user, proposalID)) ||
+      (await this.userAuth.isChairOrSecretaryOfProposal(user!.id, proposalID))
+    ) {
       return this.dataSource.getTechnicalReview(proposalID);
     } else if (await this.userAuth.isReviewerOfProposal(user, proposalID)) {
       const review = await this.dataSource.getTechnicalReview(proposalID);

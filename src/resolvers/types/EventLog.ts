@@ -1,11 +1,11 @@
 import {
-  ObjectType,
-  Field,
-  Int,
-  Resolver,
-  FieldResolver,
-  Root,
   Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  ObjectType,
+  Resolver,
+  Root,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -30,7 +30,7 @@ export class EventLog {
   public changedObjectId: string;
 }
 
-@Resolver(of => EventLog)
+@Resolver((of) => EventLog)
 export class EventLogResolver {
   @FieldResolver(() => User)
   async changedBy(

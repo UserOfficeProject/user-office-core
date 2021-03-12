@@ -22,6 +22,9 @@ export class SEPProposal {
 
   @Field(() => Date)
   public dateAssigned: Date;
+
+  @Field(() => Int, { nullable: true })
+  public sepTimeAllocation?: number | null;
 }
 
 @Resolver(() => SEPProposal)
@@ -39,8 +42,18 @@ export class SEPUserResolver {
     @Root() sepProposal: SEPProposal,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.sep.dataSource.getSEPProposalAssignments(
-      sepProposal.sepId,
+    return context.queries.sep.getSEPProposalAssignments(context.user, {
+      sepId: sepProposal.sepId,
+      proposalId: sepProposal.proposalId,
+    });
+  }
+
+  @FieldResolver(() => Boolean)
+  async instrumentSubmitted(
+    @Root() sepProposal: SEPProposal,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.instrument.dataSource.isProposalInstrumentSubmitted(
       sepProposal.proposalId
     );
   }

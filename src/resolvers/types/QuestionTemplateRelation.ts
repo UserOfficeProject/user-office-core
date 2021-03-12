@@ -1,14 +1,15 @@
 import { Field, Int, ObjectType } from 'type-graphql';
 
-import { QuestionTemplateRelation as QuestionTemplateRelationOrign } from '../../models/ProposalModel';
+import { DependenciesLogicOperator } from '../../models/ConditionEvaluator';
+import { QuestionTemplateRelation as QuestionTemplateRelationOrigin } from '../../models/Template';
 import { FieldConfigType } from './FieldConfig';
 import { FieldDependency } from './FieldDependency';
 import { Question } from './Question';
 
 @ObjectType()
 export class QuestionTemplateRelation
-  implements Partial<QuestionTemplateRelationOrign> {
-  @Field()
+  implements Partial<QuestionTemplateRelationOrigin> {
+  @Field(() => Question)
   public question: Question;
 
   @Field(() => Int)
@@ -20,6 +21,9 @@ export class QuestionTemplateRelation
   @Field(() => FieldConfigType)
   public config: typeof FieldConfigType;
 
-  @Field(() => FieldDependency, { nullable: true })
-  public dependency?: FieldDependency;
+  @Field(() => [FieldDependency])
+  public dependencies: FieldDependency[];
+
+  @Field(() => DependenciesLogicOperator, { nullable: true })
+  public dependenciesOperator?: DependenciesLogicOperator;
 }

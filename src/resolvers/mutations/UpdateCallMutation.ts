@@ -1,19 +1,19 @@
 import {
-  Args,
-  ArgsType,
   Ctx,
   Field,
   Mutation,
   Resolver,
   Int,
+  InputType,
+  Arg,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { CallResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
-@ArgsType()
-export class UpdateCallArgs {
+@InputType()
+export class UpdateCallInput {
   @Field(() => Int)
   public id: number;
 
@@ -31,6 +31,12 @@ export class UpdateCallArgs {
 
   @Field()
   public endReview: Date;
+
+  @Field(() => Date, { nullable: true })
+  public startSEPReview?: Date;
+
+  @Field(() => Date, { nullable: true })
+  public endSEPReview?: Date;
 
   @Field()
   public startNotify: Date;
@@ -51,20 +57,32 @@ export class UpdateCallArgs {
   public surveyComment: string;
 
   @Field(() => Int, { nullable: true })
+  public proposalWorkflowId: number;
+
+  @Field(() => Int, { nullable: true })
+  public callEnded?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public callReviewEnded?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public callSEPReviewEnded?: boolean;
+
+  @Field(() => Int, { nullable: true })
   public templateId?: number;
 }
 
-@ArgsType()
-export class AssignInstrumentToCallArgs {
-  @Field(() => Int)
+@InputType()
+export class AssignInstrumentsToCallInput {
+  @Field(() => [Int])
   instrumentIds: number[];
 
   @Field(() => Int)
   callId: number;
 }
 
-@ArgsType()
-export class RemoveAssignedInstrumentFromCallArgs {
+@InputType()
+export class RemoveAssignedInstrumentFromCallInput {
   @Field(() => Int)
   instrumentId: number;
 
@@ -75,33 +93,42 @@ export class RemoveAssignedInstrumentFromCallArgs {
 @Resolver()
 export class UpdateCallMutation {
   @Mutation(() => CallResponseWrap)
-  updateCall(@Args() args: UpdateCallArgs, @Ctx() context: ResolverContext) {
-    return wrapResponse(
-      context.mutations.call.update(context.user, args),
-      CallResponseWrap
-    );
-  }
-
-  @Mutation(() => CallResponseWrap)
-  assignInstrumentToCall(
-    @Args() args: AssignInstrumentToCallArgs,
+  updateCall(
+    @Arg('updateCallInput')
+    updateCallInput: UpdateCallInput,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.call.assignInstrumentToCall(context.user, args),
+      context.mutations.call.update(context.user, updateCallInput),
       CallResponseWrap
     );
   }
 
   @Mutation(() => CallResponseWrap)
-  removeAssignedInstrumentFromcall(
-    @Args() args: RemoveAssignedInstrumentFromCallArgs,
+  assignInstrumentsToCall(
+    @Arg('assignInstrumentsToCallInput')
+    assignInstrumentsToCallInput: AssignInstrumentsToCallInput,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.call.assignInstrumentsToCall(
+        context.user,
+        assignInstrumentsToCallInput
+      ),
+      CallResponseWrap
+    );
+  }
+
+  @Mutation(() => CallResponseWrap)
+  removeAssignedInstrumentFromCall(
+    @Arg('removeAssignedInstrumentFromCallInput')
+    removeAssignedInstrumentFromCallInput: RemoveAssignedInstrumentFromCallInput,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
       context.mutations.call.removeAssignedInstrumentFromCall(
         context.user,
-        args
+        removeAssignedInstrumentFromCallInput
       ),
       CallResponseWrap
     );

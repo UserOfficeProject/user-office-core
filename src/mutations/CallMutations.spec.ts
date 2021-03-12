@@ -20,12 +20,23 @@ describe('Test Call Mutations', () => {
         endCall: new Date('2019-02-19'),
         startReview: new Date('2019-02-19'),
         endReview: new Date('2019-02-19'),
+        startSEPReview: new Date('2019-02-19'),
+        endSEPReview: new Date('2019-02-19'),
         startNotify: new Date('2019-02-19'),
         endNotify: new Date('2019-02-19'),
         startCycle: new Date('2019-02-19'),
         endCycle: new Date('2019-02-19'),
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
+        proposalWorkflowId: 1,
+      })
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  });
+
+  test('A user can not delete a call', () => {
+    return expect(
+      callMutations.delete(dummyUserWithRole, {
+        callId: dummyCall.id,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -38,14 +49,40 @@ describe('Test Call Mutations', () => {
         endCall: new Date('2019-02-19'),
         startReview: new Date('2019-02-19'),
         endReview: new Date('2019-02-19'),
+        startSEPReview: new Date('2019-02-19'),
+        endSEPReview: new Date('2019-02-19'),
         startNotify: new Date('2019-02-19'),
         endNotify: new Date('2019-02-19'),
         startCycle: new Date('2019-02-19'),
         endCycle: new Date('2019-02-19'),
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
+        proposalWorkflowId: 1,
       })
     ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
+  });
+
+  test('A logged in user officer can not create a call with invalid dates', () => {
+    const callToCreate = {
+      shortCode: '2019-02-19',
+      startCall: new Date('2019-02-19'),
+      endCall: new Date('2019-02-18'),
+      startReview: new Date('2019-02-19'),
+      endReview: new Date('2019-02-18'),
+      startSEPReview: new Date('2019-02-19'),
+      endSEPReview: new Date('2019-02-19'),
+      startNotify: new Date('2019-02-19'),
+      endNotify: new Date('2019-02-19'),
+      startCycle: new Date('2019-02-19'),
+      endCycle: new Date('2019-02-19'),
+      cycleComment: 'Comment review',
+      surveyComment: 'Comment feedback',
+      proposalWorkflowId: 1,
+    };
+
+    return expect(
+      callMutations.create(dummyUserOfficerWithRole, callToCreate)
+    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
   });
 
   test('A logged in user officer can create a call', () => {
@@ -55,17 +92,27 @@ describe('Test Call Mutations', () => {
       endCall: new Date('2019-02-19'),
       startReview: new Date('2019-02-19'),
       endReview: new Date('2019-02-19'),
+      startSEPReview: new Date('2019-02-19'),
+      endSEPReview: new Date('2019-02-19'),
       startNotify: new Date('2019-02-19'),
       endNotify: new Date('2019-02-19'),
       startCycle: new Date('2019-02-19'),
       endCycle: new Date('2019-02-19'),
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
+      proposalWorkflowId: 1,
     };
 
     return expect(
       callMutations.create(dummyUserOfficerWithRole, callToCreate)
-    ).resolves.toStrictEqual({ id: 1, ...callToCreate, templateId: 1 });
+    ).resolves.toStrictEqual({
+      id: 1,
+      ...callToCreate,
+      callEnded: false,
+      callReviewEnded: false,
+      callSEPReviewEnded: false,
+      templateId: 1,
+    });
   });
 
   test('A logged in user can not update a call', () => {
@@ -77,12 +124,15 @@ describe('Test Call Mutations', () => {
         endCall: new Date('2020-06-18'),
         startReview: new Date('2020-06-18'),
         endReview: new Date('2020-06-18'),
+        startSEPReview: new Date('2019-02-19'),
+        endSEPReview: new Date('2019-02-19'),
         startNotify: new Date('2020-06-18'),
         endNotify: new Date('2020-06-18'),
         startCycle: new Date('2020-06-18'),
         endCycle: new Date('2020-06-18'),
         cycleComment: 'Comment review update',
         surveyComment: 'Comment feedback update',
+        proposalWorkflowId: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -95,12 +145,15 @@ describe('Test Call Mutations', () => {
       endCall: new Date('2020-06-18'),
       startReview: new Date('2020-06-18'),
       endReview: new Date('2020-06-18'),
+      startSEPReview: new Date('2019-02-19'),
+      endSEPReview: new Date('2019-02-19'),
       startNotify: new Date('2020-06-18'),
       endNotify: new Date('2020-06-18'),
       startCycle: new Date('2020-06-18'),
       endCycle: new Date('2020-06-18'),
       cycleComment: 'Comment review update',
       surveyComment: 'Comment feedback update',
+      proposalWorkflowId: 1,
     };
 
     return expect(
@@ -110,7 +163,7 @@ describe('Test Call Mutations', () => {
 
   test('A logged in user can not assign instrument to a call', () => {
     return expect(
-      callMutations.assignInstrumentToCall(dummyUserWithRole, {
+      callMutations.assignInstrumentsToCall(dummyUserWithRole, {
         callId: 1,
         instrumentIds: [1],
       })
@@ -119,7 +172,7 @@ describe('Test Call Mutations', () => {
 
   test('A logged in user officer can assign instrument to a call', () => {
     return expect(
-      callMutations.assignInstrumentToCall(dummyUserOfficerWithRole, {
+      callMutations.assignInstrumentsToCall(dummyUserOfficerWithRole, {
         callId: 1,
         instrumentIds: [1],
       })

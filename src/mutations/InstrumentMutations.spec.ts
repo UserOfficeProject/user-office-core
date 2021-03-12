@@ -2,15 +2,28 @@ import 'reflect-metadata';
 import {
   InstrumentDataSourceMock,
   dummyInstrument,
+  dummyInstrumentHasProposals,
 } from '../datasources/mockups/InstrumentDataSource';
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   dummyUserWithRole,
   dummyUserOfficerWithRole,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
+import { UserAuthorization } from '../utils/UserAuthorization';
 import InstrumentMutations from './InstrumentMutations';
 
+const userAuthorization = new UserAuthorization(
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock(),
+  new SEPDataSourceMock()
+);
+
 const instrumentMutations = new InstrumentMutations(
-  new InstrumentDataSourceMock()
+  new InstrumentDataSourceMock(),
+  new SEPDataSourceMock(),
+  userAuthorization
 );
 
 describe('Test Instrument Mutations', () => {
@@ -72,11 +85,14 @@ describe('Test Instrument Mutations', () => {
       instrumentMutations.assignProposalsToInstrument(
         dummyUserOfficerWithRole,
         {
-          proposalIds: [1, 2],
+          proposals: [
+            { id: 1, callId: 1 },
+            { id: 2, callId: 1 },
+          ],
           instrumentId: 1,
         }
       )
-    ).resolves.toBe(true);
+    ).resolves.toStrictEqual({ proposalIds: [1, 2] });
   });
 
   test('A logged in user officer can remove assigned proposal from instrument', () => {
@@ -139,5 +155,15 @@ describe('Test Instrument Mutations', () => {
         }
       )
     ).resolves.toBe(true);
+  });
+
+  test('A logged in user officer can submit instrument attached to a call from a SEP', () => {
+    return expect(
+      instrumentMutations.submitInstrument(dummyUserOfficerWithRole, {
+        instrumentId: 1,
+        callId: 1,
+        sepId: 1,
+      })
+    ).resolves.toBe(dummyInstrumentHasProposals);
   });
 });

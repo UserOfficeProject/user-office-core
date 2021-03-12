@@ -11,25 +11,26 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   backend:
-    image: dmsc/duo-backend
+    image: dmsc/duo-backend:develop
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
       tokenLife: 7d
       baseURL: localhost:3000
       SPARKPOST_TOKEN: dummytoken
+      USER_OFFICE_FACTORY_ENDPOINT: http://factory:4500/generate
     labels:
-      - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /proposal, /uploads"
+      - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads"
       - "traefik.port=4000"
   frontend:
-    image: dmsc/duo-frontend
+    image: dmsc/duo-frontend:develop
     labels:
       - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.port=80"
   duo-cron-job:
     image: dmsc/duo-cron-job
   db:
-    image: postgres:11.2
+    image: postgres:11-alpine
     restart: always
     environment:
       POSTGRES_PASSWORD: duopassword
@@ -49,3 +50,17 @@ services:
       NAME: "rabbitmq"
     volumes:
       - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
+  factory:
+    image: dmsc/duo-factory:develop
+    init: true
+    environment:
+      - NODE_ENV=production
+      - DATABASE_HOSTNAME=localhost
+      - DATABASE_PORT=5432
+      - DATABASE_USER=duouser
+      - DATABASE_PASSWORD=duopassword
+      - DATABASE_DATABASE=duo
+    ports:
+      - 4500:4500
+    cap_add:
+      - SYS_ADMIN

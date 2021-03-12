@@ -1,11 +1,14 @@
-import { Field, Int, ObjectType } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 
-import { TemplateCategory as TemplateCategoryOrigin } from '../../models/ProposalModel';
+import {
+  TemplateCategory as TemplateCategoryOrigin,
+  TemplateCategoryId,
+} from '../../models/Template';
 
 @ObjectType()
 export class TemplateCategory implements Partial<TemplateCategoryOrigin> {
-  @Field(() => Int)
-  public categoryId: number;
+  @Field(() => TemplateCategoryId)
+  public categoryId: TemplateCategoryId;
 
   @Field()
   public name: string;

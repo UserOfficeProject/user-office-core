@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { TemplateCategoryId } from '../../models/ProposalModel';
+import { TemplateCategoryId } from '../../models/Template';
 import { ProposalTemplate } from '../types/ProposalTemplate';
 @InputType()
 class ProposalTemplatesFilter {

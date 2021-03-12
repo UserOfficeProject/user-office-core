@@ -6,4 +6,9 @@ coverage
 downloads
 uploads
 
+.vscode/tasks.json
 .vscode/launch.json
+.vscode/settings.json
+.env
+
+build-version*.txt

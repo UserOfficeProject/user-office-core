@@ -4,24 +4,23 @@ export class SEP {
     public code: string,
     public description: string,
     public numberRatingsRequired: number,
-    public active: boolean
+    public active: boolean,
+    public sepChairUserId: number | null,
+    public sepSecretaryUserId: number | null
   ) {}
 }
 
-export class SEPMember {
-  constructor(
-    public roleUserId: number,
-    public roleId: number,
-    public userId: number,
-    public sepId: number
-  ) {}
+export class SEPReviewer {
+  constructor(public userId: number, public sepId: number) {}
 }
 
 export class SEPProposal {
   constructor(
     public proposalId: number,
     public sepId: number,
-    public dateAssigned: Date
+    public dateAssigned: Date,
+    public sepTimeAllocation: number | null,
+    public instrumentSubmitted?: boolean
   ) {}
 }
 

@@ -1,5 +1,7 @@
+import { ResourceId } from '@esss-swap/duo-localisation';
+import { logger } from '@esss-swap/duo-logger';
 import {
-  administrationProposalBEValidationSchema,
+  administrationProposalValidationSchema,
   createProposalValidationSchema,
   deleteProposalValidationSchema,
   proposalNotifyValidationSchema,
@@ -8,18 +10,18 @@ import {
 } from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
 
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
-import { ProposalStatus } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
+import { CloneProposalInput } from '../resolvers/mutations/CloneProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
-import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 
@@ -28,8 +30,8 @@ export default class ProposalMutations {
     private proposalDataSource: ProposalDataSource,
     private questionaryDataSource: QuestionaryDataSource,
     private callDataSource: CallDataSource,
-    private userAuth: UserAuthorization,
-    private logger: Logger
+    private instrumentDataSource: InstrumentDataSource,
+    private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -55,14 +57,14 @@ export default class ProposalMutations {
     }
 
     const questionary = await this.questionaryDataSource.create(
-      agent!.id,
+      (agent as UserWithRole).id,
       call.templateId
     );
 
     return this.proposalDataSource
-      .create(agent!.id, callId, questionary.questionaryId!)
-      .then(proposal => proposal)
-      .catch(err => {
+      .create((agent as UserWithRole).id, callId, questionary.questionaryId)
+      .then((proposal) => proposal)
+      .catch((err) => {
         logger.logException('Could not create proposal', err, { agent });
 
         return rejection('INTERNAL_ERROR');
@@ -105,10 +107,7 @@ export default class ProposalMutations {
       return rejection('NOT_ALLOWED');
     }
 
-    if (
-      proposal.status !== ProposalStatus.DRAFT &&
-      !(await this.userAuth.isUserOfficer(agent))
-    ) {
+    if (proposal.submitted && !(await this.userAuth.isUserOfficer(agent))) {
       return rejection('NOT_ALLOWED_PROPOSAL_SUBMITTED');
     }
 
@@ -137,8 +136,8 @@ export default class ProposalMutations {
 
     return this.proposalDataSource
       .update(proposal)
-      .then(proposal => proposal)
-      .catch(err => {
+      .then((proposal) => proposal)
+      .catch((err) => {
         logger.logException('Could not update proposal', err, {
           agent,
           id,
@@ -170,8 +169,8 @@ export default class ProposalMutations {
 
     return this.proposalDataSource
       .submitProposal(proposalId)
-      .then(proposal => proposal)
-      .catch(e => {
+      .then((proposal) => proposal)
+      .catch((e) => {
         logger.logException('Could not submit proposal', e, {
           agent,
           proposalId,
@@ -182,7 +181,7 @@ export default class ProposalMutations {
   }
 
   @ValidateArgs(deleteProposalValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized()
   async delete(
     agent: UserWithRole | null,
     { proposalId }: { proposalId: number }
@@ -190,14 +189,37 @@ export default class ProposalMutations {
     const proposal = await this.proposalDataSource.get(proposalId);
 
     if (!proposal) {
-      return rejection('INTERNAL_ERROR');
+      return rejection('NOT_FOUND');
     }
 
-    const result = await this.proposalDataSource.deleteProposal(proposalId);
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      if (
+        proposal.submitted ||
+        !this.userAuth.isPrincipalInvestigatorOfProposal(agent, proposal)
+      )
+        return rejection('NOT_ALLOWED');
+    }
 
-    await this.questionaryDataSource.delete(result.questionaryId);
+    try {
+      const result = await this.proposalDataSource.deleteProposal(proposalId);
 
-    return result || rejection('INTERNAL_ERROR');
+      await this.questionaryDataSource.delete(result.questionaryId);
+
+      return result;
+    } catch (e) {
+      if ('code' in e && e.code === '23503') {
+        return rejection(
+          `Failed to delete proposal with ID "${proposal.shortCode}", it has dependencies which need to be deleted first` as ResourceId
+        );
+      }
+
+      logger.logException('Failed to delete proposal', e, {
+        agent,
+        proposalId,
+      });
+
+      return rejection('INTERNAL_ERROR');
+    }
   }
 
   @ValidateArgs(proposalNotifyValidationSchema)
@@ -218,8 +240,9 @@ export default class ProposalMutations {
     return result || rejection('INTERNAL_ERROR');
   }
 
-  @ValidateArgs(administrationProposalBEValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED)
+  @ValidateArgs(administrationProposalValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async admin(
     agent: UserWithRole | null,
     args: AdministrationProposalArgs
@@ -228,15 +251,34 @@ export default class ProposalMutations {
       id,
       rankOrder,
       finalStatus,
-      status,
+      statusId,
       commentForManagement,
       commentForUser,
     } = args;
+    const isChairOrSecretaryOfProposal = await this.userAuth.isChairOrSecretaryOfProposal(
+      agent!.id,
+      id
+    );
+    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+
+    if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
+      return rejection('NOT_ALLOWED');
+    }
+
     const proposal = await this.proposalDataSource.get(id);
 
     if (!proposal) {
       return rejection('INTERNAL_ERROR');
     }
+
+    const isProposalInstrumentSubmitted = await this.instrumentDataSource.isProposalInstrumentSubmitted(
+      id
+    );
+
+    if (isProposalInstrumentSubmitted && !isUserOfficer) {
+      return rejection('NOT_ALLOWED');
+    }
+
     if (rankOrder !== undefined) {
       proposal.rankOrder = rankOrder;
     }
@@ -245,8 +287,21 @@ export default class ProposalMutations {
       proposal.finalStatus = finalStatus;
     }
 
-    if (status !== undefined) {
-      proposal.status = status;
+    if (proposal.statusId !== statusId && statusId) {
+      /**
+       * NOTE: Reset proposal events that are coming after given status.
+       * For example if proposal had SEP_REVIEW status and we manually reset to FEASIBILITY_REVIEW then events like:
+       * proposal_feasible, proposal_feasibility_review_submitted and proposal_sep_selected should be reset to false in the proposal_events table
+       */
+      await this.proposalDataSource.resetProposalEvents(
+        proposal.id,
+        proposal.callId,
+        statusId
+      );
+    }
+
+    if (statusId !== undefined) {
+      proposal.statusId = statusId;
     }
 
     if (commentForUser !== undefined) {
@@ -260,5 +315,41 @@ export default class ProposalMutations {
     const result = await this.proposalDataSource.update(proposal);
 
     return result || rejection('INTERNAL_ERROR');
+  }
+
+  @Authorized()
+  @EventBus(Event.PROPOSAL_CLONED)
+  async clone(
+    agent: UserWithRole | null,
+    { callId, proposalToCloneId }: CloneProposalInput
+  ): Promise<Proposal | Rejection> {
+    // Check if there is an open call
+    if (!(await this.proposalDataSource.checkActiveCall(callId))) {
+      return rejection('NO_ACTIVE_CALL_FOUND');
+    }
+
+    const call = await this.callDataSource.get(callId);
+
+    if (!call || !call.templateId) {
+      logger.logError('User tried to clone proposal on bad call', {
+        call,
+      });
+
+      return rejection('NOT_FOUND');
+    }
+
+    return this.proposalDataSource
+      .cloneProposal(
+        (agent as UserWithRole).id,
+        proposalToCloneId,
+        callId,
+        call.templateId
+      )
+      .then((proposal) => proposal)
+      .catch((err) => {
+        logger.logException('Could not clone proposal', err, { agent });
+
+        return rejection('INTERNAL_ERROR');
+      });
   }
 }

@@ -3,7 +3,7 @@ import { Field, ObjectType, Int } from 'type-graphql';
 
 @ObjectType()
 export class Role {
-  @Field(type => Int)
+  @Field((type) => Int)
   public id: number;
 
   @Field()

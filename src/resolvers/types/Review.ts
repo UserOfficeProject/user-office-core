@@ -9,10 +9,10 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ReviewStatus } from '../../models/Review';
-import { Review as ReviewOrigin } from '../../models/Review';
+import { Review as ReviewOrigin, ReviewStatus } from '../../models/Review';
 import { Proposal } from '../types/Proposal';
-import { User } from '../types/User';
+import { BasicUserDetails } from './BasicUserDetails';
+import { NextProposalStatus } from './ProposalStatus';
 
 @ObjectType()
 export class Review implements Partial<ReviewOrigin> {
@@ -37,14 +37,20 @@ export class Review implements Partial<ReviewOrigin> {
   public sepID: number;
 }
 
+@ObjectType()
+export class ReviewWithNextProposalStatus extends Review {
+  @Field(() => NextProposalStatus, { nullable: true })
+  public nextProposalStatus: NextProposalStatus;
+}
+
 @Resolver(() => Review)
 export class ReviewResolver {
-  @FieldResolver(() => User, { nullable: true })
+  @FieldResolver(() => BasicUserDetails, { nullable: true })
   async reviewer(
     @Root() review: Review,
     @Ctx() context: ResolverContext
-  ): Promise<User | null> {
-    return context.queries.user.get(context.user, review.userID);
+  ): Promise<BasicUserDetails | null> {
+    return context.queries.user.getBasic(context.user, review.userID);
   }
 
   @FieldResolver(() => Proposal, { nullable: true })

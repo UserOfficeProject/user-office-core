@@ -1,7 +1,7 @@
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-import { TemplateStep, Question } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
+import { Question, TemplateCategoryId, TemplateStep } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
@@ -18,7 +18,7 @@ export default class TemplateQueries {
     return this.dataSource.getTemplates(args);
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getComplementaryQuestions(
     agent: UserWithRole | null,
     templateId: number
@@ -26,7 +26,7 @@ export default class TemplateQueries {
     return this.dataSource.getComplementaryQuestions(templateId);
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getTemplateSteps(
     agent: UserWithRole | null,
     templateId: number
@@ -42,5 +42,13 @@ export default class TemplateQueries {
   @Authorized([Roles.USER_OFFICER])
   getTemplateCategories(user: UserWithRole | null) {
     return this.dataSource.getTemplateCategories();
+  }
+
+  @Authorized()
+  getActiveTemplateId(
+    user: UserWithRole | null,
+    templateCategoryId: TemplateCategoryId
+  ) {
+    return this.dataSource.getActiveTemplateId(templateCategoryId);
   }
 }

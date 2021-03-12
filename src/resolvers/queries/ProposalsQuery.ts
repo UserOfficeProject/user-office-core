@@ -11,15 +11,29 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { QuestionFilterCompareOperator } from '../../models/Questionary';
+import { DataType } from '../../models/Template';
 import { Proposal } from '../types/Proposal';
+
+@InputType()
+export class QuestionFilterInput {
+  @Field(() => String)
+  public questionId: string;
+
+  @Field(() => String)
+  public value: string;
+
+  @Field(() => QuestionFilterCompareOperator)
+  public compareOperator: QuestionFilterCompareOperator;
+
+  @Field(() => DataType)
+  public dataType: DataType;
+}
 
 @InputType()
 export class ProposalsFilter {
   @Field(() => String, { nullable: true })
   public text?: string;
-
-  @Field(() => [Int], { nullable: true })
-  public templateIds?: number[];
 
   @Field(() => [Int], { nullable: true })
   public questionaryIds?: number[];
@@ -29,6 +43,15 @@ export class ProposalsFilter {
 
   @Field(() => Int, { nullable: true })
   public instrumentId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public proposalStatusId?: number;
+
+  @Field(() => [String], { nullable: true })
+  public shortCodes?: string[];
+
+  @Field(() => QuestionFilterInput, { nullable: true })
+  public questionFilter?: QuestionFilterInput;
 }
 
 @ArgsType()
@@ -60,6 +83,19 @@ export class ProposalsQuery {
     @Ctx() context: ResolverContext
   ): Promise<ProposalsQueryResult | null> {
     return context.queries.proposal.getAll(
+      context.user,
+      args.filter,
+      args.first,
+      args.offset
+    );
+  }
+
+  @Query(() => ProposalsQueryResult, { nullable: true })
+  async instrumentScientistProposals(
+    @Args() args: ProposalsArgs,
+    @Ctx() context: ResolverContext
+  ): Promise<ProposalsQueryResult | null> {
+    return context.queries.proposal.getInstrumentScientistProposals(
       context.user,
       args.filter,
       args.first,

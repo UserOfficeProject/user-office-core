@@ -17,11 +17,11 @@ test('A user officer fetch can fetch any user account', () => {
   ).resolves.toBe(dummyUser);
 });
 
-test('A user is allowed to fetch its own account ', () => {
+test('A user is allowed to fetch its own account', () => {
   return expect(userQueries.me(dummyUserWithRole)).resolves.toBe(dummyUser);
 });
 
-test('A user is not allowed to fetch other peoples account ', () => {
+test('A user is not allowed to fetch other peoples account', () => {
   return expect(
     userQueries.get(dummyUserWithRole, dummyUserOfficer.id)
   ).resolves.toBe(null);

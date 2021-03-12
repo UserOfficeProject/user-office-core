@@ -1,5 +1,4 @@
 /* eslint-disable prefer-const */
-/* eslint-disable @typescript-eslint/camelcase */
 // @ts-nocheck
 import fs from 'fs';
 
@@ -26,6 +25,10 @@ export default class PostgresFileDataSource implements FileDataSource {
   }
 
   public async getMetadata(fileIds: string[]): Promise<FileMetadata[]> {
+    if (fileIds.length === 0) {
+      return [];
+    }
+
     return database('files')
       .select([
         'file_id',
@@ -38,7 +41,7 @@ export default class PostgresFileDataSource implements FileDataSource {
       ])
       .whereIn('file_id', fileIds)
       .then((records: FileRecord[]) => {
-        return records.map(record => createFileMetadata(record));
+        return records.map((record) => createFileMetadata(record));
       });
   }
 
@@ -105,7 +108,7 @@ export default class PostgresFileDataSource implements FileDataSource {
       const fileStream = fs.createReadStream(filePath);
       fileStream.pipe(stream);
     })
-      .then(newOid => {
+      .then((newOid) => {
         return newOid;
       })
       .finally(() => {
@@ -148,13 +151,13 @@ export default class PostgresFileDataSource implements FileDataSource {
 
       console.log('Streaming a large object with a total size of', size);
 
-      stream.on('end', function() {
+      stream.on('end', function () {
         connection?.query('COMMIT', () => resolve());
         database.client.releaseConnection(connection);
       });
 
       // Store it as an image
-      const fileStream = require('fs').createWriteStream(output);
+      const fileStream = fs.createWriteStream(output);
       stream.pipe(fileStream);
     });
   }

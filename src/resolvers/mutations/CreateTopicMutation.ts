@@ -17,8 +17,11 @@ export class CreateTopicArgs {
   @Field(() => Int)
   templateId: number;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   sortOrder: number;
+
+  @Field(() => Int, { nullable: true })
+  title?: string;
 }
 
 @Resolver()

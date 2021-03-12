@@ -8,6 +8,7 @@ BEGIN
 
 		ALTER TABLE users ADD COLUMN placeholder BOOLEAN DEFAULT FALSE;
 
+		UPDATE users SET placeholder = true WHERE email = 'unverified-user@example.com';
 
 
     END;

@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
@@ -7,11 +8,15 @@ import {
   assignScientistsToInstrumentValidationSchema,
   removeScientistFromInstrumentValidationSchema,
   setAvailabilityTimeOnInstrumentValidationSchema,
+  submitInstrumentValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { Authorized, ValidateArgs } from '../decorators';
-import { Instrument } from '../models/Instrument';
+import { SEPDataSource } from '../datasources/SEPDataSource';
+import { Authorized, EventBus, ValidateArgs } from '../decorators';
+import { Event } from '../events/event.enum';
+import { Instrument, InstrumentHasProposals } from '../models/Instrument';
+import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
@@ -27,11 +32,16 @@ import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMut
 import {
   UpdateInstrumentArgs,
   InstrumentAvailabilityTimeArgs,
+  InstrumentSubmitArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
-import { logger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class InstrumentMutations {
-  constructor(private dataSource: InstrumentDataSource) {}
+  constructor(
+    private dataSource: InstrumentDataSource,
+    private sepDataSource: SEPDataSource,
+    private userAuth: UserAuthorization
+  ) {}
 
   @ValidateArgs(createInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
@@ -41,8 +51,8 @@ export default class InstrumentMutations {
   ): Promise<Instrument | Rejection> {
     return this.dataSource
       .create(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not create instrument', error, {
           agent,
           shortCode: args.shortCode,
@@ -60,8 +70,8 @@ export default class InstrumentMutations {
   ): Promise<Instrument | Rejection> {
     return this.dataSource
       .update(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not update instrument', error, {
           agent,
           instrumentId: args.id,
@@ -79,8 +89,8 @@ export default class InstrumentMutations {
   ): Promise<Instrument | Rejection> {
     return this.dataSource
       .delete(args.id)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not delete instrument', error, {
           agent,
           instrumentId: args.id,
@@ -90,23 +100,58 @@ export default class InstrumentMutations {
       });
   }
 
+  async checkIfProposalsAreOnSameCallAsInstrument(
+    inputArguments: AssignProposalsToInstrumentArgs
+  ) {
+    const proposalCallIds = inputArguments.proposals.map(
+      (proposal) => proposal.callId
+    );
+    const proposalCallsWithInstrument = await this.dataSource.getCallsByInstrumentId(
+      inputArguments.instrumentId,
+      proposalCallIds
+    );
+
+    const proposalsOnSameCallAsInstrument = inputArguments.proposals.filter(
+      (proposal) =>
+        proposalCallsWithInstrument.some(
+          (call) => call.callId === proposal.callId
+        )
+    );
+
+    return (
+      proposalsOnSameCallAsInstrument.length === inputArguments.proposals.length
+    );
+  }
+
+  @EventBus(Event.PROPOSAL_INSTRUMENT_SELECTED)
   @ValidateArgs(assignProposalsToInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async assignProposalsToInstrument(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
-  ): Promise<boolean | Rejection> {
+  ): Promise<ProposalIdsWithNextStatus | Rejection> {
+    const allProposalsAreOnSameCallAsInstrument = await this.checkIfProposalsAreOnSameCallAsInstrument(
+      args
+    );
+
+    if (!allProposalsAreOnSameCallAsInstrument) {
+      return rejection('NOT_ALLOWED');
+    }
+
     return this.dataSource
-      .assignProposalsToInstrument(args.proposalIds, args.instrumentId)
-      .then(result => result)
-      .catch(error => {
+      .assignProposalsToInstrument(
+        args.proposals.map((proposal) => proposal.id),
+        args.instrumentId
+      )
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not assign proposal/s to instrument',
           error,
           {
             agent,
             instrumentId: args.instrumentId,
-            proposalIds: args.proposalIds,
+            proposals: args.proposals,
           }
         );
 
@@ -122,8 +167,8 @@ export default class InstrumentMutations {
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .removeProposalFromInstrument(args.proposalId, args.instrumentId)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not remove assigned proposal/s from instrument',
           error,
@@ -146,8 +191,8 @@ export default class InstrumentMutations {
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .assignScientistsToInstrument(args.scientistIds, args.instrumentId)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not assign scientist/s to instrument',
           error,
@@ -169,8 +214,8 @@ export default class InstrumentMutations {
   ): Promise<boolean | Rejection> {
     return this.dataSource
       .removeScientistFromInstrument(args.scientistId, args.instrumentId)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not remove assigned scientist/s from instrument',
           error,
@@ -196,8 +241,8 @@ export default class InstrumentMutations {
         args.instrumentId,
         args.availabilityTime
       )
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not set availability time on instrument',
           error,
@@ -206,6 +251,44 @@ export default class InstrumentMutations {
             args,
           }
         );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @EventBus(Event.PROPOSAL_INSTRUMENT_SUBMITTED)
+  @ValidateArgs(submitInstrumentValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  async submitInstrument(
+    agent: UserWithRole | null,
+    args: InstrumentSubmitArgs
+  ): Promise<InstrumentHasProposals | Rejection> {
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isChairOrSecretaryOfSEP(
+        (agent as UserWithRole).id,
+        args.sepId
+      ))
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    const submittedInstrumentProposalIds = (
+      await this.sepDataSource.getSEPProposalsByInstrument(
+        args.sepId,
+        args.instrumentId,
+        args.callId
+      )
+    ).map((sepInstrumentProposal) => sepInstrumentProposal.proposalId);
+
+    return this.dataSource
+      .submitInstrument(submittedInstrumentProposalIds, args.instrumentId)
+      .then((result) => result)
+      .catch((error) => {
+        logger.logException('Could not submit instrument', error, {
+          agent,
+          args,
+        });
 
         return rejection('INTERNAL_ERROR');
       });

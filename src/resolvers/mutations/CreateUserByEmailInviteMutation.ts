@@ -48,7 +48,7 @@ export class CreateUserByEmailInviteMutation {
     return wrapResponse(
       context.mutations.user
         .createUserByEmailInvite(context.user, args)
-        .then(res => (isRejection(res) ? res : res.userId)),
+        .then((res) => (isRejection(res) ? res : res.userId)),
       CreateUserByEmailInviteResponseWrap
     );
   }

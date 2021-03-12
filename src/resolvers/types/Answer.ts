@@ -1,12 +1,16 @@
-import { Field, ObjectType } from 'type-graphql';
+import { Field, ObjectType, Int } from 'type-graphql';
 
-import { Answer as AnswerOrigin } from '../../models/ProposalModel';
-import { IntStringDateBool } from '../CustomScalars';
+import { Answer as AnswerOrigin } from '../../models/Questionary';
+import { IntStringDateBoolArray, AnswerType } from '../CustomScalars';
 import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 
 @ObjectType()
-export class Answer extends QuestionTemplateRelation
+export class Answer
+  extends QuestionTemplateRelation
   implements Partial<AnswerOrigin> {
-  @Field(() => IntStringDateBool, { nullable: true })
-  public value?: number | string | Date | boolean;
+  @Field(() => Int, { nullable: true })
+  public answerId: number;
+
+  @Field(() => IntStringDateBoolArray, { nullable: true })
+  public value?: AnswerType;
 }

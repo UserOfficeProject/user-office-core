@@ -6,6 +6,7 @@ import {
   FieldResolver,
   Root,
   Ctx,
+  Directive,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -14,6 +15,7 @@ import { isRejection } from '../../rejection';
 import { BasicUserDetails } from './BasicUserDetails';
 
 @ObjectType()
+@Directive('@key(fields: "id")')
 export class Instrument implements Partial<InstrumentOrigin> {
   @Field(() => Int)
   public id: number;
@@ -32,6 +34,9 @@ export class Instrument implements Partial<InstrumentOrigin> {
 export class InstrumentWithAvailabilityTime extends Instrument {
   @Field(() => Int, { nullable: true })
   public availabilityTime: number;
+
+  @Field(() => Boolean, { defaultValue: false })
+  public submitted: boolean;
 }
 
 @Resolver(() => Instrument)
@@ -47,4 +52,21 @@ export class InstrumentResolver {
 
     return isRejection(scientists) ? [] : scientists;
   }
+}
+
+export async function resolveInstrumentReference(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ...params: any
+): Promise<Instrument> {
+  // the order of the parameters and types are messed up,
+  // it should be source, args, context, resolveInfo
+  // but instead we get source, context and resolveInfo
+  // this was the easies way to make the compiler happy and use real types
+  const [reference, ctx]: [Pick<Instrument, 'id'>, ResolverContext] = params;
+
+  // dataSource.get can be null, even with non-null operator the compiler complains
+  return (await (ctx.queries.instrument.byRef(
+    ctx.user,
+    reference.id
+  ) as unknown)) as Instrument;
 }

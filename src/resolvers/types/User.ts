@@ -1,33 +1,38 @@
 import {
   Ctx,
+  Directive,
   Field,
   FieldResolver,
   Int,
   ObjectType,
   Resolver,
   Root,
+  Arg,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { ReviewStatus } from '../../models/Review';
 import { User as UserOrigin } from '../../models/User';
+import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
 import { Review } from './Review';
 import { Role } from './Role';
 import { SEP } from './SEP';
 
 @ObjectType()
+@Directive('@key(fields: "id")')
 export class User implements Partial<UserOrigin> {
   @Field(() => Int)
   public id: number;
 
-  @Field(() => String, { nullable: true })
-  public user_title: string | null;
+  @Field(() => String)
+  public user_title: string;
 
   @Field()
   public firstname: string;
 
   @Field(() => String, { nullable: true })
-  public middlename: string | null;
+  public middlename: string | undefined;
 
   @Field()
   public lastname: string;
@@ -36,7 +41,7 @@ export class User implements Partial<UserOrigin> {
   public username: string;
 
   @Field(() => String, { nullable: true })
-  public preferredname: string | null;
+  public preferredname: string | undefined;
 
   @Field()
   public orcid: string;
@@ -72,7 +77,7 @@ export class User implements Partial<UserOrigin> {
   public telephone: string;
 
   @Field(() => String, { nullable: true })
-  public telephone_alt: string | null;
+  public telephone_alt: string | undefined;
 
   @Field()
   public placeholder: boolean;
@@ -92,8 +97,19 @@ export class UserResolver {
   }
 
   @FieldResolver(() => [Review])
-  async reviews(@Root() user: User, @Ctx() context: ResolverContext) {
-    return context.queries.review.dataSource.getUserReviews(user.id);
+  async reviews(
+    @Root() user: User,
+    @Arg('callId', () => Int, { nullable: true }) callId: number,
+    @Arg('instrumentId', () => Int, { nullable: true }) instrumentId: number,
+    @Arg('status', () => ReviewStatus, { nullable: true }) status: number,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.review.dataSource.getUserReviews(
+      user.id,
+      callId,
+      instrumentId,
+      status
+    );
   }
 
   @FieldResolver(() => [Proposal])
@@ -103,6 +119,33 @@ export class UserResolver {
 
   @FieldResolver(() => [SEP])
   async seps(@Root() user: User, @Ctx() context: ResolverContext) {
-    return context.queries.sep.dataSource.getUserSeps(user.id);
+    if (!context.user || !context.user.currentRole) {
+      return [];
+    }
+
+    return context.queries.sep.dataSource.getUserSeps(
+      user.id,
+      context.user.currentRole
+    );
   }
+
+  @FieldResolver(() => [Instrument])
+  async instruments(@Root() user: User, @Ctx() context: ResolverContext) {
+    return context.queries.instrument.dataSource.getUserInstruments(user.id);
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function resolveUserReference(...params: any): Promise<User> {
+  // the order of the parameters and types are messed up,
+  // it should be source, args, context, resolveInfo
+  // but instead we get source, context and resolveInfo
+  // this was the easies way to make the compiler happy and use real types
+  const [reference, ctx]: [Pick<User, 'id'>, ResolverContext] = params;
+
+  // dataSource.get can be null, even with non-null operator the compiler complains
+  return (await (ctx.queries.user.byRef(
+    ctx.user,
+    reference.id
+  ) as unknown)) as User;
 }

@@ -1,7 +1,8 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { logger } from '../utils/Logger';
 
 export default function createHandler(
   eventLogsDataSource: EventLogsDataSource
@@ -42,6 +43,35 @@ export default function createHandler(
             event.type,
             json,
             event.emailinviteresponse.userId.toString()
+          );
+          break;
+        case Event.PROPOSAL_INSTRUMENT_SELECTED:
+        case Event.PROPOSAL_SEP_SELECTED:
+          event.proposalidswithnextstatus.proposalIds.forEach(
+            async (proposalId) => {
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                proposalId.toString()
+              );
+            }
+          );
+          break;
+        case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            event.instrumenthasproposals.instrumentId.toString()
+          );
+          break;
+        case Event.PROPOSAL_SEP_REVIEW_UPDATED:
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            event.reviewwithnextproposalstatus.id.toString()
           );
           break;
         default:

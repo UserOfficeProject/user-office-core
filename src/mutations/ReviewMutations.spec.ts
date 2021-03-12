@@ -1,8 +1,10 @@
 import 'reflect-metadata';
+import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
 import {
   ReviewDataSourceMock,
-  dummyReview,
+  dummyReviewWithNextProposalStatus,
 } from '../datasources/mockups/ReviewDataSource';
+import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   UserDataSourceMock,
   dummyUserWithRole,
@@ -15,11 +17,13 @@ import ReviewMutations from './ReviewMutations';
 
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
-  new ReviewDataSourceMock()
+  new ReviewDataSourceMock(),
+  new SEPDataSourceMock()
 );
 const reviewMutations = new ReviewMutations(
   new ReviewDataSourceMock(),
-  userAuthorization
+  userAuthorization,
+  new ProposalSettingsDataSourceMock()
 );
 
 //Update
@@ -33,7 +37,7 @@ test('A reviewer can submit a review on a proposal he is on', () => {
       status: ReviewStatus.DRAFT,
       sepID: 1,
     })
-  ).resolves.toBe(dummyReview);
+  ).resolves.toEqual(dummyReviewWithNextProposalStatus);
 });
 
 test('A user can not submit a review on a proposal', () => {
@@ -71,13 +75,17 @@ test('A user can not add a reviewer for a proposal', () => {
 test('A userofficer can remove a reviewer for a proposal', () => {
   return expect(
     reviewMutations.removeUserForReview(dummyUserOfficerWithRole, {
-      reviewID: 1,
+      reviewId: 1,
+      sepId: 1,
     })
   ).resolves.toBeInstanceOf(Review);
 });
 
 test('A user can not remove a reviewer for a proposal', () => {
   return expect(
-    reviewMutations.removeUserForReview(dummyUserWithRole, { reviewID: 1 })
+    reviewMutations.removeUserForReview(dummyUserWithRole, {
+      reviewId: 1,
+      sepId: 1,
+    })
   ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });
