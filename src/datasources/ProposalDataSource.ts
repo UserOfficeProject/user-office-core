@@ -47,4 +47,9 @@ export interface ProposalDataSource {
     callId: number,
     templateId: number
   ): Promise<Proposal>;
+  resetProposalEvents(
+    proposalId: number,
+    callId: number,
+    statusId: number
+  ): Promise<boolean>;
 }

@@ -35,7 +35,9 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.commentForUser || 'comment for user',
     values?.commentForManagement || 'comment for management',
     values?.notified || false,
-    values?.submitted || false
+    values?.submitted || false,
+    values?.managementTimeAllocation || 0,
+    values?.managementDecisionSubmitted || false
   );
 };
 
@@ -184,5 +186,13 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     templateId: number
   ): Promise<Proposal> {
     return dummyProposal;
+  }
+
+  async resetProposalEvents(
+    proposalId: number,
+    callId: number,
+    statusId: number
+  ): Promise<boolean> {
+    return true;
   }
 }

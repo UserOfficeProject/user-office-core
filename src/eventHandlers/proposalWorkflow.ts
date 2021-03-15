@@ -101,6 +101,30 @@ export default function createHandler(
         }
 
         break;
+      case Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED:
+        try {
+          if (event.proposal.managementDecisionSubmitted) {
+            eventBus.publish({
+              type: Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED,
+              proposal: event.proposal,
+              isRejection: false,
+              key: 'proposal',
+              loggedInUserId: event.loggedInUserId,
+            });
+          }
+
+          await markProposalEventAsDoneAndCallWorkflowEngine(
+            event.type,
+            event.proposal
+          );
+        } catch (error) {
+          logger.logError(
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.id}: `,
+            error
+          );
+        }
+
+        break;
       case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED:
         try {
           switch (event.proposal.finalStatus) {
