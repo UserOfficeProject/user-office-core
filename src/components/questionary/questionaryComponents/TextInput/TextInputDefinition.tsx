@@ -9,7 +9,7 @@ import { createTextInputValidationSchema } from './createTextInputValidationSche
 import { QuestionaryComponentTextInput } from './QuestionaryComponentTextInput';
 import { QuestionTemplateRelationTextInputForm } from './QuestionTemplateRelationTextInputForm';
 import { QuestionTextInputForm } from './QuestionTextInputForm';
-import TextSearchCriteriaComponent from './TextSearchCriteriaInput';
+import TextSearchCriteriaComponent from './TextSearchCriteriaComponent';
 
 export const textInputDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.TEXT_INPUT,
