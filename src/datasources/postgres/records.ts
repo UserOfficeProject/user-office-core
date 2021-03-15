@@ -62,6 +62,8 @@ export interface ProposalRecord {
   readonly comment_for_management: string;
   readonly notified: boolean;
   readonly submitted: boolean;
+  readonly management_time_allocation: number;
+  readonly management_decision_submitted: boolean;
 }
 
 export interface ProposalViewRecord {
@@ -489,7 +491,9 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.comment_for_user,
     proposal.comment_for_management,
     proposal.notified,
-    proposal.submitted
+    proposal.submitted,
+    proposal.management_time_allocation,
+    proposal.management_decision_submitted
   );
 };
 
