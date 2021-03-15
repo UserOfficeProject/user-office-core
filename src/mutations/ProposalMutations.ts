@@ -300,6 +300,11 @@ export default class ProposalMutations {
         proposal.callId,
         statusId
       );
+
+      // NOTE: If status Draft re-open proposal for submission.
+      if (statusId === 1) {
+        proposal.submitted = false;
+      }
     }
 
     if (statusId !== undefined) {
