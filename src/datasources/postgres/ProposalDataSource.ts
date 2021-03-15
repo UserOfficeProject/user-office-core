@@ -107,6 +107,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           comment_for_user: proposal.commentForUser,
           comment_for_management: proposal.commentForManagement,
           notified: proposal.notified,
+          management_time_allocation: proposal.managementTimeAllocation,
+          management_decision_submitted: proposal.managementDecisionSubmitted,
         },
         ['*']
       )
