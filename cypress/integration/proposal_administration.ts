@@ -58,9 +58,25 @@ context('Proposal administration tests', () => {
 
     cy.get('[id="menu-proposalStatus"] [role="option"]').first().click();
 
+    cy.get('[data-cy="managementTimeAllocation"] input')
+      .clear()
+      .type('-123')
+      .blur();
+    cy.contains('Must be greater than or equal to');
+
+    cy.get('[data-cy="managementTimeAllocation"] input')
+      .clear()
+      .type('987654321')
+      .blur();
+    cy.contains('Must be less than or equal to');
+
+    cy.get('[data-cy="managementTimeAllocation"] input').clear().type('20');
+
     cy.get('[data-cy=commentForUser]').type(textUser);
 
     cy.get('[data-cy=commentForManagement]').type(textManager);
+
+    cy.get('[data-cy="is-management-decision-submitted"]').click();
 
     cy.contains('Update').click();
 
@@ -68,20 +84,23 @@ context('Proposal administration tests', () => {
 
     cy.reload();
 
-    cy.contains('Admin').click();
-
     cy.contains(textUser);
 
     cy.contains(textManager);
 
+    cy.get('[data-cy="managementTimeAllocation"] input').should(
+      'have.value',
+      '20'
+    );
+
+    cy.get('[data-cy="is-management-decision-submitted"] input').should(
+      'have.value',
+      'true'
+    );
+
     cy.closeModal();
 
     cy.contains('Accepted');
-
-    cy.contains('DRAFT');
-
-    cy.contains('Proposals').click();
-
     cy.contains('DRAFT');
   });
 
