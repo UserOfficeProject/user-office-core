@@ -1,3 +1,5 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
 import {
@@ -81,7 +83,15 @@ export default class ProposalQueries {
 
   @Authorized([Roles.USER_OFFICER])
   async getAllView(agent: UserWithRole | null, filter?: ProposalsFilter) {
-    return this.dataSource.getProposalsFromView(filter);
+    try {
+      // leave await here because getProposalsFromView might thrown an exception
+      // and we want to handle it here
+      return await this.dataSource.getProposalsFromView(filter);
+    } catch (e) {
+      logger.logException('Method getAllView failed', e, { filter });
+
+      return [];
+    }
   }
 
   @Authorized([Roles.INSTRUMENT_SCIENTIST])
