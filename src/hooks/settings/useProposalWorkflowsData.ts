@@ -26,15 +26,25 @@ export function useProposalWorkflowsData(): {
   };
 
   useEffect(() => {
+    let unmounted = false;
+
     setLoadingProposalWorkflows(true);
     api()
       .getProposalWorkflows()
       .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         if (data.proposalWorkflows) {
           setProposalWorkflows(data.proposalWorkflows as ProposalWorkflow[]);
         }
         setLoadingProposalWorkflows(false);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [api]);
 
   return {
