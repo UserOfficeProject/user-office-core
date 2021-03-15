@@ -20,15 +20,25 @@ export function useUnitsData(): {
   };
 
   useEffect(() => {
+    let unmounted = false;
+
     setLoadingUnits(true);
     api()
       .getUnits()
       .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         if (data.units) {
           setUnits(data.units as Unit[]);
         }
         setLoadingUnits(false);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [api]);
 
   return {
