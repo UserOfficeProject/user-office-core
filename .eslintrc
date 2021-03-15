@@ -29,7 +29,8 @@
     "react-hooks",
     "jest",
     "import",
-    "cypress"
+    "cypress",
+    "unused-imports"
   ],
   "rules": {
     "import/order": [
@@ -96,6 +97,7 @@
     ],
     "@typescript-eslint/ban-ts-comment": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "jest/no-export": "off" // rule not implemented properly, rule should only restrict exporting tests
+    "jest/no-export": "off", // rule not implemented properly, rule should only restrict exporting tests
+    "unused-imports/no-unused-imports-ts": 2
   }
 }
