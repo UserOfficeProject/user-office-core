@@ -61,6 +61,11 @@ interface ProposalClonedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalManagementDecisionUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED;
+  proposal: Proposal;
+}
+
 interface ProposalManagementDecisionSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED;
   proposal: Proposal;
@@ -215,6 +220,7 @@ export type ApplicationEvent =
   | ProposalRejectedEvent
   | ProposalCreatedEvent
   | ProposalClonedEvent
+  | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
   | UserCreateEvent
   | EmailInvite

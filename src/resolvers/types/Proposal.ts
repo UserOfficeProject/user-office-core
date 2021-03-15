@@ -73,6 +73,12 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => Boolean)
   public submitted: boolean;
 
+  @Field(() => Int, { nullable: true })
+  public managementTimeAllocation: number;
+
+  @Field(() => Boolean)
+  public managementDecisionSubmitted: boolean;
+
   public proposerId: number;
 }
 
