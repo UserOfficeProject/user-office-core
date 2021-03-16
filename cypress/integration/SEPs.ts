@@ -508,7 +508,9 @@ context(
       // Manually changing the proposal status to be shown in the SEPs. -------->
       cy.get('[title="View proposal"]').first().click();
 
-      cy.contains('Admin').click();
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Admin').click();
 
       cy.get('#mui-component-select-proposalStatus').click();
 
