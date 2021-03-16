@@ -13,7 +13,7 @@ function readWriteReview() {
   cy.finishedLoading();
 
   cy.get('@dialog').contains('Proposal information', { matchCase: false });
-  cy.get('@dialog').contains('Technical Review');
+  cy.get('@dialog').contains('Technical review');
   cy.get('@dialog').contains('Grade').click({ force: true });
 
   cy.get('@dialog')
@@ -538,6 +538,30 @@ context(
         });
     });
 
+    it('Officer should be able to see proposal details in modal inside proposals and assignments', () => {
+      cy.login('officer');
+
+      cy.contains('SEPs').click();
+      cy.get('button[title="Edit"]').first().click();
+
+      cy.contains('Proposals and Assignments').click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.proposalTitle)
+        .parent()
+        .get('[title="View Proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Proposal information');
+      cy.get('[role="dialog"]').contains('Technical review');
+
+      cy.get('[role="dialog"]').contains(proposal1.proposalTitle);
+      cy.get('[role="dialog"]').contains('Download PDF');
+    });
+
     it('Officer should be able to assign SEP member to proposal in existing SEP', () => {
       cy.login('officer');
 
@@ -579,7 +603,8 @@ context(
     });
 
     it('SEP Chair should be able to assign SEP member to proposal in existing SEP', () => {
-      cy.login('officer');
+      cy.login(sepMembers.chair);
+      cy.changeActiveRole('SEP Chair');
 
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
@@ -612,7 +637,8 @@ context(
     });
 
     it('SEP Secretary should be able to assign SEP member to proposal in existing SEP', () => {
-      cy.login('officer');
+      cy.login(sepMembers.secretary);
+      cy.changeActiveRole('SEP Secretary');
 
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
@@ -672,6 +698,32 @@ context(
         .find('[title="Review proposal"]')
         .click();
       readWriteReview();
+    });
+
+    it('SEP Chair should be able to see proposal details in modal inside proposals and assignments', () => {
+      cy.login(sepMembers.chair);
+      cy.changeActiveRole('SEP Chair');
+
+      cy.finishedLoading();
+
+      cy.contains('SEPs').click();
+      cy.get('button[title="Edit"]').first().click();
+
+      cy.contains('Proposals and Assignments').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.proposalTitle)
+        .parent()
+        .get('[title="View Proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Proposal information');
+      cy.get('[role="dialog"]').contains('Technical review');
+
+      cy.get('[role="dialog"]').contains(proposal1.proposalTitle);
+      cy.get('[role="dialog"]').contains('Download PDF');
     });
 
     it('SEP Chair should be able to read/write reviews', () => {
@@ -1015,7 +1067,7 @@ context(
 
       cy.get('[data-cy="view-proposal"]').first().click();
 
-      cy.get('[role="dialog"]').contains('Technical').click();
+      cy.get('[role="dialog"]').contains('Technical review').click();
       cy.get('[data-cy="timeAllocation"]').type('51');
       cy.get('[data-cy="technical-review-status"]').click();
       cy.contains('Feasible').click();

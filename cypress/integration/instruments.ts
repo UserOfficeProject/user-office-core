@@ -427,7 +427,7 @@ context('Instrument tests', () => {
     cy.get('[data-cy="view-proposal"]').first().click();
     cy.get('[role="dialog"]').as('dialog');
     cy.finishedLoading();
-    cy.get('@dialog').contains('Technical').click();
+    cy.get('@dialog').contains('Technical review').click();
 
     cy.get('[data-cy="timeAllocation"] input').type('-123').blur();
     cy.contains('Must be greater than or equal to');
@@ -448,7 +448,7 @@ context('Instrument tests', () => {
       return false;
     });
 
-    cy.contains('General').click();
+    cy.contains('Proposal information').click();
 
     cy.contains('Update').click();
 
@@ -481,7 +481,7 @@ context('Instrument tests', () => {
     cy.get('[data-cy="view-proposal"]').first().click();
     cy.get('[role="dialog"]').as('dialog');
     cy.finishedLoading();
-    cy.get('@dialog').contains('Technical').click();
+    cy.get('@dialog').contains('Technical review').click();
 
     cy.get('[data-cy="comment"] textarea').first().type(internalComment);
     cy.get('[data-cy="publicComment"] textarea').first().type(publicComment);
@@ -503,7 +503,7 @@ context('Instrument tests', () => {
     cy.get('[data-cy="view-proposal"]').first().click();
     cy.get('[role="dialog"]').as('dialog');
     cy.finishedLoading();
-    cy.get('@dialog').contains('Technical').click();
+    cy.get('@dialog').contains('Technical review').click();
 
     cy.get('[data-cy="is-review-submitted"] input')
       .should('have.value', 'true')
@@ -530,7 +530,7 @@ context('Instrument tests', () => {
     cy.get('[role="listbox"] [data-value="0"]').click();
 
     cy.get('[data-cy="view-proposal"]').first().click();
-    cy.get('[role="dialog"]').contains('Technical').click();
+    cy.get('[role="dialog"]').contains('Technical review').click();
 
     cy.get('[data-cy="update-technical-review"]').should('not.be.disabled');
     cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');

@@ -21,8 +21,8 @@ import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
 import { tableIcons } from 'utils/materialIcons';
 
+import ProposalReviewContent, { TabNames } from './ProposalReviewContent';
 import ProposalReviewModal from './ProposalReviewModal';
-import ProposalReview from './ProposalReviewReviewer';
 import ReviewStatusFilter, {
   defaultReviewStatusQueryFilter,
 } from './ReviewStatusFilter';
@@ -160,6 +160,16 @@ const ProposalTableReviewer: React.FC = () => {
     }
   };
 
+  const reviewerProposalReviewTabs: TabNames[] = [
+    'Proposal information',
+    'Technical review',
+    'Grade',
+  ];
+
+  const proposalToReview = reviewData.find(
+    (review) => review.reviewId === urlQueryParams.reviewModal
+  );
+
   return (
     <>
       <ReviewStatusFilter
@@ -187,14 +197,17 @@ const ProposalTableReviewer: React.FC = () => {
         }}
       />
       <ProposalReviewModal
-        title="Review"
+        title={`Review proposal: ${proposalToReview?.title} (${proposalToReview?.shortCode})`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={() => {
           setUrlQueryParams({ reviewModal: undefined });
           updateView();
         }}
       >
-        <ProposalReview reviewId={urlQueryParams.reviewModal} />
+        <ProposalReviewContent
+          reviewId={urlQueryParams.reviewModal}
+          tabNames={reviewerProposalReviewTabs}
+        />
       </ProposalReviewModal>
       <MaterialTable
         icons={tableIcons}

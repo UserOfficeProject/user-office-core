@@ -7,8 +7,8 @@ import PropTypes from 'prop-types';
 import React, { useState, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
+import ProposalReviewContent from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import ProposalReview from 'components/review/ProposalReviewReviewer';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import { SepAssignment, ReviewStatus, UserRole } from 'generated/sdk';
 import { SEPProposalType } from 'hooks/SEP/useSEPProposalsData';
@@ -79,14 +79,18 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
   return (
     <div className={classes.root} data-cy="sep-reviewer-assignments-table">
       <ProposalReviewModal
-        title="Review"
+        title={`Review proposal: ${sepProposal.proposal.title} (${sepProposal.proposal.shortCode})`}
         proposalReviewModalOpen={reviewModalOpen}
         setProposalReviewModalOpen={() => {
           setReviewModalOpen(false);
           currentAssignment && updateView(currentAssignment);
         }}
       >
-        <ProposalReview reviewId={editReviewID} sepId={sepProposal.sepId} />
+        <ProposalReviewContent
+          reviewId={editReviewID}
+          sepId={sepProposal.sepId}
+          tabNames={['Proposal information', 'Technical review', 'Grade']}
+        />
       </ProposalReviewModal>
 
       <MaterialTable

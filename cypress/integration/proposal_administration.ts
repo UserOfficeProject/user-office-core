@@ -128,7 +128,7 @@ context('Proposal administration tests', () => {
 
     cy.get('[data-cy="commentForUser"]').should('exist');
 
-    cy.get('[role="dialog"]').contains('Technical').click();
+    cy.get('[role="dialog"]').contains('Technical review').click();
 
     cy.reload();
 
@@ -597,5 +597,20 @@ context('Proposal administration tests', () => {
     cy.get('table tbody tr input[type="checkbox"]').first().click();
 
     cy.get('table tbody tr').eq(2).contains(proposalFixedName);
+  });
+
+  it('User officer should see Reviews tab before doing the Admin(management decision)', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy=view-proposal]').first().click();
+    cy.finishedLoading();
+    cy.get('[role="dialog"]').contains('Reviews').click();
+
+    cy.get('[role="dialog"]').contains('External reviews');
+    cy.get('[role="dialog"]').contains('SEP Meeting decision');
   });
 });

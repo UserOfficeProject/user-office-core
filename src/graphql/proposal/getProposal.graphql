@@ -35,5 +35,9 @@ query getProposal($id: Int!) {
       id
       shortCode
     }
+    sep {
+      id
+      code
+    }
   }
 }

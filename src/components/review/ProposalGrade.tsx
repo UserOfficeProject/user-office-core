@@ -36,7 +36,6 @@ type ProposalGradeProps = {
   review: Review | null;
   setReview: React.Dispatch<React.SetStateAction<Review | null>>;
   onChange: FunctionType;
-  sepId?: number | null;
   confirm: WithConfirmType;
 };
 
