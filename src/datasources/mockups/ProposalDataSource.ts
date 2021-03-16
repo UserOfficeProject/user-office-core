@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
+import { Call } from '../../models/Call';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalEventsRecord } from '../postgres/records';
@@ -182,8 +183,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async cloneProposal(
     clonerId: number,
     proposalId: number,
-    callId: number,
-    templateId: number
+    call: Call
   ): Promise<Proposal> {
     return dummyProposal;
   }
