@@ -65,7 +65,7 @@ it('User should answer topic questions', async () => {
     topicId: firstStep.topic.id,
     answers: [
       {
-        questionId: firstAnswer.question.proposalQuestionId,
+        questionId: firstAnswer.question.id,
         value: JSON.stringify({ value: 'answer' }),
       },
     ],
@@ -83,7 +83,7 @@ it('User should update question', async () => {
   const result = await mutations.updateAnswer(dummyUser, {
     questionaryId,
     answer: {
-      questionId: firstAnswer.question.proposalQuestionId,
+      questionId: firstAnswer.question.id,
       value: NEW_ANSWER,
     },
   });

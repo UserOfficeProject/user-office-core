@@ -51,7 +51,7 @@ export const dummyQuestionFactory = (
 ): Question => {
   return new Question(
     values?.categoryId || TemplateCategoryId.PROPOSAL_QUESTIONARY,
-    values?.proposalQuestionId || 'random_field_name_' + Math.random(),
+    values?.id || 'random_field_name_' + Math.random(),
     values?.naturalKey || 'is_dangerous',
     values?.dataType || DataType.TEXT_INPUT,
     values?.question || 'Some random question',
@@ -82,7 +82,7 @@ export const dummyTemplateHasQuestionRelationFactory = (
 ): TemplatesHasQuestions => {
   return new TemplatesHasQuestions(
     Math.round(Math.random() * 100),
-    dummyQuestionFactory().proposalQuestionId,
+    dummyQuestionFactory().id,
     templateId || Math.round(Math.random() * 100),
     Math.round(Math.random() * 10),
     sortOrder + 1,
@@ -101,7 +101,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
           1,
           dummyQuestionTemplateRelationFactory({
             question: dummyQuestionFactory({
-              proposalQuestionId: 'ttl_general',
+              id: 'ttl_general',
               naturalKey: 'ttl_general',
               dataType: DataType.EMBELLISHMENT,
               config: createConfig<EmbellishmentConfig>(
@@ -120,7 +120,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
           2,
           dummyQuestionTemplateRelationFactory({
             question: dummyQuestionFactory({
-              proposalQuestionId: 'has_links_with_industry',
+              id: 'has_links_with_industry',
               naturalKey: 'has_links_with_industry',
               dataType: DataType.SELECTION_FROM_OPTIONS,
               config: createConfig<SelectionFromOptionsConfig>(
@@ -139,7 +139,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
           3,
           dummyQuestionTemplateRelationFactory({
             question: dummyQuestionFactory({
-              proposalQuestionId: 'links_with_industry',
+              id: 'links_with_industry',
               naturalKey: 'links_with_industry',
               dataType: DataType.TEXT_INPUT,
               config: createConfig<TextInputConfig>(DataType.TEXT_INPUT, {
@@ -201,7 +201,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   ): Promise<string> {
     const updated = dummyQuestionarySteps.some((step) =>
       step.fields.some((field) => {
-        if (field.question.proposalQuestionId === questionId) {
+        if (field.question.id === questionId) {
           field.value = answer;
 
           return true;

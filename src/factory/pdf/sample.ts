@@ -68,10 +68,7 @@ export async function collectSamplePDFData(
   const completedFields = (getAllFields(
     questionarySteps
   ) as Answer[]).filter((field) =>
-    areDependenciesSatisfied(
-      questionarySteps,
-      field.question.proposalQuestionId
-    )
+    areDependenciesSatisfied(questionarySteps, field.question.id)
   );
 
   const attachments: Attachment[] = [];
