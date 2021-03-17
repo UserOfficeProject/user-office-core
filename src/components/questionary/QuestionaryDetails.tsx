@@ -55,10 +55,7 @@ function QuestionaryDetails(
 
     return (
       !definition.readonly &&
-      areDependenciesSatisfied(
-        questionary.steps,
-        field.question.proposalQuestionId
-      )
+      areDependenciesSatisfied(questionary.steps, field.question.id)
     );
   });
 
@@ -101,7 +98,7 @@ function QuestionaryDetails(
             });
 
             return createTableRow(
-              `answer-${question.answerId}-${question.question.proposalQuestionId}`,
+              `answer-${question.answerId}-${question.question.id}`,
               {
                 label: questionElem,
                 value: answerElem,

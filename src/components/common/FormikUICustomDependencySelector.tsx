@@ -139,8 +139,7 @@ const FormikUICustomDependencySelector = ({
           hasCircularDependency(
             currentQuestionId,
             allFields.find(
-              (option) =>
-                option.question.proposalQuestionId === dependency.dependencyId
+              (option) => option.question.id === dependency.dependencyId
             )
           )
       );
@@ -151,7 +150,7 @@ const FormikUICustomDependencySelector = ({
         (option) =>
           [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
             option.question.dataType
-          ) && currentQuestionId !== option.question.proposalQuestionId
+          ) && currentQuestionId !== option.question.id
       )
       .filter((option) => !hasCircularDependency(currentQuestionId, option));
   }, [steps, currentQuestionId]);
@@ -175,9 +174,9 @@ const FormikUICustomDependencySelector = ({
             {allAvailableFields.map((option) => {
               return (
                 <MenuItem
-                  value={option.question.proposalQuestionId}
+                  value={option.question.id}
                   className={classes.menuItem}
-                  key={option.question.proposalQuestionId}
+                  key={option.question.id}
                 >
                   {option.question.question}
                 </MenuItem>

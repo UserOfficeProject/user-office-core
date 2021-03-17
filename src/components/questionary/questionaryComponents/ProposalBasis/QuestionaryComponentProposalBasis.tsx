@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
 function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   const {
     answer: {
-      question: { proposalQuestionId },
+      question: { id },
     },
     formikProps,
   } = props;
@@ -59,7 +59,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     <div>
       <div className={classes.container}>
         <Field
-          name={`${proposalQuestionId}.title`}
+          name={`${id}.title`}
           label="Title"
           inputProps={{
             onChange: (event: ChangeEvent<HTMLInputElement>) =>
@@ -82,7 +82,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       </div>
       <div className={classes.container}>
         <Field
-          name={`${proposalQuestionId}.abstract`}
+          name={`${id}.abstract`}
           label="Abstract"
           inputProps={{
             onChange: (event: ChangeEvent<HTMLInputElement>) =>
@@ -108,7 +108,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       </div>
       <ProposalParticipant
         userChanged={(user: BasicUserDetails) => {
-          formikProps.setFieldValue(`${proposalQuestionId}.proposer`, user.id);
+          formikProps.setFieldValue(`${id}.proposer`, user.id);
           dispatch({
             type: EventType.PROPOSAL_MODIFIED,
             payload: { proposal: { ...state.proposal, proposer: user } },
@@ -121,7 +121,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         className={classes.container}
         setUsers={(users: BasicUserDetails[]) => {
           formikProps.setFieldValue(
-            `${proposalQuestionId}.users`,
+            `${id}.users`,
             users.map((user) => user.id)
           );
           dispatch({
@@ -134,7 +134,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         users={JSON.parse(JSON.stringify(users))}
       />
       <ErrorMessage
-        name={`${proposalQuestionId}.users`}
+        name={`${id}.users`}
         className={classes.error}
         component="span"
       />

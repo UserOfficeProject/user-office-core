@@ -149,8 +149,7 @@ export default function TemplateEditor() {
         dragSource.droppableId !== 'questionPicker';
 
       if (isDraggingFromQuestionDrawerToTopic) {
-        const questionId =
-          state.complementaryQuestions[dragSource.index].proposalQuestionId;
+        const questionId = state.complementaryQuestions[dragSource.index].id;
         const topicId = dragDestination.droppableId
           ? +dragDestination.droppableId
           : undefined;
@@ -178,7 +177,7 @@ export default function TemplateEditor() {
         dispatch({
           type: EventType.DELETE_QUESTION_REL_REQUESTED,
           payload: {
-            fieldId: question.proposalQuestionId,
+            fieldId: question.id,
             templateId: state.templateId,
           },
         });

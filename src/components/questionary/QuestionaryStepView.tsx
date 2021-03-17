@@ -59,11 +59,12 @@ export const createFormikConfigObjects = (
     );
     if (definition.createYupValidationSchema) {
       validationSchema[
-        answer.question.proposalQuestionId
+        answer.question.id
       ] = definition.createYupValidationSchema(answer);
-      initialValues[
-        answer.question.proposalQuestionId
-      ] = definition.getYupInitialValue({ answer, state });
+      initialValues[answer.question.id] = definition.getYupInitialValue({
+        answer,
+        state,
+      });
     }
   });
 
@@ -111,10 +112,7 @@ export default function QuestionaryStepView(props: {
   }
 
   const activeFields = questionaryStep.fields.filter((field) => {
-    return areDependenciesSatisfied(
-      state.steps,
-      field.question.proposalQuestionId
-    );
+    return areDependenciesSatisfied(state.steps, field.question.id);
   });
 
   const { initialValues, validationSchema } = createFormikConfigObjects(
@@ -239,7 +237,7 @@ export default function QuestionaryStepView(props: {
               return (
                 <div
                   className={classes.componentWrapper}
-                  key={field.question.proposalQuestionId}
+                  key={field.question.id}
                 >
                   {createQuestionaryComponent({
                     answer: field,
@@ -249,15 +247,11 @@ export default function QuestionaryStepView(props: {
                         dispatch({
                           type: EventType.FIELD_CHANGED,
                           payload: {
-                            id: field.question.proposalQuestionId,
+                            id: field.question.id,
                             newValue: newValue,
                           },
                         });
-                        setFieldValue(
-                          field.question.proposalQuestionId,
-                          newValue,
-                          true
-                        );
+                        setFieldValue(field.question.id, newValue, true);
                       }
                     },
                   })}

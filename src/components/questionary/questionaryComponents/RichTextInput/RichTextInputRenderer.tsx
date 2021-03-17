@@ -20,7 +20,7 @@ const RichTextInputAnswerRenderer = ({ answer }: { answer: Answer }) => {
     <span>
       <IconButton
         onClick={handleClickOpen}
-        data-cy={`${answer.question.proposalQuestionId}_open`}
+        data-cy={`${answer.question.id}_open`}
       >
         <VisibilityIcon />
       </IconButton>

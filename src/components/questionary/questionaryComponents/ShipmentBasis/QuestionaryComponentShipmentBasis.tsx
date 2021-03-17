@@ -48,14 +48,12 @@ const samplesToSampleIds = (samples: Pick<Sample, 'id'>[]) =>
 function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
   const {
     answer: {
-      question: { proposalQuestionId },
+      question: { id },
     },
     formikProps: { errors },
   } = props;
 
-  const fieldErrors = errors[proposalQuestionId] as FormikErrors<
-    Record<string, unknown>
-  >;
+  const fieldErrors = errors[id] as FormikErrors<Record<string, unknown>>;
   const classes = useStyles();
   const { state, dispatch } = useContext(
     QuestionaryContext

@@ -36,8 +36,8 @@ import TemplateQuestionEditor, {
 class QuestionItemAdapter implements TemplateTopicEditorData {
   constructor(public source: Question) {}
 
-  get proposalQuestionId() {
-    return this.source.proposalQuestionId;
+  get id() {
+    return this.source.id;
   }
   get question() {
     return this.source.question;
@@ -126,7 +126,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
               type: EventType.CREATE_QUESTION_REL_REQUESTED,
               payload: {
                 topicId: props.topic.id,
-                questionId: item.proposalQuestionId,
+                questionId: item.id,
                 sortOrder: 0,
                 templateId: template.templateId,
               },
@@ -138,7 +138,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             });
           }
         }}
-        key={question.proposalQuestionId.toString()}
+        key={question.id.toString()}
       />
     ));
   };

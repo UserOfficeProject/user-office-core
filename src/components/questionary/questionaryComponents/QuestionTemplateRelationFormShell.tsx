@@ -95,7 +95,7 @@ export const QuestionTemplateRelationFormShell = (props: {
                   props.dispatch({
                     type: EventType.DELETE_QUESTION_REL_REQUESTED,
                     payload: {
-                      fieldId: props.questionRel.question.proposalQuestionId,
+                      fieldId: props.questionRel.question.id,
                       templateId: props.template.templateId,
                     },
                   });

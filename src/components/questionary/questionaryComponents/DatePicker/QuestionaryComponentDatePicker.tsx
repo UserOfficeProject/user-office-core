@@ -33,7 +33,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
     formikProps: { errors, touched, setFieldValue, values },
   } = props;
   const {
-    question: { proposalQuestionId, question },
+    question: { id, question },
     answerId,
   } = answer;
   const {
@@ -44,9 +44,9 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
     small_label: smallLabel,
     required,
   } = answer.config as DateConfig;
-  const fieldError = getIn(errors, proposalQuestionId);
-  const fieldValue = getIn(values, proposalQuestionId);
-  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
+  const fieldError = getIn(errors, id);
+  const fieldValue = getIn(values, id);
+  const isError = getIn(touched, id) && !!fieldError;
   const [defaultInitialized, setDefaultInitialized] = useState(false);
 
   // set default value only when creating new proposal,
@@ -56,12 +56,12 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
   useEffect(() => {
     if (answerId === null && defaultDate && !defaultInitialized) {
       onComplete(defaultDate);
-      setFieldValue(proposalQuestionId, defaultDate, false);
+      setFieldValue(id, defaultDate, false);
       setDefaultInitialized(true);
     }
   }, [
     defaultInitialized,
-    proposalQuestionId,
+    id,
     answerId,
     defaultDate,
     onComplete,
@@ -76,8 +76,8 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
             required={required}
             error={isError}
             helperText={isError && fieldError}
-            data-cy={`${proposalQuestionId}.value`}
-            name={proposalQuestionId}
+            data-cy={`${id}.value`}
+            name={id}
             label={
               <>
                 {question}
@@ -98,7 +98,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
             onChange={(date: DateType | null) => {
               date?.setUTCHours(0, 0, 0, 0); // omit time
               onComplete(date);
-              setFieldValue(proposalQuestionId, date, false);
+              setFieldValue(id, date, false);
             }}
             minDate={minDate}
             maxDate={maxDate}

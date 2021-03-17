@@ -23,11 +23,11 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { proposalQuestionId, question },
+    question: { id, question },
   } = answer;
   const config = answer.config as BooleanConfig;
-  const fieldError = getIn(errors, proposalQuestionId);
-  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
+  const fieldError = getIn(errors, id);
+  const isError = getIn(touched, id) && !!fieldError;
   const [stateValue, setStateValue] = useState<boolean>(answer.value || false);
 
   useEffect(() => {
@@ -46,8 +46,8 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
       <FormControlLabel
         control={
           <Checkbox
-            id={proposalQuestionId}
-            name={proposalQuestionId}
+            id={id}
+            name={id}
             onChange={(evt: ChangeEvent<HTMLInputElement>) => {
               onComplete(evt.target.checked);
             }}

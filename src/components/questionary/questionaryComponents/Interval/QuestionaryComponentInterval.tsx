@@ -35,11 +35,11 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { proposalQuestionId, question },
+    question: { id, question },
   } = answer;
   const config = answer.config as IntervalConfig;
-  const fieldError = getIn(errors, proposalQuestionId);
-  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
+  const fieldError = getIn(errors, id);
+  const isError = getIn(touched, id) && !!fieldError;
   const [stateValue, setStateValue] = useState<{
     min: AcceptableUserInput;
     max: AcceptableUserInput;
@@ -48,9 +48,9 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
 
   const classes = useStyles();
 
-  const minFieldId = `${proposalQuestionId}.min`;
-  const maxFieldId = `${proposalQuestionId}.max`;
-  const unitFieldId = `${proposalQuestionId}.unit`;
+  const minFieldId = `${id}.min`;
+  const maxFieldId = `${id}.max`;
+  const unitFieldId = `${id}.unit`;
 
   const getNumberOrDefault = (
     input: string,

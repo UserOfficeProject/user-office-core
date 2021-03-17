@@ -19,10 +19,10 @@ export function QuestionaryComponentFileUpload(
     formikProps: { errors },
   } = props;
   const {
-    question: { proposalQuestionId },
+    question: { id },
     value,
   } = answer;
-  const isError = errors[proposalQuestionId] ? true : false;
+  const isError = errors[id] ? true : false;
   const config = answer.config as FileUploadConfig;
   const [stateValue, setStateValue] = useState<FileIdWithCaptionAndFigure[]>(
     value
@@ -50,7 +50,7 @@ export function QuestionaryComponentFileUpload(
       </FormLabel>
       <FileUploadComponent
         maxFiles={config.max_files}
-        id={answer.question.proposalQuestionId}
+        id={answer.question.id}
         fileType={config.file_type ? config.file_type.join(',') : ''}
         onChange={(fileMetaDataList: FileIdWithCaptionAndFigure[]) => {
           const newStateValue = fileMetaDataList.map((file) => ({
@@ -64,7 +64,7 @@ export function QuestionaryComponentFileUpload(
         }}
         value={stateValue}
       />
-      {isError && <FormHelperText>{errors[proposalQuestionId]}</FormHelperText>}
+      {isError && <FormHelperText>{errors[id]}</FormHelperText>}
     </FormControl>
   );
 }
