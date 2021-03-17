@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { logger } from '@esss-swap/duo-logger';
 import {
   cloneTemplateValidationSchema,
@@ -131,7 +130,7 @@ export default class TemplateMutations {
   ) {
     const result = await this.dataSource
       .cloneTemplate(templateId)
-      .then(result => result);
+      .then((result) => result);
 
     return result;
   }
@@ -142,7 +141,7 @@ export default class TemplateMutations {
     user: UserWithRole | null,
     { templateId }: { templateId: number }
   ): Promise<Template | Rejection> {
-    return this.dataSource.deleteTemplate(templateId).catch(err => {
+    return this.dataSource.deleteTemplate(templateId).catch((err) => {
       logger.logException('Could not delete proposal', err, {
         templateId,
         user,
@@ -194,7 +193,7 @@ export default class TemplateMutations {
       isEnabled: true,
     });
 
-    return this.dataSource.upsertTopics(dataToUpsert).catch(err => {
+    return this.dataSource.upsertTopics(dataToUpsert).catch((err) => {
       logger.logException('Could not create topic', err, {
         user,
         args,
@@ -216,7 +215,7 @@ export default class TemplateMutations {
       dataToUpsert = await this.getTopicsDataToUpsert(args);
     }
 
-    return this.dataSource.upsertTopics(dataToUpsert).catch(err => {
+    return this.dataSource.upsertTopics(dataToUpsert).catch((err) => {
       logger.logException('Could not update topic', err, {
         agent,
         args,
@@ -232,7 +231,7 @@ export default class TemplateMutations {
     agent: UserWithRole | null,
     { topicId }: { topicId: number }
   ): Promise<Topic | Rejection> {
-    return this.dataSource.deleteTopic(topicId).catch(err => {
+    return this.dataSource.deleteTopic(topicId).catch((err) => {
       logger.logException('Could not delete topic', err, { agent, topicId });
 
       return rejection('INTERNAL_ERROR');
@@ -257,7 +256,7 @@ export default class TemplateMutations {
         'New question',
         JSON.stringify(getQuestionDefinition(dataType).createBlankConfig())
       )
-      .catch(err => {
+      .catch((err) => {
         logger.logException('Could not create template field', err, {
           agent,
           dataType,
@@ -273,7 +272,7 @@ export default class TemplateMutations {
     agent: UserWithRole | null,
     args: UpdateQuestionArgs
   ): Promise<Question | Rejection> {
-    return this.dataSource.updateQuestion(args.id, args).catch(err => {
+    return this.dataSource.updateQuestion(args.id, args).catch((err) => {
       logger.logException('Could not update question', err, {
         agent,
         args,
@@ -289,7 +288,7 @@ export default class TemplateMutations {
     agent: UserWithRole | null,
     { questionId }: { questionId: string }
   ): Promise<Question | Rejection> {
-    return this.dataSource.deleteQuestion(questionId).catch(err => {
+    return this.dataSource.deleteQuestion(questionId).catch((err) => {
       logger.logException('Could not delete question', err, {
         agent,
         id: questionId,
@@ -346,7 +345,7 @@ export default class TemplateMutations {
 
     return this.dataSource
       .upsertQuestionTemplateRelations(dataToUpsert)
-      .catch(err => {
+      .catch((err) => {
         logger.logException('Could not update question rel', err, {
           agent,
           args,
@@ -364,7 +363,7 @@ export default class TemplateMutations {
   ): Promise<Template | Rejection | null> {
     return this.dataSource
       .updateQuestionTemplateRelationSettings(args)
-      .catch(err => {
+      .catch((err) => {
         logger.logException('Could not update question rel', err, {
           agent,
           args,
@@ -380,7 +379,7 @@ export default class TemplateMutations {
     agent: UserWithRole | null,
     args: DeleteQuestionTemplateRelationArgs
   ): Promise<Template | Rejection> {
-    return this.dataSource.deleteQuestionTemplateRelation(args).catch(err => {
+    return this.dataSource.deleteQuestionTemplateRelation(args).catch((err) => {
       logger.logException('Could not delete question rel', err, {
         agent,
         args,
@@ -393,7 +392,7 @@ export default class TemplateMutations {
   @ValidateArgs(updateTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
-    return this.dataSource.updateTemplate(args).catch(err => {
+    return this.dataSource.updateTemplate(args).catch((err) => {
       logger.logException('Could not update topic order', err, {
         user,
       });
@@ -417,7 +416,7 @@ export default class TemplateMutations {
       return rejection('INTERNAL_ERROR');
     }
 
-    return this.dataSource.setActiveTemplate(args).catch(err => {
+    return this.dataSource.setActiveTemplate(args).catch((err) => {
       logger.logException('Could not set active template', err, {
         user,
       });
@@ -440,7 +439,7 @@ export default class TemplateMutations {
 
     return this.dataSource
       .upsertQuestionTemplateRelations(dataToUpsert)
-      .catch(err => {
+      .catch((err) => {
         logger.logException('Could not create question rel', err, {
           agent,
           args,

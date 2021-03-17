@@ -1,16 +1,20 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import baseContext from '../../buildContext';
-import { questionaryDataSource } from '../../datasources';
 import { Proposal } from '../../models/Proposal';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId,
 } from '../../models/ProposalModelFunctions';
 import { Answer, QuestionaryStep } from '../../models/Questionary';
-import { TechnicalReview } from '../../models/TechnicalReview';
+import {
+  TechnicalReview,
+  TechnicalReviewStatus,
+} from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
 import { isRejection } from '../../rejection';
-import { getFileAttachmentIds } from '../util';
+import { getFileAttachments, Attachment } from '../util';
 import { collectSamplePDFData, SamplePDFData } from './sample';
 
 type ProposalPDFData = {
@@ -18,9 +22,24 @@ type ProposalPDFData = {
   principalInvestigator: BasicUserDetails;
   coProposers: BasicUserDetails[];
   questionarySteps: QuestionaryStep[];
-  attachmentIds: string[];
-  technicalReview?: TechnicalReview;
+  attachments: Attachment[];
+  technicalReview?: Omit<TechnicalReview, 'status'> & { status: string };
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
+};
+
+const getTechnicalReviewHumanReadableStatus = (
+  status: TechnicalReviewStatus
+): string => {
+  switch (status) {
+    case TechnicalReviewStatus.FEASIBLE:
+      return 'Feasible';
+    case TechnicalReviewStatus.PARTIALLY_FEASIBLE:
+      return 'Partially feasible';
+    case TechnicalReviewStatus.UNFEASIBLE:
+      return 'Unfeasible';
+    default:
+      return `Unknown status: ${status}`;
+  }
 };
 
 const getTopicActiveAnswers = (
@@ -30,11 +49,8 @@ const getTopicActiveAnswers = (
   const step = getQuestionaryStepByTopicId(questionarySteps, topicId);
 
   return step
-    ? (step.fields.filter(field => {
-        return areDependenciesSatisfied(
-          questionarySteps,
-          field.question.proposalQuestionId
-        );
+    ? (step.fields.filter((field) => {
+        return areDependenciesSatisfied(questionarySteps, field.question.id);
       }) as Answer[])
     : [];
 };
@@ -76,7 +92,7 @@ export const collectProposalPDFData = async (
     throw new Error('User was not PI or co-proposer');
   }
 
-  const sampleAttachmentIds: string[] = [];
+  const sampleAttachments: Attachment[] = [];
 
   const samples = await baseContext.queries.sample.getSamples(user, {
     filter: { proposalId },
@@ -84,10 +100,10 @@ export const collectProposalPDFData = async (
 
   const samplePDFData = (
     await Promise.all(
-      samples.map(sample => collectSamplePDFData(sample.id, user))
+      samples.map((sample) => collectSamplePDFData(sample.id, user))
     )
-  ).map(({ sample, sampleQuestionaryFields, attachmentIds }) => {
-    sampleAttachmentIds.push(...attachmentIds);
+  ).map(({ sample, sampleQuestionaryFields, attachments }) => {
+    sampleAttachments.push(...attachments);
 
     return { sample, sampleQuestionaryFields };
   });
@@ -103,14 +119,14 @@ export const collectProposalPDFData = async (
     principalInvestigator,
     coProposers,
     questionarySteps: [],
-    attachmentIds: [],
+    attachments: [],
     samples: samplePDFData,
   };
 
   // Information from each topic in proposal
   for (const step of questionarySteps) {
     if (!step) {
-      console.error('step not found', questionarySteps);
+      logger.logError('step not found', questionarySteps);
 
       throw 'Could not download generated PDF';
     }
@@ -118,7 +134,7 @@ export const collectProposalPDFData = async (
     const topic = step.topic;
     const answers = getTopicActiveAnswers(questionarySteps, topic.id).filter(
       // skip `PROPOSAL_BASIS` types
-      answer => answer.question.dataType !== DataType.PROPOSAL_BASIS
+      (answer) => answer.question.dataType !== DataType.PROPOSAL_BASIS
     );
 
     // if the questionary step has nothing else but `PROPOSAL_BASIS` question
@@ -127,19 +143,17 @@ export const collectProposalPDFData = async (
       continue;
     }
 
-    const questionaryAttachmentIds = [];
+    const questionaryAttachments: Attachment[] = [];
 
     for (let i = 0; i < answers.length; i++) {
       const answer = answers[i];
 
-      questionaryAttachmentIds.push(...getFileAttachmentIds(answer));
+      questionaryAttachments.push(...getFileAttachments(answer));
 
       if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
         answer.value = samples
-          .filter(
-            sample => sample.questionId === answer.question.proposalQuestionId
-          )
-          .map(sample => sample);
+          .filter((sample) => sample.questionId === answer.question.id)
+          .map((sample) => sample);
       }
     }
 
@@ -147,8 +161,8 @@ export const collectProposalPDFData = async (
       ...step,
       fields: answers,
     });
-    out.attachmentIds.push(...questionaryAttachmentIds);
-    out.attachmentIds.push(...sampleAttachmentIds);
+    out.attachments.push(...questionaryAttachments);
+    out.attachments.push(...sampleAttachments);
   }
 
   if (userAuthorization.isReviewerOfProposal(user, proposal.id)) {
@@ -157,7 +171,10 @@ export const collectProposalPDFData = async (
       proposal.id
     );
     if (technicalReview) {
-      out.technicalReview = technicalReview;
+      out.technicalReview = {
+        ...technicalReview,
+        status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
+      };
     }
   }
 

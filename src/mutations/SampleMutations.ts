@@ -50,7 +50,7 @@ export default class SampleMutations {
 
     return this.questionaryDataSource
       .create(agent.id, args.templateId)
-      .then(questionary => {
+      .then((questionary) => {
         return this.sampleDataSource.create(
           args.title,
           agent.id,
@@ -59,7 +59,7 @@ export default class SampleMutations {
           args.questionId
         );
       })
-      .catch(error => {
+      .catch((error) => {
         logger.logException('Could not create sample', error, {
           agent,
           args,
@@ -88,8 +88,8 @@ export default class SampleMutations {
 
     return this.sampleDataSource
       .updateSample(args)
-      .then(sample => sample)
-      .catch(error => {
+      .then((sample) => sample)
+      .catch((error) => {
         logger.logException('Could not update sample', error, {
           agent,
           args,
@@ -106,8 +106,8 @@ export default class SampleMutations {
 
     return this.sampleDataSource
       .delete(sampleId)
-      .then(sample => sample)
-      .catch(error => {
+      .then((sample) => sample)
+      .catch((error) => {
         logger.logException('Could not delete sample', error, {
           agent,
           sampleId,
@@ -122,12 +122,17 @@ export default class SampleMutations {
     if (!agent) {
       return rejection('NOT_AUTHORIZED');
     }
-    if (!this.sampleAuthorization.hasWriteRights(agent, sampleId)) {
+    if (!(await this.sampleAuthorization.hasWriteRights(agent, sampleId))) {
       return rejection('NOT_AUTHORIZED');
     }
 
     try {
       const sourceSample = await this.sampleDataSource.getSample(sampleId);
+
+      if (!sourceSample) {
+        return rejection('NOT_FOUND');
+      }
+
       const clonedQuestionary = await this.questionaryDataSource.clone(
         sourceSample.questionaryId
       );

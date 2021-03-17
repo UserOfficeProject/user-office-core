@@ -1,22 +1,29 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { logger } from '@esss-swap/duo-logger';
-import SparkPost from 'sparkpost';
 
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { ProposalEndStatus } from '../models/Proposal';
 import { UserRole } from '../models/User';
+import EmailSettings from './MailService/EmailSettings';
+import { MailService } from './MailService/MailService';
+import { SMTPMailService } from './MailService/SMTPMailService';
+import { SparkPostMailService } from './MailService/SparkPostMailService';
 
 const options = {
   endpoint: 'https://api.eu.sparkpost.com:443',
 };
-const client = new SparkPost(process.env.SPARKPOST_TOKEN, options);
+
+const mailService: MailService =
+  process.env.EMAIL_PROTOCOL === 'SMTP'
+    ? new SMTPMailService()
+    : new SparkPostMailService(options);
+
 const isDevEnv = process.env.NODE_ENV === 'development';
 
 // in dev env don't try to send email
 if (isDevEnv) {
-  client.transmissions.send = async (...args: any[]): Promise<any> => 'no-op';
+  mailService.sendMail = async (...args: any[]): Promise<any> => 'no-op';
 }
 
 export default function createHandler(userDataSource: UserDataSource) {
@@ -31,8 +38,8 @@ export default function createHandler(userDataSource: UserDataSource) {
 
     switch (event.type) {
       case Event.USER_PASSWORD_RESET_EMAIL: {
-        client.transmissions
-          .send({
+        mailService
+          .sendMail({
             content: {
               template_id: 'user-office-account-reset-password',
             },
@@ -71,8 +78,8 @@ export default function createHandler(userDataSource: UserDataSource) {
           return;
         }
 
-        client.transmissions
-          .send({
+        mailService
+          .sendMail({
             content: {
               template_id:
                 event.emailinviteresponse.role === UserRole.USER
@@ -109,41 +116,44 @@ export default function createHandler(userDataSource: UserDataSource) {
         if (!principalInvestigator) {
           return;
         }
-        client.transmissions
-          .send({
-            content: {
-              template_id: 'proposal-submitted',
-            },
-            substitution_data: {
-              piPreferredname: principalInvestigator.preferredname,
-              piLastname: principalInvestigator.lastname,
-              proposalNumber: event.proposal.shortCode,
-              proposalTitle: event.proposal.title,
-              coProposers: participants.map(
-                partipant => `${partipant.preferredname} ${partipant.lastname} `
-              ),
-              call: '',
-            },
-            recipients: [
-              { address: { email: principalInvestigator.email } },
-              ...participants.map(partipant => {
-                return {
-                  address: {
-                    email: partipant.email,
-                    header_to: principalInvestigator.email,
-                  },
-                };
-              }),
-            ],
-          })
+
+        const options: EmailSettings = {
+          content: {
+            template_id: 'proposal-submitted',
+          },
+          substitution_data: {
+            piPreferredname: principalInvestigator.preferredname,
+            piLastname: principalInvestigator.lastname,
+            proposalNumber: event.proposal.shortCode,
+            proposalTitle: event.proposal.title,
+            coProposers: participants.map(
+              (partipant) => `${partipant.preferredname} ${partipant.lastname} `
+            ),
+            call: '',
+          },
+          recipients: [
+            { address: principalInvestigator.email },
+            ...participants.map((partipant) => {
+              return {
+                address: {
+                  email: partipant.email,
+                  header_to: principalInvestigator.email,
+                },
+              };
+            }),
+          ],
+        };
+
+        mailService
+          .sendMail(options)
           .then((res: any) => {
-            logger.logInfo('Email sent on proposal submission:', {
+            logger.logInfo('Emails sent on proposal submission:', {
               result: res,
               event,
             });
           })
           .catch((err: string) => {
-            logger.logError('Could not send email on proposal submission:', {
+            logger.logError('Could not send email(s) on proposal submission:', {
               error: err,
               event,
             });
@@ -159,8 +169,8 @@ export default function createHandler(userDataSource: UserDataSource) {
           );
           console.log('verify user without email in development');
         } else {
-          client.transmissions
-            .send({
+          mailService
+            .sendMail({
               content: {
                 template_id: 'user-office-account-verification',
               },
@@ -195,23 +205,23 @@ export default function createHandler(userDataSource: UserDataSource) {
           return;
         }
         const { finalStatus } = event.proposal;
-        let template_id = '';
+        let templateId = '';
         if (finalStatus === ProposalEndStatus.ACCEPTED) {
-          template_id = 'Accepted-Proposal';
+          templateId = 'Accepted-Proposal';
         } else if (finalStatus === ProposalEndStatus.REJECTED) {
-          template_id = 'Rejected-Proposal';
+          templateId = 'Rejected-Proposal';
         } else if (finalStatus === ProposalEndStatus.RESERVED) {
-          template_id = 'Reserved-Proposal';
+          templateId = 'Reserved-Proposal';
         } else {
           logger.logError('Failed email notification', { event });
 
           return;
         }
 
-        client.transmissions
-          .send({
+        mailService
+          .sendMail({
             content: {
-              template_id,
+              template_id: templateId,
             },
             substitution_data: {
               piPreferredname: principalInvestigator.preferredname,

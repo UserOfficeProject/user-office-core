@@ -12,8 +12,10 @@ export interface CallDataSource {
   getCalls(filter?: CallsFilter): Promise<Call[]>;
   create(args: CreateCallInput): Promise<Call>;
   update(args: UpdateCallInput): Promise<Call>;
+  delete(id: number): Promise<Call>;
   assignInstrumentsToCall(args: AssignInstrumentsToCallInput): Promise<Call>;
   removeAssignedInstrumentFromCall(
     args: RemoveAssignedInstrumentFromCallInput
   ): Promise<Call>;
+  getCallsByInstrumentScientist(scientistId: number): Promise<Call[]>;
 }

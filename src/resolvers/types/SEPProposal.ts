@@ -47,4 +47,14 @@ export class SEPUserResolver {
       proposalId: sepProposal.proposalId,
     });
   }
+
+  @FieldResolver(() => Boolean)
+  async instrumentSubmitted(
+    @Root() sepProposal: SEPProposal,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.instrument.dataSource.isProposalInstrumentSubmitted(
+      sepProposal.proposalId
+    );
+  }
 }

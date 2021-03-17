@@ -10,7 +10,7 @@ type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 
 export function getTopicById(collection: AbstractCollection, topicId: number) {
-  const step = collection.find(step => step.topic.id === topicId);
+  const step = collection.find((step) => step.topic.id === topicId);
 
   return step ? step.topic : undefined;
 }
@@ -18,17 +18,15 @@ export function getQuestionaryStepByTopicId(
   collection: AbstractCollection,
   topicId: number
 ) {
-  return collection.find(step => step.topic.id === topicId);
+  return collection.find((step) => step.topic.id === topicId);
 }
 export function getFieldById(
   collection: AbstractCollection,
   questionId: string
 ) {
   let needle: AbstractField | undefined;
-  collection.every(step => {
-    needle = step.fields.find(
-      field => field.question.proposalQuestionId === questionId
-    );
+  collection.every((step) => {
+    needle = step.fields.find((field) => field.question.id === questionId);
 
     return needle === undefined;
   });
@@ -37,7 +35,7 @@ export function getFieldById(
 }
 export function getAllFields(collection: AbstractCollection) {
   let allFields = new Array<AbstractField>();
-  collection.forEach(step => {
+  collection.forEach((step) => {
     allFields = allFields.concat(step.fields);
   });
 
@@ -83,7 +81,7 @@ export function areDependenciesSatisfied(
     return true;
   }
 
-  return field.dependencies.every(dependency =>
+  return field.dependencies.every((dependency) =>
     isDependencySatisfied(questionary, dependency)
   );
 }
@@ -101,4 +99,19 @@ export function isMatchingConstraints(
   }
 
   return definition.validate(questionTemplateRelation, value);
+}
+
+export function transformAnswerValueIfNeeded(
+  questionTemplateRelation: QuestionTemplateRelation,
+  value: any
+) {
+  const definition = getQuestionDefinition(
+    questionTemplateRelation.question.dataType
+  );
+
+  if (!definition.transform) {
+    return undefined;
+  }
+
+  return definition.transform(questionTemplateRelation, value);
 }

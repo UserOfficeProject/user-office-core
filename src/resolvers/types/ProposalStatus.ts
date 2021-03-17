@@ -19,3 +19,21 @@ export class ProposalStatus implements Partial<ProposalStatusOrigin> {
   @Field(() => Boolean)
   public isDefault: boolean;
 }
+
+@ObjectType()
+export class NextProposalStatus implements Partial<ProposalStatusOrigin> {
+  @Field(() => Int, { nullable: true })
+  public id: number;
+
+  @Field(() => String, { nullable: true })
+  public shortCode: string;
+
+  @Field(() => String, { nullable: true })
+  public name: string;
+
+  @Field(() => String, { nullable: true })
+  public description: string;
+
+  @Field(() => Boolean, { nullable: true })
+  public isDefault: boolean;
+}

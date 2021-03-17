@@ -1,7 +1,7 @@
 import { Call } from '../models/Call';
 import { InstrumentHasProposals } from '../models/Instrument';
-import { Proposal, ProposalIds } from '../models/Proposal';
-import { Review } from '../models/Review';
+import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
+import { Review, ReviewWithNextProposalStatus } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { SEP } from '../models/SEP';
 import { TechnicalReview } from '../models/TechnicalReview';
@@ -56,6 +56,26 @@ interface ProposalNotifiedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalClonedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_CLONED;
+  proposal: Proposal;
+}
+
+interface ProposalManagementDecisionUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED;
+  proposal: Proposal;
+}
+
+interface ProposalManagementDecisionSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface ProposalFeasibilityReviewUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FEASIBILITY_REVIEW_UPDATED;
+  technicalreview: TechnicalReview;
+}
+
 interface ProposalFeasibilityReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED;
   technicalreview: TechnicalReview;
@@ -66,6 +86,16 @@ interface ProposalSEPReviewSubmittedEvent extends GeneralEvent {
   review: Review;
 }
 
+interface ProposalSEPReviewUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_REVIEW_UPDATED;
+  reviewwithnextproposalstatus: ReviewWithNextProposalStatus;
+}
+
+interface ProposalAllSEPReviewsSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED;
+  proposal: Proposal;
+}
+
 interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED;
   sample: Sample;
@@ -73,12 +103,12 @@ interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SELECTED;
-  proposalids: ProposalIds;
+  proposalidswithnextstatus: ProposalIdsWithNextStatus;
 }
 
 interface ProposalSEPSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_SELECTED;
-  proposalids: ProposalIds;
+  proposalidswithnextstatus: ProposalIdsWithNextStatus;
 }
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
@@ -189,6 +219,9 @@ export type ApplicationEvent =
   | ProposalSampleSafeEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
+  | ProposalClonedEvent
+  | ProposalManagementDecisionUpdatedEvent
+  | ProposalManagementDecisionSubmittedEvent
   | UserCreateEvent
   | EmailInvite
   | UserResetPasswordEmailEvent
@@ -206,8 +239,11 @@ export type ApplicationEvent =
   | CallEndedEvent
   | CallReviewEndedEvent
   | CallSEPReviewEndedEvent
+  | ProposalFeasibilityReviewUpdatedEvent
   | ProposalFeasibilityReviewSubmittedEvent
+  | ProposalSEPReviewUpdatedEvent
   | ProposalSEPReviewSubmittedEvent
+  | ProposalAllSEPReviewsSubmittedEvent
   | ProposalSampleReviewSubmittedEvent
   | ProposalInstrumentSelectedEvent
   | ProposalSEPSelectedEvent

@@ -1,12 +1,7 @@
 import * as faker from 'faker';
 
 export function word() {
-  return faker.random
-    .word()
-    .split(' ')
-    .join()
-    .split('-')
-    .join();
+  return faker.random.word().split(' ').join().split('-').join();
 }
 
 export function positiveNumber(max: number) {

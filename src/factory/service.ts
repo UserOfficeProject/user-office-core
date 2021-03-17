@@ -1,6 +1,8 @@
+import querystring from 'querystring';
+
 import { logger } from '@esss-swap/duo-logger';
 import contentDisposition from 'content-disposition';
-import { Response, NextFunction } from 'express';
+import { NextFunction, Response } from 'express';
 import request from 'request';
 
 import { bufferRequestBody } from './util';
@@ -18,6 +20,7 @@ export enum XLSXType {
 export enum PDFType {
   PROPOSAL = 'proposal',
   SAMPLE = 'sample',
+  SHIPMENT_LABEL = 'shipment-label',
 }
 
 export type MetaBase = { collectionFilename: string; singleFilename: string };
@@ -39,16 +42,16 @@ export default function callFactoryService<TData, TMeta extends MetaBase>(
 ) {
   const factoryReq = request
     .post(`${ENDPOINT}/${downloadType}/${type}`, { json: properties })
-    .on('response', factoryResp => {
+    .on('response', (factoryResp) => {
       if (factoryResp.statusCode !== 200) {
         bufferRequestBody(factoryReq)
-          .then(body => {
+          .then((body) => {
             logger.logError(`Failed to generate ${downloadType}/${type}`, {
               response: body,
               type,
             });
           })
-          .catch(err => {
+          .catch((err) => {
             logger.logException(
               `Failed to generate ${downloadType}/${type} and read response body`,
               err,
@@ -68,13 +71,14 @@ export default function callFactoryService<TData, TMeta extends MetaBase>(
             : properties.meta.singleFilename;
 
         res.setHeader('Content-Disposition', contentDisposition(filename));
+        res.setHeader('x-download-filename', querystring.escape(filename));
 
         factoryResp.pipe(res);
       }
     })
-    .on('error', err => {
+    .on('error', (err) => {
       next({
-        error: err,
+        error: err.toString(),
         message: `Could not download generated ${downloadType}/${type}`,
       });
     });

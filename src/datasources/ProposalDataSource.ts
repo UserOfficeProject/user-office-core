@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { Event } from '../events/event.enum';
+import { Call } from '../models/Call';
 import { Proposal } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
@@ -41,4 +41,15 @@ export interface ProposalDataSource {
     event: Event,
     proposalId: number
   ): Promise<ProposalEventsRecord | null>;
+  getCount(callId: number): Promise<number>;
+  cloneProposal(
+    clonerId: number,
+    proposalId: number,
+    call: Call
+  ): Promise<Proposal>;
+  resetProposalEvents(
+    proposalId: number,
+    callId: number,
+    statusId: number
+  ): Promise<boolean>;
 }

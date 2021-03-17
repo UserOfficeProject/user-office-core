@@ -1,5 +1,7 @@
 import { logger } from '@esss-swap/duo-logger';
+import Knex from 'knex';
 
+import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
@@ -8,6 +10,7 @@ import { fileUploadDefinition } from './FileUpload';
 import { intervalDefinition } from './Interval';
 import { numberInputDefinition } from './NumberInput';
 import { proposalBasisDefinition } from './ProposalBasis';
+import { richTextInputDefinition } from './RichTextInput';
 import { sampleBasisDefinition } from './SampleBasis';
 import { sampleDeclarationDefinition } from './SampleDeclaration';
 import { selectionFromOptionsDefinition } from './SelectionFromOptions';
@@ -20,6 +23,11 @@ export interface Question {
   readonly createBlankConfig: () => any;
   readonly isReadOnly: boolean;
   readonly getDefaultAnswer: (field: QuestionTemplateRelation) => any;
+  readonly transform?: (field: QuestionTemplateRelation, value: any) => any;
+  readonly filterQuery?: (
+    query: Knex.QueryBuilder<any, any>,
+    filter: QuestionFilterInput
+  ) => any;
 }
 
 // Add new component definitions here
@@ -36,12 +44,13 @@ const registry = [
   intervalDefinition,
   numberInputDefinition,
   shipmentBasis,
+  richTextInputDefinition,
 ];
 
 Object.freeze(registry);
 
 const componentMap = new Map<DataType, Question>();
-registry.forEach(definition =>
+registry.forEach((definition) =>
   componentMap.set(definition.dataType, definition)
 );
 

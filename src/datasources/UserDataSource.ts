@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { Role } from '../models/Role';
-import { User, BasicUserDetails } from '../models/User';
+import { User, BasicUserDetails, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 
@@ -23,7 +22,7 @@ export interface UserDataSource {
     filter?: string,
     first?: number,
     offset?: number,
-    userRole?: number,
+    userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getRoles(): Promise<Role[]>;

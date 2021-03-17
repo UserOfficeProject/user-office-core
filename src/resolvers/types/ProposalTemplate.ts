@@ -13,7 +13,7 @@ import { Template } from './Template';
 @ObjectType()
 export class ProposalTemplate extends Template {}
 
-@Resolver(of => ProposalTemplate)
+@Resolver((of) => ProposalTemplate)
 export class TemplateResolver {
   @FieldResolver(() => Int)
   async callCount(
@@ -22,6 +22,6 @@ export class TemplateResolver {
   ): Promise<number> {
     return context.queries.call
       .getAll(context.user, { templateIds: [template.templateId] })
-      .then(result => result?.length || 0);
+      .then((result) => result?.length || 0);
   }
 }

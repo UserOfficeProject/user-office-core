@@ -121,9 +121,12 @@ export class SubtemplateConfig {
 export class IntervalConfig extends ConfigBase {
   @Field(() => [String], { nullable: true })
   units: string[] | null;
+}
 
-  @Field(() => String)
-  property: string;
+export enum NumberValueConstraint {
+  NONE = 'NONE',
+  ONLY_POSITIVE = 'ONLY_POSITIVE',
+  ONLY_NEGATIVE = 'ONLY_NEGATIVE',
 }
 
 @ObjectType()
@@ -131,14 +134,20 @@ export class NumberInputConfig extends ConfigBase {
   @Field(() => [String], { nullable: true })
   units: string[] | null;
 
-  @Field(() => String)
-  property: string;
+  @Field(() => NumberValueConstraint, { nullable: true })
+  numberValueConstraint: NumberValueConstraint | null;
 }
 
 @ObjectType()
 export class ProposalBasisConfig {
   @Field(() => String)
   tooltip: string;
+}
+
+@ObjectType()
+export class RichTextInputConfig extends ConfigBase {
+  @Field(() => Int, { nullable: true })
+  max: number | null;
 }
 
 export const FieldConfigType = createUnionType({
@@ -156,5 +165,6 @@ export const FieldConfigType = createUnionType({
     IntervalConfig,
     NumberInputConfig,
     ShipmentBasisConfig,
+    RichTextInputConfig,
   ], // function that returns array of object types classes
 });

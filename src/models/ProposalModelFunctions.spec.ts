@@ -56,19 +56,13 @@ it('Dependencies should be satisfied if value matches', async () => {
     'links_with_industry'
   ) as Answer;
 
-  expect(
-    areDependenciesSatisfied(
-      questionarySteps,
-      depender.question.proposalQuestionId
-    )
-  ).toBe(true);
+  expect(areDependenciesSatisfied(questionarySteps, depender.question.id)).toBe(
+    true
+  );
 
   dependee.value = 'no';
 
-  expect(
-    areDependenciesSatisfied(
-      questionarySteps,
-      depender.question.proposalQuestionId
-    )
-  ).toBe(false);
+  expect(areDependenciesSatisfied(questionarySteps, depender.question.id)).toBe(
+    false
+  );
 });

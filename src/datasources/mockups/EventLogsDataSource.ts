@@ -39,12 +39,12 @@ export class EventLogsDataSourceMock implements EventLogsDataSource {
 
     if (filter.changedObjectId && filter.changedObjectId !== '*') {
       dummyEventLogsCopy = dummyEventLogsCopy.filter(
-        eventLog => eventLog.changedObjectId === filter.changedObjectId
+        (eventLog) => eventLog.changedObjectId === filter.changedObjectId
       );
     }
 
     if (filter.eventType && filter.eventType !== '*') {
-      dummyEventLogsCopy = dummyEventLogsCopy.filter(eventLog =>
+      dummyEventLogsCopy = dummyEventLogsCopy.filter((eventLog) =>
         eventLog.eventType.includes(filter.eventType)
       );
     }

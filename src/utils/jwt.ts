@@ -19,7 +19,7 @@ if (!expiresIn) {
 
 export const JwtAlg: Algorithm = 'HS256';
 
-export function signToken<T extends object | string | Buffer>(
+export function signToken<T extends Record<string, unknown> | string | Buffer>(
   payload: T,
   signOptions?: SignOptions
 ) {
@@ -30,7 +30,7 @@ export function signToken<T extends object | string | Buffer>(
   });
 }
 
-export function verifyToken<T extends object | string>(
+export function verifyToken<T extends Record<string, unknown> | string>(
   token: string,
   verifyOptions?: VerifyOptions
 ): T {

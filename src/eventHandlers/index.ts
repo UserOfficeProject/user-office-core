@@ -28,6 +28,6 @@ export default function createEventHandlers({
       instrumentDataSource,
       reviewDataSource,
     }),
-    createProposalWorkflowHandler(proposalDataSource),
+    createProposalWorkflowHandler(proposalDataSource, reviewDataSource),
   ];
 }

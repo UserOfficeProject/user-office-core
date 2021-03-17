@@ -97,12 +97,12 @@ export default class UserMutations {
     }
 
     if (
-      args.userRole === UserRole.REVIEWER &&
+      args.userRole === UserRole.SEP_REVIEWER &&
       (await this.userAuth.isUserOfficer(agent))
     ) {
       userId = await this.dataSource.createInviteUser(args);
-      await this.dataSource.setUserRoles(userId, [UserRole.REVIEWER]);
-      role = UserRole.REVIEWER;
+      await this.dataSource.setUserRoles(userId, [UserRole.SEP_REVIEWER]);
+      role = UserRole.SEP_REVIEWER;
     } else if (args.userRole === UserRole.USER) {
       userId = await this.dataSource.createInviteUser(args);
       await this.dataSource.setUserRoles(userId, [UserRole.USER]);
@@ -275,8 +275,8 @@ export default class UserMutations {
 
     return this.dataSource
       .update(user)
-      .then(user => user)
-      .catch(err => {
+      .then((user) => user)
+      .catch((err) => {
         logger.logException('Could not update user', err, { user });
 
         return rejection('INTERNAL_ERROR');
@@ -296,13 +296,14 @@ export default class UserMutations {
       return rejection('INTERNAL_ERROR');
     }
 
-    await this.dataSource.setUserRoles(args.id, args.roles).catch(err => {
-      logger.logException('Could not update user', err);
+    return this.dataSource
+      .setUserRoles(args.id, args.roles)
+      .then(() => user)
+      .catch((err) => {
+        logger.logException('Could not update user', err);
 
-      return rejection('INTERNAL_ERROR');
-    });
-
-    return user;
+        return rejection('INTERNAL_ERROR');
+      });
   }
 
   @ValidateArgs(signInValidationSchema)
@@ -404,13 +405,12 @@ export default class UserMutations {
         dummyUser = await this.dataSource.createDummyUser(userNumber);
       }
 
-      // TODO: this should get the user's roles rather than all roles
-      const roles = await this.dataSource.getRoles();
+      const roles = await this.dataSource.getUserRoles(dummyUser.id);
 
       const proposalsToken = signToken<AuthJwtPayload>({
         user: dummyUser,
         roles,
-        currentRole: roles[1], // Currently hardcoded to UserOfficer
+        currentRole: roles[0], // User role
       });
 
       return proposalsToken;
@@ -510,7 +510,7 @@ export default class UserMutations {
     return this.dataSource
       .addUserRole(args)
       .then(() => true)
-      .catch(err => {
+      .catch((err) => {
         logger.logException('Could not add user role', err, { agent });
 
         return rejection('INTERNAL_ERROR');
@@ -569,8 +569,8 @@ export default class UserMutations {
       ) {
         return this.dataSource
           .setUserPassword(user.id, hash)
-          .then(user => user)
-          .catch(err => {
+          .then((user) => user)
+          .catch((err) => {
             logger.logError('Could not reset password', { err });
 
             return rejection('INTERNAL_ERROR');

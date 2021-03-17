@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import {
   Instrument,
   InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../models/Instrument';
-import { ProposalIds } from '../models/Proposal';
+import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { BasicUserDetails } from '../models/User';
 import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMutation';
 
@@ -28,7 +27,7 @@ export interface InstrumentDataSource {
   assignProposalsToInstrument(
     proposalIds: number[],
     instrumentId: number
-  ): Promise<ProposalIds>;
+  ): Promise<ProposalIdsWithNextStatus>;
   removeProposalFromInstrument(
     proposalId: number,
     instrumentId: number

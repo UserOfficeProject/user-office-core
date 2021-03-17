@@ -79,6 +79,12 @@ export const dummyUser = new User(
   '2019-07-17 08:25:12.23043+00'
 );
 
+export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
+  ...dummyUser,
+  id: 1,
+  currentRole: { id: 1, title: 'Principal investigator', shortCode: 'pi' },
+};
+
 export const dummyUserWithRole: UserWithRole = {
   ...dummyUser,
   currentRole: { id: 1, title: 'User', shortCode: 'user' },
@@ -90,6 +96,16 @@ export const dummySampleReviewer: UserWithRole = {
     id: 1,
     title: 'Sample Reviewer',
     shortCode: 'sample_safety_reviewer',
+  },
+};
+
+export const dummyInstrumentScientist: UserWithRole = {
+  ...dummyUser,
+  id: 101,
+  currentRole: {
+    id: 1,
+    title: 'Instrument Scientist',
+    shortCode: 'instrument_scientist',
   },
 };
 
@@ -230,6 +246,16 @@ export class UserDataSourceMock implements UserDataSource {
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
       return [{ id: 1, shortCode: 'user_officer', title: 'User Officer' }];
+    } else if (id === dummyInstrumentScientist.id) {
+      return [
+        {
+          id: 1,
+          title: 'Instrument Scientist',
+          shortCode: 'instrument_scientist',
+        },
+      ];
+    } else if (id === 1001) {
+      return [{ id: 2, shortCode: 'SEP_Reviewer', title: 'User' }];
     } else {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }

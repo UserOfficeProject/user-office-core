@@ -30,10 +30,10 @@ export default class ShipmentQueries {
     let shipments = await this.dataSource.getAll(args);
 
     shipments = await Promise.all(
-      shipments.map(shipment =>
+      shipments.map((shipment) =>
         this.shipmentAuthorization.hasReadRights(agent, shipment.id)
       )
-    ).then(results => shipments.filter((_v, index) => results[index]));
+    ).then((results) => shipments.filter((_v, index) => results[index]));
 
     return shipments;
   }

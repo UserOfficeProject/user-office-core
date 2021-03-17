@@ -11,13 +11,13 @@ export enum DependenciesLogicOperator {
 }
 
 export class EqualityValidator implements FieldConditionEvaluator {
-  isSatisfied(answer: Answer, params: object): boolean {
+  isSatisfied(answer: Answer, params: Record<string, unknown>): boolean {
     return answer.value === params;
   }
 }
 
 export class InequalityValidator implements FieldConditionEvaluator {
-  isSatisfied(answer: Answer, params: object): boolean {
+  isSatisfied(answer: Answer, params: Record<string, unknown>): boolean {
     return answer.value !== params;
   }
 }
@@ -42,5 +42,5 @@ export class ConditionEvaluator {
 }
 
 export interface FieldConditionEvaluator {
-  isSatisfied(answer: Answer, params: object): boolean;
+  isSatisfied(answer: Answer, params: Record<string, unknown>): boolean;
 }

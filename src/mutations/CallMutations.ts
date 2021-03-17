@@ -1,3 +1,4 @@
+import { ResourceId } from '@esss-swap/duo-localisation';
 import { logger } from '@esss-swap/duo-logger';
 import {
   createCallValidationSchemas,
@@ -30,6 +31,37 @@ const updateCallValidationSchema = mergeValidationSchemas(
 export default class CallMutations {
   constructor(private dataSource: CallDataSource) {}
 
+  @Authorized([Roles.USER_OFFICER])
+  async delete(
+    agent: UserWithRole | null,
+    { callId }: { callId: number }
+  ): Promise<Call | Rejection> {
+    const call = await this.dataSource.get(callId);
+
+    if (!call) {
+      return rejection('NOT_FOUND');
+    }
+
+    try {
+      const result = await this.dataSource.delete(callId);
+
+      return result;
+    } catch (e) {
+      if ('code' in e && e.code === '23503') {
+        return rejection(
+          `Failed to delete call with ID "${call.shortCode}", it has dependencies which need to be deleted first` as ResourceId
+        );
+      }
+
+      logger.logException('Failed to delete call', e, {
+        agent,
+        callId,
+      });
+
+      return rejection('INTERNAL_ERROR');
+    }
+  }
+
   @ValidateArgs(createCallValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async create(
@@ -38,8 +70,8 @@ export default class CallMutations {
   ): Promise<Call | Rejection> {
     return this.dataSource
       .create(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not create call', error, {
           agent,
           shortCode: args.shortCode,
@@ -57,8 +89,8 @@ export default class CallMutations {
   ): Promise<Call | Rejection> {
     return this.dataSource
       .update(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not create call', error, {
           agent,
           shortCode: args.shortCode,
@@ -76,8 +108,8 @@ export default class CallMutations {
   ): Promise<Call | Rejection> {
     return this.dataSource
       .assignInstrumentsToCall(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException('Could not assign instruments to call', error, {
           agent,
           args,
@@ -95,8 +127,8 @@ export default class CallMutations {
   ): Promise<Call | Rejection> {
     return this.dataSource
       .removeAssignedInstrumentFromCall(args)
-      .then(result => result)
-      .catch(error => {
+      .then((result) => result)
+      .catch((error) => {
         logger.logException(
           'Could not remove assigned instrument from call',
           error,

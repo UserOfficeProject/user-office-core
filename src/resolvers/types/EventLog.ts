@@ -30,7 +30,7 @@ export class EventLog {
   public changedObjectId: string;
 }
 
-@Resolver(of => EventLog)
+@Resolver((of) => EventLog)
 export class EventLogResolver {
   @FieldResolver(() => User)
   async changedBy(

@@ -6,6 +6,6 @@ router.get('/health', (req: Request, res: Response) => {
   res.status(200).send();
 });
 
-export default function() {
+export default function () {
   return router;
 }
