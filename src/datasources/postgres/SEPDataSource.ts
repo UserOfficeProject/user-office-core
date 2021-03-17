@@ -28,6 +28,20 @@ import {
 } from './records';
 
 export default class PostgresSEPDataSource implements SEPDataSource {
+  async delete(id: number): Promise<SEP> {
+    return database
+      .where('SEPs.sep_id', id)
+      .del()
+      .from('SEPs')
+      .returning('*')
+      .then((sep: SEPRecord[]) => {
+        if (sep === undefined || sep.length !== 1) {
+          throw new Error(`Could not delete sep with id:${id}`);
+        }
+
+        return createSEPObject(sep[0]);
+      });
+  }
   async create(
     code: string,
     description: string,
@@ -132,7 +146,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async getAll(
-    active: boolean,
+    active?: boolean,
     filter?: string,
     first?: number,
     offset?: number
@@ -153,7 +167,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         if (offset) {
           query.offset(offset);
         }
-        if (active) {
+        if (active !== undefined) {
           query.where('active', active);
         }
       })
