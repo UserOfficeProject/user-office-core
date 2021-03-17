@@ -3,6 +3,7 @@ import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
 
 import { Event } from '../../events/event.enum';
+import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
@@ -107,6 +108,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           comment_for_user: proposal.commentForUser,
           comment_for_management: proposal.commentForManagement,
           notified: proposal.notified,
+          submitted: proposal.submitted,
           management_time_allocation: proposal.managementTimeAllocation,
           management_decision_submitted: proposal.managementDecisionSubmitted,
         },
@@ -414,8 +416,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async cloneProposal(
     clonerId: number,
     proposalId: number,
-    callId: number,
-    templateId: number
+    call: Call
   ): Promise<Proposal> {
     const sourceProposal = await this.get(proposalId);
 
@@ -436,7 +437,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         creator_id
       )
       SELECT
-        ${templateId},
+        ${call.templateId},
         ${clonerId}
       FROM 
         questionaries
@@ -481,7 +482,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         abstract,
         1,
         proposer_id,
-        ${callId},
+        ${call.id},
         ${newQuestionary.questionary_id},
         false,
         false
@@ -492,6 +493,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       RETURNING *
     `)
     ).rows;
+
+    await database.raw(`
+      INSERT INTO proposal_user
+      (
+        proposal_id,
+        user_id
+      )
+      SELECT
+        ${newProposal.proposal_id},
+        user_id
+      FROM 
+        proposal_user
+      WHERE
+        proposal_id = ${sourceProposal.id}
+      RETURNING *
+    `);
 
     return createProposalObject(newProposal);
   }

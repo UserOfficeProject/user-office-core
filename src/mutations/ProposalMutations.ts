@@ -300,6 +300,11 @@ export default class ProposalMutations {
         proposal.callId,
         statusId
       );
+
+      // NOTE: If status Draft re-open proposal for submission.
+      if (statusId === 1) {
+        proposal.submitted = false;
+      }
     }
 
     if (statusId !== undefined) {
@@ -349,12 +354,7 @@ export default class ProposalMutations {
     }
 
     return this.proposalDataSource
-      .cloneProposal(
-        (agent as UserWithRole).id,
-        proposalToCloneId,
-        callId,
-        call.templateId
-      )
+      .cloneProposal((agent as UserWithRole).id, proposalToCloneId, call)
       .then((proposal) => proposal)
       .catch((err) => {
         logger.logException('Could not clone proposal', err, { agent });

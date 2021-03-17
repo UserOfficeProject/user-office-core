@@ -50,10 +50,7 @@ const getTopicActiveAnswers = (
 
   return step
     ? (step.fields.filter((field) => {
-        return areDependenciesSatisfied(
-          questionarySteps,
-          field.question.proposalQuestionId
-        );
+        return areDependenciesSatisfied(questionarySteps, field.question.id);
       }) as Answer[])
     : [];
 };
@@ -155,9 +152,7 @@ export const collectProposalPDFData = async (
 
       if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
         answer.value = samples
-          .filter(
-            (sample) => sample.questionId === answer.question.proposalQuestionId
-          )
+          .filter((sample) => sample.questionId === answer.question.id)
           .map((sample) => sample);
       }
     }

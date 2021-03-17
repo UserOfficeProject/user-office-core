@@ -192,7 +192,7 @@ const createTemplates = async () => {
       for (const question of questions) {
         await templateDataSource.upsertQuestionTemplateRelations([
           {
-            questionId: question.proposalQuestionId,
+            questionId: question.id,
             sortOrder: faker.random.number({
               min: 0,
               max: 100,
@@ -255,7 +255,7 @@ const createProposals = async () => {
       for (const question of step.fields) {
         await questionaryDataSource.updateAnswer(
           questionary.questionaryId!,
-          question.question.proposalQuestionId,
+          question.question.id,
           JSON.stringify({ value: faker.random.words(5) })
         );
       }
