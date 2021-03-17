@@ -8,7 +8,6 @@ import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
-import { NextStatusEvent } from './NextStatusEvent';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
 import { Proposal } from './Proposal';
 import { NextProposalStatus, ProposalStatus } from './ProposalStatus';
@@ -24,6 +23,7 @@ import { Sample } from './Sample';
 import { SEP } from './SEP';
 import { SEPProposal } from './SEPProposal';
 import { Shipment } from './Shipment';
+import { StatusChangingEvent } from './StatusChangingEvent';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
 import { Topic } from './Topic';
@@ -254,10 +254,10 @@ export class ProposalWorkflowConnectionResponseWrap extends ResponseWrapBase<Pro
 }
 
 @ObjectType()
-export class ProposalNextStatusEventResponseWrap extends ResponseWrapBase<NextStatusEvent> {
+export class ProposalStatusChangingEventResponseWrap extends ResponseWrapBase<StatusChangingEvent> {
   @Response()
-  @Field(() => [NextStatusEvent], { nullable: true })
-  public nextStatusEvents: NextStatusEvent[];
+  @Field(() => [StatusChangingEvent], { nullable: true })
+  public statusChangingEvents: StatusChangingEvent[];
 }
 
 @ObjectType()

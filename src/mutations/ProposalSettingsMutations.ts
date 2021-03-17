@@ -9,20 +9,20 @@ import {
   addProposalWorkflowStatusValidationSchema,
   moveProposalWorkflowStatusValidationSchema,
   deleteProposalWorkflowStatusValidationSchema,
-  addNextStatusEventsValidationSchema,
+  // addNextStatusEventsValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
-import { NextStatusEvent } from '../models/NextStatusEvent';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { Roles } from '../models/Role';
+import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
-import { AddNextStatusEventsToConnectionInput } from '../resolvers/mutations/settings/AddNextStatusEventsToConnection';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
+import { AddStatusChangingEventsToConnectionInput } from '../resolvers/mutations/settings/AddStatusChangingEventsToConnection';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { DeleteProposalWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteProposalWorkflowStatusMutation';
@@ -372,16 +372,16 @@ export default class ProposalSettingsMutations {
     }
   }
 
-  @ValidateArgs(addNextStatusEventsValidationSchema)
+  // @ValidateArgs(addNextStatusEventsValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async addNextStatusEventsToConnection(
+  async addStatusChangingEventsToConnection(
     agent: UserWithRole | null,
-    args: AddNextStatusEventsToConnectionInput
-  ): Promise<NextStatusEvent[] | Rejection> {
+    args: AddStatusChangingEventsToConnectionInput
+  ): Promise<StatusChangingEvent[] | Rejection> {
     return this.dataSource
-      .addNextStatusEventsToConnection(
+      .addStatusChangingEventsToConnection(
         args.proposalWorkflowConnectionId,
-        args.nextStatusEvents
+        args.statusChangingEvents
       )
       .catch((error) => {
         logger.logException('Could not add next status events', error, {

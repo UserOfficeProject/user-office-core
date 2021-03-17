@@ -4,6 +4,7 @@ export enum Event {
   PROPOSAL_UPDATED = 'PROPOSAL_UPDATED',
   PROPOSAL_SUBMITTED = 'PROPOSAL_SUBMITTED',
   PROPOSAL_FEASIBLE = 'PROPOSAL_FEASIBLE',
+  PROPOSAL_UNFEASIBLE = 'PROPOSAL_UNFEASIBLE',
   PROPOSAL_SEP_SELECTED = 'PROPOSAL_SEP_SELECTED',
   PROPOSAL_INSTRUMENT_SELECTED = 'PROPOSAL_INSTRUMENT_SELECTED',
   PROPOSAL_FEASIBILITY_REVIEW_UPDATED = 'PROPOSAL_FEASIBILITY_REVIEW_UPDATED',
@@ -47,6 +48,10 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PROPOSAL_FEASIBLE,
     'Event occurs when proposal feasibility review is submitted with value of feasible',
+  ],
+  [
+    Event.PROPOSAL_UNFEASIBLE,
+    'Event occurs when proposal feasibility review is submitted with value of unfeasible',
   ],
   [
     Event.PROPOSAL_SEP_SELECTED,
