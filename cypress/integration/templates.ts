@@ -537,6 +537,8 @@ context('Template tests', () => {
 
     cy.contains('Save').click();
 
+    cy.wait(1000);
+
     cy.contains(dateQuestion)
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")

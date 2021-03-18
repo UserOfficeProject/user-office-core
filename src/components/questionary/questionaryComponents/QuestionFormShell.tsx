@@ -1,14 +1,16 @@
 import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
-import { Form, Formik, FormikProps } from 'formik';
+import { Form, Formik } from 'formik';
 import React from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
+import {
+  getQuestionaryComponentDefinition,
+  QuestionFormProps,
+} from 'components/questionary/QuestionaryComponentRegistry';
 import { Question } from 'generated/sdk';
-import { Event, EventType } from 'models/QuestionaryEditorModel';
-import { FunctionType } from 'utils/utilTypes';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -26,15 +28,42 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const QuestionFormShell = (props: {
-  validationSchema: unknown;
-  question: Question;
-  dispatch: React.Dispatch<Event>;
-  closeMe: FunctionType;
-  children: (formikProps: FormikProps<Question>) => React.ReactNode;
-}) => {
+export const QuestionFormShell = (
+  props: QuestionFormProps & {
+    validationSchema: unknown;
+  }
+) => {
   const classes = useStyles();
+  const { api } = useDataApiWithFeedback();
   const definition = getQuestionaryComponentDefinition(props.question.dataType);
+
+  const submitHandler = async (values: Question): Promise<void> => {
+    api()
+      .updateQuestion({
+        id: values.id,
+        naturalKey: values.naturalKey,
+        question: values.question,
+        config: values.config ? JSON.stringify(values.config) : undefined,
+      })
+      .then((data) => {
+        if (data.updateQuestion.question) {
+          props.onUpdated?.(data.updateQuestion.question);
+          props.closeMe();
+        }
+      });
+  };
+
+  const deleteHandler = () =>
+    api()
+      .deleteQuestion({
+        questionId: props.question.id,
+      })
+      .then((data) => {
+        if (data.deleteQuestion.question) {
+          props.onDeleted?.(data.deleteQuestion.question);
+          props.closeMe();
+        }
+      });
 
   return (
     <div className={classes.container}>
@@ -44,20 +73,12 @@ export const QuestionFormShell = (props: {
       </Typography>
       <Formik
         initialValues={props.question}
-        onSubmit={async (values): Promise<void> => {
-          props.dispatch({
-            type: EventType.UPDATE_QUESTION_REQUESTED,
-            payload: {
-              field: { ...props.question, ...values },
-            },
-          });
-          props.closeMe();
-        }}
+        onSubmit={submitHandler}
         validationSchema={props.validationSchema}
       >
         {(formikProps) => (
           <Form style={{ flexGrow: 1 }}>
-            {props.children(formikProps)}
+            {props.children?.(formikProps)}
 
             <ActionButtonContainer>
               <Button
@@ -65,13 +86,7 @@ export const QuestionFormShell = (props: {
                 variant="outlined"
                 color="primary"
                 data-cy="delete"
-                onClick={() => {
-                  props.dispatch({
-                    type: EventType.DELETE_QUESTION_REQUESTED,
-                    payload: { questionId: props.question.id },
-                  });
-                  props.closeMe();
-                }}
+                onClick={deleteHandler}
                 disabled={definition.creatable === false}
               >
                 Delete

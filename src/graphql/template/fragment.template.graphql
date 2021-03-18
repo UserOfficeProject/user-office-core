@@ -1,14 +1,14 @@
 fragment template on Template {
   steps {
     topic {
-      title
-      id
-      sortOrder
+      ...topic
     }
     fields {
       ...questionTemplateRelation
     }
   }
+  isArchived
+  questionaryCount
   templateId
   categoryId
   name

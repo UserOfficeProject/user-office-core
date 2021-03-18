@@ -1,25 +1,23 @@
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React from 'react';
+import React, { FC } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { EmbellishmentConfig, Question } from 'generated/sdk';
+import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { EmbellishmentConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionEmbellishmentForm: FormComponent<Question> = (props) => {
-  const field = props.field;
+export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
+  const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
   return (
     <QuestionFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      question={props.field}
+      {...props}
       validationSchema={Yup.object().shape({
         naturalKey: naturalKeySchema,
         config: Yup.object({

@@ -1,24 +1,21 @@
 import { Field } from 'formik';
-import React from 'react';
+import React, { FC } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import TitledContainer from 'components/common/TitledContainer';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionExcerpt } from 'components/questionary/questionaryComponents/QuestionExcerpt';
-import { QuestionTemplateRelation } from 'generated/sdk';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationBooleanForm: FormComponent<QuestionTemplateRelation> = (
+export const QuestionTemplateRelationBooleanForm: FC<QuestionTemplateRelationFormProps> = (
   props
 ) => {
   return (
     <QuestionTemplateRelationFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      questionRel={props.field}
+      {...props}
       template={props.template}
       validationSchema={Yup.object().shape({
         question: Yup.object({
@@ -30,7 +27,7 @@ export const QuestionTemplateRelationBooleanForm: FormComponent<QuestionTemplate
     >
       {(formikProps) => (
         <>
-          <QuestionExcerpt question={props.field.question} />
+          <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
             <Field
               name="config.required"

@@ -2,14 +2,16 @@ import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
-import { Form, Formik, FormikProps } from 'formik';
+import { Form, Formik } from 'formik';
 import React from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionTemplateRelation, Template } from 'generated/sdk';
-import { Event, EventType } from 'models/QuestionaryEditorModel';
-import { FunctionType } from 'utils/utilTypes';
+import {
+  getQuestionaryComponentDefinition,
+  QuestionTemplateRelationFormProps,
+} from 'components/questionary/QuestionaryComponentRegistry';
+import { FieldDependencyInput, QuestionTemplateRelation } from 'generated/sdk';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -33,20 +35,63 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const QuestionTemplateRelationFormShell = (props: {
-  validationSchema?: unknown;
-  questionRel: QuestionTemplateRelation;
-  dispatch: React.Dispatch<Event>;
-  closeMe: FunctionType;
-  template: Template;
-  children?: (
-    formikProps: FormikProps<QuestionTemplateRelation>
-  ) => React.ReactNode;
-}) => {
+// Have this until GQL accepts Union types
+// https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
+const prepareDependencies = (dependency: FieldDependencyInput) => {
+  return {
+    ...dependency,
+    condition: {
+      ...dependency?.condition,
+      params: JSON.stringify({ value: dependency?.condition.params }),
+    },
+  };
+};
+
+export const QuestionTemplateRelationFormShell = (
+  props: QuestionTemplateRelationFormProps & { validationSchema: unknown }
+) => {
   const classes = useStyles();
+  const { api } = useDataApiWithFeedback();
   const definition = getQuestionaryComponentDefinition(
     props.questionRel.question.dataType
   );
+
+  const submitHandler = async (
+    values: QuestionTemplateRelation
+  ): Promise<void> => {
+    api()
+      .updateQuestionTemplateRelationSettings({
+        templateId: props.template.templateId,
+        questionId: values.question.id,
+        config: values.config ? JSON.stringify(values.config) : undefined,
+        dependencies: values.dependencies
+          ? values.dependencies.map((dependency) =>
+              prepareDependencies(dependency)
+            )
+          : [],
+        dependenciesOperator: values.dependenciesOperator,
+      })
+      .then((data) => {
+        if (data.updateQuestionTemplateRelationSettings.template) {
+          props.onUpdated?.(
+            data.updateQuestionTemplateRelationSettings.template
+          );
+          props.closeMe();
+        }
+      });
+  };
+
+  const deleteHandler = async () => {
+    const result = await api().deleteQuestionTemplateRelation({
+      templateId: props.template.templateId,
+      questionId: props.questionRel.question.id,
+    });
+
+    if (result.deleteQuestionTemplateRelation.template) {
+      props.onDeleted?.(result.deleteQuestionTemplateRelation.template);
+      props.closeMe();
+    }
+  };
 
   return (
     <div className={classes.container}>
@@ -58,10 +103,7 @@ export const QuestionTemplateRelationFormShell = (props: {
         data-cy="natural-key"
         href="#"
         onClick={() => {
-          props.dispatch({
-            type: EventType.OPEN_QUESTION_EDITOR,
-            payload: props.questionRel.question,
-          });
+          props.onOpenQuestionClicked?.(props.questionRel.question);
           props.closeMe();
         }}
         className={classes.naturalKey}
@@ -70,16 +112,7 @@ export const QuestionTemplateRelationFormShell = (props: {
       </Link>
       <Formik
         initialValues={props.questionRel}
-        onSubmit={async (values): Promise<void> => {
-          props.dispatch({
-            type: EventType.UPDATE_QUESTION_REL_REQUESTED,
-            payload: {
-              field: { ...props.questionRel, ...values },
-              templateId: props.template.templateId,
-            },
-          });
-          props.closeMe();
-        }}
+        onSubmit={submitHandler}
         validationSchema={props.validationSchema}
       >
         {(formikProps) => (
@@ -91,16 +124,7 @@ export const QuestionTemplateRelationFormShell = (props: {
                 variant="outlined"
                 color="primary"
                 data-cy="delete"
-                onClick={() => {
-                  props.dispatch({
-                    type: EventType.DELETE_QUESTION_REL_REQUESTED,
-                    payload: {
-                      fieldId: props.questionRel.question.id,
-                      templateId: props.template.templateId,
-                    },
-                  });
-                  props.closeMe();
-                }}
+                onClick={deleteHandler}
                 disabled={definition.creatable === false}
               >
                 Remove from template

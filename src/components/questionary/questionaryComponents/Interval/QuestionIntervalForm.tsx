@@ -1,15 +1,14 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React from 'react';
+import React, { FC } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
-import { Question } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
@@ -19,8 +18,8 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export const QuestionIntervalForm: FormComponent<Question> = (props) => {
-  const field = props.field;
+export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
+  const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
   const { units } = useUnitsData();
 
@@ -28,9 +27,7 @@ export const QuestionIntervalForm: FormComponent<Question> = (props) => {
 
   return (
     <QuestionFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      question={props.field}
+      {...props}
       validationSchema={Yup.object().shape({
         naturalKey: naturalKeySchema,
         question: Yup.string().required('Question is required'),

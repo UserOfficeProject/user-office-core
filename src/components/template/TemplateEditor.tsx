@@ -26,6 +26,7 @@ import {
   getQuestionaryStepByTopicId,
 } from 'models/QuestionaryFunctions';
 import { StyledPaper } from 'styles/StyledComponents';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
 
@@ -37,6 +38,7 @@ import QuestionaryEditorTopic from './TemplateTopicEditor';
 
 export default function TemplateEditor() {
   const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const [
     selectedQuestionTemplateRelation,
     setSelectedQuestionTemplateRelation,
@@ -174,13 +176,19 @@ export default function TemplateEditor() {
           topicId
         ) as QuestionaryStep;
         const question = step.fields[dragSource.index].question;
-        dispatch({
-          type: EventType.DELETE_QUESTION_REL_REQUESTED,
-          payload: {
-            fieldId: question.id,
+        api()
+          .deleteQuestionTemplateRelation({
             templateId: state.templateId,
-          },
-        });
+            questionId: question.id,
+          })
+          .then((data) => {
+            if (data.deleteQuestionTemplateRelation.template) {
+              dispatch({
+                type: EventType.QUESTION_REL_UPDATED,
+                payload: data.deleteQuestionTemplateRelation.template,
+              });
+            }
+          });
       } else if (isReorderingInsideTopics) {
         dispatch({
           type: EventType.REORDER_QUESTION_REL_REQUESTED,
