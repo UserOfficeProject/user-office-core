@@ -91,9 +91,7 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
       const selectedQuestion = extractSearchableQuestionsFromTemplate(
         template
       ).find(
-        (question) =>
-          question.question.proposalQuestionId ===
-          questionFilterQuery.questionId
+        (question) => question.question.id === questionFilterQuery.questionId
       );
       setSelectedQuestion(selectedQuestion ?? null);
     }
@@ -164,7 +162,7 @@ function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
                 return;
               }
               handleSubmit({
-                questionId: selectedQuestion.question.proposalQuestionId,
+                questionId: selectedQuestion.question.id,
                 compareOperator: searchCriteria.compareOperator,
                 value: searchCriteria.value,
                 dataType: selectedQuestion.question.dataType,

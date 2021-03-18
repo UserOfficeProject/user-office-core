@@ -36,8 +36,8 @@ import TemplateQuestionEditor, {
 class TemplateTopicEditor implements TemplateTopicEditorData {
   constructor(public source: QuestionTemplateRelation) {}
 
-  get proposalQuestionId() {
-    return this.source.question.proposalQuestionId;
+  get id() {
+    return this.source.question.id;
   }
   get question() {
     return this.source.question.question;
@@ -186,17 +186,15 @@ export default function QuestionaryEditorTopic(props: {
         <TemplateQuestionEditor
           index={index}
           data={new TemplateTopicEditor(item)}
-          isHighlighted={
-            props.hoveredDependency === item.question.proposalQuestionId
-          }
+          isHighlighted={props.hoveredDependency === item.question.id}
           dispatch={dispatch}
           onClick={(item) =>
             dispatch({
               type: EventType.OPEN_QUESTIONREL_EDITOR,
-              payload: { questionId: item.proposalQuestionId },
+              payload: { questionId: item.id },
             })
           }
-          key={item.question.proposalQuestionId.toString()}
+          key={item.question.id.toString()}
         />
       ));
     }

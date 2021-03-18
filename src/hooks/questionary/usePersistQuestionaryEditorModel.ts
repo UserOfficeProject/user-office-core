@@ -52,7 +52,7 @@ export function usePersistQuestionaryEditorModel() {
   const updateQuestion = async (question: Question) => {
     return api()
       .updateQuestion({
-        id: question.proposalQuestionId,
+        id: question.id,
         naturalKey: question.naturalKey,
         question: question.question,
         config: question.config ? JSON.stringify(question.config) : undefined,
@@ -69,7 +69,7 @@ export function usePersistQuestionaryEditorModel() {
         templateId,
         topicId: field.topicId,
         sortOrder: field.sortOrder,
-        questionId: field.question.proposalQuestionId,
+        questionId: field.question.id,
         config: field.config ? JSON.stringify(field.config) : undefined,
       })
       .then((data) => data.updateQuestionTemplateRelation);
@@ -82,7 +82,7 @@ export function usePersistQuestionaryEditorModel() {
     return api()
       .updateQuestionTemplateRelationSettings({
         templateId,
-        questionId: field.question.proposalQuestionId,
+        questionId: field.question.id,
         config: field.config ? JSON.stringify(field.config) : undefined,
         dependencies: field.dependencies
           ? field.dependencies.map((dependency) =>
@@ -352,7 +352,7 @@ export function usePersistQuestionaryEditorModel() {
             if (result.question) {
               dispatch({
                 type: EventType.QUESTION_DELETED,
-                payload: result.question.proposalQuestionId,
+                payload: result.question.id,
               });
             }
 

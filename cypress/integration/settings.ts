@@ -438,7 +438,7 @@ context('Settings tests', () => {
         );
 
       cy.get('[data-cy="view-proposal"]').first().click();
-      cy.get('[role="dialog"]').contains('Technical').click();
+      cy.get('[role="dialog"]').contains('Technical review').click();
 
       cy.get('[data-cy="timeAllocation"] input').clear().type('20');
 

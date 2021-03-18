@@ -118,7 +118,7 @@ export default function QuestionaryEditorModel(
           const questionRel: QuestionTemplateRelation = action.payload.field;
           const questionRelToUpdate = getFieldById(
             draft.steps,
-            questionRel.question.proposalQuestionId
+            questionRel.question.id
           );
           if (questionRel && questionRelToUpdate) {
             Object.assign(questionRelToUpdate, questionRel);
@@ -129,8 +129,7 @@ export default function QuestionaryEditorModel(
         case EventType.UPDATE_QUESTION_REQUESTED: {
           const field: Question = action.payload.field;
           const fieldToUpdate = draft.complementaryQuestions.find(
-            (question) =>
-              question.proposalQuestionId === field.proposalQuestionId
+            (question) => question.id === field.id
           );
           if (field && fieldToUpdate) {
             Object.assign(fieldToUpdate, field);
@@ -156,7 +155,7 @@ export default function QuestionaryEditorModel(
           const questionId = action.payload;
           draft.complementaryQuestions.splice(
             draft.complementaryQuestions.findIndex(
-              (question) => question.proposalQuestionId === questionId
+              (question) => question.id === questionId
             ),
             1
           );
@@ -178,10 +177,8 @@ export default function QuestionaryEditorModel(
           const newQuestion = action.payload as Question;
           const curQuestion =
             draft.complementaryQuestions.find(
-              (curQuestion) =>
-                curQuestion.proposalQuestionId ===
-                newQuestion.proposalQuestionId
-            ) || getFieldById(draft.steps, newQuestion.proposalQuestionId);
+              (curQuestion) => curQuestion.id === newQuestion.id
+            ) || getFieldById(draft.steps, newQuestion.id);
           if (newQuestion && curQuestion) {
             Object.assign(curQuestion.question, newQuestion);
           }

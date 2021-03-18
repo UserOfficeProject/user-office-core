@@ -68,7 +68,7 @@ export const QuestionFormShell = (props: {
                 onClick={() => {
                   props.dispatch({
                     type: EventType.DELETE_QUESTION_REQUESTED,
-                    payload: { questionId: props.question.proposalQuestionId },
+                    payload: { questionId: props.question.id },
                   });
                   props.closeMe();
                 }}

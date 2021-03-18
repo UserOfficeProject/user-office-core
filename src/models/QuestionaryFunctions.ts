@@ -33,7 +33,7 @@ export function getFieldById(
   let needle: AbstractField | undefined;
   collection.every((step) => {
     needle = (step.fields as Array<QuestionTemplateRelation | Answer>).find(
-      (field) => field.question.proposalQuestionId === questionId
+      (field) => field.question.id === questionId
     );
 
     return needle === undefined;
@@ -111,7 +111,7 @@ export function prepareAnswers(answers?: Answer[]): AnswerInput[] {
     });
     const preparedAnswers = answers.map((answer) => {
       return {
-        questionId: answer.question.proposalQuestionId,
+        questionId: answer.question.id,
         value: JSON.stringify({ value: answer.value }),
       }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
     });

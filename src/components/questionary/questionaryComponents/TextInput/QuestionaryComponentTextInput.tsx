@@ -15,13 +15,13 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { proposalQuestionId },
+    question: { id },
     question,
     value,
   } = answer;
   const [stateValue, setStateValue] = useState(value);
-  const fieldError = getIn(errors, proposalQuestionId);
-  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
+  const fieldError = getIn(errors, id);
+  const isError = getIn(touched, id) && !!fieldError;
   const config = answer.config as TextInputConfig;
 
   useEffect(() => {
@@ -40,8 +40,8 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
       <TextFieldNoSubmit
         isCounterHidden={config.isCounterHidden}
         variant="standard"
-        id={proposalQuestionId}
-        name={proposalQuestionId}
+        id={id}
+        name={id}
         fullWidth
         required={config.required}
         label={question.question}

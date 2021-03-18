@@ -20,7 +20,7 @@ const TextFieldNoSubmit = withPreventSubmit(TextField);
 function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
   const {
     answer: {
-      question: { proposalQuestionId },
+      question: { id },
     },
   } = props;
 
@@ -37,7 +37,7 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
   return (
     <>
       <Field
-        name={proposalQuestionId}
+        name={id}
         label={props.answer.question.question}
         inputProps={{
           onChange: (event: ChangeEvent<HTMLInputElement>) => {

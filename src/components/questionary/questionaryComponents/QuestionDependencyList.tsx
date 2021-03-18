@@ -52,7 +52,7 @@ const QuestionDependencyList: React.FC<QuestionDependencyListProps> = ({
     updateFormikMemoized();
   }, [logicOperator, updateFormikMemoized]);
 
-  const currentQuestionId = field.question.proposalQuestionId;
+  const currentQuestionId = field.question.id;
 
   const allAvailableDependenciesAdded =
     field.dependencies.length >=
@@ -60,7 +60,7 @@ const QuestionDependencyList: React.FC<QuestionDependencyListProps> = ({
       (option) =>
         [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
           option.question.dataType
-        ) && currentQuestionId !== option.question.proposalQuestionId
+        ) && currentQuestionId !== option.question.id
     ).length;
 
   return (

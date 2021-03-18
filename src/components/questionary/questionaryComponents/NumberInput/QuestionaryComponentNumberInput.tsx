@@ -35,11 +35,11 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { proposalQuestionId, question },
+    question: { id, question },
   } = answer;
   const config = answer.config as NumberInputConfig;
-  const fieldError = getIn(errors, proposalQuestionId);
-  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
+  const fieldError = getIn(errors, id);
+  const isError = getIn(touched, id) && !!fieldError;
   const [stateValue, setStateValue] = useState<{
     value: AcceptableUserInput;
     unit: string;
@@ -47,8 +47,8 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
 
   const classes = useStyles();
 
-  const valueFieldId = `${proposalQuestionId}.value`;
-  const unitFieldId = `${proposalQuestionId}.unit`;
+  const valueFieldId = `${id}.value`;
+  const unitFieldId = `${id}.unit`;
 
   const getNumberOrDefault = (
     input: string,

@@ -1,6 +1,6 @@
 fragment question on Question {
+  id
   question
-  proposalQuestionId
   naturalKey
   dataType
   categoryId

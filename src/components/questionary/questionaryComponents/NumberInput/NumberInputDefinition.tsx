@@ -6,6 +6,7 @@ import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createNumberInputValidationSchema } from './createNumberInputValidationSchema';
+import NumberSearchCriteriaComponent from './NumberSearchCriteriaComponent';
 import { QuestionaryComponentNumber } from './QuestionaryComponentNumberInput';
 import { QuestionNumberForm } from './QuestionNumberInputForm';
 import { QuestionTemplateRelationNumberForm } from './QuestionTemplateRelationNumberInputForm';
@@ -40,4 +41,5 @@ export const numberInputDefinition: QuestionaryComponentDefinition = {
 
   createYupValidationSchema: createNumberInputValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || { value: '', unit: null },
+  searchCriteriaComponent: NumberSearchCriteriaComponent,
 };

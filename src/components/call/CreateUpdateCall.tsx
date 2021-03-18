@@ -101,7 +101,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
             closeModal(data.createCall.error, data.createCall.call as Call);
           }
         }}
-        shouldCreate={!!call}
+        shouldCreate={!call}
       >
         <WizardStep
           title="General"
