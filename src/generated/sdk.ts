@@ -534,6 +534,7 @@ export type Mutation = {
   deleteProposal: ProposalResponseWrap;
   deleteQuestion: QuestionResponseWrap;
   deleteSample: SampleResponseWrap;
+  deleteSEP: SepResponseWrap;
   deleteShipment: ShipmentResponseWrap;
   deleteTemplate: TemplateResponseWrap;
   deleteTopic: TemplateResponseWrap;
@@ -1088,6 +1089,11 @@ export type MutationDeleteQuestionArgs = {
 
 export type MutationDeleteSampleArgs = {
   sampleId: Scalars['Int'];
+};
+
+
+export type MutationDeleteSepArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -2441,6 +2447,23 @@ export type CreateSepMutation = (
   ) }
 );
 
+export type DeleteSepMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type DeleteSepMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteSEP: (
+    { __typename?: 'SEPResponseWrap' }
+    & Pick<SepResponseWrap, 'error'>
+    & { sep: Maybe<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id'>
+    )> }
+  ) }
+);
+
 export type GetInstrumentsBySepQueryVariables = Exact<{
   sepId: Scalars['Int'];
   callId: Scalars['Int'];
@@ -2653,7 +2676,7 @@ export type GetSepReviewersQuery = (
 
 export type GetSePsQueryVariables = Exact<{
   filter: Scalars['String'];
-  active: Scalars['Boolean'];
+  active?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -6011,6 +6034,16 @@ export const CreateSepDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
+export const DeleteSepDocument = gql`
+    mutation deleteSEP($id: Int!) {
+  deleteSEP(id: $id) {
+    error
+    sep {
+      id
+    }
+  }
+}
+    `;
 export const GetInstrumentsBySepDocument = gql`
     query getInstrumentsBySEP($sepId: Int!, $callId: Int!) {
   instrumentsBySep(sepId: $sepId, callId: $callId) {
@@ -6229,7 +6262,7 @@ export const GetSepReviewersDocument = gql`
 }
     `;
 export const GetSePsDocument = gql`
-    query getSEPs($filter: String!, $active: Boolean!) {
+    query getSEPs($filter: String!, $active: Boolean) {
   seps(filter: $filter, active: $active) {
     seps {
       id
@@ -6502,7 +6535,6 @@ export const DeleteCallDocument = gql`
     call {
       id
     }
-    error
   }
 }
     `;
@@ -8173,6 +8205,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     createSEP(variables: CreateSepMutationVariables): Promise<CreateSepMutation> {
       return withWrapper(() => client.request<CreateSepMutation>(print(CreateSepDocument), variables));
+    },
+    deleteSEP(variables: DeleteSepMutationVariables): Promise<DeleteSepMutation> {
+      return withWrapper(() => client.request<DeleteSepMutation>(print(DeleteSepDocument), variables));
     },
     getInstrumentsBySEP(variables: GetInstrumentsBySepQueryVariables): Promise<GetInstrumentsBySepQuery> {
       return withWrapper(() => client.request<GetInstrumentsBySepQuery>(print(GetInstrumentsBySepDocument), variables));

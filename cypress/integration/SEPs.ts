@@ -161,6 +161,19 @@ context(
       });
     });
 
+    it('Officer should be able to delete SEP', () => {
+      const { code, description } = sep1;
+
+      cy.login('officer');
+
+      cy.contains('SEPs').click();
+      cy.get('[title="Delete"]').last().click();
+
+      cy.get('[title="Save"]').click();
+
+      cy.notification({ variant: 'success', text: 'SEP deleted successfully' });
+    });
+
     it('Officer should be able to create SEP', () => {
       const { code, description } = sep1;
 
@@ -517,6 +530,13 @@ context(
       cy.contains('SEP_REVIEW').click();
 
       cy.get('[type="submit"]').click();
+
+      cy.get('[role="dialog"]').contains('Technical').click();
+      cy.get('[data-cy="timeAllocation"]').type('51');
+      cy.get('[data-cy="technical-review-status"]').click();
+      cy.contains('Feasible').click();
+
+      cy.get('[data-cy=update-technical-review] > .MuiButton-label').click();
       // <------------------------------------------
 
       cy.closeModal();
@@ -993,6 +1013,10 @@ context(
 
       cy.finishedLoading();
 
+      // Manually changing the proposal status to be shown in the SEPs. -------->
+      cy.get('[data-cy="status-filter"]').click();
+      cy.get('[role="listbox"] [data-value="1"]').click();
+
       cy.get('table tbody [type="checkbox"]').first().check();
 
       cy.get("[title='Assign proposals to SEP']").first().click();
@@ -1007,6 +1031,42 @@ context(
       cy.get("[id='menu-selectedSEPId'] li").first().click();
 
       cy.contains('Assign to SEP').click();
+
+      cy.get('table tbody [type="checkbox"]').first().check();
+
+      cy.get("[title='Assign proposals to instrument']").first().click();
+
+      cy.get("[id='mui-component-select-selectedInstrumentId']").should(
+        'not.have.class',
+        'Mui-disabled'
+      );
+
+      cy.get("[id='mui-component-select-selectedInstrumentId']")
+        .first()
+        .click();
+
+      cy.get("[id='menu-selectedInstrumentId'] li").first().click();
+
+      cy.contains('Assign to Instrument').click();
+
+      cy.get('[title="View proposal"]').first().click();
+
+      cy.get('[role="dialog"]').contains('Admin').click();
+
+      cy.get('#mui-component-select-proposalStatus').click();
+
+      cy.contains('SEP_REVIEW').click();
+
+      cy.get('[type="submit"]').click();
+
+      cy.get('[role="dialog"]').contains('Technical').click();
+      cy.get('[data-cy="timeAllocation"]').type('51');
+      cy.get('[data-cy="technical-review-status"]').click();
+      cy.contains('Feasible').click();
+
+      cy.get('[data-cy=update-technical-review] > .MuiButton-label').click();
+      cy.closeModal();
+      // <------------------------------------------
 
       cy.contains('Calls').click();
 
@@ -1066,22 +1126,6 @@ context(
 
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
       cy.login('officer');
-
-      cy.get('[data-cy="view-proposal"]').first().click();
-
-      cy.get('[role="dialog"]').contains('Technical review').click();
-      cy.get('[data-cy="timeAllocation"]').type('51');
-      cy.get('[data-cy="technical-review-status"]').click();
-      cy.contains('Feasible').click();
-
-      cy.contains('Update').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Technical review updated successfully',
-      });
-
-      cy.closeModal();
 
       cy.contains('SEPs').click();
 
