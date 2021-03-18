@@ -523,8 +523,10 @@ export default class PostgresProposalSettingsDataSource
   }
 
   async getProposalNextStatus(proposalId: number, event: Event) {
-    const nextProposalStatus: ProposalStatusRecord = await database('proposals')
-      .select(['ps.*'])
+    const currentProposalWorkflowConnection: ProposalWorkflowConnectionRecord = await database(
+      'proposals'
+    )
+      .select(['pwc.*'])
       .join('call', {
         'call.call_id': 'proposals.call_id',
       })
@@ -532,15 +534,33 @@ export default class PostgresProposalSettingsDataSource
         'pwc.proposal_workflow_id': 'call.proposal_workflow_id',
         'pwc.proposal_status_id': 'proposals.status_id',
       })
+      .where('proposal_id', proposalId)
+      .first();
+
+    if (!currentProposalWorkflowConnection) {
+      return null;
+    }
+
+    const nextProposalStatus: ProposalStatusRecord = await database(
+      'proposal_workflow_connections as pwc'
+    )
+      .select(['ps.*'])
       .join('proposal_statuses as ps', {
-        'ps.proposal_status_id': 'pwc.next_proposal_status_id',
+        'ps.proposal_status_id': 'pwc.proposal_status_id',
       })
-      .join('status_changing_events as nse', {
-        'nse.proposal_workflow_connection_id':
+      .join('status_changing_events as sce', {
+        'sce.proposal_workflow_connection_id':
           'pwc.proposal_workflow_connection_id',
       })
-      .where('proposal_id', proposalId)
-      .andWhere('nse.status_changing_event', event)
+      .where(
+        'pwc.proposal_status_id',
+        currentProposalWorkflowConnection.next_proposal_status_id
+      )
+      .andWhere(
+        'pwc.proposal_workflow_id',
+        currentProposalWorkflowConnection.proposal_workflow_id
+      )
+      .andWhere('sce.status_changing_event', event)
       .first();
 
     if (!nextProposalStatus) {
