@@ -160,8 +160,8 @@ export default function TemplateQuestionEditor(props: {
 
   return (
     <Draggable
-      key={props.data.proposalQuestionId}
-      draggableId={props.data.proposalQuestionId}
+      key={props.data.id}
+      draggableId={props.data.id}
       index={props.index}
       isDragDisabled={questionDefinition.creatable === false}
     >
@@ -214,7 +214,7 @@ export default function TemplateQuestionEditor(props: {
 }
 
 export interface TemplateTopicEditorData {
-  proposalQuestionId: string;
+  id: string;
   question: string;
   naturalKey: string;
   dataType: DataType;

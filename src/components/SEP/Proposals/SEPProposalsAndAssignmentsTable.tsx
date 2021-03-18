@@ -8,8 +8,11 @@ import dateformat from 'dateformat';
 import MaterialTable, { Options } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
+import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
+import ProposalReviewContent from 'components/review/ProposalReviewContent';
+import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import {
   SepAssignment,
   ReviewStatus,
@@ -27,7 +30,6 @@ import { tableIcons } from 'utils/materialIcons';
 import { average } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import SEPProposalViewModal from '../MeetingComponents/ProposalViewModal/SEPProposalViewModal';
 import AssignSEPMemberToProposal, {
   SepAssignedMember,
 } from './AssignSEPMemberToProposal';
@@ -47,6 +49,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   selectedCallId,
   Toolbar,
 }) => {
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
+    reviewModal: NumberParam,
+  });
   const {
     loadingSEPProposals,
     SEPProposalsData,
@@ -54,7 +59,6 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   } = useSEPProposalsData(sepId, selectedCallId);
   const { api } = useDataApiWithFeedback();
   const [proposalId, setProposalId] = useState<null | number>(null);
-  const [openProposalId, setOpenProposalId] = useState<number | null>(null);
   const downloadPDFProposal = useDownloadPDFProposal();
 
   const hasRightToAssignReviewers = useCheckAccess([
@@ -286,13 +290,18 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
 
   return (
     <React.Fragment>
-      <SEPProposalViewModal
-        proposalViewModalOpen={!!openProposalId}
-        setProposalViewModalOpen={() => {
-          setOpenProposalId(null);
+      <ProposalReviewModal
+        title="SEP - Proposal View"
+        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
+        setProposalReviewModalOpen={() => {
+          setUrlQueryParams({ reviewModal: undefined });
         }}
-        proposalId={openProposalId || 0}
-      />
+      >
+        <ProposalReviewContent
+          proposalId={urlQueryParams.reviewModal}
+          tabNames={['Proposal information', 'Technical review']}
+        />
+      </ProposalReviewModal>
       <Dialog
         maxWidth="sm"
         fullWidth
@@ -345,8 +354,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
                     }),
                     (rowData) => ({
                       icon: ViewIcon,
-                      onClick: () => setOpenProposalId(rowData.proposalId),
-                      tooltip: ' View Proposal',
+                      onClick: () =>
+                        setUrlQueryParams({ reviewModal: rowData.proposalId }),
+                      tooltip: 'View Proposal',
                     }),
                     {
                       icon: GetAppIconComponent,

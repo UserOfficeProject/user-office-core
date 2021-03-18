@@ -52,19 +52,17 @@ context('Proposal administration tests', () => {
     cy.contains('Proposals').click();
 
     cy.get('[data-cy=view-proposal]').click();
-    cy.get('[role="dialog"]').as('dialog');
     cy.finishedLoading();
-    cy.contains('Admin').click();
+    cy.get('[role="dialog"]').contains('Admin').click();
 
     cy.get('#mui-component-select-finalStatus').click();
 
     cy.contains('Accepted').click();
 
+    cy.contains('Loading...').should('not.exist');
     cy.get('#mui-component-select-proposalStatus').click();
 
-    cy.contains('Loading...').should('not.exist');
-
-    cy.get('[id="menu-proposalStatus"] [role="option"]').first().click();
+    cy.get('[id="menu-proposalStatus"]').contains('DRAFT').click();
 
     cy.get('[data-cy="managementTimeAllocation"] input')
       .clear()
@@ -87,6 +85,8 @@ context('Proposal administration tests', () => {
     cy.get('[data-cy="is-management-decision-submitted"]').click();
 
     cy.contains('Update').click();
+
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.notification({ variant: 'success', text: 'Updated' });
 
@@ -112,23 +112,69 @@ context('Proposal administration tests', () => {
     cy.contains('DRAFT');
   });
 
+  it('Should be able to re-open proposal for submission', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.get('[data-cy=view-proposal]').first().click();
+    cy.finishedLoading();
+    cy.get('[role="dialog"]').as('dialog');
+    cy.get('@dialog').contains('Admin').click();
+
+    cy.contains('Loading...').should('not.exist');
+
+    cy.get('#mui-component-select-proposalStatus').click();
+
+    cy.get('[id="menu-proposalStatus"]').contains('SEP Meeting').click();
+
+    cy.get('@dialog').contains('Update').click();
+
+    cy.notification({ variant: 'success', text: 'Updated' });
+
+    cy.contains('Loading...').should('not.exist');
+
+    cy.get('#mui-component-select-proposalStatus').click();
+
+    cy.get('[id="menu-proposalStatus"]').contains('DRAFT').click();
+
+    cy.get('@dialog').contains('Update').click();
+
+    cy.get('[data-cy="confirm-ok"]').click();
+
+    cy.notification({ variant: 'success', text: 'Updated' });
+
+    cy.closeModal();
+
+    cy.contains(proposalName1).parent().contains('No');
+
+    cy.logout();
+
+    cy.login('user');
+
+    cy.contains(proposalName1).parent().get('[title="Edit proposal"]').click();
+
+    cy.finishedLoading();
+    cy.contains(proposalName1);
+
+    cy.contains('Submit').parent().should('not.be.disabled');
+  });
+
   it('If you select a tab in tabular view and reload the page it should stay on specific selected tab', () => {
     cy.login('officer');
 
     cy.contains('Proposals').click();
 
     cy.get('[data-cy=view-proposal]').click();
-
-    cy.get('[role="dialog"]').as('dialog');
     cy.finishedLoading();
 
-    cy.contains('Admin').click();
+    cy.get('[role="dialog"]').contains('Admin').click();
 
     cy.reload();
 
     cy.get('[data-cy="commentForUser"]').should('exist');
 
-    cy.get('[role="dialog"]').contains('Technical').click();
+    cy.get('[role="dialog"]').contains('Technical review').click();
 
     cy.reload();
 
@@ -597,5 +643,20 @@ context('Proposal administration tests', () => {
     cy.get('table tbody tr input[type="checkbox"]').first().click();
 
     cy.get('table tbody tr').eq(2).contains(proposalFixedName);
+  });
+
+  it('User officer should see Reviews tab before doing the Admin(management decision)', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy=view-proposal]').first().click();
+    cy.finishedLoading();
+    cy.get('[role="dialog"]').contains('Reviews').click();
+
+    cy.get('[role="dialog"]').contains('External reviews');
+    cy.get('[role="dialog"]').contains('SEP Meeting decision');
   });
 });

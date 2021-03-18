@@ -9,8 +9,10 @@ import React, { useContext } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
+import ProposalReviewContent, {
+  TabNames,
+} from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import ProposalReview from 'components/review/ProposalReviewUserOfficer';
 import { UserContext } from 'context/UserContextProvider';
 import { Proposal, ProposalsFilter } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
@@ -225,6 +227,11 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     (proposal) => proposal.id === urlQueryParams.reviewModal
   );
 
+  const instrumentScientistProposalReviewTabs: TabNames[] = [
+    'Proposal information',
+    'Technical review',
+  ];
+
   return (
     <>
       <ProposalReviewModal
@@ -244,7 +251,10 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         }}
         reviewItemId={urlQueryParams.reviewModal}
       >
-        <ProposalReview proposalId={urlQueryParams.reviewModal as number} />
+        <ProposalReviewContent
+          proposalId={urlQueryParams.reviewModal as number}
+          tabNames={instrumentScientistProposalReviewTabs}
+        />
       </ProposalReviewModal>
       <ProposalFilterBar
         calls={{ data: calls, isLoading: loadingCalls }}

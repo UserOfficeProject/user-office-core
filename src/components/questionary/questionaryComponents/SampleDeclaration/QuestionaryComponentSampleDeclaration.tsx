@@ -77,11 +77,11 @@ function QuestionaryComponentSampleDeclaration(
     confirm,
     formikProps: { errors },
   } = props;
-  const proposalQuestionId = answer.question.proposalQuestionId;
+  const id = answer.question.id;
   const config = answer.config as SubtemplateConfig;
   const { state } = useContext(QuestionaryContext) as ProposalContextType;
 
-  const isError = errors[proposalQuestionId] ? true : false;
+  const isError = errors[id] ? true : false;
 
   const { api } = useDataApiWithFeedback();
 
@@ -126,14 +126,14 @@ function QuestionaryComponentSampleDeclaration(
     };
 
     const proposalId = state?.proposal.id;
-    const questionId = answer.question.proposalQuestionId;
+    const questionId = answer.question.id;
 
     if (proposalId && questionId) {
       getSamples(proposalId, questionId).then((samples) =>
         setRows(samples.map(sampleToListRow))
       );
     }
-  }, [answer.question.proposalQuestionId, state, api]);
+  }, [answer.question.id, state, api]);
 
   if (!state) {
     throw new Error(createMissingContextErrorMessage());
@@ -190,10 +190,10 @@ function QuestionaryComponentSampleDeclaration(
             }
 
             const proposalId = state.proposal.id;
-            const questionId = props.answer.question.proposalQuestionId;
+            const questionId = props.answer.question.id;
             if (proposalId <= 0 || !questionId) {
               throw new Error(
-                'Sample Declaration is missing proposal id and/or proposalQuestionId'
+                'Sample Declaration is missing proposal id and/or question id'
               );
             }
             const templateId = config.templateId;
@@ -219,9 +219,7 @@ function QuestionaryComponentSampleDeclaration(
           }}
           {...props}
         />
-        {isError && (
-          <ProposalErrorLabel>{errors[proposalQuestionId]}</ProposalErrorLabel>
-        )}
+        {isError && <ProposalErrorLabel>{errors[id]}</ProposalErrorLabel>}
       </FormControl>
       <StyledModal
         onClose={() => setSelectedSample(null)}

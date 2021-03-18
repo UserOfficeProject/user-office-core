@@ -87,7 +87,7 @@ export const Wizard: React.FC<WizardProps> = ({
       await step.props.onSubmit(values, actions);
     }
     if (isLastStep) {
-      return onSubmit(values, actions);
+      return await onSubmit(values, actions);
     } else {
       actions.setTouched({});
       next(values);
@@ -144,7 +144,7 @@ export const Wizard: React.FC<WizardProps> = ({
               disabled={formik.isSubmitting}
             >
               {formik.isSubmitting && <UOLoader size={14} />}
-              {isLastStep ? (shouldCreate ? 'Update' : 'Create') : 'Next'}
+              {isLastStep ? (shouldCreate ? 'Create' : 'Update') : 'Next'}
             </Button>
           </ActionButtonContainer>
         </Form>

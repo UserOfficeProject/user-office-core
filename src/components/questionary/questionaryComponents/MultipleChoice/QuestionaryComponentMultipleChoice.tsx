@@ -44,12 +44,12 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { proposalQuestionId, question },
+    question: { id, question },
     value,
   } = answer;
   const [stateValue, setStateValue] = useState<Array<string>>(value);
-  const fieldError = getIn(errors, proposalQuestionId);
-  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
+  const fieldError = getIn(errors, id);
+  const isError = getIn(touched, id) && !!fieldError;
   const config = answer.config as SelectionFromOptionsConfig;
 
   useEffect(() => {
@@ -90,11 +90,9 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
           error={isError}
           margin="dense"
         >
-          <InputLabel id={`questionary-${proposalQuestionId}`}>
-            {label}
-          </InputLabel>
+          <InputLabel id={`questionary-${id}`}>{label}</InputLabel>
           <Select
-            id={proposalQuestionId}
+            id={id}
             value={
               config.isMultipleSelect
                 ? stateValue
@@ -106,7 +104,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
             }
             multiple={config.isMultipleSelect}
-            labelId={`questionary-${proposalQuestionId}`}
+            labelId={`questionary-${id}`}
             required={config.required}
             renderValue={(item) =>
               config.isMultipleSelect
@@ -140,8 +138,8 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
         >
           <FormLabel>{label}</FormLabel>
           <RadioGroup
-            id={proposalQuestionId}
-            name={proposalQuestionId}
+            id={id}
+            name={id}
             value={stateValue[0] || ''}
             onChange={(evt) =>
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
