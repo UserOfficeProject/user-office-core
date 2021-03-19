@@ -16,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
+import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIconAdd from 'components/common/icons/ScienceIconAdd';
 import ScienceIconRemove from 'components/common/icons/ScienceIconRemove';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
@@ -29,7 +30,8 @@ import {
   Instrument,
   Proposal,
   ProposalsFilter,
-  ProposalsToInstrumentArgs,
+  ProposalStatus,
+  ProposalIdWithCallId,
   Sep,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -48,6 +50,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CallSelectModalOnProposalClone from './CallSelectModalOnProposalClone';
+import ChangeProposalStatus from './ChangeProposalStatus';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
 import RankInput from './RankInput';
 
@@ -68,8 +71,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const [openInstrumentAssignment, setOpenInstrumentAssignment] = useState(
     false
   );
+  const [openChangeProposalStatus, setOpenChangeProposalStatus] = useState(
+    false
+  );
   const [selectedProposals, setSelectedProposals] = useState<
-    ProposalsToInstrumentArgs[]
+    ProposalIdWithCallId[]
   >([]);
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
     ProposalViewData[]
@@ -99,7 +105,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const selection = new Set(urlQueryParams.selection);
 
       setPreselectedProposalsData((preselectedProposalsData) => {
-        const selected: ProposalsToInstrumentArgs[] = [];
+        const selected: ProposalIdWithCallId[] = [];
         const preselected = preselectedProposalsData.map((proposal) => {
           if (selection.has(proposal.id.toString())) {
             selected.push({ id: proposal.id, callId: proposal.callId });
@@ -488,6 +494,44 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     }
   };
 
+  const changeStatusOnProposals = async (status: ProposalStatus) => {
+    if (status?.id && selectedProposals?.length) {
+      const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
+      const result = await api(
+        `Proposal${shouldAddPluralLetter} status changed successfully!`
+      ).changeProposalsStatus({
+        proposals: selectedProposals,
+        statusId: status.id,
+      });
+
+      const isError = !!result.changeProposalsStatus.error;
+
+      if (!isError) {
+        const shouldChangeSubmittedValue = status.shortCode === 'DRAFT';
+
+        setProposalsData((proposalsData) =>
+          proposalsData.map((prop) => {
+            if (
+              selectedProposals.find(
+                (selectedProposal) => selectedProposal.id === prop.id
+              )
+            ) {
+              prop.statusId = status.id;
+              prop.statusName = status.name;
+              prop.statusDescription = status.description;
+
+              if (shouldChangeSubmittedValue) {
+                prop.submitted = false;
+              }
+            }
+
+            return prop;
+          })
+        );
+      }
+    }
+  };
+
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
   const DeleteIcon = (): JSX.Element => <Delete />;
   const GroupWorkIcon = (): JSX.Element => <GroupWork />;
@@ -498,6 +542,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       'data-cy'?: string;
     }
   ): JSX.Element => <ScienceIconAdd {...props} />;
+  const ChangeProposalStatusIcon = (
+    props: JSX.IntrinsicAttributes & {
+      children?: React.ReactNode;
+      'data-cy'?: string;
+    }
+  ): JSX.Element => <ListStatusIcon {...props} />;
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
 
   columns = setSortDirectionOnSortColumn(
@@ -546,6 +596,19 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             callIds={selectedProposals.map(
               (selectedProposal) => selectedProposal.callId
             )}
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openChangeProposalStatus}
+        onClose={(): void => setOpenChangeProposalStatus(false)}
+      >
+        <DialogContent>
+          <ChangeProposalStatus
+            changeStatusOnProposals={changeStatusOnProposals}
+            close={(): void => setOpenChangeProposalStatus(false)}
           />
         </DialogContent>
       </Dialog>
@@ -666,6 +729,16 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             tooltip: 'Assign proposals to instrument',
             onClick: () => {
               setOpenInstrumentAssignment(true);
+            },
+            position: 'toolbarOnSelect',
+          },
+          {
+            icon: ChangeProposalStatusIcon.bind(null, {
+              'data-cy': 'change-proposal-status',
+            }),
+            tooltip: 'Change proposal status',
+            onClick: () => {
+              setOpenChangeProposalStatus(true);
             },
             position: 'toolbarOnSelect',
           },

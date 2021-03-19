@@ -162,7 +162,7 @@ const Dashboard: React.FC = () => {
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
 
-  // TODO: Check who can see what and modify the access controll here.
+  // TODO: Check who can see what and modify the access control here.
   return (
     <div className={classes.root}>
       <CssBaseline />
