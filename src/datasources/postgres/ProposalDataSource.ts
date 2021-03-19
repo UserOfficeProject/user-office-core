@@ -7,6 +7,9 @@ import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
+import { SEPMeetingDecisionInput } from '../../resolvers/mutations/SEPManagementDecision';
+import { dummySepMeetingDecision } from '../mockups/ProposalDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
@@ -415,20 +418,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async cloneProposal(
     clonerId: number,
-    proposalId: number,
+    sourceProposal: Proposal,
     call: Call
   ): Promise<Proposal> {
-    const sourceProposal = await this.get(proposalId);
-
-    if (!sourceProposal) {
-      logger.logError(
-        'Could not clone proposal because source proposal does not exist',
-        { proposalId }
-      );
-
-      throw new Error('Could not clone proposal');
-    }
-
     const [newQuestionary]: QuestionaryRecord[] = (
       await database.raw(`
       INSERT INTO questionaries
@@ -575,5 +567,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
 
     return true;
+  }
+
+  // TODO: Finish this implementation
+  async sepMeetingDecision(
+    sepMeetingDecisionInput: SEPMeetingDecisionInput,
+    submittedBy?: number | null
+  ): Promise<SepMeetingDecision> {
+    return dummySepMeetingDecision;
   }
 }

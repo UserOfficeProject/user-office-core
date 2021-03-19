@@ -3,6 +3,8 @@ import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
+import { SEPMeetingDecisionInput } from '../../resolvers/mutations/SEPManagementDecision';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -41,6 +43,16 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.managementDecisionSubmitted || false
   );
 };
+
+export const dummySepMeetingDecision = new SepMeetingDecision(
+  1,
+  1,
+  ProposalEndStatus.ACCEPTED,
+  'Dummy comment for user',
+  'Dummy comment for management',
+  true,
+  1
+);
 
 export class ProposalDataSourceMock implements ProposalDataSource {
   async getProposalsFromView(
@@ -182,7 +194,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async cloneProposal(
     clonerId: number,
-    proposalId: number,
+    proposal: Proposal,
     call: Call
   ): Promise<Proposal> {
     return dummyProposal;
@@ -194,5 +206,12 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     statusId: number
   ): Promise<boolean> {
     return true;
+  }
+
+  async sepMeetingDecision(
+    sepMeetingDecisionInput: SEPMeetingDecisionInput,
+    submittedBy?: number | null
+  ): Promise<SepMeetingDecision> {
+    return dummySepMeetingDecision;
   }
 }

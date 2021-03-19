@@ -17,10 +17,12 @@ import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
+import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
 import { CloneProposalInput } from '../resolvers/mutations/CloneProposalMutation';
+import { SEPMeetingDecisionInput } from '../resolvers/mutations/SEPManagementDecision';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
@@ -332,12 +334,27 @@ export default class ProposalMutations {
     return result || rejection('INTERNAL_ERROR');
   }
 
-  @Authorized()
+  @Authorized([Roles.USER_OFFICER, Roles.USER])
   @EventBus(Event.PROPOSAL_CLONED)
   async clone(
     agent: UserWithRole | null,
     { callId, proposalToCloneId }: CloneProposalInput
   ): Promise<Proposal | Rejection> {
+    const sourceProposal = await this.proposalDataSource.get(proposalToCloneId);
+
+    if (!sourceProposal) {
+      logger.logError(
+        'Could not clone proposal because source proposal does not exist',
+        { proposalToCloneId }
+      );
+
+      return rejection('NOT_FOUND');
+    }
+
+    if (!this.userAuth.hasAccessRights(agent, sourceProposal)) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
+
     // Check if there is an open call
     if (!(await this.proposalDataSource.checkActiveCall(callId))) {
       return rejection('NO_ACTIVE_CALL_FOUND');
@@ -354,10 +371,43 @@ export default class ProposalMutations {
     }
 
     return this.proposalDataSource
-      .cloneProposal((agent as UserWithRole).id, proposalToCloneId, call)
+      .cloneProposal((agent as UserWithRole).id, sourceProposal, call)
       .then((proposal) => proposal)
       .catch((err) => {
         logger.logException('Could not clone proposal', err, { agent });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.PROPOSAL_CLONED)
+  async sepMeetingDecision(
+    agent: UserWithRole | null,
+    args: SEPMeetingDecisionInput
+  ): Promise<SepMeetingDecision | Rejection> {
+    const proposal = await this.proposalDataSource.get(args.proposalId);
+
+    if (!proposal?.id) {
+      logger.logError(
+        'Cannot add SEP meeting decision to non existing proposal',
+        {
+          proposal,
+        }
+      );
+
+      return rejection('NOT_FOUND');
+    }
+
+    const submittedBy = args.submitted ? (agent as UserWithRole).id : null;
+
+    return this.proposalDataSource
+      .sepMeetingDecision(args, submittedBy)
+      .then((sepMeetingDecision) => sepMeetingDecision)
+      .catch((err) => {
+        logger.logException('Could not add sep meeting decision', err, {
+          agent,
+        });
 
         return rejection('INTERNAL_ERROR');
       });

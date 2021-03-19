@@ -2,6 +2,8 @@ import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
+import { SepMeetingDecision } from '../models/SepMeetingDecision';
+import { SEPMeetingDecisionInput } from '../resolvers/mutations/SEPManagementDecision';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 import { ProposalEventsRecord } from './postgres/records';
 
@@ -44,7 +46,7 @@ export interface ProposalDataSource {
   getCount(callId: number): Promise<number>;
   cloneProposal(
     clonerId: number,
-    proposalId: number,
+    sourceProposal: Proposal,
     call: Call
   ): Promise<Proposal>;
   resetProposalEvents(
@@ -52,4 +54,8 @@ export interface ProposalDataSource {
     callId: number,
     statusId: number
   ): Promise<boolean>;
+  sepMeetingDecision(
+    sepMeetingDecisionInput: SEPMeetingDecisionInput,
+    submittedBy?: number | null
+  ): Promise<SepMeetingDecision>;
 }
