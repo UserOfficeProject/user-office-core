@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { EventLog } from '../../models/EventLog';
 import { EventLogsDataSource, EventLogFilter } from '../EventLogsDataSource';
 import database from './database';
@@ -67,7 +66,7 @@ export default class PostgresEventLogsDataSource
       .from('event_logs')
       .whereRaw(whereRawQuery)
       .then((eventLogs: EventLogRecord[]) => {
-        return eventLogs.map(eventLog => this.createEventLogObject(eventLog));
+        return eventLogs.map((eventLog) => this.createEventLogObject(eventLog));
       });
   }
 }

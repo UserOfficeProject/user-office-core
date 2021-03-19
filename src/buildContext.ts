@@ -1,5 +1,3 @@
-import { logger } from '@esss-swap/duo-logger';
-
 import { BasicResolverContext } from './context';
 // Site specific imports (only ESS atm)
 import {
@@ -77,14 +75,14 @@ const proposalMutations = new ProposalMutations(
   questionaryDataSource,
   callDataSource,
   instrumentDataSource,
-  userAuthorization,
-  logger
+  userAuthorization
 );
 
 const reviewQueries = new ReviewQueries(reviewDataSource, userAuthorization);
 const reviewMutations = new ReviewMutations(
   reviewDataSource,
-  userAuthorization
+  userAuthorization,
+  proposalSettingsDataSource
 );
 
 const callQueries = new CallQueries(callDataSource);
@@ -105,7 +103,9 @@ const sepQueries = new SEPQueries(sepDataSource, userAuthorization);
 const sepMutations = new SEPMutations(
   sepDataSource,
   instrumentDataSource,
-  userAuthorization
+  userAuthorization,
+  userDataSource,
+  proposalSettingsDataSource
 );
 
 const systemQueries = new SystemQueries(systemDataSource);
@@ -127,8 +127,7 @@ const questionaryQueries = new QuestionaryQueries(
 const questionaryMutations = new QuestionaryMutations(
   questionaryDataSource,
   templateDataSource,
-  questionaryAuthorization,
-  logger
+  questionaryAuthorization
 );
 
 const sampleQueries = new SampleQueries(

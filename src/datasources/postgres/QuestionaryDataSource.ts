@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { logger } from '@esss-swap/duo-logger';
 
 import {
@@ -110,7 +109,7 @@ export default class PostgresQuestionaryDataSource
     }
 
     await database('answer_has_files').insert(
-      files.map(file => ({ answer_id: answerId, file_id: file }))
+      files.map((file) => ({ answer_id: answerId, file_id: file }))
     );
 
     return files;
@@ -189,7 +188,7 @@ export default class PostgresQuestionaryDataSource
     topic_id: number,
     is_complete: boolean
   ): Promise<void> {
-    return database.transaction(async trx => {
+    return database.transaction(async (trx) => {
       await database
         .raw(
           `INSERT into topic_completenesses(questionary_id, topic_id, is_complete) VALUES(?,?,?) ON CONFLICT (questionary_id, topic_id)  DO UPDATE set is_complete=${is_complete}`,
@@ -213,12 +212,13 @@ export default class PostgresQuestionaryDataSource
       .where('template_id', templateId)
       .whereIn(
         'question_id',
-        questionRecords.map(questionRecord => questionRecord.question_id)
+        questionRecords.map((questionRecord) => questionRecord.question_id)
       );
 
-    return questionDependencies.map(questionDependency => {
+    return questionDependencies.map((questionDependency) => {
       const question = questionRecords.find(
-        field => field.question_id === questionDependency.dependency_question_id
+        (field) =>
+          field.question_id === questionDependency.dependency_question_id
       );
 
       return new FieldDependency(
@@ -253,10 +253,12 @@ export default class PostgresQuestionaryDataSource
                 topics.sort_order`)
     ).rows;
 
-    const answerRecords: Array<QuestionRecord &
-      QuestionTemplateRelRecord & { value: any; answer_id: number } & {
-        dependency_natural_key: string;
-      }> = (
+    const answerRecords: Array<
+      QuestionRecord &
+        QuestionTemplateRelRecord & { value: any; answer_id: number } & {
+          dependency_natural_key: string;
+        }
+    > = (
       await database.raw(`
         SELECT 
           templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id, questions.natural_key as dependency_natural_key
@@ -283,9 +285,9 @@ export default class PostgresQuestionaryDataSource
       templateId
     );
 
-    const fields = answerRecords.map(record => {
+    const fields = answerRecords.map((record) => {
       const questionDependencies = dependencies.filter(
-        dependency => dependency.questionId === record.question_id
+        (dependency) => dependency.questionId === record.question_id
       );
 
       const questionTemplateRelation = createQuestionTemplateRelationObject(
@@ -299,12 +301,12 @@ export default class PostgresQuestionaryDataSource
     });
 
     const steps = Array<QuestionaryStep>();
-    topicRecords.forEach(topic => {
+    topicRecords.forEach((topic) => {
       steps.push(
         new QuestionaryStep(
           createTopicObject(topic),
           topic.is_complete || false,
-          fields.filter(field => field.topicId === topic.topic_id)
+          fields.filter((field) => field.topicId === topic.topic_id)
         )
       );
     });
@@ -328,21 +330,49 @@ export default class PostgresQuestionaryDataSource
     );
 
     // Clone answers
-    await database.raw(`
+    await database.raw(
+      `
       INSERT INTO answers(
           questionary_id
         , question_id
         , answer
       )
       SELECT 
-          ${clonedQuestionary.questionaryId}
+          :clonedQuestionaryId
         , question_id
         , answer
       FROM 
         answers
       WHERE
-          questionary_id=${sourceQuestionary.questionaryId}
-    `);
+        questionary_id = :sourceQuestionaryId
+    `,
+      {
+        clonedQuestionaryId: clonedQuestionary.questionaryId,
+        sourceQuestionaryId: sourceQuestionary.questionaryId,
+      }
+    );
+
+    await database.raw(
+      `
+      INSERT INTO topic_completenesses(
+          questionary_id
+        , topic_id
+        , is_complete
+      )
+      SELECT 
+          :clonedQuestionaryId
+        , topic_id
+        , is_complete
+      FROM
+        topic_completenesses
+      WHERE
+        questionary_id = :sourceQuestionaryId
+    `,
+      {
+        clonedQuestionaryId: clonedQuestionary.questionaryId,
+        sourceQuestionaryId: sourceQuestionary.questionaryId,
+      }
+    );
 
     return clonedQuestionary;
   }

@@ -55,8 +55,11 @@ export const anotherDummyCall = new Call(
 export const dummyCalls = [dummyCall, anotherDummyCall];
 
 export class CallDataSourceMock implements CallDataSource {
+  async delete(id: number): Promise<Call> {
+    return dummyCall;
+  }
   async get(id: number): Promise<Call | null> {
-    const call = dummyCalls.find(dummyCallItem => dummyCallItem.id === id);
+    const call = dummyCalls.find((dummyCallItem) => dummyCallItem.id === id);
 
     if (call) {
       return call;
@@ -67,11 +70,13 @@ export class CallDataSourceMock implements CallDataSource {
 
   async getCalls(filter?: CallsFilter): Promise<Call[]> {
     if (filter?.isReviewEnded === false) {
-      return dummyCalls.filter(dummyCallItem => !dummyCallItem.callReviewEnded);
+      return dummyCalls.filter(
+        (dummyCallItem) => !dummyCallItem.callReviewEnded
+      );
     }
 
     if (filter?.isEnded === false) {
-      return dummyCalls.filter(dummyCallItem => !dummyCallItem.callEnded);
+      return dummyCalls.filter((dummyCallItem) => !dummyCallItem.callEnded);
     }
 
     return dummyCalls;
@@ -97,5 +102,9 @@ export class CallDataSourceMock implements CallDataSource {
     args: RemoveAssignedInstrumentFromCallInput
   ) {
     return dummyCall;
+  }
+
+  async getCallsByInstrumentScientist(scientistId: number): Promise<Call[]> {
+    return dummyCalls;
   }
 }

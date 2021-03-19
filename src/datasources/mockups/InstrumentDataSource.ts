@@ -3,7 +3,7 @@ import {
   InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
-import { ProposalIds } from '../../models/Proposal';
+import { ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
@@ -43,7 +43,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
 
   async get(instrumentId: number): Promise<Instrument | null> {
     const instrument = dummyInstruments.find(
-      dummyInstrumentItem => dummyInstrumentItem.id === instrumentId
+      (dummyInstrumentItem) => dummyInstrumentItem.id === instrumentId
     );
 
     if (instrument) {
@@ -85,7 +85,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   async assignProposalsToInstrument(
     proposalIds: number[],
     instrumentId: number
-  ): Promise<ProposalIds> {
+  ): Promise<ProposalIdsWithNextStatus> {
     return { proposalIds };
   }
 

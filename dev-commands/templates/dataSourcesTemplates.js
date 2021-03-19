@@ -1,6 +1,5 @@
-const postgresDatasourceTemplate = name =>
-  `/* eslint-disable @typescript-eslint/camelcase */
-import { ${name.capitalize()} } from '../../models/${name.capitalize()}';
+const postgresDatasourceTemplate = (name) =>
+  `import { ${name.capitalize()} } from '../../models/${name.capitalize()}';
 import { Create${name.capitalize()}Args } from '../../resolvers/mutations/Create${name.capitalize()}Mutation';
 import { ${name.capitalize()}DataSource } from '../${name.capitalize()}DataSource';
 import database from './database';
@@ -97,9 +96,8 @@ export default class Postgres${name.capitalize()}DataSource implements ${name.ca
 }
 `;
 
-const datasourceTemplate = name =>
-  `/* eslint-disable @typescript-eslint/camelcase */
-import { ${name.capitalize()} } from '../models/${name.capitalize()}';
+const datasourceTemplate = (name) =>
+  `import { ${name.capitalize()} } from '../models/${name.capitalize()}';
 import { Create${name.capitalize()}Args } from '../resolvers/mutations/Create${name.capitalize()}Mutation';
 
 export interface ${name.capitalize()}DataSource {
@@ -114,7 +112,7 @@ export interface ${name.capitalize()}DataSource {
 }
 `;
 
-const testingDatasourceTemplate = name =>
+const testingDatasourceTemplate = (name) =>
   `import { ${name.capitalize()} } from '../../models/${name.capitalize()}';
 import { Create${name.capitalize()}Args } from '../../resolvers/mutations/Create${name.capitalize()}Mutation';
 import { ${name.capitalize()}DataSource } from '../${name.capitalize()}DataSource';

@@ -18,7 +18,7 @@ export default class TemplateQueries {
     return this.dataSource.getTemplates(args);
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getComplementaryQuestions(
     agent: UserWithRole | null,
     templateId: number
@@ -26,7 +26,7 @@ export default class TemplateQueries {
     return this.dataSource.getComplementaryQuestions(templateId);
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getTemplateSteps(
     agent: UserWithRole | null,
     templateId: number

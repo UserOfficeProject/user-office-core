@@ -5,12 +5,12 @@ import request from 'request';
 import { Answer } from '../models/Questionary';
 import { DataType } from '../models/Template';
 
-export const getFileAttachmentIds = (answer: Answer) => {
+export type Attachment = { id: string; figure?: string; caption?: string };
+
+export const getFileAttachments = (answer: Answer): Attachment[] => {
   if (answer.question.dataType === DataType.FILE_UPLOAD && answer.value) {
     if (Array.isArray(answer.value)) {
       return answer.value;
-    } else if (typeof answer.value === 'string') {
-      return answer.value.split(',');
     } else {
       logger.logError(
         'Questionary answer with DataType `FILE_UPLOAD` has neither string nor array value',
@@ -25,10 +25,10 @@ export const getFileAttachmentIds = (answer: Answer) => {
 };
 
 export const bufferRequestBody = (req: request.Request) =>
-  new Promise(resolve => {
+  new Promise((resolve) => {
     const buffer: Buffer[] = [];
 
-    req.on('data', chunk =>
+    req.on('data', (chunk) =>
       buffer.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
     );
 

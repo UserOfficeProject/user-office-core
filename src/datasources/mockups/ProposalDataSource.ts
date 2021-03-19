@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
+import { Call } from '../../models/Call';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalEventsRecord } from '../postgres/records';
@@ -36,7 +36,9 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.commentForUser || 'comment for user',
     values?.commentForManagement || 'comment for management',
     values?.notified || false,
-    values?.submitted || false
+    values?.submitted || false,
+    values?.managementTimeAllocation || 0,
+    values?.managementDecisionSubmitted || false
   );
 };
 
@@ -114,7 +116,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async get(id: number) {
-    return allProposals.find(proposal => proposal.id === id) || null;
+    return allProposals.find((proposal) => proposal.id === id) || null;
   }
 
   async create(proposerId: number, callId: number, questionaryId: number) {
@@ -137,7 +139,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getUserProposals(id: number) {
-    return allProposals.filter(proposal => proposal.proposerId === id);
+    return allProposals.filter((proposal) => proposal.proposerId === id);
   }
 
   async getInstrumentScientistProposals(
@@ -172,5 +174,25 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       proposal_rejected: false,
       proposal_notified: false,
     };
+  }
+
+  async getCount(callId: number): Promise<number> {
+    return 1;
+  }
+
+  async cloneProposal(
+    clonerId: number,
+    proposalId: number,
+    call: Call
+  ): Promise<Proposal> {
+    return dummyProposal;
+  }
+
+  async resetProposalEvents(
+    proposalId: number,
+    callId: number,
+    statusId: number
+  ): Promise<boolean> {
+    return true;
   }
 }

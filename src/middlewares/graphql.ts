@@ -16,6 +16,7 @@ interface Req extends Request {
     user?: User;
     currentRole?: Role;
     roles?: Role[];
+    accessTokenId?: string;
   };
 }
 
@@ -46,8 +47,7 @@ const apolloServer = async (app: Express) => {
     tracing: false,
     playground: {
       settings: {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore-line igore until https://github.com/prisma-labs/graphql-playground/pull/1212 is merged
+        // @ts-expect-error NOTE: expect error until https://github.com/prisma-labs/graphql-playground/pull/1212 is merged
         'schema.polling.enable': false,
       },
     },
@@ -56,13 +56,30 @@ const apolloServer = async (app: Express) => {
     context: async ({ req }: { req: Req }) => {
       let user = null;
       const userId = req.user?.user?.id as number;
+      const accessTokenId = req.user?.accessTokenId;
 
       if (req.user) {
-        user = {
-          ...(await baseContext.queries.user.getAgent(userId)),
-          currentRole:
-            req.user.currentRole || (req.user.roles ? req.user.roles[0] : null),
-        } as UserWithRole;
+        if (accessTokenId) {
+          const {
+            accessPermissions,
+          } = await baseContext.queries.admin.getPermissionsByToken(
+            accessTokenId
+          );
+
+          user = {
+            accessPermissions: accessPermissions
+              ? JSON.parse(accessPermissions)
+              : null,
+            isApiAccessToken: true,
+          } as UserWithRole;
+        } else {
+          user = {
+            ...(await baseContext.queries.user.getAgent(userId)),
+            currentRole:
+              req.user.currentRole ||
+              (req.user.roles ? req.user.roles[0] : null),
+          } as UserWithRole;
+        }
       }
 
       const context: ResolverContext = { ...baseContext, user };

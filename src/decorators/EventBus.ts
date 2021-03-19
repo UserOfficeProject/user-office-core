@@ -8,7 +8,7 @@ import { Rejection, isRejection } from '../rejection';
 
 const EventBusDecorator = (eventType: Event) => {
   return (
-    target: object,
+    target: any,
     name: string,
     descriptor: {
       value?: (agent: UserWithRole, args: any) => Promise<Rejection | any>;
@@ -16,7 +16,7 @@ const EventBusDecorator = (eventType: Event) => {
   ) => {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function(...args) {
+    descriptor.value = async function (...args) {
       let [loggedInUser] = args;
 
       const result = await originalMethod?.apply(this, args);
@@ -41,7 +41,7 @@ const EventBusDecorator = (eventType: Event) => {
       if (process.env.NODE_ENV !== 'test') {
         eventBus
           .publish(event)
-          .catch(e =>
+          .catch((e) =>
             logger.logError(`EventBus publish failed ${event.type}`, e)
           );
       }

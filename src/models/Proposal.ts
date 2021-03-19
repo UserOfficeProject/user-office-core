@@ -44,10 +44,17 @@ export class Proposal {
     public commentForUser: string,
     public commentForManagement: string,
     public notified: boolean,
-    public submitted: boolean
+    public submitted: boolean,
+    public managementTimeAllocation: number,
+    public managementDecisionSubmitted: boolean
   ) {}
 }
 
-export class ProposalIds {
-  constructor(public proposalIds: number[]) {}
+export class ProposalIdsWithNextStatus {
+  constructor(
+    public proposalIds: number[],
+    public id?: number,
+    public shortCode?: string,
+    public name?: string
+  ) {}
 }

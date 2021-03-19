@@ -112,7 +112,7 @@ test('A user officer can invite a reviewer by email', () => {
   const emailInviteResponse = new EmailInviteResponse(
     dummyPlaceHolderUser.id,
     dummyUserOfficer.id,
-    UserRole.REVIEWER
+    UserRole.SEP_REVIEWER
   );
 
   return expect(
@@ -120,7 +120,7 @@ test('A user officer can invite a reviewer by email', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: dummyPlaceHolderUser.email,
-      userRole: UserRole.REVIEWER,
+      userRole: UserRole.SEP_REVIEWER,
     })
   ).resolves.toStrictEqual(emailInviteResponse);
 });
@@ -131,7 +131,7 @@ test('A user cannot invite a reviewer by email', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: 'email@google.com',
-      userRole: UserRole.REVIEWER,
+      userRole: UserRole.SEP_REVIEWER,
     })
   ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
 });
@@ -198,7 +198,7 @@ test('A user should be able to login with credentials and get a token', () => {
   return expect(
     userMutations
       .login(null, { email: dummyUser.email, password: 'Test1234!' })
-      .then(data => typeof data)
+      .then((data) => typeof data)
   ).resolves.toBe('string');
 });
 
@@ -226,7 +226,7 @@ test('A user should not be able to update a token if it is expired', () => {
 
 test('A user should be able to update a token if valid', () => {
   return expect(
-    userMutations.token(goodToken).then(data => typeof data)
+    userMutations.token(goodToken).then((data) => typeof data)
   ).resolves.toBe('string');
 });
 

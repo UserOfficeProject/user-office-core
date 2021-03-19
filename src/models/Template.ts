@@ -27,6 +27,7 @@ export enum DataType {
   INTERVAL = 'INTERVAL',
   NUMBER_INPUT = 'NUMBER_INPUT',
   SHIPMENT_BASIS = 'SHIPMENT_BASIS',
+  RICH_TEXT_INPUT = 'RICH_TEXT_INPUT',
 }
 
 export class Topic {
@@ -42,7 +43,7 @@ export class Topic {
 export class Question {
   constructor(
     public categoryId: TemplateCategoryId,
-    public proposalQuestionId: string,
+    public id: string,
     public naturalKey: string,
     public dataType: DataType,
     public question: string,

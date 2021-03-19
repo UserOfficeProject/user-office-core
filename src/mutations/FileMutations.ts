@@ -17,8 +17,8 @@ export default class FileMutations {
   ): Promise<FileMetadata | Rejection> {
     return this.dataSource
       .put(fileName, mimeType, sizeImBytes, path)
-      .then(metadata => metadata)
-      .catch(err => {
+      .then((metadata) => metadata)
+      .catch((err) => {
         logger.logException('Could not save file', err, { fileName, path });
 
         return rejection('INTERNAL_ERROR');
@@ -35,7 +35,7 @@ export default class FileMutations {
     return this.dataSource
       .prepare(fileId, filePath)
       .then(() => filePath)
-      .catch(err => {
+      .catch((err) => {
         logger.logException('Could not prepare file', err, { fileId });
 
         return rejection('INTERNAL_ERROR');

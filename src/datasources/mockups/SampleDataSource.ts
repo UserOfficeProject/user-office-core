@@ -21,7 +21,7 @@ export class SampleDataSourceMock implements SampleDataSource {
     ];
   }
   async getSample(sampleId: number): Promise<Sample> {
-    return this.samples.find(sample => sample.id === sampleId)!;
+    return this.samples.find((sample) => sample.id === sampleId)!;
   }
 
   async getSamples(args: SamplesArgs): Promise<Sample[]> {
@@ -53,7 +53,7 @@ export class SampleDataSourceMock implements SampleDataSource {
 
   async delete(sampleId: number): Promise<Sample> {
     return this.samples.splice(
-      this.samples.findIndex(sample => sample.id == sampleId),
+      this.samples.findIndex((sample) => sample.id == sampleId),
       1
     )[0];
   }

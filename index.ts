@@ -1,6 +1,6 @@
+import 'dotenv/config'; // Adding environmental variables. NB: keep this import first
 import { logger } from '@esss-swap/duo-logger';
 import cookieParser from 'cookie-parser';
-import 'dotenv/config';
 import express from 'express';
 
 import 'reflect-metadata';
@@ -30,7 +30,7 @@ async function bootstrap() {
 
   app.listen(PORT);
 
-  process.on('uncaughtException', error => {
+  process.on('uncaughtException', (error) => {
     logger.logException('Unhandled NODE exception', error);
   });
 

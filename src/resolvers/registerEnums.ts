@@ -8,12 +8,14 @@ import {
 import { FeatureId } from '../models/Feature';
 import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
+import { QuestionFilterCompareOperator } from '../models/Questionary';
 import { ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
 import { ShipmentStatus } from '../models/Shipment';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { DataType, TemplateCategoryId } from '../models/Template';
 import { UserRole } from '../models/User';
+import { NumberValueConstraint } from './types/FieldConfig';
 
 export const registerEnums = () => {
   registerEnumType(TemplateCategoryId, { name: 'TemplateCategoryId' });
@@ -32,4 +34,8 @@ export const registerEnums = () => {
     name: 'DependenciesLogicOperator',
   });
   registerEnumType(FeatureId, { name: 'FeatureId' });
+  registerEnumType(NumberValueConstraint, { name: 'NumberValueConstraint' });
+  registerEnumType(QuestionFilterCompareOperator, {
+    name: 'QuestionFilterCompareOperator',
+  });
 };

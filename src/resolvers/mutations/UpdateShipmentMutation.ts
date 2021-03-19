@@ -26,6 +26,9 @@ export class UpdateShipmentArgs {
 
   @Field(() => ShipmentStatus, { nullable: true })
   status?: ShipmentStatus;
+
+  @Field(() => String, { nullable: true })
+  externalRef?: string;
 }
 
 @Resolver()

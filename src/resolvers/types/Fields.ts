@@ -33,7 +33,7 @@ class Entry {
   value: string;
 }
 
-@Resolver(of => Fields)
+@Resolver((of) => Fields)
 export class FieldsResolver {
   @FieldResolver(() => [Entry])
   async nationalities(@Ctx() context: ResolverContext): Promise<Entry[]> {

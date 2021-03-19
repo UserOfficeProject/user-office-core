@@ -7,9 +7,11 @@ import {
   ObjectType,
   Resolver,
   Root,
+  Arg,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { ReviewStatus } from '../../models/Review';
 import { User as UserOrigin } from '../../models/User';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
@@ -95,8 +97,19 @@ export class UserResolver {
   }
 
   @FieldResolver(() => [Review])
-  async reviews(@Root() user: User, @Ctx() context: ResolverContext) {
-    return context.queries.review.dataSource.getUserReviews(user.id);
+  async reviews(
+    @Root() user: User,
+    @Arg('callId', () => Int, { nullable: true }) callId: number,
+    @Arg('instrumentId', () => Int, { nullable: true }) instrumentId: number,
+    @Arg('status', () => ReviewStatus, { nullable: true }) status: number,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.review.dataSource.getUserReviews(
+      user.id,
+      callId,
+      instrumentId,
+      status
+    );
   }
 
   @FieldResolver(() => [Proposal])
@@ -106,7 +119,14 @@ export class UserResolver {
 
   @FieldResolver(() => [SEP])
   async seps(@Root() user: User, @Ctx() context: ResolverContext) {
-    return context.queries.sep.dataSource.getUserSeps(user.id);
+    if (!context.user || !context.user.currentRole) {
+      return [];
+    }
+
+    return context.queries.sep.dataSource.getUserSeps(
+      user.id,
+      context.user.currentRole
+    );
   }
 
   @FieldResolver(() => [Instrument])

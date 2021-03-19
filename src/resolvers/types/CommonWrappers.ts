@@ -9,14 +9,16 @@ import { Call } from './Call';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
 import { NextStatusEvent } from './NextStatusEvent';
+import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
 import { Proposal } from './Proposal';
-import { ProposalStatus } from './ProposalStatus';
+import { NextProposalStatus, ProposalStatus } from './ProposalStatus';
 import { ProposalWorkflow } from './ProposalWorkflow';
 import { ProposalWorkflowConnection } from './ProposalWorkflowConnection';
 import { Question } from './Question';
 import { Questionary } from './Questionary';
 import { QuestionaryStep } from './QuestionaryStep';
 import { QuestionTemplateRelation } from './QuestionTemplateRelation';
+import { ReviewWithNextProposalStatus } from './Review';
 import { Review } from './Review';
 import { Sample } from './Sample';
 import { SEP } from './SEP';
@@ -25,6 +27,7 @@ import { Shipment } from './Shipment';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
 import { Topic } from './Topic';
+import { Unit } from './Unit';
 import { User } from './User';
 
 @ObjectType()
@@ -34,9 +37,7 @@ export class ResponseWrapBase<T> {
 }
 
 @ObjectType()
-export class BasicUserDetailsResponseWrap extends ResponseWrapBase<
-  BasicUserDetails
-> {
+export class BasicUserDetailsResponseWrap extends ResponseWrapBase<BasicUserDetails> {
   @Response()
   @Field(() => BasicUserDetails, { nullable: true })
   public user: BasicUserDetails;
@@ -57,10 +58,24 @@ export class ReviewResponseWrap extends ResponseWrapBase<Review> {
 }
 
 @ObjectType()
+export class ReviewWithNextStatusResponseWrap extends ResponseWrapBase<ReviewWithNextProposalStatus> {
+  @Response()
+  @Field(() => ReviewWithNextProposalStatus, { nullable: true })
+  public review: ReviewWithNextProposalStatus;
+}
+
+@ObjectType()
 export class SEPResponseWrap extends ResponseWrapBase<SEP> {
   @Response()
   @Field(() => SEP, { nullable: true })
   public sep: SEP;
+}
+
+@ObjectType()
+export class NextProposalStatusResponseWrap extends ResponseWrapBase<ProposalStatus> {
+  @Response()
+  @Field(() => NextProposalStatus, { nullable: true })
+  public nextProposalStatus: NextProposalStatus;
 }
 
 @ObjectType()
@@ -78,9 +93,7 @@ export class SEPMembersRoleResponseWrap extends ResponseWrapBase<boolean> {
 }
 
 @ObjectType()
-export class TechnicalReviewResponseWrap extends ResponseWrapBase<
-  TechnicalReview
-> {
+export class TechnicalReviewResponseWrap extends ResponseWrapBase<TechnicalReview> {
   @Response()
   @Field(() => TechnicalReview, { nullable: true })
   public technicalReview: TechnicalReview;
@@ -108,9 +121,7 @@ export class SamplesResponseWrap extends ResponseWrapBase<Questionary[]> {
 }
 
 @ObjectType()
-export class QuestionaryStepResponseWrap extends ResponseWrapBase<
-  QuestionaryStep
-> {
+export class QuestionaryStepResponseWrap extends ResponseWrapBase<QuestionaryStep> {
   @Response()
   @Field(() => QuestionaryStep, { nullable: true })
   public questionaryStep: QuestionaryStep;
@@ -131,18 +142,14 @@ export class ProposalResponseWrap extends ResponseWrapBase<Proposal> {
 }
 
 @ObjectType()
-export class QuestionTemplateRelationResponseWrap extends ResponseWrapBase<
-  QuestionTemplateRelation
-> {
+export class QuestionTemplateRelationResponseWrap extends ResponseWrapBase<QuestionTemplateRelation> {
   @Response()
   @Field(() => QuestionTemplateRelation, { nullable: true })
   public questionTemplateRelation: QuestionTemplateRelation;
 }
 
 @ObjectType()
-export class QuestionResponseWrap extends ResponseWrapBase<
-  QuestionTemplateRelation
-> {
+export class QuestionResponseWrap extends ResponseWrapBase<QuestionTemplateRelation> {
   @Response()
   @Field(() => Question, { nullable: true })
   public question: Question;
@@ -167,6 +174,13 @@ export class InstitutionResponseWrap extends ResponseWrapBase<Topic> {
   @Response()
   @Field(() => Institution, { nullable: true })
   public institution: Institution;
+}
+
+@ObjectType()
+export class UnitResponseWrap extends ResponseWrapBase<Topic> {
+  @Response()
+  @Field(() => Unit, { nullable: true })
+  public unit: Unit;
 }
 
 @ObjectType()
@@ -219,36 +233,28 @@ export class SampleResponseWrap extends ResponseWrapBase<Sample> {
 }
 
 @ObjectType()
-export class ProposalStatusResponseWrap extends ResponseWrapBase<
-  ProposalStatus
-> {
+export class ProposalStatusResponseWrap extends ResponseWrapBase<ProposalStatus> {
   @Response()
   @Field(() => ProposalStatus, { nullable: true })
   public proposalStatus: ProposalStatus;
 }
 
 @ObjectType()
-export class ProposalWorkflowResponseWrap extends ResponseWrapBase<
-  ProposalWorkflow
-> {
+export class ProposalWorkflowResponseWrap extends ResponseWrapBase<ProposalWorkflow> {
   @Response()
   @Field(() => ProposalWorkflow, { nullable: true })
   public proposalWorkflow: ProposalWorkflow;
 }
 
 @ObjectType()
-export class ProposalWorkflowConnectionResponseWrap extends ResponseWrapBase<
-  ProposalWorkflowConnection
-> {
+export class ProposalWorkflowConnectionResponseWrap extends ResponseWrapBase<ProposalWorkflowConnection> {
   @Response()
   @Field(() => ProposalWorkflowConnection, { nullable: true })
   public proposalWorkflowConnection: ProposalWorkflowConnection;
 }
 
 @ObjectType()
-export class ProposalNextStatusEventResponseWrap extends ResponseWrapBase<
-  NextStatusEvent
-> {
+export class ProposalNextStatusEventResponseWrap extends ResponseWrapBase<NextStatusEvent> {
   @Response()
   @Field(() => [NextStatusEvent], { nullable: true })
   public nextStatusEvents: NextStatusEvent[];
@@ -266,4 +272,11 @@ export class SEPProposalResponseWrap extends ResponseWrapBase<SEPProposal> {
   @Response()
   @Field(() => SEPProposal, { nullable: true })
   public sepProposal: SEPProposal;
+}
+
+@ObjectType()
+export class ApiAccessTokenResponseWrap extends ResponseWrapBase<PermissionsWithAccessToken> {
+  @Response()
+  @Field(() => PermissionsWithAccessToken, { nullable: true })
+  public apiAccessToken: PermissionsWithAccessToken;
 }

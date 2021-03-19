@@ -12,7 +12,9 @@ import { UserWithRole } from '../models/User';
 import { rejection } from '../rejection';
 import { AddSamplesToShipmentArgs } from '../resolvers/mutations/AddSamplesShipmentMutation';
 import { CreateShipmentInput } from '../resolvers/mutations/CreateShipmentMutation';
+import { SubmitShipmentArgs } from '../resolvers/mutations/SubmitShipmentMutation';
 import { UpdateShipmentArgs } from '../resolvers/mutations/UpdateShipmentMutation';
+import addAssetEquipment from '../utils/EAM_service';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 import { userAuthorization } from '../utils/UserAuthorization';
@@ -67,7 +69,7 @@ export default class ShipmentMutations {
 
     return this.questionaryDataSource
       .create(agent.id, template.templateId)
-      .then(questionary => {
+      .then((questionary) => {
         return this.shipmentDataSource.create(
           args.title,
           agent.id,
@@ -75,7 +77,7 @@ export default class ShipmentMutations {
           questionary.questionaryId
         );
       })
-      .catch(error => {
+      .catch((error) => {
         logger.logException('Could not create shipment', error, {
           agent,
           args,
@@ -85,26 +87,43 @@ export default class ShipmentMutations {
       });
   }
 
+  async submitShipment(agent: UserWithRole | null, args: SubmitShipmentArgs) {
+    if (!this.shipmentAuthorization.hasWriteRights(agent, args.shipmentId)) {
+      return rejection('NOT_AUTHORIZED');
+    }
+    try {
+      const assetId = await addAssetEquipment(); // calling external service
+
+      return this.shipmentDataSource
+        .update({
+          shipmentId: args.shipmentId,
+          status: ShipmentStatus.SUBMITTED,
+          externalRef: assetId,
+        })
+        .then((shipment) => shipment);
+    } catch (e) {
+      logger.logException('Could not submit shipment', e);
+
+      return rejection('INTERNAL_ERROR');
+    }
+  }
+
   @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
   async updateShipment(agent: UserWithRole | null, args: UpdateShipmentArgs) {
     if (!this.shipmentAuthorization.hasWriteRights(agent, args.shipmentId)) {
       return rejection('NOT_AUTHORIZED');
     }
 
-    // TODO makes sure administrative fields can be only updated by user with the right role
-    if (args.status === ShipmentStatus.DRAFT) {
-      const canAdministrerShipment = await userAuthorization.isUserOfficer(
-        agent
-      );
-      if (canAdministrerShipment === false) {
-        delete args.status;
-      }
+    const canAdministerShipment = userAuthorization.isUserOfficer(agent);
+    if (canAdministerShipment === false) {
+      delete args.status;
+      delete args.externalRef;
     }
 
     return this.shipmentDataSource
       .update(args)
-      .then(shipment => shipment)
-      .catch(error => {
+      .then((shipment) => shipment)
+      .catch((error) => {
         logger.logException('Could not update shipment', error, {
           agent,
           args,
@@ -121,8 +140,8 @@ export default class ShipmentMutations {
 
     return this.shipmentDataSource
       .delete(shipmentId)
-      .then(shipment => shipment)
-      .catch(error => {
+      .then((shipment) => shipment)
+      .catch((error) => {
         logger.logException('Could not delete shipment', error, {
           agent,
           shipmentId,

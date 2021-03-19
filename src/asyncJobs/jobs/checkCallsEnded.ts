@@ -16,7 +16,7 @@ const checkCallsEnded = async (dataSource: CallDataSource) => {
     const currentDate = new Date();
 
     const callsThatShouldEnd = notEndedCalls.filter(
-      notEndedCall => notEndedCall.endCall.getTime() <= currentDate.getTime()
+      (notEndedCall) => notEndedCall.endCall.getTime() <= currentDate.getTime()
     );
 
     const updatedCalls = [];
