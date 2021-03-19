@@ -1,7 +1,11 @@
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
-import { Proposal, ProposalEndStatus } from '../../models/Proposal';
+import {
+  Proposal,
+  ProposalEndStatus,
+  ProposalIdsWithNextStatus,
+} from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
@@ -194,5 +198,12 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     statusId: number
   ): Promise<boolean> {
     return true;
+  }
+
+  async changeProposalsStatus(
+    statusId: number,
+    proposalIds: number[]
+  ): Promise<ProposalIdsWithNextStatus> {
+    return { proposalIds: [1] };
   }
 }

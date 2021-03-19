@@ -111,6 +111,11 @@ interface ProposalSEPSelectedEvent extends GeneralEvent {
   proposalidswithnextstatus: ProposalIdsWithNextStatus;
 }
 
+interface ProposalStatusUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_STATUS_UPDATED;
+  proposalidswithnextstatus: ProposalIdsWithNextStatus;
+}
+
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
   instrumenthasproposals: InstrumentHasProposals;
@@ -222,6 +227,7 @@ export type ApplicationEvent =
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
+  | ProposalStatusUpdatedEvent
   | UserCreateEvent
   | EmailInvite
   | UserResetPasswordEmailEvent

@@ -57,6 +57,7 @@ export default function createHandler(
         break;
       case Event.PROPOSAL_INSTRUMENT_SELECTED:
       case Event.PROPOSAL_SEP_SELECTED:
+      case Event.PROPOSAL_STATUS_UPDATED:
         try {
           await Promise.all(
             event.proposalidswithnextstatus.proposalIds.map(

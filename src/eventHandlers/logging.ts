@@ -47,6 +47,7 @@ export default function createHandler(
           break;
         case Event.PROPOSAL_INSTRUMENT_SELECTED:
         case Event.PROPOSAL_SEP_SELECTED:
+        case Event.PROPOSAL_STATUS_UPDATED:
           event.proposalidswithnextstatus.proposalIds.forEach(
             async (proposalId) => {
               await eventLogsDataSource.set(
