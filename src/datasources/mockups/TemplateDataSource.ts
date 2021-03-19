@@ -52,13 +52,13 @@ const dummyTopicFactory = (values?: Partial<Topic>) => {
 const dummyTemplateStepsFactory = () => {
   const hasLinksToField = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
-      proposalQuestionId: 'has_links_to_field',
+      id: 'has_links_to_field',
       dataType: DataType.SELECTION_FROM_OPTIONS,
     }),
   });
   const linksToField = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
-      proposalQuestionId: 'links_to_field',
+      id: 'links_to_field',
       dataType: DataType.TEXT_INPUT,
     }),
     dependencies: [
@@ -73,7 +73,7 @@ const dummyTemplateStepsFactory = () => {
 
   const enableCrystallization = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
-      proposalQuestionId: 'enable_crystallization',
+      id: 'enable_crystallization',
       dataType: DataType.BOOLEAN,
       question: 'Is crystallization aplicable',
       naturalKey: 'enable_crystallization',
@@ -82,7 +82,7 @@ const dummyTemplateStepsFactory = () => {
 
   const hasLinksWithIndustry = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
-      proposalQuestionId: 'has_links_with_industry',
+      id: 'has_links_with_industry',
       dataType: DataType.BOOLEAN,
       question: 'Has links with industry',
       naturalKey: 'has_links_with_industry',
@@ -91,7 +91,7 @@ const dummyTemplateStepsFactory = () => {
 
   const proposalBasis = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
-      proposalQuestionId: 'proposal_basis',
+      id: 'proposal_basis',
       naturalKey: 'proposal_basis',
       dataType: DataType.PROPOSAL_BASIS,
     }),
@@ -114,7 +114,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     dummyTemplateSteps = dummyTemplateStepsFactory();
     dummyComplementarySteps = [
       dummyQuestionFactory({
-        proposalQuestionId: 'not_in_template',
+        id: 'not_in_template',
         naturalKey: 'not_in_template',
       }),
     ];
@@ -145,7 +145,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     templateId: number
   ): Promise<QuestionTemplateRelation | null> {
     return dummyQuestionTemplateRelationFactory({
-      question: { proposalQuestionId: questionId },
+      question: { id: questionId },
     });
   }
 
@@ -162,7 +162,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   ): Promise<Template> {
     dummyTemplateSteps.forEach(function (step) {
       step.fields = step.fields.filter((field) => {
-        return field.question.proposalQuestionId !== args.questionId;
+        return field.question.id !== args.questionId;
       });
     });
 
@@ -214,7 +214,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return dummyQuestionFactory({
       naturalKey: naturalKey,
       dataType: dataType,
-      proposalQuestionId: questionId,
+      id: questionId,
       question,
     });
   }
@@ -225,7 +225,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       return accumulated.concat(current.fields.map((field) => field.question));
     }, new Array<Question>());
     const question = allQuestions.find(
-      (question) => question.proposalQuestionId === questionId
+      (question) => question.id === questionId
     );
     if (!question) {
       return null;
@@ -240,7 +240,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       throw new Error(`Question ${questionId} does not exist`);
     }
     const copy = dummyQuestionFactory(question);
-    question.proposalQuestionId = 'deleted_question'; //works for mocking purposes
+    question.id = 'deleted_question'; //works for mocking purposes
 
     return copy;
   }
@@ -258,7 +258,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       return accumulated.concat(current.fields);
     }, new Array<QuestionTemplateRelation>());
     const questionTemplateRelation = allQuestions.find(
-      (curQuestion) => curQuestion.question.proposalQuestionId === questionId
+      (curQuestion) => curQuestion.question.id === questionId
     );
 
     if (questionTemplateRelation) {

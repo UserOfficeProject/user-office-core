@@ -43,7 +43,7 @@ export class Topic {
 export class Question {
   constructor(
     public categoryId: TemplateCategoryId,
-    public proposalQuestionId: string,
+    public id: string,
     public naturalKey: string,
     public dataType: DataType,
     public question: string,

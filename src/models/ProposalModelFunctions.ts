@@ -26,9 +26,7 @@ export function getFieldById(
 ) {
   let needle: AbstractField | undefined;
   collection.every((step) => {
-    needle = step.fields.find(
-      (field) => field.question.proposalQuestionId === questionId
-    );
+    needle = step.fields.find((field) => field.question.id === questionId);
 
     return needle === undefined;
   });

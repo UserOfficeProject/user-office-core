@@ -10,7 +10,7 @@ import { FieldConfigType } from './FieldConfig';
 @ObjectType()
 export class Question implements Partial<QuestionOrigin> {
   @Field()
-  public proposalQuestionId: string;
+  public id: string;
 
   @Field(() => TemplateCategoryId)
   public categoryId: TemplateCategoryId;
