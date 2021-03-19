@@ -4,19 +4,19 @@ import Link from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
 import { Field } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
-import React from 'react';
+import { default as React, FC } from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionTemplateRelation, TemplateCategoryId } from 'generated/sdk';
+import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { TemplateCategoryId } from 'generated/sdk';
 import { useTemplates } from 'hooks/template/useTemplates';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationSampleDeclarationForm: FormComponent<QuestionTemplateRelation> = (
+export const QuestionTemplateRelationSampleDeclarationForm: FC<QuestionTemplateRelationFormProps> = (
   props
 ) => {
   const { templates } = useTemplates(
@@ -30,10 +30,7 @@ export const QuestionTemplateRelationSampleDeclarationForm: FormComponent<Questi
 
   return (
     <QuestionTemplateRelationFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      questionRel={props.field}
-      template={props.template}
+      {...props}
       validationSchema={Yup.object().shape({
         question: Yup.object({
           config: Yup.object({
@@ -46,7 +43,7 @@ export const QuestionTemplateRelationSampleDeclarationForm: FormComponent<Questi
     >
       {(formikProps) => (
         <>
-          <QuestionExcerpt question={props.field.question} />
+          <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Options">
             <Field
               name="config.addEntryButtonLabel"
