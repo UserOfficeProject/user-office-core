@@ -91,16 +91,16 @@ export function usePersistProposalWorkflowEditorModel() {
         .then((data) => data.deleteProposalWorkflowStatus);
     };
 
-    const addNextStatusEventsToConnection = async (
+    const addStatusChangingEventsToConnection = async (
       proposalWorkflowConnectionId: number,
-      nextStatusEvents: string[]
+      statusChangingEvents: string[]
     ) => {
-      return api('Next status events added successfully!')
-        .addNextStatusEventsToConnection({
+      return api('Status changing events added successfully!')
+        .addStatusChangingEventsToConnection({
           proposalWorkflowConnectionId,
-          nextStatusEvents,
+          statusChangingEvents,
         })
-        .then((data) => data.addNextStatusEventsToConnection);
+        .then((data) => data.addStatusChangingEventsToConnection);
     };
 
     return (next: FunctionType) => (action: Event) => {
@@ -237,12 +237,12 @@ export function usePersistProposalWorkflowEditorModel() {
         }
 
         case EventType.ADD_NEXT_STATUS_EVENTS_REQUESTED: {
-          const { workflowConnection, nextStatusEvents } = action.payload;
+          const { workflowConnection, statusChangingEvents } = action.payload;
 
           return executeAndMonitorCall(async () => {
-            const result = await addNextStatusEventsToConnection(
+            const result = await addStatusChangingEventsToConnection(
               workflowConnection.id,
-              nextStatusEvents
+              statusChangingEvents
             );
 
             if (!result.error) {
@@ -250,7 +250,7 @@ export function usePersistProposalWorkflowEditorModel() {
                 type: EventType.NEXT_STATUS_EVENTS_ADDED,
                 payload: {
                   workflowConnection,
-                  nextStatusEvents: result.nextStatusEvents,
+                  statusChangingEvents: result.statusChangingEvents,
                 },
               });
             }

@@ -122,6 +122,15 @@ context('Settings tests', () => {
   });
 
   describe('Proposal workflows tests', () => {
+    const workflowName = faker.lorem.words(2);
+    const workflowDescription = faker.lorem.words(5);
+    const updatedWorkflowName = faker.lorem.words(2);
+    const updatedWorkflowDescription = faker.lorem.words(5);
+    const fastTrackWorkflowName = 'Fast track';
+    const fastTrackWorkflowDescription = 'Faster than the fastest workflow';
+    const multiColumnWorkflowName = faker.lorem.words(2);
+    const multiColumnWorkflowDescription = faker.lorem.words(5);
+
     before(() => {
       cy.resetDB();
     });
@@ -132,31 +141,19 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to create proposal workflow and it should contain default DRAFT status', () => {
-      const name = faker.lorem.words(2);
-      const description = faker.lorem.words(5);
-
       cy.login('officer');
 
       cy.contains('Settings').click();
-      cy.contains('Proposal workflows').click();
 
-      cy.contains('Create').click();
-      cy.get('#name').type(name);
-      cy.get('#description').type(description);
-      cy.get('[data-cy="submit"]').click();
+      cy.createProposalWorkflow(workflowName, workflowDescription);
 
-      cy.notification({ variant: 'success', text: 'created successfully' });
-
-      cy.get('[data-cy="connection_DRAFT_1"]').should('contain.text', 'DRAFT');
-      cy.get('[data-cy="status_DRAFT_1"]').should('not.exist');
+      cy.get('[data-cy^="connection_DRAFT"]').should('contain.text', 'DRAFT');
+      cy.get('[data-cy^="status_DRAFT"]').should('not.exist');
 
       cy.get('[data-cy="remove-workflow-status-button"]').should('not.exist');
     });
 
     it('User Officer should be able to update proposal workflow', () => {
-      const name = faker.lorem.words(2);
-      const description = faker.lorem.words(5);
-
       cy.login('officer');
 
       cy.contains('Settings').click();
@@ -166,15 +163,15 @@ context('Settings tests', () => {
 
       cy.contains('Edit').click();
 
-      cy.get('#name').clear().type(name);
-      cy.get('#description').clear().type(description);
+      cy.get('#name').clear().type(updatedWorkflowName);
+      cy.get('#description').clear().type(updatedWorkflowDescription);
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({ variant: 'success', text: 'updated successfully' });
 
       cy.get('[data-cy="proposal-workflow-metadata-container"]')
-        .should('contain.text', name)
-        .should('contain.text', description);
+        .should('contain.text', updatedWorkflowName)
+        .should('contain.text', updatedWorkflowDescription);
     });
 
     it('User Officer should be able to add more statuses in proposal workflow', () => {
@@ -183,14 +180,14 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.get('[title="Edit"]').last().click();
+      cy.contains(updatedWorkflowName).parent().find('[title="Edit"]').click();
 
-      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').dragElement([
+      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').dragElement([
         { direction: 'left', length: 1 },
         { direction: 'down', length: 1 },
       ]);
 
-      cy.get('[data-cy="connection_FEASIBILITY_REVIEW_2"]').should(
+      cy.get('[data-cy^="connection_FEASIBILITY_REVIEW"]').should(
         'contain.text',
         'FEASIBILITY_REVIEW'
       );
@@ -200,62 +197,41 @@ context('Settings tests', () => {
         text: 'Workflow status added successfully',
       });
 
-      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').should('not.exist');
+      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').should('not.exist');
     });
 
-    it('User Officer should be able to select events that are triggering next workflow status', () => {
+    it('User Officer should be able to select events that are triggering change to workflow status', () => {
       cy.login('officer');
 
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.get('[title="Edit"]').last().click();
+      cy.contains(updatedWorkflowName).parent().find('[title="Edit"]').click();
 
-      cy.get('[data-cy="connection_DRAFT_1"]').click();
+      cy.addProposalStatusChangingEventToStatus('FEASIBILITY_REVIEW', [
+        'PROPOSAL_SUBMITTED',
+      ]);
 
-      cy.get('[data-cy="next-status-events-modal"]').should('exist');
-
-      cy.contains('PROPOSAL_SUBMITTED').click();
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Next status events added successfully!',
-      });
-
-      cy.contains('PROPOSAL_SUBMITTED');
-
-      cy.get('[data-cy="connection_DRAFT_1"]').click();
-
-      cy.get('[data-cy="next-status-events-modal"]').should('exist');
-
-      cy.contains('PROPOSAL_FEASIBLE').click();
-
-      cy.get('[data-cy="submit"]').click();
+      cy.addProposalStatusChangingEventToStatus('FEASIBILITY_REVIEW', [
+        'PROPOSAL_FEASIBLE',
+      ]);
 
       cy.contains('PROPOSAL_SUBMITTED & PROPOSAL_FEASIBLE');
     });
 
     it('Proposal should follow the selected workflow', () => {
-      const name = 'Fast track';
-      const description = 'Faster than the fastest workflow';
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
-
       cy.login('officer');
 
       cy.contains('Settings').click();
-      cy.contains('Proposal workflows').click();
 
-      cy.contains('Create').click();
-      cy.get('#name').type(name);
-      cy.get('#description').type(description);
-      cy.get('[data-cy="submit"]').click();
+      cy.createProposalWorkflow(
+        fastTrackWorkflowName,
+        fastTrackWorkflowDescription
+      );
 
-      cy.notification({ variant: 'success', text: 'created successfully' });
-
-      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').dragElement([
+      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').dragElement([
         { direction: 'left', length: 1 },
         { direction: 'down', length: 1 },
       ]);
@@ -265,14 +241,14 @@ context('Settings tests', () => {
         text: 'Workflow status added successfully',
       });
 
-      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').should('not.exist');
+      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').should('not.exist');
 
-      cy.get('[data-cy="status_SEP_SELECTION_4"]').dragElement([
+      cy.get('[data-cy^="status_SEP_SELECTION"]').dragElement([
         { direction: 'left', length: 1 },
         { direction: 'down', length: 2 },
       ]);
 
-      cy.get('[data-cy="connection_SEP_SELECTION_4"]').should(
+      cy.get('[data-cy^="connection_SEP_SELECTION"]').should(
         'contain.text',
         'SEP_SELECTION'
       );
@@ -282,14 +258,14 @@ context('Settings tests', () => {
         text: 'Workflow status added successfully',
       });
 
-      cy.get('[data-cy="status_SEP_SELECTION_4"]').should('not.exist');
+      cy.get('[data-cy^="status_SEP_SELECTION"]').should('not.exist');
 
-      cy.get('[data-cy="status_SEP_REVIEW_5"]').dragElement([
+      cy.get('[data-cy^="status_SEP_REVIEW"]').dragElement([
         { direction: 'left', length: 1 },
         { direction: 'down', length: 3 },
       ]);
 
-      cy.get('[data-cy="connection_SEP_REVIEW_5"]').should(
+      cy.get('[data-cy^="connection_SEP_REVIEW"]').should(
         'contain.text',
         'SEP_REVIEW'
       );
@@ -299,14 +275,14 @@ context('Settings tests', () => {
         text: 'Workflow status added successfully',
       });
 
-      cy.get('[data-cy="status_SEP_REVIEW_5"]').should('not.exist');
+      cy.get('[data-cy^="status_SEP_REVIEW"]').should('not.exist');
 
-      cy.get('[data-cy="status_SEP_MEETING_12"]').dragElement([
+      cy.get('[data-cy^="status_SEP_MEETING"]').dragElement([
         { direction: 'left', length: 1 },
         { direction: 'down', length: 4 },
       ]);
 
-      cy.get('[data-cy="connection_SEP_MEETING_12"]').should(
+      cy.get('[data-cy^="connection_SEP_MEETING"]').should(
         'contain.text',
         'SEP Meeting'
       );
@@ -316,63 +292,23 @@ context('Settings tests', () => {
         text: 'Workflow status added successfully',
       });
 
-      cy.get('[data-cy="status_SEP_MEETING_12"]').should('not.exist');
+      cy.get('[data-cy^="status_SEP_MEETING"]').should('not.exist');
 
-      cy.get('[data-cy="connection_DRAFT_1"]').click();
+      cy.addProposalStatusChangingEventToStatus('FEASIBILITY_REVIEW', [
+        'PROPOSAL_SUBMITTED',
+      ]);
 
-      cy.get('[data-cy="next-status-events-modal"]').should('exist');
+      cy.addProposalStatusChangingEventToStatus('SEP_SELECTION', [
+        'PROPOSAL_FEASIBLE',
+      ]);
 
-      cy.contains('PROPOSAL_SUBMITTED').click();
+      cy.addProposalStatusChangingEventToStatus('SEP_REVIEW', [
+        'PROPOSAL_SEP_SELECTED',
+      ]);
 
-      cy.get('[data-cy="submit"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Next status events added successfully!',
-      });
-
-      cy.get('[data-cy="connection_FEASIBILITY_REVIEW_2"]').click();
-
-      cy.get('[data-cy="next-status-events-modal"]').should('exist');
-
-      cy.contains('PROPOSAL_FEASIBLE').click();
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Next status events added successfully!',
-      });
-
-      cy.contains('PROPOSAL_FEASIBLE');
-
-      cy.get('[data-cy="connection_SEP_SELECTION_4"]').click();
-
-      cy.get('[data-cy="next-status-events-modal"]').should('exist');
-
-      cy.contains('PROPOSAL_SEP_SELECTED').click();
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Next status events added successfully!',
-      });
-
-      cy.contains('PROPOSAL_SEP_SELECTED');
-
-      cy.get('[data-cy="connection_SEP_REVIEW_5"]').click();
-
-      cy.get('[data-cy="next-status-events-modal"]').should('exist');
-
-      cy.contains('PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED').click();
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Next status events added successfully!',
-      });
+      cy.addProposalStatusChangingEventToStatus('SEP_MEETING', [
+        'PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED',
+      ]);
 
       cy.contains('Calls').click();
 
@@ -382,7 +318,9 @@ context('Settings tests', () => {
 
       cy.contains('Loading...').should('not.exist');
 
-      cy.get('[role="presentation"] [role="listbox"] li').last().click();
+      cy.get('[role="presentation"] [role="listbox"] li')
+        .contains(fastTrackWorkflowName)
+        .click();
 
       cy.get('[data-cy="next-step"]').click();
 
@@ -598,15 +536,27 @@ context('Settings tests', () => {
         .then((element) => expect(element.text()).to.contain('DRAFT'));
     });
 
-    it('User Officer should be able to split workflow into two or more paths', () => {
+    it('User Officer should be able to create multi-column proposal workflow', () => {
       cy.login('officer');
 
       cy.contains('Settings').click();
-      cy.contains('Proposal workflows').click();
 
-      cy.get('[title="Edit"]').last().click();
+      cy.createProposalWorkflow(
+        multiColumnWorkflowName,
+        multiColumnWorkflowDescription
+      );
 
-      cy.contains('Add multicolumn row').click();
+      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').dragElement([
+        { direction: 'left', length: 1 },
+        { direction: 'down', length: 1 },
+      ]);
+
+      cy.notification({
+        variant: 'success',
+        text: 'Workflow status added successfully',
+      });
+
+      cy.contains('Add multi-column row').click();
 
       cy.get('#mui-component-select-selectedParentDroppableId').click();
       cy.get(
@@ -620,23 +570,23 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="droppable-group"]').should('have.length', 3);
 
-      cy.get('[data-cy="status_ALLOCATED_6"]').dragElement([
+      cy.get('[data-cy^="status_SEP_SELECTION"]').dragElement([
         { direction: 'left', length: 2 },
       ]);
 
-      cy.get('[data-cy="connection_ALLOCATED_6"]').should(
-        'contain.text',
-        'ALLOCATED'
-      );
+      cy.notification({
+        variant: 'success',
+        text: 'Workflow status added successfully',
+      });
 
-      cy.get('[data-cy="status_NOT_ALLOCATED_7"]').dragElement([
+      cy.get('[data-cy^="status_NOT_FEASIBLE"]').dragElement([
         { direction: 'left', length: 1 },
       ]);
 
-      cy.get('[data-cy="connection_NOT_ALLOCATED_7"]').should(
-        'contain.text',
-        'NOT_ALLOCATED'
-      );
+      cy.notification({
+        variant: 'success',
+        text: 'Workflow status added successfully',
+      });
 
       cy.reload();
 
@@ -647,17 +597,171 @@ context('Settings tests', () => {
       ).should('have.length', 2);
     });
 
+    it('Proposal should follow multi-column workflow', () => {
+      const firstProposalTitle = faker.random.words(2);
+      const firstProposalAbstract = faker.random.words(5);
+      const secondProposalTitle = faker.random.words(2);
+      const secondProposalAbstract = faker.random.words(5);
+      const internalComment = faker.random.words(2);
+      const publicComment = faker.random.words(2);
+      cy.login('officer');
+
+      cy.contains('Settings').click();
+
+      cy.contains('Proposal workflows').click();
+
+      cy.contains(multiColumnWorkflowName)
+        .parent()
+        .find('[title="Edit"]')
+        .click();
+
+      cy.addProposalStatusChangingEventToStatus('FEASIBILITY_REVIEW', [
+        'PROPOSAL_SUBMITTED',
+      ]);
+
+      cy.addProposalStatusChangingEventToStatus('SEP_SELECTION', [
+        'PROPOSAL_FEASIBLE',
+      ]);
+
+      cy.addProposalStatusChangingEventToStatus('NOT_FEASIBLE', [
+        'PROPOSAL_UNFEASIBLE',
+      ]);
+
+      cy.contains('Calls').click();
+
+      cy.get('[title="Edit"]').first().click();
+
+      cy.get('#mui-component-select-proposalWorkflowId').click();
+
+      cy.contains('Loading...').should('not.exist');
+
+      cy.get('[role="presentation"] [role="listbox"] li')
+        .contains(multiColumnWorkflowName)
+        .click();
+
+      cy.get('[data-cy="next-step"]').click();
+
+      cy.get('[data-cy="next-step"]').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Call updated successfully!',
+      });
+
+      cy.logout();
+
+      cy.login('user');
+
+      cy.createProposal(firstProposalTitle, firstProposalAbstract);
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+
+      cy.contains('Dashboard').click();
+
+      cy.createProposal(secondProposalTitle, secondProposalAbstract);
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+
+      cy.contains('Dashboard').click();
+
+      cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr')
+        .contains(firstProposalTitle)
+        .parent()
+        .contains('submitted');
+      cy.get('.MuiTable-root tbody tr')
+        .contains(secondProposalTitle)
+        .parent()
+        .contains('submitted');
+
+      cy.logout();
+      cy.login('officer');
+
+      cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr')
+        .contains(firstProposalTitle)
+        .parent()
+        .contains('FEASIBILITY_REVIEW');
+      cy.get('.MuiTable-root tbody tr')
+        .contains(secondProposalTitle)
+        .parent()
+        .contains('FEASIBILITY_REVIEW');
+
+      cy.contains(firstProposalTitle)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.get('[data-cy="timeAllocation"] input').clear().type('20');
+
+      cy.get('[data-cy="technical-review-status"]').click();
+      cy.get('[role="presentation"]').contains('Feasible').click();
+
+      cy.get('[data-cy="comment"] textarea').first().type(internalComment);
+      cy.get('[data-cy="publicComment"] textarea').first().type(publicComment);
+
+      cy.get('[data-cy="is-review-submitted"]').click();
+
+      cy.get('[data-cy="update-technical-review"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Technical review updated successfully',
+      });
+
+      cy.closeModal();
+
+      cy.contains('Proposals').click();
+
+      cy.contains(secondProposalTitle)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.get('[data-cy="timeAllocation"] input').clear().type('0');
+
+      cy.get('[data-cy="technical-review-status"]').click();
+      cy.get('[role="presentation"]').contains('Unfeasible').click();
+
+      cy.get('[data-cy="is-review-submitted"]').click();
+
+      cy.get('[data-cy="update-technical-review"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Technical review updated successfully',
+      });
+
+      cy.closeModal();
+
+      cy.contains(firstProposalTitle).parent().contains('SEP_SELECTION');
+      cy.contains(secondProposalTitle).parent().contains('NOT_FEASIBLE');
+    });
+
     it('User Officer should be able to remove statuses from proposal workflow using trash icon', () => {
       cy.login('officer');
 
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.get('[title="Edit"]').last().click();
+      cy.contains(fastTrackWorkflowName)
+        .parent()
+        .find('[title="Edit"]')
+        .click();
 
       cy.get('[data-cy="remove-workflow-status-button"]').first().click();
 
-      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').should(
+      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').should(
         'contain.text',
         'FEASIBILITY_REVIEW'
       );
@@ -667,7 +771,7 @@ context('Settings tests', () => {
         text: 'Workflow status removed successfully',
       });
 
-      cy.get('[data-cy="connection_FEASIBILITY_REVIEW_2"]').should('not.exist');
+      cy.get('[data-cy^="connection_FEASIBILITY_REVIEW"]').should('not.exist');
     });
   });
 
