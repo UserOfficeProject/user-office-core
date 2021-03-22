@@ -12,6 +12,7 @@ import {
 } from '@esss-swap/duo-validation';
 
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -20,6 +21,7 @@ import { Event } from '../events/event.enum';
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
+import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import { UserWithRole, UserRole } from '../models/User';
 import { rejection, Rejection, isRejection } from '../rejection';
 import {
@@ -31,6 +33,7 @@ import {
 } from '../resolvers/mutations/AssignMembersToSEP';
 import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
+import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { UpdateSEPTimeAllocationArgs } from '../resolvers/mutations/UpdateSEPProposalMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -41,7 +44,8 @@ export default class SEPMutations {
     private instrumentDataSource: InstrumentDataSource,
     private userAuth: UserAuthorization,
     private userDataSource: UserDataSource,
-    private proposalSettingsDataSource: ProposalSettingsDataSource
+    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    private proposalDataSource: ProposalDataSource
   ) {}
 
   @ValidateArgs(createSEPValidationSchema)
@@ -392,6 +396,49 @@ export default class SEPMutations {
             sepTimeAllocation,
           }
         );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  // @EventBus(Event.PROPOSAL_SEP_MEETING_SAVED)
+  async saveSepMeetingDecision(
+    agent: UserWithRole | null,
+    args: SaveSEPMeetingDecisionInput
+  ): Promise<SepMeetingDecision | Rejection> {
+    const isChairOrSecretaryOfProposal = await this.userAuth.isChairOrSecretaryOfProposal(
+      agent!.id,
+      args.proposalId
+    );
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+
+    if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
+
+    const proposal = await this.proposalDataSource.get(args.proposalId);
+
+    if (!proposal?.id) {
+      logger.logError(
+        'Cannot add SEP meeting decision to non existing proposal',
+        {
+          proposal,
+        }
+      );
+
+      return rejection('NOT_FOUND');
+    }
+
+    const submittedBy = args.submitted ? (agent as UserWithRole).id : null;
+
+    return this.dataSource
+      .saveSepMeetingDecision(args, submittedBy)
+      .then((sepMeetingDecision) => sepMeetingDecision)
+      .catch((err) => {
+        logger.logException('Could not save sep meeting decision', err, {
+          agent,
+        });
 
         return rejection('INTERNAL_ERROR');
       });

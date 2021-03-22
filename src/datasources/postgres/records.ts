@@ -6,13 +6,14 @@ import {
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
 import { Feature, FeatureId } from '../../models/Feature';
-import { Proposal } from '../../models/Proposal';
+import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import { SEP, SEPProposal, SEPAssignment, SEPReviewer } from '../../models/SEP';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import {
   DataType,
@@ -406,6 +407,16 @@ export interface StatusChangingEventRecord {
   readonly status_changing_event: string;
 }
 
+export interface SepMeetingDecisionRecord {
+  readonly proposal_id: number;
+  readonly comment_for_management: string;
+  readonly comment_for_user: string;
+  readonly rank_order: number;
+  readonly recommendation: ProposalEndStatus;
+  readonly submitted: boolean;
+  readonly submitted_by?: number | null;
+}
+
 export interface ProposalEventsRecord {
   readonly proposal_id: number;
   readonly proposal_created: boolean;
@@ -712,6 +723,20 @@ export const createSEPObject = (sep: SEPRecord) => {
     sep.active,
     sep.sep_chair_user_id,
     sep.sep_secretary_user_id
+  );
+};
+
+export const createSepMeetingDecisionObject = (
+  sepMeetingDecisionRecord: SepMeetingDecisionRecord
+) => {
+  return new SepMeetingDecision(
+    sepMeetingDecisionRecord.proposal_id,
+    sepMeetingDecisionRecord.rank_order,
+    sepMeetingDecisionRecord.recommendation,
+    sepMeetingDecisionRecord.comment_for_user,
+    sepMeetingDecisionRecord.comment_for_management,
+    sepMeetingDecisionRecord.submitted,
+    sepMeetingDecisionRecord.submitted_by
   );
 };
 

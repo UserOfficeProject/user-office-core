@@ -21,6 +21,7 @@ import { ReviewWithNextProposalStatus } from './Review';
 import { Review } from './Review';
 import { Sample } from './Sample';
 import { SEP } from './SEP';
+import { SepMeetingDecision } from './SepMeetingDecision';
 import { SEPProposal } from './SEPProposal';
 import { Shipment } from './Shipment';
 import { StatusChangingEvent } from './StatusChangingEvent';
@@ -76,6 +77,13 @@ export class NextProposalStatusResponseWrap extends ResponseWrapBase<ProposalSta
   @Response()
   @Field(() => NextProposalStatus, { nullable: true })
   public nextProposalStatus: NextProposalStatus;
+}
+
+@ObjectType()
+export class SepMeetingDecisionResponseWrap extends ResponseWrapBase<SepMeetingDecision> {
+  @Response()
+  @Field(() => SepMeetingDecision, { nullable: true })
+  public sepMeetingDecision: SepMeetingDecision;
 }
 
 @ObjectType()
