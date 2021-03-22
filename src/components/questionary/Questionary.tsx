@@ -11,9 +11,19 @@ import {
 } from './QuestionaryContext';
 import { QuestionaryStepButton } from './QuestionaryStepButton';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   stepper: {
-    padding: theme.spacing(3, 0, 5),
+    margin: theme.spacing(3, 0),
+    overflowX: 'auto',
+    '&::-webkit-scrollbar': {
+      webkitAppearance: 'none',
+      maxWidth: '10px',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      border: '7px solid white',
+      borderRadius: '8px',
+      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    },
   },
   header: {
     textAlign: 'center',
@@ -24,7 +34,7 @@ const useStyles = makeStyles(theme => ({
   },
   root: {
     width: 'inherit',
-    minWidth: '500px',
+    minWidth: '500px', // Giving some minimum width for questionaries with short entries
   },
 }));
 
@@ -82,11 +92,24 @@ function Questionary({
             <Step key={index}>
               <QuestionaryStepButton
                 onClick={async () => {
-                  if (!state.isDirty || (await handleReset())) {
+                  if (!state.isDirty) {
+                    await handleReset();
                     dispatch({
                       type: EventType.GO_TO_STEP,
                       payload: { stepIndex: index },
                     });
+                  } else {
+                    if (
+                      window.confirm(
+                        'Changes you recently made in this step will not be saved! Are you sure?'
+                      )
+                    ) {
+                      await handleReset();
+                      dispatch({
+                        type: EventType.GO_TO_STEP,
+                        payload: { stepIndex: index },
+                      });
+                    }
                   }
                 }}
                 completed={stepMetadata.isCompleted}

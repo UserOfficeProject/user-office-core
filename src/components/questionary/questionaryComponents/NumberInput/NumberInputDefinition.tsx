@@ -5,8 +5,8 @@ import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
-import { IntervalPropertyId } from '../Interval/intervalUnits';
 import { createNumberInputValidationSchema } from './createNumberInputValidationSchema';
+import NumberSearchCriteriaComponent from './NumberSearchCriteriaComponent';
 import { QuestionaryComponentNumber } from './QuestionaryComponentNumberInput';
 import { QuestionNumberForm } from './QuestionNumberInputForm';
 import { QuestionTemplateRelationNumberForm } from './QuestionTemplateRelationNumberInputForm';
@@ -21,14 +21,25 @@ export const numberInputDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <ExposureZeroIcon />,
   renderers: {
-    answerRenderer: ({ answer }) =>
-      answer.value.value !== null ? (
-        <span>{`${answer.value.value} ${answer.value.unit || ''}`}</span>
-      ) : null,
+    answerRenderer: function AnswerRendererComponent({ answer }) {
+      if (!answer.value.value) {
+        return <span>Left blank</span>;
+      }
+
+      const value = answer.value.value;
+      const unit = answer.value.unit;
+
+      return (
+        <span>
+          {value}
+          {unit ? ` ${unit}` : ''}
+        </span>
+      );
+    },
     questionRenderer: defaultRenderer.questionRenderer,
   },
 
   createYupValidationSchema: createNumberInputValidationSchema,
-  getYupInitialValue: ({ answer }) =>
-    answer.value || { value: '', unit: IntervalPropertyId.UNITLESS },
+  getYupInitialValue: ({ answer }) => answer.value || { value: '', unit: null },
+  searchCriteriaComponent: NumberSearchCriteriaComponent,
 };

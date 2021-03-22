@@ -3,7 +3,7 @@ import Table, { TableProps } from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import React from 'react';
+import React, { FC } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { Answer } from 'generated/sdk';
@@ -15,7 +15,7 @@ import {
 
 import { getQuestionaryComponentDefinition } from './QuestionaryComponentRegistry';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   label: {
     paddingLeft: 0,
   },
@@ -33,7 +33,7 @@ function QuestionaryDetails(
     questionaryId: number;
     additionalDetails?: Array<TableRowData>;
     title?: string;
-  } & TableProps<any>
+  } & TableProps<FC<unknown>>
 ) {
   const { questionaryId, additionalDetails, title, ...restProps } = props;
   const { questionary, loadingQuestionary } = useQuestionary(questionaryId);
@@ -48,17 +48,14 @@ function QuestionaryDetails(
   }
 
   const allQuestions = getAllFields(questionary.steps) as Answer[];
-  const displayableQuestions = allQuestions.filter(field => {
+  const displayableQuestions = allQuestions.filter((field) => {
     const definition = getQuestionaryComponentDefinition(
       field.question.dataType
     );
 
     return (
       !definition.readonly &&
-      areDependenciesSatisfied(
-        questionary.steps,
-        field.question.proposalQuestionId
-      )
+      areDependenciesSatisfied(questionary.steps, field.question.id)
     );
   });
 
@@ -84,7 +81,7 @@ function QuestionaryDetails(
           )}
 
           {/* questionary details */}
-          {displayableQuestions.map(question => {
+          {displayableQuestions.map((question) => {
             const renderers = getQuestionaryComponentDefinition(
               question.question.dataType
             ).renderers;
@@ -101,7 +98,7 @@ function QuestionaryDetails(
             });
 
             return createTableRow(
-              `answer-${question.answerId}-${question.question.proposalQuestionId}`,
+              `answer-${question.answerId}-${question.question.id}`,
               {
                 label: questionElem,
                 value: answerElem,

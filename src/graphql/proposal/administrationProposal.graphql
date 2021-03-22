@@ -5,6 +5,8 @@ mutation administrationProposal(
   $statusId: Int
   $commentForUser: String
   $commentForManagement: String
+  $managementTimeAllocation: Int
+  $managementDecisionSubmitted: Boolean
 ) {
   administrationProposal(
     id: $id
@@ -13,6 +15,8 @@ mutation administrationProposal(
     statusId: $statusId
     commentForUser: $commentForUser
     commentForManagement: $commentForManagement
+    managementTimeAllocation: $managementTimeAllocation
+    managementDecisionSubmitted: $managementDecisionSubmitted
   ) {
     proposal {
       id

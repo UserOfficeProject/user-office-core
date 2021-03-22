@@ -17,7 +17,7 @@ const assignProposalToSEPValidationSchema = yup.object().shape({
   selectedSEPId: yup.string().required('You must select active SEP'),
 });
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   cardHeader: {
     fontSize: '18px',
     padding: '22px 0 0',
@@ -38,7 +38,7 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
 }) => {
   const classes = useStyles();
   const { currentRole } = useContext(UserContext);
-  const { SEPs } = useSEPsData('', true, currentRole as UserRole);
+  const { SEPs, loadingSEPs } = useSEPsData('', true, currentRole as UserRole);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -48,7 +48,7 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const selectedSEP = SEPs.find(
-            sep => sep.id === +values.selectedSEPId
+            (sep) => sep.id === +values.selectedSEPId
           );
 
           if (!selectedSEP) {
@@ -73,10 +73,11 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
                 <FormikDropdown
                   name="selectedSEPId"
                   label="Select SEP"
-                  items={SEPs.map(sep => ({
+                  items={SEPs.map((sep) => ({
                     value: sep.id.toString(),
                     text: sep.code,
                   }))}
+                  disabled={loadingSEPs}
                   required
                 />
               </Grid>

@@ -16,14 +16,14 @@ export function useEventLogsData(eventType: string, changedObjectId: string) {
         changedObjectId,
         eventType,
       })
-      .then(data => {
+      .then((data) => {
         if (cancelled) {
           return;
         }
 
         if (data.eventLogs) {
           setEventLogsData(
-            data.eventLogs.map(eventLog => {
+            data.eventLogs.map((eventLog) => {
               return {
                 ...eventLog,
                 changedBy: eventLog.changedBy as User,

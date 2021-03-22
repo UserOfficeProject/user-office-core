@@ -24,15 +24,25 @@ export function useProposalStatusesData(): {
   };
 
   useEffect(() => {
+    let unmounted = false;
+
     setLoadingProposalStatuses(true);
     api()
       .getProposalStatuses()
-      .then(data => {
+      .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         if (data.proposalStatuses) {
           setProposalStatuses(data.proposalStatuses as ProposalStatus[]);
         }
         setLoadingProposalStatuses(false);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [api]);
 
   return {

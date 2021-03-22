@@ -1,20 +1,20 @@
 import { FormControlLabel } from '@material-ui/core';
 import { Field } from 'formik';
-import { Checkbox, CheckboxWithLabel, TextField } from 'formik-material-ui';
-import React, { ChangeEvent, useState } from 'react';
+import { Checkbox, TextField } from 'formik-material-ui';
+import React, { ChangeEvent, FC, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import TitledContainer from 'components/common/TitledContainer';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { Question, SelectionFromOptionsConfig } from 'generated/sdk';
+import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { SelectionFromOptionsConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
-  const field = props.field;
+export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
+  const field = props.question;
   const config = field.config as SelectionFromOptionsConfig;
 
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
@@ -25,9 +25,7 @@ export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
 
   return (
     <QuestionFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      question={props.field}
+      {...props}
       validationSchema={Yup.object().shape({
         naturalKey: naturalKeySchema,
         question: Yup.string().required('Question is required'),
@@ -88,11 +86,17 @@ export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
             />
 
             {showIsMultipleSelectCheckbox && (
-              <Field
-                name="config.isMultipleSelect"
-                component={CheckboxWithLabel}
-                Label={{ label: 'Is multiple select' }}
-                margin="normal"
+              <FormControlLabel
+                control={
+                  <Field
+                    name="config.isMultipleSelect"
+                    component={Checkbox}
+                    margin="normal"
+                    type="checkbox"
+                    inputProps={{ 'data-cy': 'is-multiple-select' }}
+                  />
+                }
+                label="Is multiple select"
               />
             )}
           </TitledContainer>
@@ -105,12 +109,12 @@ export const QuestionMultipleChoiceForm: FormComponent<Question> = props => {
               columns={[{ title: 'Answer', field: 'answer' }]}
               dataTransforms={{
                 toTable: (options: string[]) => {
-                  return options.map(option => {
+                  return options.map((option) => {
                     return { answer: option };
                   });
                 },
-                fromTable: (rows: any[]) => {
-                  return rows.map(row => row.answer);
+                fromTable: (rows: Record<string, unknown>[]) => {
+                  return rows.map((row) => row.answer);
                 },
               }}
               margin="normal"

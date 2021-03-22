@@ -12,15 +12,20 @@ function normalizeDate(date: Date) {
   return date;
 }
 
-export const createDateValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = answer => {
+export const createDateValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = (
+  answer
+) => {
   let schema = Yup.date()
     .typeError('Invalid Date Format')
-    .transform(function(value: Date) {
+    .transform(function (value: Date) {
       return normalizeDate(value);
     });
 
   const config = answer.config as DateConfig;
-  config.required && (schema = schema.required(`This date is required`));
+
+  if (config.required) {
+    schema = schema.required(`This date is required`);
+  }
 
   if (config.minDate) {
     const minDate = normalizeDate(new Date(config.minDate));

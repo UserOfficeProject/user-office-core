@@ -1,18 +1,17 @@
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 
+import {
+  DownloadContext,
+  PREPARE_DOWNLOAD_TYPE,
+} from 'context/DownloadContextProvider';
 export function useDownloadXLSXSEP() {
-  const downloadSEPXLSX = useCallback((sepId, callId) => {
-    const element = document.createElement('a');
-    element.setAttribute('href', `/download/xlsx/sep/${sepId}/call/${callId}`);
-    element.setAttribute('download', 'download');
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
-  }, []);
+  const { prepareDownload } = useContext(DownloadContext);
+  const downloadSEPXLSX = useCallback(
+    (sepId: number, callId: number, name: string) => {
+      prepareDownload(PREPARE_DOWNLOAD_TYPE.XLSX_SEP, [[sepId, callId]], name);
+    },
+    [prepareDownload]
+  );
 
   return downloadSEPXLSX;
 }

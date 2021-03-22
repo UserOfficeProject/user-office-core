@@ -10,19 +10,21 @@ import React from 'react';
 import { Review } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 
+const useStyles = makeStyles((theme) => ({
+  heading: {
+    marginTop: theme.spacing(2),
+  },
+  textBold: {
+    fontWeight: 'bold',
+  },
+}));
+
 type ExternalReviewsProps = {
   reviews: Review[] | null;
 };
 
 const ExternalReviews: React.FC<ExternalReviewsProps> = ({ reviews }) => {
-  const classes = makeStyles(theme => ({
-    heading: {
-      marginTop: theme.spacing(2),
-    },
-    textBold: {
-      fontWeight: 'bold',
-    },
-  }))();
+  const classes = useStyles();
 
   return (
     <div data-cy="SEP-meeting-components-external-reviews">
@@ -41,7 +43,7 @@ const ExternalReviews: React.FC<ExternalReviewsProps> = ({ reviews }) => {
               </TableCell>
               <TableCell className={classes.textBold}>Comment</TableCell>
             </TableRow>
-            {reviews?.map(review => (
+            {reviews?.map((review) => (
               <TableRow key={`externalReviews_${review.id}_${review.userID}`}>
                 <TableCell>{`${review.reviewer?.firstname} ${review.reviewer?.lastname}`}</TableCell>
                 <TableCell>{review.grade || '-'}</TableCell>

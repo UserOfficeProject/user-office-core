@@ -2,6 +2,7 @@ import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useContext } from 'react';
 
+import { NavigButton } from 'components/common/NavigButton';
 import NavigationFragment from 'components/questionary/NavigationFragment';
 import {
   createMissingContextErrorMessage,
@@ -11,9 +12,15 @@ import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryRevi
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import { EventType } from 'models/QuestionarySubmissionState';
-import withConfirm from 'utils/withConfirm';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ProposalContextType } from './ProposalContainer';
+
+type ProposalSummaryProps = {
+  data: ProposalSubmissionState;
+  readonly: boolean;
+  confirm: WithConfirmType;
+};
 
 function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
   const { state, dispatch } = useContext(
@@ -30,9 +37,9 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
 
   const allStepsComplete =
     proposal.questionary &&
-    proposal.questionary.steps.every(step => step.isCompleted);
+    proposal.questionary.steps.every((step) => step.isCompleted);
 
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     buttons: {
       display: 'flex',
       justifyContent: 'flex-end',
@@ -42,7 +49,7 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
       opacity: 0.7,
     },
     button: {
-      marginTop: proposal.status.id === 0 ? '40px' : 'auto',
+      marginTop: proposal.status?.id === 0 ? '40px' : 'auto',
       marginLeft: '10px',
       backgroundColor: theme.palette.secondary.main,
       color: '#ffff',
@@ -59,10 +66,9 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
         className={readonly ? classes.disabled : undefined}
       />
       <div className={classes.buttons}>
-        <NavigationFragment
-          back={undefined}
-          saveAndNext={{
-            callback: () => {
+        <NavigationFragment disabled={proposal.status?.id === 0}>
+          <NavigButton
+            onClick={() => {
               confirm(
                 () => {
                   dispatch({
@@ -76,30 +82,25 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
                     'I am aware that no further edits can be done after proposal submission.',
                 }
               )();
-            },
-            label: proposal.submitted ? '✔ Submitted' : 'Submit',
-            disabled: !allStepsComplete || proposal.submitted,
-          }}
-          reset={undefined}
-          isLoading={false}
-          disabled={proposal.status.id === 0}
-        />
-        <Button
-          className={classes.button}
-          onClick={() => downloadPDFProposal(proposal.id)}
-          variant="contained"
-          disabled={!allStepsComplete}
-        >
-          Download PDF
-        </Button>
+            }}
+            disabled={!allStepsComplete || proposal.submitted}
+            variant="contained"
+            color="primary"
+          >
+            {proposal.submitted ? '✔ Submitted' : 'Submit'}
+          </NavigButton>
+          <Button
+            onClick={() => downloadPDFProposal([proposal.id], proposal.title)}
+            disabled={!allStepsComplete}
+            className={classes.button}
+            variant="contained"
+          >
+            Download PDF
+          </Button>
+        </NavigationFragment>
       </div>
     </>
   );
 }
 
-interface ProposalSummaryProps {
-  data: ProposalSubmissionState;
-  readonly: boolean;
-  confirm: Function;
-}
 export default withConfirm(ProposalReview);

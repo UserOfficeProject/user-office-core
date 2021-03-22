@@ -17,14 +17,25 @@ export function useCallsData(filter?: CallsFilter) {
   };
 
   useEffect(() => {
+    let unmounted = false;
+
+    setLoadingCalls(true);
     api()
       .getCalls({ filter: callsFilter })
-      .then(data => {
+      .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         if (data.calls) {
           setCalls(data.calls as Call[]);
         }
         setLoadingCalls(false);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [api, callsFilter]);
 
   return { loadingCalls, calls, setCallsWithLoading, setCallsFilter };

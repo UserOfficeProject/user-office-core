@@ -5,6 +5,7 @@ import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
+import BooleanSearchCriteriaInput from './BooleanSearchCriteriaInput';
 import { createBooleanValidationSchema } from './createBooleanValidationSchema';
 import { QuestionaryComponentBoolean } from './QuestionaryComponentBoolean';
 import { QuestionBooleanForm } from './QuestionBooleanForm';
@@ -21,8 +22,11 @@ export const booleanDefinition: QuestionaryComponentDefinition = {
   icon: <CheckBoxOutlineBlankIcon />,
   renderers: {
     questionRenderer: defaultRenderer.questionRenderer,
-    answerRenderer: ({ answer }) => <span>{answer.value ? 'Yes' : 'No'}</span>,
+    answerRenderer: function AnswerRendererComponent({ answer }) {
+      return <span>{answer.value ? 'Yes' : 'No'}</span>;
+    },
   },
   createYupValidationSchema: createBooleanValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || false,
+  searchCriteriaComponent: BooleanSearchCriteriaInput,
 };

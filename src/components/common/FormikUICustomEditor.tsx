@@ -1,25 +1,34 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
-import { FormikHelpers } from 'formik';
+import { FormikHelpers, FormikValues } from 'formik';
 import React from 'react';
+
+import { FunctionType } from 'utils/utilTypes';
+
+const useStyles = makeStyles((theme) => ({
+  label: {
+    marginTop: '17px',
+    fontSize: '1.1875em',
+    display: 'block',
+    color: theme.palette.grey[800],
+  },
+}));
 
 const FormikUICustomEditor = ({
   field,
   form,
   ...props
 }: {
-  field: { name: string; onBlur: Function; onChange: Function; value: string };
-  form: FormikHelpers<any>;
+  field: {
+    name: string;
+    onBlur: FunctionType;
+    onChange: FunctionType;
+    value: string;
+  };
+  form: FormikHelpers<FormikValues>;
   label?: string;
 }) => {
-  const classes = makeStyles(theme => ({
-    label: {
-      marginTop: '17px',
-      fontSize: '1.1875em',
-      display: 'block',
-      color: theme.palette.grey[800],
-    },
-  }))();
+  const classes = useStyles();
 
   return (
     <>
@@ -27,7 +36,7 @@ const FormikUICustomEditor = ({
       <Editor
         initialValue={field.value}
         {...props}
-        onEditorChange={content => form.setFieldValue(field.name, content)}
+        onEditorChange={(content) => form.setFieldValue(field.name, content)}
       />
     </>
   );

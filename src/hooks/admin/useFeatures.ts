@@ -13,13 +13,27 @@ export function useFeatures(): {
   const api = useDataApi();
 
   useEffect(() => {
+    let unmounted = false;
+
     setLoadingFeatures(true);
     api()
       .getFeatures()
-      .then(data => {
+      .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         setFeatures(data.features);
         setLoadingFeatures(false);
+      })
+      .catch(() => {
+        setFeatures([]);
+        setLoadingFeatures(false);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [api]);
 
   return { loadingFeatures, features };

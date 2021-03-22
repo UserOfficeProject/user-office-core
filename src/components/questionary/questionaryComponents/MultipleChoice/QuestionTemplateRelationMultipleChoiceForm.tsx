@@ -1,24 +1,23 @@
 import { FormControlLabel } from '@material-ui/core';
 import { Field } from 'formik';
-import { Checkbox, CheckboxWithLabel } from 'formik-material-ui';
-import React, { ChangeEvent, useState } from 'react';
+import { Checkbox } from 'formik-material-ui';
+import React, { ChangeEvent, FC, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import TitledContainer from 'components/common/TitledContainer';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import {
-  QuestionTemplateRelation,
-  SelectionFromOptionsConfig,
-} from 'generated/sdk';
+import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { SelectionFromOptionsConfig } from 'generated/sdk';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionTemplateRelation> = props => {
-  const config = props.field.config as SelectionFromOptionsConfig;
+export const QuestionTemplateRelationMultipleChoiceForm: FC<QuestionTemplateRelationFormProps> = (
+  props
+) => {
+  const config = props.questionRel.config as SelectionFromOptionsConfig;
   const [
     showIsMultipleSelectCheckbox,
     setShowIsMultipleSelectCheckbox,
@@ -26,10 +25,7 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
 
   return (
     <QuestionTemplateRelationFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      questionRel={props.field}
-      template={props.template}
+      {...props}
       validationSchema={Yup.object().shape({
         question: Yup.object({
           config: Yup.object({
@@ -39,9 +35,9 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
         }),
       })}
     >
-      {formikProps => (
+      {(formikProps) => (
         <>
-          <QuestionExcerpt question={props.field.question} />
+          <QuestionExcerpt question={props.questionRel.question} />
           <TitledContainer label="Constraints">
             <FormControlLabel
               control={
@@ -71,11 +67,17 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
               }}
             />
             {showIsMultipleSelectCheckbox && (
-              <Field
-                name="config.isMultipleSelect"
-                component={CheckboxWithLabel}
-                Label={{ label: 'Is multiple select' }}
-                margin="normal"
+              <FormControlLabel
+                control={
+                  <Field
+                    name="config.isMultipleSelect"
+                    component={Checkbox}
+                    margin="normal"
+                    type="checkbox"
+                    inputProps={{ 'data-cy': 'is-multiple-select' }}
+                  />
+                }
+                label="Is multiple select"
               />
             )}
           </TitledContainer>
@@ -88,12 +90,12 @@ export const QuestionTemplateRelationMultipleChoiceForm: FormComponent<QuestionT
               columns={[{ title: 'Answer', field: 'answer' }]}
               dataTransforms={{
                 toTable: (options: string[]) => {
-                  return options.map(option => {
+                  return options.map((option) => {
                     return { answer: option };
                   });
                 },
-                fromTable: (rows: any[]) => {
-                  return rows.map(row => row.answer);
+                fromTable: (rows: Record<string, unknown>[]) => {
+                  return rows.map((row) => row.answer);
                 },
               }}
               margin="normal"

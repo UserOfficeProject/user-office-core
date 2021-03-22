@@ -17,7 +17,7 @@ import { FormWrapper } from 'styles/StyledComponents';
 
 import PhotoInSide from './PhotoInSide';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   avatar: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
@@ -61,7 +61,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
         token: match.params.token,
         password,
       })
-      .then(data =>
+      .then((data) =>
         data.resetPassword.error
           ? setErrorMessage(true)
           : setPasswordReset(true)

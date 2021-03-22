@@ -21,7 +21,7 @@ const addNextStatusEventsToConnectionValidationSchema = yup.object().shape({
     .required('You must select at least one event'),
 });
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formControl: {
     width: '100%',
   },
@@ -90,7 +90,7 @@ const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionP
               ) : (
                 <FieldArray
                   name="selectedNextStatusEvents"
-                  render={arrayHelpers => (
+                  render={(arrayHelpers) => (
                     <>
                       {proposalEvents.map((proposalEvent, index) => (
                         <Grid key={index} item sm={6}>
@@ -105,7 +105,7 @@ const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionP
                                 )}
                                 color="primary"
                                 data-cy="next-status-event"
-                                onChange={e => {
+                                onChange={(e) => {
                                   if (e.target.checked)
                                     arrayHelpers.push(proposalEvent.name);
                                   else {

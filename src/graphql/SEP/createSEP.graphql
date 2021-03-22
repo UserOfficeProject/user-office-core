@@ -16,6 +16,12 @@ mutation createSEP(
       description
       numberRatingsRequired
       active
+      sepChair {
+        ...basicUserDetails
+      }
+      sepSecretary {
+        ...basicUserDetails
+      }
     }
     error
   }

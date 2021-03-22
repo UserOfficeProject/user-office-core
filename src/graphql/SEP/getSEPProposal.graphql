@@ -4,6 +4,7 @@ query getSEPProposal($sepId: Int!, $proposalId: Int!) {
     sepId
     sepTimeAllocation
 
+    instrumentSubmitted
     proposal {
       ...proposal
       proposer {
@@ -28,7 +29,6 @@ query getSEPProposal($sepId: Int!, $proposalId: Int!) {
         reviewer {
           firstname
           lastname
-          username
           id
         }
       }

@@ -11,7 +11,7 @@ export function useSample(sampleId: number) {
   useEffect(() => {
     api()
       .getSample({ sampleId })
-      .then(data => {
+      .then((data) => {
         if (data.sample) {
           setSample(data.sample);
         }

@@ -20,14 +20,17 @@ import {
   FieldDependency,
   TemplateCategoryId,
 } from 'generated/sdk';
+import { Event, EventType } from 'models/QuestionaryEditorModel';
 
 export default function TemplateQuestionEditor(props: {
   data: TemplateTopicEditorData;
   index: number;
   onClick: { (data: TemplateTopicEditorData): void };
+  dispatch: React.Dispatch<Event>;
+  isHighlighted?: boolean;
 }) {
   const theme = useTheme();
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     icon: {
       color: theme.palette.grey[400],
       justifyItems: 'flex-end',
@@ -49,8 +52,12 @@ export default function TemplateQuestionEditor(props: {
       color: theme.palette.grey[400],
       display: 'flex',
       padding: '10px 0 5px 0',
-      justifyContent: 'flex-end',
-      alignItems: 'center',
+      '& div': {
+        marginLeft: 'auto',
+        alignItems: 'center',
+        display: 'flex',
+        cursor: 'pointer',
+      },
       '& ul': {
         display: 'inline-block',
         padding: '0',
@@ -59,6 +66,11 @@ export default function TemplateQuestionEditor(props: {
           display: 'inline',
           marginLeft: '3px',
           listStyle: 'none',
+          '&:hover': {
+            transitionDuration: '300ms',
+            textDecoration: 'underline',
+            color: theme.palette.primary.main,
+          },
         },
       },
     },
@@ -71,10 +83,16 @@ export default function TemplateQuestionEditor(props: {
 
   const getItemStyle = (
     isDragging: boolean,
-    draggableStyle: DraggingStyle | NotDraggingStyle | undefined
+    draggableStyle: DraggingStyle | NotDraggingStyle | undefined,
+    isHighlighted: boolean
   ) => ({
     display: 'flex',
     padding: '12px 8px 8px 8px',
+    outline: isHighlighted
+      ? `1px solid ${theme.palette.primary.main}`
+      : 'inherit',
+    outlineOffset: '-1px',
+    transitionDuration: '300ms',
     margin: '0',
     backgroundColor: isDragging
       ? theme.palette.grey[200]
@@ -93,7 +111,7 @@ export default function TemplateQuestionEditor(props: {
       ? '&&'
       : '||';
   const dependencyJsx = dependencies.length ? (
-    <>
+    <div>
       <LockIcon className={classes.lockIcon} />
       <ul>
         {dependencies.map((dependency, i) => {
@@ -104,7 +122,28 @@ export default function TemplateQuestionEditor(props: {
 
           return (
             dependenciesAreVisible && (
-              <li key={dependency.dependencyId + dependency.questionId}>
+              <li
+                key={dependency.dependencyId + dependency.questionId}
+                onMouseEnter={() =>
+                  props.dispatch({
+                    type: EventType.DEPENDENCY_HOVER,
+                    payload: { dependency: dependency.dependencyId },
+                  })
+                }
+                onMouseLeave={() =>
+                  props.dispatch({
+                    type: EventType.DEPENDENCY_HOVER,
+                    payload: { dependency: '' },
+                  })
+                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.dispatch({
+                    type: EventType.OPEN_QUESTIONREL_EDITOR,
+                    payload: { questionId: dependency.dependencyId },
+                  });
+                }}
+              >
                 {`${dependency.dependencyNaturalKey} `}
                 <strong>{`${dependencyComparator}`}</strong>
               </li>
@@ -112,7 +151,7 @@ export default function TemplateQuestionEditor(props: {
           );
         })}
       </ul>
-    </>
+    </div>
   ) : null;
 
   const questionDefinition = getQuestionaryComponentDefinition(
@@ -121,8 +160,8 @@ export default function TemplateQuestionEditor(props: {
 
   return (
     <Draggable
-      key={props.data.proposalQuestionId}
-      draggableId={props.data.proposalQuestionId}
+      key={props.data.id}
+      draggableId={props.data.id}
       index={props.index}
       isDragDisabled={questionDefinition.creatable === false}
     >
@@ -135,7 +174,8 @@ export default function TemplateQuestionEditor(props: {
           {...provided.dragHandleProps}
           style={getItemStyle(
             snapshot.isDragging,
-            provided.draggableProps.style
+            provided.draggableProps.style,
+            props.isHighlighted === true
           )}
           onMouseEnter={() => setIsHover(true)}
           onMouseLeave={() => setIsHover(false)}
@@ -174,7 +214,7 @@ export default function TemplateQuestionEditor(props: {
 }
 
 export interface TemplateTopicEditorData {
-  proposalQuestionId: string;
+  id: string;
   question: string;
   naturalKey: string;
   dataType: DataType;

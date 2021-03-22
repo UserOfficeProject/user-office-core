@@ -12,14 +12,14 @@ import UOLoader from 'components/common/UOLoader';
 import { Sep } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
 }));
 
 type AddSEPProps = {
-  close: (sepAdded: Sep | null | undefined) => void;
+  close: (sepAdded: Sep | null) => void;
 };
 
 const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
@@ -45,13 +45,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
       }}
       validationSchema={createSEPValidationSchema}
     >
-      {({
-        values,
-        errors,
-        handleChange,
-        touched,
-        setFieldValue,
-      }): JSX.Element => (
+      {(): JSX.Element => (
         <Form>
           <Typography variant="h6">Create new SEP</Typography>
 
@@ -60,14 +54,10 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             id="code"
             label="Code"
             type="text"
-            value={values.code}
-            onChange={handleChange}
             component={TextField}
             margin="normal"
             fullWidth
             data-cy="code"
-            error={touched.code && errors.code !== undefined}
-            helperText={touched.code && errors.code && errors.code}
             disabled={isExecutingCall}
           />
           <Field
@@ -81,13 +71,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             multiline
             rowsMax="16"
             rows="3"
-            onChange={handleChange}
-            value={values.description}
             data-cy="description"
-            error={touched.description && errors.description !== undefined}
-            helperText={
-              touched.description && errors.description && errors.description
-            }
             disabled={isExecutingCall}
           />
 
@@ -99,35 +83,25 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             component={TextField}
             margin="normal"
             fullWidth
-            onChange={handleChange}
-            value={values.numberRatingsRequired}
             data-cy="numberRatingsRequired"
-            error={
-              touched.numberRatingsRequired &&
-              errors.numberRatingsRequired !== undefined
-            }
-            helperText={
-              touched.numberRatingsRequired &&
-              errors.numberRatingsRequired &&
-              errors.numberRatingsRequired
-            }
             disabled={isExecutingCall}
           />
+
           <FormControlLabel
             control={
               <Field
                 id="active"
                 name="active"
-                type="checkbox"
                 component={Checkbox}
-                value={values.active}
                 color="primary"
-                onChange={(): void => setFieldValue('active', !values.active)}
+                type="checkbox"
                 inputProps={{ 'aria-label': 'primary checkbox' }}
+                data-cy="sepActive"
               />
             }
             label="Active"
           />
+
           <Button
             type="submit"
             fullWidth

@@ -2,7 +2,7 @@ import SvgIcon, { SvgIconProps } from '@material-ui/core/SvgIcon';
 import React from 'react';
 
 // NOTE: The icon is taken from: https://materialdesignicons.com/
-const ProposalSettingsIcon: React.FC<SvgIconProps> = props => {
+const ProposalSettingsIcon: React.FC<SvgIconProps> = (props) => {
   return (
     <SvgIcon {...props}>
       <path

@@ -1,18 +1,18 @@
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
+
+import {
+  DownloadContext,
+  PREPARE_DOWNLOAD_TYPE,
+} from 'context/DownloadContextProvider';
 
 export function useDownloadXLSXProposal() {
-  const downloadProposalXLSX = useCallback(proposalId => {
-    const element = document.createElement('a');
-    element.setAttribute('href', '/download/xlsx/proposal/' + proposalId);
-    element.setAttribute('download', 'download');
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
-  }, []);
+  const { prepareDownload } = useContext(DownloadContext);
+  const downloadProposalXLSX = useCallback(
+    (proposalIds: number[], name: string) => {
+      prepareDownload(PREPARE_DOWNLOAD_TYPE.XLSX_PROPOSAL, proposalIds, name);
+    },
+    [prepareDownload]
+  );
 
   return downloadProposalXLSX;
 }

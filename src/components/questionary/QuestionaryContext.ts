@@ -11,7 +11,7 @@ export interface QuestionaryContextType {
 }
 export const QuestionaryContext = React.createContext<QuestionaryContextType>({
   state: null,
-  dispatch: e => {},
+  dispatch: () => {},
 });
 
 export const createMissingContextErrorMessage = () =>

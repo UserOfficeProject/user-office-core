@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
@@ -14,6 +13,7 @@ import {
 } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 
+import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
@@ -138,20 +138,22 @@ class App extends React.Component {
               ref={this.notistackRef}
               anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
               maxSnack={1}
-              action={key => (
+              action={(key) => (
                 <IconButton onClick={this.onClickDismiss(key)}>
                   <Close htmlColor="white" />
                 </IconButton>
               )}
             >
               <FeatureContextProvider>
-                <ReviewAndAssignmentContextProvider>
-                  <Router>
-                    <QueryParamProvider ReactRouterRoute={Route}>
-                      <div className="App">{routes}</div>
-                    </QueryParamProvider>
-                  </Router>
-                </ReviewAndAssignmentContextProvider>
+                <DownloadContextProvider>
+                  <ReviewAndAssignmentContextProvider>
+                    <Router>
+                      <QueryParamProvider ReactRouterRoute={Route}>
+                        <div className="App">{routes}</div>
+                      </QueryParamProvider>
+                    </Router>
+                  </ReviewAndAssignmentContextProvider>
+                </DownloadContextProvider>
               </FeatureContextProvider>
             </SnackbarProvider>
           </UserContextProvider>

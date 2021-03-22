@@ -33,10 +33,18 @@ export function useInstrumentsData(
     let unmounted = false;
 
     setLoadingInstruments(true);
-    if (currentRole === UserRole.USER_OFFICER) {
+    if (
+      currentRole &&
+      [
+        UserRole.USER_OFFICER,
+        UserRole.SEP_REVIEWER,
+        UserRole.SEP_CHAIR,
+        UserRole.SEP_SECRETARY,
+      ].includes(currentRole)
+    ) {
       api()
         .getInstruments({ callIds })
-        .then(data => {
+        .then((data) => {
           if (unmounted) {
             return;
           }
@@ -49,7 +57,7 @@ export function useInstrumentsData(
     } else {
       api()
         .getUserInstruments()
-        .then(data => {
+        .then((data) => {
           if (unmounted) {
             return;
           }

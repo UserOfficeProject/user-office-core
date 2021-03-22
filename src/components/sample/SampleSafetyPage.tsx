@@ -26,140 +26,9 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import SampleDetails from './SampleDetails';
 import SamplesTable from './SamplesTable';
 
-function SampleSafetyPage() {
-  const { api, isExecutingCall } = useDataApiWithFeedback();
-  const { calls, loadingCalls } = useCallsData({ isActive: true });
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
-    call: NumberParam,
-    search: StringParam,
-  });
-
-  const [selectedCallId, setSelectedCallId] = useState<number>(
-    urlQueryParams.call ? urlQueryParams.call : 0
-  );
-  const [samples, setSamples] = useState<SampleBasic[]>([]);
-  const [selectedSample, setSelectedSample] = useState<SampleBasic | null>(
-    null
-  );
-
-  useEffect(() => {
-    if (selectedCallId === null) {
-      return;
-    }
-
-    if (selectedCallId === 0) {
-      api()
-        .getSamples()
-        .then(result => {
-          setSamples(result.samples || []);
-        });
-    } else {
-      api()
-        .getSamplesByCallId({ callId: selectedCallId })
-        .then(result => {
-          setSamples(result.samplesByCallId || []);
-        });
-    }
-  }, [api, selectedCallId]);
-
-  const downloadPDFSample = useDownloadPDFSample();
-  const RowActionButtons = (rowData: SampleBasic) => {
-    const iconButtonStyle = { padding: '7px' };
-
-    return (
-      <>
-        <Tooltip title="Review sample">
-          <IconButton
-            style={iconButtonStyle}
-            onClick={() => setSelectedSample(rowData)}
-          >
-            <VisibilityIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Download sample as pdf">
-          <IconButton
-            data-cy="download-sample"
-            onClick={() => downloadPDFSample(rowData.id)}
-            style={iconButtonStyle}
-          >
-            <GetAppIcon />
-          </IconButton>
-        </Tooltip>
-      </>
-    );
-  };
-
-  const columns = [
-    {
-      title: 'Actions',
-      sorting: false,
-      removable: false,
-      render: RowActionButtons,
-    },
-    { title: 'Title', field: 'title' },
-    { title: 'Status', field: 'safetyStatus' },
-    { title: 'Created', field: 'created' },
-  ];
-
-  return (
-    <>
-      <ContentContainer>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <StyledPaper>
-              <CallFilter
-                callId={selectedCallId}
-                calls={calls}
-                isLoading={loadingCalls}
-                onChange={callId => {
-                  setSelectedCallId(callId);
-                }}
-                shouldShowAll={true}
-              />
-              <SamplesTable
-                data={samples}
-                isLoading={isExecutingCall}
-                urlQueryParams={urlQueryParams}
-                setUrlQueryParams={setUrlQueryParams}
-                columns={columns}
-                options={{ selection: true }}
-                actions={[
-                  {
-                    icon: GetAppIcon,
-                    tooltip: 'Download sample',
-                    onClick: (event, rowData) =>
-                      downloadPDFSample(
-                        (rowData as SampleBasic[]).map(({ id }) => id).join(',')
-                      ),
-                  },
-                ]}
-              />
-            </StyledPaper>
-          </Grid>
-        </Grid>
-      </ContentContainer>
-      {selectedSample && (
-        <SampleEvaluationDialog
-          sample={selectedSample}
-          onClose={newSample => {
-            if (newSample) {
-              const newSamples = samples.map(sample =>
-                sample.id === newSample.id ? newSample : sample
-              );
-
-              setSamples(newSamples);
-            }
-            setSelectedSample(null);
-          }}
-        />
-      )}
-    </>
-  );
-}
-
 function SampleEvaluationDialog(props: {
   sample: SampleBasic;
-  onClose: (sample: Maybe<SampleBasic>) => any;
+  onClose: (sample: Maybe<SampleBasic>) => void;
 }) {
   const { sample, onClose } = props;
   const { api } = useDataApiWithFeedback();
@@ -275,6 +144,138 @@ function SampleEvaluationDialog(props: {
         )}
       </Formik>
     </InputDialog>
+  );
+}
+
+function SampleSafetyPage() {
+  const { api, isExecutingCall } = useDataApiWithFeedback();
+  const { calls, loadingCalls } = useCallsData({ isActive: true });
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
+    call: NumberParam,
+    search: StringParam,
+  });
+
+  const [selectedCallId, setSelectedCallId] = useState<number>(
+    urlQueryParams.call ? urlQueryParams.call : 0
+  );
+  const [samples, setSamples] = useState<SampleBasic[]>([]);
+  const [selectedSample, setSelectedSample] = useState<SampleBasic | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (selectedCallId === null) {
+      return;
+    }
+
+    if (selectedCallId === 0) {
+      api()
+        .getSamples()
+        .then((result) => {
+          setSamples(result.samples || []);
+        });
+    } else {
+      api()
+        .getSamplesByCallId({ callId: selectedCallId })
+        .then((result) => {
+          setSamples(result.samplesByCallId || []);
+        });
+    }
+  }, [api, selectedCallId]);
+
+  const downloadPDFSample = useDownloadPDFSample();
+  const RowActionButtons = (rowData: SampleBasic) => {
+    const iconButtonStyle = { padding: '7px' };
+
+    return (
+      <>
+        <Tooltip title="Review sample">
+          <IconButton
+            style={iconButtonStyle}
+            onClick={() => setSelectedSample(rowData)}
+          >
+            <VisibilityIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Download sample as pdf">
+          <IconButton
+            data-cy="download-sample"
+            onClick={() => downloadPDFSample([rowData.id], rowData.title)}
+            style={iconButtonStyle}
+          >
+            <GetAppIcon />
+          </IconButton>
+        </Tooltip>
+      </>
+    );
+  };
+
+  const columns = [
+    {
+      title: 'Actions',
+      sorting: false,
+      removable: false,
+      render: RowActionButtons,
+    },
+    { title: 'Title', field: 'title' },
+    { title: 'Status', field: 'safetyStatus' },
+    { title: 'Created', field: 'created' },
+  ];
+
+  return (
+    <>
+      <ContentContainer>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <StyledPaper>
+              <CallFilter
+                callId={selectedCallId}
+                calls={calls}
+                isLoading={loadingCalls}
+                onChange={(callId) => {
+                  setSelectedCallId(callId);
+                }}
+                shouldShowAll={true}
+              />
+              <SamplesTable
+                data={samples}
+                isLoading={isExecutingCall}
+                urlQueryParams={urlQueryParams}
+                setUrlQueryParams={setUrlQueryParams}
+                columns={columns}
+                options={{ selection: true }}
+                actions={[
+                  {
+                    icon: GetAppIcon,
+                    tooltip: 'Download sample',
+                    onClick: (event, rowData) =>
+                      downloadPDFSample(
+                        (rowData as SampleBasic[]).map(({ id }) => id),
+                        (rowData as SampleBasic[])[0].title
+                      ),
+                  },
+                ]}
+              />
+            </StyledPaper>
+          </Grid>
+        </Grid>
+      </ContentContainer>
+      {selectedSample && (
+        <SampleEvaluationDialog
+          sample={selectedSample}
+          onClose={(newSample) => {
+            if (newSample) {
+              const newSamples = samples.map((sample) =>
+                sample.id === newSample.id ? newSample : sample
+              );
+
+              setSamples(newSamples);
+            }
+            setSelectedSample(null);
+          }}
+        />
+      )}
+    </>
   );
 }
 

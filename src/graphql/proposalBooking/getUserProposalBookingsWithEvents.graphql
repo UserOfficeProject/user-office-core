@@ -1,0 +1,16 @@
+query getUserProposalBookingsWithEvents($endsAfter: TzLessDateTime) {
+  me {
+    proposals {
+      id
+      title
+      shortCode
+      proposalBooking {
+        scheduledEvents(filter: { endsAfter: $endsAfter }) {
+          startsAt
+          endsAt
+          bookingType
+        }
+      }
+    }
+  }
+}

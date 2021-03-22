@@ -15,7 +15,6 @@ query getInstrumentScientistProposals($filter: ProposalsFilter) {
         reviewer {
           firstname
           lastname
-          username
           id
         }
       }
@@ -23,12 +22,7 @@ query getInstrumentScientistProposals($filter: ProposalsFilter) {
         ...basicUserDetails
       }
       technicalReview {
-        id
-        comment
-        publicComment
-        timeAllocation
-        status
-        proposalID
+        ...coreTechnicalReview
       }
       instrument {
         id

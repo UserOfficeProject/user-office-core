@@ -1,0 +1,20 @@
+query getSEPReviewers($sepId: Int!) {
+  sepReviewers(sepId: $sepId) {
+    userId
+    sepId
+    role {
+      id
+      shortCode
+      title
+    }
+    user {
+      id
+      firstname
+      lastname
+      organisation
+      position
+      placeholder
+      created
+    }
+  }
+}

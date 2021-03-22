@@ -7,7 +7,6 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { Formik, Form, Field } from 'formik';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -168,17 +167,6 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
       )}
     </Formik>
   );
-};
-
-SEPGeneralInfo.propTypes = {
-  data: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    code: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    numberRatingsRequired: PropTypes.number.isRequired,
-    active: PropTypes.bool.isRequired,
-  }).isRequired,
-  onSEPUpdate: PropTypes.func.isRequired,
 };
 
 export default SEPGeneralInfo;

@@ -22,11 +22,20 @@ export default function ProposalParticipant(props: {
   const { loadBasicUserData } = useBasicUserData();
 
   useEffect(() => {
+    let unmounted = false;
     if (props.userId) {
-      loadBasicUserData(props.userId).then(user => {
+      loadBasicUserData(props.userId).then((user) => {
+        if (unmounted) {
+          return;
+        }
         setCurUser(user);
       });
     }
+
+    return () => {
+      // used to avoid unmounted component state update error
+      unmounted = true;
+    };
   }, [props.userId, loadBasicUserData]);
 
   return (

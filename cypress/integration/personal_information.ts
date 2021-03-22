@@ -20,9 +20,7 @@ context('Personal information tests', () => {
   it('Should be able update personal information', () => {
     cy.login('user');
 
-    cy.get("[data-cy='profile-page-btn']").click();
-
-    cy.contains('Profile').click();
+    cy.get('[data-cy="active-user-profile"]').click();
 
     cy.get("[name='firstname']")
       .clear()
@@ -123,29 +121,7 @@ context('Personal information tests', () => {
     // that is not attached to the DOM
     cy.wait(2000);
 
-    cy.get("[data-cy='profile-page-btn']").click();
-
-    cy.get('.MuiPopover-root .MuiMenuItem-root')
-      .contains('Roles')
-      .click();
-
-    cy.finishedLoading();
-
-    cy.contains('User roles');
-
-    cy.get("[data-cy='role-selection-table'] table tbody tr")
-      .eq(1)
-      .should(element => {
-        expect(element.text()).to.contain('SEP Chair');
-        expect(element.text()).to.contain('Use');
-      });
-
-    cy.get("[data-cy='role-selection-table'] table tbody tr")
-      .eq(1)
-      .contains('Use')
-      .click();
-
-    cy.notification({ variant: 'success', text: 'User role changed' });
+    cy.changeActiveRole('SEP Chair');
 
     cy.contains('Proposals to review');
 
@@ -191,20 +167,7 @@ context('Personal information tests', () => {
 
     cy.get('[data-cy="connection_DRAFT_1"]').should('contain.text', 'DRAFT');
 
-    cy.get("[data-cy='profile-page-btn']").click();
-
-    cy.contains('Roles').click();
-
-    cy.finishedLoading();
-
-    cy.contains('User roles');
-
-    cy.get("[data-cy='role-selection-table'] table tbody tr")
-      .eq(1)
-      .contains('Use')
-      .click();
-
-    cy.notification({ variant: 'success', text: 'User role changed' });
+    cy.changeActiveRole('SEP Chair');
 
     cy.get('[data-cy="SEPRoles-menu-items"]').should('exist');
   });

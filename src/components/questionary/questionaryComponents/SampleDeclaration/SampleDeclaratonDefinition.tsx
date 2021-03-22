@@ -22,10 +22,12 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <AssignmentIcon />,
   renderers: {
-    answerRenderer: ({ answer }) => <SamplesAnswerRenderer answer={answer} />,
+    answerRenderer: function SamplesAnswerRendererComponent({ answer }) {
+      return <SamplesAnswerRenderer answer={answer} />;
+    },
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: answer => {
+  createYupValidationSchema: (answer) => {
     const config = answer.config as SubtemplateConfig;
     let schema = Yup.array().of(Yup.number());
     if (config.minEntries) {

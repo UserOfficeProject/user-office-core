@@ -15,13 +15,13 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { proposalQuestionId },
+    question: { id },
     question,
     value,
   } = answer;
   const [stateValue, setStateValue] = useState(value);
-  const fieldError = getIn(errors, proposalQuestionId);
-  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
+  const fieldError = getIn(errors, id);
+  const isError = getIn(touched, id) && !!fieldError;
   const config = answer.config as TextInputConfig;
 
   useEffect(() => {
@@ -33,15 +33,15 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
       {config.htmlQuestion && (
         <div
           dangerouslySetInnerHTML={{
-            __html: config.htmlQuestion!,
+            __html: config.htmlQuestion,
           }}
         ></div>
       )}
       <TextFieldNoSubmit
         isCounterHidden={config.isCounterHidden}
         variant="standard"
-        id={proposalQuestionId}
-        name={proposalQuestionId}
+        id={id}
+        name={id}
         fullWidth
         required={config.required}
         label={question.question}
@@ -60,7 +60,7 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
 
           return undefined;
         }}
-        onBlur={event => {
+        onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
           onComplete(event.currentTarget.value);
         }}
         placeholder={config.placeholder}

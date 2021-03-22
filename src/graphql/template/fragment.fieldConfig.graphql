@@ -27,7 +27,6 @@ fragment fieldConfig on FieldConfig {
   }
 
   ... on IntervalConfig {
-    property
     units
 
     small_label
@@ -36,8 +35,8 @@ fragment fieldConfig on FieldConfig {
   }
 
   ... on NumberInputConfig {
-    property
     units
+    numberValueConstraint
 
     small_label
     required
@@ -89,5 +88,12 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+  }
+
+  ... on RichTextInputConfig {
+    small_label
+    required
+    tooltip
+    max
   }
 }

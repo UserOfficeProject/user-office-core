@@ -20,7 +20,7 @@ export function useProposalSamples(proposalId: number | null) {
     setLoadingSamples(true);
     api()
       .getSamples({ filter: { proposalId } })
-      .then(data => {
+      .then((data) => {
         if (data.samples) {
           setSamples(data.samples);
         }

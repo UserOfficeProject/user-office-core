@@ -1,6 +1,8 @@
-import React, { FunctionComponent } from 'react';
+import { FormikProps } from 'formik';
+import React, { FC } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
 import {
   Answer,
   DataType,
@@ -8,7 +10,6 @@ import {
   QuestionTemplateRelation,
   Template,
 } from 'generated/sdk';
-import { Event } from 'models/QuestionaryEditorModel';
 import { QuestionarySubmissionState } from 'models/QuestionarySubmissionState';
 
 import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefinition';
@@ -19,21 +20,32 @@ import { intervalDefinition } from './questionaryComponents/Interval/IntervalDef
 import { multipleChoiceDefinition as multiChoiceDefinition } from './questionaryComponents/MultipleChoice/MultipleChoiceDefinition';
 import { numberInputDefinition } from './questionaryComponents/NumberInput/NumberInputDefinition';
 import { proposalBasisDefinition } from './questionaryComponents/ProposalBasis/ProposalBasisDefinition';
+import { richTextInputDefinition } from './questionaryComponents/RichTextInput/RichTextInputDefinition';
 import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/SampleBasisDefinition';
 import { sampleDeclarationDefinition } from './questionaryComponents/SampleDeclaration/SampleDeclaratonDefinition';
 import { shipmentBasisDefinition } from './questionaryComponents/ShipmentBasis/ShipmentBasisDefinition';
 import { textInputDefinition } from './questionaryComponents/TextInput/TextInputDefinition';
 
-export interface FormProps<ValueObjectType> {
-  field: ValueObjectType;
-  template: Template;
-  dispatch: React.Dispatch<Event>;
-  closeMe: () => any;
-}
+export type FormChildren<ValueObjectType> = (
+  formikProps: FormikProps<ValueObjectType>
+) => React.ReactNode;
 
-export type FormComponent<ValueObjectType> = FunctionComponent<
-  FormProps<ValueObjectType>
->;
+export interface QuestionFormProps {
+  question: Question;
+  closeMe: () => unknown;
+  onUpdated?: (question: Question) => unknown;
+  onDeleted?: (question: Question) => unknown;
+  children?: FormChildren<Question>;
+}
+export interface QuestionTemplateRelationFormProps {
+  questionRel: QuestionTemplateRelation;
+  template: Template;
+  closeMe: () => unknown;
+  onUpdated?: (template: Template) => unknown;
+  onDeleted?: (template: Template) => unknown;
+  onOpenQuestionClicked?: (question: Question) => unknown;
+  children?: FormChildren<QuestionTemplateRelation>;
+}
 
 export interface Renderers {
   readonly questionRenderer: (props: {
@@ -45,14 +57,13 @@ export interface Renderers {
 export interface QuestionaryComponentDefinition {
   readonly dataType: DataType;
   readonly name: string;
-  readonly questionTemplateRelationForm: () => FormComponent<
-    QuestionTemplateRelation
-  >;
-  readonly questionForm: () => FormComponent<Question>;
+  readonly questionTemplateRelationForm: () => FC<QuestionTemplateRelationFormProps>;
+  readonly questionForm: () => FC<QuestionFormProps>;
   readonly questionaryComponent: (
     props: BasicComponentProps
   ) => JSX.Element | null;
   readonly renderers?: Renderers;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   readonly createYupValidationSchema: ((field: Answer) => object) | null;
   readonly getYupInitialValue: (props: {
     answer: Answer;
@@ -61,6 +72,7 @@ export interface QuestionaryComponentDefinition {
   readonly readonly: boolean; // if true then no answer will be produced
   readonly creatable: boolean; // if true then the question can be added to a questionary
   readonly icon: JSX.Element;
+  readonly searchCriteriaComponent?: FC<SearchCriteriaInputProps>;
 }
 
 const registry = [
@@ -76,12 +88,13 @@ const registry = [
   intervalDefinition,
   numberInputDefinition,
   shipmentBasisDefinition,
+  richTextInputDefinition,
 ];
 
 Object.freeze(registry);
 
 const componentMap = new Map<DataType, QuestionaryComponentDefinition>();
-registry.forEach(definition =>
+registry.forEach((definition) =>
   componentMap.set(definition.dataType, definition)
 );
 
@@ -98,18 +111,16 @@ export function getQuestionaryComponentDefinition(id: DataType) {
 export const getQuestionaryComponentDefinitions = () => registry;
 
 export function createQuestionTemplateRelationForm(
-  props: FormProps<QuestionTemplateRelation>
+  props: QuestionTemplateRelationFormProps
 ): JSX.Element {
-  const dataType = props.field.question.dataType;
+  const dataType = props.questionRel.question.dataType;
   const definition = getQuestionaryComponentDefinition(dataType);
 
   return React.createElement(definition.questionTemplateRelationForm(), props);
 }
 
-export function createQuestionTemplateForm(
-  props: FormProps<Question>
-): JSX.Element {
-  const dataType = props.field.dataType;
+export function createQuestionForm(props: QuestionFormProps): JSX.Element {
+  const dataType = props.question.dataType;
   const definition = getQuestionaryComponentDefinition(dataType);
 
   return React.createElement(definition.questionForm(), props);
