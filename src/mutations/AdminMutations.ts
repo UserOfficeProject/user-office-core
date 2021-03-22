@@ -28,11 +28,14 @@ export default class AdminMutations {
   constructor(private dataSource: AdminDataSource) {}
 
   @Authorized([Roles.USER_OFFICER])
-  async resetDB(agent: UserWithRole | null): Promise<string | Rejection> {
+  async resetDB(
+    agent: UserWithRole | null,
+    includeSeeds: boolean
+  ): Promise<string | Rejection> {
     if (process.env.NODE_ENV === 'development') {
       logger.logWarn('Resetting database', {});
 
-      return this.dataSource.resetDB();
+      return this.dataSource.resetDB(includeSeeds);
     } else {
       return rejection('NOT_ALLOWED');
     }

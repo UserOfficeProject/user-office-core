@@ -15,11 +15,12 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Proposal } from '../models/Proposal';
+import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
+import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalInput } from '../resolvers/mutations/CloneProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -328,6 +329,34 @@ export default class ProposalMutations {
     }
 
     const result = await this.proposalDataSource.update(proposal);
+
+    return result || rejection('INTERNAL_ERROR');
+  }
+
+  @EventBus(Event.PROPOSAL_STATUS_UPDATED)
+  @Authorized([Roles.USER_OFFICER])
+  async changeProposalsStatus(
+    agent: UserWithRole | null,
+    args: ChangeProposalsStatusInput
+  ): Promise<ProposalIdsWithNextStatus | Rejection> {
+    const { statusId, proposals } = args;
+
+    const result = await this.proposalDataSource.changeProposalsStatus(
+      statusId,
+      proposals.map((proposal) => proposal.id)
+    );
+
+    if (result.proposalIds.length === proposals.length) {
+      await Promise.all(
+        proposals.map((proposal) => {
+          return this.proposalDataSource.resetProposalEvents(
+            proposal.id,
+            proposal.callId,
+            statusId
+          );
+        })
+      );
+    }
 
     return result || rejection('INTERNAL_ERROR');
   }

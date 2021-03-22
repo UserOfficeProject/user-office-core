@@ -332,7 +332,7 @@ const createSeps = async () => {
 
 async function run() {
   console.log('Starting...');
-  await adminDataSource.resetDB();
+  await adminDataSource.resetDB(false);
   await createUsers();
   await createTemplates();
   await createWorkflows();

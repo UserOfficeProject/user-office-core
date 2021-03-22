@@ -67,7 +67,7 @@ export class AdminDataSourceMock implements AdminDataSource {
   applyPatches(): Promise<string> {
     throw new Error('Method not implemented.');
   }
-  async resetDB(): Promise<string> {
+  async resetDB(includeSeeds: boolean): Promise<string> {
     throw new Error('Method not implemented.');
   }
 

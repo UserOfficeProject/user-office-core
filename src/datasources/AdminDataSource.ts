@@ -19,7 +19,7 @@ export interface AdminDataSource {
   getNationalities(): Promise<Entry[]>;
   get(id: number): Promise<string | null>;
   setPageText(id: number, text: string): Promise<Page>;
-  resetDB(): Promise<string>;
+  resetDB(includeSeeds: boolean): Promise<string>;
   applyPatches(): Promise<string>;
   getFeatures(): Promise<Feature[]>;
   createUnit(unit: Unit): Promise<Unit | null>;

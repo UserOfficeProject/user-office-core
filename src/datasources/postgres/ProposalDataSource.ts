@@ -4,7 +4,7 @@ import { Transaction } from 'knex';
 
 import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
-import { Proposal } from '../../models/Proposal';
+import { Proposal, ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ProposalDataSource } from '../ProposalDataSource';
@@ -576,5 +576,34 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
 
     return true;
+  }
+
+  async changeProposalsStatus(
+    statusId: number,
+    proposalIds: number[]
+  ): Promise<ProposalIdsWithNextStatus> {
+    const dataToUpdate: { status_id: number; submitted?: boolean } = {
+      status_id: statusId,
+    };
+
+    // NOTE: If status is DRAFT re-open the proposal for submission
+    if (statusId === 1) {
+      dataToUpdate.submitted = false;
+    }
+
+    const result: ProposalRecord[] = await database
+      .update(dataToUpdate, ['*'])
+      .from('proposals')
+      .whereIn('proposal_id', proposalIds);
+
+    if (result?.length === 0) {
+      logger.logError('Could not change proposals status', { dataToUpdate });
+
+      throw new Error('Could not change proposals status');
+    }
+
+    return new ProposalIdsWithNextStatus(
+      result.map((item) => item.proposal_id)
+    );
   }
 }
