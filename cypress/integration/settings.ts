@@ -405,11 +405,11 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('.MuiTable-root tbody tr')
+      cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
         .first()
         .then((element) => expect(element.text()).to.contain('draft'));
 
-      cy.get('.MuiTable-root tbody tr')
+      cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
         .first()
         .find('[title="Edit proposal"]')
         .click();
@@ -422,7 +422,7 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('.MuiTable-root tbody tr')
+      cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
         .first()
         .then((element) => expect(element.text()).to.contain('submitted'));
 
@@ -809,9 +809,8 @@ context('Settings tests', () => {
         },
         failOnStatusCode: false,
       }).then((response) => {
-        expect(response.status).to.be.equal(500);
-        expect(response.body.errors[0].message).to.contain(
-          'Could not find permission rules for access token key'
+        expect(response.body.errors[0].extensions.code).to.equal(
+          'INTERNAL_SERVER_ERROR'
         );
       });
     });

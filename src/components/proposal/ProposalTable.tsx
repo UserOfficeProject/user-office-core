@@ -115,7 +115,7 @@ const ProposalTable = ({
   };
 
   return (
-    <>
+    <div data-cy="proposal-table">
       <Dialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
@@ -205,7 +205,7 @@ const ProposalTable = ({
           },
         ]}
       />
-    </>
+    </div>
   );
 };
 
