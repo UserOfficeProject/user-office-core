@@ -81,7 +81,7 @@ export default class InstrumentQueries {
     }
   }
 
-  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  @Authorized()
   async hasInstrumentScientistInstrument(
     agent: UserWithRole | null,
     instrumentId: number
@@ -92,7 +92,7 @@ export default class InstrumentQueries {
     );
   }
 
-  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  @Authorized()
   async hasInstrumentScientistAccess(
     agent: UserWithRole | null,
     instrumentId: number,

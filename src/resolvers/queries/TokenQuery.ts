@@ -1,7 +1,18 @@
-import { Field, ObjectType, Resolver, Query, Arg, Ctx } from 'type-graphql';
+import {
+  Field,
+  ObjectType,
+  Resolver,
+  Query,
+  Arg,
+  Ctx,
+  createUnionType,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { AuthJwtPayload as AuthJwtPayloadBase } from '../../models/User';
+import {
+  AuthJwtPayload as AuthJwtPayloadBase,
+  AuthJwtApiTokenPayload as AuthJwtApiTokenPayloadBase,
+} from '../../models/User';
 import { Role } from '../types/Role';
 import { User } from '../types/User';
 
@@ -18,12 +29,33 @@ class AuthJwtPayload implements AuthJwtPayloadBase {
 }
 
 @ObjectType()
+class AuthJwtApiTokenPayload implements AuthJwtApiTokenPayloadBase {
+  @Field(() => String)
+  accessTokenId: string;
+}
+
+const TokenPayloadUnion = createUnionType({
+  name: 'TokenPayloadUnion',
+  types: () => [AuthJwtPayload, AuthJwtApiTokenPayload] as const,
+  resolveType: (value) => {
+    if ('user' in value) {
+      return AuthJwtPayload;
+    }
+    if ('accessTokenId' in value) {
+      return AuthJwtApiTokenPayload;
+    }
+
+    return undefined;
+  },
+});
+
+@ObjectType()
 class TokenResult {
   @Field(() => Boolean)
   isValid: boolean;
 
-  @Field(() => AuthJwtPayload, { nullable: true })
-  payload: AuthJwtPayload | null;
+  @Field(() => TokenPayloadUnion, { nullable: true })
+  payload?: AuthJwtPayload | AuthJwtApiTokenPayload | null;
 }
 
 @Resolver()
