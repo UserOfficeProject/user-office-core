@@ -8,6 +8,6 @@ export class SepMeetingDecision {
     public commentForUser: string,
     public commentForManagement: string,
     public submitted: boolean,
-    public submittedBy: number
+    public submittedBy?: number | null
   ) {}
 }

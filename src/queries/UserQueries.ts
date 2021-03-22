@@ -13,6 +13,7 @@ import {
   UserWithRole,
   AuthJwtPayload,
   UserRole,
+  AuthJwtApiTokenPayload,
 } from '../models/User';
 import { signToken, verifyToken } from '../utils/jwt';
 
@@ -185,17 +186,23 @@ export default class UserQueries {
     token: string
   ): Promise<{
     isValid: boolean;
-    payload: AuthJwtPayload | null;
+    payload: AuthJwtPayload | AuthJwtApiTokenPayload | null;
   }> {
     try {
-      const payload = verifyToken<AuthJwtPayload>(token);
+      const payload = verifyToken<AuthJwtPayload | AuthJwtApiTokenPayload>(
+        token
+      );
+
+      if (!('user' in payload) && !('accessTokenId' in payload)) {
+        throw new Error('Unknown or malformed token');
+      }
 
       return {
         isValid: true,
         payload,
       };
     } catch (error) {
-      logger.logError('Bad token', { error });
+      logger.logException('Bad token', error, { token });
 
       return {
         isValid: false,

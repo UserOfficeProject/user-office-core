@@ -121,7 +121,7 @@ export default class SEPQueries {
     let reviewerId = null;
 
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
+      !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId))
     ) {
       reviewerId = agent!.id;
@@ -132,5 +132,28 @@ export default class SEPQueries {
       proposalId,
       reviewerId
     );
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  async getProposalSepMeetingDecision(
+    agent: UserWithRole | null,
+    proposalId: number
+  ) {
+    const sepMeetingDecision = await this.dataSource.getProposalSepMeetingDecision(
+      proposalId
+    );
+
+    if (!sepMeetingDecision) {
+      return null;
+    }
+
+    if (
+      this.userAuth.isUserOfficer(agent) ||
+      (await this.userAuth.isMemberOfSEP(agent, proposalId))
+    ) {
+      return sepMeetingDecision;
+    } else {
+      return null;
+    }
   }
 }

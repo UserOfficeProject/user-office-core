@@ -57,6 +57,7 @@ export default function createHandler(
         break;
       case Event.PROPOSAL_INSTRUMENT_SELECTED:
       case Event.PROPOSAL_SEP_SELECTED:
+      case Event.PROPOSAL_STATUS_UPDATED:
         try {
           await Promise.all(
             event.proposalidswithnextstatus.proposalIds.map(
@@ -82,6 +83,7 @@ export default function createHandler(
         break;
       case Event.PROPOSAL_SUBMITTED:
       case Event.PROPOSAL_FEASIBLE:
+      case Event.PROPOSAL_UNFEASIBLE:
       case Event.PROPOSAL_SAMPLE_SAFE:
       case Event.PROPOSAL_NOTIFIED:
       case Event.PROPOSAL_ACCEPTED:
@@ -212,6 +214,15 @@ export default function createHandler(
             case TechnicalReviewStatus.FEASIBLE:
               eventBus.publish({
                 type: Event.PROPOSAL_FEASIBLE,
+                proposal,
+                isRejection: false,
+                key: 'proposal',
+                loggedInUserId: event.loggedInUserId,
+              });
+              break;
+            case TechnicalReviewStatus.UNFEASIBLE:
+              eventBus.publish({
+                type: Event.PROPOSAL_UNFEASIBLE,
                 proposal,
                 isRejection: false,
                 key: 'proposal',

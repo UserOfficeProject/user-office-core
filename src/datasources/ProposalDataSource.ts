@@ -1,9 +1,7 @@
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
-import { Proposal } from '../models/Proposal';
+import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
-import { SepMeetingDecision } from '../models/SepMeetingDecision';
-import { SEPMeetingDecisionInput } from '../resolvers/mutations/SEPManagementDecision';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 import { ProposalEventsRecord } from './postgres/records';
 
@@ -54,8 +52,8 @@ export interface ProposalDataSource {
     callId: number,
     statusId: number
   ): Promise<boolean>;
-  sepMeetingDecision(
-    sepMeetingDecisionInput: SEPMeetingDecisionInput,
-    submittedBy?: number | null
-  ): Promise<SepMeetingDecision>;
+  changeProposalsStatus(
+    statusId: number,
+    proposalIds: number[]
+  ): Promise<ProposalIdsWithNextStatus>;
 }

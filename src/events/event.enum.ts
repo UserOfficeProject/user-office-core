@@ -4,6 +4,7 @@ export enum Event {
   PROPOSAL_UPDATED = 'PROPOSAL_UPDATED',
   PROPOSAL_SUBMITTED = 'PROPOSAL_SUBMITTED',
   PROPOSAL_FEASIBLE = 'PROPOSAL_FEASIBLE',
+  PROPOSAL_UNFEASIBLE = 'PROPOSAL_UNFEASIBLE',
   PROPOSAL_SEP_SELECTED = 'PROPOSAL_SEP_SELECTED',
   PROPOSAL_INSTRUMENT_SELECTED = 'PROPOSAL_INSTRUMENT_SELECTED',
   PROPOSAL_FEASIBILITY_REVIEW_UPDATED = 'PROPOSAL_FEASIBILITY_REVIEW_UPDATED',
@@ -20,6 +21,7 @@ export enum Event {
   PROPOSAL_INSTRUMENT_SUBMITTED = 'PROPOSAL_INSTRUMENT_SUBMITTED',
   PROPOSAL_ACCEPTED = 'PROPOSAL_ACCEPTED',
   PROPOSAL_REJECTED = 'PROPOSAL_REJECTED',
+  PROPOSAL_STATUS_UPDATED = 'PROPOSAL_STATUS_UPDATED',
   CALL_ENDED = 'CALL_ENDED',
   CALL_REVIEW_ENDED = 'CALL_REVIEW_ENDED',
   CALL_SEP_REVIEW_ENDED = 'CALL_SEP_REVIEW_ENDED',
@@ -47,6 +49,10 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PROPOSAL_FEASIBLE,
     'Event occurs when proposal feasibility review is submitted with value of feasible',
+  ],
+  [
+    Event.PROPOSAL_UNFEASIBLE,
+    'Event occurs when proposal feasibility review is submitted with value of unfeasible',
   ],
   [
     Event.PROPOSAL_SEP_SELECTED,
@@ -109,6 +115,10 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when proposal management decision is submitted',
   ],
   [Event.PROPOSAL_REJECTED, 'Event occurs when proposal gets rejected'],
+  [
+    Event.PROPOSAL_STATUS_UPDATED,
+    'Event occurs when proposal status gets updated manually',
+  ],
   [
     Event.CALL_ENDED,
     'Event occurs on a specific call end date set on the call',

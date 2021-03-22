@@ -1,10 +1,13 @@
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
-import { Proposal, ProposalEndStatus } from '../../models/Proposal';
+import {
+  Proposal,
+  ProposalEndStatus,
+  ProposalIdsWithNextStatus,
+} from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
-import { SEPMeetingDecisionInput } from '../../resolvers/mutations/SEPManagementDecision';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -172,12 +175,19 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       proposal_created: true,
       proposal_submitted: true,
       proposal_feasible: true,
+      proposal_unfeasible: false,
       call_ended: false,
       call_review_ended: false,
       proposal_sep_selected: false,
       proposal_instrument_selected: false,
       proposal_feasibility_review_submitted: false,
       proposal_sample_review_submitted: false,
+      proposal_all_sep_reviews_submitted: false,
+      proposal_feasibility_review_updated: false,
+      proposal_management_decision_submitted: false,
+      proposal_management_decision_updated: false,
+      proposal_sample_safe: false,
+      proposal_sep_review_updated: false,
       proposal_all_sep_reviewers_selected: false,
       proposal_sep_review_submitted: false,
       proposal_sep_meeting_submitted: false,
@@ -208,10 +218,10 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return true;
   }
 
-  async sepMeetingDecision(
-    sepMeetingDecisionInput: SEPMeetingDecisionInput,
-    submittedBy?: number | null
-  ): Promise<SepMeetingDecision> {
-    return dummySepMeetingDecision;
+  async changeProposalsStatus(
+    statusId: number,
+    proposalIds: number[]
+  ): Promise<ProposalIdsWithNextStatus> {
+    return { proposalIds: [1] };
   }
 }

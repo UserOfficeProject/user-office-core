@@ -8,7 +8,6 @@ import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
-import { NextStatusEvent } from './NextStatusEvent';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
 import { Proposal } from './Proposal';
 import { NextProposalStatus, ProposalStatus } from './ProposalStatus';
@@ -22,8 +21,10 @@ import { ReviewWithNextProposalStatus } from './Review';
 import { Review } from './Review';
 import { Sample } from './Sample';
 import { SEP } from './SEP';
+import { SepMeetingDecision } from './SepMeetingDecision';
 import { SEPProposal } from './SEPProposal';
 import { Shipment } from './Shipment';
+import { StatusChangingEvent } from './StatusChangingEvent';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
 import { Topic } from './Topic';
@@ -76,6 +77,13 @@ export class NextProposalStatusResponseWrap extends ResponseWrapBase<ProposalSta
   @Response()
   @Field(() => NextProposalStatus, { nullable: true })
   public nextProposalStatus: NextProposalStatus;
+}
+
+@ObjectType()
+export class SepMeetingDecisionResponseWrap extends ResponseWrapBase<SepMeetingDecision> {
+  @Response()
+  @Field(() => SepMeetingDecision, { nullable: true })
+  public sepMeetingDecision: SepMeetingDecision;
 }
 
 @ObjectType()
@@ -254,10 +262,10 @@ export class ProposalWorkflowConnectionResponseWrap extends ResponseWrapBase<Pro
 }
 
 @ObjectType()
-export class ProposalNextStatusEventResponseWrap extends ResponseWrapBase<NextStatusEvent> {
+export class ProposalStatusChangingEventResponseWrap extends ResponseWrapBase<StatusChangingEvent> {
   @Response()
-  @Field(() => [NextStatusEvent], { nullable: true })
-  public nextStatusEvents: NextStatusEvent[];
+  @Field(() => [StatusChangingEvent], { nullable: true })
+  public statusChangingEvents: StatusChangingEvent[];
 }
 
 @ObjectType()

@@ -10,44 +10,44 @@ import {
 
 import { ResolverContext } from '../../context';
 import { ProposalEndStatus } from '../../models/Proposal';
-import { ProposalResponseWrap } from '../types/CommonWrappers';
+import { SepMeetingDecisionResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @InputType()
-export class SEPMeetingDecisionInput {
+export class SaveSEPMeetingDecisionInput {
   @Field(() => Int)
   public proposalId: number;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   public commentForUser: string;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   public commentForManagement: string;
 
-  @Field(() => ProposalEndStatus, { nullable: true })
+  @Field(() => ProposalEndStatus)
   public recommendation: ProposalEndStatus;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   public rankOrder: number;
 
-  @Field(() => Boolean, { nullable: true })
+  @Field(() => Boolean)
   public submitted: boolean;
 }
 
 @Resolver()
 export class SEPMeetingDecisionMutation {
-  @Mutation(() => ProposalResponseWrap)
-  sepMeetingDecision(
-    @Arg('sepMeetingDecisionInput')
-    sepMeetingDecisionInput: SEPMeetingDecisionInput,
+  @Mutation(() => SepMeetingDecisionResponseWrap)
+  saveSepMeetingDecision(
+    @Arg('saveSepMeetingDecisionInput')
+    saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposal.sepMeetingDecision(
+      context.mutations.sep.saveSepMeetingDecision(
         context.user,
-        sepMeetingDecisionInput
+        saveSepMeetingDecisionInput
       ),
-      ProposalResponseWrap
+      SepMeetingDecisionResponseWrap
     );
   }
 }

@@ -30,6 +30,11 @@ interface ProposalFeasibleEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalUnfeasibleEvent extends GeneralEvent {
+  type: Event.PROPOSAL_UNFEASIBLE;
+  proposal: Proposal;
+}
+
 interface ProposalSampleSafeEvent extends GeneralEvent {
   type: Event.PROPOSAL_SAMPLE_SAFE;
   proposal: Proposal;
@@ -108,6 +113,11 @@ interface ProposalInstrumentSelectedEvent extends GeneralEvent {
 
 interface ProposalSEPSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_SELECTED;
+  proposalidswithnextstatus: ProposalIdsWithNextStatus;
+}
+
+interface ProposalStatusUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_STATUS_UPDATED;
   proposalidswithnextstatus: ProposalIdsWithNextStatus;
 }
 
@@ -216,12 +226,14 @@ export type ApplicationEvent =
   | ProposalUpdatedEvent
   | ProposalSubmittedEvent
   | ProposalFeasibleEvent
+  | ProposalUnfeasibleEvent
   | ProposalSampleSafeEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
+  | ProposalStatusUpdatedEvent
   | UserCreateEvent
   | EmailInvite
   | UserResetPasswordEmailEvent

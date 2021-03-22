@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
+import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
@@ -28,12 +29,14 @@ const dummySEPDataSource = new SEPDataSourceMock();
 const dummyInstrumentDataSource = new InstrumentDataSourceMock();
 const dummyUserDataSource = new UserDataSourceMock();
 const dummyProposalSettingsDataSource = new ProposalSettingsDataSourceMock();
+const dummyProposalDataSource = new ProposalDataSourceMock();
 const SEPMutationsInstance = new SEPMutations(
   dummySEPDataSource,
   dummyInstrumentDataSource,
   userAuthorization,
   dummyUserDataSource,
-  dummyProposalSettingsDataSource
+  dummyProposalSettingsDataSource,
+  dummyProposalDataSource
 );
 
 describe('Test SEPMutations', () => {

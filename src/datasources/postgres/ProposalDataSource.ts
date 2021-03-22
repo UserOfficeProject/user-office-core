@@ -4,12 +4,9 @@ import { Transaction } from 'knex';
 
 import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
-import { Proposal } from '../../models/Proposal';
+import { Proposal, ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
-import { SepMeetingDecision } from '../../models/SepMeetingDecision';
-import { SEPMeetingDecisionInput } from '../../resolvers/mutations/SEPManagementDecision';
-import { dummySepMeetingDecision } from '../mockups/ProposalDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
@@ -17,11 +14,11 @@ import {
   CallRecord,
   createProposalObject,
   createProposalViewObject,
-  NextStatusEventRecord,
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
   QuestionaryRecord,
+  StatusChangingEventRecord,
 } from './records';
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
@@ -524,16 +521,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       throw new Error('Could not reset proposal events');
     }
 
-    const proposalEventsToReset: NextStatusEventRecord[] = (
+    const proposalEventsToReset: StatusChangingEventRecord[] = (
       await database.raw(`
         SELECT 
           *
         FROM 
           proposal_workflow_connections AS pwc
         JOIN
-          next_status_events
+          status_changing_events
         ON
-          next_status_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
+          status_changing_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
         WHERE pwc.proposal_workflow_connection_id >= (
           SELECT proposal_workflow_connection_id
           FROM proposal_workflow_connections
@@ -547,7 +544,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     if (proposalEventsToReset?.length) {
       const dataToUpdate = proposalEventsToReset
         .map(
-          (event) => `${event.next_status_event.toLocaleLowerCase()} = false`
+          (event) =>
+            `${event.status_changing_event.toLocaleLowerCase()} = false`
         )
         .join(', ');
 
@@ -569,11 +567,32 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return true;
   }
 
-  // TODO: Finish this implementation
-  async sepMeetingDecision(
-    sepMeetingDecisionInput: SEPMeetingDecisionInput,
-    submittedBy?: number | null
-  ): Promise<SepMeetingDecision> {
-    return dummySepMeetingDecision;
+  async changeProposalsStatus(
+    statusId: number,
+    proposalIds: number[]
+  ): Promise<ProposalIdsWithNextStatus> {
+    const dataToUpdate: { status_id: number; submitted?: boolean } = {
+      status_id: statusId,
+    };
+
+    // NOTE: If status is DRAFT re-open the proposal for submission
+    if (statusId === 1) {
+      dataToUpdate.submitted = false;
+    }
+
+    const result: ProposalRecord[] = await database
+      .update(dataToUpdate, ['*'])
+      .from('proposals')
+      .whereIn('proposal_id', proposalIds);
+
+    if (result?.length === 0) {
+      logger.logError('Could not change proposals status', { dataToUpdate });
+
+      throw new Error('Could not change proposals status');
+    }
+
+    return new ProposalIdsWithNextStatus(
+      result.map((item) => item.proposal_id)
+    );
   }
 }

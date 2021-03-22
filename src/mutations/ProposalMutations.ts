@@ -15,14 +15,13 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Proposal } from '../models/Proposal';
+import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
-import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
+import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalInput } from '../resolvers/mutations/CloneProposalMutation';
-import { SEPMeetingDecisionInput } from '../resolvers/mutations/SEPManagementDecision';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
@@ -334,7 +333,35 @@ export default class ProposalMutations {
     return result || rejection('INTERNAL_ERROR');
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @EventBus(Event.PROPOSAL_STATUS_UPDATED)
+  @Authorized([Roles.USER_OFFICER])
+  async changeProposalsStatus(
+    agent: UserWithRole | null,
+    args: ChangeProposalsStatusInput
+  ): Promise<ProposalIdsWithNextStatus | Rejection> {
+    const { statusId, proposals } = args;
+
+    const result = await this.proposalDataSource.changeProposalsStatus(
+      statusId,
+      proposals.map((proposal) => proposal.id)
+    );
+
+    if (result.proposalIds.length === proposals.length) {
+      await Promise.all(
+        proposals.map((proposal) => {
+          return this.proposalDataSource.resetProposalEvents(
+            proposal.id,
+            proposal.callId,
+            statusId
+          );
+        })
+      );
+    }
+
+    return result || rejection('INTERNAL_ERROR');
+  }
+
+  @Authorized()
   @EventBus(Event.PROPOSAL_CLONED)
   async clone(
     agent: UserWithRole | null,
@@ -375,39 +402,6 @@ export default class ProposalMutations {
       .then((proposal) => proposal)
       .catch((err) => {
         logger.logException('Could not clone proposal', err, { agent });
-
-        return rejection('INTERNAL_ERROR');
-      });
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  @EventBus(Event.PROPOSAL_CLONED)
-  async sepMeetingDecision(
-    agent: UserWithRole | null,
-    args: SEPMeetingDecisionInput
-  ): Promise<SepMeetingDecision | Rejection> {
-    const proposal = await this.proposalDataSource.get(args.proposalId);
-
-    if (!proposal?.id) {
-      logger.logError(
-        'Cannot add SEP meeting decision to non existing proposal',
-        {
-          proposal,
-        }
-      );
-
-      return rejection('NOT_FOUND');
-    }
-
-    const submittedBy = args.submitted ? (agent as UserWithRole).id : null;
-
-    return this.proposalDataSource
-      .sepMeetingDecision(args, submittedBy)
-      .then((sepMeetingDecision) => sepMeetingDecision)
-      .catch((err) => {
-        logger.logException('Could not add sep meeting decision', err, {
-          agent,
-        });
 
         return rejection('INTERNAL_ERROR');
       });

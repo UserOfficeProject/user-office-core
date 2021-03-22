@@ -1,11 +1,13 @@
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Role } from '../models/Role';
 import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../models/SEP';
+import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import {
   UpdateMemberSEPArgs,
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../resolvers/mutations/AssignMembersToSEP';
+import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
 
 export interface SEPDataSource {
   create(
@@ -83,4 +85,11 @@ export interface SEPDataSource {
     userId: number,
     proposalId: number
   ): Promise<boolean>;
+  saveSepMeetingDecision(
+    saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput,
+    submittedBy?: number | null
+  ): Promise<SepMeetingDecision>;
+  getProposalSepMeetingDecision(
+    proposalId: number
+  ): Promise<SepMeetingDecision | null>;
 }
