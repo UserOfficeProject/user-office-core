@@ -400,10 +400,10 @@ export interface ProposalWorkflowConnectionRecord {
   readonly parent_droppable_group_id: string;
 }
 
-export interface NextStatusEventRecord {
-  readonly next_status_event_id: number;
+export interface StatusChangingEventRecord {
+  readonly status_changing_event_id: number;
   readonly proposal_workflow_connection_id: number;
-  readonly next_status_event: string;
+  readonly status_changing_event: string;
 }
 
 export interface ProposalEventsRecord {
@@ -411,6 +411,7 @@ export interface ProposalEventsRecord {
   readonly proposal_created: boolean;
   readonly proposal_submitted: boolean;
   readonly proposal_feasible: boolean;
+  readonly proposal_unfeasible: boolean;
   readonly call_ended: boolean;
   readonly call_review_ended: boolean;
   readonly proposal_sep_selected: boolean;
@@ -418,6 +419,12 @@ export interface ProposalEventsRecord {
   readonly proposal_feasibility_review_submitted: boolean;
   readonly proposal_sample_review_submitted: boolean;
   readonly proposal_all_sep_reviewers_selected: boolean;
+  readonly proposal_management_decision_updated: boolean;
+  readonly proposal_management_decision_submitted: boolean;
+  readonly proposal_all_sep_reviews_submitted: boolean;
+  readonly proposal_sep_review_updated: boolean;
+  readonly proposal_feasibility_review_updated: boolean;
+  readonly proposal_sample_safe: boolean;
   readonly proposal_sep_review_submitted: boolean;
   readonly proposal_sep_meeting_submitted: boolean;
   readonly proposal_instrument_submitted: boolean;

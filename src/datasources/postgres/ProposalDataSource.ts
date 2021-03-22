@@ -14,11 +14,11 @@ import {
   CallRecord,
   createProposalObject,
   createProposalViewObject,
-  NextStatusEventRecord,
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
   QuestionaryRecord,
+  StatusChangingEventRecord,
 } from './records';
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
@@ -532,16 +532,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       throw new Error('Could not reset proposal events');
     }
 
-    const proposalEventsToReset: NextStatusEventRecord[] = (
+    const proposalEventsToReset: StatusChangingEventRecord[] = (
       await database.raw(`
         SELECT 
           *
         FROM 
           proposal_workflow_connections AS pwc
         JOIN
-          next_status_events
+          status_changing_events
         ON
-          next_status_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
+          status_changing_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
         WHERE pwc.proposal_workflow_connection_id >= (
           SELECT proposal_workflow_connection_id
           FROM proposal_workflow_connections
@@ -555,7 +555,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     if (proposalEventsToReset?.length) {
       const dataToUpdate = proposalEventsToReset
         .map(
-          (event) => `${event.next_status_event.toLocaleLowerCase()} = false`
+          (event) =>
+            `${event.status_changing_event.toLocaleLowerCase()} = false`
         )
         .join(', ');
 

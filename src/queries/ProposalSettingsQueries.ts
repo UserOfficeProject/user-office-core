@@ -93,15 +93,15 @@ export default class ProposalSettingsQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getNextStatusEventsByConnectionId(
+  async getStatusChangingEventsByConnectionId(
     agent: UserWithRole | null,
     proposalWorkflowConnectionId: number
   ) {
-    const nextStatusEvents = await this.dataSource.getNextStatusEventsByConnectionId(
+    const statusChangingEvents = await this.dataSource.getStatusChangingEventsByConnectionId(
       proposalWorkflowConnectionId
     );
 
-    return nextStatusEvents;
+    return statusChangingEvents;
   }
 
   @Authorized([Roles.USER_OFFICER])

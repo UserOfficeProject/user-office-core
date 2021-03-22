@@ -1,18 +1,18 @@
 import { ObjectType, Field, Int } from 'type-graphql';
 
 import { Event } from '../../events/event.enum';
-import { NextStatusEvent as NextStatusEventOrigin } from '../../models/NextStatusEvent';
+import { StatusChangingEvent as StatusChangingEventOrigin } from '../../models/StatusChangingEvent';
 
 @ObjectType()
-export class NextStatusEvent implements NextStatusEventOrigin {
+export class StatusChangingEvent implements StatusChangingEventOrigin {
   @Field(() => Int)
-  public nextStatusEventId: number;
+  public statusChangingEventId: number;
 
   @Field(() => Int)
   public proposalWorkflowConnectionId: number;
 
   @Field(() => String)
-  public nextStatusEvent: string;
+  public statusChangingEvent: string;
 }
 
 @ObjectType()

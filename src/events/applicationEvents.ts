@@ -30,6 +30,11 @@ interface ProposalFeasibleEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalUnfeasibleEvent extends GeneralEvent {
+  type: Event.PROPOSAL_UNFEASIBLE;
+  proposal: Proposal;
+}
+
 interface ProposalSampleSafeEvent extends GeneralEvent {
   type: Event.PROPOSAL_SAMPLE_SAFE;
   proposal: Proposal;
@@ -221,6 +226,7 @@ export type ApplicationEvent =
   | ProposalUpdatedEvent
   | ProposalSubmittedEvent
   | ProposalFeasibleEvent
+  | ProposalUnfeasibleEvent
   | ProposalSampleSafeEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
