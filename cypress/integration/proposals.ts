@@ -3,6 +3,7 @@ import faker from 'faker';
 context('Proposal tests', () => {
   const proposalToCloneTitle = faker.lorem.words(2);
   const proposalToCloneAbstract = faker.lorem.words(3);
+  const clonedProposalTitle = `Copy of ${proposalToCloneTitle}`;
 
   before(() => {
     cy.resetDB();
@@ -19,10 +20,7 @@ context('Proposal tests', () => {
     cy.contains('New Proposal').click();
 
     cy.get('[data-cy=edit-proposer-button]').click();
-    cy.contains('Benjamin')
-      .parent()
-      .find("[title='Select user']")
-      .click();
+    cy.contains('Benjamin').parent().find("[title='Select user']").click();
 
     cy.contains('Save and continue').click();
 
@@ -40,13 +38,9 @@ context('Proposal tests', () => {
 
     cy.contains('Dashboard').click();
 
-    cy.contains(title)
-      .parent()
-      .contains('draft');
+    cy.contains(title).parent().contains('draft');
 
-    cy.get('[title="Edit proposal"]')
-      .should('exist')
-      .click();
+    cy.get('[title="Edit proposal"]').should('exist').click();
 
     cy.contains('Submit').click();
 
@@ -63,14 +57,8 @@ context('Proposal tests', () => {
     const shortCode = faker.random.word().split(' ')[0]; // faker random word is buggy, it ofter returns phrases
     const surveyComment = faker.random.word().split(' ')[0];
     const cycleComment = faker.random.word().split(' ')[0];
-    const startDate = faker.date
-      .past()
-      .toISOString()
-      .slice(0, 10);
-    const endDate = faker.date
-      .future()
-      .toISOString()
-      .slice(0, 10);
+    const startDate = faker.date.past().toISOString().slice(0, 10);
+    const endDate = faker.date.future().toISOString().slice(0, 10);
     const template = 'default template';
 
     cy.login('officer');
@@ -99,9 +87,7 @@ context('Proposal tests', () => {
 
     cy.get('[title="View proposal"]').should('exist');
 
-    cy.get('[title="Clone proposal"]')
-      .first()
-      .click();
+    cy.get('[title="Clone proposal"]').first().click();
 
     cy.get('#mui-component-select-selectedCallId').click();
 
@@ -114,16 +100,55 @@ context('Proposal tests', () => {
       text: 'Proposal cloned successfully',
     });
 
-    cy.contains(`Copy of ${proposalToCloneTitle}`)
+    cy.contains(clonedProposalTitle).parent().should('contain.text', shortCode);
+  });
+
+  it('User officer should be able to change status to one or multiple proposals', () => {
+    cy.login('officer');
+
+    cy.get('th input[type="checkbox"]').click();
+
+    cy.get('[data-cy="change-proposal-status"]').click();
+
+    cy.get('[role="dialog"] #mui-component-select-selectedStatusId').should(
+      'not.have.class',
+      'Mui-disabled'
+    );
+
+    cy.get('[role="dialog"] #mui-component-select-selectedStatusId').click();
+
+    cy.get('[role="presentation"] [role="listbox"]').contains('DRAFT').click();
+
+    cy.get('[role="alert"] .MuiAlert-message').contains(
+      'Be aware that changing status to "DRAFT" will reopen proposal for changes and submission.'
+    );
+
+    cy.get('[role="dialog"] #mui-component-select-selectedStatusId').click();
+
+    cy.get('[role="presentation"] [role="listbox"]')
+      .contains('SEP Meeting')
+      .click();
+
+    cy.get('[data-cy="submit-proposal-status-change"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'status changed successfully',
+    });
+
+    cy.contains(proposalToCloneTitle)
       .parent()
-      .should('contain.text', shortCode);
+      .should('contain.text', 'SEP Meeting');
+    cy.contains(clonedProposalTitle)
+      .parent()
+      .should('contain.text', 'SEP Meeting');
   });
 
   it('Should be able to delete proposal', () => {
     cy.login('user');
 
     cy.contains(`Copy of ${proposalToCloneTitle}`)
-      .closest('tr')
+      .parent()
       .find('[title="Delete proposal"]')
       .click();
 
