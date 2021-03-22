@@ -25,7 +25,7 @@ import SEPStatusFilter, {
 const SEPsTable: React.FC = () => {
   const { currentRole } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
-  const [sepFilter, setSEPFilter] = useState<undefined | boolean>(undefined);
+  const [sepFilter, setSEPFilter] = useState<undefined | boolean>(true);
   const history = useHistory();
   const { loadingSEPs, SEPs, setSEPsWithLoading: setSEPs } = useSEPsData(
     '',
