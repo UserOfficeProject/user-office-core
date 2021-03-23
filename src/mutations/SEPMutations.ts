@@ -33,6 +33,7 @@ import {
 } from '../resolvers/mutations/AssignMembersToSEP';
 import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
+import { OverwriteSepMeetingDecisionRankingInput } from '../resolvers/mutations/OverwriteSepMeetingDecisionRankingMutation';
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { UpdateSEPTimeAllocationArgs } from '../resolvers/mutations/UpdateSEPProposalMutation';
@@ -439,6 +440,42 @@ export default class SEPMutations {
         logger.logException('Could not save sep meeting decision', err, {
           agent,
         });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  // @EventBus(Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN)
+  async overwriteSepMeetingDecisionRanking(
+    agent: UserWithRole | null,
+    args: OverwriteSepMeetingDecisionRankingInput
+  ): Promise<SepMeetingDecision | Rejection> {
+    const proposal = await this.proposalDataSource.get(args.proposalId);
+
+    if (!proposal?.id) {
+      logger.logError(
+        'Cannot overwrite SEP meeting decision ranking to non existing proposal',
+        {
+          proposal,
+        }
+      );
+
+      return rejection('NOT_FOUND');
+    }
+
+    return this.dataSource
+      .overwriteSepMeetingDecisionRanking(args)
+      .then((sepMeetingDecision) => sepMeetingDecision)
+      .catch((err) => {
+        logger.logException(
+          'Could not overwrite sep meeting decision ranking',
+          err,
+          {
+            agent,
+            args,
+          }
+        );
 
         return rejection('INTERNAL_ERROR');
       });

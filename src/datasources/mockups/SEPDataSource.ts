@@ -10,6 +10,7 @@ import {
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../../resolvers/mutations/AssignMembersToSEP';
+import { OverwriteSepMeetingDecisionRankingInput } from '../../resolvers/mutations/OverwriteSepMeetingDecisionRankingMutation';
 import { SaveSEPMeetingDecisionInput } from '../../resolvers/mutations/SEPMeetingDecisionMutation';
 import { SEPDataSource } from '../SEPDataSource';
 
@@ -362,6 +363,12 @@ export class SEPDataSourceMock implements SEPDataSource {
   async getProposalSepMeetingDecision(
     proposalId: number
   ): Promise<SepMeetingDecision | null> {
+    return dummySepMeetingDecision;
+  }
+
+  async overwriteSepMeetingDecisionRanking(
+    overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput
+  ): Promise<SepMeetingDecision> {
     return dummySepMeetingDecision;
   }
 }

@@ -7,6 +7,7 @@ import {
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../resolvers/mutations/AssignMembersToSEP';
+import { OverwriteSepMeetingDecisionRankingInput } from '../resolvers/mutations/OverwriteSepMeetingDecisionRankingMutation';
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
 
 export interface SEPDataSource {
@@ -88,6 +89,9 @@ export interface SEPDataSource {
   saveSepMeetingDecision(
     saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput,
     submittedBy?: number | null
+  ): Promise<SepMeetingDecision>;
+  overwriteSepMeetingDecisionRanking(
+    overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput
   ): Promise<SepMeetingDecision>;
   getProposalSepMeetingDecision(
     proposalId: number
