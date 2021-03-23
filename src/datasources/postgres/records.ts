@@ -51,7 +51,6 @@ export interface ProposalRecord {
   readonly updated_at: Date;
   readonly full_count: number;
   readonly short_code: string;
-  readonly rank_order: number;
   readonly final_status: number;
   readonly excellence_score: number;
   readonly safety_score: number;
@@ -502,7 +501,6 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.created_at,
     proposal.updated_at,
     proposal.short_code,
-    proposal.rank_order,
     proposal.final_status,
     proposal.call_id,
     proposal.questionary_id,

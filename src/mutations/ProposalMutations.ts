@@ -250,7 +250,6 @@ export default class ProposalMutations {
   ): Promise<Proposal | Rejection> {
     const {
       id,
-      rankOrder,
       finalStatus,
       statusId,
       commentForManagement,
@@ -280,10 +279,6 @@ export default class ProposalMutations {
 
     if (isProposalInstrumentSubmitted && !isUserOfficer) {
       return rejection('NOT_ALLOWED');
-    }
-
-    if (rankOrder !== undefined) {
-      proposal.rankOrder = rankOrder;
     }
 
     if (finalStatus !== undefined) {

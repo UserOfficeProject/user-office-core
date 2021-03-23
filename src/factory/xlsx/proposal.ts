@@ -66,6 +66,11 @@ export const collectProposalXLSXData = async (
     proposalId
   );
 
+  const sepMeetingDecision = await baseContext.queries.sep.getProposalSepMeetingDecision(
+    user,
+    proposal.id
+  );
+
   return [
     proposal.shortCode,
     proposal.title,
@@ -81,6 +86,6 @@ export const collectProposalXLSXData = async (
     average(getGrades(reviews)) || 'NA',
     proposal.commentForManagement ?? '<missing>',
     ProposalEndStatus[proposal.finalStatus] ?? '<missing>',
-    proposal.rankOrder ?? '<missing>',
+    sepMeetingDecision?.rankOrder ?? '<missing>',
   ];
 };

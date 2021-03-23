@@ -50,9 +50,6 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => String)
   public shortCode: string;
 
-  @Field(() => Int, { nullable: true })
-  public rankOrder?: number;
-
   @Field(() => ProposalEndStatus, { nullable: true })
   public finalStatus?: ProposalEndStatus;
 

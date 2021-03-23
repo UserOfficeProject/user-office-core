@@ -144,6 +144,21 @@ export const collectSEPlXLSXData = async (
     })
   );
 
+  const proposalsSepMeetingDecisions = await Promise.all(
+    instrumentsProposals.map((proposals) => {
+      return Promise.all(
+        proposals.map((proposal) =>
+          proposal
+            ? baseContext.queries.sep.getProposalSepMeetingDecision(
+                user,
+                proposal.id
+              )
+            : null
+        )
+      );
+    })
+  );
+
   const proposalsPrincipalInvestigators = await Promise.all(
     instrumentsProposals.map((proposals) => {
       return Promise.all(
@@ -165,6 +180,7 @@ export const collectSEPlXLSXData = async (
       proposalsPrincipalInvestigators[indx];
     const technicalReviews = proposalsTechnicalReviews[indx];
     const sepProposals = instrumentsSepProposals[indx];
+    const sepMeetingDecisions = proposalsSepMeetingDecisions[indx];
 
     const rows = proposals.map((proposal, pIndx) => {
       const { firstname = '<missing>', lastname = '<missing>' } =
@@ -172,6 +188,7 @@ export const collectSEPlXLSXData = async (
       const technicalReview = technicalReviews[pIndx];
       const reviews = proposalReviews[pIndx];
       const sepProposal = sepProposals?.[pIndx];
+      const sepMeetingDecision = sepMeetingDecisions[pIndx];
 
       const proposalAverageScore = average(getGrades(reviews)) || 0;
 
@@ -183,7 +200,7 @@ export const collectSEPlXLSXData = async (
         techReviewTimeAllocation: technicalReview?.timeAllocation,
         sepTimeAllocation: sepProposal?.sepTimeAllocation ?? null,
         propReviewAvgScore: proposalAverageScore,
-        propSEPRankOrder: proposal?.rankOrder ?? null,
+        propSEPRankOrder: sepMeetingDecision?.rankOrder ?? null,
         inAvailZone: null,
       };
     });

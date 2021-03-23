@@ -34,7 +34,6 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.created || new Date(),
     values?.updated || new Date(),
     values?.shortCode || 'shortCode',
-    values?.rankOrder || 1,
     values?.finalStatus || ProposalEndStatus.UNSET,
     values?.callId || 1,
     values?.questionaryId || 1,
