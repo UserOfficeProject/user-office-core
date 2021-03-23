@@ -282,6 +282,62 @@ export default function createHandler(
           );
         }
         break;
+      case Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN:
+        try {
+          const proposal = await proposalDataSource.get(
+            event.sepmeetingdecision.proposalId
+          );
+
+          if (!proposal || !proposal.id) {
+            throw new Error(
+              `Proposal with id ${event.sepmeetingdecision.proposalId} not found`
+            );
+          }
+
+          await markProposalEventAsDoneAndCallWorkflowEngine(
+            event.type,
+            proposal
+          );
+        } catch (error) {
+          logger.logError(
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sepmeetingdecision.proposalId}: `,
+            error
+          );
+        }
+        break;
+      case Event.PROPOSAL_SEP_MEETING_SAVED:
+        try {
+          const proposal = await proposalDataSource.get(
+            event.sepmeetingdecision.proposalId
+          );
+
+          if (!proposal || !proposal.id) {
+            throw new Error(
+              `Proposal with id ${event.sepmeetingdecision.proposalId} not found`
+            );
+          }
+
+          if (event.sepmeetingdecision.submitted) {
+            eventBus.publish({
+              type: Event.PROPOSAL_SEP_MEETING_SUBMITTED,
+              proposal,
+              isRejection: false,
+              key: 'proposal',
+              loggedInUserId: event.loggedInUserId,
+            });
+          }
+
+          await markProposalEventAsDoneAndCallWorkflowEngine(
+            event.type,
+            proposal
+          );
+        } catch (error) {
+          logger.logError(
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sepmeetingdecision.proposalId}: `,
+            error
+          );
+        }
+        break;
       case Event.PROPOSAL_SEP_REVIEW_UPDATED:
         try {
           const proposal = await proposalDataSource.get(

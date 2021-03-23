@@ -403,7 +403,7 @@ export default class SEPMutations {
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
-  // @EventBus(Event.PROPOSAL_SEP_MEETING_SAVED)
+  @EventBus(Event.PROPOSAL_SEP_MEETING_SAVED)
   async saveSepMeetingDecision(
     agent: UserWithRole | null,
     args: SaveSEPMeetingDecisionInput
@@ -446,7 +446,7 @@ export default class SEPMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  // @EventBus(Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN)
+  @EventBus(Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN)
   async overwriteSepMeetingDecisionRanking(
     agent: UserWithRole | null,
     args: OverwriteSepMeetingDecisionRankingInput

@@ -22,6 +22,9 @@ BEGIN
 
             ALTER TABLE proposals
             DROP COLUMN rank_order;
+
+            ALTER TABLE proposal_events ADD COLUMN proposal_sep_meeting_saved BOOLEAN DEFAULT FALSE;
+            ALTER TABLE proposal_events ADD COLUMN proposal_sep_meeting_ranking_overwritten BOOLEAN DEFAULT FALSE;
         END;
 	END IF;
 END;
