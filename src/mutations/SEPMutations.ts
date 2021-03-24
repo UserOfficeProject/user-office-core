@@ -9,6 +9,8 @@ import {
   assignSEPChairOrSecretaryValidationSchema,
   assignSEPMemberToProposalValidationSchema,
   updateTimeAllocationValidationSchema,
+  saveSepMeetingDecisionValidationSchema,
+  overwriteSepMeetingDecisionRankingValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -402,6 +404,7 @@ export default class SEPMutations {
       });
   }
 
+  @ValidateArgs(saveSepMeetingDecisionValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   @EventBus(Event.PROPOSAL_SEP_MEETING_SAVED)
   async saveSepMeetingDecision(
@@ -445,6 +448,7 @@ export default class SEPMutations {
       });
   }
 
+  @ValidateArgs(overwriteSepMeetingDecisionRankingValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN)
   async overwriteSepMeetingDecisionRanking(
