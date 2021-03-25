@@ -1,5 +1,6 @@
 context('Instrument tests', () => {
   const faker = require('faker');
+  const questionText = faker.lorem.words(3);
 
   function createInstrument({
     name,
@@ -161,15 +162,30 @@ context('Instrument tests', () => {
 
     cy.createCall(call2);
 
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    cy.contains('default template').parent().get("[title='Edit']").click();
+
+    cy.createTopic('Topic for questions');
+
+    cy.get('[data-cy=show-more-button]').last().click();
+
+    cy.get('[data-cy=add-question-menu-item]').last().click();
+
+    cy.createBooleanQuestion(questionText);
+
     cy.logout();
 
     cy.login('user');
 
     cy.createProposal(proposal1.title, proposal1.abstract, 'call 1');
+    cy.contains(questionText).click();
+    cy.contains('Save and continue').click();
     cy.contains('Submit').click();
     cy.contains('OK').click();
 
     cy.createProposal(proposal2.title, proposal2.abstract, call2.shortCode);
+    cy.contains('Save and continue').click();
     cy.contains('Submit').click();
     cy.contains('OK').click();
 
@@ -371,6 +387,19 @@ context('Instrument tests', () => {
     cy.contains('No records to display');
     cy.contains(proposal1.title).should('not.exist');
     cy.contains(proposal2.title).should('not.exist');
+
+    cy.get('[data-cy="instrument-filter"]').click();
+    cy.get('[role="listbox"]').contains('All').click();
+    cy.finishedLoading();
+
+    cy.get('[data-cy=question-search-toggle]').click();
+
+    cy.get('[data-cy=question-list]').click();
+    cy.contains(questionText).click();
+    cy.get('[data-cy=is-checked]').click();
+    cy.get('[role=listbox]').contains('Yes').click();
+    cy.contains('Search').click();
+    cy.contains(proposal1.title).should('exist');
   });
 
   it('Instrument scientist should be able to download multiple proposals as PDF', () => {

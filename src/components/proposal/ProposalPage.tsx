@@ -1,7 +1,6 @@
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import {
-  DecodedValueMap,
   NumberParam,
   QueryParamConfig,
   StringParam,
@@ -12,18 +11,15 @@ import {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
-import {
-  DataType,
-  ProposalsFilter,
-  QuestionFilterCompareOperator,
-  QuestionFilterInput,
-} from 'generated/sdk';
+import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
-import ProposalFilterBar from './ProposalFilterBar';
+import ProposalFilterBar, {
+  questionaryFilterFromUrlQuery,
+} from './ProposalFilterBar';
 import ProposalTableOfficer from './ProposalTableOfficer';
 
 export type ProposalUrlQueryParamsType = {
@@ -36,24 +32,6 @@ export type ProposalUrlQueryParamsType = {
   value: QueryParamConfig<string | null | undefined>;
   dataType: QueryParamConfig<string | null | undefined>;
 } & UrlQueryParamsType;
-
-const questionaryFilterFromUrlQuery = (
-  urlQuery: DecodedValueMap<ProposalUrlQueryParamsType>
-): QuestionFilterInput | undefined => {
-  if (
-    urlQuery.questionId &&
-    urlQuery.compareOperator &&
-    urlQuery.value &&
-    urlQuery.dataType
-  ) {
-    return {
-      questionId: urlQuery.questionId,
-      compareOperator: urlQuery.compareOperator as QuestionFilterCompareOperator,
-      value: urlQuery.value,
-      dataType: urlQuery.dataType as DataType,
-    };
-  }
-};
 
 export default function ProposalPage() {
   const [
