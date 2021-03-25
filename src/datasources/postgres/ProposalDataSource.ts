@@ -345,6 +345,26 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           );
         }
 
+        if (filter?.questionFilter) {
+          const questionFilter = filter.questionFilter;
+          const questionFilterQuery = getQuestionDefinition(
+            questionFilter.dataType
+          ).filterQuery;
+          if (!questionFilterQuery) {
+            throw new Error(
+              `Filter query not implemented for ${filter.questionFilter.dataType}`
+            );
+          }
+          query
+            .leftJoin(
+              'answers',
+              'answers.questionary_id',
+              'proposals.questionary_id'
+            )
+            .andWhere('answers.question_id', questionFilter.questionId)
+            .modify(questionFilterQuery, questionFilter);
+        }
+
         if (first) {
           query.limit(first);
         }
