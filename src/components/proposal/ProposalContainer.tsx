@@ -8,7 +8,7 @@ import {
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
 import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
-import { Proposal, ProposalStatus, QuestionaryStep } from 'generated/sdk';
+import { Proposal, QuestionaryStep } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import { usePersistProposalModel } from 'hooks/proposal/usePersistProposalModel';
 import {
@@ -77,7 +77,7 @@ const isProposalSubmitted = (proposal: { submitted: boolean }) =>
   proposal.submitted;
 
 //Is the proposal in draft or edited state? If so set read only to false.
-function isProposalEditable(proposal: { status: ProposalStatus }) {
+function isProposalEditable(proposal: ProposalSubsetSubmission) {
   if (
     proposal.status.shortCode.toString() === 'DRAFT' ||
     proposal.status.shortCode.toString() === 'EDITABLE_SUBMISSION'
