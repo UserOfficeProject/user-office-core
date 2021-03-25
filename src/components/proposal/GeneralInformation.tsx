@@ -11,7 +11,7 @@ import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 
 import ProposalContainer from './ProposalContainer';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end',
@@ -66,7 +66,7 @@ const GeneralInformation: React.FC<GeneralInformationProps> = ({
       <div className={classes.buttons}>
         <Button
           className={classes.button}
-          onClick={() => downloadPDFProposal(data.id)}
+          onClick={() => downloadPDFProposal([data.id], data.title)}
           variant="contained"
         >
           Download PDF

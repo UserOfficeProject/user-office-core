@@ -1,10 +1,10 @@
 import Button from '@material-ui/core/Button';
 import Edit from '@material-ui/icons/Edit';
 import MaterialTable, { MaterialTableProps } from 'material-table';
-import React, { useState } from 'react';
+import React, { SetStateAction, useState } from 'react';
 import {
   DecodedValueMap,
-  DelimitedNumericArrayParam,
+  DelimitedArrayParam,
   NumberParam,
   QueryParamConfig,
   SetQuery,
@@ -16,10 +16,11 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
 import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
+import { FunctionType } from 'utils/utilTypes';
 
 export type UrlQueryParamsType = {
   search: QueryParamConfig<string | null | undefined>;
-  selection: QueryParamConfig<(number | null | never)[]>;
+  selection: QueryParamConfig<(string | null | never)[]>;
   sortColumn: QueryParamConfig<number | null | undefined>;
   sortDirection: QueryParamConfig<string | null | undefined>;
 };
@@ -28,27 +29,28 @@ export const DefaultQueryParams = {
   sortColumn: NumberParam,
   sortDirection: StringParam,
   search: StringParam,
-  selection: withDefault(DelimitedNumericArrayParam, []),
+  selection: withDefault(DelimitedArrayParam, []),
 };
 
 export type SortDirectionType = 'asc' | 'desc' | undefined;
 
-interface SuperProps<RowData extends object> {
+interface SuperProps<RowData extends Record<keyof RowData, unknown>> {
   createModal: (
-    onUpdate: (object: RowData) => void,
-    onCreate: (object: RowData) => void,
+    onUpdate: (object: RowData | null) => void,
+    onCreate: (object: RowData | null) => void,
     object: RowData | null
   ) => React.ReactNode;
-  setData: Function;
+  setData: FunctionType<void, [SetStateAction<RowData[]>]>;
   data: RowData[];
-  delete?: (id: number) => Promise<boolean>;
+  createModalSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
+  delete?: (id: number | string) => Promise<boolean>;
   hasAccess?: { create?: boolean; update?: boolean; remove?: boolean };
   urlQueryParams?: DecodedValueMap<UrlQueryParamsType>;
   setUrlQueryParams?: SetQuery<UrlQueryParamsType>;
 }
 
 interface EntryID {
-  id: number;
+  id: number | string;
 }
 
 export function SuperMaterialTable<Entry extends EntryID>({
@@ -74,12 +76,13 @@ export function SuperMaterialTable<Entry extends EntryID>({
 
   // NOTE: If selection is on than read the selected items from the url.
   if (options?.selection && urlQueryParams) {
-    data = data.map(objectItem => {
+    data = data.map((objectItem) => {
       return {
         ...objectItem,
         tableData: {
           checked: urlQueryParams?.selection?.some(
-            (selectedItem: number | null) => selectedItem === objectItem.id
+            (selectedItem: number | string | null) =>
+              selectedItem === objectItem.id
           ),
         },
       };
@@ -96,14 +99,16 @@ export function SuperMaterialTable<Entry extends EntryID>({
     urlQueryParams?.sortDirection
   );
 
-  const onCreated = (objectAdded: Entry) => {
-    setData([...data, objectAdded]);
+  const onCreated = (objectAdded: Entry | null) => {
+    if (objectAdded) {
+      setData([...data, objectAdded]);
+    }
     setShow(false);
   };
 
-  const onUpdated = (objectUpdated: Entry) => {
+  const onUpdated = (objectUpdated: Entry | null) => {
     if (objectUpdated) {
-      const newObjectsArray = data.map(objectItem =>
+      const newObjectsArray = data.map((objectItem) =>
         objectItem.id === objectUpdated.id ? objectUpdated : objectItem
       );
       setData(newObjectsArray);
@@ -112,12 +117,14 @@ export function SuperMaterialTable<Entry extends EntryID>({
     setShow(false);
   };
 
-  const onDeleted = async (deletedId: number) => {
-    const deleteResult = await (props.delete as Function)(deletedId);
+  const onDeleted = async (deletedId: number | string) => {
+    const deleteResult = await (props.delete as FunctionType<Promise<unknown>>)(
+      deletedId
+    );
 
     if (deleteResult) {
       const newObjectsArray = data.filter(
-        objectItem => objectItem.id !== deletedId
+        (objectItem) => objectItem.id !== deletedId
       );
       setData(newObjectsArray);
     }
@@ -138,6 +145,8 @@ export function SuperMaterialTable<Entry extends EntryID>({
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={show}
+        maxWidth={props.createModalSize}
+        fullWidth={!!props.createModalSize}
         onClose={() => {
           setShow(false);
           setEditObject(null);
@@ -177,18 +186,20 @@ export function SuperMaterialTable<Entry extends EntryID>({
               ]
             : [...localActions]
         }
-        onSearchChange={searchText => {
+        onSearchChange={(searchText) => {
           setUrlQueryParams &&
             setUrlQueryParams({
               search: searchText ? searchText : undefined,
             });
         }}
-        onSelectionChange={selectedItems => {
+        onSelectionChange={(selectedItems) => {
           setUrlQueryParams &&
             setUrlQueryParams({
               selection:
                 selectedItems.length > 0
-                  ? selectedItems.map(selectedItem => selectedItem.id)
+                  ? selectedItems.map((selectedItem) =>
+                      selectedItem.id.toString()
+                    )
                   : undefined,
             });
         }}

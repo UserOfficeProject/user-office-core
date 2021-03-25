@@ -1,26 +1,38 @@
 import * as Yup from 'yup';
 
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
-import { NumberInputConfig } from 'generated/sdk';
+import { NumberInputConfig, NumberValueConstraint } from 'generated/sdk';
 
-import { IntervalPropertyId } from '../Interval/intervalUnits';
-
-export const createNumberInputValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = answer => {
+export const createNumberInputValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = (
+  answer
+) => {
   const config = answer.config as NumberInputConfig;
-  let schema = Yup.object().shape({
-    value: Yup.number().transform(value => (isNaN(value) ? undefined : value)),
-    unit:
-      config.property !== IntervalPropertyId.UNITLESS
-        ? Yup.string().required('Please specify unit')
-        : Yup.string().nullable(),
-  });
+
+  let valueSchema = Yup.number().transform((value) =>
+    isNaN(value) ? undefined : value
+  );
+
   if (config.required) {
-    schema = schema.shape({
-      value: Yup.number()
-        .transform(value => (isNaN(value) ? undefined : value))
-        .required('Please fill in'),
-    });
+    valueSchema = valueSchema.required('Please fill in');
   }
 
-  return schema;
+  if (config.numberValueConstraint === NumberValueConstraint.ONLY_NEGATIVE) {
+    valueSchema = valueSchema.negative('Value must be a negative number');
+  }
+
+  if (config.numberValueConstraint === NumberValueConstraint.ONLY_POSITIVE) {
+    valueSchema = valueSchema.positive('Value must be a positive number');
+  }
+
+  let unitScheme = Yup.string().nullable();
+
+  // available units are specified and the field is required
+  if (config.units?.length && config.required) {
+    unitScheme = unitScheme.required('Please specify unit');
+  }
+
+  return Yup.object().shape({
+    value: valueSchema,
+    unit: unitScheme,
+  });
 };

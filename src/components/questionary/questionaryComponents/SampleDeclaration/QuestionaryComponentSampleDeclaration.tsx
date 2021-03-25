@@ -1,10 +1,10 @@
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import { FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 
 import StyledModal from 'components/common/StyledModal';
 import UOLoader from 'components/common/UOLoader';
-import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
 import ProposalErrorLabel from 'components/proposal/ProposalErrorLabel';
 import {
@@ -12,6 +12,7 @@ import {
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import {
+  Answer,
   QuestionaryStep,
   Sample,
   SampleStatus,
@@ -19,7 +20,7 @@ import {
 } from 'generated/sdk';
 import { SampleBasic } from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import withConfirm from 'utils/withConfirm';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import {
   QuestionnairesList,
@@ -31,7 +32,7 @@ const sampleToListRow = (sample: SampleBasic): QuestionnairesListRow => {
   return {
     id: sample.id,
     label: sample.title,
-    isCompleted: sample.questionary!.steps.every(step => step.isCompleted),
+    isCompleted: !!sample.questionary?.steps.every((step) => step.isCompleted),
   };
 };
 
@@ -60,6 +61,13 @@ function createSampleStub(
   };
 }
 
+type QuestionaryComponentSampleDeclarationProps = {
+  answer: Answer;
+  formikProps: FormikProps<Record<string, unknown>>;
+  onComplete: (newValue: Answer['value']) => void;
+  confirm: WithConfirmType;
+};
+
 function QuestionaryComponentSampleDeclaration(
   props: QuestionaryComponentSampleDeclarationProps
 ) {
@@ -69,11 +77,11 @@ function QuestionaryComponentSampleDeclaration(
     confirm,
     formikProps: { errors },
   } = props;
-  const proposalQuestionId = answer.question.proposalQuestionId;
+  const id = answer.question.id;
   const config = answer.config as SubtemplateConfig;
   const { state } = useContext(QuestionaryContext) as ProposalContextType;
 
-  const isError = errors[proposalQuestionId] ? true : false;
+  const isError = errors[id] ? true : false;
 
   const { api } = useDataApiWithFeedback();
 
@@ -83,7 +91,7 @@ function QuestionaryComponentSampleDeclaration(
   const copySample = (id: number) =>
     api()
       .cloneSample({ sampleId: id })
-      .then(response => {
+      .then((response) => {
         const clonedSample = response.cloneSample.sample;
         if (clonedSample) {
           const newStateValue = [...stateValue, clonedSample.id];
@@ -95,11 +103,13 @@ function QuestionaryComponentSampleDeclaration(
   const deleteSample = (id: number) =>
     api()
       .deleteSample({ sampleId: id })
-      .then(response => {
+      .then((response) => {
         if (!response.deleteSample.error) {
-          const newStateValue = stateValue.filter(sampleId => sampleId !== id);
+          const newStateValue = stateValue.filter(
+            (sampleId) => sampleId !== id
+          );
           setStateValue(newStateValue);
-          setRows(rows.filter(row => row.id !== id));
+          setRows(rows.filter((row) => row.id !== id));
           onComplete(newStateValue);
         }
       });
@@ -110,20 +120,20 @@ function QuestionaryComponentSampleDeclaration(
     ): Promise<SampleBasic[]> => {
       return api()
         .getSamples({ filter: { questionId, proposalId } })
-        .then(response => {
+        .then((response) => {
           return response.samples || [];
         });
     };
 
     const proposalId = state?.proposal.id;
-    const questionId = answer.question.proposalQuestionId;
+    const questionId = answer.question.id;
 
     if (proposalId && questionId) {
-      getSamples(proposalId, questionId).then(samples =>
+      getSamples(proposalId, questionId).then((samples) =>
         setRows(samples.map(sampleToListRow))
       );
     }
-  }, [answer.question.proposalQuestionId, state, api]);
+  }, [answer.question.id, state, api]);
 
   if (!state) {
     throw new Error(createMissingContextErrorMessage());
@@ -151,23 +161,23 @@ function QuestionaryComponentSampleDeclaration(
           addButtonLabel={config.addEntryButtonLabel}
           data={rows}
           maxEntries={config.maxEntries || undefined}
-          onEditClick={item =>
+          onEditClick={(item) =>
             api()
               .getSample({ sampleId: item.id })
-              .then(response => {
+              .then((response) => {
                 if (response.sample) {
                   setSelectedSample(response.sample);
                 }
               })
           }
-          onDeleteClick={item => {
+          onDeleteClick={(item) => {
             confirm(() => deleteSample(item.id), {
               title: 'Delete Sample',
               description:
                 'This action will delete the sample and all data associated with it',
             })();
           }}
-          onCloneClick={item => {
+          onCloneClick={(item) => {
             confirm(() => copySample(item.id), {
               title: 'Copy Sample',
               description:
@@ -180,10 +190,10 @@ function QuestionaryComponentSampleDeclaration(
             }
 
             const proposalId = state.proposal.id;
-            const questionId = props.answer.question.proposalQuestionId;
+            const questionId = props.answer.question.id;
             if (proposalId <= 0 || !questionId) {
               throw new Error(
-                'Sample Declaration is missing proposal id and/or proposalQuestionId'
+                'Sample Declaration is missing proposal id and/or question id'
               );
             }
             const templateId = config.templateId;
@@ -194,7 +204,7 @@ function QuestionaryComponentSampleDeclaration(
 
             api()
               .getBlankQuestionarySteps({ templateId })
-              .then(result => {
+              .then((result) => {
                 const blankSteps = result.blankQuestionarySteps;
                 if (blankSteps) {
                   const sampleStub = createSampleStub(
@@ -209,9 +219,7 @@ function QuestionaryComponentSampleDeclaration(
           }}
           {...props}
         />
-        {isError && (
-          <ProposalErrorLabel>{errors[proposalQuestionId]}</ProposalErrorLabel>
-        )}
+        {isError && <ProposalErrorLabel>{errors[id]}</ProposalErrorLabel>}
       </FormControl>
       <StyledModal
         onClose={() => setSelectedSample(null)}
@@ -221,9 +229,9 @@ function QuestionaryComponentSampleDeclaration(
         {selectedSample ? (
           <SampleDeclarationContainer
             sample={selectedSample}
-            sampleUpdated={updatedSample => {
+            sampleUpdated={(updatedSample) => {
               const index = rows.findIndex(
-                sample => sample.id === updatedSample.id
+                (sample) => sample.id === updatedSample.id
               );
               if (index === -1) {
                 // unexpected
@@ -237,7 +245,7 @@ function QuestionaryComponentSampleDeclaration(
               });
               setRows(newRows);
             }}
-            sampleCreated={newSample => {
+            sampleCreated={(newSample) => {
               const newStateValue = [...stateValue, newSample.id];
               setSelectedSample(newSample);
               setStateValue(newStateValue);
@@ -248,7 +256,7 @@ function QuestionaryComponentSampleDeclaration(
             }}
             sampleEditDone={() => {
               const index = rows.findIndex(
-                sample => sample.id === selectedSample.id
+                (sample) => sample.id === selectedSample.id
               );
 
               if (index === -1) {
@@ -269,11 +277,6 @@ function QuestionaryComponentSampleDeclaration(
       </StyledModal>
     </>
   );
-}
-
-interface QuestionaryComponentSampleDeclarationProps
-  extends BasicComponentProps {
-  confirm: Function;
 }
 
 export default withConfirm(QuestionaryComponentSampleDeclaration);

@@ -16,7 +16,7 @@ const ProposalStatusPicker: React.FC<{
   proposalStatuses: ProposalStatus[];
 }> = ({ proposalStatuses }) => {
   const theme = useTheme();
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     container: {
       alignItems: 'flex-start',
       alignContent: 'flex-start',

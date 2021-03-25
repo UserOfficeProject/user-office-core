@@ -31,7 +31,7 @@ export function useSEPProposalsByInstrument(
     setLoadingInstrumentProposals(true);
     api()
       .sepProposalsByInstrument({ instrumentId, sepId, callId })
-      .then(data => {
+      .then((data) => {
         if (canceled) {
           return;
         }

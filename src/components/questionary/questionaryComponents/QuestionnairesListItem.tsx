@@ -13,7 +13,7 @@ import React from 'react';
 
 import { QuestionnairesListRow } from './QuestionnairesList';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   text: {
     textOverflow: 'ellipsis',
     overflow: 'hidden',
@@ -47,6 +47,7 @@ export function QuestionnairesListItem(props: {
         <Avatar>
           <DescriptionIcon
             color={props.record.isCompleted ? undefined : 'error'}
+            data-cy={`questionnaires-list-item-completed:${props.record.isCompleted}`}
           />
         </Avatar>
       </ListItemAvatar>
@@ -67,7 +68,7 @@ export function QuestionnairesListItem(props: {
           edge="start"
           aria-label="clone"
           data-cy="clone"
-          onClick={e => {
+          onClick={(e) => {
             e.stopPropagation();
             props.onCloneClick(props.record);
           }}
@@ -80,7 +81,7 @@ export function QuestionnairesListItem(props: {
           edge="end"
           aria-label="delete"
           data-cy="delete"
-          onClick={e => {
+          onClick={(e) => {
             e.stopPropagation();
             props.onDeleteClick(props.record);
           }}

@@ -23,7 +23,6 @@ query getProposal($id: Int!) {
       reviewer {
         firstname
         lastname
-        username
         id
       }
     }
@@ -35,6 +34,10 @@ query getProposal($id: Int!) {
     call {
       id
       shortCode
+    }
+    sep {
+      id
+      code
     }
   }
 }

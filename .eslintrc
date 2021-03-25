@@ -29,7 +29,8 @@
     "react-hooks",
     "jest",
     "import",
-    "cypress"
+    "cypress",
+    "unused-imports"
   ],
   "rules": {
     "import/order": [
@@ -59,6 +60,7 @@
     ],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
+    "@typescript-eslint/no-use-before-define": ["error"],
     "padding-line-between-statements": [
       "error",
       { "blankLine": "always", "prev": "*", "next": "return" }
@@ -68,11 +70,34 @@
       { "allow": ["arrowFunctions"] }
     ],
     // TODO: Switch to default "error" and fix them all
-    "@typescript-eslint/camelcase": "warn",
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "variable",
+        "format": ["camelCase", "PascalCase", "UPPER_CASE"],
+        "leadingUnderscore": "allow",
+        "trailingUnderscore": "allow"
+      },
+      {
+        "selector": "function",
+        "format": ["PascalCase", "camelCase"]
+      }
+    ],
     "react/display-name": "warn",
-    "react/prop-types": "warn",
-    "@typescript-eslint/ban-ts-ignore": "warn",
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "jest/no-export": "off" // rule not implemented properly, rule should only restrict exporting tests
+    "react/prop-types": "off",
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        "types": {
+          // add a custom message to help explain why not to use it
+          "Function": "Use `FunctionType` instead",
+          "fixWith": "FunctionType"
+        }
+      }
+    ],
+    "@typescript-eslint/ban-ts-comment": "warn",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "jest/no-export": "off", // rule not implemented properly, rule should only restrict exporting tests
+    "unused-imports/no-unused-imports-ts": 2
   }
 }

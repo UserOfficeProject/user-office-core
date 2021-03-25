@@ -9,7 +9,7 @@ import { useQueryParams, NumberParam } from 'use-query-params';
 
 import { ProposalStatus } from 'generated/sdk';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
@@ -59,7 +59,7 @@ const ProposalStatusFilter: React.FC<ProposalStatusFilterProps> = ({
           <div className={classes.loadingText}>Loading...</div>
         ) : (
           <Select
-            onChange={proposalStatus => {
+            onChange={(proposalStatus) => {
               setQuery({
                 proposalStatus: proposalStatus.target.value
                   ? (proposalStatus.target.value as number)
@@ -67,12 +67,12 @@ const ProposalStatusFilter: React.FC<ProposalStatusFilterProps> = ({
               });
               onChange?.(proposalStatus.target.value as number);
             }}
-            value={proposalStatusId}
+            value={proposalStatusId || 0}
             defaultValue={0}
             data-cy="status-filter"
           >
             {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
-            {proposalStatuses.map(proposalStatus => (
+            {proposalStatuses.map((proposalStatus) => (
               <MenuItem key={proposalStatus.id} value={proposalStatus.id}>
                 {proposalStatus.name}
               </MenuItem>

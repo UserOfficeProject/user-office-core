@@ -1,0 +1,8 @@
+mutation submitShipment($shipmentId: Int!) {
+  submitShipment(shipmentId: $shipmentId) {
+    error
+    shipment {
+      ...shipment
+    }
+  }
+}

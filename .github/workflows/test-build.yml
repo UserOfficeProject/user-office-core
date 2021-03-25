@@ -57,7 +57,7 @@ jobs:
 
       - name: Build new e2e test image if changed
         run: |
-          DOCKERFILE_VERSION=${{ hashFiles('cypress/Dockerfile') }}
+          DOCKERFILE_VERSION=${{ hashFiles('cypress/Dockerfile', 'cypress/*.json') }}
           MANIFEST_URL="https://docker.pkg.github.com/v2/userofficeproject/user-office-frontend/e2e-cypress-core/manifests/$DOCKERFILE_VERSION"
           MANIFEST_STATUS=$(curl -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' -o /dev/null --silent --get --write-out '%{http_code}' $MANIFEST_URL)
           TAG="docker.pkg.github.com/userofficeproject/user-office-frontend/e2e-cypress-core:$DOCKERFILE_VERSION"
@@ -84,7 +84,7 @@ jobs:
 
       - name: Pull cypress image
         run: |
-          DOCKERFILE_VERSION=${{ hashFiles('cypress/Dockerfile') }}
+          DOCKERFILE_VERSION=${{ hashFiles('cypress/Dockerfile', 'cypress/*.json') }}
           TAG="docker.pkg.github.com/userofficeproject/user-office-frontend/e2e-cypress-core:$DOCKERFILE_VERSION"
           docker pull $TAG 
           docker tag $TAG e2e-cypress:latest
@@ -144,6 +144,16 @@ jobs:
             https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
           )
 
+          SCHEDULER_BE_TAGS=$(check_feature ${{ github.head_ref }} \
+            https://registry.hub.docker.com/v1/repositories/dmsc/duo-scheduler-backend/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-scheduler-backend/branches
+          )
+
+          GATEWAY_TAGS=$(check_feature ${{ github.head_ref }} \
+            https://registry.hub.docker.com/v1/repositories/dmsc/duo-gateway/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-gateway/branches
+          )
+
           BE_TAG=develop
           if [[ $BE_TAGS == "2" ]]; then
             BE_TAG="${{ github.head_ref }}"
@@ -152,16 +162,30 @@ jobs:
           FACTORY_TAG=develop
           if [[ $FACTORY_TAGS == "2" ]]; then
             FACTORY_TAG="${{ github.head_ref }}"
+          fi\
+
+          SCHEDULER_BE_TAG=develop
+          if [[ $SCHEDULER_BE_TAGS == "2" ]]; then
+            SCHEDULER_BE_TAG="${{ github.head_ref }}"
+          fi
+
+          GATEWAY_TAG=develop
+          if [[ $GATEWAY_TAGS == "2" ]]; then
+            GATEWAY_TAG="${{ github.head_ref }}"
           fi
 
           echo ::set-output name=BE_TAG::${BE_TAG}
           echo ::set-output name=FACTORY_TAG::${FACTORY_TAG}
+          echo ::set-output name=SCHEDULER_BE_TAG::${SCHEDULER_BE_TAG}
+          echo ::set-output name=GATEWAY_TAG::${GATEWAY_TAG}
 
       - name: Download required repositories
         run: |
           cd "$GITHUB_WORKSPACE/.."
           git clone --depth 1 --branch "${{ steps.resolve_rep.outputs.BE_TAG }}" https://github.com/UserOfficeProject/user-office-backend.git
           git clone --depth 1 --branch "${{ steps.resolve_rep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
+          git clone --depth 1 --branch "${{ steps.resolve_rep.outputs.SCHEDULER_BE_TAG }}" https://github.com/UserOfficeProject/user-office-scheduler-backend.git
+          git clone --depth 1 --branch "${{ steps.resolve_rep.outputs.GATEWAY_TAG }}" https://github.com/UserOfficeProject/user-office-gateway.git
 
       - name: Setup base docker-compose
         run: |
@@ -180,9 +204,17 @@ jobs:
 
           export USER_OFFICE_BACKEND_TAG=${{ steps.resolve_rep.outputs.BE_TAG }}
           export USER_OFFICE_BACKEND_DIR=user-office-backend
+          export USER_OFFICE_BACKEND=http://backend:4000/graphql
+          export USER_OFFICE_ENDPOINT=$USER_OFFICE_BACKEND
 
           export USER_OFFICE_FACTORY_TAG=${{ steps.resolve_rep.outputs.FACTORY_TAG }}
           export USER_OFFICE_FACTORY_ENDPOINT=http://factory:4500/generate
+
+          export USER_OFFICE_SCHEDULER_BACKEND_TAG=${{ steps.resolve_rep.outputs.SCHEDULER_BE_TAG }}
+          export USER_OFFICE_SCHEDULER_BACKEND_DIR=user-office-scheduler-backend
+          export USER_OFFICE_SCHEDULER_BACKEND=http://scheduler-backend:4000/graphql
+
+          export USER_OFFICE_GATEWAY_TAG=${{ steps.resolve_rep.outputs.GATEWAY_TAG }}
 
           export USER_OFFICE_FRONTEND_DIR=$REPO_DIR_NAME
           export BUILD_TAG=${{ github.sha }}
@@ -190,6 +222,8 @@ jobs:
           docker-compose -f docker-compose.all.yml \
             -f user-office-backend/docker-compose.e2e.yml \
             -f user-office-factory/docker-compose.e2e.yml \
+            -f user-office-scheduler-backend/docker-compose.e2e.yml \
+            -f user-office-gateway/docker-compose.e2e.yml \
             -f "$REPO_DIR_NAME/docker-compose.e2e.yml" \
             up --exit-code-from cypress
 

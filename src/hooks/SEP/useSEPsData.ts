@@ -5,7 +5,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useSEPsData(
   filter: string,
-  active = true,
+  active: boolean | undefined,
   role = UserRole.SEP_REVIEWER
 ): {
   loadingSEPs: boolean;
@@ -23,16 +23,18 @@ export function useSEPsData(
   };
 
   useEffect(() => {
+    setLoadingSEPs(true);
+
     if (role === UserRole.USER_OFFICER) {
       api()
         .getSEPs({
-          filter: filter,
+          filter,
           active,
         })
-        .then(data => {
+        .then((data) => {
           if (data.seps) {
             setSEPs(
-              data.seps.seps.map(sep => {
+              data.seps.seps.map((sep) => {
                 return {
                   ...sep,
                 };
@@ -44,10 +46,10 @@ export function useSEPsData(
     } else {
       api()
         .getUserSeps()
-        .then(data => {
+        .then((data) => {
           if (data.me?.seps) {
             setSEPs(
-              data.me.seps.map(sep => {
+              data.me.seps.map((sep) => {
                 return {
                   ...sep,
                 };

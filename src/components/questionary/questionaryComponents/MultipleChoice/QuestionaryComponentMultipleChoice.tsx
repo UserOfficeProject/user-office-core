@@ -23,7 +23,7 @@ const toArray = (input: string | string[]): string[] => {
   return input;
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   horizontalLayout: {
     flexDirection: 'row',
   },
@@ -44,19 +44,25 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { proposalQuestionId, question },
+    question: { id, question },
     value,
   } = answer;
   const [stateValue, setStateValue] = useState<Array<string>>(value);
-  const fieldError = getIn(errors, proposalQuestionId);
-  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
+  const fieldError = getIn(errors, id);
+  const isError = getIn(touched, id) && !!fieldError;
   const config = answer.config as SelectionFromOptionsConfig;
 
   useEffect(() => {
     setStateValue(answer.value);
   }, [answer]);
 
-  const handleOnChange = (_evt: any, value: string | string[]) => {
+  const handleOnChange = (
+    _evt: React.ChangeEvent<{
+      name?: string | undefined;
+      value: unknown;
+    }>,
+    value: string | string[]
+  ) => {
     const newValue = toArray(value);
     onComplete(newValue);
   };
@@ -84,11 +90,9 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
           error={isError}
           margin="dense"
         >
-          <InputLabel id={`questionary-${proposalQuestionId}`}>
-            {label}
-          </InputLabel>
+          <InputLabel id={`questionary-${id}`}>{label}</InputLabel>
           <Select
-            id={proposalQuestionId}
+            id={id}
             value={
               config.isMultipleSelect
                 ? stateValue
@@ -96,13 +100,13 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
                 ? stateValue[0]
                 : ''
             }
-            onChange={evt =>
+            onChange={(evt) =>
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
             }
             multiple={config.isMultipleSelect}
-            labelId={`questionary-${proposalQuestionId}`}
+            labelId={`questionary-${id}`}
             required={config.required}
-            renderValue={item =>
+            renderValue={(item) =>
               config.isMultipleSelect
                 ? (item as string[]).join(', ')
                 : (item as string)
@@ -112,7 +116,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
               getContentAnchorEl: null,
             }}
           >
-            {config.options.map(option => {
+            {config.options.map((option) => {
               return (
                 <SelectMenuItem value={option} key={option}>
                   {option}
@@ -134,19 +138,19 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
         >
           <FormLabel>{label}</FormLabel>
           <RadioGroup
-            id={proposalQuestionId}
-            name={proposalQuestionId}
+            id={id}
+            name={id}
             value={stateValue[0] || ''}
-            onChange={evt =>
+            onChange={(evt) =>
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
             }
             className={
-              config.options!.length < 3
+              config.options.length < 3
                 ? classes.horizontalLayout
                 : classes.verticalLayout
             }
           >
-            {config.options.map(option => {
+            {config.options.map((option) => {
               return (
                 <FormControlLabel
                   value={option}

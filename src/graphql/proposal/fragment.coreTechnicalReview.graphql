@@ -1,8 +1,9 @@
 fragment coreTechnicalReview on TechnicalReview {
-      id
-      comment
-      publicComment
-      timeAllocation
-      status
-      proposalID
+  id
+  comment
+  publicComment
+  timeAllocation
+  status
+  proposalID
+  submitted
 }

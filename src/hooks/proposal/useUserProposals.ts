@@ -26,7 +26,7 @@ export function useUserProposals() {
     setLoadingProposals(true);
     api()
       .getUserProposals()
-      .then(data => {
+      .then((data) => {
         if (data.me) {
           setProposals(data.me.proposals);
         }

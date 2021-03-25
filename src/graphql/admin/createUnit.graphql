@@ -1,0 +1,11 @@
+mutation createUnit(
+  $name: String!
+) {
+  createUnit(name: $name) {
+    unit {
+      id
+      name
+    }
+    error
+  }
+}

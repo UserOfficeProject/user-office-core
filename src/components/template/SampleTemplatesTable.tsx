@@ -6,7 +6,17 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
-type SampleTemplateRowDataType = TemplateRowDataType & {};
+type SampleTemplateRowDataType = TemplateRowDataType & Record<string, unknown>;
+
+type SampleTemplatesTableProps = {
+  dataProvider: () => Promise<
+    Pick<
+      Template,
+      'templateId' | 'name' | 'description' | 'isArchived' | 'questionaryCount'
+    >[]
+  >;
+  confirm: WithConfirmType;
+};
 
 function SampleTemplatesTable(props: SampleTemplatesTableProps) {
   const columns: Column<SampleTemplateRowDataType>[] = [
@@ -28,16 +38,6 @@ function SampleTemplatesTable(props: SampleTemplatesTableProps) {
       />
     </>
   );
-}
-
-interface SampleTemplatesTableProps {
-  dataProvider: () => Promise<
-    Pick<
-      Template,
-      'templateId' | 'name' | 'description' | 'isArchived' | 'questionaryCount'
-    >[]
-  >;
-  confirm: WithConfirmType;
 }
 
 export default withConfirm(SampleTemplatesTable);

@@ -1,23 +1,24 @@
 import { TableProps } from '@material-ui/core';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import QuestionaryDetails, {
   TableRowData,
 } from 'components/questionary/QuestionaryDetails';
+import { BasicUserDetails } from 'generated/sdk';
 import { ProposalSubsetSubmission } from 'models/ProposalSubmissionState';
 
 export default function ProposalQuestionaryReview(
   props: {
     data: ProposalSubsetSubmission;
-  } & TableProps<any>
+  } & TableProps<FunctionComponent<unknown>>
 ) {
   const { data, ...restProps } = props;
 
   if (!data.questionaryId) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
-  const questionary = data.questionary;
+
   const users = data.users || [];
 
   const additionalDetails: TableRowData[] = [
@@ -26,19 +27,19 @@ export default function ProposalQuestionaryReview(
     { label: 'Abstract', value: data.abstract },
     {
       label: 'Principal Investigator',
-      value: `${data.proposer.firstname} ${data.proposer.lastname}`,
+      value: `${data.proposer?.firstname} ${data.proposer?.lastname}`,
     },
     {
       label: 'Co-Proposers',
       value: users
-        .map((user: any) => `${user.firstname} ${user.lastname}`)
+        .map((user: BasicUserDetails) => `${user.firstname} ${user.lastname}`)
         .join(', '),
     },
   ];
 
   return (
     <QuestionaryDetails
-      questionaryId={questionary.questionaryId}
+      questionaryId={data.questionaryId}
       additionalDetails={additionalDetails}
       title="Proposal information"
       {...restProps}

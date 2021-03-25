@@ -1,5 +1,9 @@
-mutation removeMember($memberId: Int!, $sepId: Int!, $roleId: UserRole!) {
-  removeMember(memberId: $memberId, sepId: $sepId, roleId: $roleId) {
+mutation removeMemberFromSep(
+  $memberId: Int!
+  $sepId: Int!
+  $roleId: UserRole!
+) {
+  removeMemberFromSep(memberId: $memberId, sepId: $sepId, roleId: $roleId) {
     error
     sep {
       id

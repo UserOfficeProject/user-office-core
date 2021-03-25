@@ -19,7 +19,7 @@ import { EventType } from 'models/QuestionarySubmissionState';
 
 const TextFieldNoSubmit = withPreventSubmit(TextField);
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   disabled: {
     pointerEvents: 'none',
     opacity: 0.7,
@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
 function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   const {
     answer: {
-      question: { proposalQuestionId },
+      question: { id },
     },
     formikProps,
   } = props;
@@ -59,7 +59,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     <div>
       <div className={classes.container}>
         <Field
-          name={`${proposalQuestionId}.title`}
+          name={`${id}.title`}
           label="Title"
           inputProps={{
             onChange: (event: ChangeEvent<HTMLInputElement>) =>
@@ -82,7 +82,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       </div>
       <div className={classes.container}>
         <Field
-          name={`${proposalQuestionId}.abstract`}
+          name={`${id}.abstract`}
           label="Abstract"
           inputProps={{
             onChange: (event: ChangeEvent<HTMLInputElement>) =>
@@ -108,33 +108,33 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       </div>
       <ProposalParticipant
         userChanged={(user: BasicUserDetails) => {
-          formikProps.setFieldValue(`${proposalQuestionId}.proposer`, user.id);
+          formikProps.setFieldValue(`${id}.proposer`, user.id);
           dispatch({
             type: EventType.PROPOSAL_MODIFIED,
             payload: { proposal: { ...state.proposal, proposer: user } },
           });
         }}
         className={classes.container}
-        userId={proposer.id}
+        userId={proposer?.id}
       />
       <ProposalParticipants
         className={classes.container}
         setUsers={(users: BasicUserDetails[]) => {
           formikProps.setFieldValue(
-            `${proposalQuestionId}.users`,
-            users.map(user => user.id)
+            `${id}.users`,
+            users.map((user) => user.id)
           );
           dispatch({
             type: EventType.PROPOSAL_MODIFIED,
             payload: { proposal: { ...state.proposal, users: users } },
           });
         }}
-        // quickfix for material table changing immutable state
+        // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
       />
       <ErrorMessage
-        name={`${proposalQuestionId}.users`}
+        name={`${id}.users`}
         className={classes.error}
         component="span"
       />
@@ -142,6 +142,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const proposalBasisPreSubmit = (answer: Answer) => async ({
   api,
   dispatch,
@@ -157,8 +158,8 @@ const proposalBasisPreSubmit = (answer: Answer) => async ({
       id: id,
       title: title,
       abstract: abstract,
-      users: users.map(user => user.id),
-      proposerId: proposer.id,
+      users: users.map((user) => user.id),
+      proposerId: proposer?.id,
     });
 
     if (result.updateProposal.proposal) {
@@ -179,8 +180,8 @@ const proposalBasisPreSubmit = (answer: Answer) => async ({
         id: createResult.createProposal.proposal.id,
         title: title,
         abstract: abstract,
-        users: users.map(user => user.id),
-        proposerId: proposer.id,
+        users: users.map((user) => user.id),
+        proposerId: proposer?.id,
       });
       dispatch({
         type: EventType.PROPOSAL_CREATED,

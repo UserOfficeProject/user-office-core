@@ -27,7 +27,7 @@ const SamplesTable = (
     columns={props.columns ? props.columns : defaultColumns}
     icons={tableIcons}
     title="Samples"
-    onSearchChange={searchText => {
+    onSearchChange={(searchText) => {
       props.setUrlQueryParams({
         search: searchText ? searchText : undefined,
       });
@@ -42,5 +42,7 @@ const SamplesTable = (
 
 export default React.memo(
   SamplesTable,
-  (prevProps, nextProps) => prevProps.data === nextProps.data
+  (prevProps, nextProps) =>
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.data === nextProps.data
 );

@@ -5,7 +5,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 
 export type SepProposalBasics = Pick<
   SepProposal,
-  'proposalId' | 'sepId' | 'sepTimeAllocation'
+  'proposalId' | 'sepId' | 'sepTimeAllocation' | 'instrumentSubmitted'
 > & {
   proposal: Proposal;
 };
@@ -30,7 +30,7 @@ export function useSEPProposalData(
 
     api()
       .getSEPProposal({ sepId, proposalId })
-      .then(data => {
+      .then((data) => {
         if (canceled) {
           return;
         }

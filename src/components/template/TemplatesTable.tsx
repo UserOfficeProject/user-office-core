@@ -43,15 +43,16 @@ export function TemplatesTable(props: TemplatesTableProps) {
   const [loadingTemplates, setLoadingTemplates] = useState(true);
 
   useEffect(() => {
-    props.dataProvider().then(data => {
+    props.dataProvider().then((data) => {
       data && setTemplates(data);
       setLoadingTemplates(false);
     });
   }, [props]);
 
+  const UnarchiveIconComponent = () => <UnarchiveIcon />;
   const getUnarchiveButton = () => {
     return {
-      icon: () => <UnarchiveIcon />,
+      icon: UnarchiveIconComponent,
       tooltip: 'Unarchive',
       onClick: (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -64,11 +65,11 @@ export function TemplatesTable(props: TemplatesTableProps) {
                 templateId: (data as TemplateRowDataType).templateId,
                 isArchived: false,
               })
-              .then(response => {
+              .then((response) => {
                 const data = [...templates];
                 data.splice(
                   templates.findIndex(
-                    elem =>
+                    (elem) =>
                       elem.templateId ===
                       response.updateTemplate.template?.templateId
                   ),
@@ -91,9 +92,10 @@ export function TemplatesTable(props: TemplatesTableProps) {
     };
   };
 
+  const ArchiveIconComponent = () => <Archive />;
   const getArchiveButton = () => {
     return {
-      icon: () => <Archive />,
+      icon: ArchiveIconComponent,
       tooltip: 'Archive',
       onClick: (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -106,11 +108,11 @@ export function TemplatesTable(props: TemplatesTableProps) {
                 templateId: (data as TemplateRowDataType).templateId,
                 isArchived: true,
               })
-              .then(response => {
+              .then((response) => {
                 const data = [...templates];
                 data.splice(
                   templates.findIndex(
-                    elem =>
+                    (elem) =>
                       elem.templateId ===
                       response.updateTemplate.template?.templateId
                   ),
@@ -133,9 +135,10 @@ export function TemplatesTable(props: TemplatesTableProps) {
     };
   };
 
+  const DeleteIconComponent = () => <Delete />;
   const getDeleteButton = () => {
     return {
-      icon: () => <Delete />,
+      icon: DeleteIconComponent,
       tooltip: 'Delete',
       onClick: (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -147,11 +150,11 @@ export function TemplatesTable(props: TemplatesTableProps) {
               .deleteTemplate({
                 id: (data as TemplateRowDataType).templateId,
               })
-              .then(response => {
+              .then((response) => {
                 const data = [...templates];
                 data.splice(
                   templates.findIndex(
-                    elem =>
+                    (elem) =>
                       elem.templateId ===
                       response.deleteTemplate.template?.templateId
                   ),
@@ -191,12 +194,14 @@ export function TemplatesTable(props: TemplatesTableProps) {
   };
 
   const customActions = props.actions || [];
+  const EditIconComponent = () => <Edit />;
+  const FileCopyIconComponent = () => <FileCopy />;
 
   return (
     <>
       <InputDialog open={show} onClose={() => setShow(false)}>
         <CreateTemplate
-          onComplete={template => {
+          onComplete={(template) => {
             if (template) {
               setTemplates([...templates, template]);
 
@@ -217,14 +222,14 @@ export function TemplatesTable(props: TemplatesTableProps) {
         data={templates}
         actions={[
           {
-            icon: () => <Edit />,
+            icon: EditIconComponent,
             tooltip: 'Edit',
             onClick: (event, data) => {
               editTemplate((data as TemplateRowDataType).templateId);
             },
           },
           {
-            icon: () => <FileCopy />,
+            icon: FileCopyIconComponent,
             hidden: false,
             tooltip: 'Clone',
             onClick: (event, data) => {
@@ -234,7 +239,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
                     .cloneTemplate({
                       templateId: (data as TemplateRowDataType).templateId,
                     })
-                    .then(result => {
+                    .then((result) => {
                       const clonedTemplate = result.cloneTemplate.template;
                       if (clonedTemplate) {
                         const newTemplates = [...templates];
@@ -254,7 +259,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
               )();
             },
           },
-          rowData => getMaintenanceButton(rowData),
+          (rowData) => getMaintenanceButton(rowData),
           ...customActions,
         ]}
       />

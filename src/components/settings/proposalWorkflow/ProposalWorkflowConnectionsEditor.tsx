@@ -46,7 +46,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     workflowConnection,
     setWorkflowConnection,
   ] = useState<ProposalWorkflowConnection | null>(null);
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     container: {
       alignItems: 'flex-start',
       alignContent: 'flex-start',
@@ -106,7 +106,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
   });
 
   const allWorkflowGroupIds = proposalWorkflowStatusConnectionGroups.map(
-    proposalWorkfowConnectionGroup => proposalWorkfowConnectionGroup.groupId
+    (proposalWorkfowConnectionGroup) => proposalWorkfowConnectionGroup.groupId
   );
 
   /**
@@ -138,7 +138,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
           );
 
           if (children && children.length > 0) {
-            newElement.subGroups = children.filter(child => !!child);
+            newElement.subGroups = children.filter((child) => !!child);
           }
 
           result[index] = newElement;
@@ -217,7 +217,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
                       size="small"
                       className={classes.removeButton}
                       data-cy="remove-workflow-status-button"
-                      onClick={e => {
+                      onClick={(e) => {
                         e.stopPropagation();
                         dispatch({
                           type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
@@ -245,7 +245,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
               {!!proposalWorkflowConnection.nextStatusEvents?.length && (
                 <small className={classes.nextStatusEvents}>
                   {proposalWorkflowConnection.nextStatusEvents
-                    .map(nextEventStatus => nextEventStatus.nextStatusEvent)
+                    .map((nextEventStatus) => nextEventStatus.nextStatusEvent)
                     .join(' & ')}
                 </small>
               )}
@@ -259,7 +259,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
   const getConnectionGroupSubGroups = (
     subGroups: ProposalWorkflowConnectionGroupWithSubGroups[]
   ) => {
-    return subGroups.map(subGroup => (
+    return subGroups.map((subGroup) => (
       <Grid item xs={getGridListCols(subGroups.length)} key={subGroup.groupId}>
         <Droppable droppableId={subGroup.groupId} key={subGroup.groupId}>
           {(provided, snapshot) => (
@@ -321,7 +321,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     );
   };
 
-  const connectionGroups = workflowTree.map(element =>
+  const connectionGroups = workflowTree.map((element) =>
     getConnectionGroup(element)
   );
 
@@ -346,7 +346,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
               parentDroppableId
             ) =>
               dispatch({
-                type: EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS,
+                type: EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLUMNS,
                 payload: { numberOfColumns, parentDroppableId },
               })
             }
@@ -367,7 +367,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
             close={(): void => setWorkflowConnection(null)}
             nextStatusEvents={
               workflowConnection?.nextStatusEvents?.map(
-                nextStatusEvent => nextStatusEvent.nextStatusEvent
+                (nextStatusEvent) => nextStatusEvent.nextStatusEvent
               ) as ProposalEvent[]
             }
             addNextStatusEventsToConnection={(nextStatusEvents: string[]) =>

@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Button from '@material-ui/core/Button';
 import Email from '@material-ui/icons/Email';
 import makeStyles from '@material-ui/styles/makeStyles';
-import MaterialTable, { Query, Options } from 'material-table';
+import MaterialTable, { Query, Options, Column } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
@@ -9,6 +10,7 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { BasicUserDetails, GetUsersQuery, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
+import { FunctionType } from 'utils/utilTypes';
 
 import { InviteUserForm } from './InviteUserForm';
 
@@ -51,7 +53,9 @@ function sendUserRequest(
     });
 }
 
-type PeopleTableProps = {
+type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
+  selection: boolean;
+  isLoading?: boolean;
   title?: string;
   userRole?: UserRole;
   invitationUserRole?: UserRole;
@@ -60,16 +64,16 @@ type PeopleTableProps = {
     actionIcon: JSX.Element;
     actionText: string;
   };
-  selection: boolean;
   isFreeAction?: boolean;
-  data?: BasicUserDetails[];
+  data?: T[];
   search?: boolean;
-  onRemove?: (user: BasicUserDetails) => void;
-  onUpdate?: (user: BasicUserDetails[]) => void;
+  onRemove?: FunctionType<void, T>;
+  onUpdate?: FunctionType<void, [any[]]>;
   emailInvite?: boolean;
-  invitationButtons?: { title: string; action: Function }[];
+  invitationButtons?: { title: string; action: FunctionType }[];
   selectedUsers?: number[];
   mtOptions?: Options;
+  columns?: Column<any>[];
 };
 
 const useStyles = makeStyles({
@@ -105,9 +109,10 @@ const getTitle = (invitationUserRole?: UserRole): string => {
   }
 };
 
-const PeopleTable: React.FC<PeopleTableProps> = props => {
+const PeopleTable: React.FC<PeopleTableProps> = (props) => {
+  const { isLoading } = props;
   const sendRequest = useDataApi();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(props.isLoading ?? false);
   const [pageSize, setPageSize] = useState(5);
   const [sendUserEmail, setSendUserEmail] = useState(false);
   const [selectedParticipants, setSelectedParticipants] = useState<
@@ -119,6 +124,12 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
   const classes = useStyles();
 
   const { data, action } = props;
+
+  useEffect(() => {
+    if (isLoading !== undefined) {
+      setLoading(isLoading);
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     if (!data) {
@@ -147,8 +158,10 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
       icon: () => action.actionIcon,
       isFreeAction: props.isFreeAction,
       tooltip: action.actionText,
-      onClick: (event: React.MouseEvent<JSX.Element>, rowData: any) =>
-        action.fn(rowData),
+      onClick: (
+        event: React.MouseEvent<JSX.Element>,
+        rowData: BasicUserDetails | BasicUserDetails[]
+      ) => action.fn(rowData),
     });
   props.emailInvite &&
     actionArray.push({
@@ -158,12 +171,45 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
       onClick: () => setSendUserEmail(true),
     });
 
+  const tableData = props.data
+    ? (props.data as (BasicUserDetails & {
+        tableData: { checked: boolean };
+      })[])
+    : (
+        query: Query<
+          BasicUserDetails & {
+            tableData: {
+              checked: boolean;
+            };
+          }
+        >
+      ) => {
+        if (searchText !== query.search) {
+          setSearchText(query.search);
+        }
+
+        setPageSize(query.pageSize);
+
+        return sendUserRequest(
+          query,
+          sendRequest,
+          setLoading,
+          props.selectedUsers,
+          props.userRole,
+          selectedParticipants.map(({ id }) => id)
+        ).then((users: any) => {
+          setCurrentPageIds(users.data.map(({ id }: { id: number }) => id));
+
+          return users;
+        });
+      };
+
   return (
     <div data-cy="co-proposers" className={classes.tableWrapper}>
       <MaterialTable
         icons={tableIcons}
         title={props.title}
-        columns={columns}
+        columns={props.columns ?? columns}
         onSelectionChange={(selectedItems, selectedItem) => {
           // when the user wants to (un)select all items
           // `selectedItem` will be undefined
@@ -171,16 +217,16 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
             // first clear the current page because if any row was unselected
             // the (un)select all option will select every rows
             // which would result in duplicates
-            setSelectedParticipants(selectedParticipants =>
+            setSelectedParticipants((selectedParticipants) =>
               selectedParticipants.filter(
                 ({ id }) => !currentPageIds.includes(id)
               )
             );
 
             if (selectedItems.length > 0) {
-              setSelectedParticipants(selectedParticipants => [
+              setSelectedParticipants((selectedParticipants) => [
                 ...selectedParticipants,
-                ...(selectedItems.map(selectedItem => ({
+                ...(selectedItems.map((selectedItem) => ({
                   id: selectedItem.id,
                   firstname: selectedItem.firstname,
                   lastname: selectedItem.lastname,
@@ -192,7 +238,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
             return;
           }
 
-          setSelectedParticipants(selectedParticipants =>
+          setSelectedParticipants((selectedParticipants) =>
             selectedItem.tableData.checked
               ? ([
                   ...selectedParticipants,
@@ -206,32 +252,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
               : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
           );
         }}
-        data={
-          props.data
-            ? props.data
-            : query => {
-                if (searchText !== query.search) {
-                  setSearchText(query.search);
-                }
-
-                setPageSize(query.pageSize);
-
-                return sendUserRequest(
-                  query,
-                  sendRequest,
-                  setLoading,
-                  props.selectedUsers,
-                  props.userRole,
-                  selectedParticipants.map(({ id }) => id)
-                ).then((users: any) => {
-                  setCurrentPageIds(
-                    users.data.map(({ id }: { id: number }) => id)
-                  );
-
-                  return users;
-                });
-              }
-        }
+        data={tableData}
         isLoading={loading}
         options={{
           search: props.search,
@@ -244,10 +265,10 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
         editable={
           props.onRemove
             ? {
-                onRowDelete: oldData =>
-                  new Promise<void>(resolve => {
+                onRowDelete: (oldData) =>
+                  new Promise<void>((resolve) => {
                     resolve();
-                    (props.onRemove as any)(oldData);
+                    (props.onRemove as FunctionType)(oldData);
                   }),
               }
             : {}
@@ -278,7 +299,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
       {props.invitationButtons && (
         <ActionButtonContainer>
           {props.invitationButtons?.map(
-            (item: { title: string; action: Function }, i) => (
+            (item: { title: string; action: FunctionType }, i) => (
               <Button
                 type="button"
                 variant="contained"
@@ -315,6 +336,8 @@ PeopleTable.propTypes = {
   invitationButtons: PropTypes.array,
   selectedUsers: PropTypes.array,
   mtOptions: PropTypes.object,
+  isLoading: PropTypes.bool,
+  columns: PropTypes.array,
 };
 
 export default PeopleTable;

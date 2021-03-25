@@ -1,0 +1,11 @@
+mutation changeProposalsStatus(
+  $proposals: [ProposalIdWithCallId!]!
+  $statusId: Int!
+) {
+  changeProposalsStatus(
+    changeProposalsStatusInput: { proposals: $proposals, statusId: $statusId }
+  ) {
+    error
+    isSuccess
+  }
+}
