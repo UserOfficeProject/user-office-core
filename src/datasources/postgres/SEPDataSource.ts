@@ -1,6 +1,9 @@
 import { logger } from '@esss-swap/duo-logger';
 
-import { ProposalIdsWithNextStatus } from '../../models/Proposal';
+import {
+  ProposalEndStatus,
+  ProposalIdsWithNextStatus,
+} from '../../models/Proposal';
 import { ReviewStatus } from '../../models/Review';
 import { Role, Roles } from '../../models/Role';
 import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../../models/SEP';
@@ -640,26 +643,58 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput,
     submittedBy?: number | null
   ): Promise<SepMeetingDecision> {
-    const dataToUpsert = {
+    const dataToUpsert: {
+      proposal_id: number;
+      rank_order?: number;
+      comment_for_management?: string;
+      comment_for_user?: string;
+      recommendation?: ProposalEndStatus;
+      submitted?: boolean;
+      submitted_by?: number | null;
+    } = {
       proposal_id: saveSepMeetingDecisionInput.proposalId,
-      comment_for_management: saveSepMeetingDecisionInput.commentForManagement,
-      comment_for_user: saveSepMeetingDecisionInput.commentForUser,
-      rank_order: saveSepMeetingDecisionInput.rankOrder,
-      recommendation: saveSepMeetingDecisionInput.recommendation,
-      submitted: saveSepMeetingDecisionInput.submitted,
-      submitted_by: submittedBy,
     };
+
+    const updateQuery = [];
+
+    if (submittedBy) {
+      dataToUpsert.submitted_by = submittedBy;
+      updateQuery.push('submitted_by = EXCLUDED.submitted_by');
+    }
+    if (saveSepMeetingDecisionInput.rankOrder) {
+      dataToUpsert.rank_order = saveSepMeetingDecisionInput.rankOrder;
+      updateQuery.push('rank_order = EXCLUDED.rank_order');
+    }
+
+    if (saveSepMeetingDecisionInput.commentForManagement) {
+      dataToUpsert.comment_for_management =
+        saveSepMeetingDecisionInput.commentForManagement;
+      updateQuery.push(
+        'comment_for_management = EXCLUDED.comment_for_management'
+      );
+    }
+
+    if (saveSepMeetingDecisionInput.commentForUser) {
+      dataToUpsert.comment_for_user =
+        saveSepMeetingDecisionInput.commentForUser;
+      updateQuery.push('comment_for_user = EXCLUDED.comment_for_user');
+    }
+
+    if (saveSepMeetingDecisionInput.recommendation) {
+      dataToUpsert.recommendation = saveSepMeetingDecisionInput.recommendation;
+      updateQuery.push('recommendation = EXCLUDED.recommendation');
+    }
+
+    if (saveSepMeetingDecisionInput.submitted !== undefined) {
+      dataToUpsert.submitted = saveSepMeetingDecisionInput.submitted;
+      updateQuery.push('submitted = EXCLUDED.submitted');
+    }
 
     const [sepMeetingDecisionRecord]: SepMeetingDecisionRecord[] = (
       await database.raw(
         `? ON CONFLICT (proposal_id)
         DO UPDATE SET
-        comment_for_management = EXCLUDED.comment_for_management,
-        comment_for_user = EXCLUDED.comment_for_user,
-        rank_order = EXCLUDED.rank_order,
-        recommendation = EXCLUDED.recommendation,
-        submitted = EXCLUDED.submitted,
-        submitted_by = EXCLUDED.submitted_by
+        ${updateQuery.join(',')}
         RETURNING *;`,
         [database('SEP_meeting_decisions').insert(dataToUpsert)]
       )
