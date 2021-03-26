@@ -264,7 +264,7 @@ export default class InstrumentMutations {
     args: InstrumentSubmitArgs
   ): Promise<InstrumentHasProposals | Rejection> {
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
+      !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(
         (agent as UserWithRole).id,
         args.sepId
@@ -273,13 +273,22 @@ export default class InstrumentMutations {
       return rejection('NOT_ALLOWED');
     }
 
-    const submittedInstrumentProposalIds = (
-      await this.sepDataSource.getSEPProposalsByInstrument(
-        args.sepId,
-        args.instrumentId,
-        args.callId
-      )
-    ).map((sepInstrumentProposal) => sepInstrumentProposal.proposalId);
+    const allInstrumentProposals = await this.sepDataSource.getSEPProposalsByInstrument(
+      args.sepId,
+      args.instrumentId,
+      args.callId
+    );
+
+    const submittedInstrumentProposalIds = allInstrumentProposals.map(
+      (sepInstrumentProposal) => sepInstrumentProposal.proposalId
+    );
+
+    // TODO: Create function to get all sep meeting decisions by proposal ids and check if they all have rankings.
+    // If rankings are missing add them and save in the database using saveSepMeetingDecision
+
+    const sepMeetingDecisions = this.sepDataSource.getProposalsSepMeetingDecisions(
+      submittedInstrumentProposalIds
+    );
 
     return this.dataSource
       .submitInstrument(submittedInstrumentProposalIds, args.instrumentId)

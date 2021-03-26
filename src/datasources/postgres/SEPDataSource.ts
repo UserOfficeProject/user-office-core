@@ -732,18 +732,25 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     return createSepMeetingDecisionObject(sepMeetingDecisionRecord);
   }
 
-  async getProposalSepMeetingDecision(
-    proposalId: number
-  ): Promise<SepMeetingDecision | null> {
+  async getProposalsSepMeetingDecisions(
+    proposalIds: number[]
+  ): Promise<SepMeetingDecision[]> {
     return database
       .select()
       .from('SEP_meeting_decisions')
-      .where('proposal_id', proposalId)
-      .first()
-      .then((sepMeetingDecisionRecord: SepMeetingDecisionRecord) => {
-        return sepMeetingDecisionRecord
-          ? createSepMeetingDecisionObject(sepMeetingDecisionRecord)
-          : null;
+      .whereIn('proposal_id', proposalIds)
+      .then((sepMeetingDecisionRecords: SepMeetingDecisionRecord[]) => {
+        if (!sepMeetingDecisionRecords.length) {
+          logger.logError('Could not find any proposal meeting decision', {
+            proposalIds,
+          });
+
+          throw new Error('Could not find any proposal meeting decision');
+        }
+
+        return sepMeetingDecisionRecords.map((sepMeetingDecisionRecord) =>
+          createSepMeetingDecisionObject(sepMeetingDecisionRecord)
+        );
       });
   }
 }

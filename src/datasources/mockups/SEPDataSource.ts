@@ -360,10 +360,10 @@ export class SEPDataSourceMock implements SEPDataSource {
     return dummySepMeetingDecision;
   }
 
-  async getProposalSepMeetingDecision(
-    proposalId: number
-  ): Promise<SepMeetingDecision | null> {
-    return dummySepMeetingDecision;
+  async getProposalsSepMeetingDecisions(
+    proposalIds: number[]
+  ): Promise<SepMeetingDecision[]> {
+    return [dummySepMeetingDecision];
   }
 
   async overwriteSepMeetingDecisionRanking(

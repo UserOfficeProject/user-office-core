@@ -93,7 +93,7 @@ export interface SEPDataSource {
   overwriteSepMeetingDecisionRanking(
     overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput
   ): Promise<SepMeetingDecision>;
-  getProposalSepMeetingDecision(
-    proposalId: number
-  ): Promise<SepMeetingDecision | null>;
+  getProposalsSepMeetingDecisions(
+    proposalIds: number[]
+  ): Promise<SepMeetingDecision[]>;
 }
