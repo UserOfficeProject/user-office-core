@@ -23,7 +23,7 @@
     "@types/react": "^17.0.0",
     "@types/react-beautiful-dnd": "^13.0.0",
     "@types/react-dom": "^17.0.0",
-    "@types/react-router": "^5.1.11",
+    "@types/react-router": "^5.1.12",
     "@types/react-router-dom": "^5.1.7",
     "@types/tinymce": "^4.6.0",
     "@types/yup": "~0.29.11",
