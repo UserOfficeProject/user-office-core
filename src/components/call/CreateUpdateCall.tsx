@@ -45,6 +45,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         shortCode: '',
         startCall: currentDayStart,
         endCall: currentDayEnd,
+        referenceNumberFormat: '',
         startReview: currentDayStart,
         endReview: currentDayEnd,
         startSEPReview: null,

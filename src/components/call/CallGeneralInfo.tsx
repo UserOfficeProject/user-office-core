@@ -62,6 +62,15 @@ const CallGeneralInfo: React.FC<{
           required
           data-cy="end-date"
         />
+        <Field
+          name="referenceNumberFormat"
+          label="Reference number format"
+          type="text"
+          component={TextField}
+          margin="normal"
+          fullWidth
+          data-cy="reference-number-format"
+        />
       </MuiPickersUtilsProvider>
       <FormikDropdown
         name="templateId"

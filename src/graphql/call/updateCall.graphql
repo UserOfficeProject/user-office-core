@@ -13,6 +13,7 @@ mutation updateCall(
   $endCycle: DateTime!
   $cycleComment: String!
   $surveyComment: String!
+  $referenceNumberFormat: String
   $proposalWorkflowId: Int
   $templateId: Int
 ) {
@@ -32,6 +33,7 @@ mutation updateCall(
       endCycle: $endCycle
       cycleComment: $cycleComment
       surveyComment: $surveyComment
+      referenceNumberFormat: $referenceNumberFormat
       proposalWorkflowId: $proposalWorkflowId
       templateId: $templateId
     }
