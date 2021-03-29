@@ -49,7 +49,7 @@ export default class QuestionaryQueries {
     return this.dataSource.getQuestionarySteps(questionaryId);
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   getCount(user: UserWithRole | null, templateId: number): Promise<number> {
     return this.dataSource.getCount(templateId);
   }

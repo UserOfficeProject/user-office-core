@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/camelcase */
-import { NextStatusEvent } from '../models/NextStatusEvent';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
+import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
@@ -32,10 +31,10 @@ export interface ProposalSettingsDataSource {
     droppableGroupId?: string | undefined,
     byParentGroupId?: boolean | undefined
   ): Promise<ProposalWorkflowConnection[]>;
-  getProposalWorkflowConnection(
+  getProposalWorkflowConnectionsById(
     proposalWorkflowId: number,
     proposalWorkflowConnectionId: number
-  ): Promise<ProposalWorkflowConnection | null>;
+  ): Promise<ProposalWorkflowConnection[]>;
   addProposalWorkflowStatus(
     newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
   ): Promise<ProposalWorkflowConnection>;
@@ -47,11 +46,15 @@ export interface ProposalSettingsDataSource {
     proposalWorkflowId: number,
     nextProposalStatusId?: number
   ): Promise<ProposalWorkflowConnection>;
-  addNextStatusEventsToConnection(
+  addStatusChangingEventsToConnection(
     proposalWorkflowConnectionId: number,
-    nextStatusEvents: string[]
-  ): Promise<NextStatusEvent[]>;
-  getNextStatusEventsByConnectionId(
+    statusChangingEvents: string[]
+  ): Promise<StatusChangingEvent[]>;
+  getStatusChangingEventsByConnectionId(
     proposalWorkflowConnectionId: number
-  ): Promise<NextStatusEvent[]>;
+  ): Promise<StatusChangingEvent[]>;
+  getProposalNextStatus(
+    proposalId: number,
+    event: Event
+  ): Promise<ProposalStatus | null>;
 }

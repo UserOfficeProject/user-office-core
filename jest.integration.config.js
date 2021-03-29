@@ -6,4 +6,5 @@ module.exports = {
   testEnvironment: 'node',
   testRegex: '(/__tests__/.*|(\\.|/)(test))\\.[jt]sx?$',
   collectCoverage: true,
+  setupFiles: ['dotenv/config'],
 };

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { Role } from '../../models/Role';
 import { Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
@@ -99,14 +98,14 @@ export class StfcUserDataSource implements UserDataSource {
     const users: User[] = await postgresUserDataSource.getProposalUsersFull(
       proposalId
     );
-    const userNumbers: string[] = users.map(user => String(user.id));
+    const userNumbers: string[] = users.map((user) => String(user.id));
 
     const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
       await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
     )?.return;
 
     return stfcBasicPeople
-      ? stfcBasicPeople.map(person => toEssUser(person))
+      ? stfcBasicPeople.map((person) => toEssUser(person))
       : Promise.resolve([]);
   }
 
@@ -175,7 +174,7 @@ export class StfcUserDataSource implements UserDataSource {
 
     const roleDefinitions: Role[] = await this.getRoles();
     const userRole: Role | undefined = roleDefinitions.find(
-      role => role.shortCode == Roles.USER
+      (role) => role.shortCode == Roles.USER
     );
     if (!userRole) {
       return Promise.resolve([]);
@@ -201,7 +200,7 @@ export class StfcUserDataSource implements UserDataSource {
         | undefined = stfcRolesToEssRoleDefinitions.get(stfcRole.name);
       if (essRoleDefinition) {
         const essRole: Role | undefined = roleDefinitions.find(
-          role => role.shortCode == essRoleDefinition
+          (role) => role.shortCode == essRoleDefinition
         );
 
         if (essRole && !roles.includes(essRole)) {
@@ -254,13 +253,13 @@ export class StfcUserDataSource implements UserDataSource {
     let users: BasicUserDetails[] = [];
 
     if (dbUsers[0]) {
-      const userNumbers: string[] = dbUsers.map(record => String(record.id));
+      const userNumbers: string[] = dbUsers.map((record) => String(record.id));
       const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
         await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
       )?.return;
 
       users = stfcBasicPeople
-        ? stfcBasicPeople.map(person => toEssBasicUserDetails(person))
+        ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
         : [];
     }
 
@@ -274,14 +273,14 @@ export class StfcUserDataSource implements UserDataSource {
     const users: BasicUserDetails[] = await postgresUserDataSource.getProposalUsers(
       proposalId
     );
-    const userNumbers: string[] = users.map(user => String(user.id));
+    const userNumbers: string[] = users.map((user) => String(user.id));
 
     const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
       await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
     )?.return;
 
     return stfcBasicPeople
-      ? stfcBasicPeople.map(person => toEssBasicUserDetails(person))
+      ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
       : Promise.resolve([]);
   }
 

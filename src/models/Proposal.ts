@@ -45,10 +45,17 @@ export class Proposal {
     public commentForManagement: string,
     public notified: boolean,
     public submitted: boolean,
-    public referenceNumberSequence: number
+    public referenceNumberSequence: number,
+    public managementTimeAllocation: number,
+    public managementDecisionSubmitted: boolean
   ) {}
 }
 
-export class ProposalIds {
-  constructor(public proposalIds: number[]) {}
+export class ProposalIdsWithNextStatus {
+  constructor(
+    public proposalIds: number[],
+    public id?: number,
+    public shortCode?: string,
+    public name?: string
+  ) {}
 }

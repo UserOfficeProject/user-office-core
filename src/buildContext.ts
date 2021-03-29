@@ -81,7 +81,8 @@ const proposalMutations = new ProposalMutations(
 const reviewQueries = new ReviewQueries(reviewDataSource, userAuthorization);
 const reviewMutations = new ReviewMutations(
   reviewDataSource,
-  userAuthorization
+  userAuthorization,
+  proposalSettingsDataSource
 );
 
 const callQueries = new CallQueries(callDataSource);
@@ -102,7 +103,9 @@ const sepQueries = new SEPQueries(sepDataSource, userAuthorization);
 const sepMutations = new SEPMutations(
   sepDataSource,
   instrumentDataSource,
-  userAuthorization
+  userAuthorization,
+  userDataSource,
+  proposalSettingsDataSource
 );
 
 const systemQueries = new SystemQueries(systemDataSource);

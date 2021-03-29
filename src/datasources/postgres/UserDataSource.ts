@@ -1,9 +1,11 @@
-/* eslint-disable @typescript-eslint/camelcase */
-import BluePromise from 'bluebird';
-import { Transaction } from 'knex';
-
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Role } from '../../models/Role';
-import { User, BasicUserDetails } from '../../models/User';
+import {
+  User,
+  BasicUserDetails,
+  UserRole,
+  UserRoleShortCodeMap,
+} from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UserDataSource } from '../UserDataSource';
@@ -165,7 +167,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from('roles')
       .then((roles: RoleRecord[]) =>
-        roles.map(role => new Role(role.role_id, role.short_code, role.title))
+        roles.map((role) => new Role(role.role_id, role.short_code, role.title))
       );
   }
 
@@ -177,42 +179,22 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('users as u', { 'u.user_id': 'rc.user_id' })
       .where('u.user_id', id)
       .then((roles: RoleRecord[]) =>
-        roles.map(role => new Role(role.role_id, role.short_code, role.title))
+        roles.map((role) => new Role(role.role_id, role.short_code, role.title))
       );
   }
 
   async setUserRoles(id: number, roles: number[]): Promise<void> {
-    return database.transaction(function(trx: Transaction) {
-      return database
-        .from('role_user')
-        .where('user_id', id)
-        .del()
-        .returning('*')
-        .transacting(trx)
-        .then((data: RoleUserRecord[]) => {
-          return BluePromise.map(roles, (role_id: number) => {
-            // NOTE: If some removed roles have had sep_id we need to keep that info.
-            const foundRoleSepId = data.find(
-              roleItem => roleItem.role_id === role_id
-            )?.sep_id;
+    return database.transaction(async (trx) => {
+      await trx<RoleUserRecord>('role_user').where('user_id', id).del();
 
-            return database
-              .insert({
-                user_id: id,
-                role_id: role_id,
-                sep_id: foundRoleSepId,
-              })
-              .into('role_user')
-              .transacting(trx);
-          });
-        })
-        .then(() => {
-          trx.commit; // TODO call commit
-        })
-        .catch(error => {
-          trx.rollback; // TODO call rollback
-          throw error;
-        });
+      await trx<RoleUserRecord>('role_user')
+        .insert(
+          roles.map((roleId) => ({
+            user_id: id,
+            role_id: roleId,
+          }))
+        )
+        .into('role_user');
     });
   }
 
@@ -375,17 +357,17 @@ export default class PostgresUserDataSource implements UserDataSource {
     filter?: string,
     first?: number,
     offset?: number,
-    userRole?: number,
+    userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { organisation: 'i.institution_id' })
-      .orderBy('user_id', 'desc')
-      .modify(query => {
+      .orderBy('users.user_id', 'desc')
+      .modify((query) => {
         if (filter) {
-          query.andWhere(qb => {
+          query.andWhere((qb) => {
             qb.where('institution', 'ilike', `%${filter}%`)
               .orWhere('firstname', 'ilike', `%${filter}%`)
               .orWhere('preferredname', 'ilike', `%${filter}%`)
@@ -399,18 +381,16 @@ export default class PostgresUserDataSource implements UserDataSource {
           query.offset(offset);
         }
         if (userRole) {
-          query.whereIn('user_id', function(this: any) {
-            this.select('user_id')
-              .from('role_user')
-              .where('role_id', userRole);
-          });
+          query.join('role_user', 'role_user.user_id', '=', 'users.user_id');
+          query.join('roles', 'roles.role_id', '=', 'role_user.role_id');
+          query.where('roles.short_code', UserRoleShortCodeMap[userRole]);
         }
         if (subtractUsers) {
-          query.whereNotIn('user_id', subtractUsers);
+          query.whereNotIn('users.user_id', subtractUsers);
         }
       })
       .then((usersRecord: UserRecord[]) => {
-        const users = usersRecord.map(user => createBasicUserObject(user));
+        const users = usersRecord.map((user) => createBasicUserObject(user));
 
         return {
           totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
@@ -450,7 +430,9 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('proposal_user as pc', { 'u.user_id': 'pc.user_id' })
       .join('proposals as p', { 'p.proposal_id': 'pc.proposal_id' })
       .where('p.proposal_id', proposalId)
-      .then((users: UserRecord[]) => users.map(user => createUserObject(user)));
+      .then((users: UserRecord[]) =>
+        users.map((user) => createUserObject(user))
+      );
   }
   async getProposalUsers(id: number): Promise<BasicUserDetails[]> {
     return database
@@ -461,7 +443,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('proposals as p', { 'p.proposal_id': 'pc.proposal_id' })
       .where('p.proposal_id', id)
       .then((users: UserRecord[]) =>
-        users.map(user => createBasicUserObject(user))
+        users.map((user) => createBasicUserObject(user))
       );
   }
   async createOrganisation(name: string, verified: boolean): Promise<number> {

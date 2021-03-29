@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { logger } from '@esss-swap/duo-logger';
 
 import { Shipment } from '../../models/Shipment';
@@ -52,7 +51,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
     const filter = args.filter;
 
     return database('shipments')
-      .modify(query => {
+      .modify((query) => {
         if (filter?.creatorId) {
           query.where('creator_id', filter.creatorId);
         }
@@ -77,7 +76,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       })
       .select('*')
       .then((records: ShipmentRecord[]) =>
-        records.map(record => createShipmentObject(record))
+        records.map((record) => createShipmentObject(record))
       );
   }
 
@@ -88,7 +87,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
         'proposals.call_id': callId,
       })
       .then((shipments: ShipmentRecord[]) => {
-        return shipments.map(shipment => createShipmentObject(shipment));
+        return shipments.map((shipment) => createShipmentObject(shipment));
       });
   }
 
@@ -99,6 +98,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
           title: args.title,
           status: args.status,
           proposal_id: args.proposalId,
+          external_ref: args.externalRef,
         },
         '*'
       )
@@ -143,7 +143,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       .delete('*');
 
     await database('shipments_has_samples').insert(
-      sampleIds.map(sampleId => ({
+      sampleIds.map((sampleId) => ({
         shipment_id: shipmentId,
         sample_id: sampleId,
       }))

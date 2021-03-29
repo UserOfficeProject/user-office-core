@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable jest/valid-expect */
 /* eslint-disable quotes */
 import 'reflect-metadata';
@@ -28,7 +27,7 @@ async function createProposal(callId: number): Promise<Proposal> {
 
 async function createCall(format?: string): Promise<Call> {
   const call = await database('call')
-    .modify(query => {
+    .modify((query) => {
       if (format) {
         query.insert({
           call_id: -999,
@@ -107,21 +106,13 @@ async function setup() {
 }
 
 async function teardown() {
-  await database('questionaries')
-    .where('questionary_id', -999)
-    .del();
+  await database('questionaries').where('questionary_id', -999).del();
 
-  await database('proposals')
-    .where('title', 'like', '[IT] proposal%')
-    .del();
+  await database('proposals').where('title', 'like', '[IT] proposal%').del();
 
-  await database('call')
-    .where('call_id', -999)
-    .del();
+  await database('call').where('call_id', -999).del();
 
-  await database('templates')
-    .where('template_id', -999)
-    .del();
+  await database('templates').where('template_id', -999).del();
 
   await database('proposal_workflows')
     .where('proposal_workflow_id', -999)
@@ -268,7 +259,7 @@ describe('Submit proposal', () => {
     const expectedRefNums: string[] = [];
     const proposals = await BluePromise.mapSeries(
       new Array(1000),
-      async function(_prop, index) {
+      async function (_prop, index) {
         expectedRefNums.push('211' + String(index).padStart(4, '0'));
 
         return await createProposal(call.id);
@@ -277,11 +268,11 @@ describe('Submit proposal', () => {
 
     const submissions = await BluePromise.map(
       proposals,
-      async p => await proposalDataSource.submitProposal(p.id)
+      async (p) => await proposalDataSource.submitProposal(p.id)
     );
 
     const invalidSubmissions = submissions.filter(
-      s =>
+      (s) =>
         !s.submitted ||
         !(s.referenceNumberSequence || s.referenceNumberSequence == 0) ||
         !expectedRefNums.includes(s.shortCode)

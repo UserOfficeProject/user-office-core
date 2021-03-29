@@ -1,4 +1,3 @@
-# Use postgres/example user/password credentials
 version: "3.1"
 
 services:
@@ -12,9 +11,11 @@ services:
       SPARKPOST_TOKEN: dummytoken
       NODE_ENV: development
       UO_FEATURE_DISABLE_MESSAGE_BROKER: 1
+      UO_FEATURE_DISABLE_EAM: 1
       USER_OFFICE_FACTORY_ENDPOINT: ${USER_OFFICE_FACTORY_ENDPOINT}
+      SKIP_DB_INIT: 1
     labels:
-      - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads"
+      - "traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads"
       - "traefik.port=4000"
     volumes:
       - "./${USER_OFFICE_BACKEND_DIR}/db_patches:/home/node/app/db_patches"
@@ -26,7 +27,6 @@ services:
       POSTGRES_PASSWORD: duopassword
       POSTGRES_USER: duouser
       POSTGRES_DB: duo
-      INCLUDE_SEEDS: ${INCLUDE_SEEDS}
     ports:
       - 5432:5432
     volumes:

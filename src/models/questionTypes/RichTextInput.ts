@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import sanitizeHtml, { IOptions } from 'sanitize-html';
 
 import {
@@ -50,6 +49,35 @@ const sanitizerConfig: IOptions = {
   allowedSchemesAppliedToAttributes: [],
 };
 
+// options to remove all html tags and get only text characters count
+const sanitizerValidationConfig: IOptions = {
+  allowedTags: [],
+  disallowedTagsMode: 'discard',
+  allowedAttributes: {},
+  allowedStyles: {},
+  selfClosing: [],
+  allowedSchemes: [],
+  allowedSchemesByTag: {},
+  allowedSchemesAppliedToAttributes: [],
+};
+
+const sanitizeAndCleanHtmlTags = (htmlString: string) => {
+  const sanitized = sanitizeHtml(htmlString, sanitizerValidationConfig);
+
+  /**
+   * NOTE:
+   * 1. Remove all newline characters from counting.
+   * 2. Replace the surrogate pairs(emojis) with _ and count them as one character instead of two ("😀".length = 2).
+   *    https://stackoverflow.com/questions/31986614/what-is-a-surrogate-pair
+   */
+  const sanitizedCleaned = sanitized
+    .replace(/(\r\n|\n|\r)/gm, '')
+    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '_')
+    .trim();
+
+  return sanitizedCleaned;
+};
+
 export const richTextInputDefinition: Question = {
   dataType: DataType.RICH_TEXT_INPUT,
   validate: (field: QuestionTemplateRelation, value: any) => {
@@ -58,6 +86,14 @@ export const richTextInputDefinition: Question = {
     }
     const config = field.config as RichTextInputConfig;
     if (config.required && !value) {
+      return false;
+    }
+
+    if (
+      config.max &&
+      value &&
+      sanitizeAndCleanHtmlTags(value).length > config.max
+    ) {
       return false;
     }
 
@@ -70,6 +106,7 @@ export const richTextInputDefinition: Question = {
     config.required = false;
     config.small_label = '';
     config.tooltip = '';
+    config.max = null;
 
     return config;
   },

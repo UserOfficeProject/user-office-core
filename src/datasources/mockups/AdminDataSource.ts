@@ -2,9 +2,11 @@ import { Page } from '../../models/Admin';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
+import { Unit } from '../../models/Unit';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource, Entry } from '../AdminDataSource';
+export const dummyUnit = new Unit(1, 'Second');
 
 export const dummyInstitution = new Institution(1, 'ESS', true);
 export const dummyApiAccessToken = new Permissions(
@@ -17,24 +19,34 @@ export const dummyApiAccessToken = new Permissions(
 export const dummyApiAccessTokens = [dummyApiAccessToken];
 
 export class AdminDataSourceMock implements AdminDataSource {
+  updateUnit(unit: Unit): Promise<Unit | null> {
+    throw new Error('Method not implemented.');
+  }
+  async createUnit(unit: Unit): Promise<Unit | null> {
+    return dummyUnit;
+  }
+  async deleteUnit(id: number): Promise<Unit> {
+    return dummyUnit;
+  }
+  async getUnits(): Promise<Unit[]> {
+    return [dummyUnit];
+  }
   async getInstitutionUsers(
     id: number
   ): Promise<import('../../models/User').BasicUserDetails[]> {
     return [];
   }
-  async getInstitution(
-    id: number
-  ): Promise<import('../../models/Institution').Institution | null> {
+  async getInstitution(id: number): Promise<Institution | null> {
     return dummyInstitution;
   }
   async createInstitution(
-    institution: import('../../models/Institution').Institution
+    institution: Institution
   ): Promise<import('../../models/Institution').Institution | null> {
     return dummyInstitution;
   }
 
   async updateInstitution(
-    institution: import('../../models/Institution').Institution
+    institution: Institution
   ): Promise<import('../../models/Institution').Institution | null> {
     return dummyInstitution;
   }
@@ -55,7 +67,7 @@ export class AdminDataSourceMock implements AdminDataSource {
   applyPatches(): Promise<string> {
     throw new Error('Method not implemented.');
   }
-  async resetDB(): Promise<string> {
+  async resetDB(includeSeeds: boolean): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
@@ -102,7 +114,7 @@ export class AdminDataSourceMock implements AdminDataSource {
     args: UpdateApiAccessTokenInput
   ): Promise<Permissions> {
     const apiAccessToken = dummyApiAccessTokens.find(
-      accessToken => accessToken.id === args.accessTokenId
+      (accessToken) => accessToken.id === args.accessTokenId
     );
 
     if (!apiAccessToken) {

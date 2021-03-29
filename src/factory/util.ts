@@ -25,10 +25,10 @@ export const getFileAttachments = (answer: Answer): Attachment[] => {
 };
 
 export const bufferRequestBody = (req: request.Request) =>
-  new Promise(resolve => {
+  new Promise((resolve) => {
     const buffer: Buffer[] = [];
 
-    req.on('data', chunk =>
+    req.on('data', (chunk) =>
       buffer.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
     );
 

@@ -10,7 +10,9 @@ import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
+import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
+import { SEP, SEPProposal, SEPAssignment, SEPReviewer } from '../../models/SEP';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import {
   DataType,
@@ -61,6 +63,8 @@ export interface ProposalRecord {
   readonly notified: boolean;
   readonly submitted: boolean;
   readonly reference_number_sequence: number;
+  readonly management_time_allocation: number;
+  readonly management_decision_submitted: boolean;
 }
 
 export interface ProposalViewRecord {
@@ -251,6 +255,11 @@ export interface InstitutionRecord {
   readonly verified: boolean;
 }
 
+export interface UnitRecord {
+  readonly unit_id: number;
+  readonly unit: string;
+}
+
 export interface CountryRecord {
   readonly country_id: number;
   readonly country: string;
@@ -281,6 +290,8 @@ export interface SEPRecord {
   readonly number_ratings_required: number;
   readonly active: boolean;
   readonly full_count: number;
+  readonly sep_chair_user_id: number | null;
+  readonly sep_secretary_user_id: number | null;
 }
 
 export interface SEPProposalRecord {
@@ -301,11 +312,15 @@ export interface SEPAssignmentRecord {
   readonly email_sent: boolean;
 }
 
+export interface SEPReviewerRecord {
+  readonly user_id: number;
+  readonly sep_id: number;
+}
+
 export interface RoleUserRecord {
   readonly role_user_id: number;
   readonly role_id: number;
   readonly user_id: number;
-  readonly sep_id: number;
 }
 
 export interface InstrumentRecord {
@@ -388,10 +403,10 @@ export interface ProposalWorkflowConnectionRecord {
   readonly parent_droppable_group_id: string;
 }
 
-export interface NextStatusEventRecord {
-  readonly next_status_event_id: number;
+export interface StatusChangingEventRecord {
+  readonly status_changing_event_id: number;
   readonly proposal_workflow_connection_id: number;
-  readonly next_status_event: string;
+  readonly status_changing_event: string;
 }
 
 export interface ProposalEventsRecord {
@@ -399,6 +414,7 @@ export interface ProposalEventsRecord {
   readonly proposal_created: boolean;
   readonly proposal_submitted: boolean;
   readonly proposal_feasible: boolean;
+  readonly proposal_unfeasible: boolean;
   readonly call_ended: boolean;
   readonly call_review_ended: boolean;
   readonly proposal_sep_selected: boolean;
@@ -406,6 +422,12 @@ export interface ProposalEventsRecord {
   readonly proposal_feasibility_review_submitted: boolean;
   readonly proposal_sample_review_submitted: boolean;
   readonly proposal_all_sep_reviewers_selected: boolean;
+  readonly proposal_management_decision_updated: boolean;
+  readonly proposal_management_decision_submitted: boolean;
+  readonly proposal_all_sep_reviews_submitted: boolean;
+  readonly proposal_sep_review_updated: boolean;
+  readonly proposal_feasibility_review_updated: boolean;
+  readonly proposal_sample_safe: boolean;
   readonly proposal_sep_review_submitted: boolean;
   readonly proposal_sep_meeting_submitted: boolean;
   readonly proposal_instrument_submitted: boolean;
@@ -480,7 +502,9 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.comment_for_management,
     proposal.notified,
     proposal.submitted,
-    proposal.reference_number_sequence
+    proposal.reference_number_sequence,
+    proposal.management_time_allocation,
+    proposal.management_decision_submitted
   );
 };
 
@@ -683,4 +707,47 @@ export const createFeatureObject = (record: FeatureRecord) => {
     record.is_enabled,
     record.description
   );
+};
+
+export const createSEPObject = (sep: SEPRecord) => {
+  return new SEP(
+    sep.sep_id,
+    sep.code,
+    sep.description,
+    sep.number_ratings_required,
+    sep.active,
+    sep.sep_chair_user_id,
+    sep.sep_secretary_user_id
+  );
+};
+
+export const createSEPProposalObject = (sepAssignment: SEPProposalRecord) => {
+  return new SEPProposal(
+    sepAssignment.proposal_id,
+    sepAssignment.sep_id,
+    sepAssignment.date_assigned,
+    sepAssignment.sep_time_allocation,
+    sepAssignment.instrument_submitted
+  );
+};
+export const createSEPAssignmentObject = (
+  sepAssignment: SEPAssignmentRecord
+) => {
+  return new SEPAssignment(
+    sepAssignment.proposal_id,
+    sepAssignment.sep_member_user_id,
+    sepAssignment.sep_id,
+    sepAssignment.date_assigned,
+    sepAssignment.reassigned,
+    sepAssignment.date_reassigned,
+    sepAssignment.email_sent
+  );
+};
+
+export const createSEPReviewerObject = (sepMember: SEPReviewerRecord) => {
+  return new SEPReviewer(sepMember.user_id, sepMember.sep_id);
+};
+
+export const createRoleObject = (role: RoleRecord) => {
+  return new Role(role.role_id, role.short_code, role.title);
 };

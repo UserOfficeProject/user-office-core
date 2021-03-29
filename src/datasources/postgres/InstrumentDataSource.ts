@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { sepDataSource } from '..';
 import {
   Instrument,
   InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
-import { ProposalIds } from '../../models/Proposal';
+import { ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
@@ -78,7 +77,7 @@ export default class PostgresInstrumentDataSource
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('instruments')
       .orderBy('instrument_id', 'desc')
-      .modify(query => {
+      .modify((query) => {
         if (first) {
           query.limit(first);
         }
@@ -87,7 +86,7 @@ export default class PostgresInstrumentDataSource
         }
       })
       .then((instruments: InstrumentRecord[]) => {
-        const result = instruments.map(instrument =>
+        const result = instruments.map((instrument) =>
           this.createInstrumentObject(instrument)
         );
 
@@ -116,7 +115,7 @@ export default class PostgresInstrumentDataSource
       .whereIn('chi.call_id', callIds)
       .distinct('i.instrument_id')
       .then((instruments: InstrumentWithAvailabilityTimeRecord[]) => {
-        const result = instruments.map(instrument =>
+        const result = instruments.map((instrument) =>
           this.createInstrumentWithAvailabilityTimeObject(instrument)
         );
 
@@ -134,7 +133,7 @@ export default class PostgresInstrumentDataSource
       .whereIn('call_id', callIds)
       .andWhere('instrument_id', instrumentId)
       .then((calls: { call_id: number; instrument_id: number }[]) => {
-        const result = calls.map(call => ({
+        const result = calls.map((call) => ({
           callId: call.call_id,
           instrumentId: call.instrument_id,
         }));
@@ -152,7 +151,7 @@ export default class PostgresInstrumentDataSource
       })
       .where('ihs.user_id', userId)
       .then((instruments: InstrumentRecord[]) => {
-        const result = instruments.map(instrument =>
+        const result = instruments.map((instrument) =>
           this.createInstrumentObject(instrument)
         );
 
@@ -196,8 +195,8 @@ export default class PostgresInstrumentDataSource
   async assignProposalsToInstrument(
     proposalIds: number[],
     instrumentId: number
-  ): Promise<ProposalIds> {
-    const dataToInsert = proposalIds.map(proposalId => ({
+  ): Promise<ProposalIdsWithNextStatus> {
+    const dataToInsert = proposalIds.map((proposalId) => ({
       instrument_id: instrumentId,
       proposal_id: proposalId,
     }));
@@ -210,7 +209,7 @@ export default class PostgresInstrumentDataSource
       .returning(['*']);
 
     const returnedProposalIds = proposalInstrumentPairs.map(
-      proposalInstrumentPair => proposalInstrumentPair.proposal_id
+      (proposalInstrumentPair) => proposalInstrumentPair.proposal_id
     );
 
     if (proposalInstrumentPairs) {
@@ -218,7 +217,7 @@ export default class PostgresInstrumentDataSource
        * NOTE: We need to return changed proposalIds because we listen to events and
        * we need to do some changes on proposals based on what is changed.
        */
-      return new ProposalIds(returnedProposalIds);
+      return new ProposalIdsWithNextStatus(returnedProposalIds);
     }
 
     throw new Error(
@@ -279,7 +278,7 @@ export default class PostgresInstrumentDataSource
       );
 
       const allProposalsOnInstrumentSubmitted = allProposalsOnInstrument.every(
-        item => item.instrumentSubmitted
+        (item) => item.instrumentSubmitted
       );
 
       instrumentsWithSubmittedFlag.push({
@@ -334,7 +333,7 @@ export default class PostgresInstrumentDataSource
           callId
         );
 
-        const result = instrumentsWithSubmittedFlag.map(instrument => {
+        const result = instrumentsWithSubmittedFlag.map((instrument) => {
           const calculatedInstrumentAvailabilityTimePerSEP = Math.round(
             (instrument.proposal_count / instrument.full_count) *
               instrument.availability_time
@@ -354,7 +353,7 @@ export default class PostgresInstrumentDataSource
     scientistIds: number[],
     instrumentId: number
   ): Promise<boolean> {
-    const dataToInsert = scientistIds.map(scientistId => ({
+    const dataToInsert = scientistIds.map((scientistId) => ({
       instrument_id: instrumentId,
       user_id: scientistId,
     }));
@@ -398,7 +397,7 @@ export default class PostgresInstrumentDataSource
       .join('institutions as i', { 'u.organisation': 'i.institution_id' })
       .where('ihs.instrument_id', instrumentId)
       .then((usersRecord: UserRecord[]) => {
-        const users = usersRecord.map(user => createBasicUserObject(user));
+        const users = usersRecord.map((user) => createBasicUserObject(user));
 
         return users;
       });

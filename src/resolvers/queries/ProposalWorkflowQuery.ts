@@ -1,8 +1,8 @@
 import { Query, Arg, Ctx, Resolver, Int } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalEvent } from '../types/NextStatusEvent';
 import { ProposalWorkflow } from '../types/ProposalWorkflow';
+import { ProposalEvent } from '../types/StatusChangingEvent';
 
 @Resolver()
 export class ProposalWorkflowQuery {

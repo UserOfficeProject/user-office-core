@@ -24,7 +24,7 @@ export class ShipmentDataSourceMock implements ShipmentDataSource {
     ];
   }
   async get(shipmentId: number): Promise<Shipment> {
-    return this.shipments.find(shipment => shipment.id === shipmentId)!;
+    return this.shipments.find((shipment) => shipment.id === shipmentId)!;
   }
 
   async getAll(args: ShipmentsArgs): Promise<Shipment[]> {
@@ -55,7 +55,7 @@ export class ShipmentDataSourceMock implements ShipmentDataSource {
 
   async delete(shipmentId: number): Promise<Shipment> {
     return this.shipments.splice(
-      this.shipments.findIndex(shipment => shipment.id == shipmentId),
+      this.shipments.findIndex((shipment) => shipment.id == shipmentId),
       1
     )[0];
   }

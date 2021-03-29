@@ -16,7 +16,7 @@ const checkCallsSEPReviewEnded = async (dataSource: CallDataSource) => {
     const currentDate = new Date();
 
     const callsThatShouldEndSEPReview = sepReviewNotEndedCalls.filter(
-      sepReviewNotEndedCall =>
+      (sepReviewNotEndedCall) =>
         sepReviewNotEndedCall.endSEPReview.getTime() <= currentDate.getTime()
     );
 

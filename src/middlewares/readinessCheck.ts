@@ -8,16 +8,16 @@ const router = express.Router();
 router.get('/readiness', (req: Request, res: Response) => {
   baseContext.queries.system
     .connectivityCheck()
-    .then(success => {
+    .then((success) => {
       success ? res.status(200) : res.status(500);
       res.end();
     })
-    .catch(e => {
+    .catch((e) => {
       logger.logException('Readiness check failed', e);
       res.status(500).end();
     });
 });
 
-export default function() {
+export default function () {
   return router;
 }

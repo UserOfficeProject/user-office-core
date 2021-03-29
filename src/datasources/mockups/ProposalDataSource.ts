@@ -1,7 +1,11 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
-import { Proposal, ProposalEndStatus } from '../../models/Proposal';
+import { Call } from '../../models/Call';
+import {
+  Proposal,
+  ProposalEndStatus,
+  ProposalIdsWithNextStatus,
+} from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
@@ -37,7 +41,9 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.commentForManagement || 'comment for management',
     values?.notified || false,
     values?.submitted || false,
-    values?.referenceNumberSequence || 0
+    values?.referenceNumberSequence || 0,
+    values?.managementTimeAllocation || 0,
+    values?.managementDecisionSubmitted || false
   );
 };
 
@@ -115,7 +121,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async get(id: number) {
-    return allProposals.find(proposal => proposal.id === id) || null;
+    return allProposals.find((proposal) => proposal.id === id) || null;
   }
 
   async create(proposerId: number, callId: number, questionaryId: number) {
@@ -138,7 +144,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getUserProposals(id: number) {
-    return allProposals.filter(proposal => proposal.proposerId === id);
+    return allProposals.filter((proposal) => proposal.proposerId === id);
   }
 
   async getInstrumentScientistProposals(
@@ -159,12 +165,19 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       proposal_created: true,
       proposal_submitted: true,
       proposal_feasible: true,
+      proposal_unfeasible: false,
       call_ended: false,
       call_review_ended: false,
       proposal_sep_selected: false,
       proposal_instrument_selected: false,
       proposal_feasibility_review_submitted: false,
       proposal_sample_review_submitted: false,
+      proposal_all_sep_reviews_submitted: false,
+      proposal_feasibility_review_updated: false,
+      proposal_management_decision_submitted: false,
+      proposal_management_decision_updated: false,
+      proposal_sample_safe: false,
+      proposal_sep_review_updated: false,
       proposal_all_sep_reviewers_selected: false,
       proposal_sep_review_submitted: false,
       proposal_sep_meeting_submitted: false,
@@ -173,5 +186,32 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       proposal_rejected: false,
       proposal_notified: false,
     };
+  }
+
+  async getCount(callId: number): Promise<number> {
+    return 1;
+  }
+
+  async cloneProposal(
+    clonerId: number,
+    proposalId: number,
+    call: Call
+  ): Promise<Proposal> {
+    return dummyProposal;
+  }
+
+  async resetProposalEvents(
+    proposalId: number,
+    callId: number,
+    statusId: number
+  ): Promise<boolean> {
+    return true;
+  }
+
+  async changeProposalsStatus(
+    statusId: number,
+    proposalIds: number[]
+  ): Promise<ProposalIdsWithNextStatus> {
+    return { proposalIds: [1] };
   }
 }

@@ -40,12 +40,12 @@ export default class ProposalSettingsQueries {
 
     return (
       list
-        .map(item => ({
+        .map((item) => ({
           droppableGroupId: item.droppableGroupId,
           prevProposalStatusId: item.prevProposalStatusId,
         }))
         // remove duplicates
-        .filter(item => {
+        .filter((item) => {
           if (flags.has(item.droppableGroupId)) {
             return false;
           }
@@ -61,14 +61,14 @@ export default class ProposalSettingsQueries {
   ) {
     const groupedProposalWorkflowConnections = this.getUniqueDroppableGroupIds(
       proposalWorkflowConnections
-    ).map(item => ({
+    ).map((item) => ({
       groupId: item.droppableGroupId,
       parentGroupId:
         proposalWorkflowConnections.find(
-          element => element.proposalStatusId === item.prevProposalStatusId
+          (element) => element.proposalStatusId === item.prevProposalStatusId
         )?.droppableGroupId || null,
       connections: proposalWorkflowConnections.filter(
-        proposalWorkflowConnection =>
+        (proposalWorkflowConnection) =>
           proposalWorkflowConnection.droppableGroupId === item.droppableGroupId
       ),
     }));
@@ -93,15 +93,15 @@ export default class ProposalSettingsQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getNextStatusEventsByConnectionId(
+  async getStatusChangingEventsByConnectionId(
     agent: UserWithRole | null,
     proposalWorkflowConnectionId: number
   ) {
-    const nextStatusEvents = await this.dataSource.getNextStatusEventsByConnectionId(
+    const statusChangingEvents = await this.dataSource.getStatusChangingEventsByConnectionId(
       proposalWorkflowConnectionId
     );
 
-    return nextStatusEvents;
+    return statusChangingEvents;
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -109,10 +109,10 @@ export default class ProposalSettingsQueries {
     const allEventsArray = Object.values(Event);
     const allProposalEvents = allEventsArray
       .filter(
-        eventItem =>
+        (eventItem) =>
           eventItem.startsWith('PROPOSAL_') || eventItem.startsWith('CALL_')
       )
-      .map(eventItem => ({
+      .map((eventItem) => ({
         name: eventItem,
         description: EventLabel.get(eventItem),
       }));

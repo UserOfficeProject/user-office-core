@@ -10,10 +10,12 @@ import { Authorized, ValidateArgs } from '../decorators';
 import { Page } from '../models/Admin';
 import { Institution } from '../models/Institution';
 import { Roles } from '../models/Role';
+import { Unit } from '../models/Unit';
 import { UserWithRole } from '../models/User';
 import { Rejection, rejection } from '../rejection';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
 import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
+import { CreateUnitArgs } from '../resolvers/mutations/CreateUnitMutation';
 import { DeleteApiAccessTokenInput } from '../resolvers/mutations/DeleteApiAccessTokenMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
@@ -26,11 +28,14 @@ export default class AdminMutations {
   constructor(private dataSource: AdminDataSource) {}
 
   @Authorized([Roles.USER_OFFICER])
-  async resetDB(agent: UserWithRole | null): Promise<string | Rejection> {
+  async resetDB(
+    agent: UserWithRole | null,
+    includeSeeds: boolean
+  ): Promise<string | Rejection> {
     if (process.env.NODE_ENV === 'development') {
       logger.logWarn('Resetting database', {});
 
-      return this.dataSource.resetDB();
+      return this.dataSource.resetDB(includeSeeds);
     } else {
       return rejection('NOT_ALLOWED');
     }
@@ -51,10 +56,10 @@ export default class AdminMutations {
   ): Promise<Page | Rejection> {
     return this.dataSource
       .setPageText(id, text)
-      .then(page => {
+      .then((page) => {
         return page;
       })
-      .catch(error => {
+      .catch((error) => {
         logger.logException('Could not set page text', error, {
           agent,
           id,
@@ -88,6 +93,18 @@ export default class AdminMutations {
     const institution = new Institution(0, args.name, args.verified);
 
     return await this.dataSource.createInstitution(institution);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async createUnit(agent: UserWithRole | null, args: CreateUnitArgs) {
+    const unit = new Unit(0, args.name);
+
+    return await this.dataSource.createUnit(unit);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async deleteUnit(agent: UserWithRole | null, id: number) {
+    return await this.dataSource.deleteUnit(id);
   }
 
   @Authorized([Roles.USER_OFFICER])

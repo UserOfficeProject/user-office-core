@@ -10,7 +10,12 @@ export interface ReviewDataSource {
   updateReview(args: AddReviewArgs): Promise<Review>;
 
   getProposalReviews(id: number): Promise<Review[]>;
-  getUserReviews(id: number): Promise<Review[]>;
+  getUserReviews(
+    id: number,
+    callId?: number,
+    instrumentId?: number,
+    submitted?: number
+  ): Promise<Review[]>;
   getAssignmentReview(
     sepId: number,
     proposalId: number,
@@ -18,7 +23,7 @@ export interface ReviewDataSource {
   ): Promise<Review | null>;
   setTechnicalReview(
     args: AddTechnicalReviewInput,
-    submitted?: boolean
+    shouldUpdateReview: boolean
   ): Promise<TechnicalReview>;
   getTechnicalReview(proposalID: number): Promise<TechnicalReview | null>;
   addUserForReview(args: AddUserForReviewArgs): Promise<Review>;

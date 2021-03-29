@@ -52,7 +52,7 @@ const sortByRankOrAverageScore = (data: RowObj[]) => {
       (a.propReviewAvgScore || 0) > (b.propReviewAvgScore || 0) ? 1 : -1
     )
     .sort(sortByRankOrder)
-    .map(row => {
+    .map((row) => {
       const proposalAllocationTime =
         row.sepTimeAllocation !== null
           ? row.sepTimeAllocation
@@ -88,7 +88,7 @@ export const collectSEPlXLSXData = async (
   }
 
   const instrumentsSepProposals = await Promise.all(
-    instruments.map(instrument => {
+    instruments.map((instrument) => {
       return baseContext.queries.sep.getSEPProposalsByInstrument(user, {
         sepId,
         callId,
@@ -98,7 +98,7 @@ export const collectSEPlXLSXData = async (
   );
 
   const instrumentsProposals = await Promise.all(
-    instrumentsSepProposals.map(sepProposalIds => {
+    instrumentsSepProposals.map((sepProposalIds) => {
       if (!sepProposalIds) {
         const instrumentIds = instruments.map(({ id }) => id).join(', ');
 
@@ -118,9 +118,9 @@ export const collectSEPlXLSXData = async (
   );
 
   const proposalsReviews = await Promise.all(
-    instrumentsProposals.map(proposals => {
+    instrumentsProposals.map((proposals) => {
       return Promise.all(
-        proposals.map(proposal =>
+        proposals.map((proposal) =>
           proposal
             ? baseContext.queries.review.reviewsForProposal(user, proposal.id)
             : null
@@ -130,9 +130,9 @@ export const collectSEPlXLSXData = async (
   );
 
   const proposalsTechnicalReviews = await Promise.all(
-    instrumentsProposals.map(proposals => {
+    instrumentsProposals.map((proposals) => {
       return Promise.all(
-        proposals.map(proposal =>
+        proposals.map((proposal) =>
           proposal
             ? baseContext.queries.review.technicalReviewForProposal(
                 user,
@@ -145,9 +145,9 @@ export const collectSEPlXLSXData = async (
   );
 
   const proposalsPrincipalInvestigators = await Promise.all(
-    instrumentsProposals.map(proposals => {
+    instrumentsProposals.map((proposals) => {
       return Promise.all(
-        proposals.map(proposal =>
+        proposals.map((proposal) =>
           proposal
             ? baseContext.queries.user.getBasic(user, proposal.proposerId)
             : null
@@ -193,7 +193,7 @@ export const collectSEPlXLSXData = async (
         // Sheet names can't exceed 31 characters
         // use the short code and cut everything after 30 chars
         instrument.shortCode.substr(0, 30),
-      rows: sortByRankOrAverageScore(rows).map(row => [
+      rows: sortByRankOrAverageScore(rows).map((row) => [
         row.propShortCode ?? '<missing>',
         row.propTitle ?? '<missing>',
         row.principalInv,

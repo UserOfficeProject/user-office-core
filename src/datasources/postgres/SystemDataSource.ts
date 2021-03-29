@@ -11,7 +11,7 @@ export default class PostgreSystemDataSource implements SystemDataSource {
         .then(() => {
           return true;
         })
-        .catch(error => {
+        .catch((error) => {
           logger.logException('connectivityCheck failed', error);
 
           return false;

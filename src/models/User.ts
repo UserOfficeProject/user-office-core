@@ -1,7 +1,8 @@
 import 'reflect-metadata';
-import { Role } from './Role';
+import { Role, Roles } from './Role';
 
 export type AuthJwtPayload = { user: User; roles: Role[]; currentRole: Role };
+export type AuthJwtApiTokenPayload = { accessTokenId: string };
 
 type SpecialActionJwtPayload = {
   id: number;
@@ -52,13 +53,22 @@ export interface UserWithRole extends User {
 export enum UserRole {
   USER = 1,
   USER_OFFICER,
-  REVIEWER,
   SEP_CHAIR,
   SEP_SECRETARY,
   SEP_REVIEWER,
   INSTRUMENT_SCIENTIST,
   SAMPLE_SAFETY_REVIEWER,
 }
+
+export const UserRoleShortCodeMap = {
+  [UserRole.USER]: Roles.USER,
+  [UserRole.USER_OFFICER]: Roles.USER_OFFICER,
+  [UserRole.SEP_CHAIR]: Roles.SEP_CHAIR,
+  [UserRole.SEP_SECRETARY]: Roles.SEP_SECRETARY,
+  [UserRole.SEP_REVIEWER]: Roles.SEP_REVIEWER,
+  [UserRole.INSTRUMENT_SCIENTIST]: Roles.INSTRUMENT_SCIENTIST,
+  [UserRole.SAMPLE_SAFETY_REVIEWER]: Roles.SAMPLE_SAFETY_REVIEWER,
+} as const;
 
 export class BasicUserDetails {
   constructor(

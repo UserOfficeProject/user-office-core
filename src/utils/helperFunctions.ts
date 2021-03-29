@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { randomBytes } from 'crypto';
 
 import * as Yup from 'yup';
+
+import { Review, ReviewStatus } from '../models/Review';
 
 interface Omit {
   <T extends object, K extends [...(keyof T)[]]>(obj: T, ...keys: K): {
@@ -37,4 +40,15 @@ export const generateUniqueId = () => {
   const numberOfBytes = 16;
 
   return randomBytes(numberOfBytes).toString('hex');
+};
+
+export const checkAllReviewsSubmittedOnProposal = (
+  allReviews: Review[],
+  currentSubmittedReview: Review
+) => {
+  const allOtherReviewsSubmitted = allReviews
+    .filter((review) => review.id !== currentSubmittedReview.id)
+    .every((review) => review.status === ReviewStatus.SUBMITTED);
+
+  return allOtherReviewsSubmitted;
 };

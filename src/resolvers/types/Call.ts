@@ -87,6 +87,11 @@ export class CallInstrumentsResolver {
       call.proposalWorkflowId
     );
   }
+
+  @FieldResolver(() => Int)
+  async proposalCount(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.proposal.dataSource.getCount(call.id);
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

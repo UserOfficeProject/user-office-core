@@ -54,6 +54,7 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_ids`, async (req, res, next) => {
       DownloadType.XLSX,
       XLSXType.PROPOSAL,
       { data, meta },
+      req,
       res,
       next
     );
@@ -93,6 +94,7 @@ router.get(`/${XLSXType.SEP}/:sep_id/call/:call_id`, async (req, res, next) => {
       DownloadType.XLSX,
       XLSXType.SEP,
       { data, meta },
+      req,
       res,
       next
     );

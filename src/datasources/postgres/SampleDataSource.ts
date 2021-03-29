@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { logger } from '@esss-swap/duo-logger';
 
 import { Sample } from '../../models/Sample';
@@ -91,7 +90,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
       .select('samples.*')
       .where(' proposals.call_id', callId)
       .then((records: SampleRecord[]) => {
-        return records.map(record => createSampleObject(record)) || [];
+        return records.map((record) => createSampleObject(record)) || [];
       });
   }
 
@@ -99,7 +98,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
     const filter = args.filter;
 
     return database('samples')
-      .modify(query => {
+      .modify((query) => {
         if (filter?.creatorId) {
           query.where('creator_id', filter.creatorId);
         }
@@ -125,7 +124,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
       .select('*')
       .orderBy('created_at', 'asc')
       .then((records: SampleRecord[]) =>
-        records.map(record => createSampleObject(record))
+        records.map((record) => createSampleObject(record))
       );
   }
 
@@ -139,7 +138,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
       .select('samples.*')
       .where(' shipments_has_samples.shipment_id', shipmentId)
       .then((records: SampleRecord[]) => {
-        return records.map(record => createSampleObject(record)) || [];
+        return records.map((record) => createSampleObject(record)) || [];
       });
   }
 }

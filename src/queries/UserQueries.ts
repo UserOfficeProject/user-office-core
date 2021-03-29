@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { logger } from '@esss-swap/duo-logger';
 import * as bcrypt from 'bcryptjs';
 // TODO: Try to replace request-promise with axios. request-promise depends on reqest which is deprecated.
@@ -13,6 +12,8 @@ import {
   User,
   UserWithRole,
   AuthJwtPayload,
+  UserRole,
+  AuthJwtApiTokenPayload,
 } from '../models/User';
 import { signToken, verifyToken } from '../utils/jwt';
 
@@ -77,12 +78,12 @@ export default class UserQueries {
     };
 
     return rp(options)
-      .then(function(resp: any) {
+      .then(function (resp: any) {
         return {
           ...resp,
         };
       })
-      .catch(function(err: any) {
+      .catch(function (err: any) {
         logger.logException('Could not get getOrcIDAccessToken', err);
 
         return null;
@@ -126,7 +127,7 @@ export default class UserQueries {
     };
 
     return rp(options)
-      .then(function(resp: any) {
+      .then(function (resp: any) {
         // Generate hash for OrcID inorder to prevent user from change OrcID when sending back
         const salt = '$2a$10$1svMW3/FwE5G1BpE7/CPW.';
         const hash = bcrypt.hashSync(resp.name.path, salt);
@@ -143,7 +144,7 @@ export default class UserQueries {
             : null,
         };
       })
-      .catch(function(err: any) {
+      .catch(function (err: any) {
         logger.logException('Could not get getOrcIDInformation', err);
 
         return null;
@@ -156,7 +157,7 @@ export default class UserQueries {
     filter?: string,
     first?: number,
     offset?: number,
-    userRole?: number,
+    userRole?: UserRole,
     subtractUsers?: [number]
   ) {
     return this.dataSource.getUsers(
@@ -185,17 +186,23 @@ export default class UserQueries {
     token: string
   ): Promise<{
     isValid: boolean;
-    payload: AuthJwtPayload | null;
+    payload: AuthJwtPayload | AuthJwtApiTokenPayload | null;
   }> {
     try {
-      const payload = verifyToken<AuthJwtPayload>(token);
+      const payload = verifyToken<AuthJwtPayload | AuthJwtApiTokenPayload>(
+        token
+      );
+
+      if (!('user' in payload) && !('accessTokenId' in payload)) {
+        throw new Error('Unknown or malformed token');
+      }
 
       return {
         isValid: true,
         payload,
       };
     } catch (error) {
-      logger.logError('Bad token', { error });
+      logger.logException('Bad token', error, { token });
 
       return {
         isValid: false,

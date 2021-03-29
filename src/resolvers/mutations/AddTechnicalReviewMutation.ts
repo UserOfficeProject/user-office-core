@@ -1,7 +1,5 @@
 import {
   Arg,
-  Args,
-  ArgsType,
   Ctx,
   Field,
   InputType,
@@ -31,6 +29,9 @@ export class AddTechnicalReviewInput implements Partial<TechnicalReview> {
 
   @Field(() => TechnicalReviewStatus, { nullable: true })
   public status: TechnicalReviewStatus;
+
+  @Field(() => Boolean, { nullable: true })
+  public submitted: boolean;
 }
 
 @Resolver()

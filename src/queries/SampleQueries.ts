@@ -33,10 +33,10 @@ export default class SampleQueries {
     let samples = await this.dataSource.getSamples(args);
 
     samples = await Promise.all(
-      samples.map(sample =>
+      samples.map((sample) =>
         this.sampleAuthorization.hasReadRights(agent, sample.id)
       )
-    ).then(results => samples.filter((_v, index) => results[index]));
+    ).then((results) => samples.filter((_v, index) => results[index]));
 
     return samples;
   }

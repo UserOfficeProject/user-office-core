@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable jest/valid-expect */
 /* eslint-disable quotes */
 import 'reflect-metadata';
@@ -20,12 +19,12 @@ async function getProposalsInCall(callId: number): Promise<Proposal[]> {
     .table('proposals')
     .where('call_id', callId);
 
-  return proposals.map(p => createProposalObject(p));
+  return proposals.map((p) => createProposalObject(p));
 }
 
 async function createCall(format?: string): Promise<Call> {
   const call = await database('call')
-    .modify(query => {
+    .modify((query) => {
       if (format) {
         query.insert({
           call_id: -999,
@@ -104,21 +103,13 @@ async function setup() {
 }
 
 async function teardown() {
-  await database('questionaries')
-    .where('questionary_id', -999)
-    .del();
+  await database('questionaries').where('questionary_id', -999).del();
 
-  await database('proposals')
-    .where('title', 'like', '[IT] proposal%')
-    .del();
+  await database('proposals').where('title', 'like', '[IT] proposal%').del();
 
-  await database('call')
-    .where('call_id', -999)
-    .del();
+  await database('call').where('call_id', -999).del();
 
-  await database('templates')
-    .where('template_id', -999)
-    .del();
+  await database('templates').where('template_id', -999).del();
 
   await database('proposal_workflows')
     .where('proposal_workflow_id', -999)
@@ -158,7 +149,7 @@ describe('Call update', () => {
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
-      p => !expectedRefNums.includes(p.shortCode)
+      (p) => !expectedRefNums.includes(p.shortCode)
     );
 
     expect(invalidUpdates.length).toBe(0);
@@ -180,7 +171,7 @@ describe('Call update', () => {
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
-      p => !expectedRefNums.includes(p.shortCode)
+      (p) => !expectedRefNums.includes(p.shortCode)
     );
 
     expect(invalidUpdates.length).toBe(0);
@@ -203,7 +194,7 @@ describe('Call update', () => {
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
-      p => !expectedRefNums.includes(p.shortCode)
+      (p) => !expectedRefNums.includes(p.shortCode)
     );
 
     expect(invalidUpdates.length).toBe(0);
@@ -235,7 +226,7 @@ describe('Call update', () => {
   test('In a call with 1000 proposals, when the format is changed, all proposals are correctly updated', async () => {
     const call = await createCall('192{digits:4}');
     const expectedRefNums: string[] = [];
-    await BluePromise.mapSeries(new Array(1000), async function(_prop, index) {
+    await BluePromise.mapSeries(new Array(1000), async function (_prop, index) {
       expectedRefNums.push('221' + String(index).padStart(5, '0'));
 
       return await createSubmittedProposal(call.id, index, index);
@@ -251,7 +242,7 @@ describe('Call update', () => {
 
     const proposals = await getProposalsInCall(call.id);
     const invalidProposals = proposals.filter(
-      s => !expectedRefNums.includes(s.shortCode)
+      (s) => !expectedRefNums.includes(s.shortCode)
     );
 
     expect(invalidProposals.length).toBe(0);

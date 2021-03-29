@@ -7,7 +7,10 @@ import {
   getQuestionaryStepByTopicId,
 } from '../../models/ProposalModelFunctions';
 import { Answer, QuestionaryStep } from '../../models/Questionary';
-import { TechnicalReview } from '../../models/TechnicalReview';
+import {
+  TechnicalReview,
+  TechnicalReviewStatus,
+} from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
 import { isRejection } from '../../rejection';
@@ -20,8 +23,23 @@ type ProposalPDFData = {
   coProposers: BasicUserDetails[];
   questionarySteps: QuestionaryStep[];
   attachments: Attachment[];
-  technicalReview?: TechnicalReview;
+  technicalReview?: Omit<TechnicalReview, 'status'> & { status: string };
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
+};
+
+const getTechnicalReviewHumanReadableStatus = (
+  status: TechnicalReviewStatus
+): string => {
+  switch (status) {
+    case TechnicalReviewStatus.FEASIBLE:
+      return 'Feasible';
+    case TechnicalReviewStatus.PARTIALLY_FEASIBLE:
+      return 'Partially feasible';
+    case TechnicalReviewStatus.UNFEASIBLE:
+      return 'Unfeasible';
+    default:
+      return `Unknown status: ${status}`;
+  }
 };
 
 const getTopicActiveAnswers = (
@@ -31,11 +49,8 @@ const getTopicActiveAnswers = (
   const step = getQuestionaryStepByTopicId(questionarySteps, topicId);
 
   return step
-    ? (step.fields.filter(field => {
-        return areDependenciesSatisfied(
-          questionarySteps,
-          field.question.proposalQuestionId
-        );
+    ? (step.fields.filter((field) => {
+        return areDependenciesSatisfied(questionarySteps, field.question.id);
       }) as Answer[])
     : [];
 };
@@ -85,7 +100,7 @@ export const collectProposalPDFData = async (
 
   const samplePDFData = (
     await Promise.all(
-      samples.map(sample => collectSamplePDFData(sample.id, user))
+      samples.map((sample) => collectSamplePDFData(sample.id, user))
     )
   ).map(({ sample, sampleQuestionaryFields, attachments }) => {
     sampleAttachments.push(...attachments);
@@ -119,7 +134,7 @@ export const collectProposalPDFData = async (
     const topic = step.topic;
     const answers = getTopicActiveAnswers(questionarySteps, topic.id).filter(
       // skip `PROPOSAL_BASIS` types
-      answer => answer.question.dataType !== DataType.PROPOSAL_BASIS
+      (answer) => answer.question.dataType !== DataType.PROPOSAL_BASIS
     );
 
     // if the questionary step has nothing else but `PROPOSAL_BASIS` question
@@ -137,10 +152,8 @@ export const collectProposalPDFData = async (
 
       if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
         answer.value = samples
-          .filter(
-            sample => sample.questionId === answer.question.proposalQuestionId
-          )
-          .map(sample => sample);
+          .filter((sample) => sample.questionId === answer.question.id)
+          .map((sample) => sample);
       }
     }
 
@@ -158,7 +171,10 @@ export const collectProposalPDFData = async (
       proposal.id
     );
     if (technicalReview) {
-      out.technicalReview = technicalReview;
+      out.technicalReview = {
+        ...technicalReview,
+        status: getTechnicalReviewHumanReadableStatus(technicalReview.status),
+      };
     }
   }
 

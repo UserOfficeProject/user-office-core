@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import BluePromise from 'bluebird';
 
 import { Call } from '../../models/Call';
@@ -15,6 +14,20 @@ import { calculateReferenceNumber } from './ProposalDataSource';
 import { CallRecord, createCallObject } from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
+  async delete(id: number): Promise<Call> {
+    return database
+      .where('call.call_id', id)
+      .del()
+      .from('call')
+      .returning('*')
+      .then((call: CallRecord[]) => {
+        if (call === undefined || call.length !== 1) {
+          throw new Error(`Could not delete call with id:${id}`);
+        }
+
+        return createCallObject(call[0]);
+      });
+  }
   async get(id: number): Promise<Call | null> {
     return database
       .select()
@@ -64,7 +77,7 @@ export default class PostgresCallDataSource implements CallDataSource {
     }
 
     return query.then((callDB: CallRecord[]) =>
-      callDB.map(call => createCallObject(call))
+      callDB.map((call) => createCallObject(call))
     );
   }
 
@@ -101,7 +114,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async update(args: UpdateCallInput): Promise<Call> {
-    const call: CallRecord[] = await database.transaction(async trx => {
+    const call: CallRecord[] = await database.transaction(async (trx) => {
       try {
         /*
          * Check if the reference number format has been changed,
@@ -128,7 +141,7 @@ export default class PostgresCallDataSource implements CallDataSource {
 
           await BluePromise.map(
             proposals,
-            async p => {
+            async (p) => {
               await database
                 .update({
                   short_code: await calculateReferenceNumber(
@@ -191,7 +204,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   async assignInstrumentsToCall(
     args: AssignInstrumentsToCallInput
   ): Promise<Call> {
-    const valuesToInsert = args.instrumentIds.map(instrumentId => ({
+    const valuesToInsert = args.instrumentIds.map((instrumentId) => ({
       instrument_id: instrumentId,
       call_id: args.callId,
     }));

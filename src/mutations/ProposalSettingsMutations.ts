@@ -9,20 +9,20 @@ import {
   addProposalWorkflowStatusValidationSchema,
   moveProposalWorkflowStatusValidationSchema,
   deleteProposalWorkflowStatusValidationSchema,
-  addNextStatusEventsValidationSchema,
+  // addNextStatusEventsValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
-import { NextStatusEvent } from '../models/NextStatusEvent';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { Roles } from '../models/Role';
+import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
-import { AddNextStatusEventsToConnectionInput } from '../resolvers/mutations/settings/AddNextStatusEventsToConnection';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
+import { AddStatusChangingEventsToConnectionInput } from '../resolvers/mutations/settings/AddStatusChangingEventsToConnection';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { DeleteProposalWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteProposalWorkflowStatusMutation';
@@ -40,7 +40,7 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: CreateProposalStatusInput
   ): Promise<ProposalStatus | Rejection> {
-    return this.dataSource.createProposalStatus(args).catch(error => {
+    return this.dataSource.createProposalStatus(args).catch((error) => {
       logger.logException('Could not create proposal status', error, {
         agent,
         args,
@@ -56,7 +56,7 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: UpdateProposalStatusInput
   ): Promise<ProposalStatus | Rejection> {
-    return this.dataSource.updateProposalStatus(args).catch(error => {
+    return this.dataSource.updateProposalStatus(args).catch((error) => {
       logger.logException('Could not update proposal status', error, {
         agent,
         args,
@@ -72,7 +72,7 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: { id: number }
   ): Promise<ProposalStatus | Rejection> {
-    return this.dataSource.deleteProposalStatus(args.id).catch(error => {
+    return this.dataSource.deleteProposalStatus(args.id).catch((error) => {
       logger.logException('Could not delete proposal status', error, {
         agent,
         args,
@@ -88,7 +88,7 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: CreateProposalWorkflowInput
   ): Promise<ProposalWorkflow | Rejection> {
-    return this.dataSource.createProposalWorkflow(args).catch(error => {
+    return this.dataSource.createProposalWorkflow(args).catch((error) => {
       logger.logException('Could not create proposal workflow', error, {
         agent,
         args,
@@ -104,7 +104,7 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: UpdateProposalWorkflowInput
   ): Promise<ProposalWorkflow | Rejection> {
-    return this.dataSource.updateProposalWorkflow(args).catch(error => {
+    return this.dataSource.updateProposalWorkflow(args).catch((error) => {
       logger.logException('Could not update proposal workflow', error, {
         agent,
         args,
@@ -120,7 +120,7 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: { id: number }
   ): Promise<ProposalWorkflow | Rejection> {
-    return this.dataSource.deleteProposalWorkflow(args.id).catch(error => {
+    return this.dataSource.deleteProposalWorkflow(args.id).catch((error) => {
       logger.logException('Could not delete proposal workflow', error, {
         agent,
         args,
@@ -259,8 +259,8 @@ export default class ProposalSettingsMutations {
           findAllConnectionsByParentGroup
         )
       )
-        .filter(childConnection => childConnection.sortOrder === 0)
-        .map(firstChildConnection => ({
+        .filter((childConnection) => childConnection.sortOrder === 0)
+        .map((firstChildConnection) => ({
           ...firstChildConnection,
           prevProposalStatusId: lastConnection.proposalStatusId,
         }));
@@ -271,7 +271,7 @@ export default class ProposalSettingsMutations {
       ) {
         updatedWorkflowConnections.push(...allFirstChildrenGroupConnections);
 
-        allFirstChildrenGroupConnections.forEach(firstChildConnection => {
+        allFirstChildrenGroupConnections.forEach((firstChildConnection) => {
           updatedWorkflowConnections.push({
             ...lastConnection,
             nextProposalStatusId: firstChildConnection.proposalStatusId,
@@ -372,18 +372,18 @@ export default class ProposalSettingsMutations {
     }
   }
 
-  @ValidateArgs(addNextStatusEventsValidationSchema)
+  // @ValidateArgs(addNextStatusEventsValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async addNextStatusEventsToConnection(
+  async addStatusChangingEventsToConnection(
     agent: UserWithRole | null,
-    args: AddNextStatusEventsToConnectionInput
-  ): Promise<NextStatusEvent[] | Rejection> {
+    args: AddStatusChangingEventsToConnectionInput
+  ): Promise<StatusChangingEvent[] | Rejection> {
     return this.dataSource
-      .addNextStatusEventsToConnection(
+      .addStatusChangingEventsToConnection(
         args.proposalWorkflowConnectionId,
-        args.nextStatusEvents
+        args.statusChangingEvents
       )
-      .catch(error => {
+      .catch((error) => {
         logger.logException('Could not add next status events', error, {
           agent,
           args,
@@ -445,7 +445,7 @@ export default class ProposalSettingsMutations {
         args.proposalStatusId,
         args.proposalWorkflowId
       )
-      .then(async result => {
+      .then(async (result) => {
         const allGroupWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
           args.proposalWorkflowId,
           result.droppableGroupId
@@ -510,7 +510,7 @@ export default class ProposalSettingsMutations {
 
         return true;
       })
-      .catch(error => {
+      .catch((error) => {
         logger.logException(
           'Could not delete proposal workflow status',
           error,

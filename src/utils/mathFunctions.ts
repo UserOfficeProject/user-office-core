@@ -1,7 +1,7 @@
 import { Review, ReviewStatus } from '../models/Review';
 
 export const average = (numbers: number[]) => {
-  const sum = numbers.reduce(function(sum, value) {
+  const sum = numbers.reduce(function (sum, value) {
     return sum + value;
   }, 0);
 
@@ -25,7 +25,7 @@ export const standardDeviation = (numbers: number[]) => {
   }
   const avg = average(numbers);
 
-  const squareDiffs = numbers?.map(function(value) {
+  const squareDiffs = numbers?.map(function (value) {
     const diff = value - avg;
     const sqrDiff = diff * diff;
 
@@ -41,5 +41,5 @@ export const standardDeviation = (numbers: number[]) => {
 
 export const getGrades = (reviews: Review[] | null | undefined) =>
   reviews
-    ?.filter(review => review.status === ReviewStatus.SUBMITTED)
-    .map(review => review.grade as number) ?? [];
+    ?.filter((review) => review.status === ReviewStatus.SUBMITTED)
+    .map((review) => review.grade as number) ?? [];

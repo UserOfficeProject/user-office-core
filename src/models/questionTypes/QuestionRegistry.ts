@@ -1,5 +1,7 @@
 import { logger } from '@esss-swap/duo-logger';
+import Knex from 'knex';
 
+import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
@@ -22,6 +24,10 @@ export interface Question {
   readonly isReadOnly: boolean;
   readonly getDefaultAnswer: (field: QuestionTemplateRelation) => any;
   readonly transform?: (field: QuestionTemplateRelation, value: any) => any;
+  readonly filterQuery?: (
+    query: Knex.QueryBuilder<any, any>,
+    filter: QuestionFilterInput
+  ) => any;
 }
 
 // Add new component definitions here
@@ -44,7 +50,7 @@ const registry = [
 Object.freeze(registry);
 
 const componentMap = new Map<DataType, Question>();
-registry.forEach(definition =>
+registry.forEach((definition) =>
   componentMap.set(definition.dataType, definition)
 );
 

@@ -34,7 +34,7 @@ export class Template implements Partial<TemplateOrigin> {
   public isArchived: boolean;
 }
 
-@Resolver(of => Template)
+@Resolver((of) => Template)
 export class TemplateResolver {
   @FieldResolver(() => [TemplateStep])
   async steps(

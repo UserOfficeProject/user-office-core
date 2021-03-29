@@ -1,6 +1,7 @@
-/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable quotes */
 import { FileUploadConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionTemplateRelation } from '../../resolvers/types/QuestionTemplateRelation';
+import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType } from '../Template';
 import { Question } from './QuestionRegistry';
 
@@ -29,4 +30,24 @@ export const fileUploadDefinition: Question = {
   },
   isReadOnly: false,
   getDefaultAnswer: () => [],
+  filterQuery: (queryBuilder, filter) => {
+    const value = JSON.parse(filter.value).value;
+    switch (filter.compareOperator) {
+      case QuestionFilterCompareOperator.EXISTS:
+        if (value === true) {
+          return queryBuilder.andWhereRaw(
+            "jsonb_array_length((answers.answer->>'value')::jsonb) > 0"
+          );
+        } else {
+          return queryBuilder.andWhereRaw(
+            "jsonb_array_length((answers.answer->>'value')::jsonb) = 0"
+          );
+        }
+
+      default:
+        throw new Error(
+          `Unsupported comparator for Boolean ${filter.compareOperator}`
+        );
+    }
+  },
 };

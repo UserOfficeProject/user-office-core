@@ -47,14 +47,17 @@ export default function createHandler(
           break;
         case Event.PROPOSAL_INSTRUMENT_SELECTED:
         case Event.PROPOSAL_SEP_SELECTED:
-          event.proposalids.proposalIds.forEach(async proposalId => {
-            await eventLogsDataSource.set(
-              event.loggedInUserId,
-              event.type,
-              json,
-              proposalId.toString()
-            );
-          });
+        case Event.PROPOSAL_STATUS_UPDATED:
+          event.proposalidswithnextstatus.proposalIds.forEach(
+            async (proposalId) => {
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                proposalId.toString()
+              );
+            }
+          );
           break;
         case Event.PROPOSAL_INSTRUMENT_SUBMITTED:
           await eventLogsDataSource.set(
@@ -62,6 +65,14 @@ export default function createHandler(
             event.type,
             json,
             event.instrumenthasproposals.instrumentId.toString()
+          );
+          break;
+        case Event.PROPOSAL_SEP_REVIEW_UPDATED:
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            event.reviewwithnextproposalstatus.id.toString()
           );
           break;
         default:
