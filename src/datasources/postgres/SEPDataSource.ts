@@ -6,7 +6,13 @@ import {
 } from '../../models/Proposal';
 import { ReviewStatus } from '../../models/Review';
 import { Role, Roles } from '../../models/Role';
-import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../../models/SEP';
+import {
+  SEP,
+  SEPAssignment,
+  SEPReviewer,
+  SEPProposal,
+  SEPProposalWithReviewGradesAndRanking,
+} from '../../models/SEP';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { UserRole } from '../../models/User';
 import {
@@ -33,6 +39,7 @@ import {
   createRoleObject,
   RoleUserRecord,
   SepMeetingDecisionRecord,
+  SepProposalWithReviewGradesAndRankingRecord,
 } from './records';
 
 export default class PostgresSEPDataSource implements SEPDataSource {
@@ -741,16 +748,47 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .whereIn('proposal_id', proposalIds)
       .then((sepMeetingDecisionRecords: SepMeetingDecisionRecord[]) => {
         if (!sepMeetingDecisionRecords.length) {
-          logger.logError('Could not find any proposal meeting decision', {
-            proposalIds,
-          });
-
-          throw new Error('Could not find any proposal meeting decision');
+          return [];
         }
 
         return sepMeetingDecisionRecords.map((sepMeetingDecisionRecord) =>
           createSepMeetingDecisionObject(sepMeetingDecisionRecord)
         );
       });
+  }
+
+  async getSepProposalsWithReviewGradesAndRanking(
+    proposalIds: number[]
+  ): Promise<SEPProposalWithReviewGradesAndRanking[]> {
+    return database('SEP_Proposals as sp')
+      .select([
+        'sp.proposal_id',
+        database.raw('json_agg(sr.grade) review_grades'),
+        'smd.rank_order',
+      ])
+      .join('SEP_meeting_decisions as smd', {
+        'smd.proposal_id': 'sp.proposal_id',
+      })
+      .join('SEP_Reviews as sr', {
+        'sr.proposal_id': 'sp.proposal_id',
+      })
+      .whereIn('sp.proposal_id', proposalIds)
+      .groupBy(['sp.proposal_id', 'smd.rank_order'])
+      .then(
+        (
+          SepProposalWithReviewGradesAndRankingRecords: SepProposalWithReviewGradesAndRankingRecord[]
+        ) => {
+          const sepProposalWithReviewGradesAndRanking = SepProposalWithReviewGradesAndRankingRecords.map(
+            (SepProposalWithReviewGradesAndRankingRecord) =>
+              new SEPProposalWithReviewGradesAndRanking(
+                SepProposalWithReviewGradesAndRankingRecord.proposal_id,
+                SepProposalWithReviewGradesAndRankingRecord.rank_order,
+                SepProposalWithReviewGradesAndRankingRecord.review_grades
+              )
+          );
+
+          return sepProposalWithReviewGradesAndRanking;
+        }
+      );
   }
 }

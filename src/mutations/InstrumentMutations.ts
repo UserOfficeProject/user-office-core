@@ -34,6 +34,7 @@ import {
   InstrumentAvailabilityTimeArgs,
   InstrumentSubmitArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
+import { sortByRankOrAverageScore } from '../utils/mathFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class InstrumentMutations {
@@ -283,12 +284,39 @@ export default class InstrumentMutations {
       (sepInstrumentProposal) => sepInstrumentProposal.proposalId
     );
 
-    // TODO: Create function to get all sep meeting decisions by proposal ids and check if they all have rankings.
-    // If rankings are missing add them and save in the database using saveSepMeetingDecision
-
-    const sepMeetingDecisions = this.sepDataSource.getProposalsSepMeetingDecisions(
+    const sepProposalsWithReviewsAndRanking = await this.sepDataSource.getSepProposalsWithReviewGradesAndRanking(
       submittedInstrumentProposalIds
     );
+
+    const allSepMeetingsHasRankings = sepProposalsWithReviewsAndRanking.every(
+      (sepProposalWithReviewsAndRanking) =>
+        !!sepProposalWithReviewsAndRanking.rankOrder
+    );
+
+    if (!allSepMeetingsHasRankings) {
+      const sortedSepProposals = sortByRankOrAverageScore(
+        sepProposalsWithReviewsAndRanking
+      );
+
+      const allProposalsWithRankings = sortedSepProposals.map(
+        (sortedSepProposal, index) => {
+          if (!sortedSepProposal.rankOrder) {
+            sortedSepProposal.rankOrder = index + 1;
+          }
+
+          return sortedSepProposal;
+        }
+      );
+
+      await Promise.all(
+        allProposalsWithRankings.map((proposalWithRanking) => {
+          return this.sepDataSource.saveSepMeetingDecision({
+            proposalId: proposalWithRanking.proposalId,
+            rankOrder: proposalWithRanking.rankOrder,
+          });
+        })
+      );
+    }
 
     return this.dataSource
       .submitInstrument(submittedInstrumentProposalIds, args.instrumentId)

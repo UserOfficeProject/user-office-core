@@ -28,7 +28,7 @@ export class SaveSEPMeetingDecisionInput {
   public recommendation?: ProposalEndStatus;
 
   @Field(() => Int, { nullable: true })
-  public rankOrder?: number;
+  public rankOrder?: number | null;
 
   @Field(() => Boolean, { nullable: true })
   public submitted?: boolean;

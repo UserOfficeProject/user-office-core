@@ -416,6 +416,12 @@ export interface SepMeetingDecisionRecord {
   readonly submitted_by?: number | null;
 }
 
+export interface SepProposalWithReviewGradesAndRankingRecord {
+  readonly proposal_id: number;
+  readonly rank_order: number | null;
+  readonly review_grades: number[];
+}
+
 export interface ProposalEventsRecord {
   readonly proposal_id: number;
   readonly proposal_created: boolean;

@@ -2,7 +2,13 @@ import {
   ProposalEndStatus,
   ProposalIdsWithNextStatus,
 } from '../../models/Proposal';
-import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../../models/SEP';
+import {
+  SEP,
+  SEPAssignment,
+  SEPReviewer,
+  SEPProposal,
+  SEPProposalWithReviewGradesAndRanking,
+} from '../../models/SEP';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { User } from '../../models/User';
 import {
@@ -370,5 +376,11 @@ export class SEPDataSourceMock implements SEPDataSource {
     overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput
   ): Promise<SepMeetingDecision> {
     return dummySepMeetingDecision;
+  }
+
+  async getSepProposalsWithReviewGradesAndRanking(
+    proposalIds: number[]
+  ): Promise<SEPProposalWithReviewGradesAndRanking[]> {
+    return [new SEPProposalWithReviewGradesAndRanking(1, 1, [7])];
   }
 }

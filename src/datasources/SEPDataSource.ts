@@ -1,6 +1,12 @@
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Role } from '../models/Role';
-import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../models/SEP';
+import {
+  SEP,
+  SEPAssignment,
+  SEPReviewer,
+  SEPProposal,
+  SEPProposalWithReviewGradesAndRanking,
+} from '../models/SEP';
 import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import {
   UpdateMemberSEPArgs,
@@ -96,4 +102,7 @@ export interface SEPDataSource {
   getProposalsSepMeetingDecisions(
     proposalIds: number[]
   ): Promise<SepMeetingDecision[]>;
+  getSepProposalsWithReviewGradesAndRanking(
+    proposalIds: number[]
+  ): Promise<SEPProposalWithReviewGradesAndRanking[]>;
 }
