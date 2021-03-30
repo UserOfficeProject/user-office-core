@@ -84,8 +84,9 @@ const isProposalSubmitted = (proposal: { submitted: boolean }) =>
 //Is the proposal in draft or edited state? If so set read only to false.
 function isProposalEditable(proposal: ProposalSubsetSubmission) {
   if (
-    proposal.status.shortCode.toString() === 'DRAFT' ||
-    proposal.status.shortCode.toString() === 'EDITABLE_SUBMISSION'
+    proposal.status != null &&
+    (proposal.status.shortCode.toString() === 'DRAFT' ||
+      proposal.status.shortCode.toString() === 'EDITABLE_SUBMISSION')
   ) {
     return false;
   } else {
