@@ -20,7 +20,6 @@ BEGIN
         INSERT INTO proposal_statuses (name, description) VALUES ('NOT_ALLOCATED', 'Proposal is not allocated.');
         INSERT INTO proposal_statuses (name, description) VALUES ('SCHEDULING', 'Proposal should be scheduled.');
         INSERT INTO proposal_statuses (name, description) VALUES ('EXPIRED', 'Proposal has expired.');
-        INSERT INTO proposal_statuses (name, description) VALUES ('EDITABLE_SUBMISSION', 'Proposal is editable after submission.');
     END;
 	END IF;
 END;
