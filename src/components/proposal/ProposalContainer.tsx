@@ -86,7 +86,7 @@ function isProposalEditable(proposal: ProposalSubsetSubmission) {
   if (
     proposal.status != null &&
     (proposal.status.shortCode.toString() === 'DRAFT' ||
-      proposal.status.shortCode.toString() === 'EDITABLE_SUBMISSION')
+      proposal.status.shortCode.toString() === 'EDITABLE_SUBMITTED')
   ) {
     return false;
   } else {
