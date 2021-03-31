@@ -1,7 +1,6 @@
 import baseContext from '../../buildContext';
 import { UserWithRole } from '../../models/User';
 import { average, getGrades } from '../../utils/mathFunctions';
-import { getCurrentTimestamp } from '../util';
 
 type SEPXLSXData = Array<{
   sheetName: string;
@@ -73,6 +72,12 @@ export const collectSEPlXLSXData = async (
   callId: number,
   user: UserWithRole
 ): Promise<{ data: SEPXLSXData; filename: string }> => {
+  const sep = await baseContext.queries.sep.get(user, sepId);
+  const call = await baseContext.queries.call.get(user, callId);
+
+  // TODO: decide on filename
+  const filename = `SEP-${sep?.code}-${call?.shortCode}.xlsx`;
+
   const instruments = await baseContext.queries.instrument.getInstrumentsBySepId(
     user,
     {
@@ -216,7 +221,7 @@ export const collectSEPlXLSXData = async (
         row.principalInv,
         row.instrAvailTime ?? '<missing>',
         row.techReviewTimeAllocation ?? '<missing>',
-        row.sepTimeAllocation ?? '<missing>',
+        row.sepTimeAllocation ?? row.techReviewTimeAllocation ?? '<missing>',
         row.propReviewAvgScore ?? '<missing>',
         row.propSEPRankOrder ?? '<missing>',
         row.inAvailZone ?? '<missing>',
@@ -224,10 +229,8 @@ export const collectSEPlXLSXData = async (
     });
   });
 
-  //
   return {
     data: out,
-    // TODO: decide on filename
-    filename: `SEP_${getCurrentTimestamp()}.xlsx`,
+    filename: filename.replace(/\s+/g, '_'),
   };
 };
