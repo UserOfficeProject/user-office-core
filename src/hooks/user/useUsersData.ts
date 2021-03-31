@@ -11,13 +11,23 @@ export function useUsersData(filter: string) {
 
   const api = useDataApi();
   useEffect(() => {
+    let unmounted = false;
+
     setLoading(true);
     api()
       .getUsers({ filter })
       .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         setUsersData(data.users);
         setLoading(false);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [filter, api]);
 
   return { loading, usersData };

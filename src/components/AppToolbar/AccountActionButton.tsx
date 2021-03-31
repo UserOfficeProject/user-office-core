@@ -44,7 +44,7 @@ const AccountActionButton: React.FC = () => {
         style={{ backdropFilter: 'blur(6px)' }}
       >
         <DialogContent>
-          <RoleSelection close={() => setShow(false)} />
+          <RoleSelection />
         </DialogContent>
       </Dialog>
       <>

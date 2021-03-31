@@ -10,14 +10,24 @@ export function useCallData(callId: number) {
   const api = useDataApi();
 
   useEffect(() => {
+    let unmounted = false;
+
     api()
       .getCall({ id: callId })
       .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         if (data.call) {
           setCall(data.call as Call);
         }
         setLoading(false);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [api, callId]);
 
   return { loading, call, setCall };
