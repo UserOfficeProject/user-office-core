@@ -1,5 +1,5 @@
 ARG WINDOWS_VERSION
-FROM docker-registry.devs.facilities.rl.ac.uk/bisapps-node:12-servercore${WINDOWS_VERSION}-1.0.0-SNAPSHOT
+FROM docker-registry.devs.facilities.rl.ac.uk/bisapps-node:12-servercore${WINDOWS_VERSION}
 
 # The Git repo should be mounted from the host into this directory
 WORKDIR /app
