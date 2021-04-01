@@ -397,7 +397,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
     return database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select([
+        'proposals.*',
+        'instrument_has_scientists.*',
+        'instrument_has_proposals.instrument_id',
+        'instrument_has_proposals.proposal_id',
+        database.raw('count(*) OVER() AS full_count'),
+      ])
       .from('proposals')
       .join('instrument_has_scientists', {
         'instrument_has_scientists.user_id': scientistId,
