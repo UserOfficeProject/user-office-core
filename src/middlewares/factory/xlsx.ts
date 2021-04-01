@@ -76,19 +76,17 @@ router.get(`/${XLSXType.SEP}/:sep_id/call/:call_id`, async (req, res, next) => {
       );
     }
 
-    const meta: XLSXMetaBase = {
-      singleFilename: '',
-      collectionFilename: '', // not used
-      columns: defaultSEPDataColumns,
-    };
-
     const { data, filename } = await collectSEPlXLSXData(
       sepId,
       callId,
       userWithRole
     );
 
-    meta.singleFilename = filename;
+    const meta: XLSXMetaBase = {
+      singleFilename: filename,
+      collectionFilename: filename,
+      columns: defaultSEPDataColumns,
+    };
 
     callFactoryService(
       DownloadType.XLSX,
