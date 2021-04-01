@@ -6,5 +6,4 @@ WORKDIR /app
 
 EXPOSE 4000
 
-
 CMD ["npm.cmd", "run", "dev:docker"]
