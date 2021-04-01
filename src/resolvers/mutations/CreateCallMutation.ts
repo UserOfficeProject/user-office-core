@@ -10,7 +10,6 @@ import {
 
 import { ResolverContext } from '../../context';
 import { CallResponseWrap } from '../types/CommonWrappers';
-import { FieldCondition } from '../types/FieldCondition';
 import { wrapResponse } from '../wrapResponse';
 
 @InputType()

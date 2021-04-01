@@ -79,6 +79,8 @@ describe('Test Call Mutations', () => {
       endNotify: new Date('2019-02-19'),
       startCycle: new Date('2019-02-19'),
       endCycle: new Date('2019-02-19'),
+      referenceNumberFormat: 'format',
+      proposalSequence: 0,
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
       proposalWorkflowId: 1,
