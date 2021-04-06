@@ -1,7 +1,6 @@
 import baseContext from '../../buildContext';
 import { UserWithRole } from '../../models/User';
 import { average, getGrades } from '../../utils/mathFunctions';
-import { getCurrentTimestamp } from '../util';
 
 type SEPXLSXData = Array<{
   sheetName: string;
@@ -73,6 +72,12 @@ export const collectSEPlXLSXData = async (
   callId: number,
   user: UserWithRole
 ): Promise<{ data: SEPXLSXData; filename: string }> => {
+  const sep = await baseContext.queries.sep.get(user, sepId);
+  const call = await baseContext.queries.call.get(user, callId);
+
+  // TODO: decide on filename
+  const filename = `SEP-${sep?.code}-${call?.shortCode}.xlsx`;
+
   const instruments = await baseContext.queries.instrument.getInstrumentsBySepId(
     user,
     {
@@ -144,6 +149,21 @@ export const collectSEPlXLSXData = async (
     })
   );
 
+  const proposalsSepMeetingDecisions = await Promise.all(
+    instrumentsProposals.map((proposals) => {
+      return Promise.all(
+        proposals.map((proposal) =>
+          proposal
+            ? baseContext.queries.sep.getProposalSepMeetingDecision(
+                user,
+                proposal.id
+              )
+            : null
+        )
+      );
+    })
+  );
+
   const proposalsPrincipalInvestigators = await Promise.all(
     instrumentsProposals.map((proposals) => {
       return Promise.all(
@@ -165,6 +185,7 @@ export const collectSEPlXLSXData = async (
       proposalsPrincipalInvestigators[indx];
     const technicalReviews = proposalsTechnicalReviews[indx];
     const sepProposals = instrumentsSepProposals[indx];
+    const sepMeetingDecisions = proposalsSepMeetingDecisions[indx];
 
     const rows = proposals.map((proposal, pIndx) => {
       const { firstname = '<missing>', lastname = '<missing>' } =
@@ -172,6 +193,7 @@ export const collectSEPlXLSXData = async (
       const technicalReview = technicalReviews[pIndx];
       const reviews = proposalReviews[pIndx];
       const sepProposal = sepProposals?.[pIndx];
+      const sepMeetingDecision = sepMeetingDecisions[pIndx];
 
       const proposalAverageScore = average(getGrades(reviews)) || 0;
 
@@ -183,7 +205,7 @@ export const collectSEPlXLSXData = async (
         techReviewTimeAllocation: technicalReview?.timeAllocation,
         sepTimeAllocation: sepProposal?.sepTimeAllocation ?? null,
         propReviewAvgScore: proposalAverageScore,
-        propSEPRankOrder: proposal?.rankOrder ?? null,
+        propSEPRankOrder: sepMeetingDecision?.rankOrder ?? null,
         inAvailZone: null,
       };
     });
@@ -199,7 +221,7 @@ export const collectSEPlXLSXData = async (
         row.principalInv,
         row.instrAvailTime ?? '<missing>',
         row.techReviewTimeAllocation ?? '<missing>',
-        row.sepTimeAllocation ?? '<missing>',
+        row.sepTimeAllocation ?? row.techReviewTimeAllocation ?? '<missing>',
         row.propReviewAvgScore ?? '<missing>',
         row.propSEPRankOrder ?? '<missing>',
         row.inAvailZone ?? '<missing>',
@@ -207,10 +229,8 @@ export const collectSEPlXLSXData = async (
     });
   });
 
-  //
   return {
     data: out,
-    // TODO: decide on filename
-    filename: `SEP_${getCurrentTimestamp()}.xlsx`,
+    filename: filename.replace(/\s+/g, '_'),
   };
 };

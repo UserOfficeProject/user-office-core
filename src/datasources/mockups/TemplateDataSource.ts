@@ -109,6 +109,9 @@ const dummyTemplateStepsFactory = () => {
 };
 
 export class TemplateDataSourceMock implements TemplateDataSource {
+  constructor() {
+    this.init();
+  }
   public init() {
     dummyProposalTemplate = dummyProposalTemplateFactory();
     dummyTemplateSteps = dummyTemplateStepsFactory();
@@ -121,7 +124,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   }
 
   async getComplementaryQuestions(
-    templateId: number
+    _templateId: number
   ): Promise<Question[] | null> {
     return [dummyQuestionFactory()];
   }
@@ -130,7 +133,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return dummyProposalTemplateFactory({ templateId: templateId + 1 });
   }
 
-  async getTemplate(templateId: number): Promise<Template | null> {
+  async getTemplate(_templateId: number): Promise<Template | null> {
     return dummyProposalTemplate;
   }
 
@@ -142,7 +145,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
   async getQuestionTemplateRelation(
     questionId: string,
-    templateId: number
+    _templateId: number
   ): Promise<QuestionTemplateRelation | null> {
     return dummyQuestionTemplateRelationFactory({
       question: { id: questionId },
@@ -152,7 +155,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   async getQuestionTemplateRelations(
     sortOrder: number,
     templateId: number,
-    questionToExcludeId?: string
+    _questionToExcludeId?: string
   ): Promise<TemplatesHasQuestions[] | null> {
     return [dummyTemplateHasQuestionRelationFactory(sortOrder, templateId)];
   }
@@ -197,7 +200,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       ),
     ];
   }
-  async isNaturalKeyPresent(naturalKey: string): Promise<boolean> {
+  async isNaturalKeyPresent(_naturalKey: string): Promise<boolean> {
     return true;
   }
 
@@ -205,7 +208,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return dummyTopicFactory({ id });
   }
   async createQuestion(
-    categoryId: TemplateCategoryId,
+    _categoryId: TemplateCategoryId,
     questionId: string,
     naturalKey: string,
     dataType: DataType,
@@ -288,13 +291,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   }
 
   async updateQuestionTemplateRelationSettings(
-    args: UpdateQuestionTemplateRelationSettingsArgs
+    _args: UpdateQuestionTemplateRelationSettingsArgs
   ): Promise<Template> {
     return dummyProposalTemplate;
   }
 
   async upsertQuestionTemplateRelations(
-    collection: TemplatesHasQuestions[]
+    _collection: TemplatesHasQuestions[]
   ): Promise<Template> {
     return dummyProposalTemplate;
   }
@@ -310,13 +313,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return newTopic;
   }
 
-  async upsertTopics(data: Topic[]): Promise<Template> {
+  async upsertTopics(_data: Topic[]): Promise<Template> {
     return dummyProposalTemplate;
   }
 
   async getTopics(
-    templateId: number,
-    topicToExcludeId?: number
+    _templateId: number,
+    _topicToExcludeId?: number
   ): Promise<Topic[]> {
     return [dummyTopicFactory()];
   }
@@ -329,12 +332,12 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return [new TemplateCategory(1, 'Proposal Questionaries')];
   }
 
-  async setActiveTemplate(args: any): Promise<boolean> {
+  async setActiveTemplate(_args: any): Promise<boolean> {
     return true;
   }
 
   async getActiveTemplateId(
-    categoryId: TemplateCategoryId
+    _categoryId: TemplateCategoryId
   ): Promise<number | null> {
     return 1;
   }

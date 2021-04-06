@@ -4,6 +4,7 @@ import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Review, ReviewWithNextProposalStatus } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { SEP } from '../models/SEP';
+import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
@@ -27,6 +28,11 @@ interface ProposalSubmittedEvent extends GeneralEvent {
 
 interface ProposalFeasibleEvent extends GeneralEvent {
   type: Event.PROPOSAL_FEASIBLE;
+  proposal: Proposal;
+}
+
+interface ProposalUnfeasibleEvent extends GeneralEvent {
+  type: Event.PROPOSAL_UNFEASIBLE;
   proposal: Proposal;
 }
 
@@ -111,6 +117,11 @@ interface ProposalSEPSelectedEvent extends GeneralEvent {
   proposalidswithnextstatus: ProposalIdsWithNextStatus;
 }
 
+interface ProposalStatusUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_STATUS_UPDATED;
+  proposalidswithnextstatus: ProposalIdsWithNextStatus;
+}
+
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SUBMITTED;
   instrumenthasproposals: InstrumentHasProposals;
@@ -119,6 +130,16 @@ interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
 interface ProposalSEPMeetingSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_MEETING_SUBMITTED;
   proposal: Proposal;
+}
+
+interface ProposalSEPMeetingSavedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_SAVED;
+  sepmeetingdecision: SepMeetingDecision;
+}
+
+interface ProposalSEPMeetingRankingOverwrittenEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN;
+  sepmeetingdecision: SepMeetingDecision;
 }
 
 interface UserResetPasswordEmailEvent extends GeneralEvent {
@@ -216,12 +237,14 @@ export type ApplicationEvent =
   | ProposalUpdatedEvent
   | ProposalSubmittedEvent
   | ProposalFeasibleEvent
+  | ProposalUnfeasibleEvent
   | ProposalSampleSafeEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
+  | ProposalStatusUpdatedEvent
   | UserCreateEvent
   | EmailInvite
   | UserResetPasswordEmailEvent
@@ -248,4 +271,6 @@ export type ApplicationEvent =
   | ProposalInstrumentSelectedEvent
   | ProposalSEPSelectedEvent
   | ProposalInstrumentSubmittedEvent
-  | ProposalSEPMeetingSubmittedEvent;
+  | ProposalSEPMeetingSubmittedEvent
+  | ProposalSEPMeetingSavedEvent
+  | ProposalSEPMeetingRankingOverwrittenEvent;

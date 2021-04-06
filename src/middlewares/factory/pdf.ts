@@ -41,6 +41,7 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_ids`, async (req, res, next) => {
       DownloadType.PDF,
       PDFType.PROPOSAL,
       { data, meta },
+      req,
       res,
       next
     );
@@ -77,6 +78,7 @@ router.get(`/${PDFType.SAMPLE}/:sample_ids`, async (req, res, next) => {
       DownloadType.PDF,
       PDFType.SAMPLE,
       { data, meta },
+      req,
       res,
       next
     );
@@ -115,6 +117,7 @@ router.get(
         DownloadType.PDF,
         PDFType.SHIPMENT_LABEL,
         { data, meta },
+        req,
         res,
         next
       );

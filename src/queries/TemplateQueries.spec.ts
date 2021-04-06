@@ -1,4 +1,7 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUserOfficerWithRole,
@@ -7,10 +10,9 @@ import {
 import { Template, TemplateStep } from '../models/Template';
 import TemplateQueries from './TemplateQueries';
 
-const dummyTemplateDataSource = new TemplateDataSourceMock();
-const templateQueries = new TemplateQueries(dummyTemplateDataSource);
+const templateQueries = container.resolve(TemplateQueries);
 beforeEach(() => {
-  dummyTemplateDataSource.init();
+  container.resolve<TemplateDataSourceMock>(Tokens.TemplateDataSource).init();
 });
 
 test('Non authentificated user can not get the template', () => {

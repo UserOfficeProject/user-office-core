@@ -1,7 +1,9 @@
+import { container } from 'tsyringe';
+
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { Rejection, rejection } from '../rejection';
-import { userAuthorization } from '../utils/UserAuthorization';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 const Authorized = (roles: Roles[] = []) => {
   return (
@@ -15,6 +17,7 @@ const Authorized = (roles: Roles[] = []) => {
     }
   ) => {
     const originalMethod = descriptor.value;
+    const userAuthorization = container.resolve(UserAuthorization);
 
     descriptor.value = async function (...args) {
       const [agent] = args;

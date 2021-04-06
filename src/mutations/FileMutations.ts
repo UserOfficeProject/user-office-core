@@ -1,13 +1,17 @@
 import { existsSync, mkdirSync } from 'fs';
 
 import { logger } from '@esss-swap/duo-logger';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { FileDataSource } from '../datasources/IFileDataSource';
 import { FileMetadata } from '../models/Blob';
 import { Rejection, rejection } from '../rejection';
-
+@injectable()
 export default class FileMutations {
-  constructor(private dataSource: FileDataSource) {}
+  constructor(
+    @inject(Tokens.FileDataSource) private dataSource: FileDataSource
+  ) {}
 
   async put(
     fileName: string,

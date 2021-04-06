@@ -4,12 +4,15 @@ import { ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { ReviewStatus } from '../../models/Review';
 import { Role, Roles } from '../../models/Role';
 import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../../models/SEP';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { UserRole } from '../../models/User';
 import {
   UpdateMemberSEPArgs,
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../../resolvers/mutations/AssignMembersToSEP';
+import { OverwriteSepMeetingDecisionRankingInput } from '../../resolvers/mutations/OverwriteSepMeetingDecisionRankingMutation';
+import { SaveSEPMeetingDecisionInput } from '../../resolvers/mutations/SEPMeetingDecisionMutation';
 import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
 import {
@@ -23,8 +26,10 @@ import {
   createSEPAssignmentObject,
   createSEPProposalObject,
   createSEPReviewerObject,
+  createSepMeetingDecisionObject,
   createRoleObject,
   RoleUserRecord,
+  SepMeetingDecisionRecord,
 } from './records';
 
 export default class PostgresSEPDataSource implements SEPDataSource {
@@ -629,5 +634,81 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .first();
 
     return record !== undefined;
+  }
+
+  async saveSepMeetingDecision(
+    saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput,
+    submittedBy?: number | null
+  ): Promise<SepMeetingDecision> {
+    const dataToUpsert = {
+      proposal_id: saveSepMeetingDecisionInput.proposalId,
+      comment_for_management: saveSepMeetingDecisionInput.commentForManagement,
+      comment_for_user: saveSepMeetingDecisionInput.commentForUser,
+      rank_order: saveSepMeetingDecisionInput.rankOrder,
+      recommendation: saveSepMeetingDecisionInput.recommendation,
+      submitted: saveSepMeetingDecisionInput.submitted,
+      submitted_by: submittedBy,
+    };
+
+    const [sepMeetingDecisionRecord]: SepMeetingDecisionRecord[] = (
+      await database.raw(
+        `? ON CONFLICT (proposal_id)
+        DO UPDATE SET
+        comment_for_management = EXCLUDED.comment_for_management,
+        comment_for_user = EXCLUDED.comment_for_user,
+        rank_order = EXCLUDED.rank_order,
+        recommendation = EXCLUDED.recommendation,
+        submitted = EXCLUDED.submitted,
+        submitted_by = EXCLUDED.submitted_by
+        RETURNING *;`,
+        [database('SEP_meeting_decisions').insert(dataToUpsert)]
+      )
+    ).rows;
+
+    if (!sepMeetingDecisionRecord) {
+      logger.logError('Could not update/insert sep meeting decision', {
+        dataToUpsert,
+      });
+
+      throw new Error('Could not update/insert sep meeting decision');
+    }
+
+    return createSepMeetingDecisionObject(sepMeetingDecisionRecord);
+  }
+
+  async overwriteSepMeetingDecisionRanking(
+    overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput
+  ): Promise<SepMeetingDecision> {
+    const [
+      sepMeetingDecisionRecord,
+    ]: SepMeetingDecisionRecord[] = await database('SEP_meeting_decisions')
+      .update({ rank_order: overwriteSepMeetingDecisionRankingInput.rankOrder })
+      .where('proposal_id', overwriteSepMeetingDecisionRankingInput.proposalId)
+      .returning('*');
+
+    if (!sepMeetingDecisionRecord) {
+      logger.logError('Could not overwrite sep meeting decision ranking', {
+        overwriteSepMeetingDecisionRankingInput,
+      });
+
+      throw new Error('Could not overwrite sep meeting decision ranking');
+    }
+
+    return createSepMeetingDecisionObject(sepMeetingDecisionRecord);
+  }
+
+  async getProposalSepMeetingDecision(
+    proposalId: number
+  ): Promise<SepMeetingDecision | null> {
+    return database
+      .select()
+      .from('SEP_meeting_decisions')
+      .where('proposal_id', proposalId)
+      .first()
+      .then((sepMeetingDecisionRecord: SepMeetingDecisionRecord) => {
+        return sepMeetingDecisionRecord
+          ? createSepMeetingDecisionObject(sepMeetingDecisionRecord)
+          : null;
+      });
   }
 }

@@ -23,6 +23,7 @@ import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
 import { SEP } from './SEP';
+import { SepMeetingDecision } from './SepMeetingDecision';
 import { TechnicalReview } from './TechnicalReview';
 
 @ObjectType()
@@ -48,9 +49,6 @@ export class Proposal implements Partial<ProposalOrigin> {
 
   @Field(() => String)
   public shortCode: string;
-
-  @Field(() => Int, { nullable: true })
-  public rankOrder?: number;
 
   @Field(() => ProposalEndStatus, { nullable: true })
   public finalStatus?: ProposalEndStatus;
@@ -183,6 +181,17 @@ export class ProposalResolver {
     return context.queries.questionary.getQuestionary(
       context.user,
       proposal.questionaryId
+    );
+  }
+
+  @FieldResolver(() => SepMeetingDecision, { nullable: true })
+  async sepMeetingDecision(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<SepMeetingDecision | null> {
+    return await context.queries.sep.getProposalSepMeetingDecision(
+      context.user,
+      proposal.id
     );
   }
 }

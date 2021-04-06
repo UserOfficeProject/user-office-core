@@ -6,7 +6,9 @@ import {
   assignInstrumentsToCallValidationSchema,
   removeAssignedInstrumentFromCallValidationSchema,
 } from '@esss-swap/duo-validation';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { Call } from '../models/Call';
@@ -28,8 +30,11 @@ const updateCallValidationSchema = mergeValidationSchemas(
   ...updateCallValidationSchemas
 );
 
+@injectable()
 export default class CallMutations {
-  constructor(private dataSource: CallDataSource) {}
+  constructor(
+    @inject(Tokens.CallDataSource) private dataSource: CallDataSource
+  ) {}
 
   @Authorized([Roles.USER_OFFICER])
   async delete(

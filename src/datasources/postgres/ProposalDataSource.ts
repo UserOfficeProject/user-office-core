@@ -4,7 +4,7 @@ import { Transaction } from 'knex';
 
 import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
-import { Proposal } from '../../models/Proposal';
+import { Proposal, ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ProposalDataSource } from '../ProposalDataSource';
@@ -14,11 +14,11 @@ import {
   CallRecord,
   createProposalObject,
   createProposalViewObject,
-  NextStatusEventRecord,
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
   QuestionaryRecord,
+  StatusChangingEventRecord,
 } from './records';
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
@@ -103,7 +103,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           abstract: proposal.abstract,
           status_id: proposal.statusId,
           proposer_id: proposal.proposerId,
-          rank_order: proposal.rankOrder,
           final_status: proposal.finalStatus,
           comment_for_user: proposal.commentForUser,
           comment_for_management: proposal.commentForManagement,
@@ -304,7 +303,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
     return database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select([
+        'proposals.*',
+        'instrument_has_scientists.*',
+        'instrument_has_proposals.instrument_id',
+        'instrument_has_proposals.proposal_id',
+        database.raw('count(*) OVER() AS full_count'),
+      ])
       .from('proposals')
       .join('instrument_has_scientists', {
         'instrument_has_scientists.user_id': scientistId,
@@ -343,6 +348,26 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.whereRaw(
             `proposals.short_code similar to '%(${filteredAndPreparedShortCodes})%'`
           );
+        }
+
+        if (filter?.questionFilter) {
+          const questionFilter = filter.questionFilter;
+          const questionFilterQuery = getQuestionDefinition(
+            questionFilter.dataType
+          ).filterQuery;
+          if (!questionFilterQuery) {
+            throw new Error(
+              `Filter query not implemented for ${filter.questionFilter.dataType}`
+            );
+          }
+          query
+            .leftJoin(
+              'answers',
+              'answers.questionary_id',
+              'proposals.questionary_id'
+            )
+            .andWhere('answers.question_id', questionFilter.questionId)
+            .modify(questionFilterQuery, questionFilter);
         }
 
         if (first) {
@@ -415,20 +440,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async cloneProposal(
     clonerId: number,
-    proposalId: number,
+    sourceProposal: Proposal,
     call: Call
   ): Promise<Proposal> {
-    const sourceProposal = await this.get(proposalId);
-
-    if (!sourceProposal) {
-      logger.logError(
-        'Could not clone proposal because source proposal does not exist',
-        { proposalId }
-      );
-
-      throw new Error('Could not clone proposal');
-    }
-
     const [newQuestionary]: QuestionaryRecord[] = (
       await database.raw(`
       INSERT INTO questionaries
@@ -532,16 +546,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       throw new Error('Could not reset proposal events');
     }
 
-    const proposalEventsToReset: NextStatusEventRecord[] = (
+    const proposalEventsToReset: StatusChangingEventRecord[] = (
       await database.raw(`
         SELECT 
           *
         FROM 
           proposal_workflow_connections AS pwc
         JOIN
-          next_status_events
+          status_changing_events
         ON
-          next_status_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
+          status_changing_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
         WHERE pwc.proposal_workflow_connection_id >= (
           SELECT proposal_workflow_connection_id
           FROM proposal_workflow_connections
@@ -555,7 +569,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     if (proposalEventsToReset?.length) {
       const dataToUpdate = proposalEventsToReset
         .map(
-          (event) => `${event.next_status_event.toLocaleLowerCase()} = false`
+          (event) =>
+            `${event.status_changing_event.toLocaleLowerCase()} = false`
         )
         .join(', ');
 
@@ -575,5 +590,34 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
 
     return true;
+  }
+
+  async changeProposalsStatus(
+    statusId: number,
+    proposalIds: number[]
+  ): Promise<ProposalIdsWithNextStatus> {
+    const dataToUpdate: { status_id: number; submitted?: boolean } = {
+      status_id: statusId,
+    };
+
+    // NOTE: If status is DRAFT re-open the proposal for submission
+    if (statusId === 1) {
+      dataToUpdate.submitted = false;
+    }
+
+    const result: ProposalRecord[] = await database
+      .update(dataToUpdate, ['*'])
+      .from('proposals')
+      .whereIn('proposal_id', proposalIds);
+
+    if (result?.length === 0) {
+      logger.logError('Could not change proposals status', { dataToUpdate });
+
+      throw new Error('Could not change proposals status');
+    }
+
+    return new ProposalIdsWithNextStatus(
+      result.map((item) => item.proposal_id)
+    );
   }
 }

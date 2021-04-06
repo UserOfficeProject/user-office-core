@@ -10,7 +10,9 @@ import {
   setAvailabilityTimeOnInstrumentValidationSchema,
   submitInstrumentValidationSchema,
 } from '@esss-swap/duo-validation';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
@@ -35,12 +37,13 @@ import {
   InstrumentSubmitArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
-
+@injectable()
 export default class InstrumentMutations {
   constructor(
+    @inject(Tokens.InstrumentDataSource)
     private dataSource: InstrumentDataSource,
-    private sepDataSource: SEPDataSource,
-    private userAuth: UserAuthorization
+    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(createInstrumentValidationSchema)

@@ -37,7 +37,6 @@ export class Proposal {
     public created: Date,
     public updated: Date,
     public shortCode: string,
-    public rankOrder: number,
     public finalStatus: ProposalEndStatus,
     public callId: number,
     public questionaryId: number,

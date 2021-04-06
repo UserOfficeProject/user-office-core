@@ -1,3 +1,6 @@
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
 import { Review } from '../models/Review';
@@ -6,10 +9,11 @@ import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
+@injectable()
 export default class ReviewQueries {
   constructor(
-    public dataSource: ReviewDataSource,
-    private userAuth: UserAuthorization
+    @inject(Tokens.ReviewDataSource) public dataSource: ReviewDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()

@@ -6,13 +6,14 @@ import {
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
 import { Feature, FeatureId } from '../../models/Feature';
-import { Proposal } from '../../models/Proposal';
+import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import { SEP, SEPProposal, SEPAssignment, SEPReviewer } from '../../models/SEP';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import {
   DataType,
@@ -50,7 +51,6 @@ export interface ProposalRecord {
   readonly updated_at: Date;
   readonly full_count: number;
   readonly short_code: string;
-  readonly rank_order: number;
   readonly final_status: number;
   readonly excellence_score: number;
   readonly safety_score: number;
@@ -400,10 +400,20 @@ export interface ProposalWorkflowConnectionRecord {
   readonly parent_droppable_group_id: string;
 }
 
-export interface NextStatusEventRecord {
-  readonly next_status_event_id: number;
+export interface StatusChangingEventRecord {
+  readonly status_changing_event_id: number;
   readonly proposal_workflow_connection_id: number;
-  readonly next_status_event: string;
+  readonly status_changing_event: string;
+}
+
+export interface SepMeetingDecisionRecord {
+  readonly proposal_id: number;
+  readonly comment_for_management: string;
+  readonly comment_for_user: string;
+  readonly rank_order: number;
+  readonly recommendation: ProposalEndStatus;
+  readonly submitted: boolean;
+  readonly submitted_by: number | null;
 }
 
 export interface ProposalEventsRecord {
@@ -411,6 +421,7 @@ export interface ProposalEventsRecord {
   readonly proposal_created: boolean;
   readonly proposal_submitted: boolean;
   readonly proposal_feasible: boolean;
+  readonly proposal_unfeasible: boolean;
   readonly call_ended: boolean;
   readonly call_review_ended: boolean;
   readonly proposal_sep_selected: boolean;
@@ -418,6 +429,12 @@ export interface ProposalEventsRecord {
   readonly proposal_feasibility_review_submitted: boolean;
   readonly proposal_sample_review_submitted: boolean;
   readonly proposal_all_sep_reviewers_selected: boolean;
+  readonly proposal_management_decision_updated: boolean;
+  readonly proposal_management_decision_submitted: boolean;
+  readonly proposal_all_sep_reviews_submitted: boolean;
+  readonly proposal_sep_review_updated: boolean;
+  readonly proposal_feasibility_review_updated: boolean;
+  readonly proposal_sample_safe: boolean;
   readonly proposal_sep_review_submitted: boolean;
   readonly proposal_sep_meeting_submitted: boolean;
   readonly proposal_instrument_submitted: boolean;
@@ -484,7 +501,6 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.created_at,
     proposal.updated_at,
     proposal.short_code,
-    proposal.rank_order,
     proposal.final_status,
     proposal.call_id,
     proposal.questionary_id,
@@ -705,6 +721,20 @@ export const createSEPObject = (sep: SEPRecord) => {
     sep.active,
     sep.sep_chair_user_id,
     sep.sep_secretary_user_id
+  );
+};
+
+export const createSepMeetingDecisionObject = (
+  sepMeetingDecisionRecord: SepMeetingDecisionRecord
+) => {
+  return new SepMeetingDecision(
+    sepMeetingDecisionRecord.proposal_id,
+    sepMeetingDecisionRecord.rank_order,
+    sepMeetingDecisionRecord.recommendation,
+    sepMeetingDecisionRecord.comment_for_user,
+    sepMeetingDecisionRecord.comment_for_management,
+    sepMeetingDecisionRecord.submitted,
+    sepMeetingDecisionRecord.submitted_by
   );
 };
 

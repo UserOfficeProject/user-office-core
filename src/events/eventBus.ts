@@ -2,7 +2,7 @@ import { logger } from '@esss-swap/duo-logger';
 
 import { isRejection, Rejection } from '../rejection';
 
-type EventHandler<T> = (event: T) => Promise<void>;
+export type EventHandler<T> = (event: T) => Promise<void>;
 
 export class EventBus<T extends { type: string }> {
   constructor(private handlers: EventHandler<T>[] = []) {}

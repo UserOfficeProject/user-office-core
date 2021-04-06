@@ -1,4 +1,6 @@
-import { sepDataSource } from '..';
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../../config/Tokens';
 import {
   Instrument,
   InstrumentHasProposals,
@@ -8,6 +10,7 @@ import { ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
+import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
 import {
   InstrumentRecord,
@@ -17,8 +20,12 @@ import {
   InstrumentHasProposalsRecord,
 } from './records';
 
+@injectable()
 export default class PostgresInstrumentDataSource
   implements InstrumentDataSource {
+  constructor(
+    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource
+  ) {}
   private createInstrumentObject(instrument: InstrumentRecord) {
     return new Instrument(
       instrument.instrument_id,
@@ -271,7 +278,7 @@ export default class PostgresInstrumentDataSource
     const instrumentsWithSubmittedFlag: InstrumentWithAvailabilityTimeRecord[] = [];
 
     for (const instrument of instruments) {
-      const allProposalsOnInstrument = await sepDataSource.getSEPProposalsByInstrument(
+      const allProposalsOnInstrument = await this.sepDataSource.getSEPProposalsByInstrument(
         sepId,
         instrument.instrument_id,
         callId

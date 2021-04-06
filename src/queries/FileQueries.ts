@@ -1,11 +1,17 @@
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { FileDataSource } from '../datasources/IFileDataSource';
 
+@injectable()
 export default class FileQueries {
-  constructor(private fileDataSource: FileDataSource) {}
+  constructor(
+    @inject(Tokens.FileDataSource) private dataSource: FileDataSource
+  ) {}
 
   async getFileMetadata(fileIds: string[]) {
     // TODO There should be authentification
 
-    return this.fileDataSource.getMetadata(fileIds);
+    return this.dataSource.getMetadata(fileIds);
   }
 }
