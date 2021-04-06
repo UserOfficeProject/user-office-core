@@ -1,12 +1,20 @@
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { userAuthorization } from '../utils/UserAuthorization';
+import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallsFilter } from './../resolvers/queries/CallsQuery';
 
+@injectable()
 export default class CallQueries {
-  constructor(public dataSource: CallDataSource) {}
+  constructor(
+    @inject(Tokens.CallDataSource) public dataSource: CallDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization
+  ) {}
 
   @Authorized()
   async get(agent: UserWithRole | null, id: number) {
@@ -34,7 +42,7 @@ export default class CallQueries {
     scientistId: number
   ) {
     if (
-      !(await userAuthorization.isUserOfficer(agent)) &&
+      !(await this.userAuth.isUserOfficer(agent)) &&
       agent?.id !== scientistId
     ) {
       return null;

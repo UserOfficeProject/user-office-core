@@ -1,12 +1,7 @@
 import { logger } from '@esss-swap/duo-logger';
+import { container, inject, injectable } from 'tsyringe';
 
-import {
-  proposalDataSource,
-  questionaryDataSource,
-  sampleDataSource,
-  shipmentDataSource,
-  templateDataSource,
-} from '../datasources';
+import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
@@ -14,15 +9,21 @@ import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateCategoryId } from '../models/Template';
 import { User, UserWithRole } from '../models/User';
-import { userAuthorization } from '../utils/UserAuthorization';
+import { UserAuthorization } from './UserAuthorization';
 
 interface QuestionaryAuthorizer {
   hasReadRights(agent: User | null, questionaryId: number): Promise<boolean>;
   hasWriteRights(agent: User | null, questionaryId: number): Promise<boolean>;
 }
 
-class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
-  constructor(private proposalDataSource: ProposalDataSource) {}
+@injectable()
+export class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
+  constructor(
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization
+  ) {}
   async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
   }
@@ -41,14 +42,19 @@ class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
       })
     ).proposals[0];
 
-    return userAuthorization.hasAccessRights(agent, proposal);
+    return this.userAuth.hasAccessRights(agent, proposal);
   }
 }
 
+@injectable()
 class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
   constructor(
+    @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-    private sampleDataSource: SampleDataSource
+    @inject(Tokens.SampleDataSource)
+    private sampleDataSource: SampleDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuthorization: UserAuthorization
   ) {}
   async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
@@ -62,7 +68,7 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
       return false;
     }
 
-    if (await userAuthorization.isUserOfficer(agent)) {
+    if (await this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
@@ -91,15 +97,20 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
       return false;
     }
 
-    return userAuthorization.hasAccessRights(agent, proposal);
+    return this.userAuthorization.hasAccessRights(agent, proposal);
   }
 }
 
+@injectable()
 class ShipmentDeclarationQuestionaryAuthorizer
   implements QuestionaryAuthorizer {
   constructor(
+    @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-    private shipmentDataSource: ShipmentDataSource
+    @inject(Tokens.ShipmentDataSource)
+    private shipmentDataSource: ShipmentDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuthorization: UserAuthorization
   ) {}
   async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
@@ -113,7 +124,7 @@ class ShipmentDeclarationQuestionaryAuthorizer
       return false;
     }
 
-    if (await userAuthorization.isUserOfficer(agent)) {
+    if (await this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
@@ -142,36 +153,31 @@ class ShipmentDeclarationQuestionaryAuthorizer
       return false;
     }
 
-    return userAuthorization.hasAccessRights(agent, proposal);
+    return this.userAuthorization.hasAccessRights(agent, proposal);
   }
 }
 
+@injectable()
 export class QuestionaryAuthorization {
   private authorizers = new Map<number, QuestionaryAuthorizer>();
   constructor(
-    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
-    private sampleDataSource: SampleDataSource,
-    private shipmentDataSource: ShipmentDataSource
+    @inject(Tokens.SampleDataSource) private sampleDataSource: SampleDataSource
   ) {
     this.authorizers.set(
       TemplateCategoryId.PROPOSAL_QUESTIONARY,
-      new ProposalQuestionaryAuthorizer(this.proposalDataSource)
+      container.resolve(ProposalQuestionaryAuthorizer)
     );
     this.authorizers.set(
       TemplateCategoryId.SAMPLE_DECLARATION,
-      new SampleDeclarationQuestionaryAuthorizer(
-        this.proposalDataSource,
-        this.sampleDataSource
-      )
+      container.resolve(SampleDeclarationQuestionaryAuthorizer)
     );
     this.authorizers.set(
       TemplateCategoryId.SHIPMENT_DECLARATION,
-      new ShipmentDeclarationQuestionaryAuthorizer(
-        this.proposalDataSource,
-        this.shipmentDataSource
-      )
+      container.resolve(ShipmentDeclarationQuestionaryAuthorizer)
     );
   }
 
@@ -215,11 +221,3 @@ export class QuestionaryAuthorization {
     );
   }
 }
-
-export const questionaryAuthorization = new QuestionaryAuthorization(
-  proposalDataSource,
-  questionaryDataSource,
-  templateDataSource,
-  sampleDataSource,
-  shipmentDataSource
-);

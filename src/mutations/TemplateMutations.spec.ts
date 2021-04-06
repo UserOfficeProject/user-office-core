@@ -1,4 +1,7 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUserOfficerWithRole,
@@ -17,12 +20,10 @@ import TemplateMutations from './TemplateMutations';
 const QUESTION_ID = 'links_to_field';
 const NON_EXISTING_QUESTION_ID = 'non_existing_question_id';
 
-const dummyTemplateDataSource = new TemplateDataSourceMock();
-
-const mutations = new TemplateMutations(dummyTemplateDataSource);
+const mutations = container.resolve(TemplateMutations);
 
 beforeEach(() => {
-  dummyTemplateDataSource.init();
+  container.resolve<TemplateDataSourceMock>(Tokens.TemplateDataSource).init();
 });
 
 test('An userofficer can update topic', async () => {

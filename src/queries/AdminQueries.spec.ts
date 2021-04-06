@@ -1,7 +1,8 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
 import context from '../buildContext';
 import {
-  AdminDataSourceMock,
   dummyApiAccessToken,
   dummyApiAccessTokens,
 } from '../datasources/mockups/AdminDataSource';
@@ -11,7 +12,7 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import AdminQueries from './AdminQueries';
 
-const adminQueries = new AdminQueries(new AdminDataSourceMock());
+const adminQueries = container.resolve(AdminQueries);
 
 describe('Test Admin Queries', () => {
   test('A user can get page text', () => {

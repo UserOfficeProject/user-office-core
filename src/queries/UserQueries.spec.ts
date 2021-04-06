@@ -1,15 +1,16 @@
+import { container } from 'tsyringe';
+
 import {
-  UserDataSourceMock,
-  dummyUser,
-  dummyUserOfficer,
   basicDummyUser,
   basicDummyUserNotOnProposal,
+  dummyUser,
+  dummyUserOfficer,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import UserQueries from './UserQueries';
 
-const userQueries = new UserQueries(new UserDataSourceMock());
+const userQueries = container.resolve(UserQueries);
 
 test('A user officer fetch can fetch any user account', () => {
   return expect(

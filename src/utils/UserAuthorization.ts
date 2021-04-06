@@ -1,24 +1,19 @@
-import {
-  reviewDataSource,
-  sepDataSource,
-  userDataSource,
-} from '../datasources';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
-import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
-import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
-import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { User, UserWithRole } from '../models/User';
 
+@injectable()
 export class UserAuthorization {
   constructor(
-    private userDataSource: UserDataSource,
-    private reviewDataSource: ReviewDataSource,
-    private sepDataSource: SEPDataSource
+    @inject(Tokens.UserDataSource) private userDataSource: UserDataSource,
+    @inject(Tokens.ReviewDataSource) private reviewDataSource: ReviewDataSource,
+    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource
   ) {}
 
   isUserOfficer(agent: UserWithRole | null) {
@@ -158,25 +153,3 @@ export class UserAuthorization {
     return sep !== null;
   }
 }
-
-let userDataSourceInstance: UserDataSource = userDataSource;
-let reviewDataSourceInstance: ReviewDataSource = reviewDataSource;
-let sepDataSourceInstance: SEPDataSource = sepDataSource;
-
-if (process.env.NODE_ENV === 'test') {
-  userDataSourceInstance = new UserDataSourceMock();
-  reviewDataSourceInstance = new ReviewDataSourceMock();
-  sepDataSourceInstance = new SEPDataSourceMock();
-}
-
-if (process.env.EXTERNAL_AUTH_PROVIDER) {
-  if (process.env.EXTERNAL_AUTH_PROVIDER === 'stfc') {
-    userDataSourceInstance = new StfcUserDataSource();
-  }
-}
-
-export const userAuthorization = new UserAuthorization(
-  userDataSourceInstance,
-  reviewDataSourceInstance,
-  sepDataSourceInstance
-);

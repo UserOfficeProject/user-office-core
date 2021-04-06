@@ -1,8 +1,9 @@
 import 'reflect-metadata';
-import {
-  dummyQuestionTemplateRelationFactory,
-  QuestionaryDataSourceMock,
-} from '../datasources/mockups/QuestionaryDataSource';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
+import { dummyQuestionTemplateRelationFactory } from '../datasources/mockups/QuestionaryDataSource';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { BooleanConfig } from '../resolvers/types/FieldConfig';
 import {
   areDependenciesSatisfied,
@@ -13,10 +14,10 @@ import { Answer } from './Questionary';
 import { createConfig } from './questionTypes/QuestionRegistry';
 import { DataType } from './Template';
 
-const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
+let dataSource: QuestionaryDataSource;
 
 beforeEach(() => {
-  dummyQuestionaryDataSource.init();
+  dataSource = container.resolve(Tokens.QuestionaryDataSource);
 });
 
 it('Field config "required=true" should make field required', async () => {
@@ -44,9 +45,7 @@ it('Field config "required=false" should make field not required', async () => {
 });
 
 it('Dependencies should be satisfied if value matches', async () => {
-  const questionarySteps = await dummyQuestionaryDataSource.getQuestionarySteps(
-    1
-  );
+  const questionarySteps = await dataSource.getQuestionarySteps(1);
   const dependee = getFieldById(
     questionarySteps,
     'has_links_with_industry'

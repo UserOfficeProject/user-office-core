@@ -11,7 +11,9 @@ import {
   deleteProposalWorkflowStatusValidationSchema,
   // addNextStatusEventsValidationSchema,
 } from '@esss-swap/duo-validation';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { ProposalStatus } from '../models/ProposalStatus';
@@ -30,9 +32,12 @@ import { MoveProposalWorkflowStatusInput } from '../resolvers/mutations/settings
 import { UpdateProposalStatusInput } from '../resolvers/mutations/settings/UpdateProposalStatusMutation';
 import { UpdateProposalWorkflowInput } from '../resolvers/mutations/settings/UpdateProposalWorkflowMutation';
 import { omit } from '../utils/helperFunctions';
-
+@injectable()
 export default class ProposalSettingsMutations {
-  constructor(private dataSource: ProposalSettingsDataSource) {}
+  constructor(
+    @inject(Tokens.ProposalSettingsDataSource)
+    private dataSource: ProposalSettingsDataSource
+  ) {}
 
   @ValidateArgs(createProposalStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])

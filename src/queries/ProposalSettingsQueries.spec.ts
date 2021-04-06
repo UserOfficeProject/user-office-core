@@ -1,21 +1,20 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
 
 import {
   anotherDummyProposalWorkflowConnection,
   dummyProposalStatus,
   dummyProposalWorkflow,
   dummyProposalWorkflowConnection,
-  ProposalSettingsDataSourceMock,
 } from '../datasources/mockups/ProposalSettingsDataSource';
 import {
-  dummyUserWithRole,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import ProposalSettingsQueries from './ProposalSettingsQueries';
 
-const dummyProposalSettingsDataSource = new ProposalSettingsDataSourceMock();
-const ProposalSettingsQueriesInstance = new ProposalSettingsQueries(
-  dummyProposalSettingsDataSource
+const ProposalSettingsQueriesInstance = container.resolve(
+  ProposalSettingsQueries
 );
 
 describe('Test Proposal Statuses Queries', () => {

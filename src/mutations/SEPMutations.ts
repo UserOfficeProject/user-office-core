@@ -12,7 +12,9 @@ import {
   saveSepMeetingDecisionValidationSchema,
   overwriteSepMeetingDecisionRankingValidationSchema,
 } from '@esss-swap/duo-validation';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
@@ -41,14 +43,20 @@ import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDe
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { UpdateSEPTimeAllocationArgs } from '../resolvers/mutations/UpdateSEPProposalMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
-
+@injectable()
 export default class SEPMutations {
   constructor(
+    @inject(Tokens.SEPDataSource)
     private dataSource: SEPDataSource,
+    @inject(Tokens.InstrumentDataSource)
     private instrumentDataSource: InstrumentDataSource,
+    @inject(Tokens.UserAuthorization)
     private userAuth: UserAuthorization,
+    @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
+    @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource,
+    @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource
   ) {}
 

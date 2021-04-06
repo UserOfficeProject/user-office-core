@@ -1,20 +1,20 @@
 import 'dotenv/config';
 
 import faker from 'faker';
-
 import 'reflect-metadata';
-import {
-  adminDataSource,
-  callDataSource,
-  instrumentDataSource,
-  proposalDataSource,
-  proposalSettingsDataSource,
-  questionaryDataSource,
-  reviewDataSource,
-  sepDataSource,
-  templateDataSource,
-  userDataSource,
-} from '../datasources';
+import '../config';
+import { container } from 'tsyringe';
+
+import AdminDataSource from '../datasources/postgres/AdminDataSource';
+import CallDataSource from '../datasources/postgres/CallDataSource';
+import InstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
+import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
+import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
+import QuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
+import ReviewDataSource from '../datasources/postgres/ReviewDataSource';
+import SEPDataSource from '../datasources/postgres/SEPDataSource';
+import TemplateDataSource from '../datasources/postgres/TemplateDataSource';
+import UserDataSource from '../datasources/postgres/UserDataSource';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import {
@@ -35,6 +35,19 @@ const MAX_SEPS = 10;
 const MAX_REVIEWS = 600;
 const MAX_WORKFLOWS = 1;
 
+const adminDataSource = container.resolve(AdminDataSource);
+const callDataSource = container.resolve(CallDataSource);
+const instrumentDataSource = container.resolve(InstrumentDataSource);
+const proposalDataSource = container.resolve(ProposalDataSource);
+const proposalSettingsDataSource = container.resolve(
+  ProposalSettingsDataSource
+);
+const questionaryDataSource = container.resolve(QuestionaryDataSource);
+const reviewDataSource = container.resolve(ReviewDataSource);
+const sepDataSource = container.resolve(SEPDataSource);
+const templateDataSource = container.resolve(TemplateDataSource);
+const userDataSource = container.resolve(UserDataSource);
+
 const createUniqueIntArray = (size: number, max: number) => {
   if (size > max) {
     throw Error('size must be smaller than max');
@@ -48,10 +61,6 @@ const createUniqueIntArray = (size: number, max: number) => {
   shuffle(array);
 
   return array.slice(0, size);
-};
-
-const createIntArray = (size: number, max: number) => {
-  return new Array(size).fill(0).map((el) => dummy.positiveNumber(max));
 };
 
 const createUsers = async () => {

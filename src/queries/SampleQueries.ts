@@ -1,6 +1,7 @@
 import { logger } from '@esss-swap/duo-logger';
+import { inject, injectable } from 'tsyringe';
 
-import { sampleDataSource } from '../datasources';
+import { Tokens } from '../config/Tokens';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
@@ -10,10 +11,16 @@ import { SamplesArgs } from '../resolvers/queries/SamplesQuery';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 
+@injectable()
 export default class SampleQueries {
   constructor(
+    @inject(Tokens.SampleDataSource)
     private dataSource: SampleDataSource,
+
+    @inject(Tokens.SampleAuthorization)
     private sampleAuthorization: SampleAuthorization,
+
+    @inject(Tokens.ShipmentAuthorization)
     private shipmentAuthorization: ShipmentAuthorization
   ) {}
 
@@ -26,7 +33,7 @@ export default class SampleQueries {
       return null;
     }
 
-    return sampleDataSource.getSample(sampleId);
+    return this.dataSource.getSample(sampleId);
   }
 
   async getSamples(agent: UserWithRole | null, args: SamplesArgs) {
