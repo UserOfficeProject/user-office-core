@@ -57,6 +57,9 @@ export const dummySepMeetingDecision = new SepMeetingDecision(
 );
 
 export class ProposalDataSourceMock implements ProposalDataSource {
+  constructor() {
+    this.init();
+  }
   async getProposalsFromView(
     filter?: ProposalsFilter | undefined
   ): Promise<ProposalView[]> {

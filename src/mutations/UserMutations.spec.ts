@@ -1,13 +1,11 @@
 import jsonwebtoken from 'jsonwebtoken';
+import { container } from 'tsyringe';
 
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
-import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   dummyPlaceHolderUser,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
-  UserDataSourceMock,
   dummyUserWithRole,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
@@ -16,7 +14,6 @@ import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { AuthJwtPayload, BasicUserDetails, UserRole } from '../models/User';
 import { isRejection } from '../rejection';
 import { verifyToken } from '../utils/jwt';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import UserMutations from './UserMutations';
 
 jest.mock('../datasources/stfc/UOWSSoapInterface');
@@ -42,15 +39,7 @@ const badToken = jsonwebtoken.sign(
   { expiresIn: '-24h' }
 );
 
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock(),
-  new SEPDataSourceMock()
-);
-const userMutations = new UserMutations(
-  new UserDataSourceMock(),
-  userAuthorization
-);
+const userMutations = container.resolve(UserMutations);
 
 test('A user can invite another user by email', () => {
   const emailInviteResponse = new EmailInviteResponse(

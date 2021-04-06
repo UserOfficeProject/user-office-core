@@ -2,6 +2,7 @@ import 'dotenv/config'; // Adding environmental variables. NB: keep this import 
 import { logger } from '@esss-swap/duo-logger';
 import cookieParser from 'cookie-parser';
 import express from 'express';
+import './src/config';
 
 import 'reflect-metadata';
 import { startAsyncJobs } from './src/asyncJobs/startAsyncJobs';

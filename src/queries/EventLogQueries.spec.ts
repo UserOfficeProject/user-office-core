@@ -1,6 +1,7 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
 import {
-  EventLogsDataSourceMock,
   dummyEventLogUserUpdated,
   dummyEventLogs,
   dummyEventLogProposalCreated,
@@ -11,8 +12,7 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import EventLogQueries from './EventLogQueries';
 
-const dummyEventLogDataSource = new EventLogsDataSourceMock();
-const eventLogQueries = new EventLogQueries(dummyEventLogDataSource);
+const eventLogQueries = container.resolve(EventLogQueries);
 
 describe('Test EventLogQueries', () => {
   test('A userofficer can get all event logs if no filter is passed', () => {

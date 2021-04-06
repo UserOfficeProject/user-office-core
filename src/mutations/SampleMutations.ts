@@ -1,5 +1,7 @@
 import { logger } from '@esss-swap/duo-logger';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
@@ -12,15 +14,22 @@ import { rejection } from '../rejection';
 import { CreateSampleInput } from '../resolvers/mutations/CreateSampleMutations';
 import { UpdateSampleArgs } from '../resolvers/mutations/UpdateSampleMutation';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
-import { userAuthorization } from '../utils/UserAuthorization';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
+@injectable()
 export default class SampleMutations {
   constructor(
-    private sampleDataSource: SampleDataSource,
+    @inject(Tokens.SampleDataSource) private sampleDataSource: SampleDataSource,
+    @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
+    @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-    private sampleAuthorization: SampleAuthorization
+    @inject(Tokens.SampleAuthorization)
+    private sampleAuthorization: SampleAuthorization,
+    @inject(Tokens.UserAuthorization)
+    private userAuthorization: UserAuthorization
   ) {}
 
   @Authorized()
@@ -44,7 +53,9 @@ export default class SampleMutations {
       return rejection('NOT_FOUND');
     }
 
-    if ((await userAuthorization.hasAccessRights(agent, proposal)) === false) {
+    if (
+      (await this.userAuthorization.hasAccessRights(agent, proposal)) === false
+    ) {
       return rejection('NOT_ALLOWED');
     }
 
@@ -71,15 +82,20 @@ export default class SampleMutations {
 
   @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
   async updateSample(agent: UserWithRole | null, args: UpdateSampleArgs) {
-    if (!this.sampleAuthorization.hasWriteRights(agent, args.sampleId)) {
+    const hasWriteRights = await this.sampleAuthorization.hasWriteRights(
+      agent,
+      args.sampleId
+    );
+
+    if (hasWriteRights === false) {
       return rejection('NOT_AUTHORIZED');
     }
 
     // Thi makes sure administrative fields can be only updated by user with the right role
     if (args.safetyComment || args.safetyStatus) {
       const canAdministrerSample =
-        (await userAuthorization.isUserOfficer(agent)) ||
-        (await userAuthorization.isSampleSafetyReviewer(agent));
+        (await this.userAuthorization.isUserOfficer(agent)) ||
+        (await this.userAuthorization.isSampleSafetyReviewer(agent));
       if (canAdministrerSample === false) {
         delete args.safetyComment;
         delete args.safetyStatus;
@@ -100,7 +116,12 @@ export default class SampleMutations {
   }
 
   async deleteSample(agent: UserWithRole | null, sampleId: number) {
-    if (!this.sampleAuthorization.hasWriteRights(agent, sampleId)) {
+    const hasWriteRights = await this.sampleAuthorization.hasWriteRights(
+      agent,
+      sampleId
+    );
+
+    if (hasWriteRights === false) {
       return rejection('NOT_AUTHORIZED');
     }
 

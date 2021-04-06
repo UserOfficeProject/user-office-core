@@ -1,30 +1,17 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
 import {
-  InstrumentDataSourceMock,
   dummyInstrument,
   dummyInstrumentHasProposals,
 } from '../datasources/mockups/InstrumentDataSource';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
-import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
-  dummyUserWithRole,
   dummyUserOfficerWithRole,
-  UserDataSourceMock,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import InstrumentMutations from './InstrumentMutations';
 
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock(),
-  new SEPDataSourceMock()
-);
-
-const instrumentMutations = new InstrumentMutations(
-  new InstrumentDataSourceMock(),
-  new SEPDataSourceMock(),
-  userAuthorization
-);
+const instrumentMutations = container.resolve(InstrumentMutations);
 
 describe('Test Instrument Mutations', () => {
   test('A user can not create an instrument', () => {

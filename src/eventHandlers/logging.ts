@@ -1,12 +1,16 @@
 import { logger } from '@esss-swap/duo-logger';
+import { container } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 
-export default function createHandler(
-  eventLogsDataSource: EventLogsDataSource
-) {
+export default function createHandler() {
+  const eventLogsDataSource = container.resolve<EventLogsDataSource>(
+    Tokens.EventLogsDataSource
+  );
+
   // Handler that logs every mutation wrapped with the event bus event to stdout and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
     const json = JSON.stringify(event);

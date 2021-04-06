@@ -3,7 +3,9 @@ import * as bcrypt from 'bcryptjs';
 // TODO: Try to replace request-promise with axios. request-promise depends on reqest which is deprecated.
 import { CoreOptions, UriOptions } from 'request';
 import rp from 'request-promise';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
 import { Role, Roles } from '../models/Role';
@@ -17,8 +19,11 @@ import {
 } from '../models/User';
 import { signToken, verifyToken } from '../utils/jwt';
 
+@injectable()
 export default class UserQueries {
-  constructor(public dataSource: UserDataSource) {}
+  constructor(
+    @inject(Tokens.UserDataSource) public dataSource: UserDataSource
+  ) {}
 
   async getAgent(id: number) {
     return this.dataSource.get(id);

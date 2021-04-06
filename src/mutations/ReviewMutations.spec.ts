@@ -1,30 +1,16 @@
 import 'reflect-metadata';
-import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
+import { container } from 'tsyringe';
+
+import { dummyReviewWithNextProposalStatus } from '../datasources/mockups/ReviewDataSource';
 import {
-  ReviewDataSourceMock,
-  dummyReviewWithNextProposalStatus,
-} from '../datasources/mockups/ReviewDataSource';
-import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
-import {
-  UserDataSourceMock,
-  dummyUserWithRole,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Review, ReviewStatus } from '../models/Review';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import ReviewMutations from './ReviewMutations';
 
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock(),
-  new SEPDataSourceMock()
-);
-const reviewMutations = new ReviewMutations(
-  new ReviewDataSourceMock(),
-  userAuthorization,
-  new ProposalSettingsDataSourceMock()
-);
+const reviewMutations = container.resolve(ReviewMutations);
 
 //Update
 

@@ -9,7 +9,9 @@ import {
   updateProposalValidationSchema,
 } from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -26,13 +28,17 @@ import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutatio
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 
+@injectable()
 export default class ProposalMutations {
   constructor(
-    private proposalDataSource: ProposalDataSource,
-    private questionaryDataSource: QuestionaryDataSource,
-    private callDataSource: CallDataSource,
+    @inject(Tokens.ProposalDataSource)
+    public proposalDataSource: ProposalDataSource,
+    @inject(Tokens.QuestionaryDataSource)
+    public questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
+    @inject(Tokens.InstrumentDataSource)
     private instrumentDataSource: InstrumentDataSource,
-    private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)

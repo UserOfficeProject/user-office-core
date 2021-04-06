@@ -1,5 +1,7 @@
 import { logger } from '@esss-swap/duo-logger';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
 import {
@@ -11,7 +13,6 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { omit } from '../utils/helperFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
-import { CallDataSource } from './../datasources/CallDataSource';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 const statusMap = new Map<ProposalEndStatus, ProposalPublicStatus>();
@@ -19,11 +20,11 @@ statusMap.set(ProposalEndStatus.ACCEPTED, ProposalPublicStatus.accepted);
 statusMap.set(ProposalEndStatus.REJECTED, ProposalPublicStatus.rejected);
 statusMap.set(ProposalEndStatus.RESERVED, ProposalPublicStatus.reserved);
 
+@injectable()
 export default class ProposalQueries {
   constructor(
-    public dataSource: ProposalDataSource,
-    private callDataSource: CallDataSource,
-    private userAuth: UserAuthorization
+    @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()

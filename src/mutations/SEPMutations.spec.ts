@@ -1,43 +1,22 @@
 import 'reflect-metadata';
-import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
-import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
-import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+
+import { container } from 'tsyringe';
+
 import {
-  SEPDataSourceMock,
-  dummySEP,
   anotherDummySEP,
+  dummySEP,
   dummySEPWithoutCode,
 } from '../datasources/mockups/SEPDataSource';
 import {
-  UserDataSourceMock,
-  dummyUserWithRole,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { UserRole } from '../models/User';
 import { Rejection } from '../rejection';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import SEPMutations from './SEPMutations';
 
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock(),
-  new SEPDataSourceMock()
-);
-const dummySEPDataSource = new SEPDataSourceMock();
-const dummyInstrumentDataSource = new InstrumentDataSourceMock();
-const dummyUserDataSource = new UserDataSourceMock();
-const dummyProposalSettingsDataSource = new ProposalSettingsDataSourceMock();
-const dummyProposalDataSource = new ProposalDataSourceMock();
-const SEPMutationsInstance = new SEPMutations(
-  dummySEPDataSource,
-  dummyInstrumentDataSource,
-  userAuthorization,
-  dummyUserDataSource,
-  dummyProposalSettingsDataSource,
-  dummyProposalDataSource
-);
+const SEPMutationsInstance = container.resolve(SEPMutations);
 
 describe('Test SEPMutations', () => {
   test('A user cannot create SEP', async () => {

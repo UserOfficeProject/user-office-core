@@ -1,15 +1,14 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
+import { dummyCall } from '../datasources/mockups/CallDataSource';
 import {
-  CallDataSourceMock,
-  dummyCall,
-} from '../datasources/mockups/CallDataSource';
-import {
-  dummyUserWithRole,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import CallMutations from './CallMutations';
 
-const callMutations = new CallMutations(new CallDataSourceMock());
+const callMutations = container.resolve(CallMutations);
 
 describe('Test Call Mutations', () => {
   test('A user can not create a call', () => {

@@ -1,3 +1,6 @@
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { BasicResolverContext } from '../context';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { Authorized } from '../decorators';
@@ -5,8 +8,11 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
+@injectable()
 export default class AdminQueries {
-  constructor(private dataSource: AdminDataSource) {}
+  constructor(
+    @inject(Tokens.AdminDataSource) private dataSource: AdminDataSource
+  ) {}
 
   async getPageText(id: number): Promise<string | null> {
     return await this.dataSource.get(id);

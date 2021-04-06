@@ -4,7 +4,9 @@ import {
   proposalTechnicalReviewValidationSchema,
   addUserForReviewValidationSchema,
 } from '@esss-swap/duo-validation';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
@@ -25,10 +27,12 @@ import { SubmitTechnicalReviewInput } from '../resolvers/mutations/SubmitTechnic
 import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
+@injectable()
 export default class ReviewMutations {
   constructor(
-    private dataSource: ReviewDataSource,
-    private userAuth: UserAuthorization,
+    @inject(Tokens.ReviewDataSource) private dataSource: ReviewDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource
   ) {}
 

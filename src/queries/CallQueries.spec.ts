@@ -1,16 +1,14 @@
 import 'reflect-metadata';
-import {
-  CallDataSourceMock,
-  dummyCall,
-  dummyCalls,
-} from '../datasources/mockups/CallDataSource';
+import { container } from 'tsyringe';
+
+import { dummyCall, dummyCalls } from '../datasources/mockups/CallDataSource';
 import {
   dummyUserWithRole,
   dummyInstrumentScientist,
 } from '../datasources/mockups/UserDataSource';
 import CallQueries from './CallQueries';
 
-const callQueries = new CallQueries(new CallDataSourceMock());
+const callQueries = container.resolve(CallQueries);
 
 test('A user can get a call', () => {
   return expect(callQueries.get(dummyUserWithRole, 1)).resolves.toBe(dummyCall);
