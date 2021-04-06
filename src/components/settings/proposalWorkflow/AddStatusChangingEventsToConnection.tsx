@@ -34,6 +34,9 @@ const useStyles = makeStyles((theme) => ({
   },
   container: {
     minHeight: '350px',
+    maxHeight: '700px',
+    overflowY: 'auto',
+    overflowX: 'hidden',
     marginTop: '10px',
   },
   error: {
@@ -74,7 +77,7 @@ const AddStatusChangingEventsToConnection: React.FC<AddStatusChangingEventsToCon
   };
 
   return (
-    <Container component="main" maxWidth="md">
+    <Container component="main">
       <Formik
         initialValues={initialValues}
         onSubmit={async (values): Promise<void> => {

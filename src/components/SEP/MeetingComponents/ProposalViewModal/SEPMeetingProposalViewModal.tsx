@@ -15,8 +15,12 @@ import React, { Ref } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
-import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
-import { TechnicalReview, Review, UserRole } from 'generated/sdk';
+import {
+  TechnicalReview,
+  Review,
+  UserRole,
+  SepMeetingDecision,
+} from 'generated/sdk';
 import { useSEPProposalData } from 'hooks/SEP/useSEPProposalData';
 import { ContentContainer } from 'styles/StyledComponents';
 
@@ -45,9 +49,9 @@ const Transition = React.forwardRef<unknown, TransitionProps>(SlideComponent);
 
 type SEPMeetingProposalViewModalProps = {
   proposalViewModalOpen: boolean;
-  proposalId: number;
+  proposalId?: number | null;
   sepId: number;
-  meetingSubmitted: (data: AdministrationFormData) => void;
+  meetingSubmitted: (data: SepMeetingDecision) => void;
   setProposalViewModalOpen: (isOpen: boolean) => void;
 };
 
@@ -79,7 +83,6 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
 
   const handleClose = () => {
     setProposalViewModalOpen(false);
-    setSEPProposalData(null);
   };
 
   const sepTimeAllocation = SEPProposalData?.sepTimeAllocation ?? null;
@@ -127,8 +130,7 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
                             ...SEPProposalData,
                             proposal: {
                               ...proposalData,
-                              ...data,
-                              rankOrder: data.rankOrder as number,
+                              sepMeetingDecision: data,
                             },
                           });
                           meetingSubmitted(data);

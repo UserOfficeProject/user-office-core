@@ -57,7 +57,10 @@ function editFinalRankingForm() {
 
   cy.get('[data-cy="save"]').click();
 
-  cy.notification({ variant: 'success', text: 'Saved!' });
+  cy.notification({
+    variant: 'success',
+    text: 'SEP meeting decision saved successfully!',
+  });
 }
 
 const sepMembers = {
@@ -1307,14 +1310,16 @@ context(
       cy.get('[title="View proposal details"]').first().click();
 
       cy.get('[role="dialog"] > header + div').scrollTo('top');
-      // cy.get('#commentForUser').scrollIntoView();
       cy.get('#commentForUser').type('Test');
       cy.get('#commentForManagement').type('Test');
       cy.get('#rankOrder').type('1');
 
       cy.get('[data-cy="saveAndContinue"]').click();
 
-      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.notification({
+        variant: 'success',
+        text: 'SEP meeting decision saved successfully',
+      });
 
       cy.get("[title='Submit instrument']").first().click();
 
@@ -1377,7 +1382,7 @@ context(
       cy.get('[data-cy="saveAndContinue"]').should('not.exist');
     });
 
-    it('SEP Secretary should be able to edit SEP Meeting form after instrument is submitted', () => {
+    it('SEP Secretary should not be able to edit SEP Meeting form after instrument is submitted', () => {
       cy.login(sepMembers.secretary);
       cy.changeActiveRole('SEP Secretary');
 
