@@ -77,6 +77,7 @@ export default function createHandler(
           break;
         case Event.PROPOSAL_SEP_MEETING_SAVED:
         case Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN:
+        case Event.PROPOSAL_SEP_MEETING_REORDER:
           await eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,

@@ -474,9 +474,8 @@ export default class SEPMutations {
       });
   }
 
-  // @ValidateArgs(overwriteSepMeetingDecisionRankingValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  // @EventBus(Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN)
+  @EventBus(Event.PROPOSAL_SEP_MEETING_REORDER)
   async reorderSepMeetingDecisionProposals(
     agent: UserWithRole | null,
     args: ReorderSepMeetingDecisionProposalsInput
