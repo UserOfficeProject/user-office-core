@@ -9,9 +9,12 @@ import {
   assignSEPChairOrSecretaryValidationSchema,
   assignSEPMemberToProposalValidationSchema,
   updateTimeAllocationValidationSchema,
+  saveSepMeetingDecisionValidationSchema,
+  overwriteSepMeetingDecisionRankingValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -20,6 +23,7 @@ import { Event } from '../events/event.enum';
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
+import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import { UserWithRole, UserRole } from '../models/User';
 import { rejection, Rejection, isRejection } from '../rejection';
 import {
@@ -31,6 +35,8 @@ import {
 } from '../resolvers/mutations/AssignMembersToSEP';
 import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
+import { OverwriteSepMeetingDecisionRankingInput } from '../resolvers/mutations/OverwriteSepMeetingDecisionRankingMutation';
+import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { UpdateSEPTimeAllocationArgs } from '../resolvers/mutations/UpdateSEPProposalMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -41,7 +47,8 @@ export default class SEPMutations {
     private instrumentDataSource: InstrumentDataSource,
     private userAuth: UserAuthorization,
     private userDataSource: UserDataSource,
-    private proposalSettingsDataSource: ProposalSettingsDataSource
+    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    private proposalDataSource: ProposalDataSource
   ) {}
 
   @ValidateArgs(createSEPValidationSchema)
@@ -58,7 +65,6 @@ export default class SEPMutations {
         args.numberRatingsRequired,
         args.active
       )
-      .then((sep) => sep)
       .catch((err) => {
         logger.logException(
           'Could not create scientific evaluation panel',
@@ -85,7 +91,6 @@ export default class SEPMutations {
         args.numberRatingsRequired,
         args.active
       )
-      .then((sep) => sep)
       .catch((err) => {
         logger.logException(
           'Could not update scientific evaluation panel',
@@ -118,7 +123,6 @@ export default class SEPMutations {
 
     return this.dataSource
       .assignChairOrSecretaryToSEP(args.assignChairOrSecretaryToSEPInput)
-      .then((result) => result)
       .catch((err) => {
         logger.logException(
           'Could not assign chair and secretary to scientific evaluation panel',
@@ -138,24 +142,21 @@ export default class SEPMutations {
     args: AssignReviewersToSEPArgs
   ): Promise<SEP | Rejection> {
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
+      !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, args.sepId))
     ) {
       return rejection('NOT_ALLOWED');
     }
 
-    return this.dataSource
-      .assignReviewersToSEP(args)
-      .then((result) => result)
-      .catch((err) => {
-        logger.logException(
-          'Could not assign member to scientific evaluation panel',
-          err,
-          { agent }
-        );
+    return this.dataSource.assignReviewersToSEP(args).catch((err) => {
+      logger.logException(
+        'Could not assign member to scientific evaluation panel',
+        err,
+        { agent }
+      );
 
-        return rejection('INTERNAL_ERROR');
-      });
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(removeSEPMemberValidationSchema)
@@ -190,7 +191,6 @@ export default class SEPMutations {
 
     return this.dataSource
       .removeMemberFromSEP(args, isMemberChairOrSecretaryOfSEP)
-      .then((result) => result)
       .catch((err) => {
         logger.logException(
           'Could not remove member from scientific evaluation panel',
@@ -258,7 +258,6 @@ export default class SEPMutations {
   ): Promise<SEP | Rejection> {
     return this.dataSource
       .removeProposalAssignment(args.proposalId, args.sepId)
-      .then((result) => result)
       .catch((err) => {
         logger.logException(
           'Could not remove assigned proposal from scientific evaluation panel',
@@ -308,7 +307,7 @@ export default class SEPMutations {
     args: AssignSepReviewersToProposalArgs
   ): Promise<SEP | Rejection> {
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
+      !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, args.sepId))
     ) {
       return rejection('NOT_ALLOWED');
@@ -316,7 +315,6 @@ export default class SEPMutations {
 
     return this.dataSource
       .assignMemberToSEPProposal(args.proposalId, args.sepId, args.memberIds)
-      .then((result) => result)
       .catch((err) => {
         logger.logException(
           'Could not assign proposal to scientific evaluation panel',
@@ -336,7 +334,7 @@ export default class SEPMutations {
     args: RemoveSepReviewerFromProposalArgs
   ): Promise<SEP | Rejection> {
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
+      !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(
         (agent as UserWithRole).id,
         args.sepId
@@ -347,7 +345,6 @@ export default class SEPMutations {
 
     return this.dataSource
       .removeMemberFromSepProposal(args.proposalId, args.sepId, args.memberId)
-      .then((result) => result)
       .catch((err) => {
         logger.logException('Could not remove member from SEP proposal', err, {
           agent,
@@ -390,6 +387,85 @@ export default class SEPMutations {
             sepId,
             proposalId,
             sepTimeAllocation,
+          }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @ValidateArgs(saveSepMeetingDecisionValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @EventBus(Event.PROPOSAL_SEP_MEETING_SAVED)
+  async saveSepMeetingDecision(
+    agent: UserWithRole | null,
+    args: SaveSEPMeetingDecisionInput
+  ): Promise<SepMeetingDecision | Rejection> {
+    const isChairOrSecretaryOfProposal = await this.userAuth.isChairOrSecretaryOfProposal(
+      agent!.id,
+      args.proposalId
+    );
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+
+    if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
+
+    const proposal = await this.proposalDataSource.get(args.proposalId);
+
+    if (!proposal?.id) {
+      logger.logError(
+        'Cannot add SEP meeting decision to non existing proposal',
+        {
+          args,
+        }
+      );
+
+      return rejection('NOT_FOUND');
+    }
+
+    const submittedBy = args.submitted ? (agent as UserWithRole).id : null;
+
+    return this.dataSource
+      .saveSepMeetingDecision(args, submittedBy)
+      .catch((err) => {
+        logger.logException('Could not save sep meeting decision', err, {
+          agent,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @ValidateArgs(overwriteSepMeetingDecisionRankingValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN)
+  async overwriteSepMeetingDecisionRanking(
+    agent: UserWithRole | null,
+    args: OverwriteSepMeetingDecisionRankingInput
+  ): Promise<SepMeetingDecision | Rejection> {
+    const proposal = await this.proposalDataSource.get(args.proposalId);
+
+    if (!proposal?.id) {
+      logger.logError(
+        'Cannot overwrite SEP meeting decision ranking to non existing proposal',
+        {
+          args,
+        }
+      );
+
+      return rejection('NOT_FOUND');
+    }
+
+    return this.dataSource
+      .overwriteSepMeetingDecisionRanking(args)
+      .catch((err) => {
+        logger.logException(
+          'Could not overwrite sep meeting decision ranking',
+          err,
+          {
+            agent,
+            args,
           }
         );
 

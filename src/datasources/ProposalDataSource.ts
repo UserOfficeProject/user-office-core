@@ -44,7 +44,7 @@ export interface ProposalDataSource {
   getCount(callId: number): Promise<number>;
   cloneProposal(
     clonerId: number,
-    proposalId: number,
+    sourceProposal: Proposal,
     call: Call
   ): Promise<Proposal>;
   resetProposalEvents(

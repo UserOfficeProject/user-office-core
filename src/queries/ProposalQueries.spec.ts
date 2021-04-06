@@ -38,10 +38,9 @@ test('A user on the proposal can get a proposal it belongs to', () => {
     proposalQueries.get(dummyUserWithRole, 1)
   ).resolves.toStrictEqual(
     dummyProposal.notified
-      ? omit(dummyProposal, 'rankOrder', 'commentForManagement')
+      ? omit(dummyProposal, 'commentForManagement')
       : omit(
           dummyProposal,
-          'rankOrder',
           'commentForManagement',
           'finalStatus',
           'commentForUser'

@@ -35,16 +35,12 @@ export default class ProposalQueries {
     }
 
     // If not a user officer remove excellence, technical and safety score
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      proposal = omit(
-        proposal,
-        'rankOrder',
-        'commentForManagement'
-      ) as Proposal;
+    if (!this.userAuth.isUserOfficer(agent)) {
+      proposal = omit(proposal, 'commentForManagement') as Proposal;
     }
 
     // If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer
-    if (!(await this.userAuth.isUserOfficer(agent)) && !proposal.notified) {
+    if (!this.userAuth.isUserOfficer(agent) && !proposal.notified) {
       proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
     }
 

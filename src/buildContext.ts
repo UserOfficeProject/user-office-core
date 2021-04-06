@@ -105,7 +105,8 @@ const sepMutations = new SEPMutations(
   instrumentDataSource,
   userAuthorization,
   userDataSource,
-  proposalSettingsDataSource
+  proposalSettingsDataSource,
+  proposalDataSource
 );
 
 const systemQueries = new SystemQueries(systemDataSource);

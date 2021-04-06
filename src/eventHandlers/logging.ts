@@ -75,6 +75,15 @@ export default function createHandler(
             event.reviewwithnextproposalstatus.id.toString()
           );
           break;
+        case Event.PROPOSAL_SEP_MEETING_SAVED:
+        case Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN:
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            event.sepmeetingdecision.proposalId.toString()
+          );
+          break;
         default:
           await eventLogsDataSource.set(
             event.loggedInUserId,
