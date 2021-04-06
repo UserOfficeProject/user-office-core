@@ -1,0 +1,12 @@
+mutation overwriteSepMeetingDecisionRanking(
+  $overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput!
+) {
+  overwriteSepMeetingDecisionRanking(
+    overwriteSepMeetingDecisionRankingInput: $overwriteSepMeetingDecisionRankingInput
+  ) {
+    error
+    sepMeetingDecision {
+      proposalId
+    }
+  }
+}

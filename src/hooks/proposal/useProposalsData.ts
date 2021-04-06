@@ -15,6 +15,7 @@ export function useProposalsData(filter: ProposalsFilter) {
     instrumentId,
     proposalStatusId,
     questionaryIds,
+    questionFilter,
     text,
   } = filter;
 
@@ -31,6 +32,11 @@ export function useProposalsData(filter: ProposalsFilter) {
             instrumentId,
             proposalStatusId,
             questionaryIds,
+            questionFilter: questionFilter && {
+              ...questionFilter,
+              value:
+                JSON.stringify({ value: questionFilter?.value }) ?? undefined,
+            },
             text,
           },
         })
@@ -54,6 +60,7 @@ export function useProposalsData(filter: ProposalsFilter) {
             instrumentId,
             proposalStatusId,
             questionaryIds,
+            questionFilter,
             text,
           },
         })
@@ -77,6 +84,7 @@ export function useProposalsData(filter: ProposalsFilter) {
     instrumentId,
     proposalStatusId,
     questionaryIds,
+    questionFilter,
     text,
     api,
     currentRole,

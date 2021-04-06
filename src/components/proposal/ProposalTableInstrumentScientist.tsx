@@ -30,7 +30,9 @@ import {
   standardDeviation,
 } from 'utils/mathFunctions';
 
-import ProposalFilterBar from './ProposalFilterBar';
+import ProposalFilterBar, {
+  questionaryFilterFromUrlQuery,
+} from './ProposalFilterBar';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
 
 const ProposalTableInstrumentScientist: React.FC = () => {
@@ -55,6 +57,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
     proposalStatusId: urlQueryParams.proposalStatus || 2,
+    questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
   });
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
@@ -67,6 +70,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     proposalStatusId: proposalFilter.proposalStatusId,
     instrumentId: proposalFilter.instrumentId,
     callId: proposalFilter.callId,
+    questionFilter: proposalFilter.questionFilter,
   });
 
   const downloadPDFProposal = useDownloadPDFProposal();

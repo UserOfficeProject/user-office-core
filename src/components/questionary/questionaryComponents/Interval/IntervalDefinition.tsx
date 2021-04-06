@@ -22,15 +22,19 @@ export const intervalDefinition: QuestionaryComponentDefinition = {
   icon: <ArrowForwardIosIcon />,
   renderers: {
     answerRenderer: function AnswerRendererComponent({ answer }) {
-      const isAnswered = answer.value.min || answer.value.min; // at least one answer
+      const isMinAnswered = typeof answer.value.min === 'number';
+      const isMaxAnswered = typeof answer.value.max === 'number';
+
+      const isAnswered = isMinAnswered || isMaxAnswered; // at least one answer
+
       if (isAnswered) {
-        const min = answer.value.min;
-        const max = answer.value.max;
+        const min = answer.value.min ?? 'unspecified';
+        const max = answer.value.max ?? 'unspecified';
         const unit = answer.value.unit || '';
 
         return (
           <span>
-            {min} - {max} {unit}
+            {min} &ndash; {max} ({unit})
           </span>
         );
       }

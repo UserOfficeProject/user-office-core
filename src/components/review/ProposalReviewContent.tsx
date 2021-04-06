@@ -104,7 +104,9 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
   const AllProposalReviewsTab = isUserOfficer && (
     <>
       <ExternalReviews reviews={proposalData.reviews} />
-      <SEPMeetingDecision sepDecision={null} />
+      <SEPMeetingDecision
+        sepMeetingDecision={proposalData.sepMeetingDecision}
+      />
     </>
   );
 

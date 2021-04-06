@@ -8,13 +8,204 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  resolve_dep:
+    runs-on: ubuntu-latest
+    outputs:
+      BE_TAG: ${{ steps.resolve_rep.outputs.BE_TAG }}
+      FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}
+      SCHEDULER_BE_TAG: ${{ steps.resolve_rep.outputs.SCHEDULER_BE_TAG }}
+      GATEWAY_TAG: ${{ steps.resolve_rep.outputs.GATEWAY_TAG }}
+
+    steps:
+      - name: Resolve required repositories
+        id: resolve_rep
+        run: |
+          # this assumes the result is an array, and .name property is used
+          check_feature() {
+            # first param is the branch, everything after is endpoint for curl
+            local branch=$1
+            local found=0
+            shift
+            for endpoint in $@; do
+              local json=$(curl -s $endpoint)
+              local branch_found=$(echo $json | jq -c ".[] | select(.name==\"$branch\") | .name")
+              # to track what we found
+              >&2 echo "$endpoint -> $branch_found"
+              if [[ $branch_found != "" ]]; then
+                found=$((found += 1))
+              fi
+            done
+            echo $found
+          }
+
+          BE_TAGS=$(check_feature ${{ github.head_ref }} \
+            https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-backend/branches
+          )
+          FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
+            https://registry.hub.docker.com/v1/repositories/dmsc/duo-factory/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
+          )
+
+          SCHEDULER_BE_TAGS=$(check_feature ${{ github.head_ref }} \
+            https://registry.hub.docker.com/v1/repositories/dmsc/duo-scheduler-backend/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-scheduler-backend/branches
+          )
+
+          GATEWAY_TAGS=$(check_feature ${{ github.head_ref }} \
+            https://registry.hub.docker.com/v1/repositories/dmsc/duo-gateway/tags \
+            https://api.github.com/repos/UserOfficeProject/user-office-gateway/branches
+          )
+
+          BE_TAG=develop
+          if [[ $BE_TAGS == "2" ]]; then
+            BE_TAG="${{ github.head_ref }}"
+          fi
+
+          FACTORY_TAG=develop
+          if [[ $FACTORY_TAGS == "2" ]]; then
+            FACTORY_TAG="${{ github.head_ref }}"
+          fi
+
+          SCHEDULER_BE_TAG=develop
+          if [[ $SCHEDULER_BE_TAGS == "2" ]]; then
+            SCHEDULER_BE_TAG="${{ github.head_ref }}"
+          fi
+
+          GATEWAY_TAG=develop
+          if [[ $GATEWAY_TAGS == "2" ]]; then
+            GATEWAY_TAG="${{ github.head_ref }}"
+          fi
+
+          echo ::set-output name=BE_TAG::${BE_TAG}
+          echo ::set-output name=FACTORY_TAG::${FACTORY_TAG}
+          echo ::set-output name=SCHEDULER_BE_TAG::${SCHEDULER_BE_TAG}
+          echo ::set-output name=GATEWAY_TAG::${GATEWAY_TAG}
+
+      - name: Resolved
+        run: |
+          echo "BE_TAG: ${{ steps.resolve_rep.outputs.BE_TAG }}"
+          echo "FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}"
+          echo "SCHEDULER_BE_TAG: ${{ steps.resolve_rep.outputs.SCHEDULER_BE_TAG }}"
+          echo "GATEWAY_TAG: ${{ steps.resolve_rep.outputs.GATEWAY_TAG }}"
+
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    needs: resolve_dep
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        id: cached-modules
+        uses: actions/cache@v2
+        env:
+          cache-name: node-modules-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install dependencies
+        if: steps.cached-modules.outputs.cache-hit != 'true'
+        run: npm ci --production --loglevel error --no-fund
+
+      - name: Download required repositories
+        run: |
+          cd "$GITHUB_WORKSPACE/.."
+          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.BE_TAG }}" https://github.com/UserOfficeProject/user-office-backend.git
+          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.SCHEDULER_BE_TAG }}" https://github.com/UserOfficeProject/user-office-scheduler-backend.git
+          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.GATEWAY_TAG }}" https://github.com/UserOfficeProject/user-office-gateway.git
+
+      - name: Setup base docker-compose
+        run: |
+          cd "$GITHUB_WORKSPACE/.."
+          cat > docker-compose.all.yml << EOF
+          version: "3.1"
+          services:
+            proxy:
+              image: traefik:1.7
+              command: --api --docker
+              ports:
+                - "80:80" # The HTTP port
+              volumes:
+                - /var/run/docker.sock:/var/run/docker.sock:ro
+          EOF
+
+      - name: Run docker-compose, generate and compare SDK
+        run: |
+          cd "$GITHUB_WORKSPACE/.."
+
+          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+
+          export USER_OFFICE_BACKEND_TAG=${{ needs.resolve_dep.outputs.BE_TAG }}
+          export USER_OFFICE_BACKEND_DIR=user-office-backend
+          export USER_OFFICE_BACKEND=http://backend:4000/graphql
+          export USER_OFFICE_ENDPOINT=$USER_OFFICE_BACKEND
+
+          export USER_OFFICE_FACTORY_ENDPOINT=noop
+
+          export USER_OFFICE_SCHEDULER_BACKEND_TAG=${{ needs.resolve_dep.outputs.SCHEDULER_BE_TAG }}
+          export USER_OFFICE_SCHEDULER_BACKEND_DIR=user-office-scheduler-backend
+          export USER_OFFICE_SCHEDULER_BACKEND=http://scheduler-backend:4000/graphql
+
+          export USER_OFFICE_GATEWAY_TAG=${{ needs.resolve_dep.outputs.GATEWAY_TAG }}
+
+          docker-compose -f docker-compose.all.yml \
+            -f user-office-backend/docker-compose.e2e.yml \
+            -f user-office-scheduler-backend/docker-compose.e2e.yml \
+            -f user-office-gateway/docker-compose.e2e.yml \
+            up -d
+
+          export SCHEMA_URL=http://localhost:80/graphql
+
+          while true; do
+            STATUS=$(curl \
+              -o /dev/stderr \
+              --silent \
+              --write-out '%{http_code}' \
+              "$SCHEMA_URL?query=query%7Bversion%7D") # ?query=query{version}, without this we would get an error saying GET query missing
+
+            if [[ "$STATUS" == "200" ]]; then
+              echo "gateway is ready"
+              break
+            fi
+
+            >&2 echo " - gateway is unavailable - sleeping for 10 sec... ($STATUS)"
+            sleep 10
+          done;
+
+          cd $GITHUB_WORKSPACE
+
+          sed -i 's/\r$//' src/generated/sdk.ts  # make sure we don't fail because of line ending differences (CRLF / LF)
+          GIT_TRACKED_SUM=$(sha256sum src/generated/sdk.ts)
+          cp src/generated/sdk.ts /tmp/sdk_git_tracked.ts
+
+          npm run generate:local
+
+          sed -i 's/\r$//' src/generated/sdk.ts  # make sure we don't fail because of line ending differences (CRLF / LF)
+          PIPELINE_GENERATED_SUM=$(sha256sum src/generated/sdk.ts)
+          cp src/generated/sdk.ts /tmp/sdk_pipeline_generated.ts
+
+          # for debugging
+          echo "GIT_TRACKED_SUM: $GIT_TRACKED_SUM"
+          echo "PIPELINE_GENERATED_SUM: $PIPELINE_GENERATED_SUM"
+          git diff
+
+          # if there is a mismatch it will fail
+          echo "$GIT_TRACKED_SUM" | sha256sum -c
+
+          docker stop $(docker ps -q)
+
+      - name: Upload git tracked and pipeline generated SDK
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: sdk-files
+          path: /tmp/sdk_*
 
       - name: Cache app docker layers and image
         id: cached-image
@@ -70,7 +261,7 @@ jobs:
           fi
   e2e:
     runs-on: ubuntu-latest
-    needs: cypress
+    needs: [resolve_dep, cypress]
 
     steps:
       - uses: actions/checkout@v2
@@ -108,84 +299,13 @@ jobs:
         run: |
           docker load --input /tmp/.buildx-image-cache/img.tar
 
-      - name: Resolve required repositories
-        id: resolve_rep
-        run: |
-          # this assumes the result is an array, and .name property is used
-          check_feature() {
-            # first param is the branch, everything after is endpoint for curl
-            local branch=$1
-            local found=0
-
-            shift
-
-            for endpoint in $@; do
-              local json=$(curl -s $endpoint)
-              local branch_found=$(echo $json | jq -c ".[] | select(.name==\"$branch\") | .name")
-
-              # to track what we found
-              echo "$endpoint -> $branch_found" &> /dev/stderr
-
-              if [[ $branch_found != "" ]]; then
-                found=$((found += 1))
-              fi
-            done
-
-            echo $found
-          }
-
-          BE_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-backend/branches
-          )
-
-          FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v1/repositories/dmsc/duo-factory/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
-          )
-
-          SCHEDULER_BE_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v1/repositories/dmsc/duo-scheduler-backend/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-scheduler-backend/branches
-          )
-
-          GATEWAY_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v1/repositories/dmsc/duo-gateway/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-gateway/branches
-          )
-
-          BE_TAG=develop
-          if [[ $BE_TAGS == "2" ]]; then
-            BE_TAG="${{ github.head_ref }}"
-          fi
-
-          FACTORY_TAG=develop
-          if [[ $FACTORY_TAGS == "2" ]]; then
-            FACTORY_TAG="${{ github.head_ref }}"
-          fi\
-
-          SCHEDULER_BE_TAG=develop
-          if [[ $SCHEDULER_BE_TAGS == "2" ]]; then
-            SCHEDULER_BE_TAG="${{ github.head_ref }}"
-          fi
-
-          GATEWAY_TAG=develop
-          if [[ $GATEWAY_TAGS == "2" ]]; then
-            GATEWAY_TAG="${{ github.head_ref }}"
-          fi
-
-          echo ::set-output name=BE_TAG::${BE_TAG}
-          echo ::set-output name=FACTORY_TAG::${FACTORY_TAG}
-          echo ::set-output name=SCHEDULER_BE_TAG::${SCHEDULER_BE_TAG}
-          echo ::set-output name=GATEWAY_TAG::${GATEWAY_TAG}
-
       - name: Download required repositories
         run: |
           cd "$GITHUB_WORKSPACE/.."
-          git clone --depth 1 --branch "${{ steps.resolve_rep.outputs.BE_TAG }}" https://github.com/UserOfficeProject/user-office-backend.git
-          git clone --depth 1 --branch "${{ steps.resolve_rep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
-          git clone --depth 1 --branch "${{ steps.resolve_rep.outputs.SCHEDULER_BE_TAG }}" https://github.com/UserOfficeProject/user-office-scheduler-backend.git
-          git clone --depth 1 --branch "${{ steps.resolve_rep.outputs.GATEWAY_TAG }}" https://github.com/UserOfficeProject/user-office-gateway.git
+          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.BE_TAG }}" https://github.com/UserOfficeProject/user-office-backend.git
+          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
+          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.SCHEDULER_BE_TAG }}" https://github.com/UserOfficeProject/user-office-scheduler-backend.git
+          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.GATEWAY_TAG }}" https://github.com/UserOfficeProject/user-office-gateway.git
 
       - name: Setup base docker-compose
         run: |
@@ -202,19 +322,19 @@ jobs:
 
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
-          export USER_OFFICE_BACKEND_TAG=${{ steps.resolve_rep.outputs.BE_TAG }}
+          export USER_OFFICE_BACKEND_TAG=${{ needs.resolve_dep.outputs.BE_TAG }}
           export USER_OFFICE_BACKEND_DIR=user-office-backend
           export USER_OFFICE_BACKEND=http://backend:4000/graphql
           export USER_OFFICE_ENDPOINT=$USER_OFFICE_BACKEND
 
-          export USER_OFFICE_FACTORY_TAG=${{ steps.resolve_rep.outputs.FACTORY_TAG }}
+          export USER_OFFICE_FACTORY_TAG=${{ needs.resolve_dep.outputs.FACTORY_TAG }}
           export USER_OFFICE_FACTORY_ENDPOINT=http://factory:4500/generate
 
-          export USER_OFFICE_SCHEDULER_BACKEND_TAG=${{ steps.resolve_rep.outputs.SCHEDULER_BE_TAG }}
+          export USER_OFFICE_SCHEDULER_BACKEND_TAG=${{ needs.resolve_dep.outputs.SCHEDULER_BE_TAG }}
           export USER_OFFICE_SCHEDULER_BACKEND_DIR=user-office-scheduler-backend
           export USER_OFFICE_SCHEDULER_BACKEND=http://scheduler-backend:4000/graphql
 
-          export USER_OFFICE_GATEWAY_TAG=${{ steps.resolve_rep.outputs.GATEWAY_TAG }}
+          export USER_OFFICE_GATEWAY_TAG=${{ needs.resolve_dep.outputs.GATEWAY_TAG }}
 
           export USER_OFFICE_FRONTEND_DIR=$REPO_DIR_NAME
           export BUILD_TAG=${{ github.sha }}

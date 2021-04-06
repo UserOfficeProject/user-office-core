@@ -218,11 +218,15 @@ const ProposalTechnicalReview = ({
                   component={FormikUICustomCheckbox}
                   label="Submitted"
                   color="primary"
+                  disabled={isSubmitting}
                   data-cy="is-review-submitted"
                 />
               )}
               <Button
-                disabled={shouldDisableForm(isSubmitting)}
+                disabled={
+                  shouldDisableForm(isSubmitting) ||
+                  (isUserOfficer && isSubmitting)
+                }
                 type="submit"
                 onClick={() => setShouldSubmit(false)}
                 variant="contained"

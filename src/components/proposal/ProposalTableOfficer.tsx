@@ -134,18 +134,27 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     }
   }, [proposalsData, urlQueryParams.selection]);
 
-  const setNewRanking = (proposalID: number, ranking: number) => {
-    api().administrationProposal({
-      id: proposalID,
-      rankOrder: ranking,
-    });
-    setProposalsData((proposalsData) =>
-      proposalsData.map((prop) => {
-        if (prop.id === proposalID) prop.rankOrder = ranking;
+  const setNewRanking = async (proposalId: number, rankOrder: number) => {
+    const overwriteSepMeetingDecisionRankingInput = {
+      proposalId,
+      rankOrder,
+    };
 
-        return prop;
-      })
-    );
+    const result = await api(
+      'Ranking updated successfully'
+    ).overwriteSepMeetingDecisionRanking({
+      overwriteSepMeetingDecisionRankingInput,
+    });
+
+    if (!result.overwriteSepMeetingDecisionRanking.error) {
+      setProposalsData((proposalsData) =>
+        proposalsData.map((prop) => {
+          if (prop.id === proposalId) prop.rankOrder = rankOrder;
+
+          return prop;
+        })
+      );
+    }
   };
 
   const removeProposalFromInstrument = async (

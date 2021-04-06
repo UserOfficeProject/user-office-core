@@ -144,6 +144,8 @@ const closeModal = () => {
   cy.get('[role="dialog"] [data-cy="close-modal"]').click();
   // NOTE: Need to wait for modal to close with animation.
   cy.wait(100);
+
+  cy.get('[role="dialog"]').should('not.exist');
 };
 
 const finishedLoading = () => {
@@ -272,6 +274,41 @@ const createSampleQuestion = (
   }
 
   cy.contains('Save').click();
+};
+
+const createProposalWorkflow = (workflowName, workflowDescription) => {
+  cy.contains('Proposal workflows').click();
+  cy.contains('Create').click();
+
+  cy.get('#name').type(workflowName);
+  cy.get('#description').type(workflowDescription);
+  cy.get('[data-cy="submit"]').click();
+
+  cy.notification({ variant: 'success', text: 'created successfully' });
+};
+
+const addProposalStatusChangingEventToStatus = (
+  statusCode,
+  statusChangingEvents
+) => {
+  cy.get(`[data-cy^="connection_${statusCode}"]`).click();
+
+  cy.get('[data-cy="status-changing-events-modal"]').should('exist');
+
+  statusChangingEvents.forEach((statusChangingEvent) => {
+    cy.contains(statusChangingEvent).click();
+  });
+
+  cy.get('[data-cy="submit"]').click();
+
+  cy.notification({
+    variant: 'success',
+    text: 'Status changing events added successfully!',
+  });
+
+  statusChangingEvents.forEach((statusChangingEvent) => {
+    cy.contains(statusChangingEvent);
+  });
 };
 
 const createCall = ({
@@ -549,6 +586,13 @@ Cypress.Commands.add('createTemplate', createTemplate);
 Cypress.Commands.add('createProposal', createProposal);
 
 Cypress.Commands.add('createCall', createCall);
+
+Cypress.Commands.add('createProposalWorkflow', createProposalWorkflow);
+
+Cypress.Commands.add(
+  'addProposalStatusChangingEventToStatus',
+  addProposalStatusChangingEventToStatus
+);
 
 Cypress.Commands.add(
   'dragElement',

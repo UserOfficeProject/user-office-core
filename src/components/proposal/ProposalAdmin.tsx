@@ -24,7 +24,6 @@ export type AdministrationFormData = {
   finalStatus: ProposalEndStatus;
   managementTimeAllocation?: number;
   managementDecisionSubmitted?: boolean;
-  rankOrder?: number;
 };
 
 type ProposalAdminProps = {

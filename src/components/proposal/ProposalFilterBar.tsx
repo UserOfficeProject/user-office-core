@@ -3,6 +3,7 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
+import { DecodedValueMap } from 'use-query-params';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
@@ -10,12 +11,34 @@ import ProposalStatusFilter from 'components/common/proposalFilters/ProposalStat
 import QuestionaryFilter from 'components/common/proposalFilters/QuestionaryFilter';
 import {
   Call,
+  DataType,
   Instrument,
   ProposalsFilter,
   ProposalStatus,
+  QuestionFilterCompareOperator,
+  QuestionFilterInput,
 } from 'generated/sdk';
 import { useQuestionFilterQueryParams } from 'hooks/proposal/useQuestionFilterQueryParams';
 
+import { ProposalUrlQueryParamsType } from './ProposalPage';
+
+export const questionaryFilterFromUrlQuery = (
+  urlQuery: DecodedValueMap<ProposalUrlQueryParamsType>
+): QuestionFilterInput | undefined => {
+  if (
+    urlQuery.questionId &&
+    urlQuery.compareOperator &&
+    urlQuery.value &&
+    urlQuery.dataType
+  ) {
+    return {
+      questionId: urlQuery.questionId,
+      compareOperator: urlQuery.compareOperator as QuestionFilterCompareOperator,
+      value: urlQuery.value,
+      dataType: urlQuery.dataType as DataType,
+    };
+  }
+};
 type ProposalFilterBarProps = {
   calls?: { data: Call[]; isLoading: boolean };
   instruments?: { data: Instrument[]; isLoading: boolean };

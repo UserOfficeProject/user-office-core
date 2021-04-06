@@ -1,6 +1,5 @@
 import Button from '@material-ui/core/Button';
 import MaterialTable from 'material-table';
-import PropTypes from 'prop-types';
 import React, { useContext, useState, useEffect } from 'react';
 import { Redirect, useHistory } from 'react-router';
 
@@ -10,21 +9,22 @@ import { getUniqueArrayBy } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-type RoleSelectionProps = {
-  close: () => void;
-};
-
-const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
-  const { currentRole, user, token, handleNewToken } = useContext(UserContext);
+const RoleSelection: React.FC = () => {
+  const { currentRole, token, handleNewToken } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const { api } = useDataApiWithFeedback();
   const history = useHistory();
   const [roles, setRoles] = useState<Role[]>([]);
 
   useEffect(() => {
+    let unmounted = false;
+
     const getUserInformation = async () => {
       setLoading(true);
       const data = await api().getMyRoles();
+      if (unmounted) {
+        return;
+      }
 
       if (data?.me) {
         /** NOTE: We have roles that are duplicated in role_id and user_id but different only in sep_id
@@ -35,7 +35,12 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
       }
     };
     getUserInformation();
-  }, [user.id, api]);
+
+    return () => {
+      unmounted = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!roles) {
     return <Redirect to="/SignIn" />;
@@ -53,8 +58,6 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
 
       setTimeout(() => {
         handleNewToken(result.selectRole.token);
-
-        close();
       }, 500);
     }
   };
@@ -95,10 +98,6 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
       />
     </div>
   );
-};
-
-RoleSelection.propTypes = {
-  close: PropTypes.func.isRequired,
 };
 
 export default RoleSelection;

@@ -75,7 +75,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         callId: selectedCallId,
       });
       const allProposalsOnInstrumentHaveRankings = response.sepProposalsByInstrument?.every(
-        ({ proposal }) => !!proposal.rankOrder
+        ({ proposal }) => !!proposal.sepMeetingDecision?.rankOrder
       );
 
       if (allProposalsOnInstrumentHaveRankings) {
