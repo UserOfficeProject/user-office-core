@@ -170,7 +170,7 @@ export default function createHandler(
             event.technicalreview.proposalID
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.technicalreview.proposalID} not found`
             );
@@ -204,7 +204,7 @@ export default function createHandler(
             event.technicalreview.proposalID
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.technicalreview.proposalID} not found`
             );
@@ -251,7 +251,7 @@ export default function createHandler(
             event.sample.proposalId
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.sample.proposalId} not found`
             );
@@ -288,7 +288,7 @@ export default function createHandler(
             event.sepmeetingdecision.proposalId
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.sepmeetingdecision.proposalId} not found`
             );
@@ -311,7 +311,7 @@ export default function createHandler(
             event.sepmeetingdecision.proposalId
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.sepmeetingdecision.proposalId} not found`
             );
@@ -344,7 +344,7 @@ export default function createHandler(
             event.reviewwithnextproposalstatus.proposalID
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.reviewwithnextproposalstatus.proposalID} not found`
             );
@@ -380,7 +380,7 @@ export default function createHandler(
             event.review.proposalID
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.review.proposalID} not found`
             );

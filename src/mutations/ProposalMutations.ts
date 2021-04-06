@@ -373,7 +373,7 @@ export default class ProposalMutations {
       return rejection('NOT_FOUND');
     }
 
-    if (!this.userAuth.hasAccessRights(agent, sourceProposal)) {
+    if (!(await this.userAuth.hasAccessRights(agent, sourceProposal))) {
       return rejection('INSUFFICIENT_PERMISSIONS');
     }
 

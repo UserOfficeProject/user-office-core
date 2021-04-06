@@ -413,7 +413,7 @@ export interface SepMeetingDecisionRecord {
   readonly rank_order: number;
   readonly recommendation: ProposalEndStatus;
   readonly submitted: boolean;
-  readonly submitted_by?: number | null;
+  readonly submitted_by: number | null;
 }
 
 export interface SepProposalWithReviewGradesAndRankingRecord {

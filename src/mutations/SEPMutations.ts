@@ -66,7 +66,6 @@ export default class SEPMutations {
         args.numberRatingsRequired,
         args.active
       )
-      .then((sep) => sep)
       .catch((err) => {
         logger.logException(
           'Could not create scientific evaluation panel',
@@ -93,7 +92,6 @@ export default class SEPMutations {
         args.numberRatingsRequired,
         args.active
       )
-      .then((sep) => sep)
       .catch((err) => {
         logger.logException(
           'Could not update scientific evaluation panel',
@@ -126,7 +124,6 @@ export default class SEPMutations {
 
     return this.dataSource
       .assignChairOrSecretaryToSEP(args.assignChairOrSecretaryToSEPInput)
-      .then((result) => result)
       .catch((err) => {
         logger.logException(
           'Could not assign chair and secretary to scientific evaluation panel',
@@ -146,24 +143,21 @@ export default class SEPMutations {
     args: AssignReviewersToSEPArgs
   ): Promise<SEP | Rejection> {
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
+      !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, args.sepId))
     ) {
       return rejection('NOT_ALLOWED');
     }
 
-    return this.dataSource
-      .assignReviewersToSEP(args)
-      .then((result) => result)
-      .catch((err) => {
-        logger.logException(
-          'Could not assign member to scientific evaluation panel',
-          err,
-          { agent }
-        );
+    return this.dataSource.assignReviewersToSEP(args).catch((err) => {
+      logger.logException(
+        'Could not assign member to scientific evaluation panel',
+        err,
+        { agent }
+      );
 
-        return rejection('INTERNAL_ERROR');
-      });
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(removeSEPMemberValidationSchema)
@@ -198,7 +192,6 @@ export default class SEPMutations {
 
     return this.dataSource
       .removeMemberFromSEP(args, isMemberChairOrSecretaryOfSEP)
-      .then((result) => result)
       .catch((err) => {
         logger.logException(
           'Could not remove member from scientific evaluation panel',
@@ -266,7 +259,6 @@ export default class SEPMutations {
   ): Promise<SEP | Rejection> {
     return this.dataSource
       .removeProposalAssignment(args.proposalId, args.sepId)
-      .then((result) => result)
       .catch((err) => {
         logger.logException(
           'Could not remove assigned proposal from scientific evaluation panel',
@@ -316,7 +308,7 @@ export default class SEPMutations {
     args: AssignSepReviewersToProposalArgs
   ): Promise<SEP | Rejection> {
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
+      !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, args.sepId))
     ) {
       return rejection('NOT_ALLOWED');
@@ -324,7 +316,6 @@ export default class SEPMutations {
 
     return this.dataSource
       .assignMemberToSEPProposal(args.proposalId, args.sepId, args.memberIds)
-      .then((result) => result)
       .catch((err) => {
         logger.logException(
           'Could not assign proposal to scientific evaluation panel',
@@ -344,7 +335,7 @@ export default class SEPMutations {
     args: RemoveSepReviewerFromProposalArgs
   ): Promise<SEP | Rejection> {
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
+      !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(
         (agent as UserWithRole).id,
         args.sepId
@@ -355,7 +346,6 @@ export default class SEPMutations {
 
     return this.dataSource
       .removeMemberFromSepProposal(args.proposalId, args.sepId, args.memberId)
-      .then((result) => result)
       .catch((err) => {
         logger.logException('Could not remove member from SEP proposal', err, {
           agent,
@@ -428,7 +418,7 @@ export default class SEPMutations {
       logger.logError(
         'Cannot add SEP meeting decision to non existing proposal',
         {
-          proposal,
+          args,
         }
       );
 
@@ -439,7 +429,6 @@ export default class SEPMutations {
 
     return this.dataSource
       .saveSepMeetingDecision(args, submittedBy)
-      .then((sepMeetingDecision) => sepMeetingDecision)
       .catch((err) => {
         logger.logException('Could not save sep meeting decision', err, {
           agent,
@@ -462,7 +451,7 @@ export default class SEPMutations {
       logger.logError(
         'Cannot overwrite SEP meeting decision ranking to non existing proposal',
         {
-          proposal,
+          args,
         }
       );
 
@@ -471,7 +460,6 @@ export default class SEPMutations {
 
     return this.dataSource
       .overwriteSepMeetingDecisionRanking(args)
-      .then((sepMeetingDecision) => sepMeetingDecision)
       .catch((err) => {
         logger.logException(
           'Could not overwrite sep meeting decision ranking',
