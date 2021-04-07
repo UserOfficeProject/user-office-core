@@ -374,6 +374,7 @@ export enum Event {
   PROPOSAL_SEP_MEETING_SAVED = 'PROPOSAL_SEP_MEETING_SAVED',
   PROPOSAL_SEP_MEETING_SUBMITTED = 'PROPOSAL_SEP_MEETING_SUBMITTED',
   PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN = 'PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN',
+  PROPOSAL_SEP_MEETING_REORDER = 'PROPOSAL_SEP_MEETING_REORDER',
   PROPOSAL_MANAGEMENT_DECISION_UPDATED = 'PROPOSAL_MANAGEMENT_DECISION_UPDATED',
   PROPOSAL_MANAGEMENT_DECISION_SUBMITTED = 'PROPOSAL_MANAGEMENT_DECISION_SUBMITTED',
   PROPOSAL_INSTRUMENT_SUBMITTED = 'PROPOSAL_INSTRUMENT_SUBMITTED',
@@ -611,6 +612,7 @@ export type Mutation = {
   removeProposalAssignment: SepResponseWrap;
   createSEP: SepResponseWrap;
   overwriteSepMeetingDecisionRanking: SepMeetingDecisionResponseWrap;
+  reorderSepMeetingDecisionProposals: SepMeetingDecisionResponseWrap;
   saveSepMeetingDecision: SepMeetingDecisionResponseWrap;
   updateSEP: SepResponseWrap;
   updateSEPTimeAllocation: SepProposalResponseWrap;
@@ -966,6 +968,11 @@ export type MutationCreateSepArgs = {
 
 export type MutationOverwriteSepMeetingDecisionRankingArgs = {
   overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput;
+};
+
+
+export type MutationReorderSepMeetingDecisionProposalsArgs = {
+  reorderSepMeetingDecisionProposalsInput: ReorderSepMeetingDecisionProposalsInput;
 };
 
 
@@ -1596,6 +1603,11 @@ export type ProposalIdWithCallId = {
   callId: Scalars['Int'];
 };
 
+export type ProposalIdWithRankOrder = {
+  proposalId: Scalars['Int'];
+  rankOrder: Scalars['Int'];
+};
+
 export type ProposalProposalBookingFilter = {
   status?: Maybe<Array<ProposalBookingStatus>>;
 };
@@ -2195,6 +2207,10 @@ export type RemoveAssignedInstrumentFromCallInput = {
   callId: Scalars['Int'];
 };
 
+export type ReorderSepMeetingDecisionProposalsInput = {
+  proposals: Array<ProposalIdWithRankOrder>;
+};
+
 export type ResetPasswordEmailResponseWrap = {
   __typename?: 'ResetPasswordEmailResponseWrap';
   error: Maybe<Scalars['String']>;
@@ -2365,11 +2381,11 @@ export type SamplesFilter = {
 
 export type SaveSepMeetingDecisionInput = {
   proposalId: Scalars['Int'];
-  commentForUser: Scalars['String'];
-  commentForManagement: Scalars['String'];
-  recommendation: ProposalEndStatus;
-  rankOrder: Scalars['Int'];
-  submitted: Scalars['Boolean'];
+  commentForUser?: Maybe<Scalars['String']>;
+  commentForManagement?: Maybe<Scalars['String']>;
+  recommendation?: Maybe<ProposalEndStatus>;
+  rankOrder?: Maybe<Scalars['Int']>;
+  submitted?: Maybe<Scalars['Boolean']>;
 };
 
 export type ScheduledEvent = {
@@ -2436,9 +2452,9 @@ export type SepMeetingDecision = {
   __typename?: 'SepMeetingDecision';
   proposalId: Scalars['Int'];
   recommendation: Maybe<ProposalEndStatus>;
-  commentForManagement: Scalars['String'];
-  commentForUser: Scalars['String'];
-  rankOrder: Scalars['Int'];
+  commentForManagement: Maybe<Scalars['String']>;
+  commentForUser: Maybe<Scalars['String']>;
+  rankOrder: Maybe<Scalars['Int']>;
   submitted: Scalars['Boolean'];
   submittedBy: Maybe<Scalars['Int']>;
 };
@@ -3189,6 +3205,23 @@ export type RemoveMemberFromSepProposalMutation = (
     & { sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id'>
+    )> }
+  ) }
+);
+
+export type ReorderSepMeetingDecisionProposalsMutationVariables = Exact<{
+  reorderSepMeetingDecisionProposalsInput: ReorderSepMeetingDecisionProposalsInput;
+}>;
+
+
+export type ReorderSepMeetingDecisionProposalsMutation = (
+  { __typename?: 'Mutation' }
+  & { reorderSepMeetingDecisionProposals: (
+    { __typename?: 'SepMeetingDecisionResponseWrap' }
+    & Pick<SepMeetingDecisionResponseWrap, 'error'>
+    & { sepMeetingDecision: Maybe<(
+      { __typename?: 'SepMeetingDecision' }
+      & Pick<SepMeetingDecision, 'proposalId'>
     )> }
   ) }
 );
@@ -6839,6 +6872,18 @@ export const RemoveMemberFromSepProposalDocument = gql`
   }
 }
     `;
+export const ReorderSepMeetingDecisionProposalsDocument = gql`
+    mutation reorderSepMeetingDecisionProposals($reorderSepMeetingDecisionProposalsInput: ReorderSepMeetingDecisionProposalsInput!) {
+  reorderSepMeetingDecisionProposals(
+    reorderSepMeetingDecisionProposalsInput: $reorderSepMeetingDecisionProposalsInput
+  ) {
+    error
+    sepMeetingDecision {
+      proposalId
+    }
+  }
+}
+    `;
 export const SaveSepMeetingDecisionDocument = gql`
     mutation saveSepMeetingDecision($saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput!) {
   saveSepMeetingDecision(
@@ -8810,6 +8855,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     removeMemberFromSEPProposal(variables: RemoveMemberFromSepProposalMutationVariables): Promise<RemoveMemberFromSepProposalMutation> {
       return withWrapper(() => client.request<RemoveMemberFromSepProposalMutation>(print(RemoveMemberFromSepProposalDocument), variables));
+    },
+    reorderSepMeetingDecisionProposals(variables: ReorderSepMeetingDecisionProposalsMutationVariables): Promise<ReorderSepMeetingDecisionProposalsMutation> {
+      return withWrapper(() => client.request<ReorderSepMeetingDecisionProposalsMutation>(print(ReorderSepMeetingDecisionProposalsDocument), variables));
     },
     saveSepMeetingDecision(variables: SaveSepMeetingDecisionMutationVariables): Promise<SaveSepMeetingDecisionMutation> {
       return withWrapper(() => client.request<SaveSepMeetingDecisionMutation>(print(SaveSepMeetingDecisionDocument), variables));

@@ -75,7 +75,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         callId: selectedCallId,
       });
       const allProposalsOnInstrumentHaveRankings = response.sepProposalsByInstrument?.every(
-        ({ proposal }) => !!proposal.sepMeetingDecision?.rankOrder
+        ({ proposal }) => !!proposal.sepMeetingDecision?.submitted
       );
 
       if (allProposalsOnInstrumentHaveRankings) {
@@ -98,7 +98,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
           setInstrumentsData(newInstrumentsData);
         }
       } else {
-        enqueueSnackbar('All proposals must have rankings', {
+        enqueueSnackbar('All proposal SEP meetings should be submitted', {
           variant: 'error',
           className: 'snackbar-error',
         });
@@ -131,10 +131,10 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
             },
             {
               title: 'Submit instrument',
-              description: 'Are you sure you want to submit the instrument?',
+              description:
+                'No further changes to sep meeting decisions and rankings are possible after submission. Are you sure you want to submit the instrument?',
             }
           )(),
-        // setInstrumentToSubmit(rowData as InstrumentWithAvailabilityTime);
         tooltip: 'Submit instrument',
       })
     );

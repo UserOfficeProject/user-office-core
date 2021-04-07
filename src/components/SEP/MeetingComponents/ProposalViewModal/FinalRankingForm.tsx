@@ -52,12 +52,11 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [shouldSubmit, setShouldSubmit] = useState(false);
 
-  const initialData: SaveSepMeetingDecisionInput = {
+  const initialData = {
     proposalId: proposalData.id,
     commentForUser: proposalData.sepMeetingDecision?.commentForUser ?? '',
     commentForManagement:
       proposalData.sepMeetingDecision?.commentForManagement ?? '',
-    rankOrder: proposalData.sepMeetingDecision?.rankOrder ?? 0,
     recommendation:
       proposalData.sepMeetingDecision?.recommendation ??
       ProposalEndStatus.UNSET,
@@ -85,7 +84,6 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
         ProposalEndStatus[values.recommendation as ProposalEndStatus],
       commentForUser: values.commentForUser,
       commentForManagement: values.commentForManagement,
-      rankOrder: values.rankOrder,
       submitted: shouldSubmitMeetingDecision,
     };
 
@@ -98,7 +96,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
     const isError = !!data.saveSepMeetingDecision.error;
 
     meetingSubmitted({
-      ...saveSepMeetingDecisionInput,
+      ...(saveSepMeetingDecisionInput as SepMeetingDecision),
       submittedBy: proposalData.sepMeetingDecision?.submittedBy || null,
     });
 
@@ -130,7 +128,6 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                   async () => {
                     await handleSubmit({
                       ...values,
-                      rankOrder: +values.rankOrder,
                     });
                   },
                   {
@@ -142,13 +139,11 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
               } else {
                 await handleSubmit({
                   ...values,
-                  rankOrder: +values.rankOrder,
                 });
               }
             } else {
               await handleSubmit({
                 ...values,
-                rankOrder: +values.rankOrder,
               });
             }
           }}
@@ -212,92 +207,78 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       !hasWriteAccess || shouldDisableForm(isSubmitting)
                     }
                   />
-                  <Field
-                    id="rankOrder"
-                    name="rankOrder"
-                    label="Rank"
-                    type="number"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="rankOrder"
-                    required
-                    disabled={
-                      !hasWriteAccess || shouldDisableForm(isSubmitting)
-                    }
-                  />
+                  <ButtonContainer style={{ margin: '2rem 0 0' }}>
+                    {hasWriteAccess && (
+                      <>
+                        {isSubmitting && (
+                          <Box
+                            display="flex"
+                            alignItems="center"
+                            className={classes.button}
+                          >
+                            <UOLoader buttonSized />
+                          </Box>
+                        )}
+                        {isUserOfficer && (
+                          <Field
+                            id="submitted"
+                            name="submitted"
+                            component={FormikUICustomCheckbox}
+                            label="Submitted"
+                            color="primary"
+                            disabled={isSubmitting}
+                            data-cy="is-sep-meeting-submitted"
+                          />
+                        )}
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          onClick={() => {
+                            setShouldClose(false);
+                            setShouldSubmit(false);
+                          }}
+                          color={isUserOfficer ? 'primary' : 'secondary'}
+                          className={classes.button}
+                          data-cy="save"
+                          disabled={shouldDisableForm(isSubmitting)}
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          onClick={() => {
+                            setShouldClose(true);
+                            setShouldSubmit(false);
+                          }}
+                          color={isUserOfficer ? 'primary' : 'secondary'}
+                          className={classes.button}
+                          data-cy="saveAndContinue"
+                          disabled={shouldDisableForm(isSubmitting)}
+                        >
+                          Save and continue
+                        </Button>
+                        {!isUserOfficer && (
+                          <Button
+                            type="submit"
+                            variant="contained"
+                            onClick={() => {
+                              setShouldClose(false);
+                              setShouldSubmit(true);
+                            }}
+                            color={'primary'}
+                            className={classes.button}
+                            data-cy="submitSepMeeting"
+                            disabled={shouldDisableForm(isSubmitting)}
+                          >
+                            Submit
+                          </Button>
+                        )}
+                      </>
+                    )}
+                  </ButtonContainer>
                 </Grid>
               </Grid>
-              <ButtonContainer style={{ margin: '1rem 0' }}>
-                {hasWriteAccess && (
-                  <>
-                    {isSubmitting && (
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        className={classes.button}
-                      >
-                        <UOLoader buttonSized />
-                      </Box>
-                    )}
-                    {isUserOfficer && (
-                      <Field
-                        id="submitted"
-                        name="submitted"
-                        component={FormikUICustomCheckbox}
-                        label="Submitted"
-                        color="primary"
-                        disabled={isSubmitting}
-                        data-cy="is-sep-meeting-submitted"
-                      />
-                    )}
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      onClick={() => {
-                        setShouldClose(false);
-                        setShouldSubmit(false);
-                      }}
-                      color={isUserOfficer ? 'primary' : 'secondary'}
-                      className={classes.button}
-                      data-cy="save"
-                      disabled={shouldDisableForm(isSubmitting)}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      onClick={() => {
-                        setShouldClose(true);
-                        setShouldSubmit(false);
-                      }}
-                      color={isUserOfficer ? 'primary' : 'secondary'}
-                      className={classes.button}
-                      data-cy="saveAndContinue"
-                      disabled={shouldDisableForm(isSubmitting)}
-                    >
-                      Save and continue
-                    </Button>
-                    {!isUserOfficer && (
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        onClick={() => {
-                          setShouldClose(false);
-                          setShouldSubmit(true);
-                        }}
-                        color={'primary'}
-                        className={classes.button}
-                        data-cy="submitSepMeeting"
-                        disabled={shouldDisableForm(isSubmitting)}
-                      >
-                        Submit
-                      </Button>
-                    )}
-                  </>
-                )}
-              </ButtonContainer>
             </Form>
           )}
         </Formik>
