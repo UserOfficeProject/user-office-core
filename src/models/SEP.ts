@@ -24,6 +24,14 @@ export class SEPProposal {
   ) {}
 }
 
+export class SEPProposalWithReviewGradesAndRanking {
+  constructor(
+    public proposalId: number,
+    public rankOrder: number | null,
+    public reviewGrades: number[]
+  ) {}
+}
+
 export class SEPAssignment {
   constructor(
     public proposalId: number,

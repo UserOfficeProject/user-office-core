@@ -11,13 +11,13 @@ export class SepMeetingDecision implements Partial<SepMeetingDecisionOrigin> {
   @Field(() => ProposalEndStatus, { nullable: true })
   public recommendation: ProposalEndStatus;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public commentForManagement: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public commentForUser: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   public rankOrder: number;
 
   @Field(() => Boolean)

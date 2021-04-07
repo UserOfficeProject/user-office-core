@@ -38,6 +38,7 @@ import {
 import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { OverwriteSepMeetingDecisionRankingInput } from '../resolvers/mutations/OverwriteSepMeetingDecisionRankingMutation';
+import { ReorderSepMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderSepMeetingDecisionProposalsMutation';
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { UpdateSEPTimeAllocationArgs } from '../resolvers/mutations/UpdateSEPProposalMutation';
@@ -479,5 +480,24 @@ export default class SEPMutations {
 
         return rejection('INTERNAL_ERROR');
       });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.PROPOSAL_SEP_MEETING_REORDER)
+  async reorderSepMeetingDecisionProposals(
+    agent: UserWithRole | null,
+    args: ReorderSepMeetingDecisionProposalsInput
+  ): Promise<SepMeetingDecision | Rejection> {
+    const allSepDecisions = await Promise.all(
+      args.proposals.map((proposal) => {
+        return this.dataSource.saveSepMeetingDecision(proposal);
+      })
+    );
+
+    if (allSepDecisions.length !== args.proposals.length) {
+      return rejection('NOT_FOUND');
+    }
+
+    return allSepDecisions[0];
   }
 }

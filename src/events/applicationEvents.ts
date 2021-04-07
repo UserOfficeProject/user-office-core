@@ -142,6 +142,11 @@ interface ProposalSEPMeetingRankingOverwrittenEvent extends GeneralEvent {
   sepmeetingdecision: SepMeetingDecision;
 }
 
+interface ProposalSEPMeetingReorderEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_REORDER;
+  sepmeetingdecision: SepMeetingDecision;
+}
+
 interface UserResetPasswordEmailEvent extends GeneralEvent {
   type: Event.USER_PASSWORD_RESET_EMAIL;
   userlinkresponse: {
@@ -273,4 +278,5 @@ export type ApplicationEvent =
   | ProposalInstrumentSubmittedEvent
   | ProposalSEPMeetingSubmittedEvent
   | ProposalSEPMeetingSavedEvent
-  | ProposalSEPMeetingRankingOverwrittenEvent;
+  | ProposalSEPMeetingRankingOverwrittenEvent
+  | ProposalSEPMeetingReorderEvent;

@@ -18,20 +18,20 @@ export class SaveSEPMeetingDecisionInput {
   @Field(() => Int)
   public proposalId: number;
 
-  @Field(() => String)
-  public commentForUser: string;
+  @Field(() => String, { nullable: true })
+  public commentForUser?: string;
 
-  @Field(() => String)
-  public commentForManagement: string;
+  @Field(() => String, { nullable: true })
+  public commentForManagement?: string;
 
-  @Field(() => ProposalEndStatus)
-  public recommendation: ProposalEndStatus;
+  @Field(() => ProposalEndStatus, { nullable: true })
+  public recommendation?: ProposalEndStatus;
 
-  @Field(() => Int)
-  public rankOrder: number;
+  @Field(() => Int, { nullable: true })
+  public rankOrder?: number | null;
 
-  @Field(() => Boolean)
-  public submitted: boolean;
+  @Field(() => Boolean, { nullable: true })
+  public submitted?: boolean;
 }
 
 @Resolver()
