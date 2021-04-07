@@ -1,23 +1,22 @@
 import { Field } from 'formik';
-import React from 'react';
+import { TextField } from 'formik-material-ui';
+import React, { FC } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import TitledContainer from 'components/common/TitledContainer';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionTemplateRelation } from 'generated/sdk';
+import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationRichTextInputForm: FormComponent<QuestionTemplateRelation> = props => {
+export const QuestionTemplateRelationRichTextInputForm: FC<QuestionTemplateRelationFormProps> = (
+  props
+) => {
   return (
     <QuestionTemplateRelationFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      questionRel={props.field}
-      template={props.template}
+      {...props}
       validationSchema={Yup.object().shape({
         question: Yup.object({
           config: Yup.object({
@@ -26,9 +25,9 @@ export const QuestionTemplateRelationRichTextInputForm: FormComponent<QuestionTe
         }),
       })}
     >
-      {formikProps => (
+      {(formikProps) => (
         <>
-          <QuestionExcerpt question={props.field.question} />
+          <QuestionExcerpt question={props.questionRel.question} />
 
           <TitledContainer label="Constraints">
             <Field
@@ -38,6 +37,16 @@ export const QuestionTemplateRelationRichTextInputForm: FormComponent<QuestionTe
               margin="normal"
               fullWidth
               data-cy="required"
+            />
+
+            <Field
+              name="config.max"
+              label="Max"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="max"
             />
           </TitledContainer>
 

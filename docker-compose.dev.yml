@@ -1,8 +1,0 @@
-version: '3.1'
-
-services:
-  frontend:
-    image: 'dmsc/duo-frontend:${USER_OFFICE_FRONTEND_TAG}'
-    labels:
-      - 'traefik.frontend.rule=PathPrefix:/'
-      - 'traefik.port=80'

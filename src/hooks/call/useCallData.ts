@@ -12,7 +12,7 @@ export function useCallData(callId: number) {
   useEffect(() => {
     api()
       .getCall({ id: callId })
-      .then(data => {
+      .then((data) => {
         if (data.call) {
           setCall(data.call as Call);
         }

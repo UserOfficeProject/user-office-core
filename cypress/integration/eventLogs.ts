@@ -32,9 +32,7 @@ context('Event log tests', () => {
 
     cy.login('user');
 
-    cy.get("[data-cy='profile-page-btn']").click();
-
-    cy.contains('Profile').click();
+    cy.get('[data-cy="active-user-profile"]').click();
 
     cy.get("[name='firstname']")
       .clear()

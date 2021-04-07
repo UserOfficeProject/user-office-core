@@ -1,4 +1,4 @@
-FROM cypress/included:6.1.0
+FROM cypress/included:6.6.0
 
 WORKDIR /e2e
 
@@ -6,7 +6,7 @@ COPY cypress.json .
 COPY package* ./
 COPY tsconfig.json .
 
-# force re-build 2
+# force re-build 4
 RUN npm ci --silent
 
 COPY . ./cypress

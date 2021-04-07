@@ -22,15 +22,25 @@ export function useProposalEventsData(): {
   };
 
   useEffect(() => {
+    let unmounted = false;
+
     setLoadingProposalEvents(true);
     api()
       .getProposalEvents()
-      .then(data => {
+      .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         if (data.proposalEvents) {
           setProposalEvents(data.proposalEvents);
         }
         setLoadingProposalEvents(false);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [api]);
 
   return {

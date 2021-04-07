@@ -3,32 +3,36 @@ import * as Yup from 'yup';
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { NumberInputConfig, NumberValueConstraint } from 'generated/sdk';
 
-import { IntervalPropertyId } from '../Interval/intervalUnits';
-
-export const createNumberInputValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = answer => {
+export const createNumberInputValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = (
+  answer
+) => {
   const config = answer.config as NumberInputConfig;
 
-  let valueScheme = Yup.number().transform(value =>
+  let valueSchema = Yup.number().transform((value) =>
     isNaN(value) ? undefined : value
   );
 
   if (config.required) {
-    valueScheme = valueScheme.required('Please fill in');
+    valueSchema = valueSchema.required('Please fill in');
   }
 
   if (config.numberValueConstraint === NumberValueConstraint.ONLY_NEGATIVE) {
-    valueScheme = valueScheme.negative('Value must be a negative number');
+    valueSchema = valueSchema.negative('Value must be a negative number');
   }
 
   if (config.numberValueConstraint === NumberValueConstraint.ONLY_POSITIVE) {
-    valueScheme = valueScheme.positive('Value must be a positive number');
+    valueSchema = valueSchema.positive('Value must be a positive number');
+  }
+
+  let unitScheme = Yup.string().nullable();
+
+  // available units are specified and the field is required
+  if (config.units?.length && config.required) {
+    unitScheme = unitScheme.required('Please specify unit');
   }
 
   return Yup.object().shape({
-    value: valueScheme,
-    unit:
-      config.property !== IntervalPropertyId.UNITLESS
-        ? Yup.string().required('Please specify unit')
-        : Yup.string().nullable(),
+    value: valueSchema,
+    unit: unitScheme,
   });
 };

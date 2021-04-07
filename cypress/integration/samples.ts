@@ -223,9 +223,7 @@ context('Samples tests', () => {
       .first()
       .click();
 
-    cy.get('.MuiDialog-root')
-      .contains('Yes')
-      .click();
+    cy.get('[data-cy="confirm-ok"]').click();
 
     cy.contains(proposalTitle).should('not.exist');
   });

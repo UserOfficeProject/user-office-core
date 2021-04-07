@@ -30,10 +30,10 @@ mutation updateProposalWorkflow(
           nextProposalStatusId
           prevProposalStatusId
           droppableGroupId
-          nextStatusEvents {
-            nextStatusEventId
+          statusChangingEvents {
+            statusChangingEventId
             proposalWorkflowConnectionId
-            nextStatusEvent
+            statusChangingEvent
           }
         }
       }

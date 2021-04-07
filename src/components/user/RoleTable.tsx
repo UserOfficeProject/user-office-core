@@ -42,7 +42,7 @@ const RoleTable: React.FC<RoleTableProps> = ({ add, activeRoles }) => {
   }, [api]);
 
   const inactiveRoles = roles?.filter(
-    role => !activeRoles.find(activeRole => activeRole.id === role.id)
+    (role) => !activeRoles.find((activeRole) => activeRole.id === role.id)
   );
 
   return (
@@ -53,14 +53,14 @@ const RoleTable: React.FC<RoleTableProps> = ({ add, activeRoles }) => {
         columns={columns}
         data={inactiveRoles as Role[]}
         isLoading={isLoading}
-        onSelectionChange={data => setSelectedRoles(data)}
+        onSelectionChange={(data) => setSelectedRoles(data)}
         options={{
           search: true,
           selection: true,
         }}
         localization={{
           toolbar: {
-            nRowsSelected: numberOfSelectedRoles =>
+            nRowsSelected: (numberOfSelectedRoles) =>
               `${numberOfSelectedRoles} selected`,
           },
         }}

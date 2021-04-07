@@ -12,20 +12,52 @@ import SuperMaterialTable, {
 import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
+import CallStatusFilter, {
+  CallStatusQueryFilter,
+  defaultCallStatusQueryFilter,
+  CallStatus,
+} from './CallStatusFilter';
 import CreateUpdateCall from './CreateUpdateCall';
 
+const getFilterStatus = (callStatus: string | CallStatus) =>
+  callStatus === CallStatus.ALL
+    ? undefined // if set to ALL we don't filter by status
+    : callStatus === CallStatus.ACTIVE;
+
 const CallsTable: React.FC = () => {
-  const { loadingCalls, calls, setCallsWithLoading: setCalls } = useCallsData();
+  const { api } = useDataApiWithFeedback();
   const [assigningInstrumentsCallId, setAssigningInstrumentsCallId] = useState<
     number | null
   >(null);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType
-  >(DefaultQueryParams);
+    UrlQueryParamsType & CallStatusQueryFilter
+  >({
+    ...DefaultQueryParams,
+    callStatus: defaultCallStatusQueryFilter,
+  });
+
+  const {
+    loadingCalls,
+    calls,
+    setCallsWithLoading: setCalls,
+    setCallsFilter,
+  } = useCallsData({
+    isActive: getFilterStatus(urlQueryParams.callStatus),
+  });
+
+  const handleStatusFilterChange = (callStatus: CallStatus) => {
+    setUrlQueryParams((queries) => ({ ...queries, callStatus }));
+    setCallsFilter((filter) => ({
+      ...filter,
+      isActive: getFilterStatus(callStatus),
+    }));
+  };
 
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
@@ -60,13 +92,17 @@ const CallsTable: React.FC = () => {
           ? rowData.proposalWorkflow.name
           : '-',
     },
+    {
+      title: '#proposals',
+      field: 'proposalCount',
+    },
   ];
 
   const assignInstrumentsToCall = (
     instruments: InstrumentWithAvailabilityTime[]
   ) => {
     if (calls) {
-      const callsWithInstruments = calls.map(callItem => {
+      const callsWithInstruments = calls.map((callItem) => {
         if (callItem.id === assigningInstrumentsCallId) {
           return {
             ...callItem,
@@ -87,7 +123,7 @@ const CallsTable: React.FC = () => {
     callToRemoveFromId: number
   ) => {
     if (calls) {
-      const callsWithRemovedInstrument = calls.map(callItem => {
+      const callsWithRemovedInstrument = calls.map((callItem) => {
         if (callItem.id === callToRemoveFromId) {
           return {
             ...callItem,
@@ -103,12 +139,31 @@ const CallsTable: React.FC = () => {
     }
   };
 
+  const deleteCall = async (id: number | string) => {
+    return await api('Call deleted successfully')
+      .deleteCall({
+        id: id as number,
+      })
+      .then((resp) => {
+        if (!resp.deleteCall.error) {
+          const newObjectsArray = calls.filter(
+            (objectItem) => objectItem.id !== id
+          );
+          setCalls(newObjectsArray);
+
+          return true;
+        } else {
+          return false;
+        }
+      });
+  };
+
   const setInstrumentAvailabilityTime = (
     updatedInstruments: InstrumentWithAvailabilityTime[],
     updatingCallId: number
   ) => {
     if (calls) {
-      const callsWithInstrumentAvailabilityTime = calls.map(callItem => {
+      const callsWithInstrumentAvailabilityTime = calls.map((callItem) => {
         if (callItem.id === updatingCallId) {
           return {
             ...callItem,
@@ -133,12 +188,12 @@ const CallsTable: React.FC = () => {
   );
 
   const callAssignments = calls.find(
-    callItem => callItem.id === assigningInstrumentsCallId
+    (callItem) => callItem.id === assigningInstrumentsCallId
   );
 
   const createModal = (
-    onUpdate: Function,
-    onCreate: Function,
+    onUpdate: FunctionType<void, [Call | null]>,
+    onCreate: FunctionType<void, [Call | null]>,
     editCall: Call | null
   ) => (
     <CreateUpdateCall
@@ -151,6 +206,10 @@ const CallsTable: React.FC = () => {
 
   return (
     <div data-cy="calls-table">
+      <CallStatusFilter
+        callStatus={urlQueryParams.callStatus}
+        onChange={handleStatusFilterChange}
+      />
       {assigningInstrumentsCallId && (
         <InputDialog
           aria-labelledby="simple-modal-title"
@@ -172,6 +231,7 @@ const CallsTable: React.FC = () => {
       <SuperMaterialTable
         createModal={createModal}
         setData={setCalls}
+        delete={deleteCall}
         hasAccess={{
           create: isUserOfficer,
           update: isUserOfficer,

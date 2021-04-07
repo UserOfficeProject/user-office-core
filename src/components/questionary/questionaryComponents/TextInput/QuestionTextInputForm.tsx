@@ -2,27 +2,25 @@ import Box from '@material-ui/core/Box';
 import Collapse from '@material-ui/core/Collapse';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React from 'react';
+import React, { FC } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import TitledContainer from 'components/common/TitledContainer';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { Question, TextInputConfig } from 'generated/sdk';
+import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { TextInputConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionTextInputForm: FormComponent<Question> = props => {
-  const field = props.field;
+export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
+  const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
   return (
     <QuestionFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      question={props.field}
+      {...props}
       validationSchema={Yup.object().shape({
         naturalKey: naturalKeySchema,
         question: Yup.string().required('Question is required'),
@@ -37,7 +35,7 @@ export const QuestionTextInputForm: FormComponent<Question> = props => {
         }),
       })}
     >
-      {formikProps => (
+      {(formikProps) => (
         <>
           <Field
             name="naturalKey"

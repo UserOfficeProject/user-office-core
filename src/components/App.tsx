@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
@@ -139,7 +138,7 @@ class App extends React.Component {
               ref={this.notistackRef}
               anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
               maxSnack={1}
-              action={key => (
+              action={(key) => (
                 <IconButton onClick={this.onClickDismiss(key)}>
                   <Close htmlColor="white" />
                 </IconButton>

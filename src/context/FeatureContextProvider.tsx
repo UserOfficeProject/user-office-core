@@ -27,7 +27,7 @@ export const FeatureContext = React.createContext<FeatureContextData>(
   initialFeatureData
 );
 
-export const FeatureContextProvider: React.FC = props => {
+export const FeatureContextProvider: React.FC = (props) => {
   const { features, loadingFeatures } = useFeatures();
   const classes = useStyles();
 
@@ -39,7 +39,7 @@ export const FeatureContextProvider: React.FC = props => {
     );
   }
 
-  const featuresMap = features.reduce(function(featuresMap, feature) {
+  const featuresMap = features?.reduce(function (featuresMap, feature) {
     featuresMap.set(feature.id, feature);
 
     return featuresMap;

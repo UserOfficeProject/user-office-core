@@ -7,6 +7,7 @@ import {
 import { IndexWithGroupId, ProposalWorkflow } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
+import { FunctionType } from 'utils/utilTypes';
 
 export function usePersistProposalWorkflowEditorModel() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -24,7 +25,7 @@ export function usePersistProposalWorkflowEditorModel() {
         name,
         description,
       })
-      .then(data => data.updateProposalWorkflow);
+      .then((data) => data.updateProposalWorkflow);
   };
 
   type MonitorableServiceCall = () => Promise<{
@@ -61,7 +62,7 @@ export function usePersistProposalWorkflowEditorModel() {
           nextProposalStatusId,
           prevProposalStatusId,
         })
-        .then(data => data.addProposalWorkflowStatus);
+        .then((data) => data.addProposalWorkflowStatus);
     };
 
     const reorderStatusesInProposalWorkflow = async (
@@ -75,7 +76,7 @@ export function usePersistProposalWorkflowEditorModel() {
           to,
           proposalWorkflowId,
         })
-        .then(data => data.moveProposalWorkflowStatus);
+        .then((data) => data.moveProposalWorkflowStatus);
     };
 
     const deleteProposalWorkflowStatus = async (
@@ -87,22 +88,22 @@ export function usePersistProposalWorkflowEditorModel() {
           proposalStatusId,
           proposalWorkflowId,
         })
-        .then(data => data.deleteProposalWorkflowStatus);
+        .then((data) => data.deleteProposalWorkflowStatus);
     };
 
-    const addNextStatusEventsToConnection = async (
+    const addStatusChangingEventsToConnection = async (
       proposalWorkflowConnectionId: number,
-      nextStatusEvents: string[]
+      statusChangingEvents: string[]
     ) => {
-      return api('Next status events added successfully!')
-        .addNextStatusEventsToConnection({
+      return api('Status changing events added successfully!')
+        .addStatusChangingEventsToConnection({
           proposalWorkflowConnectionId,
-          nextStatusEvents,
+          statusChangingEvents,
         })
-        .then(data => data.addNextStatusEventsToConnection);
+        .then((data) => data.addStatusChangingEventsToConnection);
     };
 
-    return (next: Function) => (action: Event) => {
+    return (next: FunctionType) => (action: Event) => {
       next(action);
       const state = getState();
 
@@ -156,7 +157,7 @@ export function usePersistProposalWorkflowEditorModel() {
           });
 
           const groupToRemoveFrom = state.proposalWorkflowConnectionGroups.find(
-            proposalWorkflowConnectionGroup =>
+            (proposalWorkflowConnectionGroup) =>
               proposalWorkflowConnectionGroup.groupId ===
               action.payload.source.droppableId
           );
@@ -236,12 +237,12 @@ export function usePersistProposalWorkflowEditorModel() {
         }
 
         case EventType.ADD_NEXT_STATUS_EVENTS_REQUESTED: {
-          const { workflowConnection, nextStatusEvents } = action.payload;
+          const { workflowConnection, statusChangingEvents } = action.payload;
 
           return executeAndMonitorCall(async () => {
-            const result = await addNextStatusEventsToConnection(
+            const result = await addStatusChangingEventsToConnection(
               workflowConnection.id,
-              nextStatusEvents
+              statusChangingEvents
             );
 
             if (!result.error) {
@@ -249,7 +250,7 @@ export function usePersistProposalWorkflowEditorModel() {
                 type: EventType.NEXT_STATUS_EVENTS_ADDED,
                 payload: {
                   workflowConnection,
-                  nextStatusEvents: result.nextStatusEvents,
+                  statusChangingEvents: result.statusChangingEvents,
                 },
               });
             }

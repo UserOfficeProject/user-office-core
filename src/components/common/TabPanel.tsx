@@ -4,15 +4,21 @@ import useTheme from '@material-ui/core/styles/useTheme';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';
-import React from 'react';
+import React, { useEffect } from 'react';
+import {
+  NumberParam,
+  StringParam,
+  useQueryParams,
+  withDefault,
+} from 'use-query-params';
 
 import { StyledPaper } from 'styles/StyledComponents';
 
 interface TabPanelProps {
   children?: React.ReactNode;
   dir?: string;
-  index: any;
-  value: any;
+  index: number;
+  value: number;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -32,46 +38,83 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-function a11yProps(index: any) {
+function a11yProps(index: number) {
   return {
     id: `full-width-tab-${index}`,
     'aria-controls': `full-width-tabpanel-${index}`,
   };
 }
 
-export default function FullWidthTabs(props: {
+type FullWidthTabsProps = {
   children: React.ReactNode[];
   tabNames: string[];
-}) {
-  const theme = useTheme();
-  const [value, setValue] = React.useState(0);
+  isInsideModal?: boolean;
+};
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
+const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
+  tabNames,
+  children,
+  isInsideModal,
+}) => {
+  const theme = useTheme();
+  const [query, setQuery] = useQueryParams({
+    tab: withDefault(NumberParam, 0),
+    modalTab: withDefault(NumberParam, 0),
+    modal: StringParam,
+  });
+
+  const handleChange = (
+    event: React.ChangeEvent<Record<string, unknown>>,
+    newValue: number
+  ) => {
+    const tabValue = newValue > 0 ? newValue : undefined;
+
+    if (isInsideModal) {
+      setQuery({ modalTab: tabValue });
+    } else {
+      setQuery({ tab: tabValue });
+    }
   };
+
+  useEffect(() => {
+    return () => {
+      if (isInsideModal) {
+        setQuery({ modalTab: undefined });
+      } else {
+        setQuery({ tab: undefined });
+      }
+    };
+  }, [setQuery, isInsideModal]);
 
   return (
     <StyledPaper>
       <AppBar position="static" color="default">
         <Tabs
-          value={value}
+          value={isInsideModal ? query.modalTab : query.tab}
           onChange={handleChange}
           indicatorColor="primary"
           textColor="primary"
           variant="fullWidth"
           aria-label="full width tabs example"
         >
-          {props.tabNames.map((tabName, i) => (
+          {tabNames.map((tabName, i) => (
             <Tab key={i} label={tabName} {...a11yProps(i)} />
           ))}
         </Tabs>
       </AppBar>
 
-      {props.children.map((tabContent, i) => (
-        <TabPanel key={i} value={value} index={i} dir={theme.direction}>
+      {children.map((tabContent, i) => (
+        <TabPanel
+          key={i}
+          value={isInsideModal ? query.modalTab : query.tab}
+          index={i}
+          dir={theme.direction}
+        >
           {tabContent}
         </TabPanel>
       ))}
     </StyledPaper>
   );
-}
+};
+
+export default FullWidthTabs;

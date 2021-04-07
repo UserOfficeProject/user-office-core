@@ -30,7 +30,7 @@ export default function TemplateQuestionEditor(props: {
   isHighlighted?: boolean;
 }) {
   const theme = useTheme();
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles((theme) => ({
     icon: {
       color: theme.palette.grey[400],
       justifyItems: 'flex-end',
@@ -136,7 +136,7 @@ export default function TemplateQuestionEditor(props: {
                     payload: { dependency: '' },
                   })
                 }
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   props.dispatch({
                     type: EventType.OPEN_QUESTIONREL_EDITOR,
@@ -160,8 +160,8 @@ export default function TemplateQuestionEditor(props: {
 
   return (
     <Draggable
-      key={props.data.proposalQuestionId}
-      draggableId={props.data.proposalQuestionId}
+      key={props.data.id}
+      draggableId={props.data.id}
       index={props.index}
       isDragDisabled={questionDefinition.creatable === false}
     >
@@ -214,7 +214,7 @@ export default function TemplateQuestionEditor(props: {
 }
 
 export interface TemplateTopicEditorData {
-  proposalQuestionId: string;
+  id: string;
   question: string;
   naturalKey: string;
   dataType: DataType;

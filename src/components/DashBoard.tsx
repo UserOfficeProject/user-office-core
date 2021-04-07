@@ -31,15 +31,16 @@ import ProposalChooseCall from './proposal/ProposalChooseCall';
 import ProposalCreate from './proposal/ProposalCreate';
 import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
-import ProposalReviewReviewer from './review/ProposalReviewReviewer';
-import ProposalReviewUserOfficer from './review/ProposalReviewUserOfficer';
+import MyBeamTimes from './proposalBooking/MyBeamTimes';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
+import ApiAccessTokensPage from './settings/apiAccessTokens/ApiAccessTokensPage';
 import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage';
 import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
+import UnitTablePage from './settings/unitList/UnitTablePage';
 import ShipmentCreate from './shipments/CreateUpdateShipment';
 import MyShipments from './shipments/MyShipments';
 import ShipmentsPage from './shipments/ShipmentsPage';
@@ -79,7 +80,7 @@ BottomNavItem.propTypes = {
 
 const drawerWidth = 250;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
@@ -135,7 +136,9 @@ const useStyles = makeStyles(theme => ({
 
 const Dashboard: React.FC = () => {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(
+    localStorage.drawerOpen ? localStorage.drawerOpen === '1' : true
+  );
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isSampleSafetyReviewer = useCheckAccess([
     UserRole.SAMPLE_SAFETY_REVIEWER,
@@ -144,20 +147,25 @@ const Dashboard: React.FC = () => {
   const featureContext = useContext(FeatureContext);
   const isShipmentEnabled = !!featureContext.features.get(FeatureId.SHIPPING)
     ?.isEnabled;
+  const isSchedulerEnabled = featureContext.features.get(FeatureId.SCHEDULER)
+    ?.isEnabled;
 
   const { currentRole } = useContext(UserContext);
   const { calls } = useCallsData({ isActive: true });
 
   const handleDrawerOpen = () => {
+    localStorage.setItem('drawerOpen', '1');
     setOpen(true);
   };
   const handleDrawerClose = () => {
+    localStorage.setItem('drawerOpen', '0');
     setOpen(false);
   };
+
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
 
-  // TODO: Check who can see what and modify the access controll here.
+  // TODO: Check who can see what and modify the access control here.
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -221,7 +229,6 @@ const Dashboard: React.FC = () => {
             path="/QuestionaryEditor/:templateId"
             component={TemplateEditor}
           />
-          <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
           <Route path="/ProposalTemplates" component={ProposalTemplates} />
           <Route
             path="/SampleDeclarationTemplates"
@@ -235,10 +242,7 @@ const Dashboard: React.FC = () => {
             path="/ProposalTableReviewer"
             component={ProposalTableReviewer}
           />
-          <Route
-            path="/ProposalReviewUserOfficer/:id"
-            component={ProposalReviewUserOfficer}
-          />
+          {isUserOfficer && <Route path="/Units" component={UnitTablePage} />}
           {isUserOfficer && (
             <Route path="/ProposalStatuses" component={ProposalStatusesPage} />
           )}
@@ -260,6 +264,12 @@ const Dashboard: React.FC = () => {
           {isUserOfficer && (
             <Route path="/Shipments" component={ShipmentsPage} />
           )}
+          {isUserOfficer && (
+            <Route path="/ApiAccessTokens" component={ApiAccessTokensPage} />
+          )}
+          {isSchedulerEnabled && (
+            <Route path="/MyBeamTimes" component={MyBeamTimes} />
+          )}
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}
             yes={() => <Route component={ProposalPage} />}
@@ -268,7 +278,7 @@ const Dashboard: React.FC = () => {
                 allowedRoles={[UserRole.USER]}
                 yes={() => (
                   <Route
-                    render={props => (
+                    render={(props) => (
                       <OverviewPage {...props} userRole={UserRole.USER} />
                     )}
                   />
@@ -276,7 +286,6 @@ const Dashboard: React.FC = () => {
                 no={() => (
                   <Can
                     allowedRoles={[
-                      UserRole.REVIEWER,
                       UserRole.SEP_REVIEWER,
                       UserRole.SEP_CHAIR,
                       UserRole.SEP_SECRETARY,
@@ -284,7 +293,7 @@ const Dashboard: React.FC = () => {
                     ]}
                     yes={() => (
                       <Route
-                        render={props => (
+                        render={(props) => (
                           <OverviewPage
                             {...props}
                             userRole={currentRole as UserRole}

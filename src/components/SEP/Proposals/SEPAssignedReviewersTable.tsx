@@ -7,14 +7,11 @@ import PropTypes from 'prop-types';
 import React, { useState, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
+import ProposalReviewContent from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
-import {
-  SepProposal,
-  SepAssignment,
-  ReviewStatus,
-  UserRole,
-} from 'generated/sdk';
+import { SepAssignment, ReviewStatus, UserRole } from 'generated/sdk';
+import { SEPProposalType } from 'hooks/SEP/useSEPProposalsData';
 import { tableIcons } from 'utils/materialIcons';
 
 // NOTE: Some custom styles for row expand table.
@@ -31,7 +28,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 type SEPAssignedReviewersTableProps = {
-  sepProposal: SepProposal;
+  sepProposal: SEPProposalType;
   removeAssignedReviewer: (
     assignedReviewer: SepAssignment,
     proposalId: number
@@ -81,17 +78,21 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
 
   return (
     <div className={classes.root} data-cy="sep-reviewer-assignments-table">
-      {editReviewID && (
-        <ProposalReviewModal
-          editReviewID={editReviewID}
+      <ProposalReviewModal
+        title={`Review proposal: ${sepProposal.proposal.title} (${sepProposal.proposal.shortCode})`}
+        proposalReviewModalOpen={reviewModalOpen}
+        setProposalReviewModalOpen={() => {
+          setReviewModalOpen(false);
+          currentAssignment && updateView(currentAssignment);
+        }}
+      >
+        <ProposalReviewContent
+          reviewId={editReviewID}
           sepId={sepProposal.sepId}
-          reviewModalOpen={reviewModalOpen}
-          setReviewModalOpen={() => {
-            setReviewModalOpen(false);
-            currentAssignment && updateView(currentAssignment);
-          }}
+          tabNames={['Proposal information', 'Technical review', 'Grade']}
         />
-      )}
+      </ProposalReviewModal>
+
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
@@ -112,7 +113,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
             : {}
         }
         actions={[
-          rowData => ({
+          (rowData) => ({
             icon:
               rowData.review?.status === ReviewStatus.DRAFT
                 ? () => <RateReviewIcon />

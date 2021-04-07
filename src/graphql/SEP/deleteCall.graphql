@@ -1,0 +1,8 @@
+mutation deleteSEP($id: Int!) {
+  deleteSEP(id: $id) {
+    error
+    sep {
+      id
+    }
+  }
+}

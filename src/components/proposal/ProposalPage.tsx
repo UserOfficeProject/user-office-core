@@ -2,8 +2,9 @@ import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import {
   NumberParam,
-  useQueryParams,
   QueryParamConfig,
+  StringParam,
+  useQueryParams,
 } from 'use-query-params';
 
 import {
@@ -16,28 +17,42 @@ import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
-import ProposalFilterBar from './ProposalFilterBar';
+import ProposalFilterBar, {
+  questionaryFilterFromUrlQuery,
+} from './ProposalFilterBar';
 import ProposalTableOfficer from './ProposalTableOfficer';
 
 export type ProposalUrlQueryParamsType = {
   call: QueryParamConfig<number | null | undefined>;
   instrument: QueryParamConfig<number | null | undefined>;
   proposalStatus: QueryParamConfig<number | null | undefined>;
+  reviewModal: QueryParamConfig<number | null | undefined>;
+  compareOperator: QueryParamConfig<string | null | undefined>;
+  questionId: QueryParamConfig<string | null | undefined>;
+  value: QueryParamConfig<string | null | undefined>;
+  dataType: QueryParamConfig<string | null | undefined>;
 } & UrlQueryParamsType;
 
 export default function ProposalPage() {
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    ProposalUrlQueryParamsType
-  >({
+  const [
+    urlQueryParams,
+    setUrlQueryParams,
+  ] = useQueryParams<ProposalUrlQueryParamsType>({
     ...DefaultQueryParams,
     call: NumberParam,
     instrument: NumberParam,
     proposalStatus: NumberParam,
+    reviewModal: NumberParam,
+    questionId: StringParam,
+    compareOperator: StringParam,
+    value: StringParam,
+    dataType: StringParam,
   });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
     proposalStatusId: urlQueryParams.proposalStatus,
+    questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
   });
   const { calls, loadingCalls } = useCallsData();
   const { instruments, loadingInstruments } = useInstrumentsData();

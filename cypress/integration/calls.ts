@@ -10,6 +10,18 @@ context('Calls tests', () => {
     cy.viewport(1100, 1000);
   });
 
+  const call1 = {
+    shortCode: faker.random.alphaNumeric(15),
+    startDate: faker.date.past().toISOString().slice(0, 10),
+    endDate: faker.date.future().toISOString().slice(0, 10),
+  };
+
+  const call2 = {
+    shortCode: faker.random.alphaNumeric(15),
+    startDate: faker.date.past().toISOString().slice(0, 10),
+    endDate: faker.date.future().toISOString().slice(0, 10),
+  };
+
   it('A user should not be able to see/visit calls', () => {
     cy.login('user');
 
@@ -19,24 +31,16 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="user-menu-items"]')
       .find('.MuiListItem-root')
-      .should('have.length', 4);
+      .should('have.length', 5);
 
     cy.visit('/CallPage');
     cy.contains('My proposals');
   });
 
   it('A user-officer should not be able go to next step or create call if there is validation error', () => {
-    const shortCode = faker.random.word().split(' ')[0]; // faker random word is buggy, it ofter returns phrases
-
-    const startDate = faker.date
-      .past()
-      .toISOString()
-      .slice(0, 10);
-
-    const endDate = faker.date
-      .future()
-      .toISOString()
-      .slice(0, 10);
+    const shortCode = faker.random.alphaNumeric(15);
+    const startDate = faker.date.past().toISOString().slice(0, 10);
+    const endDate = faker.date.future().toISOString().slice(0, 10);
 
     cy.login('officer');
 
@@ -65,8 +69,8 @@ context('Calls tests', () => {
       .type(startDate)
       .should('have.value', startDate);
 
-    cy.get('[data-cy=end-date] input').clear();
     cy.get('[data-cy=end-date] input')
+      .clear()
       .type(endDate)
       .should('have.value', endDate);
 
@@ -91,18 +95,10 @@ context('Calls tests', () => {
     cy.get('[data-cy="cycle-comment"] input:invalid').should('have.length', 1);
   });
 
-  it('A user-officer should be able to create a call', () => {
-    const shortCode = faker.random.word().split(' ')[0]; // faker random word is buggy, it ofter returns phrases
-
-    const startDate = faker.date
-      .past()
-      .toISOString()
-      .slice(0, 10);
-
-    const endDate = faker.date
-      .future()
-      .toISOString()
-      .slice(0, 10);
+  it('A user-officer should not be able to create a call with end dates before start dates', () => {
+    const shortCode = faker.random.alphaNumeric(15);
+    const startDate = '2021-02-25';
+    const endDate = '2021-02-24';
 
     cy.login('officer');
 
@@ -116,51 +112,56 @@ context('Calls tests', () => {
       .type(shortCode)
       .should('have.value', shortCode);
 
-    cy.get('[data-cy=start-date] input').clear();
     cy.get('[data-cy=start-date] input')
+      .clear()
       .type(startDate)
       .should('have.value', startDate);
 
-    cy.get('[data-cy=end-date] input').clear();
     cy.get('[data-cy=end-date] input')
+      .clear()
       .type(endDate)
-      .should('have.value', endDate);
+      .should('not.have.value', endDate)
+      .should('have.value', startDate);
 
-    cy.get('[data-cy=reference-number-format] input').type(
-      faker.random.word().split(' ')[0]
-    );
+    cy.get('[data-cy="end-date"] .MuiInputAdornment-root button').click();
 
-    cy.get('[data-cy="next-step"]').click();
+    cy.get('.MuiPickersBasePicker-pickerView .MuiPickersDay-day')
+      .contains('24')
+      .closest('button')
+      .should('have.class', 'MuiPickersDay-dayDisabled');
 
-    cy.get('[data-cy=survey-comment] input').type(
-      faker.random.word().split(' ')[0]
-    );
+    cy.get('.MuiDialogActions-root button').contains('OK').click();
 
-    cy.get('[data-cy="next-step"]').click();
+    cy.get('[data-cy=start-date] input')
+      .clear()
+      .type('2021-02-27')
+      .should('have.value', '2021-02-27');
 
-    cy.get('[data-cy=cycle-comment] input').type(
-      faker.random.word().split(' ')[0]
-    );
+    cy.get('[data-cy=end-date] input').should('have.value', '2021-02-27');
+  });
 
-    cy.get('[data-cy="submit"]').click();
+  it('A user-officer should be able to create a call', () => {
+    const { shortCode, startDate, endDate } = call1;
 
-    cy.notification({ variant: 'success', text: 'successfully' });
+    cy.login('officer');
 
-    cy.contains(shortCode);
+    cy.contains('Proposals');
+
+    cy.createCall({
+      shortCode,
+      startDate,
+      endDate,
+    });
+
+    cy.contains(shortCode)
+      .parent()
+      .children()
+      .last()
+      .should('include.text', '0');
   });
 
   it('A user-officer should be able to edit a call', () => {
-    const shortCode = faker.random.word().split(' ')[0]; // faker random word is buggy, it ofter returns phrases
-
-    const startDate = faker.date
-      .past()
-      .toISOString()
-      .slice(0, 10);
-
-    const endDate = faker.date
-      .future()
-      .toISOString()
-      .slice(0, 10);
+    const { shortCode, startDate, endDate } = call2;
 
     cy.login('officer');
 
@@ -168,22 +169,21 @@ context('Calls tests', () => {
 
     cy.contains('Calls').click();
 
-    cy.get('[title="Edit"]')
-      .first()
-      .click();
+    // we updating the existing call 'call 1'
+    cy.contains('call 1').parent().find('[title="Edit"]').click();
 
-    cy.get('[data-cy=short-code] input').clear();
     cy.get('[data-cy=short-code] input')
+      .clear()
       .type(shortCode)
       .should('have.value', shortCode);
 
-    cy.get('[data-cy=start-date] input').clear();
     cy.get('[data-cy=start-date] input')
+      .clear()
       .type(startDate)
       .should('have.value', startDate);
 
-    cy.get('[data-cy=end-date] input').clear();
     cy.get('[data-cy=end-date] input')
+      .clear()
       .type(endDate)
       .should('have.value', endDate);
 
@@ -228,21 +228,15 @@ context('Calls tests', () => {
 
     cy.contains('Calls').click();
 
-    cy.get('[title="Assign Instrument"]')
-      .first()
-      .click();
+    cy.get('[title="Assign Instrument"]').first().click();
 
-    cy.get('tbody [type="checkbox"]')
-      .first()
-      .check();
+    cy.get('tbody [type="checkbox"]').first().check();
 
     cy.contains('Assign instrument').click();
 
     cy.notification({ variant: 'success', text: 'successfully' });
 
-    cy.get('[title="Show Instruments"]')
-      .first()
-      .click();
+    cy.get('[title="Show Instruments"]').first().click();
 
     cy.get('[title="Delete"]').should('exist');
 
@@ -256,9 +250,7 @@ context('Calls tests', () => {
 
     cy.contains('Calls').click();
 
-    cy.get('[title="Show Instruments"]')
-      .first()
-      .click();
+    cy.get('[title="Show Instruments"]').first().click();
 
     cy.get('[data-cy="call-instrument-assignments-table"] [title="Edit"]')
       .first()
@@ -266,9 +258,7 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="availability-time"]').type('-10');
 
-    cy.get('[title="Save"]')
-      .first()
-      .click();
+    cy.get('[title="Save"]').first().click();
 
     cy.notification({ variant: 'error', text: 'must be positive number' });
   });
@@ -278,9 +268,7 @@ context('Calls tests', () => {
 
     cy.contains('Calls').click();
 
-    cy.get('[title="Show Instruments"]')
-      .first()
-      .click();
+    cy.get('[title="Show Instruments"]').first().click();
 
     cy.get('[data-cy="call-instrument-assignments-table"] [title="Edit"]')
       .first()
@@ -288,16 +276,14 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="availability-time"]').type('10');
 
-    cy.get('[title="Save"]')
-      .first()
-      .click();
+    cy.get('[title="Save"]').first().click();
 
     cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.get('[data-cy="call-instrument-assignments-table"]')
       .find('tbody td')
       .last()
-      .then(element => {
+      .then((element) => {
         expect(element.text()).to.be.equal('10');
       });
   });
@@ -307,11 +293,9 @@ context('Calls tests', () => {
 
     cy.contains('Calls').click();
 
-    cy.get('[title="Show Instruments"]')
-      .first()
-      .click();
+    cy.get('[title="Show Instruments"]').first().click();
 
-    cy.get('[title="Delete"]')
+    cy.get('[data-cy="call-instrument-assignments-table"] [title="Delete"]')
       .first()
       .click();
 
@@ -326,7 +310,7 @@ context('Calls tests', () => {
     cy.get('[data-cy="call-instrument-assignments-table"]')
       .find('tbody td')
       .last()
-      .then(element => {
+      .then((element) => {
         expect(element.text()).to.be.equal('No records to display');
       });
   });
@@ -350,9 +334,7 @@ context('Calls tests', () => {
 
     cy.contains('Calls').click();
 
-    cy.get('[title="Edit"]')
-      .first()
-      .click();
+    cy.get('[title="Edit"]').first().click();
 
     cy.get('#mui-component-select-proposalWorkflowId').click();
 
@@ -360,7 +342,7 @@ context('Calls tests', () => {
 
     cy.get('[role="presentation"] [role="listbox"] li')
       .last()
-      .then(element => {
+      .then((element) => {
         selectedProposalWorkflow = element.text();
       })
       .click();
@@ -376,10 +358,8 @@ context('Calls tests', () => {
     cy.get('[data-cy="calls-table"]')
       .find('tbody tr')
       .first()
-      .find('td')
-      .last()
-      .then(element => {
-        expect(element.text()).to.be.equal(selectedProposalWorkflow);
+      .then((element) => {
+        expect(element.text()).to.include(selectedProposalWorkflow);
       });
   });
 
@@ -388,9 +368,7 @@ context('Calls tests', () => {
 
     cy.contains('Calls').click();
 
-    cy.get('[title="Edit"]')
-      .first()
-      .click();
+    cy.get('[title="Edit"]').first().click();
 
     cy.get('#mui-component-select-proposalWorkflowId').click();
 
@@ -410,9 +388,52 @@ context('Calls tests', () => {
       .find('tbody tr')
       .first()
       .find('td')
-      .last()
-      .then(element => {
-        expect(element.text()).to.be.equal('-');
-      });
+      .eq(6)
+      .should('have.text', '-');
+  });
+
+  it('User officer can filter calls by their status', () => {
+    cy.login('officer');
+    cy.contains('Calls').click();
+
+    cy.get('[data-cy="call-status-filter"]').click();
+    cy.get('[role="listbox"]').contains('Active').click();
+
+    cy.finishedLoading();
+
+    cy.contains(call1.shortCode);
+    cy.contains(call2.shortCode);
+
+    cy.get('[data-cy="call-status-filter"]').click();
+    cy.get('[role="listbox"]').contains('Inactive').click();
+
+    cy.finishedLoading();
+
+    cy.contains('No records to display');
+    cy.contains(call1.shortCode).should('not.exist');
+    cy.contains(call2.shortCode).should('not.exist');
+
+    cy.get('[data-cy="call-status-filter"]').click();
+    cy.get('[role="listbox"]').contains('All').click();
+
+    cy.finishedLoading();
+
+    cy.contains(call1.shortCode);
+    cy.contains(call2.shortCode);
+  });
+
+  it('A user-officer should be able to remove a call', () => {
+    cy.login('officer');
+
+    cy.contains('Calls').click();
+
+    cy.get('[data-cy="call-status-filter"]').click();
+    cy.get('[role="listbox"]').contains('Active').click();
+
+    cy.get('[title="Delete"]').last().click();
+
+    cy.get('[title="Save"]').click();
+
+    cy.notification({ variant: 'success', text: 'Call deleted successfully' });
   });
 });

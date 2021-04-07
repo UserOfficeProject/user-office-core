@@ -17,7 +17,7 @@ const addNewWorkflowConnectionsRowValidationSchema = yup.object().shape({
   numberOfColumns: yup.string().required('You must enter number of columns'),
 });
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   cardHeader: {
     fontSize: '18px',
     padding: '22px 0 0',
@@ -88,7 +88,7 @@ const AddNewWorkflowConnectionsRow: React.FC<AddNewWorkflowConnectionsRowProps> 
                 <FormikDropdown
                   name="numberOfColumns"
                   label="Select number of columns"
-                  items={[2, 3, 4].map(numberOfColumn => ({
+                  items={[2, 3, 4].map((numberOfColumn) => ({
                     value: numberOfColumn,
                     text: numberOfColumn.toString(),
                   }))}

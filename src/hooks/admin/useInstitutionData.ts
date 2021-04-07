@@ -23,7 +23,7 @@ export function useInstitutionsData(): {
     setLoadingInstitutions(true);
     api()
       .getInstitutions()
-      .then(data => {
+      .then((data) => {
         setInstitutions(data.institutions as Institution[]);
         setLoadingInstitutions(false);
       });

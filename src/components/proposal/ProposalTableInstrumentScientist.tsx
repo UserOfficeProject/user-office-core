@@ -1,15 +1,21 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
 import Edit from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column } from 'material-table';
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useQueryParams, NumberParam } from 'use-query-params';
+import React, { useContext } from 'react';
+import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
+import ProposalReviewContent, {
+  TabNames,
+} from 'components/review/ProposalReviewContent';
+import ProposalReviewModal from 'components/review/ProposalReviewModal';
+import { UserContext } from 'context/UserContextProvider';
 import { Proposal, ProposalsFilter } from 'generated/sdk';
+import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -18,39 +24,53 @@ import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData'
 import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import {
-  average,
   absoluteDifference,
-  standardDeviation,
+  average,
   getGrades,
+  standardDeviation,
 } from 'utils/mathFunctions';
 
-import ProposalFilterBar from './ProposalFilterBar';
+import ProposalFilterBar, {
+  questionaryFilterFromUrlQuery,
+} from './ProposalFilterBar';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
 
 const ProposalTableInstrumentScientist: React.FC = () => {
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    ProposalUrlQueryParamsType
-  >({
+  const { user } = useContext(UserContext);
+  const [
+    urlQueryParams,
+    setUrlQueryParams,
+  ] = useQueryParams<ProposalUrlQueryParamsType>({
     call: NumberParam,
     instrument: NumberParam,
     proposalStatus: NumberParam,
+    questionId: StringParam,
+    compareOperator: StringParam,
+    value: StringParam,
+    dataType: StringParam,
+    reviewModal: NumberParam,
     ...DefaultQueryParams,
   });
 
-  // NOTE: proposalStatusId has default value 2 because for IS default view should be all proposals in FEASIBILITY_REVIEW status
+  // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
     proposalStatusId: urlQueryParams.proposalStatus || 2,
+    questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
   });
   const { instruments, loadingInstruments } = useInstrumentsData();
+  const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
   const {
     proposalStatuses,
     loadingProposalStatuses,
   } = useProposalStatusesData();
 
-  const { loading, proposalsData } = useProposalsData({
+  const { loading, proposalsData, setProposalsData } = useProposalsData({
     proposalStatusId: proposalFilter.proposalStatusId,
+    instrumentId: proposalFilter.instrumentId,
+    callId: proposalFilter.callId,
+    questionFilter: proposalFilter.questionFilter,
   });
 
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -65,26 +85,38 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   const RowActionButtons = (rowData: Proposal) => {
     const iconButtonStyle = { padding: '7px' };
 
+    const showView =
+      rowData.technicalReview && rowData.technicalReview.submitted;
+
     return (
       <>
-        <IconButton data-cy="view-proposal" style={iconButtonStyle}>
-          <Link
-            to={`/ProposalReviewUserOfficer/${rowData.id}`}
-            style={{ color: 'inherit', textDecoration: 'inherit' }}
-          >
-            {rowData.technicalReview && rowData.technicalReview.status ? (
-              <Visibility />
-            ) : (
-              <Edit />
-            )}
-          </Link>
-        </IconButton>
-        <IconButton
-          onClick={() => downloadPDFProposal([rowData.id], rowData.title)}
-          style={iconButtonStyle}
+        <Tooltip
+          title={
+            showView
+              ? 'View proposal and technical review'
+              : 'Edit technical review'
+          }
         >
-          <GetAppIcon />
-        </IconButton>
+          <IconButton
+            data-cy="view-proposal"
+            onClick={() => {
+              setUrlQueryParams({ reviewModal: rowData.id });
+            }}
+            style={iconButtonStyle}
+          >
+            {showView ? <Visibility /> : <Edit />}
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Download proposal as pdf">
+          <IconButton
+            data-cy="download-proposal"
+            onClick={() => downloadPDFProposal([rowData.id], rowData.title)}
+            style={iconButtonStyle}
+          >
+            <GetAppIcon />
+          </IconButton>
+        </Tooltip>
       </>
     );
   };
@@ -110,14 +142,14 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     },
     {
       title: 'Technical status',
-      render: rowData =>
+      render: (rowData) =>
         rowData.technicalReview
           ? getTranslation(rowData.technicalReview.status as ResourceId)
           : '',
     },
     {
       title: 'Submitted',
-      render: rowData => (rowData.submitted ? 'Yes' : 'No'),
+      render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
     },
     { title: 'Status', field: 'status.name' },
     {
@@ -179,10 +211,10 @@ const ProposalTableInstrumentScientist: React.FC = () => {
 
   // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.
   if (localStorageValue) {
-    columns = columns.map(column => ({
+    columns = columns.map((column) => ({
       ...column,
       hidden: localStorageValue.find(
-        localStorageValueItem => localStorageValueItem.title === column.title
+        (localStorageValueItem) => localStorageValueItem.title === column.title
       )?.hidden,
     }));
   }
@@ -193,9 +225,43 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     urlQueryParams.sortDirection
   );
 
+  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
+
+  const proposalToReview = proposalsData.find(
+    (proposal) => proposal.id === urlQueryParams.reviewModal
+  );
+
+  const instrumentScientistProposalReviewTabs: TabNames[] = [
+    'Proposal information',
+    'Technical review',
+  ];
+
   return (
     <>
+      <ProposalReviewModal
+        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.shortCode})`}
+        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
+        setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
+          setProposalsData(
+            proposalsData.map((proposal) => {
+              if (proposal.id === updatedProposal?.id) {
+                return updatedProposal;
+              } else {
+                return proposal;
+              }
+            })
+          );
+          setUrlQueryParams({ reviewModal: undefined });
+        }}
+        reviewItemId={urlQueryParams.reviewModal}
+      >
+        <ProposalReviewContent
+          proposalId={urlQueryParams.reviewModal as number}
+          tabNames={instrumentScientistProposalReviewTabs}
+        />
+      </ProposalReviewModal>
       <ProposalFilterBar
+        calls={{ data: calls, isLoading: loadingCalls }}
         instruments={{ data: instruments, isLoading: loadingInstruments }}
         proposalStatuses={{
           data: proposalStatuses,
@@ -213,18 +279,19 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         options={{
           search: true,
           searchText: urlQueryParams.search || undefined,
+          selection: true,
           debounceInterval: 400,
           columnsButton: true,
         }}
-        onSearchChange={searchText => {
+        onSearchChange={(searchText) => {
           setUrlQueryParams({ search: searchText ? searchText : undefined });
         }}
-        onChangeColumnHidden={collumnChange => {
+        onChangeColumnHidden={(columnChange) => {
           const proposalColumns = columns.map(
             (proposalColumn: Column<Proposal>) => ({
               hidden:
-                proposalColumn.title === collumnChange.title
-                  ? collumnChange.hidden
+                proposalColumn.title === columnChange.title
+                  ? columnChange.hidden
                   : proposalColumn.hidden,
               title: proposalColumn.title,
             })
@@ -239,6 +306,19 @@ const ProposalTableInstrumentScientist: React.FC = () => {
               sortDirection: orderDirection ? orderDirection : undefined,
             });
         }}
+        actions={[
+          {
+            icon: GetAppIconComponent,
+            tooltip: 'Download proposals in PDF',
+            onClick: (event, rowData): void => {
+              downloadPDFProposal(
+                (rowData as Proposal[]).map((row) => row.id),
+                (rowData as Proposal[])[0].title
+              );
+            },
+            position: 'toolbarOnSelect',
+          },
+        ]}
       />
     </>
   );

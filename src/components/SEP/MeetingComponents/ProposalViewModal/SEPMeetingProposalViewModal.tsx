@@ -11,7 +11,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import { TransitionProps } from '@material-ui/core/transitions/transition';
 import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
-import PropTypes from 'prop-types';
 import React, { Ref } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -48,7 +47,6 @@ type SEPMeetingProposalViewModalProps = {
   proposalViewModalOpen: boolean;
   proposalId: number;
   sepId: number;
-  submitted: boolean;
   meetingSubmitted: (data: AdministrationFormData) => void;
   setProposalViewModalOpen: (isOpen: boolean) => void;
 };
@@ -57,7 +55,6 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
   proposalViewModalOpen,
   proposalId,
   sepId,
-  submitted,
   meetingSubmitted,
   setProposalViewModalOpen,
 }) => {
@@ -68,14 +65,15 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
     UserRole.SEP_SECRETARY,
   ]);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const isSepReviewer = useCheckAccess([UserRole.SEP_REVIEWER]);
-
-  const finalHasWriteAccess = submitted ? isUserOfficer : hasWriteAccess;
 
   const { SEPProposalData, loading, setSEPProposalData } = useSEPProposalData(
     sepId,
     proposalId
   );
+
+  const finalHasWriteAccess = SEPProposalData?.instrumentSubmitted
+    ? isUserOfficer
+    : hasWriteAccess;
 
   const proposalData = SEPProposalData?.proposal ?? null;
 
@@ -124,7 +122,7 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
                         closeModal={handleClose}
                         hasWriteAccess={finalHasWriteAccess}
                         proposalData={proposalData}
-                        meetingSubmitted={data => {
+                        meetingSubmitted={(data) => {
                           setSEPProposalData({
                             ...SEPProposalData,
                             proposal: {
@@ -143,7 +141,7 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
                           proposalData.technicalReview as TechnicalReview
                         }
                         sepTimeAllocation={sepTimeAllocation}
-                        onSepTimeAllocationEdit={sepTimeAllocation =>
+                        onSepTimeAllocationEdit={(sepTimeAllocation) =>
                           setSEPProposalData({
                             ...SEPProposalData,
                             sepTimeAllocation,
@@ -152,11 +150,9 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
                         proposalId={proposalData.id}
                         sepId={sepId}
                       />
-                      {!isSepReviewer && (
-                        <ExternalReviews
-                          reviews={proposalData.reviews as Review[]}
-                        />
-                      )}
+                      <ExternalReviews
+                        reviews={proposalData.reviews as Review[]}
+                      />
                     </>
                   )}
                 </div>
@@ -167,15 +163,6 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
       </Dialog>
     </>
   );
-};
-
-SEPMeetingProposalViewModal.propTypes = {
-  proposalId: PropTypes.number.isRequired,
-  proposalViewModalOpen: PropTypes.bool.isRequired,
-  setProposalViewModalOpen: PropTypes.func.isRequired,
-  meetingSubmitted: PropTypes.func.isRequired,
-  sepId: PropTypes.number.isRequired,
-  submitted: PropTypes.bool.isRequired,
 };
 
 export default SEPMeetingProposalViewModal;

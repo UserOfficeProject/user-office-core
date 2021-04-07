@@ -4,10 +4,12 @@
   "private": true,
   "proxy": "http://localhost:4000",
   "dependencies": {
-    "dateformat": "^3.0.3",
-    "faker": "^4.1.0",
-    "graphql-request": "^1.8.2",
-    "typescript": "~3.9.6"
+    "cypress-file-upload": "^3.5.3",
+    "dateformat": "^4.5.1",
+    "faker": "^5.3.1",
+    "graphql": "^15.5.0",
+    "graphql-request": "^3.4.0",
+    "typescript": "^3.9.9"
   },
   "scripts": {
     "cypress:open": "cypress open",

@@ -1,5 +1,5 @@
-mutation assignMembers($memberIds: [Int!]!, $sepId: Int!) {
-  assignMembers(memberIds: $memberIds, sepId: $sepId) {
+mutation assignReviewersToSEP($memberIds: [Int!]!, $sepId: Int!) {
+  assignReviewersToSEP(memberIds: $memberIds, sepId: $sepId) {
     error
     sep {
       id
@@ -7,8 +7,12 @@ mutation assignMembers($memberIds: [Int!]!, $sepId: Int!) {
   }
 }
 
-mutation assignChairOrSecretary($addSEPMembersRole: AddSEPMembersRole!) {
-  assignChairOrSecretary(addSEPMembersRole: $addSEPMembersRole) {
+mutation assignChairOrSecretary(
+  $assignChairOrSecretaryToSEPInput: AssignChairOrSecretaryToSEPInput!
+) {
+  assignChairOrSecretary(
+    assignChairOrSecretaryToSEPInput: $assignChairOrSecretaryToSEPInput
+  ) {
     error
     sep {
       id

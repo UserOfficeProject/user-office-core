@@ -48,8 +48,8 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         referenceNumberFormat: '',
         startReview: currentDayStart,
         endReview: currentDayEnd,
-        startSEPReview: null,
-        endSEPReview: null,
+        startSEPReview: currentDayStart,
+        endSEPReview: currentDayEnd,
         startNotify: currentDayStart,
         endNotify: currentDayEnd,
         startCycle: currentDayStart,
@@ -73,7 +73,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       </Typography>
       <Wizard
         initialValues={initialValues}
-        onSubmit={async values => {
+        onSubmit={async (values) => {
           const {
             id,
             templateId,
@@ -102,7 +102,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
             closeModal(data.createCall.error, data.createCall.call as Call);
           }
         }}
-        shouldCreate={!!call}
+        shouldCreate={!call}
       >
         <WizardStep
           title="General"

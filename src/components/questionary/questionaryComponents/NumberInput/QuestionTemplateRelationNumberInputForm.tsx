@@ -1,63 +1,46 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Field, getIn } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { ChangeEvent, useState } from 'react';
+import React, { FC } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionExcerpt } from 'components/questionary/questionaryComponents/QuestionExcerpt';
-import {
-  IntervalConfig,
-  QuestionTemplateRelation,
-  NumberValueConstraint,
-} from 'generated/sdk';
+import { NumberValueConstraint } from 'generated/sdk';
+import { useUnitsData } from 'hooks/settings/useUnitData';
 
-import { allProperties, IntervalPropertyId } from '../Interval/intervalUnits';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   units: {
     minWidth: '100%',
   },
 }));
 
-const propertyDropdownEntries = Array.from(allProperties).map(
-  ([id, property]) => ({
-    text: property.name,
-    value: id,
-  })
-);
-
-export const QuestionTemplateRelationNumberForm: FormComponent<QuestionTemplateRelation> = props => {
-  const [showUnits, setShowUnits] = useState(
-    (props.field.config as IntervalConfig).property !==
-      IntervalPropertyId.UNITLESS
-  );
-
+export const QuestionTemplateRelationNumberForm: FC<QuestionTemplateRelationFormProps> = (
+  props
+) => {
   const classes = useStyles();
+  const { units } = useUnitsData();
 
   return (
     <QuestionTemplateRelationFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      questionRel={props.field}
-      template={props.template}
+      {...props}
       validationSchema={Yup.object().shape({
         question: Yup.object({
           config: Yup.object({
             required: Yup.bool(),
-            property: Yup.string().required('This property is required'),
             units: Yup.array().of(Yup.string()),
           }),
         }),
       })}
     >
-      {formikProps => {
+      {(formikProps) => {
         if (!getIn(formikProps.values, 'config.numberValueConstraint')) {
           formikProps.setFieldValue(
             'config.numberValueConstraint',
@@ -67,7 +50,7 @@ export const QuestionTemplateRelationNumberForm: FormComponent<QuestionTemplateR
 
         return (
           <>
-            <QuestionExcerpt question={props.field.question} />
+            <QuestionExcerpt question={props.questionRel.question} />
             <Field
               name="config.small_label"
               label="Small label"
@@ -86,31 +69,14 @@ export const QuestionTemplateRelationNumberForm: FormComponent<QuestionTemplateR
                 fullWidth
                 InputProps={{ 'data-cy': 'required' }}
               />
-              <FormikDropdown
-                name="config.property"
-                label="Physical property"
-                items={propertyDropdownEntries}
-                InputProps={{
-                  'data-cy': 'property',
-                }}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  formikProps.setFieldValue('config.units', []); // reset units to empty array
-                  setShowUnits(e.target.value !== IntervalPropertyId.UNITLESS);
-                }}
-              />
+
               <Field
                 name="config.units"
                 component={FormikUICustomSelect}
                 multiple
                 label="Units"
                 margin="normal"
-                availableOptions={
-                  allProperties.get(
-                    (formikProps.values.config as IntervalConfig)
-                      .property as IntervalPropertyId
-                  )?.units || []
-                }
-                disabled={!showUnits}
+                availableOptions={units.map((unit) => unit.name)}
                 className={classes.units}
                 data-cy="units"
               />

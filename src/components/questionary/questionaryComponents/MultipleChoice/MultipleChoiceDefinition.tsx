@@ -2,6 +2,7 @@ import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
+import MultipleChoiceSearchCriteriaComponent from 'components/questionary/questionaryComponents/MultipleChoice/MultipleChoiceSearchCriteriaComponent';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
@@ -21,9 +22,12 @@ export const multipleChoiceDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <RadioButtonCheckedIcon />,
   renderers: {
-    answerRenderer: ({ answer }) => <span>{answer.value.join(', ')}</span>,
+    answerRenderer: function AnswerRendererComponent({ answer }) {
+      return <span>{answer.value.join(', ')}</span>;
+    },
     questionRenderer: defaultRenderer.questionRenderer,
   },
   createYupValidationSchema: createMultipleChoiceValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || [],
+  searchCriteriaComponent: MultipleChoiceSearchCriteriaComponent,
 };

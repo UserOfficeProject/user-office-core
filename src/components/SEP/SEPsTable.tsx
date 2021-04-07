@@ -12,15 +12,24 @@ import { UserContext } from 'context/UserContextProvider';
 import { Sep, UserRole } from 'generated/sdk';
 import { useSEPsData } from 'hooks/SEP/useSEPsData';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { FunctionType } from 'utils/utilTypes';
 
 import AddSEP from './General/AddSEP';
+import SEPStatusFilter, {
+  SEPStatusQueryFilter,
+  defaultSEPStatusQueryFilter,
+  SEPStatus,
+} from './SEPStatusFilter';
 
 const SEPsTable: React.FC = () => {
   const { currentRole } = useContext(UserContext);
+  const { api } = useDataApiWithFeedback();
+  const [sepFilter, setSEPFilter] = useState<undefined | boolean>(true);
   const history = useHistory();
   const { loadingSEPs, SEPs, setSEPsWithLoading: setSEPs } = useSEPsData(
     '',
-    false,
+    sepFilter,
     currentRole as UserRole
   );
   const columns = [
@@ -33,10 +42,23 @@ const SEPsTable: React.FC = () => {
     },
   ];
   const [editSEPID, setEditSEPID] = useState(0);
+
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType
-  >(DefaultQueryParams);
+    UrlQueryParamsType & SEPStatusQueryFilter
+  >({
+    ...DefaultQueryParams,
+    sepStatus: defaultSEPStatusQueryFilter,
+  });
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+
+  const handleStatusFilterChange = (sepStatus: SEPStatus) => {
+    setUrlQueryParams((queries) => ({ ...queries, sepStatus }));
+    if (sepStatus === SEPStatus.ALL) {
+      setSEPFilter(undefined);
+    } else {
+      setSEPFilter(sepStatus === SEPStatus.ACTIVE ? true : false);
+    }
+  };
 
   if (editSEPID) {
     return <Redirect push to={`/SEPPage/${editSEPID}`} />;
@@ -44,9 +66,28 @@ const SEPsTable: React.FC = () => {
 
   const EditIcon = (): JSX.Element => <Edit />;
 
+  const deleteSEP = async (id: number | string) => {
+    return await api('SEP deleted successfully')
+      .deleteSEP({
+        id: id as number,
+      })
+      .then((resp) => {
+        if (!resp.deleteSEP.error) {
+          const newObjectsArray = SEPs.filter(
+            (objectItem) => objectItem.id !== id
+          );
+          setSEPs(newObjectsArray);
+
+          return true;
+        } else {
+          return false;
+        }
+      });
+  };
+
   const createModal = (
-    onUpdate: Function,
-    onCreate: Function,
+    onUpdate: FunctionType<void, [Sep | null]>,
+    onCreate: FunctionType<void, [Sep | null]>,
     editSep: Sep | null
   ) => {
     if (!!editSep) {
@@ -56,7 +97,7 @@ const SEPsTable: React.FC = () => {
     } else {
       return (
         <AddSEP
-          close={(sepAdded: Sep | null | undefined) => {
+          close={(sepAdded: Sep | null) => {
             setTimeout(() => {
               history.push(`/SEPPage/${sepAdded?.id}`);
             });
@@ -68,6 +109,10 @@ const SEPsTable: React.FC = () => {
 
   return (
     <div data-cy="SEPs-table">
+      <SEPStatusFilter
+        sepStatus={urlQueryParams.sepStatus}
+        onChange={handleStatusFilterChange}
+      />
       <SuperMaterialTable
         createModal={createModal}
         hasAccess={{
@@ -80,6 +125,7 @@ const SEPsTable: React.FC = () => {
         title={'Scientific evaluation panels'}
         columns={columns}
         data={SEPs}
+        delete={deleteSEP}
         isLoading={loadingSEPs}
         options={{
           search: true,

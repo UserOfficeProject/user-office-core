@@ -6,6 +6,12 @@ query getUserSeps {
       description
       numberRatingsRequired
       active
+      sepChair {
+        ...basicUserDetails
+      }
+      sepSecretary {
+        ...basicUserDetails
+      }
     }
   }
 }

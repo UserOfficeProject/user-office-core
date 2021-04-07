@@ -23,6 +23,7 @@ import {
 } from 'models/ShipmentSubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
+import { FunctionType } from 'utils/utilTypes';
 
 import ShipmentReview from './ShipmentReview';
 
@@ -59,7 +60,7 @@ const shipmentReducer = (
     case EventType.QUESTIONARY_STEP_ANSWERED:
       const updatedStep = action.payload.questionaryStep as QuestionaryStep;
       const stepIndex = draftState.shipment.questionary.steps.findIndex(
-        step => step.topic.id === updatedStep.topic.id
+        (step) => step.topic.id === updatedStep.topic.id
       );
       draftState.shipment.questionary.steps[stepIndex] = updatedStep;
 
@@ -94,22 +95,19 @@ const createQuestionaryWizardStep = (
 
 const createReviewWizardStep = (): WizardStep => ({
   type: 'ShipmentReview',
-  getMetadata: state => {
+  getMetadata: (state) => {
     const shipmentState = state as ShipmentSubmissionState;
-    const lastShipmentStep = shipmentState.steps[state.steps.length - 1];
 
     return {
       title: 'Review',
       isCompleted: isShipmentSubmitted(shipmentState.shipment),
-      isReadonly:
-        isShipmentSubmitted(shipmentState.shipment) ||
-        lastShipmentStep.isCompleted === false,
+      isReadonly: false,
     };
   },
 });
 export default function ShipmentContainer(props: {
   shipment: ShipmentExtended;
-  done?: (shipment: ShipmentExtended) => any;
+  done?: (shipment: ShipmentExtended) => void;
 }) {
   const { api } = useDataApiWithFeedback();
   const { persistModel: persistShipmentModel } = usePersistShipmentModel();
@@ -140,10 +138,7 @@ export default function ShipmentContainer(props: {
         );
       case 'ShipmentReview':
         return (
-          <ShipmentReview
-            isReadonly={isReadonly}
-            onComplete={() => props.done?.(state.shipment)}
-          />
+          <ShipmentReview onComplete={() => props.done?.(state.shipment)} />
         );
 
       default:
@@ -166,7 +161,7 @@ export default function ShipmentContainer(props: {
     } else {
       await api()
         .getShipment({ shipmentId: shipmentState.shipment.id }) // or load blankQuestionarySteps if sample is null
-        .then(data => {
+        .then((data) => {
           if (data.shipment && data.shipment.questionary.steps) {
             dispatch({
               type: EventType.SHIPMENT_LOADED,
@@ -190,7 +185,7 @@ export default function ShipmentContainer(props: {
     getState,
     dispatch,
   }: MiddlewareInputParams<QuestionarySubmissionState, Event>) => {
-    return (next: Function) => async (action: Event) => {
+    return (next: FunctionType) => async (action: Event) => {
       next(action); // first update state/model
       const state = getState() as ShipmentSubmissionState;
       switch (action.type) {
@@ -220,9 +215,14 @@ export default function ShipmentContainer(props: {
     wizardSteps: createShipmentWizardSteps(),
   };
 
-  const { state, dispatch } = QuestionarySubmissionModel<
-    ShipmentSubmissionState
-  >(initialState, [handleEvents, persistShipmentModel], shipmentReducer);
+  const {
+    state,
+    dispatch,
+  } = QuestionarySubmissionModel<ShipmentSubmissionState>(
+    initialState,
+    [handleEvents, persistShipmentModel],
+    shipmentReducer
+  );
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =

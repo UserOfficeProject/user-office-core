@@ -42,7 +42,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
   const history = useHistory();
   const classes = useStyles();
 
-  const handleSelect = (callId: number, templateId: number) => {
+  const handleSelect = (callId: number, templateId: number | null) => {
     const url = `/ProposalCreate/${callId}/${templateId}`;
     history.push(url);
   };
@@ -58,7 +58,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
           Select a call
         </Typography>
         <List>
-          {callsData.map(call => {
+          {callsData.map((call) => {
             const daysRemainingNum = daysRemaining(new Date(call.endCall));
             const daysRemainingText = getDaysRemainingText(daysRemainingNum);
 
@@ -66,7 +66,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
               <ListItem
                 button
                 key={call.id}
-                onClick={() => handleSelect(call.id, call.templateId!)}
+                onClick={() => handleSelect(call.id, call.templateId)}
                 divider={true}
               >
                 <ListItemText
@@ -90,7 +90,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
                   <IconButton
                     edge="end"
                     aria-label="comments"
-                    onClick={() => handleSelect(call.id, call.templateId!)}
+                    onClick={() => handleSelect(call.id, call.templateId)}
                   >
                     <NavigateNext />
                   </IconButton>

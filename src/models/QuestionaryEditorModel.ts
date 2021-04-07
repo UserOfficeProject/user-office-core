@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
 
 import {
   Question,
-  QuestionTemplateRelation,
   Template,
   TemplateCategoryId,
   TemplateStep,
@@ -23,13 +23,9 @@ import {
 export enum EventType {
   READY,
   CREATE_QUESTION_REQUESTED,
-  UPDATE_QUESTION_REQUESTED,
-  DELETE_QUESTION_REQUESTED,
   QUESTION_CREATED,
   QUESTION_UPDATED,
   CREATE_QUESTION_REL_REQUESTED,
-  UPDATE_QUESTION_REL_REQUESTED,
-  DELETE_QUESTION_REL_REQUESTED,
   QUESTION_REL_CREATED,
   QUESTION_REL_UPDATED,
   QUESTION_REL_DELETED,
@@ -72,7 +68,7 @@ export default function QuestionaryEditorModel(
   };
 
   function reducer(state: Template, action: Event): Template {
-    return produce(state, draft => {
+    return produce(state, (draft) => {
       switch (action.type) {
         case EventType.READY:
           return action.payload;
@@ -81,13 +77,13 @@ export default function QuestionaryEditorModel(
             return draft;
           }
 
-          const from = draft.steps.find(step => {
+          const from = draft.steps.find((step) => {
             return (
               step.topic.id.toString() === action.payload.source.droppableId
             );
           }) as TemplateStep;
 
-          const to = draft.steps.find(step => {
+          const to = draft.steps.find((step) => {
             return (
               step.topic.id.toString() ===
               action.payload.destination.droppableId
@@ -107,39 +103,18 @@ export default function QuestionaryEditorModel(
           return draft;
         }
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
-          getTopicById(draft.steps, action.payload.topicId).topic.title =
-            action.payload.title;
-
-          return draft;
-        case EventType.UPDATE_QUESTION_REL_REQUESTED: {
-          const questionRel: QuestionTemplateRelation = action.payload.field;
-          const questionRelToUpdate = getFieldById(
-            draft.steps,
-            questionRel.question.proposalQuestionId
-          );
-          if (questionRel && questionRelToUpdate) {
-            Object.assign(questionRelToUpdate, questionRel);
+          const topicById = getTopicById(draft.steps, action.payload.topicId);
+          if (topicById) {
+            topicById.topic.title = action.payload.title;
           }
 
           return draft;
-        }
-        case EventType.UPDATE_QUESTION_REQUESTED: {
-          const field: Question = action.payload.field;
-          const fieldToUpdate = draft.complementaryQuestions.find(
-            question => question.proposalQuestionId === field.proposalQuestionId
-          );
-          if (field && fieldToUpdate) {
-            Object.assign(fieldToUpdate, field);
-          }
-
-          return draft;
-        }
 
         case EventType.DELETE_TOPIC_REQUESTED: {
           const stepToDelete = getQuestionaryStepByTopicId(
             draft.steps,
             action.payload
-          );
+          ) as TemplateStep;
           if (!stepToDelete) {
             return;
           }
@@ -152,7 +127,7 @@ export default function QuestionaryEditorModel(
           const questionId = action.payload;
           draft.complementaryQuestions.splice(
             draft.complementaryQuestions.findIndex(
-              question => question.proposalQuestionId === questionId
+              (question) => question.id === questionId
             ),
             1
           );
@@ -174,12 +149,10 @@ export default function QuestionaryEditorModel(
           const newQuestion = action.payload as Question;
           const curQuestion =
             draft.complementaryQuestions.find(
-              curQuestion =>
-                curQuestion.proposalQuestionId ===
-                newQuestion.proposalQuestionId
-            ) || getFieldById(draft.steps, newQuestion.proposalQuestionId);
+              (curQuestion) => curQuestion.id === newQuestion.id
+            ) || getFieldById(draft.steps, newQuestion.id)?.question;
           if (newQuestion && curQuestion) {
-            Object.assign(curQuestion.question, newQuestion);
+            Object.assign(curQuestion, newQuestion);
           }
 
           return draft;
@@ -196,13 +169,16 @@ export default function QuestionaryEditorModel(
     blankInitTemplate,
     middlewares || []
   );
-  const memoizedDispatch = useCallback(dispatch, []); // required to avoid infinite re-render because dispatch function is recreated
+
+  // NOTE: required to avoid infinite re-render because dispatch function is recreated
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const memoizedDispatch = useCallback(dispatch, []);
   const api = useDataApi();
 
   useEffect(() => {
     api()
       .getTemplate({ templateId: parseInt(templateId) })
-      .then(data => {
+      .then((data) => {
         memoizedDispatch({
           type: EventType.READY,
           payload: data.template,

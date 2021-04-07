@@ -1,4 +1,4 @@
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import DescriptionIcon from '@material-ui/icons/Description';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';
@@ -18,7 +18,7 @@ export const proposalBasisDefinition: QuestionaryComponentDefinition = {
   questionTemplateRelationForm: () => QuestionTemplateRelationProposalBasisForm,
   readonly: true,
   creatable: false,
-  icon: <QuestionAnswerIcon />,
+  icon: <DescriptionIcon />,
   createYupValidationSchema: createProposalBasisValidationSchema,
   getYupInitialValue: ({ state }) => {
     const proposalState = state as ProposalSubmissionState;
@@ -26,8 +26,8 @@ export const proposalBasisDefinition: QuestionaryComponentDefinition = {
     return {
       title: proposalState.proposal.title,
       abstract: proposalState.proposal.abstract,
-      proposer: proposalState.proposal.proposer.id,
-      users: proposalState.proposal.users.map(user => user.id),
+      proposer: proposalState.proposal.proposer?.id,
+      users: proposalState.proposal.users.map((user) => user.id),
     };
   },
 };

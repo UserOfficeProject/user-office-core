@@ -36,8 +36,8 @@ import TemplateQuestionEditor, {
 class QuestionItemAdapter implements TemplateTopicEditorData {
   constructor(public source: Question) {}
 
-  get proposalQuestionId() {
-    return this.source.proposalQuestionId;
+  get id() {
+    return this.source.id;
   }
   get question() {
     return this.source.question;
@@ -117,7 +117,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
         index={index}
         data={new QuestionItemAdapter(question)}
         dispatch={dispatch}
-        onClick={item => {
+        onClick={(item) => {
           const isAltDown = (window.event as MouseEvent)?.altKey;
 
           // NOTE: sortOrder is always 0 because we add at that position using alt key and after that you can reorder if you want.
@@ -126,7 +126,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
               type: EventType.CREATE_QUESTION_REL_REQUESTED,
               payload: {
                 topicId: props.topic.id,
-                questionId: item.proposalQuestionId,
+                questionId: item.id,
                 sortOrder: 0,
                 templateId: template.templateId,
               },
@@ -138,7 +138,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             });
           }
         }}
-        key={question.proposalQuestionId.toString()}
+        key={question.id.toString()}
       />
     ));
   };
@@ -181,8 +181,8 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             TransitionComponent={Fade}
           >
             {getQuestionaryComponentDefinitions()
-              .filter(definition => definition.creatable)
-              .map(definition => {
+              .filter((definition) => definition.creatable)
+              .map((definition) => {
                 return (
                   <MenuItem
                     className={classes.addQuestionMenuItem}
