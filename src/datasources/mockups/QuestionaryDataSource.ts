@@ -94,7 +94,7 @@ export const dummyTemplateHasQuestionRelationFactory = (
 const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
   return [
     new QuestionaryStep(
-      new Topic(0, 'General information', 1, 0, true),
+      new Topic(1, 'General information', 1, 0, true),
       false,
       [
         new Answer(
@@ -169,6 +169,15 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     this.init();
   }
 
+  public init() {
+    dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
+    dummyQuestionary = createDummyQuestionary();
+  }
+
+  async deleteAnswers(questionary_id: number, question_id: string[]) {
+    return;
+  }
+
   async getCount(_templateId: number): Promise<number> {
     return 1;
   }
@@ -176,10 +185,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   async clone(questionaryId: number): Promise<Questionary> {
     return createDummyQuestionary({ questionaryId: questionaryId + 1 });
   }
-  public init() {
-    dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
-    dummyQuestionary = createDummyQuestionary();
-  }
+
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
     return new AnswerBasic(answer_id, 1, 'questionId', '', new Date());
   }

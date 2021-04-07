@@ -25,6 +25,15 @@ import {
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
+  async deleteAnswers(
+    questionary_id: number,
+    question_ids: string[]
+  ): Promise<void> {
+    return database('answers')
+      .whereIn('question_id', question_ids)
+      .andWhere('questionary_id', questionary_id)
+      .delete();
+  }
   async getCount(templateId: number): Promise<number> {
     return database('questionaries')
       .count('questionary_id')

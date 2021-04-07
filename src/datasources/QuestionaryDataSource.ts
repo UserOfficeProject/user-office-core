@@ -16,6 +16,7 @@ export interface QuestionaryDataSource {
     question_id: string,
     answer: string
   ): Promise<string>;
+  deleteAnswers(questionary_id: number, question_ids: string[]): Promise<void>;
   updateTopicCompleteness(
     questionary_id: number,
     topic_id: number,
