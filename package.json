@@ -19,7 +19,7 @@
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@tinymce/tinymce-react": "^3.10.4",
     "@types/dateformat": "^3.0.1",
-    "@types/jsonwebtoken": "^8.5.0",
+    "@types/jsonwebtoken": "^8.5.1",
     "@types/react": "^17.0.3",
     "@types/react-beautiful-dnd": "^13.0.0",
     "@types/react-dom": "^17.0.2",
