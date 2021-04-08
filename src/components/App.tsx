@@ -15,6 +15,7 @@ import { QueryParamProvider } from 'use-query-params';
 
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
+import { SettingsContextProvider } from 'context/SettingsContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
@@ -35,6 +36,8 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   }
 
   const Component = component; // JSX Elements have to be uppercase.
+  const context = useContext(SettingContext);
+  const external_auth_login_url = !!context.settings.get(SettingId.EXTERNAL_AUTH_LOGIN_URL);
 
   return (
     <UserContext.Consumer>

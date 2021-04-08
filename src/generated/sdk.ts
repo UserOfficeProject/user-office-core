@@ -423,6 +423,17 @@ export enum FeatureId {
   SCHEDULER = 'SCHEDULER'
 }
 
+export type Settings = {
+  __typename?: 'Settings';
+  id: SettingsId;
+  addValue: Scalars['String'];
+  description: Scalars['String'];
+};
+
+export enum SettingsId {
+  EXTERNAL_AUTH_LOGIN_URL = 'EXTERNAL_AUTH_LOGIN_URL' 
+}
+
 export type FieldCondition = {
   __typename?: 'FieldCondition';
   condition: EvaluatorOperator;
