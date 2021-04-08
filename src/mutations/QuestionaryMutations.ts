@@ -26,6 +26,32 @@ export default class QuestionaryMutations {
     private questionaryAuth: QuestionaryAuthorization
   ) {}
 
+  async deleteOldAnswers(
+    templateId: number,
+    questionaryId: number,
+    topicId: number
+  ) {
+    const templateSteps = await this.templateDataSource.getTemplateSteps(
+      templateId
+    );
+    const stepQuestions = templateSteps.find(
+      (step) => step.topic.id === topicId
+    )?.fields;
+    if (stepQuestions === undefined) {
+      logger.logError('Expected to find step, but was not found', {
+        templateId,
+        questionaryId,
+        topicId,
+      });
+      throw new Error('Expected to find step, but was not found');
+    }
+
+    const questionIds: string[] = stepQuestions.map(
+      (question) => question.question.id
+    );
+    await this.dataSource.deleteAnswers(questionaryId, questionIds);
+  }
+
   @Authorized()
   async answerTopic(agent: User | null, args: AnswerTopicArgs) {
     const { questionaryId, topicId, answers, isPartialSave } = args;
@@ -54,8 +80,18 @@ export default class QuestionaryMutations {
       questionaryId
     );
     if (!hasRights) {
+      logger.logError(
+        'Trying to answer questionary without without permissions',
+        {
+          agent,
+          args,
+        }
+      );
+
       return rejection('INSUFFICIENT_PERMISSIONS');
     }
+
+    await this.deleteOldAnswers(template.templateId, questionaryId, topicId);
 
     for (const answer of answers) {
       if (answer.value !== undefined) {
