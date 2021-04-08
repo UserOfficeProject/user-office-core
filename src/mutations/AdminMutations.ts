@@ -140,7 +140,10 @@ export default class AdminMutations {
   ) {
     const accessTokenId = generateUniqueId();
     const accessPermissions = JSON.parse(args.accessPermissions);
-    const generatedAccessToken = signToken({ accessTokenId });
+    const generatedAccessToken = signToken(
+      { accessTokenId },
+      { expiresIn: '100y' } // API access token should have long life
+    );
 
     const result = await this.dataSource.createApiAccessToken(
       { accessPermissions, name: args.name },
