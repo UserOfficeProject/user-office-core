@@ -40,7 +40,7 @@
     "graphql-request": "^3.4.0",
     "html-react-parser": "^1.2.4",
     "http-proxy-middleware": "^0.21.0",
-    "immer": "^8.0.2",
+    "immer": "^8.0.3",
     "jsonwebtoken": "^8.5.1",
     "material-table": "~1.62.0",
     "notistack": "^0.9.17",
