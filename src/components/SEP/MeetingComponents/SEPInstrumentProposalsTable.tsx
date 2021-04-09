@@ -26,6 +26,11 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';
 
+type SepProposalWithAverageScoreAndAvailabilityZone = SepProposal & {
+  proposalAverageScore: number;
+  isInAvailabilityZone: boolean;
+};
+
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -106,49 +111,59 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     }
   };
 
-  const sortByRankOrAverageScore = (data: SepProposal[]) => {
-    let allocationTimeSum = 0;
+  const [
+    sortedProposalsWithAverageScore,
+    setSortedProposalsWithAverageScore,
+  ] = useState<SepProposalWithAverageScoreAndAvailabilityZone[]>([]);
 
-    return data
-      .map((proposalData) => {
-        const proposalAverageScore =
-          average(getGrades(proposalData.proposal.reviews) as number[]) || 0;
+  useEffect(() => {
+    const sortByRankOrAverageScore = (data: SepProposal[]) => {
+      let allocationTimeSum = 0;
 
-        return {
-          ...proposalData,
-          proposalAverageScore,
-        };
-      })
-      .sort((a, b) =>
-        a.proposalAverageScore > b.proposalAverageScore ? 1 : -1
-      )
-      .sort(sortByRankOrder)
-      .map((proposalData) => {
-        const proposalAllocationTime =
-          proposalData.sepTimeAllocation !== null
-            ? proposalData.sepTimeAllocation
-            : proposalData.proposal.technicalReview?.timeAllocation || 0;
-
-        if (
-          allocationTimeSum + proposalAllocationTime >
-          (sepInstrument.availabilityTime as number)
-        ) {
-          allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+      return data
+        .map((proposalData) => {
+          const proposalAverageScore =
+            average(getGrades(proposalData.proposal.reviews) as number[]) || 0;
 
           return {
-            isInAvailabilityZone: false,
             ...proposalData,
+            proposalAverageScore,
           };
-        } else {
-          allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+        })
+        .sort((a, b) =>
+          a.proposalAverageScore > b.proposalAverageScore ? 1 : -1
+        )
+        .sort(sortByRankOrder)
+        .map((proposalData) => {
+          const proposalAllocationTime =
+            proposalData.sepTimeAllocation !== null
+              ? proposalData.sepTimeAllocation
+              : proposalData.proposal.technicalReview?.timeAllocation || 0;
 
-          return {
-            isInAvailabilityZone: true,
-            ...proposalData,
-          };
-        }
-      });
-  };
+          if (
+            allocationTimeSum + proposalAllocationTime >
+            (sepInstrument.availabilityTime as number)
+          ) {
+            allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+
+            return {
+              ...proposalData,
+              isInAvailabilityZone: false,
+            };
+          } else {
+            allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+
+            return {
+              ...proposalData,
+              isInAvailabilityZone: true,
+            };
+          }
+        });
+    };
+
+    const sortedProposals = sortByRankOrAverageScore(instrumentProposalsData);
+    setSortedProposalsWithAverageScore(sortedProposals);
+  }, [instrumentProposalsData, sepInstrument.availabilityTime]);
 
   const proposalTimeAllocationColumn = (
     rowData: SepProposal & {
@@ -281,10 +296,6 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
 
     setInstrumentProposalsData(newInstrumentProposalsData as SepProposal[]);
   };
-
-  const sortedProposalsWithAverageScore = sortByRankOrAverageScore(
-    instrumentProposalsData
-  );
 
   const redBackgroundWhenOutOfAvailabilityZone = (
     isInsideAvailabilityZone: boolean
@@ -427,12 +438,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
           paging: false,
           toolbar: false,
           headerStyle: { backgroundColor: '#fafafa' },
-          rowStyle: (
-            rowData: SepProposal & {
-              proposalAverageScore: number;
-              isInAvailabilityZone: boolean;
-            }
-          ) =>
+          rowStyle: (rowData: SepProposalWithAverageScoreAndAvailabilityZone) =>
             redBackgroundWhenOutOfAvailabilityZone(
               rowData.isInAvailabilityZone
             ),
