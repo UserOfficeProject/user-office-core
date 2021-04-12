@@ -9,7 +9,7 @@ import {
   getQuestionaryComponentDefinition,
   QuestionFormProps,
 } from 'components/questionary/QuestionaryComponentRegistry';
-import { Question } from 'generated/sdk';
+import { Question } from 'models/Question';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles((theme) => ({
@@ -47,8 +47,11 @@ export const QuestionFormShell = (
       })
       .then((data) => {
         if (data.updateQuestion.question) {
-          props.onUpdated?.(data.updateQuestion.question);
-          props.closeMe();
+          props.onUpdated?.({
+            ...props.question,
+            ...data.updateQuestion.question,
+          });
+          props.closeMe?.();
         }
       });
   };
@@ -61,7 +64,7 @@ export const QuestionFormShell = (
       .then((data) => {
         if (data.deleteQuestion.question) {
           props.onDeleted?.(data.deleteQuestion.question);
-          props.closeMe();
+          props.closeMe?.();
         }
       });
 
