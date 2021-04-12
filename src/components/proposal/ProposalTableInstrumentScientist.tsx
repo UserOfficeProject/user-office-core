@@ -192,19 +192,19 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     },
     {
       title: 'Instrument',
-      render: (rowData: Proposal): string =>
-        rowData.instrument ? rowData.instrument.name : '-',
+      field: 'instrument.name',
+      emptyValue: '-',
     },
     {
       title: 'Call',
-      render: (rowData: Proposal): string =>
-        rowData.call ? rowData.call.shortCode : '-',
+      field: 'call.shortCode',
+      emptyValue: '-',
       hidden: true,
     },
     {
       title: 'SEP',
-      render: (rowData: Proposal): string =>
-        rowData.sep ? rowData.sep.code : '-',
+      field: 'sep.code',
+      emptyValue: '-',
       hidden: true,
     },
   ];

@@ -29,8 +29,8 @@ const InstrumentTable: React.FC = () => {
     { title: 'Description', field: 'description' },
     {
       title: 'Scientists',
-      render: (rowData: Instrument) =>
-        rowData.scientists.length > 0 ? rowData.scientists.length : '-',
+      field: 'scientists.length',
+      emptyValue: '-',
     },
   ];
   const { api } = useDataApiWithFeedback();
