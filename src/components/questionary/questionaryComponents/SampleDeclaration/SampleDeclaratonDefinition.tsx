@@ -27,7 +27,7 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
     },
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: (answer) => {
+  createYupValidationSchema: (answer, state, api) => {
     const config = answer.config as SubtemplateConfig;
     let schema = Yup.array().of(Yup.number());
     if (config.minEntries) {
@@ -42,6 +42,29 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
         `Please add at most ${config.maxEntries} sample(s)`
       );
     }
+
+    schema = schema.test(
+      'validateSamplesCompleted',
+      'All samples must be completed',
+      async () => {
+        const samples = await api?.().getSamples({
+          filter: {
+            questionId: answer.question.id,
+            proposalId: state.proposal?.id,
+          },
+        });
+
+        if (samples) {
+          const test = samples?.samples?.every((sample) =>
+            sample.questionary.steps.every((step) => step.isCompleted)
+          );
+
+          return !!test;
+        }
+
+        return true;
+      }
+    );
 
     return schema;
   },

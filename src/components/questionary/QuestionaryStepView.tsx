@@ -8,7 +8,7 @@ import { useCheckAccess } from 'components/common/Can';
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import { NavigButton } from 'components/common/NavigButton';
 import UOLoader from 'components/common/UOLoader';
-import { Answer, QuestionaryStep, UserRole } from 'generated/sdk';
+import { Answer, QuestionaryStep, Sdk, UserRole } from 'generated/sdk';
 import { usePreSubmitActions } from 'hooks/questionary/useSubmitActions';
 import {
   areDependenciesSatisfied,
@@ -44,7 +44,8 @@ const useStyles = makeStyles((theme) => ({
 
 export const createFormikConfigObjects = (
   answers: Answer[],
-  state: QuestionarySubmissionState
+  state: QuestionarySubmissionState,
+  api: () => Sdk
 ): {
   // eslint-disable-next-line @typescript-eslint/ban-types
   validationSchema: object;
@@ -60,7 +61,7 @@ export const createFormikConfigObjects = (
     if (definition.createYupValidationSchema) {
       validationSchema[
         answer.question.id
-      ] = definition.createYupValidationSchema(answer);
+      ] = definition.createYupValidationSchema(answer, state, api);
       initialValues[answer.question.id] = definition.getYupInitialValue({
         answer,
         state,
@@ -117,7 +118,8 @@ export default function QuestionaryStepView(props: {
 
   const { initialValues, validationSchema } = createFormikConfigObjects(
     activeFields,
-    state
+    state,
+    api
   );
 
   const [lastSavedFormValues, setLastSavedFormValues] = useState(initialValues);
@@ -281,6 +283,7 @@ export default function QuestionaryStepView(props: {
                   isBusy={isSubmitting}
                   variant="contained"
                   color="primary"
+                  data-cy="save-button"
                 >
                   Save
                 </NavigButton>
