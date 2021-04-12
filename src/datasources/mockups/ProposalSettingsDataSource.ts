@@ -1,6 +1,9 @@
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
-import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
+import {
+  NextAndPreviousProposalStatuses,
+  ProposalWorkflowConnection,
+} from '../../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
@@ -146,7 +149,11 @@ export class ProposalSettingsDataSourceMock
 
   async getProposalWorkflowConnectionsById(
     proposalWorkflowId: number,
-    proposalWorkflowConnectionId: number
+    proposalWorkflowConnectionId: number,
+    {
+      nextProposalStatusId,
+      prevProposalStatusId,
+    }: NextAndPreviousProposalStatuses
   ): Promise<ProposalWorkflowConnection[]> {
     return [dummyProposalWorkflowConnection];
   }
@@ -177,8 +184,8 @@ export class ProposalSettingsDataSourceMock
     return [dummyStatusChangingEvent];
   }
 
-  async getStatusChangingEventsByConnectionId(
-    proposalWorkflowConnectionId: number
+  async getStatusChangingEventsByConnectionIds(
+    proposalWorkflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]> {
     return [dummyStatusChangingEvent];
   }

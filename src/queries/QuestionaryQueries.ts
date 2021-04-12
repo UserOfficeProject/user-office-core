@@ -13,7 +13,7 @@ import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 export default class QuestionaryQueries {
   constructor(
     @inject(Tokens.QuestionaryDataSource)
-    private dataSource: QuestionaryDataSource,
+    public dataSource: QuestionaryDataSource,
     @inject(Tokens.QuestionaryAuthorization)
     private authorizer: QuestionaryAuthorization
   ) {}

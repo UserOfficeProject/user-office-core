@@ -21,8 +21,8 @@ class SamplesFilter {
   @Field(() => Int, { nullable: true })
   public creatorId?: number;
 
-  @Field(() => Int, { nullable: true })
-  public questionaryId?: number;
+  @Field(() => [Int], { nullable: true })
+  public questionaryIds?: number[];
 
   @Field(() => [Int], { nullable: true })
   public sampleIds?: number[];

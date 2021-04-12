@@ -15,6 +15,7 @@ import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/Delet
 import { SetActiveTemplateArgs } from '../resolvers/mutations/SetActiveTemplateMutation';
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
+import { QuestionsFilter } from '../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
 export interface TemplateDataSource {
@@ -50,6 +51,7 @@ export interface TemplateDataSource {
   ): Promise<Question>;
   deleteQuestion(questionId: string): Promise<Question>;
   getComplementaryQuestions(templateId: number): Promise<Question[] | null>;
+  getQuestions(filter?: QuestionsFilter): Promise<Question[]>;
 
   // TemplateField rel
   getQuestionTemplateRelation(

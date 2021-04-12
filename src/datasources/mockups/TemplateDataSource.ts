@@ -17,6 +17,7 @@ import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
+import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import {
@@ -340,5 +341,9 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     _categoryId: TemplateCategoryId
   ): Promise<number | null> {
     return 1;
+  }
+
+  async getQuestions(filter?: QuestionsFilter): Promise<Question[]> {
+    return [dummyQuestionFactory()];
   }
 }
