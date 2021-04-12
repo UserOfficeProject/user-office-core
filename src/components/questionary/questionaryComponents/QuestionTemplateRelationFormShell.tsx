@@ -76,7 +76,7 @@ export const QuestionTemplateRelationFormShell = (
           props.onUpdated?.(
             data.updateQuestionTemplateRelationSettings.template
           );
-          props.closeMe();
+          props.closeMe?.();
         }
       });
   };
@@ -89,7 +89,7 @@ export const QuestionTemplateRelationFormShell = (
 
     if (result.deleteQuestionTemplateRelation.template) {
       props.onDeleted?.(result.deleteQuestionTemplateRelation.template);
-      props.closeMe();
+      props.closeMe?.();
     }
   };
 
@@ -104,7 +104,7 @@ export const QuestionTemplateRelationFormShell = (
         href="#"
         onClick={() => {
           props.onOpenQuestionClicked?.(props.questionRel.question);
-          props.closeMe();
+          props.closeMe?.();
         }}
         className={classes.naturalKey}
       >

@@ -19,10 +19,10 @@ import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFo
 export const QuestionTemplateRelationSampleDeclarationForm: FC<QuestionTemplateRelationFormProps> = (
   props
 ) => {
-  const { templates } = useTemplates(
-    false,
-    TemplateCategoryId.SAMPLE_DECLARATION
-  );
+  const { templates } = useTemplates({
+    isArchived: false,
+    category: TemplateCategoryId.SAMPLE_DECLARATION,
+  });
 
   if (!templates) {
     return null;

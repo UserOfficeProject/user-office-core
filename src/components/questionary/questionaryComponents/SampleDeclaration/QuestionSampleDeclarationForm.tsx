@@ -18,10 +18,10 @@ import { QuestionFormShell } from '../QuestionFormShell';
 export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
-  const { templates } = useTemplates(
-    false,
-    TemplateCategoryId.SAMPLE_DECLARATION
-  );
+  const { templates } = useTemplates({
+    isArchived: false,
+    category: TemplateCategoryId.SAMPLE_DECLARATION,
+  });
 
   if (!templates) {
     return null;

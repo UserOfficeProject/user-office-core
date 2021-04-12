@@ -40,16 +40,6 @@ function editFinalRankingForm() {
   cy.get('#commentForUser').clear().type(faker.lorem.words(3));
   cy.get('#commentForManagement').clear().type(faker.lorem.words(3));
 
-  cy.get('#rankOrder').clear().type('-123').blur();
-  cy.get('[data-cy="save"]').click();
-  cy.contains('Must be greater than or equal to');
-
-  cy.get('#rankOrder').clear().type('987654321').blur();
-  cy.get('[data-cy="save"]').click();
-  cy.contains('Must be less than or equal to');
-
-  cy.get('#rankOrder').clear().type('5');
-
   cy.contains('External reviews').parent().find('table').as('reviewsTable');
 
   cy.get('@reviewsTable').contains('Carl Carlsson');
@@ -59,7 +49,7 @@ function editFinalRankingForm() {
 
   cy.notification({
     variant: 'success',
-    text: 'SEP meeting decision saved successfully!',
+    text: 'successfully',
   });
 }
 
@@ -935,7 +925,7 @@ context(
       cy.contains('External reviews');
     });
 
-    it('Officer should not be able to submit an instrument if all proposals are not ranked in SEP', () => {
+    it('Officer should not be able to submit an instrument if all proposals are not submitted in SEP meetings', () => {
       cy.login('officer');
 
       cy.contains('SEPs').click();
@@ -951,7 +941,7 @@ context(
 
       cy.notification({
         variant: 'error',
-        text: 'All proposals must have rankings',
+        text: 'All proposal SEP meetings should be submitted',
       });
 
       cy.contains('Proposals and Assignments').click();
@@ -1295,7 +1285,7 @@ context(
       ).should('not.have.css', 'background-color', 'rgb(246, 104, 94)');
     });
 
-    it('Officer should be able to submit an instrument if all proposals are ranked in existing SEP', () => {
+    it('Officer should be able to submit an instrument if all proposals SEP meetings are submitted in existing SEP', () => {
       cy.login('officer');
 
       cy.contains('SEPs').click();
@@ -1312,18 +1302,30 @@ context(
       cy.get('[role="dialog"] > header + div').scrollTo('top');
       cy.get('#commentForUser').type('Test');
       cy.get('#commentForManagement').type('Test');
-      cy.get('#rankOrder').type('1');
 
+      cy.get('[data-cy="is-sep-meeting-submitted"]').click();
       cy.get('[data-cy="saveAndContinue"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'SEP meeting decision saved successfully',
+        text: 'SEP meeting decision submitted successfully',
       });
 
       cy.get("[title='Submit instrument']").first().click();
 
       cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Instrument submitted',
+      });
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
+        .first()
+        .find('td')
+        .eq(5)
+        .should('not.contain.text', '-')
+        .should('contain.text', '1');
 
       cy.contains('Proposals and Assignments').click();
 
@@ -1376,8 +1378,6 @@ context(
 
       cy.get('#commentForManagement').should('be.disabled');
 
-      cy.get('#rankOrder').should('be.disabled');
-
       cy.get('[data-cy="save"]').should('not.exist');
       cy.get('[data-cy="saveAndContinue"]').should('not.exist');
     });
@@ -1403,8 +1403,6 @@ context(
       cy.get('#commentForUser').should('be.disabled');
 
       cy.get('#commentForManagement').should('be.disabled');
-
-      cy.get('#rankOrder').should('be.disabled');
 
       cy.get('[data-cy="save"]').should('not.exist');
       cy.get('[data-cy="saveAndContinue"]').should('not.exist');
