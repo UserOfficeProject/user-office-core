@@ -52,7 +52,6 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import CallSelectModalOnProposalClone from './CallSelectModalOnProposalClone';
 import ChangeProposalStatus from './ChangeProposalStatus';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
-import RankInput from './RankInput';
 
 type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
@@ -133,36 +132,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       setSelectedProposals([]);
     }
   }, [proposalsData, urlQueryParams.selection]);
-
-  const setNewRanking = async (proposalId: number, rankOrder: number) => {
-    const overwriteSepMeetingDecisionRankingInput = {
-      proposalId,
-      rankOrder,
-    };
-
-    if (rankOrder > 0) {
-      const result = await api(
-        'Ranking updated successfully'
-      ).overwriteSepMeetingDecisionRanking({
-        overwriteSepMeetingDecisionRankingInput,
-      });
-
-      if (!result.overwriteSepMeetingDecisionRanking.error) {
-        setProposalsData((proposalsData) =>
-          proposalsData.map((prop) => {
-            if (prop.id === proposalId) prop.rankOrder = rankOrder;
-
-            return prop;
-          })
-        );
-      }
-    } else {
-      enqueueSnackbar('Ranking should be grater than 0', {
-        variant: 'error',
-        className: 'snackbar-error',
-      });
-    }
-  };
 
   const removeProposalFromInstrument = async (
     proposalId: number,
@@ -267,14 +236,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     );
   };
 
-  const RankComponent = (rowData: ProposalViewData) => (
-    <RankInput
-      proposalID={rowData.id}
-      defaultValue={rowData.rankOrder}
-      onChange={setNewRanking}
-    />
-  );
-
   let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
@@ -321,7 +282,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     {
       title: 'Ranking',
       field: 'rankOrder',
-      render: RankComponent,
     },
     { title: 'Notified', field: 'notified' },
     {
