@@ -9,6 +9,7 @@ import {
   useReducerWithMiddleWares,
 } from 'utils/useReducerWithMiddleWares';
 
+import { ProposalSubsetSubmission } from './ProposalSubmissionState';
 import { getFieldById } from './QuestionaryFunctions';
 
 export enum EventType {
@@ -65,6 +66,7 @@ export interface QuestionarySubmissionState {
   stepIndex: number;
   isDirty: boolean;
   wizardSteps: WizardStep[];
+  proposal?: ProposalSubsetSubmission;
 }
 
 const clamStepIndex = (stepIndex: number, stepCount: number) => {

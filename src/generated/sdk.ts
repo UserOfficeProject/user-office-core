@@ -61,6 +61,15 @@ export type Answer = {
   value: Maybe<Scalars['IntStringDateBoolArray']>;
 };
 
+export type AnswerBasic = {
+  __typename?: 'AnswerBasic';
+  answerId: Maybe<Scalars['Int']>;
+  answer: Scalars['IntStringDateBoolArray'];
+  questionaryId: Scalars['Int'];
+  questionId: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+};
+
 export type AnswerInput = {
   questionId: Scalars['String'];
   value?: Maybe<Scalars['String']>;
@@ -1756,6 +1765,7 @@ export type Query = {
   callsByInstrumentScientist: Maybe<Array<Call>>;
   proposals: Maybe<ProposalsQueryResult>;
   instrumentScientistProposals: Maybe<ProposalsQueryResult>;
+  questions: Array<QuestionWithUsage>;
   templates: Maybe<Array<Template>>;
   activeTemplateId: Maybe<Scalars['Int']>;
   basicUserDetails: Maybe<BasicUserDetails>;
@@ -1851,6 +1861,11 @@ export type QueryInstrumentScientistProposalsArgs = {
   filter?: Maybe<ProposalsFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryQuestionsArgs = {
+  filter?: Maybe<QuestionsFilter>;
 };
 
 
@@ -2175,6 +2190,18 @@ export type QuestionTemplateRelation = {
   dependenciesOperator: Maybe<DependenciesLogicOperator>;
 };
 
+export type QuestionWithUsage = {
+  __typename?: 'QuestionWithUsage';
+  id: Scalars['String'];
+  categoryId: TemplateCategoryId;
+  naturalKey: Scalars['String'];
+  dataType: DataType;
+  question: Scalars['String'];
+  config: FieldConfig;
+  answers: Array<AnswerBasic>;
+  templates: Array<Template>;
+};
+
 export type Questionary = {
   __typename?: 'Questionary';
   questionaryId: Scalars['Int'];
@@ -2200,6 +2227,13 @@ export type QuestionaryStepResponseWrap = {
   __typename?: 'QuestionaryStepResponseWrap';
   error: Maybe<Scalars['String']>;
   questionaryStep: Maybe<QuestionaryStep>;
+};
+
+export type QuestionsFilter = {
+  text?: Maybe<Scalars['String']>;
+  category?: Maybe<TemplateCategoryId>;
+  dataType?: Maybe<Array<DataType>>;
+  excludeDataType?: Maybe<Array<DataType>>;
 };
 
 export type RemoveAssignedInstrumentFromCallInput = {
@@ -2372,7 +2406,7 @@ export enum SampleStatus {
 export type SamplesFilter = {
   title?: Maybe<Scalars['String']>;
   creatorId?: Maybe<Scalars['Int']>;
-  questionaryId?: Maybe<Scalars['Int']>;
+  questionaryIds?: Maybe<Array<Scalars['Int']>>;
   sampleIds?: Maybe<Array<Scalars['Int']>>;
   status?: Maybe<SampleStatus>;
   questionId?: Maybe<Scalars['String']>;
@@ -2501,7 +2535,7 @@ export type ShipmentsFilter = {
   title?: Maybe<Scalars['String']>;
   creatorId?: Maybe<Scalars['Int']>;
   proposalId?: Maybe<Scalars['Int']>;
-  questionaryId?: Maybe<Scalars['Int']>;
+  questionaryIds?: Maybe<Array<Scalars['Int']>>;
   status?: Maybe<ShipmentStatus>;
   externalRef?: Maybe<Scalars['String']>;
   shipmentIds?: Maybe<Array<Scalars['Int']>>;
@@ -2617,6 +2651,7 @@ export type TemplateStep = {
 export type TemplatesFilter = {
   isArchived?: Maybe<Scalars['Boolean']>;
   category?: Maybe<TemplateCategoryId>;
+  templateIds?: Maybe<Array<Scalars['Int']>>;
 };
 
 export type TextInputConfig = {
@@ -5558,6 +5593,65 @@ export type GetProposalTemplatesQuery = (
   )>> }
 );
 
+export type GetQuestionsQueryVariables = Exact<{
+  filter?: Maybe<QuestionsFilter>;
+}>;
+
+
+export type GetQuestionsQuery = (
+  { __typename?: 'Query' }
+  & { questions: Array<(
+    { __typename?: 'QuestionWithUsage' }
+    & Pick<QuestionWithUsage, 'id' | 'question' | 'naturalKey' | 'dataType' | 'categoryId'>
+    & { config: (
+      { __typename?: 'BooleanConfig' }
+      & FieldConfigBooleanConfigFragment
+    ) | (
+      { __typename?: 'DateConfig' }
+      & FieldConfigDateConfigFragment
+    ) | (
+      { __typename?: 'EmbellishmentConfig' }
+      & FieldConfigEmbellishmentConfigFragment
+    ) | (
+      { __typename?: 'FileUploadConfig' }
+      & FieldConfigFileUploadConfigFragment
+    ) | (
+      { __typename?: 'SelectionFromOptionsConfig' }
+      & FieldConfigSelectionFromOptionsConfigFragment
+    ) | (
+      { __typename?: 'TextInputConfig' }
+      & FieldConfigTextInputConfigFragment
+    ) | (
+      { __typename?: 'SampleBasisConfig' }
+      & FieldConfigSampleBasisConfigFragment
+    ) | (
+      { __typename?: 'SubtemplateConfig' }
+      & FieldConfigSubtemplateConfigFragment
+    ) | (
+      { __typename?: 'ProposalBasisConfig' }
+      & FieldConfigProposalBasisConfigFragment
+    ) | (
+      { __typename?: 'IntervalConfig' }
+      & FieldConfigIntervalConfigFragment
+    ) | (
+      { __typename?: 'NumberInputConfig' }
+      & FieldConfigNumberInputConfigFragment
+    ) | (
+      { __typename?: 'ShipmentBasisConfig' }
+      & FieldConfigShipmentBasisConfigFragment
+    ) | (
+      { __typename?: 'RichTextInputConfig' }
+      & FieldConfigRichTextInputConfigFragment
+    ), answers: Array<(
+      { __typename?: 'AnswerBasic' }
+      & Pick<AnswerBasic, 'questionaryId'>
+    )>, templates: Array<(
+      { __typename?: 'Template' }
+      & Pick<Template, 'templateId'>
+    )> }
+  )> }
+);
+
 export type GetTemplateQueryVariables = Exact<{
   templateId: Scalars['Int'];
 }>;
@@ -8355,6 +8449,26 @@ export const GetProposalTemplatesDocument = gql`
   }
 }
     `;
+export const GetQuestionsDocument = gql`
+    query getQuestions($filter: QuestionsFilter) {
+  questions(filter: $filter) {
+    id
+    question
+    naturalKey
+    dataType
+    categoryId
+    config {
+      ...fieldConfig
+    }
+    answers {
+      questionaryId
+    }
+    templates {
+      templateId
+    }
+  }
+}
+    ${FieldConfigFragmentDoc}`;
 export const GetTemplateDocument = gql`
     query getTemplate($templateId: Int!) {
   template(templateId: $templateId) {
@@ -9176,6 +9290,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getProposalTemplates(variables?: GetProposalTemplatesQueryVariables): Promise<GetProposalTemplatesQuery> {
       return withWrapper(() => client.request<GetProposalTemplatesQuery>(print(GetProposalTemplatesDocument), variables));
+    },
+    getQuestions(variables?: GetQuestionsQueryVariables): Promise<GetQuestionsQuery> {
+      return withWrapper(() => client.request<GetQuestionsQuery>(print(GetQuestionsDocument), variables));
     },
     getTemplate(variables: GetTemplateQueryVariables): Promise<GetTemplateQuery> {
       return withWrapper(() => client.request<GetTemplateQuery>(print(GetTemplateDocument), variables));
