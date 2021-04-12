@@ -247,30 +247,44 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     { title: 'Status', field: 'proposal.status.name' },
     {
       title: 'Average score',
-      render: (
-        rowData: SepProposal & {
-          proposalAverageScore: number;
-        }
-      ) => (rowData.proposalAverageScore ? rowData.proposalAverageScore : '-'),
+      field: 'proposalAverageScore',
+      emptyValue: '-',
     },
     {
       title: 'Current rank',
-      render: (rowData: SepProposal) =>
-        rowData.proposal.sepMeetingDecision?.rankOrder
-          ? rowData.proposal.sepMeetingDecision.rankOrder
-          : '-',
+      field: 'proposal.sepMeetingDecision.rankOrder',
+      emptyValue: '-',
     },
     {
       title: 'Time allocation',
-      render: (
-        rowData: SepProposal & {
-          proposalAverageScore: number;
+      render: (rowData: SepProposalWithAverageScoreAndAvailabilityZone) =>
+        proposalTimeAllocationColumn(rowData),
+      customSort: (
+        a: SepProposalWithAverageScoreAndAvailabilityZone,
+        b: SepProposalWithAverageScoreAndAvailabilityZone
+      ) => {
+        if (a.sepTimeAllocation && b.sepTimeAllocation) {
+          return a.sepTimeAllocation - b.sepTimeAllocation;
         }
-      ) => proposalTimeAllocationColumn(rowData),
+
+        if (
+          a.proposal.technicalReview?.timeAllocation &&
+          b.proposal.technicalReview?.timeAllocation
+        ) {
+          return (
+            a.proposal.technicalReview.timeAllocation -
+            b.proposal.technicalReview.timeAllocation
+          );
+        } else {
+          return -1;
+        }
+      },
     },
     {
       title: 'SEP meeting submitted',
-      render: (rowData: SepProposal): string =>
+      render: (
+        rowData: SepProposalWithAverageScoreAndAvailabilityZone
+      ): string =>
         rowData.proposal.sepMeetingDecision?.submitted ? 'Yes' : 'No',
     },
   ];
