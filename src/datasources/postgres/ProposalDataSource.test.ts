@@ -17,7 +17,7 @@ async function createProposal(callId: number): Promise<Proposal> {
     .insert({
       title: '[IT] proposal',
       call_id: callId,
-      questionary_id: 1,
+      questionary_id: -999,
       status_id: 1,
     })
     .returning('*');
@@ -106,9 +106,9 @@ async function setup() {
 }
 
 async function teardown() {
-  await database('questionaries').where('questionary_id', -999).del();
-
   await database('proposals').where('title', 'like', '[IT] proposal%').del();
+
+  await database('questionaries').where('questionary_id', -999).del();
 
   await database('call').where('call_id', -999).del();
 
