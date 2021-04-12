@@ -7,6 +7,7 @@ import {
   ProposalIdsWithNextStatus,
 } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -33,7 +34,6 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.created || new Date(),
     values?.updated || new Date(),
     values?.shortCode || 'shortCode',
-    values?.rankOrder || 1,
     values?.finalStatus || ProposalEndStatus.UNSET,
     values?.callId || 1,
     values?.questionaryId || 1,
@@ -47,7 +47,20 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
   );
 };
 
+export const dummySepMeetingDecision = new SepMeetingDecision(
+  1,
+  1,
+  ProposalEndStatus.ACCEPTED,
+  'Dummy comment for user',
+  'Dummy comment for management',
+  true,
+  1
+);
+
 export class ProposalDataSourceMock implements ProposalDataSource {
+  constructor() {
+    this.init();
+  }
   async getProposalsFromView(
     filter?: ProposalsFilter | undefined
   ): Promise<ProposalView[]> {
@@ -194,7 +207,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async cloneProposal(
     clonerId: number,
-    proposalId: number,
+    proposal: Proposal,
     call: Call
   ): Promise<Proposal> {
     return dummyProposal;

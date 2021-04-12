@@ -6,9 +6,11 @@ import { MailService, SendMailResults } from './MailService';
 export class SparkPostMailService extends MailService {
   private client: SparkPost;
 
-  constructor(options: { endpoint: string }) {
+  constructor() {
     super();
-    this.client = new SparkPost(process.env.SPARKPOST_TOKEN, options);
+    this.client = new SparkPost(process.env.SPARKPOST_TOKEN, {
+      endpoint: 'https://api.eu.sparkpost.com:443',
+    });
   }
 
   sendMail = (

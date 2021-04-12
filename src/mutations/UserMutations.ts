@@ -13,7 +13,9 @@ import {
   userPasswordFieldBEValidationSchema,
 } from '@esss-swap/duo-validation';
 import * as bcrypt from 'bcryptjs';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
@@ -41,10 +43,11 @@ import {
 import { signToken, verifyToken } from '../utils/jwt';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
+@injectable()
 export default class UserMutations {
   constructor(
-    private dataSource: UserDataSource,
-    private userAuth: UserAuthorization
+    @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   createHash(password: string): string {

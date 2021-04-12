@@ -1,15 +1,20 @@
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized } from '../decorators';
 import { Instrument } from '../models/Instrument';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { userAuthorization } from '../utils/UserAuthorization';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
+@injectable()
 export default class InstrumentQueries {
   constructor(
+    @inject(Tokens.InstrumentDataSource)
     public dataSource: InstrumentDataSource,
-    private sepDataSource: SEPDataSource
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization
   ) {}
 
   private isUserOfficer(agent: UserWithRole | null) {
@@ -68,7 +73,7 @@ export default class InstrumentQueries {
   ) {
     if (
       this.isUserOfficer(agent) ||
-      (await userAuthorization.isMemberOfSEP(agent, sepId))
+      (await this.userAuth.isMemberOfSEP(agent, sepId))
     ) {
       const instruments = await this.dataSource.getInstrumentsBySepId(
         sepId,

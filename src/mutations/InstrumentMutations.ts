@@ -10,7 +10,9 @@ import {
   setAvailabilityTimeOnInstrumentValidationSchema,
   submitInstrumentValidationSchema,
 } from '@esss-swap/duo-validation';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
@@ -34,13 +36,15 @@ import {
   InstrumentAvailabilityTimeArgs,
   InstrumentSubmitArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
+import { sortByRankOrAverageScore } from '../utils/mathFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
-
+@injectable()
 export default class InstrumentMutations {
   constructor(
+    @inject(Tokens.InstrumentDataSource)
     private dataSource: InstrumentDataSource,
-    private sepDataSource: SEPDataSource,
-    private userAuth: UserAuthorization
+    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(createInstrumentValidationSchema)
@@ -264,7 +268,7 @@ export default class InstrumentMutations {
     args: InstrumentSubmitArgs
   ): Promise<InstrumentHasProposals | Rejection> {
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
+      !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(
         (agent as UserWithRole).id,
         args.sepId
@@ -273,13 +277,49 @@ export default class InstrumentMutations {
       return rejection('NOT_ALLOWED');
     }
 
-    const submittedInstrumentProposalIds = (
-      await this.sepDataSource.getSEPProposalsByInstrument(
-        args.sepId,
-        args.instrumentId,
-        args.callId
-      )
-    ).map((sepInstrumentProposal) => sepInstrumentProposal.proposalId);
+    const allInstrumentProposals = await this.sepDataSource.getSEPProposalsByInstrument(
+      args.sepId,
+      args.instrumentId,
+      args.callId
+    );
+
+    const submittedInstrumentProposalIds = allInstrumentProposals.map(
+      (sepInstrumentProposal) => sepInstrumentProposal.proposalId
+    );
+
+    const sepProposalsWithReviewsAndRanking = await this.sepDataSource.getSepProposalsWithReviewGradesAndRanking(
+      submittedInstrumentProposalIds
+    );
+
+    const allSepMeetingsHasRankings = sepProposalsWithReviewsAndRanking.every(
+      (sepProposalWithReviewsAndRanking) =>
+        !!sepProposalWithReviewsAndRanking.rankOrder
+    );
+
+    if (!allSepMeetingsHasRankings) {
+      const sortedSepProposals = sortByRankOrAverageScore(
+        sepProposalsWithReviewsAndRanking
+      );
+
+      const allProposalsWithRankings = sortedSepProposals.map(
+        (sortedSepProposal, index) => {
+          if (!sortedSepProposal.rankOrder) {
+            sortedSepProposal.rankOrder = index + 1;
+          }
+
+          return sortedSepProposal;
+        }
+      );
+
+      await Promise.all(
+        allProposalsWithRankings.map((proposalWithRanking) => {
+          return this.sepDataSource.saveSepMeetingDecision({
+            proposalId: proposalWithRanking.proposalId,
+            rankOrder: proposalWithRanking.rankOrder,
+          });
+        })
+      );
+    }
 
     return this.dataSource
       .submitInstrument(submittedInstrumentProposalIds, args.instrumentId)

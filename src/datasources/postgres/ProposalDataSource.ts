@@ -196,7 +196,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           abstract: proposal.abstract,
           status_id: proposal.statusId,
           proposer_id: proposal.proposerId,
-          rank_order: proposal.rankOrder,
           final_status: proposal.finalStatus,
           comment_for_user: proposal.commentForUser,
           comment_for_management: proposal.commentForManagement,
@@ -534,20 +533,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async cloneProposal(
     clonerId: number,
-    proposalId: number,
+    sourceProposal: Proposal,
     call: Call
   ): Promise<Proposal> {
-    const sourceProposal = await this.get(proposalId);
-
-    if (!sourceProposal) {
-      logger.logError(
-        'Could not clone proposal because source proposal does not exist',
-        { proposalId }
-      );
-
-      throw new Error('Could not clone proposal');
-    }
-
     const [newQuestionary]: QuestionaryRecord[] = (
       await database.raw(`
       INSERT INTO questionaries

@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 import { logger } from '@esss-swap/duo-logger';
+import { injectable } from 'tsyringe';
 
 import { Page } from '../../models/Admin';
 import { Feature } from '../../models/Feature';
@@ -31,23 +32,8 @@ import {
 const dbPatchesFolderPath = path.join(process.cwd(), 'db_patches');
 const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
 
+@injectable()
 export default class PostgresAdminDataSource implements AdminDataSource {
-  constructor() {
-    if (
-      process.env.NODE_ENV === 'test' || // don't run db init while running unit tests
-      process.env.SKIP_DB_INIT === '1' // don't run db init in e2e tests
-    ) {
-      logger.logInfo('Skipping db initialization', {
-        NODE_ENV: process.env.NODE_ENV,
-        SKIP_DB_INIT: process.env.SKIP_DB_INIT,
-      });
-
-      return;
-    }
-
-    this.initDb();
-  }
-
   async createUnit(unit: Unit): Promise<Unit | null> {
     const [unitRecord]: UnitRecord[] = await database
       .insert({
@@ -345,7 +331,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     logger.logInfo('Applying seeds finished', {});
   }
 
-  private async initDb() {
+  protected async upgrade() {
     let initDbFailed = 0;
 
     const initDb = () => {
@@ -490,5 +476,12 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     }
 
     return true;
+  }
+}
+
+export class PostgresAdminDataSourceWithAutoUpgrade extends PostgresAdminDataSource {
+  constructor() {
+    super();
+    this.upgrade();
   }
 }

@@ -1,15 +1,27 @@
 import { logger } from '@esss-swap/duo-logger';
 
-import { ProposalIdsWithNextStatus } from '../../models/Proposal';
+import {
+  ProposalEndStatus,
+  ProposalIdsWithNextStatus,
+} from '../../models/Proposal';
 import { ReviewStatus } from '../../models/Review';
 import { Role, Roles } from '../../models/Role';
-import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../../models/SEP';
+import {
+  SEP,
+  SEPAssignment,
+  SEPReviewer,
+  SEPProposal,
+  SEPProposalWithReviewGradesAndRanking,
+} from '../../models/SEP';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { UserRole } from '../../models/User';
 import {
   UpdateMemberSEPArgs,
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../../resolvers/mutations/AssignMembersToSEP';
+import { OverwriteSepMeetingDecisionRankingInput } from '../../resolvers/mutations/OverwriteSepMeetingDecisionRankingMutation';
+import { SaveSEPMeetingDecisionInput } from '../../resolvers/mutations/SEPMeetingDecisionMutation';
 import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
 import {
@@ -23,8 +35,11 @@ import {
   createSEPAssignmentObject,
   createSEPProposalObject,
   createSEPReviewerObject,
+  createSepMeetingDecisionObject,
   createRoleObject,
   RoleUserRecord,
+  SepMeetingDecisionRecord,
+  SepProposalWithReviewGradesAndRankingRecord,
 } from './records';
 
 export default class PostgresSEPDataSource implements SEPDataSource {
@@ -629,5 +644,151 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .first();
 
     return record !== undefined;
+  }
+
+  async saveSepMeetingDecision(
+    saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput,
+    submittedBy?: number | null
+  ): Promise<SepMeetingDecision> {
+    const dataToUpsert: {
+      proposal_id: number;
+      rank_order?: number;
+      comment_for_management?: string;
+      comment_for_user?: string;
+      recommendation?: ProposalEndStatus;
+      submitted?: boolean;
+      submitted_by?: number | null;
+    } = {
+      proposal_id: saveSepMeetingDecisionInput.proposalId,
+    };
+
+    const updateQuery = [];
+
+    if (submittedBy) {
+      dataToUpsert.submitted_by = submittedBy;
+      updateQuery.push('submitted_by = EXCLUDED.submitted_by');
+    }
+    if (saveSepMeetingDecisionInput.rankOrder) {
+      dataToUpsert.rank_order = saveSepMeetingDecisionInput.rankOrder;
+      updateQuery.push('rank_order = EXCLUDED.rank_order');
+    }
+
+    if (saveSepMeetingDecisionInput.commentForManagement) {
+      dataToUpsert.comment_for_management =
+        saveSepMeetingDecisionInput.commentForManagement;
+      updateQuery.push(
+        'comment_for_management = EXCLUDED.comment_for_management'
+      );
+    }
+
+    if (saveSepMeetingDecisionInput.commentForUser) {
+      dataToUpsert.comment_for_user =
+        saveSepMeetingDecisionInput.commentForUser;
+      updateQuery.push('comment_for_user = EXCLUDED.comment_for_user');
+    }
+
+    if (saveSepMeetingDecisionInput.recommendation) {
+      dataToUpsert.recommendation = saveSepMeetingDecisionInput.recommendation;
+      updateQuery.push('recommendation = EXCLUDED.recommendation');
+    }
+
+    if (saveSepMeetingDecisionInput.submitted !== undefined) {
+      dataToUpsert.submitted = saveSepMeetingDecisionInput.submitted;
+      updateQuery.push('submitted = EXCLUDED.submitted');
+    }
+
+    const [sepMeetingDecisionRecord]: SepMeetingDecisionRecord[] = (
+      await database.raw(
+        `? ON CONFLICT (proposal_id)
+        DO UPDATE SET
+        ${updateQuery.join(',')}
+        RETURNING *;`,
+        [database('SEP_meeting_decisions').insert(dataToUpsert)]
+      )
+    ).rows;
+
+    if (!sepMeetingDecisionRecord) {
+      logger.logError('Could not update/insert sep meeting decision', {
+        dataToUpsert,
+      });
+
+      throw new Error('Could not update/insert sep meeting decision');
+    }
+
+    return createSepMeetingDecisionObject(sepMeetingDecisionRecord);
+  }
+
+  async overwriteSepMeetingDecisionRanking(
+    overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput
+  ): Promise<SepMeetingDecision> {
+    const [
+      sepMeetingDecisionRecord,
+    ]: SepMeetingDecisionRecord[] = await database('SEP_meeting_decisions')
+      .update({ rank_order: overwriteSepMeetingDecisionRankingInput.rankOrder })
+      .where('proposal_id', overwriteSepMeetingDecisionRankingInput.proposalId)
+      .returning('*');
+
+    if (!sepMeetingDecisionRecord) {
+      logger.logError('Could not overwrite sep meeting decision ranking', {
+        overwriteSepMeetingDecisionRankingInput,
+      });
+
+      throw new Error('Could not overwrite sep meeting decision ranking');
+    }
+
+    return createSepMeetingDecisionObject(sepMeetingDecisionRecord);
+  }
+
+  async getProposalsSepMeetingDecisions(
+    proposalIds: number[]
+  ): Promise<SepMeetingDecision[]> {
+    return database
+      .select()
+      .from('SEP_meeting_decisions')
+      .whereIn('proposal_id', proposalIds)
+      .then((sepMeetingDecisionRecords: SepMeetingDecisionRecord[]) => {
+        if (!sepMeetingDecisionRecords.length) {
+          return [];
+        }
+
+        return sepMeetingDecisionRecords.map((sepMeetingDecisionRecord) =>
+          createSepMeetingDecisionObject(sepMeetingDecisionRecord)
+        );
+      });
+  }
+
+  async getSepProposalsWithReviewGradesAndRanking(
+    proposalIds: number[]
+  ): Promise<SEPProposalWithReviewGradesAndRanking[]> {
+    return database('SEP_Proposals as sp')
+      .select([
+        'sp.proposal_id',
+        database.raw('json_agg(sr.grade) review_grades'),
+        'smd.rank_order',
+      ])
+      .join('SEP_meeting_decisions as smd', {
+        'smd.proposal_id': 'sp.proposal_id',
+      })
+      .join('SEP_Reviews as sr', {
+        'sr.proposal_id': 'sp.proposal_id',
+      })
+      .whereIn('sp.proposal_id', proposalIds)
+      .groupBy(['sp.proposal_id', 'smd.rank_order'])
+      .then(
+        (
+          SepProposalWithReviewGradesAndRankingRecords: SepProposalWithReviewGradesAndRankingRecord[]
+        ) => {
+          const sepProposalWithReviewGradesAndRanking = SepProposalWithReviewGradesAndRankingRecords.map(
+            (SepProposalWithReviewGradesAndRankingRecord) =>
+              new SEPProposalWithReviewGradesAndRanking(
+                SepProposalWithReviewGradesAndRankingRecord.proposal_id,
+                SepProposalWithReviewGradesAndRankingRecord.rank_order,
+                SepProposalWithReviewGradesAndRankingRecord.review_grades
+              )
+          );
+
+          return sepProposalWithReviewGradesAndRanking;
+        }
+      );
   }
 }

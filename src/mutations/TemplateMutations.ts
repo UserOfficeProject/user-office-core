@@ -14,7 +14,9 @@ import {
   updateTemplateValidationSchema,
   updateTopicValidationSchema,
 } from '@esss-swap/duo-validation';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
@@ -40,9 +42,11 @@ import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/Updat
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
-
+@injectable()
 export default class TemplateMutations {
-  constructor(private dataSource: TemplateDataSource) {}
+  constructor(
+    @inject(Tokens.TemplateDataSource) private dataSource: TemplateDataSource
+  ) {}
 
   @ValidateArgs(createTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])

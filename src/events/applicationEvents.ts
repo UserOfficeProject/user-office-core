@@ -4,6 +4,7 @@ import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Review, ReviewWithNextProposalStatus } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { SEP } from '../models/SEP';
+import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
@@ -129,6 +130,21 @@ interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
 interface ProposalSEPMeetingSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_MEETING_SUBMITTED;
   proposal: Proposal;
+}
+
+interface ProposalSEPMeetingSavedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_SAVED;
+  sepmeetingdecision: SepMeetingDecision;
+}
+
+interface ProposalSEPMeetingRankingOverwrittenEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN;
+  sepmeetingdecision: SepMeetingDecision;
+}
+
+interface ProposalSEPMeetingReorderEvent extends GeneralEvent {
+  type: Event.PROPOSAL_SEP_MEETING_REORDER;
+  sepmeetingdecision: SepMeetingDecision;
 }
 
 interface UserResetPasswordEmailEvent extends GeneralEvent {
@@ -260,4 +276,7 @@ export type ApplicationEvent =
   | ProposalInstrumentSelectedEvent
   | ProposalSEPSelectedEvent
   | ProposalInstrumentSubmittedEvent
-  | ProposalSEPMeetingSubmittedEvent;
+  | ProposalSEPMeetingSubmittedEvent
+  | ProposalSEPMeetingSavedEvent
+  | ProposalSEPMeetingRankingOverwrittenEvent
+  | ProposalSEPMeetingReorderEvent;

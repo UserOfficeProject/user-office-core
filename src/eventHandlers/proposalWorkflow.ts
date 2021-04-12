@@ -1,5 +1,7 @@
 import { logger } from '@esss-swap/duo-logger';
+import { container } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { eventBus } from '../events';
@@ -12,10 +14,14 @@ import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
 import { workflowEngine, WorkflowEngineProposalType } from '../workflowEngine';
 
-export default function createHandler(
-  proposalDataSource: ProposalDataSource,
-  reviewDataSource: ReviewDataSource
-) {
+export default function createHandler() {
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+  const reviewDataSource = container.resolve<ReviewDataSource>(
+    Tokens.ReviewDataSource
+  );
+
   // Handler to align input for workflowEngine
 
   return async function proposalWorkflowHandler(event: ApplicationEvent) {
@@ -170,7 +176,7 @@ export default function createHandler(
             event.technicalreview.proposalID
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.technicalreview.proposalID} not found`
             );
@@ -204,7 +210,7 @@ export default function createHandler(
             event.technicalreview.proposalID
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.technicalreview.proposalID} not found`
             );
@@ -251,7 +257,7 @@ export default function createHandler(
             event.sample.proposalId
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.sample.proposalId} not found`
             );
@@ -282,13 +288,70 @@ export default function createHandler(
           );
         }
         break;
+      case Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN:
+      case Event.PROPOSAL_SEP_MEETING_REORDER:
+        try {
+          const proposal = await proposalDataSource.get(
+            event.sepmeetingdecision.proposalId
+          );
+
+          if (!proposal) {
+            throw new Error(
+              `Proposal with id ${event.sepmeetingdecision.proposalId} not found`
+            );
+          }
+
+          await markProposalEventAsDoneAndCallWorkflowEngine(
+            event.type,
+            proposal
+          );
+        } catch (error) {
+          logger.logError(
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sepmeetingdecision.proposalId}: `,
+            error
+          );
+        }
+        break;
+      case Event.PROPOSAL_SEP_MEETING_SAVED:
+        try {
+          const proposal = await proposalDataSource.get(
+            event.sepmeetingdecision.proposalId
+          );
+
+          if (!proposal) {
+            throw new Error(
+              `Proposal with id ${event.sepmeetingdecision.proposalId} not found`
+            );
+          }
+
+          if (event.sepmeetingdecision.submitted) {
+            eventBus.publish({
+              type: Event.PROPOSAL_SEP_MEETING_SUBMITTED,
+              proposal,
+              isRejection: false,
+              key: 'proposal',
+              loggedInUserId: event.loggedInUserId,
+            });
+          }
+
+          await markProposalEventAsDoneAndCallWorkflowEngine(
+            event.type,
+            proposal
+          );
+        } catch (error) {
+          logger.logError(
+            `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sepmeetingdecision.proposalId}: `,
+            error
+          );
+        }
+        break;
       case Event.PROPOSAL_SEP_REVIEW_UPDATED:
         try {
           const proposal = await proposalDataSource.get(
             event.reviewwithnextproposalstatus.proposalID
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.reviewwithnextproposalstatus.proposalID} not found`
             );
@@ -324,7 +387,7 @@ export default function createHandler(
             event.review.proposalID
           );
 
-          if (!proposal || !proposal.id) {
+          if (!proposal) {
             throw new Error(
               `Proposal with id ${event.review.proposalID} not found`
             );

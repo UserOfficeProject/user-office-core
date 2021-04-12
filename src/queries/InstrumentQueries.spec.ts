@@ -1,22 +1,14 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
 
-import {
-  InstrumentDataSourceMock,
-  dummyInstrument,
-} from '../datasources/mockups/InstrumentDataSource';
-import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
+import { dummyInstrument } from '../datasources/mockups/InstrumentDataSource';
 import {
   dummyUserWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
 import InstrumentQueries from './InstrumentQueries';
 
-const dummyInstrumentDataSource = new InstrumentDataSourceMock();
-const dummySepDataSource = new SEPDataSourceMock();
-const InstrumentQueriesInstance = new InstrumentQueries(
-  dummyInstrumentDataSource,
-  dummySepDataSource
-);
+const InstrumentQueriesInstance = container.resolve(InstrumentQueries);
 
 describe('Test Instrument Queries', () => {
   // for new skip this test as the decorator is disabled

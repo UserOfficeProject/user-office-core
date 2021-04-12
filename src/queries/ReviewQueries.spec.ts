@@ -1,27 +1,14 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
+import { dummyReview } from '../datasources/mockups/ReviewDataSource';
 import {
-  ReviewDataSourceMock,
-  dummyReview,
-} from '../datasources/mockups/ReviewDataSource';
-import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
-import {
-  UserDataSourceMock,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import ReviewQueries from './ReviewQueries';
 
-// const dummyEventBus = new EventBus<ApplicationEvent>();
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock(),
-  new SEPDataSourceMock()
-);
-const reviewQueries = new ReviewQueries(
-  new ReviewDataSourceMock(),
-  userAuthorization
-);
+const reviewQueries = container.resolve(ReviewQueries);
 
 test('A userofficer can get a review', () => {
   return expect(

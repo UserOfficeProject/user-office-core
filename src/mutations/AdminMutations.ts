@@ -4,7 +4,9 @@ import {
   createApiAccessTokenValidationSchema,
   updateApiAccessTokenValidationSchema,
 } from '@esss-swap/duo-validation';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { Page } from '../models/Admin';
@@ -23,9 +25,11 @@ import { generateUniqueId } from '../utils/helperFunctions';
 import { signToken } from '../utils/jwt';
 
 const IS_BACKEND_VALIDATION = true;
-
+@injectable()
 export default class AdminMutations {
-  constructor(private dataSource: AdminDataSource) {}
+  constructor(
+    @inject(Tokens.AdminDataSource) private dataSource: AdminDataSource
+  ) {}
 
   @Authorized([Roles.USER_OFFICER])
   async resetDB(
@@ -136,7 +140,10 @@ export default class AdminMutations {
   ) {
     const accessTokenId = generateUniqueId();
     const accessPermissions = JSON.parse(args.accessPermissions);
-    const generatedAccessToken = signToken({ accessTokenId });
+    const generatedAccessToken = signToken(
+      { accessTokenId },
+      { expiresIn: '100y' } // API access token should have long life
+    );
 
     const result = await this.dataSource.createApiAccessToken(
       { accessPermissions, name: args.name },

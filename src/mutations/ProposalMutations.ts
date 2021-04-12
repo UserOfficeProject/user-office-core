@@ -9,7 +9,9 @@ import {
   updateProposalValidationSchema,
 } from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -26,13 +28,17 @@ import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutatio
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 
+@injectable()
 export default class ProposalMutations {
   constructor(
-    private proposalDataSource: ProposalDataSource,
-    private questionaryDataSource: QuestionaryDataSource,
-    private callDataSource: CallDataSource,
+    @inject(Tokens.ProposalDataSource)
+    public proposalDataSource: ProposalDataSource,
+    @inject(Tokens.QuestionaryDataSource)
+    public questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
+    @inject(Tokens.InstrumentDataSource)
     private instrumentDataSource: InstrumentDataSource,
-    private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -250,7 +256,6 @@ export default class ProposalMutations {
   ): Promise<Proposal | Rejection> {
     const {
       id,
-      rankOrder,
       finalStatus,
       statusId,
       commentForManagement,
@@ -280,10 +285,6 @@ export default class ProposalMutations {
 
     if (isProposalInstrumentSubmitted && !isUserOfficer) {
       return rejection('NOT_ALLOWED');
-    }
-
-    if (rankOrder !== undefined) {
-      proposal.rankOrder = rankOrder;
     }
 
     if (finalStatus !== undefined) {
@@ -367,6 +368,21 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     { callId, proposalToCloneId }: CloneProposalInput
   ): Promise<Proposal | Rejection> {
+    const sourceProposal = await this.proposalDataSource.get(proposalToCloneId);
+
+    if (!sourceProposal) {
+      logger.logError(
+        'Could not clone proposal because source proposal does not exist',
+        { proposalToCloneId }
+      );
+
+      return rejection('NOT_FOUND');
+    }
+
+    if (!(await this.userAuth.hasAccessRights(agent, sourceProposal))) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
+
     // Check if there is an open call
     if (!(await this.proposalDataSource.checkActiveCall(callId))) {
       return rejection('NO_ACTIVE_CALL_FOUND');
@@ -383,7 +399,7 @@ export default class ProposalMutations {
     }
 
     return this.proposalDataSource
-      .cloneProposal((agent as UserWithRole).id, proposalToCloneId, call)
+      .cloneProposal((agent as UserWithRole).id, sourceProposal, call)
       .then((proposal) => proposal)
       .catch((err) => {
         logger.logException('Could not clone proposal', err, { agent });

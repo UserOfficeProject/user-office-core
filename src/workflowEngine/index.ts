@@ -1,6 +1,14 @@
-import { proposalDataSource, proposalSettingsDataSource } from '../datasources';
+import { container } from 'tsyringe';
+
+import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
+import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import { ProposalEventsRecord } from '../datasources/postgres/records';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
+
+const proposalSettingsDataSource = container.resolve(
+  ProposalSettingsDataSource
+);
+const proposalDataSource = container.resolve(ProposalDataSource);
 
 const getProposalWorkflowByCallId = (callId: number) => {
   return proposalSettingsDataSource.getProposalWorkflowByCall(callId);
@@ -39,12 +47,7 @@ const shouldMoveToNextStatus = (
 const updateProposalStatus = (
   proposalId: number,
   nextProposalStatusId: number
-) => {
-  return proposalDataSource.updateProposalStatus(
-    proposalId,
-    nextProposalStatusId
-  );
-};
+) => proposalDataSource.updateProposalStatus(proposalId, nextProposalStatusId);
 
 export type WorkflowEngineProposalType = {
   id: number;

@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
+import { container } from 'tsyringe';
+
 import SystemQueries from './SystemQueries';
 
-const dummySystemDataSource = new SystemDataSourceMock();
-const systemQueries = new SystemQueries(dummySystemDataSource);
+const systemQueries = container.resolve(SystemQueries);
 
 test('Healthcheck should pass', () => {
   return expect(systemQueries.connectivityCheck()).resolves.toBeTruthy();

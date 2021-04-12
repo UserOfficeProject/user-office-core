@@ -1,12 +1,16 @@
 import { logger } from '@esss-swap/duo-logger';
+import { container } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 
-export default function createHandler(
-  eventLogsDataSource: EventLogsDataSource
-) {
+export default function createHandler() {
+  const eventLogsDataSource = container.resolve<EventLogsDataSource>(
+    Tokens.EventLogsDataSource
+  );
+
   // Handler that logs every mutation wrapped with the event bus event to stdout and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
     const json = JSON.stringify(event);
@@ -73,6 +77,16 @@ export default function createHandler(
             event.type,
             json,
             event.reviewwithnextproposalstatus.id.toString()
+          );
+          break;
+        case Event.PROPOSAL_SEP_MEETING_SAVED:
+        case Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN:
+        case Event.PROPOSAL_SEP_MEETING_REORDER:
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            event.sepmeetingdecision.proposalId.toString()
           );
           break;
         default:

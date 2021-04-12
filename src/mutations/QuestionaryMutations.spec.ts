@@ -1,40 +1,18 @@
 import 'reflect-metadata';
-import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
-import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
-import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
-import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUser,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import { isRejection } from '../rejection';
-import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import QuestionaryMutations from './QuestionaryMutations';
 
-const dummyProposalDataSource = new ProposalDataSourceMock();
-const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
-const dummyTemplateDataSource = new TemplateDataSourceMock();
-const dummySampleDataSource = new SampleDataSourceMock();
-const dummyShipmentDataSource = new ShipmentDataSourceMock();
-
-const questionaryAuth = new QuestionaryAuthorization(
-  dummyProposalDataSource,
-  dummyQuestionaryDataSource,
-  dummyTemplateDataSource,
-  dummySampleDataSource,
-  dummyShipmentDataSource
-);
-const mutations = new QuestionaryMutations(
-  dummyQuestionaryDataSource,
-  dummyTemplateDataSource,
-  questionaryAuth
-);
-const queries = new QuestionaryQueries(
-  dummyQuestionaryDataSource,
-  questionaryAuth
-);
+const mutations = container.resolve(QuestionaryMutations);
+const queries = container.resolve(QuestionaryQueries);
 
 const getDummyUsersProposal = async () => {
   const USER_QUESTIONARY_ID = 1;
@@ -49,9 +27,9 @@ const getDummyUsersProposal = async () => {
 };
 
 beforeEach(() => {
-  dummyQuestionaryDataSource.init();
-  dummyTemplateDataSource.init();
-  dummyProposalDataSource.init();
+  container
+    .resolve<QuestionaryDataSourceMock>(Tokens.QuestionaryDataSource)
+    .init();
 });
 
 it('User should answer topic questions', async () => {
@@ -75,11 +53,7 @@ it('User should answer topic questions', async () => {
 
 it('User should update question', async () => {
   const NEW_ANSWER = 'NEW_ANSWER';
-  const {
-    firstAnswer,
-    firstStep,
-    questionaryId,
-  } = await getDummyUsersProposal();
+  const { firstAnswer, questionaryId } = await getDummyUsersProposal();
   const result = await mutations.updateAnswer(dummyUser, {
     questionaryId,
     answer: {

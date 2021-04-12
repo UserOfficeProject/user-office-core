@@ -1,11 +1,23 @@
-import { ProposalIdsWithNextStatus } from '../../models/Proposal';
-import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../../models/SEP';
+import {
+  ProposalEndStatus,
+  ProposalIdsWithNextStatus,
+} from '../../models/Proposal';
+import {
+  SEP,
+  SEPAssignment,
+  SEPReviewer,
+  SEPProposal,
+  SEPProposalWithReviewGradesAndRanking,
+} from '../../models/SEP';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { User } from '../../models/User';
 import {
   UpdateMemberSEPArgs,
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../../resolvers/mutations/AssignMembersToSEP';
+import { OverwriteSepMeetingDecisionRankingInput } from '../../resolvers/mutations/OverwriteSepMeetingDecisionRankingMutation';
+import { SaveSEPMeetingDecisionInput } from '../../resolvers/mutations/SEPMeetingDecisionMutation';
 import { SEPDataSource } from '../SEPDataSource';
 
 export const dummySEP = new SEP(
@@ -75,6 +87,16 @@ export const anotherDummySEPProposal = new SEPProposal(
   2,
   new Date('2020-04-20 08:25:12.23043+00'),
   null
+);
+
+export const dummySepMeetingDecision = new SepMeetingDecision(
+  1,
+  1,
+  ProposalEndStatus.ACCEPTED,
+  'Dummy comment for user',
+  'Dummy comment for management',
+  true,
+  1
 );
 
 export const dummySEPAssignments = [
@@ -335,5 +357,30 @@ export class SEPDataSourceMock implements SEPDataSource {
     }
 
     throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async saveSepMeetingDecision(
+    saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput,
+    submittedBy?: number | null
+  ): Promise<SepMeetingDecision> {
+    return dummySepMeetingDecision;
+  }
+
+  async getProposalsSepMeetingDecisions(
+    proposalIds: number[]
+  ): Promise<SepMeetingDecision[]> {
+    return [dummySepMeetingDecision];
+  }
+
+  async overwriteSepMeetingDecisionRanking(
+    overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput
+  ): Promise<SepMeetingDecision> {
+    return dummySepMeetingDecision;
+  }
+
+  async getSepProposalsWithReviewGradesAndRanking(
+    proposalIds: number[]
+  ): Promise<SEPProposalWithReviewGradesAndRanking[]> {
+    return [new SEPProposalWithReviewGradesAndRanking(1, 1, [7])];
   }
 }
