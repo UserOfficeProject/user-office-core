@@ -13,9 +13,11 @@ query sepProposalsByInstrument(
       id
       title
       shortCode
-      rankOrder
       status {
         ...proposalStatus
+      }
+      sepMeetingDecision {
+        ...sepMeetingDecision
       }
       reviews {
         id

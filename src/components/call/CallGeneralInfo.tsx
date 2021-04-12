@@ -25,13 +25,12 @@ const CallGeneralInfo: React.FC<{
   loadingTemplates,
   templates,
 }) => {
-  const proposalWorkflowsWithInjectedSelectionRemoval = [
-    { id: '', name: 'None (remove selection)' },
-    ...proposalWorkflows,
-  ].map((proposalWorkflow) => ({
-    text: proposalWorkflow.name,
-    value: proposalWorkflow.id,
-  }));
+  const proposalWorkflowsWithInjectedSelectionRemoval = proposalWorkflows.map(
+    (proposalWorkflow) => ({
+      text: proposalWorkflow.name,
+      value: proposalWorkflow.id,
+    })
+  );
 
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
@@ -114,7 +113,10 @@ const CallGeneralInfo: React.FC<{
             ? proposalWorkflowsWithInjectedSelectionRemoval
             : []
         }
-        InputProps={{ 'data-cy': 'call-workflow' }}
+        InputProps={{
+          'data-cy': 'call-workflow',
+        }}
+        isClearable
       />
     </>
   );

@@ -20,13 +20,23 @@ export function useInstitutionsData(): {
   };
 
   useEffect(() => {
+    let unmounted = false;
+
     setLoadingInstitutions(true);
     api()
       .getInstitutions()
       .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         setInstitutions(data.institutions as Institution[]);
         setLoadingInstitutions(false);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [api]);
 
   return { loadingInstitutions, institutions, setInstitutionsWithLoading };

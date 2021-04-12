@@ -83,7 +83,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
                 {average(getGrades(proposal.reviews)) || '-'}
               </TableCell>
               <TableCell className={classes.textBold}>Current Rank</TableCell>
-              <TableCell>{proposal.rankOrder}</TableCell>
+              <TableCell>{proposal.sepMeetingDecision?.rankOrder}</TableCell>
             </TableRow>
             <TableRow key="instrumentAndPdf">
               <TableCell className={classes.textBold}>Instrument</TableCell>

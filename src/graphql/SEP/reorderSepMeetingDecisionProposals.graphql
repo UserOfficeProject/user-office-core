@@ -1,0 +1,12 @@
+mutation reorderSepMeetingDecisionProposals(
+  $reorderSepMeetingDecisionProposalsInput: ReorderSepMeetingDecisionProposalsInput!
+) {
+  reorderSepMeetingDecisionProposals(
+    reorderSepMeetingDecisionProposalsInput: $reorderSepMeetingDecisionProposalsInput
+  ) {
+    error
+    sepMeetingDecision {
+      proposalId
+    }
+  }
+}

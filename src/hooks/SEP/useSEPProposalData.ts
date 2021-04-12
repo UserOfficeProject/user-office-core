@@ -12,7 +12,7 @@ export type SepProposalBasics = Pick<
 
 export function useSEPProposalData(
   sepId: number,
-  proposalId: number
+  proposalId?: number | null
 ): {
   loading: boolean;
   SEPProposalData: SepProposalBasics | null;
@@ -25,24 +25,28 @@ export function useSEPProposalData(
   ] = useState<SepProposalBasics | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    let canceled = false;
+    let unmounted = false;
     setLoading(true);
 
-    api()
-      .getSEPProposal({ sepId, proposalId })
-      .then((data) => {
-        if (canceled) {
-          return;
-        }
+    if (proposalId && sepId) {
+      api()
+        .getSEPProposal({ sepId, proposalId })
+        .then((data) => {
+          if (unmounted) {
+            return;
+          }
 
-        if (data.sepProposal) {
-          setSEPProposalData(data.sepProposal as SepProposalBasics);
-        }
-        setLoading(false);
-      });
+          if (data.sepProposal) {
+            setSEPProposalData(data.sepProposal as SepProposalBasics);
+          }
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
 
     return () => {
-      canceled = true;
+      unmounted = true;
     };
   }, [sepId, api, proposalId]);
 

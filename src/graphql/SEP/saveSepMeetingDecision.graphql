@@ -1,0 +1,12 @@
+mutation saveSepMeetingDecision(
+  $saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput!
+) {
+  saveSepMeetingDecision(
+    saveSepMeetingDecisionInput: $saveSepMeetingDecisionInput
+  ) {
+    error
+    sepMeetingDecision {
+      proposalId
+    }
+  }
+}
