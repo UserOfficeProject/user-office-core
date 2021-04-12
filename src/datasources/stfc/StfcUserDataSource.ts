@@ -58,9 +58,9 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     '',
     '',
     '',
-    0,
-    '',
-    0,
+    1,
+    '2000-01-01',
+    1,
     stfcUser.deptName ?? '',
     '',
     stfcUser.email ?? '',
@@ -68,8 +68,8 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     stfcUser.workPhone ?? '',
     undefined,
     false,
-    '',
-    ''
+    '2000-01-01 00:00:00.000000+00',
+    '2000-01-01 00:00:00.000000+00'
   );
 }
 
@@ -222,11 +222,19 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async me(id: number) {
-    return await postgresUserDataSource.me(id);
+    const stfcUser = (
+      await client.getBasicPersonDetailsFromUserNumber(token, id)
+    )?.return;
+
+    return stfcUser ? toEssUser(stfcUser) : null;
   }
 
   async get(id: number) {
-    return await postgresUserDataSource.get(id);
+    const stfcUser = (
+      await client.getBasicPersonDetailsFromUserNumber(token, id)
+    )?.return;
+
+    return stfcUser ? toEssUser(stfcUser) : null;
   }
 
   async createDummyUser(userId: number): Promise<User> {
