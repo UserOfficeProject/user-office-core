@@ -24,8 +24,8 @@ class ShipmentsFilter {
   @Field(() => Int, { nullable: true })
   public proposalId?: number;
 
-  @Field(() => Int, { nullable: true })
-  public questionaryId?: number;
+  @Field(() => [Int], { nullable: true })
+  public questionaryIds?: number[];
 
   @Field(() => ShipmentStatus, { nullable: true })
   public status?: ShipmentStatus;

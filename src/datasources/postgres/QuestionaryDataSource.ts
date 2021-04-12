@@ -7,12 +7,13 @@ import {
   QuestionaryStep,
 } from '../../models/Questionary';
 import { getDefaultAnswerValue } from '../../models/questionTypes/QuestionRegistry';
-import { FieldDependency } from '../../models/Template';
+import { FieldDependency, Template } from '../../models/Template';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
   AnswerRecord,
   createAnswerBasic,
+  createProposalTemplateObject,
   createQuestionaryObject,
   createQuestionTemplateRelationObject,
   createTopicObject,
@@ -50,6 +51,27 @@ export default class PostgresQuestionaryDataSource
       .first();
 
     return createAnswerBasic(answerRecord);
+  }
+
+  async getAnswers(questionId: string): Promise<AnswerBasic[]> {
+    return database('answers')
+      .where('question_id', questionId)
+      .then((rows) => {
+        return rows.map((row) => createAnswerBasic(row));
+      });
+  }
+  async getTemplates(questionId: string): Promise<Template[]> {
+    return database('templates_has_questions')
+      .leftJoin(
+        'templates',
+        'templates.template_id',
+        '=',
+        'templates_has_questions.template_id'
+      )
+      .where('question_id', questionId)
+      .then((rows) => {
+        return rows.map((row) => createProposalTemplateObject(row));
+      });
   }
 
   async create(creator_id: number, template_id: number): Promise<Questionary> {
