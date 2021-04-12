@@ -94,9 +94,9 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         !b.proposal.sepMeetingDecision?.rankOrder)
     ) {
       return -1;
-    } else if (a.proposal.sepMeetingDecision?.rankOrder === null) {
+    } else if (!a.proposal.sepMeetingDecision?.rankOrder) {
       return 1;
-    } else if (b.proposal.sepMeetingDecision?.rankOrder === null) {
+    } else if (!b.proposal.sepMeetingDecision?.rankOrder) {
       return -1;
     } else {
       return (a.proposal.sepMeetingDecision?.rankOrder as number) >

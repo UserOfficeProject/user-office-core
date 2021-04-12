@@ -140,20 +140,27 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       rankOrder,
     };
 
-    const result = await api(
-      'Ranking updated successfully'
-    ).overwriteSepMeetingDecisionRanking({
-      overwriteSepMeetingDecisionRankingInput,
-    });
+    if (rankOrder > 0) {
+      const result = await api(
+        'Ranking updated successfully'
+      ).overwriteSepMeetingDecisionRanking({
+        overwriteSepMeetingDecisionRankingInput,
+      });
 
-    if (!result.overwriteSepMeetingDecisionRanking.error) {
-      setProposalsData((proposalsData) =>
-        proposalsData.map((prop) => {
-          if (prop.id === proposalId) prop.rankOrder = rankOrder;
+      if (!result.overwriteSepMeetingDecisionRanking.error) {
+        setProposalsData((proposalsData) =>
+          proposalsData.map((prop) => {
+            if (prop.id === proposalId) prop.rankOrder = rankOrder;
 
-          return prop;
-        })
-      );
+            return prop;
+          })
+        );
+      }
+    } else {
+      enqueueSnackbar('Ranking should be grater than 0', {
+        variant: 'error',
+        className: 'snackbar-error',
+      });
     }
   };
 
