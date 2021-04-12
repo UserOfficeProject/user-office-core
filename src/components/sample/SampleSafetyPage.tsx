@@ -60,7 +60,7 @@ function SampleEvaluationDialog(props: {
           onClose(newSample || null);
         }}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, dirty }) => (
           <Form>
             <Field
               type="text"
@@ -136,6 +136,7 @@ function SampleEvaluationDialog(props: {
                 type="submit"
                 color="primary"
                 data-cy="submit"
+                disabled={!dirty}
               >
                 Submit
               </Button>

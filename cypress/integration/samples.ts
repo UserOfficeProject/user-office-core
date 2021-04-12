@@ -110,9 +110,7 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=add-button]').should('be.disabled'); // Add button should be disabled because of max entry limit
 
-    cy.get('[data-cy="delete"]')
-      .eq(1)
-      .click();
+    cy.get('[data-cy="delete"]').eq(1).click();
 
     cy.contains('OK').click();
 
@@ -127,12 +125,49 @@ context('Samples tests', () => {
     cy.contains('OK').click();
   });
 
+  it('User should not be able to submit proposal with unfinished sample', () => {
+    cy.login('user');
+
+    cy.createProposal();
+
+    cy.get('[data-cy=add-button]').click();
+
+    cy.get('[data-cy=title-input] input')
+      .clear()
+      .type(sampleTitle)
+      .should('have.value', sampleTitle);
+
+    cy.get('[data-cy="sample-declaration-modal"] [data-cy="save-button"]')
+      .focus()
+      .click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
+
+    cy.contains('All samples must be completed');
+
+    cy.get(
+      '[data-cy="sample-declaration-modal"] [data-cy="save-and-continue-button"]'
+    ).click();
+
+    cy.finishedLoading();
+
+    cy.get('.Mui-error').should('not.exist');
+
+    cy.contains('Save and continue').click();
+
+    cy.contains('Submit').click();
+
+    cy.contains('OK').click();
+  });
+
   it('Officer should be able to edit proposal', () => {
     cy.login('officer');
 
     cy.contains('Proposals').click();
 
-    cy.get('[title="View proposal"]').click();
+    cy.get('[title="View proposal"]').first().click();
 
     cy.contains('Edit proposal').click();
 
@@ -155,9 +190,7 @@ context('Samples tests', () => {
 
     cy.contains('Sample safety').click();
 
-    cy.get('[title="Review sample"]')
-      .last()
-      .click();
+    cy.get('[title="Review sample"]').last().click();
 
     cy.get('[data-cy="safety-status"]').click();
 
@@ -171,9 +204,7 @@ context('Samples tests', () => {
 
     cy.reload();
 
-    cy.get('[title="Review sample"]')
-      .last()
-      .click();
+    cy.get('[title="Review sample"]').last().click();
 
     cy.contains(safetyComment); // test if comment entered is present after reload
 
@@ -191,9 +222,7 @@ context('Samples tests', () => {
 
     cy.contains('Sample safety').click();
 
-    cy.get('[data-cy="download-sample"]')
-      .first()
-      .click();
+    cy.get('[data-cy="download-sample"]').first().click();
 
     cy.get('[data-cy="preparing-download-dialog"]').should('exist');
     cy.get('[data-cy="preparing-download-dialog-item"]').contains(sampleTitle);
@@ -204,7 +233,7 @@ context('Samples tests', () => {
 
     cy.contains('Sample safety').click();
 
-    cy.request('GET', '/download/pdf/sample/1').then(response => {
+    cy.request('GET', '/download/pdf/sample/1').then((response) => {
       expect(response.headers['content-type']).to.be.equal('application/pdf');
       expect(response.status).to.be.equal(200);
     });
@@ -215,13 +244,9 @@ context('Samples tests', () => {
 
     cy.contains('Proposals').click();
 
-    cy.get("input[type='checkbox']")
-      .first()
-      .click();
+    cy.get("input[type='checkbox']").first().click();
 
-    cy.get("[title='Delete proposals']")
-      .first()
-      .click();
+    cy.get("[title='Delete proposals']").first().click();
 
     cy.get('[data-cy="confirm-ok"]').click();
 
