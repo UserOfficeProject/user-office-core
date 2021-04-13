@@ -45,8 +45,8 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     { title: 'Description', field: 'description' },
     {
       title: 'Availability time',
-      render: (rowData: InstrumentWithAvailabilityTime) =>
-        rowData.availabilityTime ? rowData.availabilityTime : '-',
+      field: 'availabilityTime',
+      emptyValue: '-',
     },
     {
       title: 'Submitted',

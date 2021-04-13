@@ -71,8 +71,8 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
     { title: 'Review status', field: 'review.status' },
     {
       title: 'Grade',
-      render: (rowData: SepAssignment) =>
-        rowData.review?.grade ? rowData.review.grade : '-',
+      field: 'review.grade',
+      emptyValue: '-',
     },
   ];
 
