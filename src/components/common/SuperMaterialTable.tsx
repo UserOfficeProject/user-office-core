@@ -37,7 +37,10 @@ export type SortDirectionType = 'asc' | 'desc' | undefined;
 interface SuperProps<RowData extends Record<keyof RowData, unknown>> {
   createModal: (
     onUpdate: (object: RowData | null) => void,
-    onCreate: (object: RowData | null) => void,
+    onCreate: (
+      object: RowData | null,
+      shouldCloseAfterCreation?: boolean
+    ) => void,
     object: RowData | null
   ) => React.ReactNode;
   setData: FunctionType<void, [SetStateAction<RowData[]>]>;
@@ -99,11 +102,17 @@ export function SuperMaterialTable<Entry extends EntryID>({
     urlQueryParams?.sortDirection
   );
 
-  const onCreated = (objectAdded: Entry | null) => {
+  const onCreated = (
+    objectAdded: Entry | null,
+    shouldCloseAfterCreation = true
+  ) => {
     if (objectAdded) {
       setData([...data, objectAdded]);
     }
-    setShow(false);
+
+    if (shouldCloseAfterCreation) {
+      setShow(false);
+    }
   };
 
   const onUpdated = (objectUpdated: Entry | null) => {

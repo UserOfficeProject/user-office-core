@@ -69,7 +69,8 @@ const ProposalTable = ({
     { title: 'Status', field: 'publicStatus' },
     {
       title: 'Call',
-      render: (rowData: PartialProposalsDataType) => rowData.call?.shortCode,
+      field: 'call.shortCode',
+      emptyValue: '-',
     },
     { title: 'Created', field: 'created' },
   ];

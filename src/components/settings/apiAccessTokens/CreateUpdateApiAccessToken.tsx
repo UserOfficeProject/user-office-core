@@ -20,7 +20,6 @@ import {
   Formik,
 } from 'formik';
 import { TextField } from 'formik-material-ui';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import SimpleTabs from 'components/common/TabPanel';
@@ -87,7 +86,10 @@ type FormPermissionsWithAccessToken = {
 };
 
 type CreateUpdateApiAccessTokenProps = {
-  close: (apiAccessTokenAdded: PermissionsWithAccessToken | null) => void;
+  close: (
+    apiAccessTokenAdded: PermissionsWithAccessToken | null,
+    shouldCloseAfterCreation?: boolean
+  ) => void;
   apiAccessToken: PermissionsWithAccessToken | null;
 };
 
@@ -216,6 +218,8 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
               'accessToken',
               `Bearer ${data.createApiAccessToken.apiAccessToken.accessToken}`
             );
+
+            close(data.createApiAccessToken.apiAccessToken, false);
           }
         }
       }}
@@ -318,7 +322,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
                 data-cy="submit"
               >
                 {isExecutingCall && <UOLoader size={14} />}
-                {apiAccessToken ? 'Update' : 'Create'}
+                {values.accessToken ? 'Update' : 'Create'}
               </Button>
             </Grid>
           </Grid>
@@ -326,16 +330,6 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
       )}
     </Formik>
   );
-};
-
-CreateUpdateApiAccessToken.propTypes = {
-  apiAccessToken: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    accessToken: PropTypes.string.isRequired,
-    accessPermissions: PropTypes.string.isRequired,
-  }),
-  close: PropTypes.func.isRequired,
 };
 
 export default CreateUpdateApiAccessToken;

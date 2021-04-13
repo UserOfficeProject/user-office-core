@@ -6,6 +6,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import DashboardIcon from '@material-ui/icons/Dashboard';
+import DescriptionIcon from '@material-ui/icons/Description';
 import EventIcon from '@material-ui/icons/Event';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
@@ -18,7 +19,6 @@ import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import NoteAdd from '@material-ui/icons/NoteAdd';
 import People from '@material-ui/icons/People';
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import Settings from '@material-ui/icons/Settings';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import VpnKey from '@material-ui/icons/VpnKey';
@@ -30,6 +30,7 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { Call, FeatureId, UserRole } from 'generated/sdk';
 
 import BoxIcon from './common/icons/BoxIcon';
+import CommentQuestionIcon from './common/icons/CommentQuestionIcon';
 import ProposalSettingsIcon from './common/icons/ProposalSettingsIcon';
 import ProposalWorkflowIcon from './common/icons/ProposalWorkflowIcon';
 import ScienceIcon from './common/icons/ScienceIcon';
@@ -142,7 +143,7 @@ const TemplateMenuListItem = () => {
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
         <ListItem component={NavLink} to="/ProposalTemplates" button>
           <ListItemIcon>
-            <QuestionAnswerIcon />
+            <DescriptionIcon />
           </ListItemIcon>
           <ListItemText primary="Proposal" title="Proposal templates" />
         </ListItem>
@@ -303,6 +304,12 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         <ListItemText primary="Institutions" />
       </ListItem>
       <TemplateMenuListItem />
+      <ListItem component={NavLink} to="/Questions" button>
+        <ListItemIcon>
+          <CommentQuestionIcon />
+        </ListItemIcon>
+        <ListItemText primary="Questions" />
+      </ListItem>
       <SamplesMenuListItem />
       {isShipmentFeatureEnabled && <ShipmentMenuListItem />}
       <SettingsMenuListItem />
