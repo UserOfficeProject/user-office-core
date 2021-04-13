@@ -73,7 +73,7 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
     }
 
     const queryResult = await this.sampleDataSource.getSamples({
-      filter: { questionaryId },
+      filter: { questionaryIds: [questionaryId] },
     });
 
     if (queryResult.length !== 1) {
@@ -129,7 +129,7 @@ class ShipmentDeclarationQuestionaryAuthorizer
     }
 
     const queryResult = await this.shipmentDataSource.getAll({
-      filter: { questionaryId },
+      filter: { questionaryIds: [questionaryId] },
     });
 
     if (queryResult.length !== 1) {

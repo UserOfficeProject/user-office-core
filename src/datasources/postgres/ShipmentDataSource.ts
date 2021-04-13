@@ -58,8 +58,8 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
         if (filter?.status) {
           query.where('creator_id', filter.status);
         }
-        if (filter?.questionaryId) {
-          query.where('questionary_id', filter.questionaryId);
+        if (filter?.questionaryIds) {
+          query.where('questionary_id', 'in', filter.questionaryIds);
         }
         if (filter?.title) {
           query.where('title', 'like', `%${filter.title}%`);

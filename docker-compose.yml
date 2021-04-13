@@ -74,8 +74,6 @@ services:
     labels:
       - "traefik.frontend.rule=PathPrefix:/gateway"
       - "traefik.port=4100"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
   scheduler-frontend:
     image: "dmsc/duo-scheduler-frontend:develop"

@@ -20,7 +20,6 @@ import {
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../../resolvers/mutations/AssignMembersToSEP';
-import { OverwriteSepMeetingDecisionRankingInput } from '../../resolvers/mutations/OverwriteSepMeetingDecisionRankingMutation';
 import { SaveSEPMeetingDecisionInput } from '../../resolvers/mutations/SEPMeetingDecisionMutation';
 import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
@@ -713,27 +712,6 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       });
 
       throw new Error('Could not update/insert sep meeting decision');
-    }
-
-    return createSepMeetingDecisionObject(sepMeetingDecisionRecord);
-  }
-
-  async overwriteSepMeetingDecisionRanking(
-    overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput
-  ): Promise<SepMeetingDecision> {
-    const [
-      sepMeetingDecisionRecord,
-    ]: SepMeetingDecisionRecord[] = await database('SEP_meeting_decisions')
-      .update({ rank_order: overwriteSepMeetingDecisionRankingInput.rankOrder })
-      .where('proposal_id', overwriteSepMeetingDecisionRankingInput.proposalId)
-      .returning('*');
-
-    if (!sepMeetingDecisionRecord) {
-      logger.logError('Could not overwrite sep meeting decision ranking', {
-        overwriteSepMeetingDecisionRankingInput,
-      });
-
-      throw new Error('Could not overwrite sep meeting decision ranking');
     }
 
     return createSepMeetingDecisionObject(sepMeetingDecisionRecord);
