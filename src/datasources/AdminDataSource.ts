@@ -22,6 +22,7 @@ export interface AdminDataSource {
   resetDB(includeSeeds: boolean): Promise<string>;
   applyPatches(): Promise<string>;
   getFeatures(): Promise<Feature[]>;
+  getSettings(): Promise<Settings[]>;
   createUnit(unit: Unit): Promise<Unit | null>;
   deleteUnit(id: number): Promise<Unit>;
   getUnits(): Promise<Unit[]>;

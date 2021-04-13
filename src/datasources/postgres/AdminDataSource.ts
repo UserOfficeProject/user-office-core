@@ -8,6 +8,7 @@ import { Page } from '../../models/Admin';
 import { Feature } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
+import { Settings } from '../../models/Settings';
 import { Unit } from '../../models/Unit';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
@@ -19,8 +20,10 @@ import {
   CountryRecord,
   createBasicUserObject,
   createFeatureObject,
+  createSettingsObject,
   createPageObject,
   FeatureRecord,
+  SettingsRecord,
   InstitutionRecord,
   NationalityRecord,
   PageTextRecord,
@@ -362,6 +365,15 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from('features')
       .then((features: FeatureRecord[]) =>
         features.map((feature) => createFeatureObject(feature))
+      );
+  }
+
+  async getSettings(): Promise<Settings[]> {
+    return database
+      .select()
+      .from('settings')
+      .then((settings: SettingsRecord[]) =>
+        settings.map((settings) => createSettingsObject(settings))
       );
   }
 
