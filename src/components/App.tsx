@@ -2,7 +2,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import { ProviderContext, SnackbarProvider } from 'notistack';
-import React, { ErrorInfo } from 'react';
+import React, { ErrorInfo, useContext, useState } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import {
   BrowserRouter as Router,
@@ -15,9 +15,12 @@ import { QueryParamProvider } from 'use-query-params';
 
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
-import { SettingsContextProvider } from 'context/SettingsContextProvider';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
+import { SettingsContextProvider } from 'context/SettingsContextProvider';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
+import { FeatureId, SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
 import { getTheme } from '../theme';
@@ -36,8 +39,11 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   }
 
   const Component = component; // JSX Elements have to be uppercase.
-  const context = useContext(SettingContext);
-  const external_auth_login_url = !!context.settings.get(SettingId.EXTERNAL_AUTH_LOGIN_URL);
+  const context = useContext(SettingsContext);
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const external_auth_login_url = !!context.settings.get(
+    SettingsId.EXTERNAL_AUTH_LOGIN_URL
+  );
 
   return (
     <UserContext.Consumer>
@@ -48,10 +54,9 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
             if (!token) {
               if (
                 process.env.REACT_APP_AUTH_TYPE === 'external' &&
-                process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL
+                external_auth_login_url
               ) {
-                window.location.href =
-                  process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL;
+                window.location.href = external_auth_login_url;
 
                 return <p>Redirecting to external sign-in page...</p>;
               }

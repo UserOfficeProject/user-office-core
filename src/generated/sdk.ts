@@ -3436,6 +3436,17 @@ export type GetFeaturesQuery = (
   )> }
 );
 
+export type GetSettingsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSettingsQuery = (
+  { __typename?: 'Query' }
+  & { settings: Array<(
+    { __typename?: 'Settings' }
+    & Pick<Settings, 'id' | 'addValue' | 'description'>
+  )> }
+);
+
 export type GetInstitutionsQueryVariables = Exact<{
   filter?: Maybe<InstitutionsFilter>;
 }>;
@@ -7036,6 +7047,15 @@ export const GetFeaturesDocument = gql`
   }
 }
     `;
+export const GetSettingsDocument = gql`
+    query getSettings {
+  features {
+    id
+    addValue
+    description
+  }
+}
+    `;
 export const GetInstitutionsDocument = gql`
     query getInstitutions($filter: InstitutionsFilter) {
   institutions(filter: $filter) {
@@ -8908,6 +8928,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getFeatures(variables?: GetFeaturesQueryVariables): Promise<GetFeaturesQuery> {
       return withWrapper(() => client.request<GetFeaturesQuery>(print(GetFeaturesDocument), variables));
+    },
+    getSettings(variables?: GetSettingsQueryVariables): Promise<GetSettingsQuery> {
+      return withWrapper(() => client.request<GetSettingsQuery>(print(GetSettingsDocument), variables));
     },
     getInstitutions(variables?: GetInstitutionsQueryVariables): Promise<GetInstitutionsQuery> {
       return withWrapper(() => client.request<GetInstitutionsQuery>(print(GetInstitutionsDocument), variables));
