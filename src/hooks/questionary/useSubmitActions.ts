@@ -21,11 +21,11 @@ export function usePreSubmitActions() {
     const actions = answers.flatMap((answer) => {
       switch (answer.question.dataType) {
         case DataType.SAMPLE_BASIS:
-          return sampleBasisPreSubmit(answer);
+          return sampleBasisPreSubmit();
         case DataType.PROPOSAL_BASIS:
-          return proposalBasisPreSubmit(answer);
+          return proposalBasisPreSubmit();
         case DataType.SHIPMENT_BASIS:
-          return shipmentBasisPreSubmit(answer);
+          return shipmentBasisPreSubmit();
       }
 
       return [];

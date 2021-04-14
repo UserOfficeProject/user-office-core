@@ -15,6 +15,7 @@ export type ProposalSubsetSubmission = Pick<
   | 'callId'
   | 'questionaryId'
   | 'submitted'
+  | 'samples'
 >;
 
 export interface ProposalSubmissionState extends QuestionarySubmissionState {

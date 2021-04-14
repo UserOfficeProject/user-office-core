@@ -18,6 +18,7 @@ context('Samples tests', () => {
   const safetyComment = faker.lorem.words(5);
   const sampleTitle = faker.lorem.words(2);
   const proposalTitleUpdated = faker.lorem.words(2);
+  const sampleQuestionaryQuestion = faker.lorem.words(2);
 
   it('Should be able to create proposal template with sample', () => {
     cy.login('officer');
@@ -25,6 +26,14 @@ context('Samples tests', () => {
     cy.createTemplate('sample', sampleTemplateName, sampleTemplateDescription);
 
     cy.contains('New sample');
+
+    cy.createTopic(faker.lorem.word());
+
+    cy.get('[data-cy=show-more-button]').last().click();
+
+    cy.get('[data-cy=add-question-menu-item]').last().click();
+
+    cy.createTextQuestion(sampleQuestionaryQuestion, false, false);
 
     cy.visit('/');
 
@@ -95,6 +104,10 @@ context('Samples tests', () => {
 
     cy.finishedLoading();
 
+    cy.get(
+      '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
+    ).click();
+
     cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
     cy.get('[data-cy="clone"]').click();
@@ -137,15 +150,23 @@ context('Samples tests', () => {
       .type(sampleTitle)
       .should('have.value', sampleTitle);
 
-    cy.get('[data-cy="sample-declaration-modal"] [data-cy="save-button"]')
-      .focus()
-      .click();
+    cy.get(
+      '[data-cy="sample-declaration-modal"] [data-cy="save-and-continue-button"]'
+    ).click();
+
+    cy.finishedLoading();
+
+    cy.get('body').type('{esc}');
 
     cy.finishedLoading();
 
     cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
+    cy.get('[data-cy="save-and-continue-button"]').click();
+
     cy.contains('All samples must be completed');
+
+    cy.contains(sampleTitle).click();
 
     cy.get(
       '[data-cy="sample-declaration-modal"] [data-cy="save-and-continue-button"]'

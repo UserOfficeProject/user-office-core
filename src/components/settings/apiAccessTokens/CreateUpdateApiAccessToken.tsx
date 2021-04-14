@@ -11,17 +11,11 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
-import {
-  ErrorMessage,
-  Field,
-  FieldArray,
-  FieldArrayRenderProps,
-  Form,
-  Formik,
-} from 'formik';
+import { Field, FieldArray, FieldArrayRenderProps, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 
+import ErrorMessage from 'components/common/ErrorMessage';
 import SimpleTabs from 'components/common/TabPanel';
 import UOLoader from 'components/common/UOLoader';
 import { PermissionsWithAccessToken } from 'generated/sdk';
@@ -38,10 +32,6 @@ const useStyles = makeStyles((theme) => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
-  },
-  error: {
-    color: theme.palette.error.main,
-    marginRight: theme.spacing(1),
   },
   submitContainer: {
     margin: theme.spacing(2, 0, 2),
@@ -306,11 +296,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
             className={classes.submitContainer}
           >
             <Grid item>
-              <ErrorMessage
-                className={classes.error}
-                component="span"
-                name="accessPermissions"
-              />
+              <ErrorMessage name="accessPermissions" />
 
               <Button
                 type="submit"
