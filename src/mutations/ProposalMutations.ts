@@ -248,6 +248,7 @@ export default class ProposalMutations {
   }
 
   @EventBus(Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED)
+  @EventBus(Event.PROPOSAL_STATUS_CHANGED_BY_USER)
   @ValidateArgs(administrationProposalValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async admin(
