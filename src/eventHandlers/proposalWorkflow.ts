@@ -40,11 +40,25 @@ export default function createHandler() {
         proposal.id
       );
 
-      await workflowEngine({
+      const updatedProposals = await workflowEngine({
         ...proposal,
         proposalEvents: allProposalEvents,
         currentEvent: eventType,
       });
+
+      if (updatedProposals) {
+        updatedProposals.forEach(
+          (updatedProposal) =>
+            updatedProposal &&
+            eventBus.publish({
+              type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
+              proposal: updatedProposal,
+              isRejection: false,
+              key: 'proposal',
+              loggedInUserId: event.loggedInUserId,
+            })
+        );
+      }
     };
 
     switch (event.type) {
@@ -71,10 +85,22 @@ export default function createHandler() {
                 const proposal = await proposalDataSource.get(proposalId);
 
                 if (proposal?.id) {
-                  return await markProposalEventAsDoneAndCallWorkflowEngine(
+                  await markProposalEventAsDoneAndCallWorkflowEngine(
                     event.type,
                     proposal
                   );
+
+                  // only if the status changed
+                  // trigger and individual event for the proposal status change
+                  if (event.type === Event.PROPOSAL_STATUS_UPDATED) {
+                    eventBus.publish({
+                      type: Event.PROPOSAL_STATUS_CHANGED_BY_USER,
+                      proposal: proposal,
+                      isRejection: false,
+                      key: 'proposal',
+                      loggedInUserId: event.loggedInUserId,
+                    });
+                  }
                 }
               }
             )

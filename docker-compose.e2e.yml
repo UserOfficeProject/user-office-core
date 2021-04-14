@@ -1,8 +1,8 @@
-version: '3.1'
+version: "3.1"
 
 services:
   backend:
-    image: 'dmsc/duo-backend:${USER_OFFICE_BACKEND_TAG}'
+    image: "dmsc/duo-backend:${USER_OFFICE_BACKEND_TAG}"
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
@@ -13,10 +13,10 @@ services:
       DEPENDENCY_CONFIG: e2e
       USER_OFFICE_FACTORY_ENDPOINT: ${USER_OFFICE_FACTORY_ENDPOINT}
     labels:
-      - 'traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads'
-      - 'traefik.port=4000'
+      - "traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads"
+      - "traefik.port=4000"
     volumes:
-      - './${USER_OFFICE_BACKEND_DIR}/db_patches:/home/node/app/db_patches'
+      - "./${USER_OFFICE_BACKEND_DIR}/db_patches:/home/node/app/db_patches"
 
   db:
     image: postgres:11-alpine
@@ -28,4 +28,4 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - './${USER_OFFICE_BACKEND_DIR}/db_patches/:/docker-entrypoint-initdb.d/'
+      - "./${USER_OFFICE_BACKEND_DIR}/db_patches/:/docker-entrypoint-initdb.d/"
