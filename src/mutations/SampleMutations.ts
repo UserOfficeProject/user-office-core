@@ -144,26 +144,15 @@ export default class SampleMutations {
       return rejection('NOT_AUTHORIZED');
     }
     if (!(await this.sampleAuthorization.hasWriteRights(agent, sampleId))) {
-      return rejection('NOT_AUTHORIZED');
+      return rejection('INSUFFICIENT_PERMISSIONS');
     }
 
     try {
-      const sourceSample = await this.sampleDataSource.getSample(sampleId);
-
-      if (!sourceSample) {
-        return rejection('NOT_FOUND');
-      }
-
-      const clonedQuestionary = await this.questionaryDataSource.clone(
-        sourceSample.questionaryId
-      );
-      const clonedSample = await this.sampleDataSource.create(
-        `Copy of ${sourceSample.title}`,
-        agent.id,
-        sourceSample.proposalId,
-        clonedQuestionary.questionaryId,
-        sourceSample.questionId
-      );
+      let clonedSample = await this.sampleDataSource.cloneSample(sampleId);
+      clonedSample = await this.sampleDataSource.updateSample({
+        sampleId: clonedSample.id,
+        title: `Copy of ${clonedSample.title}`,
+      });
 
       return clonedSample;
     } catch (e) {

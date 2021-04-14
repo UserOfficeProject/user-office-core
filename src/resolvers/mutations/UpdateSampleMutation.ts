@@ -26,6 +26,11 @@ export class UpdateSampleArgs {
 
   @Field(() => SampleStatus, { nullable: true })
   safetyStatus?: SampleStatus;
+
+  // do not expose this fields to a user
+  proposalId?: number;
+  questionaryId?: number;
+  shipmentId?: number | null;
 }
 
 @Resolver()
