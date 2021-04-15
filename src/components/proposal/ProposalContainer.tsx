@@ -76,13 +76,10 @@ const proposalReducer = (
   return draftState;
 };
 
-//Option 1: Change isProposalSubmitted to isProposalEditable and have this be true when proposal status is either DRAFT or EDITABLE_SUBMISSION
-//Option 2: Have the isProposalSubmitted bypassed if the proposal status is EDITABLE_SUBMISSION
 const isProposalSubmitted = (proposal: { submitted: boolean }) =>
   proposal.submitted;
 
-//Is the proposal in draft or edited state? If so set read only to false.
-function isProposalEditable(proposal: ProposalSubsetSubmission) {
+function isReadOnly(proposal: ProposalSubsetSubmission) {
   if (
     proposal.status != null &&
     (proposal.status.shortCode.toString() === 'DRAFT' ||
@@ -107,7 +104,7 @@ const createQuestionaryWizardStep = (
     return {
       title: questionaryStep.topic.title,
       isCompleted: questionaryStep.isCompleted,
-      isReadonly: isProposalEditable(proposalState.proposal),
+      isReadonly: isReadOnly(proposalState.proposal),
     };
   },
 });
@@ -122,8 +119,8 @@ const createReviewWizardStep = (): WizardStep => ({
       title: 'Review',
       isCompleted: isProposalSubmitted(proposalState.proposal),
       isReadonly:
-        isProposalEditable(proposalState.proposal) &&
-        lastProposalStep.isCompleted === false,
+        isReadOnly(proposalState.proposal) &&
+        lastProposalStep.isCompleted === true,
     };
   },
 });
