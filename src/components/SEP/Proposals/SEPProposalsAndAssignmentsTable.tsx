@@ -95,8 +95,8 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     },
     {
       title: 'Reviewers',
-      render: (rowData: SEPProposalType): string =>
-        rowData.assignments ? rowData.assignments.length.toString() : '-',
+      field: 'assignments.length',
+      emptyValue: '-',
     },
     {
       title: 'Average grade',
