@@ -1,8 +1,9 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import { ErrorMessage, Field } from 'formik';
+import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { ChangeEvent, useContext, useState } from 'react';
 
+import ErrorMessage from 'components/common/ErrorMessage';
 import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
@@ -12,7 +13,7 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { Answer, BasicUserDetails } from 'generated/sdk';
+import { BasicUserDetails } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import { EventType } from 'models/QuestionarySubmissionState';
@@ -26,10 +27,6 @@ const useStyles = makeStyles((theme) => ({
   },
   container: {
     margin: theme.spacing(1, 0),
-  },
-  error: {
-    color: theme.palette.error.main,
-    marginRight: '10px',
   },
 }));
 
@@ -133,17 +130,12 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
       />
-      <ErrorMessage
-        name={`${id}.users`}
-        className={classes.error}
-        component="span"
-      />
+      <ErrorMessage name={`${id}.users`} />
     </div>
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const proposalBasisPreSubmit = (answer: Answer) => async ({
+const proposalBasisPreSubmit = () => async ({
   api,
   dispatch,
   state,

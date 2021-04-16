@@ -18,7 +18,7 @@ import {
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import { ShipmentContextType } from 'components/shipments/ShipmentContainer';
-import { Answer, Sample } from 'generated/sdk';
+import { Sample } from 'generated/sdk';
 import { useUserProposals } from 'hooks/proposal/useUserProposals';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { useProposalSamples } from 'hooks/sample/useProposalSamples';
@@ -161,8 +161,7 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const shipmentBasisPreSubmit = (answer: Answer) => async ({
+const shipmentBasisPreSubmit = () => async ({
   api,
   dispatch,
   state,

@@ -13,6 +13,7 @@ mutation createSample(
     sample {
       ...sample
       questionary {
+        isCompleted
         ...questionary
       }
     }

@@ -1,10 +1,8 @@
 query getSamples($filter: SamplesFilter) {
   samples(filter: $filter) {
     ...sample
-    questionary{
-      steps{
-       isCompleted 
-      }
+    questionary {
+      isCompleted
     }
   }
 }
