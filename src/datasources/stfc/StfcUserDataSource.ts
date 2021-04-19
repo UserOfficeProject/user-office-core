@@ -237,8 +237,8 @@ export class StfcUserDataSource implements UserDataSource {
     return stfcUser ? toEssUser(stfcUser) : null;
   }
 
-  async createDummyUser(userId: number): Promise<User> {
-    return await postgresUserDataSource.createDummyUser(userId);
+  async ensureDummyUserExists(userId: number): Promise<User> {
+    return await postgresUserDataSource.ensureDummyUserExists(userId);
   }
 
   async getUsers(
