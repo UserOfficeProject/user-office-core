@@ -2,7 +2,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import { ProviderContext, SnackbarProvider } from 'notistack';
-import React, { ErrorInfo, useContext, useState } from 'react';
+import React, { ErrorInfo, useContext } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import {
   BrowserRouter as Router,
@@ -15,12 +15,10 @@ import { QueryParamProvider } from 'use-query-params';
 
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
-import { FeatureContext } from 'context/FeatureContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
-import { SettingsContextProvider } from 'context/SettingsContextProvider';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
-import { FeatureId, SettingsId } from 'generated/sdk';
+import { SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
 import { getTheme } from '../theme';
@@ -41,7 +39,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   const Component = component; // JSX Elements have to be uppercase.
   const context = useContext(SettingsContext);
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const external_auth_login_url = !!context.settings.get(
+  const external_auth_login_url = context.settings.get(
     SettingsId.EXTERNAL_AUTH_LOGIN_URL
   );
 
@@ -56,7 +54,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
                 process.env.REACT_APP_AUTH_TYPE === 'external' &&
                 external_auth_login_url
               ) {
-                window.location.href = external_auth_login_url;
+                window.location.href = external_auth_login_url.addValue;
 
                 return <p>Redirecting to external sign-in page...</p>;
               }
