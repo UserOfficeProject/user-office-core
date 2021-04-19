@@ -2,6 +2,7 @@ import { Page } from '../models/Admin';
 import { Feature } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { Permissions } from '../models/Permissions';
+import { Settings } from '../models/Settings';
 import { Unit } from '../models/Unit';
 import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
