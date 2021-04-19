@@ -62,7 +62,6 @@ export class SMTPMailService extends MailService {
                       process.env.NODE_ENV === 'development'
                         ? <string>process.env.SINK_EMAIL
                         : participant.address.email,
-                    // : 'BISAPPSSINK@stfc.ac.uk',
                     name: participant.address.header_to,
                   },
                 }
@@ -71,7 +70,6 @@ export class SMTPMailService extends MailService {
                     process.env.NODE_ENV === 'development'
                       ? <string>process.env.SINK_EMAIL
                       : participant.address,
-                  // : 'BISAPPSSINK@stfc.ac.uk',
                 }),
           },
           locals: options.substitution_data,
