@@ -7,7 +7,7 @@ import {
   QuestionaryStep,
 } from '../../models/Questionary';
 import { getDefaultAnswerValue } from '../../models/questionTypes/QuestionRegistry';
-import { FieldDependency, Template } from '../../models/Template';
+import { FieldDependency, Template, Topic } from '../../models/Template';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
@@ -26,6 +26,30 @@ import {
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
+  async getIsCompleted(questionaryId: number): Promise<boolean> {
+    const unFinishedTopics: Topic[] = (
+      await database.raw(
+        `
+        SELECT *
+        FROM topics
+        LEFT JOIN (
+            SELECT *
+            FROM topic_completenesses
+            WHERE questionary_id = ?
+          ) topic_completenesses ON topic_completenesses.topic_id = topics.topic_id
+        WHERE topics.template_id =(
+              select template_id
+              from questionaries
+              where questionary_id = ?
+          )
+          AND topic_completenesses.is_complete IS NOT true`,
+        [questionaryId, questionaryId]
+      )
+    ).rows;
+
+    return unFinishedTopics.length === 0;
+  }
+
   async deleteAnswers(
     questionary_id: number,
     question_ids: string[]

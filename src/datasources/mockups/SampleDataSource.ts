@@ -24,8 +24,8 @@ export class SampleDataSourceMock implements SampleDataSource {
       ),
     ];
   }
-  async getSample(sampleId: number): Promise<Sample> {
-    return this.samples.find((sample) => sample.id === sampleId)!;
+  async getSample(sampleId: number): Promise<Sample | null> {
+    return this.samples.find((sample) => sample.id === sampleId) || null;
   }
 
   async getSamples(_args: SamplesArgs): Promise<Sample[]> {
@@ -64,6 +64,9 @@ export class SampleDataSourceMock implements SampleDataSource {
 
   async updateSample(args: UpdateSampleArgs): Promise<Sample> {
     const sample = await this.getSample(args.sampleId);
+    if (!sample) {
+      throw new Error('Sample not found');
+    }
     sample.title = args.title || sample.title;
     sample.safetyComment = args.safetyComment || sample.safetyComment;
     sample.safetyStatus = args.safetyStatus || sample.safetyStatus;
@@ -73,8 +76,11 @@ export class SampleDataSourceMock implements SampleDataSource {
 
   async cloneSample(sampleId: number): Promise<Sample> {
     const sample = await this.getSample(sampleId);
+    if (!sample) {
+      throw new Error('Sample not found');
+    }
 
-    return { ...sample, id: sample.id++ };
+    return sample;
   }
 
   async getSamplesByShipmentId(_shipmentId: number): Promise<Sample[]> {
