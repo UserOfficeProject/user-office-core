@@ -132,6 +132,16 @@ interface ProposalSEPMeetingSubmittedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalStatusChangedByWorkflowEvent extends GeneralEvent {
+  type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW;
+  proposal: Proposal;
+}
+
+interface ProposalStatusChangedByUserEvent extends GeneralEvent {
+  type: Event.PROPOSAL_STATUS_CHANGED_BY_USER;
+  proposal: Proposal;
+}
+
 interface ProposalSEPMeetingSavedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_MEETING_SAVED;
   sepmeetingdecision: SepMeetingDecision;
@@ -277,6 +287,8 @@ export type ApplicationEvent =
   | ProposalSEPSelectedEvent
   | ProposalInstrumentSubmittedEvent
   | ProposalSEPMeetingSubmittedEvent
+  | ProposalStatusChangedByWorkflowEvent
+  | ProposalStatusChangedByUserEvent
   | ProposalSEPMeetingSavedEvent
   | ProposalSEPMeetingRankingOverwrittenEvent
   | ProposalSEPMeetingReorderEvent;

@@ -1,13 +1,16 @@
 import { logger } from '@esss-swap/duo-logger';
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import { Event } from '../../events/event.enum';
-import { Call } from '../../models/Call';
 import { Proposal, ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ProposalDataSource } from '../ProposalDataSource';
+import { QuestionaryDataSource } from '../QuestionaryDataSource';
+import { SampleDataSource } from '../SampleDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
 import {
@@ -17,7 +20,6 @@ import {
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
-  QuestionaryRecord,
   StatusChangingEventRecord,
 } from './records';
 
@@ -54,7 +56,14 @@ export async function calculateReferenceNumber(
   return prefix + paddedSequence;
 }
 
+@injectable()
 export default class PostgresProposalDataSource implements ProposalDataSource {
+  constructor(
+    @inject(Tokens.QuestionaryDataSource)
+    private questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.SampleDataSource)
+    private sampleDataSource: SampleDataSource
+  ) {}
   // TODO move this function to callDataSource
   public async checkActiveCall(callId: number): Promise<boolean> {
     const currentDate = new Date().toISOString();
@@ -194,9 +203,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         {
           title: proposal.title,
           abstract: proposal.abstract,
-          status_id: proposal.statusId,
           proposer_id: proposal.proposerId,
+          status_id: proposal.statusId,
+          created_at: proposal.created,
+          updated_at: proposal.updated,
+          short_code: proposal.shortCode,
           final_status: proposal.finalStatus,
+          call_id: proposal.callId,
+          questionary_id: proposal.questionaryId,
           comment_for_user: proposal.commentForUser,
           comment_for_management: proposal.commentForManagement,
           notified: proposal.notified,
@@ -531,46 +545,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async cloneProposal(
-    clonerId: number,
-    sourceProposal: Proposal,
-    call: Call
-  ): Promise<Proposal> {
-    const [newQuestionary]: QuestionaryRecord[] = (
-      await database.raw(`
-      INSERT INTO questionaries
-      (
-        template_id,
-        creator_id
-      )
-      SELECT
-        ${call.templateId},
-        ${clonerId}
-      FROM 
-        questionaries
-      WHERE
-        questionary_id = ${sourceProposal.questionaryId}
-      RETURNING *
-    `)
-    ).rows;
-
-    await database.raw(`
-      INSERT INTO answers
-      (
-        questionary_id,
-        question_id,
-        answer
-      )
-      SELECT
-        ${newQuestionary.questionary_id},
-        question_id,
-        answer
-      FROM 
-        answers
-      WHERE
-        questionary_id = ${sourceProposal.questionaryId}
-    `);
-
+  async cloneProposal(sourceProposal: Proposal): Promise<Proposal> {
     const [newProposal]: ProposalRecord[] = (
       await database.raw(`
       INSERT INTO proposals
@@ -579,20 +554,34 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         abstract,
         status_id,
         proposer_id,
+        created_at,
+        updated_at,
+        final_status,
         call_id,
         questionary_id,
+        comment_for_management,
+        comment_for_user,
         notified,
-        submitted
+        submitted,
+        management_decision_submitted,
+        management_time_allocation
       )
       SELECT
-        'Copy of ${sourceProposal.title}',
+        title,
         abstract,
-        1,
+        status_id,
         proposer_id,
-        ${call.id},
-        ${newQuestionary.questionary_id},
-        false,
-        false
+        created_at,
+        updated_at,
+        final_status,
+        call_id,
+        questionary_id,
+        comment_for_management,
+        comment_for_user,
+        notified,
+        submitted,
+        management_decision_submitted,
+        management_time_allocation
       FROM 
         proposals
       WHERE
@@ -600,22 +589,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       RETURNING *
     `)
     ).rows;
-
-    await database.raw(`
-      INSERT INTO proposal_user
-      (
-        proposal_id,
-        user_id
-      )
-      SELECT
-        ${newProposal.proposal_id},
-        user_id
-      FROM 
-        proposal_user
-      WHERE
-        proposal_id = ${sourceProposal.id}
-      RETURNING *
-    `);
 
     return createProposalObject(newProposal);
   }

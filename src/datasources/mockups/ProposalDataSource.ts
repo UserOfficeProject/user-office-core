@@ -205,11 +205,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return 1;
   }
 
-  async cloneProposal(
-    clonerId: number,
-    proposal: Proposal,
-    call: Call
-  ): Promise<Proposal> {
+  async cloneProposal(proposal: Proposal, call: Call): Promise<Proposal> {
     return dummyProposal;
   }
 

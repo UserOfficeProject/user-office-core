@@ -22,6 +22,7 @@ import { Instrument } from './Instrument';
 import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
+import { Sample } from './Sample';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
 import { TechnicalReview } from './TechnicalReview';
@@ -193,6 +194,16 @@ export class ProposalResolver {
       context.user,
       proposal.id
     );
+  }
+
+  @FieldResolver(() => [Sample], { nullable: true })
+  async samples(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Sample[] | null> {
+    return await context.queries.sample.getSamples(context.user, {
+      filter: { proposalId: proposal.id },
+    });
   }
 }
 

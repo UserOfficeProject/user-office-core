@@ -59,6 +59,21 @@ export default class QuestionaryQueries {
     return this.dataSource.getCount(templateId);
   }
 
+  @Authorized()
+  async isCompleted(agent: UserWithRole | null, questionaryId: number) {
+    const hasRights = await this.authorizer.hasReadRights(agent, questionaryId);
+    if (!hasRights) {
+      logger.logWarn('Permissions violated trying to access isComplete', {
+        email: agent?.email,
+        questionaryId,
+      });
+
+      return false;
+    }
+
+    return this.dataSource.getIsCompleted(questionaryId);
+  }
+
   async getBlankQuestionarySteps(
     agent: UserWithRole | null,
     templateId: number

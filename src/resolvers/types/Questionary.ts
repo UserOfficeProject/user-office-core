@@ -36,4 +36,15 @@ export class QuestionaryResolver {
       questionary.questionaryId
     );
   }
+
+  @FieldResolver(() => Boolean)
+  async isCompleted(
+    @Root() questionary: Questionary,
+    @Ctx() context: ResolverContext
+  ): Promise<boolean> {
+    return context.queries.questionary.isCompleted(
+      context.user,
+      questionary.questionaryId
+    );
+  }
 }

@@ -21,7 +21,6 @@ BEGIN
      , created_at
      , updated_at
      , short_code
-     , rank_order
      , final_status
      , call_id
      , questionary_id
@@ -40,7 +39,6 @@ BEGIN
      , NOW()              -- created_at
      , NOW()              -- updated_at
      , '999999'           -- short_code
-     , NULL               -- rank_order
      , 1                  -- final_status
      , 1                  -- call_id
      , 1                  -- questionary_id
