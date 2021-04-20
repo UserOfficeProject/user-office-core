@@ -191,8 +191,8 @@ jobs:
           cp src/generated/sdk.ts /tmp/sdk_pipeline_generated.ts
 
           # for debugging
-          echo "GIT_TRACKED_SUM: $GIT_TRACKED_SUM"
-          echo "PIPELINE_GENERATED_SUM: $PIPELINE_GENERATED_SUM"
+          echo -e "GIT_TRACKED_SUM:\t$GIT_TRACKED_SUM"
+          echo -e "PIPELINE_GENERATED_SUM:\t$PIPELINE_GENERATED_SUM"
           git diff
 
           # if there is a mismatch it will fail

@@ -9,7 +9,7 @@ import { useProposalData } from 'hooks/proposal/useProposalData';
 import ProposalContainer from './ProposalContainer';
 
 export default function ProposalEdit() {
-  const { proposalID } = useParams();
+  const { proposalID } = useParams<{ proposalID: string }>();
 
   const { proposalData } = useProposalData(+proposalID);
 
@@ -19,12 +19,10 @@ export default function ProposalEdit() {
   if (proposalData.notified) {
     return (
       <SimpleTabs tabNames={['Comment', 'Proposal']}>
-        <>
-          <p>
-            Decision: {getTranslation(proposalData.finalStatus as ResourceId)}
-          </p>
-          <p>Comment: {proposalData.commentForUser}</p>
-        </>
+        <p>
+          Decision: {getTranslation(proposalData.finalStatus as ResourceId)}
+        </p>
+        <p>Comment: {proposalData.commentForUser}</p>
         <ProposalContainer proposal={proposalData} />
       </SimpleTabs>
     );

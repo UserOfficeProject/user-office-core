@@ -6,7 +6,7 @@ import TableRow from '@material-ui/core/TableRow';
 import React, { FC } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { Answer } from 'generated/sdk';
+import { Answer, DataType } from 'generated/sdk';
 import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import {
   areDependenciesSatisfied,
@@ -54,7 +54,8 @@ function QuestionaryDetails(
     );
 
     return (
-      !definition.readonly &&
+      (!definition.readonly ||
+        field.question.dataType === DataType.SAMPLE_DECLARATION) &&
       areDependenciesSatisfied(questionary.steps, field.question.id)
     );
   });

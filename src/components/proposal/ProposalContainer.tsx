@@ -76,7 +76,7 @@ const proposalReducer = (
   return draftState;
 };
 
-const isProposalSubmitted = (proposal: { submitted: boolean }) =>
+const isProposalSubmitted = (proposal: Pick<Proposal, 'submitted'>) =>
   proposal.submitted;
 
 const createQuestionaryWizardStep = (
