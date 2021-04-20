@@ -6,7 +6,7 @@ import TableRow from '@material-ui/core/TableRow';
 import React, { FC } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { Answer, DataType } from 'generated/sdk';
+import { Answer, DataType, Question } from 'generated/sdk';
 import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import {
   areDependenciesSatisfied,
@@ -82,24 +82,26 @@ function QuestionaryDetails(
           )}
 
           {/* questionary details */}
-          {displayableQuestions.map((question) => {
+          {displayableQuestions.map((answer) => {
             const renderers = getQuestionaryComponentDefinition(
-              question.question.dataType
+              answer.question.dataType
             ).renderers;
 
             if (!renderers) {
               return null;
             }
 
-            const questionElem = renderers.questionRenderer({
-              question: question.question,
-            });
-            const answerElem = renderers.answerRenderer({
-              answer: question,
-            });
+            const questionElem = React.createElement<Question>(
+              renderers.questionRenderer,
+              answer.question
+            );
+            const answerElem = React.createElement<Answer>(
+              renderers.answerRenderer,
+              answer
+            );
 
             return createTableRow(
-              `answer-${question.answerId}-${question.question.id}`,
+              `answer-${answer.answerId}-${answer.question.id}`,
               {
                 label: questionElem,
                 value: answerElem,
