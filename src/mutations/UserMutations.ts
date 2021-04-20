@@ -403,11 +403,7 @@ export default class UserMutations {
       // This is needed to satisfy the FOREIGN_KEY constraints
       // in tables that link to a user (such as proposals)
       const userNumber = parseInt(stfcUser.userNumber);
-      let dummyUser = await this.dataSource.get(userNumber);
-      if (!dummyUser) {
-        dummyUser = await this.dataSource.createDummyUser(userNumber);
-      }
-
+      const dummyUser = await this.dataSource.ensureDummyUserExists(userNumber);
       const roles = await this.dataSource.getUserRoles(dummyUser.id);
 
       const proposalsToken = signToken<AuthJwtPayload>({
