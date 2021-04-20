@@ -59,7 +59,7 @@ export class SMTPMailService extends MailService {
               ? {
                   to: {
                     address:
-                      process.env.NODE_ENV === 'development'
+                      process.env.NODE_ENV !== 'production'
                         ? <string>process.env.SINK_EMAIL
                         : participant.address.email,
                     name: participant.address.header_to,
@@ -67,7 +67,7 @@ export class SMTPMailService extends MailService {
                 }
               : {
                   to:
-                    process.env.NODE_ENV === 'development'
+                    process.env.NODE_ENV !== 'production'
                       ? <string>process.env.SINK_EMAIL
                       : participant.address,
                 }),
