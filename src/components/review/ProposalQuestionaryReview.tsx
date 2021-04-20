@@ -2,9 +2,8 @@ import { TableProps } from '@material-ui/core';
 import React, { FunctionComponent } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import QuestionaryDetails, {
-  TableRowData,
-} from 'components/questionary/QuestionaryDetails';
+import ProposalQuestionaryDetails from 'components/proposal/ProposalQuestionaryDetails';
+import { TableRowData } from 'components/questionary/QuestionaryDetails';
 import { BasicUserDetails } from 'generated/sdk';
 import { ProposalSubsetSubmission } from 'models/ProposalSubmissionState';
 
@@ -38,10 +37,11 @@ export default function ProposalQuestionaryReview(
   ];
 
   return (
-    <QuestionaryDetails
+    <ProposalQuestionaryDetails
       questionaryId={data.questionaryId}
       additionalDetails={additionalDetails}
       title="Proposal information"
+      proposalId={data.id}
       {...restProps}
     />
   );
