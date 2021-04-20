@@ -6,9 +6,9 @@ import React, { useContext, useState } from 'react';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
+import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionaryContext } from 'components/questionary/QuestionaryContext';
 import SampleDetails from 'components/sample/SampleDetails';
-import { Answer } from 'generated/sdk';
 import { useSamples } from 'hooks/sample/useSamples';
 import { SampleBasic } from 'models/Sample';
 
@@ -44,13 +44,13 @@ function SampleList(props: {
   );
 }
 
-function SamplesAnswerRenderer(props: { answer: Answer }) {
+const SamplesAnswerRenderer: AnswerRenderer = ({ question }) => {
   const [selectedSampleId, setSelectedSampleId] = useState<number | null>(null);
   const { state } = useContext(QuestionaryContext) as ProposalContextType;
 
   const { samples } = useSamples({
     proposalId: state?.proposal.id,
-    questionId: props.answer.question.id,
+    questionId: question.id,
   });
 
   return (
@@ -80,6 +80,6 @@ function SamplesAnswerRenderer(props: { answer: Answer }) {
       </InputDialog>
     </div>
   );
-}
+};
 
 export default SamplesAnswerRenderer;

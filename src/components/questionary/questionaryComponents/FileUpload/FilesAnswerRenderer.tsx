@@ -3,7 +3,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import React from 'react';
 
 import { FileIdWithCaptionAndFigure } from 'components/common/FileUploadComponent';
-import { Answer } from 'generated/sdk';
+import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
 import { useFileMetadata } from 'hooks/file/useFileMetadata';
 import { FileMetaData } from 'models/FileUpload';
 
@@ -39,16 +39,12 @@ function DownloadableFileList(props: { fileIds: string[] }) {
   );
 }
 
-function FilesAnswerRenderer(props: { answer: Answer }) {
-  return (
-    <div>
-      <DownloadableFileList
-        fileIds={props.answer.value.map(
-          (fileItem: FileIdWithCaptionAndFigure) => fileItem.id
-        )}
-      />
-    </div>
-  );
-}
+const FilesAnswerRenderer: AnswerRenderer = ({ value }) => (
+  <div>
+    <DownloadableFileList
+      fileIds={value.map((fileItem: FileIdWithCaptionAndFigure) => fileItem.id)}
+    />
+  </div>
+);
 
 export default FilesAnswerRenderer;

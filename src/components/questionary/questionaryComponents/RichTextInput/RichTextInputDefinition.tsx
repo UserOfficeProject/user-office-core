@@ -8,7 +8,10 @@ import { createRichTextInputValidationSchema } from './createRichTextInputValida
 import { QuestionaryComponentRichTextInput } from './QuestionaryComponentRichTextInput';
 import { QuestionRichTextInputForm } from './QuestionRichTextInputForm';
 import { QuestionTemplateRelationRichTextInputForm } from './QuestionTemplateRelationRichTextInputForm';
-import richTextInputRenderer from './RichTextInputRenderer';
+import {
+  RichTextInputAnswerRenderer,
+  RichTextInputQuestionRenderer,
+} from './RichTextInputRenderer';
 
 export const richTextInputDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.RICH_TEXT_INPUT,
@@ -19,7 +22,10 @@ export const richTextInputDefinition: QuestionaryComponentDefinition = {
   readonly: false,
   creatable: true,
   icon: <TextFormatIcon />,
-  renderers: richTextInputRenderer,
+  renderers: {
+    questionRenderer: RichTextInputQuestionRenderer,
+    answerRenderer: RichTextInputAnswerRenderer,
+  },
   createYupValidationSchema: createRichTextInputValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || '',
 };
