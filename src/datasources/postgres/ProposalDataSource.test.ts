@@ -283,4 +283,21 @@ describe('Submit proposal', () => {
       proposalSequence: proposals.length,
     });
   });
+
+  test('In a call with a reference number format, when a cloned proposal is submitted, it is given a unique reference number', async () => {
+    const call = await createCall('211{digits:4}{other:param}text');
+    const original = await createProposal(call.id);
+    await proposalDataSource.submitProposal(original.id);
+    const cloned = await proposalDataSource.cloneProposal(original);
+
+    const submission = proposalDataSource.submitProposal(cloned.id);
+
+    return expect(submission).resolves.toEqual(
+      expect.objectContaining({
+        shortCode: '2110001',
+        submitted: true,
+        referenceNumberSequence: 1,
+      })
+    );
+  });
 });
