@@ -49,11 +49,11 @@ export interface QuestionTemplateRelationFormProps {
   children?: FormChildren<QuestionTemplateRelation>;
 }
 
+export type QuestionRenderer = React.FunctionComponent<Question>;
+export type AnswerRenderer = React.FunctionComponent<Answer>;
 export interface Renderers {
-  readonly questionRenderer: (props: {
-    question: Question;
-  }) => JSX.Element | null;
-  readonly answerRenderer: (props: { answer: Answer }) => JSX.Element | null;
+  readonly questionRenderer: QuestionRenderer;
+  readonly answerRenderer: AnswerRenderer;
 }
 
 export interface QuestionaryComponentDefinition {

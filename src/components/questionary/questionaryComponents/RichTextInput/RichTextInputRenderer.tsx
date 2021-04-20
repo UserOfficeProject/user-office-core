@@ -7,10 +7,15 @@ import IconButton from '@material-ui/core/IconButton';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import React, { useState } from 'react';
 
-import { Renderers } from 'components/questionary/QuestionaryComponentRegistry';
-import { Answer, Question } from 'generated/sdk';
+import {
+  AnswerRenderer,
+  QuestionRenderer,
+} from 'components/questionary/QuestionaryComponentRegistry';
 
-const RichTextInputAnswerRenderer = ({ answer }: { answer: Answer }) => {
+export const RichTextInputAnswerRendererComponent: AnswerRenderer = ({
+  question,
+  value,
+}) => {
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => setOpen(true);
@@ -18,19 +23,16 @@ const RichTextInputAnswerRenderer = ({ answer }: { answer: Answer }) => {
 
   return (
     <span>
-      <IconButton
-        onClick={handleClickOpen}
-        data-cy={`${answer.question.id}_open`}
-      >
+      <IconButton onClick={handleClickOpen} data-cy={`${question.id}_open`}>
         <VisibilityIcon />
       </IconButton>
       <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
-        <DialogTitle>{answer.question.question}</DialogTitle>
+        <DialogTitle>{question.question}</DialogTitle>
 
         <DialogContent>
           <div
             dangerouslySetInnerHTML={{
-              __html: answer.value,
+              __html: value,
             }}
           />
         </DialogContent>
@@ -45,17 +47,10 @@ const RichTextInputAnswerRenderer = ({ answer }: { answer: Answer }) => {
   );
 };
 
-const RichTextInputAnswerRendererComponent = (props: { answer: Answer }) => (
-  <RichTextInputAnswerRenderer {...props} />
+export const RichTextInputAnswerRenderer: AnswerRenderer = (answer) => (
+  <RichTextInputAnswerRendererComponent {...answer} />
 );
 
-const questionRendererComponent = ({ question }: { question: Question }) => (
+export const RichTextInputQuestionRenderer: QuestionRenderer = (question) => (
   <span>{question.question}</span>
 );
-
-const richTextInputRenderer: Renderers = {
-  answerRenderer: RichTextInputAnswerRendererComponent,
-  questionRenderer: questionRendererComponent,
-};
-
-export default richTextInputRenderer;

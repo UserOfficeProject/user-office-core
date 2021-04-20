@@ -1,12 +1,10 @@
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
-import { ProposalContextType } from 'components/proposal/ProposalContainer';
-import { QuestionaryContext } from 'components/questionary/QuestionaryContext';
 import SampleDetails from 'components/sample/SampleDetails';
 import { Answer } from 'generated/sdk';
 import { useSamples } from 'hooks/sample/useSamples';
@@ -44,13 +42,20 @@ function SampleList(props: {
   );
 }
 
-function SamplesAnswerRenderer(props: { answer: Answer }) {
+interface SamplesAnswerRendererProps {
+  proposalId: number;
+  answer: Answer;
+}
+
+const SamplesAnswerRenderer = ({
+  proposalId,
+  answer,
+}: SamplesAnswerRendererProps) => {
   const [selectedSampleId, setSelectedSampleId] = useState<number | null>(null);
-  const { state } = useContext(QuestionaryContext) as ProposalContextType;
 
   const { samples } = useSamples({
-    proposalId: state?.proposal.id,
-    questionId: props.answer.question.id,
+    proposalId: proposalId,
+    questionId: answer.question.id,
   });
 
   return (
@@ -80,6 +85,6 @@ function SamplesAnswerRenderer(props: { answer: Answer }) {
       </InputDialog>
     </div>
   );
-}
+};
 
 export default SamplesAnswerRenderer;
