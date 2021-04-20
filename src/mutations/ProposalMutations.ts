@@ -458,6 +458,7 @@ export default class ProposalMutations {
         commentForManagement: '',
         notified: false,
         submitted: false,
+        referenceNumberSequence: 0,
         managementTimeAllocation: 0,
         managementDecisionSubmitted: false,
       });

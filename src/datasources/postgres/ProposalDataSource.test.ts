@@ -1,8 +1,8 @@
 /* eslint-disable jest/valid-expect */
 /* eslint-disable quotes */
 import 'reflect-metadata';
-
 import BluePromise from 'bluebird';
+import { container } from 'tsyringe';
 
 import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
@@ -10,7 +10,7 @@ import database from './database';
 import ProposalDataSource from './ProposalDataSource';
 import { createCallObject, createProposalObject } from './records';
 
-const proposalDataSource = new ProposalDataSource();
+const proposalDataSource = container.resolve(ProposalDataSource);
 
 async function createProposal(callId: number): Promise<Proposal> {
   const proposal = await database('proposals')
