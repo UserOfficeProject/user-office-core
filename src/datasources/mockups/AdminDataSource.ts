@@ -91,7 +91,7 @@ export class AdminDataSourceMock implements AdminDataSource {
     return [
       {
         id: SettingsId.EXTERNAL_AUTH_LOGIN_URL,
-        addValue: 'https://devusers.facilities.rl.ac.uk/auth/Login.aspx',
+        addValue: '',
         description: '',
       },
     ];
