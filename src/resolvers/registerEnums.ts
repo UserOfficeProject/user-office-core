@@ -11,6 +11,7 @@ import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
 import { QuestionFilterCompareOperator } from '../models/Questionary';
 import { ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
+import { SettingsId } from '../models/Settings';
 import { ShipmentStatus } from '../models/Shipment';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { DataType, TemplateCategoryId } from '../models/Template';
@@ -34,6 +35,7 @@ export const registerEnums = () => {
     name: 'DependenciesLogicOperator',
   });
   registerEnumType(FeatureId, { name: 'FeatureId' });
+  registerEnumType(SettingsId, { name: 'SettingsId' });
   registerEnumType(NumberValueConstraint, { name: 'NumberValueConstraint' });
   registerEnumType(QuestionFilterCompareOperator, {
     name: 'QuestionFilterCompareOperator',
