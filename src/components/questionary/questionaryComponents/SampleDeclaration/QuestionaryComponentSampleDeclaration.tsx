@@ -1,3 +1,4 @@
+import { makeStyles } from '@material-ui/core';
 import { Field, FieldProps, FormikProps } from 'formik';
 import React, { useContext, useState } from 'react';
 
@@ -26,6 +27,13 @@ import {
 } from '../QuestionnairesList';
 import { SampleDeclarationContainer } from './SampleDeclarationContainer';
 
+const useStyles = makeStyles(() => ({
+  questionLabel: {
+    opacity: 0.54,
+    fontWeight: 400,
+    fontSize: '1rem',
+  },
+}));
 const sampleToListRow = (sample: SampleBasic): QuestionnairesListRow => {
   return {
     id: sample.id,
@@ -76,6 +84,7 @@ function QuestionaryComponentSampleDeclaration(
   const { state } = useContext(QuestionaryContext) as ProposalContextType;
 
   const { api } = useDataApiWithFeedback();
+  const classes = useStyles();
 
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
 
@@ -110,6 +119,9 @@ function QuestionaryComponentSampleDeclaration(
 
         return (
           <div>
+            <label className={classes.questionLabel}>
+              {answer.question.question}
+            </label>
             <QuestionnairesList
               addButtonLabel={config.addEntryButtonLabel}
               data={field.value?.map(sampleToListRow) ?? []}

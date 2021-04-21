@@ -9,7 +9,6 @@ import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegist
 import QuestionaryComponentSampleDeclaration from './QuestionaryComponentSampleDeclaration';
 import { QuestionSampleDeclarationForm } from './QuestionSampleDeclarationForm';
 import { QuestionTemplateRelationSampleDeclarationForm } from './QuestionTemplateRelationSampleDeclarationForm';
-import SamplesAnswerRenderer from './SamplesAnswerRenderer';
 
 export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.SAMPLE_DECLARATION,
@@ -22,7 +21,7 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <AssignmentIcon />,
   renderers: {
-    answerRenderer: SamplesAnswerRenderer,
+    answerRenderer: () => null,
     questionRenderer: defaultRenderer.questionRenderer,
   },
   createYupValidationSchema: (answer) => {
