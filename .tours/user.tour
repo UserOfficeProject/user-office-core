@@ -1,0 +1,27 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "user",
+  "steps": [
+    {
+      "file": "src/components/App.tsx",
+      "description": "This is our component from React.",
+      "line": 39,
+      "selection": {
+        "start": {
+          "line": 37,
+          "character": 1
+        },
+        "end": {
+          "line": 38,
+          "character": 1
+        }
+      }
+    },
+    {
+      "file": "src/context/SettingsContextProvider.tsx",
+      "description": "We use the context for settings by creating the SettingsContext with createContext.",
+      "line": 26
+    }
+  ],
+  "ref": "53-sandbox"
+}

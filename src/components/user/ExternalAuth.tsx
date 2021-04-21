@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useRef } from 'react';
 
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
+import { SettingsId } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 
 const ExternalAuthPropTypes = {
@@ -21,6 +23,12 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
 
   const isFirstRun = useRef<boolean>(true);
 
+  const context = useContext(SettingsContext);
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const external_auth_login_url = context.settings.get(
+    SettingsId.EXTERNAL_AUTH_LOGIN_URL
+  );
+
   useEffect(() => {
     if (!isFirstRun.current) {
       return;
@@ -36,13 +44,12 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
           handleLogin(token.checkExternalToken.token);
           window.location.href = '/';
         } else {
-          if (process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL) {
-            window.location.href =
-              process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL;
+          if (external_auth_login_url) {
+            window.location.href = external_auth_login_url.addValue;
           }
         }
       });
-  }, [token, handleLogin, sessionId, unauthorizedApi]);
+  }, [token, handleLogin, sessionId, unauthorizedApi, external_auth_login_url]);
 
   return <p>Logging in with external service...</p>;
 };

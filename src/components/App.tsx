@@ -16,6 +16,7 @@ import { QueryParamProvider } from 'use-query-params';
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
+import { SettingsContextProvider } from 'context/SettingsContextProvider';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { SettingsId } from 'generated/sdk';
@@ -52,7 +53,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
             if (!token) {
               if (
                 process.env.REACT_APP_AUTH_TYPE === 'external' &&
-                external_auth_login_url
+                external_auth_login_url?.addValue
               ) {
                 window.location.href = external_auth_login_url.addValue;
 
@@ -150,17 +151,19 @@ class App extends React.Component {
                 </IconButton>
               )}
             >
-              <FeatureContextProvider>
-                <DownloadContextProvider>
-                  <ReviewAndAssignmentContextProvider>
-                    <Router>
-                      <QueryParamProvider ReactRouterRoute={Route}>
-                        <div className="App">{routes}</div>
-                      </QueryParamProvider>
-                    </Router>
-                  </ReviewAndAssignmentContextProvider>
-                </DownloadContextProvider>
-              </FeatureContextProvider>
+              <SettingsContextProvider>
+                <FeatureContextProvider>
+                  <DownloadContextProvider>
+                    <ReviewAndAssignmentContextProvider>
+                      <Router>
+                        <QueryParamProvider ReactRouterRoute={Route}>
+                          <div className="App">{routes}</div>
+                        </QueryParamProvider>
+                      </Router>
+                    </ReviewAndAssignmentContextProvider>
+                  </DownloadContextProvider>
+                </FeatureContextProvider>
+              </SettingsContextProvider>
             </SnackbarProvider>
           </UserContextProvider>
         </CookiesProvider>

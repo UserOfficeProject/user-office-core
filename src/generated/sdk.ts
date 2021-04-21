@@ -1775,6 +1775,7 @@ export type Query = {
   checkEmailExist: Maybe<Scalars['Boolean']>;
   eventLogs: Maybe<Array<EventLog>>;
   features: Array<Feature>;
+  settings: Array<Settings>;
   fileMetadata: Maybe<Array<FileMetadata>>;
   allAccessTokensAndPermissions: Maybe<Array<PermissionsWithAccessToken>>;
   queriesAndMutations: Maybe<QueriesAndMutations>;
@@ -7049,7 +7050,7 @@ export const GetFeaturesDocument = gql`
     `;
 export const GetSettingsDocument = gql`
     query getSettings {
-  features {
+  settings {
     id
     addValue
     description
