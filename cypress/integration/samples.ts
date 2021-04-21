@@ -108,6 +108,8 @@ context('Samples tests', () => {
       '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
     ).click();
 
+    cy.finishedLoading();
+
     cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
     cy.get('[data-cy="clone"]').click();

@@ -28,14 +28,22 @@ export interface TableRowData {
   label: JSX.Element | string | null;
   value: JSX.Element | string | null;
 }
-function QuestionaryDetails(
-  props: {
-    questionaryId: number;
-    additionalDetails?: Array<TableRowData>;
-    title?: string;
-  } & TableProps<FC<unknown>>
-) {
-  const { questionaryId, additionalDetails, title, ...restProps } = props;
+export interface QuestionaryDetailsProps extends TableProps<FC<unknown>> {
+  questionaryId: number;
+  additionalDetails?: Array<TableRowData>;
+  title?: string;
+  answerRenderer?: (answer: Answer) => JSX.Element | null;
+}
+
+function QuestionaryDetails(props: QuestionaryDetailsProps) {
+  const {
+    answerRenderer,
+    questionaryId,
+    additionalDetails,
+    title,
+    ...restProps
+  } = props;
+
   const { questionary, loadingQuestionary } = useQuestionary(questionaryId);
   const classes = useStyles();
 
@@ -95,10 +103,9 @@ function QuestionaryDetails(
               renderers.questionRenderer,
               answer.question
             );
-            const answerElem = React.createElement<Answer>(
-              renderers.answerRenderer,
-              answer
-            );
+            const answerElem =
+              answerRenderer?.(answer) ||
+              React.createElement<Answer>(renderers.answerRenderer, answer);
 
             return createTableRow(
               `answer-${answer.answerId}-${answer.question.id}`,
