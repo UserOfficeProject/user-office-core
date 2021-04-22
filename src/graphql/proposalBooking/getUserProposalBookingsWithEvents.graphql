@@ -1,10 +1,14 @@
-query getUserProposalBookingsWithEvents($endsAfter: TzLessDateTime) {
+query getUserProposalBookingsWithEvents(
+  $endsAfter: TzLessDateTime
+  $status: [ProposalBookingStatus!]
+  $instrumentId: Int
+) {
   me {
-    proposals {
+    proposals(instrumentId: $instrumentId) {
       id
       title
       shortCode
-      proposalBooking {
+      proposalBooking(filter: { status: $status }) {
         scheduledEvents(filter: { endsAfter: $endsAfter }) {
           startsAt
           endsAt

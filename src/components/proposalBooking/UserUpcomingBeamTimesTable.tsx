@@ -6,11 +6,14 @@ import { StyledPaper } from 'styles/StyledComponents';
 
 import BeamTimesTable from './BeamTimesTable';
 
-export default function UpcomingBeamTimesTable() {
+export default function UserUpcomingBeamTimesTable() {
   const {
     loading,
     proposalScheduledEvents,
-  } = useProposalBookingsScheduledEvents(true);
+  } = useProposalBookingsScheduledEvents({
+    onlyUpcoming: true,
+    notDraft: true,
+  });
 
   // if there are no upcoming beam times
   // just hide the whole table altogether

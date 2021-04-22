@@ -4,7 +4,7 @@ import React, { useContext } from 'react';
 
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
 import ProposalTableUser from 'components/proposal/ProposalTableUser';
-import UpcomingBeamTimesTable from 'components/proposalBooking/UpcomingBeamTimesTable';
+import UserUpcomingBeamTimesTable from 'components/proposalBooking/UserUpcomingBeamTimesTable';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { PageName, UserRole, FeatureId } from 'generated/sdk';
@@ -34,7 +34,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
     case UserRole.USER:
       roleBasedOverView = (
         <>
-          {isSchedulerEnabled && <UpcomingBeamTimesTable />}
+          {isSchedulerEnabled && <UserUpcomingBeamTimesTable />}
           <PaperContainer>
             <ProposalTableUser />
           </PaperContainer>
