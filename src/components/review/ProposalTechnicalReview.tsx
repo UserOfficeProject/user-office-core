@@ -196,7 +196,7 @@ const ProposalTechnicalReview = ({
               <Grid item xs={12}>
                 <Field
                   name="publicComment"
-                  label="Public comment"
+                  label="Comments for the review panel"
                   type="text"
                   component={TextField}
                   margin="normal"
@@ -231,9 +231,9 @@ const ProposalTechnicalReview = ({
                 onClick={() => setShouldSubmit(false)}
                 variant="contained"
                 color={isUserOfficer ? 'primary' : 'secondary'}
-                data-cy="update-technical-review"
+                data-cy="save-technical-review"
               >
-                Update
+                Save
               </Button>
               {!isUserOfficer && (
                 <Button

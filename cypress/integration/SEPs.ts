@@ -529,7 +529,7 @@ context(
       cy.get('[data-cy="technical-review-status"]').click();
       cy.contains('Feasible').click();
 
-      cy.get('[data-cy=update-technical-review] > .MuiButton-label').click();
+      cy.get('[data-cy=save-technical-review] > .MuiButton-label').click();
       // <------------------------------------------
 
       cy.closeModal();
@@ -1057,7 +1057,7 @@ context(
       cy.get('[data-cy="technical-review-status"]').click();
       cy.contains('Feasible').click();
 
-      cy.get('[data-cy=update-technical-review] > .MuiButton-label').click();
+      cy.get('[data-cy=save-technical-review] > .MuiButton-label').click();
       cy.closeModal();
       // <------------------------------------------
 
