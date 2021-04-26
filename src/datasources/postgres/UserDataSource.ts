@@ -321,7 +321,7 @@ export default class PostgresUserDataSource implements UserDataSource {
 
   async ensureDummyUserExists(userId: number): Promise<User> {
     let user: UserRecord[] = await database
-      .select('user_id')
+      .select()
       .from('users')
       .where({ user_id: userId });
     if (!user || user.length == 0) {
@@ -357,6 +357,7 @@ export default class PostgresUserDataSource implements UserDataSource {
 
     return createUserObject(user[0]);
   }
+
   async getUsers(
     filter?: string,
     first?: number,
