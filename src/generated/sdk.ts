@@ -420,7 +420,8 @@ export type Feature = {
 
 export enum FeatureId {
   SHIPPING = 'SHIPPING',
-  SCHEDULER = 'SCHEDULER'
+  SCHEDULER = 'SCHEDULER',
+  EXTERNAL_AUTH = 'EXTERNAL_AUTH'
 }
 
 export type Settings = {

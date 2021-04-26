@@ -15,11 +15,12 @@ import { QueryParamProvider } from 'use-query-params';
 
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
 import { SettingsContextProvider } from 'context/SettingsContextProvider';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
-import { SettingsId } from 'generated/sdk';
+import { FeatureId, SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
 import { getTheme } from '../theme';
@@ -38,6 +39,11 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   }
 
   const Component = component; // JSX Elements have to be uppercase.
+
+  const contextf = useContext(FeatureContext);
+  const external_auth = !!contextf.features.get(FeatureId.EXTERNAL_AUTH)
+    ?.isEnabled;
+
   const context = useContext(SettingsContext);
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const external_auth_login_url = context.settings.get(
@@ -52,7 +58,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           render={(props): JSX.Element => {
             if (!token) {
               if (
-                process.env.REACT_APP_AUTH_TYPE === 'external' &&
+                external_auth === true &&
                 external_auth_login_url?.addValue
               ) {
                 window.location.href = external_auth_login_url.addValue;
