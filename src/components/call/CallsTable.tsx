@@ -74,6 +74,11 @@ const CallsTable: React.FC = () => {
         dateformat(new Date(rowData.endCall), 'dd-mmm-yyyy'),
     },
     {
+      title: 'Reference number format',
+      field: 'referenceNumberFormat',
+      render: (rowData: Call): string => rowData.referenceNumberFormat || '',
+    },
+    {
       title: 'Instruments',
       field: 'instruments.length',
       emptyValue: '-',

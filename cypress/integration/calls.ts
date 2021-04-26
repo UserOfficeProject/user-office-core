@@ -197,6 +197,10 @@ context('Calls tests', () => {
       .type(endDate)
       .should('have.value', endDate);
 
+    cy.get('[data-cy=reference-number-format] input').type(
+      faker.random.word().split(' ')[0]
+    );
+
     cy.get('[data-cy="next-step"]').click();
 
     cy.get('[data-cy=survey-comment] input').type(
