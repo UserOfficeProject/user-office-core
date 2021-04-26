@@ -2,20 +2,6 @@ import { GraphQLClient } from 'graphql-request';
 import faker from 'faker';
 
 context('Scheduler tests', () => {
-  before(() => {
-    cy.resetDB();
-    cy.resetSchedulerDB(true);
-  });
-
-  beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
-  });
-
-  after(() => {
-    cy.resetSchedulerDB();
-  });
-
   const futureDate = faker.date.future().toISOString().split('T')[0];
   const pastDate = faker.date.past().toISOString().split('T')[0];
 
@@ -28,10 +14,56 @@ context('Scheduler tests', () => {
     endsAt: `${pastDate} 11:00`,
   };
 
+  const instrument = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+  };
+
+  const proposalTitle = faker.random.words(2);
+
+  before(() => {
+    cy.resetDB();
+    cy.resetSchedulerDB(true);
+
+    cy.visit('/');
+    cy.viewport(1100, 1000);
+
+    cy.login('user');
+    cy.createProposal(proposalTitle);
+    cy.logout();
+
+    cy.login('officer');
+
+    cy.contains('People').click();
+    cy.addScientistRoleToUser('Carl');
+
+    cy.contains('Instruments').click();
+    cy.createInstrument(instrument);
+
+    cy.contains('Instruments').click();
+    cy.assignScientistsToInstrument(instrument.shortCode);
+
+    cy.contains('Calls').click();
+    cy.assignInstrumentToCall('call 1', instrument.shortCode);
+
+    cy.contains('Proposals').click();
+    cy.assignInstrumentToProposal(proposalTitle, instrument.name);
+
+    cy.logout();
+  });
+
+  beforeEach(() => {
+    cy.visit('/');
+    cy.viewport(1100, 1000);
+  });
+
+  after(() => {
+    cy.resetSchedulerDB();
+  });
+
   it('User should not be able to see upcoming beam times if there is none', () => {
     cy.login('user');
-    cy.createProposal();
-
     cy.contains('Dashboard').click();
     cy.finishedLoading();
 
@@ -84,6 +116,17 @@ context('Scheduler tests', () => {
     cy.logout();
   });
 
+  it('Instrument scientist should not be able to see upcoming beam times in DRAFT state', () => {
+    cy.login('user');
+    cy.changeActiveRole('Instrument Scientist');
+    cy.finishedLoading();
+
+    cy.finishedLoading();
+    cy.contains('Upcoming beam times').click();
+
+    cy.contains('No records to display');
+  });
+
   it('User should be able to see upcoming beam times in BOOKED', () => {
     const query = `
       mutation activateProposalBooking($id: ID!
@@ -114,6 +157,21 @@ context('Scheduler tests', () => {
     cy.logout();
   });
 
+  it('Instrument scientist should be able to see upcoming beam times in BOOKED', () => {
+    cy.login('user');
+    cy.changeActiveRole('Instrument Scientist');
+
+    cy.finishedLoading();
+    cy.contains('Upcoming beam times').click();
+
+    cy.contains(upcoming.startsAt);
+    cy.contains(upcoming.endsAt);
+
+    cy.contains(ended.startsAt).should('not.exist');
+    cy.contains(ended.endsAt).should('not.exist');
+    cy.logout();
+  });
+
   it('User should be able to see upcoming beam times in CLOSED', () => {
     const query = `
       mutation finalizeProposalBooking($id: ID!, $action: ProposalBookingFinalizeAction!) {
@@ -135,6 +193,21 @@ context('Scheduler tests', () => {
     cy.login('user');
 
     cy.contains('Upcoming beam times').should('exist');
+
+    cy.contains(upcoming.startsAt);
+    cy.contains(upcoming.endsAt);
+
+    cy.contains(ended.startsAt).should('not.exist');
+    cy.contains(ended.endsAt).should('not.exist');
+    cy.logout();
+  });
+
+  it('Instrument scientist should be able to see upcoming beam times in CLOSED', () => {
+    cy.login('user');
+    cy.changeActiveRole('Instrument Scientist');
+
+    cy.finishedLoading();
+    cy.contains('Upcoming beam times').click();
 
     cy.contains(upcoming.startsAt);
     cy.contains(upcoming.endsAt);

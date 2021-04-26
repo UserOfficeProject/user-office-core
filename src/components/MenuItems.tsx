@@ -360,6 +360,14 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItemIcon>
         <ListItemText primary="Instruments" />
       </ListItem>
+      {isSchedulerEnabled && (
+        <ListItem component={NavLink} to="/UpcomingBeamTimes" button>
+          <ListItemIcon>
+            <EventIcon />
+          </ListItemIcon>
+          <ListItemText primary="Upcoming beam times" />
+        </ListItem>
+      )}
     </div>
   );
 
