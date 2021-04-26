@@ -21,7 +21,10 @@ export interface ProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
-  getUserProposals(id: number): Promise<Proposal[]>;
+  getUserProposals(
+    id: number,
+    filter?: { instrumentId?: number | null }
+  ): Promise<Proposal[]>;
 
   // Write
   create(

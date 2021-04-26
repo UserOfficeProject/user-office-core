@@ -496,7 +496,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async getUserProposals(id: number): Promise<Proposal[]> {
+  async getUserProposals(
+    id: number,
+    filter?: { instrumentId?: number | null }
+  ): Promise<Proposal[]> {
     return database
       .select('p.*')
       .from('proposals as p')
@@ -505,6 +508,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       })
       .where('pc.user_id', id)
       .orWhere('p.proposer_id', id)
+      .modify((qb) => {
+        if (filter?.instrumentId) {
+          qb.innerJoin('instrument_has_proposals as ihp', {
+            'p.proposal_id': 'ihp.proposal_id',
+          });
+          qb.where('ihp.instrument_id', filter.instrumentId);
+        }
+      })
       .groupBy('p.proposal_id')
       .then((proposals: ProposalRecord[]) =>
         proposals.map((proposal) => createProposalObject(proposal))
