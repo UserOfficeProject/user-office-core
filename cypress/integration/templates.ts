@@ -573,15 +573,15 @@ context('Template tests', () => {
 
       cy.get('@dateField').clear().type('2020-01-01');
       cy.contains('Save and continue').click();
-      cy.contains('Value must be a date at or after');
+      cy.contains('Date must be no earlier than');
 
       cy.get('@dateField').clear().type('2022-01-01');
       cy.contains('Save and continue').click();
-      cy.contains('Value must be a date at or before');
+      cy.contains('Date must be no latter than');
 
       cy.get('@dateField').clear().type('2021-01-15');
       cy.contains('Save and continue').click();
-      cy.contains('Value must be a date at or').should('not.exist');
+      cy.contains('Date must be no').should('not.exist');
     });
   });
 
