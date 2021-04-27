@@ -90,8 +90,8 @@ export class AdminDataSourceMock implements AdminDataSource {
   async getSettings(): Promise<Settings[]> {
     return [
       {
-        id: SettingsId.EXTERNAL_AUTH_LOGIN_URL,
-        addValue: '',
+        id: SettingsId.externalAuthLoginUrl,
+        settingsValue: '',
         description: '',
       },
     ];

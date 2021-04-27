@@ -7,7 +7,7 @@ export class Settings implements Partial<SettingsOrigin> {
   public id: SettingsId;
 
   @Field()
-  public addValue: string;
+  public settingsValue: string;
 
   @Field()
   public description: string;

@@ -6,7 +6,7 @@ BEGIN
       INSERT INTO 
         features(feature_id, is_enabled, description)
       VALUES
-        ('EXTERNAL_AUTH', true, 'STFC Authentication');
+        ('externalAuth', true, 'STFC Authentication');
     END;
 	END IF;
 END;
