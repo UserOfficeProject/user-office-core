@@ -92,6 +92,15 @@ export class CallInstrumentsResolver {
   async proposalCount(@Root() call: Call, @Ctx() context: ResolverContext) {
     return context.queries.proposal.dataSource.getCount(call.id);
   }
+
+  @FieldResolver(() => Boolean)
+  isActive(@Root() call: Call): boolean {
+    const now = new Date();
+    const startCall = new Date(call.startCall);
+    const endCall = new Date(call.endCall);
+
+    return startCall <= now && endCall >= now;
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

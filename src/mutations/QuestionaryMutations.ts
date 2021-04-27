@@ -9,12 +9,13 @@ import {
   isMatchingConstraints,
   transformAnswerValueIfNeeded,
 } from '../models/ProposalModelFunctions';
-import { User } from '../models/User';
+import { User, UserWithRole } from '../models/User';
 import { rejection } from '../rejection';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
 import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
+
 @injectable()
 export default class QuestionaryMutations {
   constructor(
@@ -53,7 +54,7 @@ export default class QuestionaryMutations {
   }
 
   @Authorized()
-  async answerTopic(agent: User | null, args: AnswerTopicArgs) {
+  async answerTopic(agent: UserWithRole | null, args: AnswerTopicArgs) {
     const { questionaryId, topicId, answers, isPartialSave } = args;
 
     const questionary = await this.dataSource.getQuestionary(questionaryId);

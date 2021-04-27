@@ -1,16 +1,13 @@
 import { logger } from '@esss-swap/duo-logger';
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
-import { inject, injectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
 import { Event } from '../../events/event.enum';
 import { Proposal, ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ProposalDataSource } from '../ProposalDataSource';
-import { QuestionaryDataSource } from '../QuestionaryDataSource';
-import { SampleDataSource } from '../SampleDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
 import {
@@ -58,26 +55,6 @@ export async function calculateReferenceNumber(
 
 @injectable()
 export default class PostgresProposalDataSource implements ProposalDataSource {
-  constructor(
-    @inject(Tokens.QuestionaryDataSource)
-    private questionaryDataSource: QuestionaryDataSource,
-    @inject(Tokens.SampleDataSource)
-    private sampleDataSource: SampleDataSource
-  ) {}
-  // TODO move this function to callDataSource
-  public async checkActiveCall(callId: number): Promise<boolean> {
-    const currentDate = new Date().toISOString();
-
-    return database
-      .select()
-      .from('call')
-      .where('start_call', '<=', currentDate)
-      .andWhere('end_call', '>=', currentDate)
-      .andWhere('call_id', '=', callId)
-      .first()
-      .then((call: CallRecord) => (call ? true : false));
-  }
-
   async submitProposal(id: number): Promise<Proposal> {
     const proposal: ProposalRecord[] = await database.transaction(
       async (trx) => {

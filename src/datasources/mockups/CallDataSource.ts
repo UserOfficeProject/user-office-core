@@ -137,4 +137,8 @@ export class CallDataSourceMock implements CallDataSource {
   async getCallsByInstrumentScientist(scientistId: number): Promise<Call[]> {
     return dummyCalls;
   }
+
+  async checkActiveCall(callId: number): Promise<boolean> {
+    return callId === 1;
+  }
 }

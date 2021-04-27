@@ -60,7 +60,7 @@ export default class ProposalMutations {
     { callId }: { callId: number }
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
-    if (!(await this.proposalDataSource.checkActiveCall(callId))) {
+    if (!(await this.callDataSource.checkActiveCall(callId))) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
 
@@ -108,7 +108,7 @@ export default class ProposalMutations {
     // Check if the call is open
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.proposalDataSource.checkActiveCall(proposal.callId))
+      !(await this.callDataSource.checkActiveCall(proposal.callId))
     ) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
@@ -152,17 +152,14 @@ export default class ProposalMutations {
       proposal.proposerId = proposerId;
     }
 
-    return this.proposalDataSource
-      .update(proposal)
-      .then((proposal) => proposal)
-      .catch((err) => {
-        logger.logException('Could not update proposal', err, {
-          agent,
-          id,
-        });
-
-        return rejection('INTERNAL_ERROR');
+    return this.proposalDataSource.update(proposal).catch((err) => {
+      logger.logException('Could not update proposal', err, {
+        agent,
+        id,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(submitProposalValidationSchema)
@@ -178,24 +175,30 @@ export default class ProposalMutations {
       return rejection('INTERNAL_ERROR');
     }
 
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (
-      !this.userAuth.isUserOfficer(agent) &&
+      !isUserOfficer &&
       !(await this.userAuth.isMemberOfProposal(agent, proposal))
     ) {
       return rejection('NOT_ALLOWED');
     }
 
-    return this.proposalDataSource
-      .submitProposal(proposalId)
-      .then((proposal) => proposal)
-      .catch((e) => {
-        logger.logException('Could not submit proposal', e, {
-          agent,
-          proposalId,
-        });
+    // Check if there is an open call
+    const hasActiveCall = await this.callDataSource.checkActiveCall(
+      proposal.callId
+    );
+    if (!isUserOfficer && !hasActiveCall) {
+      return rejection('NO_ACTIVE_CALL_FOUND');
+    }
 
-        return rejection('INTERNAL_ERROR');
+    return this.proposalDataSource.submitProposal(proposalId).catch((e) => {
+      logger.logException('Could not submit proposal', e, {
+        agent,
+        proposalId,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(deleteProposalValidationSchema)
@@ -396,7 +399,7 @@ export default class ProposalMutations {
     }
 
     // Check if there is an open call
-    if (!(await this.proposalDataSource.checkActiveCall(callId))) {
+    if (!(await this.callDataSource.checkActiveCall(callId))) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
 

@@ -254,4 +254,17 @@ export default class PostgresCallDataSource implements CallDataSource {
 
     return records.map(createCallObject);
   }
+
+  public async checkActiveCall(callId: number): Promise<boolean> {
+    const currentDate = new Date().toISOString();
+
+    return database
+      .select()
+      .from('call')
+      .where('start_call', '<=', currentDate)
+      .andWhere('end_call', '>=', currentDate)
+      .andWhere('call_id', '=', callId)
+      .first()
+      .then((call: CallRecord) => (call ? true : false));
+  }
 }
