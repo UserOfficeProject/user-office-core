@@ -458,7 +458,7 @@ export interface FeatureRecord {
 
 export interface SettingsRecord {
   readonly settings_id: string;
-  readonly add_value: string;
+  readonly settings_value: string;
   readonly description: string;
 }
 
@@ -728,7 +728,7 @@ export const createFeatureObject = (record: FeatureRecord) => {
 export const createSettingsObject = (record: SettingsRecord) => {
   return new Settings(
     record.settings_id as SettingsId,
-    record.add_value,
+    record.settings_value,
     record.description
   );
 };
