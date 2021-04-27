@@ -16,10 +16,10 @@ import { QueryParamProvider } from 'use-query-params';
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
 import { SettingsContextProvider } from 'context/SettingsContextProvider';
 import { SettingsContext } from 'context/SettingsContextProvider';
+import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { FeatureId, SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
@@ -45,7 +45,9 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
     ?.isEnabled;
 
   const settingsContext = useContext(SettingsContext);
-  const externalAuthLoginUrl = settingsContext.settings.get(SettingsId.externalAuthLoginUrl);
+  const externalAuthLoginUrl = settingsContext.settings.get(
+    SettingsId.externalAuthLoginUrl
+  );
 
   return (
     <UserContext.Consumer>
@@ -54,7 +56,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
-              if(
+              if (
                 externalAuth === true &&
                 externalAuthLoginUrl?.settingsValue
               ) {
