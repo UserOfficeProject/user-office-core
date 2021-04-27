@@ -15,7 +15,7 @@ BEGIN
       INSERT INTO 
         settings(settings_id, add_value, description)
       VALUES
-        ('externalAuthLoginUrl', 'https://devusers.facilities.rl.ac.uk/auth/Login.aspx', 'P&O Login URL');
+        ('EXTERNAL_AUTH_LOGIN_URL', 'https://devusers.facilities.rl.ac.uk/auth/Login.aspx', 'P&O Login URL');
     END;
 	END IF;
 END;

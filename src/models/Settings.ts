@@ -7,5 +7,5 @@ export class Settings {
 }
 
 export enum SettingsId {
-  externalAuthLoginUrl = 'externalAuthLoginUrl',
+  EXTERNAL_AUTH_LOGIN_URL = 'EXTERNAL_AUTH_LOGIN_URL',
 }

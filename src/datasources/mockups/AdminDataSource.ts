@@ -88,13 +88,7 @@ export class AdminDataSourceMock implements AdminDataSource {
     return [{ id: FeatureId.SHIPPING, isEnabled: false, description: '' }];
   }
   async getSettings(): Promise<Settings[]> {
-    return [
-      {
-        id: SettingsId.externalAuthLoginUrl,
-        settingsValue: '',
-        description: '',
-      },
-    ];
+    return [{ id: SettingsId.EXTERNAL_AUTH_LOGIN_URL, settingsValue: '', description: '', }];
   }
 
   async getTokenAndPermissionsById(
