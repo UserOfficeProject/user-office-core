@@ -135,6 +135,9 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   );
 }
 
+export const PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR =
+  'PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR';
+
 const proposalBasisPreSubmit = () => async ({
   api,
   dispatch,
@@ -161,6 +164,8 @@ const proposalBasisPreSubmit = () => async ({
           proposal: { ...proposal, ...result.updateProposal.proposal },
         },
       });
+    } else if (result.updateProposal.error) {
+      throw PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR;
     }
   } else {
     const createResult = await api.createProposal({
@@ -186,6 +191,8 @@ const proposalBasisPreSubmit = () => async ({
         },
       });
       returnValue = createResult.createProposal.proposal.questionaryId;
+    } else if (createResult.createProposal.error) {
+      throw PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR;
     }
   }
 
