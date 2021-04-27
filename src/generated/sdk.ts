@@ -421,7 +421,7 @@ export type Feature = {
 export enum FeatureId {
   SHIPPING = 'SHIPPING',
   SCHEDULER = 'SCHEDULER',
-  externalAuth = 'externalAuth'
+  EXTERNAL_AUTH = 'EXTERNAL_AUTH'
 }
 
 export type Settings = {
@@ -432,7 +432,7 @@ export type Settings = {
 };
 
 export enum SettingsId {
-  externalAuthLoginUrl = 'externalAuthLoginUrl' 
+  EXTERNAL_AUTH_LOGIN_URL = 'EXTERNAL_AUTH_LOGIN_URL' 
 }
 
 export type FieldCondition = {
