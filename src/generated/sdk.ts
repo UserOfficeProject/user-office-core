@@ -421,18 +421,18 @@ export type Feature = {
 export enum FeatureId {
   SHIPPING = 'SHIPPING',
   SCHEDULER = 'SCHEDULER',
-  EXTERNAL_AUTH = 'EXTERNAL_AUTH'
+  externalAuth = 'externalAuth'
 }
 
 export type Settings = {
   __typename?: 'Settings';
   id: SettingsId;
-  addValue: Scalars['String'];
+  settingsValue: Scalars['String'];
   description: Scalars['String'];
 };
 
 export enum SettingsId {
-  EXTERNAL_AUTH_LOGIN_URL = 'EXTERNAL_AUTH_LOGIN_URL' 
+  externalAuthLoginUrl = 'externalAuthLoginUrl' 
 }
 
 export type FieldCondition = {
@@ -3445,7 +3445,7 @@ export type GetSettingsQuery = (
   { __typename?: 'Query' }
   & { settings: Array<(
     { __typename?: 'Settings' }
-    & Pick<Settings, 'id' | 'addValue' | 'description'>
+    & Pick<Settings, 'id' | 'settingsValue' | 'description'>
   )> }
 );
 
@@ -7053,7 +7053,7 @@ export const GetSettingsDocument = gql`
     query getSettings {
   settings {
     id
-    addValue
+    settingsValue
     description
   }
 }

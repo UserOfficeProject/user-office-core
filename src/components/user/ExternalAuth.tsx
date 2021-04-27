@@ -23,10 +23,10 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
 
   const isFirstRun = useRef<boolean>(true);
 
-  const context = useContext(SettingsContext);
+  const settingsContext = useContext(SettingsContext);
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const external_auth_login_url = context.settings.get(
-    SettingsId.EXTERNAL_AUTH_LOGIN_URL
+  const externalAuthLoginUrl = settingsContext.settings.get(
+    SettingsId.externalAuthLoginUrl
   );
 
   useEffect(() => {
@@ -44,12 +44,12 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
           handleLogin(token.checkExternalToken.token);
           window.location.href = '/';
         } else {
-          if (external_auth_login_url) {
-            window.location.href = external_auth_login_url.addValue;
+          if (externalAuthLoginUrl) {
+            window.location.href = externalAuthLoginUrl.settingsValue;
           }
         }
       });
-  }, [token, handleLogin, sessionId, unauthorizedApi, external_auth_login_url]);
+  }, [token, handleLogin, sessionId, unauthorizedApi, externalAuthLoginUrl]);
 
   return <p>Logging in with external service...</p>;
 };

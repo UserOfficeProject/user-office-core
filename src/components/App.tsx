@@ -16,10 +16,10 @@ import { QueryParamProvider } from 'use-query-params';
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
 import { FeatureContext } from 'context/FeatureContextProvider';
+import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
 import { SettingsContextProvider } from 'context/SettingsContextProvider';
 import { SettingsContext } from 'context/SettingsContextProvider';
-import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { FeatureId, SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
@@ -40,15 +40,12 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
 
   const Component = component; // JSX Elements have to be uppercase.
 
-  const contextf = useContext(FeatureContext);
-  const external_auth = !!contextf.features.get(FeatureId.EXTERNAL_AUTH)
+  const featureContext = useContext(FeatureContext);
+  const externalAuth = !!featureContext.features.get(FeatureId.externalAuth)
     ?.isEnabled;
 
-  const context = useContext(SettingsContext);
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const external_auth_login_url = context.settings.get(
-    SettingsId.EXTERNAL_AUTH_LOGIN_URL
-  );
+  const settingsContext = useContext(SettingsContext);
+  const externalAuthLoginUrl = settingsContext.settings.get(SettingsId.externalAuthLoginUrl);
 
   return (
     <UserContext.Consumer>
@@ -57,11 +54,11 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
-              if (
-                external_auth === true &&
-                external_auth_login_url?.addValue
+              if(
+                externalAuth === true &&
+                externalAuthLoginUrl?.settingsValue
               ) {
-                window.location.href = external_auth_login_url.addValue;
+                window.location.href = externalAuthLoginUrl.settingsValue;
 
                 return <p>Redirecting to external sign-in page...</p>;
               }
