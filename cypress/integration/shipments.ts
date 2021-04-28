@@ -65,10 +65,6 @@ context('Shipments tests', () => {
     cy.createTopic('New topic');
 
     cy.createSampleQuestion(sampleQuestion, sampleTemplateName);
-
-    cy.contains(sampleQuestion)
-      .parent()
-      .dragElement([{ direction: 'left', length: 1 }]);
   });
 
   it('Should be able to declare sample', () => {
@@ -88,7 +84,6 @@ context('Shipments tests', () => {
     cy.contains('Submit').click();
 
     cy.contains('OK').click();
-
   });
 
   it('Should be able to delete shipment', () => {
@@ -153,13 +148,11 @@ context('Shipments tests', () => {
     cy.contains('OK').click();
 
     cy.contains(shipmentTitle);
-    
+
     cy.contains('SUBMITTED', { matchCase: false });
 
     cy.get('[data-cy=download-shipment-label]').click();
 
     cy.get('[data-cy="preparing-download-dialog"]').should('exist');
-
-
   });
 });

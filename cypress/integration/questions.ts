@@ -19,11 +19,10 @@ context('Questions tests', () => {
 
     cy.contains('default template').parent().get("[title='Edit']").click();
 
-    cy.get('[data-cy=show-more-button]').click();
-
-    cy.get('[data-cy=add-question-menu-item]').last().click();
-
-    cy.createTextQuestion(textQuestion, true, true);
+    cy.createTextQuestion(textQuestion, {
+      isRequired: true,
+      isMultipleLines: true,
+    });
 
     cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 

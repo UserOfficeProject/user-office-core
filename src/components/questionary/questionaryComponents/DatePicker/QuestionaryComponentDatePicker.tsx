@@ -29,7 +29,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
   const {
     question: { id, question },
   } = answer;
-  const { tooltip, minDate, maxDate, required } = answer.config as DateConfig;
+  const { tooltip, required } = answer.config as DateConfig;
 
   return (
     <TooltipWrapper title={tooltip}>

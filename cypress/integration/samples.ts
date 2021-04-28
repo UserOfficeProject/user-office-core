@@ -29,11 +29,7 @@ context('Samples tests', () => {
 
     cy.createTopic(faker.lorem.word());
 
-    cy.get('[data-cy=show-more-button]').last().click();
-
-    cy.get('[data-cy=add-question-menu-item]').last().click();
-
-    cy.createTextQuestion(sampleQuestionaryQuestion, false, false);
+    cy.createTextQuestion(sampleQuestionaryQuestion);
 
     cy.visit('/');
 
@@ -49,13 +45,10 @@ context('Samples tests', () => {
 
     cy.createTopic('New topic');
 
-    cy.createSampleQuestion(sampleQuestion, sampleTemplateName, '1', '2');
-
-    cy.contains(sampleQuestion)
-      .parent()
-      .dragElement([{ direction: 'left', length: 1 }]);
-
-    cy.get('[data-cy=close-button]').click(); // closing question list
+    cy.createSampleQuestion(sampleQuestion, sampleTemplateName, {
+      minEntries: 1,
+      maxEntries: 2,
+    });
 
     cy.contains(sampleQuestion); // checking if question in the topic column
   });

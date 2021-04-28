@@ -102,10 +102,6 @@ context('Instrument tests', () => {
 
     cy.createTopic('Topic for questions');
 
-    cy.get('[data-cy=show-more-button]').last().click();
-
-    cy.get('[data-cy=add-question-menu-item]').last().click();
-
     cy.createBooleanQuestion(questionText);
 
     cy.logout();

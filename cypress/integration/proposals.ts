@@ -169,9 +169,7 @@ context('Proposal tests', () => {
     cy.get('[title="Edit"]').first().click();
 
     cy.createTopic(topic);
-    cy.get('[data-cy=show-more-button]').last().click();
-    cy.get('[data-cy=add-question-menu-item]').last().click();
-    cy.createTextQuestion(textQuestion, false, false);
+    cy.createTextQuestion(textQuestion);
 
     cy.logout();
 

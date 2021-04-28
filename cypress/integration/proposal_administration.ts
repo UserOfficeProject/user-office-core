@@ -301,10 +301,6 @@ context('Proposal administration tests', () => {
 
     cy.createTopic('Topic for questions');
 
-    cy.get('[data-cy=show-more-button]').last().click();
-
-    cy.get('[data-cy=add-question-menu-item]').last().click();
-
     cy.createIntervalQuestion(intervalQuestion);
     cy.contains(intervalQuestion)
       .closest('[data-cy=question-container]')
@@ -332,12 +328,11 @@ context('Proposal administration tests', () => {
         dateQuestionId = fieldId;
       });
 
-    cy.createMultipleChoiceQuestion(
-      multipleChoiceQuestion,
-      'One',
-      'Two',
-      'Three'
-    );
+    cy.createMultipleChoiceQuestion(multipleChoiceQuestion, {
+      option1: 'One',
+      option2: 'Two',
+      option3: 'Three',
+    });
     cy.contains(multipleChoiceQuestion)
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")
@@ -346,7 +341,7 @@ context('Proposal administration tests', () => {
         multipleChoiceQuestionId = fieldId;
       });
 
-    cy.createTextQuestion(textQuestion, false, false);
+    cy.createTextQuestion(textQuestion);
     cy.contains(textQuestion)
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")

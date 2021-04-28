@@ -55,6 +55,15 @@ export const QuestionRichTextInputForm: FC<QuestionFormProps> = (props) => {
               fullWidth
               data-cy="required"
             />
+            <Field
+              name="config.max"
+              label="Max"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="max"
+            />
           </TitledContainer>
         </>
       )}
