@@ -224,8 +224,6 @@ export default class ProposalMutations {
     try {
       const result = await this.proposalDataSource.deleteProposal(proposalId);
 
-      await this.questionaryDataSource.delete(result.questionaryId);
-
       return result;
     } catch (e) {
       if ('code' in e && e.code === '23503') {
