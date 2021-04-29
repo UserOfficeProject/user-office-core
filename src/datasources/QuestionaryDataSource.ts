@@ -3,6 +3,7 @@ import {
   Questionary,
   QuestionaryStep,
 } from '../models/Questionary';
+import { Template } from '../models/Template';
 
 export interface QuestionaryDataSource {
   getCount(templateId: number): Promise<number>;
@@ -11,6 +12,9 @@ export interface QuestionaryDataSource {
   getQuestionary(questionary_id: number): Promise<Questionary | null>;
   getQuestionarySteps(questionaryId: number): Promise<QuestionaryStep[]>;
   getBlankQuestionarySteps(templateId: number): Promise<QuestionaryStep[]>;
+  getAnswers(questionId: string): Promise<AnswerBasic[]>;
+  getTemplates(questionId: string): Promise<Template[]>;
+  getIsCompleted(questionaryId: number): Promise<boolean>;
   updateAnswer(
     questionary_id: number,
     question_id: string,

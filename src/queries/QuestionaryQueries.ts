@@ -13,7 +13,7 @@ import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 export default class QuestionaryQueries {
   constructor(
     @inject(Tokens.QuestionaryDataSource)
-    private dataSource: QuestionaryDataSource,
+    public dataSource: QuestionaryDataSource,
     @inject(Tokens.QuestionaryAuthorization)
     private authorizer: QuestionaryAuthorization
   ) {}
@@ -57,6 +57,21 @@ export default class QuestionaryQueries {
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   getCount(user: UserWithRole | null, templateId: number): Promise<number> {
     return this.dataSource.getCount(templateId);
+  }
+
+  @Authorized()
+  async isCompleted(agent: UserWithRole | null, questionaryId: number) {
+    const hasRights = await this.authorizer.hasReadRights(agent, questionaryId);
+    if (!hasRights) {
+      logger.logWarn('Permissions violated trying to access isComplete', {
+        email: agent?.email,
+        questionaryId,
+      });
+
+      return false;
+    }
+
+    return this.dataSource.getIsCompleted(questionaryId);
   }
 
   async getBlankQuestionarySteps(

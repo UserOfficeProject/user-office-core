@@ -113,8 +113,15 @@ export class UserResolver {
   }
 
   @FieldResolver(() => [Proposal])
-  async proposals(@Root() user: User, @Ctx() context: ResolverContext) {
-    return context.queries.proposal.dataSource.getUserProposals(user.id);
+  async proposals(
+    @Root() user: User,
+    @Ctx() context: ResolverContext,
+    @Arg('instrumentId', () => Int, { nullable: true })
+    instrumentId?: number | null
+  ) {
+    return context.queries.proposal.dataSource.getUserProposals(user.id, {
+      instrumentId,
+    });
   }
 
   @FieldResolver(() => [SEP])

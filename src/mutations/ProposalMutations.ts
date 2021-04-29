@@ -15,10 +15,17 @@ import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
+import { SampleDataSource } from '../datasources/SampleDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
+import {
+  Proposal,
+  ProposalEndStatus,
+  ProposalIdsWithNextStatus,
+} from '../models/Proposal';
 import { Roles } from '../models/Role';
+import { SampleStatus } from '../models/Sample';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
@@ -38,6 +45,10 @@ export default class ProposalMutations {
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
     @inject(Tokens.InstrumentDataSource)
     private instrumentDataSource: InstrumentDataSource,
+    @inject(Tokens.SampleDataSource)
+    private sampleDataSource: SampleDataSource,
+    @inject(Tokens.UserDataSource)
+    private userDataSource: UserDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
@@ -49,7 +60,7 @@ export default class ProposalMutations {
     { callId }: { callId: number }
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
-    if (!(await this.proposalDataSource.checkActiveCall(callId))) {
+    if (!(await this.callDataSource.checkActiveCall(callId))) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
 
@@ -97,7 +108,7 @@ export default class ProposalMutations {
     // Check if the call is open
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.proposalDataSource.checkActiveCall(proposal.callId))
+      !(await this.callDataSource.checkActiveCall(proposal.callId))
     ) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
@@ -141,17 +152,14 @@ export default class ProposalMutations {
       proposal.proposerId = proposerId;
     }
 
-    return this.proposalDataSource
-      .update(proposal)
-      .then((proposal) => proposal)
-      .catch((err) => {
-        logger.logException('Could not update proposal', err, {
-          agent,
-          id,
-        });
-
-        return rejection('INTERNAL_ERROR');
+    return this.proposalDataSource.update(proposal).catch((err) => {
+      logger.logException('Could not update proposal', err, {
+        agent,
+        id,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(submitProposalValidationSchema)
@@ -167,24 +175,30 @@ export default class ProposalMutations {
       return rejection('INTERNAL_ERROR');
     }
 
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (
-      !this.userAuth.isUserOfficer(agent) &&
+      !isUserOfficer &&
       !(await this.userAuth.isMemberOfProposal(agent, proposal))
     ) {
       return rejection('NOT_ALLOWED');
     }
 
-    return this.proposalDataSource
-      .submitProposal(proposalId)
-      .then((proposal) => proposal)
-      .catch((e) => {
-        logger.logException('Could not submit proposal', e, {
-          agent,
-          proposalId,
-        });
+    // Check if there is an open call
+    const hasActiveCall = await this.callDataSource.checkActiveCall(
+      proposal.callId
+    );
+    if (!isUserOfficer && !hasActiveCall) {
+      return rejection('NO_ACTIVE_CALL_FOUND');
+    }
 
-        return rejection('INTERNAL_ERROR');
+    return this.proposalDataSource.submitProposal(proposalId).catch((e) => {
+      logger.logException('Could not submit proposal', e, {
+        agent,
+        proposalId,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(deleteProposalValidationSchema)
@@ -209,8 +223,6 @@ export default class ProposalMutations {
 
     try {
       const result = await this.proposalDataSource.deleteProposal(proposalId);
-
-      await this.questionaryDataSource.delete(result.questionaryId);
 
       return result;
     } catch (e) {
@@ -248,6 +260,7 @@ export default class ProposalMutations {
   }
 
   @EventBus(Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED)
+  @EventBus(Event.PROPOSAL_STATUS_CHANGED_BY_USER)
   @ValidateArgs(administrationProposalValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async admin(
@@ -384,7 +397,7 @@ export default class ProposalMutations {
     }
 
     // Check if there is an open call
-    if (!(await this.proposalDataSource.checkActiveCall(callId))) {
+    if (!(await this.callDataSource.checkActiveCall(callId))) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
 
@@ -398,13 +411,88 @@ export default class ProposalMutations {
       return rejection('NOT_FOUND');
     }
 
-    return this.proposalDataSource
-      .cloneProposal((agent as UserWithRole).id, sourceProposal, call)
-      .then((proposal) => proposal)
-      .catch((err) => {
-        logger.logException('Could not clone proposal', err, { agent });
+    const sourceQuestionary = await this.questionaryDataSource.getQuestionary(
+      sourceProposal.questionaryId
+    );
 
-        return rejection('INTERNAL_ERROR');
+    if (call.templateId !== sourceQuestionary?.templateId) {
+      logger.logError(
+        'Can not clone proposal to a call whose template is different',
+        {
+          call,
+          sourceQuestionary,
+        }
+      );
+
+      return rejection('INTERNAL_ERROR');
+    }
+
+    try {
+      let clonedProposal = await this.proposalDataSource.cloneProposal(
+        sourceProposal,
+        call
+      );
+
+      const clonedQuestionary = await this.questionaryDataSource.clone(
+        sourceProposal.questionaryId
+      );
+
+      // if user clones the proposal then it is his/her,
+      // but if userofficer, then it will belong to original proposer
+      const proposerId = this.userAuth.isUserOfficer(agent)
+        ? sourceProposal.proposerId
+        : agent!.id;
+
+      clonedProposal = await this.proposalDataSource.update({
+        id: clonedProposal.id,
+        title: `Copy of ${clonedProposal.title}`,
+        abstract: clonedProposal.abstract,
+        proposerId: proposerId,
+        statusId: 1,
+        created: new Date(),
+        updated: new Date(),
+        shortCode: clonedProposal.shortCode,
+        finalStatus: ProposalEndStatus.UNSET,
+        callId: callId,
+        questionaryId: clonedQuestionary.questionaryId,
+        commentForUser: '',
+        commentForManagement: '',
+        notified: false,
+        submitted: false,
+        referenceNumberSequence: 0,
+        managementTimeAllocation: 0,
+        managementDecisionSubmitted: false,
       });
+
+      const proposalUsers = await this.userDataSource.getProposalUsers(
+        sourceProposal.id
+      );
+      await this.proposalDataSource.setProposalUsers(
+        clonedProposal.id,
+        proposalUsers.map((user) => user.id)
+      );
+
+      const proposalSamples = await this.sampleDataSource.getSamples({
+        filter: { proposalId: sourceProposal.id },
+      });
+
+      for await (const sample of proposalSamples) {
+        const clonedSample = await this.sampleDataSource.cloneSample(sample.id);
+        await this.sampleDataSource.updateSample({
+          sampleId: clonedSample.id,
+          proposalId: clonedProposal.id,
+          questionaryId: clonedQuestionary.questionaryId,
+          safetyComment: '',
+          safetyStatus: SampleStatus.PENDING_EVALUATION,
+          shipmentId: null,
+        });
+      }
+
+      return clonedProposal;
+    } catch (e) {
+      logger.logException('Could not cone proposal', e);
+
+      return rejection('INTERNAL_ERROR');
+    }
   }
 }

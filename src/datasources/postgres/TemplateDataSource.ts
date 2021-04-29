@@ -18,6 +18,7 @@ import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/De
 import { SetActiveTemplateArgs } from '../../resolvers/mutations/SetActiveTemplateMutation';
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
+import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import database from './database';
@@ -71,6 +72,29 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return questionRecords.map((value) => createQuestionObject(value));
   }
 
+  getQuestions(filter?: QuestionsFilter): Promise<Question[]> {
+    return database
+      .select('*')
+      .from('questions')
+      .modify((query) => {
+        if (filter?.category !== undefined) {
+          query.where('category_id', filter.category);
+        }
+        if (filter?.dataType !== undefined) {
+          query.whereIn('data_type', filter.dataType);
+        }
+        if (filter?.excludeDataType !== undefined) {
+          query.whereNotIn('data_type', filter.excludeDataType);
+        }
+        if (filter?.text !== undefined) {
+          query.where('question', 'ilike', `%${filter.text}%`);
+        }
+      })
+      .then((rows: QuestionRecord[]) => {
+        return rows.map((row) => createQuestionObject(row));
+      });
+  }
+
   async createTemplate(args: CreateTemplateArgs): Promise<Template> {
     return database('templates')
       .insert({
@@ -113,6 +137,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .modify((query) => {
         if (args.filter?.category) {
           query.where({ category_id: args.filter?.category || undefined });
+        }
+        if (args.filter?.templateIds) {
+          query.where('template_id', 'in', args.filter.templateIds);
         }
       })
       .then((resultSet: TemplateRecord[]) => {

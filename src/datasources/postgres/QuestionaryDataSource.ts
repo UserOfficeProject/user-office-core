@@ -7,12 +7,13 @@ import {
   QuestionaryStep,
 } from '../../models/Questionary';
 import { getDefaultAnswerValue } from '../../models/questionTypes/QuestionRegistry';
-import { FieldDependency } from '../../models/Template';
+import { FieldDependency, Template, Topic } from '../../models/Template';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
   AnswerRecord,
   createAnswerBasic,
+  createProposalTemplateObject,
   createQuestionaryObject,
   createQuestionTemplateRelationObject,
   createTopicObject,
@@ -25,6 +26,30 @@ import {
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
+  async getIsCompleted(questionaryId: number): Promise<boolean> {
+    const unFinishedTopics: Topic[] = (
+      await database.raw(
+        `
+        SELECT *
+        FROM topics
+        LEFT JOIN (
+            SELECT *
+            FROM topic_completenesses
+            WHERE questionary_id = ?
+          ) topic_completenesses ON topic_completenesses.topic_id = topics.topic_id
+        WHERE topics.template_id =(
+              select template_id
+              from questionaries
+              where questionary_id = ?
+          )
+          AND topic_completenesses.is_complete IS NOT true`,
+        [questionaryId, questionaryId]
+      )
+    ).rows;
+
+    return unFinishedTopics.length === 0;
+  }
+
   async deleteAnswers(
     questionary_id: number,
     question_ids: string[]
@@ -50,6 +75,27 @@ export default class PostgresQuestionaryDataSource
       .first();
 
     return createAnswerBasic(answerRecord);
+  }
+
+  async getAnswers(questionId: string): Promise<AnswerBasic[]> {
+    return database('answers')
+      .where('question_id', questionId)
+      .then((rows) => {
+        return rows.map((row) => createAnswerBasic(row));
+      });
+  }
+  async getTemplates(questionId: string): Promise<Template[]> {
+    return database('templates_has_questions')
+      .leftJoin(
+        'templates',
+        'templates.template_id',
+        '=',
+        'templates_has_questions.template_id'
+      )
+      .where('question_id', questionId)
+      .then((rows) => {
+        return rows.map((row) => createProposalTemplateObject(row));
+      });
   }
 
   async create(creator_id: number, template_id: number): Promise<Questionary> {
@@ -262,6 +308,8 @@ export default class PostgresQuestionaryDataSource
                 topics.sort_order`)
     ).rows;
 
+    // this contains all questions for template, with left joined answers
+    // meaning that if there is no answer, it will still be on the list but `null`
     const answerRecords: Array<
       QuestionRecord &
         QuestionTemplateRelRecord & { value: any; answer_id: number } & {
@@ -303,8 +351,12 @@ export default class PostgresQuestionaryDataSource
         record,
         questionDependencies
       );
+
+      // if no answer has been saved, return the default answer value
       const value =
-        record.value?.value || getDefaultAnswerValue(questionTemplateRelation);
+        record.value === null
+          ? getDefaultAnswerValue(questionTemplateRelation)
+          : record.value.value;
 
       return new Answer(record.answer_id, questionTemplateRelation, value);
     });

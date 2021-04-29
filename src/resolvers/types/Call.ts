@@ -53,6 +53,12 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => Date)
   public endCycle: Date;
 
+  @Field({ nullable: true })
+  public referenceNumberFormat: string;
+
+  @Field(() => Int, { nullable: true })
+  public proposalSequence: number;
+
   @Field()
   public cycleComment: string;
 
@@ -85,6 +91,15 @@ export class CallInstrumentsResolver {
   @FieldResolver(() => Int)
   async proposalCount(@Root() call: Call, @Ctx() context: ResolverContext) {
     return context.queries.proposal.dataSource.getCount(call.id);
+  }
+
+  @FieldResolver(() => Boolean)
+  isActive(@Root() call: Call): boolean {
+    const now = new Date();
+    const startCall = new Date(call.startCall);
+    const endCall = new Date(call.endCall);
+
+    return startCall <= now && endCall >= now;
   }
 }
 

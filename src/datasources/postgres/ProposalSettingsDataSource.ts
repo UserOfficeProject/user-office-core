@@ -1,6 +1,9 @@
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
-import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
+import {
+  NextAndPreviousProposalStatuses,
+  ProposalWorkflowConnection,
+} from '../../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
@@ -312,7 +315,11 @@ export default class PostgresProposalSettingsDataSource
 
   async getProposalWorkflowConnectionsById(
     proposalWorkflowId: number,
-    proposalStatusId: number
+    proposalStatusId: number,
+    {
+      nextProposalStatusId,
+      prevProposalStatusId,
+    }: NextAndPreviousProposalStatuses
   ): Promise<ProposalWorkflowConnection[]> {
     const proposalWorkflowConnectionRecords: (ProposalWorkflowConnectionRecord &
       ProposalStatusRecord)[] = await database
@@ -322,7 +329,16 @@ export default class PostgresProposalSettingsDataSource
         'ps.proposal_status_id': 'pwc.proposal_status_id',
       })
       .where('proposal_workflow_id', proposalWorkflowId)
-      .andWhere('pwc.proposal_status_id', proposalStatusId);
+      .andWhere('pwc.proposal_status_id', proposalStatusId)
+      .modify((query) => {
+        if (nextProposalStatusId) {
+          query.andWhere('pwc.next_proposal_status_id', nextProposalStatusId);
+        }
+
+        if (prevProposalStatusId) {
+          query.andWhere('pwc.prev_proposal_status_id', prevProposalStatusId);
+        }
+      });
 
     if (!proposalWorkflowConnectionRecords) {
       throw new Error(
@@ -392,6 +408,7 @@ export default class PostgresProposalSettingsDataSource
     const result = await database.raw(
       `? ON CONFLICT (proposal_workflow_connection_id)
                   DO UPDATE SET
+                  proposal_status_id = EXCLUDED.proposal_status_id,
                   next_proposal_status_id = EXCLUDED.next_proposal_status_id,
                   prev_proposal_status_id = EXCLUDED.prev_proposal_status_id,
                   sort_order = EXCLUDED.sort_order,
@@ -508,13 +525,13 @@ export default class PostgresProposalSettingsDataSource
     );
   }
 
-  async getStatusChangingEventsByConnectionId(
-    proposalWorkflowConnectionId: number
+  async getStatusChangingEventsByConnectionIds(
+    proposalWorkflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]> {
     return database
       .select('*')
       .from('status_changing_events')
-      .where('proposal_workflow_connection_id', proposalWorkflowConnectionId)
+      .whereIn('proposal_workflow_connection_id', proposalWorkflowConnectionIds)
       .then((statusChangingEvents: StatusChangingEventRecord[]) => {
         return statusChangingEvents.map((statusChangingEvent) =>
           this.createStatusChangingEventObject(statusChangingEvent)

@@ -12,6 +12,7 @@ import {
   FieldDependency,
   Question,
   QuestionTemplateRelation,
+  Template,
   TemplateCategoryId,
   TemplatesHasQuestions,
   Topic,
@@ -177,9 +178,18 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   async deleteAnswers(questionary_id: number, question_id: string[]) {
     return;
   }
-
-  async getCount(_templateId: number): Promise<number> {
+  async getAnswers(questionId: string): Promise<AnswerBasic[]> {
+    return [];
+  }
+  async getTemplates(questionId: string): Promise<Template[]> {
+    return [];
+  }
+  async getCount(templateId: number): Promise<number> {
     return 1;
+  }
+
+  async getIsCompleted(questionaryId: number): Promise<boolean> {
+    return dummyQuestionarySteps.every((step) => step.isCompleted);
   }
 
   async clone(questionaryId: number): Promise<Questionary> {

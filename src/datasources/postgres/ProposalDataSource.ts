@@ -1,9 +1,9 @@
 import { logger } from '@esss-swap/duo-logger';
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
+import { injectable } from 'tsyringe';
 
 import { Event } from '../../events/event.enum';
-import { Call } from '../../models/Call';
 import { Proposal, ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
@@ -17,42 +17,121 @@ import {
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
-  QuestionaryRecord,
   StatusChangingEventRecord,
 } from './records';
 
-export default class PostgresProposalDataSource implements ProposalDataSource {
-  // TODO move this function to callDataSource
-  public async checkActiveCall(callId: number): Promise<boolean> {
-    const currentDate = new Date().toISOString();
+export async function calculateReferenceNumber(
+  format: string,
+  sequence: number | null
+): Promise<string> {
+  const prefix: string = format.slice(0, format.indexOf('{'));
+  const formatParameters: { [param: string]: string } = {};
+  format.match(/(\w+:\w+)/g)?.forEach((el: string) => {
+    const [k, v] = el.split(':');
+    formatParameters[k] = v;
+  });
 
-    return database
-      .select()
-      .from('call')
-      .where('start_call', '<=', currentDate)
-      .andWhere('end_call', '>=', currentDate)
-      .andWhere('call_id', '=', callId)
-      .first()
-      .then((call: CallRecord) => (call ? true : false));
+  if (!prefix || !('digits' in formatParameters)) {
+    return Promise.reject(
+      new Error(`The reference number format ('${format}') is invalid`)
+    );
   }
 
-  async submitProposal(id: number): Promise<Proposal> {
-    return database
-      .update(
-        {
-          submitted: true,
-        },
-        ['*']
+  sequence = sequence ?? 0;
+  if (String(sequence).length > Number(formatParameters['digits'])) {
+    return Promise.reject(
+      new Error(
+        `The sequence number provided ('${formatParameters['digits']}') exceeds the format's digits parameter`
       )
-      .from('proposals')
-      .where('proposal_id', id)
-      .then((proposal: ProposalRecord[]) => {
-        if (proposal === undefined || proposal.length !== 1) {
-          throw new Error(`Failed to submit proposal with id '${id}'`);
-        }
+    );
+  }
+  const paddedSequence: string = String(sequence).padStart(
+    Number(formatParameters['digits']),
+    '0'
+  );
 
-        return createProposalObject(proposal[0]);
-      });
+  return prefix + paddedSequence;
+}
+
+@injectable()
+export default class PostgresProposalDataSource implements ProposalDataSource {
+  async submitProposal(id: number): Promise<Proposal> {
+    const proposal: ProposalRecord[] = await database.transaction(
+      async (trx) => {
+        try {
+          const call = await database
+            .select(
+              'c.call_id',
+              'c.reference_number_format',
+              'c.proposal_sequence'
+            )
+            .from('call as c')
+            .join('proposals as p', { 'p.call_id': 'c.call_id' })
+            .where('p.proposal_id', id)
+            .first()
+            .forUpdate()
+            .transacting(trx);
+
+          let referenceNumber: string | null;
+          if (call.reference_number_format) {
+            referenceNumber = await calculateReferenceNumber(
+              call.reference_number_format,
+              call.proposal_sequence
+            );
+
+            if (!referenceNumber) {
+              throw new Error(
+                `Failed to calculate reference number for proposal with id '${id}' using format '${call.reference_number_format}'`
+              );
+            } else if (referenceNumber.length > 16) {
+              throw new Error(
+                `The reference number calculated is too long ('${referenceNumber.length} characters)`
+              );
+            }
+          }
+
+          await database
+            .update({
+              proposal_sequence: (call.proposal_sequence ?? 0) + 1,
+            })
+            .from('call as c')
+            .where('c.call_id', call.call_id)
+            .transacting(trx);
+
+          const proposalUpdate = await database
+            .from('proposals')
+            .returning('*')
+            .where('proposal_id', id)
+            .modify((query) => {
+              if (referenceNumber) {
+                query.update({
+                  short_code: referenceNumber,
+                  reference_number_sequence: call.proposal_sequence ?? 0,
+                  submitted: true,
+                });
+              } else {
+                query.update({
+                  reference_number_sequence: call.proposal_sequence ?? 0,
+                  submitted: true,
+                });
+              }
+            })
+            .transacting(trx);
+
+          return await trx.commit(proposalUpdate);
+        } catch (error) {
+          throw new Error(
+            `Failed to submit proposal with id '${id}' because: '${error.message}'`
+          );
+        }
+      }
+    );
+
+    if (proposal === undefined || proposal.length !== 1) {
+      throw new Error(`Failed to submit proposal with id '${id}'`);
+    }
+
+    return createProposalObject(proposal[0]);
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
@@ -101,9 +180,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         {
           title: proposal.title,
           abstract: proposal.abstract,
-          status_id: proposal.statusId,
           proposer_id: proposal.proposerId,
+          status_id: proposal.statusId,
+          created_at: proposal.created,
+          updated_at: proposal.updated,
+          short_code: proposal.shortCode,
           final_status: proposal.finalStatus,
+          call_id: proposal.callId,
+          questionary_id: proposal.questionaryId,
           comment_for_user: proposal.commentForUser,
           comment_for_management: proposal.commentForManagement,
           notified: proposal.notified,
@@ -389,7 +473,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async getUserProposals(id: number): Promise<Proposal[]> {
+  async getUserProposals(
+    id: number,
+    filter?: { instrumentId?: number | null }
+  ): Promise<Proposal[]> {
     return database
       .select('p.*')
       .from('proposals as p')
@@ -398,6 +485,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       })
       .where('pc.user_id', id)
       .orWhere('p.proposer_id', id)
+      .modify((qb) => {
+        if (filter?.instrumentId) {
+          qb.innerJoin('instrument_has_proposals as ihp', {
+            'p.proposal_id': 'ihp.proposal_id',
+          });
+          qb.where('ihp.instrument_id', filter.instrumentId);
+        }
+      })
       .groupBy('p.proposal_id')
       .then((proposals: ProposalRecord[]) =>
         proposals.map((proposal) => createProposalObject(proposal))
@@ -438,46 +533,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async cloneProposal(
-    clonerId: number,
-    sourceProposal: Proposal,
-    call: Call
-  ): Promise<Proposal> {
-    const [newQuestionary]: QuestionaryRecord[] = (
-      await database.raw(`
-      INSERT INTO questionaries
-      (
-        template_id,
-        creator_id
-      )
-      SELECT
-        ${call.templateId},
-        ${clonerId}
-      FROM 
-        questionaries
-      WHERE
-        questionary_id = ${sourceProposal.questionaryId}
-      RETURNING *
-    `)
-    ).rows;
-
-    await database.raw(`
-      INSERT INTO answers
-      (
-        questionary_id,
-        question_id,
-        answer
-      )
-      SELECT
-        ${newQuestionary.questionary_id},
-        question_id,
-        answer
-      FROM 
-        answers
-      WHERE
-        questionary_id = ${sourceProposal.questionaryId}
-    `);
-
+  async cloneProposal(sourceProposal: Proposal): Promise<Proposal> {
     const [newProposal]: ProposalRecord[] = (
       await database.raw(`
       INSERT INTO proposals
@@ -486,20 +542,34 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         abstract,
         status_id,
         proposer_id,
+        created_at,
+        updated_at,
+        final_status,
         call_id,
         questionary_id,
+        comment_for_management,
+        comment_for_user,
         notified,
-        submitted
+        submitted,
+        management_decision_submitted,
+        management_time_allocation
       )
       SELECT
-        'Copy of ${sourceProposal.title}',
+        title,
         abstract,
-        1,
+        status_id,
         proposer_id,
-        ${call.id},
-        ${newQuestionary.questionary_id},
-        false,
-        false
+        created_at,
+        updated_at,
+        final_status,
+        call_id,
+        questionary_id,
+        comment_for_management,
+        comment_for_user,
+        notified,
+        submitted,
+        management_decision_submitted,
+        management_time_allocation
       FROM 
         proposals
       WHERE
@@ -507,22 +577,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       RETURNING *
     `)
     ).rows;
-
-    await database.raw(`
-      INSERT INTO proposal_user
-      (
-        proposal_id,
-        user_id
-      )
-      SELECT
-        ${newProposal.proposal_id},
-        user_id
-      FROM 
-        proposal_user
-      WHERE
-        proposal_id = ${sourceProposal.id}
-      RETURNING *
-    `);
 
     return createProposalObject(newProposal);
   }

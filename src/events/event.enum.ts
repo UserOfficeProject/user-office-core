@@ -43,6 +43,8 @@ export enum Event {
   SEP_MEMBER_REMOVED_FROM_PROPOSAL = 'SEP_MEMBER_REMOVED_FROM_PROPOSAL',
   PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED',
   PROPOSAL_CLONED = 'PROPOSAL_CLONED',
+  PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
+  PROPOSAL_STATUS_CHANGED_BY_USER = 'PROPOSAL_STATUS_CHANGED_BY_USER',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -176,4 +178,12 @@ export const EventLabel = new Map<Event, string>([
   ],
   [Event.PROPOSAL_NOTIFIED, 'Event occurs when proposal is notified'],
   [Event.PROPOSAL_CLONED, 'Event occurs when proposal is cloned'],
+  [
+    Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
+    'Event occurs when the proposal status was changed by the workflow engine',
+  ],
+  [
+    Event.PROPOSAL_STATUS_CHANGED_BY_USER,
+    'Event occurs when the proposal status was changed by the user',
+  ],
 ]);

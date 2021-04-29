@@ -1,6 +1,9 @@
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
-import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
+import {
+  NextAndPreviousProposalStatuses,
+  ProposalWorkflowConnection,
+} from '../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
@@ -33,7 +36,11 @@ export interface ProposalSettingsDataSource {
   ): Promise<ProposalWorkflowConnection[]>;
   getProposalWorkflowConnectionsById(
     proposalWorkflowId: number,
-    proposalWorkflowConnectionId: number
+    proposalWorkflowConnectionId: number,
+    {
+      nextProposalStatusId,
+      prevProposalStatusId,
+    }: NextAndPreviousProposalStatuses
   ): Promise<ProposalWorkflowConnection[]>;
   addProposalWorkflowStatus(
     newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
@@ -50,8 +57,8 @@ export interface ProposalSettingsDataSource {
     proposalWorkflowConnectionId: number,
     statusChangingEvents: string[]
   ): Promise<StatusChangingEvent[]>;
-  getStatusChangingEventsByConnectionId(
-    proposalWorkflowConnectionId: number
+  getStatusChangingEventsByConnectionIds(
+    proposalWorkflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]>;
   getProposalNextStatus(
     proposalId: number,

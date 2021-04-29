@@ -1,13 +1,14 @@
+import { logger } from '@esss-swap/duo-logger';
 import { Queue, RabbitMQMessageBroker } from '@esss-swap/duo-message-broker';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
-import { ProposalEndStatus } from '../models/Proposal';
+import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 
 export function createPostToQueueHandler() {
   // return the mapped implementation
@@ -17,8 +18,8 @@ export function createPostToQueueHandler() {
 }
 
 export function createPostToRabbitMQHandler() {
-  const reviewDataSource = container.resolve<ReviewDataSource>(
-    Tokens.ReviewDataSource
+  const proposalSettingsDataSource = container.resolve<ProposalSettingsDataSource>(
+    Tokens.ProposalSettingsDataSource
   );
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
@@ -40,30 +41,34 @@ export function createPostToRabbitMQHandler() {
     }
 
     switch (event.type) {
-      // TODO: maybe put it behind a feature flag, may only be relevant for ESS
-      case Event.PROPOSAL_NOTIFIED: {
-        const { proposal } = event;
+      case Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW:
+      case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
+        const proposal = event.proposal;
+        const proposalStatus = await proposalSettingsDataSource.getProposalStatus(
+          proposal.statusId
+        );
 
+        // if the new status isn't 'SCHEDULING' ignore the event
         if (
-          // we only care about accepted and reserved proposals
-          ![ProposalEndStatus.ACCEPTED, ProposalEndStatus.RESERVED].includes(
-            proposal.finalStatus
-          )
+          proposalStatus?.shortCode !==
+          ProposalStatusDefaultShortCodes.SCHEDULING
         ) {
+          logger.logDebug(
+            `Proposal '${proposal.id}' status isn't 'SCHEDULING', skipping`,
+            { proposal, proposalStatus }
+          );
+
           return;
         }
 
-        const [review, instrument] = await Promise.all([
-          reviewDataSource.getTechnicalReview(proposal.id),
-          instrumentDataSource.getInstrumentByProposalId(proposal.id),
-        ]);
+        const instrument = await instrumentDataSource.getInstrumentByProposalId(
+          proposal.id
+        );
 
-        if (!review || !instrument) {
-          // TODO: maybe log centrally, probably shouldn't happen
-          console.warn(
-            `Proposal '${proposal.id}' has no review and/or instrument`,
-            { review, instrument }
-          );
+        if (!instrument) {
+          logger.logWarn(`Proposal '${proposal.id}' has no instrument`, {
+            proposal,
+          });
 
           return;
         }
@@ -72,15 +77,21 @@ export function createPostToRabbitMQHandler() {
         const message = {
           proposalId: proposal.id,
           callId: proposal.callId,
-          // the UI supports days only currently
-          allocatedTime: review.timeAllocation * 24 * 60 * 60,
+          // the UI supports days
+          allocatedTime: proposal.managementTimeAllocation * 24 * 60 * 60,
           instrumentId: instrument.id,
         };
 
         const json = JSON.stringify(message);
 
         await rabbitMQ.sendMessage(Queue.PROPOSAL, event.type, json);
-      }
+
+        logger.logDebug(
+          'Proposal event successfully sent to the message broker',
+          { eventType: event.type, json }
+        );
+
+        break;
     }
   };
 }

@@ -6,6 +6,7 @@ import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { Question, TemplateCategoryId, TemplateStep } from '../models/Template';
 import { UserWithRole } from '../models/User';
+import { QuestionsFilter } from '../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
 @injectable()
@@ -30,6 +31,14 @@ export default class TemplateQueries {
     templateId: number
   ): Promise<Question[] | null> {
     return this.dataSource.getComplementaryQuestions(templateId);
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async getQuestions(
+    agent: UserWithRole | null,
+    filter?: QuestionsFilter
+  ): Promise<Question[] | null> {
+    return this.dataSource.getQuestions(filter);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])

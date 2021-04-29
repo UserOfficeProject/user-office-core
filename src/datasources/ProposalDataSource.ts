@@ -9,7 +9,7 @@ export interface ProposalDataSource {
   getProposalsFromView(filter?: ProposalsFilter): Promise<ProposalView[]>;
   // Read
   get(id: number): Promise<Proposal | null>;
-  checkActiveCall(callId: number): Promise<boolean>;
+
   getProposals(
     filter?: ProposalsFilter,
     first?: number,
@@ -21,7 +21,10 @@ export interface ProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
-  getUserProposals(id: number): Promise<Proposal[]>;
+  getUserProposals(
+    id: number,
+    filter?: { instrumentId?: number | null }
+  ): Promise<Proposal[]>;
 
   // Write
   create(
@@ -42,11 +45,7 @@ export interface ProposalDataSource {
     proposalId: number
   ): Promise<ProposalEventsRecord | null>;
   getCount(callId: number): Promise<number>;
-  cloneProposal(
-    clonerId: number,
-    sourceProposal: Proposal,
-    call: Call
-  ): Promise<Proposal>;
+  cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal>;
   resetProposalEvents(
     proposalId: number,
     callId: number,

@@ -34,7 +34,7 @@ test('User officer should be able to clone sample', () => {
 test('User should not be able to clone sample that does not exist', () => {
   return expect(
     sampleMutations.cloneSample(dummyUserOfficerWithRole, 100)
-  ).resolves.toHaveProperty('reason', 'NOT_FOUND');
+  ).resolves.toHaveProperty('reason', 'INTERNAL_ERROR');
 });
 
 test('User should be able to update title of the sample', () => {

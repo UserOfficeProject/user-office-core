@@ -2,6 +2,7 @@ import { logger } from '@esss-swap/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
@@ -22,12 +23,33 @@ export class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization
+    private userAuth: UserAuthorization,
+    @inject(Tokens.CallDataSource)
+    private callDataSource: CallDataSource
   ) {}
   async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
   }
   async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    if (isUserOfficer) {
+      return true;
+    }
+
+    const proposal = (
+      await this.proposalDataSource.getProposals({
+        questionaryIds: [questionaryId],
+      })
+    ).proposals[0];
+
+    const hasActiveCall = await this.callDataSource.checkActiveCall(
+      proposal.callId
+    );
+
+    if (!hasActiveCall) {
+      return false;
+    }
+
     return this.hasRights(agent, questionaryId);
   }
 
@@ -73,7 +95,7 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
     }
 
     const queryResult = await this.sampleDataSource.getSamples({
-      filter: { questionaryId },
+      filter: { questionaryIds: [questionaryId] },
     });
 
     if (queryResult.length !== 1) {
@@ -129,7 +151,7 @@ class ShipmentDeclarationQuestionaryAuthorizer
     }
 
     const queryResult = await this.shipmentDataSource.getAll({
-      filter: { questionaryId },
+      filter: { questionaryIds: [questionaryId] },
     });
 
     if (queryResult.length !== 1) {
