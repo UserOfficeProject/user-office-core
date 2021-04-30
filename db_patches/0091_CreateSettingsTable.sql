@@ -1,7 +1,5 @@
 DO
 $$
-DECLARE 
-settings_value varchar;
 BEGIN
 	IF register_patch('CreateSettings.sql', 'Alberto Popescu', 'Create Settings', '2021-03-25') THEN
 	BEGIN
