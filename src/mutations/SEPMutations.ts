@@ -401,7 +401,10 @@ export default class SEPMutations {
       });
   }
 
-  @ValidateArgs(saveSepMeetingDecisionValidationSchema)
+  @ValidateArgs(saveSepMeetingDecisionValidationSchema, [
+    'commentForUser',
+    'commentForManagement',
+  ])
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   @EventBus(Event.PROPOSAL_SEP_MEETING_SAVED)
   async saveSepMeetingDecision(

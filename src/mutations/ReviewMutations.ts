@@ -37,7 +37,7 @@ export default class ReviewMutations {
   ) {}
 
   @EventBus(Event.PROPOSAL_SEP_REVIEW_UPDATED)
-  @ValidateArgs(proposalGradeValidationSchema)
+  @ValidateArgs(proposalGradeValidationSchema, ['comment'])
   @Authorized()
   async updateReview(
     agent: UserWithRole | null,
@@ -125,7 +125,10 @@ export default class ReviewMutations {
   }
 
   @EventBus(Event.PROPOSAL_FEASIBILITY_REVIEW_UPDATED)
-  @ValidateArgs(proposalTechnicalReviewValidationSchema)
+  @ValidateArgs(proposalTechnicalReviewValidationSchema, [
+    'comment',
+    'publicComment',
+  ])
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async setTechnicalReview(
     agent: UserWithRole | null,

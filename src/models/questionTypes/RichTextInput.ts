@@ -8,7 +8,7 @@ import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
 
 // explicitly limit the accepted elements, attributes, styles
-const sanitizerConfig: IOptions = {
+export const sanitizerConfig: IOptions = {
   allowedTags: [
     'p',
     'span',
