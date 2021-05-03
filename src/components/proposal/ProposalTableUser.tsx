@@ -17,7 +17,7 @@ export type PartialProposalsDataType = {
   submitted: boolean;
   shortCode: string;
   created: string | null;
-  call: Maybe<Pick<Call, 'shortCode' | 'id'>>;
+  call?: Maybe<Pick<Call, 'shortCode' | 'id' | 'isActive'>>;
   proposerId?: number;
 };
 

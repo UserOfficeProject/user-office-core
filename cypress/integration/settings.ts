@@ -388,7 +388,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="is-review-submitted"]').click();
 
-      cy.get('[data-cy="update-technical-review"]').click();
+      cy.get('[data-cy="save-technical-review"]').click();
 
       cy.notification({
         variant: 'success',
@@ -711,7 +711,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="is-review-submitted"]').click();
 
-      cy.get('[data-cy="update-technical-review"]').click();
+      cy.get('[data-cy="save-technical-review"]').click();
 
       cy.notification({
         variant: 'success',
@@ -735,7 +735,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="is-review-submitted"]').click();
 
-      cy.get('[data-cy="update-technical-review"]').click();
+      cy.get('[data-cy="save-technical-review"]').click();
 
       cy.notification({
         variant: 'success',

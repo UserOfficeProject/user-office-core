@@ -8,7 +8,6 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { Answer } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { EventType } from 'models/QuestionarySubmissionState';
 import { SampleSubmissionState } from 'models/SampleSubmissionState';
@@ -60,8 +59,7 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const sampleBasisPreSubmit = (answer: Answer) => async ({
+const sampleBasisPreSubmit = () => async ({
   api,
   dispatch,
   state,

@@ -22,6 +22,6 @@ export const dateDefinition: QuestionaryComponentDefinition = {
   icon: <TodayIcon />,
   renderers: defaultRenderer,
   createYupValidationSchema: createDateValidationSchema,
-  getYupInitialValue: ({ answer }) => answer.value || '',
+  getYupInitialValue: ({ answer }) => answer.value,
   searchCriteriaComponent: DateSearchCriteriaInput,
 };

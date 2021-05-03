@@ -23,6 +23,7 @@ function createProposalStub(
     proposer: proposer,
     questionary: {
       questionaryId: 0,
+      isCompleted: false,
       templateId: templateId,
       created: new Date(),
       steps: questionarySteps,
@@ -30,14 +31,16 @@ function createProposalStub(
     questionaryId: 0,
     shortCode: '',
     status: {
-      id: 0,
-      shortCode: '',
-      description: '',
-      name: '',
+      id: 1,
+      shortCode: 'DRAFT',
+      description:
+        'When proposal is created it gets draft status before it is submitted.',
+      name: 'DRAFT',
       isDefault: true,
     },
     submitted: false,
     users: [],
+    samples: [],
   };
 }
 

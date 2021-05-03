@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { FormikProps } from 'formik';
 import React, { FC } from 'react';
 
@@ -6,10 +7,11 @@ import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInpu
 import {
   Answer,
   DataType,
-  Question,
   QuestionTemplateRelation,
+  Sdk,
   Template,
 } from 'generated/sdk';
+import { Question } from 'models/Question';
 import { QuestionarySubmissionState } from 'models/QuestionarySubmissionState';
 
 import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefinition';
@@ -32,7 +34,7 @@ export type FormChildren<ValueObjectType> = (
 
 export interface QuestionFormProps {
   question: Question;
-  closeMe: () => unknown;
+  closeMe?: () => unknown;
   onUpdated?: (question: Question) => unknown;
   onDeleted?: (question: Question) => unknown;
   children?: FormChildren<Question>;
@@ -40,18 +42,18 @@ export interface QuestionFormProps {
 export interface QuestionTemplateRelationFormProps {
   questionRel: QuestionTemplateRelation;
   template: Template;
-  closeMe: () => unknown;
+  closeMe?: () => unknown;
   onUpdated?: (template: Template) => unknown;
   onDeleted?: (template: Template) => unknown;
   onOpenQuestionClicked?: (question: Question) => unknown;
   children?: FormChildren<QuestionTemplateRelation>;
 }
 
+export type QuestionRenderer = React.FunctionComponent<Question>;
+export type AnswerRenderer = React.FunctionComponent<Answer>;
 export interface Renderers {
-  readonly questionRenderer: (props: {
-    question: Question;
-  }) => JSX.Element | null;
-  readonly answerRenderer: (props: { answer: Answer }) => JSX.Element | null;
+  readonly questionRenderer: QuestionRenderer;
+  readonly answerRenderer: AnswerRenderer;
 }
 
 export interface QuestionaryComponentDefinition {
@@ -63,8 +65,13 @@ export interface QuestionaryComponentDefinition {
     props: BasicComponentProps
   ) => JSX.Element | null;
   readonly renderers?: Renderers;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  readonly createYupValidationSchema: ((field: Answer) => object) | null;
+  readonly createYupValidationSchema:
+    | ((
+        field: Answer,
+        state: QuestionarySubmissionState,
+        api?: () => Sdk
+      ) => object)
+    | null;
   readonly getYupInitialValue: (props: {
     answer: Answer;
     state: QuestionarySubmissionState;
@@ -138,3 +145,11 @@ export function createQuestionaryComponent(
 export const getTemplateFieldIcon = (dataType: DataType) => {
   return getQuestionaryComponentDefinition(dataType).icon;
 };
+
+export const creatableQuestions = registry.filter(
+  (def) => def.creatable === true
+);
+
+export const nonCreatableQuestions = registry.filter(
+  (def) => def.creatable === false
+);

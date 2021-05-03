@@ -114,9 +114,11 @@ export function SampleDeclarationContainer(props: {
       <QuestionaryStepView
         readonly={isReadonly}
         topicId={wizardStep.payload.topicId}
-        onStepComplete={() =>
-          isLastStep(wizardStep) ? props.sampleEditDone?.() : undefined
-        }
+        onStepComplete={() => {
+          if (isLastStep(wizardStep)) {
+            props.sampleEditDone?.();
+          }
+        }}
       />
     );
   };

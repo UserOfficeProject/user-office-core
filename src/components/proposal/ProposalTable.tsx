@@ -69,7 +69,8 @@ const ProposalTable = ({
     { title: 'Status', field: 'publicStatus' },
     {
       title: 'Call',
-      render: (rowData: PartialProposalsDataType) => rowData.call?.shortCode,
+      field: 'call.shortCode',
+      emptyValue: '-',
     },
     { title: 'Created', field: 'created' },
   ];
@@ -141,9 +142,12 @@ const ProposalTable = ({
         }}
         actions={[
           (rowData) => {
+            const isCallActive = rowData.call?.isActive ?? true;
+            const readOnly = !isCallActive || rowData.submitted;
+
             return {
-              icon: rowData.submitted ? () => <Visibility /> : () => <Edit />,
-              tooltip: rowData.submitted ? 'View proposal' : 'Edit proposal',
+              icon: readOnly ? () => <Visibility /> : () => <Edit />,
+              tooltip: readOnly ? 'View proposal' : 'Edit proposal',
               onClick: (event, rowData) =>
                 setEditProposalID((rowData as PartialProposalsDataType).id),
             };

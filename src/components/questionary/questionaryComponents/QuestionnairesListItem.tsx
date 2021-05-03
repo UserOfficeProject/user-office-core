@@ -9,7 +9,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import DescriptionIcon from '@material-ui/icons/Description';
 import FileCopy from '@material-ui/icons/FileCopy';
-import React from 'react';
+import React, { MouseEvent } from 'react';
 
 import { QuestionnairesListRow } from './QuestionnairesList';
 
@@ -68,7 +68,7 @@ export function QuestionnairesListItem(props: {
           edge="start"
           aria-label="clone"
           data-cy="clone"
-          onClick={(e) => {
+          onClick={(e: MouseEvent) => {
             e.stopPropagation();
             props.onCloneClick(props.record);
           }}
@@ -81,7 +81,7 @@ export function QuestionnairesListItem(props: {
           edge="end"
           aria-label="delete"
           data-cy="delete"
-          onClick={(e) => {
+          onClick={(e: MouseEvent) => {
             e.stopPropagation();
             props.onDeleteClick(props.record);
           }}

@@ -67,22 +67,8 @@ context('Template tests', () => {
       .clear()
       .type(`${faker.random.words(1)}{enter}`);
 
-    cy.get('[data-cy=show-more-button]').click();
-
-    cy.contains('Add question').click();
-
     /* Add Text Input */
-    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-      .last()
-      .click();
-
-    cy.contains('Add Text Input').click();
-
-    cy.get('[data-cy=question]').clear().type(textQuestion);
-
-    cy.contains('Is required').click();
-
-    cy.contains('Save').click();
+    cy.createTextQuestion(textQuestion);
 
     cy.contains(textQuestion)
       .closest('[data-cy=question-container]')
@@ -106,10 +92,6 @@ context('Template tests', () => {
 
     cy.createTopic(topic);
 
-    cy.get('[data-cy=show-more-button]').last().click();
-
-    cy.get('[data-cy=add-question-menu-item]').last().click();
-
     /* Boolean */
 
     cy.createBooleanQuestion(booleanQuestion);
@@ -125,23 +107,9 @@ context('Template tests', () => {
     /* --- */
 
     /* Interval */
-    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-      .last()
-      .click();
-
-    cy.contains('Add Interval').click();
-
-    cy.get('[data-cy=question]').clear().type(intervalQuestion);
-
-    cy.get('[data-cy=units]>[role=button]').click({ force: true });
-
-    cy.contains('celsius').click();
-
-    cy.contains('kelvin').click();
-
-    cy.get('body').type('{esc}');
-
-    cy.contains('Save').click();
+    cy.createIntervalQuestion(intervalQuestion, {
+      units: ['celsius', 'kelvin'],
+    });
 
     cy.contains(intervalQuestion)
       .closest('[data-cy=question-container]')
@@ -151,27 +119,13 @@ context('Template tests', () => {
         intervalId = fieldId;
       });
 
-    cy.contains(intervalQuestion)
-      .parent()
-      .dragElement([{ direction: 'left', length: 1 }]);
     /* --- */
 
     /* Number */
-    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
-    cy.contains('Add Number').click();
-
-    cy.get('[data-cy=question]').clear().type(numberQuestion);
-
-    cy.get('[data-cy=units]>[role=button]').click({ force: true });
-
-    cy.contains('celsius').click();
-
-    cy.contains('kelvin').click();
-
-    cy.get('body').type('{esc}');
-
-    cy.contains('Save').click();
+    cy.createNumberInputQuestion(numberQuestion, {
+      units: ['celsius', 'kelvin'],
+    });
 
     cy.contains(numberQuestion)
       .closest('[data-cy=question-container]')
@@ -181,13 +135,14 @@ context('Template tests', () => {
         numberId = fieldId;
       });
 
-    cy.contains(numberQuestion)
-      .parent()
-      .dragElement([{ direction: 'left', length: 1 }]);
     /* --- */
 
     /* Text input */
-    cy.createTextQuestion(textQuestion, true, true, minimumCharacters);
+    cy.createTextQuestion(textQuestion, {
+      isRequired: true,
+      isMultipleLines: true,
+      minimumCharacters: minimumCharacters,
+    });
 
     cy.contains(textQuestion)
       .closest('[data-cy=question-container]')
@@ -257,12 +212,11 @@ context('Template tests', () => {
       .should('not.contain', textQuestion);
 
     /* Selection from options */
-    cy.createMultipleChoiceQuestion(
-      multipleChoiceQuestion,
-      multipleChoiceAnswers[0],
-      multipleChoiceAnswers[1],
-      multipleChoiceAnswers[2]
-    );
+    cy.createMultipleChoiceQuestion(multipleChoiceQuestion, {
+      option1: multipleChoiceAnswers[0],
+      option2: multipleChoiceAnswers[1],
+      option3: multipleChoiceAnswers[2],
+    });
 
     cy.contains(multipleChoiceQuestion)
       .closest('[data-cy=question-container]')
@@ -304,33 +258,16 @@ context('Template tests', () => {
     /* --- */
 
     /* File */
-    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-      .last()
-      .click();
 
-    cy.contains('Add File Upload').click();
+    cy.createFileUploadQuestion(fileQuestion);
 
-    cy.get('[data-cy=question]').clear().type(fileQuestion);
-
-    cy.contains('Save').click();
-
-    cy.contains(fileQuestion);
-
-    cy.contains(fileQuestion)
-      .parent()
-      .dragElement([{ direction: 'left', length: 1 }]);
     /* --- */
 
     /* Rich Text Input */
-    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-      .last()
-      .click();
 
-    cy.contains('Add Rich Text Input').click();
-
-    cy.get('[data-cy=question]').clear().type(richTextInputQuestion);
-
-    cy.contains('Save').click();
+    cy.createRichTextInput(richTextInputQuestion, {
+      maxChars: richTextEditorMaxChars,
+    });
 
     cy.contains(richTextInputQuestion);
 
@@ -342,16 +279,6 @@ context('Template tests', () => {
         richTextInputId = fieldId;
       });
 
-    cy.contains(richTextInputQuestion)
-      .parent()
-      .dragElement([{ direction: 'left', length: 1 }]);
-
-    cy.finishedLoading();
-    cy.contains(richTextInputQuestion).click();
-
-    cy.get('[data-cy="max"] input').clear().type(`${richTextEditorMaxChars}`);
-
-    cy.contains('Update').click();
     /* --- */
 
     /* --- Update templateQuestionRelation */
@@ -573,15 +500,15 @@ context('Template tests', () => {
 
       cy.get('@dateField').clear().type('2020-01-01');
       cy.contains('Save and continue').click();
-      cy.contains('Value must be a date at or after');
+      cy.contains('Date must be no earlier than');
 
       cy.get('@dateField').clear().type('2022-01-01');
       cy.contains('Save and continue').click();
-      cy.contains('Value must be a date at or before');
+      cy.contains('Date must be no latter than');
 
       cy.get('@dateField').clear().type('2021-01-15');
       cy.contains('Save and continue').click();
-      cy.contains('Value must be a date at or').should('not.exist');
+      cy.contains('Date must be no').should('not.exist');
     });
   });
 
@@ -1123,34 +1050,13 @@ context('Template tests', () => {
     cy.get('[data-cy="submit"]').click();
     cy.contains(templateName);
 
-    cy.get('[data-cy=show-more-button]').last().click();
-
-    cy.get('[data-cy=add-question-menu-item]').last().click();
-
     const field1 = 'boolean_1_' + Date.now();
     const field2 = 'boolean_2_' + Date.now();
     const field3 = 'boolean_3_' + Date.now();
 
-    function addBooleanField(fieldName: string) {
-      cy.get('[data-cy=questionPicker] [data-cy=show-more-button]')
-        .last()
-        .click();
-      cy.contains('Add Boolean').click();
-
-      cy.get('[data-cy="natural_key"]').clear().type(fieldName);
-      cy.get('[data-cy="question"]').clear().type(fieldName);
-      cy.contains('Save').click();
-
-      cy.contains(fieldName)
-        .parent()
-        .dragElement([{ direction: 'left', length: 1 }]);
-    }
-
-    addBooleanField(field1);
-    addBooleanField(field2);
-    addBooleanField(field3);
-
-    cy.finishedLoading();
+    cy.createBooleanQuestion(field1);
+    cy.createBooleanQuestion(field2);
+    cy.createBooleanQuestion(field3);
 
     function addDependency(
       fieldName: string,

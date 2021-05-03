@@ -22,9 +22,7 @@ export const fileUploadDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <AttachFileIcon />,
   renderers: {
-    answerRenderer: function AnswerRendererComponent({ answer }) {
-      return <FilesAnswerRenderer answer={answer} />;
-    },
+    answerRenderer: FilesAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,
   },
   createYupValidationSchema: () => Yup.array().of(Yup.string()),

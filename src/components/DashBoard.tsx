@@ -31,7 +31,8 @@ import ProposalChooseCall from './proposal/ProposalChooseCall';
 import ProposalCreate from './proposal/ProposalCreate';
 import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
-import MyBeamTimes from './proposalBooking/MyBeamTimes';
+import InstrSciUpcomingBeamTimesTable from './proposalBooking/InstrSciUpcomingBeamTimesTable';
+import UserMyBeamTimesTable from './proposalBooking/UserMyBeamTimesTable';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
@@ -45,6 +46,7 @@ import ShipmentCreate from './shipments/CreateUpdateShipment';
 import MyShipments from './shipments/MyShipments';
 import ShipmentsPage from './shipments/ShipmentsPage';
 import ProposalTemplates from './template/ProposalTemplates';
+import QuestionsPage from './template/QuestionsPage';
 import SampleTemplatesPage from './template/SampleTemplates';
 import ShipmentTemplatesPage from './template/ShipmentTemplatesPage';
 import TemplateEditor from './template/TemplateEditor';
@@ -268,7 +270,16 @@ const Dashboard: React.FC = () => {
             <Route path="/ApiAccessTokens" component={ApiAccessTokensPage} />
           )}
           {isSchedulerEnabled && (
-            <Route path="/MyBeamTimes" component={MyBeamTimes} />
+            <Route path="/MyBeamTimes" component={UserMyBeamTimesTable} />
+          )}
+          {isSchedulerEnabled && (
+            <Route
+              path="/UpcomingBeamTimes"
+              component={InstrSciUpcomingBeamTimesTable}
+            />
+          )}
+          {isUserOfficer && (
+            <Route path="/Questions" component={QuestionsPage} />
           )}
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}

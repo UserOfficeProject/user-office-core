@@ -6,11 +6,13 @@ import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
 import BeamTimesTable from './BeamTimesTable';
 
-export default function MyBeamTimes() {
+export default function UserMyBeamTimesTable() {
   const {
     loading,
     proposalScheduledEvents,
-  } = useProposalBookingsScheduledEvents();
+  } = useProposalBookingsScheduledEvents({
+    notDraft: true,
+  });
 
   return (
     <ContentContainer>

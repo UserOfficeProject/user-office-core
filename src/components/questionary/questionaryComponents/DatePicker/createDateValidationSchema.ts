@@ -16,8 +16,13 @@ export const createDateValidationSchema: QuestionaryComponentDefinition['createY
   answer
 ) => {
   let schema = Yup.date()
+    .nullable()
     .typeError('Invalid Date Format')
-    .transform(function (value: Date) {
+    .transform(function (value: Date | null) {
+      if (value === null) {
+        return null;
+      }
+
       return normalizeDate(value);
     });
 
@@ -31,7 +36,7 @@ export const createDateValidationSchema: QuestionaryComponentDefinition['createY
     const minDate = normalizeDate(new Date(config.minDate));
     schema = schema.min(
       minDate,
-      `Value must be a date at or after ${moment(minDate).format('yyyy-MM-DD')}`
+      `Date must be no earlier than ${moment(minDate).format('yyyy-MM-DD')}`
     );
   }
 
@@ -39,9 +44,7 @@ export const createDateValidationSchema: QuestionaryComponentDefinition['createY
     const maxDate = normalizeDate(new Date(config.maxDate));
     schema = schema.max(
       maxDate,
-      `Value must be a date at or before ${moment(maxDate).format(
-        'yyyy-MM-DD'
-      )}`
+      `Date must be no latter than ${moment(maxDate).format('yyyy-MM-DD')}`
     );
   }
 

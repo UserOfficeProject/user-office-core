@@ -76,8 +76,20 @@ const proposalReducer = (
   return draftState;
 };
 
-const isProposalSubmitted = (proposal: { submitted: boolean }) =>
+const isProposalSubmitted = (proposal: Pick<Proposal, 'submitted'>) =>
   proposal.submitted;
+
+function isReadOnly(proposal: ProposalSubsetSubmission) {
+  if (
+    proposal.status != null &&
+    (proposal.status.shortCode.toString() === 'DRAFT' ||
+      proposal.status.shortCode.toString() === 'EDITABLE_SUBMITTED')
+  ) {
+    return false;
+  } else {
+    return true;
+  }
+}
 
 const createQuestionaryWizardStep = (
   step: QuestionaryStep,
@@ -92,9 +104,7 @@ const createQuestionaryWizardStep = (
     return {
       title: questionaryStep.topic.title,
       isCompleted: questionaryStep.isCompleted,
-      isReadonly:
-        isProposalSubmitted(proposalState.proposal) ||
-        (index > 0 && state.steps[index - 1].isCompleted === false),
+      isReadonly: isReadOnly(proposalState.proposal),
     };
   },
 });
@@ -109,8 +119,8 @@ const createReviewWizardStep = (): WizardStep => ({
       title: 'Review',
       isCompleted: isProposalSubmitted(proposalState.proposal),
       isReadonly:
-        isProposalSubmitted(proposalState.proposal) ||
-        lastProposalStep.isCompleted === false,
+        isReadOnly(proposalState.proposal) &&
+        lastProposalStep.isCompleted === true,
     };
   },
 });
@@ -147,7 +157,7 @@ export default function ProposalContainer(props: {
           />
         );
       case 'ProposalReview':
-        return <ProposalSummary data={state} readonly={false} />;
+        return <ProposalSummary data={state} readonly={isReadonly} />;
 
       default:
         throw new Error(`Unknown step type ${metadata.type}`);

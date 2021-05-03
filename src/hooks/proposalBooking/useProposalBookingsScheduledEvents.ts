@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { ScheduledEvent, Proposal } from 'generated/sdk';
+import { ScheduledEvent, Proposal, ProposalBookingStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { toTzLessDateTime } from 'utils/Time';
 
@@ -11,7 +11,15 @@ export type ProposalScheduledEvent = Pick<
   proposal: Pick<Proposal, 'id' | 'title' | 'shortCode'>;
 };
 
-export function useProposalBookingsScheduledEvents(onlyUpcoming?: boolean) {
+export function useProposalBookingsScheduledEvents({
+  onlyUpcoming,
+  notDraft,
+  instrumentId,
+}: {
+  onlyUpcoming?: boolean;
+  notDraft?: boolean;
+  instrumentId?: number;
+} = {}) {
   const [proposalScheduledEvents, setProposalScheduledEvents] = useState<
     ProposalScheduledEvent[]
   >([]);
@@ -26,6 +34,10 @@ export function useProposalBookingsScheduledEvents(onlyUpcoming?: boolean) {
     api()
       .getUserProposalBookingsWithEvents({
         ...(onlyUpcoming ? { endsAfter: toTzLessDateTime(new Date()) } : null),
+        status: notDraft
+          ? [ProposalBookingStatus.BOOKED, ProposalBookingStatus.CLOSED]
+          : null,
+        instrumentId,
       })
       .then((data) => {
         if (unmounted) {
@@ -59,7 +71,7 @@ export function useProposalBookingsScheduledEvents(onlyUpcoming?: boolean) {
     return () => {
       unmounted = true;
     };
-  }, [onlyUpcoming, api]);
+  }, [onlyUpcoming, notDraft, instrumentId, api]);
 
   return { loading, proposalScheduledEvents };
 }

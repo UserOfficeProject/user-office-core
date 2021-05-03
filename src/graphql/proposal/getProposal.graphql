@@ -34,10 +34,17 @@ query getProposal($id: Int!) {
     call {
       id
       shortCode
+      isActive
     }
     sep {
       id
       code
+    }
+    samples {
+      ...sample
+      questionary {
+        isCompleted
+      }
     }
   }
 }

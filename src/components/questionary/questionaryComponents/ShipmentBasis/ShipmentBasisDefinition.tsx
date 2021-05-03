@@ -1,4 +1,4 @@
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';
@@ -21,7 +21,7 @@ export const shipmentBasisDefinition: QuestionaryComponentDefinition = {
   questionTemplateRelationForm: () => QuestionTemplateRelationShipmentBasisForm,
   readonly: true,
   creatable: false,
-  icon: <QuestionAnswerIcon />,
+  icon: <LocalShippingIcon />,
   createYupValidationSchema: createShipmentBasisValidationSchema,
   getYupInitialValue: ({ state }): ShipmentBasisFormikData => {
     const shipmentState = state as ShipmentSubmissionState;

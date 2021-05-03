@@ -5,11 +5,12 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
-import { ErrorMessage, FieldArray, Form, Formik } from 'formik';
+import { FieldArray, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
 import * as yup from 'yup';
 
+import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
 import { Event } from 'generated/sdk';
 import { useProposalEventsData } from 'hooks/settings/useProposalEventsData';
@@ -38,10 +39,6 @@ const useStyles = makeStyles((theme) => ({
     overflowY: 'auto',
     overflowX: 'hidden',
     marginTop: '10px',
-  },
-  error: {
-    color: theme.palette.error.main,
-    marginRight: '10px',
   },
   submitContainer: {
     margin: theme.spacing(2, 0, 2),
@@ -149,11 +146,7 @@ const AddStatusChangingEventsToConnection: React.FC<AddStatusChangingEventsToCon
               className={classes.submitContainer}
             >
               <Grid item>
-                <ErrorMessage
-                  className={classes.error}
-                  component="span"
-                  name="selectedStatusChangingEvents"
-                />
+                <ErrorMessage name="selectedStatusChangingEvents" />
 
                 <Button
                   type="submit"

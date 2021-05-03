@@ -42,11 +42,20 @@ function SampleList(props: {
   );
 }
 
-function SamplesAnswerRenderer(props: { answer: Answer }) {
+interface SamplesAnswerRendererProps {
+  proposalId: number;
+  answer: Answer;
+}
+
+const SamplesAnswerRenderer = ({
+  proposalId,
+  answer,
+}: SamplesAnswerRendererProps) => {
   const [selectedSampleId, setSelectedSampleId] = useState<number | null>(null);
 
   const { samples } = useSamples({
-    sampleIds: props.answer.value,
+    proposalId: proposalId,
+    questionId: answer.question.id,
   });
 
   return (
@@ -76,6 +85,6 @@ function SamplesAnswerRenderer(props: { answer: Answer }) {
       </InputDialog>
     </div>
   );
-}
+};
 
 export default SamplesAnswerRenderer;

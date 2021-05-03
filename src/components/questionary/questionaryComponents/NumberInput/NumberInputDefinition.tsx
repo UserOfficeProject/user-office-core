@@ -6,6 +6,7 @@ import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createNumberInputValidationSchema } from './createNumberInputValidationSchema';
+import NumberInputAnswerRenderer from './NumberInputAnswerRenderer';
 import NumberSearchCriteriaComponent from './NumberSearchCriteriaComponent';
 import { QuestionaryComponentNumber } from './QuestionaryComponentNumberInput';
 import { QuestionNumberForm } from './QuestionNumberInputForm';
@@ -21,21 +22,7 @@ export const numberInputDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <ExposureZeroIcon />,
   renderers: {
-    answerRenderer: function AnswerRendererComponent({ answer }) {
-      if (!answer.value.value) {
-        return <span>Left blank</span>;
-      }
-
-      const value = answer.value.value;
-      const unit = answer.value.unit;
-
-      return (
-        <span>
-          {value}
-          {unit ? ` ${unit}` : ''}
-        </span>
-      );
-    },
+    answerRenderer: NumberInputAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,
   },
 

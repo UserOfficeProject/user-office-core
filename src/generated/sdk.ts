@@ -61,6 +61,15 @@ export type Answer = {
   value: Maybe<Scalars['IntStringDateBoolArray']>;
 };
 
+export type AnswerBasic = {
+  __typename?: 'AnswerBasic';
+  answerId: Maybe<Scalars['Int']>;
+  answer: Scalars['IntStringDateBoolArray'];
+  questionaryId: Scalars['Int'];
+  questionId: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+};
+
 export type AnswerInput = {
   questionId: Scalars['String'];
   value?: Maybe<Scalars['String']>;
@@ -149,6 +158,8 @@ export type Call = {
   endNotify: Scalars['DateTime'];
   startCycle: Scalars['DateTime'];
   endCycle: Scalars['DateTime'];
+  referenceNumberFormat: Maybe<Scalars['String']>;
+  proposalSequence: Maybe<Scalars['Int']>;
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
   proposalWorkflowId: Maybe<Scalars['Int']>;
@@ -156,6 +167,7 @@ export type Call = {
   instruments: Array<InstrumentWithAvailabilityTime>;
   proposalWorkflow: Maybe<ProposalWorkflow>;
   proposalCount: Scalars['Int'];
+  isActive: Scalars['Boolean'];
 };
 
 export type CallResponseWrap = {
@@ -211,6 +223,8 @@ export type CreateCallInput = {
   endNotify: Scalars['DateTime'];
   startCycle: Scalars['DateTime'];
   endCycle: Scalars['DateTime'];
+  referenceNumberFormat?: Maybe<Scalars['String']>;
+  proposalSequence?: Maybe<Scalars['Int']>;
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
   proposalWorkflowId?: Maybe<Scalars['Int']>;
@@ -398,7 +412,9 @@ export enum Event {
   SEP_MEMBER_ASSIGNED_TO_PROPOSAL = 'SEP_MEMBER_ASSIGNED_TO_PROPOSAL',
   SEP_MEMBER_REMOVED_FROM_PROPOSAL = 'SEP_MEMBER_REMOVED_FROM_PROPOSAL',
   PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED',
-  PROPOSAL_CLONED = 'PROPOSAL_CLONED'
+  PROPOSAL_CLONED = 'PROPOSAL_CLONED',
+  PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
+  PROPOSAL_STATUS_CHANGED_BY_USER = 'PROPOSAL_STATUS_CHANGED_BY_USER'
 }
 
 export type EventLog = {
@@ -623,7 +639,6 @@ export type Mutation = {
   assignProposalToSEP: NextProposalStatusResponseWrap;
   removeProposalAssignment: SepResponseWrap;
   createSEP: SepResponseWrap;
-  overwriteSepMeetingDecisionRanking: SepMeetingDecisionResponseWrap;
   reorderSepMeetingDecisionProposals: SepMeetingDecisionResponseWrap;
   saveSepMeetingDecision: SepMeetingDecisionResponseWrap;
   updateSEP: SepResponseWrap;
@@ -975,11 +990,6 @@ export type MutationCreateSepArgs = {
   description: Scalars['String'];
   numberRatingsRequired?: Maybe<Scalars['Int']>;
   active: Scalars['Boolean'];
-};
-
-
-export type MutationOverwriteSepMeetingDecisionRankingArgs = {
-  overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput;
 };
 
 
@@ -1475,11 +1485,6 @@ export type OrcIdInformation = {
   token: Maybe<Scalars['String']>;
 };
 
-export type OverwriteSepMeetingDecisionRankingInput = {
-  proposalId: Scalars['Int'];
-  rankOrder: Scalars['Int'];
-};
-
 export type Page = {
   __typename?: 'Page';
   id: Scalars['Int'];
@@ -1543,6 +1548,7 @@ export type Proposal = {
   call: Maybe<Call>;
   questionary: Maybe<Questionary>;
   sepMeetingDecision: Maybe<SepMeetingDecision>;
+  samples: Maybe<Array<Sample>>;
   proposalBooking: Maybe<ProposalBooking>;
 };
 
@@ -1768,6 +1774,7 @@ export type Query = {
   callsByInstrumentScientist: Maybe<Array<Call>>;
   proposals: Maybe<ProposalsQueryResult>;
   instrumentScientistProposals: Maybe<ProposalsQueryResult>;
+  questions: Array<QuestionWithUsage>;
   templates: Maybe<Array<Template>>;
   activeTemplateId: Maybe<Scalars['Int']>;
   basicUserDetails: Maybe<BasicUserDetails>;
@@ -1864,6 +1871,11 @@ export type QueryInstrumentScientistProposalsArgs = {
   filter?: Maybe<ProposalsFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryQuestionsArgs = {
+  filter?: Maybe<QuestionsFilter>;
 };
 
 
@@ -2188,12 +2200,25 @@ export type QuestionTemplateRelation = {
   dependenciesOperator: Maybe<DependenciesLogicOperator>;
 };
 
+export type QuestionWithUsage = {
+  __typename?: 'QuestionWithUsage';
+  id: Scalars['String'];
+  categoryId: TemplateCategoryId;
+  naturalKey: Scalars['String'];
+  dataType: DataType;
+  question: Scalars['String'];
+  config: FieldConfig;
+  answers: Array<AnswerBasic>;
+  templates: Array<Template>;
+};
+
 export type Questionary = {
   __typename?: 'Questionary';
   questionaryId: Scalars['Int'];
   templateId: Scalars['Int'];
   created: Scalars['DateTime'];
   steps: Array<QuestionaryStep>;
+  isCompleted: Scalars['Boolean'];
 };
 
 export type QuestionaryResponseWrap = {
@@ -2213,6 +2238,13 @@ export type QuestionaryStepResponseWrap = {
   __typename?: 'QuestionaryStepResponseWrap';
   error: Maybe<Scalars['String']>;
   questionaryStep: Maybe<QuestionaryStep>;
+};
+
+export type QuestionsFilter = {
+  text?: Maybe<Scalars['String']>;
+  category?: Maybe<TemplateCategoryId>;
+  dataType?: Maybe<Array<DataType>>;
+  excludeDataType?: Maybe<Array<DataType>>;
 };
 
 export type RemoveAssignedInstrumentFromCallInput = {
@@ -2385,7 +2417,7 @@ export enum SampleStatus {
 export type SamplesFilter = {
   title?: Maybe<Scalars['String']>;
   creatorId?: Maybe<Scalars['Int']>;
-  questionaryId?: Maybe<Scalars['Int']>;
+  questionaryIds?: Maybe<Array<Scalars['Int']>>;
   sampleIds?: Maybe<Array<Scalars['Int']>>;
   status?: Maybe<SampleStatus>;
   questionId?: Maybe<Scalars['String']>;
@@ -2409,11 +2441,13 @@ export type ScheduledEvent = {
   bookingType: ScheduledEventBookingType;
   startsAt: Scalars['TzLessDateTime'];
   endsAt: Scalars['TzLessDateTime'];
+  proposalBookingId: Maybe<Scalars['Int']>;
   scheduledBy: Maybe<User>;
   description: Maybe<Scalars['String']>;
   instrument: Maybe<Instrument>;
   equipments: Array<EquipmentWithAssignmentStatus>;
   equipmentAssignmentStatus: Maybe<EquipmentAssignmentStatus>;
+  proposalBooking: Maybe<ProposalBooking>;
 };
 
 
@@ -2514,7 +2548,7 @@ export type ShipmentsFilter = {
   title?: Maybe<Scalars['String']>;
   creatorId?: Maybe<Scalars['Int']>;
   proposalId?: Maybe<Scalars['Int']>;
-  questionaryId?: Maybe<Scalars['Int']>;
+  questionaryIds?: Maybe<Array<Scalars['Int']>>;
   status?: Maybe<ShipmentStatus>;
   externalRef?: Maybe<Scalars['String']>;
   shipmentIds?: Maybe<Array<Scalars['Int']>>;
@@ -2630,6 +2664,7 @@ export type TemplateStep = {
 export type TemplatesFilter = {
   isArchived?: Maybe<Scalars['Boolean']>;
   category?: Maybe<TemplateCategoryId>;
+  templateIds?: Maybe<Array<Scalars['Int']>>;
 };
 
 export type TextInputConfig = {
@@ -2707,6 +2742,8 @@ export type UpdateCallInput = {
   endNotify: Scalars['DateTime'];
   startCycle: Scalars['DateTime'];
   endCycle: Scalars['DateTime'];
+  referenceNumberFormat?: Maybe<Scalars['String']>;
+  proposalSequence?: Maybe<Scalars['Int']>;
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
   proposalWorkflowId?: Maybe<Scalars['Int']>;
@@ -2766,6 +2803,11 @@ export type UserReviewsArgs = {
   status?: Maybe<ReviewStatus>;
   instrumentId?: Maybe<Scalars['Int']>;
   callId?: Maybe<Scalars['Int']>;
+};
+
+
+export type UserProposalsArgs = {
+  instrumentId?: Maybe<Scalars['Int']>;
 };
 
 export type UserQueryResult = {
@@ -3147,23 +3189,6 @@ export type GetSePsQuery = (
       )> }
     )> }
   )> }
-);
-
-export type OverwriteSepMeetingDecisionRankingMutationVariables = Exact<{
-  overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput;
-}>;
-
-
-export type OverwriteSepMeetingDecisionRankingMutation = (
-  { __typename?: 'Mutation' }
-  & { overwriteSepMeetingDecisionRanking: (
-    { __typename?: 'SepMeetingDecisionResponseWrap' }
-    & Pick<SepMeetingDecisionResponseWrap, 'error'>
-    & { sepMeetingDecision: Maybe<(
-      { __typename?: 'SepMeetingDecision' }
-      & Pick<SepMeetingDecision, 'proposalId'>
-    )> }
-  ) }
 );
 
 export type RemoveProposalAssignmentMutationVariables = Exact<{
@@ -3571,6 +3596,7 @@ export type CreateCallMutationVariables = Exact<{
   endCycle: Scalars['DateTime'];
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
+  referenceNumberFormat?: Maybe<Scalars['String']>;
   proposalWorkflowId?: Maybe<Scalars['Int']>;
   templateId?: Maybe<Scalars['Int']>;
 }>;
@@ -3607,7 +3633,7 @@ export type DeleteCallMutation = (
 
 export type CallFragment = (
   { __typename?: 'Call' }
-  & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startSEPReview' | 'endSEPReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'proposalWorkflowId' | 'templateId' | 'proposalCount'>
+  & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startSEPReview' | 'endSEPReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'referenceNumberFormat' | 'proposalWorkflowId' | 'templateId' | 'proposalCount'>
   & { instruments: Array<(
     { __typename?: 'InstrumentWithAvailabilityTime' }
     & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime' | 'submitted'>
@@ -3693,6 +3719,7 @@ export type UpdateCallMutationVariables = Exact<{
   endCycle: Scalars['DateTime'];
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
+  referenceNumberFormat?: Maybe<Scalars['String']>;
   proposalWorkflowId?: Maybe<Scalars['Int']>;
   templateId?: Maybe<Scalars['Int']>;
 }>;
@@ -3987,7 +4014,7 @@ export type CloneProposalMutation = (
         & Pick<Instrument, 'id' | 'name' | 'shortCode'>
       )>, call: Maybe<(
         { __typename?: 'Call' }
-        & Pick<Call, 'id' | 'shortCode'>
+        & Pick<Call, 'id' | 'shortCode' | 'isActive'>
       )> }
       & ProposalFragment
     )> }
@@ -4019,7 +4046,10 @@ export type CreateProposalMutation = (
       )>, users: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
-      )> }
+      )>, samples: Maybe<Array<(
+        { __typename?: 'Sample' }
+        & SampleFragment
+      )>> }
     )> }
   ) }
 );
@@ -4134,11 +4164,18 @@ export type GetProposalQuery = (
       & Pick<Instrument, 'id' | 'name' | 'shortCode'>
     )>, call: Maybe<(
       { __typename?: 'Call' }
-      & Pick<Call, 'id' | 'shortCode'>
+      & Pick<Call, 'id' | 'shortCode' | 'isActive'>
     )>, sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id' | 'code'>
-    )> }
+    )>, samples: Maybe<Array<(
+      { __typename?: 'Sample' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+      ) }
+      & SampleFragment
+    )>> }
     & ProposalFragment
   )> }
 );
@@ -4263,6 +4300,8 @@ export type UpdateProposalMutation = (
 
 export type GetUserProposalBookingsWithEventsQueryVariables = Exact<{
   endsAfter?: Maybe<Scalars['TzLessDateTime']>;
+  status?: Maybe<Array<ProposalBookingStatus> | ProposalBookingStatus>;
+  instrumentId?: Maybe<Scalars['Int']>;
 }>;
 
 
@@ -4615,6 +4654,7 @@ export type CloneSampleMutation = (
       { __typename?: 'Sample' }
       & { questionary: (
         { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
         & QuestionaryFragment
       ) }
       & SampleFragment
@@ -4639,6 +4679,7 @@ export type CreateSampleMutation = (
       { __typename?: 'Sample' }
       & { questionary: (
         { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
         & QuestionaryFragment
       ) }
       & SampleFragment
@@ -4679,6 +4720,7 @@ export type GetSampleQuery = (
     { __typename?: 'Sample' }
     & { questionary: (
       { __typename?: 'Questionary' }
+      & Pick<Questionary, 'isCompleted'>
       & QuestionaryFragment
     ) }
     & SampleFragment
@@ -4696,10 +4738,7 @@ export type GetSamplesQuery = (
     { __typename?: 'Sample' }
     & { questionary: (
       { __typename?: 'Questionary' }
-      & { steps: Array<(
-        { __typename?: 'QuestionaryStep' }
-        & Pick<QuestionaryStep, 'isCompleted'>
-      )> }
+      & Pick<Questionary, 'isCompleted'>
     ) }
     & SampleFragment
   )>> }
@@ -4716,10 +4755,7 @@ export type GetSamplesByCallIdQuery = (
     { __typename?: 'Sample' }
     & { questionary: (
       { __typename?: 'Questionary' }
-      & { steps: Array<(
-        { __typename?: 'QuestionaryStep' }
-        & Pick<QuestionaryStep, 'isCompleted'>
-      )> }
+      & Pick<Questionary, 'isCompleted'>
     ) }
     & SampleFragment
   )>> }
@@ -4742,10 +4778,7 @@ export type UpdateSampleMutation = (
       { __typename?: 'Sample' }
       & { questionary: (
         { __typename?: 'Questionary' }
-        & { steps: Array<(
-          { __typename?: 'QuestionaryStep' }
-          & Pick<QuestionaryStep, 'isCompleted'>
-        )> }
+        & Pick<Questionary, 'isCompleted'>
       ) }
       & SampleFragment
     )> }
@@ -5582,6 +5615,65 @@ export type GetProposalTemplatesQuery = (
   )>> }
 );
 
+export type GetQuestionsQueryVariables = Exact<{
+  filter?: Maybe<QuestionsFilter>;
+}>;
+
+
+export type GetQuestionsQuery = (
+  { __typename?: 'Query' }
+  & { questions: Array<(
+    { __typename?: 'QuestionWithUsage' }
+    & Pick<QuestionWithUsage, 'id' | 'question' | 'naturalKey' | 'dataType' | 'categoryId'>
+    & { config: (
+      { __typename?: 'BooleanConfig' }
+      & FieldConfigBooleanConfigFragment
+    ) | (
+      { __typename?: 'DateConfig' }
+      & FieldConfigDateConfigFragment
+    ) | (
+      { __typename?: 'EmbellishmentConfig' }
+      & FieldConfigEmbellishmentConfigFragment
+    ) | (
+      { __typename?: 'FileUploadConfig' }
+      & FieldConfigFileUploadConfigFragment
+    ) | (
+      { __typename?: 'SelectionFromOptionsConfig' }
+      & FieldConfigSelectionFromOptionsConfigFragment
+    ) | (
+      { __typename?: 'TextInputConfig' }
+      & FieldConfigTextInputConfigFragment
+    ) | (
+      { __typename?: 'SampleBasisConfig' }
+      & FieldConfigSampleBasisConfigFragment
+    ) | (
+      { __typename?: 'SubtemplateConfig' }
+      & FieldConfigSubtemplateConfigFragment
+    ) | (
+      { __typename?: 'ProposalBasisConfig' }
+      & FieldConfigProposalBasisConfigFragment
+    ) | (
+      { __typename?: 'IntervalConfig' }
+      & FieldConfigIntervalConfigFragment
+    ) | (
+      { __typename?: 'NumberInputConfig' }
+      & FieldConfigNumberInputConfigFragment
+    ) | (
+      { __typename?: 'ShipmentBasisConfig' }
+      & FieldConfigShipmentBasisConfigFragment
+    ) | (
+      { __typename?: 'RichTextInputConfig' }
+      & FieldConfigRichTextInputConfigFragment
+    ), answers: Array<(
+      { __typename?: 'AnswerBasic' }
+      & Pick<AnswerBasic, 'questionaryId'>
+    )>, templates: Array<(
+      { __typename?: 'Template' }
+      & Pick<Template, 'templateId'>
+    )> }
+  )> }
+);
+
 export type GetTemplateQueryVariables = Exact<{
   templateId: Scalars['Int'];
 }>;
@@ -5955,7 +6047,7 @@ export type GetUserProposalsQuery = (
         & Pick<BasicUserDetails, 'id'>
       )>, call: Maybe<(
         { __typename?: 'Call' }
-        & Pick<Call, 'id' | 'shortCode'>
+        & Pick<Call, 'id' | 'shortCode' | 'isActive'>
       )> }
     )> }
   )> }
@@ -6183,6 +6275,7 @@ export const CallFragmentDoc = gql`
   endCycle
   cycleComment
   surveyComment
+  referenceNumberFormat
   proposalWorkflowId
   templateId
   instruments {
@@ -6850,18 +6943,6 @@ export const GetSePsDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
-export const OverwriteSepMeetingDecisionRankingDocument = gql`
-    mutation overwriteSepMeetingDecisionRanking($overwriteSepMeetingDecisionRankingInput: OverwriteSepMeetingDecisionRankingInput!) {
-  overwriteSepMeetingDecisionRanking(
-    overwriteSepMeetingDecisionRankingInput: $overwriteSepMeetingDecisionRankingInput
-  ) {
-    error
-    sepMeetingDecision {
-      proposalId
-    }
-  }
-}
-    `;
 export const RemoveProposalAssignmentDocument = gql`
     mutation removeProposalAssignment($proposalId: Int!, $sepId: Int!) {
   removeProposalAssignment(proposalId: $proposalId, sepId: $sepId) {
@@ -7131,9 +7212,9 @@ export const AssignInstrumentsToCallDocument = gql`
 }
     `;
 export const CreateCallDocument = gql`
-    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $proposalWorkflowId: Int, $templateId: Int) {
+    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $referenceNumberFormat: String, $proposalWorkflowId: Int, $templateId: Int) {
   createCall(
-    createCallInput: {shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId}
+    createCallInput: {shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId}
   ) {
     error
     call {
@@ -7187,9 +7268,9 @@ export const RemoveAssignedInstrumentFromCallDocument = gql`
 }
     `;
 export const UpdateCallDocument = gql`
-    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $proposalWorkflowId: Int, $templateId: Int) {
+    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $referenceNumberFormat: String, $proposalWorkflowId: Int, $templateId: Int) {
   updateCall(
-    updateCallInput: {id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId}
+    updateCallInput: {id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId}
   ) {
     error
     call {
@@ -7419,6 +7500,7 @@ export const CloneProposalDocument = gql`
       call {
         id
         shortCode
+        isActive
       }
     }
     error
@@ -7447,13 +7529,17 @@ export const CreateProposalDocument = gql`
       users {
         ...basicUserDetails
       }
+      samples {
+        ...sample
+      }
     }
     error
   }
 }
     ${ProposalStatusFragmentDoc}
 ${QuestionaryFragmentDoc}
-${BasicUserDetailsFragmentDoc}`;
+${BasicUserDetailsFragmentDoc}
+${SampleFragmentDoc}`;
 export const DeleteProposalDocument = gql`
     mutation deleteProposal($id: Int!) {
   deleteProposal(id: $id) {
@@ -7547,17 +7633,25 @@ export const GetProposalDocument = gql`
     call {
       id
       shortCode
+      isActive
     }
     sep {
       id
       code
+    }
+    samples {
+      ...sample
+      questionary {
+        isCompleted
+      }
     }
   }
 }
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
 ${QuestionaryFragmentDoc}
-${CoreTechnicalReviewFragmentDoc}`;
+${CoreTechnicalReviewFragmentDoc}
+${SampleFragmentDoc}`;
 export const GetProposalsDocument = gql`
     query getProposals($filter: ProposalsFilter) {
   proposals(filter: $filter) {
@@ -7674,13 +7768,13 @@ export const UpdateProposalDocument = gql`
 }
     ${BasicUserDetailsFragmentDoc}`;
 export const GetUserProposalBookingsWithEventsDocument = gql`
-    query getUserProposalBookingsWithEvents($endsAfter: TzLessDateTime) {
+    query getUserProposalBookingsWithEvents($endsAfter: TzLessDateTime, $status: [ProposalBookingStatus!], $instrumentId: Int) {
   me {
-    proposals {
+    proposals(instrumentId: $instrumentId) {
       id
       title
       shortCode
-      proposalBooking {
+      proposalBooking(filter: {status: $status}) {
         scheduledEvents(filter: {endsAfter: $endsAfter}) {
           startsAt
           endsAt
@@ -7863,6 +7957,7 @@ export const CloneSampleDocument = gql`
     sample {
       ...sample
       questionary {
+        isCompleted
         ...questionary
       }
     }
@@ -7882,6 +7977,7 @@ export const CreateSampleDocument = gql`
     sample {
       ...sample
       questionary {
+        isCompleted
         ...questionary
       }
     }
@@ -7905,6 +8001,7 @@ export const GetSampleDocument = gql`
   sample(sampleId: $sampleId) {
     ...sample
     questionary {
+      isCompleted
       ...questionary
     }
   }
@@ -7916,9 +8013,7 @@ export const GetSamplesDocument = gql`
   samples(filter: $filter) {
     ...sample
     questionary {
-      steps {
-        isCompleted
-      }
+      isCompleted
     }
   }
 }
@@ -7928,9 +8023,7 @@ export const GetSamplesByCallIdDocument = gql`
   samplesByCallId(callId: $callId) {
     ...sample
     questionary {
-      steps {
-        isCompleted
-      }
+      isCompleted
     }
   }
 }
@@ -7946,9 +8039,7 @@ export const UpdateSampleDocument = gql`
     sample {
       ...sample
       questionary {
-        steps {
-          isCompleted
-        }
+        isCompleted
       }
     }
     error
@@ -8388,6 +8479,26 @@ export const GetProposalTemplatesDocument = gql`
   }
 }
     `;
+export const GetQuestionsDocument = gql`
+    query getQuestions($filter: QuestionsFilter) {
+  questions(filter: $filter) {
+    id
+    question
+    naturalKey
+    dataType
+    categoryId
+    config {
+      ...fieldConfig
+    }
+    answers {
+      questionaryId
+    }
+    templates {
+      templateId
+    }
+  }
+}
+    ${FieldConfigFragmentDoc}`;
 export const GetTemplateDocument = gql`
     query getTemplate($templateId: Int!) {
   template(templateId: $templateId) {
@@ -8695,6 +8806,7 @@ export const GetUserProposalsDocument = gql`
       call {
         id
         shortCode
+        isActive
       }
     }
   }
@@ -8876,9 +8988,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getSEPs(variables: GetSePsQueryVariables): Promise<GetSePsQuery> {
       return withWrapper(() => client.request<GetSePsQuery>(print(GetSePsDocument), variables));
-    },
-    overwriteSepMeetingDecisionRanking(variables: OverwriteSepMeetingDecisionRankingMutationVariables): Promise<OverwriteSepMeetingDecisionRankingMutation> {
-      return withWrapper(() => client.request<OverwriteSepMeetingDecisionRankingMutation>(print(OverwriteSepMeetingDecisionRankingDocument), variables));
     },
     removeProposalAssignment(variables: RemoveProposalAssignmentMutationVariables): Promise<RemoveProposalAssignmentMutation> {
       return withWrapper(() => client.request<RemoveProposalAssignmentMutation>(print(RemoveProposalAssignmentDocument), variables));
@@ -9212,6 +9321,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getProposalTemplates(variables?: GetProposalTemplatesQueryVariables): Promise<GetProposalTemplatesQuery> {
       return withWrapper(() => client.request<GetProposalTemplatesQuery>(print(GetProposalTemplatesDocument), variables));
+    },
+    getQuestions(variables?: GetQuestionsQueryVariables): Promise<GetQuestionsQuery> {
+      return withWrapper(() => client.request<GetQuestionsQuery>(print(GetQuestionsDocument), variables));
     },
     getTemplate(variables: GetTemplateQueryVariables): Promise<GetTemplateQuery> {
       return withWrapper(() => client.request<GetTemplateQuery>(print(GetTemplateDocument), variables));

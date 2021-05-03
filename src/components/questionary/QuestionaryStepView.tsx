@@ -8,7 +8,7 @@ import { useCheckAccess } from 'components/common/Can';
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import { NavigButton } from 'components/common/NavigButton';
 import UOLoader from 'components/common/UOLoader';
-import { Answer, QuestionaryStep, UserRole } from 'generated/sdk';
+import { Answer, QuestionaryStep, Sdk, UserRole } from 'generated/sdk';
 import { usePreSubmitActions } from 'hooks/questionary/useSubmitActions';
 import {
   areDependenciesSatisfied,
@@ -27,6 +27,7 @@ import {
   createQuestionaryComponent,
   getQuestionaryComponentDefinition,
 } from './QuestionaryComponentRegistry';
+import { PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR } from './questionaryComponents/ProposalBasis/QuestionaryComponentProposalBasis';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
@@ -44,7 +45,8 @@ const useStyles = makeStyles((theme) => ({
 
 export const createFormikConfigObjects = (
   answers: Answer[],
-  state: QuestionarySubmissionState
+  state: QuestionarySubmissionState,
+  api: () => Sdk
 ): {
   // eslint-disable-next-line @typescript-eslint/ban-types
   validationSchema: object;
@@ -60,7 +62,7 @@ export const createFormikConfigObjects = (
     if (definition.createYupValidationSchema) {
       validationSchema[
         answer.question.id
-      ] = definition.createYupValidationSchema(answer);
+      ] = definition.createYupValidationSchema(answer, state, api);
       initialValues[answer.question.id] = definition.getYupInitialValue({
         answer,
         state,
@@ -101,6 +103,10 @@ export default function QuestionaryStepView(props: {
     throw new Error(createMissingContextErrorMessage());
   }
 
+  const isCallActive = state.proposal?.call?.isActive ?? true;
+
+  const readOnly = !isUserOfficer && (!isCallActive || props.readonly);
+
   const questionaryStep = getStepByTopicId(state.steps, topicId) as
     | QuestionaryStep
     | undefined;
@@ -117,7 +123,8 @@ export default function QuestionaryStepView(props: {
 
   const { initialValues, validationSchema } = createFormikConfigObjects(
     activeFields,
-    state
+    state,
+    api
   );
 
   const [lastSavedFormValues, setLastSavedFormValues] = useState(initialValues);
@@ -157,15 +164,28 @@ export default function QuestionaryStepView(props: {
     };
   }, [initialValues, lastSavedFormValues, state.isDirty, dispatch]);
 
-  const performSave = async (isPartialSave: boolean) => {
-    const result =
-      (
-        await Promise.all(
-          preSubmitActions(activeFields).map(
-            async (f) => await f({ state, dispatch, api: api() })
-          )
+  const performSave = async (isPartialSave: boolean): Promise<boolean> => {
+    let result = state.questionaryId; // TODO obtain newly created questionary ID some other way
+
+    try {
+      const saveResults = await Promise.all(
+        preSubmitActions(activeFields).map((f) =>
+          f({ state, dispatch, api: api() })
         )
-      ).pop() || state.questionaryId; // TODO obtain newly created questionary ID some other way
+      );
+      const lastResult = saveResults.pop();
+
+      if (lastResult) {
+        result = lastResult; // TODO obtain newly created questionary ID some other way
+      }
+    } catch (err) {
+      // prevent navigation
+      if (err === PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR) {
+        return false;
+      }
+
+      throw err;
+    }
 
     const questionaryId = state.questionaryId || result;
     if (!questionaryId) {
@@ -188,7 +208,12 @@ export default function QuestionaryStepView(props: {
       });
 
       setLastSavedFormValues(initialValues);
+    } else if (answerTopicResult.answerTopic.error) {
+      // prevent navigation
+      return false;
     }
+
+    return true;
   };
 
   const backHandler = () => {
@@ -228,10 +253,11 @@ export default function QuestionaryStepView(props: {
           validateForm,
           setFieldValue,
           isSubmitting,
+          setSubmitting,
         } = formikProps;
 
         return (
-          <form className={props.readonly ? classes.disabled : undefined}>
+          <form className={readOnly ? classes.disabled : undefined}>
             <PromptIfDirty isDirty={state.isDirty} />
             {activeFields.map((field) => {
               return (
@@ -258,10 +284,7 @@ export default function QuestionaryStepView(props: {
                 </div>
               );
             })}
-            <NavigationFragment
-              disabled={props.readonly}
-              isLoading={isSubmitting}
-            >
+            <NavigationFragment disabled={readOnly} isLoading={isSubmitting}>
               <NavigButton
                 onClick={backHandler}
                 disabled={state.stepIndex === 0}
@@ -281,6 +304,7 @@ export default function QuestionaryStepView(props: {
                   isBusy={isSubmitting}
                   variant="contained"
                   color="primary"
+                  data-cy="save-button"
                 >
                   Save
                 </NavigButton>
@@ -290,7 +314,13 @@ export default function QuestionaryStepView(props: {
                   submitFormAsync(submitForm, validateForm).then(
                     async (isValid: boolean) => {
                       if (isValid) {
-                        await performSave(false);
+                        const goNextStep = await performSave(false);
+                        if (!goNextStep) {
+                          setSubmitting(false);
+
+                          return;
+                        }
+
                         dispatch({ type: EventType.GO_STEP_FORWARD });
                         props.onStepComplete?.(topicId);
                       }

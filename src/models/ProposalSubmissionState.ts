@@ -1,4 +1,4 @@
-import { Proposal } from 'generated/sdk';
+import { Proposal, Maybe, Call } from 'generated/sdk';
 
 import { QuestionarySubmissionState } from './QuestionarySubmissionState';
 
@@ -15,7 +15,8 @@ export type ProposalSubsetSubmission = Pick<
   | 'callId'
   | 'questionaryId'
   | 'submitted'
->;
+  | 'samples'
+> & { call?: Maybe<Pick<Call, 'isActive'>> };
 
 export interface ProposalSubmissionState extends QuestionarySubmissionState {
   proposal: ProposalSubsetSubmission;

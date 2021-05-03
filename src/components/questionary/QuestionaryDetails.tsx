@@ -6,7 +6,7 @@ import TableRow from '@material-ui/core/TableRow';
 import React, { FC } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { Answer } from 'generated/sdk';
+import { Answer, DataType, Question } from 'generated/sdk';
 import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import {
   areDependenciesSatisfied,
@@ -28,14 +28,22 @@ export interface TableRowData {
   label: JSX.Element | string | null;
   value: JSX.Element | string | null;
 }
-function QuestionaryDetails(
-  props: {
-    questionaryId: number;
-    additionalDetails?: Array<TableRowData>;
-    title?: string;
-  } & TableProps<FC<unknown>>
-) {
-  const { questionaryId, additionalDetails, title, ...restProps } = props;
+export interface QuestionaryDetailsProps extends TableProps<FC<unknown>> {
+  questionaryId: number;
+  additionalDetails?: Array<TableRowData>;
+  title?: string;
+  answerRenderer?: (answer: Answer) => JSX.Element | null;
+}
+
+function QuestionaryDetails(props: QuestionaryDetailsProps) {
+  const {
+    answerRenderer,
+    questionaryId,
+    additionalDetails,
+    title,
+    ...restProps
+  } = props;
+
   const { questionary, loadingQuestionary } = useQuestionary(questionaryId);
   const classes = useStyles();
 
@@ -54,7 +62,8 @@ function QuestionaryDetails(
     );
 
     return (
-      !definition.readonly &&
+      (!definition.readonly ||
+        field.question.dataType === DataType.SAMPLE_DECLARATION) &&
       areDependenciesSatisfied(questionary.steps, field.question.id)
     );
   });
@@ -81,24 +90,25 @@ function QuestionaryDetails(
           )}
 
           {/* questionary details */}
-          {displayableQuestions.map((question) => {
+          {displayableQuestions.map((answer) => {
             const renderers = getQuestionaryComponentDefinition(
-              question.question.dataType
+              answer.question.dataType
             ).renderers;
 
             if (!renderers) {
               return null;
             }
 
-            const questionElem = renderers.questionRenderer({
-              question: question.question,
-            });
-            const answerElem = renderers.answerRenderer({
-              answer: question,
-            });
+            const questionElem = React.createElement<Question>(
+              renderers.questionRenderer,
+              answer.question
+            );
+            const answerElem =
+              answerRenderer?.(answer) ||
+              React.createElement<Answer>(renderers.answerRenderer, answer);
 
             return createTableRow(
-              `answer-${question.answerId}-${question.question.id}`,
+              `answer-${answer.answerId}-${answer.question.id}`,
               {
                 label: questionElem,
                 value: answerElem,

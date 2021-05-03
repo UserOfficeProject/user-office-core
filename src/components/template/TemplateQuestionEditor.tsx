@@ -9,6 +9,7 @@ import {
   NotDraggingStyle,
 } from 'react-beautiful-dnd';
 
+import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import {
   getQuestionaryComponentDefinition,
   getTemplateFieldIcon,
@@ -198,10 +199,8 @@ export default function TemplateQuestionEditor(props: {
 
           <Grid item xs={10} className={classes.question}>
             {questionDefinition.renderers
-              ? questionDefinition.renderers.questionRenderer({
-                  question: props.data,
-                })
-              : props.data.question}
+              ? questionDefinition.renderers.questionRenderer(props.data)
+              : defaultRenderer.questionRenderer}
           </Grid>
 
           <Grid item xs={12} className={classes.dependencies}>

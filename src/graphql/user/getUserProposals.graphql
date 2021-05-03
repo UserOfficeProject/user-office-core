@@ -19,6 +19,7 @@ query getUserProposals {
       call {
         id
         shortCode
+        isActive
       }
     }
   }

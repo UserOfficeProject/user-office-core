@@ -74,18 +74,19 @@ const CallsTable: React.FC = () => {
         dateformat(new Date(rowData.endCall), 'dd-mmm-yyyy'),
     },
     {
+      title: 'Reference number format',
+      field: 'referenceNumberFormat',
+      render: (rowData: Call): string => rowData.referenceNumberFormat || '',
+    },
+    {
       title: 'Instruments',
-      render: (rowData: Call): string =>
-        rowData.instruments && rowData.instruments.length > 0
-          ? rowData.instruments.length.toString()
-          : '-',
+      field: 'instruments.length',
+      emptyValue: '-',
     },
     {
       title: 'Proposal Workflow',
-      render: (rowData: Call): string =>
-        rowData.proposalWorkflow && rowData.proposalWorkflow.name
-          ? rowData.proposalWorkflow.name
-          : '-',
+      field: 'proposalWorkflow.name',
+      emptyValue: '-',
     },
     {
       title: '#proposals',
