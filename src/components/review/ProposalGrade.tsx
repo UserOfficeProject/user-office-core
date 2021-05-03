@@ -3,13 +3,13 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import { Editor } from '@tinymce/tinymce-react';
 import { Field, Form, Formik, useFormikContext } from 'formik';
-import { TextField, Select } from 'formik-material-ui';
 import React, { useState, useContext } from 'react';
 import { Prompt } from 'react-router';
 
+import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import UOLoader from 'components/common/UOLoader';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import {
@@ -22,13 +22,16 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end',
   },
   button: {
-    marginLeft: '10px',
+    marginLeft: theme.spacing(1),
+  },
+  gradeInput: {
+    marginTop: theme.spacing(1),
   },
 }));
 
@@ -59,6 +62,12 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
   if (!review) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
+
+  const initialValues = {
+    grade: review.grade?.toString() || '',
+    comment: review.comment || '',
+    saveOnly: true,
+  };
 
   const PromptIfDirty = () => {
     const formik = useFormikContext();
@@ -100,11 +109,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
 
   return (
     <Formik
-      initialValues={{
-        grade: review.grade || '',
-        comment: review.comment || '',
-        saveOnly: true,
-      }}
+      initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
         if (shouldSubmit) {
           confirm(
@@ -123,38 +128,45 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
       }}
       validationSchema={proposalGradeValidationSchema}
     >
-      {({ isSubmitting }) => (
+      {({ isSubmitting, setFieldValue }) => (
         <Form>
           <PromptIfDirty />
           <CssBaseline />
-          <Field
-            name="comment"
-            label="Comment"
-            type="text"
-            component={TextField}
-            margin="normal"
-            fullWidth
-            multiline
-            rowsMax="16"
-            rows="4"
+          <InputLabel htmlFor="comment" shrink margin="dense">
+            Comment
+          </InputLabel>
+          <Editor
+            id="comment"
+            initialValue={initialValues.comment}
+            init={{
+              skin: false,
+              content_css: false,
+              plugins: ['link', 'preview', 'code', 'charmap', 'wordcount'],
+              toolbar: 'bold italic',
+              branding: false,
+            }}
+            onEditorChange={(content: string) =>
+              setFieldValue('comment', content)
+            }
             disabled={isDisabled(isSubmitting)}
           />
-          <InputLabel htmlFor="grade-proposal">Grade</InputLabel>
-          <Field
-            name="grade"
-            inputProps={{
-              id: 'grade-proposal',
-            }}
-            component={Select}
-            disabled={isDisabled(isSubmitting)}
-            required
-          >
-            {[...Array(10)].map((e, i) => (
-              <MenuItem key={i} value={i + 1}>
-                {i + 1}
-              </MenuItem>
-            ))}
-          </Field>
+          <Box marginTop={1} width={150}>
+            <Field
+              name="grade"
+              label="Grade"
+              fullWidth
+              component={FormikUICustomSelect}
+              inputProps={{
+                id: 'grade-proposal',
+              }}
+              availableOptions={[...Array(10)].map((e, i) =>
+                (i + 1).toString()
+              )}
+              disabled={isDisabled(isSubmitting)}
+              required
+              data-cy="grade-proposal"
+            />
+          </Box>
           <ButtonContainer>
             {isSubmitting && (
               <Box display="flex" alignItems="center" mx={1}>

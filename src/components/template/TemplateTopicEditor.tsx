@@ -159,7 +159,11 @@ export default function QuestionaryEditorTopic(props: {
         setIsEditMode(false);
         dispatch({
           type: EventType.UPDATE_TOPIC_TITLE_REQUESTED,
-          payload: { topicId: data.topic.id, title: title },
+          payload: {
+            topicId: data.topic.id,
+            title: title,
+            sortOrder: data.topic.sortOrder,
+          },
         });
       }}
       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {

@@ -383,8 +383,16 @@ context('Settings tests', () => {
       cy.get('[data-cy="technical-review-status"]').click();
       cy.contains('Feasible').click();
 
-      cy.get('[data-cy="comment"] textarea').first().type(internalComment);
-      cy.get('[data-cy="publicComment"] textarea').first().type(publicComment);
+      cy.setTinyMceContent('comment', internalComment);
+      cy.setTinyMceContent('publicComment', publicComment);
+
+      cy.getTinyMceContent('comment').then((content) =>
+        expect(content).to.have.string(internalComment)
+      );
+
+      cy.getTinyMceContent('publicComment').then((content) =>
+        expect(content).to.have.string(publicComment)
+      );
 
       cy.get('[data-cy="is-review-submitted"]').click();
 
@@ -480,8 +488,9 @@ context('Settings tests', () => {
 
       cy.get('[role="dialog"]').contains('Grade').click({ force: true });
 
-      cy.get('textarea[name="comment"]').clear().type(faker.lorem.words(3));
-      cy.get('[id="mui-component-select-grade"]').click();
+      cy.setTinyMceContent('comment', faker.lorem.words(3));
+
+      cy.get('[data-cy="grade-proposal"]').click();
 
       cy.get('[role="listbox"] > [role="option"]').first().click();
 
@@ -706,8 +715,8 @@ context('Settings tests', () => {
       cy.get('[data-cy="technical-review-status"]').click();
       cy.get('[role="presentation"]').contains('Feasible').click();
 
-      cy.get('[data-cy="comment"] textarea').first().type(internalComment);
-      cy.get('[data-cy="publicComment"] textarea').first().type(publicComment);
+      cy.setTinyMceContent('comment', internalComment);
+      cy.setTinyMceContent('publicComment', publicComment);
 
       cy.get('[data-cy="is-review-submitted"]').click();
 

@@ -106,35 +106,9 @@ context('Proposal tests', () => {
   it('User officer should be able to change status to one or multiple proposals', () => {
     cy.login('officer');
 
-    cy.get('th input[type="checkbox"]').click();
+    cy.changeProposalStatus('DRAFT');
 
-    cy.get('[data-cy="change-proposal-status"]').click();
-
-    cy.get('[role="dialog"] #mui-component-select-selectedStatusId').should(
-      'not.have.class',
-      'Mui-disabled'
-    );
-
-    cy.get('[role="dialog"] #mui-component-select-selectedStatusId').click();
-
-    cy.get('[role="presentation"] [role="listbox"]').contains('DRAFT').click();
-
-    cy.get('[role="alert"] .MuiAlert-message').contains(
-      'Be aware that changing status to "DRAFT" will reopen proposal for changes and submission.'
-    );
-
-    cy.get('[role="dialog"] #mui-component-select-selectedStatusId').click();
-
-    cy.get('[role="presentation"] [role="listbox"]')
-      .contains('SEP Meeting')
-      .click();
-
-    cy.get('[data-cy="submit-proposal-status-change"]').click();
-
-    cy.notification({
-      variant: 'success',
-      text: 'status changed successfully',
-    });
+    cy.changeProposalStatus('SEP Meeting');
 
     cy.contains(proposalToCloneTitle)
       .parent()

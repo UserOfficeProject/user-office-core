@@ -218,11 +218,19 @@ const TechnicalReviewInfo: React.FC<TechnicalReviewInfoProps> = ({
               <TableCell className={classes.textBold}>
                 Internal comment
               </TableCell>
-              <TableCell>{technicalReview?.comment || '-'}</TableCell>
+              <TableCell
+                dangerouslySetInnerHTML={{
+                  __html: technicalReview?.comment || '-',
+                }}
+              />
               <TableCell className={classes.textBold}>
                 Comments for the review panel
               </TableCell>
-              <TableCell>{technicalReview?.publicComment || '-'}</TableCell>
+              <TableCell
+                dangerouslySetInnerHTML={{
+                  __html: technicalReview?.publicComment || '-',
+                }}
+              />
             </TableRow>
           </TableBody>
         </Table>

@@ -15,6 +15,20 @@ declare global {
         call?: string,
         proposer?: string
       ) => void;
+
+      /**
+       * Change of the proposal status by name with status name passed as second parameter.
+       * If no proposalTitle is passed it selects all proposals.
+       *
+       * @returns {typeof changeProposalStatus}
+       * @memberof Chainable
+       * @example
+       *    cy.changeProposalStatus('DRAFT', 'Proposal title')
+       */
+      changeProposalStatus: (
+        statusName?: string,
+        proposalTitle?: string
+      ) => void;
     }
   }
 }

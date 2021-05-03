@@ -43,6 +43,7 @@ context('Proposal administration tests', () => {
   it('Should be able to set comment for user/manager and final status', () => {
     cy.login('user');
     cy.createProposal(proposalName1);
+    cy.finishedLoading();
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();
@@ -59,11 +60,6 @@ context('Proposal administration tests', () => {
 
     cy.contains('Accepted').click();
 
-    cy.contains('Loading...').should('not.exist');
-    cy.get('#mui-component-select-proposalStatus').click();
-
-    cy.get('[id="menu-proposalStatus"]').contains('DRAFT').click();
-
     cy.get('[data-cy="managementTimeAllocation"] input')
       .clear()
       .type('-123')
@@ -78,23 +74,24 @@ context('Proposal administration tests', () => {
 
     cy.get('[data-cy="managementTimeAllocation"] input').clear().type('20');
 
-    cy.get('[data-cy=commentForUser]').type(textUser);
-
-    cy.get('[data-cy=commentForManagement]').type(textManager);
+    cy.setTinyMceContent('commentForUser', textUser);
+    cy.setTinyMceContent('commentForManagement', textManager);
 
     cy.get('[data-cy="is-management-decision-submitted"]').click();
 
-    cy.contains('Update').click();
+    cy.get('[data-cy="save-admin-decision"]').click();
 
-    cy.get('[data-cy="confirm-ok"]').click();
-
-    cy.notification({ variant: 'success', text: 'Updated' });
+    cy.notification({ variant: 'success', text: 'Saved' });
 
     cy.reload();
 
-    cy.contains(textUser);
+    cy.getTinyMceContent('commentForUser').then((content) =>
+      expect(content).to.have.string(textUser)
+    );
 
-    cy.contains(textManager);
+    cy.getTinyMceContent('commentForManagement').then((content) =>
+      expect(content).to.have.string(textManager)
+    );
 
     cy.get('[data-cy="managementTimeAllocation"] input').should(
       'have.value',
@@ -115,36 +112,7 @@ context('Proposal administration tests', () => {
   it('Should be able to re-open proposal for submission', () => {
     cy.login('officer');
 
-    cy.contains('Proposals').click();
-
-    cy.get('[data-cy=view-proposal]').first().click();
-    cy.finishedLoading();
-    cy.get('[role="dialog"]').as('dialog');
-    cy.get('@dialog').contains('Admin').click();
-
-    cy.contains('Loading...').should('not.exist');
-
-    cy.get('#mui-component-select-proposalStatus').click();
-
-    cy.get('[id="menu-proposalStatus"]').contains('SEP Meeting').click();
-
-    cy.get('@dialog').contains('Update').click();
-
-    cy.notification({ variant: 'success', text: 'Updated' });
-
-    cy.contains('Loading...').should('not.exist');
-
-    cy.get('#mui-component-select-proposalStatus').click();
-
-    cy.get('[id="menu-proposalStatus"]').contains('DRAFT').click();
-
-    cy.get('@dialog').contains('Update').click();
-
-    cy.get('[data-cy="confirm-ok"]').click();
-
-    cy.notification({ variant: 'success', text: 'Updated' });
-
-    cy.closeModal();
+    cy.changeProposalStatus('DRAFT', proposalName1);
 
     cy.contains(proposalName1).parent().contains('No');
 
@@ -172,7 +140,7 @@ context('Proposal administration tests', () => {
 
     cy.reload();
 
-    cy.get('[data-cy="commentForUser"]').should('exist');
+    cy.get('#commentForUser').should('exist');
 
     cy.get('[role="dialog"]').contains('Technical review').click();
 
@@ -197,7 +165,13 @@ context('Proposal administration tests', () => {
 
     cy.contains('Proposals').click();
 
-    cy.request('GET', '/download/pdf/proposal/1').then((response) => {
+    cy.request({
+      url: '/download/pdf/proposal/1',
+      method: 'GET',
+      headers: {
+        authorization: `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`,
+      },
+    }).then((response) => {
       expect(response.headers['content-type']).to.be.equal('application/pdf');
       expect(response.status).to.be.equal(200);
     });

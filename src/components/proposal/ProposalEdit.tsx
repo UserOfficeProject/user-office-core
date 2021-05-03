@@ -16,13 +16,20 @@ export default function ProposalEdit() {
   if (!proposalData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
+
   if (proposalData.notified) {
     return (
       <SimpleTabs tabNames={['Comment', 'Proposal']}>
-        <p>
-          Decision: {getTranslation(proposalData.finalStatus as ResourceId)}
-        </p>
-        <p>Comment: {proposalData.commentForUser}</p>
+        <>
+          <p>
+            Decision: {getTranslation(proposalData.finalStatus as ResourceId)}
+          </p>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: proposalData.commentForUser || '-',
+            }}
+          />
+        </>
         <ProposalContainer proposal={proposalData} />
       </SimpleTabs>
     );

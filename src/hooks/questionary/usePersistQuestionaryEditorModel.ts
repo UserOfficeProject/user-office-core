@@ -206,6 +206,7 @@ export function usePersistQuestionaryEditorModel() {
             updateTopic(action.payload.topicId, {
               title: action.payload.title as string,
               templateId: state.templateId,
+              sortOrder: action.payload.sortOrder,
             })
           );
           break;

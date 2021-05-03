@@ -12,10 +12,11 @@ import {
   QuestionRenderer,
 } from 'components/questionary/QuestionaryComponentRegistry';
 
-export const RichTextInputAnswerRendererComponent: AnswerRenderer = ({
-  question,
-  value,
-}) => {
+export const RichTextInputRendererComponent: React.FC<{
+  id: string;
+  title: string;
+  valueToRender: string;
+}> = ({ id, title, valueToRender }) => {
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => setOpen(true);
@@ -23,16 +24,16 @@ export const RichTextInputAnswerRendererComponent: AnswerRenderer = ({
 
   return (
     <span>
-      <IconButton onClick={handleClickOpen} data-cy={`${question.id}_open`}>
+      <IconButton onClick={handleClickOpen} data-cy={`${id}_open`}>
         <VisibilityIcon />
       </IconButton>
       <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
-        <DialogTitle>{question.question}</DialogTitle>
+        <DialogTitle>{title}</DialogTitle>
 
         <DialogContent>
           <div
             dangerouslySetInnerHTML={{
-              __html: value,
+              __html: valueToRender,
             }}
           />
         </DialogContent>
@@ -48,7 +49,11 @@ export const RichTextInputAnswerRendererComponent: AnswerRenderer = ({
 };
 
 export const RichTextInputAnswerRenderer: AnswerRenderer = (answer) => (
-  <RichTextInputAnswerRendererComponent {...answer} />
+  <RichTextInputRendererComponent
+    id={answer.question.id}
+    title={answer.question.question}
+    valueToRender={answer.value}
+  />
 );
 
 export const RichTextInputQuestionRenderer: QuestionRenderer = (question) => (
