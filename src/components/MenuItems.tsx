@@ -211,49 +211,59 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
 
   const user = (
     <div data-cy="user-menu-items">
-      <ListItem component={NavLink} to="/" exact button>
-        <ListItemIcon>
-          <DashboardIcon />
-        </ListItemIcon>
-        <ListItemText primary="Dashboard" />
-      </ListItem>
-      <ListItem
-        component={NavLink}
-        to={
-          multipleCalls
-            ? '/ProposalSelectType'
-            : `/ProposalCreate/${callsData[0]?.id}/${callsData[0]?.templateId}`
-        }
-        button
-        disabled={proposalDisabled}
-      >
-        <ListItemIcon>
-          <NoteAdd />
-        </ListItemIcon>
-        <ListItemText primary="New Proposal" />
-      </ListItem>
-      {isShipmentFeatureEnabled && (
-        <ListItem component={NavLink} to="/MyShipments" button>
+      <Tooltip title="Dashboard">
+        <ListItem component={NavLink} to="/" exact button>
           <ListItemIcon>
-            <LocalShippingIcon />
+            <DashboardIcon />
           </ListItemIcon>
-          <ListItemText primary="My shipments" />
+          <ListItemText primary="Dashboard" />
         </ListItem>
+      </Tooltip>
+      <Tooltip title="New Proposal">
+        <ListItem
+          component={NavLink}
+          to={
+            multipleCalls
+              ? '/ProposalSelectType'
+              : `/ProposalCreate/${callsData[0]?.id}/${callsData[0]?.templateId}`
+          }
+          button
+          disabled={proposalDisabled}
+        >
+          <ListItemIcon>
+            <NoteAdd />
+          </ListItemIcon>
+          <ListItemText primary="New Proposal" />
+        </ListItem>
+      </Tooltip>
+      {isShipmentFeatureEnabled && (
+        <Tooltip title="My shipments">
+          <ListItem component={NavLink} to="/MyShipments" button>
+            <ListItemIcon>
+              <LocalShippingIcon />
+            </ListItemIcon>
+            <ListItemText primary="My shipments" />
+          </ListItem>
+        </Tooltip>
       )}
       {isSchedulerEnabled && (
-        <ListItem component={NavLink} to="/MyBeamTimes" button>
-          <ListItemIcon>
-            <EventIcon />
-          </ListItemIcon>
-          <ListItemText primary="My beam times" />
-        </ListItem>
+        <Tooltip title="My Beam Times">
+          <ListItem component={NavLink} to="/MyBeamTimes" button>
+            <ListItemIcon>
+              <EventIcon />
+            </ListItemIcon>
+            <ListItemText primary="My beam times" />
+          </ListItem>
+        </Tooltip>
       )}
-      <ListItem component={NavLink} to="/HelpPage" button>
-        <ListItemIcon>
-          <Help />
-        </ListItemIcon>
-        <ListItemText primary="Help" />
-      </ListItem>
+      <Tooltip title="Help">
+        <ListItem component={NavLink} to="/HelpPage" button>
+          <ListItemIcon>
+            <Help />
+          </ListItemIcon>
+          <ListItemText primary="Help" />
+        </ListItem>
+      </Tooltip>
     </div>
   );
 
