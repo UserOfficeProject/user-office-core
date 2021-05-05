@@ -52,6 +52,7 @@ const AccountActionButton: React.FC = () => {
           color="inherit"
           aria-controls="simple-menu"
           aria-haspopup="true"
+          aria-label="Account"
           onClick={handleClick}
           data-cy="profile-page-btn"
         >

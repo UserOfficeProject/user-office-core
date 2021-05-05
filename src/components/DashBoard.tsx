@@ -187,7 +187,7 @@ const Dashboard: React.FC = () => {
         open={open}
       >
         <div className={classes.toolbarIcon}>
-          <IconButton onClick={handleDrawerClose}>
+          <IconButton aria-label="Close drawer" onClick={handleDrawerClose}>
             <ChevronLeftIcon />
           </IconButton>
         </div>

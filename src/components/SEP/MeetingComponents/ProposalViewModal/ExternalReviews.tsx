@@ -47,7 +47,11 @@ const ExternalReviews: React.FC<ExternalReviewsProps> = ({ reviews }) => {
               <TableRow key={`externalReviews_${review.id}_${review.userID}`}>
                 <TableCell>{`${review.reviewer?.firstname} ${review.reviewer?.lastname}`}</TableCell>
                 <TableCell>{review.grade || '-'}</TableCell>
-                <TableCell>{review.comment || '-'}</TableCell>
+                <TableCell
+                  dangerouslySetInnerHTML={{
+                    __html: review?.comment || '-',
+                  }}
+                />
               </TableRow>
             ))}
           </TableBody>

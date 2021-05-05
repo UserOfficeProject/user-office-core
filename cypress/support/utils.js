@@ -100,6 +100,25 @@ const dragElement = (element, moveArgs) => {
   return element;
 };
 
+const setTinyMceContent = (tinyMceId, content) => {
+  cy.get(`#${tinyMceId}`).should('exist');
+
+  cy.window().then((win) => {
+    const editor = win.tinyMCE.editors[tinyMceId];
+    editor.setContent(content);
+  });
+};
+
+const getTinyMceContent = (tinyMceId) => {
+  cy.get(`#${tinyMceId}`).should('exist');
+
+  cy.window().then((win) => {
+    const editor = win.tinyMCE.editors[tinyMceId];
+
+    return editor.getContent();
+  });
+};
+
 Cypress.Commands.add('notification', notification);
 
 Cypress.Commands.add('closeNotification', closeNotification);
@@ -117,3 +136,6 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('presentationMode', presentationMode);
+
+Cypress.Commands.add('setTinyMceContent', setTinyMceContent);
+Cypress.Commands.add('getTinyMceContent', getTinyMceContent);

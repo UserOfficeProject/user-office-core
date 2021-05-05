@@ -2,10 +2,11 @@ import { saveSepMeetingDecisionValidationSchema } from '@esss-swap/duo-validatio
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import InputLabel from '@material-ui/core/InputLabel';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
+import { Editor } from '@tinymce/tinymce-react';
 import { Formik, Form, Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Prompt } from 'react-router';
@@ -148,7 +149,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
             }
           }}
         >
-          {({ isSubmitting }): JSX.Element => (
+          {({ isSubmitting, setFieldValue }): JSX.Element => (
             <Form>
               <PromptIfDirty />
               <Typography variant="h6" gutterBottom>
@@ -156,19 +157,28 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
               </Typography>
               <Grid container spacing={3}>
                 <Grid item xs={6}>
-                  <Field
-                    name="commentForUser"
+                  <InputLabel htmlFor="commentForUser" shrink margin="dense">
+                    Comment for user
+                  </InputLabel>
+                  <Editor
                     id="commentForUser"
-                    label="Comment for user"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    multiline
-                    rowsMax="16"
-                    rows="3"
-                    data-cy="commentForUser"
-                    required
+                    initialValue={initialData.commentForUser}
+                    init={{
+                      skin: false,
+                      content_css: false,
+                      plugins: [
+                        'link',
+                        'preview',
+                        'code',
+                        'charmap',
+                        'wordcount',
+                      ],
+                      toolbar: 'bold italic',
+                      branding: false,
+                    }}
+                    onEditorChange={(content: string) =>
+                      setFieldValue('commentForUser', content)
+                    }
                     disabled={
                       !hasWriteAccess || shouldDisableForm(isSubmitting)
                     }
@@ -190,19 +200,32 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                   />
                 </Grid>
                 <Grid item xs={6}>
-                  <Field
+                  <InputLabel
+                    htmlFor="commentForManagement"
+                    shrink
+                    margin="dense"
+                  >
+                    Comment for management
+                  </InputLabel>
+                  <Editor
                     id="commentForManagement"
-                    name="commentForManagement"
-                    label="Comment for management"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    multiline
-                    rowsMax="16"
-                    rows="3"
-                    data-cy="commentForManagement"
-                    required
+                    initialValue={initialData.commentForManagement}
+                    init={{
+                      skin: false,
+                      content_css: false,
+                      plugins: [
+                        'link',
+                        'preview',
+                        'code',
+                        'charmap',
+                        'wordcount',
+                      ],
+                      toolbar: 'bold italic',
+                      branding: false,
+                    }}
+                    onEditorChange={(content: string) =>
+                      setFieldValue('commentForManagement', content)
+                    }
                     disabled={
                       !hasWriteAccess || shouldDisableForm(isSubmitting)
                     }

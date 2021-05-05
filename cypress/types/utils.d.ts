@@ -70,6 +70,26 @@ declare global {
        *    cy.presentationMode()
        */
       presentationMode: () => void;
+
+      /**
+       * Set content in TinyMCE fetched by editor id.
+       *
+       * @returns {typeof setTinyMceContent}
+       * @memberof Chainable
+       * @example
+       *    cy.setTinyMceContent('editorId', 'content to type inside the editor')
+       */
+      setTinyMceContent: (tinyMceId: string, content: string) => void;
+
+      /**
+       * Get content from TinyMCE editor fetched by editor id.
+       *
+       * @returns {typeof getTinyMceContent}
+       * @memberof Chainable
+       * @example
+       *    cy.getTinyMceContent('editorId')
+       */
+      getTinyMceContent: (tinyMceId: string) => Promise<string>;
     }
   }
 

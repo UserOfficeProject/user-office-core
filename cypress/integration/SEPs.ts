@@ -16,11 +16,9 @@ function readWriteReview() {
   cy.get('@dialog').contains('Technical review');
   cy.get('@dialog').contains('Grade').click({ force: true });
 
-  cy.get('@dialog')
-    .get('textarea[name="comment"]')
-    .clear()
-    .type(faker.lorem.words(3));
-  cy.get('@dialog').get('[id="mui-component-select-grade"]').click();
+  cy.setTinyMceContent('comment', faker.lorem.words(3));
+
+  cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
 
   cy.get('[role="listbox"] > [role="option"]').first().click();
 
@@ -37,8 +35,8 @@ function readWriteReview() {
 function editFinalRankingForm() {
   cy.get('[role="dialog"] > header + div').scrollTo('top');
 
-  cy.get('#commentForUser').clear().type(faker.lorem.words(3));
-  cy.get('#commentForManagement').clear().type(faker.lorem.words(3));
+  cy.setTinyMceContent('commentForUser', faker.lorem.words(3));
+  cy.setTinyMceContent('commentForManagement', faker.lorem.words(3));
 
   cy.contains('External reviews').parent().find('table').as('reviewsTable');
 
@@ -82,6 +80,10 @@ const sep2 = {
 };
 
 const proposal1 = {
+  proposalTitle: faker.random.words(3),
+};
+
+const proposal2 = {
   proposalTitle: faker.random.words(3),
 };
 
@@ -512,17 +514,14 @@ context(
       cy.contains('Assign to SEP').click();
 
       // Manually changing the proposal status to be shown in the SEPs. -------->
-      cy.get('[title="View proposal"]').first().click();
+      cy.changeProposalStatus('SEP_REVIEW', proposal1.proposalTitle);
+
+      cy.contains(proposal1.proposalTitle)
+        .parent()
+        .find('[title="View proposal"]')
+        .click();
 
       cy.finishedLoading();
-
-      cy.get('[role="dialog"]').contains('Admin').click();
-
-      cy.get('#mui-component-select-proposalStatus').click();
-
-      cy.contains('SEP_REVIEW').click();
-
-      cy.get('[type="submit"]').click();
 
       cy.get('[role="dialog"]').contains('Technical').click();
       cy.get('[data-cy="timeAllocation"]').type('51');
@@ -959,7 +958,7 @@ context(
       const { code, description } = sep2;
 
       cy.login('user');
-      cy.createProposal();
+      cy.createProposal(proposal2.proposalTitle);
       cy.contains('Submit').click();
       cy.contains('OK').click();
       cy.logout();
@@ -1006,7 +1005,6 @@ context(
 
       cy.finishedLoading();
 
-      // Manually changing the proposal status to be shown in the SEPs. -------->
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="1"]').click();
 
@@ -1042,15 +1040,14 @@ context(
 
       cy.contains('Assign to Instrument').click();
 
-      cy.get('[title="View proposal"]').first().click();
+      cy.changeProposalStatus('SEP_REVIEW', proposal2.proposalTitle);
 
-      cy.get('[role="dialog"]').contains('Admin').click();
+      cy.contains(proposal2.proposalTitle)
+        .parent()
+        .find('[title="View proposal"]')
+        .click();
 
-      cy.get('#mui-component-select-proposalStatus').click();
-
-      cy.contains('SEP_REVIEW').click();
-
-      cy.get('[type="submit"]').click();
+      cy.finishedLoading();
 
       cy.get('[role="dialog"]').contains('Technical').click();
       cy.get('[data-cy="timeAllocation"]').type('51');
@@ -1059,7 +1056,6 @@ context(
 
       cy.get('[data-cy=save-technical-review] > .MuiButton-label').click();
       cy.closeModal();
-      // <------------------------------------------
 
       cy.contains('Calls').click();
 
@@ -1300,8 +1296,9 @@ context(
       cy.get('[title="View proposal details"]').first().click();
 
       cy.get('[role="dialog"] > header + div').scrollTo('top');
-      cy.get('#commentForUser').type('Test');
-      cy.get('#commentForManagement').type('Test');
+
+      cy.setTinyMceContent('commentForUser', 'Test');
+      cy.setTinyMceContent('commentForManagement', 'Test');
 
       cy.get('[data-cy="is-sep-meeting-submitted"]').click();
       cy.get('[data-cy="saveAndContinue"]').click();
@@ -1374,9 +1371,15 @@ context(
 
       cy.get('[title="View proposal details"]').click();
 
-      cy.get('#commentForUser').should('be.disabled');
+      cy.get('#commentForUser')
+        .parent()
+        .find('.tox-menubar button')
+        .should('be.disabled');
 
-      cy.get('#commentForManagement').should('be.disabled');
+      cy.get('#commentForManagement')
+        .parent()
+        .find('.tox-menubar button')
+        .should('be.disabled');
 
       cy.get('[data-cy="save"]').should('not.exist');
       cy.get('[data-cy="saveAndContinue"]').should('not.exist');
@@ -1400,9 +1403,15 @@ context(
 
       cy.get('[title="View proposal details"]').click();
 
-      cy.get('#commentForUser').should('be.disabled');
+      cy.get('#commentForUser')
+        .parent()
+        .find('.tox-menubar button')
+        .should('be.disabled');
 
-      cy.get('#commentForManagement').should('be.disabled');
+      cy.get('#commentForManagement')
+        .parent()
+        .find('.tox-menubar button')
+        .should('be.disabled');
 
       cy.get('[data-cy="save"]').should('not.exist');
       cy.get('[data-cy="saveAndContinue"]').should('not.exist');

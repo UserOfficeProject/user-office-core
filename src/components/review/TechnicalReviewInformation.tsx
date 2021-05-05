@@ -41,7 +41,11 @@ const TechnicalReviewInformation: React.FC<TechnicalReviewInformationProps> = (
           </TableRow>
           <TableRow key="comment">
             <TableCell>Comment</TableCell>
-            <TableCell>{props.data.publicComment}</TableCell>
+            <TableCell
+              dangerouslySetInnerHTML={{
+                __html: props.data?.publicComment || '-',
+              }}
+            />
           </TableRow>
           <TableRow key="timeAllocation">
             <TableCell>Time Allocation</TableCell>

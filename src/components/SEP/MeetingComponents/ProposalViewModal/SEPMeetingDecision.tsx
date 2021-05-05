@@ -54,13 +54,19 @@ const SEPMeetingDecision: React.FC<SEPMeetingDecisionProps> = ({
               <TableCell className={classes.textBold}>
                 Comment for management
               </TableCell>
-              <TableCell>
-                {sepMeetingDecision?.commentForManagement || '-'}
-              </TableCell>
+              <TableCell
+                dangerouslySetInnerHTML={{
+                  __html: sepMeetingDecision?.commentForManagement || '-',
+                }}
+              />
               <TableCell className={classes.textBold}>
                 Comment for user
               </TableCell>
-              <TableCell>{sepMeetingDecision?.commentForUser || '-'}</TableCell>
+              <TableCell
+                dangerouslySetInnerHTML={{
+                  __html: sepMeetingDecision?.commentForUser || '-',
+                }}
+              />
             </TableRow>
           </TableBody>
         </Table>

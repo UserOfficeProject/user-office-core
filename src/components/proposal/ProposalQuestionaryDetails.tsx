@@ -11,21 +11,20 @@ interface ProposalQuestionaryDetailsProps extends QuestionaryDetailsProps {
 }
 
 function ProposalQuestionaryDetails(props: ProposalQuestionaryDetailsProps) {
+  const { proposalId, ...restProps } = props;
+
   return (
     <QuestionaryDetails
       answerRenderer={(answer) => {
         if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
           return (
-            <SamplesAnswerRenderer
-              proposalId={props.proposalId}
-              answer={answer}
-            />
+            <SamplesAnswerRenderer proposalId={proposalId} answer={answer} />
           );
         } else {
           return null;
         }
       }}
-      {...props}
+      {...restProps}
     />
   );
 }
