@@ -15,6 +15,7 @@ import { Call } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { getProposalStatus } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
+import { tableLocalization } from 'utils/materialLocalization';
 import { timeAgo } from 'utils/Time';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -132,6 +133,7 @@ const ProposalTable = ({
       </Dialog>
       <MaterialTable
         icons={tableIcons}
+        localization={tableLocalization}
         title={title}
         columns={columns}
         data={partialProposalsData as PartialProposalsDataType[]}
