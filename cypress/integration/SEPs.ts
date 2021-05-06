@@ -542,7 +542,7 @@ context(
 
       cy.get('[data-cy="sep-assignments-table"]')
         .find('tbody td')
-        .should('have.length', 8);
+        .should('have.length', 9);
 
       cy.get('[data-cy="sep-assignments-table"]')
         .find('tbody td')
@@ -574,6 +574,19 @@ context(
 
       cy.get('[role="dialog"]').contains(proposal1.proposalTitle);
       cy.get('[role="dialog"]').contains('Download PDF');
+    });
+
+    it('Proposal should contain standard deviation field inside proposals and assignments', () => {
+      cy.login('officer');
+
+      cy.contains('SEPs').click();
+      cy.get('button[title="Edit"]').first().click();
+
+      cy.contains('Proposals and Assignments').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="sep-assignments-table"] thead').contains('Deviation');
     });
 
     it('Officer should be able to assign SEP member to proposal in existing SEP', () => {
@@ -912,6 +925,10 @@ context(
       cy.get("[title='Submit instrument']").should('exist');
 
       cy.get("[title='Show proposals']").first().click();
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] thead').contains(
+        'Deviation'
+      );
 
       cy.get(
         '[data-cy="sep-instrument-proposals-table"] [title="View proposal details"]'
@@ -1320,7 +1337,7 @@ context(
       cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
         .first()
         .find('td')
-        .eq(5)
+        .eq(6)
         .should('not.contain.text', '-')
         .should('contain.text', '1');
 
