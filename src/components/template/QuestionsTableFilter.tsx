@@ -34,7 +34,6 @@ function QuestionsTableFilter(props: QuestionsTableFilterProps) {
   const [searchText, setSearchText] = useState<string | undefined>();
 
   const handleChange = (update: Partial<QuestionsFilter>) => {
-    console.log(update);
     props.onChange?.({
       dataType: questionType,
       text: searchText,

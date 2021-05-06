@@ -81,12 +81,14 @@ export function usePersistProposalWorkflowEditorModel() {
 
     const deleteProposalWorkflowStatus = async (
       proposalStatusId: number,
-      proposalWorkflowId: number
+      proposalWorkflowId: number,
+      sortOrder: number
     ) => {
       return api('Workflow status removed successfully')
         .deleteProposalWorkflowStatus({
           proposalStatusId,
           proposalWorkflowId,
+          sortOrder,
         })
         .then((data) => data.deleteProposalWorkflowStatus);
     };
@@ -168,7 +170,8 @@ export function usePersistProposalWorkflowEditorModel() {
             return executeAndMonitorCall(async () => {
               const result = await deleteProposalWorkflowStatus(
                 proposalWorkflowConnectionToRemove.proposalStatusId,
-                proposalWorkflowConnectionToRemove.proposalWorkflowId
+                proposalWorkflowConnectionToRemove.proposalWorkflowId,
+                proposalWorkflowConnectionToRemove.sortOrder
               );
 
               if (result.error) {

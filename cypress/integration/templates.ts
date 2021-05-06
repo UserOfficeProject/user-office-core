@@ -387,8 +387,6 @@ context('Template tests', () => {
 
     cy.window().then((win) => {
       return new Cypress.Promise((resolve) => {
-        console.log('richTextInputId', richTextInputId);
-
         win.tinyMCE.editors[richTextInputId].setContent(richTextInputValue);
         win.tinyMCE.editors[richTextInputId].fire('blur');
 
@@ -621,9 +619,6 @@ context('Template tests', () => {
     cy.contains(numberQuestion1);
     cy.contains(numberQuestion2);
     cy.get('body').then(() => {
-      console.log(`[data-cy="${numberField1Id}.value"] input`);
-      console.log(`[data-cy="${numberField2Id}.value"] input`);
-
       cy.get(`[data-cy="${numberField1Id}.value"] input`).as('numberField1');
       cy.get(`[data-cy="${numberField2Id}.value"] input`).as('numberField2');
 

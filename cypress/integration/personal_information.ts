@@ -165,7 +165,7 @@ context('Personal information tests', () => {
 
     cy.notification({ variant: 'success', text: 'created successfully' });
 
-    cy.get('[data-cy="connection_DRAFT_1"]').should('contain.text', 'DRAFT');
+    cy.get('[data-cy^="connection_DRAFT_1"]').should('contain.text', 'DRAFT');
 
     cy.changeActiveRole('SEP Chair');
 
