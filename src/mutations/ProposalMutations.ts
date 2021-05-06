@@ -124,9 +124,10 @@ export default class ProposalMutations {
     ) {
       return rejection('NOT_ALLOWED');
     }
-
-    if (proposal.submitted && !this.userAuth.isUserOfficer(agent)) {
-      return rejection('NOT_ALLOWED_PROPOSAL_SUBMITTED');
+    if (!(proposal.statusId.valueOf() == 14)) {
+      if (proposal.submitted && !this.userAuth.isUserOfficer(agent)) {
+        return rejection('NOT_ALLOWED_PROPOSAL_SUBMITTED');
+      }
     }
 
     if (title !== undefined) {
