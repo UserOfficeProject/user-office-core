@@ -279,7 +279,7 @@ export default class ProposalMutations {
       managementDecisionSubmitted,
     } = args;
     const isChairOrSecretaryOfProposal = await this.userAuth.isChairOrSecretaryOfProposal(
-      agent!.id,
+      agent,
       id
     );
     const isUserOfficer = this.userAuth.isUserOfficer(agent);

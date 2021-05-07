@@ -126,7 +126,7 @@ export default class SEPQueries {
 
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId))
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId))
     ) {
       reviewerId = agent!.id;
     }
