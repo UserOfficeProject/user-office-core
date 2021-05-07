@@ -260,8 +260,10 @@ export default class ProposalMutations {
   }
 
   @EventBus(Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED)
-  @EventBus(Event.PROPOSAL_STATUS_CHANGED_BY_USER)
-  @ValidateArgs(administrationProposalValidationSchema)
+  @ValidateArgs(administrationProposalValidationSchema, [
+    'commentForUser',
+    'commentForManagement',
+  ])
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async admin(
     agent: UserWithRole | null,
@@ -277,7 +279,7 @@ export default class ProposalMutations {
       managementDecisionSubmitted,
     } = args;
     const isChairOrSecretaryOfProposal = await this.userAuth.isChairOrSecretaryOfProposal(
-      agent!.id,
+      agent,
       id
     );
     const isUserOfficer = this.userAuth.isUserOfficer(agent);

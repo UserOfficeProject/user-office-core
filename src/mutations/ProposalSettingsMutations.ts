@@ -198,7 +198,7 @@ export default class ProposalSettingsMutations {
     return await this.dataSource.deleteProposalWorkflowStatus(
       lastConnectionInParentDroppableGroup.proposalStatusId,
       lastConnectionInParentDroppableGroup.proposalWorkflowId,
-      lastConnectionInParentDroppableGroup.nextProposalStatusId as number
+      lastConnectionInParentDroppableGroup.sortOrder
     );
   }
 
@@ -268,9 +268,18 @@ export default class ProposalSettingsMutations {
 
       // Delete connection between second last and last connection if there is one.
       if (secondLastConnection) {
+        const secondLastConnectionInitialSortOrder = proposalWorkflowConnections.find(
+          (proposalWorkflowConnection) =>
+            proposalWorkflowConnection.proposalStatusId ===
+              secondLastConnection.proposalStatusId &&
+            proposalWorkflowConnection.prevProposalStatusId ===
+              secondLastConnection.prevProposalStatusId
+        )?.sortOrder;
+
         await this.dataSource.deleteProposalWorkflowStatus(
           secondLastConnection.proposalStatusId,
-          secondLastConnection.proposalWorkflowId
+          secondLastConnection.proposalWorkflowId,
+          secondLastConnectionInitialSortOrder || secondLastConnection.sortOrder
         );
       }
 
@@ -505,7 +514,7 @@ export default class ProposalSettingsMutations {
       const workflowConnectionsToRemove = await this.dataSource.getProposalWorkflowConnectionsById(
         args.proposalWorkflowId,
         args.proposalStatusId,
-        {}
+        { sortOrder: args.sortOrder }
       );
 
       const [firstWorkflowConnectionToRemove] = workflowConnectionsToRemove;
@@ -576,12 +585,14 @@ export default class ProposalSettingsMutations {
 
         await this.dataSource.deleteProposalWorkflowStatus(
           workflowConnectionToReplaceRemoved.proposalStatusId,
-          workflowConnectionToReplaceRemoved.proposalWorkflowId
+          workflowConnectionToReplaceRemoved.proposalWorkflowId,
+          workflowConnectionToReplaceRemoved.sortOrder
         );
       } else {
         const result = await this.dataSource.deleteProposalWorkflowStatus(
           args.proposalStatusId,
-          args.proposalWorkflowId
+          args.proposalWorkflowId,
+          args.sortOrder
         );
 
         const [

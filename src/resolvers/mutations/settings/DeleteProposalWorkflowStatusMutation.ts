@@ -19,6 +19,9 @@ export class DeleteProposalWorkflowStatusInput {
 
   @Field(() => Int)
   public proposalWorkflowId: number;
+
+  @Field(() => Int)
+  public sortOrder: number;
 }
 
 @Resolver()

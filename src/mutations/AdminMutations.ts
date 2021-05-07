@@ -52,7 +52,7 @@ export default class AdminMutations {
     return this.dataSource.applyPatches();
   }
 
-  @ValidateArgs(setPageTextValidationSchema)
+  @ValidateArgs(setPageTextValidationSchema, ['text'])
   @Authorized([Roles.USER_OFFICER])
   async setPageText(
     agent: UserWithRole | null,
