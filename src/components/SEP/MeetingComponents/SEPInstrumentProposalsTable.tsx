@@ -21,7 +21,7 @@ import {
 } from 'generated/sdk';
 import { useSEPProposalsByInstrument } from 'hooks/SEP/useSEPProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
-import { getGrades, average } from 'utils/mathFunctions';
+import { getGrades, average, standardDeviation } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';
@@ -249,6 +249,27 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
       title: 'Average score',
       field: 'proposalAverageScore',
       emptyValue: '-',
+    },
+    {
+      title: 'Deviation',
+      field: 'deviation',
+      render: (
+        rowData: SepProposalWithAverageScoreAndAvailabilityZone
+      ): string => {
+        const stdDeviation = standardDeviation(
+          getGrades(rowData.proposal.reviews ?? []) as number[]
+        );
+
+        return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
+      },
+      customSort: (
+        a: SepProposalWithAverageScoreAndAvailabilityZone,
+        b: SepProposalWithAverageScoreAndAvailabilityZone
+      ) =>
+        (standardDeviation(getGrades(a.proposal.reviews ?? []) as number[]) ||
+          0) -
+        (standardDeviation(getGrades(b.proposal.reviews ?? []) as number[]) ||
+          0),
     },
     {
       title: 'Current rank',

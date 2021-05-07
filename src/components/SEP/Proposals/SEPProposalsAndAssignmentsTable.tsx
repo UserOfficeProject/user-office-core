@@ -15,7 +15,6 @@ import ProposalReviewContent from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import {
   SepAssignment,
-  ReviewStatus,
   UserRole,
   ReviewWithNextProposalStatus,
   ProposalStatus,
@@ -27,7 +26,7 @@ import {
   SEPProposalAssignmentType,
 } from 'hooks/SEP/useSEPProposalsData';
 import { tableIcons } from 'utils/materialIcons';
-import { average } from 'utils/mathFunctions';
+import { average, standardDeviation } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import AssignSEPMemberToProposal, {
@@ -71,11 +70,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   ]);
 
   const getGradesFromAssignments = (assignments: SEPProposalAssignmentType[]) =>
-    assignments
-      ?.filter(
-        (assignment) => assignment.review?.status === ReviewStatus.SUBMITTED
-      )
-      .map((assignment) => assignment.review?.grade) ?? [];
+    assignments?.map((assignment) => assignment.review?.grade) ?? [];
 
   const SEPProposalColumns = [
     { title: 'ID', field: 'proposal.shortCode' },
@@ -107,6 +102,29 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
 
         return isNaN(avgGrade) ? '-' : `${avgGrade}`;
       },
+      customSort: (a: SEPProposalType, b: SEPProposalType) =>
+        (average(getGradesFromAssignments(a.assignments ?? []) as number[]) ||
+          0) -
+        (average(getGradesFromAssignments(b.assignments ?? []) as number[]) ||
+          0),
+    },
+    {
+      title: 'Deviation',
+      field: 'deviation',
+      render: (rowData: SEPProposalType): string => {
+        const stdDeviation = standardDeviation(
+          getGradesFromAssignments(rowData.assignments ?? []) as number[]
+        );
+
+        return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
+      },
+      customSort: (a: SEPProposalType, b: SEPProposalType) =>
+        (standardDeviation(
+          getGradesFromAssignments(a.assignments ?? []) as number[]
+        ) || 0) -
+        (standardDeviation(
+          getGradesFromAssignments(b.assignments ?? []) as number[]
+        ) || 0),
     },
   ];
 

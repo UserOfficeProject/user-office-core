@@ -174,11 +174,22 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     }
   };
 
-  const isDraftStatus = (
+  const isVeryFirstDraftStatus = (
     proposalWorkflowConnection: ProposalWorkflowConnection
   ) =>
     proposalWorkflowConnection.proposalStatus.id === 1 &&
-    proposalWorkflowConnection.proposalStatus.shortCode === 'DRAFT';
+    proposalWorkflowConnection.proposalStatus.shortCode === 'DRAFT' &&
+    proposalWorkflowConnection.sortOrder === 0 &&
+    proposalWorkflowConnection.droppableGroupId ===
+      'proposalWorkflowConnections_0';
+
+  const getUniqueKey = (
+    proposalWorkflowConnection: ProposalWorkflowConnection
+  ) => {
+    return `${proposalWorkflowConnection.proposalStatus.shortCode}_${
+      proposalWorkflowConnection.proposalStatus.id
+    }_${proposalWorkflowConnection.prevProposalStatusId || ''}`;
+  };
 
   const getConnectionGroupItems = (
     connections: ProposalWorkflowConnection[]
@@ -186,8 +197,8 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     return connections.map((proposalWorkflowConnection, index) => {
       return (
         <Draggable
-          key={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.shortCode}`}
-          draggableId={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.shortCode}`}
+          key={getUniqueKey(proposalWorkflowConnection)}
+          draggableId={getUniqueKey(proposalWorkflowConnection)}
           index={index}
           isDragDisabled={true}
         >
@@ -206,7 +217,9 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
               <Grid
                 item
                 xs={12}
-                data-cy={`connection_${proposalWorkflowConnection.proposalStatus.shortCode}_${proposalWorkflowConnection.proposalStatus.id}`}
+                data-cy={`connection_${getUniqueKey(
+                  proposalWorkflowConnection
+                )}`}
                 ref={provided.innerRef}
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
@@ -221,7 +234,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
                   }
                 }}
               >
-                {!isDraftStatus(proposalWorkflowConnection) && (
+                {!isVeryFirstDraftStatus(proposalWorkflowConnection) && (
                   <DialogActions className={classes.dialogActions}>
                     <IconButton
                       size="small"

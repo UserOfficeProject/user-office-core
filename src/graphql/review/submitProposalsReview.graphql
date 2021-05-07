@@ -1,0 +1,6 @@
+mutation submitProposalsReview($proposals: [ProposalIdWithReviewId!]!) {
+  submitProposalsReview(submitProposalsReviewInput: { proposals: $proposals }) {
+    error
+    isSuccess
+  }
+}

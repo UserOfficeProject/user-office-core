@@ -1,11 +1,13 @@
 mutation deleteProposalWorkflowStatus(
   $proposalStatusId: Int!
   $proposalWorkflowId: Int!
+  $sortOrder: Int!
 ) {
   deleteProposalWorkflowStatus(
     deleteProposalWorkflowStatusInput: {
       proposalStatusId: $proposalStatusId
       proposalWorkflowId: $proposalWorkflowId
+      sortOrder: $sortOrder
     }
   ) {
     isSuccess
