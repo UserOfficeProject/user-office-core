@@ -618,6 +618,7 @@ export type Mutation = {
   updateAnswer: UpdateAnswerResponseWrap;
   addReview: ReviewWithNextStatusResponseWrap;
   addUserForReview: ReviewResponseWrap;
+  submitProposalsReview: SuccessResponseWrap;
   createSample: SampleResponseWrap;
   updateSample: SampleResponseWrap;
   assignChairOrSecretary: SepResponseWrap;
@@ -911,6 +912,11 @@ export type MutationAddUserForReviewArgs = {
   userID: Scalars['Int'];
   proposalID: Scalars['Int'];
   sepID: Scalars['Int'];
+};
+
+
+export type MutationSubmitProposalsReviewArgs = {
+  submitProposalsReviewInput: SubmitProposalsReviewInput;
 };
 
 
@@ -1613,6 +1619,11 @@ export type ProposalIdWithCallId = {
 export type ProposalIdWithRankOrder = {
   proposalId: Scalars['Int'];
   rankOrder: Scalars['Int'];
+};
+
+export type ProposalIdWithReviewId = {
+  proposalId: Scalars['Int'];
+  reviewId: Scalars['Int'];
 };
 
 export type ProposalProposalBookingFilter = {
@@ -2561,6 +2572,10 @@ export type StatusChangingEvent = {
   statusChangingEventId: Scalars['Int'];
   proposalWorkflowConnectionId: Scalars['Int'];
   statusChangingEvent: Scalars['String'];
+};
+
+export type SubmitProposalsReviewInput = {
+  proposals: Array<ProposalIdWithReviewId>;
 };
 
 export type SubmitTechnicalReviewInput = {
@@ -4544,6 +4559,19 @@ export type RemoveUserForReviewMutation = (
   & { removeUserForReview: (
     { __typename?: 'ReviewResponseWrap' }
     & Pick<ReviewResponseWrap, 'error'>
+  ) }
+);
+
+export type SubmitProposalsReviewMutationVariables = Exact<{
+  proposals: Array<ProposalIdWithReviewId> | ProposalIdWithReviewId;
+}>;
+
+
+export type SubmitProposalsReviewMutation = (
+  { __typename?: 'Mutation' }
+  & { submitProposalsReview: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
   ) }
 );
 
@@ -7860,6 +7888,14 @@ export const RemoveUserForReviewDocument = gql`
   }
 }
     `;
+export const SubmitProposalsReviewDocument = gql`
+    mutation submitProposalsReview($proposals: [ProposalIdWithReviewId!]!) {
+  submitProposalsReview(submitProposalsReviewInput: {proposals: $proposals}) {
+    error
+    isSuccess
+  }
+}
+    `;
 export const SubmitTechnicalReviewDocument = gql`
     mutation submitTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus, $submitted: Boolean!) {
   submitTechnicalReview(
@@ -9155,6 +9191,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     removeUserForReview(variables: RemoveUserForReviewMutationVariables): Promise<RemoveUserForReviewMutation> {
       return withWrapper(() => client.request<RemoveUserForReviewMutation>(print(RemoveUserForReviewDocument), variables));
+    },
+    submitProposalsReview(variables: SubmitProposalsReviewMutationVariables): Promise<SubmitProposalsReviewMutation> {
+      return withWrapper(() => client.request<SubmitProposalsReviewMutation>(print(SubmitProposalsReviewDocument), variables));
     },
     submitTechnicalReview(variables: SubmitTechnicalReviewMutationVariables): Promise<SubmitTechnicalReviewMutation> {
       return withWrapper(() => client.request<SubmitTechnicalReviewMutation>(print(SubmitTechnicalReviewDocument), variables));
