@@ -5,6 +5,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import Alert from '@material-ui/lab/Alert';
 import React, { useCallback, useState } from 'react';
 
 import { FunctionType } from './utilTypes';
@@ -14,6 +15,7 @@ const defaultOptions = {
   description: '',
   confirmationText: 'OK',
   cancellationText: 'Cancel',
+  alertText: '',
   dialogProps: {},
   onClose: (): void => {},
   onCancel: (): void => {},
@@ -36,6 +38,7 @@ const withConfirm = <T extends Record<string, unknown>>(
       confirmationText,
       cancellationText,
       dialogProps,
+      alertText,
       onClose,
       onCancel,
     } = options;
@@ -80,6 +83,7 @@ const withConfirm = <T extends Record<string, unknown>>(
           {description && (
             <DialogContent>
               <DialogContentText>{description}</DialogContentText>
+              {alertText && <Alert severity="warning">{alertText}</Alert>}
             </DialogContent>
           )}
           <DialogActions>
@@ -88,6 +92,7 @@ const withConfirm = <T extends Record<string, unknown>>(
               onClick={handleConfirm}
               color="primary"
               data-cy="confirm-ok"
+              disabled={!!alertText}
             >
               {confirmationText}
             </Button>
@@ -103,6 +108,7 @@ interface Options {
   description: string;
   confirmationText?: string;
   cancellationText?: string;
+  alertText?: string;
   dialogProps?: Record<string, unknown>;
   onClose?: FunctionType;
   onCancel?: FunctionType;

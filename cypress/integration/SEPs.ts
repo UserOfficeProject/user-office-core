@@ -819,7 +819,7 @@ context(
       readWriteReview();
     });
 
-    it('should be able to filter their reviews by status', () => {
+    it('Should be able to filter their reviews by status and bulk submit them', () => {
       cy.login(sepMembers.reviewer);
 
       cy.get('[data-cy="review-status-filter"]').click();
@@ -842,7 +842,23 @@ context(
 
       cy.finishedLoading();
 
-      cy.contains(proposal1.proposalTitle);
+      cy.contains(proposal1.proposalTitle).parent().contains('DRAFT');
+
+      cy.contains(proposal1.proposalTitle)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="submit-proposal-reviews"]').click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal review submitted successfully!',
+      });
+
+      cy.contains(proposal1.proposalTitle).parent().contains('SUBMITTED');
     });
 
     it('Officer should get error when trying to delete proposal which has dependencies (like reviews)', () => {
