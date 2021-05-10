@@ -67,7 +67,7 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ text, linkText }) => {
       text={text}
       linkText={linkText}
       linkStyle={{
-        fontSize: '10px',
+        fontSize: '12px',
         minWidth: 'auto',
         padding: '10px',
       }}
