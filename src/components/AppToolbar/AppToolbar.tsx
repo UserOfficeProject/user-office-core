@@ -4,6 +4,7 @@ import MuiLink from '@material-ui/core/Link';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import MenuIcon from '@material-ui/icons/Menu';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
@@ -17,9 +18,6 @@ import AccountActionButton from './AccountActionButton';
 const drawerWidth = 250;
 
 const useStyles = makeStyles((theme) => ({
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
@@ -36,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
     }),
   },
   menuButton: {
-    marginRight: 36,
+    marginRight: 15,
   },
   menuButtonHidden: {
     display: 'none',
@@ -67,6 +65,8 @@ type AppToolbarProps = {
 };
 
 const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
+  const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
+  const isPortraitMode = useMediaQuery('(orientation: portrait)');
   const classes = useStyles();
   const { user, roles, currentRole } = useContext(UserContext);
   const humanReadableActiveRole = useMemo(
@@ -81,7 +81,7 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
       position="fixed"
       className={clsx(classes.appBar, open && classes.appBarShift)}
     >
-      <Toolbar className={classes.toolbar}>
+      <Toolbar>
         <IconButton
           edge="start"
           color="inherit"
@@ -91,15 +91,17 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
         >
           <MenuIcon />
         </IconButton>
-        <Typography
-          component="h1"
-          variant="h6"
-          color="inherit"
-          noWrap
-          className={classes.title}
-        >
-          User Office
-        </Typography>
+        {(!isTabletOrMobile || !isPortraitMode) && (
+          <Typography
+            component="h1"
+            variant="h6"
+            color="inherit"
+            noWrap
+            className={classes.title}
+          >
+            User Office
+          </Typography>
+        )}
         <div className={classes.horizontalSpacing}>
           Logged in as{' '}
           <MuiLink
