@@ -163,6 +163,7 @@ describe('Test Proposal settings mutations', () => {
         {
           proposalStatusId: 1,
           proposalWorkflowId: 1,
+          sortOrder: 0,
         }
       )
     ).resolves.toStrictEqual(true);

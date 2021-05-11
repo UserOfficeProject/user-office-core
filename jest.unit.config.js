@@ -4,7 +4,8 @@ module.exports = {
     '^.+\\.tsx?$': 'ts-jest',
   },
   testEnvironment: 'node',
+  testRegex: '(/__tests__/.*|(\\.|/)(spec))\\.[jt]sx?$',
   collectCoverage: true,
-  setupFiles: ['dotenv/config'],
   setupFilesAfterEnv: ['<rootDir>/src/config/dependencyConfigTest.ts'],
+  setupFiles: ['dotenv/config'],
 };

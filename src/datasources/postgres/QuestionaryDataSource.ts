@@ -308,6 +308,8 @@ export default class PostgresQuestionaryDataSource
                 topics.sort_order`)
     ).rows;
 
+    // this contains all questions for template, with left joined answers
+    // meaning that if there is no answer, it will still be on the list but `null`
     const answerRecords: Array<
       QuestionRecord &
         QuestionTemplateRelRecord & { value: any; answer_id: number } & {
@@ -349,8 +351,12 @@ export default class PostgresQuestionaryDataSource
         record,
         questionDependencies
       );
+
+      // if no answer has been saved, return the default answer value
       const value =
-        record.value?.value || getDefaultAnswerValue(questionTemplateRelation);
+        record.value === null
+          ? getDefaultAnswerValue(questionTemplateRelation)
+          : record.value.value;
 
       return new Answer(record.answer_id, questionTemplateRelation, value);
     });

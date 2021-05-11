@@ -284,7 +284,7 @@ export default class PostgresProposalSettingsDataSource
 
     const getUniqueOrderedProposalWorkflowConnectionsQuery = `
       SELECT * FROM (
-        SELECT DISTINCT ON (pwc.proposal_status_id) *
+        SELECT DISTINCT ON (pwc.proposal_status_id, pwc.sort_order, pwc.droppable_group_id) *
         FROM proposal_workflow_connections as pwc
         LEFT JOIN
           proposal_statuses as ps
@@ -319,6 +319,7 @@ export default class PostgresProposalSettingsDataSource
     {
       nextProposalStatusId,
       prevProposalStatusId,
+      sortOrder,
     }: NextAndPreviousProposalStatuses
   ): Promise<ProposalWorkflowConnection[]> {
     const proposalWorkflowConnectionRecords: (ProposalWorkflowConnectionRecord &
@@ -337,6 +338,10 @@ export default class PostgresProposalSettingsDataSource
 
         if (prevProposalStatusId) {
           query.andWhere('pwc.prev_proposal_status_id', prevProposalStatusId);
+        }
+
+        if (sortOrder) {
+          query.andWhere('pwc.sort_order', sortOrder);
         }
       });
 
@@ -448,22 +453,16 @@ export default class PostgresProposalSettingsDataSource
   async deleteProposalWorkflowStatus(
     proposalStatusId: number,
     proposalWorkflowId: number,
-    nextProposalStatusId: number
+    sortOrder: number
   ): Promise<ProposalWorkflowConnection> {
     const removeWorkflowConnectionQuery = database(
       'proposal_workflow_connections'
     )
       .where('proposal_workflow_id', proposalWorkflowId)
       .andWhere('proposal_status_id', proposalStatusId)
+      .andWhere('sort_order', sortOrder)
       .del()
       .returning('*');
-
-    if (nextProposalStatusId) {
-      removeWorkflowConnectionQuery.andWhere(
-        'next_proposal_status_id',
-        nextProposalStatusId
-      );
-    }
 
     return removeWorkflowConnectionQuery.then(
       (proposalWorkflowStatus: ProposalWorkflowConnectionRecord[]) => {

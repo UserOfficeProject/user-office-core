@@ -115,28 +115,31 @@ export class UserAuthorization {
       (await this.isMemberOfProposal(agent, proposal)) ||
       (await this.isReviewerOfProposal(agent, proposal.id)) ||
       (await this.isScientistToProposal(agent, proposal.id)) ||
-      (await this.isChairOrSecretaryOfProposal(agent.id, proposal.id)) ||
+      (await this.isChairOrSecretaryOfProposal(agent, proposal.id)) ||
       this.hasGetAccessByToken(agent)
     );
   }
 
   async isChairOrSecretaryOfSEP(
-    userId: number,
+    agent: User | null,
     sepId: number
   ): Promise<boolean> {
-    if (!userId || !sepId) {
+    if (agent == null || !agent.id || !sepId) {
       return false;
     }
 
-    return this.sepDataSource.isChairOrSecretaryOfSEP(userId, sepId);
+    return this.sepDataSource.isChairOrSecretaryOfSEP(agent.id, sepId);
   }
 
-  async isChairOrSecretaryOfProposal(userId: number, proposalId: number) {
-    if (!userId || !proposalId) {
+  async isChairOrSecretaryOfProposal(agent: User | null, proposalId: number) {
+    if (agent == null || !agent.id || !proposalId) {
       return false;
     }
 
-    return this.sepDataSource.isChairOrSecretaryOfProposal(userId, proposalId);
+    return this.sepDataSource.isChairOrSecretaryOfProposal(
+      agent.id,
+      proposalId
+    );
   }
 
   hasGetAccessByToken(agent: UserWithRole) {

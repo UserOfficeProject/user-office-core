@@ -40,6 +40,7 @@ export interface ProposalSettingsDataSource {
     {
       nextProposalStatusId,
       prevProposalStatusId,
+      sortOrder,
     }: NextAndPreviousProposalStatuses
   ): Promise<ProposalWorkflowConnection[]>;
   addProposalWorkflowStatus(
@@ -51,7 +52,7 @@ export interface ProposalSettingsDataSource {
   deleteProposalWorkflowStatus(
     proposalStatusId: number,
     proposalWorkflowId: number,
-    nextProposalStatusId?: number
+    sortOrder: number
   ): Promise<ProposalWorkflowConnection>;
   addStatusChangingEventsToConnection(
     proposalWorkflowConnectionId: number,

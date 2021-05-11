@@ -9,7 +9,7 @@ export interface ProposalDataSource {
   getProposalsFromView(filter?: ProposalsFilter): Promise<ProposalView[]>;
   // Read
   get(id: number): Promise<Proposal | null>;
-  checkActiveCall(callId: number): Promise<boolean>;
+
   getProposals(
     filter?: ProposalsFilter,
     first?: number,

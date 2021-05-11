@@ -17,12 +17,13 @@ const getProposalWorkflowByCallId = (callId: number) => {
 
 const getProposalWorkflowConnectionByStatusId = (
   proposalWorkflowId: number,
-  proposalStatusId: number
+  proposalStatusId: number,
+  prevProposalStatusId?: number
 ) => {
   return proposalSettingsDataSource.getProposalWorkflowConnectionsById(
     proposalWorkflowId,
     proposalStatusId,
-    {}
+    { prevProposalStatusId }
   );
 };
 
@@ -98,7 +99,8 @@ export const workflowEngine = async (
 
       const nextWorkflowConnections = await getProposalWorkflowConnectionByStatusId(
         proposalWorkflow.id,
-        currentWorkflowConnection.nextProposalStatusId
+        currentWorkflowConnection.nextProposalStatusId,
+        currentWorkflowConnection.proposalStatusId
       );
 
       if (!nextWorkflowConnections?.length) {
