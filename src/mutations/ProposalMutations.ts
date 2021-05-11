@@ -483,7 +483,7 @@ export default class ProposalMutations {
         await this.sampleDataSource.updateSample({
           sampleId: clonedSample.id,
           proposalId: clonedProposal.id,
-          questionaryId: clonedQuestionary.questionaryId,
+          questionaryId: clonedSample.questionaryId,
           safetyComment: '',
           safetyStatus: SampleStatus.PENDING_EVALUATION,
           shipmentId: null,
