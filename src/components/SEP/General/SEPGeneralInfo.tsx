@@ -66,7 +66,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
             Scientific evaluation panel
           </Typography>
           <Grid container spacing={3}>
-            <Grid item xs={6}>
+            <Grid item sm={6} xs={12}>
               <Field
                 name="code"
                 id="code"
@@ -105,7 +105,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                 disabled={!hasAccessRights || isExecutingCall}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item sm={6} xs={12}>
               <Field
                 id="description"
                 name="description"

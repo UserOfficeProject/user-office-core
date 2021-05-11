@@ -8,7 +8,7 @@ import ShipmentsTable from './ShipmentsTable';
 function MyShipments() {
   return (
     <ContentContainer>
-      <Grid container spacing={3}>
+      <Grid container>
         <Grid item xs={12}>
           <StyledPaper>
             <ShipmentsTable />

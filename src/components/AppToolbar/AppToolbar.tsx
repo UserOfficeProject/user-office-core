@@ -17,46 +17,6 @@ import AccountActionButton from './AccountActionButton';
 
 const drawerWidth = 250;
 
-const useStyles = makeStyles((theme) => ({
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    marginRight: 15,
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-  title: {
-    flexGrow: 1,
-  },
-  profileLink: {
-    color: theme.palette.common.white,
-    textDecoration: 'none',
-    borderBottom: '1px dashed',
-    borderBottomColor: theme.palette.common.white,
-    padding: '3px',
-    '&:hover': {
-      textDecoration: 'none',
-    },
-  },
-  horizontalSpacing: {
-    margin: theme.spacing(0, 0.5),
-  },
-}));
-
 type AppToolbarProps = {
   /** Content of the information modal. */
   open: boolean;
@@ -67,6 +27,49 @@ type AppToolbarProps = {
 const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
+
+  const useStyles = makeStyles((theme) => ({
+    appBar: {
+      zIndex: theme.zIndex.drawer + 1,
+      transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    appBarShift: {
+      marginLeft: isTabletOrMobile ? 0 : drawerWidth,
+      width: isTabletOrMobile ? '100%' : `calc(100% - ${drawerWidth}px)`,
+      transition: isTabletOrMobile
+        ? 'none'
+        : theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
+    },
+    menuButton: {
+      marginRight: 15,
+    },
+    menuButtonHidden: {
+      display: isTabletOrMobile ? 'inline-flex' : 'none',
+    },
+    title: {
+      flexGrow: 1,
+    },
+    profileLink: {
+      color: theme.palette.common.white,
+      textDecoration: 'none',
+      borderBottom: '1px dashed',
+      borderBottomColor: theme.palette.common.white,
+      padding: '3px',
+      '&:hover': {
+        textDecoration: 'none',
+      },
+    },
+    horizontalSpacing: {
+      marginLeft: 'auto',
+      margin: theme.spacing(0, 0.5),
+    },
+  }));
   const classes = useStyles();
   const { user, roles, currentRole } = useContext(UserContext);
   const humanReadableActiveRole = useMemo(

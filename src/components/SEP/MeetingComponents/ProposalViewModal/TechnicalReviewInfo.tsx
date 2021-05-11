@@ -12,6 +12,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import EditIcon from '@material-ui/icons/Edit';
@@ -53,6 +54,9 @@ const useStyles = makeStyles((theme) => ({
   },
   spacingLeft: {
     marginLeft: theme.spacing(1),
+  },
+  table: {
+    minWidth: 500,
   },
 }));
 
@@ -174,66 +178,68 @@ const TechnicalReviewInfo: React.FC<TechnicalReviewInfoProps> = ({
         <Typography variant="h6" className={classes.heading} gutterBottom>
           Technical review info
         </Typography>
-        <Table>
-          <TableBody>
-            <TableRow key="statusAndTime">
-              <TableCell width="25%" className={classes.textBold}>
-                Status
-              </TableCell>
-              <TableCell width="25%">
-                {technicalReview?.status || '-'}
-              </TableCell>
-              <TableCell width="25%" className={classes.textBold}>
-                Time allocation
-                {hasWriteAccess && (
-                  <Tooltip title="Edit" className={classes.spacingLeft}>
-                    <IconButton
-                      size="medium"
-                      onClick={() => setOpen(true)}
-                      data-cy="edit-sep-time-allocation"
-                    >
-                      <EditIcon fontSize="inherit" />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </TableCell>
-              <TableCell>
-                <span
-                  className={clsx({
-                    [classes.disabled]: sepTimeAllocation !== null,
-                  })}
-                >
-                  {technicalReview?.timeAllocation || '-'}
-                </span>
-                {sepTimeAllocation !== null && (
+        <TableContainer>
+          <Table className={classes.table}>
+            <TableBody>
+              <TableRow key="statusAndTime">
+                <TableCell width="25%" className={classes.textBold}>
+                  Status
+                </TableCell>
+                <TableCell width="25%">
+                  {technicalReview?.status || '-'}
+                </TableCell>
+                <TableCell width="25%" className={classes.textBold}>
+                  Time allocation
+                  {hasWriteAccess && (
+                    <Tooltip title="Edit" className={classes.spacingLeft}>
+                      <IconButton
+                        size="medium"
+                        onClick={() => setOpen(true)}
+                        data-cy="edit-sep-time-allocation"
+                      >
+                        <EditIcon fontSize="inherit" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </TableCell>
+                <TableCell>
                   <span
-                    className={clsx(classes.overwritten, classes.spacingLeft)}
+                    className={clsx({
+                      [classes.disabled]: sepTimeAllocation !== null,
+                    })}
                   >
-                    {sepTimeAllocation} (Overwritten)
+                    {technicalReview?.timeAllocation || '-'}
                   </span>
-                )}
-              </TableCell>
-            </TableRow>
-            <TableRow key="comments">
-              <TableCell className={classes.textBold}>
-                Internal comment
-              </TableCell>
-              <TableCell
-                dangerouslySetInnerHTML={{
-                  __html: technicalReview?.comment || '-',
-                }}
-              />
-              <TableCell className={classes.textBold}>
-                Comments for the review panel
-              </TableCell>
-              <TableCell
-                dangerouslySetInnerHTML={{
-                  __html: technicalReview?.publicComment || '-',
-                }}
-              />
-            </TableRow>
-          </TableBody>
-        </Table>
+                  {sepTimeAllocation !== null && (
+                    <span
+                      className={clsx(classes.overwritten, classes.spacingLeft)}
+                    >
+                      {sepTimeAllocation} (Overwritten)
+                    </span>
+                  )}
+                </TableCell>
+              </TableRow>
+              <TableRow key="comments">
+                <TableCell className={classes.textBold}>
+                  Internal comment
+                </TableCell>
+                <TableCell
+                  dangerouslySetInnerHTML={{
+                    __html: technicalReview?.comment || '-',
+                  }}
+                />
+                <TableCell className={classes.textBold}>
+                  Comments for the review panel
+                </TableCell>
+                <TableCell
+                  dangerouslySetInnerHTML={{
+                    __html: technicalReview?.publicComment || '-',
+                  }}
+                />
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
       </StyledPaper>
     </div>
   );

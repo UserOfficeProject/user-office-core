@@ -252,7 +252,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
           SEP Members
         </Typography>
         <Grid container spacing={3} alignItems="center">
-          <Grid item xs={6}>
+          <Grid item sm={6} xs={12}>
             <TextField
               name="SEPChair"
               id="SEPChair"
@@ -310,7 +310,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               }}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item sm={6} xs={12}>
             <TextField
               name="SEPSecretary"
               id="SEPSecretary"

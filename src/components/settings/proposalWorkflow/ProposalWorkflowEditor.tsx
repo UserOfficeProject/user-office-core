@@ -15,7 +15,7 @@ import {
 } from 'generated/sdk';
 import { usePersistProposalWorkflowEditorModel } from 'hooks/settings/usePersistProposalWorkflowEditorModel';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
-import { StyledPaper } from 'styles/StyledComponents';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import { FunctionType } from 'utils/utilTypes';
 
 import ProposalStatusPicker from './ProposalStatusPicker';
@@ -231,7 +231,7 @@ const ProposalWorkflowEditor: React.FC = () => {
   const progressJsx = !dataLoaded ? <LinearProgress /> : null;
 
   return (
-    <>
+    <ContentContainer>
       <ProposalWorkflowMetadataEditor
         dispatch={dispatch}
         proposalWorkflow={state}
@@ -256,7 +256,7 @@ const ProposalWorkflowEditor: React.FC = () => {
           </Grid>
         </DragDropContext>
       </StyledPaper>
-    </>
+    </ContentContainer>
   );
 };
 

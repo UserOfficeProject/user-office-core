@@ -129,7 +129,6 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     height: 'calc(100vh - 64px)',
     marginTop: '64px',
-    padding: `0 ${theme.spacing(2)}px`,
     width: `calc(100% - ${drawerWidth}px)`,
   },
   bottomNavigation: {
