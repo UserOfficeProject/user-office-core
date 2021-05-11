@@ -1,8 +1,9 @@
 query getSamplesByCallId($callId: Int!) {
   samplesByCallId(callId: $callId) {
     ...sample
-    questionary {
-      isCompleted
+    proposal {
+      id
+      shortCode
     }
   }
 }

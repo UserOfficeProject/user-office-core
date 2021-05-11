@@ -12,9 +12,6 @@ mutation updateSample(
   ) {
     sample {
       ...sample
-      questionary {
-        isCompleted
-      }
     }
     error
   }

@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { GetSamplesQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { SampleWithQuestionaryStatus } from 'models/Sample';
 
 export function useProposalSamples(proposalId: number | null) {
-  const [samples, setSamples] = useState<
-    Exclude<GetSamplesQuery['samples'], null>
-  >([]);
+  const [samples, setSamples] = useState<SampleWithQuestionaryStatus[]>([]);
 
   const [loadingSamples, setLoadingSamples] = useState(false);
   const api = useDataApi();
@@ -19,7 +17,7 @@ export function useProposalSamples(proposalId: number | null) {
     }
     setLoadingSamples(true);
     api()
-      .getSamples({ filter: { proposalId } })
+      .getSamplesWithQuestionaryStatus({ filter: { proposalId } })
       .then((data) => {
         if (data.samples) {
           setSamples(data.samples);

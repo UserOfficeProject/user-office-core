@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 
 import { TemplateCategoryId } from 'generated/sdk';
 import { useProposalsData } from 'hooks/proposal/useProposalsData';
-import { useSamples } from 'hooks/sample/useSamples';
+import { useSamplesWithQuestionaryStatus } from 'hooks/sample/useSamplesWithQuestionaryStatus';
 import { useShipments } from 'hooks/shipment/useShipments';
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
 import { tableIcons } from 'utils/materialIcons';
@@ -35,7 +35,7 @@ function SampleList({ question }: { question: QuestionWithUsage }) {
     () => question.answers.map((answer) => answer.questionaryId),
     [question]
   );
-  const { samples } = useSamples({ questionaryIds });
+  const { samples } = useSamplesWithQuestionaryStatus({ questionaryIds });
 
   return (
     <MaterialTable

@@ -141,7 +141,12 @@ function Questionary({
 
   return (
     <div className={classes.root}>
-      <Typography variant="h4" className={classes.header} ref={titleRef}>
+      <Typography
+        variant="h4"
+        className={classes.header}
+        ref={titleRef}
+        data-cy="questionary-title"
+      >
         {title}
       </Typography>
       <Typography className={classes.subHeader}>{info}</Typography>
