@@ -2,10 +2,10 @@ import MaterialTable, { MaterialTableProps, Column } from 'material-table';
 import React from 'react';
 import { DecodedValueMap, SetQuery, QueryParamConfig } from 'use-query-params';
 
-import { SampleBasic } from 'models/Sample';
+import { SampleWithProposalData } from 'models/Sample';
 import { tableIcons } from 'utils/materialIcons';
 
-const defaultColumns: Column<SampleBasic>[] = [
+const defaultColumns: Column<SampleWithProposalData>[] = [
   { title: 'Title', field: 'title' },
   { title: 'Status', field: 'safetyStatus' },
   { title: 'Created', field: 'created' },
@@ -17,27 +17,29 @@ type SamplesTableQueryParamsType = {
 };
 
 const SamplesTable = (
-  props: Omit<MaterialTableProps<SampleBasic>, 'columns'> & {
+  props: Omit<MaterialTableProps<SampleWithProposalData>, 'columns'> & {
     urlQueryParams: DecodedValueMap<SamplesTableQueryParamsType>;
     setUrlQueryParams: SetQuery<SamplesTableQueryParamsType>;
-    columns?: Column<SampleBasic>[];
+    columns?: Column<SampleWithProposalData>[];
   }
 ) => (
-  <MaterialTable
-    columns={props.columns ? props.columns : defaultColumns}
-    icons={tableIcons}
-    title="Samples"
-    onSearchChange={(searchText) => {
-      props.setUrlQueryParams({
-        search: searchText ? searchText : undefined,
-      });
-    }}
-    options={{
-      ...props.options,
-      searchText: props.urlQueryParams.search || undefined,
-    }}
-    {...props}
-  />
+  <div data-cy="samples-table">
+    <MaterialTable
+      columns={props.columns ? props.columns : defaultColumns}
+      icons={tableIcons}
+      title="Samples"
+      onSearchChange={(searchText) => {
+        props.setUrlQueryParams({
+          search: searchText ? searchText : undefined,
+        });
+      }}
+      options={{
+        ...props.options,
+        searchText: props.urlQueryParams.search || undefined,
+      }}
+      {...props}
+    />
+  </div>
 );
 
 export default React.memo(

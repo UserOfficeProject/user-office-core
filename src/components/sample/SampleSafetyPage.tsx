@@ -19,7 +19,7 @@ import CallFilter from 'components/common/proposalFilters/CallFilter';
 import { Maybe, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useDownloadPDFSample } from 'hooks/sample/useDownloadPDFSample';
-import { SampleBasic } from 'models/Sample';
+import { SampleWithProposalData } from 'models/Sample';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -27,13 +27,13 @@ import SampleDetails from './SampleDetails';
 import SamplesTable from './SamplesTable';
 
 function SampleEvaluationDialog(props: {
-  sample: SampleBasic;
-  onClose: (sample: Maybe<SampleBasic>) => void;
+  sample: SampleWithProposalData;
+  onClose: (sample: Maybe<SampleWithProposalData>) => void;
 }) {
   const { sample, onClose } = props;
   const { api } = useDataApiWithFeedback();
 
-  const initialValues: SampleBasic = {
+  const initialValues: SampleWithProposalData = {
     ...sample,
   };
 
@@ -56,8 +56,8 @@ function SampleEvaluationDialog(props: {
             `Review for '${sample?.title}' submitted`
           ).updateSample({ sampleId: id, safetyComment, safetyStatus });
 
-          const newSample = result.updateSample.sample;
-          onClose(newSample || null);
+          const updatedSample = result.updateSample.sample;
+          onClose({ ...values, ...updatedSample } || null);
         }}
       >
         {({ isSubmitting, dirty }) => (
@@ -159,10 +159,11 @@ function SampleSafetyPage() {
   const [selectedCallId, setSelectedCallId] = useState<number>(
     urlQueryParams.call ? urlQueryParams.call : 0
   );
-  const [samples, setSamples] = useState<SampleBasic[]>([]);
-  const [selectedSample, setSelectedSample] = useState<SampleBasic | null>(
-    null
-  );
+  const [samples, setSamples] = useState<SampleWithProposalData[]>([]);
+  const [
+    selectedSample,
+    setSelectedSample,
+  ] = useState<SampleWithProposalData | null>(null);
 
   useEffect(() => {
     if (selectedCallId === null) {
@@ -171,7 +172,7 @@ function SampleSafetyPage() {
 
     if (selectedCallId === 0) {
       api()
-        .getSamples()
+        .getSamplesWithProposalData()
         .then((result) => {
           setSamples(result.samples || []);
         });
@@ -185,7 +186,7 @@ function SampleSafetyPage() {
   }, [api, selectedCallId]);
 
   const downloadPDFSample = useDownloadPDFSample();
-  const RowActionButtons = (rowData: SampleBasic) => {
+  const RowActionButtons = (rowData: SampleWithProposalData) => {
     const iconButtonStyle = { padding: '7px' };
 
     return (
@@ -221,6 +222,10 @@ function SampleSafetyPage() {
     { title: 'Title', field: 'title' },
     { title: 'Status', field: 'safetyStatus' },
     { title: 'Created', field: 'created' },
+    {
+      title: 'Proposal shortcode',
+      field: 'proposal.shortCode',
+    },
   ];
 
   return (
@@ -251,8 +256,10 @@ function SampleSafetyPage() {
                     tooltip: 'Download sample',
                     onClick: (event, rowData) =>
                       downloadPDFSample(
-                        (rowData as SampleBasic[]).map(({ id }) => id),
-                        (rowData as SampleBasic[])[0].title
+                        (rowData as SampleWithProposalData[]).map(
+                          ({ id }) => id
+                        ),
+                        (rowData as SampleWithProposalData[])[0].title
                       ),
                   },
                 ]}
