@@ -2303,6 +2303,11 @@ export type ReviewWithNextStatusResponseWrap = {
   review: Maybe<ReviewWithNextProposalStatus>;
 };
 
+export enum ReviewerFilter {
+  YOU = 'YOU',
+  ALL = 'ALL'
+}
+
 export type RichTextInputConfig = {
   __typename?: 'RichTextInputConfig';
   small_label: Scalars['String'];
@@ -2804,6 +2809,7 @@ export type User = {
 
 
 export type UserReviewsArgs = {
+  reviewer?: Maybe<ReviewerFilter>;
   status?: Maybe<ReviewStatus>;
   instrumentId?: Maybe<Scalars['Int']>;
   callId?: Maybe<Scalars['Int']>;
@@ -4627,6 +4633,7 @@ export type UserWithReviewsQueryVariables = Exact<{
   callId?: Maybe<Scalars['Int']>;
   instrumentId?: Maybe<Scalars['Int']>;
   status?: Maybe<ReviewStatus>;
+  reviewer?: Maybe<ReviewerFilter>;
 }>;
 
 
@@ -7949,13 +7956,18 @@ export const AddReviewDocument = gql`
 }
     `;
 export const UserWithReviewsDocument = gql`
-    query userWithReviews($callId: Int, $instrumentId: Int, $status: ReviewStatus) {
+    query userWithReviews($callId: Int, $instrumentId: Int, $status: ReviewStatus, $reviewer: ReviewerFilter) {
   me {
     id
     firstname
     lastname
     organisation
-    reviews(callId: $callId, instrumentId: $instrumentId, status: $status) {
+    reviews(
+      callId: $callId
+      instrumentId: $instrumentId
+      status: $status
+      reviewer: $reviewer
+    ) {
       id
       grade
       comment
