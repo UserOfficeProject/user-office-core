@@ -4,7 +4,7 @@ context('Mobile views tests', () => {
   });
 
   beforeEach(() => {
-    cy.viewport(480, 853);
+    cy.viewport('iphone-x');
   });
 
   it('A user officer should not see sidebar menu by default on mobile if not opened but be able to open it', () => {
