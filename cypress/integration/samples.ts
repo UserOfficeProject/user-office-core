@@ -6,7 +6,7 @@ context('Samples tests', () => {
   });
 
   beforeEach(() => {
-    cy.viewport(1300, 1200);
+    cy.viewport(1920, 1080);
   });
 
   const proposalTemplateName = faker.lorem.words(2);
