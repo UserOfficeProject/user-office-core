@@ -818,7 +818,7 @@ context(
       readWriteReview();
     });
 
-    it('Should be able to filter their reviews by status and bulk submit them', () => {
+    it('SEP Reviewer should be able to filter their reviews by status and bulk submit them', () => {
       cy.login(sepMembers.reviewer);
 
       cy.get('[data-cy="review-status-filter"]').click();
@@ -1514,10 +1514,8 @@ context(
       cy.finishedLoading();
       assertAndRemoveAssignment(2);
       cy.finishedLoading();
-      assertAndRemoveAssignment(1);
-      cy.finishedLoading();
 
-      cy.get('@rows').parent().contains('No records to display');
+      cy.get('@rows').should('have.length', 1);
 
       cy.contains('Logs').click();
 
@@ -1526,6 +1524,31 @@ context(
       cy.get("[title='Last Page'] button").first().click();
 
       cy.contains('SEP_MEMBER_REMOVED_FROM_PROPOSAL');
+    });
+
+    it('SEP Reviewer should be able to see reviews even if he/she is not direct reviewer but only member of the SEP', () => {
+      cy.login(sepMembers.reviewer);
+      cy.finishedLoading();
+
+      cy.get('main table tbody').contains('No records to display');
+
+      cy.get('[data-cy="reviewer-filter"]').click();
+
+      cy.get('[data-value="ALL"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.proposalTitle)
+        .parent()
+        .find('[title="Review proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.proposalTitle);
+      cy.get('[role="dialog"]').contains('Grade').click();
+      cy.get('textarea[id="comment"]').should('exist');
+      cy.get('button[type="submit"]').should('exist');
     });
 
     it('SEP Chair should not be able to remove assigned proposal from existing SEP', () => {
