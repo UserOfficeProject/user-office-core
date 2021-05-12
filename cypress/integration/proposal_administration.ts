@@ -6,8 +6,7 @@ context('Proposal administration tests', () => {
   });
 
   beforeEach(() => {
-    cy.viewport(1100, 900);
-    cy.visit('/');
+    cy.viewport(1300, 1200);
   });
 
   const proposalName1 = faker.random.words(3);

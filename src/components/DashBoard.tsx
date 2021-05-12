@@ -166,8 +166,9 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     if (isTabletOrMobile) {
-      localStorage.setItem('drawerOpen', '0');
       setOpen(false);
+    } else if (localStorage.getItem('drawerOpen') === '1') {
+      setOpen(true);
     }
   }, [isTabletOrMobile]);
 

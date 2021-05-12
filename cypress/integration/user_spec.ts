@@ -6,6 +6,7 @@ context('User tests', () => {
   });
 
   beforeEach(() => {
+    cy.viewport(1300, 1200);
     cy.visit('/SignUp?code=WRMVXa');
   });
 
@@ -30,9 +31,7 @@ context('User tests', () => {
   const telephone = faker.phone.phoneNumber('0##########');
 
   it('A user should be able to create a new account with mandatory fields only', () => {
-    cy.get('[data-cy=email] input')
-      .type(email)
-      .should('have.value', email);
+    cy.get('[data-cy=email] input').type(email).should('have.value', email);
 
     cy.get('[data-cy=password] input')
       .type(password)
@@ -142,9 +141,7 @@ context('User tests', () => {
     const telephone = faker.phone.phoneNumber('0##########');
     const telephoneAlt = faker.phone.phoneNumber('0##########');
 
-    cy.get('[data-cy=email] input')
-      .type(email)
-      .should('have.value', email);
+    cy.get('[data-cy=email] input').type(email).should('have.value', email);
 
     cy.get('[data-cy=password] input')
       .type(password)

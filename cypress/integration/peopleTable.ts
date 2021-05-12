@@ -6,6 +6,10 @@ before(() => {
 
 describe('PageTable component tests', () => {
   describe('Preserve selected users', () => {
+    beforeEach(() => {
+      cy.viewport(1300, 1200);
+    });
+
     it('should preserve the selected users', () => {
       cy.login('user');
 
@@ -17,45 +21,30 @@ describe('PageTable component tests', () => {
 
       cy.get('@modal').contains('0 user(s) selected');
 
-      cy.get('@modal')
-        .find('tr[index="1"] input')
-        .click();
+      cy.get('@modal').find('tr[index="1"] input').click();
 
       cy.get('@modal').contains('1 user(s) selected');
 
-      cy.get('@modal')
-        .find('[aria-label="Search"]')
-        .type('foo bar');
+      cy.get('@modal').find('[aria-label="Search"]').type('foo bar');
 
       cy.get('@modal').contains('No records to display');
       cy.get('@modal').contains('1 user(s) selected');
 
-      cy.get('@modal')
-        .find('[aria-label="Search"] ~ * > button')
-        .click();
+      cy.get('@modal').find('[aria-label="Search"] ~ * > button').click();
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal').find('tr[index="1"] input:checked');
 
-      cy.get('@modal')
-        .find('[aria-label="Search"]')
-        .type('Carlsson');
+      cy.get('@modal').find('[aria-label="Search"]').type('Carlsson');
 
       cy.get('@modal').contains('1 user(s) selected');
-      cy.get('@modal')
-        .find('tr[index="0"]')
-        .contains('Carlsson');
+      cy.get('@modal').find('tr[index="0"]').contains('Carlsson');
       cy.get('@modal').find('tr[index="0"] input:not(:checked)');
 
-      cy.get('@modal')
-        .find('[aria-label="Search"]')
-        .clear()
-        .type('Benjamin');
+      cy.get('@modal').find('[aria-label="Search"]').clear().type('Benjamin');
 
       cy.get('@modal').contains('1 user(s) selected');
-      cy.get('@modal')
-        .find('tr[index="0"]')
-        .contains('Benjamin');
+      cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
       cy.get('@modal').find('tr[index="0"] input:checked');
 
       cy.get('[data-cy="assign-selected-users"]').click();
@@ -112,40 +101,26 @@ describe('PageTable component tests', () => {
       cy.get('@modal').contains('0 user(s) selected');
       cy.get('@modal').contains('1-5 of 8');
 
-      cy.get('@modal')
-        .find('tr[index="1"] input')
-        .click();
+      cy.get('@modal').find('tr[index="1"] input').click();
 
       cy.get('@modal').contains('1 user(s) selected');
 
-      cy.get('@modal')
-        .find('[title="Next Page"]')
-        .click();
+      cy.get('@modal').find('[title="Next Page"]').click();
 
-      cy.get('@modal')
-        .find('tr[index="0"] input')
-        .click();
+      cy.get('@modal').find('tr[index="0"] input').click();
       cy.get('@modal').contains('2 user(s) selected');
 
-      cy.get('@modal')
-        .find('[title="Previous Page"]')
-        .click();
+      cy.get('@modal').find('[title="Previous Page"]').click();
 
       cy.get('@modal').find('tr[index="1"] input:checked');
       cy.get('@modal').contains('2 user(s) selected');
 
-      cy.get('@modal')
-        .find('thead th input')
-        .click();
+      cy.get('@modal').find('thead th input').click();
       cy.get('@modal').contains('6 user(s) selected');
-      cy.get('@modal')
-        .find('thead th input')
-        .click();
+      cy.get('@modal').find('thead th input').click();
       cy.get('@modal').contains('1 user(s) selected');
 
-      cy.get('@modal')
-        .find('[title="Next Page"]')
-        .click();
+      cy.get('@modal').find('[title="Next Page"]').click();
       cy.get('@modal').find('tr[index="0"] input:checked');
       cy.get('@modal').contains('1 user(s) selected');
     });

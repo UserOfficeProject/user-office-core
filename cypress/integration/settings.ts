@@ -7,8 +7,7 @@ context('Settings tests', () => {
     });
 
     beforeEach(() => {
-      cy.visit('/');
-      cy.viewport(1100, 1000);
+      cy.viewport(1300, 1200);
     });
 
     it('User should not be able to see Settings page', () => {

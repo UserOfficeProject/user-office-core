@@ -6,8 +6,7 @@ context('Page tests', () => {
   });
 
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
+    cy.viewport(1300, 1200);
   });
 
   const faqContents = faker.random.words(2);

@@ -6,8 +6,7 @@ context('Questions tests', () => {
   });
 
   beforeEach(() => {
-    cy.viewport(1100, 1100);
-    cy.visit('/');
+    cy.viewport(1300, 1200);
   });
 
   const textQuestion = faker.lorem.words(2);

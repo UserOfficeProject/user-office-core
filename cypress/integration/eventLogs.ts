@@ -7,8 +7,7 @@ context('Event log tests', () => {
   });
 
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
+    cy.viewport(1300, 1200);
   });
 
   it('If user creates a proposal, officer should be able to see the event logs for that proposal', () => {
