@@ -91,6 +91,7 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
           aria-label="Open drawer"
           onClick={handleDrawerOpen}
           className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
+          data-cy="open-drawer"
         >
           <MenuIcon />
         </IconButton>
