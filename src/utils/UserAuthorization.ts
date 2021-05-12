@@ -72,14 +72,27 @@ export class UserAuthorization {
     });
   }
 
-  async isReviewerOfProposal(agent: User | null, proposalID: number) {
-    if (agent == null || !agent.id) {
+  async isReviewerOfProposal(agent: UserWithRole | null, proposalID: number) {
+    if (agent == null || !agent.id || !agent.currentRole) {
       return false;
     }
 
-    return this.reviewDataSource.getUserReviews(agent.id).then((reviews) => {
-      return reviews.some((review) => review.proposalID === proposalID);
-    });
+    const sepsUserIsMemberOf = await this.sepDataSource.getUserSepsByRoleAndSepId(
+      agent.id,
+      agent.currentRole
+    );
+
+    const sepIdsUserIsMemberOf = sepsUserIsMemberOf.map((sep) => sep.id);
+
+    /**
+     * NOTE: Everybody who is on a(member of) SEP(Scientific evaluation panel) is able to view and review a proposal.
+     * If we like to limit that we can just send userId on the getUserReviews and query for reviews that are only on that specific user.
+     */
+    return this.reviewDataSource
+      .getUserReviews(sepIdsUserIsMemberOf)
+      .then((reviews) => {
+        return reviews.some((review) => review.proposalID === proposalID);
+      });
   }
 
   async isScientistToProposal(agent: User | null, proposalID: number) {
@@ -146,12 +159,19 @@ export class UserAuthorization {
     return !!agent.accessPermissions?.['ProposalQueries.get'];
   }
 
-  async isMemberOfSEP(agent: User | null, sepId: number): Promise<boolean> {
-    if (agent == null) {
+  async isMemberOfSEP(
+    agent: UserWithRole | null,
+    sepId: number
+  ): Promise<boolean> {
+    if (agent == null || !agent.currentRole) {
       return false;
     }
 
-    const sep = await this.sepDataSource.getUserSepBySepId(agent.id, sepId);
+    const [sep] = await this.sepDataSource.getUserSepsByRoleAndSepId(
+      agent.id,
+      agent.currentRole,
+      sepId
+    );
 
     return sep !== null;
   }

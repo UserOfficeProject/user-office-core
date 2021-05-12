@@ -29,9 +29,10 @@ export default class ReviewQueries {
     if (
       review.userID === agent!.id ||
       this.userAuth.isUserOfficer(agent) ||
-      (sepId && (await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId)))
+      (sepId && (await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId))) ||
+      (await this.userAuth.isReviewerOfProposal(agent, review.proposalID))
     ) {
-      return this.dataSource.get(reviewId);
+      return review;
     } else {
       return null;
     }
