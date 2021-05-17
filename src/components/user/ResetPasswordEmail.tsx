@@ -43,7 +43,7 @@ export default function ResetPasswordEmail() {
   const requestResetEmail = async (values: { email: string }) => {
     await unauthorizedApi()
       .resetPasswordEmail({ email: values.email })
-      .then((data) => setEmailSuccess(!!data.resetPasswordEmail));
+      .then((data) => setEmailSuccess(!!data.resetPasswordEmail.isSuccess));
   };
 
   return (
@@ -71,6 +71,7 @@ export default function ResetPasswordEmail() {
               component={TextField}
               margin="normal"
               fullWidth
+              data-cy="reset-password-email"
             />
             {emailSuccess !== null &&
               (emailSuccess ? (
