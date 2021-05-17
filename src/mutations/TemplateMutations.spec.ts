@@ -7,6 +7,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { isRejection } from '../models/Rejection';
 import {
   Template,
   Topic,
@@ -14,7 +15,6 @@ import {
   DataType,
   Question,
 } from '../models/Template';
-import { isRejection } from '../rejection';
 import TemplateMutations from './TemplateMutations';
 
 const QUESTION_ID = 'links_to_field';

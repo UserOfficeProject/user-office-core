@@ -1,4 +1,3 @@
-import { logger } from '@esss-swap/duo-logger';
 import {
   deleteUserValidationSchema,
   createUserByEmailInviteValidationSchema,
@@ -21,6 +20,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
+import { isRejection, rejection, Rejection } from '../models/Rejection';
 import { Roles, Role } from '../models/Role';
 import {
   User,
@@ -32,7 +32,6 @@ import {
 } from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
-import { isRejection, rejection, Rejection } from '../rejection';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
@@ -70,7 +69,10 @@ export default class UserMutations {
   ): Promise<User | Rejection> {
     const user = await this.dataSource.delete(id);
     if (!user) {
-      return rejection('INTERNAL_ERROR');
+      return rejection('Can not delete user because user does not exist', {
+        id,
+        agent,
+      });
     }
 
     return user;
@@ -96,7 +98,10 @@ export default class UserMutations {
 
       return this.createEmailInviteResponse(userId, (agent as User).id, role);
     } else if (user) {
-      return rejection('ACCOUNT_EXIST');
+      return rejection(
+        'Can not create account because account already exists',
+        { args }
+      );
     }
 
     if (
@@ -132,7 +137,9 @@ export default class UserMutations {
     }
 
     if (!userId) {
-      return rejection('NOT_ALLOWED');
+      return rejection('Can not create user for this role', {
+        args,
+      });
     } else {
       return this.createEmailInviteResponse(userId, (agent as User).id, role);
     }
@@ -148,9 +155,9 @@ export default class UserMutations {
       this.createHash(args.orcid) !== args.orcidHash &&
       !(process.env.NODE_ENV === 'development')
     ) {
-      logger.logError('ORCID hash mismatch', { args });
-
-      return rejection('ORCID_HASH_MISMATCH');
+      return rejection('Can not create user because of ORCID hash mismatch', {
+        args,
+      });
     }
 
     const hash = this.createHash(args.password);
@@ -178,16 +185,16 @@ export default class UserMutations {
       })) as UserWithRole;
 
       if (isRejection(updatedUser) || !changePassword) {
-        logger.logError('Could not create user', {
+        return rejection('Can not create user', {
           updatedUser,
           changePassword,
         });
-
-        return rejection('INTERNAL_ERROR');
       }
       user = updatedUser;
     } else if (user) {
-      return rejection('ACCOUNT_EXIST');
+      return rejection('Can not create user because account already exists', {
+        args,
+      });
     } else {
       try {
         user = (await this.dataSource.create(
@@ -210,9 +217,13 @@ export default class UserMutations {
           args.telephone,
           args.telephone_alt
         )) as UserWithRole;
-      } catch (err) {
-        if ('code' in err && err.code === '23505') {
-          return rejection('ACCOUNT_EXIST');
+      } catch (error) {
+        if ('code' in error && error.code === '23505') {
+          return rejection(
+            'Can not create user because account already exists',
+            { args },
+            error
+          );
         }
       }
     }
@@ -225,9 +236,7 @@ export default class UserMutations {
     }
 
     if (!user) {
-      logger.logError('Could not create user', { args });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection('Could not create user', { args });
     }
 
     const token = signToken<EmailVerificationJwtPayload>(
@@ -259,13 +268,19 @@ export default class UserMutations {
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.userAuth.isUser(agent, args.id))
     ) {
-      return rejection('INSUFFICIENT_PERMISSIONS');
+      return rejection(
+        'Can not update user because of insufficient permissions',
+        { args, agent }
+      );
     }
 
     let user = await this.dataSource.get(args.id); //Hacky
 
     if (!user) {
-      return rejection('INTERNAL_ERROR');
+      return rejection('Can not update user because user does not exist', {
+        args,
+        agent,
+      });
     }
 
     delete args.orcid;
@@ -280,9 +295,7 @@ export default class UserMutations {
       .update(user)
       .then((user) => user)
       .catch((err) => {
-        logger.logException('Could not update user', err, { user });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection('Could not update user', { user }, err);
       });
   }
 
@@ -296,16 +309,21 @@ export default class UserMutations {
     const user = await this.dataSource.get(args.id);
 
     if (!user) {
-      return rejection('INTERNAL_ERROR');
+      return rejection('Can not update role because user does not exist', {
+        args,
+        agent,
+      });
     }
 
     return this.dataSource
       .setUserRoles(args.id, args.roles)
       .then(() => user)
       .catch((err) => {
-        logger.logException('Could not update user', err);
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Can not update user because an error occurred',
+          { args, agent },
+          err
+        );
       });
   }
 
@@ -317,23 +335,23 @@ export default class UserMutations {
     const user = await this.dataSource.getByEmail(args.email);
 
     if (!user) {
-      return rejection('WRONG_EMAIL_OR_PASSWORD');
+      return rejection('Wrong username or password');
     }
     const roles = await this.dataSource.getUserRoles(user.id);
     const result = await this.dataSource.getPasswordByEmail(args.email);
 
     if (!result) {
-      return rejection('WRONG_EMAIL_OR_PASSWORD');
+      return rejection('Wrong username or password');
     }
 
     const valid = bcrypt.compareSync(args.password, result);
 
     if (!valid) {
-      return rejection('WRONG_EMAIL_OR_PASSWORD');
+      return rejection('Wrong email or password');
     }
 
     if (!user.emailVerified) {
-      return rejection('EMAIL_NOT_VERIFIED');
+      return rejection('Email is not verified');
     }
 
     const token = signToken<AuthJwtPayload>({
@@ -354,7 +372,10 @@ export default class UserMutations {
     const user = await this.dataSource.get(userId);
 
     if (!user) {
-      return rejection('USER_DOES_NOT_EXIST');
+      return rejection(
+        'Can not get token for user because user does not exist',
+        { userId }
+      );
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
@@ -379,9 +400,7 @@ export default class UserMutations {
 
       return freshToken;
     } catch (error) {
-      logger.logError('Bad token', { token });
-
-      return rejection('BAD_TOKEN');
+      return rejection('Bad token', { token }, error);
     }
   }
 
@@ -393,9 +412,7 @@ export default class UserMutations {
         externalToken
       );
       if (!rawStfcUser) {
-        logger.logInfo('User not found for token', { externalToken });
-
-        return rejection('USER_DOES_NOT_EXIST');
+        return rejection('User not found', { externalToken });
       }
       const stfcUser = rawStfcUser.return;
 
@@ -414,11 +431,11 @@ export default class UserMutations {
 
       return proposalsToken;
     } catch (error) {
-      logger.logError('Error occured during external authentication', {
-        error,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Error occurred during external authentication',
+        {},
+        error
+      );
     }
   }
 
@@ -442,9 +459,7 @@ export default class UserMutations {
 
       return tokenWithRole;
     } catch (error) {
-      logger.logError('Bad token', { token });
-
-      return rejection('BAD_TOKEN');
+      return rejection('Bad token', { selectedRoleId }, error);
     }
   }
 
@@ -457,9 +472,7 @@ export default class UserMutations {
     const user = await this.dataSource.getByEmail(args.email);
 
     if (!user) {
-      logger.logInfo('Could not find user by email', { email: args });
-
-      return rejection('COULD_NOT_FIND_USER_BY_EMAIL');
+      return rejection('Could not find user by email', { args });
     }
 
     const token = signToken<PasswordResetJwtPayload>(
@@ -494,12 +507,10 @@ export default class UserMutations {
 
         return true;
       } else {
-        return rejection('COULD_NOT_VERIFY_USER');
+        return rejection('Can not verify user', { user });
       }
     } catch (error) {
-      logger.logException('Could not verify email', error, { token });
-
-      return rejection('COULD_NOT_VERIFY_USER');
+      return rejection('Can not verify email', {}, error);
     }
   }
 
@@ -510,9 +521,7 @@ export default class UserMutations {
       .addUserRole(args)
       .then(() => true)
       .catch((err) => {
-        logger.logException('Could not add user role', err, { agent });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection('Could not add user role', { agent, args }, err);
       });
   }
 
@@ -526,7 +535,10 @@ export default class UserMutations {
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.userAuth.isUser(agent, id))
     ) {
-      return rejection('INSUFFICIENT_PERMISSIONS');
+      return rejection(
+        'Can not update password because of insufficient permissions',
+        { id, agent }
+      );
     }
 
     try {
@@ -535,17 +547,13 @@ export default class UserMutations {
       if (user) {
         return this.dataSource.setUserPassword(user.id, hash);
       } else {
-        logger.logError('Could not update password. Used does not exist', {
+        return rejection('Could not update password. Used does not exist', {
           agent,
           id,
         });
-
-        return rejection('USER_DOES_NOT_EXIST');
       }
     } catch (error) {
-      logger.logException('Could not update password', error, { agent, id });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection('Could not update password', { agent, id }, error);
     }
   }
 
@@ -570,21 +578,16 @@ export default class UserMutations {
           .setUserPassword(user.id, hash)
           .then((user) => user)
           .catch((err) => {
-            logger.logError('Could not reset password', { err });
-
-            return rejection('INTERNAL_ERROR');
+            return rejection('Could not reset password', { user }, err);
           });
       }
-      logger.logError('Could not reset password incomplete data', {
+
+      return rejection('Could not reset password incomplete data', {
         user,
         decoded,
       });
-
-      return rejection('INTERNAL_ERROR');
     } catch (error) {
-      logger.logError('Could not reset password', { error, token });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection('Could not reset password', { error, token });
     }
   }
 

@@ -128,7 +128,7 @@ describe('Test Instrument Mutations', () => {
           availabilityTime: -1,
         }
       )
-    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A logged in user officer can set availability time on instrument attached to a call', () => {

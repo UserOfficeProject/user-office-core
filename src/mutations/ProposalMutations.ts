@@ -1,5 +1,3 @@
-import { ResourceId } from '@esss-swap/duo-localisation';
-import { logger } from '@esss-swap/duo-logger';
 import {
   administrationProposalValidationSchema,
   createProposalValidationSchema,
@@ -8,7 +6,6 @@ import {
   submitProposalValidationSchema,
   updateProposalValidationSchema,
 } from '@esss-swap/duo-validation';
-import { to } from 'await-to-js';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -25,10 +22,10 @@ import {
   ProposalIdsWithNextStatus,
 } from '../models/Proposal';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SampleStatus } from '../models/Sample';
 import { UserWithRole } from '../models/User';
-import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalInput } from '../resolvers/mutations/CloneProposalMutation';
@@ -66,17 +63,16 @@ export default class ProposalMutations {
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
     if (!(await this.callDataSource.checkActiveCall(callId))) {
-      return rejection('NO_ACTIVE_CALL_FOUND');
+      return rejection('Call is not active', { callId, agent });
     }
 
     const call = await this.callDataSource.get(callId);
 
     if (!call || !call.templateId) {
-      logger.logError('User tried to create proposal on bad call', {
-        call,
-      });
-
-      return rejection('NOT_FOUND');
+      return rejection(
+        'Can not create proposal because there is problem with the call',
+        { call }
+      );
     }
 
     const questionary = await this.questionaryDataSource.create(
@@ -88,9 +84,7 @@ export default class ProposalMutations {
       .create((agent as UserWithRole).id, callId, questionary.questionaryId)
       .then((proposal) => proposal)
       .catch((err) => {
-        logger.logException('Could not create proposal', err, { agent });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection('Could not create proposal', { agent, call }, err);
       });
   }
 
@@ -107,7 +101,7 @@ export default class ProposalMutations {
     const proposal = await this.proposalDataSource.get(id); //Hacky
 
     if (!proposal) {
-      return rejection('NOT_FOUND');
+      return rejection('Proposal not found', { args });
     }
 
     // Check if the call is open
@@ -115,20 +109,16 @@ export default class ProposalMutations {
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.callDataSource.checkActiveCall(proposal.callId))
     ) {
-      return rejection('NO_ACTIVE_CALL_FOUND');
-    }
-
-    // Check that proposal exist
-    if (!proposal) {
-      return rejection('INTERNAL_ERROR');
+      return rejection('Call is not active', { args });
     }
 
     if (
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isMemberOfProposal(agent, proposal))
     ) {
-      return rejection('NOT_ALLOWED');
+      return rejection('Unauthorized proposal update', { args });
     }
+
 
     const proposalStatus = await this.proposalSettingsDataSource.getProposalStatus(
       proposal.statusId
@@ -152,14 +142,13 @@ export default class ProposalMutations {
     }
 
     if (users !== undefined) {
-      const [err] = await to(
-        this.proposalDataSource.setProposalUsers(id, users)
-      );
-      if (err) {
-        logger.logError('Could not update users', { err, id, agent });
-
-        return rejection('INTERNAL_ERROR');
-      }
+      this.proposalDataSource.setProposalUsers(id, users).catch((error) => {
+        return rejection(
+          'Could not update proposal co-proposers',
+          { id, agent },
+          error
+        );
+      });
     }
 
     if (proposerId !== undefined) {
@@ -167,12 +156,7 @@ export default class ProposalMutations {
     }
 
     return this.proposalDataSource.update(proposal).catch((err) => {
-      logger.logException('Could not update proposal', err, {
-        agent,
-        id,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection('Could not update proposal', { agent, id }, err);
     });
   }
 
@@ -186,7 +170,9 @@ export default class ProposalMutations {
     const proposal = await this.proposalDataSource.get(proposalId);
 
     if (!proposal) {
-      return rejection('INTERNAL_ERROR');
+      return rejection('Can not submit proposal, because proposal not found', {
+        proposalId,
+      });
     }
 
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
@@ -194,7 +180,10 @@ export default class ProposalMutations {
       !isUserOfficer &&
       !(await this.userAuth.isMemberOfProposal(agent, proposal))
     ) {
-      return rejection('NOT_ALLOWED');
+      return rejection('Unauthorized submission of the proposal', {
+        agent,
+        proposalId,
+      });
     }
 
     // Check if there is an open call
@@ -202,16 +191,18 @@ export default class ProposalMutations {
       proposal.callId
     );
     if (!isUserOfficer && !hasActiveCall) {
-      return rejection('NO_ACTIVE_CALL_FOUND');
-    }
-
-    return this.proposalDataSource.submitProposal(proposalId).catch((e) => {
-      logger.logException('Could not submit proposal', e, {
+      return rejection('Can not submit proposal because call is not active', {
         agent,
         proposalId,
       });
+    }
 
-      return rejection('INTERNAL_ERROR');
+    return this.proposalDataSource.submitProposal(proposalId).catch((error) => {
+      return rejection(
+        'Could not submit proposal',
+        { agent, proposalId },
+        error
+      );
     });
   }
 
@@ -224,7 +215,10 @@ export default class ProposalMutations {
     const proposal = await this.proposalDataSource.get(proposalId);
 
     if (!proposal) {
-      return rejection('NOT_FOUND');
+      return rejection('Can not delete proposal because proposal not found', {
+        agent,
+        proposalId,
+      });
     }
 
     if (!this.userAuth.isUserOfficer(agent)) {
@@ -232,26 +226,30 @@ export default class ProposalMutations {
         proposal.submitted ||
         !this.userAuth.isPrincipalInvestigatorOfProposal(agent, proposal)
       )
-        return rejection('NOT_ALLOWED');
+        return rejection(
+          'Can not delete proposal because proposal is submitted',
+          { agent, proposalId }
+        );
     }
 
     try {
       const result = await this.proposalDataSource.deleteProposal(proposalId);
 
       return result;
-    } catch (e) {
-      if ('code' in e && e.code === '23503') {
+    } catch (error) {
+      if ('code' in error && error.code === '23503') {
         return rejection(
-          `Failed to delete proposal with ID "${proposal.shortCode}", it has dependencies which need to be deleted first` as ResourceId
+          'Failed to delete proposal because, it has dependencies which need to be deleted first',
+          { proposal },
+          error
         );
       }
 
-      logger.logException('Failed to delete proposal', e, {
-        agent,
-        proposalId,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Failed to delete proposal',
+        { agent, proposalId },
+        error
+      );
     }
   }
 
@@ -265,12 +263,12 @@ export default class ProposalMutations {
     const proposal = await this.proposalDataSource.get(proposalId);
 
     if (!proposal || proposal.notified || !proposal.finalStatus) {
-      return rejection('INTERNAL_ERROR');
+      return rejection('Can not notify proposal', { proposal });
     }
     proposal.notified = true;
     const result = await this.proposalDataSource.update(proposal);
 
-    return result || rejection('INTERNAL_ERROR');
+    return result || rejection('Can not notify proposal', { result });
   }
 
   @EventBus(Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED)
@@ -299,13 +297,19 @@ export default class ProposalMutations {
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
 
     if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not administer proposal because of insufficient permissions',
+        { args, agent }
+      );
     }
 
     const proposal = await this.proposalDataSource.get(id);
 
     if (!proposal) {
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Can not administer proposal because proposal not found',
+        { args, agent }
+      );
     }
 
     const isProposalInstrumentSubmitted = await this.instrumentDataSource.isProposalInstrumentSubmitted(
@@ -313,7 +317,10 @@ export default class ProposalMutations {
     );
 
     if (isProposalInstrumentSubmitted && !isUserOfficer) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not administer proposal because instrument is submitted',
+        { args, agent }
+      );
     }
 
     if (finalStatus !== undefined) {
@@ -360,7 +367,7 @@ export default class ProposalMutations {
 
     const result = await this.proposalDataSource.update(proposal);
 
-    return result || rejection('INTERNAL_ERROR');
+    return result || rejection('Can not administer proposal', { result });
   }
 
   @EventBus(Event.PROPOSAL_STATUS_UPDATED)
@@ -388,7 +395,7 @@ export default class ProposalMutations {
       );
     }
 
-    return result || rejection('INTERNAL_ERROR');
+    return result || rejection('Can not change proposal status', { result });
   }
 
   @Authorized()
@@ -400,31 +407,34 @@ export default class ProposalMutations {
     const sourceProposal = await this.proposalDataSource.get(proposalToCloneId);
 
     if (!sourceProposal) {
-      logger.logError(
-        'Could not clone proposal because source proposal does not exist',
+      return rejection(
+        'Can not clone proposal because source proposal does not exist',
         { proposalToCloneId }
       );
-
-      return rejection('NOT_FOUND');
     }
 
     if (!(await this.userAuth.hasAccessRights(agent, sourceProposal))) {
-      return rejection('INSUFFICIENT_PERMISSIONS');
+      return rejection(
+        'Can not clone proposal because of insufficient permissions',
+        { sourceProposal, agent }
+      );
     }
 
     // Check if there is an open call
     if (!(await this.callDataSource.checkActiveCall(callId))) {
-      return rejection('NO_ACTIVE_CALL_FOUND');
+      return rejection(
+        'Can not clone proposal because the call is not active',
+        { callId, agent, sourceProposal }
+      );
     }
 
     const call = await this.callDataSource.get(callId);
 
     if (!call || !call.templateId) {
-      logger.logError('User tried to clone proposal on bad call', {
-        call,
-      });
-
-      return rejection('NOT_FOUND');
+      return rejection(
+        'Can not clone proposal because the call is invalid or misconfigured',
+        { call }
+      );
     }
 
     const sourceQuestionary = await this.questionaryDataSource.getQuestionary(
@@ -432,15 +442,10 @@ export default class ProposalMutations {
     );
 
     if (call.templateId !== sourceQuestionary?.templateId) {
-      logger.logError(
+      return rejection(
         'Can not clone proposal to a call whose template is different',
-        {
-          call,
-          sourceQuestionary,
-        }
+        { call, sourceQuestionary }
       );
-
-      return rejection('INTERNAL_ERROR');
     }
 
     try {
@@ -505,10 +510,8 @@ export default class ProposalMutations {
       }
 
       return clonedProposal;
-    } catch (e) {
-      logger.logException('Could not cone proposal', e);
-
-      return rejection('INTERNAL_ERROR');
+    } catch (error) {
+      return rejection('Could not cone proposal', { proposalToCloneId }, error);
     }
   }
 }

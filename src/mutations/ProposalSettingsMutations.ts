@@ -1,4 +1,3 @@
-import { logger } from '@esss-swap/duo-logger';
 import {
   createProposalStatusValidationSchema,
   updateProposalStatusValidationSchema,
@@ -19,10 +18,10 @@ import { Authorized, ValidateArgs } from '../decorators';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { UserWithRole } from '../models/User';
-import { rejection, Rejection } from '../rejection';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { AddStatusChangingEventsToConnectionInput } from '../resolvers/mutations/settings/AddStatusChangingEventsToConnection';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
@@ -46,12 +45,11 @@ export default class ProposalSettingsMutations {
     args: CreateProposalStatusInput
   ): Promise<ProposalStatus | Rejection> {
     return this.dataSource.createProposalStatus(args).catch((error) => {
-      logger.logException('Could not create proposal status', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not create proposal status',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -62,12 +60,11 @@ export default class ProposalSettingsMutations {
     args: UpdateProposalStatusInput
   ): Promise<ProposalStatus | Rejection> {
     return this.dataSource.updateProposalStatus(args).catch((error) => {
-      logger.logException('Could not update proposal status', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not update proposal status',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -78,12 +75,11 @@ export default class ProposalSettingsMutations {
     args: { id: number }
   ): Promise<ProposalStatus | Rejection> {
     return this.dataSource.deleteProposalStatus(args.id).catch((error) => {
-      logger.logException('Could not delete proposal status', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not delete proposal status',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -94,12 +90,11 @@ export default class ProposalSettingsMutations {
     args: CreateProposalWorkflowInput
   ): Promise<ProposalWorkflow | Rejection> {
     return this.dataSource.createProposalWorkflow(args).catch((error) => {
-      logger.logException('Could not create proposal workflow', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not create proposal workflow',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -110,12 +105,11 @@ export default class ProposalSettingsMutations {
     args: UpdateProposalWorkflowInput
   ): Promise<ProposalWorkflow | Rejection> {
     return this.dataSource.updateProposalWorkflow(args).catch((error) => {
-      logger.logException('Could not update proposal workflow', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not update proposal workflow',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -126,12 +120,11 @@ export default class ProposalSettingsMutations {
     args: { id: number }
   ): Promise<ProposalWorkflow | Rejection> {
     return this.dataSource.deleteProposalWorkflow(args.id).catch((error) => {
-      logger.logException('Could not delete proposal workflow', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not delete proposal workflow',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -397,12 +390,11 @@ export default class ProposalSettingsMutations {
         return this.insertNewAndUpdateExistingProposalWorkflowStatuses(args);
       }
     } catch (error) {
-      logger.logException('Could not add proposal workflow status', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not add proposal workflow status',
+        { agent, args },
+        error
+      );
     }
   }
 
@@ -418,12 +410,11 @@ export default class ProposalSettingsMutations {
         args.statusChangingEvents
       )
       .catch((error) => {
-        logger.logException('Could not add next status events', error, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Could not add next status events',
+          { agent, args },
+          error
+        );
       });
   }
 
@@ -459,12 +450,11 @@ export default class ProposalSettingsMutations {
 
       return reorderedWorkflowConnections[args.to.index];
     } catch (error) {
-      logger.logException('Could not move proposal workflow status', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not move proposal workflow status',
+        { agent, args },
+        error
+      );
     }
   }
 
@@ -520,7 +510,10 @@ export default class ProposalSettingsMutations {
       const [firstWorkflowConnectionToRemove] = workflowConnectionsToRemove;
 
       if (!firstWorkflowConnectionToRemove) {
-        return rejection('NOT_FOUND');
+        return rejection(
+          'Can not delete workflow connection because first connection not found',
+          { workflowConnectionsToRemove }
+        );
       }
 
       const allGroupWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
@@ -546,7 +539,10 @@ export default class ProposalSettingsMutations {
         );
 
         if (!workflowConnectionToReplaceRemoved) {
-          return rejection('NOT_FOUND');
+          return rejection(
+            'Can not delete workflow connection because connection to replace is not found',
+            { firstWorkflowConnectionToRemove }
+          );
         }
 
         workflowConnectionsToRemove.forEach(async (connection) => {
@@ -627,12 +623,11 @@ export default class ProposalSettingsMutations {
 
       return true;
     } catch (error) {
-      logger.logException('Could not delete proposal workflow status', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not delete proposal workflow status',
+        { agent, args },
+        error
+      );
     }
   }
 }

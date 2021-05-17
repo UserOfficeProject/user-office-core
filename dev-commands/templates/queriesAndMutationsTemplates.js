@@ -1,4 +1,4 @@
-const queriesTemplate = name =>
+const queriesTemplate = (name) =>
   `import { ${name.capitalize()}DataSource } from '../datasources/${name.capitalize()}DataSource';
 import { Authorized } from '../decorators';
 import { UserWithRole } from '../models/User';
@@ -22,7 +22,7 @@ export default class ${name.capitalize()}Queries {
 }
 `;
 
-const mutationsTemplate = name =>
+const mutationsTemplate = (name) =>
   `import { logger } from '@esss-swap/duo-logger';
   import { create${name.capitalize()}ValidationSchema } from '@esss-swap/duo-validation';
 
@@ -57,7 +57,7 @@ export default class ${name.capitalize()}Mutations {
           ${name}Id: args.${name}Id,
         });
 
-        return rejection('INTERNAL_ERROR');
+        return rejection('Could not create ${name}');
       });
   }
 
@@ -76,7 +76,7 @@ export default class ${name.capitalize()}Mutations {
           ${name}Id: args.${name}Id,
         });
 
-        return rejection('INTERNAL_ERROR');
+        return rejection(''Could not update ${name}');
       });
   }
 
@@ -95,7 +95,7 @@ export default class ${name.capitalize()}Mutations {
           ${name}Id: args.${name}Id,
         });
 
-        return rejection('INTERNAL_ERROR');
+        return rejection('Could not delete ${name}');
       });
   }
 }

@@ -16,7 +16,7 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
-import { isRejection } from '../rejection';
+import { isRejection } from '../models/Rejection';
 import ProposalMutations from './ProposalMutations';
 
 const proposalMutations = container.resolve(ProposalMutations);
@@ -39,7 +39,10 @@ test('A user on the proposal can not update its title if it is not in edit mode'
       id: dummyProposalSubmitted.id,
       title: '',
     })
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED_PROPOSAL_SUBMITTED');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not update proposal after submission'
+  );
 });
 
 test('A user-officer can update a proposal', async () => {
@@ -104,7 +107,10 @@ test('A user can not update a proposals score mode', async () => {
       id: dummyProposalSubmitted.id,
       proposerId: newProposerId,
     })
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED_PROPOSAL_SUBMITTED');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not update proposal after submission'
+  );
 });
 
 test('A user not on a proposal can not update it', () => {
@@ -113,7 +119,7 @@ test('A user not on a proposal can not update it', () => {
       id: 1,
       proposerId: dummyUserNotOnProposal.id,
     })
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
+  ).resolves.toHaveProperty('reason', 'Unauthorized proposal update');
 });
 
 //Submit
@@ -121,7 +127,10 @@ test('A user not on a proposal can not update it', () => {
 test('A user officer can not reject a proposal that does not exist', () => {
   return expect(
     proposalMutations.submit(dummyUserOfficerWithRole, { proposalId: 99 })
-  ).resolves.toHaveProperty('reason', 'INTERNAL_ERROR');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not submit proposal, because proposal not found'
+  );
 });
 
 test('A user officer can submit a proposal', () => {
@@ -133,7 +142,10 @@ test('A user officer can submit a proposal', () => {
 test('A user officer can not submit a proposal that does not exist', () => {
   return expect(
     proposalMutations.submit(dummyUserOfficerWithRole, { proposalId: -1 })
-  ).resolves.toHaveProperty('reason', 'INTERNAL_ERROR');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not submit proposal, because proposal not found'
+  );
 });
 
 test('A user on the proposal can submit a proposal', () => {
@@ -153,7 +165,10 @@ test('A user on the proposal can not submit a proposal if the call is not active
 test('A user not on the proposal cannot submit a proposal', () => {
   return expect(
     proposalMutations.submit(dummyUserNotOnProposalWithRole, { proposalId: 1 })
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Unauthorized submission of the proposal'
+  );
 });
 
 test('A non-logged in user cannot submit a proposal', () => {
@@ -187,7 +202,10 @@ test('Principal investigator can not delete submitted proposal', async () => {
     proposalMutations.delete(dummyPrincipalInvestigatorWithRole, {
       proposalId: dummyProposalSubmitted.id,
     })
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not delete proposal because proposal is submitted'
+  );
 });
 
 test('Has to be logged in to create proposal', () => {

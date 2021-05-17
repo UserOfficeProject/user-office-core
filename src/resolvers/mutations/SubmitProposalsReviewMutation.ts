@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { isRejection, rejection } from '../../rejection';
+import { isRejection, rejection } from '../../models/Rejection';
 import { SuccessResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 

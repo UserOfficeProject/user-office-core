@@ -7,8 +7,8 @@ import {
   dummyUser,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { isRejection } from '../models/Rejection';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
-import { isRejection } from '../rejection';
 import QuestionaryMutations from './QuestionaryMutations';
 
 const mutations = container.resolve(QuestionaryMutations);

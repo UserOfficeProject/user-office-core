@@ -115,19 +115,28 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       });
   }
 
-  async getUserSepBySepId(userId: number, sepId: number): Promise<SEP | null> {
-    const sepRecords = await database<SEPRecord>('SEPs')
-      .select<SEPRecord>('SEPs.*')
+  async getUserSepsByRoleAndSepId(
+    userId: number,
+    role: Role,
+    sepId?: number
+  ): Promise<SEP[]> {
+    const sepRecords = await database<SEPRecord[]>('SEPs')
+      .select<SEPRecord[]>('SEPs.*')
       .leftJoin('SEP_Reviewers', 'SEP_Reviewers.sep_id', '=', 'SEPs.sep_id')
-      .where('SEPs.sep_id', sepId)
-      .andWhere((qb) => {
-        qb.where('sep_chair_user_id', userId);
-        qb.orWhere('sep_secretary_user_id', userId);
-        qb.orWhere('SEP_Reviewers.user_id', userId);
-      })
-      .first();
+      .where((qb) => {
+        if (sepId) {
+          qb.where('SEPs.sep_id', sepId);
+        }
+        if (role.shortCode === Roles.SEP_CHAIR) {
+          qb.where('sep_chair_user_id', userId);
+        } else if (role.shortCode === Roles.SEP_SECRETARY) {
+          qb.where('sep_secretary_user_id', userId);
+        } else {
+          qb.where('SEP_Reviewers.user_id', userId);
+        }
+      });
 
-    return sepRecords ? createSEPObject(sepRecords) : null;
+    return sepRecords.map(createSEPObject);
   }
 
   async getUserSeps(userId: number, role: Role): Promise<SEP[]> {
