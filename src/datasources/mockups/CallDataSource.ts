@@ -8,6 +8,32 @@ import {
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 
+export const dummyCallFactory = (values?: Partial<Call>) => {
+  return new Call(
+    values?.id || 1,
+    values?.shortCode || 'shortCode',
+    values?.startCall || new Date(),
+    values?.endCall || new Date(),
+    values?.startReview || new Date(),
+    values?.endReview || new Date(),
+    values?.startSEPReview || new Date(),
+    values?.endSEPReview || new Date(),
+    values?.startNotify || new Date(),
+    values?.endNotify || new Date(),
+    values?.startCycle || new Date(),
+    values?.endCycle || new Date(),
+    values?.cycleComment || 'Cycle comment',
+    values?.surveyComment || 'Survey comment',
+    values?.referenceNumberFormat || '',
+    values?.proposalSequence || 0,
+    values?.proposalWorkflowId || 1,
+    values?.callEnded || false,
+    values?.callReviewEnded || false,
+    values?.callSEPReviewEnded || false,
+    values?.templateId || 1
+  );
+};
+
 export const dummyCall = new Call(
   1,
   'shortCode',
@@ -23,6 +49,8 @@ export const dummyCall = new Call(
   new Date('2019-07-17 08:25:12.23043+00'),
   '',
   '',
+  '',
+  0,
   1,
   false,
   false,
@@ -45,6 +73,8 @@ export const anotherDummyCall = new Call(
   new Date('2019-07-17 08:25:12.23043+00'),
   '',
   '',
+  '',
+  0,
   1,
   true,
   false,
@@ -106,5 +136,9 @@ export class CallDataSourceMock implements CallDataSource {
 
   async getCallsByInstrumentScientist(scientistId: number): Promise<Call[]> {
     return dummyCalls;
+  }
+
+  async checkActiveCall(callId: number): Promise<boolean> {
+    return callId === 1;
   }
 }

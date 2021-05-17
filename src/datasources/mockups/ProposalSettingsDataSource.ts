@@ -153,6 +153,7 @@ export class ProposalSettingsDataSourceMock
     {
       nextProposalStatusId,
       prevProposalStatusId,
+      sortOrder,
     }: NextAndPreviousProposalStatuses
   ): Promise<ProposalWorkflowConnection[]> {
     return [dummyProposalWorkflowConnection];
@@ -172,7 +173,8 @@ export class ProposalSettingsDataSourceMock
 
   async deleteProposalWorkflowStatus(
     proposalStatusId: number,
-    proposalWorkflowId: number
+    proposalWorkflowId: number,
+    sortOrder: number
   ): Promise<ProposalWorkflowConnection> {
     return dummyProposalWorkflowConnection;
   }

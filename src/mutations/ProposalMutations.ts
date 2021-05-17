@@ -65,7 +65,7 @@ export default class ProposalMutations {
     { callId }: { callId: number }
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
-    if (!(await this.proposalDataSource.checkActiveCall(callId))) {
+    if (!(await this.callDataSource.checkActiveCall(callId))) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
 
@@ -113,7 +113,7 @@ export default class ProposalMutations {
     // Check if the call is open
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.proposalDataSource.checkActiveCall(proposal.callId))
+      !(await this.callDataSource.checkActiveCall(proposal.callId))
     ) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
@@ -166,17 +166,14 @@ export default class ProposalMutations {
       proposal.proposerId = proposerId;
     }
 
-    return this.proposalDataSource
-      .update(proposal)
-      .then((proposal) => proposal)
-      .catch((err) => {
-        logger.logException('Could not update proposal', err, {
-          agent,
-          id,
-        });
-
-        return rejection('INTERNAL_ERROR');
+    return this.proposalDataSource.update(proposal).catch((err) => {
+      logger.logException('Could not update proposal', err, {
+        agent,
+        id,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(submitProposalValidationSchema)
@@ -192,24 +189,30 @@ export default class ProposalMutations {
       return rejection('INTERNAL_ERROR');
     }
 
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (
-      !this.userAuth.isUserOfficer(agent) &&
+      !isUserOfficer &&
       !(await this.userAuth.isMemberOfProposal(agent, proposal))
     ) {
       return rejection('NOT_ALLOWED');
     }
 
-    return this.proposalDataSource
-      .submitProposal(proposalId)
-      .then((proposal) => proposal)
-      .catch((e) => {
-        logger.logException('Could not submit proposal', e, {
-          agent,
-          proposalId,
-        });
+    // Check if there is an open call
+    const hasActiveCall = await this.callDataSource.checkActiveCall(
+      proposal.callId
+    );
+    if (!isUserOfficer && !hasActiveCall) {
+      return rejection('NO_ACTIVE_CALL_FOUND');
+    }
 
-        return rejection('INTERNAL_ERROR');
+    return this.proposalDataSource.submitProposal(proposalId).catch((e) => {
+      logger.logException('Could not submit proposal', e, {
+        agent,
+        proposalId,
       });
+
+      return rejection('INTERNAL_ERROR');
+    });
   }
 
   @ValidateArgs(deleteProposalValidationSchema)
@@ -234,8 +237,6 @@ export default class ProposalMutations {
 
     try {
       const result = await this.proposalDataSource.deleteProposal(proposalId);
-
-      await this.questionaryDataSource.delete(result.questionaryId);
 
       return result;
     } catch (e) {
@@ -273,8 +274,10 @@ export default class ProposalMutations {
   }
 
   @EventBus(Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED)
-  @EventBus(Event.PROPOSAL_STATUS_CHANGED_BY_USER)
-  @ValidateArgs(administrationProposalValidationSchema)
+  @ValidateArgs(administrationProposalValidationSchema, [
+    'commentForUser',
+    'commentForManagement',
+  ])
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async admin(
     agent: UserWithRole | null,
@@ -290,7 +293,7 @@ export default class ProposalMutations {
       managementDecisionSubmitted,
     } = args;
     const isChairOrSecretaryOfProposal = await this.userAuth.isChairOrSecretaryOfProposal(
-      agent!.id,
+      agent,
       id
     );
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
@@ -410,7 +413,7 @@ export default class ProposalMutations {
     }
 
     // Check if there is an open call
-    if (!(await this.proposalDataSource.checkActiveCall(callId))) {
+    if (!(await this.callDataSource.checkActiveCall(callId))) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
 
@@ -472,6 +475,7 @@ export default class ProposalMutations {
         commentForManagement: '',
         notified: false,
         submitted: false,
+        referenceNumberSequence: 0,
         managementTimeAllocation: 0,
         managementDecisionSubmitted: false,
       });
@@ -493,7 +497,7 @@ export default class ProposalMutations {
         await this.sampleDataSource.updateSample({
           sampleId: clonedSample.id,
           proposalId: clonedProposal.id,
-          questionaryId: clonedQuestionary.questionaryId,
+          questionaryId: clonedSample.questionaryId,
           safetyComment: '',
           safetyStatus: SampleStatus.PENDING_EVALUATION,
           shipmentId: null,

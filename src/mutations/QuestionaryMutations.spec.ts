@@ -14,8 +14,9 @@ import QuestionaryMutations from './QuestionaryMutations';
 const mutations = container.resolve(QuestionaryMutations);
 const queries = container.resolve(QuestionaryQueries);
 
+const USER_QUESTIONARY_ID = 1;
+
 const getDummyUsersProposal = async () => {
-  const USER_QUESTIONARY_ID = 1;
   const steps = await queries.getQuestionarySteps(
     dummyUserWithRole,
     USER_QUESTIONARY_ID
@@ -38,7 +39,7 @@ it('User should answer topic questions', async () => {
     firstStep,
     questionaryId,
   } = await getDummyUsersProposal();
-  const result = await mutations.answerTopic(dummyUser, {
+  const result = await mutations.answerTopic(dummyUserWithRole, {
     questionaryId,
     topicId: firstStep.topic.id,
     answers: [
@@ -49,6 +50,25 @@ it('User should answer topic questions', async () => {
     ],
   });
   expect(isRejection(result)).toBeFalsy();
+});
+
+it('User should not be able to answer topic questions if proposal has no active call', async () => {
+  const {
+    firstAnswer,
+    firstStep,
+    questionaryId,
+  } = await getDummyUsersProposal();
+  const result = await mutations.answerTopic(dummyUserWithRole, {
+    questionaryId: questionaryId + 1, // anything other than 1 is considered to have no active call
+    topicId: firstStep.topic.id,
+    answers: [
+      {
+        questionId: firstAnswer.question.id,
+        value: JSON.stringify({ value: 'answer' }),
+      },
+    ],
+  });
+  expect(isRejection(result)).toBe(true);
 });
 
 it('User should update question', async () => {

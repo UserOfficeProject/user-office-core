@@ -62,6 +62,7 @@ export interface ProposalRecord {
   readonly comment_for_management: string;
   readonly notified: boolean;
   readonly submitted: boolean;
+  readonly reference_number_sequence: number;
   readonly management_time_allocation: number;
   readonly management_decision_submitted: boolean;
 }
@@ -229,6 +230,8 @@ export interface CallRecord {
   readonly end_cycle: Date;
   readonly cycle_comment: string;
   readonly survey_comment: string;
+  readonly reference_number_format: string;
+  readonly proposal_sequence: number;
   readonly proposal_workflow_id: number;
   readonly call_ended: boolean;
   readonly call_review_ended: boolean;
@@ -514,6 +517,7 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.comment_for_management,
     proposal.notified,
     proposal.submitted,
+    proposal.reference_number_sequence,
     proposal.management_time_allocation,
     proposal.management_decision_submitted
   );
@@ -647,6 +651,8 @@ export const createCallObject = (call: CallRecord) => {
     call.end_cycle,
     call.cycle_comment,
     call.survey_comment,
+    call.reference_number_format,
+    call.proposal_sequence,
     call.proposal_workflow_id,
     call.call_ended,
     call.call_review_ended,

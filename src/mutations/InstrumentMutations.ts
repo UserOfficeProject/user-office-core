@@ -269,10 +269,7 @@ export default class InstrumentMutations {
   ): Promise<InstrumentHasProposals | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(
-        (agent as UserWithRole).id,
-        args.sepId
-      ))
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, args.sepId))
     ) {
       return rejection('NOT_ALLOWED');
     }
