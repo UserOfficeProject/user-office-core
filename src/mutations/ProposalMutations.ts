@@ -24,6 +24,7 @@ import {
   ProposalEndStatus,
   ProposalIdsWithNextStatus,
 } from '../models/Proposal';
+import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 import { Roles } from '../models/Role';
 import { SampleStatus } from '../models/Sample';
 import { UserWithRole } from '../models/User';
@@ -34,6 +35,7 @@ import { CloneProposalInput } from '../resolvers/mutations/CloneProposalMutation
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
+import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
 
 @injectable()
 export default class ProposalMutations {
@@ -49,7 +51,10 @@ export default class ProposalMutations {
     private sampleDataSource: SampleDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalSettingsDataSource)
+    private proposalSettingsDataSource: ProposalSettingsDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -124,7 +129,15 @@ export default class ProposalMutations {
     ) {
       return rejection('NOT_ALLOWED');
     }
-    if (!(proposal.statusId.valueOf() == 14)) {
+
+    const proposalStatus = await this.proposalSettingsDataSource.getProposalStatus(
+      proposal.statusId
+    );
+
+    if (
+      proposalStatus?.shortCode !==
+      ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED
+    ) {
       if (proposal.submitted && !this.userAuth.isUserOfficer(agent)) {
         return rejection('NOT_ALLOWED_PROPOSAL_SUBMITTED');
       }
