@@ -5,7 +5,9 @@ mutation assignInstrumentsToCall($instrumentIds: [Int!]!, $callId: Int!) {
       callId: $callId
     }
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     call {
       id
     }

@@ -1,4 +1,3 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { createTemplateValidationSchema } from '@esss-swap/duo-validation/lib/Template';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
@@ -29,11 +28,11 @@ const CreateTemplate = (props: {
         onSubmit={async (values): Promise<void> => {
           const result = await api().createTemplate({ ...values, categoryId });
           const {
-            createTemplate: { template, error },
+            createTemplate: { template, rejection },
           } = result;
 
-          if (error) {
-            enqueueSnackbar(getTranslation(error as ResourceId), {
+          if (rejection) {
+            enqueueSnackbar(rejection.reason, {
               variant: 'error',
             });
           }

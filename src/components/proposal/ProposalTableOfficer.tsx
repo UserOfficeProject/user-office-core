@@ -148,7 +148,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       instrumentId,
     });
 
-    const isError = !!result.removeProposalFromInstrument.error;
+    const isError = !!result.removeProposalFromInstrument.rejection;
 
     if (!isError) {
       setProposalsData((proposalsData) =>
@@ -312,12 +312,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const emailProposals = (): void => {
     selectedProposals.forEach(async (proposal) => {
       const {
-        notifyProposal: { error },
+        notifyProposal: { rejection },
       } = await api('Notification sent successfully').notifyProposal({
         id: proposal.id,
       });
 
-      if (error) {
+      if (rejection) {
         return;
       }
 
@@ -333,10 +333,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const deleteProposals = (): void => {
     selectedProposals.forEach(async (proposal) => {
       const {
-        deleteProposal: { error },
+        deleteProposal: { rejection },
       } = await api().deleteProposal({ id: proposal.id });
 
-      if (error) {
+      if (rejection) {
         return;
       }
 
@@ -361,7 +361,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       })
     );
 
-    const errors = responses.map((item) => item.result.error);
+    const errors = responses.map((item) => item.result.rejection);
     const isError = !!errors.join('');
 
     enqueueSnackbar(
@@ -417,7 +417,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         proposals: selectedProposals,
         instrumentId: instrument.id,
       });
-      const isError = !!result.assignProposalsToInstrument.error;
+      const isError = !!result.assignProposalsToInstrument.rejection;
 
       if (!isError) {
         setProposalsData((proposalsData) =>
@@ -459,7 +459,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
     const resultProposal = result.cloneProposal.proposal;
 
-    if (!result.cloneProposal.error && proposalsData && resultProposal) {
+    if (!result.cloneProposal.rejection && proposalsData && resultProposal) {
       const newClonedProposal = fromProposalToProposalView(
         resultProposal as Proposal
       );
@@ -480,7 +480,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         statusId: status.id,
       });
 
-      const isError = !!result.changeProposalsStatus.error;
+      const isError = !!result.changeProposalsStatus.rejection;
 
       if (!isError) {
         const shouldChangeSubmittedValue = status.shortCode === 'DRAFT';

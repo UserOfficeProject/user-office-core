@@ -261,7 +261,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         `Proposal${shouldAddPluralLetter} review submitted successfully!`
       ).submitProposalsReview({ proposals: submitProposalReviewsInput });
 
-      const isError = !!result.submitProposalsReview.error;
+      const isError = !!result.submitProposalsReview.rejection;
 
       if (!isError) {
         setUserData(

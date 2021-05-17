@@ -38,7 +38,7 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
         const data = await api('Unit created successfully').createUnit({
           name: values.name,
         });
-        if (data.createUnit.error) {
+        if (data.createUnit.rejection) {
           close(null);
         } else if (data.createUnit.unit) {
           close(data.createUnit.unit);

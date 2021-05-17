@@ -85,7 +85,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     const [sepChair] = value;
 
     const {
-      assignChairOrSecretary: { error },
+      assignChairOrSecretary: { rejection },
     } = await api('SEP chair assigned successfully!').assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
         sepId: sepId,
@@ -96,7 +96,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
     setOpen(false);
 
-    if (error) {
+    if (rejection) {
       return;
     }
     setSepChairModalOpen(false);
@@ -116,7 +116,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     const [sepSecretary] = value;
 
     const {
-      assignChairOrSecretary: { error },
+      assignChairOrSecretary: { rejection },
     } = await api(
       'SEP secretary assigned successfully!'
     ).assignChairOrSecretary({
@@ -129,7 +129,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
     setOpen(false);
 
-    if (error) {
+    if (rejection) {
       return;
     }
 
@@ -146,7 +146,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
   const addMember = async (users: BasicUserDetails[]): Promise<void> => {
     const {
-      assignReviewersToSEP: { error },
+      assignReviewersToSEP: { rejection },
     } = await api('SEP member assigned successfully!').assignReviewersToSEP({
       memberIds: users.map((user) => user.id),
       sepId,
@@ -154,7 +154,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
     setOpen(false);
 
-    if (error) {
+    if (rejection) {
       return;
     }
 
@@ -168,14 +168,14 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     user: BasicUserDetailsWithRole
   ): Promise<void> => {
     const {
-      removeMemberFromSep: { error },
+      removeMemberFromSep: { rejection },
     } = await api('SEP member removed successfully!').removeMemberFromSep({
       memberId: user.id,
       sepId,
       roleId: user.roleId,
     });
 
-    if (error) {
+    if (rejection) {
       return;
     }
 

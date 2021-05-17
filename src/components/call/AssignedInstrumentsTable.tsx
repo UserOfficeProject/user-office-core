@@ -95,7 +95,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       instrumentId,
     });
 
-    if (!result.removeAssignedInstrumentFromCall.error) {
+    if (!result.removeAssignedInstrumentFromCall.rejection) {
       const dataUpdate = call.instruments.filter(
         (instrumentItem) => instrumentItem.id !== instrumentId
       );
@@ -115,7 +115,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       availabilityTime: +(newData.availabilityTime as number),
     });
 
-    if (!result.setInstrumentAvailabilityTime.error) {
+    if (!result.setInstrumentAvailabilityTime.rejection) {
       const dataUpdate = [...call.instruments];
       const index = dataUpdate.indexOf(oldData);
       dataUpdate[index] = newData;

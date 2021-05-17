@@ -72,7 +72,7 @@ const SEPsTable: React.FC = () => {
         id: id as number,
       })
       .then((resp) => {
-        if (!resp.deleteSEP.error) {
+        if (!resp.deleteSEP.rejection) {
           const newObjectsArray = SEPs.filter(
             (objectItem) => objectItem.id !== id
           );

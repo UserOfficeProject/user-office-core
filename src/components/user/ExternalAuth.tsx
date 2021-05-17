@@ -32,7 +32,7 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
         externalToken: sessionId,
       })
       .then((token) => {
-        if (token.checkExternalToken && !token.checkExternalToken.error) {
+        if (token.checkExternalToken && !token.checkExternalToken.rejection) {
           handleLogin(token.checkExternalToken.token);
           window.location.href = '/';
         } else {

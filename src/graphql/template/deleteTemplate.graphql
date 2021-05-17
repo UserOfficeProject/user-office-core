@@ -4,6 +4,8 @@ mutation deleteTemplate($id: Int!) {
       templateId
       name
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

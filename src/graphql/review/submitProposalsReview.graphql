@@ -1,6 +1,8 @@
 mutation submitProposalsReview($proposals: [ProposalIdWithReviewId!]!) {
   submitProposalsReview(submitProposalsReviewInput: { proposals: $proposals }) {
-    error
+    rejection {
+      ...rejection
+    }
     isSuccess
   }
 }

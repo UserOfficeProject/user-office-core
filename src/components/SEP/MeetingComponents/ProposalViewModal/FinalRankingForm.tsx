@@ -94,7 +94,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
       } successfully!`
     ).saveSepMeetingDecision({ saveSepMeetingDecisionInput });
 
-    const isError = !!data.saveSepMeetingDecision.error;
+    const isError = !!data.saveSepMeetingDecision.rejection;
 
     meetingSubmitted({
       ...(saveSepMeetingDecisionInput as SepMeetingDecision),

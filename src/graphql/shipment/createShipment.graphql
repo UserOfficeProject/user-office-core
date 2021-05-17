@@ -9,6 +9,8 @@ mutation createShipment($title: String!, $proposalId: Int!) {
         ...sample
       }
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

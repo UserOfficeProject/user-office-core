@@ -3,6 +3,8 @@ mutation submitProposal($id: Int!) {
     proposal {
       ...proposal
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

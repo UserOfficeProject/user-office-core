@@ -65,7 +65,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
       administrationValues
     );
 
-    if (!result.administrationProposal.error) {
+    if (!result.administrationProposal.rejection) {
       setAdministration(administrationValues);
     }
   };

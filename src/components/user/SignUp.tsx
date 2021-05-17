@@ -1,4 +1,3 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { createUserValidationSchema } from '@esss-swap/duo-validation';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -198,8 +197,8 @@ const SignUp: React.FC<SignUpProps> = (props) => {
         ...values,
       })
       .then((data) => {
-        if (data.createUser.error) {
-          enqueueSnackbar(getTranslation(data.createUser.error as ResourceId), {
+        if (data.createUser.rejection) {
+          enqueueSnackbar(data.createUser.rejection.reason, {
             variant: 'error',
           });
         } else {

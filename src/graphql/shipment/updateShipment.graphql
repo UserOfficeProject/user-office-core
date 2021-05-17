@@ -10,7 +10,9 @@ mutation updateShipment(
     status: $status
     proposalId: $proposalId
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     shipment {
       ...shipment
       questionary {

@@ -13,6 +13,8 @@ mutation createQuestionTemplateRelation(
     template {
       ...template
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

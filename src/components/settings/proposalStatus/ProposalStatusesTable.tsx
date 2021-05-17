@@ -57,7 +57,7 @@ const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
         id: id,
       })
       .then((resp) => {
-        if (!resp.deleteProposalStatus.error) {
+        if (!resp.deleteProposalStatus.rejection) {
           const newObjectsArray = proposalStatuses.filter(
             (objectItem) => objectItem.id !== id
           );

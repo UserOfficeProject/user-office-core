@@ -88,7 +88,7 @@ const OverwriteTimeAllocationDialog = ({
         onSubmit={async (values) => {
           const result = await api('Updated').updateSEPTimeAllocation(values);
 
-          if (result.updateSEPTimeAllocation.error) {
+          if (result.updateSEPTimeAllocation.rejection) {
             return;
           }
 

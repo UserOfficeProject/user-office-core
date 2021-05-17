@@ -23,6 +23,8 @@ mutation updateProposal(
         ...basicUserDetails
       }
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

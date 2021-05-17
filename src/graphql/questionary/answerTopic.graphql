@@ -13,6 +13,8 @@ mutation answerTopic(
     questionaryStep {
       ...questionaryStep
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

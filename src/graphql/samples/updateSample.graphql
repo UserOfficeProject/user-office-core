@@ -13,6 +13,8 @@ mutation updateSample(
     sample {
       ...sample
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

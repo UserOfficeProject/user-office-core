@@ -6,6 +6,8 @@ mutation createQuestion(
     question {
       ...question
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

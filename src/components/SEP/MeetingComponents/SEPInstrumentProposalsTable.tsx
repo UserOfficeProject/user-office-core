@@ -411,7 +411,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
       },
     });
 
-    if (!result.reorderSepMeetingDecisionProposals.error) {
+    if (!result.reorderSepMeetingDecisionProposals.rejection) {
       setInstrumentProposalsData(tableDataWithRankingsUpdated);
     }
 

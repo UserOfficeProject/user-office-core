@@ -51,7 +51,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             id: instrument.id,
             ...values,
           });
-          if (data.updateInstrument.error) {
+          if (data.updateInstrument.rejection) {
             close(null);
           } else if (data.updateInstrument.instrument) {
             close(data.updateInstrument.instrument);
@@ -60,7 +60,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
           const data = await api(
             'Instrument created successfully!'
           ).createInstrument(values);
-          if (data.createInstrument.error) {
+          if (data.createInstrument.rejection) {
             close(null);
           } else if (data.createInstrument.instrument) {
             close(data.createInstrument.instrument);

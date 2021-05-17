@@ -39,8 +39,8 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
       verified,
     });
 
-    const { error, institution } = response.createInstitution;
-    if (error) {
+    const { rejection, institution } = response.createInstitution;
+    if (rejection) {
       close(null);
     } else if (institution) {
       close(institution);
@@ -59,7 +59,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
       name,
       verified,
     });
-    const { error, institution } = response.updateInstitution;
+    const { rejection: error, institution } = response.updateInstitution;
     if (error) {
       close(null);
     } else if (institution) {

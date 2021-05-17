@@ -38,7 +38,9 @@ mutation updateCall(
       templateId: $templateId
     }
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     call {
       ...call
     }
