@@ -1,4 +1,3 @@
-import { logger } from '@esss-swap/duo-logger';
 import {
   proposalGradeValidationSchema,
   proposalTechnicalReviewValidationSchema,
@@ -11,6 +10,7 @@ import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataS
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
+import { rejection, Rejection } from '../models/Rejection';
 import {
   Review,
   ReviewStatus,
@@ -19,7 +19,6 @@ import {
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
-import { rejection, Rejection } from '../rejection';
 import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
 import { AddTechnicalReviewInput } from '../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
@@ -48,7 +47,9 @@ export default class ReviewMutations {
     const review = await this.dataSource.get(reviewID);
 
     if (!review) {
-      return rejection('NOT_FOUND');
+      return rejection('Could not update review because review was not found', {
+        args,
+      });
     }
 
     if (
@@ -58,16 +59,20 @@ export default class ReviewMutations {
         this.userAuth.isUserOfficer(agent)
       )
     ) {
-      logger.logWarn('Blocked submitting review', { agent, args });
-
-      return rejection('NOT_REVIEWER_OF_PROPOSAL');
+      return rejection(
+        'Can not update review because of insufficient permissions',
+        { agent, args }
+      );
     }
 
     if (
       review.status === ReviewStatus.SUBMITTED &&
       !this.userAuth.isUserOfficer(agent)
     ) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not update review because review already submitted',
+        { agent, args }
+      );
     }
 
     return this.dataSource
@@ -111,14 +116,11 @@ export default class ReviewMutations {
         );
       })
       .catch((err) => {
-        logger.logException('Could not submit review', err, {
-          agent,
-          reviewID,
-          comment,
-          grade,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Could not submit review',
+          { agent, reviewID, comment, grade },
+          err
+        );
       });
   }
 
@@ -133,7 +135,10 @@ export default class ReviewMutations {
     const review = await this.dataSource.get(reviewId);
 
     if (!review) {
-      return rejection('NOT_FOUND');
+      return rejection(
+        'Can not submit proposal review because review was not found',
+        { args }
+      );
     }
 
     if (
@@ -143,16 +148,20 @@ export default class ReviewMutations {
         this.userAuth.isUserOfficer(agent)
       )
     ) {
-      logger.logWarn('Blocked submitting review', { agent, args });
-
-      return rejection('NOT_REVIEWER_OF_PROPOSAL');
+      return rejection(
+        'Can not submit proposal review because of insufficient premissions',
+        { agent, args }
+      );
     }
 
     if (
       review.status === ReviewStatus.SUBMITTED &&
       !this.userAuth.isUserOfficer(agent)
     ) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not submit proposal review because review already submitted',
+        { agent, args }
+      );
     }
 
     return this.dataSource
@@ -161,12 +170,12 @@ export default class ReviewMutations {
         reviewID: review.id,
         status: ReviewStatus.SUBMITTED,
       })
-      .catch((err) => {
-        logger.logException('Could not submit review', err, {
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+      .catch((error) => {
+        return rejection(
+          'Can not submit proposal review because error occurred',
+          { agent, args },
+          error
+        );
       });
   }
 
@@ -186,9 +195,10 @@ export default class ReviewMutations {
         (await this.userAuth.isScientistToProposal(agent, args.proposalID))
       )
     ) {
-      logger.logWarn('Blocked submitting technical review', { agent, args });
-
-      return rejection('INSUFFICIENT_PERMISSIONS');
+      return rejection(
+        'Can not set technical review because of insufficient permissions',
+        { agent, args }
+      );
     }
 
     const technicalReview = await this.dataSource.getTechnicalReview(
@@ -198,18 +208,21 @@ export default class ReviewMutations {
     const shouldUpdateReview = !!technicalReview?.id;
 
     if (!this.userAuth.isUserOfficer(agent) && technicalReview?.submitted) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not set technical review because review already submitted',
+        { agent, args }
+      );
     }
 
     return this.dataSource
       .setTechnicalReview(args, shouldUpdateReview)
       .then((review) => review)
       .catch((err) => {
-        logger.logException('Could not set technicalReview', err, {
-          agent,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Can not set technical review because review already submitted',
+          { agent, args },
+          err
+        );
       });
   }
 
@@ -222,19 +235,21 @@ export default class ReviewMutations {
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId))
     ) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not remove user for review because of insufficient permissions',
+        { agent, reviewId, sepId }
+      );
     }
 
     return this.dataSource
       .removeUserForReview(reviewId)
       .then((review) => review)
-      .catch((err) => {
-        logger.logException('Could not remove user for review', err, {
-          agent,
-          reviewId,
-        });
-
-        return rejection('INTERNAL_ERROR');
+      .catch((error) => {
+        return rejection(
+          'Can not remove user for review because error occurred',
+          { agent, reviewId, sepId },
+          error
+        );
       });
   }
 
@@ -249,20 +264,21 @@ export default class ReviewMutations {
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepID))
     ) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not add user for review because of insufficient permissions',
+        { agent, args }
+      );
     }
 
     return this.dataSource
       .addUserForReview(args)
       .then((review) => review)
       .catch((err) => {
-        logger.logException('Failed to add user for review', err, {
-          agent,
-          userID,
-          proposalID,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Can not add user for review because of insufficient permissions',
+          { agent, userID, proposalID },
+          err
+        );
       });
   }
 }

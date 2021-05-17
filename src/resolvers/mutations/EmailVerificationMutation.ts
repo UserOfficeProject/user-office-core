@@ -6,7 +6,7 @@ import { ResponseWrapBase } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ObjectType()
-class EmailVerificationResponseWrap extends ResponseWrapBase<boolean> {
+class EmailVerificationResponseWrap extends ResponseWrapBase {
   @Response()
   @Field({ nullable: true })
   public success: boolean;

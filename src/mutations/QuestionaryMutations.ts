@@ -9,8 +9,8 @@ import {
   isMatchingConstraints,
   transformAnswerValueIfNeeded,
 } from '../models/ProposalModelFunctions';
+import { rejection } from '../models/Rejection';
 import { User, UserWithRole } from '../models/User';
-import { rejection } from '../rejection';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
 import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
@@ -59,21 +59,19 @@ export default class QuestionaryMutations {
 
     const questionary = await this.dataSource.getQuestionary(questionaryId);
     if (!questionary) {
-      logger.logError('Trying to answer non-existing questionary', {
-        questionaryId,
-      });
-
-      return rejection('NOT_FOUND');
+      return rejection(
+        'Can not answer topic because quesitonary does not exist',
+        { questionaryId }
+      );
     }
     const template = await this.templateDataSource.getTemplate(
       questionary.templateId
     );
     if (!template) {
-      logger.logError('Trying to answer questionary without template', {
-        templateId: questionary.templateId,
-      });
-
-      return rejection('NOT_FOUND');
+      return rejection(
+        'Can not answer questionary because the template is missing',
+        { questionary }
+      );
     }
 
     const hasRights = await this.questionaryAuth.hasWriteRights(
@@ -81,15 +79,10 @@ export default class QuestionaryMutations {
       questionaryId
     );
     if (!hasRights) {
-      logger.logError(
-        'Trying to answer questionary without without permissions',
-        {
-          agent,
-          args,
-        }
+      return rejection(
+        'Can not answer topic because of insufficient permissions',
+        { agent, args }
       );
-
-      return rejection('INSUFFICIENT_PERMISSIONS');
     }
 
     await this.deleteOldAnswers(template.templateId, questionaryId, topicId);
@@ -101,24 +94,23 @@ export default class QuestionaryMutations {
           questionary.templateId
         );
         if (!questionTemplateRelation) {
-          logger.logError('Could not find questionTemplateRelation', {
-            questionId: answer.questionId,
-            templateId: questionary.templateId,
-          });
-
-          return rejection('INTERNAL_ERROR');
+          return rejection(
+            'Can not answer topic because could not find QuestionTemplateRelation',
+            {
+              questionId: answer.questionId,
+              templateId: questionary.templateId,
+            }
+          );
         }
         const { value, ...parsedAnswerRest } = JSON.parse(answer.value);
         if (
           !isPartialSave &&
           !isMatchingConstraints(questionTemplateRelation, value)
         ) {
-          logger.logError('User provided value not matching constraint', {
-            answer,
-            questionTemplateRelation,
-          });
-
-          return rejection('VALUE_CONSTRAINT_REJECTION');
+          return rejection(
+            'Can not answer topic because provided value is not sattisfying constraint',
+            { answer, questionTemplateRelation }
+          );
         }
 
         const transformedValue = transformAnswerValueIfNeeded(
@@ -159,18 +151,27 @@ export default class QuestionaryMutations {
       args.questionaryId
     );
     if (!hasRights) {
-      return rejection('INSUFFICIENT_PERMISSIONS');
+      return rejection(
+        'Can not update answer because of insufficient permissions',
+        { args, agent }
+      );
     }
 
-    return this.dataSource.updateAnswer(
-      args.questionaryId,
-      args.answer.questionId,
-      args.answer.value
-    );
+    return this.dataSource
+      .updateAnswer(
+        args.questionaryId,
+        args.answer.questionId,
+        args.answer.value
+      )
+      .catch((error) => {
+        return rejection('Failed to update answer', { args }, error);
+      });
   }
 
   @Authorized()
   async create(agent: User | null, args: CreateQuestionaryArgs) {
-    return this.dataSource.create(agent!.id, args.templateId);
+    return this.dataSource.create(agent!.id, args.templateId).catch((error) => {
+      return rejection('Failed to create questionary', { args }, error);
+    });
   }
 }

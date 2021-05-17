@@ -1,8 +1,8 @@
 import { container } from 'tsyringe';
 
+import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { Rejection, rejection } from '../rejection';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 const Authorized = (roles: Roles[] = []) => {

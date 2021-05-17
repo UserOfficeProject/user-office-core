@@ -10,7 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { ProposalWorkflow as ProposalWorkflowOrigin } from '../../models/ProposalWorkflow';
-import { isRejection } from '../../rejection';
+import { isRejection } from '../../models/Rejection';
 import { ProposalWorkflowConnectionGroup } from './ProposalWorkflowConnection';
 
 @ObjectType()
