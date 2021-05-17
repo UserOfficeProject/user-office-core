@@ -12,8 +12,8 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
+import { Rejection } from '../models/Rejection';
 import { UserRole } from '../models/User';
-import { Rejection } from '../rejection';
 import SEPMutations from './SEPMutations';
 
 const SEPMutationsInstance = container.resolve(SEPMutations);
@@ -37,7 +37,7 @@ describe('Test SEPMutations', () => {
   test('A userofficer can not create SEP with bad input arguments', () => {
     return expect(
       SEPMutationsInstance.create(dummyUserOfficerWithRole, dummySEPWithoutCode)
-    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A user cannot update SEP', async () => {
@@ -112,7 +112,9 @@ describe('Test SEPMutations', () => {
       }
     );
 
-    return expect((result as Rejection).reason).toBe('NOT_ALLOWED');
+    return expect((result as Rejection).reason).toBe(
+      'Can not assign to SEP, because only users with sep reviewer role can be chair or secretary'
+    );
   });
 
   test('Officer can not assign Secretary to SEP if the user has no SEP Reviewer role', async () => {
@@ -127,7 +129,9 @@ describe('Test SEPMutations', () => {
       }
     );
 
-    return expect((result as Rejection).reason).toBe('NOT_ALLOWED');
+    return expect((result as Rejection).reason).toBe(
+      'Can not assign to SEP, because only users with sep reviewer role can be chair or secretary'
+    );
   });
 
   test('A userofficer can not assign other roles using `assignChairOrSecretaryToSEP`', async () => {
@@ -142,7 +146,7 @@ describe('Test SEPMutations', () => {
       }
     )) as Rejection;
 
-    return expect(result.reason).toBe('BAD_REQUEST');
+    return expect(result.reason).toBe('Input validation errors');
   });
 
   test('A user can not assign reviewers to SEP', async () => {

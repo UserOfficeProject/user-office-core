@@ -11,10 +11,10 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { Page } from '../models/Admin';
 import { Institution } from '../models/Institution';
+import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { Unit } from '../models/Unit';
 import { UserWithRole } from '../models/User';
-import { Rejection, rejection } from '../rejection';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
 import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
 import { CreateUnitArgs } from '../resolvers/mutations/CreateUnitMutation';
@@ -41,7 +41,7 @@ export default class AdminMutations {
 
       return this.dataSource.resetDB(includeSeeds);
     } else {
-      return rejection('NOT_ALLOWED');
+      return rejection('Resetting database is not allowed');
     }
   }
 
@@ -64,12 +64,7 @@ export default class AdminMutations {
         return page;
       })
       .catch((error) => {
-        logger.logException('Could not set page text', error, {
-          agent,
-          id,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection('Could not set page text', { agent, id }, error);
       });
   }
 
@@ -80,7 +75,7 @@ export default class AdminMutations {
   ) {
     const institution = await this.dataSource.getInstitution(args.id);
     if (!institution) {
-      return rejection('NOT_ALLOWED');
+      return rejection('Could not retrieve insititutions');
     }
 
     institution.name = args.name ?? institution.name;
@@ -115,12 +110,12 @@ export default class AdminMutations {
   async deleteInstitutions(agent: UserWithRole | null, id: number) {
     const institution = await this.dataSource.getInstitution(id);
     if (!institution) {
-      return rejection('NOT_ALLOWED');
+      return rejection('Institution not found');
     }
 
     const institutionUsers = await this.dataSource.getInstitutionUsers(id);
     if (institutionUsers.length !== 0) {
-      return rejection('VALUE_CONSTRAINT_REJECTION');
+      return rejection('There are users associated with this institution');
     }
 
     return await this.dataSource.deleteInstitution(id);
@@ -154,7 +149,7 @@ export default class AdminMutations {
     if (generatedAccessToken === result.accessToken) {
       return result;
     } else {
-      return rejection('NOT_ALLOWED');
+      return rejection('Could not generate access token');
     }
   }
 
@@ -172,12 +167,11 @@ export default class AdminMutations {
         accessPermissions,
       });
     } catch (error) {
-      logger.logException('Could not update api access token', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not update api access token',
+        { agent, args },
+        error
+      );
     }
   }
 
@@ -189,12 +183,11 @@ export default class AdminMutations {
     try {
       return await this.dataSource.deleteApiAccessToken(args.accessTokenId);
     } catch (error) {
-      logger.logException('Could not remove api access token', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not remove api access token',
+        { agent, args },
+        error
+      );
     }
   }
 }

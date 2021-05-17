@@ -5,7 +5,7 @@ import express, { Request, Response } from 'express';
 import multer from 'multer';
 
 import baseContext from '../buildContext';
-import { isRejection } from '../rejection';
+import { isRejection } from '../models/Rejection';
 
 const files = () => {
   const router = express.Router();

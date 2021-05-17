@@ -25,7 +25,7 @@ export class UpdateAnswerArgs {
 }
 
 @ObjectType()
-export class UpdateAnswerResponseWrap extends ResponseWrapBase<string> {
+export class UpdateAnswerResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => String, { nullable: true })
   public questionId: string;

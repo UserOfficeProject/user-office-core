@@ -17,6 +17,7 @@ import { Question } from './Question';
 import { Questionary } from './Questionary';
 import { QuestionaryStep } from './QuestionaryStep';
 import { QuestionTemplateRelation } from './QuestionTemplateRelation';
+import { Rejection } from './Rejection';
 import { ReviewWithNextProposalStatus } from './Review';
 import { Review } from './Review';
 import { Sample } from './Sample';
@@ -32,258 +33,258 @@ import { Unit } from './Unit';
 import { User } from './User';
 
 @ObjectType()
-export class ResponseWrapBase<T> {
-  @Field(() => String, { nullable: true })
-  public error: string;
+export class ResponseWrapBase {
+  @Field(() => Rejection, { nullable: true })
+  public rejection: Rejection;
 }
 
 @ObjectType()
-export class BasicUserDetailsResponseWrap extends ResponseWrapBase<BasicUserDetails> {
+export class BasicUserDetailsResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => BasicUserDetails, { nullable: true })
   public user: BasicUserDetails;
 }
 
 @ObjectType()
-export class UserResponseWrap extends ResponseWrapBase<User> {
+export class UserResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => User, { nullable: true })
   public user: User;
 }
 
 @ObjectType()
-export class ReviewResponseWrap extends ResponseWrapBase<Review> {
+export class ReviewResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Review, { nullable: true })
   public review: Review;
 }
 
 @ObjectType()
-export class ReviewWithNextStatusResponseWrap extends ResponseWrapBase<ReviewWithNextProposalStatus> {
+export class ReviewWithNextStatusResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => ReviewWithNextProposalStatus, { nullable: true })
   public review: ReviewWithNextProposalStatus;
 }
 
 @ObjectType()
-export class SEPResponseWrap extends ResponseWrapBase<SEP> {
+export class SEPResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => SEP, { nullable: true })
   public sep: SEP;
 }
 
 @ObjectType()
-export class NextProposalStatusResponseWrap extends ResponseWrapBase<ProposalStatus> {
+export class NextProposalStatusResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => NextProposalStatus, { nullable: true })
   public nextProposalStatus: NextProposalStatus;
 }
 
 @ObjectType()
-export class SepMeetingDecisionResponseWrap extends ResponseWrapBase<SepMeetingDecision> {
+export class SepMeetingDecisionResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => SepMeetingDecision, { nullable: true })
   public sepMeetingDecision: SepMeetingDecision;
 }
 
 @ObjectType()
-export class InstrumentResponseWrap extends ResponseWrapBase<Instrument> {
+export class InstrumentResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Instrument, { nullable: true })
   public instrument: Instrument;
 }
 
 @ObjectType()
-export class SEPMembersRoleResponseWrap extends ResponseWrapBase<boolean> {
+export class SEPMembersRoleResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Boolean, { nullable: true })
   public success = false;
 }
 
 @ObjectType()
-export class TechnicalReviewResponseWrap extends ResponseWrapBase<TechnicalReview> {
+export class TechnicalReviewResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => TechnicalReview, { nullable: true })
   public technicalReview: TechnicalReview;
 }
 
 @ObjectType()
-export class TemplateResponseWrap extends ResponseWrapBase<Template> {
+export class TemplateResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Template, { nullable: true })
   public template: Template;
 }
 
 @ObjectType()
-export class QuestionaryResponseWrap extends ResponseWrapBase<Questionary> {
+export class QuestionaryResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Questionary, { nullable: true })
   public questionary: Questionary;
 }
 
 @ObjectType()
-export class SamplesResponseWrap extends ResponseWrapBase<Questionary[]> {
+export class SamplesResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => [Sample])
   public samples: Sample[];
 }
 
 @ObjectType()
-export class QuestionaryStepResponseWrap extends ResponseWrapBase<QuestionaryStep> {
+export class QuestionaryStepResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => QuestionaryStep, { nullable: true })
   public questionaryStep: QuestionaryStep;
 }
 
 @ObjectType()
-export class CallResponseWrap extends ResponseWrapBase<Call> {
+export class CallResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Call, { nullable: true })
   public call: Call;
 }
 
 @ObjectType()
-export class ProposalResponseWrap extends ResponseWrapBase<Proposal> {
+export class ProposalResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Proposal, { nullable: true })
   public proposal: Proposal;
 }
 
 @ObjectType()
-export class QuestionTemplateRelationResponseWrap extends ResponseWrapBase<QuestionTemplateRelation> {
+export class QuestionTemplateRelationResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => QuestionTemplateRelation, { nullable: true })
   public questionTemplateRelation: QuestionTemplateRelation;
 }
 
 @ObjectType()
-export class QuestionResponseWrap extends ResponseWrapBase<QuestionTemplateRelation> {
+export class QuestionResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Question, { nullable: true })
   public question: Question;
 }
 
 @ObjectType()
-export class PageResponseWrap extends ResponseWrapBase<Page> {
+export class PageResponseWrap extends ResponseWrapBase {
   @Response()
   @Field({ nullable: true })
   public page: Page;
 }
 
 @ObjectType()
-export class TopicResponseWrap extends ResponseWrapBase<Topic> {
+export class TopicResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Topic, { nullable: true })
   public topic: Topic;
 }
 
 @ObjectType()
-export class InstitutionResponseWrap extends ResponseWrapBase<Topic> {
+export class InstitutionResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Institution, { nullable: true })
   public institution: Institution;
 }
 
 @ObjectType()
-export class UnitResponseWrap extends ResponseWrapBase<Topic> {
+export class UnitResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Unit, { nullable: true })
   public unit: Unit;
 }
 
 @ObjectType()
-export class SuccessResponseWrap extends ResponseWrapBase<string> {
+export class SuccessResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Boolean, { nullable: true })
   public isSuccess: boolean;
 }
 
 @ObjectType()
-export class TokenResponseWrap extends ResponseWrapBase<string> {
+export class TokenResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => String, { nullable: true })
   public token: string;
 }
 
 @ObjectType()
-export class CheckExternalTokenWrap extends ResponseWrapBase<string> {
+export class CheckExternalTokenWrap extends ResponseWrapBase {
   @Response()
   @Field(() => String, { nullable: true })
   public token: string;
 }
 
 @ObjectType()
-export class PrepareDBResponseWrap extends ResponseWrapBase<string> {
+export class PrepareDBResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => String, { nullable: true })
   public log: string;
 }
 
 @ObjectType()
-export class AnswerResponseWrap extends ResponseWrapBase<Answer> {
+export class AnswerResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Answer, { nullable: true })
   public answer: Answer;
 }
 
 @ObjectType()
-export class AnswerBasicResponseWrap extends ResponseWrapBase<AnswerBasic> {
+export class AnswerBasicResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => AnswerBasic, { nullable: true })
   public answer: AnswerBasic;
 }
 
 @ObjectType()
-export class SampleResponseWrap extends ResponseWrapBase<Sample> {
+export class SampleResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Sample, { nullable: true })
   public sample: Sample;
 }
 
 @ObjectType()
-export class ProposalStatusResponseWrap extends ResponseWrapBase<ProposalStatus> {
+export class ProposalStatusResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => ProposalStatus, { nullable: true })
   public proposalStatus: ProposalStatus;
 }
 
 @ObjectType()
-export class ProposalWorkflowResponseWrap extends ResponseWrapBase<ProposalWorkflow> {
+export class ProposalWorkflowResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => ProposalWorkflow, { nullable: true })
   public proposalWorkflow: ProposalWorkflow;
 }
 
 @ObjectType()
-export class ProposalWorkflowConnectionResponseWrap extends ResponseWrapBase<ProposalWorkflowConnection> {
+export class ProposalWorkflowConnectionResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => ProposalWorkflowConnection, { nullable: true })
   public proposalWorkflowConnection: ProposalWorkflowConnection;
 }
 
 @ObjectType()
-export class ProposalStatusChangingEventResponseWrap extends ResponseWrapBase<StatusChangingEvent> {
+export class ProposalStatusChangingEventResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => [StatusChangingEvent], { nullable: true })
   public statusChangingEvents: StatusChangingEvent[];
 }
 
 @ObjectType()
-export class ShipmentResponseWrap extends ResponseWrapBase<Shipment> {
+export class ShipmentResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Shipment, { nullable: true })
   public shipment: Shipment;
 }
 
 @ObjectType()
-export class SEPProposalResponseWrap extends ResponseWrapBase<SEPProposal> {
+export class SEPProposalResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => SEPProposal, { nullable: true })
   public sepProposal: SEPProposal;
 }
 
 @ObjectType()
-export class ApiAccessTokenResponseWrap extends ResponseWrapBase<PermissionsWithAccessToken> {
+export class ApiAccessTokenResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => PermissionsWithAccessToken, { nullable: true })
   public apiAccessToken: PermissionsWithAccessToken;
