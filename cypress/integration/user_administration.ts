@@ -114,4 +114,24 @@ context('User administration tests', () => {
 
     cy.contains('1-5 of 5');
   });
+
+  it('Should be able to send email for password reset', () => {
+    cy.contains('Forgot password?').click();
+
+    cy.get('[data-cy="reset-password-email"] input').type(
+      'Aaron_Harris49@gmail.com'
+    );
+
+    cy.get('[type="submit"]').click();
+
+    cy.contains('A mail has been sent to the provided email.');
+
+    cy.get('[data-cy="reset-password-email"] input')
+      .clear()
+      .type('test@test.com');
+
+    cy.get('[type="submit"]').click();
+
+    cy.contains('No account found for this email address.');
+  });
 });

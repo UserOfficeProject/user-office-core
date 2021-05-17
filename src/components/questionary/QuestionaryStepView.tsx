@@ -208,7 +208,7 @@ export default function QuestionaryStepView(props: {
       });
 
       setLastSavedFormValues(initialValues);
-    } else if (answerTopicResult.answerTopic.error) {
+    } else if (answerTopicResult.answerTopic.rejection) {
       // prevent navigation
       return false;
     }

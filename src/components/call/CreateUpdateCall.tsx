@@ -89,7 +89,10 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
                 ? +proposalWorkflowId
                 : null,
             });
-            closeModal(data.updateCall.error, data.updateCall.call as Call);
+            closeModal(
+              data.updateCall.rejection?.reason,
+              data.updateCall.call as Call
+            );
           } else {
             const data = await api('Call created successfully!').createCall({
               ...restValues,
@@ -99,7 +102,10 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
                 : null,
             });
 
-            closeModal(data.createCall.error, data.createCall.call as Call);
+            closeModal(
+              data.createCall.rejection?.reason,
+              data.createCall.call as Call
+            );
           }
         }}
         shouldCreate={!call}

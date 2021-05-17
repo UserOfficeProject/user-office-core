@@ -52,7 +52,7 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
             shipmentId: shipmentToDelete.id,
           })
           .then((data) => {
-            if (!data.deleteShipment.error) {
+            if (!data.deleteShipment.rejection) {
               setShipments(
                 shipments.filter(
                   (shipment) => shipment.id !== shipmentToDelete.id

@@ -11,6 +11,8 @@ mutation createTemplate(
     template {
       ...templateMetadata
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

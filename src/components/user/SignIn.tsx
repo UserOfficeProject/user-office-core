@@ -1,4 +1,3 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { signInValidationSchema } from '@esss-swap/duo-validation/lib/User';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -87,11 +86,11 @@ export default function SignInSide() {
 
     const data = await unauthorizedApi().login({ email, password });
 
-    if (data.login && !data.login.error) {
+    if (data.login && !data.login.rejection) {
       handleLogin(data.login.token);
     } else {
       if (data.login) {
-        setErrorMessage(getTranslation(data.login.error as ResourceId));
+        setErrorMessage(data.login.rejection!.reason);
         setFailed(true);
       }
     }

@@ -28,6 +28,8 @@ mutation createProposalWorkflow($name: String!, $description: String!) {
         }
       }
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

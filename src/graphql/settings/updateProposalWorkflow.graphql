@@ -38,6 +38,8 @@ mutation updateProposalWorkflow(
         }
       }
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

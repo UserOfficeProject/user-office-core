@@ -3,6 +3,8 @@ mutation deleteSample($sampleId: Int!) {
     sample {
       ...sample
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

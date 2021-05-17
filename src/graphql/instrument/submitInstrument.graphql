@@ -4,7 +4,9 @@ mutation submitInstrument($callId: Int!, $instrumentId: Int!, $sepId: Int!) {
     instrumentId: $instrumentId
     sepId: $sepId
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     isSuccess
   }
 }

@@ -60,7 +60,7 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
       instrumentId: instrument.id,
     });
 
-    if (!result.removeScientistFromInstrument.error) {
+    if (!result.removeScientistFromInstrument.rejection) {
       removeAssignedScientistFromInstrument(scientistId, instrument.id);
     }
   };

@@ -35,9 +35,9 @@ export function Impersonate(props: { id: number }) {
             api()
               .getTokenForUser({ userId: props.id })
               .then((data) => {
-                const { token, error } = data.getTokenForUser;
-                if (error) {
-                  enqueueSnackbar(error, { variant: 'error' });
+                const { token, rejection } = data.getTokenForUser;
+                if (rejection) {
+                  enqueueSnackbar(rejection, { variant: 'error' });
                 } else {
                   handleLogin(token);
                   history.push('/home');

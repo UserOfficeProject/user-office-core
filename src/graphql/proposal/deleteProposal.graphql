@@ -1,6 +1,8 @@
 mutation deleteProposal($id: Int!) {
   deleteProposal(id: $id) {
-    error
+    rejection {
+      ...rejection
+    }
     proposal {
       id
     }

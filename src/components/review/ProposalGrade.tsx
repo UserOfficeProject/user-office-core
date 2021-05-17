@@ -93,7 +93,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
       sepID: review.sepID,
     });
 
-    if (!data.addReview.error && data.addReview.review) {
+    if (!data.addReview.rejection && data.addReview.review) {
       setReview({
         ...review,
         comment: data.addReview.review.comment,

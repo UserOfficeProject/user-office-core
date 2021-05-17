@@ -872,7 +872,8 @@ context(
 
       cy.notification({
         variant: 'error',
-        text: /Failed to delete proposal with ID "([^"]+)", it has dependencies which need to be deleted first/i,
+        text:
+          'Failed to delete proposal because, it has dependencies which need to be deleted first',
       });
     });
 

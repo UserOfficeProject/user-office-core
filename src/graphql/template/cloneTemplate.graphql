@@ -3,6 +3,8 @@ mutation cloneTemplate($templateId: Int!) {
     template {
       ...templateMetadata
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

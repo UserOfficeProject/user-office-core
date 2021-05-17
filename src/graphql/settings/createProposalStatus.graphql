@@ -13,6 +13,8 @@ mutation createProposalStatus(
     proposalStatus {
       ...proposalStatus
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

@@ -4,6 +4,8 @@ mutation deleteInstitution($id: Int!) {
       id
       verified
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

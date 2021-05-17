@@ -66,7 +66,6 @@ describe('PageTable component tests', () => {
                 user {
                   id
                 }
-                error
               }
             }`,
             variables: {

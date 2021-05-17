@@ -111,10 +111,10 @@ export default function UpdateUserInformation(props: { id: number }) {
 
   const handleSetUserEmailVerified = async () => {
     const {
-      setUserEmailVerified: { error },
+      setUserEmailVerified: { rejection },
     } = await api('Email verified').setUserEmailVerified({ id: props.id });
 
-    if (!error) {
+    if (!rejection) {
       setUserData((userData) =>
         userData
           ? {
@@ -128,12 +128,12 @@ export default function UpdateUserInformation(props: { id: number }) {
 
   const handleSetUserNotPlaceholder = async () => {
     const {
-      setUserNotPlaceholder: { error },
+      setUserNotPlaceholder: { rejection },
     } = await api('User is no longer placeholder').setUserNotPlaceholder({
       id: props.id,
     });
 
-    if (!error) {
+    if (!rejection) {
       setUserData((userData) =>
         userData
           ? {

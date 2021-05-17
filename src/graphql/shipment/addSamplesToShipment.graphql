@@ -1,6 +1,8 @@
 mutation addSamplesToShipment($shipmentId: Int!, $sampleIds: [Int!]!) {
   addSamplesToShipment(shipmentId: $shipmentId, sampleIds: $sampleIds) {
-    error
+    rejection {
+      ...rejection
+    }
     shipment {
       ...shipment
       samples {

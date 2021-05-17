@@ -3,6 +3,8 @@ mutation updateUserRoles($id: Int!, $roles: [Int!]) {
     user {
       id
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

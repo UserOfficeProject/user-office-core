@@ -96,7 +96,11 @@ const ProposalTable = ({
 
     const resultProposal = result.cloneProposal.proposal;
 
-    if (!result.cloneProposal.error && partialProposalsData && resultProposal) {
+    if (
+      !result.cloneProposal.rejection &&
+      partialProposalsData &&
+      resultProposal
+    ) {
       const newClonedProposal = {
         id: resultProposal.id,
         title: resultProposal.title,

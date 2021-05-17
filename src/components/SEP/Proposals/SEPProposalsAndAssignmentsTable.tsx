@@ -195,14 +195,14 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     }
 
     const {
-      assignSepReviewersToProposal: { error },
+      assignSepReviewersToProposal: { rejection },
     } = await api('Members assigned').assignSepReviewersToProposal({
       memberIds: assignedMembers.map(({ id }) => id),
       proposalId: proposalId,
       sepId,
     });
 
-    if (error) {
+    if (rejection) {
       return;
     }
 
