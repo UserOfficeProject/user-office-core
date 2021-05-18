@@ -50,7 +50,7 @@ jobs:
           registry: docker.io
           buildArgs: BUILD_VERSION=${{ github.sha }}
           dockerfile: ./Dockerfile.win
-          image: dmsc/duo-backend-win:${{ steps.extract_branch.outputs.branch }}
+          image: dmsc/duo-backend-win
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
