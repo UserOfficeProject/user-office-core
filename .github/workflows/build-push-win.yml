@@ -35,7 +35,7 @@ jobs:
           echo ::set-output name=win_version::${$WINDOWS_VERSION}
 
       - name: Windows Version
-        run: "Windows Version ${{ win_ver.outputs.win_version }}"
+        run: "Windows Version ${{ steps.win_ver.outputs.win_version }}"
 
       - name: Extract branch name
         id: extract_branch
