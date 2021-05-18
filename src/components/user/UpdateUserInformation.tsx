@@ -32,16 +32,20 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '25px',
     marginLeft: '10px',
   },
+  orcIdLabel: {
+    marginBottom: theme.spacing(1),
+  },
   orcidIconSmall: {
-    'vertical-align': 'middle',
-    'margin-right': '4px',
+    verticalAlign: 'middle',
+    marginLeft: theme.spacing(0.5),
     width: '16px',
     height: '16px',
     border: '0px',
   },
   orcIdContainer: {
-    'margin-top': '16px',
-    'margin-bottom': '19px',
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+    overflow: 'hidden',
   },
   chipSpace: {
     '& > * + *': {
@@ -316,17 +320,19 @@ export default function UpdateUserInformation(props: { id: number }) {
               </Grid>
               <Grid item xs={6}>
                 <div className={classes.orcIdContainer}>
-                  <InputLabel shrink>ORCID iD</InputLabel>
-                  <a
-                    href={'https://orcid.org/' + values.orcid}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
+                  <InputLabel shrink className={classes.orcIdLabel}>
+                    ORCID iD{' '}
                     <img
                       className={classes.orcidIconSmall}
                       src={orcid}
                       alt="ORCID iD icon"
                     />
+                  </InputLabel>
+                  <a
+                    href={'https://orcid.org/' + values.orcid}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
                     https://orcid.org/{values.orcid}
                   </a>
                 </div>

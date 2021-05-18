@@ -39,8 +39,7 @@ context('Instrument tests', () => {
   });
 
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
+    cy.viewport(1920, 1080);
   });
 
   it('User should not be able to see Instruments page', () => {

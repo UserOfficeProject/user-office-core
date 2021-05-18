@@ -22,7 +22,6 @@ import {
   SepMeetingDecision,
 } from 'generated/sdk';
 import { useSEPProposalData } from 'hooks/SEP/useSEPProposalData';
-import { ContentContainer } from 'styles/StyledComponents';
 
 import ExternalReviews from './ExternalReviews';
 import FinalRankingForm from './FinalRankingForm';
@@ -111,56 +110,52 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
           </Toolbar>
         </AppBar>
         <DialogContent>
-          <ContentContainer>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <div data-cy="SEP-meeting-components-proposal-view">
-                  {loading || !SEPProposalData || !proposalData ? (
-                    <UOLoader
-                      style={{ marginLeft: '50%', marginTop: '20px' }}
+          <Grid container>
+            <Grid item xs={12}>
+              <div data-cy="SEP-meeting-components-proposal-view">
+                {loading || !SEPProposalData || !proposalData ? (
+                  <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />
+                ) : (
+                  <>
+                    <FinalRankingForm
+                      closeModal={handleClose}
+                      hasWriteAccess={finalHasWriteAccess}
+                      proposalData={proposalData}
+                      meetingSubmitted={(data) => {
+                        setSEPProposalData({
+                          ...SEPProposalData,
+                          proposal: {
+                            ...proposalData,
+                            sepMeetingDecision: data,
+                          },
+                        });
+                        meetingSubmitted(data);
+                      }}
                     />
-                  ) : (
-                    <>
-                      <FinalRankingForm
-                        closeModal={handleClose}
-                        hasWriteAccess={finalHasWriteAccess}
-                        proposalData={proposalData}
-                        meetingSubmitted={(data) => {
-                          setSEPProposalData({
-                            ...SEPProposalData,
-                            proposal: {
-                              ...proposalData,
-                              sepMeetingDecision: data,
-                            },
-                          });
-                          meetingSubmitted(data);
-                        }}
-                      />
-                      <ProposalDetails proposal={proposalData} />
-                      <TechnicalReviewInfo
-                        hasWriteAccess={finalHasWriteAccess}
-                        technicalReview={
-                          proposalData.technicalReview as TechnicalReview
-                        }
-                        sepTimeAllocation={sepTimeAllocation}
-                        onSepTimeAllocationEdit={(sepTimeAllocation) =>
-                          setSEPProposalData({
-                            ...SEPProposalData,
-                            sepTimeAllocation,
-                          })
-                        }
-                        proposalId={proposalData.id}
-                        sepId={sepId}
-                      />
-                      <ExternalReviews
-                        reviews={proposalData.reviews as Review[]}
-                      />
-                    </>
-                  )}
-                </div>
-              </Grid>
+                    <ProposalDetails proposal={proposalData} />
+                    <TechnicalReviewInfo
+                      hasWriteAccess={finalHasWriteAccess}
+                      technicalReview={
+                        proposalData.technicalReview as TechnicalReview
+                      }
+                      sepTimeAllocation={sepTimeAllocation}
+                      onSepTimeAllocationEdit={(sepTimeAllocation) =>
+                        setSEPProposalData({
+                          ...SEPProposalData,
+                          sepTimeAllocation,
+                        })
+                      }
+                      proposalId={proposalData.id}
+                      sepId={sepId}
+                    />
+                    <ExternalReviews
+                      reviews={proposalData.reviews as Review[]}
+                    />
+                  </>
+                )}
+              </div>
             </Grid>
-          </ContentContainer>
+          </Grid>
         </DialogContent>
       </Dialog>
     </>

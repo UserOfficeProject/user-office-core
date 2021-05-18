@@ -49,3 +49,11 @@ code {
   border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+/*------ Mobile view improvements ------*/
+
+div.MuiToolbar-root[class*='MTableToolbar-highlight'] {
+  flex-wrap: wrap;
+}
+
+/*------ Mobile view improvements ------*/

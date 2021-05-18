@@ -25,7 +25,7 @@ import {
   getFieldById,
   getQuestionaryStepByTopicId,
 } from 'models/QuestionaryFunctions';
-import { StyledPaper } from 'styles/StyledComponents';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
@@ -256,7 +256,7 @@ export default function TemplateEditor() {
     ) : null;
 
   return (
-    <>
+    <ContentContainer>
       <TemplateMetadataEditor dispatch={dispatch} template={state} />
       <StyledPaper style={getContainerStyle()}>
         {progressJsx}
@@ -318,6 +318,6 @@ export default function TemplateEditor() {
         closeMe={() => setSelectedQuestion(null)}
         template={state}
       />
-    </>
+    </ContentContainer>
   );
 }

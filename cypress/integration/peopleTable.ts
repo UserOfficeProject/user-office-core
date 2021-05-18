@@ -6,6 +6,10 @@ before(() => {
 
 describe('PageTable component tests', () => {
   describe('Preserve selected users', () => {
+    beforeEach(() => {
+      cy.viewport(1920, 1080);
+    });
+
     it('should preserve the selected users', () => {
       cy.login('user');
 

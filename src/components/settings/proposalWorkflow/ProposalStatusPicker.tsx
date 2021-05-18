@@ -28,6 +28,7 @@ const ProposalStatusPicker: React.FC<{
     },
     itemContainer: {
       minHeight: '180px',
+      overflow: 'auto !important',
     },
     item: {
       '&:hover': {
@@ -52,6 +53,7 @@ const ProposalStatusPicker: React.FC<{
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
     boxShadow: '0px 1px 2px 0px rgba(163,163,163,0.66)',
     maxWidth: '100%',
+    minWidth: '200px',
     ...draggableStyle,
   });
 

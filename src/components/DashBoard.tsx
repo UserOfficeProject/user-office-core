@@ -5,10 +5,12 @@ import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import Typography from '@material-ui/core/Typography';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -89,9 +91,14 @@ const useStyles = makeStyles((theme) => ({
   toolbarIcon: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
+    justifyContent: 'center',
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(1),
     ...theme.mixins.toolbar,
+
+    '& .closeDrawer': {
+      marginLeft: 'auto',
+    },
   },
   drawer: {
     width: drawerWidth,
@@ -122,7 +129,6 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     height: 'calc(100vh - 64px)',
     marginTop: '64px',
-    padding: `0 ${theme.spacing(2)}px`,
     width: `calc(100% - ${drawerWidth}px)`,
   },
   bottomNavigation: {
@@ -137,9 +143,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Dashboard: React.FC = () => {
+  const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const classes = useStyles();
   const [open, setOpen] = React.useState(
-    localStorage.drawerOpen ? localStorage.drawerOpen === '1' : true
+    localStorage.drawerOpen
+      ? localStorage.drawerOpen === '1'
+      : !isTabletOrMobile
   );
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isSampleSafetyReviewer = useCheckAccess([
@@ -154,6 +163,14 @@ const Dashboard: React.FC = () => {
 
   const { currentRole } = useContext(UserContext);
   const { calls } = useCallsData({ isActive: true });
+
+  useEffect(() => {
+    if (isTabletOrMobile) {
+      setOpen(false);
+    } else if (localStorage.getItem('drawerOpen') === '1') {
+      setOpen(true);
+    }
+  }, [isTabletOrMobile]);
 
   const handleDrawerOpen = () => {
     localStorage.setItem('drawerOpen', '1');
@@ -173,7 +190,7 @@ const Dashboard: React.FC = () => {
       <CssBaseline />
       <AppToolbar open={open} handleDrawerOpen={handleDrawerOpen} />
       <Drawer
-        variant="permanent"
+        variant={isTabletOrMobile ? 'temporary' : 'permanent'}
         className={clsx(classes.drawer, {
           [classes.drawerOpen]: open,
           [classes.drawerClose]: !open,
@@ -185,9 +202,19 @@ const Dashboard: React.FC = () => {
           }),
         }}
         open={open}
+        onClose={handleDrawerClose}
       >
         <div className={classes.toolbarIcon}>
-          <IconButton aria-label="Close drawer" onClick={handleDrawerClose}>
+          {isTabletOrMobile && (
+            <Typography component="h1" variant="h6" color="inherit" noWrap>
+              User Office
+            </Typography>
+          )}
+          <IconButton
+            aria-label="Close drawer"
+            onClick={handleDrawerClose}
+            className="closeDrawer"
+          >
             <ChevronLeftIcon />
           </IconButton>
         </div>

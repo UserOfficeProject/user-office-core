@@ -231,7 +231,7 @@ function SampleSafetyPage() {
   return (
     <>
       <ContentContainer>
-        <Grid container spacing={3}>
+        <Grid container>
           <Grid item xs={12}>
             <StyledPaper>
               <CallFilter

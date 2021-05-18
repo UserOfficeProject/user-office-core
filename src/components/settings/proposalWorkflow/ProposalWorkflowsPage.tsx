@@ -8,7 +8,7 @@ import ProposalWorkflowsTable from './ProposalWorkflowsTable';
 const ProposalWorkflowsPage: React.FC = () => {
   return (
     <ContentContainer>
-      <Grid container spacing={3}>
+      <Grid container>
         <Grid item xs={12}>
           <StyledPaper>
             <ProposalWorkflowsTable />

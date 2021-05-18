@@ -14,7 +14,7 @@ const HelpPage: React.FC = () => {
   return (
     <React.Fragment>
       <ContentContainer>
-        <Grid container spacing={3}>
+        <Grid container>
           <Grid item xs={12}>
             <StyledPaper>
               {loadingHelpContent ? null : parse(helpPageContent)}

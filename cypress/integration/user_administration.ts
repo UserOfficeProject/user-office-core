@@ -6,8 +6,7 @@ context('User administration tests', () => {
   });
 
   beforeEach(() => {
-    cy.viewport(1100, 900);
-    cy.visit('/');
+    cy.viewport(1920, 1080);
   });
 
   const newFirstName = faker.name.firstName();
@@ -114,6 +113,8 @@ context('User administration tests', () => {
     cy.get("[title='Save']").first().click();
 
     cy.contains('1-5 of 5');
+
+    cy.logout();
   });
 
   it('Should be able to send email for password reset', () => {

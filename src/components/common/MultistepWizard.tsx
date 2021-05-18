@@ -33,6 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     stepper: {
       padding: '20px 0 0',
+      flexWrap: 'wrap',
     },
     formErrors: {
       color: theme.palette.error.main,
@@ -40,6 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     step: {
       cursor: 'pointer',
+      padding: theme.spacing(1),
     },
   })
 );
