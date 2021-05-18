@@ -27,6 +27,13 @@ jobs:
       #     username: ${{ secrets.DOCKER_STFC_USERNAME }}
       #     password: ${{ secrets.DOCKER_STFC_PASSWORD }}
 
+      - name: Get Windows Version
+        id: win_ver
+        shell: powershell
+        run: |
+          WINDOWS_VERSION=(Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion").ReleaseId
+          echo ::set-output name=branch::${BRANCH_NAME}
+
       - name: Extract branch name
         id: extract_branch
         shell: bash
@@ -48,7 +55,7 @@ jobs:
           username: ${{ secrets.DOCKER_STFC_USERNAME }}
           password: ${{ secrets.DOCKER_STFC_PASSWORD }}
           registry: docker.io
-          buildArgs: BUILD_VERSION=${{ github.sha }}
+          buildArgs: BUILD_VERSION=${{ github.sha }}, WINDOWS_VERSION=
           dockerfile: ./Dockerfile.win
           image: dmsc/duo-backend-win
 
