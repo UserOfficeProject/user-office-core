@@ -46,7 +46,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           build-args: BUILD_VERSION=${{ github.sha }}
-          file: {context}/Dockerfile.dev.win
+          file: ./Dockerfile.win
           push: true
           tags: dmsc/duo-backend-win:${{ steps.extract_branch.outputs.branch }}
 
