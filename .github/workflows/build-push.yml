@@ -41,7 +41,9 @@ jobs:
       - name: Extracted branch
         run: echo "Extracted branch ${{ steps.extract_branch.outputs.branch }}"
 
+      # Build and push only for 'develop' branch because for 'master' we have another action that builds release image
       - name: Build and push
+        if: steps.extract_branch.outputs.branch == 'develop'
         id: docker_build
         uses: docker/build-push-action@v2
         with:
