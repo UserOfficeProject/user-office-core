@@ -38,7 +38,7 @@ const UnitTable: React.FC = () => {
         id: id as number,
       })
       .then((resp) => {
-        if (!resp.deleteUnit.error) {
+        if (!resp.deleteUnit.rejection) {
           const newObjectsArray = units.filter(
             (objectItem) => objectItem.id !== id
           );

@@ -94,7 +94,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
       } successfully!`
     ).saveSepMeetingDecision({ saveSepMeetingDecisionInput });
 
-    const isError = !!data.saveSepMeetingDecision.error;
+    const isError = !!data.saveSepMeetingDecision.rejection;
 
     meetingSubmitted({
       ...(saveSepMeetingDecisionInput as SepMeetingDecision),
@@ -156,7 +156,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                 SEP Meeting form
               </Typography>
               <Grid container spacing={3}>
-                <Grid item xs={6}>
+                <Grid item sm={6} xs={12}>
                   <InputLabel htmlFor="commentForUser" shrink margin="dense">
                     Comment for user
                   </InputLabel>
@@ -199,7 +199,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                     }
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item sm={6} xs={12}>
                   <InputLabel
                     htmlFor="commentForManagement"
                     shrink

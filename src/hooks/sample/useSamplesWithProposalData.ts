@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { GetSamplesQuery, SamplesFilter } from 'generated/sdk';
+import { SamplesFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { SampleWithQuestionaryStatus } from 'models/Sample';
 
 export function useSamples(filter?: SamplesFilter) {
-  const [samples, setSamples] = useState<
-    Exclude<GetSamplesQuery['samples'], null>
-  >([]);
+  const [samples, setSamples] = useState<SampleWithQuestionaryStatus[]>([]);
 
   const [samplesFilter, setSamplesFilter] = useState(filter);
   const [loadingSamples, setLoadingSamples] = useState(false);
@@ -15,7 +14,7 @@ export function useSamples(filter?: SamplesFilter) {
   useEffect(() => {
     setLoadingSamples(true);
     api()
-      .getSamples({ filter: samplesFilter })
+      .getSamplesWithQuestionaryStatus({ filter: samplesFilter })
       .then((data) => {
         if (data.samples) {
           setSamples(data.samples);

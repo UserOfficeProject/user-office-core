@@ -13,11 +13,13 @@ import {
 import {
   Answer,
   QuestionaryStep,
-  Sample,
   SampleStatus,
   SubtemplateConfig,
 } from 'generated/sdk';
-import { SampleBasic } from 'models/Sample';
+import {
+  SampleWithQuestionaryStatus,
+  SampleWithQuestionary,
+} from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -34,7 +36,9 @@ const useStyles = makeStyles(() => ({
     fontSize: '1rem',
   },
 }));
-const sampleToListRow = (sample: SampleBasic): QuestionnairesListRow => {
+const sampleToListRow = (
+  sample: SampleWithQuestionaryStatus
+): QuestionnairesListRow => {
   return {
     id: sample.id,
     label: sample.title,
@@ -47,7 +51,7 @@ function createSampleStub(
   questionarySteps: QuestionaryStep[],
   proposalId: number,
   questionId: string
-): Sample {
+): SampleWithQuestionary {
   return {
     id: 0,
     created: new Date(),
@@ -86,7 +90,10 @@ function QuestionaryComponentSampleDeclaration(
   const { api } = useDataApiWithFeedback();
   const classes = useStyles();
 
-  const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
+  const [
+    selectedSample,
+    setSelectedSample,
+  ] = useState<SampleWithQuestionary | null>(null);
 
   if (!state) {
     throw new Error(createMissingContextErrorMessage());
@@ -94,7 +101,7 @@ function QuestionaryComponentSampleDeclaration(
 
   return (
     <Field name={answerId}>
-      {({ field, form }: FieldProps<Sample[]>) => {
+      {({ field, form }: FieldProps<SampleWithQuestionary[]>) => {
         const copySample = (id: number) =>
           api()
             .cloneSample({ sampleId: id })
@@ -109,7 +116,7 @@ function QuestionaryComponentSampleDeclaration(
           api()
             .deleteSample({ sampleId: id })
             .then((response) => {
-              if (!response.deleteSample.error) {
+              if (!response.deleteSample.rejection) {
                 const newStateValue = field.value.filter(
                   (sample) => sample.id !== id
                 );
@@ -211,7 +218,7 @@ function QuestionaryComponentSampleDeclaration(
                   sampleEditDone={() => {
                     // refresh all samples
                     api()
-                      .getSamples({
+                      .getSamplesWithQuestionaryStatus({
                         filter: {
                           questionId: answer.question.id,
                           proposalId: state.proposal.id,

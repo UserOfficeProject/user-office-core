@@ -1,11 +1,11 @@
-mutation createUnit(
-  $name: String!
-) {
+mutation createUnit($name: String!) {
   createUnit(name: $name) {
     unit {
       id
       name
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

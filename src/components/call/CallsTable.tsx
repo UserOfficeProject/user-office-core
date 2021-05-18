@@ -141,7 +141,7 @@ const CallsTable: React.FC = () => {
         id: id as number,
       })
       .then((resp) => {
-        if (!resp.deleteCall.error) {
+        if (!resp.deleteCall.rejection) {
           const newObjectsArray = calls.filter(
             (objectItem) => objectItem.id !== id
           );

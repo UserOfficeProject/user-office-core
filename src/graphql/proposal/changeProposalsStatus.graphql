@@ -5,7 +5,9 @@ mutation changeProposalsStatus(
   changeProposalsStatus(
     changeProposalsStatusInput: { proposals: $proposals, statusId: $statusId }
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     isSuccess
   }
 }

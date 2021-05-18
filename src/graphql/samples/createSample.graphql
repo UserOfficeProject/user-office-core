@@ -17,6 +17,8 @@ mutation createSample(
         ...questionary
       }
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

@@ -34,8 +34,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   container: {
-    minHeight: '350px',
-    maxHeight: '700px',
+    minHeight: 'auto',
+    maxHeight: 'calc(100vh - 220px)',
     overflowY: 'auto',
     overflowX: 'hidden',
     marginTop: '10px',

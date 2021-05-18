@@ -43,6 +43,8 @@ mutation createUser(
     user {
       id
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

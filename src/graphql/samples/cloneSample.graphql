@@ -7,6 +7,8 @@ mutation cloneSample($sampleId: Int!) {
         ...questionary
       }
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

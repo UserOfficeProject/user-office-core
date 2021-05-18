@@ -1,6 +1,8 @@
 mutation verifyEmail($token: String!) {
   emailVerification(token: $token) {
-    error
+    rejection {
+      ...rejection
+    }
     success
   }
 }

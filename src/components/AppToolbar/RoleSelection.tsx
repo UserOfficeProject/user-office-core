@@ -53,7 +53,7 @@ const RoleSelection: React.FC = () => {
       selectedRoleId: role.id,
     });
 
-    if (!result.selectRole.error) {
+    if (!result.selectRole.rejection) {
       history.push('/');
 
       setTimeout(() => {

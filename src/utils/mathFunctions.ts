@@ -1,4 +1,4 @@
-import { Review, ReviewStatus } from '../generated/sdk';
+import { Review } from '../generated/sdk';
 
 export const average = (numbers: number[]) => {
   const sum = numbers.reduce(function (sum, value) {
@@ -40,6 +40,4 @@ export const standardDeviation = (numbers: number[]) => {
 };
 
 export const getGrades = (reviews: Review[] | null | undefined) =>
-  reviews
-    ?.filter((review) => review.status === ReviewStatus.SUBMITTED)
-    .map((review) => review.grade as number) ?? [];
+  reviews?.map((review) => review.grade as number) ?? [];

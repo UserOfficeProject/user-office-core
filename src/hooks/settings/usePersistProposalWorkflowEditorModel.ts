@@ -4,7 +4,7 @@ import {
   Event,
   EventType,
 } from 'components/settings/proposalWorkflow/ProposalWorkflowEditorModel';
-import { IndexWithGroupId, ProposalWorkflow } from 'generated/sdk';
+import { IndexWithGroupId, ProposalWorkflow, Rejection } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
@@ -29,7 +29,7 @@ export function usePersistProposalWorkflowEditorModel() {
   };
 
   type MonitorableServiceCall = () => Promise<{
-    error?: string | null;
+    rejection?: Rejection | null;
   }>;
 
   const persistModel = ({
@@ -81,12 +81,14 @@ export function usePersistProposalWorkflowEditorModel() {
 
     const deleteProposalWorkflowStatus = async (
       proposalStatusId: number,
-      proposalWorkflowId: number
+      proposalWorkflowId: number,
+      sortOrder: number
     ) => {
       return api('Workflow status removed successfully')
         .deleteProposalWorkflowStatus({
           proposalStatusId,
           proposalWorkflowId,
+          sortOrder,
         })
         .then((data) => data.deleteProposalWorkflowStatus);
     };
@@ -138,7 +140,7 @@ export function usePersistProposalWorkflowEditorModel() {
               state.id
             );
 
-            if (result.error) {
+            if (result.rejection) {
               dispatch({
                 type: EventType.REORDER_WORKFLOW_STATUS_FAILED,
                 payload: {
@@ -168,10 +170,11 @@ export function usePersistProposalWorkflowEditorModel() {
             return executeAndMonitorCall(async () => {
               const result = await deleteProposalWorkflowStatus(
                 proposalWorkflowConnectionToRemove.proposalStatusId,
-                proposalWorkflowConnectionToRemove.proposalWorkflowId
+                proposalWorkflowConnectionToRemove.proposalWorkflowId,
+                proposalWorkflowConnectionToRemove.sortOrder
               );
 
-              if (result.error) {
+              if (result.rejection) {
                 dispatch({
                   type: EventType.WORKFLOW_STATUS_ADDED,
                   payload: {
@@ -223,7 +226,7 @@ export function usePersistProposalWorkflowEditorModel() {
               },
             });
 
-            if (result.error) {
+            if (result.rejection) {
               dispatch({
                 type: EventType.WORKFLOW_STATUS_DELETED,
                 payload: {
@@ -245,7 +248,7 @@ export function usePersistProposalWorkflowEditorModel() {
               statusChangingEvents
             );
 
-            if (!result.error) {
+            if (!result.rejection) {
               dispatch({
                 type: EventType.NEXT_STATUS_EVENTS_ADDED,
                 payload: {

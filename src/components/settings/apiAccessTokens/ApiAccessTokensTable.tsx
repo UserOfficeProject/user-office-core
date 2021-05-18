@@ -52,7 +52,7 @@ const ApiAccessTokensTable: React.FC = () => {
         accessTokenId: id as string,
       })
       .then((resp) => {
-        if (resp.deleteApiAccessToken.error) {
+        if (resp.deleteApiAccessToken.rejection) {
           return false;
         } else {
           return true;

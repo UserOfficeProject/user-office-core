@@ -98,8 +98,7 @@ context(
     });
 
     beforeEach(() => {
-      cy.visit('/');
-      cy.viewport(1100, 1000);
+      cy.viewport(1920, 1080);
     });
 
     it('User should not be able to see SEPs page', () => {
@@ -542,7 +541,7 @@ context(
 
       cy.get('[data-cy="sep-assignments-table"]')
         .find('tbody td')
-        .should('have.length', 8);
+        .should('have.length', 9);
 
       cy.get('[data-cy="sep-assignments-table"]')
         .find('tbody td')
@@ -574,6 +573,19 @@ context(
 
       cy.get('[role="dialog"]').contains(proposal1.proposalTitle);
       cy.get('[role="dialog"]').contains('Download PDF');
+    });
+
+    it('Proposal should contain standard deviation field inside proposals and assignments', () => {
+      cy.login('officer');
+
+      cy.contains('SEPs').click();
+      cy.get('button[title="Edit"]').first().click();
+
+      cy.contains('Proposals and Assignments').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="sep-assignments-table"] thead').contains('Deviation');
     });
 
     it('Officer should be able to assign SEP member to proposal in existing SEP', () => {
@@ -806,7 +818,7 @@ context(
       readWriteReview();
     });
 
-    it('should be able to filter their reviews by status', () => {
+    it('SEP Reviewer should be able to filter their reviews by status and bulk submit them', () => {
       cy.login(sepMembers.reviewer);
 
       cy.get('[data-cy="review-status-filter"]').click();
@@ -829,7 +841,23 @@ context(
 
       cy.finishedLoading();
 
-      cy.contains(proposal1.proposalTitle);
+      cy.contains(proposal1.proposalTitle).parent().contains('DRAFT');
+
+      cy.contains(proposal1.proposalTitle)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="submit-proposal-reviews"]').click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal review submitted successfully!',
+      });
+
+      cy.contains(proposal1.proposalTitle).parent().contains('SUBMITTED');
     });
 
     it('Officer should get error when trying to delete proposal which has dependencies (like reviews)', () => {
@@ -844,7 +872,8 @@ context(
 
       cy.notification({
         variant: 'error',
-        text: /Failed to delete proposal with ID "([^"]+)", it has dependencies which need to be deleted first/i,
+        text:
+          'Failed to delete proposal because, it has dependencies which need to be deleted first',
       });
     });
 
@@ -912,6 +941,10 @@ context(
       cy.get("[title='Submit instrument']").should('exist');
 
       cy.get("[title='Show proposals']").first().click();
+
+      cy.get('[data-cy="sep-instrument-proposals-table"] thead').contains(
+        'Deviation'
+      );
 
       cy.get(
         '[data-cy="sep-instrument-proposals-table"] [title="View proposal details"]'
@@ -1320,7 +1353,7 @@ context(
       cy.get('[data-cy="sep-instrument-proposals-table"] tbody tr')
         .first()
         .find('td')
-        .eq(5)
+        .eq(6)
         .should('not.contain.text', '-')
         .should('contain.text', '1');
 
@@ -1482,10 +1515,8 @@ context(
       cy.finishedLoading();
       assertAndRemoveAssignment(2);
       cy.finishedLoading();
-      assertAndRemoveAssignment(1);
-      cy.finishedLoading();
 
-      cy.get('@rows').parent().contains('No records to display');
+      cy.get('@rows').should('have.length', 1);
 
       cy.contains('Logs').click();
 
@@ -1494,6 +1525,31 @@ context(
       cy.get("[title='Last Page'] button").first().click();
 
       cy.contains('SEP_MEMBER_REMOVED_FROM_PROPOSAL');
+    });
+
+    it('SEP Reviewer should be able to see reviews even if he/she is not direct reviewer but only member of the SEP', () => {
+      cy.login(sepMembers.reviewer);
+      cy.finishedLoading();
+
+      cy.get('main table tbody').contains('No records to display');
+
+      cy.get('[data-cy="reviewer-filter"]').click();
+
+      cy.get('[data-value="ALL"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.proposalTitle)
+        .parent()
+        .find('[title="Review proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.proposalTitle);
+      cy.get('[role="dialog"]').contains('Grade').click();
+      cy.get('textarea[id="comment"]').should('exist');
+      cy.get('button[type="submit"]').should('exist');
     });
 
     it('SEP Chair should not be able to remove assigned proposal from existing SEP', () => {

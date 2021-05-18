@@ -6,8 +6,7 @@ context('Samples tests', () => {
   });
 
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
+    cy.viewport(1920, 1080);
   });
 
   const proposalTemplateName = faker.lorem.words(2);
@@ -74,7 +73,7 @@ context('Samples tests', () => {
   it('Should be able to create proposal with sample', () => {
     cy.login('user');
 
-    cy.createProposal();
+    cy.createProposal(proposalTitle);
 
     cy.get('[data-cy=add-button]').click();
 
@@ -133,6 +132,43 @@ context('Samples tests', () => {
     cy.contains('OK').click();
   });
 
+  it('Should be able to clone proposal with samples', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.contains(proposalTitle)
+      .parent()
+      .find('[title="Clone proposal"]')
+      .click();
+
+    cy.get('#mui-component-select-selectedCallId').click();
+
+    cy.get('[role="presentation"]').contains('call 1').click();
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Proposal cloned successfully',
+    });
+
+    cy.contains(`Copy of ${proposalTitle}`)
+      .parent()
+      .find('[title="View proposal"]')
+      .click();
+
+    cy.contains('Edit proposal').click();
+
+    cy.contains('New topic').click();
+
+    cy.get('[data-cy=questionnaires-list-item]').contains(sampleTitle).click();
+
+    cy.get('[role=presentation] [data-cy=questionary-title]').contains(
+      sampleTitle
+    );
+  });
+
   it('User should not be able to submit proposal with unfinished sample', () => {
     cy.login('user');
 
@@ -183,7 +219,7 @@ context('Samples tests', () => {
 
     cy.contains('Proposals').click();
 
-    cy.get('[title="View proposal"]').first().click();
+    cy.contains(proposalTitle).parent().find('[title="View proposal"]').click();
 
     cy.contains('Edit proposal').click();
 
@@ -201,16 +237,30 @@ context('Samples tests', () => {
     cy.contains(proposalTitleUpdated);
   });
 
-  it('Should be able to evaluate sample', () => {
+  it('Officer should be able to evaluate sample', () => {
     cy.login('officer');
 
     cy.contains('Sample safety').click();
+
+    cy.get('[data-cy=samples-table]').contains('701367');
+
+    cy.get('[data-cy=samples-table]').contains('567122');
+
+    cy.get('[placeholder=Search]').click().clear().type('567122');
+
+    cy.get('[data-cy=samples-table]').contains('567122');
+
+    cy.get('[data-cy=samples-table]').should('not.contain', '701367');
+
+    cy.get('[placeholder=Search]').click().clear();
+
+    cy.get('[data-cy=samples-table]').contains('701367');
 
     cy.get('[title="Review sample"]').last().click();
 
     cy.get('[data-cy="safety-status"]').click();
 
-    cy.contains('Low risk').click();
+    cy.get('[role=presentation]').contains('Low risk').click();
 
     cy.get('[data-cy="safety-comment"]').type(safetyComment);
 

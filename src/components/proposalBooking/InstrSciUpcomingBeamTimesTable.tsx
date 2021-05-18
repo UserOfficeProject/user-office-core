@@ -31,7 +31,7 @@ export default function InstrSciUpcomingBeamTimesTable() {
 
   return (
     <ContentContainer>
-      <Grid container spacing={3}>
+      <Grid container>
         <Grid item xs={12}>
           <StyledPaper margin={[0]}>
             <InstrumentFilter

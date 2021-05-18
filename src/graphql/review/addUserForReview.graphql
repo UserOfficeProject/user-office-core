@@ -1,6 +1,8 @@
 mutation addUserForReview($userID: Int!, $proposalID: Int!, $sepID: Int!) {
   addUserForReview(userID: $userID, proposalID: $proposalID, sepID: $sepID) {
-    error
+    rejection {
+      ...rejection
+    }
     review {
       id
     }

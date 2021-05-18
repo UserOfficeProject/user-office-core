@@ -10,7 +10,9 @@ mutation createUserByEmailInvite(
     email: $email
     userRole: $userRole
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     id
   }
 }

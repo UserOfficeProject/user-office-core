@@ -64,7 +64,7 @@ export default function ProposalPage() {
   return (
     <>
       <ContentContainer>
-        <Grid container spacing={3}>
+        <Grid container>
           <Grid item xs={12}>
             <StyledPaper data-cy="officer-proposals-table">
               <ProposalFilterBar

@@ -1,7 +1,6 @@
-import { Sample } from 'generated/sdk';
-
 import { QuestionarySubmissionState } from './QuestionarySubmissionState';
+import { SampleWithQuestionary } from './Sample';
 
 export interface SampleSubmissionState extends QuestionarySubmissionState {
-  sample: Sample;
+  sample: SampleWithQuestionary;
 }

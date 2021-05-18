@@ -40,7 +40,7 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
         const data = await api(
           'Proposal workflow created successfully'
         ).createProposalWorkflow(values);
-        if (data.createProposalWorkflow.error) {
+        if (data.createProposalWorkflow.rejection) {
           close(null);
         } else if (data.createProposalWorkflow.proposalWorkflow) {
           close(data.createProposalWorkflow.proposalWorkflow);

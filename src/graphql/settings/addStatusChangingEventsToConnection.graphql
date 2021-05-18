@@ -13,6 +13,8 @@ mutation addStatusChangingEventsToConnection(
       proposalWorkflowConnectionId
       statusChangingEvent
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

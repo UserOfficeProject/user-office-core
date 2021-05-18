@@ -21,7 +21,7 @@ import {
 } from 'generated/sdk';
 import { useSEPProposalsByInstrument } from 'hooks/SEP/useSEPProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
-import { getGrades, average } from 'utils/mathFunctions';
+import { getGrades, average, standardDeviation } from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';
@@ -251,6 +251,27 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
       emptyValue: '-',
     },
     {
+      title: 'Deviation',
+      field: 'deviation',
+      render: (
+        rowData: SepProposalWithAverageScoreAndAvailabilityZone
+      ): string => {
+        const stdDeviation = standardDeviation(
+          getGrades(rowData.proposal.reviews ?? []) as number[]
+        );
+
+        return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
+      },
+      customSort: (
+        a: SepProposalWithAverageScoreAndAvailabilityZone,
+        b: SepProposalWithAverageScoreAndAvailabilityZone
+      ) =>
+        (standardDeviation(getGrades(a.proposal.reviews ?? []) as number[]) ||
+          0) -
+        (standardDeviation(getGrades(b.proposal.reviews ?? []) as number[]) ||
+          0),
+    },
+    {
       title: 'Current rank',
       field: 'proposal.sepMeetingDecision.rankOrder',
       emptyValue: '-',
@@ -390,13 +411,17 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
       },
     });
 
-    if (!result.reorderSepMeetingDecisionProposals.error) {
+    if (!result.reorderSepMeetingDecisionProposals.rejection) {
       setInstrumentProposalsData(tableDataWithRankingsUpdated);
     }
 
     setSavingOrder(false);
   };
 
+  /**  NOTE: Making this to work on mobile is a bit harder and might need more attention.
+   * Here is some useful article (https://medium.com/@deepakkadarivel/drag-and-drop-dnd-for-mobile-browsers-fc9bcd1ad3c5)
+   * And example https://github.com/deepakkadarivel/DnDWithTouch/blob/master/main.js
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const RowDraggableComponent = (props: any) => (
     <MTableBodyRow

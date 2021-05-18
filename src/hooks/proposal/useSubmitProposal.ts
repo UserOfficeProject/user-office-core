@@ -15,7 +15,7 @@ export function useSubmitProposal() {
       .then((data) => {
         setIsLoading(false);
 
-        return !data.submitProposal.error;
+        return !data.submitProposal.rejection;
       });
   };
 
