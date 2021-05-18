@@ -113,6 +113,8 @@ context('User administration tests', () => {
     cy.get("[title='Save']").first().click();
 
     cy.contains('1-5 of 5');
+
+    cy.logout();
   });
 
   it('Should be able to send email for password reset', () => {
