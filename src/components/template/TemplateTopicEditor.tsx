@@ -98,6 +98,7 @@ export default function QuestionaryEditorTopic(props: {
     },
     itemContainer: {
       minHeight: '180px',
+      height: '100%',
       padding: '1px',
     },
     topic: {

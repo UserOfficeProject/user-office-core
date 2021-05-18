@@ -123,6 +123,7 @@ export default function TemplateEditor() {
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
     display: 'flex',
     overflow: 'auto',
+    maxHeight: '700px',
   });
 
   const onDragEnd = (result: DropResult): void => {
@@ -268,7 +269,7 @@ export default function TemplateEditor() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 style={getTopicListStyle(snapshot.isDraggingOver)}
-                className="topicsDroppable"
+                className="tinyScroll"
               >
                 {state.steps.map((step, index) => {
                   const questionPicker =

@@ -52,6 +52,8 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
       alignContent: 'flex-start',
       flexBasis: '100%',
       height: '100%',
+      maxHeight: '850px',
+      overflowY: 'auto',
       backgroundColor: theme.palette.grey[200],
       boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
     },
@@ -67,6 +69,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
       minHeight: '70px',
     },
     item: {
+      position: 'relative',
       '&:hover': {
         backgroundColor: `${theme.palette.grey[100]} !important`,
       },
@@ -344,7 +347,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
   return (
     <Grid
       container
-      className={classes.container}
+      className={`${classes.container} tinyScroll`}
       data-cy="proposal-workflow-connections"
     >
       <Dialog

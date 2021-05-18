@@ -76,6 +76,9 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
       marginRight: '10px',
       backgroundColor: theme.palette.grey[200],
       boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
+      position: 'sticky',
+      top: 0,
+      borderLeft: `2px solid ${theme.palette.grey[200]}`,
     },
     appbar: {
       background: 'transparent',
@@ -93,7 +96,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
     },
     itemContainer: {
       minHeight: '180px',
-      maxHeight: '600px',
+      maxHeight: '655px',
       overflowY: 'auto',
       overflowX: 'hidden',
     },
@@ -222,7 +225,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             xs={12}
             ref={provided.innerRef}
             style={getListStyle(snapshot.isDraggingOver)}
-            className={`${classes.itemContainer} questionItemsWrapper`}
+            className={`${classes.itemContainer} tinyScroll`}
           >
             {getItems()}
             {provided.placeholder}
