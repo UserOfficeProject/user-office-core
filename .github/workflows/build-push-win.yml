@@ -32,6 +32,7 @@ jobs:
         shell: powershell
         run: |
           $WINDOWS_VERSION=(Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion").ReleaseId
+          echo $WINDOWS_VERSION
           echo ::set-output name=win_version::${$WINDOWS_VERSION}
 
       - name: Windows Version
