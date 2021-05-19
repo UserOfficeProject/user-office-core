@@ -52,7 +52,7 @@ export const FormWrapper = styled(({ ...other }) => <Box {...other} />)({
 });
 
 export const ContentContainer = styled(({ ...other }) => (
-  <Container maxWidth="false" {...other} />
+  <Container maxWidth={false} {...other} />
 ))({
   padding: (props: Record<string, PaddingMarginType | unknown>) =>
     getSpacing(props.padding as PaddingMarginType, [2, 2]),

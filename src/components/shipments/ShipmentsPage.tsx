@@ -3,12 +3,16 @@ import React from 'react';
 
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
+import ShipmentsTable from './ShipmentsTable';
+
 function ShipmentsPage() {
   return (
     <ContentContainer>
       <Grid container>
         <Grid item xs={12}>
-          <StyledPaper>{/* <UserShipmentsTable /> */}</StyledPaper>
+          <StyledPaper>
+            <ShipmentsTable />
+          </StyledPaper>
         </Grid>
       </Grid>
     </ContentContainer>

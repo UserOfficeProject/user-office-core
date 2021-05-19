@@ -35,6 +35,10 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
   }
 
   const columns = [
+    {
+      title: 'Proposal ID',
+      field: 'shortCode',
+    },
     { title: 'Title', field: 'title' },
     { title: 'Status', field: 'status' },
     {
