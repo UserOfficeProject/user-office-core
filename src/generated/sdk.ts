@@ -331,6 +331,13 @@ export type Equipment = {
   maintenanceStartsAt: Maybe<Scalars['TzLessDateTime']>;
   maintenanceEndsAt: Maybe<Scalars['TzLessDateTime']>;
   autoAccept: Scalars['Boolean'];
+  events: Array<ScheduledEvent>;
+};
+
+
+export type EquipmentEventsArgs = {
+  endsAt: Scalars['TzLessDateTime'];
+  startsAt: Scalars['TzLessDateTime'];
 };
 
 export enum EquipmentAssignmentStatus {
@@ -362,7 +369,14 @@ export type EquipmentWithAssignmentStatus = {
   maintenanceStartsAt: Maybe<Scalars['TzLessDateTime']>;
   maintenanceEndsAt: Maybe<Scalars['TzLessDateTime']>;
   autoAccept: Scalars['Boolean'];
+  events: Array<ScheduledEvent>;
   status: EquipmentAssignmentStatus;
+};
+
+
+export type EquipmentWithAssignmentStatusEventsArgs = {
+  endsAt: Scalars['TzLessDateTime'];
+  startsAt: Scalars['TzLessDateTime'];
 };
 
 export enum EvaluatorOperator {
@@ -1836,7 +1850,6 @@ export type Query = {
   scheduledEvent: Maybe<ScheduledEvent>;
   proposalBookingScheduledEvents: Array<ScheduledEvent>;
   proposalBookingScheduledEvent: Maybe<ScheduledEvent>;
-  equipmentScheduledEvents: Array<ScheduledEvent>;
   equipments: Array<Equipment>;
   availableEquipments: Array<Equipment>;
   equipment: Maybe<Equipment>;
@@ -2129,8 +2142,8 @@ export type QueryProposalBookingScheduledEventArgs = {
 };
 
 
-export type QueryEquipmentScheduledEventsArgs = {
-  equipmentId: Scalars['ID'];
+export type QueryEquipmentsArgs = {
+  equipmentIds?: Maybe<Array<Scalars['Int']>>;
 };
 
 
@@ -2451,21 +2464,18 @@ export type ScheduledEvent = {
   scheduledBy: Maybe<User>;
   description: Maybe<Scalars['String']>;
   instrument: Maybe<Instrument>;
+  equipmentId: Scalars['Int'];
   equipments: Array<EquipmentWithAssignmentStatus>;
   equipmentAssignmentStatus: Maybe<EquipmentAssignmentStatus>;
   proposalBooking: Maybe<ProposalBooking>;
-};
-
-
-export type ScheduledEventEquipmentAssignmentStatusArgs = {
-  equipmentId: Scalars['ID'];
 };
 
 export enum ScheduledEventBookingType {
   USER_OPERATIONS = 'USER_OPERATIONS',
   MAINTENANCE = 'MAINTENANCE',
   SHUTDOWN = 'SHUTDOWN',
-  COMMISSIONING = 'COMMISSIONING'
+  COMMISSIONING = 'COMMISSIONING',
+  EQUIPMENT = 'EQUIPMENT'
 }
 
 export type ScheduledEventFilter = {
