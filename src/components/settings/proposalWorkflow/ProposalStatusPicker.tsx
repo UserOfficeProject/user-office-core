@@ -2,6 +2,7 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import React from 'react';
 import {
   Draggable,
@@ -16,13 +17,14 @@ const ProposalStatusPicker: React.FC<{
   proposalStatuses: ProposalStatus[];
 }> = ({ proposalStatuses }) => {
   const theme = useTheme();
+  const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
   const classes = makeStyles((theme) => ({
     container: {
       alignItems: 'flex-start',
       alignContent: 'flex-start',
       flexBasis: '100%',
       height: '100%',
-      maxHeight: '850px',
+      maxHeight: isExtraLargeScreen ? '1400px' : '850px',
       overflowY: 'auto',
       overflowX: 'hidden',
       backgroundColor: theme.palette.grey[200],

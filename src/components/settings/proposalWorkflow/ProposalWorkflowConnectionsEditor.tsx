@@ -7,6 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Delete from '@material-ui/icons/Delete';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
@@ -41,18 +42,19 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
   dispatch,
 }) => {
   const theme = useTheme();
+  const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
   const [openNewRowDialog, setOpenNewRowDialog] = useState(false);
   const [
     workflowConnection,
     setWorkflowConnection,
   ] = useState<ProposalWorkflowConnection | null>(null);
-  const classes = makeStyles((theme) => ({
+  const classes = makeStyles({
     container: {
       alignItems: 'flex-start',
       alignContent: 'flex-start',
       flexBasis: '100%',
       height: '100%',
-      maxHeight: '850px',
+      maxHeight: isExtraLargeScreen ? '1400px' : '850px',
       overflowY: 'auto',
       backgroundColor: theme.palette.grey[200],
       boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
@@ -93,7 +95,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
       padding: '2px 0',
       color: theme.palette.grey[500],
     },
-  }))();
+  })();
 
   const getItemStyle = (
     isDragging: boolean,
