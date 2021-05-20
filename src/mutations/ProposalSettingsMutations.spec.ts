@@ -12,7 +12,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { Rejection } from '../rejection';
+import { Rejection } from '../models/Rejection';
 import ProposalSettingsMutations from './ProposalSettingsMutations';
 
 const ProposalSettingsMutationsInstance = container.resolve(
@@ -39,7 +39,7 @@ describe('Test Proposal settings mutations', () => {
           description: 'This is some small description',
         }
       )
-    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A userofficer can create proposal status', () => {
@@ -96,7 +96,7 @@ describe('Test Proposal settings mutations', () => {
           description: 'This is some small description',
         }
       )
-    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A userofficer can create proposal workflow', () => {

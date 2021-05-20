@@ -1,9 +1,9 @@
-import { rejection } from '../rejection';
+import { rejection } from '../models/Rejection';
 import { SuccessResponseWrap } from './types/CommonWrappers';
 import { wrapResponse } from './wrapResponse';
 
 test('Should wrap the success result', async () => {
-  const result = (await wrapResponse<boolean>(
+  const result = (await wrapResponse(
     new Promise((resolve, reject) => {
       resolve(true);
     }),
@@ -15,12 +15,12 @@ test('Should wrap the success result', async () => {
 
 test('Should wrap the fail result', async () => {
   const ERROR_REASON = 'NOT_FOUND';
-  const result = (await wrapResponse<boolean>(
+  const result = (await wrapResponse(
     new Promise((resolve, reject) => {
       resolve(rejection(ERROR_REASON));
     }),
     SuccessResponseWrap
   )) as SuccessResponseWrap;
 
-  return expect(result.error).toEqual(ERROR_REASON);
+  return expect(result.rejection).not.toBeNull();
 });

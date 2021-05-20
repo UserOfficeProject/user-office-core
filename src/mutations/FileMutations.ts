@@ -1,12 +1,11 @@
 import { existsSync, mkdirSync } from 'fs';
 
-import { logger } from '@esss-swap/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { FileDataSource } from '../datasources/IFileDataSource';
 import { FileMetadata } from '../models/Blob';
-import { Rejection, rejection } from '../rejection';
+import { Rejection, rejection } from '../models/Rejection';
 @injectable()
 export default class FileMutations {
   constructor(
@@ -23,9 +22,7 @@ export default class FileMutations {
       .put(fileName, mimeType, sizeImBytes, path)
       .then((metadata) => metadata)
       .catch((err) => {
-        logger.logException('Could not save file', err, { fileName, path });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection('Could not save file', { fileName, path }, err);
       });
   }
 
@@ -40,9 +37,7 @@ export default class FileMutations {
       .prepare(fileId, filePath)
       .then(() => filePath)
       .catch((err) => {
-        logger.logException('Could not prepare file', err, { fileId });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection('Could not prepare file', { fileId }, err);
       });
   }
 }

@@ -1,6 +1,6 @@
 import { logger } from '@esss-swap/duo-logger';
 
-import { isRejection, Rejection } from '../rejection';
+import { isRejection, Rejection } from '../models/Rejection';
 
 export type EventHandler<T> = (event: T) => Promise<void>;
 

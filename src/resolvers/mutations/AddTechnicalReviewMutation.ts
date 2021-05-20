@@ -42,7 +42,7 @@ export class AddTechnicalReviewMutation {
     addTechnicalReviewInput: AddTechnicalReviewInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse<TechnicalReview>(
+    return wrapResponse(
       context.mutations.review.setTechnicalReview(
         context.user,
         addTechnicalReviewInput

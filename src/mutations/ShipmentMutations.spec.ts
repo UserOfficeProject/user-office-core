@@ -7,8 +7,8 @@ import {
   dummyUserNotOnProposalWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { isRejection } from '../models/Rejection';
 import { Shipment } from '../models/Shipment';
-import { isRejection } from '../rejection';
 import ShipmentMutations from './ShipmentMutations';
 
 const mutations = container.resolve(ShipmentMutations);

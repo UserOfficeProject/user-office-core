@@ -1,22 +1,22 @@
-import { Rejection, isRejection } from '../rejection';
+import { Rejection, isRejection } from '../models/Rejection';
 import { getResponseField } from './Decorators';
 import { ResponseWrapBase } from './types/CommonWrappers';
 
-export async function wrapResponse<T>(
-  executor: Promise<T | Rejection>,
-  ResponseWrapper: new () => ResponseWrapBase<T>
-): Promise<ResponseWrapBase<T>> {
+export async function wrapResponse(
+  executor: Promise<any>,
+  ResponseWrapper: new () => ResponseWrapBase
+): Promise<ResponseWrapBase | Rejection> {
   const result = await executor;
   const wrapper = new ResponseWrapper();
 
   const responseFieldName = getResponseField(wrapper);
-  if (responseFieldName) {
-    isRejection(result)
-      ? (wrapper.error = result.reason)
-      : ((wrapper as any)[responseFieldName] = result);
+  if (!responseFieldName) {
+    throw new Error(`No response fields found in '${ResponseWrapper.name}'`);
+  }
+  if (isRejection(result)) {
+    wrapper.rejection = result;
   } else {
-    wrapper.error = `No response fields found in '${ResponseWrapper.name}'`;
-    console.error(wrapper.error); // print out for easier debugging, most likely missing @Response() decorator
+    (wrapper as any)[responseFieldName] = result;
   }
 
   return wrapper;

@@ -1,6 +1,7 @@
 import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import { Express, Request } from 'express';
+import { applyMiddleware } from 'graphql-middleware';
 
 import 'reflect-metadata';
 import baseContext from '../buildContext';
@@ -10,6 +11,8 @@ import { User, UserWithRole } from '../models/User';
 import federationSources from '../resolvers/federationSources';
 import { registerEnums } from '../resolvers/registerEnums';
 import { buildFederatedSchema } from '../utils/buildFederatedSchema';
+import rejectionLogger from './rejectionLogger';
+import rejectionSanitizer from './rejectionSanitizer';
 
 interface Req extends Request {
   user?: {
@@ -27,7 +30,7 @@ const apolloServer = async (app: Express) => {
 
   const { orphanedTypes, referenceResolvers } = federationSources();
 
-  const schema = await buildFederatedSchema(
+  let schema = await buildFederatedSchema(
     {
       resolvers: [
         __dirname + '/../resolvers/**/*Query.{ts,js}',
@@ -42,8 +45,14 @@ const apolloServer = async (app: Express) => {
     }
   );
 
+  schema = applyMiddleware(schema, rejectionLogger);
+  if (process.env.NODE_ENV === 'production') {
+    // prevent exposing too much information when running in production
+    schema = applyMiddleware(schema, rejectionSanitizer);
+  }
+
   const server = new ApolloServer({
-    schema,
+    schema: schema,
     tracing: false,
     playground: {
       settings: {

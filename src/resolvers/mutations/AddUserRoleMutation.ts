@@ -24,7 +24,7 @@ export class AddUserRoleArgs {
 }
 
 @ObjectType()
-class AddUserRoleResponseWrap extends ResponseWrapBase<boolean> {
+class AddUserRoleResponseWrap extends ResponseWrapBase {
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   @Response()
   @Field({ nullable: true })

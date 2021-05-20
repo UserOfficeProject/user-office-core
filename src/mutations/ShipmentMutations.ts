@@ -1,4 +1,3 @@
-import { logger } from '@esss-swap/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -8,10 +7,10 @@ import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
+import { rejection } from '../models/Rejection';
 import { ShipmentStatus } from '../models/Shipment';
 import { TemplateCategoryId } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { rejection } from '../rejection';
 import { AddSamplesToShipmentArgs } from '../resolvers/mutations/AddSamplesShipmentMutation';
 import { CreateShipmentInput } from '../resolvers/mutations/CreateShipmentMutation';
 import { SubmitShipmentArgs } from '../resolvers/mutations/SubmitShipmentMutation';
@@ -44,12 +43,18 @@ export default class ShipmentMutations {
   @Authorized()
   async createShipment(agent: UserWithRole | null, args: CreateShipmentInput) {
     if (!agent) {
-      return rejection('NOT_AUTHORIZED');
+      return rejection(
+        'Can not create shipment because user is not authorized',
+        { args }
+      );
     }
 
     const proposal = await this.proposalDataSource.get(args.proposalId);
     if (!proposal) {
-      return rejection('NOT_FOUND');
+      return rejection(
+        'Can not create shipment because proposal was not found',
+        { args }
+      );
     }
 
     const templateId = await this.templateDataSource.getActiveTemplateId(
@@ -57,26 +62,25 @@ export default class ShipmentMutations {
     );
 
     if (!templateId) {
-      logger.logError('Cant create shipment, no active template has been set', {
-        args,
-        agent,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Can not create shipment because no active template has been set',
+        { args, agent }
+      );
     }
 
     const template = await this.templateDataSource.getTemplate(templateId);
     if (template?.categoryId !== TemplateCategoryId.SHIPMENT_DECLARATION) {
-      logger.logError('Cant create shipment with this template', {
+      return rejection('Can not create shipment with this template', {
         args,
         agent,
       });
-
-      return rejection('INTERNAL_ERROR');
     }
 
     if ((await this.userAuth.hasAccessRights(agent, proposal)) === false) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not create shipment because of insufficient permissions',
+        { args, agent }
+      );
     }
 
     return this.questionaryDataSource
@@ -90,12 +94,7 @@ export default class ShipmentMutations {
         );
       })
       .catch((error) => {
-        logger.logException('Could not create shipment', error, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection('Could not create shipment', { agent, args }, error);
       });
   }
 
@@ -106,7 +105,9 @@ export default class ShipmentMutations {
     );
 
     if (hasWriteRights === false) {
-      return rejection('NOT_AUTHORIZED');
+      return rejection(
+        'Can not submit shipment because user is not authorized'
+      );
     }
 
     try {
@@ -119,10 +120,12 @@ export default class ShipmentMutations {
           externalRef: assetId,
         })
         .then((shipment) => shipment);
-    } catch (e) {
-      logger.logException('Could not submit shipment', e);
-
-      return rejection('INTERNAL_ERROR');
+    } catch (error) {
+      return rejection(
+        'Could not submit shipment because an error occurred',
+        { args },
+        error
+      );
     }
   }
 
@@ -134,7 +137,10 @@ export default class ShipmentMutations {
     );
 
     if (hasWriteRights === false) {
-      return rejection('NOT_AUTHORIZED');
+      return rejection(
+        'Can not update shipment because user is not authorized',
+        { args }
+      );
     }
 
     const canAdministerShipment = this.userAuth.isUserOfficer(agent);
@@ -147,12 +153,7 @@ export default class ShipmentMutations {
       .update(args)
       .then((shipment) => shipment)
       .catch((error) => {
-        logger.logException('Could not update shipment', error, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection('Could not update shipment', { agent, args }, error);
       });
   }
 
@@ -163,19 +164,21 @@ export default class ShipmentMutations {
     );
 
     if (hasWriteRights === false) {
-      return rejection('NOT_AUTHORIZED');
+      return rejection(
+        'Can not delete shipment because user is not authorized',
+        { shipmentId }
+      );
     }
 
     return this.shipmentDataSource
       .delete(shipmentId)
       .then((shipment) => shipment)
       .catch((error) => {
-        logger.logException('Could not delete shipment', error, {
-          agent,
-          shipmentId,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Could not delete shipment',
+          { agent, shipmentId },
+          error
+        );
       });
   }
 
@@ -203,11 +206,17 @@ export default class ShipmentMutations {
     );
 
     if (hasWriteRights === false) {
-      return rejection('NOT_AUTHORIZED');
+      return rejection(
+        'Can not add samples user does not have permissions to change shipment',
+        { args, agent }
+      );
     }
 
     if (!this.isSamplesAuthorized(agent, args.sampleIds)) {
-      return rejection('NOT_AUTHORIZED');
+      return rejection(
+        'Can not add samples because user does not have permissions to change samples',
+        { args, agent }
+      );
     }
 
     // TODO check if samplesIds provided belongs to the proposal
