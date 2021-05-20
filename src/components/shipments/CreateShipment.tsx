@@ -36,6 +36,9 @@ function createShipmentStub(
       created: new Date(),
       steps: questionarySteps,
     },
+    proposal: {
+      shortCode: '123456',
+    },
     samples: [],
   };
 }
