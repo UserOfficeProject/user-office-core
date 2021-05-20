@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 
-import { GetUsersQuery } from 'generated/sdk';
+import { GetUsersQuery, GetUsersQueryVariables } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useUsersData(filter: string) {
+export function useUsersData(filter: GetUsersQueryVariables) {
+  const [usersFilter, setUsersFilter] = useState(filter);
   const [usersData, setUsersData] = useState<GetUsersQuery['users'] | null>(
     null
   );
-  const [loading, setLoading] = useState(true);
+  const [loadingUsersData, setLoading] = useState(true);
 
   const api = useDataApi();
   useEffect(() => {
@@ -15,7 +16,7 @@ export function useUsersData(filter: string) {
 
     setLoading(true);
     api()
-      .getUsers({ filter })
+      .getUsers(usersFilter)
       .then((data) => {
         if (unmounted) {
           return;
@@ -28,7 +29,7 @@ export function useUsersData(filter: string) {
     return () => {
       unmounted = true;
     };
-  }, [filter, api]);
+  }, [usersFilter, api]);
 
-  return { loading, usersData };
+  return { loadingUsersData, usersData, setUsersFilter };
 }
