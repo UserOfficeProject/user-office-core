@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import React, { Fragment } from 'react';
 
 import { TechnicalReview } from 'generated/sdk';
+import { getFullUserName } from 'utils/user';
 
 type TechnicalReviewInformationProps = {
   data: TechnicalReview | null | undefined;
@@ -23,7 +24,7 @@ const TechnicalReviewInformation: React.FC<TechnicalReviewInformationProps> = (
   }))();
 
   if (!props.data) {
-    return <p>Can&apos;t find technical review</p>;
+    return <p>Proposal has no technical review</p>;
   }
 
   return (
@@ -50,6 +51,10 @@ const TechnicalReviewInformation: React.FC<TechnicalReviewInformationProps> = (
           <TableRow key="timeAllocation">
             <TableCell>Time Allocation</TableCell>
             <TableCell>{props.data.timeAllocation}</TableCell>
+          </TableRow>
+          <TableRow key="reviewer">
+            <TableCell>Reviewer</TableCell>
+            <TableCell>{getFullUserName(props.data.reviewer)}</TableCell>
           </TableRow>
         </TableBody>
       </Table>

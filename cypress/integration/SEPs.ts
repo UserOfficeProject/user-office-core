@@ -87,6 +87,8 @@ const proposal2 = {
   proposalTitle: faker.random.words(3),
 };
 
+const scientist = 'Carl';
+
 context(
   'Scientific evaluation panel tests',
   {
@@ -884,11 +886,18 @@ context(
 
       cy.login('officer');
 
+      cy.contains('People').click();
+      cy.addScientistRoleToUser(scientist);
+
       cy.contains('Instruments').click();
       cy.contains('Create').click();
       cy.get('#name').type(name);
       cy.get('#shortCode').type(shortCode);
       cy.get('#description').type(description);
+
+      cy.get('[data-cy=beamline-manager]').click();
+      cy.contains(scientist).click();
+
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({ variant: 'success', text: 'created successfully' });

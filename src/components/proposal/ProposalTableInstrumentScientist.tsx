@@ -84,9 +84,12 @@ const ProposalTableInstrumentScientist: React.FC = () => {
    */
   const RowActionButtons = (rowData: Proposal) => {
     const iconButtonStyle = { padding: '7px' };
+    const isCurrentUserTechnicalReviewAssignee =
+      rowData.technicalReviewAssignee === user.id;
 
     const showView =
-      rowData.technicalReview && rowData.technicalReview.submitted;
+      (rowData.technicalReview && rowData.technicalReview.submitted) ||
+      isCurrentUserTechnicalReviewAssignee === false;
 
     return (
       <>

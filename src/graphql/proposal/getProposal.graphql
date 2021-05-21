@@ -12,6 +12,9 @@ query getProposal($id: Int!) {
     }
     technicalReview {
       ...coreTechnicalReview
+      reviewer {
+        ...basicUserDetails
+      }
     }
     reviews {
       id
