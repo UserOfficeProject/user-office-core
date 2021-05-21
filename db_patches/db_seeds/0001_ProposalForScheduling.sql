@@ -50,7 +50,7 @@ BEGIN
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_id) VALUES (1, 1);
 
-  INSERT INTO technical_review (technical_review_id, proposal_id, comment, time_allocation, status, public_comment) VALUES (1, 1, '', 2, 0, '');
+  INSERT INTO technical_review (technical_review_id, proposal_id, comment, time_allocation, status, public_comment, reviewer_id) VALUES (1, 1, '', 2, 0, '', 0);
 
 END;
 $DO$
