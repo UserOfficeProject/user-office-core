@@ -6,7 +6,7 @@ context('Template tests', () => {
   });
 
   beforeEach(() => {
-    cy.viewport(1600, 1080);
+    cy.viewport(1920, 1080);
   });
 
   let boolId: string;
