@@ -3,7 +3,8 @@ export class Instrument {
     public id: number,
     public name: string,
     public shortCode: string,
-    public description: string
+    public description: string,
+    public managerUserId: number
   ) {}
 }
 
@@ -13,10 +14,11 @@ export class InstrumentWithAvailabilityTime extends Instrument {
     public name: string,
     public shortCode: string,
     public description: string,
+    public managerUserId: number,
     public availabilityTime: number,
     public submitted: boolean
   ) {
-    super(id, name, shortCode, description);
+    super(id, name, shortCode, description, managerUserId);
   }
 }
 

@@ -289,3 +289,10 @@ export class ApiAccessTokenResponseWrap extends ResponseWrapBase {
   @Field(() => PermissionsWithAccessToken, { nullable: true })
   public apiAccessToken: PermissionsWithAccessToken;
 }
+
+@ObjectType()
+export class ProposalsResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => [Proposal])
+  public proposals: Proposal[];
+}

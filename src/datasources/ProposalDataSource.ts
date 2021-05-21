@@ -2,6 +2,7 @@ import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
+import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 import { ProposalEventsRecord } from './postgres/records';
 
@@ -37,6 +38,9 @@ export interface ProposalDataSource {
     proposalId: number,
     proposalStatusId: number
   ): Promise<Proposal>;
+  updateProposalTechnicalReviewer(
+    args: UpdateTechnicalReviewAssigneeInput
+  ): Promise<Proposal[]>;
   setProposalUsers(id: number, users: number[]): Promise<void>;
   submitProposal(id: number): Promise<Proposal>;
   deleteProposal(id: number): Promise<Proposal>;

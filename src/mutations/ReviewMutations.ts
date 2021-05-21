@@ -6,10 +6,12 @@ import {
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
+import { Proposal } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import {
   Review,
@@ -24,6 +26,7 @@ import { AddTechnicalReviewInput } from '../resolvers/mutations/AddTechnicalRevi
 import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
 import { ProposalIdWithReviewId } from '../resolvers/mutations/SubmitProposalsReviewMutation';
 import { SubmitTechnicalReviewInput } from '../resolvers/mutations/SubmitTechnicalReviewMutation';
+import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
@@ -31,6 +34,8 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 export default class ReviewMutations {
   constructor(
     @inject(Tokens.ReviewDataSource) private dataSource: ReviewDataSource,
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource
@@ -214,6 +219,13 @@ export default class ReviewMutations {
       );
     }
 
+    if (args.reviewerId !== undefined && args.reviewerId !== agent?.id) {
+      return rejection('Request is impersonating another user', {
+        args,
+        agent,
+      });
+    }
+
     return this.dataSource
       .setTechnicalReview(args, shouldUpdateReview)
       .then((review) => review)
@@ -251,6 +263,37 @@ export default class ReviewMutations {
           error
         );
       });
+  }
+
+  async isTechnicalReviewAssignee(
+    proposalIds: number[],
+    assigneeUserId?: number
+  ) {
+    for await (const proposalId of proposalIds) {
+      const technicalReviewAssignee = (
+        await this.proposalDataSource.get(proposalId)
+      )?.technicalReviewAssignee;
+      if (technicalReviewAssignee !== assigneeUserId) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async updateTechnicalReviewAssignee(
+    agent: UserWithRole | null,
+    args: UpdateTechnicalReviewAssigneeInput
+  ): Promise<Proposal[] | Rejection> {
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !this.isTechnicalReviewAssignee(args.proposalIds, agent?.id)
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    return this.proposalDataSource.updateProposalTechnicalReviewer(args);
   }
 
   @ValidateArgs(addUserForReviewValidationSchema)

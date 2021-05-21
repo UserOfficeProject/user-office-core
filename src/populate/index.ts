@@ -226,6 +226,7 @@ const createInstruments = async () => {
       name: `${dummy.word()}${dummy.positiveNumber(100)}`,
       description: faker.random.words(5),
       shortCode: `${dummy.word()}${dummy.positiveNumber(100)}`.substr(0, 19),
+      managerUserId: 1,
     });
   }, MAX_INSTRUMENTS);
 
@@ -300,6 +301,7 @@ const createReviews = async () => {
             : TechnicalReviewStatus.UNFEASIBLE,
         timeAllocation: dummy.positiveNumber(10),
         submitted: faker.random.boolean(),
+        reviewerId: 1,
       },
       false
     );

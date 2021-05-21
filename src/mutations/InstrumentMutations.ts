@@ -37,12 +37,15 @@ import {
 } from '../resolvers/mutations/UpdateInstrumentMutation';
 import { sortByRankOrAverageScore } from '../utils/mathFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { ProposalDataSource } from './../datasources/ProposalDataSource';
 @injectable()
 export default class InstrumentMutations {
   constructor(
     @inject(Tokens.InstrumentDataSource)
     private dataSource: InstrumentDataSource,
     @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
@@ -141,11 +144,24 @@ export default class InstrumentMutations {
       );
     }
 
+    const instrument = await this.dataSource.get(args.instrumentId);
+
+    if (!instrument) {
+      return rejection(
+        'Cannot assign the proposal to the instrument because the proposals call has no such instrument',
+        { agent, args }
+      );
+    }
+
+    const proposalIds = args.proposals.map((proposal) => proposal.id);
+
+    await this.proposalDataSource.updateProposalTechnicalReviewer({
+      userId: instrument.managerUserId,
+      proposalIds: proposalIds,
+    });
+
     return this.dataSource
-      .assignProposalsToInstrument(
-        args.proposals.map((proposal) => proposal.id),
-        args.instrumentId
-      )
+      .assignProposalsToInstrument(proposalIds, args.instrumentId)
       .then((result) => result)
       .catch((error) => {
         return rejection(

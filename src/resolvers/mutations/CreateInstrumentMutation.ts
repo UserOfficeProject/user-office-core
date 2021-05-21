@@ -1,4 +1,12 @@
-import { Args, ArgsType, Ctx, Mutation, Resolver, Field } from 'type-graphql';
+import {
+  Args,
+  ArgsType,
+  Ctx,
+  Mutation,
+  Resolver,
+  Field,
+  Int,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { InstrumentResponseWrap } from '../types/CommonWrappers';
@@ -14,6 +22,9 @@ export class CreateInstrumentArgs {
 
   @Field(() => String)
   public description: string;
+
+  @Field(() => Int)
+  public managerUserId: number;
 }
 
 @Resolver()

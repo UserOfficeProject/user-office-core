@@ -29,7 +29,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       technicalReview.public_comment,
       technicalReview.time_allocation,
       technicalReview.status,
-      technicalReview.submitted
+      technicalReview.submitted,
+      technicalReview.reviewer_id
     );
   }
 
@@ -43,6 +44,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       publicComment,
       timeAllocation,
       status,
+      reviewerId,
       submitted = false,
     } = args;
 
@@ -55,6 +57,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           time_allocation: timeAllocation,
           status,
           submitted,
+          reviewer_id: reviewerId,
         })
         .from('technical_review')
         .where('proposal_id', proposalID)
@@ -72,6 +75,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         time_allocation: timeAllocation,
         status,
         submitted,
+        reviewer_id: reviewerId,
       })
       .returning('*')
       .into('technical_review')
