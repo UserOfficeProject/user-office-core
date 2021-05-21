@@ -32,6 +32,9 @@ export class AddTechnicalReviewInput implements Partial<TechnicalReview> {
 
   @Field(() => Boolean, { nullable: true })
   public submitted: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public reviewerId: number;
 }
 
 @Resolver()

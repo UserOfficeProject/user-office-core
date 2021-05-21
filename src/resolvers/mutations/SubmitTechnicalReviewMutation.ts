@@ -33,6 +33,9 @@ export class SubmitTechnicalReviewInput implements Partial<TechnicalReview> {
 
   @Field(() => Boolean)
   public submitted: boolean;
+
+  @Field(() => Int)
+  public reviewerId: number;
 }
 
 @Resolver()

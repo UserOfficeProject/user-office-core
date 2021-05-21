@@ -13,7 +13,8 @@ export const dummyInstrument = new Instrument(
   1,
   'Dummy instrument 1',
   'instrument_1',
-  'This is test instrument.'
+  'This is test instrument.',
+  1
 );
 
 export const dummyInstrumentWithAvailabilityTime = new InstrumentWithAvailabilityTime(
@@ -21,6 +22,7 @@ export const dummyInstrumentWithAvailabilityTime = new InstrumentWithAvailabilit
   'Dummy instrument 1',
   'instrument_1',
   'This is test instrument.',
+  1,
   10,
   false
 );
