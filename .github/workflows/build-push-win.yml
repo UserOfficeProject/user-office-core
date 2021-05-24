@@ -1,0 +1,44 @@
+name: Build && Push Win
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the develop branch
+on:
+  push:
+    branches: [120-win-images-built-in-gh-actions]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: windows-2019
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Extract branch name
+        id: extract_branch
+        shell: bash
+        run: |
+          # Extract branch name
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+
+          # set output variable accessible in the action
+          echo ::set-output name=branch::${BRANCH_NAME}
+
+      # For debugging capture the selected branch
+      - name: Extracted branch
+        run: echo "Extracted branch ${{ steps.extract_branch.outputs.branch }}"
+
+      - name: Build and push
+        id: docker_build
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          username: ${{ secrets.DOCKER_STFC_USERNAME }}
+          password: ${{ secrets.DOCKER_STFC_PASSWORD }}
+          registry: docker.io
+          buildArgs: BUILD_VERSION=${{ github.sha }}, WINDOWS_VERSION=ltsc2019
+          dockerfile: ./Dockerfile.win
+          image: dmsc/duo-frontend-win
