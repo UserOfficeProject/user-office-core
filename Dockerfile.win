@@ -12,7 +12,6 @@ COPY . .
 RUN npm run tsc
 
 
-FROM docker-registry.devs.facilities.rl.ac.uk/bisapps-node:12.19.0-servercore${WINDOWS_VERSION}
 FROM dmsc/bisapps-node:12-servercore${WINDOWS_VERSION}
 
 WORKDIR /app
