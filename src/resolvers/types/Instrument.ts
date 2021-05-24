@@ -28,6 +28,9 @@ export class Instrument implements Partial<InstrumentOrigin> {
 
   @Field()
   public description: string;
+
+  @Field(() => Int)
+  public managerUserId: number;
 }
 
 @ObjectType()

@@ -8,6 +8,7 @@ import {
 } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
+import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -45,7 +46,8 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.submitted || false,
     values?.referenceNumberSequence || 0,
     values?.managementTimeAllocation || 0,
-    values?.managementDecisionSubmitted || false
+    values?.managementDecisionSubmitted || false,
+    0
   );
 };
 
@@ -62,6 +64,12 @@ export const dummySepMeetingDecision = new SepMeetingDecision(
 export class ProposalDataSourceMock implements ProposalDataSource {
   constructor() {
     this.init();
+  }
+
+  async updateProposalTechnicalReviewer(
+    args: UpdateTechnicalReviewAssigneeInput
+  ): Promise<Proposal[]> {
+    return allProposals;
   }
 
   async getProposalsFromView(
