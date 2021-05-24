@@ -119,7 +119,6 @@ export default class ProposalMutations {
       return rejection('Unauthorized proposal update', { args });
     }
 
-
     const proposalStatus = await this.proposalSettingsDataSource.getProposalStatus(
       proposal.statusId
     );
@@ -129,7 +128,7 @@ export default class ProposalMutations {
       ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED
     ) {
       if (proposal.submitted && !this.userAuth.isUserOfficer(agent)) {
-        return rejection('NOT_ALLOWED_PROPOSAL_SUBMITTED');
+        return rejection('Can not update proposal after submission');
       }
     }
 
