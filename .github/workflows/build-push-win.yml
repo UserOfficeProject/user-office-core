@@ -42,6 +42,3 @@ jobs:
           buildArgs: BUILD_VERSION=${{ github.sha }}, WINDOWS_VERSION=ltsc2019
           dockerfile: ./Dockerfile.win
           image: dmsc/duo-backend-win
-
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
