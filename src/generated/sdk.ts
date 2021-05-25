@@ -456,17 +456,6 @@ export enum FeatureId {
   EXTERNAL_AUTH = 'EXTERNAL_AUTH'
 }
 
-export type Settings = {
-  __typename?: 'Settings';
-  id: SettingsId;
-  settingsValue: Scalars['String'];
-  description: Scalars['String'];
-};
-
-export enum SettingsId {
-  EXTERNAL_AUTH_LOGIN_URL = 'EXTERNAL_AUTH_LOGIN_URL' 
-}
-
 export type FieldCondition = {
   __typename?: 'FieldCondition';
   condition: EvaluatorOperator;
@@ -1828,7 +1817,6 @@ export type Query = {
   checkEmailExist: Maybe<Scalars['Boolean']>;
   eventLogs: Maybe<Array<EventLog>>;
   features: Array<Feature>;
-  settings: Array<Settings>;
   fileMetadata: Maybe<Array<FileMetadata>>;
   allAccessTokensAndPermissions: Maybe<Array<PermissionsWithAccessToken>>;
   queriesAndMutations: Maybe<QueriesAndMutations>;
@@ -1867,6 +1855,7 @@ export type Query = {
   sepProposal: Maybe<SepProposal>;
   sepProposalsByInstrument: Maybe<Array<SepProposal>>;
   seps: Maybe<SePsQueryResult>;
+  settings: Array<Settings>;
   shipment: Maybe<Shipment>;
   shipments: Maybe<Array<Shipment>>;
   version: Scalars['String'];
@@ -2559,6 +2548,17 @@ export type SepMeetingDecisionResponseWrap = {
   rejection: Maybe<Rejection>;
   sepMeetingDecision: Maybe<SepMeetingDecision>;
 };
+
+export type Settings = {
+  __typename?: 'Settings';
+  id: SettingsId;
+  settingsValue: Scalars['String'];
+  description: Scalars['String'];
+};
+
+export enum SettingsId {
+  EXTERNAL_AUTH_LOGIN_URL = 'EXTERNAL_AUTH_LOGIN_URL'
+}
 
 export type Shipment = {
   __typename?: 'Shipment';
@@ -3568,17 +3568,6 @@ export type GetFeaturesQuery = (
   )> }
 );
 
-export type GetSettingsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetSettingsQuery = (
-  { __typename?: 'Query' }
-  & { settings: Array<(
-    { __typename?: 'Settings' }
-    & Pick<Settings, 'id' | 'settingsValue' | 'description'>
-  )> }
-);
-
 export type GetInstitutionsQueryVariables = Exact<{
   filter?: Maybe<InstitutionsFilter>;
 }>;
@@ -3600,6 +3589,17 @@ export type GetPageContentQueryVariables = Exact<{
 export type GetPageContentQuery = (
   { __typename?: 'Query' }
   & Pick<Query, 'getPageContent'>
+);
+
+export type GetSettingsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSettingsQuery = (
+  { __typename?: 'Query' }
+  & { settings: Array<(
+    { __typename?: 'Settings' }
+    & Pick<Settings, 'id' | 'settingsValue' | 'description'>
+  )> }
 );
 
 export type GetUnitsQueryVariables = Exact<{ [key: string]: never; }>;
@@ -7567,15 +7567,6 @@ export const GetFeaturesDocument = gql`
   }
 }
     `;
-export const GetSettingsDocument = gql`
-    query getSettings {
-  settings {
-    id
-    settingsValue
-    description
-  }
-}
-    `;
 export const GetInstitutionsDocument = gql`
     query getInstitutions($filter: InstitutionsFilter) {
   institutions(filter: $filter) {
@@ -7588,6 +7579,15 @@ export const GetInstitutionsDocument = gql`
 export const GetPageContentDocument = gql`
     query getPageContent($id: PageName!) {
   getPageContent(id: $id)
+}
+    `;
+export const GetSettingsDocument = gql`
+    query getSettings {
+  settings {
+    id
+    settingsValue
+    description
+  }
 }
     `;
 export const GetUnitsDocument = gql`
@@ -9734,14 +9734,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getFeatures(variables?: GetFeaturesQueryVariables): Promise<GetFeaturesQuery> {
       return withWrapper(() => client.request<GetFeaturesQuery>(print(GetFeaturesDocument), variables));
     },
-    getSettings(variables?: GetSettingsQueryVariables): Promise<GetSettingsQuery> {
-      return withWrapper(() => client.request<GetSettingsQuery>(print(GetSettingsDocument), variables));
-    },
     getInstitutions(variables?: GetInstitutionsQueryVariables): Promise<GetInstitutionsQuery> {
       return withWrapper(() => client.request<GetInstitutionsQuery>(print(GetInstitutionsDocument), variables));
     },
     getPageContent(variables: GetPageContentQueryVariables): Promise<GetPageContentQuery> {
       return withWrapper(() => client.request<GetPageContentQuery>(print(GetPageContentDocument), variables));
+    },
+    getSettings(variables?: GetSettingsQueryVariables): Promise<GetSettingsQuery> {
+      return withWrapper(() => client.request<GetSettingsQuery>(print(GetSettingsDocument), variables));
     },
     getUnits(variables?: GetUnitsQueryVariables): Promise<GetUnitsQuery> {
       return withWrapper(() => client.request<GetUnitsQuery>(print(GetUnitsDocument), variables));
