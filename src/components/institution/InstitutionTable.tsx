@@ -32,7 +32,7 @@ const InstitutionPage: React.FC = () => {
         id: id as number,
       })
       .then((resp) => {
-        if (resp.deleteInstitution.error) {
+        if (resp.deleteInstitution.rejection) {
           return false;
         } else {
           return true;

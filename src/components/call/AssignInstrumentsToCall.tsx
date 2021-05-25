@@ -56,7 +56,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
       ),
     });
 
-    if (!assignInstrumentToCallResult.assignInstrumentsToCall.error) {
+    if (!assignInstrumentToCallResult.assignInstrumentsToCall.rejection) {
       assignInstrumentsToCall(selectedInstruments);
     }
   };

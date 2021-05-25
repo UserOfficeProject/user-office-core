@@ -14,6 +14,7 @@ import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import {
   ProposalIdWithReviewId,
+  ReviewerFilter,
   ReviewStatus,
   SepAssignment,
   UserWithReviewsQuery,
@@ -28,6 +29,9 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalReviewContent, { TabNames } from './ProposalReviewContent';
 import ProposalReviewModal from './ProposalReviewModal';
+import ReviewerFilterComponent, {
+  defaultReviewerQueryFilter,
+} from './ReviewerFilter';
 import ReviewStatusFilter, {
   defaultReviewStatusQueryFilter,
 } from './ReviewStatusFilter';
@@ -49,6 +53,9 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
     ? ReviewStatus.DRAFT
     : undefined; // if the selected status is not a valid status assume we want to see everything
 
+const getFilterReviewer = (selected: string | ReviewerFilter) =>
+  selected === ReviewerFilter.YOU ? ReviewerFilter.YOU : ReviewerFilter.ALL;
+
 const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
   confirm,
 }) => {
@@ -63,6 +70,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     instrument: NumberParam,
     reviewStatus: defaultReviewStatusQueryFilter,
     reviewModal: NumberParam,
+    reviewer: defaultReviewerQueryFilter,
   });
 
   const [selectedProposals, setSelectedProposals] = useState<
@@ -89,6 +97,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     callId: selectedCallId,
     instrumentId: selectedInstrumentId,
     status: getFilterStatus(urlQueryParams.reviewStatus),
+    reviewer: getFilterReviewer(urlQueryParams.reviewer),
   });
 
   const handleStatusFilterChange = (reviewStatus: ReviewStatus) => {
@@ -96,6 +105,14 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     setUserWithReviewsFilter((filter) => ({
       ...filter,
       status: getFilterStatus(reviewStatus),
+    }));
+  };
+
+  const handleReviewOwnerFilterChange = (reviewer: ReviewerFilter) => {
+    setUrlQueryParams((queries) => ({ ...queries, reviewer }));
+    setUserWithReviewsFilter((filter) => ({
+      ...filter,
+      reviewer,
     }));
   };
 
@@ -244,7 +261,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         `Proposal${shouldAddPluralLetter} review submitted successfully!`
       ).submitProposalsReview({ proposals: submitProposalReviewsInput });
 
-      const isError = !!result.submitProposalsReview.error;
+      const isError = !!result.submitProposalsReview.rejection;
 
       if (!isError) {
         setUserData(
@@ -286,6 +303,10 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
 
   return (
     <>
+      <ReviewerFilterComponent
+        reviewer={urlQueryParams.reviewer}
+        onChange={handleReviewOwnerFilterChange}
+      />
       <ReviewStatusFilter
         reviewStatus={urlQueryParams.reviewStatus}
         onChange={handleStatusFilterChange}

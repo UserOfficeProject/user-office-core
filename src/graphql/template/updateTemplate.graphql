@@ -13,6 +13,8 @@ mutation updateTemplate(
     template {
       ...templateMetadata
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

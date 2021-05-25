@@ -2,5 +2,7 @@
   "video": false,
   "baseUrl": "http://proxy:80",
   "screenshotsFolder": "/tmp/screenshots",
-  "retries": 1
+  "retries": 1,
+  "viewportWidth": 1300,
+  "viewportHeight": 1200
 }

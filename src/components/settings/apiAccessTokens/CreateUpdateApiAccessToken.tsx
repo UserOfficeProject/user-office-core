@@ -187,7 +187,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
             name: values.name,
             accessPermissions: JSON.stringify(accessPermissions),
           });
-          if (data.updateApiAccessToken.error) {
+          if (data.updateApiAccessToken.rejection) {
             close(null);
           } else if (data.updateApiAccessToken.apiAccessToken) {
             close(data.updateApiAccessToken.apiAccessToken);
@@ -201,7 +201,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
           });
 
           if (
-            !data.createApiAccessToken.error &&
+            !data.createApiAccessToken.rejection &&
             data.createApiAccessToken.apiAccessToken
           ) {
             formikHelpers.setFieldValue(

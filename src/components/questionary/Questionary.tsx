@@ -1,4 +1,5 @@
 import { makeStyles, Step, Stepper, Typography } from '@material-ui/core';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import React, { useContext, useRef, useEffect } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -10,33 +11,6 @@ import {
   QuestionaryContext,
 } from './QuestionaryContext';
 import { QuestionaryStepButton } from './QuestionaryStepButton';
-
-const useStyles = makeStyles((theme) => ({
-  stepper: {
-    margin: theme.spacing(3, 0),
-    overflowX: 'auto',
-    '&::-webkit-scrollbar': {
-      webkitAppearance: 'none',
-      maxWidth: '10px',
-    },
-    '&::-webkit-scrollbar-thumb': {
-      border: '7px solid white',
-      borderRadius: '8px',
-      backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    },
-  },
-  header: {
-    textAlign: 'center',
-  },
-  subHeader: {
-    color: theme.palette.grey[700],
-    textAlign: 'right',
-  },
-  root: {
-    width: 'inherit',
-    minWidth: '500px', // Giving some minimum width for questionaries with short entries
-  },
-}));
 
 interface QuestionaryProps {
   title: string;
@@ -54,6 +28,35 @@ function Questionary({
   handleReset,
   displayElementFactory,
 }: QuestionaryProps) {
+  const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
+
+  const useStyles = makeStyles((theme) => ({
+    stepper: {
+      margin: theme.spacing(3, 0),
+      overflowX: 'auto',
+      '&::-webkit-scrollbar': {
+        webkitAppearance: 'none',
+        maxWidth: '10px',
+      },
+      '&::-webkit-scrollbar-thumb': {
+        border: '7px solid white',
+        borderRadius: '8px',
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+      },
+    },
+    header: {
+      textAlign: 'center',
+    },
+    subHeader: {
+      color: theme.palette.grey[700],
+      textAlign: 'right',
+    },
+    root: {
+      width: 'inherit',
+      minWidth: isTabletOrMobile ? 'inherit' : '500px', // Giving some minimum width for questionaries with short entries
+    },
+  }));
+
   const classes = useStyles();
   const { state, dispatch } = useContext(QuestionaryContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
@@ -141,7 +144,12 @@ function Questionary({
 
   return (
     <div className={classes.root}>
-      <Typography variant="h4" className={classes.header} ref={titleRef}>
+      <Typography
+        variant="h4"
+        className={classes.header}
+        ref={titleRef}
+        data-cy="questionary-title"
+      >
         {title}
       </Typography>
       <Typography className={classes.subHeader}>{info}</Typography>

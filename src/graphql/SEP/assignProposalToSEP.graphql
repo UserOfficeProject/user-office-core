@@ -1,6 +1,8 @@
 mutation assignProposalToSEP($proposalId: Int!, $sepId: Int!) {
   assignProposalToSEP(proposalId: $proposalId, sepId: $sepId) {
-    error
+    rejection {
+      ...rejection
+    }
     nextProposalStatus {
       id
       shortCode

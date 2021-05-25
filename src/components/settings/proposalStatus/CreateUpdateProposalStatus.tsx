@@ -56,7 +56,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             id: proposalStatus.id,
             ...values,
           });
-          if (data.updateProposalStatus.error) {
+          if (data.updateProposalStatus.rejection) {
             close(null);
           } else if (data.updateProposalStatus.proposalStatus) {
             close(data.updateProposalStatus.proposalStatus);
@@ -65,7 +65,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
           const data = await api(
             'Proposal status created successfully'
           ).createProposalStatus(values);
-          if (data.createProposalStatus.error) {
+          if (data.createProposalStatus.rejection) {
             close(null);
           } else if (data.createProposalStatus.proposalStatus) {
             close(data.createProposalStatus.proposalStatus);

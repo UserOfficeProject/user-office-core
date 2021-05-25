@@ -4,6 +4,8 @@ mutation setPageContent($id: PageName!, $text: String!) {
       id
       content
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

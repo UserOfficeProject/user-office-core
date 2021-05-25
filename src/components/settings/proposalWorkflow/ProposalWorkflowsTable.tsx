@@ -55,7 +55,7 @@ const ProposalWorkflowsTable: React.FC = () => {
         id: id as number,
       })
       .then((resp) => {
-        if (resp.deleteProposalWorkflow.error) {
+        if (resp.deleteProposalWorkflow.rejection) {
           return false;
         } else {
           return true;

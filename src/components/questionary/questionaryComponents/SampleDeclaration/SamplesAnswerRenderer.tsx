@@ -7,8 +7,8 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
 import SampleDetails from 'components/sample/SampleDetails';
 import { Answer } from 'generated/sdk';
-import { useSamples } from 'hooks/sample/useSamples';
-import { SampleBasic } from 'models/Sample';
+import { useSamplesWithQuestionaryStatus } from 'hooks/sample/useSamplesWithQuestionaryStatus';
+import { SampleWithQuestionaryStatus } from 'models/Sample';
 
 const useStyles = makeStyles((theme) => ({
   list: {
@@ -22,12 +22,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function SampleList(props: {
-  samples: SampleBasic[];
-  onClick?: (sample: SampleBasic) => void;
+  samples: SampleWithQuestionaryStatus[];
+  onClick?: (sample: SampleWithQuestionaryStatus) => void;
 }) {
   const classes = useStyles();
 
-  const sampleLink = (sample: SampleBasic) => (
+  const sampleLink = (sample: SampleWithQuestionaryStatus) => (
     <Link href="#" onClick={() => props.onClick?.(sample)}>
       {sample.title}
     </Link>
@@ -53,7 +53,7 @@ const SamplesAnswerRenderer = ({
 }: SamplesAnswerRendererProps) => {
   const [selectedSampleId, setSelectedSampleId] = useState<number | null>(null);
 
-  const { samples } = useSamples({
+  const { samples } = useSamplesWithQuestionaryStatus({
     proposalId: proposalId,
     questionId: answer.question.id,
   });

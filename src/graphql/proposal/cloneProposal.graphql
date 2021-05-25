@@ -43,6 +43,8 @@ mutation cloneProposal($proposalToCloneId: Int!, $callId: Int!) {
         isActive
       }
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

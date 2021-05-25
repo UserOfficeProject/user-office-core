@@ -1,13 +1,19 @@
-function createInstrument({ name, shortCode, description }) {
+function createInstrument({ name, shortCode, description }, scientist) {
+  cy.contains('Instruments').click();
   cy.contains('Create').click();
   cy.get('#name').type(name);
   cy.get('#shortCode').type(shortCode);
   cy.get('#description').type(description);
+
+  cy.get('[data-cy=beamline-manager]').click();
+  cy.get('[role=presentation]').contains(scientist).click();
+
   cy.get('[data-cy="submit"]').click();
 
   cy.contains(name);
   cy.contains(shortCode);
   cy.contains(description);
+  cy.contains(scientist);
 
   cy.notification({ variant: 'success', text: 'created successfully' });
 }
@@ -69,6 +75,24 @@ const assignInstrumentToProposal = (proposal, instrument) => {
     .should('exist');
 };
 
+const assignReviewer = (proposalTitle, reviewerName) => {
+  cy.contains('Proposals');
+
+  cy.get('[data-cy="status-filter"]').click();
+  cy.get('[role="listbox"] [data-value="0"]').click();
+
+  cy.contains(proposalTitle).parent().find('[data-cy="view-proposal"]').click();
+  cy.get('[role="dialog"]').as('dialog');
+  cy.finishedLoading();
+  cy.get('@dialog').contains('Technical review').click();
+
+  cy.get('[data-cy=re-assign]').click();
+  cy.get('[data-cy=user-list]').click();
+  cy.contains(reviewerName).click();
+  cy.get('[data-cy=re-assign-submit]').click();
+  cy.get('[role=presentation]').contains('OK').click();
+};
+
 Cypress.Commands.add('createInstrument', createInstrument);
 Cypress.Commands.add(
   'assignScientistsToInstrument',
@@ -77,3 +101,5 @@ Cypress.Commands.add(
 Cypress.Commands.add('assignInstrumentToProposal', assignInstrumentToProposal);
 
 Cypress.Commands.add('assignInstrumentToCall', assignInstrumentToCall);
+
+Cypress.Commands.add('assignReviewer', assignReviewer);

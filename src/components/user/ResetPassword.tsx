@@ -62,7 +62,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
         password,
       })
       .then((data) =>
-        data.resetPassword.error
+        data.resetPassword.rejection
           ? setErrorMessage(true)
           : setPasswordReset(true)
       );

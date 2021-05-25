@@ -5,7 +5,9 @@ mutation createApiAccessToken($name: String!, $accessPermissions: String!) {
       accessPermissions: $accessPermissions
     }
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     apiAccessToken {
       id
       name

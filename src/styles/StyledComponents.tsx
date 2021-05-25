@@ -55,7 +55,7 @@ export const ContentContainer = styled(({ ...other }) => (
   <Container maxWidth="lg" {...other} />
 ))({
   padding: (props: Record<string, PaddingMarginType | unknown>) =>
-    getSpacing(props.padding as PaddingMarginType, [4, 0]),
+    getSpacing(props.padding as PaddingMarginType, [2, 2]),
 });
 
 export const ButtonContainer = styled(({ ...other }) => <div {...other} />)({

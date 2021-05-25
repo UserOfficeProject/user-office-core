@@ -51,6 +51,10 @@ const login = (roleOrCredentials) => {
       email: 'Aaron_Harris49@gmail.com',
       password: 'Test1234!',
     },
+    user2: {
+      email: 'ben@inbox.com',
+      password: 'Test1234!',
+    },
   };
 
   const credentials =

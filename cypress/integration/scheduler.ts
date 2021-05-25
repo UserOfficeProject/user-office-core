@@ -20,14 +20,13 @@ context('Scheduler tests', () => {
     description: faker.random.words(5),
   };
 
+  const scientist = 'Carl';
+
   const proposalTitle = faker.random.words(2);
 
   before(() => {
     cy.resetDB();
     cy.resetSchedulerDB(true);
-
-    cy.visit('/');
-    cy.viewport(1100, 1000);
 
     cy.login('user');
     cy.createProposal(proposalTitle);
@@ -36,10 +35,9 @@ context('Scheduler tests', () => {
     cy.login('officer');
 
     cy.contains('People').click();
-    cy.addScientistRoleToUser('Carl');
+    cy.addScientistRoleToUser(scientist);
 
-    cy.contains('Instruments').click();
-    cy.createInstrument(instrument);
+    cy.createInstrument(instrument, scientist);
 
     cy.contains('Instruments').click();
     cy.assignScientistsToInstrument(instrument.shortCode);
@@ -54,8 +52,7 @@ context('Scheduler tests', () => {
   });
 
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
+    cy.viewport(1920, 1080);
   });
 
   after(() => {

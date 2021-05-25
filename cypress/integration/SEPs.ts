@@ -87,6 +87,8 @@ const proposal2 = {
   proposalTitle: faker.random.words(3),
 };
 
+const scientist = 'Carl';
+
 context(
   'Scientific evaluation panel tests',
   {
@@ -98,8 +100,7 @@ context(
     });
 
     beforeEach(() => {
-      cy.visit('/');
-      cy.viewport(1100, 1000);
+      cy.viewport(1920, 1080);
     });
 
     it('User should not be able to see SEPs page', () => {
@@ -819,7 +820,7 @@ context(
       readWriteReview();
     });
 
-    it('Should be able to filter their reviews by status and bulk submit them', () => {
+    it('SEP Reviewer should be able to filter their reviews by status and bulk submit them', () => {
       cy.login(sepMembers.reviewer);
 
       cy.get('[data-cy="review-status-filter"]').click();
@@ -873,7 +874,8 @@ context(
 
       cy.notification({
         variant: 'error',
-        text: /Failed to delete proposal with ID "([^"]+)", it has dependencies which need to be deleted first/i,
+        text:
+          'Failed to delete proposal because, it has dependencies which need to be deleted first',
       });
     });
 
@@ -884,11 +886,18 @@ context(
 
       cy.login('officer');
 
+      cy.contains('People').click();
+      cy.addScientistRoleToUser(scientist);
+
       cy.contains('Instruments').click();
       cy.contains('Create').click();
       cy.get('#name').type(name);
       cy.get('#shortCode').type(shortCode);
       cy.get('#description').type(description);
+
+      cy.get('[data-cy=beamline-manager]').click();
+      cy.contains(scientist).click();
+
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({ variant: 'success', text: 'created successfully' });
@@ -1515,10 +1524,8 @@ context(
       cy.finishedLoading();
       assertAndRemoveAssignment(2);
       cy.finishedLoading();
-      assertAndRemoveAssignment(1);
-      cy.finishedLoading();
 
-      cy.get('@rows').parent().contains('No records to display');
+      cy.get('@rows').should('have.length', 1);
 
       cy.contains('Logs').click();
 
@@ -1527,6 +1534,31 @@ context(
       cy.get("[title='Last Page'] button").first().click();
 
       cy.contains('SEP_MEMBER_REMOVED_FROM_PROPOSAL');
+    });
+
+    it('SEP Reviewer should be able to see reviews even if he/she is not direct reviewer but only member of the SEP', () => {
+      cy.login(sepMembers.reviewer);
+      cy.finishedLoading();
+
+      cy.get('main table tbody').contains('No records to display');
+
+      cy.get('[data-cy="reviewer-filter"]').click();
+
+      cy.get('[data-value="ALL"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.proposalTitle)
+        .parent()
+        .find('[title="Review proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.proposalTitle);
+      cy.get('[role="dialog"]').contains('Grade').click();
+      cy.get('textarea[id="comment"]').should('exist');
+      cy.get('button[type="submit"]').should('exist');
     });
 
     it('SEP Chair should not be able to remove assigned proposal from existing SEP', () => {

@@ -6,8 +6,7 @@ context('Calls tests', () => {
   });
 
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
+    cy.viewport(1920, 1080);
   });
 
   const newCall = {
@@ -32,6 +31,8 @@ context('Calls tests', () => {
     shortCode: faker.random.alphaNumeric(15),
     description: faker.random.words(8),
   };
+
+  const scientist = 'Carl';
 
   it('A user should not be able to see/visit calls', () => {
     cy.login('user');
@@ -223,15 +224,10 @@ context('Calls tests', () => {
   it('A user-officer should be able to assign instrument/s to a call', () => {
     cy.login('officer');
 
-    cy.contains('Instruments').click();
-    cy.contains('Create').click();
-    cy.get('#name').type(instrumentAssignedToCall.name);
-    cy.get('#shortCode').type(instrumentAssignedToCall.shortCode);
-    cy.get('#description').type(instrumentAssignedToCall.description);
-    cy.get('[data-cy="submit"]').click();
+    cy.contains('People').click();
+    cy.addScientistRoleToUser(scientist);
 
-    cy.notification({ variant: 'success', text: 'successfully' });
-
+    cy.createInstrument(instrumentAssignedToCall, scientist);
     cy.contains('Calls').click();
 
     cy.contains(updatedCall.shortCode)

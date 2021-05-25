@@ -4,7 +4,9 @@ const resetDB = () => {
   const query = `mutation {
       prepareDB {
         log
-        error
+        rejection {
+          reason
+        }
       }
     }`;
   const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;

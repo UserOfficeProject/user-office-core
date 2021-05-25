@@ -7,7 +7,7 @@ import {
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
 import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
-import { QuestionaryStep, Sample } from 'generated/sdk';
+import { QuestionaryStep } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import {
   Event,
@@ -16,6 +16,7 @@ import {
   QuestionarySubmissionState,
   WizardStep,
 } from 'models/QuestionarySubmissionState';
+import { SampleWithQuestionary } from 'models/Sample';
 import { SampleSubmissionState } from 'models/SampleSubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
@@ -33,7 +34,7 @@ const samplesReducer = (
   switch (action.type) {
     case EventType.SAMPLE_CREATED:
     case EventType.SAMPLE_LOADED:
-      const sample: Sample = action.payload.sample;
+      const sample: SampleWithQuestionary = action.payload.sample;
       draftState.isDirty = false;
       draftState.questionaryId = sample.questionaryId;
       draftState.sample = sample;
@@ -83,9 +84,9 @@ const createQuestionaryWizardStep = (
 });
 
 export function SampleDeclarationContainer(props: {
-  sample: Sample;
-  sampleCreated?: (sample: Sample) => void;
-  sampleUpdated?: (sample: Sample) => void;
+  sample: SampleWithQuestionary;
+  sampleCreated?: (sample: SampleWithQuestionary) => void;
+  sampleUpdated?: (sample: SampleWithQuestionary) => void;
   sampleEditDone?: () => void;
 }) {
   const { api } = useDataApiWithFeedback();

@@ -1,0 +1,10 @@
+mutation updateTechnicalReviewAssignee($proposalIds: [Int!]!, $userId: Int!) {
+  updateTechnicalReviewAssignee(proposalIds: $proposalIds, userId: $userId) {
+    proposals {
+      ...proposal
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

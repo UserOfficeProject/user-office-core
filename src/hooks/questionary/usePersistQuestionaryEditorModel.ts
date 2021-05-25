@@ -3,6 +3,7 @@ import { useState } from 'react';
 import {
   DataType,
   QuestionTemplateRelation,
+  Rejection,
   Template,
   TemplateCategoryId,
 } from 'generated/sdk';
@@ -117,7 +118,7 @@ export function usePersistQuestionaryEditorModel() {
   };
 
   type MonitorableServiceCall = () => Promise<{
-    error?: string | null;
+    rejection?: Rejection | null;
   }>;
 
   const persistModel = ({
@@ -127,10 +128,10 @@ export function usePersistQuestionaryEditorModel() {
     const executeAndMonitorCall = (call: MonitorableServiceCall) => {
       setIsLoading(true);
       call().then((result) => {
-        if (result.error) {
+        if (result.rejection) {
           dispatch({
             type: EventType.SERVICE_ERROR_OCCURRED,
-            payload: result.error,
+            payload: result.rejection.reason,
           });
         }
         setIsLoading(false);

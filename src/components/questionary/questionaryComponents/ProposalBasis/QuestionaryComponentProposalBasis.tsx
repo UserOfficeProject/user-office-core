@@ -164,7 +164,7 @@ const proposalBasisPreSubmit = () => async ({
           proposal: { ...proposal, ...result.updateProposal.proposal },
         },
       });
-    } else if (result.updateProposal.error) {
+    } else if (result.updateProposal.rejection) {
       throw PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR;
     }
   } else {
@@ -191,7 +191,7 @@ const proposalBasisPreSubmit = () => async ({
         },
       });
       returnValue = createResult.createProposal.proposal.questionaryId;
-    } else if (createResult.createProposal.error) {
+    } else if (createResult.createProposal.rejection) {
       throw PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR;
     }
   }

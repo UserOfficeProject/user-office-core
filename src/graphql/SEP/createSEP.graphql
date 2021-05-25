@@ -23,6 +23,8 @@ mutation createSEP(
         ...basicUserDetails
       }
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

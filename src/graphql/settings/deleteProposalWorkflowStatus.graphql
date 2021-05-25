@@ -11,6 +11,8 @@ mutation deleteProposalWorkflowStatus(
     }
   ) {
     isSuccess
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

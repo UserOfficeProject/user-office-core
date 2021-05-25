@@ -10,9 +10,12 @@ import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import FormikDropdown from 'components/common/FormikDropdown';
 import UOLoader from 'components/common/UOLoader';
-import { Instrument } from 'generated/sdk';
+import { Instrument, UserRole } from 'generated/sdk';
+import { useUsersData } from 'hooks/user/useUsersData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 
 const useStyles = makeStyles((theme) => ({
   submit: {
@@ -31,13 +34,20 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
 }) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
+  const { usersData } = useUsersData({
+    userRole: UserRole.INSTRUMENT_SCIENTIST,
+  });
 
+  if (!usersData) {
+    return <UOLoader />;
+  }
   const initialValues = instrument
     ? instrument
     : {
         name: '',
         shortCode: '',
         description: '',
+        managerUserId: -1,
       };
 
   return (
@@ -51,7 +61,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             id: instrument.id,
             ...values,
           });
-          if (data.updateInstrument.error) {
+          if (data.updateInstrument.rejection) {
             close(null);
           } else if (data.updateInstrument.instrument) {
             close(data.updateInstrument.instrument);
@@ -60,7 +70,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
           const data = await api(
             'Instrument created successfully!'
           ).createInstrument(values);
-          if (data.createInstrument.error) {
+          if (data.createInstrument.rejection) {
             close(null);
           } else if (data.createInstrument.instrument) {
             close(data.createInstrument.instrument);
@@ -115,6 +125,20 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             disabled={isExecutingCall}
           />
 
+          <FormikDropdown
+            name="managerUserId"
+            label="Beamline manager"
+            noOptionsText="No one"
+            items={usersData.users.map((user) => ({
+              text: getFullUserName(user),
+              value: user.id,
+            }))}
+            InputProps={{
+              'data-cy': 'beamline-manager',
+            }}
+            isClearable={false}
+          />
+
           <Button
             type="submit"
             fullWidth
@@ -139,6 +163,7 @@ CreateUpdateInstrument.propTypes = {
     name: PropTypes.string.isRequired,
     shortCode: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
+    managerUserId: PropTypes.number.isRequired,
     scientists: PropTypes.array.isRequired,
   }),
   close: PropTypes.func.isRequired,

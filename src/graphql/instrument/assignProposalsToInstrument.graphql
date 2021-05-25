@@ -6,7 +6,9 @@ mutation assignProposalsToInstrument(
     proposals: $proposals
     instrumentId: $instrumentId
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     isSuccess
   }
 }

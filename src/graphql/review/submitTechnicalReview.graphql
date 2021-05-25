@@ -5,6 +5,7 @@ mutation submitTechnicalReview(
   $publicComment: String
   $status: TechnicalReviewStatus
   $submitted: Boolean!
+  $reviewerId: Int!
 ) {
   submitTechnicalReview(
     submitTechnicalReviewInput: {
@@ -14,9 +15,12 @@ mutation submitTechnicalReview(
       publicComment: $publicComment
       status: $status
       submitted: $submitted
+      reviewerId: $reviewerId
     }
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     technicalReview {
       id
     }

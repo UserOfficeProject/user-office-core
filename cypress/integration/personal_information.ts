@@ -5,8 +5,7 @@ context('Personal information tests', () => {
     cy.resetDB();
   });
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1100);
+    cy.viewport(1920, 1080);
   });
 
   const newFirstName = faker.name.firstName();
@@ -22,33 +21,19 @@ context('Personal information tests', () => {
 
     cy.get('[data-cy="active-user-profile"]').click();
 
-    cy.get("[name='firstname']")
-      .clear()
-      .type(newFirstName);
+    cy.get("[name='firstname']").clear().type(newFirstName);
 
-    cy.get("[name='middlename']")
-      .clear()
-      .type(newMiddleName);
+    cy.get("[name='middlename']").clear().type(newMiddleName);
 
-    cy.get("[name='lastname']")
-      .clear()
-      .type(newLastName);
+    cy.get("[name='lastname']").clear().type(newLastName);
 
-    cy.get("[name='preferredname']")
-      .clear()
-      .type(newPreferredName);
+    cy.get("[name='preferredname']").clear().type(newPreferredName);
 
-    cy.get("[name='position']")
-      .clear()
-      .type(newPosition);
+    cy.get("[name='position']").clear().type(newPosition);
 
-    cy.get("[name='department']")
-      .clear()
-      .type(newDepartment);
+    cy.get("[name='department']").clear().type(newDepartment);
 
-    cy.get("[name='telephone']")
-      .clear()
-      .type(newTelephone);
+    cy.get("[name='telephone']").clear().type(newTelephone);
 
     cy.contains('Update Profile').click();
 
@@ -56,33 +41,21 @@ context('Personal information tests', () => {
 
     cy.reload();
 
-    cy.get("[name='firstname']")
-      .invoke('val')
-      .should('eq', newFirstName);
+    cy.get("[name='firstname']").invoke('val').should('eq', newFirstName);
 
-    cy.get("[name='middlename']")
-      .invoke('val')
-      .should('eq', newMiddleName);
+    cy.get("[name='middlename']").invoke('val').should('eq', newMiddleName);
 
-    cy.get("[name='lastname']")
-      .invoke('val')
-      .should('eq', newLastName);
+    cy.get("[name='lastname']").invoke('val').should('eq', newLastName);
 
     cy.get("[name='preferredname']")
       .invoke('val')
       .should('eq', newPreferredName);
 
-    cy.get("[name='position']")
-      .invoke('val')
-      .should('eq', newPosition);
+    cy.get("[name='position']").invoke('val').should('eq', newPosition);
 
-    cy.get("[name='department']")
-      .invoke('val')
-      .should('eq', newDepartment);
+    cy.get("[name='department']").invoke('val').should('eq', newDepartment);
 
-    cy.get("[name='telephone']")
-      .invoke('val')
-      .should('eq', newTelephone);
+    cy.get("[name='telephone']").invoke('val').should('eq', newTelephone);
   });
 
   it('User Officer should be able to see all and change roles if there are multiple', () => {
@@ -92,10 +65,7 @@ context('Personal information tests', () => {
 
     cy.finishedLoading();
 
-    cy.contains('Andersson')
-      .parent()
-      .find('button[title="Edit user"]')
-      .click();
+    cy.contains('Andersson').parent().find('button[title="Edit user"]').click();
 
     const mainContentElement = cy.get('main');
     mainContentElement.contains('Settings').click();
@@ -143,7 +113,7 @@ context('Personal information tests', () => {
 
     cy.get("[data-cy='role-selection-table'] table tbody tr")
       .first()
-      .should(element => {
+      .should((element) => {
         expect(element.text()).to.contain('User Officer');
 
         expect(element.text()).to.contain('In Use');

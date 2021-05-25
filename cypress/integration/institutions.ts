@@ -6,8 +6,7 @@ context('Institution tests', () => {
   });
 
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
+    cy.viewport(1920, 1080);
   });
 
   it('User should not be able to see Institutions page', () => {
@@ -57,9 +56,7 @@ context('Institution tests', () => {
     cy.login('officer');
 
     cy.contains('Institutions').click();
-    cy.get('[title="Edit"]')
-      .first()
-      .click();
+    cy.get('[title="Edit"]').first().click();
     cy.get('#name').clear();
     cy.get('#name').type(name);
     cy.get('[data-cy="submit"]').click();
@@ -84,9 +81,7 @@ context('Institution tests', () => {
 
     lastPageButtonElement.click({ force: true });
 
-    cy.get('[title="Delete"]')
-      .last()
-      .click();
+    cy.get('[title="Delete"]').last().click();
 
     cy.get('[title="Save"]').click();
 

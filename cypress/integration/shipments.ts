@@ -6,8 +6,7 @@ context('Shipments tests', () => {
   });
 
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
+    cy.viewport(1920, 1080);
   });
 
   const proposalTitle = faker.lorem.words(2);

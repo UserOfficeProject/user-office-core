@@ -78,7 +78,7 @@ const sampleBasisPreSubmit = () => async ({
       dispatch({
         type: EventType.SAMPLE_UPDATED,
         payload: {
-          sample: result.updateSample.sample,
+          sample: { ...sample, ...result.updateSample.sample },
         },
       });
     }

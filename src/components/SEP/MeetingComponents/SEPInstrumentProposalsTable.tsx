@@ -411,13 +411,17 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
       },
     });
 
-    if (!result.reorderSepMeetingDecisionProposals.error) {
+    if (!result.reorderSepMeetingDecisionProposals.rejection) {
       setInstrumentProposalsData(tableDataWithRankingsUpdated);
     }
 
     setSavingOrder(false);
   };
 
+  /**  NOTE: Making this to work on mobile is a bit harder and might need more attention.
+   * Here is some useful article (https://medium.com/@deepakkadarivel/drag-and-drop-dnd-for-mobile-browsers-fc9bcd1ad3c5)
+   * And example https://github.com/deepakkadarivel/DnDWithTouch/blob/master/main.js
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const RowDraggableComponent = (props: any) => (
     <MTableBodyRow

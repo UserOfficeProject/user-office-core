@@ -3,6 +3,8 @@ mutation createQuestionary($templateId: Int!) {
     questionary {
       ...questionary
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

@@ -3,7 +3,9 @@ mutation removeProposalFromInstrument($proposalId: Int!, $instrumentId: Int!) {
     proposalId: $proposalId
     instrumentId: $instrumentId
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     isSuccess
   }
 }

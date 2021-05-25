@@ -1,12 +1,10 @@
-mutation notifyProposal(
-  $id: Int!
-) {
-  notifyProposal(
-    id: $id
-  ) {
+mutation notifyProposal($id: Int!) {
+  notifyProposal(id: $id) {
     proposal {
       id
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

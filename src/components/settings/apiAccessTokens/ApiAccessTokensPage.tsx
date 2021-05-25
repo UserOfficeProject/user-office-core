@@ -8,7 +8,7 @@ import ApiAccessTokensTable from './ApiAccessTokensTable';
 const ApiAccessTokensPage: React.FC = () => {
   return (
     <ContentContainer>
-      <Grid container spacing={3}>
+      <Grid container>
         <Grid item xs={12}>
           <StyledPaper>
             <ApiAccessTokensTable />

@@ -1,9 +1,13 @@
 mutation deleteCall($id: Int!) {
   deleteCall(id: $id) {
-    error
+    rejection {
+      ...rejection
+    }
     call {
       id
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

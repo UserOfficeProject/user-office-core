@@ -36,7 +36,9 @@ mutation createCall(
       templateId: $templateId
     }
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     call {
       ...call
     }
