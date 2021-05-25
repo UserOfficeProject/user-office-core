@@ -4,7 +4,7 @@ name: Build && Push Win
 # events but only for the develop branch
 on:
   push:
-    branches: [120-win-images-built-in-gh-actions]
+    branches: [develop, master]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
