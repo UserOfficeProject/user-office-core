@@ -11,7 +11,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { Instrument as InstrumentOrigin } from '../../models/Instrument';
-import { isRejection } from '../../rejection';
+import { isRejection } from '../../models/Rejection';
 import { BasicUserDetails } from './BasicUserDetails';
 
 @ObjectType()
@@ -28,6 +28,9 @@ export class Instrument implements Partial<InstrumentOrigin> {
 
   @Field()
   public description: string;
+
+  @Field(() => Int)
+  public managerUserId: number;
 }
 
 @ObjectType()

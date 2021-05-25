@@ -87,7 +87,7 @@ describe('Test Call Mutations', () => {
 
     return expect(
       callMutations.create(dummyUserOfficerWithRole, callToCreate)
-    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A logged in user officer can create a call', () => {

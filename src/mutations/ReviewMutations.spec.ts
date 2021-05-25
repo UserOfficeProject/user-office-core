@@ -35,7 +35,10 @@ test('A user can not submit a review on a proposal', () => {
       status: ReviewStatus.DRAFT,
       sepID: 1,
     })
-  ).resolves.toHaveProperty('reason', 'NOT_REVIEWER_OF_PROPOSAL');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not update review because of insufficient permissions'
+  );
 });
 
 test('A userofficer can add a reviewer for a proposal', () => {

@@ -1,11 +1,9 @@
-import { ResourceId } from '@esss-swap/duo-localisation';
-import { logger } from '@esss-swap/duo-logger';
 import sanitizeHtml from 'sanitize-html';
 import * as Yup from 'yup';
 
 import { sanitizerConfig } from '../models/questionTypes/RichTextInput';
+import { Rejection, rejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
-import { Rejection, rejection } from '../rejection';
 
 const schemaValidation = async (schema: Yup.ObjectSchema, inputArgs: any) => {
   try {
@@ -46,15 +44,10 @@ const ValidateArgs = (schema: Yup.ObjectSchema, sanitizeInput?: string[]) => {
       const errors = await schemaValidation(schema, inputArgs);
 
       if (errors) {
-        if (process.env.NODE_ENV === 'development') {
-          logger.logError(`Input validation errors: ${errors}`, {
-            errors: errors.errors,
-            inputArgs,
-          });
-        }
-
-        // NOTE: Add BAD_REQUEST in the duo-localisation
-        return rejection('BAD_REQUEST' as ResourceId);
+        return rejection('Input validation errors', {
+          errors: errors.errors,
+          inputArgs,
+        });
       }
 
       return await originalMethod?.apply(this, args);

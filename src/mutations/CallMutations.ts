@@ -1,5 +1,3 @@
-import { ResourceId } from '@esss-swap/duo-localisation';
-import { logger } from '@esss-swap/duo-logger';
 import {
   createCallValidationSchemas,
   updateCallValidationSchemas,
@@ -12,9 +10,9 @@ import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { Call } from '../models/Call';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { rejection, Rejection } from '../rejection';
 import { CreateCallInput } from '../resolvers/mutations/CreateCallMutation';
 import {
   UpdateCallInput,
@@ -44,26 +42,30 @@ export default class CallMutations {
     const call = await this.dataSource.get(callId);
 
     if (!call) {
-      return rejection('NOT_FOUND');
+      return rejection('Call not found', { callId });
     }
 
     try {
       const result = await this.dataSource.delete(callId);
 
       return result;
-    } catch (e) {
-      if ('code' in e && e.code === '23503') {
+    } catch (error) {
+      if ('code' in error && error.code === '23503') {
         return rejection(
-          `Failed to delete call with ID "${call.shortCode}", it has dependencies which need to be deleted first` as ResourceId
+          'Failed to delete call, it has dependencies which need to be deleted first',
+          { callId },
+          error
         );
       }
 
-      logger.logException('Failed to delete call', e, {
-        agent,
-        callId,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Failed to delete call',
+        {
+          agent,
+          callId,
+        },
+        error
+      );
     }
   }
 
@@ -77,12 +79,11 @@ export default class CallMutations {
       .create(args)
       .then((result) => result)
       .catch((error) => {
-        logger.logException('Could not create call', error, {
-          agent,
-          shortCode: args.shortCode,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Could not create call',
+          { agent, shortCode: args.shortCode },
+          error
+        );
       });
   }
 
@@ -96,12 +97,11 @@ export default class CallMutations {
       .update(args)
       .then((result) => result)
       .catch((error) => {
-        logger.logException('Could not create call', error, {
-          agent,
-          shortCode: args.shortCode,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Could not create call',
+          { agent, shortCode: args.shortCode },
+          error
+        );
       });
   }
 
@@ -115,12 +115,11 @@ export default class CallMutations {
       .assignInstrumentsToCall(args)
       .then((result) => result)
       .catch((error) => {
-        logger.logException('Could not assign instruments to call', error, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Could not assign instruments to call',
+          { agent, args },
+          error
+        );
       });
   }
 
@@ -134,16 +133,11 @@ export default class CallMutations {
       .removeAssignedInstrumentFromCall(args)
       .then((result) => result)
       .catch((error) => {
-        logger.logException(
+        return rejection(
           'Could not remove assigned instrument from call',
-          error,
-          {
-            agent,
-            args,
-          }
+          { agent, args },
+          error
         );
-
-        return rejection('INTERNAL_ERROR');
       });
   }
 }

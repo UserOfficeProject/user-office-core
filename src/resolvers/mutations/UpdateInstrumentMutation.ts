@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { isRejection } from '../../rejection';
+import { isRejection } from '../../models/Rejection';
 import {
   InstrumentResponseWrap,
   SuccessResponseWrap,
@@ -29,6 +29,9 @@ export class UpdateInstrumentArgs {
 
   @Field(() => String)
   public description: string;
+
+  @Field(() => Int)
+  public managerUserId: number;
 }
 
 @ArgsType()

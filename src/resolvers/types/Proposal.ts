@@ -15,7 +15,7 @@ import {
   ProposalEndStatus,
   ProposalPublicStatus,
 } from '../../models/Proposal';
-import { isRejection } from '../../rejection';
+import { isRejection } from '../../models/Rejection';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Instrument } from './Instrument';
@@ -77,6 +77,9 @@ export class Proposal implements Partial<ProposalOrigin> {
 
   @Field(() => Boolean)
   public managementDecisionSubmitted: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public technicalReviewAssignee: number | null;
 
   public proposerId: number;
 }

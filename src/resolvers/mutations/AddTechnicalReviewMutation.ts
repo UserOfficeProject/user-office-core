@@ -32,6 +32,9 @@ export class AddTechnicalReviewInput implements Partial<TechnicalReview> {
 
   @Field(() => Boolean, { nullable: true })
   public submitted: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public reviewerId: number;
 }
 
 @Resolver()
@@ -42,7 +45,7 @@ export class AddTechnicalReviewMutation {
     addTechnicalReviewInput: AddTechnicalReviewInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse<TechnicalReview>(
+    return wrapResponse(
       context.mutations.review.setTechnicalReview(
         context.user,
         addTechnicalReviewInput

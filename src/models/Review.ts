@@ -17,6 +17,11 @@ export enum ReviewStatus {
   SUBMITTED = 1,
 }
 
+export enum ReviewerFilter {
+  YOU = 0,
+  ALL = 1,
+}
+
 export class ReviewWithNextProposalStatus {
   constructor(
     public id: number,

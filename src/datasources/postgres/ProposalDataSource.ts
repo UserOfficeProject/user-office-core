@@ -7,6 +7,7 @@ import { Event } from '../../events/event.enum';
 import { Proposal, ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
+import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
@@ -55,6 +56,20 @@ export async function calculateReferenceNumber(
 
 @injectable()
 export default class PostgresProposalDataSource implements ProposalDataSource {
+  async updateProposalTechnicalReviewer({
+    userId,
+    proposalIds,
+  }: UpdateTechnicalReviewAssigneeInput): Promise<Proposal[]> {
+    const response = await database('proposals')
+      .update('technical_review_assignee', userId)
+      .whereIn('proposal_id', proposalIds)
+      .returning('*')
+      .then((proposals: ProposalRecord[]) => {
+        return proposals.map((proposal) => createProposalObject(proposal));
+      });
+
+    return response;
+  }
   async submitProposal(id: number): Promise<Proposal> {
     const proposal: ProposalRecord[] = await database.transaction(
       async (trx) => {

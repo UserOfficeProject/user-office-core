@@ -29,7 +29,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       technicalReview.public_comment,
       technicalReview.time_allocation,
       technicalReview.status,
-      technicalReview.submitted
+      technicalReview.submitted,
+      technicalReview.reviewer_id
     );
   }
 
@@ -43,6 +44,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       publicComment,
       timeAllocation,
       status,
+      reviewerId,
       submitted = false,
     } = args;
 
@@ -55,6 +57,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           time_allocation: timeAllocation,
           status,
           submitted,
+          reviewer_id: reviewerId,
         })
         .from('technical_review')
         .where('proposal_id', proposalID)
@@ -72,6 +75,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         time_allocation: timeAllocation,
         status,
         submitted,
+        reviewer_id: reviewerId,
       })
       .returning('*')
       .into('technical_review')
@@ -180,7 +184,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   }
 
   async getUserReviews(
-    id: number,
+    sepIds: number[],
+    userId?: number,
     callId?: number,
     instrumentId?: number,
     status?: ReviewStatus
@@ -189,6 +194,10 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .select()
       .from('SEP_Reviews')
       .modify((qb) => {
+        if (userId) {
+          qb.where('user_id', userId);
+        }
+
         // sometimes the ID 0 is sent as a equivalent of all
         if (callId) {
           qb.join('proposals', {
@@ -209,7 +218,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           qb.where('SEP_Reviews.status', status);
         }
       })
-      .where('user_id', id)
+      .whereIn('sep_id', sepIds)
+      .distinctOn('proposal_id')
       .then((reviews: ReviewRecord[]) => {
         return reviews.map((review) => this.createReviewObject(review));
       });

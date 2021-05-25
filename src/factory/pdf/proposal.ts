@@ -7,13 +7,13 @@ import {
   getQuestionaryStepByTopicId,
 } from '../../models/ProposalModelFunctions';
 import { Answer, QuestionaryStep } from '../../models/Questionary';
+import { isRejection } from '../../models/Rejection';
 import {
   TechnicalReview,
   TechnicalReviewStatus,
 } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
-import { isRejection } from '../../rejection';
 import { getFileAttachments, Attachment } from '../util';
 import { collectSamplePDFData, SamplePDFData } from './sample';
 

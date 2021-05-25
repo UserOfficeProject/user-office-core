@@ -3,8 +3,8 @@ import { logger } from '@esss-swap/duo-logger';
 import { eventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
+import { Rejection, isRejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
-import { Rejection, isRejection } from '../rejection';
 
 const EventBusDecorator = (eventType: Event) => {
   return (
