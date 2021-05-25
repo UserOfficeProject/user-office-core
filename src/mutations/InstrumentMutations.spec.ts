@@ -88,11 +88,10 @@ describe('Test Instrument Mutations', () => {
 
   test('A logged in user officer can remove assigned proposal from instrument', () => {
     return expect(
-      instrumentMutations.removeProposalFromInstrument(
+      instrumentMutations.removeProposalsFromInstrument(
         dummyUserOfficerWithRole,
         {
-          proposalId: 1,
-          instrumentId: 1,
+          proposalIds: [1],
         }
       )
     ).resolves.toBe(true);
