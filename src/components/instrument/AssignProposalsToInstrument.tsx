@@ -3,18 +3,14 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
+import Alert from '@material-ui/lab/Alert';
 import { Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
-import * as yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import { Instrument } from 'generated/sdk';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
-
-const assignProposalToInstrumentValidationSchema = yup.object().shape({
-  selectedInstrumentId: yup.string().required('You must select instrument'),
-});
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
@@ -28,44 +24,44 @@ const useStyles = makeStyles((theme) => ({
 
 type AssignProposalsToInstrumentProps = {
   close: () => void;
-  assignProposalsToInstrument: (instrument: Instrument) => Promise<void>;
+  assignProposalsToInstrument: (instrument: Instrument | null) => Promise<void>;
   callIds: number[];
+  instrumentIds: (number | null)[];
 };
 
 const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = ({
   close,
   assignProposalsToInstrument,
   callIds,
+  instrumentIds,
 }) => {
   const classes = useStyles();
   const { instruments, loadingInstruments } = useInstrumentsData(callIds);
+  const [firstInstrumentId] = instrumentIds;
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container
+      component="main"
+      maxWidth="xs"
+      data-cy="proposals-instrument-assignment"
+    >
       <Formik
         initialValues={{
-          selectedInstrumentId: '',
+          selectedInstrumentId: firstInstrumentId || 0,
         }}
-        onSubmit={async (values, actions): Promise<void> => {
+        onSubmit={async (values): Promise<void> => {
           const selectedInstrument = instruments.find(
             (instrument) => instrument.id === +values.selectedInstrumentId
           );
 
-          if (!selectedInstrument) {
-            actions.setFieldError('selectedInstrumentId', 'Required');
-
-            return;
-          }
-
-          await assignProposalsToInstrument(selectedInstrument);
+          await assignProposalsToInstrument(selectedInstrument || null);
           close();
         }}
-        validationSchema={assignProposalToInstrumentValidationSchema}
       >
-        {({ isSubmitting }): JSX.Element => (
-          <Form>
+        {({ isSubmitting, values }): JSX.Element => (
+          <Form style={{ width: '240px' }}>
             <Typography className={classes.cardHeader}>
-              Assign proposal/s to instrument
+              Assign instrument to proposal/s
             </Typography>
 
             <Grid container spacing={3}>
@@ -73,15 +69,23 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
                 <FormikDropdown
                   name="selectedInstrumentId"
                   label="Select instrument"
+                  loading={loadingInstruments}
                   items={instruments.map((instrument) => ({
                     value: instrument.id.toString(),
                     text: instrument.name,
                   }))}
-                  disabled={loadingInstruments}
-                  required
+                  disabled={isSubmitting}
+                  noOptionsText="No instruments"
+                  isClearable
                 />
               </Grid>
             </Grid>
+            {!values.selectedInstrumentId && (
+              <Alert severity="warning" data-cy="remove-instrument-alert">
+                Be aware that leaving instrument selection empty will remove
+                assigned instrument from proposal/s.
+              </Alert>
+            )}
             <Button
               type="submit"
               fullWidth
@@ -89,9 +93,9 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
               color="primary"
               className={classes.submit}
               disabled={isSubmitting}
-              data-cy="submit"
+              data-cy="submit-assign-remove-instrument"
             >
-              Assign to Instrument
+              Save
             </Button>
           </Form>
         )}
@@ -104,6 +108,7 @@ AssignProposalsToInstrument.propTypes = {
   close: PropTypes.func.isRequired,
   assignProposalsToInstrument: PropTypes.func.isRequired,
   callIds: PropTypes.array.isRequired,
+  instrumentIds: PropTypes.array.isRequired,
 };
 
 export default AssignProposalsToInstrument;

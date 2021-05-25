@@ -915,27 +915,7 @@ context(
 
       cy.get('table tbody [type="checkbox"]').first().check();
 
-      cy.get("[title='Assign proposals to instrument']").first().click();
-
-      cy.get("[id='mui-component-select-selectedInstrumentId']").should(
-        'not.have.class',
-        'Mui-disabled'
-      );
-
-      cy.get("[id='mui-component-select-selectedInstrumentId']")
-        .first()
-        .click();
-
-      cy.get("[id='menu-selectedInstrumentId'] li").first().click();
-
-      cy.contains('Assign to Instrument').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Proposal/s assigned to the selected instrument',
-      });
-
-      cy.get('[title="Remove assigned instrument"]').should('exist');
+      cy.assignInstrumentToProposal(proposal1.proposalTitle, name);
 
       cy.contains('SEPs').click();
 
