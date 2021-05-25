@@ -9,6 +9,7 @@ export enum ProposalStatusDefaultShortCodes {
   NOT_ALLOCATED = 'NOT_ALLOCATED',
   SCHEDULING = 'SCHEDULING',
   EXPIRED = 'EXPIRED',
+  EDITABLE_SUBMITTED = 'EDITABLE_SUBMITTED',
 }
 
 export class ProposalStatus {
