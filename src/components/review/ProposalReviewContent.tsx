@@ -1,6 +1,6 @@
-import { Button } from '@material-ui/core';
+import { Button, Link, makeStyles, Paper, Typography } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/TabPanel';
@@ -12,14 +12,17 @@ import ProposalAdmin, {
 } from 'components/proposal/ProposalAdmin';
 import ExternalReviews from 'components/SEP/MeetingComponents/ProposalViewModal/ExternalReviews';
 import SEPMeetingDecision from 'components/SEP/MeetingComponents/ProposalViewModal/SEPMeetingDecision';
+import { UserContext } from 'context/UserContextProvider';
 import {
   CoreTechnicalReviewFragment,
+  Proposal,
   TechnicalReview,
   UserRole,
 } from 'generated/sdk';
 import { useProposalData } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
 
+import AssignTechnicalReview from './AssignTechnicalReview';
 import ProposalGrade from './ProposalGrade';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
@@ -40,6 +43,17 @@ type ProposalReviewContentProps = {
   isInsideModal?: boolean;
 };
 
+const useStyles = makeStyles((theme) => ({
+  reassignContainer: {
+    padding: theme.spacing(2),
+    marginTop: 0,
+    marginBottom: theme.spacing(6),
+  },
+  showReassignLink: {
+    cursor: 'pointer',
+  },
+}));
+
 const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
   proposalId,
   tabNames,
@@ -47,8 +61,10 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
   sepId,
   isInsideModal,
 }) => {
+  const classes = useStyles();
+  const { user } = useContext(UserContext);
+  const [showReassign, setShowReassign] = useState(false);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const { reviewData, setReviewData } = useReviewData(reviewId, sepId);
   const { proposalData, setProposalData, loading } = useProposalData(
     proposalId || reviewData?.proposal?.id
@@ -74,21 +90,59 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
     />
   );
 
+  const assignAnotherReviewerView = (proposal: Proposal) => {
+    if (proposal.technicalReview?.submitted) {
+      return null;
+    }
+
+    return (
+      <Paper elevation={1} className={classes.reassignContainer}>
+        <Typography variant="h6" gutterBottom>
+          Assign to someone else?
+        </Typography>
+        If you think there is a better candidate to do the review for the
+        proposal, you can re-assign it to someone else
+        <div>
+          {showReassign ? (
+            <AssignTechnicalReview
+              proposal={proposal}
+              onProposalUpdated={(updatedProposal) => {
+                setProposalData(updatedProposal);
+                setShowReassign(false);
+              }}
+            />
+          ) : (
+            <Link
+              onClick={() => setShowReassign(true)}
+              className={classes.showReassignLink}
+              data-cy="re-assign"
+            >
+              Re-assign...
+            </Link>
+          )}
+        </div>
+      </Paper>
+    );
+  };
+
   const TechnicalReviewTab =
-    isUserOfficer || isInstrumentScientist ? (
-      <ProposalTechnicalReview
-        id={proposalData.id}
-        data={proposalData.technicalReview}
-        setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
-          setProposalData({
-            ...proposalData,
-            technicalReview: {
-              ...proposalData.technicalReview,
-              ...data,
-            } as TechnicalReview,
-          })
-        }
-      />
+    isUserOfficer || proposalData.technicalReviewAssignee === user.id ? (
+      <>
+        {assignAnotherReviewerView(proposalData)}
+        <ProposalTechnicalReview
+          id={proposalData.id}
+          data={proposalData.technicalReview}
+          setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
+            setProposalData({
+              ...proposalData,
+              technicalReview: {
+                ...proposalData.technicalReview,
+                ...data,
+              } as TechnicalReview,
+            })
+          }
+        />
+      </>
     ) : (
       <TechnicalReviewInformation data={proposalData.technicalReview} />
     );

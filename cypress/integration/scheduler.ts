@@ -20,6 +20,8 @@ context('Scheduler tests', () => {
     description: faker.random.words(5),
   };
 
+  const scientist = 'Carl';
+
   const proposalTitle = faker.random.words(2);
 
   before(() => {
@@ -33,10 +35,9 @@ context('Scheduler tests', () => {
     cy.login('officer');
 
     cy.contains('People').click();
-    cy.addScientistRoleToUser('Carl');
+    cy.addScientistRoleToUser(scientist);
 
-    cy.contains('Instruments').click();
-    cy.createInstrument(instrument);
+    cy.createInstrument(instrument, scientist);
 
     cy.contains('Instruments').click();
     cy.assignScientistsToInstrument(instrument.shortCode);
