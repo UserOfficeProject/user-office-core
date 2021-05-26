@@ -18,7 +18,7 @@ export default class CallQueries {
 
   @Authorized()
   async get(agent: UserWithRole | null, id: number) {
-    const call = await this.dataSource.get(id);
+    const call = await this.dataSource.getCall(id);
 
     return call;
   }
@@ -33,7 +33,7 @@ export default class CallQueries {
   // TODO: figure out the role parts
   @Authorized()
   async byRef(agent: UserWithRole | null, id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getCall(id);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])

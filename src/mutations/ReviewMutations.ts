@@ -49,7 +49,7 @@ export default class ReviewMutations {
     args: AddReviewArgs
   ): Promise<ReviewWithNextProposalStatus | Rejection> {
     const { reviewID, comment, grade } = args;
-    const review = await this.dataSource.get(reviewID);
+    const review = await this.dataSource.getReview(reviewID);
 
     if (!review) {
       return rejection('Could not update review because review was not found', {
@@ -137,7 +137,7 @@ export default class ReviewMutations {
     args: ProposalIdWithReviewId
   ): Promise<Review | Rejection> {
     const { reviewId } = args;
-    const review = await this.dataSource.get(reviewId);
+    const review = await this.dataSource.getReview(reviewId);
 
     if (!review) {
       return rejection(

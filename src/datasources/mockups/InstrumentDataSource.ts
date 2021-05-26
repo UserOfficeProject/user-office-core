@@ -43,7 +43,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return { ...dummyInstrument, ...args };
   }
 
-  async get(instrumentId: number): Promise<Instrument | null> {
+  async getInstrument(instrumentId: number): Promise<Instrument | null> {
     const instrument = dummyInstruments.find(
       (dummyInstrumentItem) => dummyInstrumentItem.id === instrumentId
     );
@@ -55,7 +55,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     }
   }
 
-  async getAll(
+  async getInstruments(
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {

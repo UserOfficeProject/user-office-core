@@ -6,7 +6,7 @@ import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMut
 
 export interface ReviewDataSource {
   removeUserForReview(id: number): Promise<Review>;
-  get(id: number): Promise<Review | null>;
+  getReview(id: number): Promise<Review | null>;
   updateReview(args: AddReviewArgs): Promise<Review>;
 
   getProposalReviews(id: number): Promise<Review[]>;

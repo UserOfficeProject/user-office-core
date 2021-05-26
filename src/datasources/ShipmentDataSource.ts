@@ -10,8 +10,8 @@ export interface ShipmentDataSource {
     proposalId: number,
     questionaryId: number
   ): Promise<Shipment>;
-  get(shipmentId: number): Promise<Shipment | null>;
-  getAll(args: ShipmentsArgs): Promise<Shipment[]>;
+  getShipment(shipmentId: number): Promise<Shipment | null>;
+  getShipments(args: ShipmentsArgs): Promise<Shipment[]>;
   getShipmentsByCallId(callId: number): Promise<Shipment[]>;
   update(args: UpdateShipmentArgs): Promise<Shipment>;
   addSamples(args: AddSamplesToShipmentArgs): Promise<Shipment>;

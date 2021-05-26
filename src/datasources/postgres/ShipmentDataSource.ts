@@ -32,7 +32,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       });
   }
 
-  async get(shipmentId: number): Promise<Shipment | null> {
+  async getShipment(shipmentId: number): Promise<Shipment | null> {
     return database('shipments')
       .select('*')
       .where('shipment_id', shipmentId)
@@ -47,7 +47,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       });
   }
 
-  async getAll(args: ShipmentsArgs): Promise<Shipment[]> {
+  async getShipments(args: ShipmentsArgs): Promise<Shipment[]> {
     const filter = args.filter;
 
     return database('shipments')
@@ -131,7 +131,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
     shipmentId,
     sampleIds,
   }: AddSamplesToShipmentArgs): Promise<Shipment> {
-    const shipment = await this.get(shipmentId);
+    const shipment = await this.getShipment(shipmentId);
 
     if (!shipment) {
       logger.logError('Shipment does not exist', { shipmentId, sampleIds });

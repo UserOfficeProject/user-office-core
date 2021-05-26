@@ -39,7 +39,7 @@ export default class CallMutations {
     agent: UserWithRole | null,
     { callId }: { callId: number }
   ): Promise<Call | Rejection> {
-    const call = await this.dataSource.get(callId);
+    const call = await this.dataSource.getCall(callId);
 
     if (!call) {
       return rejection('Call not found', { callId });

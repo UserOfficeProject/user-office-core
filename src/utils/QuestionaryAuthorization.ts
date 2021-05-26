@@ -150,7 +150,7 @@ class ShipmentDeclarationQuestionaryAuthorizer
       return true;
     }
 
-    const queryResult = await this.shipmentDataSource.getAll({
+    const queryResult = await this.shipmentDataSource.getShipments({
       filter: { questionaryIds: [questionaryId] },
     });
 

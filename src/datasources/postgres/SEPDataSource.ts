@@ -104,7 +104,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       });
   }
 
-  async get(id: number) {
+  async getSEP(id: number) {
     return database
       .select()
       .from('SEPs')
@@ -168,7 +168,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     return sepRecords.map(createSEPObject);
   }
 
-  async getAll(
+  async getSEPs(
     active?: boolean,
     filter?: string,
     first?: number,
@@ -304,7 +304,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .from('SEP_Reviewers')
       .where('sep_id', sepId);
 
-    const sep = await this.get(sepId);
+    const sep = await this.getSEP(sepId);
 
     if (!sep) {
       throw new Error(`SEP not found ${sepId}`);
@@ -334,7 +334,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async getSEPUserRole(userId: number, sepId: number): Promise<Role | null> {
-    const sep = await this.get(sepId);
+    const sep = await this.getSEP(sepId);
 
     if (!sep) {
       throw new Error(`SEP not found ${sepId}`);
@@ -426,7 +426,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         .ignore();
     });
 
-    const sepUpdated = await this.get(args.sepId);
+    const sepUpdated = await this.getSEP(args.sepId);
 
     if (sepUpdated) {
       return sepUpdated;
@@ -443,7 +443,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       }))
     );
 
-    const sepUpdated = await this.get(args.sepId);
+    const sepUpdated = await this.getSEP(args.sepId);
 
     if (sepUpdated) {
       return sepUpdated;
@@ -486,7 +486,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       }
     }
 
-    const sepUpdated = await this.get(args.sepId);
+    const sepUpdated = await this.getSEP(args.sepId);
 
     if (sepUpdated) {
       return sepUpdated;
@@ -531,7 +531,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         .del();
     });
 
-    const sepUpdated = await this.get(sepId);
+    const sepUpdated = await this.getSEP(sepId);
 
     if (!sepUpdated) {
       throw new Error(`SEP not found ${sepId}`);
@@ -568,7 +568,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         .returning<ReviewRecord[]>(['*']);
     });
 
-    const updatedSep = await this.get(sepId);
+    const updatedSep = await this.getSEP(sepId);
 
     if (updatedSep) {
       return updatedSep;
@@ -588,7 +588,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .andWhere('proposal_id', proposalId)
       .andWhere('sep_member_user_id', memberId);
 
-    const sepUpdated = await this.get(sepId);
+    const sepUpdated = await this.getSEP(sepId);
 
     if (memberRemovedFromProposal && sepUpdated) {
       return sepUpdated;
