@@ -134,6 +134,9 @@ export default function ShipmentContainer(props: {
           <QuestionaryStepView
             readonly={isReadonly}
             topicId={metadata.payload.topicId}
+            onStepComplete={() => {
+              props.done?.(state.shipment);
+            }}
           />
         );
       case 'ShipmentReview':

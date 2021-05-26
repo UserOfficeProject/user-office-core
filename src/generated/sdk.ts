@@ -2559,6 +2559,7 @@ export type Shipment = {
   created: Scalars['DateTime'];
   questionary: Questionary;
   samples: Array<Sample>;
+  proposal: Proposal;
 };
 
 export type ShipmentBasisConfig = {
@@ -5396,6 +5397,10 @@ export type DeleteShipmentMutation = (
 export type ShipmentFragment = (
   { __typename?: 'Shipment' }
   & Pick<Shipment, 'id' | 'title' | 'proposalId' | 'status' | 'externalRef' | 'questionaryId' | 'creatorId' | 'created'>
+  & { proposal: (
+    { __typename?: 'Proposal' }
+    & Pick<Proposal, 'shortCode'>
+  ) }
 );
 
 export type GetShipmentQueryVariables = Exact<{
@@ -6920,6 +6925,9 @@ export const ShipmentFragmentDoc = gql`
   questionaryId
   creatorId
   created
+  proposal {
+    shortCode
+  }
 }
     `;
 export const QuestionTemplateRelationFragmentDoc = gql`

@@ -2,6 +2,7 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import React from 'react';
 import {
   Draggable,
@@ -16,12 +17,16 @@ const ProposalStatusPicker: React.FC<{
   proposalStatuses: ProposalStatus[];
 }> = ({ proposalStatuses }) => {
   const theme = useTheme();
+  const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
   const classes = makeStyles((theme) => ({
     container: {
       alignItems: 'flex-start',
       alignContent: 'flex-start',
       flexBasis: '100%',
       height: '100%',
+      maxHeight: isExtraLargeScreen ? '1400px' : '850px',
+      overflowY: 'auto',
+      overflowX: 'hidden',
       backgroundColor: theme.palette.grey[200],
       marginLeft: '5px',
       boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
@@ -96,7 +101,7 @@ const ProposalStatusPicker: React.FC<{
   return (
     <Grid
       container
-      className={classes.container}
+      className={`${classes.container} tinyScroll`}
       data-cy="proposal-status-picker"
     >
       <Grid item xs={12} className={classes.title}>
@@ -110,7 +115,7 @@ const ProposalStatusPicker: React.FC<{
               xs={12}
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
-              className={classes.itemContainer}
+              className={`${classes.itemContainer} tinyScroll`}
             >
               {getItems()}
               {provided.placeholder}

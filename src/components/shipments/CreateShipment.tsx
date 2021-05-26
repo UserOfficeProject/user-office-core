@@ -36,6 +36,9 @@ function createShipmentStub(
       created: new Date(),
       steps: questionarySteps,
     },
+    proposal: {
+      shortCode: '123456',
+    },
     samples: [],
   };
 }
@@ -47,6 +50,10 @@ function CreateShipment({ close }: CreateShipmentProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [blankShipment, setBlankShipment] = useState<ShipmentExtended>();
+  const [
+    noActiveShipmentTemplates,
+    setNoActiveShipmentTemplates,
+  ] = useState<boolean>(false);
 
   useEffect(() => {
     api()
@@ -66,10 +73,17 @@ function CreateShipment({ close }: CreateShipmentProps) {
                 );
                 setBlankShipment(blankShipment);
               }
+              setNoActiveShipmentTemplates(false);
             });
+        } else {
+          setNoActiveShipmentTemplates(true);
         }
       });
   }, [setBlankShipment, api, user]);
+
+  if (noActiveShipmentTemplates) {
+    return <div>No active templates found</div>;
+  }
 
   if (!blankShipment) {
     return <UOLoader />;
