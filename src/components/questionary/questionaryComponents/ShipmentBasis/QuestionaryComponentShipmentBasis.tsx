@@ -18,7 +18,8 @@ import {
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import { ShipmentContextType } from 'components/shipments/ShipmentContainer';
-import { Sample } from 'generated/sdk';
+import { UserContext } from 'context/UserContextProvider';
+import { Sample, UserRole } from 'generated/sdk';
 import { useUserProposals } from 'hooks/proposal/useUserProposals';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { useProposalSamples } from 'hooks/sample/useProposalSamples';
@@ -67,7 +68,10 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
     state?.shipment.samples.map((sample) => sample.id) || []
   );
 
-  const { proposals, loadingProposals } = useUserProposals();
+  const { currentRole } = useContext(UserContext);
+  const { proposals, loadingProposals } = useUserProposals(
+    currentRole as UserRole
+  );
   const { samples, loadingSamples } = useProposalSamples(proposalId);
 
   if (!state || !dispatch) {
