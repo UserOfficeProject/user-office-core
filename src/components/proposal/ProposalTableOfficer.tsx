@@ -425,12 +425,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           })
         );
       }
-      // enqueueSnackbar(
-      //   'One or more of your selected proposals already have instrument assigned',
-      //   {
-      //     variant: 'error',
-      //   }
-      // );
     }
   };
 
@@ -465,7 +459,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const result = await api(
         `Proposal${shouldAddPluralLetter} status changed successfully!`
       ).changeProposalsStatus({
-        proposals: selectedProposals,
+        proposals: selectedProposals.map((selectedProposal) => ({
+          id: selectedProposal.id,
+          callId: selectedProposal.callId,
+        })),
         statusId: status.id,
       });
 
