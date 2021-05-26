@@ -174,7 +174,7 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Call | null> {
-    return await context.queries.call.dataSource.get(proposal.callId);
+    return await context.queries.call.dataSource.getCall(proposal.callId);
   }
 
   @FieldResolver(() => Questionary, { nullable: true })

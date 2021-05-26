@@ -8,7 +8,7 @@ import {
 import { CallsFilter } from './../resolvers/queries/CallsQuery';
 
 export interface CallDataSource {
-  get(id: number): Promise<Call | null>;
+  getCall(id: number): Promise<Call | null>;
   getCalls(filter?: CallsFilter): Promise<Call[]>;
   create(args: CreateCallInput): Promise<Call>;
   update(args: UpdateCallInput): Promise<Call>;
