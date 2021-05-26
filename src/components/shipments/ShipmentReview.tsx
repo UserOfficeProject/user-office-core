@@ -62,6 +62,7 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
         </Link>
       ),
     },
+    { label: 'Proposal ID', value: state.shipment.proposal.shortCode },
     {
       label: 'Samples',
       value: (
