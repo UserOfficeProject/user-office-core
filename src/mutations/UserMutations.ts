@@ -106,7 +106,7 @@ export default class UserMutations {
 
     if (
       args.userRole === UserRole.SEP_REVIEWER &&
-      (await this.userAuth.isUserOfficer(agent))
+      this.userAuth.isUserOfficer(agent)
     ) {
       userId = await this.dataSource.createInviteUser(args);
       await this.dataSource.setUserRoles(userId, [UserRole.SEP_REVIEWER]);
@@ -117,20 +117,20 @@ export default class UserMutations {
       role = UserRole.USER;
     } else if (
       args.userRole === UserRole.SEP_CHAIR &&
-      (await this.userAuth.isUserOfficer(agent))
+      this.userAuth.isUserOfficer(agent)
     ) {
       // NOTE: For inviting SEP_CHAIR and SEP_SECRETARY we do not setUserRoles because they are set right after in separate call.
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.SEP_CHAIR;
     } else if (
       args.userRole === UserRole.SEP_SECRETARY &&
-      (await this.userAuth.isUserOfficer(agent))
+      this.userAuth.isUserOfficer(agent)
     ) {
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.SEP_SECRETARY;
     } else if (
       args.userRole === UserRole.INSTRUMENT_SCIENTIST &&
-      (await this.userAuth.isUserOfficer(agent))
+      this.userAuth.isUserOfficer(agent)
     ) {
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.INSTRUMENT_SCIENTIST;
@@ -265,8 +265,8 @@ export default class UserMutations {
     args: UpdateUserArgs
   ): Promise<User | Rejection> {
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isUser(agent, args.id))
+      !this.userAuth.isUserOfficer(agent) &&
+      !this.userAuth.isUser(agent, args.id)
     ) {
       return rejection(
         'Can not update user because of insufficient permissions',
@@ -532,8 +532,8 @@ export default class UserMutations {
     { id, password }: { id: number; password: string }
   ): Promise<BasicUserDetails | Rejection> {
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isUser(agent, id))
+      !this.userAuth.isUserOfficer(agent) &&
+      !this.userAuth.isUser(agent, id)
     ) {
       return rejection(
         'Can not update password because of insufficient permissions',
