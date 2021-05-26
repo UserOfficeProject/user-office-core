@@ -42,3 +42,4 @@ jobs:
           buildArgs: BUILD_VERSION=${{ github.sha }}, WINDOWS_VERSION=ltsc2019
           dockerfile: ./Dockerfile.win
           image: dmsc/duo-frontend-win
+          tags: ${{ steps.extract_branch.outputs.branch }}
