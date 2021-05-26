@@ -27,11 +27,11 @@ export default class ShipmentQueries {
       return null;
     }
 
-    return this.dataSource.get(shipmentId);
+    return this.dataSource.getShipment(shipmentId);
   }
 
   async getShipments(agent: UserWithRole | null, args: ShipmentsArgs) {
-    let shipments = await this.dataSource.getAll(args);
+    let shipments = await this.dataSource.getShipments(args);
 
     shipments = await Promise.all(
       shipments.map((shipment) =>

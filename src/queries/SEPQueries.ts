@@ -16,7 +16,7 @@ export default class SEPQueries {
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async get(agent: UserWithRole | null, id: number) {
-    const sep = await this.dataSource.get(id);
+    const sep = await this.dataSource.getSEP(id);
 
     if (!sep) {
       return null;
@@ -40,7 +40,7 @@ export default class SEPQueries {
     first?: number,
     offset?: number
   ) {
-    return this.dataSource.getAll(active, filter, first, offset);
+    return this.dataSource.getSEPs(active, filter, first, offset);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])

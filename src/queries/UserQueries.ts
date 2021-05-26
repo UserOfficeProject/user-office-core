@@ -26,17 +26,17 @@ export default class UserQueries {
   ) {}
 
   async getAgent(id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getUser(id);
   }
 
   @Authorized([Roles.USER_OFFICER])
   async get(agent: UserWithRole | null, id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getUser(id);
   }
 
   @Authorized()
   async byRef(agent: UserWithRole | null, id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getUser(id);
   }
 
   @Authorized()
@@ -180,7 +180,7 @@ export default class UserQueries {
   }
 
   async getUser(id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getUser(id);
   }
 
   async getProposers(agent: UserWithRole | null, proposalId: number) {

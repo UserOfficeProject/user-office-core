@@ -30,7 +30,7 @@ export interface SEPDataSource {
     active: boolean
   ): Promise<SEP>;
   delete(id: number): Promise<SEP>;
-  get(id: number): Promise<SEP | null>;
+  getSEP(id: number): Promise<SEP | null>;
   getUserSepsByRoleAndSepId(
     userId: number,
     role: Role,
@@ -38,7 +38,7 @@ export interface SEPDataSource {
   ): Promise<SEP[]>;
   getUserSeps(id: number, role: Role): Promise<SEP[]>;
   getSEPByProposalId(proposalId: number): Promise<SEP | null>;
-  getAll(
+  getSEPs(
     active?: boolean,
     filter?: string,
     first?: number,

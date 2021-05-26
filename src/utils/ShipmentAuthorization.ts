@@ -36,7 +36,7 @@ export class ShipmentAuthorization {
     agent: UserWithRole | null,
     shipmentId: number | number[]
   ) {
-    if (await this.userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
@@ -57,7 +57,7 @@ export class ShipmentAuthorization {
     agent: UserWithRole | null,
     shipmentId: number
   ) {
-    const shipment = await this.shipmentDataSource.get(shipmentId);
+    const shipment = await this.shipmentDataSource.getShipment(shipmentId);
     if (!shipment) {
       logger.logError('Could not find shipment', {
         shipmentId,

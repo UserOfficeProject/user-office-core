@@ -37,7 +37,7 @@ export class ReviewDataSourceMock implements ReviewDataSource {
   async removeUserForReview(id: number): Promise<Review> {
     return new Review(1, 1, 1, ' ', 1, 1, 1);
   }
-  async get(id: number): Promise<Review | null> {
+  async getReview(id: number): Promise<Review | null> {
     if (id == 1) {
       return dummyReviewBad;
     }

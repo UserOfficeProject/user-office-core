@@ -99,7 +99,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       });
   }
 
-  async get(id: number): Promise<Review | null> {
+  async getReview(id: number): Promise<Review | null> {
     return database
       .select()
       .from('SEP_Reviews')

@@ -144,7 +144,7 @@ export default class InstrumentMutations {
       );
     }
 
-    const instrument = await this.dataSource.get(args.instrumentId);
+    const instrument = await this.dataSource.getInstrument(args.instrumentId);
 
     if (!instrument) {
       return rejection(

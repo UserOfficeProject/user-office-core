@@ -28,7 +28,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         return createCallObject(call[0]);
       });
   }
-  async get(id: number): Promise<Call | null> {
+  async getCall(id: number): Promise<Call | null> {
     return database
       .select()
       .from('call')
@@ -211,7 +211,7 @@ export default class PostgresCallDataSource implements CallDataSource {
 
     await database.insert(valuesToInsert).into('call_has_instruments');
 
-    const callUpdated = await this.get(args.callId);
+    const callUpdated = await this.getCall(args.callId);
 
     if (callUpdated) {
       return callUpdated;
@@ -228,7 +228,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       .where('instrument_id', args.instrumentId)
       .andWhere('call_id', args.callId);
 
-    const callUpdated = await this.get(args.callId);
+    const callUpdated = await this.getCall(args.callId);
 
     if (callUpdated) {
       return callUpdated;

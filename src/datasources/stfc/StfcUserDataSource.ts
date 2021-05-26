@@ -229,7 +229,7 @@ export class StfcUserDataSource implements UserDataSource {
     return stfcUser ? toEssUser(stfcUser) : null;
   }
 
-  async get(id: number) {
+  async getUser(id: number) {
     const stfcUser = (
       await client.getBasicPersonDetailsFromUserNumber(token, id)
     )?.return;

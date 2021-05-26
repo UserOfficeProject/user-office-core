@@ -21,7 +21,7 @@ export default class ReviewQueries {
     agent: UserWithRole | null,
     { reviewId, sepId }: { reviewId: number; sepId?: number | null }
   ): Promise<Review | null> {
-    const review = await this.dataSource.get(reviewId);
+    const review = await this.dataSource.getReview(reviewId);
     if (!review) {
       return null;
     }

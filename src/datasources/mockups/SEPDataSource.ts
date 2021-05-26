@@ -237,7 +237,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     );
   }
 
-  async get(id: number) {
+  async getSEP(id: number) {
     if (id && id > 0) {
       if (id == dummySEP.id) {
         return dummySEP;
@@ -251,7 +251,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     return [dummySEP];
   }
 
-  async getAll(
+  async getSEPs(
     active: boolean,
     filter?: string,
     first?: number,

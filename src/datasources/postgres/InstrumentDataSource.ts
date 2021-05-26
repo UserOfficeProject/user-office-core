@@ -68,7 +68,7 @@ export default class PostgresInstrumentDataSource
     return this.createInstrumentObject(instrumentRecord);
   }
 
-  async get(instrumentId: number): Promise<Instrument | null> {
+  async getInstrument(instrumentId: number): Promise<Instrument | null> {
     return database
       .select()
       .from('instruments')
@@ -79,7 +79,7 @@ export default class PostgresInstrumentDataSource
       );
   }
 
-  async getAll(
+  async getInstruments(
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
