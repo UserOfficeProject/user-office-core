@@ -36,7 +36,7 @@ export class ShipmentAuthorization {
     agent: UserWithRole | null,
     shipmentId: number | number[]
   ) {
-    if (await this.userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 

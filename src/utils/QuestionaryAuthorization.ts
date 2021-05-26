@@ -90,7 +90,7 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
       return false;
     }
 
-    if (await this.userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
@@ -146,7 +146,7 @@ class ShipmentDeclarationQuestionaryAuthorizer
       return false;
     }
 
-    if (await this.userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 

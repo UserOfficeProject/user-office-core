@@ -26,7 +26,7 @@ export class SampleAuthorization {
   }
 
   private async hasAccessRights(agent: UserWithRole | null, sampleId: number) {
-    if (await this.userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 

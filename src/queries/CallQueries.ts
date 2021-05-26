@@ -41,10 +41,7 @@ export default class CallQueries {
     agent: UserWithRole | null,
     scientistId: number
   ) {
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      agent?.id !== scientistId
-    ) {
+    if (!this.userAuth.isUserOfficer(agent) && agent?.id !== scientistId) {
       return null;
     }
 
