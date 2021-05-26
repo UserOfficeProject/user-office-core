@@ -5,10 +5,25 @@ import { container } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
+import { ProposalEndStatus } from '../models/Proposal';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
+
+type ProposalAcceptedMessage = {
+  proposalId: number;
+  shortCode: string;
+  title: string;
+  members: { firstName: string; lastName: string; email: string }[];
+  proposer?: { firstName: string; lastName: string; email: string };
+  technicalReviewAssignee?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+};
 
 export function createPostToQueueHandler() {
   // return the mapped implementation
@@ -23,6 +38,9 @@ export function createPostToRabbitMQHandler() {
   );
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
+  );
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
   );
 
   const rabbitMQ = new RabbitMQMessageBroker();
@@ -90,6 +108,64 @@ export function createPostToRabbitMQHandler() {
           'Proposal event successfully sent to the message broker',
           { eventType: event.type, json }
         );
+
+        break;
+
+      case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED:
+        switch (event.proposal.finalStatus) {
+          case ProposalEndStatus.ACCEPTED:
+            const proposal = event.proposal;
+
+            const proposalUsers = await userDataSource.getProposalUsersFull(
+              proposal.id
+            );
+
+            const message: ProposalAcceptedMessage = {
+              proposalId: proposal.id,
+              shortCode: proposal.shortCode,
+              title: proposal.title,
+              members: proposalUsers.map((proposalUser) => ({
+                firstName: proposalUser.firstname,
+                lastName: proposalUser.lastname,
+                email: proposalUser.email,
+              })),
+            };
+
+            const proposer = await userDataSource.getUser(proposal.proposerId);
+
+            if (proposer) {
+              message.proposer = {
+                firstName: proposer.firstname,
+                lastName: proposer.lastname,
+                email: proposer.email,
+              };
+            }
+
+            if (proposal.technicalReviewAssignee) {
+              const technicalReviewAssignee = await userDataSource.getUser(
+                proposal.technicalReviewAssignee
+              );
+
+              if (technicalReviewAssignee) {
+                message.technicalReviewAssignee = {
+                  firstName: technicalReviewAssignee.firstname,
+                  lastName: technicalReviewAssignee.lastname,
+                  email: technicalReviewAssignee.email,
+                };
+              }
+            }
+
+            const json = JSON.stringify(message);
+
+            await rabbitMQ.sendMessage(
+              Queue.PROPOSAL,
+              Event.PROPOSAL_ACCEPTED,
+              json
+            );
+            break;
+          default:
+            break;
+        }
 
         break;
     }
