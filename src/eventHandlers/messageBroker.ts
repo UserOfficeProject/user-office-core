@@ -18,11 +18,6 @@ type ProposalAcceptedMessage = {
   title: string;
   members: { firstName: string; lastName: string; email: string }[];
   proposer?: { firstName: string; lastName: string; email: string };
-  technicalReviewAssignee?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
 };
 
 export function createPostToQueueHandler() {
@@ -139,20 +134,6 @@ export function createPostToRabbitMQHandler() {
                 lastName: proposer.lastname,
                 email: proposer.email,
               };
-            }
-
-            if (proposal.technicalReviewAssignee) {
-              const technicalReviewAssignee = await userDataSource.getUser(
-                proposal.technicalReviewAssignee
-              );
-
-              if (technicalReviewAssignee) {
-                message.technicalReviewAssignee = {
-                  firstName: technicalReviewAssignee.firstname,
-                  lastName: technicalReviewAssignee.lastname,
-                  email: technicalReviewAssignee.email,
-                };
-              }
             }
 
             const json = JSON.stringify(message);
