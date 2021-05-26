@@ -4,7 +4,7 @@ name: Build && Push Win
 # events but only for the develop branch
 on:
   push:
-    branches: [develop, master]
+    branches: [120-win-images-built-in-gh-actions, develop, master]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -42,3 +42,4 @@ jobs:
           buildArgs: BUILD_VERSION=${{ github.sha }}, WINDOWS_VERSION=ltsc2019
           dockerfile: ./Dockerfile.win
           image: dmsc/duo-backend-win
+          tags: ${{ steps.extract_branch.outputs.branch }}
