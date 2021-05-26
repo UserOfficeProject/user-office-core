@@ -14,7 +14,7 @@ function readWriteReview() {
 
   cy.get('@dialog').contains('Proposal information', { matchCase: false });
   cy.get('@dialog').contains('Technical review');
-  cy.get('@dialog').contains('Grade').click({ force: true });
+  cy.get('@dialog').contains('Grade').click();
 
   cy.setTinyMceContent('comment', faker.lorem.words(3));
 
@@ -1252,7 +1252,7 @@ context(
 
       cy.closeNotification();
 
-      cy.contains('Logs').click({ force: true });
+      cy.contains('Logs').click();
 
       cy.finishedLoading();
 
