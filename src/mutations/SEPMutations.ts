@@ -281,7 +281,7 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     { sepId }: { sepId: number }
   ): Promise<SEP | Rejection> {
-    const sep = await this.dataSource.get(sepId);
+    const sep = await this.dataSource.getSEP(sepId);
 
     if (!sep) {
       return rejection('Can not delete SEP because sep was not found', {

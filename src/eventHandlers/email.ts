@@ -55,7 +55,9 @@ export default function createHandler() {
       }
 
       case Event.EMAIL_INVITE: {
-        const user = await userDataSource.get(event.emailinviteresponse.userId);
+        const user = await userDataSource.getUser(
+          event.emailinviteresponse.userId
+        );
         const inviter = await userDataSource.getBasicUserInfo(
           event.emailinviteresponse.inviterId
         );
@@ -95,7 +97,7 @@ export default function createHandler() {
       }
 
       case Event.PROPOSAL_SUBMITTED: {
-        const principalInvestigator = await userDataSource.get(
+        const principalInvestigator = await userDataSource.getUser(
           event.proposal.proposerId
         );
         const participants = await userDataSource.getProposalUsersFull(
@@ -186,7 +188,7 @@ export default function createHandler() {
         return;
       }
       case Event.PROPOSAL_NOTIFIED: {
-        const principalInvestigator = await userDataSource.get(
+        const principalInvestigator = await userDataSource.getUser(
           event.proposal.proposerId
         );
         if (!principalInvestigator) {

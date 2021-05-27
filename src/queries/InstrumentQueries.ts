@@ -27,7 +27,7 @@ export default class InstrumentQueries {
 
   @Authorized()
   async get(agent: UserWithRole | null, instrumentId: number) {
-    const instrument = await this.dataSource.get(instrumentId);
+    const instrument = await this.dataSource.getInstrument(instrumentId);
 
     return instrument;
   }
@@ -40,7 +40,7 @@ export default class InstrumentQueries {
   ])
   async getAll(agent: UserWithRole | null, callIds: number[]) {
     if (!callIds || callIds.length === 0) {
-      return await this.dataSource.getAll();
+      return await this.dataSource.getInstruments();
     } else {
       const instrumentsByCallIds = await this.dataSource.getInstrumentsByCallId(
         callIds
@@ -58,7 +58,7 @@ export default class InstrumentQueries {
     agent: UserWithRole | null
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
     if (this.isUserOfficer(agent)) {
-      return this.dataSource.getAll();
+      return this.dataSource.getInstruments();
     }
 
     const instruments = await this.dataSource.getUserInstruments(agent!.id);
@@ -112,6 +112,6 @@ export default class InstrumentQueries {
 
   @Authorized()
   async byRef(agent: UserWithRole | null, id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getInstrument(id);
   }
 }

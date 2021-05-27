@@ -9,7 +9,7 @@ import database from './database';
 import { createShipmentObject, ShipmentRecord } from './records';
 
 export default class PostgresShipmentDataSource implements ShipmentDataSource {
-  create(
+  async create(
     title: string,
     creator_id: number,
     proposal_id: number,
@@ -32,7 +32,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       });
   }
 
-  async get(shipmentId: number): Promise<Shipment | null> {
+  async getShipment(shipmentId: number): Promise<Shipment | null> {
     return database('shipments')
       .select('*')
       .where('shipment_id', shipmentId)
@@ -47,7 +47,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       });
   }
 
-  async getAll(args: ShipmentsArgs): Promise<Shipment[]> {
+  async getShipments(args: ShipmentsArgs): Promise<Shipment[]> {
     const filter = args.filter;
 
     return database('shipments')
@@ -80,7 +80,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       );
   }
 
-  getShipmentsByCallId(callId: number): Promise<Shipment[]> {
+  async getShipmentsByCallId(callId: number): Promise<Shipment[]> {
     return database('proposals')
       .leftJoin('shipments', 'proposals.proposal_id', 'shipments.proposal_id')
       .where({
@@ -91,7 +91,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       });
   }
 
-  update(args: UpdateShipmentArgs): Promise<Shipment> {
+  async update(args: UpdateShipmentArgs): Promise<Shipment> {
     return database('shipments')
       .update(
         {
@@ -113,7 +113,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
       });
   }
 
-  delete(shipmentId: number): Promise<Shipment> {
+  async delete(shipmentId: number): Promise<Shipment> {
     return database('shipments')
       .where({ shipment_id: shipmentId })
       .delete('*')
@@ -131,7 +131,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
     shipmentId,
     sampleIds,
   }: AddSamplesToShipmentArgs): Promise<Shipment> {
-    const shipment = await this.get(shipmentId);
+    const shipment = await this.getShipment(shipmentId);
 
     if (!shipment) {
       logger.logError('Shipment does not exist', { shipmentId, sampleIds });

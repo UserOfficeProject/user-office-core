@@ -9,8 +9,8 @@ import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMut
 
 export interface InstrumentDataSource {
   create(args: CreateInstrumentArgs): Promise<Instrument>;
-  get(instrumentId: number): Promise<Instrument | null>;
-  getAll(
+  getInstrument(instrumentId: number): Promise<Instrument | null>;
+  getInstruments(
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }>;
