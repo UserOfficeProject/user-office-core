@@ -23,7 +23,7 @@ import ProposalReviewContent, {
   TabNames,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
+import AssignProposalsToSEP from 'components/SEP/Proposals/AssignProposalsToSEP';
 import {
   Call,
   Instrument,
@@ -59,8 +59,9 @@ type ProposalTableOfficerProps = {
   confirm: WithConfirmType;
 };
 
-type ProposalWithCallAndInstrumentId = ProposalIdWithCallId & {
+type ProposalWithCallInstrumentAndSepId = ProposalIdWithCallId & {
   instrumentId: number | null;
+  sepId: number | null;
 };
 
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
@@ -77,7 +78,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     false
   );
   const [selectedProposals, setSelectedProposals] = useState<
-    ProposalWithCallAndInstrumentId[]
+    ProposalWithCallInstrumentAndSepId[]
   >([]);
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
     ProposalViewData[]
@@ -107,13 +108,14 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const selection = new Set(urlQueryParams.selection);
 
       setPreselectedProposalsData((preselectedProposalsData) => {
-        const selected: ProposalWithCallAndInstrumentId[] = [];
+        const selected: ProposalWithCallInstrumentAndSepId[] = [];
         const preselected = preselectedProposalsData.map((proposal) => {
           if (selection.has(proposal.id.toString())) {
             selected.push({
               id: proposal.id,
               callId: proposal.callId,
               instrumentId: proposal.instrumentId,
+              sepId: proposal.sepId,
             });
           }
 
@@ -313,57 +315,69 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     });
   };
 
-  const assignProposalToSEP = async (sep: Sep): Promise<void> => {
-    const responses = await Promise.all(
-      selectedProposals.map(async (selectedProposal) => {
-        const result = await api().assignProposalToSEP({
-          proposalId: selectedProposal.id,
-          sepId: sep.id,
-        });
+  const assignProposalsToSEP = async (sep: Sep | null): Promise<void> => {
+    if (sep) {
+      const response = await api(
+        'Proposal/s assigned to the selected SEP successfully!'
+      ).assignProposalsToSep({
+        proposals: selectedProposals.map((selectedProposal) => ({
+          id: selectedProposal.id,
+          callId: selectedProposal.callId,
+        })),
+        sepId: sep.id,
+      });
 
-        return {
-          result: result.assignProposalToSEP,
-          proposalId: selectedProposal.id,
-        };
-      })
-    );
+      const isError = !!response.assignProposalsToSep.rejection;
 
-    const errors = responses.map((item) => item.result.rejection);
-    const isError = !!errors.join('');
+      if (!isError) {
+        setProposalsData((proposalsData) =>
+          proposalsData.map((prop) => {
+            if (
+              selectedProposals.find(
+                (selectedProposal) => selectedProposal.id === prop.id
+              )
+            ) {
+              prop.sepCode = sep.code;
+              prop.sepId = sep.id;
 
-    enqueueSnackbar(
-      isError
-        ? 'Proposal/s can not be assigned to SEP'
-        : 'Proposal/s assigned to SEP',
-      {
-        variant: isError ? 'error' : 'success',
-        className: isError ? 'snackbar-error' : 'snackbar-success',
-      }
-    );
-
-    if (!isError) {
-      setProposalsData((proposalsData) =>
-        proposalsData.map((prop) => {
-          if (
-            selectedProposals.find(
-              (selectedProposal) => selectedProposal.id === prop.id
-            )
-          ) {
-            prop.sepCode = sep.code;
-
-            const proposalNextStatusResponse = responses.find(
-              (item) => item.proposalId === prop.id
-            );
-
-            if (proposalNextStatusResponse?.result.nextProposalStatus?.name) {
-              prop.statusName =
-                proposalNextStatusResponse.result.nextProposalStatus.name;
+              if (response.assignProposalsToSep.nextProposalStatus?.name) {
+                prop.statusName =
+                  response.assignProposalsToSep.nextProposalStatus.name;
+              }
             }
-          }
 
-          return prop;
-        })
-      );
+            return prop;
+          })
+        );
+      }
+    } else {
+      const result = await api(
+        'Proposal/s removed from the SEP successfully!'
+      ).removeProposalsFromSep({
+        proposalIds: selectedProposals.map(
+          (selectedProposal) => selectedProposal.id
+        ),
+        sepId: selectedProposals[0].sepId as number,
+      });
+
+      const isError = !!result.removeProposalsFromSep.rejection;
+
+      if (!isError) {
+        setProposalsData((proposalsData) =>
+          proposalsData.map((prop) => {
+            if (
+              selectedProposals.find(
+                (selectedProposal) => selectedProposal.id === prop.id
+              )
+            ) {
+              prop.sepCode = null;
+              prop.sepId = null;
+            }
+
+            return prop;
+          })
+        );
+      }
     }
   };
 
@@ -521,9 +535,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         onClose={(): void => setOpenAssignment(false)}
       >
         <DialogContent>
-          <AssignProposalToSEP
-            assignProposalToSEP={assignProposalToSEP}
+          <AssignProposalsToSEP
+            assignProposalsToSEP={assignProposalsToSEP}
             close={(): void => setOpenAssignment(false)}
+            sepIds={selectedProposals.map(
+              (selectedProposal) => selectedProposal.sepId
+            )}
           />
         </DialogContent>
       </Dialog>

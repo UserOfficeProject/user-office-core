@@ -131,8 +131,8 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   const removeProposalFromSEP = async (
     proposalToRemove: SEPProposalType
   ): Promise<void> => {
-    await api('Assignment removed').removeProposalAssignment({
-      proposalId: proposalToRemove.proposalId,
+    await api('Assignment removed').removeProposalsFromSep({
+      proposalIds: [proposalToRemove.proposalId],
       sepId,
     });
 

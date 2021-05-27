@@ -3,19 +3,15 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
+import Alert from '@material-ui/lab/Alert';
 import { Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
-import * as yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import { UserContext } from 'context/UserContextProvider';
 import { UserRole, Sep } from 'generated/sdk';
 import { useSEPsData } from 'hooks/SEP/useSEPsData';
-
-const assignProposalToSEPValidationSchema = yup.object().shape({
-  selectedSEPId: yup.string().required('You must select active SEP'),
-});
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
@@ -25,45 +21,48 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  form: {
+    width: '240px',
+  },
 }));
 
 type AssignProposalToSEPProps = {
   close: () => void;
-  assignProposalToSEP: (sep: Sep) => Promise<void>;
+  assignProposalsToSEP: (sep: Sep | null) => Promise<void>;
+  sepIds: (number | null)[];
 };
 
-const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
+const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
   close,
-  assignProposalToSEP,
+  assignProposalsToSEP,
+  sepIds,
 }) => {
   const classes = useStyles();
   const { currentRole } = useContext(UserContext);
   const { SEPs, loadingSEPs } = useSEPsData('', true, currentRole as UserRole);
+  const [firstSepId] = sepIds;
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container
+      component="main"
+      maxWidth="xs"
+      data-cy="proposals-sep-assignment"
+    >
       <Formik
         initialValues={{
-          selectedSEPId: '',
+          selectedSEPId: firstSepId || 0,
         }}
-        onSubmit={async (values, actions): Promise<void> => {
+        onSubmit={async (values): Promise<void> => {
           const selectedSEP = SEPs.find(
             (sep) => sep.id === +values.selectedSEPId
           );
 
-          if (!selectedSEP) {
-            actions.setFieldError('selectedSEPId', 'Required');
-
-            return;
-          }
-
-          await assignProposalToSEP(selectedSEP);
+          await assignProposalsToSEP(selectedSEP || null);
           close();
         }}
-        validationSchema={assignProposalToSEPValidationSchema}
       >
-        {({ isSubmitting }): JSX.Element => (
-          <Form>
+        {({ isSubmitting, values }): JSX.Element => (
+          <Form className={classes.form}>
             <Typography className={classes.cardHeader}>
               Assign proposal/s to SEP
             </Typography>
@@ -79,20 +78,27 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
                     text: sep.code,
                   }))}
                   disabled={isSubmitting}
-                  required
+                  isClearable
+                  noOptionsText="No SEPs"
                 />
               </Grid>
             </Grid>
+            {!values.selectedSEPId && (
+              <Alert severity="warning" data-cy="remove-sep-alert">
+                Be aware that leaving SEP selection empty will remove assigned
+                SEP from proposal/s.
+              </Alert>
+            )}
             <Button
               type="submit"
               fullWidth
               variant="contained"
               color="primary"
               className={classes.submit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || loadingSEPs}
               data-cy="submit"
             >
-              Assign to SEP
+              Save
             </Button>
           </Form>
         )}
@@ -101,9 +107,10 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
   );
 };
 
-AssignProposalToSEP.propTypes = {
+AssignProposalsToSEP.propTypes = {
   close: PropTypes.func.isRequired,
-  assignProposalToSEP: PropTypes.func.isRequired,
+  assignProposalsToSEP: PropTypes.func.isRequired,
+  sepIds: PropTypes.array.isRequired,
 };
 
-export default AssignProposalToSEP;
+export default AssignProposalsToSEP;
