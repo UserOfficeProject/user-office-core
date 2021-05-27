@@ -41,6 +41,7 @@ export type AddTechnicalReviewInput = {
   timeAllocation?: Maybe<Scalars['Int']>;
   status?: Maybe<TechnicalReviewStatus>;
   submitted?: Maybe<Scalars['Boolean']>;
+  reviewerId?: Maybe<Scalars['Int']>;
 };
 
 export type AddUserRoleResponseWrap = {
@@ -538,6 +539,7 @@ export type Instrument = {
   name: Scalars['String'];
   shortCode: Scalars['String'];
   description: Scalars['String'];
+  managerUserId: Scalars['Int'];
   scientists: Array<BasicUserDetails>;
 };
 
@@ -553,6 +555,7 @@ export type InstrumentWithAvailabilityTime = {
   name: Scalars['String'];
   shortCode: Scalars['String'];
   description: Scalars['String'];
+  managerUserId: Scalars['Int'];
   scientists: Array<BasicUserDetails>;
   availabilityTime: Maybe<Scalars['Int']>;
   submitted: Maybe<Scalars['Boolean']>;
@@ -633,6 +636,7 @@ export type Mutation = {
   addReview: ReviewWithNextStatusResponseWrap;
   addUserForReview: ReviewResponseWrap;
   submitProposalsReview: SuccessResponseWrap;
+  updateTechnicalReviewAssignee: ProposalsResponseWrap;
   createSample: SampleResponseWrap;
   updateSample: SampleResponseWrap;
   assignChairOrSecretary: SepResponseWrap;
@@ -804,6 +808,7 @@ export type MutationCreateInstrumentArgs = {
   name: Scalars['String'];
   shortCode: Scalars['String'];
   description: Scalars['String'];
+  managerUserId: Scalars['Int'];
 };
 
 
@@ -812,6 +817,7 @@ export type MutationUpdateInstrumentArgs = {
   name: Scalars['String'];
   shortCode: Scalars['String'];
   description: Scalars['String'];
+  managerUserId: Scalars['Int'];
 };
 
 
@@ -931,6 +937,12 @@ export type MutationAddUserForReviewArgs = {
 
 export type MutationSubmitProposalsReviewArgs = {
   submitProposalsReviewInput: SubmitProposalsReviewInput;
+};
+
+
+export type MutationUpdateTechnicalReviewAssigneeArgs = {
+  userId: Scalars['Int'];
+  proposalIds: Array<Scalars['Int']>;
 };
 
 
@@ -1546,6 +1558,7 @@ export type Proposal = {
   submitted: Scalars['Boolean'];
   managementTimeAllocation: Maybe<Scalars['Int']>;
   managementDecisionSubmitted: Scalars['Boolean'];
+  technicalReviewAssignee: Maybe<Scalars['Int']>;
   users: Array<BasicUserDetails>;
   proposer: Maybe<BasicUserDetails>;
   status: Maybe<ProposalStatus>;
@@ -1773,6 +1786,12 @@ export type ProposalsFilter = {
 export type ProposalsQueryResult = {
   __typename?: 'ProposalsQueryResult';
   totalCount: Scalars['Int'];
+  proposals: Array<Proposal>;
+};
+
+export type ProposalsResponseWrap = {
+  __typename?: 'ProposalsResponseWrap';
+  rejection: Maybe<Rejection>;
   proposals: Array<Proposal>;
 };
 
@@ -2540,6 +2559,7 @@ export type Shipment = {
   created: Scalars['DateTime'];
   questionary: Questionary;
   samples: Array<Sample>;
+  proposal: Proposal;
 };
 
 export type ShipmentBasisConfig = {
@@ -2602,6 +2622,7 @@ export type SubmitTechnicalReviewInput = {
   timeAllocation?: Maybe<Scalars['Int']>;
   status?: Maybe<TechnicalReviewStatus>;
   submitted: Scalars['Boolean'];
+  reviewerId: Scalars['Int'];
 };
 
 export type SubtemplateConfig = {
@@ -2630,7 +2651,9 @@ export type TechnicalReview = {
   timeAllocation: Maybe<Scalars['Int']>;
   status: Maybe<TechnicalReviewStatus>;
   submitted: Scalars['Boolean'];
+  reviewerId: Scalars['Int'];
   proposal: Maybe<Proposal>;
+  reviewer: Maybe<BasicUserDetails>;
 };
 
 export type TechnicalReviewResponseWrap = {
@@ -3089,6 +3112,10 @@ export type GetSepProposalQuery = (
         & QuestionaryFragment
       )>, technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
+        & { reviewer: Maybe<(
+          { __typename?: 'BasicUserDetails' }
+          & BasicUserDetailsFragment
+        )> }
         & CoreTechnicalReviewFragment
       )>, reviews: Maybe<Array<(
         { __typename?: 'Review' }
@@ -3872,6 +3899,7 @@ export type CreateInstrumentMutationVariables = Exact<{
   name: Scalars['String'];
   shortCode: Scalars['String'];
   description: Scalars['String'];
+  managerUserId: Scalars['Int'];
 }>;
 
 
@@ -3881,7 +3909,7 @@ export type CreateInstrumentMutation = (
     { __typename?: 'InstrumentResponseWrap' }
     & { instrument: Maybe<(
       { __typename?: 'Instrument' }
-      & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description'>
+      & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description' | 'managerUserId'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -3921,7 +3949,7 @@ export type GetInstrumentsQuery = (
     & Pick<InstrumentsQueryResult, 'totalCount'>
     & { instruments: Array<(
       { __typename?: 'Instrument' }
-      & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description'>
+      & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description' | 'managerUserId'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -4027,6 +4055,7 @@ export type UpdateInstrumentMutationVariables = Exact<{
   name: Scalars['String'];
   shortCode: Scalars['String'];
   description: Scalars['String'];
+  managerUserId: Scalars['Int'];
 }>;
 
 
@@ -4036,7 +4065,7 @@ export type UpdateInstrumentMutation = (
     { __typename?: 'InstrumentResponseWrap' }
     & { instrument: Maybe<(
       { __typename?: 'Instrument' }
-      & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description'>
+      & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description' | 'managerUserId'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -4198,7 +4227,7 @@ export type CoreTechnicalReviewFragment = (
 
 export type ProposalFragment = (
   { __typename?: 'Proposal' }
-  & Pick<Proposal, 'id' | 'title' | 'abstract' | 'statusId' | 'publicStatus' | 'shortCode' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'questionaryId' | 'notified' | 'submitted' | 'managementTimeAllocation' | 'managementDecisionSubmitted'>
+  & Pick<Proposal, 'id' | 'title' | 'abstract' | 'statusId' | 'publicStatus' | 'shortCode' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'questionaryId' | 'notified' | 'submitted' | 'managementTimeAllocation' | 'managementDecisionSubmitted' | 'technicalReviewAssignee'>
   & { status: Maybe<(
     { __typename?: 'ProposalStatus' }
     & ProposalStatusFragment
@@ -4271,6 +4300,10 @@ export type GetProposalQuery = (
       & QuestionaryFragment
     )>, technicalReview: Maybe<(
       { __typename?: 'TechnicalReview' }
+      & { reviewer: Maybe<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )> }
       & CoreTechnicalReviewFragment
     )>, reviews: Maybe<Array<(
       { __typename?: 'Review' }
@@ -4327,6 +4360,10 @@ export type GetProposalsQuery = (
         & BasicUserDetailsFragment
       )>, technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
+        & { reviewer: Maybe<(
+          { __typename?: 'BasicUserDetails' }
+          & BasicUserDetailsFragment
+        )> }
         & CoreTechnicalReviewFragment
       )>, instrument: Maybe<(
         { __typename?: 'Instrument' }
@@ -4612,6 +4649,7 @@ export type AddTechnicalReviewMutationVariables = Exact<{
   publicComment?: Maybe<Scalars['String']>;
   status?: Maybe<TechnicalReviewStatus>;
   submitted: Scalars['Boolean'];
+  reviewerId: Scalars['Int'];
 }>;
 
 
@@ -4646,6 +4684,26 @@ export type AddUserForReviewMutation = (
     )>, review: Maybe<(
       { __typename?: 'Review' }
       & Pick<Review, 'id'>
+    )> }
+  ) }
+);
+
+export type UpdateTechnicalReviewAssigneeMutationVariables = Exact<{
+  proposalIds: Array<Scalars['Int']> | Scalars['Int'];
+  userId: Scalars['Int'];
+}>;
+
+
+export type UpdateTechnicalReviewAssigneeMutation = (
+  { __typename?: 'Mutation' }
+  & { updateTechnicalReviewAssignee: (
+    { __typename?: 'ProposalsResponseWrap' }
+    & { proposals: Array<(
+      { __typename?: 'Proposal' }
+      & ProposalFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
     )> }
   ) }
 );
@@ -4685,6 +4743,9 @@ export type GetReviewQuery = (
         { __typename?: 'BasicUserDetails' }
         & Pick<BasicUserDetails, 'id'>
       )> }
+    )>, reviewer: Maybe<(
+      { __typename?: 'BasicUserDetails' }
+      & BasicUserDetailsFragment
     )> }
     & CoreReviewFragment
   )> }
@@ -4731,6 +4792,7 @@ export type SubmitTechnicalReviewMutationVariables = Exact<{
   publicComment?: Maybe<Scalars['String']>;
   status?: Maybe<TechnicalReviewStatus>;
   submitted: Scalars['Boolean'];
+  reviewerId: Scalars['Int'];
 }>;
 
 
@@ -5335,6 +5397,10 @@ export type DeleteShipmentMutation = (
 export type ShipmentFragment = (
   { __typename?: 'Shipment' }
   & Pick<Shipment, 'id' | 'title' | 'proposalId' | 'status' | 'externalRef' | 'questionaryId' | 'creatorId' | 'created'>
+  & { proposal: (
+    { __typename?: 'Proposal' }
+    & Pick<Proposal, 'shortCode'>
+  ) }
 );
 
 export type GetShipmentQueryVariables = Exact<{
@@ -6657,6 +6723,7 @@ export const ProposalFragmentDoc = gql`
   submitted
   managementTimeAllocation
   managementDecisionSubmitted
+  technicalReviewAssignee
   sepMeetingDecision {
     ...sepMeetingDecision
   }
@@ -6858,6 +6925,9 @@ export const ShipmentFragmentDoc = gql`
   questionaryId
   creatorId
   created
+  proposal {
+    shortCode
+  }
 }
     `;
 export const QuestionTemplateRelationFragmentDoc = gql`
@@ -7116,6 +7186,9 @@ export const GetSepProposalDocument = gql`
       }
       technicalReview {
         ...coreTechnicalReview
+        reviewer {
+          ...basicUserDetails
+        }
       }
       reviews {
         id
@@ -7680,13 +7753,19 @@ export const AssignScientistsToInstrumentDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const CreateInstrumentDocument = gql`
-    mutation createInstrument($name: String!, $shortCode: String!, $description: String!) {
-  createInstrument(name: $name, shortCode: $shortCode, description: $description) {
+    mutation createInstrument($name: String!, $shortCode: String!, $description: String!, $managerUserId: Int!) {
+  createInstrument(
+    name: $name
+    shortCode: $shortCode
+    description: $description
+    managerUserId: $managerUserId
+  ) {
     instrument {
       id
       name
       shortCode
       description
+      managerUserId
       scientists {
         ...basicUserDetails
       }
@@ -7715,6 +7794,7 @@ export const GetInstrumentsDocument = gql`
       name
       shortCode
       description
+      managerUserId
       scientists {
         ...basicUserDetails
       }
@@ -7789,18 +7869,20 @@ export const SubmitInstrumentDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const UpdateInstrumentDocument = gql`
-    mutation updateInstrument($id: Int!, $name: String!, $shortCode: String!, $description: String!) {
+    mutation updateInstrument($id: Int!, $name: String!, $shortCode: String!, $description: String!, $managerUserId: Int!) {
   updateInstrument(
     id: $id
     name: $name
     shortCode: $shortCode
     description: $description
+    managerUserId: $managerUserId
   ) {
     instrument {
       id
       name
       shortCode
       description
+      managerUserId
       scientists {
         ...basicUserDetails
       }
@@ -8003,6 +8085,9 @@ export const GetProposalDocument = gql`
     }
     technicalReview {
       ...coreTechnicalReview
+      reviewer {
+        ...basicUserDetails
+      }
     }
     reviews {
       id
@@ -8070,6 +8155,9 @@ export const GetProposalsDocument = gql`
       }
       technicalReview {
         ...coreTechnicalReview
+        reviewer {
+          ...basicUserDetails
+        }
       }
       instrument {
         id
@@ -8242,9 +8330,9 @@ export const GetQuestionaryDocument = gql`
 }
     ${QuestionaryFragmentDoc}`;
 export const AddTechnicalReviewDocument = gql`
-    mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus, $submitted: Boolean!) {
+    mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus, $submitted: Boolean!, $reviewerId: Int!) {
   addTechnicalReview(
-    addTechnicalReviewInput: {proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, publicComment: $publicComment, status: $status, submitted: $submitted}
+    addTechnicalReviewInput: {proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, publicComment: $publicComment, status: $status, submitted: $submitted, reviewerId: $reviewerId}
   ) {
     rejection {
       ...rejection
@@ -8267,6 +8355,19 @@ export const AddUserForReviewDocument = gql`
   }
 }
     ${RejectionFragmentDoc}`;
+export const UpdateTechnicalReviewAssigneeDocument = gql`
+    mutation updateTechnicalReviewAssignee($proposalIds: [Int!]!, $userId: Int!) {
+  updateTechnicalReviewAssignee(proposalIds: $proposalIds, userId: $userId) {
+    proposals {
+      ...proposal
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${ProposalFragmentDoc}
+${RejectionFragmentDoc}`;
 export const GetProposalReviewsDocument = gql`
     query getProposalReviews($proposalId: Int!) {
   proposalReviews(proposalId: $proposalId) {
@@ -8291,9 +8392,13 @@ export const GetReviewDocument = gql`
         id
       }
     }
+    reviewer {
+      ...basicUserDetails
+    }
   }
 }
-    ${CoreReviewFragmentDoc}`;
+    ${CoreReviewFragmentDoc}
+${BasicUserDetailsFragmentDoc}`;
 export const RemoveUserForReviewDocument = gql`
     mutation removeUserForReview($reviewId: Int!, $sepId: Int!) {
   removeUserForReview(reviewId: $reviewId, sepId: $sepId) {
@@ -8314,9 +8419,9 @@ export const SubmitProposalsReviewDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const SubmitTechnicalReviewDocument = gql`
-    mutation submitTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus, $submitted: Boolean!) {
+    mutation submitTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus, $submitted: Boolean!, $reviewerId: Int!) {
   submitTechnicalReview(
-    submitTechnicalReviewInput: {proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, publicComment: $publicComment, status: $status, submitted: $submitted}
+    submitTechnicalReviewInput: {proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, publicComment: $publicComment, status: $status, submitted: $submitted, reviewerId: $reviewerId}
   ) {
     rejection {
       ...rejection
@@ -9741,6 +9846,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     addUserForReview(variables: AddUserForReviewMutationVariables): Promise<AddUserForReviewMutation> {
       return withWrapper(() => client.request<AddUserForReviewMutation>(print(AddUserForReviewDocument), variables));
+    },
+    updateTechnicalReviewAssignee(variables: UpdateTechnicalReviewAssigneeMutationVariables): Promise<UpdateTechnicalReviewAssigneeMutation> {
+      return withWrapper(() => client.request<UpdateTechnicalReviewAssigneeMutation>(print(UpdateTechnicalReviewAssigneeDocument), variables));
     },
     getProposalReviews(variables: GetProposalReviewsQueryVariables): Promise<GetProposalReviewsQuery> {
       return withWrapper(() => client.request<GetProposalReviewsQuery>(print(GetProposalReviewsDocument), variables));

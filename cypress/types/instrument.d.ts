@@ -13,11 +13,14 @@ declare global {
        *      description: faker.random.words(5),
        *    })
        */
-      createInstrument: (instrument: {
-        name: string;
-        shortCode: string;
-        description: string;
-      }) => void;
+      createInstrument: (
+        instrument: {
+          name: string;
+          shortCode: string;
+          description: string;
+        },
+        scientist: string
+      ) => void;
 
       /**
        * Assigns all available scientist to an instrument
@@ -51,6 +54,16 @@ declare global {
        *    cy.assignInstrumentToCall('call name or code', 'instrument code or short code')
        */
       assignInstrumentToCall: (call: string, instrument: string) => void;
+
+      /**
+       * Assign technical reviewer assignee
+       *
+       * @returns {typeof assignReviewer}
+       * @memberof Chainable
+       * @example
+       *    cy.assignReviewer('New proposal', 'Carl')
+       */
+      assignReviewer: (proposalTitle: string, reviewerName: string) => void;
     }
   }
 }

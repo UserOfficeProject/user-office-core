@@ -5,6 +5,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
 import Switch from '@material-ui/core/Switch';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
@@ -106,6 +107,7 @@ export default function TemplateEditor() {
   const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
 
   const theme = useTheme();
+  const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
   const classes = makeStyles(() => ({
     modalContainer: {
       backgroundColor: 'white',
@@ -123,6 +125,7 @@ export default function TemplateEditor() {
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
     display: 'flex',
     overflow: 'auto',
+    maxHeight: isExtraLargeScreen ? '1400px' : '700px',
   });
 
   const onDragEnd = (result: DropResult): void => {
@@ -268,7 +271,7 @@ export default function TemplateEditor() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 style={getTopicListStyle(snapshot.isDraggingOver)}
-                className="topicsDroppable"
+                className="tinyScroll"
               >
                 {state.steps.map((step, index) => {
                   const questionPicker =

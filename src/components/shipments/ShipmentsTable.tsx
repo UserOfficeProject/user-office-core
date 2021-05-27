@@ -22,7 +22,11 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import CreateUpdateShipment from './CreateUpdateShipment';
 
 const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
-  const { loadingShipments, shipments, setShipments } = useShipments();
+  const {
+    loadingShipments,
+    shipments,
+    setShipmentsWithLoading: setShipments,
+  } = useShipments();
   const downloadShipmentLabel = useDownloadPDFShipmentLabel();
   const [
     urlQueryParams,
@@ -35,6 +39,10 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
   }
 
   const columns = [
+    {
+      title: 'Proposal ID',
+      field: 'proposal.shortCode',
+    },
     { title: 'Title', field: 'title' },
     { title: 'Status', field: 'status' },
     {
@@ -75,9 +83,17 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
   ) => (
     <CreateUpdateShipment
       shipment={editShipment}
-      close={(shipment: ShipmentBasic | null) =>
-        !!editShipment ? onUpdate(shipment) : onCreate(shipment)
-      }
+      close={async () => {
+        /**
+         * NOTE: Hacky workaround but for now this is the only working solution to get the records in the table updated
+         * after creation or update because state is really messy and is not updated properly inside ShipmentsContainer.
+         */
+        const result = await api().getShipments();
+
+        if (result.shipments) {
+          setShipments(result.shipments);
+        }
+      }}
     />
   );
 

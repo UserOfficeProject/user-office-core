@@ -1,4 +1,3 @@
-import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import { useParams } from 'react-router';
@@ -34,9 +33,9 @@ const SEPPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="lg">
+      <ContentContainer>
         <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
-      </Container>
+      </ContentContainer>
     );
   }
 

@@ -18,6 +18,9 @@ query getSEPProposal($sepId: Int!, $proposalId: Int!) {
       }
       technicalReview {
         ...coreTechnicalReview
+        reviewer {
+          ...basicUserDetails
+        }
       }
       reviews {
         id

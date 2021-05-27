@@ -5,6 +5,7 @@ mutation addTechnicalReview(
   $publicComment: String
   $status: TechnicalReviewStatus
   $submitted: Boolean!
+  $reviewerId: Int!
 ) {
   addTechnicalReview(
     addTechnicalReviewInput: {
@@ -14,6 +15,7 @@ mutation addTechnicalReview(
       publicComment: $publicComment
       status: $status
       submitted: $submitted
+      reviewerId: $reviewerId
     }
   ) {
     rejection {

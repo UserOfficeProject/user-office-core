@@ -9,5 +9,8 @@ query getReview($reviewId: Int!, $sepId: Int) {
         id
       }
     }
+    reviewer {
+      ...basicUserDetails
+    }
   }
 }

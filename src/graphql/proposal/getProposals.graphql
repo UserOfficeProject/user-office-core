@@ -23,6 +23,9 @@ query getProposals($filter: ProposalsFilter) {
       }
       technicalReview {
         ...coreTechnicalReview
+        reviewer {
+          ...basicUserDetails
+        }
       }
       instrument {
         id

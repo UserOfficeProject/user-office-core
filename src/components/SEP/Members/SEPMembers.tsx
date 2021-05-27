@@ -19,6 +19,7 @@ import { useRenewToken } from 'hooks/common/useRenewToken';
 import { useSEPReviewersData } from 'hooks/SEP/useSEPReviewersData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 const useStyles = makeStyles(() => ({
@@ -258,11 +259,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               id="SEPChair"
               label="SEP Chair"
               type="text"
-              value={
-                sepData.sepChair
-                  ? `${sepData.sepChair.firstname} ${sepData.sepChair.lastname}`
-                  : ''
-              }
+              value={getFullUserName(sepData.sepChair)}
               margin="none"
               fullWidth
               data-cy="SEPChair"
@@ -288,7 +285,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                               },
                               {
                                 title: 'Remove SEP member',
-                                description: `Are you sure you want to remove ${sepData.sepChair?.firstname} ${sepData.sepChair?.lastname} from this SEP?`,
+                                description: `Are you sure you want to remove ${getFullUserName(
+                                  sepData.sepChair
+                                )} from this SEP?`,
                               }
                             )()
                           }
@@ -316,11 +315,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               id="SEPSecretary"
               label="SEP Secretary"
               type="text"
-              value={
-                sepData.sepSecretary
-                  ? `${sepData.sepSecretary.firstname} ${sepData.sepSecretary.lastname}`
-                  : ''
-              }
+              value={getFullUserName(sepData.sepSecretary)}
               margin="none"
               fullWidth
               data-cy="SEPSecretary"
@@ -346,7 +341,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                               },
                               {
                                 title: 'Remove SEP member',
-                                description: `Are you sure you want to remove ${sepData.sepSecretary?.firstname} ${sepData.sepSecretary?.lastname} from this SEP?`,
+                                description: `Are you sure you want to remove ${getFullUserName(
+                                  sepData.sepSecretary
+                                )} from this SEP?`,
                               }
                             )()
                           }
