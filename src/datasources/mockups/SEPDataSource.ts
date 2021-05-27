@@ -17,6 +17,7 @@ import {
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../../resolvers/mutations/AssignMembersToSEP';
+import { AssignProposalsToSepArgs } from '../../resolvers/mutations/AssignProposalsToSep';
 import { SaveSEPMeetingDecisionInput } from '../../resolvers/mutations/SEPMeetingDecisionMutation';
 import { SEPDataSource } from '../SEPDataSource';
 
@@ -319,7 +320,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     return { id: 4, shortCode: 'SEP_Chair', title: 'SEP Chair' };
   }
 
-  async assignProposal(proposalId: number, sepId: number) {
+  async assignProposalsToSep({ proposals, sepId }: AssignProposalsToSepArgs) {
     const sep = dummySEPs.find((element) => element.id === sepId);
 
     if (sep) {
@@ -329,7 +330,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     throw new Error(`SEP not found ${sepId}`);
   }
 
-  async removeProposalAssignment(proposalId: number, sepId: number) {
+  async removeProposalsFromSep(proposalIds: number[], sepId: number) {
     const sep = dummySEPs.find((element) => element.id === sepId);
 
     if (sep) {
