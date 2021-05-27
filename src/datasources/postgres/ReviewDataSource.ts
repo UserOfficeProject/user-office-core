@@ -219,7 +219,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         }
       })
       .whereIn('sep_id', sepIds)
-      .distinctOn('proposal_id')
+      .distinctOn('SEP_Reviews.proposal_id')
       .then((reviews: ReviewRecord[]) => {
         return reviews.map((review) => this.createReviewObject(review));
       });
