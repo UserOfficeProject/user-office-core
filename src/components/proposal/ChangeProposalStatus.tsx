@@ -74,12 +74,13 @@ const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
                 <FormikDropdown
                   name="selectedStatusId"
                   label="Select proposal status"
+                  loading={loadingProposalStatuses}
                   items={proposalStatuses.map((status) => ({
                     value: status.id.toString(),
                     text: status.name,
                   }))}
                   required
-                  disabled={loadingProposalStatuses || isSubmitting}
+                  disabled={isSubmitting}
                 />
               </Grid>
             </Grid>
