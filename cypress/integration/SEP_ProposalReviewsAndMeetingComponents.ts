@@ -26,7 +26,7 @@ function readWriteReview() {
 
   cy.notification({ variant: 'success', text: 'Updated' });
 
-  cy.get('[aria-label="close"]').click();
+  cy.closeModal();
 
   cy.get('@dialog').should('not.exist');
   cy.wait(100);
@@ -925,7 +925,7 @@ context(
 
       cy.contains('9999 (Overwritten)');
 
-      cy.get('[aria-label="close"]').click();
+      cy.closeModal();
       cy.contains('9999');
 
       cy.reload();
@@ -942,6 +942,8 @@ context(
       cy.finishedLoading();
 
       cy.get('body').should('not.contain', '9999 (Overwritten)');
+
+      cy.closeModal();
     });
 
     it('should use SEP time allocation (if set) when calculating if they fit in available time', () => {
@@ -974,7 +976,7 @@ context(
 
       cy.contains('15 (Overwritten)');
 
-      cy.get('[aria-label="close"]').click();
+      cy.closeModal();
 
       cy.get(
         '[data-cy="sep-instrument-proposals-table"] tbody tr:last-child'
