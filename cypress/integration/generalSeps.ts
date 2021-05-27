@@ -504,8 +504,6 @@ context('General scientific evaluation panel tests', () => {
       text: 'SEP member removed successfully',
     });
 
-    cy.closeNotification();
-
     cy.contains('Logs').click();
 
     cy.finishedLoading();
