@@ -749,7 +749,7 @@ context(
 
       cy.get("[id='menu-selectedInstrumentId'] li").first().click();
 
-      cy.contains('Assign to Instrument').click();
+      cy.get('[data-cy="submit-assign-remove-instrument"]').click();
 
       cy.changeProposalStatus('SEP_REVIEW', proposal2.proposalTitle);
 
