@@ -72,15 +72,16 @@ export default function QuestionaryEditorTopic(props: {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
-  const classes = makeStyles((theme) => ({
+  const classes = makeStyles({
     // TODO move out styles
     container: {
       alignItems: 'flex-start',
       alignContent: 'flex-start',
       background: '#FFF',
       flexBasis: '100%',
+      height: '100%',
     },
-    appbar: {
+    appBar: {
       background: 'transparent',
       boxShadow: 'none',
       paddingRight: 0,
@@ -98,6 +99,7 @@ export default function QuestionaryEditorTopic(props: {
     },
     itemContainer: {
       minHeight: '180px',
+      height: 'calc(100% - 36px)',
       padding: '1px',
     },
     topic: {
@@ -126,7 +128,7 @@ export default function QuestionaryEditorTopic(props: {
       borderWidth: '1px',
       borderStyle: 'dashed',
     },
-  }))();
+  })();
 
   const { data, dispatch, index } = props;
   const [title, setTitle] = useState<string>(data.topic.title);
@@ -223,7 +225,7 @@ export default function QuestionaryEditorTopic(props: {
           style={getItemStyle(provided.draggableProps.style)}
           {...provided.dragHandleProps}
         >
-          <AppBar position="static" className={classes.appbar}>
+          <AppBar position="static" className={classes.appBar}>
             <Toolbar className={classes.toolbar}>
               <Grid item xs={10} className={classes.topic}>
                 {titleJsx}

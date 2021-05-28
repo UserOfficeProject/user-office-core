@@ -115,7 +115,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
             </>
           </FormLabel>
         </Grid>
-        <Grid item xs={2} className={classes.unitField}>
+        <Grid item xs={3} className={classes.unitField}>
           <TextField
             label="Min"
             onChange={(e) =>
@@ -135,7 +135,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
           />
         </Grid>
 
-        <Grid item xs={2} className={classes.unitField}>
+        <Grid item xs={3} className={classes.unitField}>
           <TextField
             label="Max"
             onChange={(e) =>
@@ -154,17 +154,17 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
             error={isError}
           />
         </Grid>
-        <Grid item xs={8} className={classes.unitField}>
+        <Grid item xs={6} className={classes.unitField}>
           {getUnits()}
         </Grid>
 
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           {isError && <FormHelperText>{fieldError.min}</FormHelperText>}
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           {isError && <FormHelperText>{fieldError.max}</FormHelperText>}
         </Grid>
-        <Grid item xs={8}>
+        <Grid item xs={6}>
           {isError && <FormHelperText>{fieldError.unit}</FormHelperText>}
         </Grid>
       </Grid>
