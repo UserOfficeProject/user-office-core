@@ -12,7 +12,7 @@ import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsDat
 import { useProposalsTemplates } from 'hooks/template/useProposalTemplates';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import CallGeneralInfo from './CallGeneralInfo';
+import CallGeneralInfo, { AllocationTimeUnits } from './CallGeneralInfo';
 import CallNotificationAndCycleInfo from './CallNotificationAndCycleInfo';
 import CallReviewsInfo from './CallReviewsInfo';
 
@@ -40,6 +40,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         ...call,
         templateId: call.templateId || '',
         proposalWorkflowId: call.proposalWorkflowId || '',
+        // allocationTimeUnit: call.allocationTimeUnit || AllocationTimeUnits.Days,
       }
     : {
         shortCode: '',
@@ -58,6 +59,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         surveyComment: '',
         proposalWorkflowId: '',
         templateId: '',
+        allocationTimeUnit: AllocationTimeUnits.Days,
       };
 
   const closeModal = (error: string | null | undefined, callToReturn: Call) => {

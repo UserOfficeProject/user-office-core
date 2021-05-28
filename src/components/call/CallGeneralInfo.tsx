@@ -14,6 +14,11 @@ import {
   UpdateCallMutationVariables,
 } from 'generated/sdk';
 
+export enum AllocationTimeUnits {
+  Days = 'DAYS',
+  Hours = 'HOURS',
+}
+
 const CallGeneralInfo: React.FC<{
   templates: Exclude<GetProposalTemplatesQuery['proposalTemplates'], null>;
   loadingTemplates: boolean;
@@ -29,6 +34,13 @@ const CallGeneralInfo: React.FC<{
     (proposalWorkflow) => ({
       text: proposalWorkflow.name,
       value: proposalWorkflow.id,
+    })
+  );
+
+  const allocationTimeUnitOptions = Object.keys(AllocationTimeUnits).map(
+    (key) => ({
+      text: key,
+      value: AllocationTimeUnits[key as keyof typeof AllocationTimeUnits],
     })
   );
 
@@ -117,6 +129,12 @@ const CallGeneralInfo: React.FC<{
           'data-cy': 'call-workflow',
         }}
         isClearable
+      />
+      <FormikDropdown
+        name="allocationTimeUnit"
+        label="Allocation time unit"
+        items={allocationTimeUnitOptions}
+        InputProps={{ 'data-cy': 'allocation-time-unit' }}
       />
     </>
   );
