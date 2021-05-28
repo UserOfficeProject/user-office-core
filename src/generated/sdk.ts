@@ -1807,6 +1807,7 @@ export type Query = {
   callsByInstrumentScientist: Maybe<Array<Call>>;
   proposals: Maybe<ProposalsQueryResult>;
   instrumentScientistProposals: Maybe<ProposalsQueryResult>;
+  shipments: Maybe<Array<Shipment>>;
   questions: Array<QuestionWithUsage>;
   templates: Maybe<Array<Template>>;
   activeTemplateId: Maybe<Scalars['Int']>;
@@ -1831,6 +1832,7 @@ export type Query = {
   instrumentScientistHasInstrument: Maybe<Scalars['Boolean']>;
   instrumentScientistHasAccess: Maybe<Scalars['Boolean']>;
   isNaturalKeyPresent: Maybe<Scalars['Boolean']>;
+  myShipments: Maybe<Array<Shipment>>;
   proposal: Maybe<Proposal>;
   userHasAccessToProposal: Maybe<Scalars['Boolean']>;
   proposalStatus: Maybe<ProposalStatus>;
@@ -1855,7 +1857,6 @@ export type Query = {
   sepProposalsByInstrument: Maybe<Array<SepProposal>>;
   seps: Maybe<SePsQueryResult>;
   shipment: Maybe<Shipment>;
-  shipments: Maybe<Array<Shipment>>;
   version: Scalars['String'];
   factoryVersion: Scalars['String'];
   templateCategories: Maybe<Array<TemplateCategory>>;
@@ -1902,6 +1903,11 @@ export type QueryInstrumentScientistProposalsArgs = {
   filter?: Maybe<ProposalsFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryShipmentsArgs = {
+  filter?: Maybe<ShipmentsFilter>;
 };
 
 
@@ -2108,11 +2114,6 @@ export type QuerySepsArgs = {
 
 export type QueryShipmentArgs = {
   shipmentId: Scalars['Int'];
-};
-
-
-export type QueryShipmentsArgs = {
-  filter?: Maybe<ShipmentsFilter>;
 };
 
 
@@ -5401,6 +5402,17 @@ export type ShipmentFragment = (
     { __typename?: 'Proposal' }
     & Pick<Proposal, 'shortCode'>
   ) }
+);
+
+export type GetMyShipmentsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyShipmentsQuery = (
+  { __typename?: 'Query' }
+  & { myShipments: Maybe<Array<(
+    { __typename?: 'Shipment' }
+    & ShipmentFragment
+  )>> }
 );
 
 export type GetShipmentQueryVariables = Exact<{
@@ -8891,6 +8903,13 @@ export const DeleteShipmentDocument = gql`
   }
 }
     ${RejectionFragmentDoc}`;
+export const GetMyShipmentsDocument = gql`
+    query getMyShipments {
+  myShipments {
+    ...shipment
+  }
+}
+    ${ShipmentFragmentDoc}`;
 export const GetShipmentDocument = gql`
     query getShipment($shipmentId: Int!) {
   shipment(shipmentId: $shipmentId) {
@@ -9945,6 +9964,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     deleteShipment(variables: DeleteShipmentMutationVariables): Promise<DeleteShipmentMutation> {
       return withWrapper(() => client.request<DeleteShipmentMutation>(print(DeleteShipmentDocument), variables));
+    },
+    getMyShipments(variables?: GetMyShipmentsQueryVariables): Promise<GetMyShipmentsQuery> {
+      return withWrapper(() => client.request<GetMyShipmentsQuery>(print(GetMyShipmentsDocument), variables));
     },
     getShipment(variables: GetShipmentQueryVariables): Promise<GetShipmentQuery> {
       return withWrapper(() => client.request<GetShipmentQuery>(print(GetShipmentDocument), variables));
