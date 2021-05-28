@@ -10,7 +10,9 @@ import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateCategoryId } from '../models/Template';
 import { User, UserWithRole } from '../models/User';
+import { VisitationDataSource } from './../datasources/VisitationDataSource';
 import { UserAuthorization } from './UserAuthorization';
+import { VisitationAuthorization } from './VisitationAuthorization';
 
 interface QuestionaryAuthorizer {
   hasReadRights(agent: User | null, questionaryId: number): Promise<boolean>;
@@ -180,6 +182,58 @@ class ShipmentDeclarationQuestionaryAuthorizer
 }
 
 @injectable()
+class VisitationQuestionaryAuthorizer implements QuestionaryAuthorizer {
+  constructor(
+    @inject(Tokens.VisitationDataSource)
+    private visitationDataSource: VisitationDataSource,
+    @inject(Tokens.VisitationAuthorization)
+    private visitAuth: VisitationAuthorization,
+    @inject(Tokens.UserAuthorization)
+    private userAuthorization: UserAuthorization
+  ) {}
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
+    if (!agent) {
+      return false;
+    }
+
+    if (await this.userAuthorization.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const visit = (
+      await this.visitationDataSource.getVisitations({
+        questionaryId: questionaryId,
+      })
+    )[0];
+    if (!visit) {
+      return false;
+    }
+
+    return this.visitAuth.hasReadRights(agent, visit.id);
+  }
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
+    if (!agent) {
+      return false;
+    }
+
+    if (await this.userAuthorization.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const visit = (
+      await this.visitationDataSource.getVisitations({
+        questionaryId: questionaryId,
+      })
+    )[0];
+    if (!visit) {
+      return false;
+    }
+
+    return this.visitAuth.hasWriteRights(agent, visit.id);
+  }
+}
+
+@injectable()
 export class QuestionaryAuthorization {
   private authorizers = new Map<number, QuestionaryAuthorizer>();
   constructor(
@@ -200,6 +254,10 @@ export class QuestionaryAuthorization {
     this.authorizers.set(
       TemplateCategoryId.SHIPMENT_DECLARATION,
       container.resolve(ShipmentDeclarationQuestionaryAuthorizer)
+    );
+    this.authorizers.set(
+      TemplateCategoryId.VISITATION,
+      container.resolve(VisitationQuestionaryAuthorizer)
     );
   }
 

@@ -13,6 +13,7 @@ import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSour
 import PostgreSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
+import PostgresVisitationDataSource from '../datasources/postgres/VisitationDataSource';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import { createSkipPostingHandler } from '../eventHandlers/messageBroker';
 import { SkipAssetRegistrar } from '../utils/EAM_service';
@@ -20,6 +21,7 @@ import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { VisitationAuthorization } from '../utils/VisitationAuthorization';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
@@ -27,6 +29,7 @@ mapClass(Tokens.UserAuthorization, UserAuthorization);
 mapClass(Tokens.QuestionaryAuthorization, QuestionaryAuthorization);
 mapClass(Tokens.SampleAuthorization, SampleAuthorization);
 mapClass(Tokens.ShipmentAuthorization, ShipmentAuthorization);
+mapClass(Tokens.VisitationAuthorization, VisitationAuthorization);
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSource);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
@@ -43,6 +46,7 @@ mapClass(Tokens.ShipmentDataSource, PostgresShipmentDataSource);
 mapClass(Tokens.SystemDataSource, PostgreSystemDataSource);
 mapClass(Tokens.TemplateDataSource, PostgresTemplateDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
+mapClass(Tokens.VisitationDataSource, PostgresVisitationDataSource);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
