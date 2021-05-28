@@ -15,6 +15,7 @@ import { ShipmentStatus } from '../models/Shipment';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { DataType, TemplateCategoryId } from '../models/Template';
 import { UserRole } from '../models/User';
+import { VisitationStatus } from '../models/Visitation';
 import { NumberValueConstraint } from './types/FieldConfig';
 
 export const registerEnums = () => {
@@ -38,5 +39,8 @@ export const registerEnums = () => {
   registerEnumType(NumberValueConstraint, { name: 'NumberValueConstraint' });
   registerEnumType(QuestionFilterCompareOperator, {
     name: 'QuestionFilterCompareOperator',
+  });
+  registerEnumType(VisitationStatus, {
+    name: 'VisitationStatus',
   });
 };

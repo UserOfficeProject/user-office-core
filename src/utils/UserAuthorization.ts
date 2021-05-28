@@ -24,16 +24,12 @@ export class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
   }
 
-  // NOTE: This is not a good check if it is a user or not. It should do the same check as isUserOfficer.
-  isUser(agent: User | null, id: number) {
+  isUser(agent: UserWithRole | null) {
     if (agent == null) {
       return false;
     }
-    if (agent.id !== id) {
-      return false;
-    }
 
-    return true;
+    return agent?.currentRole?.shortCode === Roles.USER;
   }
 
   async hasRole(agent: UserWithRole | null, role: string): Promise<boolean> {
