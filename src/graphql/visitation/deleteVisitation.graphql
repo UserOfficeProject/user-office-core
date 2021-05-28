@@ -1,0 +1,11 @@
+mutation deleteVisitation($visitationId: Int!) {
+  deleteVisitation(visitationId: $visitationId) {
+    visitation {
+      ...visitation
+    }
+
+    rejection {
+      ...rejection
+    }
+  }
+}

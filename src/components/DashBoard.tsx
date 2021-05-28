@@ -52,9 +52,11 @@ import QuestionsPage from './template/QuestionsPage';
 import SampleTemplatesPage from './template/SampleTemplates';
 import ShipmentTemplatesPage from './template/ShipmentTemplatesPage';
 import TemplateEditor from './template/TemplateEditor';
+import VisitationTemplatesPage from './template/VisitationTemplatesPage';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
+import MyVisitations from './visitation/MyVisitations';
 
 type BottomNavItemProps = {
   /** Content of the information modal. */
@@ -241,6 +243,7 @@ const Dashboard: React.FC = () => {
           {isShipmentEnabled && (
             <Route path="/MyShipments" component={MyShipments} />
           )}
+          <Route path="/MyVisitations" component={MyVisitations} />
           <Route path="/ProfilePage/:id" component={ProfilePage} />
           {isUserOfficer && (
             <Route path="/PeoplePage/:id" component={UserPage} />
@@ -266,6 +269,10 @@ const Dashboard: React.FC = () => {
           <Route
             path="/ShipmentDeclarationTemplates"
             component={ShipmentTemplatesPage}
+          />
+          <Route
+            path="/VisitationTemplates"
+            component={VisitationTemplatesPage}
           />
           <Route
             path="/ProposalTableReviewer"

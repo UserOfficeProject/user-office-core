@@ -34,10 +34,12 @@ export enum EventType {
   PROPOSAL_SUBMIT_CLICKED = 'PROPOSAL_SUBMIT_CLICKED',
   SHIPMENT_CREATED = 'SHIPMENT_CREATED',
   SHIPMENT_LOADED = 'SHIPMENT_LOADED',
-  SHIPMENT_SUBMIT_CLICKED = 'SHIPMENT_SUBMIT_CLICKED',
   SHIPMENT_MODIFIED = 'SHIPMENT_MODIFIED',
   SHIPMENT_DONE = 'SHIPMENT_DONE',
   CLEAN_DIRTY_STATE = 'CLEAN_DIRTY_STATE',
+  VISITATION_CREATED = 'VISITATION_CREATED',
+  VISITATION_LOADED = 'VISITATION_LOADED',
+  VISITATION_MODIFIED = 'VISITATION_MODIFIED',
 }
 export interface Event {
   type: EventType;
@@ -51,7 +53,11 @@ export interface WizardStepMetadata {
 }
 
 export interface WizardStep {
-  type: 'QuestionaryStep' | 'ProposalReview' | 'ShipmentReview';
+  type:
+    | 'QuestionaryStep'
+    | 'ProposalReview'
+    | 'ShipmentReview'
+    | 'VisitationReview';
   payload?: any;
   getMetadata: (
     state: QuestionarySubmissionState,
