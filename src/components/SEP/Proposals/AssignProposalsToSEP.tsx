@@ -86,7 +86,8 @@ const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
             {!values.selectedSEPId && (
               <Alert severity="warning" data-cy="remove-sep-alert">
                 Be aware that leaving SEP selection empty will remove assigned
-                SEP from proposal/s.
+                SEP from proposal/s and delete all SEP reviews on that
+                assignment.
               </Alert>
             )}
             <Button
