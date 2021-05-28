@@ -30,6 +30,7 @@ export default class ShipmentQueries {
     return this.dataSource.getShipment(shipmentId);
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async getShipments(agent: UserWithRole | null, args: ShipmentsArgs) {
     let shipments = await this.dataSource.getShipments(args);
 
@@ -45,5 +46,20 @@ export default class ShipmentQueries {
   @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
   async getShipmentsByCallId(user: UserWithRole | null, callId: number) {
     return await this.dataSource.getShipmentsByCallId(callId);
+  }
+
+  @Authorized([Roles.USER])
+  async getMyShipments(agent: UserWithRole | null) {
+    let shipments = await this.dataSource.getShipments({
+      filter: { creatorId: agent!.id },
+    });
+
+    shipments = await Promise.all(
+      shipments.map((shipment) =>
+        this.shipmentAuthorization.hasReadRights(agent, shipment.id)
+      )
+    ).then((results) => shipments.filter((_v, index) => results[index]));
+
+    return shipments;
   }
 }
