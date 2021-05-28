@@ -51,8 +51,8 @@ export const FormWrapper = styled(({ ...other }) => <Box {...other} />)({
   overflow: (props) => (props.overflow as string) || 'auto',
 });
 
-export const ContentContainer = styled(({ ...other }) => (
-  <Container maxWidth={false} {...other} />
+export const ContentContainer = styled(({ maxWidth = false, ...other }) => (
+  <Container maxWidth={maxWidth} {...other} />
 ))({
   padding: (props: Record<string, PaddingMarginType | unknown>) =>
     getSpacing(props.padding as PaddingMarginType, [2, 2]),
