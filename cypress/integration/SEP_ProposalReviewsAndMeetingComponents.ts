@@ -736,7 +736,7 @@ context(
 
       cy.get('table tbody [type="checkbox"]').first().check();
 
-      cy.get("[title='Assign proposals to instrument']").first().click();
+      cy.get("[title='Assign/Remove instrument']").first().click();
 
       cy.get("[id='mui-component-select-selectedInstrumentId']").should(
         'not.have.class',
