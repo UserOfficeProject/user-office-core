@@ -6,6 +6,7 @@ import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createDateValidationSchema } from './createDateValidationSchema';
+import DateAnswerRenderer from './DateAnswerRenderer';
 import DateSearchCriteriaInput from './DateSearchCriteriaInput';
 import { QuestionaryComponentDatePicker } from './QuestionaryComponentDatePicker';
 import { QuestionDateForm } from './QuestionDateForm';
@@ -20,7 +21,10 @@ export const dateDefinition: QuestionaryComponentDefinition = {
   readonly: false,
   creatable: true,
   icon: <TodayIcon />,
-  renderers: defaultRenderer,
+  renderers: {
+    questionRenderer: defaultRenderer.questionRenderer,
+    answerRenderer: DateAnswerRenderer,
+  },
   createYupValidationSchema: createDateValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value,
   searchCriteriaComponent: DateSearchCriteriaInput,

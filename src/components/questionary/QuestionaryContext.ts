@@ -15,4 +15,4 @@ export const QuestionaryContext = React.createContext<QuestionaryContextType>({
 });
 
 export const createMissingContextErrorMessage = () =>
-  `Element is missing valid QuestionaryContext. Wrap this element or one of its parrents with QuestionaryContext and make sure it is set up properly`;
+  `Element is missing valid QuestionaryContext. Wrap this element or one of its parents with QuestionaryContext and make sure it is set up properly`;
