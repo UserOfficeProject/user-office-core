@@ -19,7 +19,7 @@ import {
 } from './records';
 
 export default class PostgresUserDataSource implements UserDataSource {
-  delete(id: number): Promise<User | null> {
+  async delete(id: number): Promise<User | null> {
     return database('users')
       .where('users.user_id', id)
       .del()
@@ -34,7 +34,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       });
   }
 
-  addUserRole(args: AddUserRoleArgs): Promise<boolean> {
+  async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     const { userID, roleID } = args;
 
     return database
@@ -48,7 +48,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       });
   }
 
-  checkEmailExist(email: string): Promise<boolean> {
+  async checkEmailExist(email: string): Promise<boolean> {
     return database
       .select()
       .from('users')
@@ -58,7 +58,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (user ? true : false));
   }
 
-  checkOrcIDExist(orcID: string): Promise<boolean> {
+  async checkOrcIDExist(orcID: string): Promise<boolean> {
     return database
       .select()
       .from('users')
@@ -67,7 +67,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (user ? true : false));
   }
 
-  getPasswordByEmail(email: string): Promise<string | null> {
+  async getPasswordByEmail(email: string): Promise<string | null> {
     return database
       .select('password')
       .from('users')
@@ -76,7 +76,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (user ? user.password : null));
   }
 
-  getPasswordByUsername(username: string): Promise<string | null> {
+  async getPasswordByUsername(username: string): Promise<string | null> {
     return database
       .select('password')
       .from('users')
@@ -221,7 +221,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
-  async get(id: number): Promise<User | null> {
+  async getUser(id: number): Promise<User | null> {
     return database
       .select()
       .from('users')
@@ -230,7 +230,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
 
-  getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
+  async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
     return database
       .select()
       .from('users as u')
@@ -319,38 +319,43 @@ export default class PostgresUserDataSource implements UserDataSource {
       });
   }
 
-  async createDummyUser(userId: number): Promise<User> {
-    return database
-      .insert({
-        user_id: userId,
-        user_title: '',
-        firstname: '',
-        middlename: '',
-        lastname: '',
-        username: userId.toString(),
-        password: '',
-        preferredname: '',
-        orcid: '',
-        orcid_refreshtoken: '',
-        gender: '',
-        nationality: 1,
-        birthdate: '2000-01-01',
-        organisation: 1,
-        department: '',
-        position: '',
-        email: userId.toString(),
-        telephone: '',
-        telephone_alt: '',
-      })
-      .returning(['*'])
-      .into('users')
-      .then((user: UserRecord[]) => {
-        if (!user || user.length == 0) {
-          throw new Error('Could not create user');
-        }
+  async ensureDummyUserExists(userId: number): Promise<User> {
+    let user: UserRecord[] = await database
+      .select()
+      .from('users')
+      .where({ user_id: userId });
+    if (!user || user.length == 0) {
+      user = await database
+        .insert({
+          user_id: userId,
+          user_title: '',
+          firstname: '',
+          middlename: '',
+          lastname: '',
+          username: userId.toString(),
+          password: '',
+          preferredname: '',
+          orcid: '',
+          orcid_refreshtoken: '',
+          gender: '',
+          nationality: 1,
+          birthdate: '2000-01-01',
+          organisation: 1,
+          department: '',
+          position: '',
+          email: userId.toString(),
+          telephone: '',
+          telephone_alt: '',
+        })
+        .returning(['*'])
+        .into('users');
+    }
 
-        return createUserObject(user[0]);
-      });
+    if (!user || user.length == 0) {
+      throw new Error('Could not create user');
+    }
+
+    return createUserObject(user[0]);
   }
 
   async getUsers(

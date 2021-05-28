@@ -1,5 +1,7 @@
 import { logger } from '@esss-swap/duo-logger';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
@@ -7,9 +9,11 @@ import { UserWithRole } from '../models/User';
 import { ShipmentsArgs } from '../resolvers/queries/ShipmentsQuery';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 
+@injectable()
 export default class ShipmentQueries {
   constructor(
-    private dataSource: ShipmentDataSource,
+    @inject(Tokens.ShipmentDataSource) private dataSource: ShipmentDataSource,
+    @inject(Tokens.ShipmentAuthorization)
     private shipmentAuthorization: ShipmentAuthorization
   ) {}
 
@@ -23,11 +27,11 @@ export default class ShipmentQueries {
       return null;
     }
 
-    return this.dataSource.get(shipmentId);
+    return this.dataSource.getShipment(shipmentId);
   }
 
   async getShipments(agent: UserWithRole | null, args: ShipmentsArgs) {
-    let shipments = await this.dataSource.getAll(args);
+    let shipments = await this.dataSource.getShipments(args);
 
     shipments = await Promise.all(
       shipments.map((shipment) =>

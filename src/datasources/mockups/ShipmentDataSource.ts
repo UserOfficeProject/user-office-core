@@ -5,9 +5,10 @@ import { ShipmentsArgs } from '../../resolvers/queries/ShipmentsQuery';
 import { ShipmentDataSource } from '../ShipmentDataSource';
 
 export class ShipmentDataSourceMock implements ShipmentDataSource {
-  update(args: UpdateShipmentArgs): Promise<Shipment> {
-    throw new Error('Method not implemented.');
+  constructor() {
+    this.init();
   }
+
   shipments: Shipment[];
   public init() {
     this.shipments = [
@@ -23,15 +24,15 @@ export class ShipmentDataSourceMock implements ShipmentDataSource {
       ),
     ];
   }
-  async get(shipmentId: number): Promise<Shipment> {
+  async getShipment(shipmentId: number): Promise<Shipment> {
     return this.shipments.find((shipment) => shipment.id === shipmentId)!;
   }
 
-  async getAll(args: ShipmentsArgs): Promise<Shipment[]> {
+  async getShipments(_args: ShipmentsArgs): Promise<Shipment[]> {
     return this.shipments;
   }
 
-  async getShipmentsByCallId(callId: number): Promise<Shipment[]> {
+  async getShipmentsByCallId(_callId: number): Promise<Shipment[]> {
     return this.shipments;
   }
 
@@ -60,15 +61,15 @@ export class ShipmentDataSourceMock implements ShipmentDataSource {
     )[0];
   }
 
-  async updateShipment(args: UpdateShipmentArgs): Promise<Shipment> {
-    const shipment = await this.get(args.shipmentId);
+  async update(args: UpdateShipmentArgs): Promise<Shipment> {
+    const shipment = await this.getShipment(args.shipmentId);
     shipment.title = args.title || shipment.title;
     shipment.status = args.status || shipment.status;
 
     return shipment;
   }
 
-  async addSamples(args: AddSamplesToShipmentArgs): Promise<Shipment> {
+  async addSamples(_args: AddSamplesToShipmentArgs): Promise<Shipment> {
     return this.shipments[0];
   }
 }

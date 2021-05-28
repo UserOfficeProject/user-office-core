@@ -1,6 +1,15 @@
-import { proposalDataSource, proposalSettingsDataSource } from '../datasources';
+import { container } from 'tsyringe';
+
+import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
+import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import { ProposalEventsRecord } from '../datasources/postgres/records';
-import { NextStatusEvent } from '../models/NextStatusEvent';
+import { Proposal } from '../models/Proposal';
+import { StatusChangingEvent } from '../models/StatusChangingEvent';
+
+const proposalSettingsDataSource = container.resolve(
+  ProposalSettingsDataSource
+);
+const proposalDataSource = container.resolve(ProposalDataSource);
 
 const getProposalWorkflowByCallId = (callId: number) => {
   return proposalSettingsDataSource.getProposalWorkflowByCall(callId);
@@ -8,16 +17,18 @@ const getProposalWorkflowByCallId = (callId: number) => {
 
 const getProposalWorkflowConnectionByStatusId = (
   proposalWorkflowId: number,
-  proposalStatusId: number
+  proposalStatusId: number,
+  prevProposalStatusId?: number
 ) => {
-  return proposalSettingsDataSource.getProposalWorkflowConnection(
+  return proposalSettingsDataSource.getProposalWorkflowConnectionsById(
     proposalWorkflowId,
-    proposalStatusId
+    proposalStatusId,
+    { prevProposalStatusId }
   );
 };
 
 const shouldMoveToNextStatus = (
-  nextStatusEvents: NextStatusEvent[],
+  statusChangingEvents: StatusChangingEvent[],
   proposalEvents: ProposalEventsRecord
 ): boolean => {
   const proposalEventsKeys = Object.keys(proposalEvents);
@@ -26,10 +37,10 @@ const shouldMoveToNextStatus = (
       !proposalEvents[proposalEventsKey as keyof ProposalEventsRecord]
   );
 
-  const allNextStatusRulesFulfilled = !nextStatusEvents.some(
-    (nextStatusEvent) =>
+  const allNextStatusRulesFulfilled = !statusChangingEvents.some(
+    (statusChangingEvent) =>
       allProposalIncompleteEvents.indexOf(
-        nextStatusEvent.nextStatusEvent.toLowerCase()
+        statusChangingEvent.statusChangingEvent.toLowerCase()
       ) >= 0
   );
 
@@ -39,12 +50,7 @@ const shouldMoveToNextStatus = (
 const updateProposalStatus = (
   proposalId: number,
   nextProposalStatusId: number
-) => {
-  return proposalDataSource.updateProposalStatus(
-    proposalId,
-    nextProposalStatusId
-  );
-};
+) => proposalDataSource.updateProposalStatus(proposalId, nextProposalStatusId);
 
 export type WorkflowEngineProposalType = {
   id: number;
@@ -57,55 +63,75 @@ export const workflowEngine = async (
     proposalEvents: ProposalEventsRecord | null;
     currentEvent: Event;
   }
-) => {
-  if (!proposal.proposalEvents) {
-    return;
-  }
-
+): Promise<Array<Proposal | void> | void> => {
   const proposalWorkflow = await getProposalWorkflowByCallId(proposal.callId);
 
   if (!proposalWorkflow) {
     return;
   }
 
-  const currentWorkflowConnection = await getProposalWorkflowConnectionByStatusId(
+  const currentWorkflowConnections = await getProposalWorkflowConnectionByStatusId(
     proposalWorkflow.id,
     proposal.statusId
   );
 
-  if (
-    !currentWorkflowConnection ||
-    !currentWorkflowConnection.nextProposalStatusId
-  ) {
+  if (!currentWorkflowConnections.length) {
     return;
   }
 
-  const nextWorkflowConnection = await getProposalWorkflowConnectionByStatusId(
-    proposalWorkflow.id,
-    currentWorkflowConnection.nextProposalStatusId
+  /**
+   * NOTE: We can have more than one current connection because of the multi-column workflows.
+   * This is the way how we store the connection that has multiple next connections.
+   * We have multiple separate connection records pointing to each next connection.
+   * For example if we have status: FEASIBILITY_REVIEW which has multiple next statuses like: SEP_SELECTION and NOT_FEASIBLE.
+   * We store one record of FEASIBILITY_REVIEW with nextProposalStatusId = SEP_SELECTION and another one with nextProposalStatusId = NOT_FEASIBLE.
+   * We go through each record and based on the currentEvent we move the proposal into the right direction
+   */
+  return Promise.all(
+    currentWorkflowConnections.map(async (currentWorkflowConnection) => {
+      if (!currentWorkflowConnection.nextProposalStatusId) {
+        return;
+      }
+
+      if (!proposal.proposalEvents) {
+        return;
+      }
+
+      const nextWorkflowConnections = await getProposalWorkflowConnectionByStatusId(
+        proposalWorkflow.id,
+        currentWorkflowConnection.nextProposalStatusId,
+        currentWorkflowConnection.proposalStatusId
+      );
+
+      if (!nextWorkflowConnections?.length) {
+        return;
+      }
+
+      const statusChangingEvents = await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
+        nextWorkflowConnections.map((connection) => connection.id)
+      );
+
+      if (!statusChangingEvents) {
+        return;
+      }
+
+      const eventThatTriggeredStatusChangeIsStatusChangingEvent = statusChangingEvents.find(
+        (statusChangingEvent) =>
+          proposal.currentEvent === statusChangingEvent.statusChangingEvent
+      );
+
+      if (!eventThatTriggeredStatusChangeIsStatusChangingEvent) {
+        return;
+      }
+
+      if (
+        shouldMoveToNextStatus(statusChangingEvents, proposal.proposalEvents)
+      ) {
+        return updateProposalStatus(
+          proposal.id,
+          currentWorkflowConnection.nextProposalStatusId
+        );
+      }
+    })
   );
-
-  const nextStatusEvents = await proposalSettingsDataSource.getNextStatusEventsByConnectionId(
-    currentWorkflowConnection.id
-  );
-
-  if (!nextStatusEvents || !nextWorkflowConnection) {
-    return;
-  }
-
-  const eventThatTriggeredStatusChangeIsNextStatusEvent = nextStatusEvents.find(
-    (nextStatusEvent) =>
-      proposal.currentEvent === nextStatusEvent.nextStatusEvent
-  );
-
-  if (!eventThatTriggeredStatusChangeIsNextStatusEvent) {
-    return;
-  }
-
-  if (shouldMoveToNextStatus(nextStatusEvents, proposal.proposalEvents)) {
-    await updateProposalStatus(
-      proposal.id,
-      nextWorkflowConnection.proposalStatusId
-    );
-  }
 };

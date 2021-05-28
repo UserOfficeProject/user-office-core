@@ -1,36 +1,24 @@
 import 'reflect-metadata';
-import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import {
   dummyProposal,
   ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
-import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
-  UserDataSourceMock,
-  dummyUserWithRole,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { ProposalPublicStatus } from '../models/Proposal';
 import { omit } from '../utils/helperFunctions';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import ProposalQueries from './ProposalQueries';
 
-const dummyProposalDataSource = new ProposalDataSourceMock();
-const dummyCallDataSource = new CallDataSourceMock();
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock(),
-  new SEPDataSourceMock()
-);
-const proposalQueries = new ProposalQueries(
-  dummyProposalDataSource,
-  dummyCallDataSource,
-  userAuthorization
-);
+const proposalQueries = container.resolve(ProposalQueries);
+
 beforeEach(() => {
-  dummyProposalDataSource.init();
+  container.resolve<ProposalDataSourceMock>(Tokens.ProposalDataSource).init();
 });
 
 test('A user on the proposal can get a proposal it belongs to', () => {
@@ -38,10 +26,9 @@ test('A user on the proposal can get a proposal it belongs to', () => {
     proposalQueries.get(dummyUserWithRole, 1)
   ).resolves.toStrictEqual(
     dummyProposal.notified
-      ? omit(dummyProposal, 'rankOrder', 'commentForManagement')
+      ? omit(dummyProposal, 'commentForManagement')
       : omit(
           dummyProposal,
-          'rankOrder',
           'commentForManagement',
           'finalStatus',
           'commentForUser'

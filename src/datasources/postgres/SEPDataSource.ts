@@ -1,15 +1,26 @@
 import { logger } from '@esss-swap/duo-logger';
 
-import { ProposalIdsWithNextStatus } from '../../models/Proposal';
+import {
+  ProposalEndStatus,
+  ProposalIdsWithNextStatus,
+} from '../../models/Proposal';
 import { ReviewStatus } from '../../models/Review';
 import { Role, Roles } from '../../models/Role';
-import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../../models/SEP';
+import {
+  SEP,
+  SEPAssignment,
+  SEPReviewer,
+  SEPProposal,
+  SEPProposalWithReviewGradesAndRanking,
+} from '../../models/SEP';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { UserRole } from '../../models/User';
 import {
   UpdateMemberSEPArgs,
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../../resolvers/mutations/AssignMembersToSEP';
+import { SaveSEPMeetingDecisionInput } from '../../resolvers/mutations/SEPMeetingDecisionMutation';
 import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
 import {
@@ -23,11 +34,28 @@ import {
   createSEPAssignmentObject,
   createSEPProposalObject,
   createSEPReviewerObject,
+  createSepMeetingDecisionObject,
   createRoleObject,
   RoleUserRecord,
+  SepMeetingDecisionRecord,
+  SepProposalWithReviewGradesAndRankingRecord,
 } from './records';
 
 export default class PostgresSEPDataSource implements SEPDataSource {
+  async delete(id: number): Promise<SEP> {
+    return database
+      .where('SEPs.sep_id', id)
+      .del()
+      .from('SEPs')
+      .returning('*')
+      .then((sep: SEPRecord[]) => {
+        if (sep === undefined || sep.length !== 1) {
+          throw new Error(`Could not delete sep with id:${id}`);
+        }
+
+        return createSEPObject(sep[0]);
+      });
+  }
   async create(
     code: string,
     description: string,
@@ -76,7 +104,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       });
   }
 
-  async get(id: number) {
+  async getSEP(id: number) {
     return database
       .select()
       .from('SEPs')
@@ -87,19 +115,28 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       });
   }
 
-  async getUserSepBySepId(userId: number, sepId: number): Promise<SEP | null> {
-    const sepRecords = await database<SEPRecord>('SEPs')
-      .select<SEPRecord>('SEPs.*')
+  async getUserSepsByRoleAndSepId(
+    userId: number,
+    role: Role,
+    sepId?: number
+  ): Promise<SEP[]> {
+    const sepRecords = await database<SEPRecord[]>('SEPs')
+      .select<SEPRecord[]>('SEPs.*')
       .leftJoin('SEP_Reviewers', 'SEP_Reviewers.sep_id', '=', 'SEPs.sep_id')
-      .where('SEPs.sep_id', sepId)
-      .andWhere((qb) => {
-        qb.where('sep_chair_user_id', userId);
-        qb.orWhere('sep_secretary_user_id', userId);
-        qb.orWhere('SEP_Reviewers.user_id', userId);
-      })
-      .first();
+      .where((qb) => {
+        if (sepId) {
+          qb.where('SEPs.sep_id', sepId);
+        }
+        if (role.shortCode === Roles.SEP_CHAIR) {
+          qb.where('sep_chair_user_id', userId);
+        } else if (role.shortCode === Roles.SEP_SECRETARY) {
+          qb.where('sep_secretary_user_id', userId);
+        } else {
+          qb.where('SEP_Reviewers.user_id', userId);
+        }
+      });
 
-    return sepRecords ? createSEPObject(sepRecords) : null;
+    return sepRecords.map(createSEPObject);
   }
 
   async getUserSeps(userId: number, role: Role): Promise<SEP[]> {
@@ -131,8 +168,8 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     return sepRecords.map(createSEPObject);
   }
 
-  async getAll(
-    active: boolean,
+  async getSEPs(
+    active?: boolean,
     filter?: string,
     first?: number,
     offset?: number
@@ -153,7 +190,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         if (offset) {
           query.offset(offset);
         }
-        if (active) {
+        if (active !== undefined) {
           query.where('active', active);
         }
       })
@@ -267,7 +304,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .from('SEP_Reviewers')
       .where('sep_id', sepId);
 
-    const sep = await this.get(sepId);
+    const sep = await this.getSEP(sepId);
 
     if (!sep) {
       throw new Error(`SEP not found ${sepId}`);
@@ -297,7 +334,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async getSEPUserRole(userId: number, sepId: number): Promise<Role | null> {
-    const sep = await this.get(sepId);
+    const sep = await this.getSEP(sepId);
 
     if (!sep) {
       throw new Error(`SEP not found ${sepId}`);
@@ -389,7 +426,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         .ignore();
     });
 
-    const sepUpdated = await this.get(args.sepId);
+    const sepUpdated = await this.getSEP(args.sepId);
 
     if (sepUpdated) {
       return sepUpdated;
@@ -406,7 +443,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       }))
     );
 
-    const sepUpdated = await this.get(args.sepId);
+    const sepUpdated = await this.getSEP(args.sepId);
 
     if (sepUpdated) {
       return sepUpdated;
@@ -449,7 +486,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       }
     }
 
-    const sepUpdated = await this.get(args.sepId);
+    const sepUpdated = await this.getSEP(args.sepId);
 
     if (sepUpdated) {
       return sepUpdated;
@@ -494,7 +531,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         .del();
     });
 
-    const sepUpdated = await this.get(sepId);
+    const sepUpdated = await this.getSEP(sepId);
 
     if (!sepUpdated) {
       throw new Error(`SEP not found ${sepId}`);
@@ -531,7 +568,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         .returning<ReviewRecord[]>(['*']);
     });
 
-    const updatedSep = await this.get(sepId);
+    const updatedSep = await this.getSEP(sepId);
 
     if (updatedSep) {
       return updatedSep;
@@ -551,7 +588,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .andWhere('proposal_id', proposalId)
       .andWhere('sep_member_user_id', memberId);
 
-    const sepUpdated = await this.get(sepId);
+    const sepUpdated = await this.getSEP(sepId);
 
     if (memberRemovedFromProposal && sepUpdated) {
       return sepUpdated;
@@ -615,5 +652,130 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .first();
 
     return record !== undefined;
+  }
+
+  async saveSepMeetingDecision(
+    saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput,
+    submittedBy?: number | null
+  ): Promise<SepMeetingDecision> {
+    const dataToUpsert: {
+      proposal_id: number;
+      rank_order?: number;
+      comment_for_management?: string;
+      comment_for_user?: string;
+      recommendation?: ProposalEndStatus;
+      submitted?: boolean;
+      submitted_by?: number | null;
+    } = {
+      proposal_id: saveSepMeetingDecisionInput.proposalId,
+    };
+
+    const updateQuery = [];
+
+    if (submittedBy) {
+      dataToUpsert.submitted_by = submittedBy;
+      updateQuery.push('submitted_by = EXCLUDED.submitted_by');
+    }
+    if (saveSepMeetingDecisionInput.rankOrder) {
+      dataToUpsert.rank_order = saveSepMeetingDecisionInput.rankOrder;
+      updateQuery.push('rank_order = EXCLUDED.rank_order');
+    }
+
+    if (saveSepMeetingDecisionInput.commentForManagement) {
+      dataToUpsert.comment_for_management =
+        saveSepMeetingDecisionInput.commentForManagement;
+      updateQuery.push(
+        'comment_for_management = EXCLUDED.comment_for_management'
+      );
+    }
+
+    if (saveSepMeetingDecisionInput.commentForUser) {
+      dataToUpsert.comment_for_user =
+        saveSepMeetingDecisionInput.commentForUser;
+      updateQuery.push('comment_for_user = EXCLUDED.comment_for_user');
+    }
+
+    if (saveSepMeetingDecisionInput.recommendation) {
+      dataToUpsert.recommendation = saveSepMeetingDecisionInput.recommendation;
+      updateQuery.push('recommendation = EXCLUDED.recommendation');
+    }
+
+    if (saveSepMeetingDecisionInput.submitted !== undefined) {
+      dataToUpsert.submitted = saveSepMeetingDecisionInput.submitted;
+      updateQuery.push('submitted = EXCLUDED.submitted');
+    }
+
+    const [sepMeetingDecisionRecord]: SepMeetingDecisionRecord[] = (
+      await database.raw(
+        `? ON CONFLICT (proposal_id)
+        DO UPDATE SET
+        ${updateQuery.join(',')}
+        RETURNING *;`,
+        [database('SEP_meeting_decisions').insert(dataToUpsert)]
+      )
+    ).rows;
+
+    if (!sepMeetingDecisionRecord) {
+      logger.logError('Could not update/insert sep meeting decision', {
+        dataToUpsert,
+      });
+
+      throw new Error('Could not update/insert sep meeting decision');
+    }
+
+    return createSepMeetingDecisionObject(sepMeetingDecisionRecord);
+  }
+
+  async getProposalsSepMeetingDecisions(
+    proposalIds: number[]
+  ): Promise<SepMeetingDecision[]> {
+    return database
+      .select()
+      .from('SEP_meeting_decisions')
+      .whereIn('proposal_id', proposalIds)
+      .then((sepMeetingDecisionRecords: SepMeetingDecisionRecord[]) => {
+        if (!sepMeetingDecisionRecords.length) {
+          return [];
+        }
+
+        return sepMeetingDecisionRecords.map((sepMeetingDecisionRecord) =>
+          createSepMeetingDecisionObject(sepMeetingDecisionRecord)
+        );
+      });
+  }
+
+  async getSepProposalsWithReviewGradesAndRanking(
+    proposalIds: number[]
+  ): Promise<SEPProposalWithReviewGradesAndRanking[]> {
+    return database('SEP_Proposals as sp')
+      .select([
+        'sp.proposal_id',
+        database.raw('json_agg(sr.grade) review_grades'),
+        'smd.rank_order',
+      ])
+      .join('SEP_meeting_decisions as smd', {
+        'smd.proposal_id': 'sp.proposal_id',
+      })
+      .join('SEP_Reviews as sr', {
+        'sr.proposal_id': 'sp.proposal_id',
+      })
+      .whereIn('sp.proposal_id', proposalIds)
+      .groupBy(['sp.proposal_id', 'smd.rank_order'])
+      .then(
+        (
+          SepProposalWithReviewGradesAndRankingRecords: SepProposalWithReviewGradesAndRankingRecord[]
+        ) => {
+          const sepProposalWithReviewGradesAndRanking = SepProposalWithReviewGradesAndRankingRecords.map(
+            (SepProposalWithReviewGradesAndRankingRecord) =>
+              new SEPProposalWithReviewGradesAndRanking(
+                SepProposalWithReviewGradesAndRankingRecord.proposal_id,
+                SepProposalWithReviewGradesAndRankingRecord.rank_order,
+                SepProposalWithReviewGradesAndRankingRecord.review_grades
+              )
+          );
+
+          return sepProposalWithReviewGradesAndRanking;
+        }
+      );
   }
 }

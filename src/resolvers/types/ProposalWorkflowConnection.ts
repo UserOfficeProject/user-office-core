@@ -10,9 +10,9 @@ import {
 
 import { ResolverContext } from '../../context';
 import { ProposalWorkflowConnection as ProposalWorkflowConnectionOrigin } from '../../models/ProposalWorkflowConnections';
-import { isRejection } from '../../rejection';
-import { NextStatusEvent } from './NextStatusEvent';
+import { isRejection } from '../../models/Rejection';
 import { ProposalStatus } from './ProposalStatus';
+import { StatusChangingEvent } from './StatusChangingEvent';
 
 @ObjectType()
 export class ProposalWorkflowConnection
@@ -56,16 +56,16 @@ export class ProposalWorkflowConnectionGroup {
 
 @Resolver(() => ProposalWorkflowConnection)
 export class ProposalWorkflowConnectionResolver {
-  @FieldResolver(() => [NextStatusEvent])
-  async nextStatusEvents(
+  @FieldResolver(() => [StatusChangingEvent])
+  async statusChangingEvents(
     @Root() proposalWorkflowConnection: ProposalWorkflowConnection,
     @Ctx() context: ResolverContext
-  ): Promise<NextStatusEvent[]> {
-    const nextStatusEvents = await context.queries.proposalSettings.getNextStatusEventsByConnectionId(
+  ): Promise<StatusChangingEvent[]> {
+    const statusChangingEvents = await context.queries.proposalSettings.getStatusChangingEventsByConnectionId(
       context.user,
       proposalWorkflowConnection.id
     );
 
-    return isRejection(nextStatusEvents) ? [] : nextStatusEvents;
+    return isRejection(statusChangingEvents) ? [] : statusChangingEvents;
   }
 }

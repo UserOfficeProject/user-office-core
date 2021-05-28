@@ -13,7 +13,8 @@ export const dummyInstrument = new Instrument(
   1,
   'Dummy instrument 1',
   'instrument_1',
-  'This is test instrument.'
+  'This is test instrument.',
+  1
 );
 
 export const dummyInstrumentWithAvailabilityTime = new InstrumentWithAvailabilityTime(
@@ -21,6 +22,7 @@ export const dummyInstrumentWithAvailabilityTime = new InstrumentWithAvailabilit
   'Dummy instrument 1',
   'instrument_1',
   'This is test instrument.',
+  1,
   10,
   false
 );
@@ -41,7 +43,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return { ...dummyInstrument, ...args };
   }
 
-  async get(instrumentId: number): Promise<Instrument | null> {
+  async getInstrument(instrumentId: number): Promise<Instrument | null> {
     const instrument = dummyInstruments.find(
       (dummyInstrumentItem) => dummyInstrumentItem.id === instrumentId
     );
@@ -53,7 +55,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     }
   }
 
-  async getAll(
+  async getInstruments(
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {

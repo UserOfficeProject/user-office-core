@@ -1,30 +1,17 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
 import {
-  InstrumentDataSourceMock,
   dummyInstrument,
   dummyInstrumentHasProposals,
 } from '../datasources/mockups/InstrumentDataSource';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
-import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
-  dummyUserWithRole,
   dummyUserOfficerWithRole,
-  UserDataSourceMock,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import InstrumentMutations from './InstrumentMutations';
 
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock(),
-  new SEPDataSourceMock()
-);
-
-const instrumentMutations = new InstrumentMutations(
-  new InstrumentDataSourceMock(),
-  new SEPDataSourceMock(),
-  userAuthorization
-);
+const instrumentMutations = container.resolve(InstrumentMutations);
 
 describe('Test Instrument Mutations', () => {
   test('A user can not create an instrument', () => {
@@ -33,6 +20,7 @@ describe('Test Instrument Mutations', () => {
         name: 'Test Instrument',
         shortCode: '2020-06-15',
         description: 'Test instrument description',
+        managerUserId: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -43,6 +31,7 @@ describe('Test Instrument Mutations', () => {
         name: 'Test Instrument',
         shortCode: '2020-06-15',
         description: 'Test instrument description',
+        managerUserId: 1,
       })
     ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
   });
@@ -52,6 +41,7 @@ describe('Test Instrument Mutations', () => {
       name: 'Test Instrument',
       shortCode: '2020-06-15',
       description: 'Test instrument description',
+      managerUserId: 1,
     };
 
     return expect(
@@ -65,6 +55,7 @@ describe('Test Instrument Mutations', () => {
       name: 'Test Instrument 1',
       shortCode: '2020-06-15',
       description: 'Test instrument description 1',
+      managerUserId: 1,
     };
 
     return expect(
@@ -141,7 +132,7 @@ describe('Test Instrument Mutations', () => {
           availabilityTime: -1,
         }
       )
-    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A logged in user officer can set availability time on instrument attached to a call', () => {

@@ -1,40 +1,22 @@
 import 'reflect-metadata';
-import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
-import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+
+import { container } from 'tsyringe';
+
 import {
-  SEPDataSourceMock,
-  dummySEP,
   anotherDummySEP,
+  dummySEP,
   dummySEPWithoutCode,
 } from '../datasources/mockups/SEPDataSource';
 import {
-  UserDataSourceMock,
-  dummyUserWithRole,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
+import { Rejection } from '../models/Rejection';
 import { UserRole } from '../models/User';
-import { Rejection } from '../rejection';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import SEPMutations from './SEPMutations';
 
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock(),
-  new SEPDataSourceMock()
-);
-const dummySEPDataSource = new SEPDataSourceMock();
-const dummyInstrumentDataSource = new InstrumentDataSourceMock();
-const dummyUserDataSource = new UserDataSourceMock();
-const dummyProposalSettingsDataSource = new ProposalSettingsDataSourceMock();
-const SEPMutationsInstance = new SEPMutations(
-  dummySEPDataSource,
-  dummyInstrumentDataSource,
-  userAuthorization,
-  dummyUserDataSource,
-  dummyProposalSettingsDataSource
-);
+const SEPMutationsInstance = container.resolve(SEPMutations);
 
 describe('Test SEPMutations', () => {
   test('A user cannot create SEP', async () => {
@@ -55,7 +37,7 @@ describe('Test SEPMutations', () => {
   test('A userofficer can not create SEP with bad input arguments', () => {
     return expect(
       SEPMutationsInstance.create(dummyUserOfficerWithRole, dummySEPWithoutCode)
-    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A user cannot update SEP', async () => {
@@ -130,7 +112,9 @@ describe('Test SEPMutations', () => {
       }
     );
 
-    return expect((result as Rejection).reason).toBe('NOT_ALLOWED');
+    return expect((result as Rejection).reason).toBe(
+      'Can not assign to SEP, because only users with sep reviewer role can be chair or secretary'
+    );
   });
 
   test('Officer can not assign Secretary to SEP if the user has no SEP Reviewer role', async () => {
@@ -145,7 +129,9 @@ describe('Test SEPMutations', () => {
       }
     );
 
-    return expect((result as Rejection).reason).toBe('NOT_ALLOWED');
+    return expect((result as Rejection).reason).toBe(
+      'Can not assign to SEP, because only users with sep reviewer role can be chair or secretary'
+    );
   });
 
   test('A userofficer can not assign other roles using `assignChairOrSecretaryToSEP`', async () => {
@@ -160,7 +146,7 @@ describe('Test SEPMutations', () => {
       }
     )) as Rejection;
 
-    return expect(result.reason).toBe('BAD_REQUEST');
+    return expect(result.reason).toBe('Input validation errors');
   });
 
   test('A user can not assign reviewers to SEP', async () => {

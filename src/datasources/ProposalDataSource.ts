@@ -1,6 +1,8 @@
 import { Event } from '../events/event.enum';
-import { Proposal } from '../models/Proposal';
+import { Call } from '../models/Call';
+import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
+import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 import { ProposalEventsRecord } from './postgres/records';
 
@@ -8,7 +10,7 @@ export interface ProposalDataSource {
   getProposalsFromView(filter?: ProposalsFilter): Promise<ProposalView[]>;
   // Read
   get(id: number): Promise<Proposal | null>;
-  checkActiveCall(callId: number): Promise<boolean>;
+
   getProposals(
     filter?: ProposalsFilter,
     first?: number,
@@ -20,7 +22,10 @@ export interface ProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
-  getUserProposals(id: number): Promise<Proposal[]>;
+  getUserProposals(
+    id: number,
+    filter?: { instrumentId?: number | null }
+  ): Promise<Proposal[]>;
 
   // Write
   create(
@@ -33,6 +38,9 @@ export interface ProposalDataSource {
     proposalId: number,
     proposalStatusId: number
   ): Promise<Proposal>;
+  updateProposalTechnicalReviewer(
+    args: UpdateTechnicalReviewAssigneeInput
+  ): Promise<Proposal[]>;
   setProposalUsers(id: number, users: number[]): Promise<void>;
   submitProposal(id: number): Promise<Proposal>;
   deleteProposal(id: number): Promise<Proposal>;
@@ -41,15 +49,14 @@ export interface ProposalDataSource {
     proposalId: number
   ): Promise<ProposalEventsRecord | null>;
   getCount(callId: number): Promise<number>;
-  cloneProposal(
-    clonerId: number,
-    proposalId: number,
-    callId: number,
-    templateId: number
-  ): Promise<Proposal>;
+  cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal>;
   resetProposalEvents(
     proposalId: number,
     callId: number,
     statusId: number
   ): Promise<boolean>;
+  changeProposalsStatus(
+    statusId: number,
+    proposalIds: number[]
+  ): Promise<ProposalIdsWithNextStatus>;
 }

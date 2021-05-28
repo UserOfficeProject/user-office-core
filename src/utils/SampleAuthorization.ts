@@ -1,14 +1,20 @@
 import { logger } from '@esss-swap/duo-logger';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { UserWithRole } from '../models/User';
-import { userAuthorization } from '../utils/UserAuthorization';
+import { UserAuthorization } from './UserAuthorization';
 
+@injectable()
 export class SampleAuthorization {
   constructor(
-    private sampleDataSource: SampleDataSource,
-    private proposalDataSource: ProposalDataSource
+    @inject(Tokens.SampleDataSource) private sampleDataSource: SampleDataSource,
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuthorization: UserAuthorization
   ) {}
 
   async hasReadRights(agent: UserWithRole | null, sampleId: number) {
@@ -20,7 +26,7 @@ export class SampleAuthorization {
   }
 
   private async hasAccessRights(agent: UserWithRole | null, sampleId: number) {
-    if (await userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
@@ -40,6 +46,6 @@ export class SampleAuthorization {
       return false;
     }
 
-    return userAuthorization.hasAccessRights(agent, proposal);
+    return this.userAuthorization.hasAccessRights(agent, proposal);
   }
 }

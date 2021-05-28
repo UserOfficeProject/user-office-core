@@ -14,6 +14,7 @@ import {
   TechnicalReviewStatus,
 } from '../../models/TechnicalReview';
 import { Proposal } from '../types/Proposal';
+import { BasicUserDetails } from './BasicUserDetails';
 
 @ObjectType()
 export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
@@ -37,6 +38,9 @@ export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
 
   @Field(() => Boolean)
   public submitted: boolean;
+
+  @Field(() => Int)
+  public reviewerId: number;
 }
 
 @Resolver(() => TechnicalReview)
@@ -49,6 +53,17 @@ export class TechnicalReviewResolver {
     return context.queries.proposal.get(
       context.user,
       technicalReview.proposalID
+    );
+  }
+
+  @FieldResolver(() => BasicUserDetails, { nullable: true })
+  async reviewer(
+    @Root() technicalReview: TechnicalReview,
+    @Ctx() context: ResolverContext
+  ): Promise<BasicUserDetails | null> {
+    return context.queries.user.getBasic(
+      context.user,
+      technicalReview.reviewerId
     );
   }
 }

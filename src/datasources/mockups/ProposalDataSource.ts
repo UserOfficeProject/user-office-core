@@ -1,13 +1,22 @@
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
-import { Proposal, ProposalEndStatus } from '../../models/Proposal';
+import { Call } from '../../models/Call';
+import {
+  Proposal,
+  ProposalEndStatus,
+  ProposalIdsWithNextStatus,
+} from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
+import { SepMeetingDecision } from '../../models/SepMeetingDecision';
+import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 
 export let dummyProposal: Proposal;
 export let dummyProposalSubmitted: Proposal;
+export let dummyProposalWithNotActiveCall: Proposal;
+
 let allProposals: Proposal[];
 
 export type DeepPartial<T> = {
@@ -28,18 +37,41 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.created || new Date(),
     values?.updated || new Date(),
     values?.shortCode || 'shortCode',
-    values?.rankOrder || 1,
     values?.finalStatus || ProposalEndStatus.UNSET,
     values?.callId || 1,
     values?.questionaryId || 1,
     values?.commentForUser || 'comment for user',
     values?.commentForManagement || 'comment for management',
     values?.notified || false,
-    values?.submitted || false
+    values?.submitted || false,
+    values?.referenceNumberSequence || 0,
+    values?.managementTimeAllocation || 0,
+    values?.managementDecisionSubmitted || false,
+    0
   );
 };
 
+export const dummySepMeetingDecision = new SepMeetingDecision(
+  1,
+  1,
+  ProposalEndStatus.ACCEPTED,
+  'Dummy comment for user',
+  'Dummy comment for management',
+  true,
+  1
+);
+
 export class ProposalDataSourceMock implements ProposalDataSource {
+  constructor() {
+    this.init();
+  }
+
+  async updateProposalTechnicalReviewer(
+    args: UpdateTechnicalReviewAssigneeInput
+  ): Promise<Proposal[]> {
+    return allProposals;
+  }
+
   async getProposalsFromView(
     filter?: ProposalsFilter | undefined
   ): Promise<ProposalView[]> {
@@ -55,7 +87,17 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       notified: true,
     });
 
-    allProposals = [dummyProposal, dummyProposalSubmitted];
+    dummyProposalWithNotActiveCall = dummyProposalFactory({
+      id: 3,
+      questionaryId: 2,
+      callId: 2,
+    });
+
+    allProposals = [
+      dummyProposal,
+      dummyProposalSubmitted,
+      dummyProposalWithNotActiveCall,
+    ];
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
@@ -63,10 +105,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     dummyProposal.id = -1; // hacky
 
     return dummyProposalRef;
-  }
-
-  async checkActiveCall(callId: number): Promise<boolean> {
-    return true;
   }
 
   async rejectProposal(proposalId: number): Promise<Proposal> {
@@ -80,12 +118,13 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async update(proposal: Proposal): Promise<Proposal> {
-    if (proposal.id !== dummyProposal.id) {
+    const foundIndex = allProposals.findIndex(({ id }) => proposal.id === id);
+
+    if (foundIndex === -1) {
       throw new Error('Proposal does not exist');
     }
-    dummyProposal = proposal;
 
-    return dummyProposal;
+    return proposal;
   }
 
   async updateProposalStatus(
@@ -104,12 +143,16 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async submitProposal(id: number): Promise<Proposal> {
-    if (id !== dummyProposal.id) {
+    const found = allProposals.find((proposal) => proposal.id === id);
+
+    if (!found) {
       throw new Error('Wrong ID');
     }
-    dummyProposal.submitted = true;
 
-    return dummyProposal;
+    const newObj = { ...found, submitted: true };
+    Object.setPrototypeOf(newObj, Proposal.prototype);
+
+    return newObj;
   }
 
   async get(id: number) {
@@ -157,12 +200,19 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       proposal_created: true,
       proposal_submitted: true,
       proposal_feasible: true,
+      proposal_unfeasible: false,
       call_ended: false,
       call_review_ended: false,
       proposal_sep_selected: false,
       proposal_instrument_selected: false,
       proposal_feasibility_review_submitted: false,
       proposal_sample_review_submitted: false,
+      proposal_all_sep_reviews_submitted: false,
+      proposal_feasibility_review_updated: false,
+      proposal_management_decision_submitted: false,
+      proposal_management_decision_updated: false,
+      proposal_sample_safe: false,
+      proposal_sep_review_updated: false,
       proposal_all_sep_reviewers_selected: false,
       proposal_sep_review_submitted: false,
       proposal_sep_meeting_submitted: false,
@@ -177,12 +227,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return 1;
   }
 
-  async cloneProposal(
-    clonerId: number,
-    proposalId: number,
-    callId: number,
-    templateId: number
-  ): Promise<Proposal> {
+  async cloneProposal(proposal: Proposal, call: Call): Promise<Proposal> {
     return dummyProposal;
   }
 
@@ -192,5 +237,12 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     statusId: number
   ): Promise<boolean> {
     return true;
+  }
+
+  async changeProposalsStatus(
+    statusId: number,
+    proposalIds: number[]
+  ): Promise<ProposalIdsWithNextStatus> {
+    return { proposalIds: [1] };
   }
 }

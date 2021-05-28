@@ -1,16 +1,24 @@
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { userAuthorization } from '../utils/UserAuthorization';
+import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallsFilter } from './../resolvers/queries/CallsQuery';
 
+@injectable()
 export default class CallQueries {
-  constructor(public dataSource: CallDataSource) {}
+  constructor(
+    @inject(Tokens.CallDataSource) public dataSource: CallDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization
+  ) {}
 
   @Authorized()
   async get(agent: UserWithRole | null, id: number) {
-    const call = await this.dataSource.get(id);
+    const call = await this.dataSource.getCall(id);
 
     return call;
   }
@@ -25,7 +33,7 @@ export default class CallQueries {
   // TODO: figure out the role parts
   @Authorized()
   async byRef(agent: UserWithRole | null, id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getCall(id);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
@@ -33,10 +41,7 @@ export default class CallQueries {
     agent: UserWithRole | null,
     scientistId: number
   ) {
-    if (
-      !(await userAuthorization.isUserOfficer(agent)) &&
-      agent?.id !== scientistId
-    ) {
+    if (!this.userAuth.isUserOfficer(agent) && agent?.id !== scientistId) {
       return null;
     }
 

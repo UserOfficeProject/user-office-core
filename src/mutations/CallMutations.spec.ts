@@ -1,15 +1,14 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
+import { dummyCall } from '../datasources/mockups/CallDataSource';
 import {
-  CallDataSourceMock,
-  dummyCall,
-} from '../datasources/mockups/CallDataSource';
-import {
-  dummyUserWithRole,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import CallMutations from './CallMutations';
 
-const callMutations = new CallMutations(new CallDataSourceMock());
+const callMutations = container.resolve(CallMutations);
 
 describe('Test Call Mutations', () => {
   test('A user can not create a call', () => {
@@ -26,6 +25,8 @@ describe('Test Call Mutations', () => {
         endNotify: new Date('2019-02-19'),
         startCycle: new Date('2019-02-19'),
         endCycle: new Date('2019-02-19'),
+        referenceNumberFormat: 'format',
+        proposalSequence: 0,
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
         proposalWorkflowId: 1,
@@ -55,6 +56,8 @@ describe('Test Call Mutations', () => {
         endNotify: new Date('2019-02-19'),
         startCycle: new Date('2019-02-19'),
         endCycle: new Date('2019-02-19'),
+        referenceNumberFormat: 'format',
+        proposalSequence: 0,
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
         proposalWorkflowId: 1,
@@ -75,6 +78,8 @@ describe('Test Call Mutations', () => {
       endNotify: new Date('2019-02-19'),
       startCycle: new Date('2019-02-19'),
       endCycle: new Date('2019-02-19'),
+      referenceNumberFormat: 'format',
+      proposalSequence: 0,
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
       proposalWorkflowId: 1,
@@ -82,7 +87,7 @@ describe('Test Call Mutations', () => {
 
     return expect(
       callMutations.create(dummyUserOfficerWithRole, callToCreate)
-    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A logged in user officer can create a call', () => {
@@ -98,6 +103,8 @@ describe('Test Call Mutations', () => {
       endNotify: new Date('2019-02-19'),
       startCycle: new Date('2019-02-19'),
       endCycle: new Date('2019-02-19'),
+      referenceNumberFormat: 'format',
+      proposalSequence: 0,
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
       proposalWorkflowId: 1,
@@ -130,6 +137,8 @@ describe('Test Call Mutations', () => {
         endNotify: new Date('2020-06-18'),
         startCycle: new Date('2020-06-18'),
         endCycle: new Date('2020-06-18'),
+        referenceNumberFormat: 'format',
+        proposalSequence: 0,
         cycleComment: 'Comment review update',
         surveyComment: 'Comment feedback update',
         proposalWorkflowId: 1,
@@ -151,6 +160,8 @@ describe('Test Call Mutations', () => {
       endNotify: new Date('2020-06-18'),
       startCycle: new Date('2020-06-18'),
       endCycle: new Date('2020-06-18'),
+      referenceNumberFormat: 'format',
+      proposalSequence: 0,
       cycleComment: 'Comment review update',
       surveyComment: 'Comment feedback update',
       proposalWorkflowId: 1,

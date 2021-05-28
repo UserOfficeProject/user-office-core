@@ -1,8 +1,7 @@
 import 'reflect-metadata';
-import {
-  AdminDataSourceMock,
-  dummyInstitution,
-} from '../datasources/mockups/AdminDataSource';
+import { container } from 'tsyringe';
+
+import { dummyInstitution } from '../datasources/mockups/AdminDataSource';
 import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
@@ -11,7 +10,8 @@ import { Page } from '../models/Admin';
 import { Permissions } from '../models/Permissions';
 import AdminMutations from './AdminMutations';
 
-const adminMutations = new AdminMutations(new AdminDataSourceMock());
+const adminMutations = container.resolve(AdminMutations);
+
 describe('Test Admin Mutations', () => {
   test('A user can not set page text', () => {
     return expect(
@@ -77,7 +77,7 @@ describe('Test Admin Mutations', () => {
       }
     );
 
-    expect(firstResult).toHaveProperty('reason', 'BAD_REQUEST');
+    expect(firstResult).toHaveProperty('reason', 'Input validation errors');
 
     const secondResult = await adminMutations.createApiAccessToken(
       dummyUserOfficerWithRole,
@@ -87,7 +87,7 @@ describe('Test Admin Mutations', () => {
       }
     );
 
-    expect(secondResult).toHaveProperty('reason', 'BAD_REQUEST');
+    expect(secondResult).toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A user officer can create an api access token', async () => {
@@ -128,7 +128,7 @@ describe('Test Admin Mutations', () => {
       }
     );
 
-    expect(firstResult).toHaveProperty('reason', 'BAD_REQUEST');
+    expect(firstResult).toHaveProperty('reason', 'Input validation errors');
 
     const secondResult = await adminMutations.updateApiAccessToken(
       dummyUserOfficerWithRole,
@@ -139,7 +139,7 @@ describe('Test Admin Mutations', () => {
       }
     );
 
-    expect(secondResult).toHaveProperty('reason', 'BAD_REQUEST');
+    expect(secondResult).toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A user officer can update an api access token', async () => {

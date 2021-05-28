@@ -1,9 +1,8 @@
-# Use postgres/example user/password credentials
-version: '3.1'
+version: "3.1"
 
 services:
   backend:
-    image: 'dmsc/duo-backend:${USER_OFFICE_BACKEND_TAG}'
+    image: "dmsc/duo-backend:${USER_OFFICE_BACKEND_TAG}"
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
@@ -11,14 +10,13 @@ services:
       baseURL: localhost:3000
       SPARKPOST_TOKEN: dummytoken
       NODE_ENV: development
-      UO_FEATURE_DISABLE_MESSAGE_BROKER: 1
-      UO_FEATURE_DISABLE_EAM: 1
+      DEPENDENCY_CONFIG: e2e
       USER_OFFICE_FACTORY_ENDPOINT: ${USER_OFFICE_FACTORY_ENDPOINT}
     labels:
-      - 'traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads'
-      - 'traefik.port=4000'
+      - "traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads"
+      - "traefik.port=4000"
     volumes:
-      - './${USER_OFFICE_BACKEND_DIR}/db_patches:/home/node/app/db_patches'
+      - "./${USER_OFFICE_BACKEND_DIR}/db_patches:/home/node/app/db_patches"
 
   db:
     image: postgres:11-alpine
@@ -27,8 +25,7 @@ services:
       POSTGRES_PASSWORD: duopassword
       POSTGRES_USER: duouser
       POSTGRES_DB: duo
-      INCLUDE_SEEDS: ${INCLUDE_SEEDS}
     ports:
       - 5432:5432
     volumes:
-      - './${USER_OFFICE_BACKEND_DIR}/db_patches/:/docker-entrypoint-initdb.d/'
+      - "./${USER_OFFICE_BACKEND_DIR}/db_patches/:/docker-entrypoint-initdb.d/"

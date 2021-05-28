@@ -9,7 +9,7 @@ import { FeatureId } from '../models/Feature';
 import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
 import { QuestionFilterCompareOperator } from '../models/Questionary';
-import { ReviewStatus } from '../models/Review';
+import { ReviewerFilter, ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
 import { ShipmentStatus } from '../models/Shipment';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
@@ -22,6 +22,7 @@ export const registerEnums = () => {
   registerEnumType(ProposalEndStatus, { name: 'ProposalEndStatus' });
   registerEnumType(ProposalPublicStatus, { name: 'ProposalPublicStatus' });
   registerEnumType(ReviewStatus, { name: 'ReviewStatus' });
+  registerEnumType(ReviewerFilter, { name: 'ReviewerFilter' });
   registerEnumType(TechnicalReviewStatus, { name: 'TechnicalReviewStatus' });
   registerEnumType(PageName, { name: 'PageName' });
   registerEnumType(UserRole, { name: 'UserRole' });

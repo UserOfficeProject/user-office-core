@@ -1,7 +1,10 @@
-import { NextStatusEvent } from '../models/NextStatusEvent';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
-import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
+import {
+  NextAndPreviousProposalStatuses,
+  ProposalWorkflowConnection,
+} from '../models/ProposalWorkflowConnections';
+import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
@@ -31,10 +34,15 @@ export interface ProposalSettingsDataSource {
     droppableGroupId?: string | undefined,
     byParentGroupId?: boolean | undefined
   ): Promise<ProposalWorkflowConnection[]>;
-  getProposalWorkflowConnection(
+  getProposalWorkflowConnectionsById(
     proposalWorkflowId: number,
-    proposalWorkflowConnectionId: number
-  ): Promise<ProposalWorkflowConnection | null>;
+    proposalWorkflowConnectionId: number,
+    {
+      nextProposalStatusId,
+      prevProposalStatusId,
+      sortOrder,
+    }: NextAndPreviousProposalStatuses
+  ): Promise<ProposalWorkflowConnection[]>;
   addProposalWorkflowStatus(
     newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
   ): Promise<ProposalWorkflowConnection>;
@@ -44,15 +52,15 @@ export interface ProposalSettingsDataSource {
   deleteProposalWorkflowStatus(
     proposalStatusId: number,
     proposalWorkflowId: number,
-    nextProposalStatusId?: number
+    sortOrder: number
   ): Promise<ProposalWorkflowConnection>;
-  addNextStatusEventsToConnection(
+  addStatusChangingEventsToConnection(
     proposalWorkflowConnectionId: number,
-    nextStatusEvents: string[]
-  ): Promise<NextStatusEvent[]>;
-  getNextStatusEventsByConnectionId(
-    proposalWorkflowConnectionId: number
-  ): Promise<NextStatusEvent[]>;
+    statusChangingEvents: string[]
+  ): Promise<StatusChangingEvent[]>;
+  getStatusChangingEventsByConnectionIds(
+    proposalWorkflowConnectionIds: number[]
+  ): Promise<StatusChangingEvent[]>;
   getProposalNextStatus(
     proposalId: number,
     event: Event

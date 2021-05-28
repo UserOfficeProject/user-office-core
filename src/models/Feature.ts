@@ -8,4 +8,5 @@ export class Feature {
 
 export enum FeatureId {
   SHIPPING = 'SHIPPING',
+  SCHEDULER = 'SCHEDULER',
 }

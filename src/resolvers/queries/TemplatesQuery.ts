@@ -6,6 +6,7 @@ import {
   Query,
   Resolver,
   InputType,
+  Int,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -18,6 +19,9 @@ class TemplatesFilter {
 
   @Field(() => TemplateCategoryId, { nullable: true })
   public category?: TemplateCategoryId;
+
+  @Field(() => [Int], { nullable: true })
+  public templateIds?: number[];
 }
 
 @ArgsType()

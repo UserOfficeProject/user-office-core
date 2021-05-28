@@ -1,7 +1,10 @@
-import { NextStatusEvent } from '../../models/NextStatusEvent';
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
-import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
+import {
+  NextAndPreviousProposalStatuses,
+  ProposalWorkflowConnection,
+} from '../../models/ProposalWorkflowConnections';
+import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
@@ -65,7 +68,7 @@ export const anotherDummyProposalWorkflowConnection = new ProposalWorkflowConnec
   null
 );
 
-export const dummyNextStatusEvent = new NextStatusEvent(
+export const dummyStatusChangingEvent = new StatusChangingEvent(
   1,
   1,
   'PROPOSAL_SUBMITTED'
@@ -144,11 +147,16 @@ export class ProposalSettingsDataSourceMock
     ];
   }
 
-  async getProposalWorkflowConnection(
+  async getProposalWorkflowConnectionsById(
     proposalWorkflowId: number,
-    proposalWorkflowConnectionId: number
-  ): Promise<ProposalWorkflowConnection | null> {
-    return dummyProposalWorkflowConnection;
+    proposalWorkflowConnectionId: number,
+    {
+      nextProposalStatusId,
+      prevProposalStatusId,
+      sortOrder,
+    }: NextAndPreviousProposalStatuses
+  ): Promise<ProposalWorkflowConnection[]> {
+    return [dummyProposalWorkflowConnection];
   }
 
   async addProposalWorkflowStatus(
@@ -165,22 +173,23 @@ export class ProposalSettingsDataSourceMock
 
   async deleteProposalWorkflowStatus(
     proposalStatusId: number,
-    proposalWorkflowId: number
+    proposalWorkflowId: number,
+    sortOrder: number
   ): Promise<ProposalWorkflowConnection> {
     return dummyProposalWorkflowConnection;
   }
 
-  async addNextStatusEventsToConnection(
+  async addStatusChangingEventsToConnection(
     proposalWorkflowConnectionId: number,
-    nextStatusEvents: string[]
-  ): Promise<NextStatusEvent[]> {
-    return [dummyNextStatusEvent];
+    statusChangingEvents: string[]
+  ): Promise<StatusChangingEvent[]> {
+    return [dummyStatusChangingEvent];
   }
 
-  async getNextStatusEventsByConnectionId(
-    proposalWorkflowConnectionId: number
-  ): Promise<NextStatusEvent[]> {
-    return [dummyNextStatusEvent];
+  async getStatusChangingEventsByConnectionIds(
+    proposalWorkflowConnectionIds: number[]
+  ): Promise<StatusChangingEvent[]> {
+    return [dummyStatusChangingEvent];
   }
 
   async getProposalNextStatus(

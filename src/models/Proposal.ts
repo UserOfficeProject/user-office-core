@@ -37,14 +37,17 @@ export class Proposal {
     public created: Date,
     public updated: Date,
     public shortCode: string,
-    public rankOrder: number,
     public finalStatus: ProposalEndStatus,
     public callId: number,
     public questionaryId: number,
     public commentForUser: string,
     public commentForManagement: string,
     public notified: boolean,
-    public submitted: boolean
+    public submitted: boolean,
+    public referenceNumberSequence: number,
+    public managementTimeAllocation: number,
+    public managementDecisionSubmitted: boolean,
+    public technicalReviewAssignee: number | null
   ) {}
 }
 

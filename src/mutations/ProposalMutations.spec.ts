@@ -1,43 +1,28 @@
 /* eslint-disable prettier/prettier */
 import 'reflect-metadata';
-import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
-import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
-import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
-import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
+import {
+  ProposalDataSourceMock,
+  dummyProposalWithNotActiveCall,
+  dummyProposalSubmitted,
+} from '../datasources/mockups/ProposalDataSource';
 import {
   dummyPrincipalInvestigatorWithRole,
   dummyUserNotOnProposal,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
-  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
-import { UserAuthorization } from '../utils/UserAuthorization';
-import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
+import { isRejection } from '../models/Rejection';
 import ProposalMutations from './ProposalMutations';
 
-const dummyProposalDataSource = new ProposalDataSourceMock();
-const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
-const dummyCallDataSource = new CallDataSourceMock();
-const dummyInstrumentDataSource = new InstrumentDataSourceMock();
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock(),
-  new SEPDataSourceMock()
-);
-const proposalMutations = new ProposalMutations(
-  dummyProposalDataSource,
-  dummyQuestionaryDataSource,
-  dummyCallDataSource,
-  dummyInstrumentDataSource,
-  userAuthorization
-);
+const proposalMutations = container.resolve(ProposalMutations);
 
 beforeEach(() => {
-  dummyQuestionaryDataSource.init();
-  dummyProposalDataSource.init();
+  container.resolve<ProposalDataSourceMock>(Tokens.ProposalDataSource).init();
 });
 
 test('A user on the proposal can update its title if it is in edit mode', () => {
@@ -49,11 +34,15 @@ test('A user on the proposal can update its title if it is in edit mode', () => 
 });
 
 test('A user on the proposal can not update its title if it is not in edit mode', async () => {
-  await proposalMutations.submit(dummyUserWithRole, { proposalId: 1 });
-
   return expect(
-    proposalMutations.update(dummyUserWithRole, { id: 1, title: '' })
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED_PROPOSAL_SUBMITTED');
+    proposalMutations.update(dummyUserWithRole, {
+      id: dummyProposalSubmitted.id,
+      title: '',
+    })
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not update proposal after submission'
+  );
 });
 
 test('A user-officer can update a proposal', async () => {
@@ -62,6 +51,17 @@ test('A user-officer can update a proposal', async () => {
   return expect(
     proposalMutations.update(dummyUserOfficerWithRole, {
       id: 1,
+      title: newTitle,
+    })
+  ).resolves.toHaveProperty('title', newTitle);
+});
+
+test('A user-officer can update a proposal even if the call is not active', async () => {
+  const newTitle = 'New Title';
+
+  return expect(
+    proposalMutations.update(dummyUserOfficerWithRole, {
+      id: dummyProposalWithNotActiveCall.id,
       title: newTitle,
     })
   ).resolves.toHaveProperty('title', newTitle);
@@ -79,6 +79,14 @@ test('A user-officer can update submitted proposal', async () => {
   ).resolves.toHaveProperty('title', newTitle);
 });
 
+test('A user-officer can submit proposal even if the call is not active', async () => {
+  const result = await proposalMutations.submit(dummyUserOfficerWithRole, {
+    proposalId: dummyProposalWithNotActiveCall.id,
+  });
+
+  return expect(isRejection(result)).toBe(false);
+});
+
 test('A user-officer can update a proposals score in submit mode', async () => {
   const newProposerId = 99;
   await proposalMutations.submit(dummyUserOfficerWithRole, { proposalId: 1 });
@@ -93,14 +101,16 @@ test('A user-officer can update a proposals score in submit mode', async () => {
 
 test('A user can not update a proposals score mode', async () => {
   const newProposerId = 99;
-  await proposalMutations.submit(dummyUserWithRole, { proposalId: 1 });
 
   return expect(
     proposalMutations.update(dummyUserWithRole, {
-      id: 1,
+      id: dummyProposalSubmitted.id,
       proposerId: newProposerId,
     })
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED_PROPOSAL_SUBMITTED');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not update proposal after submission'
+  );
 });
 
 test('A user not on a proposal can not update it', () => {
@@ -109,7 +119,7 @@ test('A user not on a proposal can not update it', () => {
       id: 1,
       proposerId: dummyUserNotOnProposal.id,
     })
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
+  ).resolves.toHaveProperty('reason', 'Unauthorized proposal update');
 });
 
 //Submit
@@ -117,7 +127,10 @@ test('A user not on a proposal can not update it', () => {
 test('A user officer can not reject a proposal that does not exist', () => {
   return expect(
     proposalMutations.submit(dummyUserOfficerWithRole, { proposalId: 99 })
-  ).resolves.toHaveProperty('reason', 'INTERNAL_ERROR');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not submit proposal, because proposal not found'
+  );
 });
 
 test('A user officer can submit a proposal', () => {
@@ -129,7 +142,10 @@ test('A user officer can submit a proposal', () => {
 test('A user officer can not submit a proposal that does not exist', () => {
   return expect(
     proposalMutations.submit(dummyUserOfficerWithRole, { proposalId: -1 })
-  ).resolves.toHaveProperty('reason', 'INTERNAL_ERROR');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not submit proposal, because proposal not found'
+  );
 });
 
 test('A user on the proposal can submit a proposal', () => {
@@ -138,10 +154,21 @@ test('A user on the proposal can submit a proposal', () => {
   ).resolves.toHaveProperty('submitted', true);
 });
 
+test('A user on the proposal can not submit a proposal if the call is not active', async () => {
+  const result = await proposalMutations.submit(dummyUserWithRole, {
+    proposalId: 3,
+  });
+
+  return expect(isRejection(result)).toBe(true);
+});
+
 test('A user not on the proposal cannot submit a proposal', () => {
   return expect(
     proposalMutations.submit(dummyUserNotOnProposalWithRole, { proposalId: 1 })
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Unauthorized submission of the proposal'
+  );
 });
 
 test('A non-logged in user cannot submit a proposal', () => {
@@ -170,16 +197,15 @@ test('Principal investigator can delete a proposal', () => {
   ).resolves.toBeInstanceOf(Proposal);
 });
 
-test('Principal investigator can delete submitted proposal', async () => {
-  await proposalMutations.submit(dummyPrincipalInvestigatorWithRole, {
-    proposalId: 1,
-  });
-
+test('Principal investigator can not delete submitted proposal', async () => {
   return expect(
     proposalMutations.delete(dummyPrincipalInvestigatorWithRole, {
-      proposalId: 1,
+      proposalId: dummyProposalSubmitted.id,
     })
-  ).resolves.not.toBeInstanceOf(Proposal);
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not delete proposal because proposal is submitted'
+  );
 });
 
 test('Has to be logged in to create proposal', () => {

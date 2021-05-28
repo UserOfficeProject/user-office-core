@@ -1,34 +1,24 @@
-# Use postgres/example user/password credentials
 version: "3.1"
 
 services:
-  reverse-proxy:
+  # used to proxy the scheduler UI FE and BE requests to the right container
+  # Scheduler FE is accessible on localhost:33000/
+  # API gateway is accessible on localhost:33000/gateway
+  scheduler-proxy:
     image: traefik:1.7 # The official Traefik docker image
     command: --api --docker # Enables the web UI and tells Traefik to listen to docker
     ports:
-      - "8081:80" # The HTTP port
+      - "33000:80" # The HTTP port
       - "8080:8080" # The Web UI (enabled by --api)
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-  backend:
-    image: dmsc/duo-backend:develop
-    environment:
-      DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
-      secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
-      tokenLife: 7d
-      baseURL: localhost:3000
-      SPARKPOST_TOKEN: dummytoken
-      USER_OFFICE_FACTORY_ENDPOINT: http://factory:4500/generate
-    labels:
-      - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /download, /uploads"
-      - "traefik.port=4000"
-  frontend:
-    image: dmsc/duo-frontend:develop
-    labels:
-      - "traefik.frontend.rule=PathPrefix:/"
-      - "traefik.port=80"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
   duo-cron-job:
-    image: dmsc/duo-cron-job
+    image: dmsc/duo-cron-job:develop
+    environment:
+      API_URL: http://host.docker.internal:4000/graphql
+      API_AUTH_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQW5kZXJzIiwibWlkZGxlbmFtZSI6IkFkYW0iLCJsYXN0bmFtZSI6IkFuZGVyc3NvbiIsInVzZXJuYW1lIjoidGVzdG9mZmljZXIiLCJwcmVmZXJyZWRuYW1lIjoiUmhpYW5ub24iLCJvcmNpZCI6Ijg3ODMyMTg5NyIsImdlbmRlciI6Im1hbGUiLCJuYXRpb25hbGl0eSI6IkZyZW5jaCIsImJpcnRoZGF0ZSI6IjE5ODEtMDgtMDRUMjI6MDA6MDAuMDAwWiIsIm9yZ2FuaXNhdGlvbiI6IlBmYW5uZXJzdGlsbCBhbmQgU29ucyIsImRlcGFydG1lbnQiOiJJVCBkZXBhcnRtZW50Iiwib3JnYW5pc2F0aW9uX2FkZHJlc3MiOiJDb25nbywgQWxsZW5ldmlsbGUsIDM1ODIzIE11ZWxsZXIgR2xlbnMiLCJwb3NpdGlvbiI6IkxpYWlzb24iLCJlbWFpbCI6IkFhcm9uX0hhcnJpczQ5QGdtYWlsLmNvbSIsImVtYWlsVmVyaWZpZWQiOnRydWUsInRlbGVwaG9uZSI6IjcxMS0zMTYtNTcyOCIsInRlbGVwaG9uZV9hbHQiOiIxLTM1OS04NjQtMzQ4OSB4NzM5MCIsImNyZWF0ZWQiOiIyMDE5LTEwLTE3VDEwOjU4OjM4LjczNVoiLCJ1cGRhdGVkIjoiMjAxOS0xMC0xN1QxMDo1ODozOC43MzVaIn0sInJvbGVzIjpbeyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU3MTMyNzQ2Mn0.NinmUuwuu0D6syqwd2z5J1BaqhwRPlFaxtML8sA2Ang
+
   db:
     image: postgres:11-alpine
     restart: always
@@ -40,27 +30,74 @@ services:
       - 5432:5432
     volumes:
       - ./db_patches/:/docker-entrypoint-initdb.d/
+
+  scheduler-db:
+    image: postgres:11-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: scheduler
+      POSTGRES_USER: schedulerUser
+      POSTGRES_PASSWORD: schedulerPassword
+    ports:
+      - 54320:5432 # avoid collision
+
   rabbitmq:
     image: "rabbitmq:3-management"
-    hostname: "rabbit"
     ports:
       - "15672:15672"
       - "5672:5672"
-    labels:
-      NAME: "rabbitmq"
     volumes:
       - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
+
   factory:
     image: dmsc/duo-factory:develop
     init: true
     environment:
-      - NODE_ENV=production
-      - DATABASE_HOSTNAME=localhost
-      - DATABASE_PORT=5432
-      - DATABASE_USER=duouser
-      - DATABASE_PASSWORD=duopassword
-      - DATABASE_DATABASE=duo
+      NODE_ENV: development
+      DATABASE_HOSTNAME: db
+      DATABASE_PORT: 5432
+      DATABASE_USER: duouser
+      DATABASE_PASSWORD: duopassword
+      DATABASE_DATABASE: duo
     ports:
       - 4500:4500
     cap_add:
       - SYS_ADMIN
+
+  gateway:
+    image: "dmsc/duo-gateway:develop"
+    environment:
+      USER_OFFICE_BACKEND: http://host.docker.internal:4000/graphql
+      USER_OFFICE_SCHEDULER_BACKEND: http://scheduler-backend:4000/graphql
+      NODE_ENV: development
+      ENABLE_SERVICE_POLLING: 1 # see gateway
+      KEEP_RETRYING: 1 # see gateway
+    ports:
+      - 4100:4100
+    labels:
+      - "traefik.frontend.rule=PathPrefix:/gateway"
+      - "traefik.port=4100"
+
+  scheduler-frontend:
+    image: "dmsc/duo-scheduler-frontend:develop"
+    labels:
+      - "traefik.frontend.rule=PathPrefix:/"
+      - "traefik.port=80"
+
+  scheduler-backend:
+    image: "dmsc/duo-scheduler-backend:develop"
+    environment:
+      NODE_ENV: development
+      DATABASE_HOSTNAME: scheduler-db
+      DATABASE_PORT: 5432
+      DATABASE_USER: schedulerUser
+      DATABASE_PASSWORD: schedulerPassword
+      DATABASE_DATABASE: scheduler
+      SCHEDULER_CONFIG_AUTH_REDIRECT: http://localhost:3000/shared-auth
+      USER_OFFICE_ENDPOINT: http://host.docker.internal:4000/graphql
+      RABBITMQ_HOSTNAME: rabbitmq
+    depends_on:
+      - scheduler-db
+    ports:
+      - 44000:4000 # avoid collision
+

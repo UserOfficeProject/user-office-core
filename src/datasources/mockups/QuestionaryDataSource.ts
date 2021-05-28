@@ -12,6 +12,7 @@ import {
   FieldDependency,
   Question,
   QuestionTemplateRelation,
+  Template,
   TemplateCategoryId,
   TemplatesHasQuestions,
   Topic,
@@ -51,7 +52,7 @@ export const dummyQuestionFactory = (
 ): Question => {
   return new Question(
     values?.categoryId || TemplateCategoryId.PROPOSAL_QUESTIONARY,
-    values?.proposalQuestionId || 'random_field_name_' + Math.random(),
+    values?.id || 'random_field_name_' + Math.random(),
     values?.naturalKey || 'is_dangerous',
     values?.dataType || DataType.TEXT_INPUT,
     values?.question || 'Some random question',
@@ -82,7 +83,7 @@ export const dummyTemplateHasQuestionRelationFactory = (
 ): TemplatesHasQuestions => {
   return new TemplatesHasQuestions(
     Math.round(Math.random() * 100),
-    dummyQuestionFactory().proposalQuestionId,
+    dummyQuestionFactory().id,
     templateId || Math.round(Math.random() * 100),
     Math.round(Math.random() * 10),
     sortOrder + 1,
@@ -94,14 +95,14 @@ export const dummyTemplateHasQuestionRelationFactory = (
 const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
   return [
     new QuestionaryStep(
-      new Topic(0, 'General information', 1, 0, true),
+      new Topic(1, 'General information', 1, 0, true),
       false,
       [
         new Answer(
           1,
           dummyQuestionTemplateRelationFactory({
             question: dummyQuestionFactory({
-              proposalQuestionId: 'ttl_general',
+              id: 'ttl_general',
               naturalKey: 'ttl_general',
               dataType: DataType.EMBELLISHMENT,
               config: createConfig<EmbellishmentConfig>(
@@ -120,7 +121,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
           2,
           dummyQuestionTemplateRelationFactory({
             question: dummyQuestionFactory({
-              proposalQuestionId: 'has_links_with_industry',
+              id: 'has_links_with_industry',
               naturalKey: 'has_links_with_industry',
               dataType: DataType.SELECTION_FROM_OPTIONS,
               config: createConfig<SelectionFromOptionsConfig>(
@@ -139,7 +140,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
           3,
           dummyQuestionTemplateRelationFactory({
             question: dummyQuestionFactory({
-              proposalQuestionId: 'links_with_industry',
+              id: 'links_with_industry',
               naturalKey: 'links_with_industry',
               dataType: DataType.TEXT_INPUT,
               config: createConfig<TextInputConfig>(DataType.TEXT_INPUT, {
@@ -165,23 +166,42 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
 };
 
 export class QuestionaryDataSourceMock implements QuestionaryDataSource {
+  constructor() {
+    this.init();
+  }
+
+  public init() {
+    dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
+    dummyQuestionary = createDummyQuestionary();
+  }
+
+  async deleteAnswers(questionary_id: number, question_id: string[]) {
+    return;
+  }
+  async getAnswers(questionId: string): Promise<AnswerBasic[]> {
+    return [];
+  }
+  async getTemplates(questionId: string): Promise<Template[]> {
+    return [];
+  }
   async getCount(templateId: number): Promise<number> {
     return 1;
+  }
+
+  async getIsCompleted(questionaryId: number): Promise<boolean> {
+    return dummyQuestionarySteps.every((step) => step.isCompleted);
   }
 
   async clone(questionaryId: number): Promise<Questionary> {
     return createDummyQuestionary({ questionaryId: questionaryId + 1 });
   }
-  public init() {
-    dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
-    dummyQuestionary = createDummyQuestionary();
-  }
+
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
     return new AnswerBasic(answer_id, 1, 'questionId', '', new Date());
   }
 
   async getBlankQuestionarySteps(
-    templateId: number
+    _templateId: number
   ): Promise<QuestionaryStep[]> {
     return dummyQuestionarySteps;
   }
@@ -195,13 +215,13 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   }
 
   async updateAnswer(
-    proposalId: number,
+    _proposalId: number,
     questionId: string,
     answer: string
   ): Promise<string> {
     const updated = dummyQuestionarySteps.some((step) =>
       step.fields.some((field) => {
-        if (field.question.proposalQuestionId === questionId) {
+        if (field.question.id === questionId) {
           field.value = answer;
 
           return true;
@@ -217,14 +237,17 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     return questionId;
   }
   async insertFiles(
-    proposalId: number,
-    questionId: string,
+    _proposalId: number,
+    _questionId: string,
     files: string[]
   ): Promise<string[]> {
     return files;
   }
 
-  async deleteFiles(proposalId: number, questionId: string): Promise<string[]> {
+  async deleteFiles(
+    _proposalId: number,
+    _questionId: string
+  ): Promise<string[]> {
     return ['file_id_012345'];
   }
 
@@ -235,13 +258,13 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   }
 
   async getQuestionarySteps(
-    questionary_id: number
+    _questionary_id: number
   ): Promise<QuestionaryStep[]> {
     return dummyQuestionarySteps;
   }
 
   async updateTopicCompleteness(
-    questionary_id: number, // TODO name this questionary_id
+    questionary_id: number,
     topic_id: number,
     isComplete: boolean
   ): Promise<void> {

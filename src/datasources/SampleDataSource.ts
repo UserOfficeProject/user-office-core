@@ -4,6 +4,7 @@ import { SamplesArgs } from '../resolvers/queries/SamplesQuery';
 
 export interface SampleDataSource {
   delete(sampleId: number): Promise<Sample>;
+  cloneSample(sampleId: number): Promise<Sample>;
   updateSample(args: UpdateSampleArgs): Promise<Sample>;
   create(
     title: string,

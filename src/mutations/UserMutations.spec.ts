@@ -1,22 +1,19 @@
 import jsonwebtoken from 'jsonwebtoken';
+import { container } from 'tsyringe';
 
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
-import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   dummyPlaceHolderUser,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
-  UserDataSourceMock,
   dummyUserWithRole,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
+import { isRejection } from '../models/Rejection';
 import { AuthJwtPayload, BasicUserDetails, UserRole } from '../models/User';
-import { isRejection } from '../rejection';
 import { verifyToken } from '../utils/jwt';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import UserMutations from './UserMutations';
 
 jest.mock('../datasources/stfc/UOWSSoapInterface');
@@ -42,15 +39,7 @@ const badToken = jsonwebtoken.sign(
   { expiresIn: '-24h' }
 );
 
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock(),
-  new SEPDataSourceMock()
-);
-const userMutations = new UserMutations(
-  new UserDataSourceMock(),
-  userAuthorization
-);
+const userMutations = container.resolve(UserMutations);
 
 test('A user can invite another user by email', () => {
   const emailInviteResponse = new EmailInviteResponse(
@@ -88,7 +77,10 @@ test('A user cannot invite another user by email if the user already has an acco
       email: dummyUser.email,
       userRole: UserRole.USER,
     })
-  ).resolves.toHaveProperty('reason', 'ACCOUNT_EXIST');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not create account because account already exists'
+  );
 });
 
 test('A user can reinvite another user by email if the user has not created an account', () => {
@@ -133,7 +125,7 @@ test('A user cannot invite a reviewer by email', () => {
       email: 'email@google.com',
       userRole: UserRole.SEP_REVIEWER,
     })
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
+  ).resolves.toHaveProperty('reason', 'Can not create user for this role');
 });
 
 test('A user can update its own name', () => {
@@ -153,7 +145,10 @@ test('A user cannot update another users name', () => {
       firstname: 'klara',
       lastname: 'undefined',
     })
-  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not update user because of insufficient permissions'
+  );
 });
 
 test('A not logged in user cannot update another users name', () => {
@@ -208,19 +203,19 @@ test('A user should not be able to login with invalid credentials', () => {
       email: dummyUser.email,
       password: 'WrongPassword!',
     })
-  ).resolves.toHaveProperty('reason', 'WRONG_EMAIL_OR_PASSWORD');
+  ).resolves.toHaveProperty('reason', 'Wrong email or password');
 });
 
 test('A user should not be able to update a token if it is unvalid', () => {
   return expect(
     userMutations.token('this_is_a_invalid_token')
-  ).resolves.toHaveProperty('reason', 'BAD_TOKEN');
+  ).resolves.toHaveProperty('reason', 'Bad token');
 });
 
 test('A user should not be able to update a token if it is expired', () => {
   return expect(userMutations.token(badToken)).resolves.toHaveProperty(
     'reason',
-    'BAD_TOKEN'
+    'Bad token'
   );
 });
 
@@ -239,7 +234,7 @@ test('A user can reset its password by providing a valid email', () => {
 test('A user gets an error if providing a email not attached to a account', () => {
   return expect(
     userMutations.resetPasswordEmail(null, { email: 'dummyemail@ess.se' })
-  ).resolves.toHaveProperty('reason', 'COULD_NOT_FIND_USER_BY_EMAIL');
+  ).resolves.toHaveProperty('reason', 'Could not find user by email');
 });
 
 test('A user can update its password if it has a valid token', () => {
@@ -275,7 +270,10 @@ test('A user can not update another users password', () => {
       id: dummyUser.id,
       password: 'Test1234!',
     })
-  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Can not update password because of insufficient permissions'
+  );
 });
 
 test('A not logged in users can not update passwords', () => {
@@ -325,7 +323,7 @@ test('A user officer can must be able to delete another user', async () => {
 test('When an invalid external token is supplied, no user is found', async () => {
   return expect(
     userMutations.checkExternalToken('invalid')
-  ).resolves.toHaveProperty('reason', 'USER_DOES_NOT_EXIST');
+  ).resolves.toHaveProperty('reason', 'User not found');
 });
 
 test('When a valid external token is supplied, a new JWT is returned', async () => {

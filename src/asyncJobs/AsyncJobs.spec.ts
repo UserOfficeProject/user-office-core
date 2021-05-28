@@ -32,7 +32,7 @@ describe('Test if predefined async jobs are running correctly', () => {
       },
     ];
 
-    runAsyncJobs(allJobs, { callDataSource: callDataSourceMock });
+    runAsyncJobs(allJobs);
 
     clock.tick(1 * 60 * 1000);
 
@@ -65,7 +65,7 @@ describe('Test if predefined async jobs are running correctly', () => {
       },
     ];
 
-    runAsyncJobs(allJobs, { callDataSource: callDataSourceMock });
+    runAsyncJobs(allJobs);
 
     clock.tick(24 * 60 * 60 * 1000);
 
@@ -101,7 +101,7 @@ describe('Test if predefined async jobs are running correctly', () => {
       },
     ];
 
-    runAsyncJobs(allJobs, { callDataSource: callDataSourceMock });
+    runAsyncJobs(allJobs);
 
     clock.tick(2 * 24 * 60 * 60 * 1000);
 
@@ -140,7 +140,7 @@ describe('Test if predefined async jobs are running correctly', () => {
       },
     ];
 
-    runAsyncJobs(allJobs, { callDataSource: callDataSourceMock });
+    runAsyncJobs(allJobs);
 
     clock.tick(24 * 60 * 60 * 1000);
 

@@ -1,18 +1,22 @@
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
+@injectable()
 export default class SEPQueries {
   constructor(
-    public dataSource: SEPDataSource,
-    private userAuth: UserAuthorization
+    @inject(Tokens.SEPDataSource) public dataSource: SEPDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async get(agent: UserWithRole | null, id: number) {
-    const sep = await this.dataSource.get(id);
+    const sep = await this.dataSource.getSEP(id);
 
     if (!sep) {
       return null;
@@ -31,12 +35,12 @@ export default class SEPQueries {
   @Authorized([Roles.USER_OFFICER])
   async getAll(
     agent: UserWithRole | null,
-    active = true,
+    active?: boolean,
     filter?: string,
     first?: number,
     offset?: number
   ) {
-    return this.dataSource.getAll(active, filter, first, offset);
+    return this.dataSource.getSEPs(active, filter, first, offset);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
@@ -121,8 +125,8 @@ export default class SEPQueries {
     let reviewerId = null;
 
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId))
+      !this.userAuth.isUserOfficer(agent) &&
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId))
     ) {
       reviewerId = agent!.id;
     }
@@ -132,5 +136,28 @@ export default class SEPQueries {
       proposalId,
       reviewerId
     );
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  async getProposalSepMeetingDecision(
+    agent: UserWithRole | null,
+    proposalId: number
+  ) {
+    const [
+      sepMeetingDecision,
+    ] = await this.dataSource.getProposalsSepMeetingDecisions([proposalId]);
+
+    if (!sepMeetingDecision) {
+      return null;
+    }
+
+    if (
+      this.userAuth.isUserOfficer(agent) ||
+      (await this.userAuth.isMemberOfSEP(agent, proposalId))
+    ) {
+      return sepMeetingDecision;
+    } else {
+      return null;
+    }
   }
 }

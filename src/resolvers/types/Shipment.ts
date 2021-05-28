@@ -13,6 +13,7 @@ import {
   Shipment as ShipmentOrigin,
   ShipmentStatus,
 } from '../../models/Shipment';
+import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
 import { Sample } from './Sample';
 
@@ -65,5 +66,18 @@ export class ShipmentResolver {
       context.user,
       shipment.id
     );
+  }
+
+  @FieldResolver(() => Proposal)
+  async proposal(
+    @Root() shipment: Shipment,
+    @Ctx() context: ResolverContext
+  ): Promise<Proposal | null> {
+    const proposal = await context.queries.proposal.get(
+      context.user,
+      shipment.proposalId
+    );
+
+    return proposal;
   }
 }

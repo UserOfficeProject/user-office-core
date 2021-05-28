@@ -1,14 +1,21 @@
 import { logger } from '@esss-swap/duo-logger';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { UserWithRole } from '../models/User';
-import { userAuthorization } from './UserAuthorization';
+import { UserAuthorization } from './UserAuthorization';
 
+@injectable()
 export class ShipmentAuthorization {
   constructor(
+    @inject(Tokens.ShipmentDataSource)
     private shipmentDataSource: ShipmentDataSource,
-    private proposalDataSource: ProposalDataSource
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuthorization: UserAuthorization
   ) {}
 
   async hasReadRights(
@@ -29,7 +36,7 @@ export class ShipmentAuthorization {
     agent: UserWithRole | null,
     shipmentId: number | number[]
   ) {
-    if (await userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
@@ -50,7 +57,7 @@ export class ShipmentAuthorization {
     agent: UserWithRole | null,
     shipmentId: number
   ) {
-    const shipment = await this.shipmentDataSource.get(shipmentId);
+    const shipment = await this.shipmentDataSource.getShipment(shipmentId);
     if (!shipment) {
       logger.logError('Could not find shipment', {
         shipmentId,
@@ -69,6 +76,6 @@ export class ShipmentAuthorization {
       return false;
     }
 
-    return userAuthorization.hasAccessRights(agent, proposal);
+    return this.userAuthorization.hasAccessRights(agent, proposal);
   }
 }

@@ -42,12 +42,18 @@ const apolloServer = async (app: Express) => {
     }
   );
 
+  // TODO Find out why applyMiddleware is corrupting the schema
+  // schema = applyMiddleware(schema, rejectionLogger);
+  // if (process.env.NODE_ENV === 'production') {
+  //   // prevent exposing too much information when running in production
+  //   schema = applyMiddleware(schema, rejectionSanitizer);
+  // }
+
   const server = new ApolloServer({
-    schema,
+    schema: schema,
     tracing: false,
     playground: {
       settings: {
-        // @ts-expect-error NOTE: expect error until https://github.com/prisma-labs/graphql-playground/pull/1212 is merged
         'schema.polling.enable': false,
       },
     },

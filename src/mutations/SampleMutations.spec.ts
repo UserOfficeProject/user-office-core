@@ -1,39 +1,22 @@
 import 'reflect-metadata';
-import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
-import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
-import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummySampleReviewer,
+  dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { isRejection } from '../models/Rejection';
 import { Sample, SampleStatus } from '../models/Sample';
-import { SampleAuthorization } from '../utils/SampleAuthorization';
 import SampleMutations from './SampleMutations';
 
-const dummySampleDataSource = new SampleDataSourceMock();
-const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
-const dummyTemplateDataSource = new TemplateDataSourceMock();
-const dummyProposalDataSource = new ProposalDataSourceMock();
-const sampleAuthorization = new SampleAuthorization(
-  dummySampleDataSource,
-  dummyProposalDataSource
-);
-
-const sampleMutations = new SampleMutations(
-  dummySampleDataSource,
-  dummyQuestionaryDataSource,
-  dummyTemplateDataSource,
-  dummyProposalDataSource,
-  sampleAuthorization
-);
+const sampleMutations = container.resolve(SampleMutations);
 
 beforeEach(() => {
-  dummySampleDataSource.init();
-  dummyQuestionaryDataSource.init();
-  dummyTemplateDataSource.init();
-  dummyProposalDataSource.init();
+  container.resolve<SampleDataSourceMock>(Tokens.SampleDataSource).init();
 });
 
 test('User should be able to clone its sample', () => {
@@ -51,7 +34,10 @@ test('User officer should be able to clone sample', () => {
 test('User should not be able to clone sample that does not exist', () => {
   return expect(
     sampleMutations.cloneSample(dummyUserOfficerWithRole, 100)
-  ).resolves.toHaveProperty('reason', 'NOT_FOUND');
+  ).resolves.toHaveProperty(
+    'reason',
+    'Could not clone sample because an error occurred'
+  );
 });
 
 test('User should be able to update title of the sample', () => {
@@ -103,4 +89,34 @@ test('Sample safety reviewer should be able to update the sample safety comment'
       safetyComment: newComment,
     })
   ).resolves.toHaveProperty('safetyComment', newComment);
+});
+
+test('User can delete sample', async () => {
+  const result = await sampleMutations.deleteSample(dummyUserWithRole, 1);
+  expect(isRejection(result)).toBeFalsy();
+});
+
+test('User not on proposal can not delete sample', async () => {
+  const result = await sampleMutations.deleteSample(
+    dummyUserNotOnProposalWithRole,
+    1
+  );
+  expect(isRejection(result)).toBeTruthy();
+});
+
+test('User can update sample', async () => {
+  const updatedTitle = 'Updated title';
+  const result = await sampleMutations.updateSample(dummyUserWithRole, {
+    sampleId: 1,
+    title: updatedTitle,
+  });
+  expect((result as Sample).title).toEqual(updatedTitle);
+});
+
+test('User not on proposal can not update sample', async () => {
+  const result = await sampleMutations.updateSample(
+    dummyUserNotOnProposalWithRole,
+    { sampleId: 1, title: 'Not my sample' }
+  );
+  expect(isRejection(result)).toBeTruthy();
 });

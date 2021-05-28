@@ -1,20 +1,20 @@
 import 'dotenv/config';
 
 import faker from 'faker';
-
 import 'reflect-metadata';
-import {
-  adminDataSource,
-  callDataSource,
-  instrumentDataSource,
-  proposalDataSource,
-  proposalSettingsDataSource,
-  questionaryDataSource,
-  reviewDataSource,
-  sepDataSource,
-  templateDataSource,
-  userDataSource,
-} from '../datasources';
+import '../config';
+import { container } from 'tsyringe';
+
+import AdminDataSource from '../datasources/postgres/AdminDataSource';
+import CallDataSource from '../datasources/postgres/CallDataSource';
+import InstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
+import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
+import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
+import QuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
+import ReviewDataSource from '../datasources/postgres/ReviewDataSource';
+import SEPDataSource from '../datasources/postgres/SEPDataSource';
+import TemplateDataSource from '../datasources/postgres/TemplateDataSource';
+import UserDataSource from '../datasources/postgres/UserDataSource';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import {
@@ -35,6 +35,19 @@ const MAX_SEPS = 10;
 const MAX_REVIEWS = 600;
 const MAX_WORKFLOWS = 1;
 
+const adminDataSource = container.resolve(AdminDataSource);
+const callDataSource = container.resolve(CallDataSource);
+const instrumentDataSource = container.resolve(InstrumentDataSource);
+const proposalDataSource = container.resolve(ProposalDataSource);
+const proposalSettingsDataSource = container.resolve(
+  ProposalSettingsDataSource
+);
+const questionaryDataSource = container.resolve(QuestionaryDataSource);
+const reviewDataSource = container.resolve(ReviewDataSource);
+const sepDataSource = container.resolve(SEPDataSource);
+const templateDataSource = container.resolve(TemplateDataSource);
+const userDataSource = container.resolve(UserDataSource);
+
 const createUniqueIntArray = (size: number, max: number) => {
   if (size > max) {
     throw Error('size must be smaller than max');
@@ -48,10 +61,6 @@ const createUniqueIntArray = (size: number, max: number) => {
   shuffle(array);
 
   return array.slice(0, size);
-};
-
-const createIntArray = (size: number, max: number) => {
-  return new Array(size).fill(0).map((el) => dummy.positiveNumber(max));
 };
 
 const createUsers = async () => {
@@ -141,6 +150,11 @@ const createCalls = async () => {
       endCycle: faker.date.future(1),
       endReview: faker.date.future(1),
       endSEPReview: faker.date.future(1),
+      referenceNumberFormat: faker.random.words(8),
+      proposalSequence: faker.random.number({
+        min: 0,
+        max: 100,
+      }),
       shortCode: `${dummy.word().substr(0, 15)}${dummy.positiveNumber(100)}`,
       surveyComment: faker.random.words(5),
       proposalWorkflowId: 1,
@@ -192,7 +206,7 @@ const createTemplates = async () => {
       for (const question of questions) {
         await templateDataSource.upsertQuestionTemplateRelations([
           {
-            questionId: question.proposalQuestionId,
+            questionId: question.id,
             sortOrder: faker.random.number({
               min: 0,
               max: 100,
@@ -212,6 +226,7 @@ const createInstruments = async () => {
       name: `${dummy.word()}${dummy.positiveNumber(100)}`,
       description: faker.random.words(5),
       shortCode: `${dummy.word()}${dummy.positiveNumber(100)}`.substr(0, 19),
+      managerUserId: 1,
     });
   }, MAX_INSTRUMENTS);
 
@@ -255,7 +270,7 @@ const createProposals = async () => {
       for (const question of step.fields) {
         await questionaryDataSource.updateAnswer(
           questionary.questionaryId!,
-          question.question.proposalQuestionId,
+          question.question.id,
           JSON.stringify({ value: faker.random.words(5) })
         );
       }
@@ -286,6 +301,7 @@ const createReviews = async () => {
             : TechnicalReviewStatus.UNFEASIBLE,
         timeAllocation: dummy.positiveNumber(10),
         submitted: faker.random.boolean(),
+        reviewerId: 1,
       },
       false
     );
@@ -332,7 +348,7 @@ const createSeps = async () => {
 
 async function run() {
   console.log('Starting...');
-  await adminDataSource.resetDB();
+  await adminDataSource.resetDB(false);
   await createUsers();
   await createTemplates();
   await createWorkflows();

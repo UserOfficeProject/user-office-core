@@ -3,7 +3,9 @@ import * as bcrypt from 'bcryptjs';
 // TODO: Try to replace request-promise with axios. request-promise depends on reqest which is deprecated.
 import { CoreOptions, UriOptions } from 'request';
 import rp from 'request-promise';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
 import { Role, Roles } from '../models/Role';
@@ -13,24 +15,28 @@ import {
   UserWithRole,
   AuthJwtPayload,
   UserRole,
+  AuthJwtApiTokenPayload,
 } from '../models/User';
 import { signToken, verifyToken } from '../utils/jwt';
 
+@injectable()
 export default class UserQueries {
-  constructor(public dataSource: UserDataSource) {}
+  constructor(
+    @inject(Tokens.UserDataSource) public dataSource: UserDataSource
+  ) {}
 
   async getAgent(id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getUser(id);
   }
 
   @Authorized([Roles.USER_OFFICER])
   async get(agent: UserWithRole | null, id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getUser(id);
   }
 
   @Authorized()
   async byRef(agent: UserWithRole | null, id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getUser(id);
   }
 
   @Authorized()
@@ -174,7 +180,7 @@ export default class UserQueries {
   }
 
   async getUser(id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getUser(id);
   }
 
   async getProposers(agent: UserWithRole | null, proposalId: number) {
@@ -185,17 +191,23 @@ export default class UserQueries {
     token: string
   ): Promise<{
     isValid: boolean;
-    payload: AuthJwtPayload | null;
+    payload: AuthJwtPayload | AuthJwtApiTokenPayload | null;
   }> {
     try {
-      const payload = verifyToken<AuthJwtPayload>(token);
+      const payload = verifyToken<AuthJwtPayload | AuthJwtApiTokenPayload>(
+        token
+      );
+
+      if (!('user' in payload) && !('accessTokenId' in payload)) {
+        throw new Error('Unknown or malformed token');
+      }
 
       return {
         isValid: true,
         payload,
       };
     } catch (error) {
-      logger.logError('Bad token', { error });
+      logger.logException('Bad token', error, { token });
 
       return {
         isValid: false,

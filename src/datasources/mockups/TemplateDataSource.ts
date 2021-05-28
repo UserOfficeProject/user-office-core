@@ -17,6 +17,7 @@ import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
+import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import {
@@ -52,13 +53,13 @@ const dummyTopicFactory = (values?: Partial<Topic>) => {
 const dummyTemplateStepsFactory = () => {
   const hasLinksToField = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
-      proposalQuestionId: 'has_links_to_field',
+      id: 'has_links_to_field',
       dataType: DataType.SELECTION_FROM_OPTIONS,
     }),
   });
   const linksToField = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
-      proposalQuestionId: 'links_to_field',
+      id: 'links_to_field',
       dataType: DataType.TEXT_INPUT,
     }),
     dependencies: [
@@ -73,7 +74,7 @@ const dummyTemplateStepsFactory = () => {
 
   const enableCrystallization = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
-      proposalQuestionId: 'enable_crystallization',
+      id: 'enable_crystallization',
       dataType: DataType.BOOLEAN,
       question: 'Is crystallization aplicable',
       naturalKey: 'enable_crystallization',
@@ -82,7 +83,7 @@ const dummyTemplateStepsFactory = () => {
 
   const hasLinksWithIndustry = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
-      proposalQuestionId: 'has_links_with_industry',
+      id: 'has_links_with_industry',
       dataType: DataType.BOOLEAN,
       question: 'Has links with industry',
       naturalKey: 'has_links_with_industry',
@@ -91,7 +92,7 @@ const dummyTemplateStepsFactory = () => {
 
   const proposalBasis = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
-      proposalQuestionId: 'proposal_basis',
+      id: 'proposal_basis',
       naturalKey: 'proposal_basis',
       dataType: DataType.PROPOSAL_BASIS,
     }),
@@ -109,19 +110,22 @@ const dummyTemplateStepsFactory = () => {
 };
 
 export class TemplateDataSourceMock implements TemplateDataSource {
+  constructor() {
+    this.init();
+  }
   public init() {
     dummyProposalTemplate = dummyProposalTemplateFactory();
     dummyTemplateSteps = dummyTemplateStepsFactory();
     dummyComplementarySteps = [
       dummyQuestionFactory({
-        proposalQuestionId: 'not_in_template',
+        id: 'not_in_template',
         naturalKey: 'not_in_template',
       }),
     ];
   }
 
   async getComplementaryQuestions(
-    templateId: number
+    _templateId: number
   ): Promise<Question[] | null> {
     return [dummyQuestionFactory()];
   }
@@ -130,7 +134,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return dummyProposalTemplateFactory({ templateId: templateId + 1 });
   }
 
-  async getTemplate(templateId: number): Promise<Template | null> {
+  async getTemplate(_templateId: number): Promise<Template | null> {
     return dummyProposalTemplate;
   }
 
@@ -142,17 +146,17 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
   async getQuestionTemplateRelation(
     questionId: string,
-    templateId: number
+    _templateId: number
   ): Promise<QuestionTemplateRelation | null> {
     return dummyQuestionTemplateRelationFactory({
-      question: { proposalQuestionId: questionId },
+      question: { id: questionId },
     });
   }
 
   async getQuestionTemplateRelations(
     sortOrder: number,
     templateId: number,
-    questionToExcludeId?: string
+    _questionToExcludeId?: string
   ): Promise<TemplatesHasQuestions[] | null> {
     return [dummyTemplateHasQuestionRelationFactory(sortOrder, templateId)];
   }
@@ -162,7 +166,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   ): Promise<Template> {
     dummyTemplateSteps.forEach(function (step) {
       step.fields = step.fields.filter((field) => {
-        return field.question.proposalQuestionId !== args.questionId;
+        return field.question.id !== args.questionId;
       });
     });
 
@@ -197,7 +201,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       ),
     ];
   }
-  async isNaturalKeyPresent(naturalKey: string): Promise<boolean> {
+  async isNaturalKeyPresent(_naturalKey: string): Promise<boolean> {
     return true;
   }
 
@@ -205,7 +209,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return dummyTopicFactory({ id });
   }
   async createQuestion(
-    categoryId: TemplateCategoryId,
+    _categoryId: TemplateCategoryId,
     questionId: string,
     naturalKey: string,
     dataType: DataType,
@@ -214,7 +218,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return dummyQuestionFactory({
       naturalKey: naturalKey,
       dataType: dataType,
-      proposalQuestionId: questionId,
+      id: questionId,
       question,
     });
   }
@@ -225,7 +229,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       return accumulated.concat(current.fields.map((field) => field.question));
     }, new Array<Question>());
     const question = allQuestions.find(
-      (question) => question.proposalQuestionId === questionId
+      (question) => question.id === questionId
     );
     if (!question) {
       return null;
@@ -240,7 +244,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       throw new Error(`Question ${questionId} does not exist`);
     }
     const copy = dummyQuestionFactory(question);
-    question.proposalQuestionId = 'deleted_question'; //works for mocking purposes
+    question.id = 'deleted_question'; //works for mocking purposes
 
     return copy;
   }
@@ -258,7 +262,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       return accumulated.concat(current.fields);
     }, new Array<QuestionTemplateRelation>());
     const questionTemplateRelation = allQuestions.find(
-      (curQuestion) => curQuestion.question.proposalQuestionId === questionId
+      (curQuestion) => curQuestion.question.id === questionId
     );
 
     if (questionTemplateRelation) {
@@ -288,13 +292,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   }
 
   async updateQuestionTemplateRelationSettings(
-    args: UpdateQuestionTemplateRelationSettingsArgs
+    _args: UpdateQuestionTemplateRelationSettingsArgs
   ): Promise<Template> {
     return dummyProposalTemplate;
   }
 
   async upsertQuestionTemplateRelations(
-    collection: TemplatesHasQuestions[]
+    _collection: TemplatesHasQuestions[]
   ): Promise<Template> {
     return dummyProposalTemplate;
   }
@@ -310,13 +314,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return newTopic;
   }
 
-  async upsertTopics(data: Topic[]): Promise<Template> {
+  async upsertTopics(_data: Topic[]): Promise<Template> {
     return dummyProposalTemplate;
   }
 
   async getTopics(
-    templateId: number,
-    topicToExcludeId?: number
+    _templateId: number,
+    _topicToExcludeId?: number
   ): Promise<Topic[]> {
     return [dummyTopicFactory()];
   }
@@ -329,13 +333,17 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return [new TemplateCategory(1, 'Proposal Questionaries')];
   }
 
-  async setActiveTemplate(args: any): Promise<boolean> {
+  async setActiveTemplate(_args: any): Promise<boolean> {
     return true;
   }
 
   async getActiveTemplateId(
-    categoryId: TemplateCategoryId
+    _categoryId: TemplateCategoryId
   ): Promise<number | null> {
     return 1;
+  }
+
+  async getQuestions(filter?: QuestionsFilter): Promise<Question[]> {
+    return [dummyQuestionFactory()];
   }
 }

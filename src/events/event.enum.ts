@@ -4,6 +4,7 @@ export enum Event {
   PROPOSAL_UPDATED = 'PROPOSAL_UPDATED',
   PROPOSAL_SUBMITTED = 'PROPOSAL_SUBMITTED',
   PROPOSAL_FEASIBLE = 'PROPOSAL_FEASIBLE',
+  PROPOSAL_UNFEASIBLE = 'PROPOSAL_UNFEASIBLE',
   PROPOSAL_SEP_SELECTED = 'PROPOSAL_SEP_SELECTED',
   PROPOSAL_INSTRUMENT_SELECTED = 'PROPOSAL_INSTRUMENT_SELECTED',
   PROPOSAL_FEASIBILITY_REVIEW_UPDATED = 'PROPOSAL_FEASIBILITY_REVIEW_UPDATED',
@@ -14,11 +15,16 @@ export enum Event {
   PROPOSAL_SEP_REVIEW_UPDATED = 'PROPOSAL_SEP_REVIEW_UPDATED',
   PROPOSAL_SEP_REVIEW_SUBMITTED = 'PROPOSAL_SEP_REVIEW_SUBMITTED',
   PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED = 'PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED',
+  PROPOSAL_SEP_MEETING_SAVED = 'PROPOSAL_SEP_MEETING_SAVED',
   PROPOSAL_SEP_MEETING_SUBMITTED = 'PROPOSAL_SEP_MEETING_SUBMITTED',
+  PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN = 'PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN',
+  PROPOSAL_SEP_MEETING_REORDER = 'PROPOSAL_SEP_MEETING_REORDER',
+  PROPOSAL_MANAGEMENT_DECISION_UPDATED = 'PROPOSAL_MANAGEMENT_DECISION_UPDATED',
   PROPOSAL_MANAGEMENT_DECISION_SUBMITTED = 'PROPOSAL_MANAGEMENT_DECISION_SUBMITTED',
   PROPOSAL_INSTRUMENT_SUBMITTED = 'PROPOSAL_INSTRUMENT_SUBMITTED',
   PROPOSAL_ACCEPTED = 'PROPOSAL_ACCEPTED',
   PROPOSAL_REJECTED = 'PROPOSAL_REJECTED',
+  PROPOSAL_STATUS_UPDATED = 'PROPOSAL_STATUS_UPDATED',
   CALL_ENDED = 'CALL_ENDED',
   CALL_REVIEW_ENDED = 'CALL_REVIEW_ENDED',
   CALL_SEP_REVIEW_ENDED = 'CALL_SEP_REVIEW_ENDED',
@@ -37,6 +43,8 @@ export enum Event {
   SEP_MEMBER_REMOVED_FROM_PROPOSAL = 'SEP_MEMBER_REMOVED_FROM_PROPOSAL',
   PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED',
   PROPOSAL_CLONED = 'PROPOSAL_CLONED',
+  PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
+  PROPOSAL_STATUS_CHANGED_BY_USER = 'PROPOSAL_STATUS_CHANGED_BY_USER',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -46,6 +54,10 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PROPOSAL_FEASIBLE,
     'Event occurs when proposal feasibility review is submitted with value of feasible',
+  ],
+  [
+    Event.PROPOSAL_UNFEASIBLE,
+    'Event occurs when proposal feasibility review is submitted with value of unfeasible',
   ],
   [
     Event.PROPOSAL_SEP_SELECTED,
@@ -88,8 +100,20 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when all SEP reviews on a proposal are submitted',
   ],
   [
+    Event.PROPOSAL_SEP_MEETING_SAVED,
+    'Event occurs when SEP meeting is saved on a proposal',
+  ],
+  [
     Event.PROPOSAL_SEP_MEETING_SUBMITTED,
     'Event occurs when SEP meeting is submitted on a proposal',
+  ],
+  [
+    Event.PROPOSAL_SEP_MEETING_RANKING_OVERWRITTEN,
+    'Event occurs when SEP meeting ranking is overwritten on a proposal',
+  ],
+  [
+    Event.PROPOSAL_SEP_MEETING_REORDER,
+    'Event occurs when proposals are reordered in SEP meeting components',
   ],
   [
     Event.PROPOSAL_INSTRUMENT_SUBMITTED,
@@ -100,10 +124,18 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when proposal gets final decision as accepted',
   ],
   [
+    Event.PROPOSAL_MANAGEMENT_DECISION_UPDATED,
+    'Event occurs when proposal management decision is updated',
+  ],
+  [
     Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED,
     'Event occurs when proposal management decision is submitted',
   ],
   [Event.PROPOSAL_REJECTED, 'Event occurs when proposal gets rejected'],
+  [
+    Event.PROPOSAL_STATUS_UPDATED,
+    'Event occurs when proposal status gets updated manually',
+  ],
   [
     Event.CALL_ENDED,
     'Event occurs on a specific call end date set on the call',
@@ -146,4 +178,12 @@ export const EventLabel = new Map<Event, string>([
   ],
   [Event.PROPOSAL_NOTIFIED, 'Event occurs when proposal is notified'],
   [Event.PROPOSAL_CLONED, 'Event occurs when proposal is cloned'],
+  [
+    Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
+    'Event occurs when the proposal status was changed by the workflow engine',
+  ],
+  [
+    Event.PROPOSAL_STATUS_CHANGED_BY_USER,
+    'Event occurs when the proposal status was changed by the user',
+  ],
 ]);

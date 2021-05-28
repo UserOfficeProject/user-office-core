@@ -1,24 +1,20 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
 import {
-  SEPDataSourceMock,
-  dummySEP,
   anotherDummySEP,
-  dummySEPs,
+  dummySEP,
   dummySEPMembers,
   dummySEPProposal,
+  dummySEPs,
 } from '../datasources/mockups/SEPDataSource';
 import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { userAuthorization } from '../utils/UserAuthorization';
 import SEPQueries from './SEPQueries';
 
-const dummySEPDataSource = new SEPDataSourceMock();
-const SEPQueriesInstance = new SEPQueries(
-  dummySEPDataSource,
-  userAuthorization
-);
+const SEPQueriesInstance = container.resolve(SEPQueries);
 
 describe('Test SEPQueries', () => {
   test('A user cannot query all SEPs', () => {

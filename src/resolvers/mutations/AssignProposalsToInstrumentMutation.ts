@@ -6,27 +6,18 @@ import {
   Mutation,
   Resolver,
   Int,
-  InputType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { isRejection } from '../../rejection';
+import { isRejection } from '../../models/Rejection';
 import { SuccessResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
-
-@InputType()
-export class ProposalsToInstrumentArgs {
-  @Field(() => Int)
-  public id: number;
-
-  @Field(() => Int)
-  public callId: number;
-}
+import { ProposalIdWithCallId } from './ChangeProposalsStatusMutation';
 
 @ArgsType()
 export class AssignProposalsToInstrumentArgs {
-  @Field(() => [ProposalsToInstrumentArgs])
-  public proposals: ProposalsToInstrumentArgs[];
+  @Field(() => [ProposalIdWithCallId])
+  public proposals: ProposalIdWithCallId[];
 
   @Field(() => Int)
   public instrumentId: number;

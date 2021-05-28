@@ -7,13 +7,13 @@ import {
   getQuestionaryStepByTopicId,
 } from '../../models/ProposalModelFunctions';
 import { Answer, QuestionaryStep } from '../../models/Questionary';
+import { isRejection } from '../../models/Rejection';
 import {
   TechnicalReview,
   TechnicalReviewStatus,
 } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
-import { isRejection } from '../../rejection';
 import { getFileAttachments, Attachment } from '../util';
 import { collectSamplePDFData, SamplePDFData } from './sample';
 
@@ -50,10 +50,7 @@ const getTopicActiveAnswers = (
 
   return step
     ? (step.fields.filter((field) => {
-        return areDependenciesSatisfied(
-          questionarySteps,
-          field.question.proposalQuestionId
-        );
+        return areDependenciesSatisfied(questionarySteps, field.question.id);
       }) as Answer[])
     : [];
 };
@@ -129,7 +126,7 @@ export const collectProposalPDFData = async (
   // Information from each topic in proposal
   for (const step of questionarySteps) {
     if (!step) {
-      logger.logError('step not found', questionarySteps);
+      logger.logError('step not found', { ...questionarySteps }); // TODO: fix type of the second param in the lib (don't use Record<string, unknown>)
 
       throw 'Could not download generated PDF';
     }
@@ -155,9 +152,7 @@ export const collectProposalPDFData = async (
 
       if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
         answer.value = samples
-          .filter(
-            (sample) => sample.questionId === answer.question.proposalQuestionId
-          )
+          .filter((sample) => sample.questionId === answer.question.id)
           .map((sample) => sample);
       }
     }

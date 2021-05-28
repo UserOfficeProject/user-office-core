@@ -1,24 +1,19 @@
-import {
-  reviewDataSource,
-  sepDataSource,
-  userDataSource,
-} from '../datasources';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
-import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
-import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
-import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { User, UserWithRole } from '../models/User';
 
+@injectable()
 export class UserAuthorization {
   constructor(
-    private userDataSource: UserDataSource,
-    private reviewDataSource: ReviewDataSource,
-    private sepDataSource: SEPDataSource
+    @inject(Tokens.UserDataSource) private userDataSource: UserDataSource,
+    @inject(Tokens.ReviewDataSource) private reviewDataSource: ReviewDataSource,
+    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource
   ) {}
 
   isUserOfficer(agent: UserWithRole | null) {
@@ -77,14 +72,27 @@ export class UserAuthorization {
     });
   }
 
-  async isReviewerOfProposal(agent: User | null, proposalID: number) {
-    if (agent == null || !agent.id) {
+  async isReviewerOfProposal(agent: UserWithRole | null, proposalID: number) {
+    if (agent == null || !agent.id || !agent.currentRole) {
       return false;
     }
 
-    return this.reviewDataSource.getUserReviews(agent.id).then((reviews) => {
-      return reviews.some((review) => review.proposalID === proposalID);
-    });
+    const sepsUserIsMemberOf = await this.sepDataSource.getUserSepsByRoleAndSepId(
+      agent.id,
+      agent.currentRole
+    );
+
+    const sepIdsUserIsMemberOf = sepsUserIsMemberOf.map((sep) => sep.id);
+
+    /**
+     * NOTE: Everybody who is on a(member of) SEP(Scientific evaluation panel) is able to view and review a proposal.
+     * If we like to limit that we can just send userId on the getUserReviews and query for reviews that are only on that specific user.
+     */
+    return this.reviewDataSource
+      .getUserReviews(sepIdsUserIsMemberOf)
+      .then((reviews) => {
+        return reviews.some((review) => review.proposalID === proposalID);
+      });
   }
 
   async isScientistToProposal(agent: User | null, proposalID: number) {
@@ -120,63 +128,51 @@ export class UserAuthorization {
       (await this.isMemberOfProposal(agent, proposal)) ||
       (await this.isReviewerOfProposal(agent, proposal.id)) ||
       (await this.isScientistToProposal(agent, proposal.id)) ||
-      (await this.isChairOrSecretaryOfProposal(agent.id, proposal.id)) ||
+      (await this.isChairOrSecretaryOfProposal(agent, proposal.id)) ||
       this.hasGetAccessByToken(agent)
     );
   }
 
   async isChairOrSecretaryOfSEP(
-    userId: number,
+    agent: User | null,
     sepId: number
   ): Promise<boolean> {
-    if (!userId || !sepId) {
+    if (agent == null || !agent.id || !sepId) {
       return false;
     }
 
-    return this.sepDataSource.isChairOrSecretaryOfSEP(userId, sepId);
+    return this.sepDataSource.isChairOrSecretaryOfSEP(agent.id, sepId);
   }
 
-  async isChairOrSecretaryOfProposal(userId: number, proposalId: number) {
-    if (!userId || !proposalId) {
+  async isChairOrSecretaryOfProposal(agent: User | null, proposalId: number) {
+    if (agent == null || !agent.id || !proposalId) {
       return false;
     }
 
-    return this.sepDataSource.isChairOrSecretaryOfProposal(userId, proposalId);
+    return this.sepDataSource.isChairOrSecretaryOfProposal(
+      agent.id,
+      proposalId
+    );
   }
 
   hasGetAccessByToken(agent: UserWithRole) {
     return !!agent.accessPermissions?.['ProposalQueries.get'];
   }
 
-  async isMemberOfSEP(agent: User | null, sepId: number): Promise<boolean> {
-    if (agent == null) {
+  async isMemberOfSEP(
+    agent: UserWithRole | null,
+    sepId: number
+  ): Promise<boolean> {
+    if (agent == null || !agent.currentRole) {
       return false;
     }
 
-    const sep = await this.sepDataSource.getUserSepBySepId(agent.id, sepId);
+    const [sep] = await this.sepDataSource.getUserSepsByRoleAndSepId(
+      agent.id,
+      agent.currentRole,
+      sepId
+    );
 
     return sep !== null;
   }
 }
-
-let userDataSourceInstance: UserDataSource = userDataSource;
-let reviewDataSourceInstance: ReviewDataSource = reviewDataSource;
-let sepDataSourceInstance: SEPDataSource = sepDataSource;
-
-if (process.env.NODE_ENV === 'test') {
-  userDataSourceInstance = new UserDataSourceMock();
-  reviewDataSourceInstance = new ReviewDataSourceMock();
-  sepDataSourceInstance = new SEPDataSourceMock();
-}
-
-if (process.env.EXTERNAL_AUTH_PROVIDER) {
-  if (process.env.EXTERNAL_AUTH_PROVIDER === 'stfc') {
-    userDataSourceInstance = new StfcUserDataSource();
-  }
-}
-
-export const userAuthorization = new UserAuthorization(
-  userDataSourceInstance,
-  reviewDataSourceInstance,
-  sepDataSourceInstance
-);

@@ -31,7 +31,10 @@ export class AdministrationProposalArgs {
   public statusId?: number;
 
   @Field(() => Int, { nullable: true })
-  public rankOrder?: number;
+  public managementTimeAllocation?: number;
+
+  @Field(() => Boolean, { nullable: true })
+  public managementDecisionSubmitted?: boolean;
 }
 
 @Resolver()

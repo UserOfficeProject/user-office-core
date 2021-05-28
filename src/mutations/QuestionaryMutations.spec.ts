@@ -1,43 +1,22 @@
 import 'reflect-metadata';
-import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
-import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
-import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
-import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUser,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { isRejection } from '../models/Rejection';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
-import { isRejection } from '../rejection';
-import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import QuestionaryMutations from './QuestionaryMutations';
 
-const dummyProposalDataSource = new ProposalDataSourceMock();
-const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
-const dummyTemplateDataSource = new TemplateDataSourceMock();
-const dummySampleDataSource = new SampleDataSourceMock();
-const dummyShipmentDataSource = new ShipmentDataSourceMock();
+const mutations = container.resolve(QuestionaryMutations);
+const queries = container.resolve(QuestionaryQueries);
 
-const questionaryAuth = new QuestionaryAuthorization(
-  dummyProposalDataSource,
-  dummyQuestionaryDataSource,
-  dummyTemplateDataSource,
-  dummySampleDataSource,
-  dummyShipmentDataSource
-);
-const mutations = new QuestionaryMutations(
-  dummyQuestionaryDataSource,
-  dummyTemplateDataSource,
-  questionaryAuth
-);
-const queries = new QuestionaryQueries(
-  dummyQuestionaryDataSource,
-  questionaryAuth
-);
+const USER_QUESTIONARY_ID = 1;
 
 const getDummyUsersProposal = async () => {
-  const USER_QUESTIONARY_ID = 1;
   const steps = await queries.getQuestionarySteps(
     dummyUserWithRole,
     USER_QUESTIONARY_ID
@@ -49,9 +28,9 @@ const getDummyUsersProposal = async () => {
 };
 
 beforeEach(() => {
-  dummyQuestionaryDataSource.init();
-  dummyTemplateDataSource.init();
-  dummyProposalDataSource.init();
+  container
+    .resolve<QuestionaryDataSourceMock>(Tokens.QuestionaryDataSource)
+    .init();
 });
 
 it('User should answer topic questions', async () => {
@@ -60,12 +39,12 @@ it('User should answer topic questions', async () => {
     firstStep,
     questionaryId,
   } = await getDummyUsersProposal();
-  const result = await mutations.answerTopic(dummyUser, {
+  const result = await mutations.answerTopic(dummyUserWithRole, {
     questionaryId,
     topicId: firstStep.topic.id,
     answers: [
       {
-        questionId: firstAnswer.question.proposalQuestionId,
+        questionId: firstAnswer.question.id,
         value: JSON.stringify({ value: 'answer' }),
       },
     ],
@@ -73,17 +52,32 @@ it('User should answer topic questions', async () => {
   expect(isRejection(result)).toBeFalsy();
 });
 
-it('User should update question', async () => {
-  const NEW_ANSWER = 'NEW_ANSWER';
+it('User should not be able to answer topic questions if proposal has no active call', async () => {
   const {
     firstAnswer,
     firstStep,
     questionaryId,
   } = await getDummyUsersProposal();
+  const result = await mutations.answerTopic(dummyUserWithRole, {
+    questionaryId: questionaryId + 1, // anything other than 1 is considered to have no active call
+    topicId: firstStep.topic.id,
+    answers: [
+      {
+        questionId: firstAnswer.question.id,
+        value: JSON.stringify({ value: 'answer' }),
+      },
+    ],
+  });
+  expect(isRejection(result)).toBe(true);
+});
+
+it('User should update question', async () => {
+  const NEW_ANSWER = 'NEW_ANSWER';
+  const { firstAnswer, questionaryId } = await getDummyUsersProposal();
   const result = await mutations.updateAnswer(dummyUser, {
     questionaryId,
     answer: {
-      questionId: firstAnswer.question.proposalQuestionId,
+      questionId: firstAnswer.question.id,
       value: NEW_ANSWER,
     },
   });

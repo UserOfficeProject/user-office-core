@@ -1,13 +1,45 @@
 import { logger } from '@esss-swap/duo-logger';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import { Sample } from '../../models/Sample';
 import { UpdateSampleArgs } from '../../resolvers/mutations/UpdateSampleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
+import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import { SampleDataSource } from '../SampleDataSource';
 import database from './database';
 import { createSampleObject, SampleRecord } from './records';
 
+@injectable()
 export default class PostgresSampleDataSource implements SampleDataSource {
+  constructor(
+    @inject(Tokens.QuestionaryDataSource)
+    private questionaryDataSource: QuestionaryDataSource
+  ) {}
+  async cloneSample(sampleId: number): Promise<Sample> {
+    const sourceSample = await this.getSample(sampleId);
+    if (!sourceSample) {
+      logger.logError(
+        'Could not clone sample because source sample does not exist',
+        { sampleId }
+      );
+      throw new Error('Could not clone sample');
+    }
+
+    const newQuestionary = await this.questionaryDataSource.clone(
+      sourceSample.questionaryId
+    );
+
+    const newSample = await this.create(
+      sourceSample.title,
+      sourceSample.creatorId,
+      sourceSample.proposalId,
+      newQuestionary.questionaryId,
+      sourceSample.questionId
+    );
+
+    return newSample;
+  }
   delete(sampleId: number): Promise<Sample> {
     return database('samples')
       .where({ sample_id: sampleId })
@@ -29,6 +61,9 @@ export default class PostgresSampleDataSource implements SampleDataSource {
           title: args.title,
           safety_comment: args.safetyComment,
           safety_status: args.safetyStatus,
+          proposal_id: args.proposalId,
+          questionary_id: args.questionaryId,
+          shipment_id: args.shipmentId,
         },
         '*'
       )
@@ -105,8 +140,8 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         if (filter?.status) {
           query.where('creator_id', filter.status);
         }
-        if (filter?.questionaryId) {
-          query.where('questionary_id', filter.questionaryId);
+        if (filter?.questionaryIds) {
+          query.where('questionary_id', 'in', filter.questionaryIds);
         }
         if (filter?.title) {
           query.where('title', 'like', `%${filter.title}%`);

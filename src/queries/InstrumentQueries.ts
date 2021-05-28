@@ -1,15 +1,20 @@
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized } from '../decorators';
 import { Instrument } from '../models/Instrument';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { userAuthorization } from '../utils/UserAuthorization';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
+@injectable()
 export default class InstrumentQueries {
   constructor(
+    @inject(Tokens.InstrumentDataSource)
     public dataSource: InstrumentDataSource,
-    private sepDataSource: SEPDataSource
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization
   ) {}
 
   private isUserOfficer(agent: UserWithRole | null) {
@@ -22,7 +27,7 @@ export default class InstrumentQueries {
 
   @Authorized()
   async get(agent: UserWithRole | null, instrumentId: number) {
-    const instrument = await this.dataSource.get(instrumentId);
+    const instrument = await this.dataSource.getInstrument(instrumentId);
 
     return instrument;
   }
@@ -35,7 +40,7 @@ export default class InstrumentQueries {
   ])
   async getAll(agent: UserWithRole | null, callIds: number[]) {
     if (!callIds || callIds.length === 0) {
-      return await this.dataSource.getAll();
+      return await this.dataSource.getInstruments();
     } else {
       const instrumentsByCallIds = await this.dataSource.getInstrumentsByCallId(
         callIds
@@ -53,7 +58,7 @@ export default class InstrumentQueries {
     agent: UserWithRole | null
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
     if (this.isUserOfficer(agent)) {
-      return this.dataSource.getAll();
+      return this.dataSource.getInstruments();
     }
 
     const instruments = await this.dataSource.getUserInstruments(agent!.id);
@@ -68,7 +73,7 @@ export default class InstrumentQueries {
   ) {
     if (
       this.isUserOfficer(agent) ||
-      (await userAuthorization.isMemberOfSEP(agent, sepId))
+      (await this.userAuth.isMemberOfSEP(agent, sepId))
     ) {
       const instruments = await this.dataSource.getInstrumentsBySepId(
         sepId,
@@ -81,7 +86,7 @@ export default class InstrumentQueries {
     }
   }
 
-  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  @Authorized()
   async hasInstrumentScientistInstrument(
     agent: UserWithRole | null,
     instrumentId: number
@@ -92,7 +97,7 @@ export default class InstrumentQueries {
     );
   }
 
-  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  @Authorized()
   async hasInstrumentScientistAccess(
     agent: UserWithRole | null,
     instrumentId: number,
@@ -107,6 +112,6 @@ export default class InstrumentQueries {
 
   @Authorized()
   async byRef(agent: UserWithRole | null, id: number) {
-    return this.dataSource.get(id);
+    return this.dataSource.getInstrument(id);
   }
 }

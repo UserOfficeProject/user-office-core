@@ -1,4 +1,3 @@
-import { logger } from '@esss-swap/duo-logger';
 import {
   createProposalStatusValidationSchema,
   updateProposalStatusValidationSchema,
@@ -9,20 +8,22 @@ import {
   addProposalWorkflowStatusValidationSchema,
   moveProposalWorkflowStatusValidationSchema,
   deleteProposalWorkflowStatusValidationSchema,
-  addNextStatusEventsValidationSchema,
+  // addNextStatusEventsValidationSchema,
 } from '@esss-swap/duo-validation';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
-import { NextStatusEvent } from '../models/NextStatusEvent';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
+import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { UserWithRole } from '../models/User';
-import { rejection, Rejection } from '../rejection';
-import { AddNextStatusEventsToConnectionInput } from '../resolvers/mutations/settings/AddNextStatusEventsToConnection';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
+import { AddStatusChangingEventsToConnectionInput } from '../resolvers/mutations/settings/AddStatusChangingEventsToConnection';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { DeleteProposalWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteProposalWorkflowStatusMutation';
@@ -30,9 +31,12 @@ import { MoveProposalWorkflowStatusInput } from '../resolvers/mutations/settings
 import { UpdateProposalStatusInput } from '../resolvers/mutations/settings/UpdateProposalStatusMutation';
 import { UpdateProposalWorkflowInput } from '../resolvers/mutations/settings/UpdateProposalWorkflowMutation';
 import { omit } from '../utils/helperFunctions';
-
+@injectable()
 export default class ProposalSettingsMutations {
-  constructor(private dataSource: ProposalSettingsDataSource) {}
+  constructor(
+    @inject(Tokens.ProposalSettingsDataSource)
+    private dataSource: ProposalSettingsDataSource
+  ) {}
 
   @ValidateArgs(createProposalStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
@@ -41,12 +45,11 @@ export default class ProposalSettingsMutations {
     args: CreateProposalStatusInput
   ): Promise<ProposalStatus | Rejection> {
     return this.dataSource.createProposalStatus(args).catch((error) => {
-      logger.logException('Could not create proposal status', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not create proposal status',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -57,12 +60,11 @@ export default class ProposalSettingsMutations {
     args: UpdateProposalStatusInput
   ): Promise<ProposalStatus | Rejection> {
     return this.dataSource.updateProposalStatus(args).catch((error) => {
-      logger.logException('Could not update proposal status', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not update proposal status',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -73,12 +75,11 @@ export default class ProposalSettingsMutations {
     args: { id: number }
   ): Promise<ProposalStatus | Rejection> {
     return this.dataSource.deleteProposalStatus(args.id).catch((error) => {
-      logger.logException('Could not delete proposal status', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not delete proposal status',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -89,12 +90,11 @@ export default class ProposalSettingsMutations {
     args: CreateProposalWorkflowInput
   ): Promise<ProposalWorkflow | Rejection> {
     return this.dataSource.createProposalWorkflow(args).catch((error) => {
-      logger.logException('Could not create proposal workflow', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not create proposal workflow',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -105,12 +105,11 @@ export default class ProposalSettingsMutations {
     args: UpdateProposalWorkflowInput
   ): Promise<ProposalWorkflow | Rejection> {
     return this.dataSource.updateProposalWorkflow(args).catch((error) => {
-      logger.logException('Could not update proposal workflow', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not update proposal workflow',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -121,12 +120,11 @@ export default class ProposalSettingsMutations {
     args: { id: number }
   ): Promise<ProposalWorkflow | Rejection> {
     return this.dataSource.deleteProposalWorkflow(args.id).catch((error) => {
-      logger.logException('Could not delete proposal workflow', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not delete proposal workflow',
+        { agent, args },
+        error
+      );
     });
   }
 
@@ -193,15 +191,17 @@ export default class ProposalSettingsMutations {
     return await this.dataSource.deleteProposalWorkflowStatus(
       lastConnectionInParentDroppableGroup.proposalStatusId,
       lastConnectionInParentDroppableGroup.proposalWorkflowId,
-      lastConnectionInParentDroppableGroup.nextProposalStatusId as number
+      lastConnectionInParentDroppableGroup.sortOrder
     );
   }
 
   async updateProposalWorkflowConnectionStatuses(
     proposalWorkflowConnections: ProposalWorkflowConnection[],
-    isFirstConnectionInChildGroup: boolean,
-    isLastConnectionInParentGroup: boolean = false,
-    isInTheMiddleOfAGroup: boolean = false
+    {
+      isInTheMiddleOfAGroup = false,
+      isLastConnectionInParentGroup = false,
+      isFirstConnectionInChildGroup = false,
+    }
   ) {
     const updatedWorkflowConnections = this.orderAndConnectAllWorkflowStatusesInSameDroppableGroup(
       proposalWorkflowConnections,
@@ -212,13 +212,29 @@ export default class ProposalSettingsMutations {
     const parentDroppableGroupId = firstConnection.parentDroppableGroupId;
 
     if (parentDroppableGroupId) {
-      const lastConnectionInParentDroppableGroup = await this.getLastConnectionInParentDroppableGroup(
-        firstConnection.proposalWorkflowId,
-        parentDroppableGroupId
+      const [
+        lastConnectionInParentDroppableGroup,
+      ] = await this.dataSource.getProposalWorkflowConnectionsById(
+        proposalWorkflowConnections[0].proposalWorkflowId,
+        proposalWorkflowConnections[0].prevProposalStatusId as number,
+        {
+          nextProposalStatusId:
+            secondConnection && isFirstConnectionInChildGroup
+              ? proposalWorkflowConnections[1]?.proposalStatusId
+              : null,
+        }
       );
 
+      if (secondConnection && isFirstConnectionInChildGroup) {
+        updatedWorkflowConnections[0].prevProposalStatusId =
+          proposalWorkflowConnections[1].prevProposalStatusId;
+      } else {
+        updatedWorkflowConnections[0].prevProposalStatusId =
+          lastConnectionInParentDroppableGroup?.proposalStatusId;
+      }
+
       updatedWorkflowConnections[0].prevProposalStatusId =
-        lastConnectionInParentDroppableGroup.proposalStatusId;
+        lastConnectionInParentDroppableGroup?.proposalStatusId;
 
       if (isFirstConnectionInChildGroup) {
         if (secondConnection) {
@@ -245,9 +261,18 @@ export default class ProposalSettingsMutations {
 
       // Delete connection between second last and last connection if there is one.
       if (secondLastConnection) {
+        const secondLastConnectionInitialSortOrder = proposalWorkflowConnections.find(
+          (proposalWorkflowConnection) =>
+            proposalWorkflowConnection.proposalStatusId ===
+              secondLastConnection.proposalStatusId &&
+            proposalWorkflowConnection.prevProposalStatusId ===
+              secondLastConnection.prevProposalStatusId
+        )?.sortOrder;
+
         await this.dataSource.deleteProposalWorkflowStatus(
           secondLastConnection.proposalStatusId,
-          secondLastConnection.proposalWorkflowId
+          secondLastConnection.proposalWorkflowId,
+          secondLastConnectionInitialSortOrder || secondLastConnection.sortOrder
         );
       }
 
@@ -317,9 +342,11 @@ export default class ProposalSettingsMutations {
     const insertedWorkflowConnection = (
       await this.updateProposalWorkflowConnectionStatuses(
         allWorkflowGroupConnections,
-        isFirstConnectionInChildGroup,
-        isLastConnectionInParentGroup,
-        isInTheMiddleOfAGroup
+        {
+          isInTheMiddleOfAGroup,
+          isFirstConnectionInChildGroup,
+          isLastConnectionInParentGroup,
+        }
       )
     )[newWorkflowConnection.sortOrder];
 
@@ -363,33 +390,31 @@ export default class ProposalSettingsMutations {
         return this.insertNewAndUpdateExistingProposalWorkflowStatuses(args);
       }
     } catch (error) {
-      logger.logException('Could not add proposal workflow status', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not add proposal workflow status',
+        { agent, args },
+        error
+      );
     }
   }
 
-  @ValidateArgs(addNextStatusEventsValidationSchema)
+  // @ValidateArgs(addNextStatusEventsValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async addNextStatusEventsToConnection(
+  async addStatusChangingEventsToConnection(
     agent: UserWithRole | null,
-    args: AddNextStatusEventsToConnectionInput
-  ): Promise<NextStatusEvent[] | Rejection> {
+    args: AddStatusChangingEventsToConnectionInput
+  ): Promise<StatusChangingEvent[] | Rejection> {
     return this.dataSource
-      .addNextStatusEventsToConnection(
+      .addStatusChangingEventsToConnection(
         args.proposalWorkflowConnectionId,
-        args.nextStatusEvents
+        args.statusChangingEvents
       )
       .catch((error) => {
-        logger.logException('Could not add next status events', error, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Could not add next status events',
+          { agent, args },
+          error
+        );
       });
   }
 
@@ -416,22 +441,56 @@ export default class ProposalSettingsMutations {
         );
       }
 
-      const isFirstConnectionInGroup = args.to.index === 0;
+      const isFirstConnectionInChildGroup = args.to.index === 0;
 
       await this.updateProposalWorkflowConnectionStatuses(
         reorderedWorkflowConnections,
-        isFirstConnectionInGroup
+        { isFirstConnectionInChildGroup }
       );
 
       return reorderedWorkflowConnections[args.to.index];
     } catch (error) {
-      logger.logException('Could not move proposal workflow status', error, {
-        agent,
-        args,
-      });
-
-      return rejection('INTERNAL_ERROR');
+      return rejection(
+        'Could not move proposal workflow status',
+        { agent, args },
+        error
+      );
     }
+  }
+
+  async findPreviousAndNextConnections(
+    proposalWorkflowId: number,
+    {
+      currentConnectionId,
+      previousConnectionId,
+      nextConnectionId,
+    }: {
+      currentConnectionId: number;
+      previousConnectionId: number | null;
+      nextConnectionId: number | null;
+    }
+  ) {
+    const [previousConnection] = previousConnectionId
+      ? await this.dataSource.getProposalWorkflowConnectionsById(
+          proposalWorkflowId,
+          previousConnectionId,
+          {
+            nextProposalStatusId: currentConnectionId,
+          }
+        )
+      : [];
+
+    const [nextConnection] = nextConnectionId
+      ? await this.dataSource.getProposalWorkflowConnectionsById(
+          proposalWorkflowId,
+          nextConnectionId,
+          {
+            prevProposalStatusId: currentConnectionId,
+          }
+        )
+      : [];
+
+    return [previousConnection, nextConnection];
   }
 
   @ValidateArgs(deleteProposalWorkflowStatusValidationSchema)
@@ -440,87 +499,135 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: DeleteProposalWorkflowStatusInput
   ): Promise<boolean | Rejection> {
-    return this.dataSource
-      .deleteProposalWorkflowStatus(
+    try {
+      // NOTE: We can have more than one connection if it is multi-column workflow
+      const workflowConnectionsToRemove = await this.dataSource.getProposalWorkflowConnectionsById(
+        args.proposalWorkflowId,
         args.proposalStatusId,
-        args.proposalWorkflowId
-      )
-      .then(async (result) => {
-        const allGroupWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
-          args.proposalWorkflowId,
-          result.droppableGroupId
+        { sortOrder: args.sortOrder }
+      );
+
+      const [firstWorkflowConnectionToRemove] = workflowConnectionsToRemove;
+
+      if (!firstWorkflowConnectionToRemove) {
+        return rejection(
+          'Can not delete workflow connection because first connection not found',
+          { workflowConnectionsToRemove }
+        );
+      }
+
+      const allGroupWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
+        args.proposalWorkflowId,
+        firstWorkflowConnectionToRemove.droppableGroupId
+      );
+
+      const isLastConnectionInGroupRemoved =
+        firstWorkflowConnectionToRemove.sortOrder + 1 ===
+        allGroupWorkflowConnections.length;
+      const lastConnectionInParentGroupRemoved =
+        isLastConnectionInGroupRemoved &&
+        firstWorkflowConnectionToRemove.nextProposalStatusId &&
+        firstWorkflowConnectionToRemove.prevProposalStatusId;
+
+      if (lastConnectionInParentGroupRemoved) {
+        const [
+          workflowConnectionToReplaceRemoved,
+        ] = await this.dataSource.getProposalWorkflowConnectionsById(
+          firstWorkflowConnectionToRemove.proposalWorkflowId,
+          firstWorkflowConnectionToRemove.prevProposalStatusId as number,
+          {}
         );
 
-        const isFirstConnectionInGroup = result.sortOrder === 0;
-        const isLastConnectionInGroupRemoved =
-          result.sortOrder === allGroupWorkflowConnections.length;
-        const connectionsLeftInTheGroup =
-          allGroupWorkflowConnections.length > 0;
-
-        if (connectionsLeftInTheGroup) {
-          if (isLastConnectionInGroupRemoved && result.nextProposalStatusId) {
-            await this.dataSource.deleteProposalWorkflowStatus(
-              result.prevProposalStatusId as number,
-              result.proposalWorkflowId,
-              result.proposalStatusId
-            );
-
-            const newLastParentConnection =
-              allGroupWorkflowConnections[
-                allGroupWorkflowConnections.length - 1
-              ];
-
-            if (newLastParentConnection) {
-              await this.insertNewAndUpdateExistingProposalWorkflowStatuses(
-                omit(newLastParentConnection, 'id')
-              );
-            }
-          } else if (!result.nextProposalStatusId) {
-            await this.updateProposalWorkflowConnectionStatuses(
-              allGroupWorkflowConnections,
-              false,
-              false,
-              false
-            );
-          }
-
-          if (
-            isFirstConnectionInGroup &&
-            result.prevProposalStatusId &&
-            result.nextProposalStatusId
-          ) {
-            await this.dataSource.deleteProposalWorkflowStatus(
-              result.prevProposalStatusId as number,
-              result.proposalWorkflowId,
-              result.proposalStatusId
-            );
-          }
-        } else {
-          if (result.parentDroppableGroupId) {
-            const lastConnectionInPreviousDroppableGroup = await this.getLastConnectionInParentDroppableGroup(
-              result.proposalWorkflowId,
-              result.parentDroppableGroupId as string
-            );
-            lastConnectionInPreviousDroppableGroup.nextProposalStatusId = null;
-            await this.dataSource.updateProposalWorkflowStatuses([
-              lastConnectionInPreviousDroppableGroup,
-            ]);
-          }
+        if (!workflowConnectionToReplaceRemoved) {
+          return rejection(
+            'Can not delete workflow connection because connection to replace is not found',
+            { firstWorkflowConnectionToRemove }
+          );
         }
 
-        return true;
-      })
-      .catch((error) => {
-        logger.logException(
-          'Could not delete proposal workflow status',
-          error,
-          {
-            agent,
-            args,
+        workflowConnectionsToRemove.forEach(async (connection) => {
+          const updatedWorkflowConnections: ProposalWorkflowConnection[] = [];
+
+          if (connection.nextProposalStatusId) {
+            const [
+              nextConnection,
+            ] = await this.dataSource.getProposalWorkflowConnectionsById(
+              connection.proposalWorkflowId,
+              connection.nextProposalStatusId as number,
+              {}
+            );
+
+            if (nextConnection) {
+              updatedWorkflowConnections.push({
+                ...nextConnection,
+                prevProposalStatusId: connection.prevProposalStatusId,
+              });
+            }
           }
+
+          updatedWorkflowConnections.push({
+            ...connection,
+            prevProposalStatusId:
+              workflowConnectionToReplaceRemoved.prevProposalStatusId,
+            proposalStatusId:
+              workflowConnectionToReplaceRemoved.proposalStatusId,
+            sortOrder: workflowConnectionToReplaceRemoved.sortOrder,
+          });
+
+          await this.dataSource.updateProposalWorkflowStatuses(
+            updatedWorkflowConnections
+          );
+        });
+
+        await this.dataSource.deleteProposalWorkflowStatus(
+          workflowConnectionToReplaceRemoved.proposalStatusId,
+          workflowConnectionToReplaceRemoved.proposalWorkflowId,
+          workflowConnectionToReplaceRemoved.sortOrder
+        );
+      } else {
+        const result = await this.dataSource.deleteProposalWorkflowStatus(
+          args.proposalStatusId,
+          args.proposalWorkflowId,
+          args.sortOrder
         );
 
-        return rejection('INTERNAL_ERROR');
-      });
+        const [
+          previousConnection,
+          nextConnection,
+        ] = await this.findPreviousAndNextConnections(args.proposalWorkflowId, {
+          currentConnectionId: result.proposalStatusId,
+          previousConnectionId: result.prevProposalStatusId,
+          nextConnectionId: result.nextProposalStatusId,
+        });
+
+        const connectionsToUpdate = [];
+
+        if (previousConnection) {
+          connectionsToUpdate.push({
+            ...previousConnection,
+            nextProposalStatusId: result.nextProposalStatusId,
+          });
+        }
+
+        if (nextConnection) {
+          connectionsToUpdate.push({
+            ...nextConnection,
+            prevProposalStatusId: result.prevProposalStatusId,
+          });
+        }
+
+        await this.dataSource.updateProposalWorkflowStatuses(
+          connectionsToUpdate
+        );
+      }
+
+      return true;
+    } catch (error) {
+      return rejection(
+        'Could not delete proposal workflow status',
+        { agent, args },
+        error
+      );
+    }
   }
 }

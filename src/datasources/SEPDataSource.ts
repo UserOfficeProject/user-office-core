@@ -1,11 +1,19 @@
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
 import { Role } from '../models/Role';
-import { SEP, SEPAssignment, SEPReviewer, SEPProposal } from '../models/SEP';
+import {
+  SEP,
+  SEPAssignment,
+  SEPReviewer,
+  SEPProposal,
+  SEPProposalWithReviewGradesAndRanking,
+} from '../models/SEP';
+import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import {
   UpdateMemberSEPArgs,
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../resolvers/mutations/AssignMembersToSEP';
+import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
 
 export interface SEPDataSource {
   create(
@@ -21,12 +29,17 @@ export interface SEPDataSource {
     numberRatingsRequired: number,
     active: boolean
   ): Promise<SEP>;
-  get(id: number): Promise<SEP | null>;
-  getUserSepBySepId(userId: number, sepId: number): Promise<SEP | null>;
+  delete(id: number): Promise<SEP>;
+  getSEP(id: number): Promise<SEP | null>;
+  getUserSepsByRoleAndSepId(
+    userId: number,
+    role: Role,
+    sepId?: number
+  ): Promise<SEP[]>;
   getUserSeps(id: number, role: Role): Promise<SEP[]>;
   getSEPByProposalId(proposalId: number): Promise<SEP | null>;
-  getAll(
-    active: boolean,
+  getSEPs(
+    active?: boolean,
     filter?: string,
     first?: number,
     offset?: number
@@ -82,4 +95,14 @@ export interface SEPDataSource {
     userId: number,
     proposalId: number
   ): Promise<boolean>;
+  saveSepMeetingDecision(
+    saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput,
+    submittedBy?: number | null
+  ): Promise<SepMeetingDecision>;
+  getProposalsSepMeetingDecisions(
+    proposalIds: number[]
+  ): Promise<SepMeetingDecision[]>;
+  getSepProposalsWithReviewGradesAndRanking(
+    proposalIds: number[]
+  ): Promise<SEPProposalWithReviewGradesAndRanking[]>;
 }

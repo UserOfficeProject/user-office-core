@@ -1,14 +1,18 @@
-import { logger } from '@esss-swap/duo-logger';
 import {
   proposalGradeValidationSchema,
   proposalTechnicalReviewValidationSchema,
   addUserForReviewValidationSchema,
 } from '@esss-swap/duo-validation';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
+import { Proposal } from '../models/Proposal';
+import { rejection, Rejection } from '../models/Rejection';
 import {
   Review,
   ReviewStatus,
@@ -17,55 +21,63 @@ import {
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
-import { rejection, Rejection } from '../rejection';
 import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
 import { AddTechnicalReviewInput } from '../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
+import { ProposalIdWithReviewId } from '../resolvers/mutations/SubmitProposalsReviewMutation';
 import { SubmitTechnicalReviewInput } from '../resolvers/mutations/SubmitTechnicalReviewMutation';
+import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
+@injectable()
 export default class ReviewMutations {
   constructor(
-    private dataSource: ReviewDataSource,
-    private userAuth: UserAuthorization,
+    @inject(Tokens.ReviewDataSource) private dataSource: ReviewDataSource,
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource
   ) {}
 
   @EventBus(Event.PROPOSAL_SEP_REVIEW_UPDATED)
-  @ValidateArgs(proposalGradeValidationSchema)
+  @ValidateArgs(proposalGradeValidationSchema, ['comment'])
   @Authorized()
   async updateReview(
     agent: UserWithRole | null,
     args: AddReviewArgs
   ): Promise<ReviewWithNextProposalStatus | Rejection> {
     const { reviewID, comment, grade } = args;
-    const review = await this.dataSource.get(reviewID);
+    const review = await this.dataSource.getReview(reviewID);
 
     if (!review) {
-      return rejection('NOT_FOUND');
+      return rejection('Could not update review because review was not found', {
+        args,
+      });
     }
 
     if (
       !(
         (await this.userAuth.isReviewerOfProposal(agent, review.proposalID)) ||
-        (await this.userAuth.isChairOrSecretaryOfSEP(
-          agent!.id,
-          review.sepID
-        )) ||
+        (await this.userAuth.isChairOrSecretaryOfSEP(agent, review.sepID)) ||
         this.userAuth.isUserOfficer(agent)
       )
     ) {
-      logger.logWarn('Blocked submitting review', { agent, args });
-
-      return rejection('NOT_REVIEWER_OF_PROPOSAL');
+      return rejection(
+        'Can not update review because of insufficient permissions',
+        { agent, args }
+      );
     }
 
     if (
       review.status === ReviewStatus.SUBMITTED &&
       !this.userAuth.isUserOfficer(agent)
     ) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not update review because review already submitted',
+        { agent, args }
+      );
     }
 
     return this.dataSource
@@ -109,19 +121,74 @@ export default class ReviewMutations {
         );
       })
       .catch((err) => {
-        logger.logException('Could not submit review', err, {
-          agent,
-          reviewID,
-          comment,
-          grade,
-        });
+        return rejection(
+          'Could not submit review',
+          { agent, reviewID, comment, grade },
+          err
+        );
+      });
+  }
 
-        return rejection('INTERNAL_ERROR');
+  @EventBus(Event.PROPOSAL_SEP_REVIEW_SUBMITTED)
+  @ValidateArgs(proposalGradeValidationSchema, ['comment'])
+  @Authorized()
+  async submitProposalReview(
+    agent: UserWithRole | null,
+    args: ProposalIdWithReviewId
+  ): Promise<Review | Rejection> {
+    const { reviewId } = args;
+    const review = await this.dataSource.getReview(reviewId);
+
+    if (!review) {
+      return rejection(
+        'Can not submit proposal review because review was not found',
+        { args }
+      );
+    }
+
+    if (
+      !(
+        (await this.userAuth.isReviewerOfProposal(agent, review.proposalID)) ||
+        (await this.userAuth.isChairOrSecretaryOfSEP(agent, review.sepID)) ||
+        this.userAuth.isUserOfficer(agent)
+      )
+    ) {
+      return rejection(
+        'Can not submit proposal review because of insufficient premissions',
+        { agent, args }
+      );
+    }
+
+    if (
+      review.status === ReviewStatus.SUBMITTED &&
+      !this.userAuth.isUserOfficer(agent)
+    ) {
+      return rejection(
+        'Can not submit proposal review because review already submitted',
+        { agent, args }
+      );
+    }
+
+    return this.dataSource
+      .updateReview({
+        ...review,
+        reviewID: review.id,
+        status: ReviewStatus.SUBMITTED,
+      })
+      .catch((error) => {
+        return rejection(
+          'Can not submit proposal review because error occurred',
+          { agent, args },
+          error
+        );
       });
   }
 
   @EventBus(Event.PROPOSAL_FEASIBILITY_REVIEW_UPDATED)
-  @ValidateArgs(proposalTechnicalReviewValidationSchema)
+  @ValidateArgs(proposalTechnicalReviewValidationSchema, [
+    'comment',
+    'publicComment',
+  ])
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async setTechnicalReview(
     agent: UserWithRole | null,
@@ -133,9 +200,10 @@ export default class ReviewMutations {
         (await this.userAuth.isScientistToProposal(agent, args.proposalID))
       )
     ) {
-      logger.logWarn('Blocked submitting technical review', { agent, args });
-
-      return rejection('INSUFFICIENT_PERMISSIONS');
+      return rejection(
+        'Can not set technical review because of insufficient permissions',
+        { agent, args }
+      );
     }
 
     const technicalReview = await this.dataSource.getTechnicalReview(
@@ -145,18 +213,28 @@ export default class ReviewMutations {
     const shouldUpdateReview = !!technicalReview?.id;
 
     if (!this.userAuth.isUserOfficer(agent) && technicalReview?.submitted) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not set technical review because review already submitted',
+        { agent, args }
+      );
+    }
+
+    if (args.reviewerId !== undefined && args.reviewerId !== agent?.id) {
+      return rejection('Request is impersonating another user', {
+        args,
+        agent,
+      });
     }
 
     return this.dataSource
       .setTechnicalReview(args, shouldUpdateReview)
       .then((review) => review)
       .catch((err) => {
-        logger.logException('Could not set technicalReview', err, {
-          agent,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Can not set technical review because review already submitted',
+          { agent, args },
+          err
+        );
       });
   }
 
@@ -166,23 +244,56 @@ export default class ReviewMutations {
     { reviewId, sepId }: { reviewId: number; sepId: number }
   ): Promise<Review | Rejection> {
     if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepId))
+      !this.userAuth.isUserOfficer(agent) &&
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId))
     ) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not remove user for review because of insufficient permissions',
+        { agent, reviewId, sepId }
+      );
     }
 
     return this.dataSource
       .removeUserForReview(reviewId)
       .then((review) => review)
-      .catch((err) => {
-        logger.logException('Could not remove user for review', err, {
-          agent,
-          reviewId,
-        });
-
-        return rejection('INTERNAL_ERROR');
+      .catch((error) => {
+        return rejection(
+          'Can not remove user for review because error occurred',
+          { agent, reviewId, sepId },
+          error
+        );
       });
+  }
+
+  async isTechnicalReviewAssignee(
+    proposalIds: number[],
+    assigneeUserId?: number
+  ) {
+    for await (const proposalId of proposalIds) {
+      const technicalReviewAssignee = (
+        await this.proposalDataSource.get(proposalId)
+      )?.technicalReviewAssignee;
+      if (technicalReviewAssignee !== assigneeUserId) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async updateTechnicalReviewAssignee(
+    agent: UserWithRole | null,
+    args: UpdateTechnicalReviewAssigneeInput
+  ): Promise<Proposal[] | Rejection> {
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !this.isTechnicalReviewAssignee(args.proposalIds, agent?.id)
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    return this.proposalDataSource.updateProposalTechnicalReviewer(args);
   }
 
   @ValidateArgs(addUserForReviewValidationSchema)
@@ -194,22 +305,23 @@ export default class ReviewMutations {
     const { proposalID, userID, sepID } = args;
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfSEP(agent!.id, sepID))
+      !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepID))
     ) {
-      return rejection('NOT_ALLOWED');
+      return rejection(
+        'Can not add user for review because of insufficient permissions',
+        { agent, args }
+      );
     }
 
     return this.dataSource
       .addUserForReview(args)
       .then((review) => review)
       .catch((err) => {
-        logger.logException('Failed to add user for review', err, {
-          agent,
-          userID,
-          proposalID,
-        });
-
-        return rejection('INTERNAL_ERROR');
+        return rejection(
+          'Can not add user for review because of insufficient permissions',
+          { agent, userID, proposalID },
+          err
+        );
       });
   }
 }

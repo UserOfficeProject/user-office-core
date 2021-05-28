@@ -12,7 +12,7 @@ export interface UserDataSource {
   checkOrcIDExist(orcID: string): Promise<boolean>;
   // Read
   me(id: number): Promise<User | null>;
-  get(id: number): Promise<User | null>;
+  getUser(id: number): Promise<User | null>;
   getByUsername(username: string): Promise<User | null>;
   getByEmail(email: string): Promise<User | null>;
   getByOrcID(orcID: string): Promise<User | null>;
@@ -49,7 +49,7 @@ export interface UserDataSource {
     telephone: string,
     telephone_alt: string | undefined
   ): Promise<User>;
-  createDummyUser(userId: number): Promise<User>;
+  ensureDummyUserExists(userId: number): Promise<User>;
   createOrganisation(name: string, verified: boolean): Promise<number>;
   update(user: User): Promise<User>;
   setUserRoles(id: number, roles: number[]): Promise<void>;

@@ -1,11 +1,13 @@
 import { logger } from '@esss-swap/duo-logger';
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
+import { injectable } from 'tsyringe';
 
 import { Event } from '../../events/event.enum';
-import { Proposal } from '../../models/Proposal';
+import { Proposal, ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
+import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
@@ -13,45 +15,138 @@ import {
   CallRecord,
   createProposalObject,
   createProposalViewObject,
-  NextStatusEventRecord,
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
-  QuestionaryRecord,
+  StatusChangingEventRecord,
 } from './records';
 
-export default class PostgresProposalDataSource implements ProposalDataSource {
-  // TODO move this function to callDataSource
-  public async checkActiveCall(callId: number): Promise<boolean> {
-    const currentDate = new Date().toISOString();
+export async function calculateReferenceNumber(
+  format: string,
+  sequence: number | null
+): Promise<string> {
+  const prefix: string = format.slice(0, format.indexOf('{'));
+  const formatParameters: { [param: string]: string } = {};
+  format.match(/(\w+:\w+)/g)?.forEach((el: string) => {
+    const [k, v] = el.split(':');
+    formatParameters[k] = v;
+  });
 
-    return database
-      .select()
-      .from('call')
-      .where('start_call', '<=', currentDate)
-      .andWhere('end_call', '>=', currentDate)
-      .andWhere('call_id', '=', callId)
-      .first()
-      .then((call: CallRecord) => (call ? true : false));
+  if (!prefix || !('digits' in formatParameters)) {
+    return Promise.reject(
+      new Error(`The reference number format ('${format}') is invalid`)
+    );
   }
 
-  async submitProposal(id: number): Promise<Proposal> {
-    return database
-      .update(
-        {
-          submitted: true,
-        },
-        ['*']
+  sequence = sequence ?? 0;
+  if (String(sequence).length > Number(formatParameters['digits'])) {
+    return Promise.reject(
+      new Error(
+        `The sequence number provided ('${formatParameters['digits']}') exceeds the format's digits parameter`
       )
-      .from('proposals')
-      .where('proposal_id', id)
-      .then((proposal: ProposalRecord[]) => {
-        if (proposal === undefined || proposal.length !== 1) {
-          throw new Error(`Failed to submit proposal with id '${id}'`);
-        }
+    );
+  }
+  const paddedSequence: string = String(sequence).padStart(
+    Number(formatParameters['digits']),
+    '0'
+  );
 
-        return createProposalObject(proposal[0]);
+  return prefix + paddedSequence;
+}
+
+@injectable()
+export default class PostgresProposalDataSource implements ProposalDataSource {
+  async updateProposalTechnicalReviewer({
+    userId,
+    proposalIds,
+  }: UpdateTechnicalReviewAssigneeInput): Promise<Proposal[]> {
+    const response = await database('proposals')
+      .update('technical_review_assignee', userId)
+      .whereIn('proposal_id', proposalIds)
+      .returning('*')
+      .then((proposals: ProposalRecord[]) => {
+        return proposals.map((proposal) => createProposalObject(proposal));
       });
+
+    return response;
+  }
+  async submitProposal(id: number): Promise<Proposal> {
+    const proposal: ProposalRecord[] = await database.transaction(
+      async (trx) => {
+        try {
+          const call = await database
+            .select(
+              'c.call_id',
+              'c.reference_number_format',
+              'c.proposal_sequence'
+            )
+            .from('call as c')
+            .join('proposals as p', { 'p.call_id': 'c.call_id' })
+            .where('p.proposal_id', id)
+            .first()
+            .forUpdate()
+            .transacting(trx);
+
+          let referenceNumber: string | null;
+          if (call.reference_number_format) {
+            referenceNumber = await calculateReferenceNumber(
+              call.reference_number_format,
+              call.proposal_sequence
+            );
+
+            if (!referenceNumber) {
+              throw new Error(
+                `Failed to calculate reference number for proposal with id '${id}' using format '${call.reference_number_format}'`
+              );
+            } else if (referenceNumber.length > 16) {
+              throw new Error(
+                `The reference number calculated is too long ('${referenceNumber.length} characters)`
+              );
+            }
+          }
+
+          await database
+            .update({
+              proposal_sequence: (call.proposal_sequence ?? 0) + 1,
+            })
+            .from('call as c')
+            .where('c.call_id', call.call_id)
+            .transacting(trx);
+
+          const proposalUpdate = await database
+            .from('proposals')
+            .returning('*')
+            .where('proposal_id', id)
+            .modify((query) => {
+              if (referenceNumber) {
+                query.update({
+                  short_code: referenceNumber,
+                  reference_number_sequence: call.proposal_sequence ?? 0,
+                  submitted: true,
+                });
+              } else {
+                query.update({
+                  reference_number_sequence: call.proposal_sequence ?? 0,
+                  submitted: true,
+                });
+              }
+            })
+            .transacting(trx);
+
+          return await trx.commit(proposalUpdate);
+        } catch (error) {
+          throw new Error(
+            `Failed to submit proposal with id '${id}' because: '${error.message}'`
+          );
+        }
+      }
+    );
+
+    if (proposal === undefined || proposal.length !== 1) {
+      throw new Error(`Failed to submit proposal with id '${id}'`);
+    }
+
+    return createProposalObject(proposal[0]);
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
@@ -100,13 +195,20 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         {
           title: proposal.title,
           abstract: proposal.abstract,
-          status_id: proposal.statusId,
           proposer_id: proposal.proposerId,
-          rank_order: proposal.rankOrder,
+          status_id: proposal.statusId,
+          created_at: proposal.created,
+          updated_at: proposal.updated,
+          short_code: proposal.shortCode,
           final_status: proposal.finalStatus,
+          call_id: proposal.callId,
+          questionary_id: proposal.questionaryId,
           comment_for_user: proposal.commentForUser,
           comment_for_management: proposal.commentForManagement,
           notified: proposal.notified,
+          submitted: proposal.submitted,
+          management_time_allocation: proposal.managementTimeAllocation,
+          management_decision_submitted: proposal.managementDecisionSubmitted,
         },
         ['*']
       )
@@ -205,16 +307,19 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           const questionFilterQuery = getQuestionDefinition(
             questionFilter.dataType
           ).filterQuery;
-          if (questionFilterQuery) {
-            query
-              .leftJoin(
-                'answers',
-                'answers.questionary_id',
-                'proposal_table_view.questionary_id'
-              )
-              .andWhere('answers.question_id', questionFilter.questionId)
-              .modify(questionFilterQuery, questionFilter);
+          if (!questionFilterQuery) {
+            throw new Error(
+              `Filter query not implemented for ${filter.questionFilter.dataType}`
+            );
           }
+          query
+            .leftJoin(
+              'answers',
+              'answers.questionary_id',
+              'proposal_table_view.questionary_id'
+            )
+            .andWhere('answers.question_id', questionFilter.questionId)
+            .modify(questionFilterQuery, questionFilter);
         }
       })
       .then((proposals: ProposalViewRecord[]) => {
@@ -297,7 +402,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
     return database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select([
+        'proposals.*',
+        'instrument_has_scientists.*',
+        'instrument_has_proposals.instrument_id',
+        'instrument_has_proposals.proposal_id',
+        database.raw('count(*) OVER() AS full_count'),
+      ])
       .from('proposals')
       .join('instrument_has_scientists', {
         'instrument_has_scientists.user_id': scientistId,
@@ -338,6 +449,26 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           );
         }
 
+        if (filter?.questionFilter) {
+          const questionFilter = filter.questionFilter;
+          const questionFilterQuery = getQuestionDefinition(
+            questionFilter.dataType
+          ).filterQuery;
+          if (!questionFilterQuery) {
+            throw new Error(
+              `Filter query not implemented for ${filter.questionFilter.dataType}`
+            );
+          }
+          query
+            .leftJoin(
+              'answers',
+              'answers.questionary_id',
+              'proposals.questionary_id'
+            )
+            .andWhere('answers.question_id', questionFilter.questionId)
+            .modify(questionFilterQuery, questionFilter);
+        }
+
         if (first) {
           query.limit(first);
         }
@@ -357,7 +488,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async getUserProposals(id: number): Promise<Proposal[]> {
+  async getUserProposals(
+    id: number,
+    filter?: { instrumentId?: number | null }
+  ): Promise<Proposal[]> {
     return database
       .select('p.*')
       .from('proposals as p')
@@ -366,6 +500,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       })
       .where('pc.user_id', id)
       .orWhere('p.proposer_id', id)
+      .modify((qb) => {
+        if (filter?.instrumentId) {
+          qb.innerJoin('instrument_has_proposals as ihp', {
+            'p.proposal_id': 'ihp.proposal_id',
+          });
+          qb.where('ihp.instrument_id', filter.instrumentId);
+        }
+      })
       .groupBy('p.proposal_id')
       .then((proposals: ProposalRecord[]) =>
         proposals.map((proposal) => createProposalObject(proposal))
@@ -406,58 +548,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async cloneProposal(
-    clonerId: number,
-    proposalId: number,
-    callId: number,
-    templateId: number
-  ): Promise<Proposal> {
-    const sourceProposal = await this.get(proposalId);
-
-    if (!sourceProposal) {
-      logger.logError(
-        'Could not clone proposal because source proposal does not exist',
-        { proposalId }
-      );
-
-      throw new Error('Could not clone proposal');
-    }
-
-    const [newQuestionary]: QuestionaryRecord[] = (
-      await database.raw(`
-      INSERT INTO questionaries
-      (
-        template_id,
-        creator_id
-      )
-      SELECT
-        ${templateId},
-        ${clonerId}
-      FROM 
-        questionaries
-      WHERE
-        questionary_id = ${sourceProposal.questionaryId}
-      RETURNING *
-    `)
-    ).rows;
-
-    await database.raw(`
-      INSERT INTO answers
-      (
-        questionary_id,
-        question_id,
-        answer
-      )
-      SELECT
-        ${newQuestionary.questionary_id},
-        question_id,
-        answer
-      FROM 
-        answers
-      WHERE
-        questionary_id = ${sourceProposal.questionaryId}
-    `);
-
+  async cloneProposal(sourceProposal: Proposal): Promise<Proposal> {
     const [newProposal]: ProposalRecord[] = (
       await database.raw(`
       INSERT INTO proposals
@@ -466,20 +557,34 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         abstract,
         status_id,
         proposer_id,
+        created_at,
+        updated_at,
+        final_status,
         call_id,
         questionary_id,
+        comment_for_management,
+        comment_for_user,
         notified,
-        submitted
+        submitted,
+        management_decision_submitted,
+        management_time_allocation
       )
       SELECT
-        'Copy of ${sourceProposal.title}',
+        title,
         abstract,
-        1,
+        status_id,
         proposer_id,
-        ${callId},
-        ${newQuestionary.questionary_id},
-        false,
-        false
+        created_at,
+        updated_at,
+        final_status,
+        call_id,
+        questionary_id,
+        comment_for_management,
+        comment_for_user,
+        notified,
+        submitted,
+        management_decision_submitted,
+        management_time_allocation
       FROM 
         proposals
       WHERE
@@ -510,16 +615,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       throw new Error('Could not reset proposal events');
     }
 
-    const proposalEventsToReset: NextStatusEventRecord[] = (
+    const proposalEventsToReset: StatusChangingEventRecord[] = (
       await database.raw(`
         SELECT 
           *
         FROM 
           proposal_workflow_connections AS pwc
         JOIN
-          next_status_events
+          status_changing_events
         ON
-          next_status_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
+          status_changing_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
         WHERE pwc.proposal_workflow_connection_id >= (
           SELECT proposal_workflow_connection_id
           FROM proposal_workflow_connections
@@ -533,7 +638,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     if (proposalEventsToReset?.length) {
       const dataToUpdate = proposalEventsToReset
         .map(
-          (event) => `${event.next_status_event.toLocaleLowerCase()} = false`
+          (event) =>
+            `${event.status_changing_event.toLocaleLowerCase()} = false`
         )
         .join(', ');
 
@@ -553,5 +659,34 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
 
     return true;
+  }
+
+  async changeProposalsStatus(
+    statusId: number,
+    proposalIds: number[]
+  ): Promise<ProposalIdsWithNextStatus> {
+    const dataToUpdate: { status_id: number; submitted?: boolean } = {
+      status_id: statusId,
+    };
+
+    // NOTE: If status is DRAFT re-open the proposal for submission
+    if (statusId === 1) {
+      dataToUpdate.submitted = false;
+    }
+
+    const result: ProposalRecord[] = await database
+      .update(dataToUpdate, ['*'])
+      .from('proposals')
+      .whereIn('proposal_id', proposalIds);
+
+    if (result?.length === 0) {
+      logger.logError('Could not change proposals status', { dataToUpdate });
+
+      throw new Error('Could not change proposals status');
+    }
+
+    return new ProposalIdsWithNextStatus(
+      result.map((item) => item.proposal_id)
+    );
   }
 }

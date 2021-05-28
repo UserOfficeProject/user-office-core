@@ -1,22 +1,22 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
 import {
   anotherDummyProposalStatus,
-  dummyNextStatusEvent,
   dummyProposalStatus,
   dummyProposalWorkflow,
   dummyProposalWorkflowConnection,
-  ProposalSettingsDataSourceMock,
+  dummyStatusChangingEvent,
 } from '../datasources/mockups/ProposalSettingsDataSource';
 import {
-  dummyUserWithRole,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { Rejection } from '../rejection';
+import { Rejection } from '../models/Rejection';
 import ProposalSettingsMutations from './ProposalSettingsMutations';
 
-const dummyProposalSettingsDataSource = new ProposalSettingsDataSourceMock();
-const ProposalSettingsMutationsInstance = new ProposalSettingsMutations(
-  dummyProposalSettingsDataSource
+const ProposalSettingsMutationsInstance = container.resolve(
+  ProposalSettingsMutations
 );
 
 describe('Test Proposal settings mutations', () => {
@@ -39,7 +39,7 @@ describe('Test Proposal settings mutations', () => {
           description: 'This is some small description',
         }
       )
-    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A userofficer can create proposal status', () => {
@@ -96,7 +96,7 @@ describe('Test Proposal settings mutations', () => {
           description: 'This is some small description',
         }
       )
-    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
+    ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
 
   test('A userofficer can create proposal workflow', () => {
@@ -146,14 +146,14 @@ describe('Test Proposal settings mutations', () => {
 
   test('A userofficer can add next status event/s to workflow connection', () => {
     return expect(
-      ProposalSettingsMutationsInstance.addNextStatusEventsToConnection(
+      ProposalSettingsMutationsInstance.addStatusChangingEventsToConnection(
         dummyUserOfficerWithRole,
         {
-          nextStatusEvents: ['PROPOSAL_SUBMITTED'],
+          statusChangingEvents: ['PROPOSAL_SUBMITTED'],
           proposalWorkflowConnectionId: 1,
         }
       )
-    ).resolves.toStrictEqual([dummyNextStatusEvent]);
+    ).resolves.toStrictEqual([dummyStatusChangingEvent]);
   });
 
   test('A userofficer can remove proposal workflow connection', () => {
@@ -163,6 +163,7 @@ describe('Test Proposal settings mutations', () => {
         {
           proposalStatusId: 1,
           proposalWorkflowId: 1,
+          sortOrder: 0,
         }
       )
     ).resolves.toStrictEqual(true);
