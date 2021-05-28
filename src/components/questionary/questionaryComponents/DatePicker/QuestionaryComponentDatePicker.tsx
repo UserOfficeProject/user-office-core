@@ -33,7 +33,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
 
   return (
     <TooltipWrapper title={tooltip}>
-      <FormControl margin="dense">
+      <FormControl margin="dense" fullWidth>
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <Field
             required={required}
