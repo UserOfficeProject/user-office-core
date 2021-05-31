@@ -12,6 +12,7 @@ context('Template tests', () => {
   let boolId: string;
   let textId: string;
   let dateId: string;
+  let timeId: string;
   let multipleChoiceId: string;
   let intervalId: string;
   let numberId: string;
@@ -20,6 +21,7 @@ context('Template tests', () => {
   const booleanQuestion = faker.lorem.words(2);
   const textQuestion = faker.lorem.words(2);
   const dateQuestion = faker.lorem.words(2);
+  const timeQuestion = faker.lorem.words(2);
   const fileQuestion = faker.lorem.words(2);
   const intervalQuestion = faker.lorem.words(2);
   const numberQuestion = faker.lorem.words(3);
@@ -244,7 +246,10 @@ context('Template tests', () => {
     /* --- */
 
     /* Date */
-    cy.createDateQuestion(dateQuestion);
+    cy.createDateQuestion(dateQuestion, {
+      includeTime: false,
+      isRequired: true,
+    });
 
     cy.contains(dateQuestion)
       .closest('[data-cy=question-container]')
@@ -252,6 +257,19 @@ context('Template tests', () => {
       .invoke('html')
       .then((fieldId) => {
         dateId = fieldId;
+      });
+
+    cy.createDateQuestion(timeQuestion, {
+      includeTime: true,
+      isRequired: false,
+    });
+
+    cy.contains(timeQuestion)
+      .closest('[data-cy=question-container]')
+      .find("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then((fieldId) => {
+        timeId = fieldId;
       });
 
     /* --- */
@@ -296,6 +314,7 @@ context('Template tests', () => {
     cy.contains(booleanQuestion);
     cy.contains(textQuestion);
     cy.contains(dateQuestion);
+    cy.contains(timeQuestion);
   });
 
   it('User officer can clone template', () => {
@@ -373,9 +392,10 @@ context('Template tests', () => {
     cy.get(`#${textId}`).clear().type(textAnswer);
     cy.contains(`${textAnswer.length}/${minimumCharacters}`);
     cy.get(`[data-cy='${dateId}.value'] button`).click();
-    cy.wait(300);
-    cy.get(`[data-cy='${dateId}.value'] button`).click({ force: true }); // click twice because ui hangs sometimes
-    cy.contains('15').click({ force: true });
+    cy.contains('15').click();
+    cy.get(`[data-cy='${timeId}.value'] input`)
+      .clear()
+      .type('2022-02-20 20:00');
 
     cy.get(`#${multipleChoiceId}`).click();
     cy.contains(multipleChoiceAnswers[0]).click();
@@ -416,6 +436,7 @@ context('Template tests', () => {
     cy.contains(multipleChoiceAnswers[0]);
     cy.contains(multipleChoiceAnswers[1]).should('not.exist');
     cy.contains(multipleChoiceAnswers[2]);
+    cy.contains('20-Feb-2022 20:00');
 
     cy.contains(richTextInputQuestion);
     cy.get(`[data-cy="${richTextInputId}_open"]`).click();
