@@ -7,6 +7,5 @@ export const visitationBasisDefinition: Question = {
   createBlankConfig: (): VisitationBasisConfig => {
     return new VisitationBasisConfig();
   },
-  isReadOnly: true,
   getDefaultAnswer: () => null,
 };
