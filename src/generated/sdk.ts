@@ -4933,6 +4933,13 @@ export type UserWithReviewsQuery = (
       & { proposal: Maybe<(
         { __typename?: 'Proposal' }
         & Pick<Proposal, 'id' | 'title' | 'shortCode'>
+        & { call: Maybe<(
+          { __typename?: 'Call' }
+          & Pick<Call, 'shortCode'>
+        )>, instrument: Maybe<(
+          { __typename?: 'Instrument' }
+          & Pick<Instrument, 'shortCode'>
+        )> }
       )> }
     )> }
   )> }
@@ -8757,6 +8764,12 @@ export const UserWithReviewsDocument = gql`
         id
         title
         shortCode
+        call {
+          shortCode
+        }
+        instrument {
+          shortCode
+        }
       }
     }
   }
