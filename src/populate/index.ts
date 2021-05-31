@@ -159,6 +159,7 @@ const createCalls = async () => {
       surveyComment: faker.random.words(5),
       proposalWorkflowId: 1,
       templateId: dummy.positiveNumber(MAX_TEMPLATES),
+      allocationTimeUnit: 0,
     });
   }, MAX_CALLS);
 };

@@ -1,6 +1,7 @@
 import { registerEnumType } from 'type-graphql';
 
 import { Event } from '../events/event.enum';
+import { AllocationTimeUnits } from '../models/Call';
 import {
   DependenciesLogicOperator,
   EvaluatorOperator,
@@ -42,5 +43,8 @@ export const registerEnums = () => {
   });
   registerEnumType(VisitationStatus, {
     name: 'VisitationStatus',
+  });
+  registerEnumType(AllocationTimeUnits, {
+    name: 'AllocationTimeUnits',
   });
 };

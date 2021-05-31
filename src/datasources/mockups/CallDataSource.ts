@@ -30,7 +30,8 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.callEnded || false,
     values?.callReviewEnded || false,
     values?.callSEPReviewEnded || false,
-    values?.templateId || 1
+    values?.templateId || 1,
+    values?.allocationTimeUnit || 0
   );
 };
 
@@ -55,7 +56,8 @@ export const dummyCall = new Call(
   false,
   false,
   false,
-  1
+  1,
+  0
 );
 
 export const anotherDummyCall = new Call(
@@ -79,7 +81,8 @@ export const anotherDummyCall = new Call(
   true,
   false,
   false,
-  1
+  1,
+  0
 );
 
 export const dummyCalls = [dummyCall, anotherDummyCall];
