@@ -511,7 +511,11 @@ export default class ProposalMutations {
 
       return clonedProposal;
     } catch (error) {
-      return rejection('Could not cone proposal', { proposalToCloneId }, error);
+      return rejection(
+        'Could not clone the proposal',
+        { proposalToCloneId },
+        error
+      );
     }
   }
 }

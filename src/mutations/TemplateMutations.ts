@@ -80,12 +80,20 @@ export default class TemplateMutations {
           'shipment_basis'
         );
         break;
+      case TemplateCategoryId.VISITATION:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New visitation',
+          'visitation_basis'
+        );
+        break;
     }
 
     return newTemplate;
   }
 
-  /** cretes first topic, so that template is not empty to begin with */
+  /** creates the first topic, so that the template is not empty to begin with */
   private async createInitialTopic(
     templateId: number,
     sortOrder: number,

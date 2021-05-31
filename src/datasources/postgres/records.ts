@@ -26,6 +26,7 @@ import {
   Topic,
 } from '../../models/Template';
 import { BasicUserDetails, User } from '../../models/User';
+import { Visitation, VisitationStatus } from '../../models/Visitation';
 
 // Interfaces corresponding exactly to database tables
 
@@ -474,6 +475,16 @@ export interface TokensAndPermissionsRecord {
   readonly access_permissions: string;
 }
 
+export interface VisitationRecord {
+  readonly visitation_id: number;
+  readonly proposal_id: number;
+  readonly instrument_id: number;
+  readonly status: string;
+  readonly questionary_id: number;
+  readonly visitor_id: number;
+  readonly created_at: Date;
+}
+
 export const createTopicObject = (record: TopicRecord) => {
   return new Topic(
     record.topic_id,
@@ -786,4 +797,15 @@ export const createSEPReviewerObject = (sepMember: SEPReviewerRecord) => {
 
 export const createRoleObject = (role: RoleRecord) => {
   return new Role(role.role_id, role.short_code, role.title);
+};
+
+export const createVisitationObject = (visitation: VisitationRecord) => {
+  return new Visitation(
+    visitation.visitation_id,
+    visitation.proposal_id,
+    (visitation.status as any) as VisitationStatus,
+    visitation.questionary_id,
+    visitation.visitor_id,
+    visitation.created_at
+  );
 };
