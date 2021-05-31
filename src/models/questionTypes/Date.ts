@@ -58,6 +58,7 @@ export const dateDefinition: Question = {
     config.small_label = '';
     config.required = false;
     config.tooltip = '';
+    config.includeTime = false;
 
     return config;
   },
