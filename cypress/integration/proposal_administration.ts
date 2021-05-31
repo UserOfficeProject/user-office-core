@@ -292,7 +292,7 @@ context('Proposal administration tests', () => {
         boolQuestionId = fieldId;
       });
 
-    cy.createDateQuestion(dateQuestion);
+    cy.createDateQuestion(dateQuestion, { isRequired: true });
     cy.contains(dateQuestion)
       .closest('[data-cy=question-container]')
       .find("[data-cy='proposal-question-id']")

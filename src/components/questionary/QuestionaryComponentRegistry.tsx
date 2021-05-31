@@ -84,6 +84,7 @@ export interface QuestionaryComponentDefinition {
   readonly creatable: boolean; // if true then the question can be added to a questionary
   readonly icon: JSX.Element;
   readonly searchCriteriaComponent?: FC<SearchCriteriaInputProps>;
+  readonly preSubmitTransform?: (answer: Answer) => Answer;
 }
 
 const registry = [

@@ -11,6 +11,7 @@ fragment fieldConfig on FieldConfig {
     minDate
     maxDate
     defaultDate
+    includeTime
   }
   ... on EmbellishmentConfig {
     html

@@ -274,6 +274,7 @@ export type DateConfig = {
   minDate: Maybe<Scalars['String']>;
   maxDate: Maybe<Scalars['String']>;
   defaultDate: Maybe<Scalars['String']>;
+  includeTime: Scalars['Boolean'];
 };
 
 
@@ -5783,7 +5784,7 @@ type FieldConfigBooleanConfigFragment = (
 
 type FieldConfigDateConfigFragment = (
   { __typename?: 'DateConfig' }
-  & Pick<DateConfig, 'small_label' | 'required' | 'tooltip' | 'minDate' | 'maxDate' | 'defaultDate'>
+  & Pick<DateConfig, 'small_label' | 'required' | 'tooltip' | 'minDate' | 'maxDate' | 'defaultDate' | 'includeTime'>
 );
 
 type FieldConfigEmbellishmentConfigFragment = (
@@ -7024,6 +7025,7 @@ export const FieldConfigFragmentDoc = gql`
     minDate
     maxDate
     defaultDate
+    includeTime
   }
   ... on EmbellishmentConfig {
     html
