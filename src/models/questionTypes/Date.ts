@@ -62,7 +62,6 @@ export const dateDefinition: Question = {
 
     return config;
   },
-  isReadOnly: false,
   getDefaultAnswer: (relation: QuestionTemplateRelation) =>
     (relation.config as DateConfig).defaultDate || null,
   filterQuery: (queryBuilder, filter) => {

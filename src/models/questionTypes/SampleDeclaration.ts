@@ -15,6 +15,5 @@ export const sampleDeclarationDefinition: Question = {
 
     return config;
   },
-  isReadOnly: false,
   getDefaultAnswer: () => [],
 };

@@ -11,7 +11,6 @@ import { Question } from './QuestionRegistry';
 
 export const numberInputDefinition: Question = {
   dataType: DataType.NUMBER_INPUT,
-  isReadOnly: false,
   getDefaultAnswer: (field) => {
     return {
       value: '',
