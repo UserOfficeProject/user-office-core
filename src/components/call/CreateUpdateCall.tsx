@@ -7,12 +7,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
-import { Call } from 'generated/sdk';
+import { Call, AllocationTimeUnits } from 'generated/sdk';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
 import { useProposalsTemplates } from 'hooks/template/useProposalTemplates';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import CallGeneralInfo, { AllocationTimeUnits } from './CallGeneralInfo';
+import CallGeneralInfo from './CallGeneralInfo';
 import CallNotificationAndCycleInfo from './CallNotificationAndCycleInfo';
 import CallReviewsInfo from './CallReviewsInfo';
 
@@ -40,7 +40,6 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         ...call,
         templateId: call.templateId || '',
         proposalWorkflowId: call.proposalWorkflowId || '',
-        // allocationTimeUnit: call.allocationTimeUnit || AllocationTimeUnits.Days,
       }
     : {
         shortCode: '',
@@ -59,7 +58,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         surveyComment: '',
         proposalWorkflowId: '',
         templateId: '',
-        allocationTimeUnit: AllocationTimeUnits.Days,
+        allocationTimeUnit: AllocationTimeUnits.DAYS,
       };
 
   const closeModal = (error: string | null | undefined, callToReturn: Call) => {

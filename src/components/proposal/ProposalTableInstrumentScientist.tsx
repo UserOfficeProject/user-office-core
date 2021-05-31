@@ -139,8 +139,9 @@ const ProposalTableInstrumentScientist: React.FC = () => {
       ...{ width: 'auto' },
     },
     {
-      title: 'Time(Days)',
-      field: 'technicalReview.timeAllocation',
+      title: 'Time allocation',
+      render: (rowData) =>
+        `${rowData.technicalReview?.timeAllocation}(${rowData.call?.allocationTimeUnit})`,
       hidden: false,
     },
     {

@@ -251,8 +251,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       ...{ width: 'auto' },
     },
     {
-      title: 'Time(Days)',
-      field: 'timeAllocation',
+      title: 'Time allocation',
+      render: (rowData) =>
+        `${rowData.timeAllocation}(${rowData.allocationTimeUnit})`,
       hidden: true,
     },
     {

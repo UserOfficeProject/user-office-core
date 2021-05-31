@@ -130,7 +130,7 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
       <>
         {assignAnotherReviewerView(proposalData)}
         <ProposalTechnicalReview
-          id={proposalData.id}
+          proposal={proposalData}
           data={proposalData.technicalReview}
           setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
             setProposalData({
