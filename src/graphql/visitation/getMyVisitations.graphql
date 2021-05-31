@@ -1,0 +1,11 @@
+query getMyVisitations {
+  myVisitations {
+    ...visitation
+    proposal {
+      ...proposal
+      instrument {
+        name
+      }
+    }
+  }
+}

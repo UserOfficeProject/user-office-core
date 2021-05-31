@@ -10,6 +10,7 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import EventIcon from '@material-ui/icons/Event';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
 import FolderOpen from '@material-ui/icons/FolderOpen';
 import FunctionsIcon from '@material-ui/icons/Functions';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
@@ -171,6 +172,12 @@ const TemplateMenuListItem = () => {
             />
           </ListItem>
         )}
+        <ListItem component={NavLink} to="/VisitationTemplates" button>
+          <ListItemIcon>
+            <FlightTakeoffIcon />
+          </ListItemIcon>
+          <ListItemText primary="Visitation" title="Visitation templates" />
+        </ListItem>
       </Collapse>
     </>
   );
@@ -256,6 +263,14 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           </ListItem>
         </Tooltip>
       )}
+      <Tooltip title="My Visitations">
+        <ListItem component={NavLink} to="/MyVisitations" button>
+          <ListItemIcon>
+            <EventIcon />
+          </ListItemIcon>
+          <ListItemText primary="My visitations" />
+        </ListItem>
+      </Tooltip>
       <Tooltip title="Help">
         <ListItem component={NavLink} to="/HelpPage" button>
           <ListItemIcon>
