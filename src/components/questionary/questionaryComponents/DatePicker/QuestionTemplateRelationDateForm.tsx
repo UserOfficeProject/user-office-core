@@ -26,6 +26,14 @@ export const QuestionTemplateRelationDateForm: FC<QuestionTemplateRelationFormPr
         <>
           <QuestionExcerpt question={props.questionRel.question} />
           <Field
+            name="config.includeTime"
+            label="Include time"
+            component={FormikUICustomCheckbox}
+            margin="normal"
+            fullWidth
+            inputProps={{ 'data-cy': 'includeTime' }}
+          />
+          <Field
             name="config.tooltip"
             label="Tooltip"
             type="text"
