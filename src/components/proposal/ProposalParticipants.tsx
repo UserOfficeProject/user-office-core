@@ -11,18 +11,20 @@ import { BasicUserDetails, UserRole } from 'generated/sdk';
 
 import ParticipantModal from './ParticipantModal';
 
-type ProposalParticipantsProps = {
+type ParticipantsProps = {
   /** Basic user details array to be shown in the modal. */
   users: BasicUserDetails[];
   /** Function for setting up the users. */
   setUsers: (users: BasicUserDetails[]) => void;
   className?: string;
+  title: string;
 };
 
-const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
+const Participants: React.FC<ParticipantsProps> = ({
   users,
   setUsers,
   className,
+  title,
 }) => {
   const [modalOpen, setOpen] = useState(false);
 
@@ -48,16 +50,16 @@ const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
         close={() => setOpen(false)}
         addParticipants={addUsers}
         selectedUsers={users.map((user) => user.id)}
-        title={'Add Co-Proposer'}
+        title={title}
         selection={true}
         userRole={UserRole.USER}
       />
       <FormControl margin="dense" fullWidth>
         <FormLabel component="div">
-          Co-Proposers
-          <Tooltip title="Add Co-Proposers">
+          {title}
+          <Tooltip title={title}>
             <IconButton onClick={openModal}>
-              <People data-cy="co-proposers-button" />
+              <People data-cy="add-participant-button" />
             </IconButton>
           </Tooltip>
         </FormLabel>
@@ -81,10 +83,10 @@ const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
   );
 };
 
-ProposalParticipants.propTypes = {
+Participants.propTypes = {
   users: PropTypes.array.isRequired,
   setUsers: PropTypes.func.isRequired,
   className: PropTypes.string,
 };
 
-export default ProposalParticipants;
+export default Participants;

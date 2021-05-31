@@ -27,6 +27,7 @@ import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/Sampl
 import { sampleDeclarationDefinition } from './questionaryComponents/SampleDeclaration/SampleDeclaratonDefinition';
 import { shipmentBasisDefinition } from './questionaryComponents/ShipmentBasis/ShipmentBasisDefinition';
 import { textInputDefinition } from './questionaryComponents/TextInput/TextInputDefinition';
+import { visitationBasisDefinition } from './questionaryComponents/VisitationBasis/VisitiationBasisDefinition';
 
 export type FormChildren<ValueObjectType> = (
   formikProps: FormikProps<ValueObjectType>
@@ -55,27 +56,30 @@ export interface Renderers {
   readonly questionRenderer: QuestionRenderer;
   readonly answerRenderer: AnswerRenderer;
 }
+export type CreateYupValidation =
+  | ((
+      field: Answer,
+      state: QuestionarySubmissionState,
+      api?: () => Sdk
+    ) => object)
+  | null;
+
+export type GetYupInitialValue = (props: {
+  answer: Answer;
+  state: QuestionarySubmissionState;
+}) => Answer['value'];
+
+type QuestionaryComponent = (props: BasicComponentProps) => JSX.Element | null;
 
 export interface QuestionaryComponentDefinition {
   readonly dataType: DataType;
   readonly name: string;
   readonly questionTemplateRelationForm: () => FC<QuestionTemplateRelationFormProps>;
   readonly questionForm: () => FC<QuestionFormProps>;
-  readonly questionaryComponent: (
-    props: BasicComponentProps
-  ) => JSX.Element | null;
+  readonly questionaryComponent: QuestionaryComponent;
   readonly renderers?: Renderers;
-  readonly createYupValidationSchema:
-    | ((
-        field: Answer,
-        state: QuestionarySubmissionState,
-        api?: () => Sdk
-      ) => object)
-    | null;
-  readonly getYupInitialValue: (props: {
-    answer: Answer;
-    state: QuestionarySubmissionState;
-  }) => Answer['value'];
+  readonly createYupValidationSchema: CreateYupValidation;
+  readonly getYupInitialValue: GetYupInitialValue;
   readonly readonly: boolean; // if true then no answer will be produced
   readonly creatable: boolean; // if true then the question can be added to a questionary
   readonly icon: JSX.Element;
@@ -96,6 +100,7 @@ const registry = [
   numberInputDefinition,
   shipmentBasisDefinition,
   richTextInputDefinition,
+  visitationBasisDefinition,
 ];
 
 Object.freeze(registry);
