@@ -2914,12 +2914,6 @@ export enum UserRole {
   SAMPLE_SAFETY_REVIEWER = 'SAMPLE_SAFETY_REVIEWER'
 }
 
-
-export type AssignProposalsToSepMutationVariables = Exact<{
-  proposals: Array<ProposalIdWithCallId> | ProposalIdWithCallId;
-  sepId: Scalars['Int'];
-}>;
-
 export type Visitation = {
   __typename?: 'Visitation';
   id: Scalars['Int'];
@@ -2957,11 +2951,13 @@ export type VisitationsFilter = {
   questionaryId?: Maybe<Scalars['Int']>;
 };
 
-export type AssignProposalToSepMutationVariables = Exact<{
-  proposalId: Scalars['Int'];
+export type AssignProposalsToSepMutationVariables = Exact<{
+  proposals: Array<ProposalIdWithCallId> | ProposalIdWithCallId;
+  sepId: Scalars['Int'];
+}>;
 
-export type 
-Mutation = (
+
+export type AssignProposalsToSepMutation = (
   { __typename?: 'Mutation' }
   & { assignProposalsToSep: (
     { __typename?: 'NextProposalStatusResponseWrap' }
@@ -7269,6 +7265,15 @@ export const TemplateStepFragmentDoc = gql`
   }
 }
     ${QuestionTemplateRelationFragmentDoc}`;
+export const VisitationFragmentDoc = gql`
+    fragment visitation on Visitation {
+  id
+  proposalId
+  status
+  questionaryId
+  visitorId
+}
+    `;
 export const AssignProposalsToSepDocument = gql`
     mutation assignProposalsToSep($proposals: [ProposalIdWithCallId!]!, $sepId: Int!) {
   assignProposalsToSep(proposals: $proposals, sepId: $sepId) {
@@ -7282,17 +7287,6 @@ export const AssignProposalsToSepDocument = gql`
     }
   }
 }
-
-export const VisitationFragmentDoc = gql`
-    fragment visitation on Visitation {
-  id
-  proposalId
-  status
-  questionaryId
-  visitorId
-}
-    `;
-
     ${RejectionFragmentDoc}`;
 export const AssignReviewersToSepDocument = gql`
     mutation assignReviewersToSEP($memberIds: [Int!]!, $sepId: Int!) {
