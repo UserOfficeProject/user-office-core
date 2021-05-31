@@ -39,7 +39,6 @@ export const textInputDefinition: Question = {
 
     return config;
   },
-  isReadOnly: false,
   getDefaultAnswer: () => '',
   filterQuery: (queryBuilder, filter) => {
     const value = JSON.parse(filter.value).value;
