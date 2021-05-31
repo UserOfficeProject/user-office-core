@@ -7,7 +7,7 @@ import {
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
 import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
-import { QuestionaryStep, ShipmentStatus } from 'generated/sdk';
+import { QuestionaryStep, VisitationStatus } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import {
   Event,
@@ -17,51 +17,51 @@ import {
   WizardStep,
 } from 'models/QuestionarySubmissionState';
 import {
-  ShipmentExtended,
-  ShipmentSubmissionState,
-} from 'models/ShipmentSubmissionState';
+  VisitationExtended,
+  VisitationSubmissionState,
+} from 'models/VisitationSubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
 
-import ShipmentReview from './ShipmentReview';
+import VisitationReview from './VisitationReview';
 
-export interface ShipmentContextType extends QuestionaryContextType {
-  state: ShipmentSubmissionState | null;
+export interface VisitationContextType extends QuestionaryContextType {
+  state: VisitationSubmissionState | null;
 }
 
-const shipmentReducer = (
-  state: ShipmentSubmissionState,
-  draftState: ShipmentSubmissionState,
+const visitationReducer = (
+  state: VisitationSubmissionState,
+  draftState: VisitationSubmissionState,
   action: Event
 ) => {
   switch (action.type) {
-    case EventType.SHIPMENT_CREATED:
-    case EventType.SHIPMENT_LOADED:
-      const shipment: ShipmentExtended = action.payload.shipment;
+    case EventType.VISITATION_CREATED:
+    case EventType.VISITATION_LOADED:
+      const visitation: VisitationExtended = action.payload.visitation;
       draftState.isDirty = false;
-      draftState.questionaryId = shipment.questionaryId;
-      draftState.shipment = shipment;
-      draftState.steps = shipment.questionary.steps;
-      draftState.templateId = shipment.questionary.templateId;
+      draftState.questionaryId = visitation.questionaryId;
+      draftState.visitation = visitation;
+      draftState.steps = visitation.questionary.steps;
+      draftState.templateId = visitation.questionary.templateId;
       break;
-    case EventType.SHIPMENT_MODIFIED:
-      draftState.shipment = {
-        ...draftState.shipment,
-        ...action.payload.shipment,
+    case EventType.VISITATION_MODIFIED:
+      draftState.visitation = {
+        ...draftState.visitation,
+        ...action.payload.visitation,
       };
       draftState.isDirty = true;
       break;
     case EventType.QUESTIONARY_STEPS_LOADED: {
-      draftState.shipment.questionary.steps = action.payload.questionarySteps;
+      draftState.visitation.questionary.steps = action.payload.questionarySteps;
       break;
     }
     case EventType.QUESTIONARY_STEP_ANSWERED:
       const updatedStep = action.payload.questionaryStep as QuestionaryStep;
-      const stepIndex = draftState.shipment.questionary.steps.findIndex(
+      const stepIndex = draftState.visitation.questionary.steps.findIndex(
         (step) => step.topic.id === updatedStep.topic.id
       );
-      draftState.shipment.questionary.steps[stepIndex] = updatedStep;
+      draftState.visitation.questionary.steps[stepIndex] = updatedStep;
 
       break;
   }
@@ -69,8 +69,8 @@ const shipmentReducer = (
   return draftState;
 };
 
-const isShipmentSubmitted = (shipment: { status: ShipmentStatus }) =>
-  shipment.status === ShipmentStatus.SUBMITTED;
+const isVisitationSubmitted = (visitation: { status: VisitationStatus }) =>
+  visitation.status === VisitationStatus.SUBMITTED;
 
 const createQuestionaryWizardStep = (
   step: QuestionaryStep,
@@ -79,42 +79,48 @@ const createQuestionaryWizardStep = (
   type: 'QuestionaryStep',
   payload: { topicId: step.topic.id, questionaryStepIndex: index },
   getMetadata: (state, payload) => {
-    const shipmentState = state as ShipmentSubmissionState;
+    const visitationState = state as VisitationSubmissionState;
     const questionaryStep = state.steps[payload.questionaryStepIndex];
 
     return {
       title: questionaryStep.topic.title,
       isCompleted: questionaryStep.isCompleted,
       isReadonly:
-        isShipmentSubmitted(shipmentState.shipment) ||
+        isVisitationSubmitted(visitationState.visitation) ||
         (index > 0 && state.steps[index - 1].isCompleted === false),
     };
   },
 });
 
 const createReviewWizardStep = (): WizardStep => ({
-  type: 'ShipmentReview',
+  type: 'VisitationReview',
   getMetadata: (state) => {
-    const shipmentState = state as ShipmentSubmissionState;
+    const visitationState = state as VisitationSubmissionState;
 
     return {
       title: 'Review',
-      isCompleted: isShipmentSubmitted(shipmentState.shipment),
+      isCompleted: isVisitationSubmitted(visitationState.visitation),
       isReadonly: false,
     };
   },
 });
-export default function ShipmentContainer(props: {
-  shipment: ShipmentExtended;
-  done?: (shipment: ShipmentExtended) => void;
-}) {
+
+export interface VisitationContainerProps {
+  visitation: VisitationExtended;
+  onCreate?: (visitation: VisitationExtended) => void;
+  onUpdate?: (visitation: VisitationExtended) => void;
+}
+export default function VisitationContainer(props: VisitationContainerProps) {
   const { api } = useDataApiWithFeedback();
 
-  const previousInitialShipment = usePrevious(props.shipment);
+  const previousInitialVisitation = usePrevious(props.visitation);
 
-  const createShipmentWizardSteps = (): WizardStep[] => {
+  const createVisitationWizardSteps = (): WizardStep[] => {
+    if (!props.visitation) {
+      return [];
+    }
     const wizardSteps: WizardStep[] = [];
-    const questionarySteps = props.shipment.questionary.steps;
+    const questionarySteps = props.visitation.questionary.steps;
 
     questionarySteps.forEach((step, index) =>
       wizardSteps.push(createQuestionaryWizardStep(step, index))
@@ -132,15 +138,10 @@ export default function ShipmentContainer(props: {
           <QuestionaryStepView
             readonly={isReadonly}
             topicId={metadata.payload.topicId}
-            onStepComplete={() => {
-              props.done?.(state.shipment);
-            }}
           />
         );
-      case 'ShipmentReview':
-        return (
-          <ShipmentReview onComplete={() => props.done?.(state.shipment)} />
-        );
+      case 'VisitationReview':
+        return <VisitationReview />;
 
       default:
         throw new Error(`Unknown step type ${metadata.type}`);
@@ -151,27 +152,27 @@ export default function ShipmentContainer(props: {
    * Returns true if reset was performed, false otherwise
    */
   const handleReset = async (): Promise<boolean> => {
-    const shipmentState = state as ShipmentSubmissionState;
+    const visitationState = state as VisitationSubmissionState;
 
-    if (shipmentState.shipment.id === 0) {
-      // if shipment is not created yet
+    if (visitationState.visitation.id === 0) {
+      // if visitation is not created yet
       dispatch({
-        type: EventType.SHIPMENT_LOADED,
-        payload: { shipment: initialState.shipment },
+        type: EventType.VISITATION_LOADED,
+        payload: { visitation: initialState.visitation },
       });
     } else {
       await api()
-        .getShipment({ shipmentId: shipmentState.shipment.id }) // or load blankQuestionarySteps if sample is null
+        .getVisitation({ visitationId: visitationState.visitation.id }) // or load blankQuestionarySteps if sample is null
         .then((data) => {
-          if (data.shipment && data.shipment.questionary.steps) {
+          if (data.visitation && data.visitation.questionary.steps) {
             dispatch({
-              type: EventType.SHIPMENT_LOADED,
-              payload: { shipment: data.shipment },
+              type: EventType.VISITATION_LOADED,
+              payload: { visitation: data.visitation },
             });
             dispatch({
               type: EventType.QUESTIONARY_STEPS_LOADED,
               payload: {
-                questionarySteps: data.shipment.questionary.steps,
+                questionarySteps: data.visitation.questionary.steps,
                 stepIndex: state.stepIndex,
               },
             });
@@ -188,12 +189,8 @@ export default function ShipmentContainer(props: {
   }: MiddlewareInputParams<QuestionarySubmissionState, Event>) => {
     return (next: FunctionType) => async (action: Event) => {
       next(action); // first update state/model
-      const state = getState() as ShipmentSubmissionState;
+      const state = getState() as VisitationSubmissionState;
       switch (action.type) {
-        case EventType.SHIPMENT_DONE:
-          props.done?.(action.payload.shipment);
-          break;
-
         case EventType.BACK_CLICKED: // move this
           if (!state.isDirty || (await handleReset())) {
             dispatch({ type: EventType.GO_STEP_BACK });
@@ -203,48 +200,56 @@ export default function ShipmentContainer(props: {
         case EventType.RESET_CLICKED:
           handleReset();
           break;
+
+        case EventType.VISITATION_CREATED:
+          props.onCreate?.(state.visitation);
+          break;
+
+        case EventType.VISITATION_MODIFIED:
+          props.onUpdate?.(state.visitation);
+          break;
       }
     };
   };
-  const initialState: ShipmentSubmissionState = {
-    shipment: props.shipment,
-    templateId: props.shipment.questionary.templateId,
+  const initialState: VisitationSubmissionState = {
+    visitation: props.visitation,
+    templateId: props.visitation.questionary.templateId,
     isDirty: false,
-    questionaryId: props.shipment.questionary.questionaryId,
+    questionaryId: props.visitation.questionary.questionaryId,
     stepIndex: 0,
-    steps: props.shipment.questionary.steps,
-    wizardSteps: createShipmentWizardSteps(),
+    steps: props.visitation.questionary.steps,
+    wizardSteps: createVisitationWizardSteps(),
   };
 
   const {
     state,
     dispatch,
-  } = QuestionarySubmissionModel<ShipmentSubmissionState>(
+  } = QuestionarySubmissionModel<VisitationSubmissionState>(
     initialState,
     [handleEvents],
-    shipmentReducer
+    visitationReducer
   );
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =
-      previousInitialShipment === undefined;
+      previousInitialVisitation === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: EventType.SHIPMENT_LOADED,
-        payload: { shipment: props.shipment },
+        type: EventType.VISITATION_LOADED,
+        payload: { visitation: props.visitation },
       });
       dispatch({
         type: EventType.QUESTIONARY_STEPS_LOADED,
-        payload: { questionarySteps: props.shipment.questionary.steps },
+        payload: { questionarySteps: props.visitation.questionary.steps },
       });
     }
-  }, [previousInitialShipment, props.shipment, dispatch]);
+  }, [previousInitialVisitation, props.visitation, dispatch]);
 
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
       <Questionary
-        title={state.shipment.title || 'New Shipment'}
-        info={state.shipment.status}
+        title={'Visitation'}
+        info={state.visitation.status}
         handleReset={handleReset}
         displayElementFactory={displayElementFactory}
       />

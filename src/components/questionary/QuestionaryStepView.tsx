@@ -27,7 +27,6 @@ import {
   createQuestionaryComponent,
   getQuestionaryComponentDefinition,
 } from './QuestionaryComponentRegistry';
-import { PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR } from './questionaryComponents/ProposalBasis/QuestionaryComponentProposalBasis';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
@@ -165,31 +164,17 @@ export default function QuestionaryStepView(props: {
   }, [initialValues, lastSavedFormValues, state.isDirty, dispatch]);
 
   const performSave = async (isPartialSave: boolean): Promise<boolean> => {
-    let result = state.questionaryId; // TODO obtain newly created questionary ID some other way
-
-    try {
-      const saveResults = await Promise.all(
-        preSubmitActions(activeFields).map((f) =>
-          f({ state, dispatch, api: api() })
+    const questionaryId =
+      (
+        await Promise.all(
+          preSubmitActions(activeFields).map(
+            async (f) => await f({ state, dispatch, api: api() })
+          )
         )
-      );
-      const lastResult = saveResults.pop();
+      ).pop() || state.questionaryId; // TODO obtain newly created questionary ID some other way
 
-      if (lastResult) {
-        result = lastResult; // TODO obtain newly created questionary ID some other way
-      }
-    } catch (err) {
-      // prevent navigation
-      if (err === PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR) {
-        return false;
-      }
-
-      throw err;
-    }
-
-    const questionaryId = state.questionaryId || result;
     if (!questionaryId) {
-      throw new Error('Missing questionaryId');
+      return false;
     }
 
     const answerTopicResult = await api('Saved').answerTopic({
@@ -209,7 +194,6 @@ export default function QuestionaryStepView(props: {
 
       setLastSavedFormValues(initialValues);
     } else if (answerTopicResult.answerTopic.rejection) {
-      // prevent navigation
       return false;
     }
 

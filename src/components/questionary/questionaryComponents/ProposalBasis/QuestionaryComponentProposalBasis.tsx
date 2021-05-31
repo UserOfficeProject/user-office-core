@@ -8,7 +8,7 @@ import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
 import ProposalParticipant from 'components/proposal/ProposalParticipant';
-import ProposalParticipants from 'components/proposal/ProposalParticipants';
+import Participants from 'components/proposal/ProposalParticipants';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
@@ -114,7 +114,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         className={classes.container}
         userId={proposer?.id}
       />
-      <ProposalParticipants
+      <Participants
+        title="Add Co-Proposers"
         className={classes.container}
         setUsers={(users: BasicUserDetails[]) => {
           formikProps.setFieldValue(
@@ -134,9 +135,6 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     </div>
   );
 }
-
-export const PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR =
-  'PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR';
 
 const proposalBasisPreSubmit = () => async ({
   api,
@@ -164,8 +162,6 @@ const proposalBasisPreSubmit = () => async ({
           proposal: { ...proposal, ...result.updateProposal.proposal },
         },
       });
-    } else if (result.updateProposal.rejection) {
-      throw PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR;
     }
   } else {
     const createResult = await api.createProposal({
@@ -191,8 +187,6 @@ const proposalBasisPreSubmit = () => async ({
         },
       });
       returnValue = createResult.createProposal.proposal.questionaryId;
-    } else if (createResult.createProposal.rejection) {
-      throw PROPOSAL_BASIS_PRE_SUBMIT_MUTATION_ERROR;
     }
   }
 
