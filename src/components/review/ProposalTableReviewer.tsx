@@ -44,6 +44,8 @@ type UserWithReview = {
   reviewId: number;
   comment: string;
   status: ReviewStatus;
+  callShortCode: string;
+  instrumentShortCode: string;
 };
 
 const getFilterStatus = (selected: string | ReviewStatus) =>
@@ -82,10 +84,10 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
   >([]);
 
   const [selectedCallId, setSelectedCallId] = useState<number>(
-    urlQueryParams.call ? urlQueryParams.call : 0
+    urlQueryParams.call || 0
   );
   const [selectedInstrumentId, setSelectedInstrumentId] = useState<number>(
-    urlQueryParams.instrument ? urlQueryParams.instrument : 0
+    urlQueryParams.instrument || 0
   );
 
   const {
@@ -129,6 +131,8 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
                 reviewId: review.id,
                 comment: review.comment,
                 status: review.status,
+                callShortCode: review.proposal?.call?.shortCode,
+                instrumentShortCode: review.proposal?.instrument?.shortCode,
               } as UserWithReview)
           )
         : []
@@ -223,6 +227,8 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     { title: 'Title', field: 'title' },
     { title: 'Grade', field: 'grade' },
     { title: 'Review status', field: 'status' },
+    { title: 'Call', field: 'callShortCode' },
+    { title: 'Instrument', field: 'instrumentShortCode' },
   ];
 
   const updateView = () => {

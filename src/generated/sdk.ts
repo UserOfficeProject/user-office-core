@@ -274,6 +274,7 @@ export type DateConfig = {
   minDate: Maybe<Scalars['String']>;
   maxDate: Maybe<Scalars['String']>;
   defaultDate: Maybe<Scalars['String']>;
+  includeTime: Scalars['Boolean'];
 };
 
 
@@ -4933,6 +4934,13 @@ export type UserWithReviewsQuery = (
       & { proposal: Maybe<(
         { __typename?: 'Proposal' }
         & Pick<Proposal, 'id' | 'title' | 'shortCode'>
+        & { call: Maybe<(
+          { __typename?: 'Call' }
+          & Pick<Call, 'shortCode'>
+        )>, instrument: Maybe<(
+          { __typename?: 'Instrument' }
+          & Pick<Instrument, 'shortCode'>
+        )> }
       )> }
     )> }
   )> }
@@ -5775,7 +5783,7 @@ type FieldConfigBooleanConfigFragment = (
 
 type FieldConfigDateConfigFragment = (
   { __typename?: 'DateConfig' }
-  & Pick<DateConfig, 'small_label' | 'required' | 'tooltip' | 'minDate' | 'maxDate' | 'defaultDate'>
+  & Pick<DateConfig, 'small_label' | 'required' | 'tooltip' | 'minDate' | 'maxDate' | 'defaultDate' | 'includeTime'>
 );
 
 type FieldConfigEmbellishmentConfigFragment = (
@@ -7016,6 +7024,7 @@ export const FieldConfigFragmentDoc = gql`
     minDate
     maxDate
     defaultDate
+    includeTime
   }
   ... on EmbellishmentConfig {
     html
@@ -8757,6 +8766,12 @@ export const UserWithReviewsDocument = gql`
         id
         title
         shortCode
+        call {
+          shortCode
+        }
+        instrument {
+          shortCode
+        }
       }
     }
   }
