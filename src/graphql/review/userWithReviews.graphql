@@ -24,6 +24,12 @@ query userWithReviews(
         id
         title
         shortCode
+        call {
+          shortCode
+        }
+        instrument {
+          shortCode
+        }
       }
     }
   }
