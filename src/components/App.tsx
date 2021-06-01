@@ -2,7 +2,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import { ProviderContext, SnackbarProvider } from 'notistack';
-import React, { ErrorInfo } from 'react';
+import React, { ErrorInfo, useContext } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import {
   BrowserRouter as Router,
@@ -15,8 +15,12 @@ import { QueryParamProvider } from 'use-query-params';
 
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
+import { SettingsContextProvider } from 'context/SettingsContextProvider';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
+import { FeatureId, SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
 import { getTheme } from '../theme';
@@ -36,6 +40,15 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
 
   const Component = component; // JSX Elements have to be uppercase.
 
+  const featureContext = useContext(FeatureContext);
+  const EXTERNAL_AUTH = !!featureContext.features.get(FeatureId.EXTERNAL_AUTH)
+    ?.isEnabled;
+
+  const settingsContext = useContext(SettingsContext);
+  const EXTERNAL_AUTH_LOGIN_URL = settingsContext.settings.get(
+    SettingsId.EXTERNAL_AUTH_LOGIN_URL
+  );
+
   return (
     <UserContext.Consumer>
       {({ roles, token, currentRole, handleRole }): JSX.Element => (
@@ -43,12 +56,8 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
-              if (
-                process.env.REACT_APP_AUTH_TYPE === 'external' &&
-                process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL
-              ) {
-                window.location.href =
-                  process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL;
+              if (EXTERNAL_AUTH && EXTERNAL_AUTH_LOGIN_URL?.settingsValue) {
+                window.location.href = EXTERNAL_AUTH_LOGIN_URL.settingsValue;
 
                 return <p>Redirecting to external sign-in page...</p>;
               }
@@ -144,17 +153,19 @@ class App extends React.Component {
                 </IconButton>
               )}
             >
-              <FeatureContextProvider>
-                <DownloadContextProvider>
-                  <ReviewAndAssignmentContextProvider>
-                    <Router>
-                      <QueryParamProvider ReactRouterRoute={Route}>
-                        <div className="App">{routes}</div>
-                      </QueryParamProvider>
-                    </Router>
-                  </ReviewAndAssignmentContextProvider>
-                </DownloadContextProvider>
-              </FeatureContextProvider>
+              <SettingsContextProvider>
+                <FeatureContextProvider>
+                  <DownloadContextProvider>
+                    <ReviewAndAssignmentContextProvider>
+                      <Router>
+                        <QueryParamProvider ReactRouterRoute={Route}>
+                          <div className="App">{routes}</div>
+                        </QueryParamProvider>
+                      </Router>
+                    </ReviewAndAssignmentContextProvider>
+                  </DownloadContextProvider>
+                </FeatureContextProvider>
+              </SettingsContextProvider>
             </SnackbarProvider>
           </UserContextProvider>
         </CookiesProvider>
