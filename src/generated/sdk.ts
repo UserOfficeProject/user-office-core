@@ -614,7 +614,7 @@ export type Mutation = {
   removeAssignedInstrumentFromCall: CallResponseWrap;
   changeProposalsStatus: SuccessResponseWrap;
   assignProposalsToInstrument: SuccessResponseWrap;
-  removeProposalFromInstrument: SuccessResponseWrap;
+  removeProposalsFromInstrument: SuccessResponseWrap;
   assignScientistsToInstrument: SuccessResponseWrap;
   removeScientistFromInstrument: SuccessResponseWrap;
   createInstrument: InstrumentResponseWrap;
@@ -791,9 +791,8 @@ export type MutationAssignProposalsToInstrumentArgs = {
 };
 
 
-export type MutationRemoveProposalFromInstrumentArgs = {
-  proposalId: Scalars['Int'];
-  instrumentId: Scalars['Int'];
+export type MutationRemoveProposalsFromInstrumentArgs = {
+  proposalIds: Array<Scalars['Int']>;
 };
 
 
@@ -4052,15 +4051,14 @@ export type GetUserInstrumentsQuery = (
   )> }
 );
 
-export type RemoveProposalFromInstrumentMutationVariables = Exact<{
-  proposalId: Scalars['Int'];
-  instrumentId: Scalars['Int'];
+export type RemoveProposalsFromInstrumentMutationVariables = Exact<{
+  proposalIds: Array<Scalars['Int']> | Scalars['Int'];
 }>;
 
 
-export type RemoveProposalFromInstrumentMutation = (
+export type RemoveProposalsFromInstrumentMutation = (
   { __typename?: 'Mutation' }
-  & { removeProposalFromInstrument: (
+  & { removeProposalsFromInstrument: (
     { __typename?: 'SuccessResponseWrap' }
     & Pick<SuccessResponseWrap, 'isSuccess'>
     & { rejection: Maybe<(
@@ -8105,12 +8103,9 @@ export const GetUserInstrumentsDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
-export const RemoveProposalFromInstrumentDocument = gql`
-    mutation removeProposalFromInstrument($proposalId: Int!, $instrumentId: Int!) {
-  removeProposalFromInstrument(
-    proposalId: $proposalId
-    instrumentId: $instrumentId
-  ) {
+export const RemoveProposalsFromInstrumentDocument = gql`
+    mutation removeProposalsFromInstrument($proposalIds: [Int!]!) {
+  removeProposalsFromInstrument(proposalIds: $proposalIds) {
     rejection {
       ...rejection
     }
@@ -10199,8 +10194,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getUserInstruments(variables?: GetUserInstrumentsQueryVariables): Promise<GetUserInstrumentsQuery> {
       return withWrapper(() => client.request<GetUserInstrumentsQuery>(print(GetUserInstrumentsDocument), variables));
     },
-    removeProposalFromInstrument(variables: RemoveProposalFromInstrumentMutationVariables): Promise<RemoveProposalFromInstrumentMutation> {
-      return withWrapper(() => client.request<RemoveProposalFromInstrumentMutation>(print(RemoveProposalFromInstrumentDocument), variables));
+    removeProposalsFromInstrument(variables: RemoveProposalsFromInstrumentMutationVariables): Promise<RemoveProposalsFromInstrumentMutation> {
+      return withWrapper(() => client.request<RemoveProposalsFromInstrumentMutation>(print(RemoveProposalsFromInstrumentDocument), variables));
     },
     removeScientistFromInstrument(variables: RemoveScientistFromInstrumentMutationVariables): Promise<RemoveScientistFromInstrumentMutation> {
       return withWrapper(() => client.request<RemoveScientistFromInstrumentMutation>(print(RemoveScientistFromInstrumentDocument), variables));
