@@ -41,6 +41,10 @@ export default class AdminQueries {
     return await this.dataSource.getFeatures();
   }
 
+  async getSettings() {
+    return await this.dataSource.getSettings();
+  }
+
   async getPermissionsByToken(accessToken: string) {
     return await this.dataSource.getTokenAndPermissionsById(accessToken);
   }

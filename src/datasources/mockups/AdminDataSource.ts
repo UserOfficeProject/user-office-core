@@ -2,6 +2,7 @@ import { Page } from '../../models/Admin';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
+import { Settings, SettingsId } from '../../models/Settings';
 import { Unit } from '../../models/Unit';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
@@ -84,7 +85,13 @@ export class AdminDataSourceMock implements AdminDataSource {
     return new Page(id, text);
   }
   async getFeatures(): Promise<Feature[]> {
-    return [{ id: FeatureId.SHIPPING, isEnabled: false, description: '' }];
+    return [
+      { id: FeatureId.SHIPPING, isEnabled: false, description: '' },
+      { id: FeatureId.EXTERNAL_AUTH, isEnabled: true, description: '' },
+    ];
+  }
+  async getSettings(): Promise<Settings[]> {
+    return [{ id: SettingsId.EXTERNAL_AUTH_LOGIN_URL, settingsValue: '', description: '', }];
   }
 
   async getTokenAndPermissionsById(
