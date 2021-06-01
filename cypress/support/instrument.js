@@ -49,30 +49,28 @@ const assignInstrumentToProposal = (proposal, instrument) => {
 
   cy.get('@checkbox').check();
 
-  cy.get("[title='Assign proposals to instrument']").click();
+  cy.get('[data-cy="assign-remove-instrument"]').click();
 
-  cy.get("[id='mui-component-select-selectedInstrumentId']").should(
-    'not.have.class',
-    'Mui-disabled'
-  );
+  cy.get('[data-cy="proposals-instrument-assignment"]')
+    .contains('Loading...')
+    .should('not.exist');
 
   cy.get("[id='mui-component-select-selectedInstrumentId']").first().click();
 
   cy.get("[id='menu-selectedInstrumentId'] li").contains(instrument).click();
 
-  cy.contains('Assign to Instrument').click();
+  cy.get('[data-cy="submit-assign-remove-instrument"]').click();
+
+  cy.get('[data-cy="proposals-instrument-assignment"]').should('not.exist');
 
   cy.notification({
     variant: 'success',
-    text: 'Proposal/s assigned to the selected instrument',
+    text: 'Proposal/s assigned to the selected instrument successfully!',
   });
 
   cy.get('@checkbox').uncheck();
 
-  cy.contains(proposal)
-    .parent()
-    .find('[title="Remove assigned instrument"]')
-    .should('exist');
+  cy.contains(proposal).parent().contains(instrument);
 };
 
 const assignReviewer = (proposalTitle, reviewerName) => {

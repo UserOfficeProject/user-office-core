@@ -17,8 +17,7 @@ import isEqual from 'react-fast-compare';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
-import ScienceIconAdd from 'components/common/icons/ScienceIconAdd';
-import ScienceIconRemove from 'components/common/icons/ScienceIconRemove';
+import ScienceIcon from 'components/common/icons/ScienceIcon';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
 import ProposalReviewContent, {
   TabNames,
@@ -60,6 +59,10 @@ type ProposalTableOfficerProps = {
   confirm: WithConfirmType;
 };
 
+type ProposalWithCallAndInstrumentId = ProposalIdWithCallId & {
+  instrumentId: number | null;
+};
+
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
   urlQueryParams,
@@ -74,7 +77,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     false
   );
   const [selectedProposals, setSelectedProposals] = useState<
-    ProposalIdWithCallId[]
+    ProposalWithCallAndInstrumentId[]
   >([]);
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
     ProposalViewData[]
@@ -104,10 +107,14 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const selection = new Set(urlQueryParams.selection);
 
       setPreselectedProposalsData((preselectedProposalsData) => {
-        const selected: ProposalIdWithCallId[] = [];
+        const selected: ProposalWithCallAndInstrumentId[] = [];
         const preselected = preselectedProposalsData.map((proposal) => {
           if (selection.has(proposal.id.toString())) {
-            selected.push({ id: proposal.id, callId: proposal.callId });
+            selected.push({
+              id: proposal.id,
+              callId: proposal.callId,
+              instrumentId: proposal.instrumentId,
+            });
           }
 
           return {
@@ -133,38 +140,23 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     }
   }, [proposalsData, urlQueryParams.selection]);
 
-  const removeProposalFromInstrument = async (
-    proposalId: number,
-    instrumentId: number | null
-  ) => {
-    if (!instrumentId || !proposalId) {
-      return;
+  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
+  const DeleteIcon = (): JSX.Element => <Delete />;
+  const GroupWorkIcon = (): JSX.Element => <GroupWork />;
+  const EmailIcon = (): JSX.Element => <Email />;
+  const ScienceIconComponent = (
+    props: JSX.IntrinsicAttributes & {
+      children?: React.ReactNode;
+      'data-cy'?: string;
     }
-
-    const result = await api(
-      'Proposal removed from the instrument successfully!'
-    ).removeProposalFromInstrument({
-      proposalId,
-      instrumentId,
-    });
-
-    const isError = !!result.removeProposalFromInstrument.rejection;
-
-    if (!isError) {
-      setProposalsData((proposalsData) =>
-        proposalsData.map((prop) => {
-          if (prop.id === proposalId) {
-            prop.instrumentName = null;
-            prop.instrumentId = null;
-          }
-
-          return prop;
-        })
-      );
+  ): JSX.Element => <ScienceIcon {...props} />;
+  const ChangeProposalStatusIcon = (
+    props: JSX.IntrinsicAttributes & {
+      children?: React.ReactNode;
+      'data-cy'?: string;
     }
-  };
-
-  const RemoveScienceIcon = (): JSX.Element => <ScienceIconRemove />;
+  ): JSX.Element => <ListStatusIcon {...props} />;
+  const ExportIcon = (): JSX.Element => <GridOnIcon />;
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -207,31 +199,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             <GetAppIcon />
           </IconButton>
         </Tooltip>
-
-        {rowData.instrumentName && (
-          <Tooltip title="Remove assigned instrument">
-            <IconButton
-              style={iconButtonStyle}
-              onClick={() => {
-                confirm(
-                  async () => {
-                    await removeProposalFromInstrument(
-                      rowData.id,
-                      rowData.instrumentId
-                    );
-                  },
-                  {
-                    title: 'Remove assigned instrument',
-                    description:
-                      'This action will remove assigned instrument from proposal.',
-                  }
-                )();
-              }}
-            >
-              <RemoveScienceIcon />
-            </IconButton>
-          </Tooltip>
-        )}
       </>
     );
   };
@@ -404,20 +371,16 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   };
 
   const assignProposalsToInstrument = async (
-    instrument: Instrument
+    instrument: Instrument | null
   ): Promise<void> => {
-    const selectedProposalsWithInstrument = proposalsData.filter(
-      (proposalDataItem) =>
-        selectedProposals.some(
-          (selectedProposal) => selectedProposal.id === proposalDataItem.id
-        ) && proposalDataItem.instrumentId
-    );
-
-    if (selectedProposalsWithInstrument.length === 0) {
+    if (instrument) {
       const result = await api(
-        'Proposal/s assigned to the selected instrument'
+        'Proposal/s assigned to the selected instrument successfully!'
       ).assignProposalsToInstrument({
-        proposals: selectedProposals,
+        proposals: selectedProposals.map((selectedProposal) => ({
+          id: selectedProposal.id,
+          callId: selectedProposal.callId,
+        })),
         instrumentId: instrument.id,
       });
       const isError = !!result.assignProposalsToInstrument.rejection;
@@ -439,12 +402,32 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         );
       }
     } else {
-      enqueueSnackbar(
-        'One or more of your selected proposals already have instrument assigned',
-        {
-          variant: 'error',
-        }
-      );
+      const result = await api(
+        'Proposal/s removed from the instrument successfully!'
+      ).removeProposalsFromInstrument({
+        proposalIds: selectedProposals.map(
+          (selectedProposal) => selectedProposal.id
+        ),
+      });
+
+      const isError = !!result.removeProposalsFromInstrument.rejection;
+
+      if (!isError) {
+        setProposalsData((proposalsData) =>
+          proposalsData.map((prop) => {
+            if (
+              selectedProposals.find(
+                (selectedProposal) => selectedProposal.id === prop.id
+              )
+            ) {
+              prop.instrumentName = null;
+              prop.instrumentId = null;
+            }
+
+            return prop;
+          })
+        );
+      }
     }
   };
 
@@ -479,7 +462,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const result = await api(
         `Proposal${shouldAddPluralLetter} status changed successfully!`
       ).changeProposalsStatus({
-        proposals: selectedProposals,
+        proposals: selectedProposals.map((selectedProposal) => ({
+          id: selectedProposal.id,
+          callId: selectedProposal.callId,
+        })),
         statusId: status.id,
       });
 
@@ -510,24 +496,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       }
     }
   };
-
-  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
-  const DeleteIcon = (): JSX.Element => <Delete />;
-  const GroupWorkIcon = (): JSX.Element => <GroupWork />;
-  const EmailIcon = (): JSX.Element => <Email />;
-  const AddScienceIcon = (
-    props: JSX.IntrinsicAttributes & {
-      children?: React.ReactNode;
-      'data-cy'?: string;
-    }
-  ): JSX.Element => <ScienceIconAdd {...props} />;
-  const ChangeProposalStatusIcon = (
-    props: JSX.IntrinsicAttributes & {
-      children?: React.ReactNode;
-      'data-cy'?: string;
-    }
-  ): JSX.Element => <ListStatusIcon {...props} />;
-  const ExportIcon = (): JSX.Element => <GridOnIcon />;
 
   columns = setSortDirectionOnSortColumn(
     columns,
@@ -574,6 +542,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             close={(): void => setOpenInstrumentAssignment(false)}
             callIds={selectedProposals.map(
               (selectedProposal) => selectedProposal.callId
+            )}
+            instrumentIds={selectedProposals.map(
+              (selectedProposal) => selectedProposal.instrumentId
             )}
           />
         </DialogContent>
@@ -702,10 +673,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             position: 'toolbarOnSelect',
           },
           {
-            icon: AddScienceIcon.bind(null, {
-              'data-cy': 'assign-proposals-to-instrument',
+            icon: ScienceIconComponent.bind(null, {
+              'data-cy': 'assign-remove-instrument',
             }),
-            tooltip: 'Assign proposals to instrument',
+            tooltip: 'Assign/Remove instrument',
             onClick: () => {
               setOpenInstrumentAssignment(true);
             },

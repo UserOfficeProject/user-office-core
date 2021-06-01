@@ -73,11 +73,12 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
                 <FormikDropdown
                   name="selectedSEPId"
                   label="Select SEP"
+                  loading={loadingSEPs}
                   items={SEPs.map((sep) => ({
                     value: sep.id.toString(),
                     text: sep.code,
                   }))}
-                  disabled={loadingSEPs}
+                  disabled={isSubmitting}
                   required
                 />
               </Grid>
