@@ -26,7 +26,6 @@ export const booleanDefinition: Question = {
 
     return config;
   },
-  isReadOnly: false,
   getDefaultAnswer: () => false,
   filterQuery: (queryBuilder, filter) => {
     const value = JSON.parse(filter.value).value;

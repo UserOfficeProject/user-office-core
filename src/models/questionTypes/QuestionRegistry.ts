@@ -19,12 +19,39 @@ import { textInputDefinition } from './TextInput';
 import { visitationBasisDefinition } from './VisitationBasis';
 
 export interface Question {
+  /**
+   * The enum value from DataType
+   */
   readonly dataType: DataType;
+
+  /**
+   * Perform validation rules before persisting data into the database
+   */
   readonly validate?: (field: QuestionTemplateRelation, value: any) => boolean;
+
+  /**
+   * Question can contain configuration, e.g. isRequired, maxValue, etc,
+   * This function returns configuration for newly created questions
+   */
   readonly createBlankConfig: () => any;
-  readonly isReadOnly: boolean;
+
+  /**
+   * Returns the answer value for the question that is not answered yet
+   */
   readonly getDefaultAnswer: (field: QuestionTemplateRelation) => any;
+
+  /**
+   * Function to transform the value before storing in the database.
+   * Good for sanitizing, or adjusting the format of the answer
+   */
   readonly transform?: (field: QuestionTemplateRelation, value: any) => any;
+
+  /**
+   * Function that is used when searching answers.
+   * @param query Knex query builder, on which Knex methods can be invoked to adjust
+   * search query. e.g. `query.andWhere(....)`
+   * @param filter search criteria provided by the user
+   */
   readonly filterQuery?: (
     query: Knex.QueryBuilder<any, any>,
     filter: QuestionFilterInput
