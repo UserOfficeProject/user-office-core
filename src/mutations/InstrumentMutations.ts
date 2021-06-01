@@ -3,7 +3,6 @@ import {
   updateInstrumentValidationSchema,
   deleteInstrumentValidationSchema,
   assignProposalsToInstrumentValidationSchema,
-  removeProposalFromInstrumentValidationSchema,
   assignScientistsToInstrumentValidationSchema,
   removeScientistFromInstrumentValidationSchema,
   setAvailabilityTimeOnInstrumentValidationSchema,
@@ -172,14 +171,13 @@ export default class InstrumentMutations {
       });
   }
 
-  @ValidateArgs(removeProposalFromInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async removeProposalFromInstrument(
+  async removeProposalsFromInstrument(
     agent: UserWithRole | null,
     args: RemoveProposalsFromInstrumentArgs
   ): Promise<boolean | Rejection> {
     return this.dataSource
-      .removeProposalFromInstrument(args.proposalId, args.instrumentId)
+      .removeProposalsFromInstrument(args.proposalIds)
       .then((result) => result)
       .catch((error) => {
         return rejection(
