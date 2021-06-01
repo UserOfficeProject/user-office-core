@@ -1,6 +1,8 @@
 import faker from 'faker';
 
 context('Proposal tests', () => {
+  const title = faker.lorem.words(2);
+  const abstract = faker.lorem.words(3);
   const proposalToCloneTitle = faker.lorem.words(2);
   const proposalToCloneAbstract = faker.lorem.words(3);
   const clonedProposalTitle = `Copy of ${proposalToCloneTitle}`;
@@ -29,8 +31,6 @@ context('Proposal tests', () => {
       'You must be part of the proposal. Either add yourself as Principal Investigator or a Co-Proposer!'
     );
 
-    const title = faker.lorem.words(2);
-    const abstract = faker.lorem.words(3);
     const proposer = 'Carl';
 
     cy.createProposal(title, abstract, '', proposer);
@@ -50,6 +50,51 @@ context('Proposal tests', () => {
     cy.contains('submitted');
 
     cy.get('[title="View proposal"]').should('exist');
+  });
+
+  it('Should be able to see proposal allocation time unit on the proposal', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.get("[title='Show Columns']").first().click();
+    cy.get('.MuiPopover-paper').contains('Time allocation').click();
+
+    cy.get('body').click();
+
+    cy.contains(title).parent().find('[title="View proposal"]').click();
+
+    cy.contains('Technical review').click();
+
+    cy.get('[data-cy="timeAllocation"] input').clear().type('10');
+
+    cy.get('[data-cy="technical-review-status"]').click();
+    cy.contains('Feasible').click();
+
+    cy.get('[data-cy="save-technical-review"]').click();
+
+    cy.closeModal();
+
+    cy.contains(title).parent().contains('10(Days)');
+
+    cy.contains('Calls').click();
+
+    cy.finishedLoading();
+
+    cy.get('[title="Edit"]').first().click();
+
+    cy.get('[data-cy="allocation-time-unit"]').click();
+
+    cy.contains('Hours').click();
+
+    cy.get('[data-cy="next-step"]').click();
+    cy.get('[data-cy="next-step"]').click();
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ variant: 'success', text: 'successfully' });
+
+    cy.contains('Proposals').click();
+    cy.contains(title).parent().contains('10(Hours)');
   });
 
   it('Should be able clone proposal to another call', () => {
