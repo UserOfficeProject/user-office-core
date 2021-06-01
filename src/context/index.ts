@@ -12,6 +12,7 @@ import SEPMutations from '../mutations/SEPMutations';
 import ShipmentMutations from '../mutations/ShipmentMutations';
 import TemplateMutations from '../mutations/TemplateMutations';
 import UserMutations from '../mutations/UserMutations';
+import VisitationMutations from '../mutations/VisitationMutations';
 import AdminQueries from '../queries/AdminQueries';
 import CallQueries from '../queries/CallQueries';
 import EventLogQueries from '../queries/EventLogQueries';
@@ -27,6 +28,7 @@ import ShipmentQueries from '../queries/ShipmentQueries';
 import SystemQueries from '../queries/SystemQueries';
 import TemplateQueries from '../queries/TemplateQueries';
 import UserQueries from '../queries/UserQueries';
+import VisitationQueries from '../queries/VisitationQueries';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 interface ResolverContextQueries {
@@ -45,6 +47,7 @@ interface ResolverContextQueries {
   proposalSettings: ProposalSettingsQueries;
   shipment: ShipmentQueries;
   system: SystemQueries;
+  visitation: VisitationQueries;
 }
 
 interface ResolverContextMutations {
@@ -61,6 +64,7 @@ interface ResolverContextMutations {
   sample: SampleMutations;
   proposalSettings: ProposalSettingsMutations;
   shipment: ShipmentMutations;
+  visitation: VisitationMutations;
 }
 
 export interface BasicResolverContext {

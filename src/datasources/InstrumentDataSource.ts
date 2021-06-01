@@ -28,10 +28,7 @@ export interface InstrumentDataSource {
     proposalIds: number[],
     instrumentId: number
   ): Promise<ProposalIdsWithNextStatus>;
-  removeProposalFromInstrument(
-    proposalId: number,
-    instrumentId: number
-  ): Promise<boolean>;
+  removeProposalsFromInstrument(proposalIds: number[]): Promise<boolean>;
   assignScientistsToInstrument(
     scientistIds: number[],
     instrumentId: number

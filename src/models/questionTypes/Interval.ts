@@ -8,7 +8,6 @@ import { Question } from './QuestionRegistry';
 
 export const intervalDefinition: Question = {
   dataType: DataType.INTERVAL,
-  isReadOnly: false,
   getDefaultAnswer: (field) => {
     return {
       min: '',

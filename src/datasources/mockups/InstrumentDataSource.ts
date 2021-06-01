@@ -91,10 +91,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return { proposalIds };
   }
 
-  async removeProposalFromInstrument(
-    proposalId: number,
-    instrumentId: number
-  ): Promise<boolean> {
+  async removeProposalsFromInstrument(proposalIds: number[]): Promise<boolean> {
     return true;
   }
 

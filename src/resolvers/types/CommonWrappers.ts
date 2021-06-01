@@ -31,6 +31,7 @@ import { Template } from './Template';
 import { Topic } from './Topic';
 import { Unit } from './Unit';
 import { User } from './User';
+import { Visitation } from './Visitation';
 
 @ObjectType()
 export class ResponseWrapBase {
@@ -295,4 +296,11 @@ export class ProposalsResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => [Proposal])
   public proposals: Proposal[];
+}
+
+@ObjectType()
+export class VisitationResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => Visitation, { nullable: true })
+  public visitation: Visitation;
 }

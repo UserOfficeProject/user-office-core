@@ -58,10 +58,10 @@ export const dateDefinition: Question = {
     config.small_label = '';
     config.required = false;
     config.tooltip = '';
+    config.includeTime = false;
 
     return config;
   },
-  isReadOnly: false,
   getDefaultAnswer: (relation: QuestionTemplateRelation) =>
     (relation.config as DateConfig).defaultDate || null,
   filterQuery: (queryBuilder, filter) => {

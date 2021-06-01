@@ -25,11 +25,8 @@ export class AssignProposalsToInstrumentArgs {
 
 @ArgsType()
 export class RemoveProposalsFromInstrumentArgs {
-  @Field(() => Int)
-  public proposalId: number;
-
-  @Field(() => Int)
-  public instrumentId: number;
+  @Field(() => [Int])
+  public proposalIds: number[];
 }
 
 @Resolver()
@@ -51,12 +48,12 @@ export class AssignProposalsToInstrumentMutation {
   }
 
   @Mutation(() => SuccessResponseWrap)
-  async removeProposalFromInstrument(
+  async removeProposalsFromInstrument(
     @Args() args: RemoveProposalsFromInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.instrument.removeProposalFromInstrument(
+      context.mutations.instrument.removeProposalsFromInstrument(
         context.user,
         args
       ),

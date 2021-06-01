@@ -110,6 +110,5 @@ export const richTextInputDefinition: Question = {
 
     return config;
   },
-  isReadOnly: false,
   getDefaultAnswer: () => '',
 };

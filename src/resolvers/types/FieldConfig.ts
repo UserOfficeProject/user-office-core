@@ -19,6 +19,9 @@ export class SampleBasisConfig {
 }
 
 @ObjectType()
+export class VisitationBasisConfig extends ConfigBase {}
+
+@ObjectType()
 export class BooleanConfig extends ConfigBase {}
 
 @ObjectType()
@@ -31,6 +34,9 @@ export class DateConfig extends ConfigBase {
 
   @Field(() => String, { nullable: true })
   defaultDate: string | null;
+
+  @Field(() => Boolean)
+  includeTime: boolean;
 }
 
 @ObjectType()
@@ -166,5 +172,6 @@ export const FieldConfigType = createUnionType({
     NumberInputConfig,
     ShipmentBasisConfig,
     RichTextInputConfig,
+    VisitationBasisConfig,
   ], // function that returns array of object types classes
 });

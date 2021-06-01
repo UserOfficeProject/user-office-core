@@ -12,6 +12,5 @@ export const embellishmentDefinition: Question = {
 
     return config;
   },
-  isReadOnly: true,
   getDefaultAnswer: () => null,
 };

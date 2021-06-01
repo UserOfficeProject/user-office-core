@@ -28,6 +28,7 @@ export enum DataType {
   NUMBER_INPUT = 'NUMBER_INPUT',
   SHIPMENT_BASIS = 'SHIPMENT_BASIS',
   RICH_TEXT_INPUT = 'RICH_TEXT_INPUT',
+  VISITATION_BASIS = 'VISITATION_BASIS',
 }
 
 export class Topic {
@@ -87,6 +88,7 @@ export enum TemplateCategoryId {
   PROPOSAL_QUESTIONARY = 1,
   SAMPLE_DECLARATION,
   SHIPMENT_DECLARATION,
+  VISITATION,
 }
 
 export class FieldCondition {

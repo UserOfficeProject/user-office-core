@@ -22,4 +22,6 @@ export const Tokens = {
   AssetRegistrar: Symbol('AssetRegistrar'),
   PostToMessageQueue: Symbol('PostToMessageQueue'),
   MailService: Symbol('MailService'),
+  VisitationDataSource: Symbol('VisitationDataSource'),
+  VisitationAuthorization: Symbol('VisitationAuthorization'),
 };

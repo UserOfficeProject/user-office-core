@@ -39,7 +39,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@apollo/federation": "^0.24.0",
+    "@apollo/federation": "^0.25.0",
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-logger": "^1.1.0",
     "@esss-swap/duo-message-broker": "^1.0.4",
@@ -55,7 +55,7 @@
     "class-validator": "^0.13.1",
     "cookie-parser": "^1.4.5",
     "cron": "^1.8.2",
-    "dotenv": "^8.2.0",
+    "dotenv": "^8.6.0",
     "email-templates": "^8.0.4",
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",

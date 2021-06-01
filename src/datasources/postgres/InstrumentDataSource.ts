@@ -216,9 +216,31 @@ export default class PostgresInstrumentDataSource
     const proposalInstrumentPairs: {
       proposal_id: number;
       instrument_id: number;
-    }[] = await database('instrument_has_proposals')
-      .insert(dataToInsert)
-      .returning(['*']);
+    }[] = await database.transaction(async (trx) => {
+      try {
+        /**
+         * NOTE: First delete all connections that should be changed,
+         * because currently we only support one proposal to be assigned on one instrument.
+         * So we don't end up in a situation that one proposal is assigned to multiple instruments
+         * which is not supported scenario by the frontend because it only shows one instrument per proposal.
+         */
+        await database('instrument_has_proposals')
+          .del()
+          .whereIn('proposal_id', proposalIds)
+          .transacting(trx);
+
+        const result = await database('instrument_has_proposals')
+          .insert(dataToInsert)
+          .returning(['*'])
+          .transacting(trx);
+
+        return await trx.commit(result);
+      } catch (error) {
+        throw new Error(
+          `Could not assign proposals ${proposalIds} to instrument with id: ${instrumentId}`
+        );
+      }
+    });
 
     const returnedProposalIds = proposalInstrumentPairs.map(
       (proposalInstrumentPair) => proposalInstrumentPair.proposal_id
@@ -233,17 +255,13 @@ export default class PostgresInstrumentDataSource
     }
 
     throw new Error(
-      `Could not assign proposals ${proposalIds} to instrument with id: ${instrumentId} `
+      `Could not assign proposals ${proposalIds} to instrument with id: ${instrumentId}`
     );
   }
 
-  async removeProposalFromInstrument(
-    proposalId: number,
-    instrumentId: number
-  ): Promise<boolean> {
+  async removeProposalsFromInstrument(proposalIds: number[]): Promise<boolean> {
     const result = await database('instrument_has_proposals')
-      .where('instrument_id', instrumentId)
-      .andWhere('proposal_id', proposalId)
+      .whereIn('proposal_id', proposalIds)
       .del();
 
     if (result) {
