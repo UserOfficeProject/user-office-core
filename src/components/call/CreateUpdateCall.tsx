@@ -40,6 +40,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         ...call,
         templateId: call.templateId || '',
         proposalWorkflowId: call.proposalWorkflowId || '',
+        referenceNumberFormat: call.referenceNumberFormat || '',
       }
     : {
         shortCode: '',

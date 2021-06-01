@@ -9,7 +9,6 @@ import {
 import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
 import { QuestionaryStep, ShipmentStatus } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
-import { usePersistShipmentModel } from 'hooks/shipment/usePersistShipmentModel';
 import {
   Event,
   EventType,
@@ -110,7 +109,6 @@ export default function ShipmentContainer(props: {
   done?: (shipment: ShipmentExtended) => void;
 }) {
   const { api } = useDataApiWithFeedback();
-  const { persistModel: persistShipmentModel } = usePersistShipmentModel();
 
   const previousInitialShipment = usePrevious(props.shipment);
 
@@ -223,7 +221,7 @@ export default function ShipmentContainer(props: {
     dispatch,
   } = QuestionarySubmissionModel<ShipmentSubmissionState>(
     initialState,
-    [handleEvents, persistShipmentModel],
+    [handleEvents],
     shipmentReducer
   );
 

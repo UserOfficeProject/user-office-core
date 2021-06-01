@@ -149,63 +149,45 @@ context('Instrument tests', () => {
 
     cy.finishedLoading();
 
-    cy.get('tbody [type="checkbox"]').first().check();
+    cy.contains(proposal1.title).parent().find('[type="checkbox"]').check();
 
-    cy.get('[title="Remove assigned instrument"]').first().click();
+    cy.get('[data-cy="assign-remove-instrument"]').click();
 
-    cy.get('[data-cy="confirm-ok"]').click();
+    cy.contains('Loading...').should('not.exist');
 
-    cy.notification({
-      variant: 'success',
-      text: 'Proposal removed from the instrument successfully!',
-    });
+    cy.get('[data-cy="clear-selection"]').click();
 
-    cy.get('[data-cy="assign-proposals-to-instrument"]').first().click();
+    cy.get('[data-cy="remove-instrument-alert"]').should('exist');
 
-    cy.get("[id='mui-component-select-selectedInstrumentId']").should(
-      'not.have.class',
-      'Mui-disabled'
-    );
+    cy.get('[data-cy="submit-assign-remove-instrument"]').click();
 
-    cy.get("[id='mui-component-select-selectedInstrumentId']").first().click();
-
-    cy.get("[id='menu-selectedInstrumentId'] li").first().click();
-
-    cy.contains('Assign to Instrument').click();
+    cy.get('[data-cy="proposals-instrument-assignment"]').should('not.exist');
 
     cy.notification({
       variant: 'success',
-      text: 'Proposal/s assigned to the selected instrument',
+      text: 'Proposal/s removed from the instrument successfully!',
     });
 
-    cy.get('[title="Remove assigned instrument"]').first().click();
+    cy.assignInstrumentToProposal(proposal1.title, instrument1.name);
 
-    cy.get('[data-cy="confirm-ok"]').click();
+    cy.contains(proposal1.title).parent().find('[type="checkbox"]').check();
+
+    cy.get('[data-cy="assign-remove-instrument"]').click();
+
+    cy.contains('Loading...').should('not.exist');
+
+    cy.get('[data-cy="clear-selection"]').click();
+
+    cy.get('[data-cy="remove-instrument-alert"]').should('exist');
+
+    cy.get('[data-cy="submit-assign-remove-instrument"]').click();
 
     cy.notification({
       variant: 'success',
-      text: 'Proposal removed from the instrument successfully!',
+      text: 'Proposal/s removed from the instrument successfully!',
     });
 
-    cy.get('[data-cy="assign-proposals-to-instrument"]').first().click();
-
-    cy.get("[id='mui-component-select-selectedInstrumentId']").should(
-      'not.have.class',
-      'Mui-disabled'
-    );
-
-    cy.get("[id='mui-component-select-selectedInstrumentId']").first().click();
-
-    cy.get("[id='menu-selectedInstrumentId'] li").first().click();
-
-    cy.contains('Assign to Instrument').click();
-
-    cy.notification({
-      variant: 'success',
-      text: 'Proposal/s assigned to the selected instrument',
-    });
-
-    cy.get('[title="Remove assigned instrument"]').should('exist');
+    cy.assignInstrumentToProposal(proposal1.title, instrument1.name);
   });
 
   it('User Officer should be able to assign scientist to instrument and instrument scientist should be able to see instruments he is assigned to', () => {
@@ -490,17 +472,23 @@ context('Instrument tests', () => {
 
     cy.contains(proposal1.title)
       .parent()
-      .find('[title="Remove assigned instrument"]')
+      .find('input[type="checkbox"]')
       .click();
 
-    cy.get('[data-cy="confirm-ok"]').click();
+    cy.get('[data-cy="assign-remove-instrument"]').click();
+
+    cy.contains('Loading...').should('not.exist');
+
+    cy.get('[data-cy="clear-selection"]').click();
+
+    cy.get('[data-cy="remove-instrument-alert"]').should('exist');
+
+    cy.get('[data-cy="submit-assign-remove-instrument"]').click();
 
     cy.notification({
       variant: 'success',
-      text: 'Proposal removed from the instrument',
+      text: 'Proposal/s removed from the instrument successfully!',
     });
-
-    cy.get('[title="Remove assigned instrument"]').should('have.length', 1);
   });
 
   it('User Officer should be able to remove assigned scientist from instrument', () => {
