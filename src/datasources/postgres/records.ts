@@ -14,6 +14,7 @@ import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import { SEP, SEPProposal, SEPAssignment, SEPReviewer } from '../../models/SEP';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
+import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import {
   DataType,
@@ -465,6 +466,12 @@ export interface FeatureRecord {
   readonly description: string;
 }
 
+export interface SettingsRecord {
+  readonly settings_id: string;
+  readonly settings_value: string;
+  readonly description: string;
+}
+
 export const createPageObject = (record: PageTextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
@@ -740,6 +747,14 @@ export const createFeatureObject = (record: FeatureRecord) => {
   return new Feature(
     record.feature_id as FeatureId,
     record.is_enabled,
+    record.description
+  );
+};
+
+export const createSettingsObject = (record: SettingsRecord) => {
+  return new Settings(
+    record.settings_id as SettingsId,
+    record.settings_value,
     record.description
   );
 };
