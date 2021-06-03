@@ -11,7 +11,7 @@ import {
 import UOLoader from 'components/common/UOLoader';
 import { ShipmentFragment, ShipmentStatus } from 'generated/sdk';
 import { useDownloadPDFShipmentLabel } from 'hooks/proposal/useDownloadPDFShipmentLabel';
-import { useShipments } from 'hooks/shipment/useShipments';
+import { useMyShipments } from 'hooks/shipment/useMyShipments';
 import { ShipmentBasic } from 'models/ShipmentSubmissionState';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
@@ -22,7 +22,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import CreateUpdateShipment from './CreateUpdateShipment';
 
 const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
-  const { loadingShipments, shipments, setShipments } = useShipments();
+  const { loadingMyShipments, myShipments, setMyShipments } = useMyShipments();
   const downloadShipmentLabel = useDownloadPDFShipmentLabel();
   const [
     urlQueryParams,
@@ -30,11 +30,15 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
   ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
   const { api } = useDataApiWithFeedback();
 
-  if (!shipments) {
+  if (!myShipments) {
     return <UOLoader />;
   }
 
   const columns = [
+    {
+      title: 'Proposal ID',
+      field: 'proposal.shortCode',
+    },
     { title: 'Title', field: 'title' },
     { title: 'Status', field: 'status' },
     {
@@ -53,8 +57,8 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
           })
           .then((data) => {
             if (!data.deleteShipment.rejection) {
-              setShipments(
-                shipments.filter(
+              setMyShipments(
+                myShipments.filter(
                   (shipment) => shipment.id !== shipmentToDelete.id
                 )
               );
@@ -75,24 +79,31 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
   ) => (
     <CreateUpdateShipment
       shipment={editShipment}
-      close={(shipment: ShipmentBasic | null) =>
-        !!editShipment ? onUpdate(shipment) : onCreate(shipment)
-      }
+      close={async () => {
+        /**
+         * Reloading myShipments
+         */
+        const result = await api().getMyShipments();
+
+        if (result.myShipments) {
+          setMyShipments(result.myShipments);
+        }
+      }}
     />
   );
 
   return (
     <div data-cy="shipments-table">
       <SuperMaterialTable
-        setData={setShipments}
+        setData={setMyShipments}
         createModal={createModal}
         hasAccess={{ update: true, create: true, remove: true }}
         icons={tableIcons}
         localization={tableLocalization}
         title="Shipments"
         columns={columns}
-        isLoading={loadingShipments}
-        data={shipments}
+        isLoading={loadingMyShipments}
+        data={myShipments}
         urlQueryParams={urlQueryParams}
         setUrlQueryParams={setUrlQueryParams}
         actions={[

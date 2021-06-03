@@ -14,7 +14,7 @@ function readWriteReview() {
 
   cy.get('@dialog').contains('Proposal information', { matchCase: false });
   cy.get('@dialog').contains('Technical review');
-  cy.get('@dialog').contains('Grade').click({ force: true });
+  cy.get('@dialog').contains('Grade').click();
 
   cy.setTinyMceContent('comment', faker.lorem.words(3));
 
@@ -26,7 +26,7 @@ function readWriteReview() {
 
   cy.notification({ variant: 'success', text: 'Updated' });
 
-  cy.get('[aria-label="close"]').click();
+  cy.closeModal();
 
   cy.get('@dialog').should('not.exist');
   cy.wait(100);
@@ -90,40 +90,12 @@ const proposal2 = {
 const scientist = 'Carl';
 
 context(
-  'Scientific evaluation panel tests',
-  {
-    scrollBehavior: 'center',
-  },
+  'Scientific evaluation panel proposal reviews and meeting component tests',
   () => {
     before(() => {
       cy.resetDB();
-    });
-
-    beforeEach(() => {
       cy.viewport(1920, 1080);
-    });
 
-    it('User should not be able to see SEPs page', () => {
-      cy.login('user');
-
-      cy.get('[data-cy="profile-page-btn"]').should('exist');
-
-      let userMenuItems = cy.get('[data-cy="user-menu-items"]');
-
-      userMenuItems.should('not.contain', 'SEPs');
-    });
-
-    it('SEP REviewer should not able to see SEPs page', () => {
-      cy.login(sepMembers.reviewer);
-
-      cy.get('[data-cy="profile-page-btn"]').should('exist');
-
-      let userMenuItems = cy.get('[data-cy="SEPReviewer-menu-items"]');
-
-      userMenuItems.should('not.contain', 'SEPs');
-    });
-
-    it('Officer should be able to assign SEP Reviewer role', () => {
       cy.login('officer');
 
       cy.contains('People').click();
@@ -155,79 +127,15 @@ context(
         text: 'Roles updated successfully!',
         variant: 'success',
       });
-    });
-
-    it('Officer should be able to delete SEP', () => {
-      const { code, description } = sep1;
-
-      cy.login('officer');
-
-      cy.contains('SEPs').click();
-      cy.get('[title="Delete"]').last().click();
-
-      cy.get('[title="Save"]').click();
-
-      cy.notification({ variant: 'success', text: 'SEP deleted successfully' });
-    });
-
-    it('Officer should be able to create SEP', () => {
-      const { code, description } = sep1;
-
-      cy.login('officer');
-
-      cy.contains('SEPs').click();
-      cy.contains('Create').click();
-      cy.get('#code').type(code);
-      cy.get('#description').type(description);
-
-      cy.get('[data-cy="sepActive"] input').should('be.checked');
-      cy.get('[data-cy="sepActive"] input').uncheck();
-      cy.get('[data-cy="sepActive"] input').should('not.be.checked');
-      cy.get('[data-cy="sepActive"] input').check();
-      cy.get('[data-cy="sepActive"] input').should('be.checked');
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.notification({ variant: 'success', text: 'SEP created successfully' });
-
-      cy.contains('Update SEP');
-
-      cy.get('#code').should('contain.value', code);
-      cy.get('#description').should('contain.value', description);
-
-      cy.url().should('contain', 'SEPPage/2');
-    });
-
-    it('Officer should be able to edit existing SEP', () => {
-      const code = faker.random.words(3);
-      const description = faker.random.words(8);
-
-      cy.login('officer');
 
       cy.contains('SEPs').click();
       cy.get('button[title="Edit"]').first().click();
-      cy.get('#code').type(code);
-      cy.get('#description').type(description);
+
+      cy.get('#code').clear().type(sep1.code);
+      cy.get('#description').clear().type(sep1.description);
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({ variant: 'success', text: 'SEP updated successfully' });
-
-      cy.contains('SEPs').click();
-
-      let SEPsTable = cy.get('[data-cy="SEPs-table"]');
-
-      SEPsTable.should('contain', code);
-      SEPsTable.should('contain', description);
-    });
-
-    it('Officer should be able to assign SEP Chair to existing SEP', () => {
-      let selectedChairUserFirstName = '';
-      let selectedChairUserLastName = '';
-
-      cy.login('officer');
-
-      cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
 
       cy.contains('Members').click();
 
@@ -237,22 +145,6 @@ context(
 
       searchMuiTableAsync(sepMembers.chair.surname);
 
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .first()
-        .then((element) => {
-          selectedChairUserFirstName = element.text();
-        });
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .eq(1)
-        .then((element) => {
-          selectedChairUserLastName = element.text();
-        });
-
       cy.get('[title="Select user"]').first().click();
 
       cy.notification({
@@ -260,51 +152,11 @@ context(
         text: 'SEP chair assigned successfully',
       });
 
-      cy.contains('Logs').click({ force: true });
-
-      cy.contains('SEP_MEMBERS_ASSIGNED');
-
-      cy.contains('Members').click();
-
-      cy.get('input[id="SEPChair"]').should((element) => {
-        expect(element.val()).to.equal(
-          `${selectedChairUserFirstName} ${selectedChairUserLastName}`
-        );
-      });
-    });
-
-    it('Officer should be able to assign SEP Secretary to existing SEP', () => {
-      let selectedSecretaryUserFirstName = '';
-      let selectedSecretaryUserLastName = '';
-
-      cy.login('officer');
-
-      cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
-
-      cy.contains('Members').click();
-
       cy.get('[title="Set SEP Secretary"]').click();
 
       cy.finishedLoading();
 
       searchMuiTableAsync(sepMembers.secretary.surname);
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .first()
-        .then((element) => {
-          selectedSecretaryUserFirstName = element.text();
-        });
-
-      cy.get('[role="dialog"] table tbody tr')
-        .first()
-        .find('td.MuiTableCell-alignLeft')
-        .eq(1)
-        .then((element) => {
-          selectedSecretaryUserLastName = element.text();
-        });
 
       cy.get('[title="Select user"]').first().click();
 
@@ -312,161 +164,6 @@ context(
         variant: 'success',
         text: 'SEP secretary assigned successfully',
       });
-
-      cy.reload();
-
-      cy.contains('Logs').click({ force: true });
-
-      cy.contains('SEP_MEMBERS_ASSIGNED');
-
-      cy.contains('Members').click();
-
-      cy.get('input[id="SEPSecretary"]').should((element) => {
-        expect(element.val()).to.contain(
-          `${selectedSecretaryUserFirstName} ${selectedSecretaryUserLastName}`
-        );
-      });
-    });
-
-    it('SEP Chair should not be able to modify SEP Chair and SEP Secretary', () => {
-      cy.login(sepMembers.chair);
-
-      cy.changeActiveRole('SEP Chair');
-
-      cy.finishedLoading();
-
-      cy.contains('SEPs').click();
-
-      cy.get('button[title="Edit"]').first().click();
-
-      cy.contains('Members').click();
-
-      cy.finishedLoading();
-
-      cy.get('[title="Set SEP Chair"]').should('not.exist');
-      cy.get('[title="Set SEP Secretary"]').should('not.exist');
-
-      cy.get('[title="Remove SEP Chair"]').should('not.exist');
-      cy.get('[title="Remove SEP Secretary"]').should('not.exist');
-    });
-
-    it('SEP Chair should be able to modify SEP Reviewers', () => {
-      cy.login(sepMembers.chair);
-
-      cy.changeActiveRole('SEP Chair');
-
-      cy.finishedLoading();
-
-      cy.contains('SEPs').click();
-
-      cy.get('button[title="Edit"]').first().click();
-
-      cy.contains('Members').click();
-
-      cy.get('[data-cy="add-member"]').click();
-
-      cy.finishedLoading();
-
-      searchMuiTableAsync(sepMembers.reviewer.surname);
-
-      cy.get('input[type="checkbox"]').eq(1).click();
-
-      cy.contains('Update').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'SEP member assigned successfully',
-      });
-
-      cy.contains(sepMembers.reviewer.surname);
-
-      cy.closeNotification();
-
-      cy.get('[title="Remove reviewer"]').click();
-      cy.get('[title="Save"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'SEP member removed successfully',
-      });
-
-      cy.get('body').should('not.contain', sepMembers.reviewer.surname);
-      cy.contains('No records to display');
-    });
-
-    it('SEP Secretary should not be able to modify SEP Chair and SEP Secretary', () => {
-      cy.login(sepMembers.secretary);
-
-      cy.changeActiveRole('SEP Secretary');
-
-      cy.finishedLoading();
-
-      cy.contains('SEPs').click();
-
-      cy.get('button[title="Edit"]').first().click();
-
-      cy.contains('Members').click();
-
-      cy.finishedLoading();
-
-      cy.get('[title="Set SEP Chair"]').should('not.exist');
-      cy.get('[title="Set SEP Secretary"]').should('not.exist');
-
-      cy.get('[title="Remove SEP Chair"]').should('not.exist');
-      cy.get('[title="Remove SEP Secretary"]').should('not.exist');
-    });
-
-    it('SEP Secretary should be able to modify SEP Reviewers', () => {
-      cy.login(sepMembers.secretary);
-
-      cy.changeActiveRole('SEP Secretary');
-
-      cy.finishedLoading();
-
-      cy.contains('SEPs').click();
-
-      cy.get('button[title="Edit"]').first().click();
-
-      cy.contains('Members').click();
-
-      cy.get('[data-cy="add-member"]').click();
-
-      cy.finishedLoading();
-
-      searchMuiTableAsync(sepMembers.reviewer.surname);
-
-      cy.get('input[type="checkbox"]').eq(1).click();
-
-      cy.contains('Update').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'SEP member assigned successfully',
-      });
-
-      cy.contains(sepMembers.reviewer.surname);
-
-      cy.closeNotification();
-
-      cy.get('[title="Remove reviewer"]').click();
-      cy.get('[title="Save"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'SEP member removed successfully',
-      });
-
-      cy.get('body').should('not.contain', sepMembers.reviewer.surname);
-      cy.contains('No records to display');
-    });
-
-    it('Officer should be able to assign SEP Reviewers to existing SEP', () => {
-      cy.login('officer');
-
-      cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
-
-      cy.contains('Members').click();
 
       cy.get('[title="Add Member"]').click();
 
@@ -483,11 +180,11 @@ context(
         text: 'SEP member assigned successfully',
       });
 
-      cy.contains(sepMembers.reviewer.surname);
+      cy.logout();
+    });
 
-      cy.contains('Logs').click();
-
-      cy.contains('SEP_MEMBERS_ASSIGNED');
+    beforeEach(() => {
+      cy.viewport(1920, 1080);
     });
 
     it('Officer should be able to assign proposal to existing SEP', () => {
@@ -535,7 +232,7 @@ context(
       cy.closeModal();
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
 
@@ -554,10 +251,8 @@ context(
     });
 
     it('Officer should be able to see proposal details in modal inside proposals and assignments', () => {
-      cy.login('officer');
-
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
 
@@ -575,13 +270,13 @@ context(
 
       cy.get('[role="dialog"]').contains(proposal1.proposalTitle);
       cy.get('[role="dialog"]').contains('Download PDF');
+
+      cy.closeModal();
     });
 
     it('Proposal should contain standard deviation field inside proposals and assignments', () => {
-      cy.login('officer');
-
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
 
@@ -591,10 +286,8 @@ context(
     });
 
     it('Officer should be able to assign SEP member to proposal in existing SEP', () => {
-      cy.login('officer');
-
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
 
@@ -625,8 +318,6 @@ context(
 
       cy.finishedLoading();
 
-      cy.get("[title='Last Page'] button").first().click();
-
       cy.contains('SEP_MEMBER_ASSIGNED_TO_PROPOSAL');
     });
 
@@ -635,7 +326,7 @@ context(
       cy.changeActiveRole('SEP Chair');
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
 
@@ -669,7 +360,7 @@ context(
       cy.changeActiveRole('SEP Secretary');
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
 
@@ -702,7 +393,7 @@ context(
       cy.login('officer');
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
@@ -735,7 +426,7 @@ context(
       cy.finishedLoading();
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
@@ -761,7 +452,7 @@ context(
       cy.finishedLoading();
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
@@ -794,7 +485,7 @@ context(
       cy.finishedLoading();
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
@@ -884,8 +575,6 @@ context(
       const shortCode = faker.random.alphaNumeric(15);
       const description = faker.random.words(8);
 
-      cy.login('officer');
-
       cy.contains('People').click();
       cy.addScientistRoleToUser(scientist);
 
@@ -915,31 +604,11 @@ context(
 
       cy.get('table tbody [type="checkbox"]').first().check();
 
-      cy.get("[title='Assign proposals to instrument']").first().click();
-
-      cy.get("[id='mui-component-select-selectedInstrumentId']").should(
-        'not.have.class',
-        'Mui-disabled'
-      );
-
-      cy.get("[id='mui-component-select-selectedInstrumentId']")
-        .first()
-        .click();
-
-      cy.get("[id='menu-selectedInstrumentId'] li").first().click();
-
-      cy.contains('Assign to Instrument').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Proposal/s assigned to the selected instrument',
-      });
-
-      cy.get('[title="Remove assigned instrument"]').should('exist');
+      cy.assignInstrumentToProposal(proposal1.proposalTitle, name);
 
       cy.contains('SEPs').click();
 
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Meeting Components').click();
 
@@ -964,13 +633,13 @@ context(
       cy.contains('SEP Meeting form');
       cy.contains('Proposal details');
       cy.contains('External reviews');
+
+      cy.closeModal();
     });
 
     it('Officer should not be able to submit an instrument if all proposals are not submitted in SEP meetings', () => {
-      cy.login('officer');
-
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Meeting Components').click();
 
@@ -1067,7 +736,7 @@ context(
 
       cy.get('table tbody [type="checkbox"]').first().check();
 
-      cy.get("[title='Assign proposals to instrument']").first().click();
+      cy.get("[title='Assign/Remove instrument']").first().click();
 
       cy.get("[id='mui-component-select-selectedInstrumentId']").should(
         'not.have.class',
@@ -1080,7 +749,7 @@ context(
 
       cy.get("[id='menu-selectedInstrumentId'] li").first().click();
 
-      cy.contains('Assign to Instrument').click();
+      cy.get('[data-cy="submit-assign-remove-instrument"]').click();
 
       cy.changeProposalStatus('SEP_REVIEW', proposal2.proposalTitle);
 
@@ -1118,7 +787,7 @@ context(
 
       cy.contains('SEPs').click();
 
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Meeting Components').click();
 
@@ -1129,38 +798,10 @@ context(
         .should('have.text', '25');
     });
 
-    it('SEP Chair should only see SEPs where they have SEP Chair role', () => {
-      cy.login(sepMembers.chair);
-
-      cy.changeActiveRole('SEP Chair');
-
-      cy.finishedLoading();
-
-      cy.contains('SEPs').click();
-
-      cy.contains(sep1.code);
-      cy.contains(sep2.code).should('not.exist');
-    });
-
-    it('SEP Secretary should only see SEPs where they have SEP Secretary role', () => {
-      cy.login(sepMembers.secretary);
-
-      cy.changeActiveRole('SEP Secretary');
-
-      cy.finishedLoading();
-
-      cy.contains('SEPs').click();
-
-      cy.contains(sep1.code);
-      cy.contains(sep2.code).should('not.exist');
-    });
-
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
-      cy.login('officer');
-
       cy.contains('SEPs').click();
 
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Meeting Components').click();
 
@@ -1173,10 +814,8 @@ context(
     });
 
     it('Officer should be able to edit SEP Meeting form', () => {
-      cy.login('officer');
-
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').eq(1).click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
@@ -1197,7 +836,7 @@ context(
       cy.finishedLoading();
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
@@ -1218,7 +857,7 @@ context(
       cy.finishedLoading();
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
@@ -1236,7 +875,7 @@ context(
       cy.login('officer');
       cy.contains('SEPs').click();
 
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Meeting Components').click();
 
@@ -1266,7 +905,7 @@ context(
 
       cy.contains('9999 (Overwritten)');
 
-      cy.get('[aria-label="close"]').click();
+      cy.closeModal();
       cy.contains('9999');
 
       cy.reload();
@@ -1283,13 +922,14 @@ context(
       cy.finishedLoading();
 
       cy.get('body').should('not.contain', '9999 (Overwritten)');
+
+      cy.closeModal();
     });
 
     it('should use SEP time allocation (if set) when calculating if they fit in available time', () => {
-      cy.login('officer');
       cy.contains('SEPs').click();
 
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Meeting Components').click();
 
@@ -1316,7 +956,7 @@ context(
 
       cy.contains('15 (Overwritten)');
 
-      cy.get('[aria-label="close"]').click();
+      cy.closeModal();
 
       cy.get(
         '[data-cy="sep-instrument-proposals-table"] tbody tr:last-child'
@@ -1324,10 +964,8 @@ context(
     });
 
     it('Officer should be able to submit an instrument if all proposals SEP meetings are submitted in existing SEP', () => {
-      cy.login('officer');
-
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').eq(1).click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click(); // NOTE:
 
       cy.contains('Meeting Components').click();
 
@@ -1378,10 +1016,8 @@ context(
     });
 
     it('Officer should be able to edit SEP Meeting form after instrument is submitted', () => {
-      cy.login('officer');
-
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').eq(1).click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click(); // NOTE:
 
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
@@ -1402,7 +1038,7 @@ context(
       cy.finishedLoading();
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
@@ -1434,7 +1070,7 @@ context(
       cy.finishedLoading();
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
@@ -1463,7 +1099,7 @@ context(
       cy.login('officer');
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').eq(1).click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click(); // NOTE:
 
       cy.contains('Meeting Components').click();
 
@@ -1477,24 +1113,9 @@ context(
       cy.get('[data-cy="preparing-download-dialog-item"]').contains('call 1');
     });
 
-    it('Should be able to download SEP as Excel file', () => {
-      cy.login('officer');
-
-      cy.contains('Sample safety').click();
-
-      cy.request('GET', '/download/xlsx/sep/2/call/1').then((response) => {
-        expect(response.headers['content-type']).to.be.equal(
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        );
-        expect(response.status).to.be.equal(200);
-      });
-    });
-
     it('Officer should be able to remove assigned SEP member from proposal in existing SEP', () => {
-      cy.login('officer');
-
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').eq(1).click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click(); // NOTE:
 
       cy.contains('Proposals and Assignments').click();
 
@@ -1568,7 +1189,7 @@ context(
       cy.finishedLoading();
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
 
@@ -1584,7 +1205,7 @@ context(
       cy.finishedLoading();
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').first().click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
 
       cy.contains('Proposals and Assignments').click();
 
@@ -1597,7 +1218,7 @@ context(
       cy.login('officer');
 
       cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').eq(1).click();
+      cy.contains(sep1.code).parent().find('button[title="Edit"]').click(); // NOTE:
 
       cy.contains('Proposals and Assignments').click();
 
@@ -1613,7 +1234,7 @@ context(
 
       cy.closeNotification();
 
-      cy.contains('Logs').click({ force: true });
+      cy.contains('Logs').click();
 
       cy.finishedLoading();
 
@@ -1626,76 +1247,6 @@ context(
       cy.get('[data-cy="sep-assignments-table"]')
         .find('tbody td')
         .last()
-        .then((element) => {
-          expect(element.text()).to.be.equal('No records to display');
-        });
-    });
-
-    it('Officer should be able to remove assigned SEP Chair and SEP Secretary from existing SEP', () => {
-      cy.login('officer');
-
-      cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').eq(1).click();
-
-      cy.contains('Members').click();
-
-      cy.finishedLoading();
-
-      cy.get('[title="Remove SEP Chair"]').click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'SEP member removed successfully',
-      });
-
-      cy.get('[title="Remove SEP Secretary"]').click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'SEP member removed successfully',
-      });
-    });
-
-    it('Officer should be able to remove SEP Reviewers from existing SEP', () => {
-      cy.login('officer');
-
-      cy.contains('SEPs').click();
-      cy.get('button[title="Edit"]').eq(1).click();
-
-      cy.contains('Members').click();
-
-      cy.get('[title="Remove reviewer"]').click();
-
-      cy.get('[title="Save"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'SEP member removed successfully',
-      });
-
-      cy.closeNotification();
-
-      cy.contains('Logs').click({ force: true });
-
-      cy.finishedLoading();
-
-      cy.get("[title='Last Page'] button").first().click();
-
-      cy.contains('SEP_MEMBER_REMOVED');
-
-      cy.contains('Members').click();
-
-      cy.get('[data-cy="sep-reviewers-table"]')
-        .find('tbody td')
-        .should('have.length', 1);
-
-      cy.get('[data-cy="sep-reviewers-table"]')
-        .find('tbody td')
-        .first()
         .then((element) => {
           expect(element.text()).to.be.equal('No records to display');
         });

@@ -34,9 +34,15 @@ declare global {
        * @returns {typeof createDateQuestion}
        * @memberof Chainable
        * @example
-       *    cy.createDateQuestion('Is dangerous')
+       *    cy.createDateQuestion('Specify visitation time', {includeTime:true})
        */
-      createDateQuestion: (title: string) => void;
+      createDateQuestion: (
+        title: string,
+        options?: {
+          includeTime?: boolean;
+          isRequired?: boolean;
+        }
+      ) => void;
 
       /**
        * Creates multiple choice question. You have to be in edit template view to call this method

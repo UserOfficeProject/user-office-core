@@ -136,7 +136,6 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
             InputProps={{
               'data-cy': 'beamline-manager',
             }}
-            isClearable={false}
           />
 
           <Button

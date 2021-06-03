@@ -89,8 +89,8 @@ export default function SignInSide() {
     if (data.login && !data.login.rejection) {
       handleLogin(data.login.token);
     } else {
-      if (data.login) {
-        setErrorMessage(data.login.rejection?.reason as string);
+      if (data.login.rejection) {
+        setErrorMessage(data.login.rejection.reason);
         setFailed(true);
       }
     }

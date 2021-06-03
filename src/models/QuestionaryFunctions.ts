@@ -109,6 +109,15 @@ export function prepareAnswers(answers?: Answer[]): AnswerInput[] {
 
       return !definition.readonly;
     });
+
+    answers = answers.map((answer) => {
+      const { preSubmitTransform } = getQuestionaryComponentDefinition(
+        answer.question.dataType
+      );
+
+      return preSubmitTransform ? preSubmitTransform(answer) : answer;
+    });
+
     const preparedAnswers = answers.map((answer) => {
       return {
         questionId: answer.question.id,

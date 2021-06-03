@@ -11,13 +11,23 @@ export function useShipment(shipmentId: number) {
   const api = useDataApi();
 
   useEffect(() => {
+    let unmounted = false;
+
     api()
       .getShipment({ shipmentId })
       .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         if (data.shipment) {
           setShipment(data.shipment);
         }
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [api, shipmentId]);
 
   return { shipment };
