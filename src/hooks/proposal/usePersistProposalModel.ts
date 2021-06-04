@@ -5,7 +5,6 @@ import { FunctionType } from 'utils/utilTypes';
 
 import {
   Event,
-  EventType,
   QuestionarySubmissionState,
 } from '../../models/QuestionarySubmissionState';
 
@@ -19,20 +18,18 @@ export function usePersistProposalModel() {
     return (next: FunctionType) => async (action: Event) => {
       next(action);
       switch (action.type) {
-        case EventType.PROPOSAL_SUBMIT_CLICKED: {
+        case 'PROPOSAL_SUBMIT_CLICKED': {
           api('Saved')
             .submitProposal({
-              id: action.payload.proposalId,
+              id: action.proposalId,
             })
             .then((result) => {
               const state = getState() as ProposalSubmissionState;
               dispatch({
-                type: EventType.PROPOSAL_LOADED,
-                payload: {
-                  proposal: {
-                    ...state.proposal,
-                    ...result.submitProposal.proposal,
-                  },
+                type: 'PROPOSAL_LOADED',
+                proposal: {
+                  ...state.proposal,
+                  ...result.submitProposal.proposal,
                 },
               });
             });

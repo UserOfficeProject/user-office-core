@@ -12,7 +12,6 @@ import { VisitationContextType } from 'components/visitation/VisitationContainer
 import { BasicUserDetails } from 'generated/sdk';
 import { useUserProposals } from 'hooks/proposal/useUserProposals';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
-import { EventType } from 'models/QuestionarySubmissionState';
 import { VisitationSubmissionState } from 'models/VisitationSubmissionState';
 
 const useStyles = makeStyles((theme) => ({
@@ -51,12 +50,9 @@ function QuestionaryComponentVisitationBasis(props: BasicComponentProps) {
         InputProps={{ 'data-cy': 'proposal-selection' }}
         onChange={(event) => {
           dispatch({
-            type: EventType.VISITATION_MODIFIED,
-            payload: {
-              visitation: {
-                ...state.visitation,
-                proposalId: event.target.value,
-              },
+            type: 'VISITATION_MODIFIED',
+            visitation: {
+              proposalId: +event.target.value,
             },
           });
         }}
@@ -72,8 +68,8 @@ function QuestionaryComponentVisitationBasis(props: BasicComponentProps) {
             team.map((user) => user.id)
           );
           dispatch({
-            type: EventType.VISITATION_MODIFIED,
-            payload: { visitation: { ...state.visitation, team } },
+            type: 'VISITATION_MODIFIED',
+            visitation: { team },
           });
         }}
         users={JSON.parse(JSON.stringify(state.visitation.team))}
@@ -99,10 +95,8 @@ const visitationBasisPreSubmit = () => async ({
 
     if (result.updateVisitation.visitation) {
       dispatch({
-        type: EventType.VISITATION_MODIFIED,
-        payload: {
-          visitation: { ...visitation, ...result.updateVisitation.visitation },
-        },
+        type: 'VISITATION_MODIFIED',
+        visitation: result.updateVisitation.visitation,
       });
     }
   } else {
@@ -114,10 +108,8 @@ const visitationBasisPreSubmit = () => async ({
     const newVisitation = result.createVisitation.visitation;
     if (newVisitation) {
       dispatch({
-        type: EventType.VISITATION_CREATED,
-        payload: {
-          visitation: newVisitation,
-        },
+        type: 'VISITATION_CREATED',
+        visitation: newVisitation,
       });
       returnValue = newVisitation.questionaryId;
     }

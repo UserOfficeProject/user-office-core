@@ -15,7 +15,6 @@ import QuestionaryDetails, {
 import { ShipmentStatus } from 'generated/sdk';
 import { useDownloadPDFShipmentLabel } from 'hooks/proposal/useDownloadPDFShipmentLabel';
 import { useProposalData } from 'hooks/proposal/useProposalData';
-import { EventType } from 'models/QuestionarySubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -92,9 +91,12 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
                 const result = await api().submitShipment({
                   shipmentId: state.shipment.id,
                 });
+                if (!result.submitShipment.shipment) {
+                  return;
+                }
                 dispatch({
-                  type: EventType.SHIPMENT_MODIFIED,
-                  payload: { shipment: result.submitShipment.shipment },
+                  type: 'SHIPMENT_MODIFIED',
+                  shipment: result.submitShipment.shipment,
                 });
               },
               {

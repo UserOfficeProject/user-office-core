@@ -11,40 +11,34 @@ import {
 
 import { ProposalSubsetSubmission } from './ProposalSubmissionState';
 import { getFieldById } from './QuestionaryFunctions';
+import { SampleWithQuestionary } from './Sample';
+import { ShipmentExtended } from './ShipmentSubmissionState';
+import { VisitationExtended } from './VisitationSubmissionState';
 
-export enum EventType {
-  FIELD_CHANGED = 'FIELD_CHANGED',
-  WIZARD_STEPS_COMPLETE = 'WIZARD_STEPS_COMPLETE',
-  BACK_CLICKED = 'BACK_CLICKED',
-  RESET_CLICKED = 'RESET_CLICKED',
-  GO_STEP_BACK = 'GO_TO_STEP_REQUESTED',
-  GO_STEP_FORWARD = 'GO_STEP_FORWARD',
-  GO_TO_STEP = 'GO_TO_STEP',
-  QUESTIONARY_STEPS_LOADED = 'QUESTIONARY_STEPS_LOADED',
-  QUESTIONARY_STEP_ANSWERED = 'QUESTIONARY_STEP_ANSWERED',
-  SAVE_AND_CONTINUE_CLICKED = 'SAVE_AND_CONTINUE_CLICKED',
-  SAMPLE_CREATED = 'SAMPLE_CREATED',
-  SAMPLE_UPDATED = 'SAMPLE_UPDATED',
-  SAMPLE_LOADED = 'SAMPLE_LOADED',
-  SAMPLE_MODIFIED = 'SAMPLE_MODIFIED',
-  SAVE_GENERAL_INFO_CLICKED = 'SAVE_GENERAL_INFO_CLICKED',
-  PROPOSAL_MODIFIED = 'PROPOSAL_MODIFIED',
-  PROPOSAL_CREATED = 'PROPOSAL_CREATED',
-  PROPOSAL_LOADED = 'PROPOSAL_LOADED',
-  PROPOSAL_SUBMIT_CLICKED = 'PROPOSAL_SUBMIT_CLICKED',
-  SHIPMENT_CREATED = 'SHIPMENT_CREATED',
-  SHIPMENT_LOADED = 'SHIPMENT_LOADED',
-  SHIPMENT_MODIFIED = 'SHIPMENT_MODIFIED',
-  SHIPMENT_DONE = 'SHIPMENT_DONE',
-  CLEAN_DIRTY_STATE = 'CLEAN_DIRTY_STATE',
-  VISITATION_CREATED = 'VISITATION_CREATED',
-  VISITATION_LOADED = 'VISITATION_LOADED',
-  VISITATION_MODIFIED = 'VISITATION_MODIFIED',
-}
-export interface Event {
-  type: EventType;
-  payload?: any;
-}
+export type Event =
+  | { type: 'FIELD_CHANGED'; id: string; newValue: any }
+  | { type: 'BACK_CLICKED' }
+  | { type: 'RESET_CLICKED' }
+  | { type: 'GO_STEP_BACK' }
+  | { type: 'GO_STEP_FORWARD' }
+  | { type: 'CLEAN_DIRTY_STATE' }
+  | { type: 'GO_TO_STEP'; stepIndex: number }
+  | { type: 'STEPS_LOADED'; steps: QuestionaryStep[]; stepIndex?: number }
+  | { type: 'STEP_ANSWERED'; step: QuestionaryStep }
+  | { type: 'SAMPLE_CREATED'; sample: SampleWithQuestionary }
+  | { type: 'SAMPLE_UPDATED'; sample: Partial<SampleWithQuestionary> }
+  | { type: 'SAMPLE_LOADED'; sample: SampleWithQuestionary }
+  | { type: 'SAMPLE_MODIFIED'; sample: Partial<SampleWithQuestionary> }
+  | { type: 'PROPOSAL_MODIFIED'; proposal: Partial<ProposalSubsetSubmission> }
+  | { type: 'PROPOSAL_CREATED'; proposal: ProposalSubsetSubmission }
+  | { type: 'PROPOSAL_LOADED'; proposal: ProposalSubsetSubmission }
+  | { type: 'PROPOSAL_SUBMIT_CLICKED'; proposalId: number }
+  | { type: 'SHIPMENT_CREATED'; shipment: ShipmentExtended }
+  | { type: 'SHIPMENT_LOADED'; shipment: ShipmentExtended }
+  | { type: 'SHIPMENT_MODIFIED'; shipment: Partial<ShipmentExtended> }
+  | { type: 'VISITATION_CREATED'; visitation: VisitationExtended }
+  | { type: 'VISITATION_LOADED'; visitation: VisitationExtended }
+  | { type: 'VISITATION_MODIFIED'; visitation: Partial<VisitationExtended> };
 
 export interface WizardStepMetadata {
   title: string;
@@ -111,20 +105,17 @@ export function QuestionarySubmissionModel<
   function reducer(state: T, action: Event) {
     return produce(state, (draftState) => {
       switch (action.type) {
-        case EventType.FIELD_CHANGED:
-          const field = getFieldById(
-            draftState.steps,
-            action.payload.id
-          ) as Answer;
-          field.value = action.payload.newValue;
+        case 'FIELD_CHANGED':
+          const field = getFieldById(draftState.steps, action.id) as Answer;
+          field.value = action.newValue;
           draftState.isDirty = true;
           break;
 
-        case EventType.CLEAN_DIRTY_STATE:
+        case 'CLEAN_DIRTY_STATE':
           draftState.isDirty = false;
           break;
 
-        case EventType.GO_STEP_BACK:
+        case 'GO_STEP_BACK':
           draftState.stepIndex = clamStepIndex(
             draftState.stepIndex - 1,
             draftState.wizardSteps.length
@@ -132,33 +123,33 @@ export function QuestionarySubmissionModel<
 
           break;
 
-        case EventType.GO_STEP_FORWARD:
+        case 'GO_STEP_FORWARD':
           draftState.stepIndex = clamStepIndex(
             draftState.stepIndex + 1,
             draftState.wizardSteps.length
           );
           break;
 
-        case EventType.GO_TO_STEP:
+        case 'GO_TO_STEP':
           draftState.stepIndex = clamStepIndex(
-            action.payload.stepIndex,
+            action.stepIndex,
             draftState.wizardSteps.length
           );
 
           break;
 
-        case EventType.QUESTIONARY_STEPS_LOADED: {
-          draftState.steps = action.payload.questionarySteps;
+        case 'STEPS_LOADED': {
+          draftState.steps = action.steps;
           const stepIndex =
-            action.payload.stepIndex !== undefined
-              ? action.payload.stepIndex
+            action.stepIndex !== undefined
+              ? action.stepIndex
               : getInitialStepIndex(draftState);
           draftState.stepIndex = stepIndex;
           draftState.isDirty = false;
           break;
         }
-        case EventType.QUESTIONARY_STEP_ANSWERED:
-          const updatedStep = action.payload.questionaryStep as QuestionaryStep;
+        case 'STEP_ANSWERED':
+          const updatedStep = action.step;
           const stepIndex = draftState.steps.findIndex(
             (step) => step.topic.id === updatedStep.topic.id
           );
