@@ -15,10 +15,7 @@ import {
   getQuestionaryStepByTopicId as getStepByTopicId,
   prepareAnswers,
 } from 'models/QuestionaryFunctions';
-import {
-  EventType,
-  QuestionarySubmissionState,
-} from 'models/QuestionarySubmissionState';
+import { QuestionarySubmissionState } from 'models/QuestionarySubmissionState';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -150,7 +147,7 @@ export default function QuestionaryStepView(props: {
         JSON.stringify(initialValues) === JSON.stringify(lastSavedFormValues)
       ) {
         dispatch({
-          type: EventType.CLEAN_DIRTY_STATE,
+          type: 'CLEAN_DIRTY_STATE',
         });
       }
     };
@@ -186,10 +183,8 @@ export default function QuestionaryStepView(props: {
 
     if (answerTopicResult.answerTopic.questionaryStep) {
       dispatch({
-        type: EventType.QUESTIONARY_STEP_ANSWERED,
-        payload: {
-          questionaryStep: answerTopicResult.answerTopic.questionaryStep,
-        },
+        type: 'STEP_ANSWERED',
+        step: answerTopicResult.answerTopic.questionaryStep,
       });
 
       setLastSavedFormValues(initialValues);
@@ -207,14 +202,14 @@ export default function QuestionaryStepView(props: {
           'Changes you recently made in this step will not be saved! Are you sure?'
         )
       ) {
-        dispatch({ type: EventType.BACK_CLICKED });
+        dispatch({ type: 'BACK_CLICKED' });
       }
     } else {
-      dispatch({ type: EventType.BACK_CLICKED });
+      dispatch({ type: 'BACK_CLICKED' });
     }
   };
 
-  const resetHandler = () => dispatch({ type: EventType.RESET_CLICKED });
+  const resetHandler = () => dispatch({ type: 'RESET_CLICKED' });
 
   const saveHandler = () => performSave(true);
 
@@ -253,11 +248,9 @@ export default function QuestionaryStepView(props: {
                     onComplete: (newValue: Answer['value']) => {
                       if (field.value !== newValue) {
                         dispatch({
-                          type: EventType.FIELD_CHANGED,
-                          payload: {
-                            id: field.question.id,
-                            newValue: newValue,
-                          },
+                          type: 'FIELD_CHANGED',
+                          id: field.question.id,
+                          newValue: newValue,
                         });
                         setFieldValue(field.question.id, newValue, true);
                       }
@@ -303,7 +296,7 @@ export default function QuestionaryStepView(props: {
                           return;
                         }
 
-                        dispatch({ type: EventType.GO_STEP_FORWARD });
+                        dispatch({ type: 'GO_STEP_FORWARD' });
                         props.onStepComplete?.(topicId);
                       }
                     }

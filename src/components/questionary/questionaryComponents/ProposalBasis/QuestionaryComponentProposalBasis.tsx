@@ -16,7 +16,6 @@ import {
 import { BasicUserDetails } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
-import { EventType } from 'models/QuestionarySubmissionState';
 
 const TextFieldNoSubmit = withPreventSubmit(TextField);
 
@@ -63,10 +62,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
               setLocalTitle(event.target.value),
             onBlur: () => {
               dispatch({
-                type: EventType.PROPOSAL_MODIFIED,
-                payload: {
-                  proposal: { ...state.proposal, title: localTitle },
-                },
+                type: 'PROPOSAL_MODIFIED',
+                proposal: { title: localTitle },
               });
             },
           }}
@@ -86,10 +83,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
               setLocalAbstract(event.target.value),
             onBlur: () => {
               dispatch({
-                type: EventType.PROPOSAL_MODIFIED,
-                payload: {
-                  proposal: { ...state.proposal, abstract: localAbstract },
-                },
+                type: 'PROPOSAL_MODIFIED',
+                proposal: { abstract: localAbstract },
               });
             },
           }}
@@ -107,8 +102,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         userChanged={(user: BasicUserDetails) => {
           formikProps.setFieldValue(`${id}.proposer`, user.id);
           dispatch({
-            type: EventType.PROPOSAL_MODIFIED,
-            payload: { proposal: { ...state.proposal, proposer: user } },
+            type: 'PROPOSAL_MODIFIED',
+            proposal: { proposer: user },
           });
         }}
         className={classes.container}
@@ -123,8 +118,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             users.map((user) => user.id)
           );
           dispatch({
-            type: EventType.PROPOSAL_MODIFIED,
-            payload: { proposal: { ...state.proposal, users: users } },
+            type: 'PROPOSAL_MODIFIED',
+            proposal: { users: users },
           });
         }}
         // QuickFix for material table changing immutable state
@@ -157,10 +152,8 @@ const proposalBasisPreSubmit = () => async ({
 
     if (result.updateProposal.proposal) {
       dispatch({
-        type: EventType.PROPOSAL_LOADED,
-        payload: {
-          proposal: { ...proposal, ...result.updateProposal.proposal },
-        },
+        type: 'PROPOSAL_LOADED',
+        proposal: { ...proposal, ...result.updateProposal.proposal },
       });
     }
   } else {
@@ -177,13 +170,11 @@ const proposalBasisPreSubmit = () => async ({
         proposerId: proposer?.id,
       });
       dispatch({
-        type: EventType.PROPOSAL_CREATED,
-        payload: {
-          proposal: {
-            ...proposal,
-            ...createResult.createProposal.proposal,
-            ...updateResult.updateProposal.proposal,
-          },
+        type: 'PROPOSAL_CREATED',
+        proposal: {
+          ...proposal,
+          ...createResult.createProposal.proposal,
+          ...updateResult.updateProposal.proposal,
         },
       });
       returnValue = createResult.createProposal.proposal.questionaryId;

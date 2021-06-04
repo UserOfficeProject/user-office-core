@@ -11,7 +11,6 @@ import { QuestionaryStep, VisitationStatus } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import {
   Event,
-  EventType,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
   WizardStep,
@@ -36,28 +35,28 @@ const visitationReducer = (
   action: Event
 ) => {
   switch (action.type) {
-    case EventType.VISITATION_CREATED:
-    case EventType.VISITATION_LOADED:
-      const visitation: VisitationExtended = action.payload.visitation;
+    case 'VISITATION_CREATED':
+    case 'VISITATION_LOADED':
+      const visitation = action.visitation;
       draftState.isDirty = false;
       draftState.questionaryId = visitation.questionaryId;
       draftState.visitation = visitation;
       draftState.steps = visitation.questionary.steps;
       draftState.templateId = visitation.questionary.templateId;
       break;
-    case EventType.VISITATION_MODIFIED:
+    case 'VISITATION_MODIFIED':
       draftState.visitation = {
         ...draftState.visitation,
-        ...action.payload.visitation,
+        ...action.visitation,
       };
       draftState.isDirty = true;
       break;
-    case EventType.QUESTIONARY_STEPS_LOADED: {
-      draftState.visitation.questionary.steps = action.payload.questionarySteps;
+    case 'STEPS_LOADED': {
+      draftState.visitation.questionary.steps = action.steps;
       break;
     }
-    case EventType.QUESTIONARY_STEP_ANSWERED:
-      const updatedStep = action.payload.questionaryStep as QuestionaryStep;
+    case 'STEP_ANSWERED':
+      const updatedStep = action.step;
       const stepIndex = draftState.visitation.questionary.steps.findIndex(
         (step) => step.topic.id === updatedStep.topic.id
       );
@@ -157,8 +156,8 @@ export default function VisitationContainer(props: VisitationContainerProps) {
     if (visitationState.visitation.id === 0) {
       // if visitation is not created yet
       dispatch({
-        type: EventType.VISITATION_LOADED,
-        payload: { visitation: initialState.visitation },
+        type: 'VISITATION_LOADED',
+        visitation: initialState.visitation,
       });
     } else {
       await api()
@@ -166,15 +165,13 @@ export default function VisitationContainer(props: VisitationContainerProps) {
         .then((data) => {
           if (data.visitation && data.visitation.questionary.steps) {
             dispatch({
-              type: EventType.VISITATION_LOADED,
-              payload: { visitation: data.visitation },
+              type: 'VISITATION_LOADED',
+              visitation: data.visitation,
             });
             dispatch({
-              type: EventType.QUESTIONARY_STEPS_LOADED,
-              payload: {
-                questionarySteps: data.visitation.questionary.steps,
-                stepIndex: state.stepIndex,
-              },
+              type: 'STEPS_LOADED',
+              steps: data.visitation.questionary.steps,
+              stepIndex: state.stepIndex,
             });
           }
         });
@@ -191,21 +188,21 @@ export default function VisitationContainer(props: VisitationContainerProps) {
       next(action); // first update state/model
       const state = getState() as VisitationSubmissionState;
       switch (action.type) {
-        case EventType.BACK_CLICKED: // move this
+        case 'BACK_CLICKED': // move this
           if (!state.isDirty || (await handleReset())) {
-            dispatch({ type: EventType.GO_STEP_BACK });
+            dispatch({ type: 'GO_STEP_BACK' });
           }
           break;
 
-        case EventType.RESET_CLICKED:
+        case 'RESET_CLICKED':
           handleReset();
           break;
 
-        case EventType.VISITATION_CREATED:
+        case 'VISITATION_CREATED':
           props.onCreate?.(state.visitation);
           break;
 
-        case EventType.VISITATION_MODIFIED:
+        case 'VISITATION_MODIFIED':
           props.onUpdate?.(state.visitation);
           break;
       }
@@ -235,12 +232,12 @@ export default function VisitationContainer(props: VisitationContainerProps) {
       previousInitialVisitation === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: EventType.VISITATION_LOADED,
-        payload: { visitation: props.visitation },
+        type: 'VISITATION_LOADED',
+        visitation: props.visitation,
       });
       dispatch({
-        type: EventType.QUESTIONARY_STEPS_LOADED,
-        payload: { questionarySteps: props.visitation.questionary.steps },
+        type: 'STEPS_LOADED',
+        steps: props.visitation.questionary.steps,
       });
     }
   }, [previousInitialVisitation, props.visitation, dispatch]);

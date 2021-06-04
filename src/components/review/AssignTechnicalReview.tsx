@@ -2,15 +2,16 @@ import { Button, makeStyles, TextField } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import React, { useState } from 'react';
 
-import { Proposal, UserRole } from 'generated/sdk';
+import { UserRole } from 'generated/sdk';
+import { ProposalData } from 'hooks/proposal/useProposalData';
 import { useUsersData } from 'hooks/user/useUsersData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 type AssignTechnicalReviewProps = {
-  proposal: Proposal;
-  onProposalUpdated: (proposal: Proposal) => void;
+  proposal: ProposalData;
+  onProposalUpdated: (proposal: ProposalData) => void;
   confirm: WithConfirmType;
 };
 

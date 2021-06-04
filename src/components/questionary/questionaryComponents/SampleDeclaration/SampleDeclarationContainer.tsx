@@ -11,7 +11,6 @@ import { QuestionaryStep } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import {
   Event,
-  EventType,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
   WizardStep,
@@ -32,29 +31,29 @@ const samplesReducer = (
   action: Event
 ) => {
   switch (action.type) {
-    case EventType.SAMPLE_CREATED:
-    case EventType.SAMPLE_LOADED:
-      const sample: SampleWithQuestionary = action.payload.sample;
+    case 'SAMPLE_CREATED':
+    case 'SAMPLE_LOADED':
+      const sample = action.sample;
       draftState.isDirty = false;
       draftState.questionaryId = sample.questionaryId;
       draftState.sample = sample;
       draftState.steps = sample.questionary.steps;
       draftState.templateId = sample.questionary.templateId;
       break;
-    case EventType.SAMPLE_MODIFIED:
+    case 'SAMPLE_MODIFIED':
       draftState.sample = {
         ...draftState.sample,
-        ...action.payload,
+        ...action.sample,
       };
       draftState.isDirty = true;
       break;
 
-    case EventType.QUESTIONARY_STEPS_LOADED: {
-      draftState.sample.questionary.steps = action.payload.questionarySteps;
+    case 'STEPS_LOADED': {
+      draftState.sample.questionary.steps = action.steps;
       break;
     }
-    case EventType.QUESTIONARY_STEP_ANSWERED:
-      const updatedStep = action.payload.questionaryStep as QuestionaryStep;
+    case 'STEP_ANSWERED':
+      const updatedStep = action.step;
       const stepIndex = draftState.sample.questionary.steps.findIndex(
         (step) => step.topic.id === updatedStep.topic.id
       );
@@ -132,8 +131,8 @@ export function SampleDeclarationContainer(props: {
     if (sampleState.sample.id === 0) {
       // if sample isn't created yet
       dispatch({
-        type: EventType.SAMPLE_LOADED,
-        payload: { sample: initialState.sample },
+        type: 'SAMPLE_LOADED',
+        sample: initialState.sample,
       });
     } else {
       await api()
@@ -141,15 +140,13 @@ export function SampleDeclarationContainer(props: {
         .then((data) => {
           if (data.sample && data.sample.questionary.steps) {
             dispatch({
-              type: EventType.SAMPLE_LOADED,
-              payload: { sample: data.sample },
+              type: 'SAMPLE_LOADED',
+              sample: data.sample,
             });
             dispatch({
-              type: EventType.QUESTIONARY_STEPS_LOADED,
-              payload: {
-                questionarySteps: data.sample.questionary.steps,
-                stepIndex: state.stepIndex,
-              },
+              type: 'STEPS_LOADED',
+              steps: data.sample.questionary.steps,
+              stepIndex: state.stepIndex,
             });
           }
         });
@@ -166,18 +163,18 @@ export function SampleDeclarationContainer(props: {
       next(action);
       const state = getState() as SampleSubmissionState;
       switch (action.type) {
-        case EventType.SAMPLE_UPDATED:
-          props.sampleUpdated?.(action.payload.sample);
+        case 'SAMPLE_UPDATED':
+          props.sampleUpdated?.({ ...state.sample, ...action.sample });
           break;
-        case EventType.SAMPLE_CREATED:
-          props.sampleCreated?.(action.payload.sample);
+        case 'SAMPLE_CREATED':
+          props.sampleCreated?.(action.sample);
           break;
-        case EventType.BACK_CLICKED:
+        case 'BACK_CLICKED':
           if (!state.isDirty || (await handleReset())) {
-            dispatch({ type: EventType.GO_STEP_BACK });
+            dispatch({ type: 'GO_STEP_BACK' });
           }
           break;
-        case EventType.RESET_CLICKED:
+        case 'RESET_CLICKED':
           handleReset();
           break;
       }
@@ -205,12 +202,12 @@ export function SampleDeclarationContainer(props: {
       previousInitialSample === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: EventType.SAMPLE_LOADED,
-        payload: { sample: props.sample },
+        type: 'SAMPLE_LOADED',
+        sample: props.sample,
       });
       dispatch({
-        type: EventType.QUESTIONARY_STEPS_LOADED,
-        payload: { questionarySteps: props.sample.questionary.steps },
+        type: 'STEPS_LOADED',
+        steps: props.sample.questionary.steps,
       });
     }
   }, [previousInitialSample, props.sample, dispatch]);

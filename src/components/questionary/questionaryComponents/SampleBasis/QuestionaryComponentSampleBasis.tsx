@@ -9,7 +9,6 @@ import {
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
-import { EventType } from 'models/QuestionarySubmissionState';
 import { SampleSubmissionState } from 'models/SampleSubmissionState';
 
 import { SampleContextType } from '../SampleDeclaration/SampleDeclarationContainer';
@@ -27,7 +26,7 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
     QuestionaryContext
   ) as SampleContextType;
 
-  const [title, setTitle] = useState(state?.sample.title);
+  const [title, setTitle] = useState(state?.sample.title || '');
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
@@ -44,8 +43,8 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
           },
           onBlur: () => {
             dispatch({
-              type: EventType.SAMPLE_MODIFIED,
-              payload: { ...state.sample, title: title },
+              type: 'SAMPLE_MODIFIED',
+              sample: { title: title },
             });
           },
         }}
@@ -76,10 +75,8 @@ const sampleBasisPreSubmit = () => async ({
     });
     if (result.updateSample.sample) {
       dispatch({
-        type: EventType.SAMPLE_UPDATED,
-        payload: {
-          sample: { ...sample, ...result.updateSample.sample },
-        },
+        type: 'SAMPLE_UPDATED',
+        sample: result.updateSample.sample,
       });
     }
   } else {
@@ -92,10 +89,8 @@ const sampleBasisPreSubmit = () => async ({
 
     if (result.createSample.sample) {
       dispatch({
-        type: EventType.SAMPLE_CREATED,
-        payload: {
-          sample: result.createSample.sample,
-        },
+        type: 'SAMPLE_CREATED',
+        sample: result.createSample.sample,
       });
       returnValue = result.createSample.sample.questionaryId;
     }
