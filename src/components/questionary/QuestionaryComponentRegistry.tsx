@@ -72,17 +72,71 @@ export type GetYupInitialValue = (props: {
 type QuestionaryComponent = (props: BasicComponentProps) => JSX.Element | null;
 
 export interface QuestionaryComponentDefinition {
+  /**
+   * The enum value from DataType
+   */
   readonly dataType: DataType;
+
+  /**
+   * A human readable name
+   */
   readonly name: string;
-  readonly questionTemplateRelationForm: () => FC<QuestionTemplateRelationFormProps>;
-  readonly questionForm: () => FC<QuestionFormProps>;
+
+  /**
+   * The main component that is rendered in the questionary and visible by user
+   */
   readonly questionaryComponent: QuestionaryComponent;
+
+  /**
+   * A form used in administration panel to define a question (more on this below)
+   */
+  readonly questionForm: () => FC<QuestionFormProps>;
+
+  /**
+   * A form used in administration panel to define a question template relation (more on that below)
+   */
+  readonly questionTemplateRelationForm: () => FC<QuestionTemplateRelationFormProps>;
+
+  /**
+   * Rendering of the question and answer that is displayed in the review,
+   * For most components use the `defaultRenderer`. The `defaultRenderer` will print question and answer
+   * as simple strings.
+   *
+   * If you want to exclude your question from review completely you can set renderers to undefined
+   */
   readonly renderers?: Renderers;
+
+  /**
+   * Yup validation rules for the answer
+   */
   readonly createYupValidationSchema: CreateYupValidation;
+
+  /**
+   * Returns initial value for the Yup validation schema
+   */
   readonly getYupInitialValue: GetYupInitialValue;
-  readonly readonly: boolean; // if true then no answer will be produced
-  readonly creatable: boolean; // if true then the question can be added to a questionary
+
+  /**
+   * If true then no answer will be produced.
+   * This could be set to true for decorative components
+   * or components with special functionality where no answer is needed
+   */
+  readonly readonly: boolean;
+
+  /**
+   * If true then the question can be added to a questionary from template editor.
+   */
+  readonly creatable: boolean;
+
+  /**
+   * The icon for component
+   */
   readonly icon: JSX.Element;
+
+  /**
+   * Component used in search questions page. Contains UI that user officer
+   * can use to specify search criteria for the dataType
+   */
   readonly searchCriteriaComponent?: FC<SearchCriteriaInputProps>;
   readonly preSubmitTransform?: (answer: Answer) => Answer;
 }
