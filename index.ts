@@ -2,7 +2,7 @@ import { logger } from '@esss-swap/duo-logger';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 
-import './env-loader.js';
+import './src/env-loader.js';
 import './src/config';
 import 'reflect-metadata';
 
