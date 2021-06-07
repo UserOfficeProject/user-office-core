@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
-import ScienceIconAdd from 'components/common/icons/ScienceIconAdd';
+import ScienceIcon from 'components/common/icons/ScienceIcon';
 import InputDialog from 'components/common/InputDialog';
 import SuperMaterialTable, {
   DefaultQueryParams,
@@ -173,7 +173,7 @@ const CallsTable: React.FC = () => {
       setCalls(callsWithInstrumentAvailabilityTime);
     }
   };
-  const ScienceIconComponent = (): JSX.Element => <ScienceIconAdd />;
+  const ScienceIconComponent = (): JSX.Element => <ScienceIcon />;
 
   const AssignedInstruments = (rowData: Call) => (
     <AssignedInstrumentsTable

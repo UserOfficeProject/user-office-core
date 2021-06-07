@@ -1,4 +1,3 @@
-import Container from '@material-ui/core/Container';
 import Divider from '@material-ui/core/Divider';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React from 'react';
@@ -6,6 +5,7 @@ import { withRouter } from 'react-router-dom';
 
 import SimpleTabs from 'components/common/TabPanel';
 import EventLogList from 'components/eventLog/EventLogList';
+import { ContentContainer } from 'styles/StyledComponents';
 
 import { getTheme } from '../../theme';
 import { Impersonate } from './Impersonate';
@@ -30,7 +30,7 @@ function UserPage(props: { match: { params: { id: string } } }) {
   const classes = useStyles();
 
   return (
-    <Container maxWidth="lg" cy-data="user-page">
+    <ContentContainer cy-data="user-page">
       <SimpleTabs tabNames={['General', 'Settings', 'Logs']}>
         <UpdateUserInformation id={userId} />
         <React.Fragment>
@@ -45,7 +45,7 @@ function UserPage(props: { match: { params: { id: string } } }) {
           changedObjectId={userId}
         />
       </SimpleTabs>
-    </Container>
+    </ContentContainer>
   );
 }
 

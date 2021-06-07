@@ -47,6 +47,14 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
             inputProps={{ 'data-cy': 'question' }}
           />
           <Field
+            name="config.includeTime"
+            label="Include time"
+            component={FormikUICustomCheckbox}
+            margin="normal"
+            fullWidth
+            inputProps={{ 'data-cy': 'includeTime' }}
+          />
+          <Field
             name="config.tooltip"
             label="Tooltip"
             type="text"

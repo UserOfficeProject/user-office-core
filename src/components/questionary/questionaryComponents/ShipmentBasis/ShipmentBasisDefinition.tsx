@@ -15,7 +15,7 @@ import { QuestionTemplateRelationShipmentBasisForm } from './QuestionTemplateRel
 
 export const shipmentBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.SHIPMENT_BASIS,
-  name: 'Shpiment Basis',
+  name: 'Shipment Basis',
   questionaryComponent: QuestionaryComponentShipmentBasis,
   questionForm: () => QuestionShipmentBasisForm,
   questionTemplateRelationForm: () => QuestionTemplateRelationShipmentBasisForm,

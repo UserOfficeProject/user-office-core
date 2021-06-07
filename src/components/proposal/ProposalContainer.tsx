@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { Container } from '@material-ui/core';
 import { default as React, useEffect } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
@@ -22,7 +21,7 @@ import {
   QuestionarySubmissionState,
   WizardStep,
 } from 'models/QuestionarySubmissionState';
-import { StyledPaper } from 'styles/StyledComponents';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
@@ -267,7 +266,7 @@ export default function ProposalContainer(props: {
 
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
-      <Container maxWidth="lg">
+      <ContentContainer maxWidth="md">
         <StyledPaper>
           <Questionary
             title={state.proposal.title || 'New Proposal'}
@@ -280,7 +279,7 @@ export default function ProposalContainer(props: {
             displayElementFactory={displayElementFactory}
           />
         </StyledPaper>
-      </Container>
+      </ContentContainer>
     </QuestionaryContext.Provider>
   );
 }

@@ -105,14 +105,20 @@ function createTextQuestion(question, options) {
   closeQuestionsMenu();
 }
 
-function createDateQuestion(question) {
+function createDateQuestion(question, options) {
   openQuestionsMenu();
 
   cy.contains('Add Date').click();
 
   cy.get('[data-cy=question]').clear().type(question);
 
-  cy.contains('Is required').click();
+  if (options?.isRequired) {
+    cy.contains('Is required').click();
+  }
+
+  if (options?.includeTime) {
+    cy.contains('Include time').click();
+  }
 
   cy.contains('Save').click();
 

@@ -23,6 +23,8 @@ export function useSEPsData(
   };
 
   useEffect(() => {
+    let unmounted = false;
+
     setLoadingSEPs(true);
 
     if (role === UserRole.USER_OFFICER) {
@@ -32,6 +34,10 @@ export function useSEPsData(
           active,
         })
         .then((data) => {
+          if (unmounted) {
+            return;
+          }
+
           if (data.seps) {
             setSEPs(
               data.seps.seps.map((sep) => {
@@ -47,6 +53,10 @@ export function useSEPsData(
       api()
         .getUserSeps()
         .then((data) => {
+          if (unmounted) {
+            return;
+          }
+
           if (data.me?.seps) {
             setSEPs(
               data.me.seps.map((sep) => {
@@ -59,6 +69,10 @@ export function useSEPsData(
           setLoadingSEPs(false);
         });
     }
+
+    return () => {
+      unmounted = true;
+    };
   }, [filter, active, api, role]);
 
   return { loadingSEPs, SEPs, setSEPsWithLoading };

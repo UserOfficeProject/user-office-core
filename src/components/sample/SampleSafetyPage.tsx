@@ -219,13 +219,13 @@ function SampleSafetyPage() {
       removable: false,
       render: RowActionButtons,
     },
+    {
+      title: 'Proposal ID',
+      field: 'proposal.shortCode',
+    },
     { title: 'Title', field: 'title' },
     { title: 'Status', field: 'safetyStatus' },
     { title: 'Created', field: 'created' },
-    {
-      title: 'Proposal shortcode',
-      field: 'proposal.shortCode',
-    },
   ];
 
   return (
