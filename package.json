@@ -25,7 +25,7 @@
     "@types/react-router": "^5.1.14",
     "@types/react-dom": "^17.0.5",
     "@types/react-router-dom": "^5.1.7",
-    "@types/tinymce": "^4.6.0",
+    "@types/tinymce": "^4.6.1",
     "@types/yup": "~0.29.11",
     "clsx": "^1.1.1",
     "date-fns": "^2.21.3",
