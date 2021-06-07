@@ -149,26 +149,13 @@ const ProposalTable = ({
         actions={[
           (rowData) => {
             const isCallActive = rowData.call?.isActive ?? true;
-
-            function ReadOnly() {
-              if (isCallActive) {
-                if (!rowData.submitted) {
-                  return false;
-                } else if (rowData.submitted) {
-                  if (rowData.status == 'EDITABLE_SUBMITTED') {
-                    return false;
-                  } else {
-                    return true;
-                  }
-                }
-              } else if (!isCallActive) {
-                return true;
-              }
-            }
+            const readOnly =
+              !isCallActive ||
+              (rowData.submitted && rowData.status == 'EDITABLE_SUBMITTED');
 
             return {
-              icon: ReadOnly() ? () => <Visibility /> : () => <Edit />,
-              tooltip: ReadOnly() ? 'View proposal' : 'Edit proposal',
+              icon: readOnly ? () => <Visibility /> : () => <Edit />,
+              tooltip: readOnly ? 'View proposal' : 'Edit proposal',
               onClick: (event, rowData) =>
                 setEditProposalID((rowData as PartialProposalsDataType).id),
             };
