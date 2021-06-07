@@ -16,7 +16,6 @@ import {
   ProposalSubmissionState,
   ProposalSubsetSubmission,
 } from 'models/ProposalSubmissionState';
-import { EventType } from 'models/QuestionarySubmissionState';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ProposalContextType } from './ProposalContainer';
@@ -88,8 +87,8 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
               confirm(
                 () => {
                   dispatch({
-                    type: EventType.PROPOSAL_SUBMIT_CLICKED,
-                    payload: { proposalId: proposal.id },
+                    type: 'PROPOSAL_SUBMIT_CLICKED',
+                    proposalId: proposal.id,
                   });
                 },
                 {

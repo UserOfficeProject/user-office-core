@@ -4,7 +4,7 @@ import React, { useContext, useRef, useEffect } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
-import { EventType, WizardStep } from 'models/QuestionarySubmissionState';
+import { WizardStep } from 'models/QuestionarySubmissionState';
 
 import {
   createMissingContextErrorMessage,
@@ -98,8 +98,8 @@ function Questionary({
                   if (!state.isDirty) {
                     await handleReset();
                     dispatch({
-                      type: EventType.GO_TO_STEP,
-                      payload: { stepIndex: index },
+                      type: 'GO_TO_STEP',
+                      stepIndex: index,
                     });
                   } else {
                     if (
@@ -109,8 +109,8 @@ function Questionary({
                     ) {
                       await handleReset();
                       dispatch({
-                        type: EventType.GO_TO_STEP,
-                        payload: { stepIndex: index },
+                        type: 'GO_TO_STEP',
+                        stepIndex: index,
                       });
                     }
                   }

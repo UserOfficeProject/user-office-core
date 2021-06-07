@@ -15,11 +15,11 @@ import SEPMeetingDecision from 'components/SEP/MeetingComponents/ProposalViewMod
 import { UserContext } from 'context/UserContextProvider';
 import {
   CoreTechnicalReviewFragment,
-  Proposal,
+  Review,
   TechnicalReview,
   UserRole,
 } from 'generated/sdk';
-import { useProposalData } from 'hooks/proposal/useProposalData';
+import { ProposalData, useProposalData } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
 
 import AssignTechnicalReview from './AssignTechnicalReview';
@@ -86,11 +86,17 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
   const ProposalInformationTab = (
     <GeneralInformation
       data={proposalData}
-      onProposalChanged={(newProposal): void => setProposalData(newProposal)}
+      onProposalChanged={(newProposal): void =>
+        setProposalData({
+          ...proposalData,
+          ...newProposal,
+          call: proposalData.call,
+        })
+      }
     />
   );
 
-  const assignAnotherReviewerView = (proposal: Proposal) => {
+  const assignAnotherReviewerView = (proposal: ProposalData) => {
     if (proposal.technicalReview?.submitted) {
       return null;
     }
@@ -144,7 +150,9 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
         />
       </>
     ) : (
-      <TechnicalReviewInformation data={proposalData.technicalReview} />
+      <TechnicalReviewInformation
+        data={proposalData.technicalReview as TechnicalReview}
+      />
     );
 
   const GradeTab = (
@@ -157,7 +165,7 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
 
   const AllProposalReviewsTab = isUserOfficer && (
     <>
-      <ExternalReviews reviews={proposalData.reviews} />
+      <ExternalReviews reviews={proposalData.reviews as Review[]} />
       <SEPMeetingDecision
         sepMeetingDecision={proposalData.sepMeetingDecision}
       />
