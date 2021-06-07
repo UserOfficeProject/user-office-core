@@ -9,6 +9,7 @@ mutation createProposal($callId: Int!) {
       questionaryId
       questionary {
         ...questionary
+        isCompleted
       }
       proposer {
         ...basicUserDetails
@@ -18,6 +19,9 @@ mutation createProposal($callId: Int!) {
       }
       samples {
         ...sample
+        questionary {
+          isCompleted
+        }
       }
     }
     rejection {

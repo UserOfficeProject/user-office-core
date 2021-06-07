@@ -23,7 +23,6 @@ import { Sample, UserRole } from 'generated/sdk';
 import { useUserProposals } from 'hooks/proposal/useUserProposals';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { useProposalSamples } from 'hooks/sample/useProposalSamples';
-import { EventType } from 'models/QuestionarySubmissionState';
 import {
   ShipmentBasisFormikData,
   ShipmentSubmissionState,
@@ -80,13 +79,8 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
 
   const handleChange = (changes: Partial<ShipmentBasisFormikData>) => {
     dispatch({
-      type: EventType.SHIPMENT_MODIFIED,
-      payload: {
-        shipment: {
-          ...state.shipment,
-          ...changes,
-        },
-      },
+      type: 'SHIPMENT_MODIFIED',
+      shipment: changes,
     });
   };
 
@@ -182,10 +176,8 @@ const shipmentBasisPreSubmit = () => async ({
     });
     if (result.updateShipment.shipment) {
       dispatch({
-        type: EventType.SHIPMENT_MODIFIED,
-        payload: {
-          shipment: result.updateShipment.shipment,
-        },
+        type: 'SHIPMENT_MODIFIED',
+        shipment: result.updateShipment.shipment,
       });
     }
   } else {
@@ -195,10 +187,8 @@ const shipmentBasisPreSubmit = () => async ({
     });
     if (result.createShipment.shipment) {
       dispatch({
-        type: EventType.SHIPMENT_CREATED,
-        payload: {
-          shipment: result.createShipment.shipment,
-        },
+        type: 'SHIPMENT_CREATED',
+        shipment: result.createShipment.shipment,
       });
       shipmentId = result.createShipment.shipment.id;
       returnValue = result.createShipment.shipment.questionaryId;

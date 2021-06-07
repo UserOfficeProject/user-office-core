@@ -11,7 +11,6 @@ import { QuestionaryStep, ShipmentStatus } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import {
   Event,
-  EventType,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
   WizardStep,
@@ -36,28 +35,28 @@ const shipmentReducer = (
   action: Event
 ) => {
   switch (action.type) {
-    case EventType.SHIPMENT_CREATED:
-    case EventType.SHIPMENT_LOADED:
-      const shipment: ShipmentExtended = action.payload.shipment;
+    case 'SHIPMENT_CREATED':
+    case 'SHIPMENT_LOADED':
+      const shipment: ShipmentExtended = action.shipment;
       draftState.isDirty = false;
       draftState.questionaryId = shipment.questionaryId;
       draftState.shipment = shipment;
       draftState.steps = shipment.questionary.steps;
       draftState.templateId = shipment.questionary.templateId;
       break;
-    case EventType.SHIPMENT_MODIFIED:
+    case 'SHIPMENT_MODIFIED':
       draftState.shipment = {
         ...draftState.shipment,
-        ...action.payload.shipment,
+        ...action.shipment,
       };
       draftState.isDirty = true;
       break;
-    case EventType.QUESTIONARY_STEPS_LOADED: {
-      draftState.shipment.questionary.steps = action.payload.questionarySteps;
+    case 'STEPS_LOADED': {
+      draftState.shipment.questionary.steps = action.steps;
       break;
     }
-    case EventType.QUESTIONARY_STEP_ANSWERED:
-      const updatedStep = action.payload.questionaryStep as QuestionaryStep;
+    case 'STEP_ANSWERED':
+      const updatedStep = action.step;
       const stepIndex = draftState.shipment.questionary.steps.findIndex(
         (step) => step.topic.id === updatedStep.topic.id
       );
@@ -156,8 +155,8 @@ export default function ShipmentContainer(props: {
     if (shipmentState.shipment.id === 0) {
       // if shipment is not created yet
       dispatch({
-        type: EventType.SHIPMENT_LOADED,
-        payload: { shipment: initialState.shipment },
+        type: 'SHIPMENT_LOADED',
+        shipment: initialState.shipment,
       });
     } else {
       await api()
@@ -165,15 +164,13 @@ export default function ShipmentContainer(props: {
         .then((data) => {
           if (data.shipment && data.shipment.questionary.steps) {
             dispatch({
-              type: EventType.SHIPMENT_LOADED,
-              payload: { shipment: data.shipment },
+              type: 'SHIPMENT_LOADED',
+              shipment: data.shipment,
             });
             dispatch({
-              type: EventType.QUESTIONARY_STEPS_LOADED,
-              payload: {
-                questionarySteps: data.shipment.questionary.steps,
-                stepIndex: state.stepIndex,
-              },
+              type: 'STEPS_LOADED',
+              steps: data.shipment.questionary.steps,
+              stepIndex: state.stepIndex,
             });
           }
         });
@@ -190,17 +187,13 @@ export default function ShipmentContainer(props: {
       next(action); // first update state/model
       const state = getState() as ShipmentSubmissionState;
       switch (action.type) {
-        case EventType.SHIPMENT_DONE:
-          props.done?.(action.payload.shipment);
-          break;
-
-        case EventType.BACK_CLICKED: // move this
+        case 'BACK_CLICKED': // move this
           if (!state.isDirty || (await handleReset())) {
-            dispatch({ type: EventType.GO_STEP_BACK });
+            dispatch({ type: 'GO_STEP_BACK' });
           }
           break;
 
-        case EventType.RESET_CLICKED:
+        case 'RESET_CLICKED':
           handleReset();
           break;
       }
@@ -230,12 +223,12 @@ export default function ShipmentContainer(props: {
       previousInitialShipment === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: EventType.SHIPMENT_LOADED,
-        payload: { shipment: props.shipment },
+        type: 'SHIPMENT_LOADED',
+        shipment: props.shipment,
       });
       dispatch({
-        type: EventType.QUESTIONARY_STEPS_LOADED,
-        payload: { questionarySteps: props.shipment.questionary.steps },
+        type: 'STEPS_LOADED',
+        steps: props.shipment.questionary.steps,
       });
     }
   }, [previousInitialShipment, props.shipment, dispatch]);

@@ -16,7 +16,6 @@ import {
 } from 'models/ProposalSubmissionState';
 import {
   Event,
-  EventType,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
   WizardStep,
@@ -38,30 +37,30 @@ const proposalReducer = (
   action: Event
 ) => {
   switch (action.type) {
-    case EventType.PROPOSAL_CREATED:
-    case EventType.PROPOSAL_LOADED:
-      const proposal: Proposal = action.payload.proposal;
+    case 'PROPOSAL_CREATED':
+    case 'PROPOSAL_LOADED':
+      const proposal = action.proposal;
       draftState.isDirty = false;
       draftState.questionaryId = proposal.questionaryId;
       draftState.proposal = proposal;
       draftState.steps = proposal.questionary?.steps || [];
       draftState.templateId = proposal.questionary?.templateId || 0;
       break;
-    case EventType.PROPOSAL_MODIFIED:
+    case 'PROPOSAL_MODIFIED':
       draftState.proposal = {
         ...draftState.proposal,
-        ...action.payload.proposal,
+        ...action.proposal,
       };
       draftState.isDirty = true;
       break;
-    case EventType.QUESTIONARY_STEPS_LOADED: {
+    case 'STEPS_LOADED': {
       if (draftState.proposal.questionary) {
-        draftState.proposal.questionary.steps = action.payload.questionarySteps;
+        draftState.proposal.questionary.steps = action.steps;
       }
       break;
     }
-    case EventType.QUESTIONARY_STEP_ANSWERED:
-      const updatedStep = action.payload.questionaryStep as QuestionaryStep;
+    case 'STEP_ANSWERED':
+      const updatedStep = action.step;
       if (draftState.proposal.questionary) {
         const stepIndex = draftState.proposal.questionary.steps.findIndex(
           (step) => step.topic.id === updatedStep.topic.id
@@ -126,8 +125,8 @@ const createReviewWizardStep = (): WizardStep => ({
 
 export default function ProposalContainer(props: {
   proposal: ProposalSubsetSubmission;
-  proposalCreated?: (proposal: Proposal) => void;
-  proposalUpdated?: (proposal: Proposal) => void;
+  proposalCreated?: (proposal: ProposalSubsetSubmission) => void;
+  proposalUpdated?: (proposal: ProposalSubsetSubmission) => void;
 }) {
   const { api } = useDataApiWithFeedback();
   const { persistModel: persistProposalModel } = usePersistProposalModel();
@@ -171,8 +170,8 @@ export default function ProposalContainer(props: {
     if (proposalState.proposal.id === 0) {
       // if proposal is not created yet
       dispatch({
-        type: EventType.PROPOSAL_LOADED,
-        payload: { proposal: initialState.proposal },
+        type: 'PROPOSAL_LOADED',
+        proposal: initialState.proposal,
       });
     } else {
       await api()
@@ -180,15 +179,13 @@ export default function ProposalContainer(props: {
         .then((data) => {
           if (data.proposal && data.proposal.questionary?.steps) {
             dispatch({
-              type: EventType.PROPOSAL_LOADED,
-              payload: { proposal: data.proposal },
+              type: 'PROPOSAL_LOADED',
+              proposal: data.proposal,
             });
             dispatch({
-              type: EventType.QUESTIONARY_STEPS_LOADED,
-              payload: {
-                questionarySteps: data.proposal.questionary.steps,
-                stepIndex: state.stepIndex,
-              },
+              type: 'STEPS_LOADED',
+              steps: data.proposal.questionary.steps,
+              stepIndex: state.stepIndex,
             });
           }
         });
@@ -205,19 +202,19 @@ export default function ProposalContainer(props: {
       next(action); // first update state/model
       const state = getState() as ProposalSubmissionState;
       switch (action.type) {
-        case EventType.PROPOSAL_MODIFIED:
-          props.proposalUpdated?.(action.payload.proposal);
+        case 'PROPOSAL_MODIFIED':
+          props.proposalUpdated?.({ ...state.proposal, ...action.proposal });
           break;
-        case EventType.PROPOSAL_CREATED:
-          props.proposalCreated?.(action.payload.proposal);
+        case 'PROPOSAL_CREATED':
+          props.proposalCreated?.(action.proposal);
           break;
-        case EventType.BACK_CLICKED:
+        case 'BACK_CLICKED':
           if (!state.isDirty || (await handleReset())) {
-            dispatch({ type: EventType.GO_STEP_BACK });
+            dispatch({ type: 'GO_STEP_BACK' });
           }
           break;
 
-        case EventType.RESET_CLICKED:
+        case 'RESET_CLICKED':
           handleReset();
           break;
       }
@@ -247,13 +244,15 @@ export default function ProposalContainer(props: {
       previousInitialProposal === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: EventType.PROPOSAL_LOADED,
-        payload: { proposal: props.proposal },
+        type: 'PROPOSAL_LOADED',
+        proposal: props.proposal,
       });
-      dispatch({
-        type: EventType.QUESTIONARY_STEPS_LOADED,
-        payload: { questionarySteps: props.proposal.questionary?.steps },
-      });
+      if (props.proposal.questionary) {
+        dispatch({
+          type: 'STEPS_LOADED',
+          steps: props.proposal.questionary.steps,
+        });
+      }
     }
   }, [previousInitialProposal, props.proposal, dispatch]);
 

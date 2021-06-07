@@ -13,7 +13,6 @@ import QuestionaryDetails, {
 } from 'components/questionary/QuestionaryDetails';
 import { VisitationStatus } from 'generated/sdk';
 import { useProposalData } from 'hooks/proposal/useProposalData';
-import { EventType } from 'models/QuestionarySubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -88,11 +87,12 @@ function VisitationReview({ confirm }: VisitationReviewProps) {
                   visitationId: state.visitation.id,
                   status: VisitationStatus.SUBMITTED,
                 });
+                if (!result.updateVisitation.visitation) {
+                  return;
+                }
                 dispatch({
-                  type: EventType.VISITATION_MODIFIED,
-                  payload: {
-                    visitation: result.updateVisitation.visitation,
-                  },
+                  type: 'VISITATION_MODIFIED',
+                  visitation: result.updateVisitation.visitation,
                 });
               },
               {

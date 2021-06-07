@@ -12,8 +12,9 @@ import { Prompt } from 'react-router';
 import { useCheckAccess } from 'components/common/Can';
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
-import { Proposal, UserRole } from 'generated/sdk';
+import { UserRole } from 'generated/sdk';
 import { ProposalEndStatus } from 'generated/sdk';
+import { ProposalData } from 'hooks/proposal/useProposalData';
 import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -27,7 +28,7 @@ export type AdministrationFormData = {
 };
 
 type ProposalAdminProps = {
-  data: Proposal;
+  data: ProposalData;
   setAdministration: (data: AdministrationFormData) => void;
 };
 

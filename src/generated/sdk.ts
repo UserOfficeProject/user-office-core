@@ -4292,6 +4292,7 @@ export type CreateProposalMutation = (
         & ProposalStatusFragment
       )>, questionary: Maybe<(
         { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
         & QuestionaryFragment
       )>, proposer: Maybe<(
         { __typename?: 'BasicUserDetails' }
@@ -4301,6 +4302,10 @@ export type CreateProposalMutation = (
         & BasicUserDetailsFragment
       )>, samples: Maybe<Array<(
         { __typename?: 'Sample' }
+        & { questionary: (
+          { __typename?: 'Questionary' }
+          & Pick<Questionary, 'isCompleted'>
+        ) }
         & SampleFragment
       )>> }
     )>, rejection: Maybe<(
@@ -4406,6 +4411,7 @@ export type GetProposalQuery = (
       & BasicUserDetailsFragment
     )>, questionary: Maybe<(
       { __typename?: 'Questionary' }
+      & Pick<Questionary, 'isCompleted'>
       & QuestionaryFragment
     )>, technicalReview: Maybe<(
       { __typename?: 'TechnicalReview' }
@@ -8319,6 +8325,7 @@ export const CreateProposalDocument = gql`
       questionaryId
       questionary {
         ...questionary
+        isCompleted
       }
       proposer {
         ...basicUserDetails
@@ -8328,6 +8335,9 @@ export const CreateProposalDocument = gql`
       }
       samples {
         ...sample
+        questionary {
+          isCompleted
+        }
       }
     }
     rejection {
@@ -8411,6 +8421,7 @@ export const GetProposalDocument = gql`
     }
     questionary {
       ...questionary
+      isCompleted
     }
     technicalReview {
       ...coreTechnicalReview

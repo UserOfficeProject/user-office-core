@@ -6,8 +6,9 @@ import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
-import { Proposal, UserRole } from 'generated/sdk';
+import { UserRole } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { ProposalSubsetSubmission } from 'models/ProposalSubmissionState';
 
 import ProposalContainer from './ProposalContainer';
 
@@ -27,8 +28,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type GeneralInformationProps = {
-  data: Proposal;
-  onProposalChanged?: (newProposal: Proposal) => void;
+  data: ProposalSubsetSubmission;
+  onProposalChanged?: (newProposal: ProposalSubsetSubmission) => void;
 };
 
 const GeneralInformation: React.FC<GeneralInformationProps> = ({

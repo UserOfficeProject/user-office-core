@@ -9,6 +9,7 @@ query getProposal($id: Int!) {
     }
     questionary {
       ...questionary
+      isCompleted
     }
     technicalReview {
       ...coreTechnicalReview
