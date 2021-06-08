@@ -74,6 +74,17 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
     !allStepsComplete ||
     proposal.submitted;
 
+  function SubmitButtonMessage() {
+    if (
+      proposal.status != null &&
+      proposal.status.shortCode.toString() == 'EDITABLE_SUBMITTED'
+    ) {
+      return 'Submit proposal? The proposal can be edited after submission.';
+    } else {
+      return 'I am aware that no further edits can be done after proposal submission.';
+    }
+  }
+
   return (
     <>
       <ProposalQuestionaryReview
@@ -93,8 +104,7 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
                 },
                 {
                   title: 'Please confirm',
-                  description:
-                    'I am aware that no further edits can be done after proposal submission.',
+                  description: SubmitButtonMessage(),
                 }
               )();
             }}
