@@ -172,11 +172,11 @@ const TemplateMenuListItem = () => {
             />
           </ListItem>
         )}
-        <ListItem component={NavLink} to="/VisitationTemplates" button>
+        <ListItem component={NavLink} to="/VisitTemplates" button>
           <ListItemIcon>
             <FlightTakeoffIcon />
           </ListItemIcon>
-          <ListItemText primary="Visitation" title="Visitation templates" />
+          <ListItemText primary="Visit" title="Visit templates" />
         </ListItem>
       </Collapse>
     </>
@@ -244,31 +244,31 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       {isShipmentFeatureEnabled && (
-        <Tooltip title="My shipments">
+        <Tooltip title="Shipments">
           <ListItem component={NavLink} to="/MyShipments" button>
             <ListItemIcon>
               <LocalShippingIcon />
             </ListItemIcon>
-            <ListItemText primary="My shipments" />
+            <ListItemText primary="Shipments" />
           </ListItem>
         </Tooltip>
       )}
       {isSchedulerEnabled && (
-        <Tooltip title="My Beam Times">
-          <ListItem component={NavLink} to="/MyBeamTimes" button>
+        <Tooltip title="Experiment Times">
+          <ListItem component={NavLink} to="/ExperimentTimes" button>
             <ListItemIcon>
               <EventIcon />
             </ListItemIcon>
-            <ListItemText primary="My beam times" />
+            <ListItemText primary="Experiment Times" />
           </ListItem>
         </Tooltip>
       )}
-      <Tooltip title="My Visitations">
-        <ListItem component={NavLink} to="/MyVisitations" button>
+      <Tooltip title="My Visits">
+        <ListItem component={NavLink} to="/MyVisits" button>
           <ListItemIcon>
             <EventIcon />
           </ListItemIcon>
-          <ListItemText primary="My visitations" />
+          <ListItemText primary="Visits" />
         </ListItem>
       </Tooltip>
       <Tooltip title="Help">
@@ -386,11 +386,11 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         <ListItemText primary="Instruments" />
       </ListItem>
       {isSchedulerEnabled && (
-        <ListItem component={NavLink} to="/UpcomingBeamTimes" button>
+        <ListItem component={NavLink} to="/UpcomingExperimentTimes" button>
           <ListItemIcon>
             <EventIcon />
           </ListItemIcon>
-          <ListItemText primary="Upcoming beam times" />
+          <ListItemText primary="Upcoming experiments" />
         </ListItem>
       )}
     </div>

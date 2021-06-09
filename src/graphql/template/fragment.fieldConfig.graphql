@@ -98,7 +98,7 @@ fragment fieldConfig on FieldConfig {
     max
   }
 
-  ... on VisitationBasisConfig {
+  ... on VisitBasisConfig {
     small_label
     required
     tooltip
