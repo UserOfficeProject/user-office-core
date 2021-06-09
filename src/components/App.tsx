@@ -23,7 +23,7 @@ import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { FeatureId, SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
-import { getTheme } from '../theme';
+import { getTheme } from '../themes/theme';
 import DashBoard from './DashBoard';
 import EmailVerification from './user/EmailVerification';
 import ExternalAuth from './user/ExternalAuth';

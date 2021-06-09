@@ -7,7 +7,7 @@ import SimpleTabs from 'components/common/TabPanel';
 import EventLogList from 'components/eventLog/EventLogList';
 import { ContentContainer } from 'styles/StyledComponents';
 
-import { getTheme } from '../../theme';
+import { getTheme } from '../../themes/theme';
 import { Impersonate } from './Impersonate';
 import UpdatePassword from './UpdatePassword';
 import UpdateUserInformation from './UpdateUserInformation';
