@@ -34,7 +34,7 @@ declare global {
        * @returns {typeof createDateQuestion}
        * @memberof Chainable
        * @example
-       *    cy.createDateQuestion('Specify visitation time', {includeTime:true})
+       *    cy.createDateQuestion('Specify visit time', {includeTime:true})
        */
       createDateQuestion: (
         title: string,

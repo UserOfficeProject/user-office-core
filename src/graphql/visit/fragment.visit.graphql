@@ -1,0 +1,7 @@
+fragment visit on Visit {
+  id
+  proposalId
+  status
+  questionaryId
+  visitorId
+}
