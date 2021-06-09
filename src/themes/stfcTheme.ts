@@ -4,13 +4,14 @@ import {
   responsiveFontSizes,
 } from '@material-ui/core/styles';
 import createPalette from '@material-ui/core/styles/createPalette';
+import createTypography from '@material-ui/core/styles/createTypography';
 
 const palette = createPalette({
   primary: {
     dark: '#2e2d62',
     main: '#003088',
     light: '#1e5df8',
-    contrastText: '#FFFFFF',
+    contrastText: '#ffffff',
   },
   secondary: {
     dark: '#d77900',
@@ -34,9 +35,44 @@ const palette = createPalette({
   tonalOffset: 0.2,
 });
 
+const typography = createTypography(palette, {
+  fontFamily: [
+    '-apple-system',
+    'BlinkMacSystemFont',
+    'Roboto',
+    'Segoe UI',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    'sans-serif',
+  ].join(','),
+  h1: {
+    color: palette.primary.dark,
+  },
+  h2: {
+    color: palette.primary.dark,
+  },
+  h3: {
+    color: palette.primary.dark,
+  },
+  h4: {
+    color: palette.primary.dark,
+  },
+  h5: {
+    color: palette.primary.dark,
+  },
+  h6: {
+    color: palette.primary.dark,
+  },
+});
+
 const theme: Theme = responsiveFontSizes(
   createMuiTheme({
     palette: palette,
+    typography: typography,
     mixins: {
       toolbar: {
         '@media (min-width:600px)': {

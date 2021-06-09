@@ -44,15 +44,33 @@ const prodPalette = createPalette({
   },
 });
 
+const typography = {
+  fontFamily: [
+    '-apple-system',
+    'BlinkMacSystemFont',
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    'sans-serif',
+  ].join(','),
+};
+
 const devTheme = responsiveFontSizes(
   createMuiTheme({
     palette: devPalette,
+    typography: typography,
   })
 );
 
 const prodTheme = responsiveFontSizes(
   createMuiTheme({
     palette: prodPalette,
+    typography: typography,
   })
 );
 
