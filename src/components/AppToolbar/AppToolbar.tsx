@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import AppBar from '@material-ui/core/AppBar';
 import IconButton from '@material-ui/core/IconButton';
 import MuiLink from '@material-ui/core/Link';
@@ -14,6 +15,13 @@ import { Link } from 'react-router-dom';
 import { UserContext } from 'context/UserContextProvider';
 
 import AccountActionButton from './AccountActionButton';
+
+let headerLogo: string | undefined;
+switch (process.env.REACT_APP_AUTH_PROVIDER) {
+  case 'stfc':
+    headerLogo = require('images/stfc-ukri-white.svg').default;
+    break;
+}
 
 const drawerWidth = 250;
 
@@ -69,6 +77,17 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
       marginLeft: 'auto',
       margin: theme.spacing(0, 0.5),
     },
+    logoContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 24,
+      ...theme.mixins.toolbar,
+    },
+    logo: {
+      // Ensures min 1/4 of the height is padding
+      maxHeight: '71.4%',
+    },
   }));
   const classes = useStyles();
   const { user, roles, currentRole } = useContext(UserContext);
@@ -95,6 +114,11 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
         >
           <MenuIcon />
         </IconButton>
+        {(!isTabletOrMobile || !isPortraitMode) && headerLogo && (
+          <div className={classes.logoContainer}>
+            <img src={headerLogo} alt="logo" className={classes.logo} />
+          </div>
+        )}
         {(!isTabletOrMobile || !isPortraitMode) && (
           <Typography
             component="h1"
