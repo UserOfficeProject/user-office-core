@@ -19,11 +19,6 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     marginTop: '20px',
-    backgroundColor: theme.palette.secondary.main,
-    color: '#ffff',
-    '&:hover': {
-      backgroundColor: theme.palette.secondary.light,
-    },
   },
 }));
 
@@ -69,6 +64,7 @@ const GeneralInformation: React.FC<GeneralInformationProps> = ({
           className={classes.button}
           onClick={() => downloadPDFProposal([data.id], data.title)}
           variant="contained"
+          color="secondary"
         >
           Download PDF
         </Button>

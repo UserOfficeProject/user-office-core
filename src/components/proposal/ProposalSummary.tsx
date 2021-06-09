@@ -33,11 +33,6 @@ const useStyles = makeStyles((theme) => ({
     marginTop: ({ proposal }: { proposal: ProposalSubsetSubmission }) =>
       proposal.status?.id === 0 ? '40px' : 'auto',
     marginLeft: '10px',
-    backgroundColor: theme.palette.secondary.main,
-    color: '#ffff',
-    '&:hover': {
-      backgroundColor: theme.palette.secondary.light,
-    },
   },
 }));
 
@@ -109,6 +104,7 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
             disabled={!allStepsComplete}
             className={classes.button}
             variant="contained"
+            color="secondary"
           >
             Download PDF
           </Button>
