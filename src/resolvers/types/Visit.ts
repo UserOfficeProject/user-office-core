@@ -9,22 +9,22 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Visitation as VisitationOrigin } from '../../models/Visitation';
-import { VisitationStatus } from './../../models/Visitation';
+import { Visit as VisitOrigin } from '../../models/Visit';
+import { VisitStatus } from '../../models/Visit';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
 
 @ObjectType()
-export class Visitation implements Partial<VisitationOrigin> {
+export class Visit implements Partial<VisitOrigin> {
   @Field(() => Int)
   public id: number;
 
   @Field(() => Int)
   public proposalId: number;
 
-  @Field(() => VisitationStatus)
-  public status: VisitationStatus;
+  @Field(() => VisitStatus)
+  public status: VisitStatus;
 
   @Field(() => Int)
   public questionaryId: number;
@@ -36,32 +36,32 @@ export class Visitation implements Partial<VisitationOrigin> {
   public visitorId: number;
 }
 
-@Resolver(() => Visitation)
-export class VisitationResolver {
+@Resolver(() => Visit)
+export class VisitResolver {
   @FieldResolver(() => Proposal)
   async proposal(
-    @Root() visitation: Visitation,
+    @Root() visit: Visit,
     @Ctx() context: ResolverContext
   ): Promise<Proposal | null> {
-    return context.queries.proposal.get(context.user, visitation.proposalId);
+    return context.queries.proposal.get(context.user, visit.proposalId);
   }
 
   @FieldResolver(() => [BasicUserDetails])
   async team(
-    @Root() visitation: Visitation,
+    @Root() visit: Visit,
     @Ctx() context: ResolverContext
   ): Promise<BasicUserDetails[] | null> {
-    return context.queries.visitation.getTeam(context.user, visitation.id);
+    return context.queries.visit.getTeam(context.user, visit.id);
   }
 
   @FieldResolver(() => Questionary)
   async questionary(
-    @Root() visitation: Visitation,
+    @Root() visit: Visit,
     @Ctx() context: ResolverContext
   ): Promise<Questionary | null> {
     return context.queries.questionary.getQuestionary(
       context.user,
-      visitation.questionaryId
+      visit.questionaryId
     );
   }
 }

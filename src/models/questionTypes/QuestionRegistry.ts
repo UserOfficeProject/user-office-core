@@ -16,7 +16,7 @@ import { sampleDeclarationDefinition } from './SampleDeclaration';
 import { selectionFromOptionsDefinition } from './SelectionFromOptions';
 import { shipmentBasis } from './ShipmentBasis';
 import { textInputDefinition } from './TextInput';
-import { visitationBasisDefinition } from './VisitationBasis';
+import { visitBasisDefinition } from './VisitBasis';
 
 export interface Question {
   /**
@@ -73,7 +73,7 @@ const registry = [
   numberInputDefinition,
   shipmentBasis,
   richTextInputDefinition,
-  visitationBasisDefinition,
+  visitBasisDefinition,
 ];
 
 Object.freeze(registry);

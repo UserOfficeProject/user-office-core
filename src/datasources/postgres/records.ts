@@ -27,7 +27,7 @@ import {
   Topic,
 } from '../../models/Template';
 import { BasicUserDetails, User } from '../../models/User';
-import { Visitation, VisitationStatus } from '../../models/Visitation';
+import { Visit, VisitStatus } from '../../models/Visit';
 
 // Interfaces corresponding exactly to database tables
 
@@ -482,8 +482,8 @@ export interface TokensAndPermissionsRecord {
   readonly access_permissions: string;
 }
 
-export interface VisitationRecord {
-  readonly visitation_id: number;
+export interface VisitRecord {
+  readonly visit_id: number;
   readonly proposal_id: number;
   readonly instrument_id: number;
   readonly status: string;
@@ -814,13 +814,13 @@ export const createRoleObject = (role: RoleRecord) => {
   return new Role(role.role_id, role.short_code, role.title);
 };
 
-export const createVisitationObject = (visitation: VisitationRecord) => {
-  return new Visitation(
-    visitation.visitation_id,
-    visitation.proposal_id,
-    (visitation.status as any) as VisitationStatus,
-    visitation.questionary_id,
-    visitation.visitor_id,
-    visitation.created_at
+export const createVisitObject = (visit: VisitRecord) => {
+  return new Visit(
+    visit.visit_id,
+    visit.proposal_id,
+    (visit.status as any) as VisitStatus,
+    visit.questionary_id,
+    visit.visitor_id,
+    visit.created_at
   );
 };

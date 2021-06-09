@@ -80,12 +80,12 @@ export default class TemplateMutations {
           'shipment_basis'
         );
         break;
-      case TemplateCategoryId.VISITATION:
+      case TemplateCategoryId.VISIT:
         await this.createInitialTopic(
           newTemplate.templateId,
           0,
-          'New visitation',
-          'visitation_basis'
+          'New visit',
+          'visit_basis'
         );
         break;
     }
