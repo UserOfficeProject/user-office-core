@@ -1,17 +1,17 @@
 import 'reflect-metadata';
 
-export class Visitation {
+export class Visit {
   constructor(
     public id: number,
     public proposalId: number,
-    public status: VisitationStatus,
+    public status: VisitStatus,
     public questionaryId: number,
     public visitorId: number,
     public created: Date
   ) {}
 }
 
-export enum VisitationStatus {
+export enum VisitStatus {
   'DRAFT' = 'DRAFT',
   'ACCEPTED' = 'ACCEPTED',
   'SUBMITTED' = 'SUBMITTED',

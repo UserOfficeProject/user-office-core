@@ -14,7 +14,7 @@ import SEPMutations from './mutations/SEPMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
 import TemplateMutations from './mutations/TemplateMutations';
 import UserMutations from './mutations/UserMutations';
-import VisitationMutations from './mutations/VisitationMutations';
+import VisitMutations from './mutations/VisitMutations';
 import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
@@ -30,7 +30,7 @@ import ShipmentQueries from './queries/ShipmentQueries';
 import SystemQueries from './queries/SystemQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
-import VisitationQueries from './queries/VisitationQueries';
+import VisitQueries from './queries/VisitQueries';
 import { UserAuthorization } from './utils/UserAuthorization';
 
 const context: BasicResolverContext = {
@@ -51,7 +51,7 @@ const context: BasicResolverContext = {
     system: container.resolve(SystemQueries),
     template: container.resolve(TemplateQueries),
     user: container.resolve(UserQueries),
-    visitation: container.resolve(VisitationQueries),
+    visit: container.resolve(VisitQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -67,7 +67,7 @@ const context: BasicResolverContext = {
     shipment: container.resolve(ShipmentMutations),
     template: container.resolve(TemplateMutations),
     user: container.resolve(UserMutations),
-    visitation: container.resolve(VisitationMutations),
+    visit: container.resolve(VisitMutations),
   },
 };
 
