@@ -1,7 +1,7 @@
 import { proposalBasisPreSubmit } from 'components/questionary/questionaryComponents/ProposalBasis/QuestionaryComponentProposalBasis';
 import { sampleBasisPreSubmit } from 'components/questionary/questionaryComponents/SampleBasis/QuestionaryComponentSampleBasis';
 import { shipmentBasisPreSubmit } from 'components/questionary/questionaryComponents/ShipmentBasis/QuestionaryComponentShipmentBasis';
-import { visitationBasisPreSubmit } from 'components/questionary/questionaryComponents/VisitationBasis/QuestionaryComponentVisitationBasis';
+import { visitBasisPreSubmit } from 'components/questionary/questionaryComponents/VisitBasis/QuestionaryComponentVisitBasis';
 import { Answer, DataType, Sdk } from 'generated/sdk';
 import {
   Event,
@@ -27,8 +27,8 @@ export function usePreSubmitActions() {
           return proposalBasisPreSubmit();
         case DataType.SHIPMENT_BASIS:
           return shipmentBasisPreSubmit();
-        case DataType.VISITATION_BASIS:
-          return visitationBasisPreSubmit();
+        case DataType.VISIT_BASIS:
+          return visitBasisPreSubmit();
       }
 
       return [];

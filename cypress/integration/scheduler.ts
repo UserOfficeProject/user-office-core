@@ -60,16 +60,16 @@ context('Scheduler tests', () => {
     cy.resetSchedulerDB();
   });
 
-  it('User should not be able to see upcoming beam times if there is none', () => {
+  it('User should not be able to see upcoming experiments if there is none', () => {
     cy.login('user');
     cy.contains('Dashboard').click();
     cy.finishedLoading();
 
-    cy.contains('Upcoming beam times').should('not.exist');
+    cy.contains('Upcoming experiments').should('not.exist');
     cy.logout();
   });
 
-  it('User should not be able to see upcoming beam times in DRAFT state', () => {
+  it('User should not be able to see upcoming experiments in DRAFT state', () => {
     const query = `
       mutation bulkUpsertScheduledEvents($input: BulkUpsertScheduledEventsInput!) {
         bulkUpsertScheduledEvents(bulkUpsertScheduledEvents: $input) {
@@ -104,7 +104,7 @@ context('Scheduler tests', () => {
 
     cy.login('user');
 
-    cy.contains('Upcoming beam times').should('not.exist');
+    cy.contains('Upcoming experiments').should('not.exist');
 
     cy.contains(upcoming.startsAt).should('not.exist');
     cy.contains(upcoming.endsAt).should('not.exist');
@@ -114,18 +114,18 @@ context('Scheduler tests', () => {
     cy.logout();
   });
 
-  it('Instrument scientist should not be able to see upcoming beam times in DRAFT state', () => {
+  it('Instrument scientist should not be able to see upcoming experiments in DRAFT state', () => {
     cy.login('user');
     cy.changeActiveRole('Instrument Scientist');
     cy.finishedLoading();
 
     cy.finishedLoading();
-    cy.contains('Upcoming beam times').click();
+    cy.contains('Upcoming experiments').click();
 
     cy.contains('No records to display');
   });
 
-  it('User should be able to see upcoming beam times in BOOKED', () => {
+  it('User should be able to see upcoming experiments in BOOKED', () => {
     const query = `
       mutation activateProposalBooking($id: ID!
         ) {
@@ -145,7 +145,7 @@ context('Scheduler tests', () => {
 
     cy.login('user');
 
-    cy.contains('Upcoming beam times').should('exist');
+    cy.contains('Upcoming experiments').should('exist');
 
     cy.contains(upcoming.startsAt);
     cy.contains(upcoming.endsAt);
@@ -155,12 +155,12 @@ context('Scheduler tests', () => {
     cy.logout();
   });
 
-  it('Instrument scientist should be able to see upcoming beam times in BOOKED', () => {
+  it('Instrument scientist should be able to see upcoming experiments in BOOKED', () => {
     cy.login('user');
     cy.changeActiveRole('Instrument Scientist');
 
     cy.finishedLoading();
-    cy.contains('Upcoming beam times').click();
+    cy.contains('Upcoming experiments').click();
 
     cy.contains(upcoming.startsAt);
     cy.contains(upcoming.endsAt);
@@ -170,7 +170,7 @@ context('Scheduler tests', () => {
     cy.logout();
   });
 
-  it('User should be able to see upcoming beam times in CLOSED', () => {
+  it('User should be able to see upcoming experiments in CLOSED', () => {
     const query = `
       mutation finalizeProposalBooking($id: ID!, $action: ProposalBookingFinalizeAction!) {
           finalizeProposalBooking(id: $id, action: $action) {
@@ -190,7 +190,7 @@ context('Scheduler tests', () => {
 
     cy.login('user');
 
-    cy.contains('Upcoming beam times').should('exist');
+    cy.contains('Upcoming experiments').should('exist');
 
     cy.contains(upcoming.startsAt);
     cy.contains(upcoming.endsAt);
@@ -200,12 +200,12 @@ context('Scheduler tests', () => {
     cy.logout();
   });
 
-  it('Instrument scientist should be able to see upcoming beam times in CLOSED', () => {
+  it('Instrument scientist should be able to see upcoming experiments in CLOSED', () => {
     cy.login('user');
     cy.changeActiveRole('Instrument Scientist');
 
     cy.finishedLoading();
-    cy.contains('Upcoming beam times').click();
+    cy.contains('Upcoming experiments').click();
 
     cy.contains(upcoming.startsAt);
     cy.contains(upcoming.endsAt);
@@ -215,10 +215,10 @@ context('Scheduler tests', () => {
     cy.logout();
   });
 
-  it('User should be able to see past and upcoming beam times', () => {
+  it('User should be able to see past and upcoming experiments', () => {
     cy.login('user');
 
-    cy.contains('My beam times').click();
+    cy.contains('Experiment Times').click();
     cy.finishedLoading();
 
     cy.contains(upcoming.startsAt);
