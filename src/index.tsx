@@ -5,6 +5,13 @@ import './index.css';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 
+const org = process.env.REACT_APP_AUTH_PROVIDER;
+switch (org) {
+  case 'stfc':
+    require('./stfc-stylesheet.css');
+    break;
+}
+
 ReactDOM.render(<App />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
