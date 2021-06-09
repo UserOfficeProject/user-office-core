@@ -20,8 +20,8 @@ import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
-import { VisitationAuthorization } from '../utils/VisitationAuthorization';
-import { VisitationDataSourceMock } from './../datasources/mockups/VisitationDataSource';
+import { VisitAuthorization } from '../utils/VisitAuthorization';
+import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
@@ -29,7 +29,7 @@ mapClass(Tokens.UserAuthorization, UserAuthorization);
 mapClass(Tokens.QuestionaryAuthorization, QuestionaryAuthorization);
 mapClass(Tokens.SampleAuthorization, SampleAuthorization);
 mapClass(Tokens.ShipmentAuthorization, ShipmentAuthorization);
-mapClass(Tokens.VisitationAuthorization, VisitationAuthorization);
+mapClass(Tokens.VisitAuthorization, VisitAuthorization);
 
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
 mapClass(Tokens.CallDataSource, CallDataSourceMock);
@@ -46,7 +46,7 @@ mapClass(Tokens.SystemDataSource, SystemDataSourceMock);
 mapClass(Tokens.TemplateDataSource, TemplateDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
 mapClass(Tokens.FileDataSource, FileDataSourceMock);
-mapClass(Tokens.VisitationDataSource, VisitationDataSourceMock);
+mapClass(Tokens.VisitDataSource, VisitDataSourceMock);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
