@@ -33,8 +33,8 @@ import ProposalChooseCall from './proposal/ProposalChooseCall';
 import ProposalCreate from './proposal/ProposalCreate';
 import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
-import InstrSciUpcomingBeamTimesTable from './proposalBooking/InstrSciUpcomingBeamTimesTable';
-import UserMyBeamTimesTable from './proposalBooking/UserMyBeamTimesTable';
+import InstrSciUpcomingExperimentTimesTable from './proposalBooking/InstrSciUpcomingExperimentTimesTable';
+import UserExperimentTimesTable from './proposalBooking/UserExperimentsTable';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
@@ -52,11 +52,11 @@ import QuestionsPage from './template/QuestionsPage';
 import SampleTemplatesPage from './template/SampleTemplates';
 import ShipmentTemplatesPage from './template/ShipmentTemplatesPage';
 import TemplateEditor from './template/TemplateEditor';
-import VisitationTemplatesPage from './template/VisitationTemplatesPage';
+import VisitTemplatesPage from './template/VisitTemplatesPage';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
-import MyVisitations from './visitation/MyVisitations';
+import MyVisits from './visit/MyVisits';
 
 type BottomNavItemProps = {
   /** Content of the information modal. */
@@ -243,7 +243,7 @@ const Dashboard: React.FC = () => {
           {isShipmentEnabled && (
             <Route path="/MyShipments" component={MyShipments} />
           )}
-          <Route path="/MyVisitations" component={MyVisitations} />
+          <Route path="/MyVisits" component={MyVisits} />
           <Route path="/ProfilePage/:id" component={ProfilePage} />
           {isUserOfficer && (
             <Route path="/PeoplePage/:id" component={UserPage} />
@@ -270,10 +270,7 @@ const Dashboard: React.FC = () => {
             path="/ShipmentDeclarationTemplates"
             component={ShipmentTemplatesPage}
           />
-          <Route
-            path="/VisitationTemplates"
-            component={VisitationTemplatesPage}
-          />
+          <Route path="/VisitTemplates" component={VisitTemplatesPage} />
           <Route
             path="/ProposalTableReviewer"
             component={ProposalTableReviewer}
@@ -304,12 +301,15 @@ const Dashboard: React.FC = () => {
             <Route path="/ApiAccessTokens" component={ApiAccessTokensPage} />
           )}
           {isSchedulerEnabled && (
-            <Route path="/MyBeamTimes" component={UserMyBeamTimesTable} />
+            <Route
+              path="/ExperimentTimes"
+              component={UserExperimentTimesTable}
+            />
           )}
           {isSchedulerEnabled && (
             <Route
-              path="/UpcomingBeamTimes"
-              component={InstrSciUpcomingBeamTimesTable}
+              path="/UpcomingExperimentTimes"
+              component={InstrSciUpcomingExperimentTimesTable}
             />
           )}
           {isUserOfficer && (
