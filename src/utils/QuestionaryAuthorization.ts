@@ -10,9 +10,9 @@ import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateCategoryId } from '../models/Template';
 import { User, UserWithRole } from '../models/User';
-import { VisitationDataSource } from './../datasources/VisitationDataSource';
+import { VisitDataSource } from './../datasources/VisitDataSource';
 import { UserAuthorization } from './UserAuthorization';
-import { VisitationAuthorization } from './VisitationAuthorization';
+import { VisitAuthorization } from './VisitAuthorization';
 
 interface QuestionaryAuthorizer {
   hasReadRights(agent: User | null, questionaryId: number): Promise<boolean>;
@@ -182,12 +182,12 @@ class ShipmentDeclarationQuestionaryAuthorizer
 }
 
 @injectable()
-class VisitationQuestionaryAuthorizer implements QuestionaryAuthorizer {
+class VisitQuestionaryAuthorizer implements QuestionaryAuthorizer {
   constructor(
-    @inject(Tokens.VisitationDataSource)
-    private visitationDataSource: VisitationDataSource,
-    @inject(Tokens.VisitationAuthorization)
-    private visitAuth: VisitationAuthorization,
+    @inject(Tokens.VisitDataSource)
+    private visitDataSource: VisitDataSource,
+    @inject(Tokens.VisitAuthorization)
+    private visitAuth: VisitAuthorization,
     @inject(Tokens.UserAuthorization)
     private userAuthorization: UserAuthorization
   ) {}
@@ -201,7 +201,7 @@ class VisitationQuestionaryAuthorizer implements QuestionaryAuthorizer {
     }
 
     const visit = (
-      await this.visitationDataSource.getVisitations({
+      await this.visitDataSource.getVisits({
         questionaryId: questionaryId,
       })
     )[0];
@@ -221,7 +221,7 @@ class VisitationQuestionaryAuthorizer implements QuestionaryAuthorizer {
     }
 
     const visit = (
-      await this.visitationDataSource.getVisitations({
+      await this.visitDataSource.getVisits({
         questionaryId: questionaryId,
       })
     )[0];
@@ -256,8 +256,8 @@ export class QuestionaryAuthorization {
       container.resolve(ShipmentDeclarationQuestionaryAuthorizer)
     );
     this.authorizers.set(
-      TemplateCategoryId.VISITATION,
-      container.resolve(VisitationQuestionaryAuthorizer)
+      TemplateCategoryId.VISIT,
+      container.resolve(VisitQuestionaryAuthorizer)
     );
   }
 

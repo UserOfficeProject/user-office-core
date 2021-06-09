@@ -20,3 +20,5 @@ to release new versions automatically.
 - Commits with `BREAKING CHANGE` in body or footer will trigger breaking releases, think `1.0.0`
 
 All other commit types will trigger no new release.
+
+> **_NOTE:_** When merging the pull requests with `Squash and merge` option on github, the title of the pull request should follow the commit guidelines mentioned above because all the commits are squashed into one commit with title od the PR as a message of the commit. Otherwise when using normal `Merge pull request` the title of the pull request doesn't need to follow the commit guidelines but only the commit messages.
