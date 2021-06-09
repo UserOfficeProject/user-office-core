@@ -266,7 +266,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
       <Tooltip title="My Visits">
         <ListItem component={NavLink} to="/MyVisits" button>
           <ListItemIcon>
-            <EventIcon />
+            <FlightTakeoffIcon />
           </ListItemIcon>
           <ListItemText primary="Visits" />
         </ListItem>
