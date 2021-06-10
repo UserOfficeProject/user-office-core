@@ -33,7 +33,7 @@
     "express": "^4.17.1",
     "express-favicon": "^2.0.1",
     "express-http-proxy": "^1.6.2",
-    "formik": "^2.2.6",
+    "formik": "^2.2.7",
     "formik-material-ui": "^3.0.1",
     "formik-material-ui-pickers": "0.0.12",
     "graphql": "^15.5.0",
