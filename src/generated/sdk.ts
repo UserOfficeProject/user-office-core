@@ -335,6 +335,7 @@ export type Equipment = {
   maintenanceEndsAt: Maybe<Scalars['TzLessDateTime']>;
   autoAccept: Scalars['Boolean'];
   events: Array<ScheduledEvent>;
+  equipmentResponsible: Array<User>;
 };
 
 
@@ -362,6 +363,11 @@ export type EquipmentResponseWrap = {
   equipment: Maybe<Equipment>;
 };
 
+export type EquipmentResponsibleInput = {
+  equipmentId: Scalars['ID'];
+  userIds: Array<Scalars['Int']>;
+};
+
 export type EquipmentWithAssignmentStatus = {
   __typename?: 'EquipmentWithAssignmentStatus';
   id: Scalars['ID'];
@@ -373,6 +379,7 @@ export type EquipmentWithAssignmentStatus = {
   maintenanceEndsAt: Maybe<Scalars['TzLessDateTime']>;
   autoAccept: Scalars['Boolean'];
   events: Array<ScheduledEvent>;
+  equipmentResponsible: Array<User>;
   status: EquipmentAssignmentStatus;
 };
 
@@ -719,6 +726,7 @@ export type Mutation = {
   assignToScheduledEvents: Scalars['Boolean'];
   deleteEquipmentAssignment: Scalars['Boolean'];
   confirmEquipmentAssignment: Scalars['Boolean'];
+  addEquipmentResponsible: Scalars['Boolean'];
   bulkUpsertLostTimes: LostTimesResponseWrap;
   createScheduledEvent: ScheduledEventResponseWrap;
   bulkUpsertScheduledEvents: ScheduledEventsResponseWrap;
@@ -1449,6 +1457,11 @@ export type MutationDeleteEquipmentAssignmentArgs = {
 
 export type MutationConfirmEquipmentAssignmentArgs = {
   confirmEquipmentAssignmentInput: ConfirmEquipmentAssignmentInput;
+};
+
+
+export type MutationAddEquipmentResponsibleArgs = {
+  equipmentResponsibleInput: EquipmentResponsibleInput;
 };
 
 
