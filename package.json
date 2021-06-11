@@ -17,7 +17,7 @@
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
-    "@tinymce/tinymce-react": "^3.12.4",
+    "@tinymce/tinymce-react": "^3.12.6",
     "@types/dateformat": "^3.0.1",
     "@types/jsonwebtoken": "^8.5.1",
     "@types/react": "^17.0.6",
@@ -54,7 +54,7 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.0",
-    "tinymce": "^5.8.0",
+    "tinymce": "^5.8.1",
     "typescript": "^3.9.9",
     "use-query-params": "^1.2.2",
     "yup": "~0.29.3"
