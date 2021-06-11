@@ -88,7 +88,7 @@ context('Shipments tests', () => {
   it('Should be able to delete shipment', () => {
     cy.login('user');
 
-    cy.contains('My shipment').click();
+    cy.contains('Shipment').click();
 
     cy.get('[data-cy=create-new-entry]').click();
 
@@ -120,7 +120,7 @@ context('Shipments tests', () => {
   it('Should be able to declare shipment', () => {
     cy.login('user');
 
-    cy.contains('My shipment').click();
+    cy.contains('Shipment').click();
 
     cy.get('[data-cy=create-new-entry]').click();
 

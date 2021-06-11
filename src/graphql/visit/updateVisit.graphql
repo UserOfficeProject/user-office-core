@@ -1,0 +1,37 @@
+mutation updateVisit(
+  $visitId: Int!
+  $team: [Int!]
+  $status: VisitStatus
+  $proposalId: Int
+) {
+  updateVisit(
+    visitId: $visitId
+    proposalId: $proposalId
+    team: $team
+    status: $status
+  ) {
+    visit {
+      ...visit
+
+      questionary {
+        ...questionary
+      }
+      team {
+        id
+        firstname
+        lastname
+      }
+
+      proposal {
+        ...proposal
+        instrument {
+          name
+        }
+      }
+    }
+
+    rejection {
+      ...rejection
+    }
+  }
+}
