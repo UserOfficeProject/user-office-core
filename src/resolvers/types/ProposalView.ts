@@ -54,6 +54,9 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => String, { nullable: true })
   public sepCode: string;
 
+  @Field(() => Int, { nullable: true })
+  public sepId: number;
+
   @Field(() => Float, { nullable: true })
   public reviewAverage: number;
 
