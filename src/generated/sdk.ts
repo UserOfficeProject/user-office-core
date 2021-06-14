@@ -661,8 +661,8 @@ export type Mutation = {
   removeMemberFromSep: SepResponseWrap;
   assignSepReviewersToProposal: SepResponseWrap;
   removeMemberFromSEPProposal: SepResponseWrap;
-  assignProposalToSEP: NextProposalStatusResponseWrap;
-  removeProposalAssignment: SepResponseWrap;
+  assignProposalsToSep: NextProposalStatusResponseWrap;
+  removeProposalsFromSep: SepResponseWrap;
   createSEP: SepResponseWrap;
   reorderSepMeetingDecisionProposals: SepMeetingDecisionResponseWrap;
   saveSepMeetingDecision: SepMeetingDecisionResponseWrap;
@@ -1014,14 +1014,14 @@ export type MutationRemoveMemberFromSepProposalArgs = {
 };
 
 
-export type MutationAssignProposalToSepArgs = {
-  proposalId: Scalars['Int'];
+export type MutationAssignProposalsToSepArgs = {
+  proposals: Array<ProposalIdWithCallId>;
   sepId: Scalars['Int'];
 };
 
 
-export type MutationRemoveProposalAssignmentArgs = {
-  proposalId: Scalars['Int'];
+export type MutationRemoveProposalsFromSepArgs = {
+  proposalIds: Array<Scalars['Int']>;
   sepId: Scalars['Int'];
 };
 
@@ -1771,6 +1771,7 @@ export type ProposalView = {
   instrumentName: Maybe<Scalars['String']>;
   callShortCode: Maybe<Scalars['String']>;
   sepCode: Maybe<Scalars['String']>;
+  sepId: Maybe<Scalars['Int']>;
   reviewAverage: Maybe<Scalars['Float']>;
   reviewDeviation: Maybe<Scalars['Float']>;
   instrumentId: Maybe<Scalars['Int']>;
@@ -2986,15 +2987,15 @@ export type VisitsFilter = {
   questionaryId?: Maybe<Scalars['Int']>;
 };
 
-export type AssignProposalToSepMutationVariables = Exact<{
-  proposalId: Scalars['Int'];
+export type AssignProposalsToSepMutationVariables = Exact<{
+  proposals: Array<ProposalIdWithCallId> | ProposalIdWithCallId;
   sepId: Scalars['Int'];
 }>;
 
 
-export type AssignProposalToSepMutation = (
+export type AssignProposalsToSepMutation = (
   { __typename?: 'Mutation' }
-  & { assignProposalToSEP: (
+  & { assignProposalsToSep: (
     { __typename?: 'NextProposalStatusResponseWrap' }
     & { rejection: Maybe<(
       { __typename?: 'Rejection' }
@@ -3361,15 +3362,15 @@ export type GetSePsQuery = (
   )> }
 );
 
-export type RemoveProposalAssignmentMutationVariables = Exact<{
-  proposalId: Scalars['Int'];
+export type RemoveProposalsFromSepMutationVariables = Exact<{
+  proposalIds: Array<Scalars['Int']> | Scalars['Int'];
   sepId: Scalars['Int'];
 }>;
 
 
-export type RemoveProposalAssignmentMutation = (
+export type RemoveProposalsFromSepMutation = (
   { __typename?: 'Mutation' }
-  & { removeProposalAssignment: (
+  & { removeProposalsFromSep: (
     { __typename?: 'SEPResponseWrap' }
     & { rejection: Maybe<(
       { __typename?: 'Rejection' }
@@ -4517,7 +4518,7 @@ export type GetProposalsCoreQuery = (
   { __typename?: 'Query' }
   & { proposalsView: Maybe<Array<(
     { __typename?: 'ProposalView' }
-    & Pick<ProposalView, 'id' | 'title' | 'statusId' | 'statusName' | 'statusDescription' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'notified' | 'timeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepCode' | 'reviewAverage' | 'reviewDeviation' | 'instrumentId' | 'callId' | 'submitted' | 'allocationTimeUnit'>
+    & Pick<ProposalView, 'id' | 'title' | 'statusId' | 'statusName' | 'statusDescription' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'notified' | 'timeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepCode' | 'sepId' | 'reviewAverage' | 'reviewDeviation' | 'instrumentId' | 'callId' | 'submitted' | 'allocationTimeUnit'>
   )>> }
 );
 
@@ -7337,9 +7338,9 @@ export const VisitFragmentDoc = gql`
   visitorId
 }
     `;
-export const AssignProposalToSepDocument = gql`
-    mutation assignProposalToSEP($proposalId: Int!, $sepId: Int!) {
-  assignProposalToSEP(proposalId: $proposalId, sepId: $sepId) {
+export const AssignProposalsToSepDocument = gql`
+    mutation assignProposalsToSep($proposals: [ProposalIdWithCallId!]!, $sepId: Int!) {
+  assignProposalsToSep(proposals: $proposals, sepId: $sepId) {
     rejection {
       ...rejection
     }
@@ -7677,9 +7678,9 @@ export const GetSePsDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
-export const RemoveProposalAssignmentDocument = gql`
-    mutation removeProposalAssignment($proposalId: Int!, $sepId: Int!) {
-  removeProposalAssignment(proposalId: $proposalId, sepId: $sepId) {
+export const RemoveProposalsFromSepDocument = gql`
+    mutation removeProposalsFromSep($proposalIds: [Int!]!, $sepId: Int!) {
+  removeProposalsFromSep(proposalIds: $proposalIds, sepId: $sepId) {
     rejection {
       ...rejection
     }
@@ -8549,6 +8550,7 @@ export const GetProposalsCoreDocument = gql`
     instrumentName
     callShortCode
     sepCode
+    sepId
     reviewAverage
     reviewDeviation
     instrumentId
@@ -10108,8 +10110,8 @@ export type SdkFunctionWrapper = <T>(action: () => Promise<T>) => Promise<T>;
 const defaultWrapper: SdkFunctionWrapper = sdkFunction => sdkFunction();
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    assignProposalToSEP(variables: AssignProposalToSepMutationVariables): Promise<AssignProposalToSepMutation> {
-      return withWrapper(() => client.request<AssignProposalToSepMutation>(print(AssignProposalToSepDocument), variables));
+    assignProposalsToSep(variables: AssignProposalsToSepMutationVariables): Promise<AssignProposalsToSepMutation> {
+      return withWrapper(() => client.request<AssignProposalsToSepMutation>(print(AssignProposalsToSepDocument), variables));
     },
     assignReviewersToSEP(variables: AssignReviewersToSepMutationVariables): Promise<AssignReviewersToSepMutation> {
       return withWrapper(() => client.request<AssignReviewersToSepMutation>(print(AssignReviewersToSepDocument), variables));
@@ -10153,8 +10155,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getSEPs(variables: GetSePsQueryVariables): Promise<GetSePsQuery> {
       return withWrapper(() => client.request<GetSePsQuery>(print(GetSePsDocument), variables));
     },
-    removeProposalAssignment(variables: RemoveProposalAssignmentMutationVariables): Promise<RemoveProposalAssignmentMutation> {
-      return withWrapper(() => client.request<RemoveProposalAssignmentMutation>(print(RemoveProposalAssignmentDocument), variables));
+    removeProposalsFromSep(variables: RemoveProposalsFromSepMutationVariables): Promise<RemoveProposalsFromSepMutation> {
+      return withWrapper(() => client.request<RemoveProposalsFromSepMutation>(print(RemoveProposalsFromSepDocument), variables));
     },
     removeMemberFromSep(variables: RemoveMemberFromSepMutationVariables): Promise<RemoveMemberFromSepMutation> {
       return withWrapper(() => client.request<RemoveMemberFromSepMutation>(print(RemoveMemberFromSepDocument), variables));
