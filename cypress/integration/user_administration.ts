@@ -103,16 +103,87 @@ context('User administration tests', () => {
     cy.get("[name='telephone']").invoke('val').should('eq', newTelephone);
   });
 
-  it('Should be able to delete user user information', () => {
-    cy.login('officer');
+  it('Should be able to invite user or sep reviewer by email', () => {
+    const userFirstName = faker.name.firstName();
+    const userLastName = faker.name.lastName();
+    const userEmail = faker.internet.email();
+    const reviewerFirstName = faker.name.firstName();
+    const reviewerLastName = faker.name.lastName();
+    const reviewerEmail = faker.internet.email();
 
+    cy.contains('People').click();
+
+    cy.get('[data-cy="invite-user-button"]').click();
+
+    cy.get('[data-cy="firstname"] input').clear().type(userFirstName);
+    cy.get('[data-cy="lastname"] input').clear().type(userLastName);
+    cy.get('[data-cy="email"] input').clear().type(userEmail);
+
+    cy.get('[data-cy="invitation-submit"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Invitation sent successfully',
+    });
+
+    cy.get('[data-cy="co-proposers"]').contains(userFirstName);
+    cy.get('[data-cy="co-proposers"]')
+      .contains(userLastName)
+      .parent()
+      .find('[title="Edit user"]')
+      .click();
+
+    cy.finishedLoading();
+
+    cy.get('[name="email"]').should('have.value', userEmail);
+
+    cy.get('[role="tablist"]').contains('Settings').click();
+
+    cy.get('[data-cy="user-roles-table"] table tbody tr')
+      .first()
+      .contains('User');
+
+    cy.contains('People').click();
+
+    cy.get('[data-cy="invite-reviewer-button"]').click();
+
+    cy.get('[data-cy="firstname"] input').clear().type(reviewerFirstName);
+    cy.get('[data-cy="lastname"] input').clear().type(reviewerLastName);
+    cy.get('[data-cy="email"] input').clear().type(reviewerEmail);
+
+    cy.get('[data-cy="invitation-submit"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Invitation sent successfully',
+    });
+
+    cy.get('[data-cy="co-proposers"]').contains(reviewerFirstName);
+    cy.get('[data-cy="co-proposers"]')
+      .contains(reviewerLastName)
+      .parent()
+      .find('[title="Edit user"]')
+      .click();
+
+    cy.finishedLoading();
+
+    cy.get('[name="email"]').should('have.value', reviewerEmail);
+
+    cy.get('[role="tablist"]').contains('Settings').click();
+
+    cy.get('[data-cy="user-roles-table"] table tbody tr')
+      .first()
+      .contains('SEP Reviewer');
+  });
+
+  it('Should be able to delete user information', () => {
     cy.contains('People').click();
 
     cy.get("[title='Delete']").first().click();
 
     cy.get("[title='Save']").first().click();
 
-    cy.contains('1-5 of 5');
+    cy.contains('1-5 of 8');
 
     cy.logout();
   });

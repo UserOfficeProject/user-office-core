@@ -7,7 +7,7 @@ import { UserRole } from 'generated/sdk';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import { InviteUserForm } from './InviteUserForm';
+import InviteUserForm from './InviteUserForm';
 import PeopleTable from './PeopleTable';
 
 export default function PeoplePage() {
@@ -36,6 +36,7 @@ export default function PeoplePage() {
         title: 'Invite User',
         userRole: UserRole.USER,
       }),
+    'data-cy': 'invite-user-button',
   });
 
   invitationButtons.push({
@@ -46,6 +47,7 @@ export default function PeoplePage() {
         title: 'Invite Reviewer',
         userRole: UserRole.SEP_REVIEWER,
       }),
+    'data-cy': 'invite-reviewer-button',
   });
 
   return (
