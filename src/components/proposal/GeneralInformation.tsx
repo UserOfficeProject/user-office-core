@@ -12,7 +12,7 @@ import { ProposalSubsetSubmission } from 'models/ProposalSubmissionState';
 
 import ProposalContainer from './ProposalContainer';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end',
