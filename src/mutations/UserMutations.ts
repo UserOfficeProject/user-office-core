@@ -29,6 +29,7 @@ import {
   EmailVerificationJwtPayload,
   AuthJwtPayload,
   PasswordResetJwtPayload,
+  UserRoleShortCodeMap,
 } from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
@@ -109,11 +110,21 @@ export default class UserMutations {
       this.userAuth.isUserOfficer(agent)
     ) {
       userId = await this.dataSource.createInviteUser(args);
-      await this.dataSource.setUserRoles(userId, [UserRole.SEP_REVIEWER]);
+
+      const newUserRole = await this.dataSource.getRoleByShortCode(
+        UserRoleShortCodeMap[role]
+      );
+
+      await this.dataSource.setUserRoles(userId, [newUserRole.id]);
       role = UserRole.SEP_REVIEWER;
     } else if (args.userRole === UserRole.USER) {
       userId = await this.dataSource.createInviteUser(args);
-      await this.dataSource.setUserRoles(userId, [UserRole.USER]);
+
+      const newUserRole = await this.dataSource.getRoleByShortCode(
+        UserRoleShortCodeMap[role]
+      );
+
+      await this.dataSource.setUserRoles(userId, [newUserRole.id]);
       role = UserRole.USER;
     } else if (
       args.userRole === UserRole.SEP_CHAIR &&
