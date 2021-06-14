@@ -333,7 +333,10 @@ const createSeps = async () => {
     const proposalIds = createUniqueIntArray(5, MAX_PROPOSALS);
     for (const proposalId of proposalIds) {
       const tmpUserId = dummy.positiveNumber(MAX_USERS);
-      await sepDataSource.assignProposal(proposalId, sep.id);
+      await sepDataSource.assignProposalsToSep({
+        proposals: [{ id: proposalId, callId: 1 }],
+        sepId: sep.id,
+      });
       await sepDataSource.assignMemberToSEPProposal(proposalId, sep.id, [
         tmpUserId,
       ]);

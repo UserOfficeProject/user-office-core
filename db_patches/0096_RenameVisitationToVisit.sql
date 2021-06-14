@@ -15,6 +15,13 @@ BEGIN
 
       UPDATE question_datatypes SET question_datatype_id='VISIT_BASIS' WHERE question_datatype_id='VISITATION_BASIS';
 
+      ALTER TABLE templates_has_questions
+      DROP CONSTRAINT IF EXISTS templates_has_questions_question_id_fkey,
+      add CONSTRAINT templates_has_questions_question_id_fkey
+         FOREIGN KEY (question_id)
+         REFERENCES questions(question_id)
+         ON UPDATE cascade;
+         
       UPDATE questions 
       SET 
         question_id='visit_basis',
@@ -29,6 +36,8 @@ BEGIN
 
       ALTER TABLE visits_has_users 
       RENAME visitation_id TO visit_id;
+
+
 	END IF;
 END;
 $$

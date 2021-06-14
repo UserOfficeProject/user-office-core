@@ -13,6 +13,7 @@ import {
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../resolvers/mutations/AssignMembersToSEP';
+import { AssignProposalsToSepArgs } from '../resolvers/mutations/AssignProposalsToSep';
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
 
 export interface SEPDataSource {
@@ -70,16 +71,15 @@ export interface SEPDataSource {
     args: UpdateMemberSEPArgs,
     isMemberChairOrSecretaryOfSEP: boolean
   ): Promise<SEP>;
-  assignProposal(
-    proposalId: number,
-    sepId: number
+  assignProposalsToSep(
+    args: AssignProposalsToSepArgs
   ): Promise<ProposalIdsWithNextStatus>;
   removeMemberFromSepProposal(
     proposalId: number,
     sepId: number,
     memberId: number
   ): Promise<SEP>;
-  removeProposalAssignment(proposalId: number, sepId: number): Promise<SEP>;
+  removeProposalsFromSep(proposalIds: number[], sepId: number): Promise<SEP>;
   assignMemberToSEPProposal(
     proposalId: number,
     sepId: number,
