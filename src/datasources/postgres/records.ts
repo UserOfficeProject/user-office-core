@@ -85,6 +85,7 @@ export interface ProposalViewRecord {
   readonly technical_review_status: number;
   readonly instrument_name: string;
   readonly call_short_code: string;
+  readonly sep_id: number;
   readonly sep_code: string;
   readonly average: number;
   readonly deviation: number;
@@ -561,6 +562,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.technical_review_status,
     proposal.instrument_name,
     proposal.call_short_code,
+    proposal.sep_id,
     proposal.sep_code,
     proposal.average,
     proposal.deviation,

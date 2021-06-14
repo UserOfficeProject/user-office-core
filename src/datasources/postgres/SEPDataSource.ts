@@ -20,6 +20,7 @@ import {
   AssignReviewersToSEPArgs,
   AssignChairOrSecretaryToSEPInput,
 } from '../../resolvers/mutations/AssignMembersToSEP';
+import { AssignProposalsToSepArgs } from '../../resolvers/mutations/AssignProposalsToSep';
 import { SaveSEPMeetingDecisionInput } from '../../resolvers/mutations/SEPMeetingDecisionMutation';
 import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
@@ -495,39 +496,77 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     throw new Error(`SEP not found ${args.sepId}`);
   }
 
-  async assignProposal(proposalId: number, sepId: number) {
-    const result = await database.raw(
-      `${database('SEP_Proposals').insert({
-        proposal_id: proposalId,
-        sep_id: sepId,
-        call_id: database('proposals')
-          .select('call_id')
-          .where('proposal_id', proposalId),
-      })} ON CONFLICT (sep_id, proposal_id) DO UPDATE SET date_assigned=NOW() RETURNING *`
+  async assignProposalsToSep({ proposals, sepId }: AssignProposalsToSepArgs) {
+    const dataToInsert = proposals.map((proposal) => ({
+      sep_id: sepId,
+      proposal_id: proposal.id,
+      call_id: proposal.callId,
+    }));
+
+    const proposalSepPairs: {
+      proposal_id: number;
+      sep_id: number;
+    }[] = await database.transaction(async (trx) => {
+      try {
+        /**
+         * NOTE: First delete all connections that should be changed,
+         * because currently we only support one proposal to be assigned on one SEP.
+         * So we don't end up in a situation that one proposal is assigned to multiple SEPs
+         * which is not supported scenario by the frontend because it only shows one SEP per proposal.
+         */
+        await database('SEP_Proposals')
+          .del()
+          .whereIn(
+            'proposal_id',
+            proposals.map((proposal) => proposal.id)
+          )
+          .transacting(trx);
+
+        const result = await database('SEP_Proposals')
+          .insert(dataToInsert)
+          .returning(['*'])
+          .transacting(trx);
+
+        return await trx.commit(result);
+      } catch (error) {
+        throw new Error(
+          `Could not assign proposals ${proposals} to SEP with id: ${sepId}`
+        );
+      }
+    });
+
+    const returnedProposalIds = proposalSepPairs.map(
+      (proposalSepPair) => proposalSepPair.proposal_id
     );
 
-    if (result.rows?.length) {
-      return new ProposalIdsWithNextStatus([proposalId]);
+    if (proposalSepPairs?.length) {
+      /**
+       * NOTE: We need to return changed proposalIds because we listen to events and
+       * we need to do some changes on proposals based on what is changed.
+       */
+      return new ProposalIdsWithNextStatus(returnedProposalIds);
     }
 
-    throw new Error(`SEP not found ${sepId}`);
+    throw new Error(
+      `Could not assign proposals ${proposals} to SEP with id: ${sepId}`
+    );
   }
 
-  async removeProposalAssignment(proposalId: number, sepId: number) {
+  async removeProposalsFromSep(proposalIds: number[], sepId: number) {
     await database.transaction(async (trx) => {
       await trx('SEP_Proposals')
-        .where('sep_id', sepId)
-        .andWhere('proposal_id', proposalId)
+        .whereIn('proposal_id', proposalIds)
+        .andWhere('sep_id', sepId)
         .del();
 
       await trx('SEP_Assignments')
-        .where('sep_id', sepId)
-        .andWhere('proposal_id', proposalId)
+        .whereIn('proposal_id', proposalIds)
+        .andWhere('sep_id', sepId)
         .del();
 
       await trx('SEP_Reviews')
-        .where('sep_id', sepId)
-        .andWhere('proposal_id', proposalId)
+        .whereIn('proposal_id', proposalIds)
+        .andWhere('sep_id', sepId)
         .del();
     });
 
