@@ -428,11 +428,11 @@ context('Settings tests', () => {
 
       cy.get("[id='menu-selectedSEPId'] li").first().click();
 
-      cy.contains('Assign to SEP').click();
+      cy.get('[data-cy="submit"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Proposal/s assigned to SEP',
+        text: 'Proposal/s assigned to the selected SEP successfully',
       });
 
       cy.should('not.contain', 'SEP_SELECTION');
