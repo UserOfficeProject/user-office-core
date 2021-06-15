@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import clsx from 'clsx';
+import parse from 'html-react-parser';
 import PropTypes from 'prop-types';
 import React, { useContext, useEffect } from 'react';
 import { Route, Switch } from 'react-router-dom';
@@ -185,6 +186,7 @@ const Dashboard: React.FC = () => {
 
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
+  const [, footerContent] = useGetPageContent(PageName.FOOTERCONTENT);
 
   // TODO: Check who can see what and modify the access control here.
   return (
@@ -352,6 +354,7 @@ const Dashboard: React.FC = () => {
             )}
           />
         </Switch>
+        {parse(footerContent)}
         <BottomNavigation className={classes.bottomNavigation}>
           <BottomNavItem
             text={privacyPageContent}
