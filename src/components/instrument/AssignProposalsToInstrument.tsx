@@ -20,6 +20,9 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  form: {
+    width: '240px',
+  },
 }));
 
 type AssignProposalsToInstrumentProps = {
@@ -59,9 +62,9 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
         }}
       >
         {({ isSubmitting, values }): JSX.Element => (
-          <Form style={{ width: '240px' }}>
+          <Form className={classes.form}>
             <Typography className={classes.cardHeader}>
-              Assign instrument to proposal/s
+              Assign proposal/s to instrument
             </Typography>
 
             <Grid container spacing={3}>
@@ -92,7 +95,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
               variant="contained"
               color="primary"
               className={classes.submit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || loadingInstruments}
               data-cy="submit-assign-remove-instrument"
             >
               Save
