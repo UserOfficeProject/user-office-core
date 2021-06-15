@@ -9,10 +9,10 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
-import { ProposalEndStatus } from '../models/Proposal';
+import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 
-type ProposalAcceptedMessage = {
+type ProposalMessageData = {
   proposalId: number;
   shortCode: string;
   title: string;
@@ -28,15 +28,44 @@ export function createPostToQueueHandler() {
   );
 }
 
+const getProposalMessageData = async (proposal: Proposal) => {
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
+  );
+
+  const proposalUsers = await userDataSource.getProposalUsersFull(proposal.id);
+
+  const messageData: ProposalMessageData = {
+    proposalId: proposal.id,
+    shortCode: proposal.shortCode,
+    title: proposal.title,
+    abstract: proposal.abstract,
+    members: proposalUsers.map((proposalUser) => ({
+      firstName: proposalUser.firstname,
+      lastName: proposalUser.lastname,
+      email: proposalUser.email,
+    })),
+  };
+
+  const proposer = await userDataSource.getUser(proposal.proposerId);
+
+  if (proposer) {
+    messageData.proposer = {
+      firstName: proposer.firstname,
+      lastName: proposer.lastname,
+      email: proposer.email,
+    };
+  }
+
+  return JSON.stringify(messageData);
+};
+
 export function createPostToRabbitMQHandler() {
   const proposalSettingsDataSource = container.resolve<ProposalSettingsDataSource>(
     Tokens.ProposalSettingsDataSource
   );
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
-  );
-  const userDataSource = container.resolve<UserDataSource>(
-    Tokens.UserDataSource
   );
 
   const rabbitMQ = new RabbitMQMessageBroker();
@@ -56,7 +85,7 @@ export function createPostToRabbitMQHandler() {
 
     switch (event.type) {
       case Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW:
-      case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
+      case Event.PROPOSAL_STATUS_CHANGED_BY_USER: {
         const proposal = event.proposal;
         const proposalStatus = await proposalSettingsDataSource.getProposalStatus(
           proposal.statusId
@@ -106,39 +135,11 @@ export function createPostToRabbitMQHandler() {
         );
 
         break;
-
-      case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED:
+      }
+      case Event.PROPOSAL_MANAGEMENT_DECISION_SUBMITTED: {
         switch (event.proposal.finalStatus) {
           case ProposalEndStatus.ACCEPTED:
-            const proposal = event.proposal;
-
-            const proposalUsers = await userDataSource.getProposalUsersFull(
-              proposal.id
-            );
-
-            const message: ProposalAcceptedMessage = {
-              proposalId: proposal.id,
-              shortCode: proposal.shortCode,
-              title: proposal.title,
-              abstract: proposal.abstract,
-              members: proposalUsers.map((proposalUser) => ({
-                firstName: proposalUser.firstname,
-                lastName: proposalUser.lastname,
-                email: proposalUser.email,
-              })),
-            };
-
-            const proposer = await userDataSource.getUser(proposal.proposerId);
-
-            if (proposer) {
-              message.proposer = {
-                firstName: proposer.firstname,
-                lastName: proposer.lastname,
-                email: proposer.email,
-              };
-            }
-
-            const json = JSON.stringify(message);
+            const json = await getProposalMessageData(event.proposal);
 
             await rabbitMQ.sendMessage(
               Queue.PROPOSAL,
@@ -149,8 +150,19 @@ export function createPostToRabbitMQHandler() {
           default:
             break;
         }
-
         break;
+      }
+
+      case Event.PROPOSAL_UPDATED: {
+        const json = await getProposalMessageData(event.proposal);
+
+        await rabbitMQ.sendMessage(
+          Queue.PROPOSAL,
+          Event.PROPOSAL_UPDATED,
+          json
+        );
+        break;
+      }
     }
   };
 }
