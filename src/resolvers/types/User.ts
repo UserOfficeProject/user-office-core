@@ -161,7 +161,7 @@ export async function resolveUserReference(...params: any): Promise<User> {
   // the order of the parameters and types are messed up,
   // it should be source, args, context, resolveInfo
   // but instead we get source, context and resolveInfo
-  // this was the easies way to make the compiler happy and use real types
+  // this was the easiest way to make the compiler happy and use real types
   const [reference, ctx]: [Pick<User, 'id'>, ResolverContext] = params;
 
   // dataSource.get can be null, even with non-null operator the compiler complains
