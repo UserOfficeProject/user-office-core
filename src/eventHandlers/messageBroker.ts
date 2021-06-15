@@ -16,6 +16,7 @@ type ProposalAcceptedMessage = {
   proposalId: number;
   shortCode: string;
   title: string;
+  abstract: string;
   members: { firstName: string; lastName: string; email: string }[];
   proposer?: { firstName: string; lastName: string; email: string };
 };
@@ -119,6 +120,7 @@ export function createPostToRabbitMQHandler() {
               proposalId: proposal.id,
               shortCode: proposal.shortCode,
               title: proposal.title,
+              abstract: proposal.abstract,
               members: proposalUsers.map((proposalUser) => ({
                 firstName: proposalUser.firstname,
                 lastName: proposalUser.lastname,
