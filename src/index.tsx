@@ -5,7 +5,7 @@ import './index.css';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 
-const org = process.env.REACT_APP_AUTH_PROVIDER;
+const org = process.env.REACT_APP_THEME;
 switch (org) {
   case 'stfc':
     require('./stfc-stylesheet.css');

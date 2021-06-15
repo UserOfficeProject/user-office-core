@@ -10,7 +10,7 @@ interface OrganisationTheme {
 }
 
 let theme: OrganisationTheme;
-const org = process.env.REACT_APP_AUTH_PROVIDER;
+const org = process.env.REACT_APP_THEME;
 switch (org) {
   case 'stfc':
     theme = new StfcTheme();
