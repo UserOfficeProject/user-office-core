@@ -74,15 +74,7 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
       margin: theme.spacing(0, 0.5),
     },
     logoContainer: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginRight: 24,
       ...theme.mixins.toolbar,
-    },
-    logo: {
-      // Ensures min 1/4 of the height is padding
-      maxHeight: '71.4%',
     },
   }));
   const classes = useStyles();
@@ -111,8 +103,8 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
           <MenuIcon />
         </IconButton>
         {(!isTabletOrMobile || !isPortraitMode) && headerLogo && (
-          <div className={classes.logoContainer}>
-            <img src={headerLogo} alt="logo" className={classes.logo} />
+          <div className={`header-logo-container ${classes.logoContainer}`}>
+            <img src={headerLogo} alt="logo" className={'header-logo'} />
           </div>
         )}
         {(!isTabletOrMobile || !isPortraitMode) && (

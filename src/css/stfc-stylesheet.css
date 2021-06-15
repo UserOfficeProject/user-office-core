@@ -70,3 +70,15 @@ h1, h2, h3, h4, h5, h6 {
 .MuiList-root .MuiMenuItem-root:not(.Mui-disabled) svg {
   fill: var(--palette-primary-main);
 }
+
+/* Logo image - ensures min 1/4 of the height is padding */
+.header-logo {
+  max-height: 71.4%;
+}
+
+.header-logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 24px;
+}
