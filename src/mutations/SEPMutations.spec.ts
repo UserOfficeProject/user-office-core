@@ -194,10 +194,10 @@ describe('Test SEPMutations', () => {
   });
 
   test('A user can not assign proposal to SEP', async () => {
-    const result = (await SEPMutationsInstance.assignProposalToSEP(
+    const result = (await SEPMutationsInstance.assignProposalsToSep(
       dummyUserWithRole,
       {
-        proposalId: 1,
+        proposals: [{ id: 1, callId: 1 }],
         sepId: 1,
       }
     )) as Rejection;
@@ -207,8 +207,8 @@ describe('Test SEPMutations', () => {
 
   test('A userofficer can assign proposal to SEP', () => {
     return expect(
-      SEPMutationsInstance.assignProposalToSEP(dummyUserOfficerWithRole, {
-        proposalId: 1,
+      SEPMutationsInstance.assignProposalsToSep(dummyUserOfficerWithRole, {
+        proposals: [{ id: 1, callId: 1 }],
         sepId: 1,
       })
     ).resolves.toStrictEqual(
@@ -217,10 +217,10 @@ describe('Test SEPMutations', () => {
   });
 
   test('A user can not remove proposal from SEP', async () => {
-    const result = (await SEPMutationsInstance.removeProposalAssignment(
+    const result = (await SEPMutationsInstance.removeProposalsFromSep(
       dummyUserWithRole,
       {
-        proposalId: 1,
+        proposalIds: [1],
         sepId: 1,
       }
     )) as Rejection;
@@ -230,8 +230,8 @@ describe('Test SEPMutations', () => {
 
   test('A userofficer can remove proposal from SEP', () => {
     return expect(
-      SEPMutationsInstance.removeProposalAssignment(dummyUserOfficerWithRole, {
-        proposalId: 1,
+      SEPMutationsInstance.removeProposalsFromSep(dummyUserOfficerWithRole, {
+        proposalIds: [1],
         sepId: 1,
       })
     ).resolves.toStrictEqual(dummySEP);

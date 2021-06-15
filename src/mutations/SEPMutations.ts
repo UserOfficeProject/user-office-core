@@ -3,7 +3,6 @@ import {
   updateSEPValidationSchema,
   assignSEPMembersValidationSchema,
   removeSEPMemberValidationSchema,
-  assignProposalToSEPValidationSchema,
   assignSEPChairOrSecretaryValidationSchema,
   assignSEPMemberToProposalValidationSchema,
   updateTimeAllocationValidationSchema,
@@ -20,7 +19,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
 import { ProposalIdsWithNextStatus } from '../models/Proposal';
-import { rejection, Rejection, isRejection } from '../models/Rejection';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
 import { SepMeetingDecision } from '../models/SepMeetingDecision';
@@ -32,7 +31,10 @@ import {
   RemoveSepReviewerFromProposalArgs,
   AssignChairOrSecretaryToSEPArgs,
 } from '../resolvers/mutations/AssignMembersToSEP';
-import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
+import {
+  AssignProposalsToSepArgs,
+  RemoveProposalsFromSepArgs,
+} from '../resolvers/mutations/AssignProposalsToSep';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { ReorderSepMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderSepMeetingDecisionProposalsMutation';
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
@@ -210,35 +212,17 @@ export default class SEPMutations {
       });
   }
 
-  @ValidateArgs(assignProposalToSEPValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.PROPOSAL_SEP_SELECTED)
-  async assignProposalToSEP(
+  async assignProposalsToSep(
     agent: UserWithRole | null,
-    args: AssignProposalToSEPArgs
+    args: AssignProposalsToSepArgs
   ): Promise<ProposalIdsWithNextStatus | Rejection> {
-    const SEP = await this.dataSource.getSEPByProposalId(args.proposalId);
-    if (SEP) {
-      if (
-        isRejection(
-          await this.removeProposalAssignment(agent, {
-            proposalId: args.proposalId,
-            sepId: SEP.id,
-          })
-        )
-      ) {
-        return rejection(
-          'Could not assign proposal to SEP because an error occurred',
-          { args, agent }
-        );
-      }
-    }
-
     return this.dataSource
-      .assignProposal(args.proposalId, args.sepId)
+      .assignProposalsToSep(args)
       .then(async (result) => {
         const nextProposalStatus = await this.proposalSettingsDataSource.getProposalNextStatus(
-          args.proposalId,
+          args.proposals[0].id,
           Event.PROPOSAL_SEP_SELECTED
         );
 
@@ -258,15 +242,14 @@ export default class SEPMutations {
       });
   }
 
-  @ValidateArgs(assignProposalToSEPValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.SEP_PROPOSAL_REMOVED)
-  async removeProposalAssignment(
+  async removeProposalsFromSep(
     agent: UserWithRole | null,
-    args: AssignProposalToSEPArgs
+    args: RemoveProposalsFromSepArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
-      .removeProposalAssignment(args.proposalId, args.sepId)
+      .removeProposalsFromSep(args.proposalIds, args.sepId)
       .catch((err) => {
         return rejection(
           'Could not remove assigned proposal from scientific evaluation panel',
