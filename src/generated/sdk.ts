@@ -551,13 +551,6 @@ export type Instrument = {
   description: Scalars['String'];
   managerUserId: Scalars['Int'];
   scientists: Array<BasicUserDetails>;
-  events: Array<ScheduledEvent>;
-};
-
-
-export type InstrumentEventsArgs = {
-  endsAt: Scalars['TzLessDateTime'];
-  startsAt: Scalars['TzLessDateTime'];
 };
 
 export type InstrumentResponseWrap = {
