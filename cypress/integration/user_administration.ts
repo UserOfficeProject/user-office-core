@@ -187,12 +187,13 @@ context('User administration tests', () => {
 
     cy.get("[title='Save']").first().click();
 
-    cy.contains('1-5 of 8');
+    cy.notification({ variant: 'success', text: 'User removed successfully' });
 
     cy.logout();
   });
 
   it('Should be able to send email for password reset', () => {
+    cy.visit('/SignIn');
     cy.contains('Forgot password?').click();
 
     cy.get('[data-cy="reset-password-email"] input').type(

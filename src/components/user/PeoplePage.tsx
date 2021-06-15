@@ -80,7 +80,9 @@ export default function PeoplePage() {
                   selection={false}
                   invitationButtons={invitationButtons}
                   onRemove={(user: { id: number }) =>
-                    api().deleteUser({ id: user.id })
+                    api('User removed successfully!').deleteUser({
+                      id: user.id,
+                    })
                   }
                 />
               )}
