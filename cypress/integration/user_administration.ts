@@ -139,6 +139,8 @@ context('User administration tests', () => {
 
     cy.get('[role="tablist"]').contains('Settings').click();
 
+    cy.finishedLoading();
+
     cy.get('[data-cy="user-roles-table"] table tbody tr')
       .first()
       .contains('User');
@@ -170,6 +172,8 @@ context('User administration tests', () => {
     cy.get('[name="email"]').should('have.value', reviewerEmail);
 
     cy.get('[role="tablist"]').contains('Settings').click();
+
+    cy.finishedLoading();
 
     cy.get('[data-cy="user-roles-table"] table tbody tr')
       .first()
