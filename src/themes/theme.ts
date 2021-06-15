@@ -1,12 +1,30 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Theme } from '@material-ui/core/styles';
 
-export function getTheme(): Theme {
-  const org = process.env.REACT_APP_AUTH_PROVIDER;
-  switch (org) {
-    case 'stfc':
-      return require('./stfcTheme').theme;
-    default:
-      return require('./essTheme').theme;
-  }
+import { EssTheme } from './essTheme';
+import { StfcTheme } from './stfcTheme';
+
+interface OrganisationTheme {
+  getTheme: () => Theme;
+  getHeaderLogo: () => string | undefined;
 }
+
+let theme: OrganisationTheme;
+const org = process.env.REACT_APP_AUTH_PROVIDER;
+switch (org) {
+  case 'stfc':
+    theme = new StfcTheme();
+    break;
+  default:
+    theme = new EssTheme();
+}
+
+export function getTheme(): Theme {
+  return theme.getTheme();
+}
+
+export function getHeaderLogo(): string | undefined {
+  return theme.getHeaderLogo();
+}
+
+export type { OrganisationTheme };

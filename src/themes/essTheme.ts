@@ -1,5 +1,12 @@
-import { createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+import {
+  createMuiTheme,
+  responsiveFontSizes,
+  Theme,
+} from '@material-ui/core/styles';
 import createPalette from '@material-ui/core/styles/createPalette';
+
+import { OrganisationTheme } from './theme';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const developHosts: any = {
@@ -76,4 +83,14 @@ const prodTheme = responsiveFontSizes(
 
 const theme = isDevelop() ? devTheme : prodTheme;
 
-export { theme };
+class EssTheme implements OrganisationTheme {
+  getTheme(): Theme {
+    return theme;
+  }
+
+  getHeaderLogo(): string | undefined {
+    return undefined;
+  }
+}
+
+export { EssTheme };

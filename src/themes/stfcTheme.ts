@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import {
   createMuiTheme,
   Theme,
@@ -5,6 +6,8 @@ import {
 } from '@material-ui/core/styles';
 import createPalette from '@material-ui/core/styles/createPalette';
 import createTypography from '@material-ui/core/styles/createTypography';
+
+import { OrganisationTheme } from './theme';
 
 const palette = createPalette({
   primary: {
@@ -146,4 +149,14 @@ const theme: Theme = responsiveFontSizes(
   })
 );
 
-export { theme };
+class StfcTheme implements OrganisationTheme {
+  getTheme(): Theme {
+    return theme;
+  }
+
+  getHeaderLogo(): string | undefined {
+    return require('../images/stfc-ukri-white.svg').default;
+  }
+}
+
+export { StfcTheme };

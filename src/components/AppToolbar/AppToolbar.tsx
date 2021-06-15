@@ -14,14 +14,8 @@ import { Link } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 
+import { getHeaderLogo } from '../../themes/theme';
 import AccountActionButton from './AccountActionButton';
-
-let headerLogo: string | undefined;
-switch (process.env.REACT_APP_AUTH_PROVIDER) {
-  case 'stfc':
-    headerLogo = require('images/stfc-ukri-white.svg').default;
-    break;
-}
 
 const drawerWidth = 250;
 
@@ -35,6 +29,8 @@ type AppToolbarProps = {
 const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
+
+  const headerLogo: string | undefined = getHeaderLogo();
 
   const useStyles = makeStyles((theme) => ({
     appBar: {
