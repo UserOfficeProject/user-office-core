@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import './index.css';
+import './css/shared-stylesheet.css';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 
 const org = process.env.REACT_APP_THEME;
 switch (org) {
   case 'stfc':
-    require('./stfc-stylesheet.css');
+    require('./css/stfc-stylesheet.css');
     break;
 }
 
