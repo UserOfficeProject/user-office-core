@@ -209,7 +209,7 @@ context(
 
       cy.get("[id='menu-selectedSEPId'] li").first().click();
 
-      cy.contains('Assign to SEP').click();
+      cy.get('[data-cy="submit"]').click();
 
       // Manually changing the proposal status to be shown in the SEPs. -------->
       cy.changeProposalStatus('SEP_REVIEW', proposal1.proposalTitle);
@@ -732,7 +732,7 @@ context(
 
       cy.get("[id='menu-selectedSEPId'] li").first().click();
 
-      cy.contains('Assign to SEP').click();
+      cy.get('[data-cy="submit"]').click();
 
       cy.get('table tbody [type="checkbox"]').first().check();
 

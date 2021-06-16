@@ -13,7 +13,14 @@ export default function PageEditor() {
       <Grid container>
         <Grid item xs={12}>
           <SimpleTabs
-            tabNames={['User', 'Reviewer', 'Help', 'Privacy', 'Cookie']}
+            tabNames={[
+              'User',
+              'Reviewer',
+              'Help',
+              'Privacy',
+              'Cookie',
+              'Footer',
+            ]}
           >
             <PageInputBox
               pageName={PageName.HOMEPAGE}
@@ -34,6 +41,10 @@ export default function PageEditor() {
             <PageInputBox
               pageName={PageName.COOKIEPAGE}
               heading={'Set cookie policy'}
+            />
+            <PageInputBox
+              pageName={PageName.FOOTERCONTENT}
+              heading={'Set footer content'}
             />
           </SimpleTabs>
         </Grid>

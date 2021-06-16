@@ -13,7 +13,7 @@ import { ProposalSubsetSubmission } from './ProposalSubmissionState';
 import { getFieldById } from './QuestionaryFunctions';
 import { SampleWithQuestionary } from './Sample';
 import { ShipmentExtended } from './ShipmentSubmissionState';
-import { VisitationExtended } from './VisitationSubmissionState';
+import { VisitExtended } from './VisitSubmissionState';
 
 export type Event =
   | { type: 'FIELD_CHANGED'; id: string; newValue: any }
@@ -36,9 +36,9 @@ export type Event =
   | { type: 'SHIPMENT_CREATED'; shipment: ShipmentExtended }
   | { type: 'SHIPMENT_LOADED'; shipment: ShipmentExtended }
   | { type: 'SHIPMENT_MODIFIED'; shipment: Partial<ShipmentExtended> }
-  | { type: 'VISITATION_CREATED'; visitation: VisitationExtended }
-  | { type: 'VISITATION_LOADED'; visitation: VisitationExtended }
-  | { type: 'VISITATION_MODIFIED'; visitation: Partial<VisitationExtended> };
+  | { type: 'VISIT_CREATED'; visit: VisitExtended }
+  | { type: 'VISIT_LOADED'; visit: VisitExtended }
+  | { type: 'VISIT_MODIFIED'; visit: Partial<VisitExtended> };
 
 export interface WizardStepMetadata {
   title: string;
@@ -47,11 +47,7 @@ export interface WizardStepMetadata {
 }
 
 export interface WizardStep {
-  type:
-    | 'QuestionaryStep'
-    | 'ProposalReview'
-    | 'ShipmentReview'
-    | 'VisitationReview';
+  type: 'QuestionaryStep' | 'ProposalReview' | 'ShipmentReview' | 'VisitReview';
   payload?: any;
   getMetadata: (
     state: QuestionarySubmissionState,

@@ -27,7 +27,7 @@ import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/Sampl
 import { sampleDeclarationDefinition } from './questionaryComponents/SampleDeclaration/SampleDeclaratonDefinition';
 import { shipmentBasisDefinition } from './questionaryComponents/ShipmentBasis/ShipmentBasisDefinition';
 import { textInputDefinition } from './questionaryComponents/TextInput/TextInputDefinition';
-import { visitationBasisDefinition } from './questionaryComponents/VisitationBasis/VisitiationBasisDefinition';
+import { visitBasisDefinition } from './questionaryComponents/VisitBasis/VisitBasisDefinition';
 
 export type FormChildren<ValueObjectType> = (
   formikProps: FormikProps<ValueObjectType>
@@ -155,7 +155,7 @@ const registry = [
   numberInputDefinition,
   shipmentBasisDefinition,
   richTextInputDefinition,
-  visitationBasisDefinition,
+  visitBasisDefinition,
 ];
 
 Object.freeze(registry);
