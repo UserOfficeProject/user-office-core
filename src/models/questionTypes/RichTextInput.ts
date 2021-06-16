@@ -10,6 +10,7 @@ import { Question } from './QuestionRegistry';
 // explicitly limit the accepted elements, attributes, styles
 export const sanitizerConfig: IOptions = {
   allowedTags: [
+    'a',
     'p',
     'span',
     'strong',
@@ -29,6 +30,7 @@ export const sanitizerConfig: IOptions = {
   ],
   disallowedTagsMode: 'discard',
   allowedAttributes: {
+    a: ['href', 'title'],
     span: ['style'],
     p: ['style'],
   },
