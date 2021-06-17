@@ -75,7 +75,7 @@ export default class AdminMutations {
   ) {
     const institution = await this.dataSource.getInstitution(args.id);
     if (!institution) {
-      return rejection('Could not retrieve insititutions');
+      return rejection('Could not retrieve institutions');
     }
 
     institution.name = args.name ?? institution.name;

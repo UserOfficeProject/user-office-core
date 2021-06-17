@@ -19,11 +19,17 @@ beforeEach(() => {
 
 test('User can create visit for his proposal', async () => {
   await expect(
-    mutations.createVisit(dummyUserWithRole, { proposalId: 1 })
+    mutations.createVisit(dummyUserWithRole, { proposalId: 2 })
   ).resolves.toBeInstanceOf(Visit);
 });
 
-test('User cannot create visit for someone elses proposal', async () => {
+test('User can not create visit for proposal that is not accepted', async () => {
+  await expect(
+    mutations.createVisit(dummyUserWithRole, { proposalId: 1 })
+  ).resolves.toBeInstanceOf(Rejection);
+});
+
+test('User can not create visit for someone elses proposal', async () => {
   await expect(
     mutations.createVisit(dummyUserWithRole, { proposalId: 99 })
   ).resolves.toBeInstanceOf(Rejection);
@@ -31,7 +37,7 @@ test('User cannot create visit for someone elses proposal', async () => {
 
 test('User can update visit', async () => {
   const visit = (await mutations.createVisit(dummyUserWithRole, {
-    proposalId: 1,
+    proposalId: 2,
   })) as Visit;
 
   expect(visit.status).toEqual(VisitStatus.DRAFT);
@@ -68,7 +74,7 @@ test('User can not delete visit that is already accepted', async () => {
   ).resolves.not.toBeInstanceOf(Rejection);
 });
 
-test('User cannot set the state to ACCEPTED', async () => {
+test('User can not set the state to ACCEPTED', async () => {
   await expect(
     mutations.updateVisit(dummyUserWithRole, {
       visitId: 1,
@@ -86,7 +92,7 @@ test('User officer can set the state to ACCEPTED', async () => {
   ).resolves.not.toBeInstanceOf(Rejection);
 });
 
-test('User cannot delete accepted visit', async () => {
+test('User can not delete accepted visit', async () => {
   await mutations.updateVisit(dummyUserOfficerWithRole, {
     visitId: 1,
     status: VisitStatus.ACCEPTED,
