@@ -51,8 +51,8 @@ export type AddUserRoleResponseWrap = {
 };
 
 export enum AllocationTimeUnits {
-  DAYS = 'Days',
-  HOURS = 'Hours'
+  DAY = 'Day',
+  HOUR = 'Hour'
 }
 
 export type Answer = {

@@ -172,7 +172,7 @@ const ProposalTechnicalReview = ({
               <Grid item sm={6} xs={12}>
                 <Field
                   name="timeAllocation"
-                  label={`Time allocation(${proposal.call?.allocationTimeUnit})`}
+                  label={`Time allocation(${proposal.call?.allocationTimeUnit}s)`}
                   type="number"
                   component={TextField}
                   margin="normal"

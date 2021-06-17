@@ -50,7 +50,7 @@ const TechnicalReviewInformation: React.FC<TechnicalReviewInformationProps> = (
           </TableRow>
           <TableRow key="timeAllocation">
             <TableCell>
-              Time Allocation({props.data.proposal?.call?.allocationTimeUnit})
+              Time Allocation({props.data.proposal?.call?.allocationTimeUnit}s)
             </TableCell>
             <TableCell>{props.data.timeAllocation}</TableCell>
           </TableRow>

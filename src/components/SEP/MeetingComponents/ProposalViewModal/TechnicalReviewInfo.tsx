@@ -111,7 +111,7 @@ const OverwriteTimeAllocationDialog = ({
                 id="sepTimeAllocation"
                 type="number"
                 name="sepTimeAllocation"
-                label={`Time Allocation(${sepProposalArgs.proposal.call?.allocationTimeUnit})`}
+                label={`Time Allocation(${sepProposalArgs.proposal.call?.allocationTimeUnit}s)`}
                 value={values.sepTimeAllocation ?? ''}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue(
@@ -191,7 +191,7 @@ const TechnicalReviewInfo: React.FC<TechnicalReviewInfoProps> = ({
                 </TableCell>
                 <TableCell width="25%" className={classes.textBold}>
                   Time allocation(
-                  {sepProposalArgs.proposal.call?.allocationTimeUnit})
+                  {sepProposalArgs.proposal.call?.allocationTimeUnit}s)
                   {hasWriteAccess && (
                     <Tooltip title="Edit" className={classes.spacingLeft}>
                       <IconButton

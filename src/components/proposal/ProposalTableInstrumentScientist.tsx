@@ -141,7 +141,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     {
       title: 'Time allocation',
       render: (rowData) =>
-        `${rowData.technicalReview?.timeAllocation}(${rowData.call?.allocationTimeUnit})`,
+        `${rowData.technicalReview?.timeAllocation}(${rowData.call?.allocationTimeUnit}s)`,
       hidden: false,
     },
     {
