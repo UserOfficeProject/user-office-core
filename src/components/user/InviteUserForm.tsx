@@ -7,16 +7,23 @@ import { TextField } from 'formik-material-ui';
 import React from 'react';
 
 import { UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
-export function InviteUserForm(props: {
+type InviteUserFormProps = {
   action: FunctionType;
   title: string;
   userRole: UserRole;
   close: FunctionType;
-}) {
-  const api = useDataApi();
+};
+
+const InviteUserForm: React.FC<InviteUserFormProps> = ({
+  action,
+  title,
+  userRole,
+  close,
+}) => {
+  const { api } = useDataApiWithFeedback();
   const classes = makeStyles({
     buttons: {
       display: 'flex',
@@ -31,43 +38,47 @@ export function InviteUserForm(props: {
   return (
     <Formik
       initialValues={{
-        name: '',
+        firstname: '',
         lastname: '',
         email: '',
+        userRole: userRole,
       }}
       onSubmit={async (values): Promise<void> => {
-        const createResult = await api().createUserByEmailInvite({
-          firstname: values.name,
+        const createResult = await api(
+          'Invitation sent successfully!'
+        ).createUserByEmailInvite({
+          firstname: values.firstname,
           lastname: values.lastname,
           email: values.email,
-          userRole: props.userRole,
+          userRole: userRole,
         });
-        props.action({
-          firstname: values.name,
+        action({
+          firstname: values.firstname,
           lastname: values.lastname,
           organisation: '',
           id: createResult?.createUserByEmailInvite.id,
         });
-        props.close();
+        close();
       }}
       validationSchema={createUserByEmailInviteValidationSchema(UserRole)}
     >
-      {(subformik) => (
+      {() => (
         <Form>
           <Typography component="h1" variant="h5">
-            {props.title}
+            {title}
           </Typography>
           <Field
-            name="name"
-            label="Name"
+            name="firstname"
+            label="First name"
             type="text"
             component={TextField}
             margin="normal"
             fullWidth
+            data-cy="firstname"
           />
           <Field
             name="lastname"
-            label="Lastname"
+            label="Last name"
             type="text"
             component={TextField}
             margin="normal"
@@ -86,7 +97,7 @@ export function InviteUserForm(props: {
 
           <div className={classes.buttons}>
             <Button
-              onClick={() => props.close()}
+              onClick={() => close()}
               variant="contained"
               color="secondary"
               className={classes.button}
@@ -94,16 +105,19 @@ export function InviteUserForm(props: {
               Cancel
             </Button>
             <Button
-              onClick={() => subformik.submitForm()}
               variant="contained"
               color="primary"
               className={classes.button}
+              type="submit"
+              data-cy="invitation-submit"
             >
-              Invite User
+              {title}
             </Button>
           </div>
         </Form>
       )}
     </Formik>
   );
-}
+};
+
+export default InviteUserForm;

@@ -69,7 +69,7 @@ export default function UpdateUserRoles(props: { id: number }) {
   const columns = [{ title: 'Name', field: 'title' }];
 
   return (
-    <React.Fragment>
+    <div data-cy="user-roles-table">
       <RoleModal
         show={modalOpen}
         close={() => setOpen(false)}
@@ -109,6 +109,6 @@ export default function UpdateUserRoles(props: { id: number }) {
           Add role
         </Button>
       </ActionButtonContainer>
-    </React.Fragment>
+    </div>
   );
 }
