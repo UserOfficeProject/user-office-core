@@ -4,11 +4,15 @@ import { ScheduledEvent, Proposal, ProposalBookingStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { toTzLessDateTime } from 'utils/Time';
 
+import { VisitFragment } from './../../generated/sdk';
+
 export type ProposalScheduledEvent = Pick<
   ScheduledEvent,
   'startsAt' | 'endsAt'
 > & {
-  proposal: Pick<Proposal, 'id' | 'title' | 'shortCode'>;
+  proposal: Pick<Proposal, 'id' | 'title' | 'shortCode'> & {
+    visits: VisitFragment[] | null;
+  };
 };
 
 export function useProposalBookingsScheduledEvents({
@@ -56,6 +60,7 @@ export function useProposalBookingsScheduledEvents({
                     id: proposal.id,
                     title: proposal.title,
                     shortCode: proposal.shortCode,
+                    visits: proposal.visits,
                   },
                 });
               }

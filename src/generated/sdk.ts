@@ -1616,6 +1616,7 @@ export type Proposal = {
   questionary: Maybe<Questionary>;
   sepMeetingDecision: Maybe<SepMeetingDecision>;
   samples: Maybe<Array<Sample>>;
+  visits: Maybe<Array<Visit>>;
   proposalBooking: Maybe<ProposalBooking>;
 };
 
@@ -2926,7 +2927,13 @@ export type UserReviewsArgs = {
 
 
 export type UserProposalsArgs = {
+  filter?: Maybe<UserProposalsFilter>;
+};
+
+export type UserProposalsFilter = {
   instrumentId?: Maybe<Scalars['Int']>;
+  managementDecisionSubmitted?: Maybe<Scalars['Boolean']>;
+  finalStatus?: Maybe<ProposalEndStatus>;
 };
 
 export type UserQueryResult = {
@@ -2957,7 +2964,6 @@ export type Visit = {
   proposalId: Scalars['Int'];
   status: VisitStatus;
   questionaryId: Scalars['Int'];
-  instrumentId: Scalars['Int'];
   visitorId: Scalars['Int'];
   proposal: Proposal;
   team: Array<BasicUserDetails>;
@@ -2986,6 +2992,7 @@ export enum VisitStatus {
 export type VisitsFilter = {
   visitorId?: Maybe<Scalars['Int']>;
   questionaryId?: Maybe<Scalars['Int']>;
+  proposalId?: Maybe<Scalars['Int']>;
 };
 
 export type AssignProposalsToSepMutationVariables = Exact<{
@@ -4409,6 +4416,22 @@ export type GetInstrumentScientistProposalsQuery = (
   )> }
 );
 
+export type GetMyProposalsQueryVariables = Exact<{
+  filter?: Maybe<UserProposalsFilter>;
+}>;
+
+
+export type GetMyProposalsQuery = (
+  { __typename?: 'Query' }
+  & { me: Maybe<(
+    { __typename?: 'User' }
+    & { proposals: Array<(
+      { __typename?: 'Proposal' }
+      & ProposalFragment
+    )> }
+  )> }
+);
+
 export type GetProposalQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -4611,7 +4634,10 @@ export type GetUserProposalBookingsWithEventsQuery = (
           { __typename?: 'ScheduledEvent' }
           & Pick<ScheduledEvent, 'startsAt' | 'endsAt' | 'bookingType'>
         )> }
-      )> }
+      )>, visits: Maybe<Array<(
+        { __typename?: 'Visit' }
+        & VisitFragment
+      )>> }
     )> }
   )> }
 );
@@ -8424,6 +8450,15 @@ export const GetInstrumentScientistProposalsDocument = gql`
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
 ${CoreTechnicalReviewFragmentDoc}`;
+export const GetMyProposalsDocument = gql`
+    query getMyProposals($filter: UserProposalsFilter) {
+  me {
+    proposals(filter: $filter) {
+      ...proposal
+    }
+  }
+}
+    ${ProposalFragmentDoc}`;
 export const GetProposalDocument = gql`
     query getProposal($id: Int!) {
   proposal(id: $id) {
@@ -8616,7 +8651,7 @@ ${RejectionFragmentDoc}`;
 export const GetUserProposalBookingsWithEventsDocument = gql`
     query getUserProposalBookingsWithEvents($endsAfter: TzLessDateTime, $status: [ProposalBookingStatus!], $instrumentId: Int) {
   me {
-    proposals(instrumentId: $instrumentId) {
+    proposals(filter: {instrumentId: $instrumentId}) {
       id
       title
       shortCode
@@ -8627,10 +8662,13 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
           bookingType
         }
       }
+      visits {
+        ...visit
+      }
     }
   }
 }
-    `;
+    ${VisitFragmentDoc}`;
 export const AnswerTopicDocument = gql`
     mutation answerTopic($questionaryId: Int!, $topicId: Int!, $answers: [AnswerInput!]!, $isPartialSave: Boolean) {
   answerTopic(
@@ -10305,6 +10343,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getInstrumentScientistProposals(variables?: GetInstrumentScientistProposalsQueryVariables): Promise<GetInstrumentScientistProposalsQuery> {
       return withWrapper(() => client.request<GetInstrumentScientistProposalsQuery>(print(GetInstrumentScientistProposalsDocument), variables));
+    },
+    getMyProposals(variables?: GetMyProposalsQueryVariables): Promise<GetMyProposalsQuery> {
+      return withWrapper(() => client.request<GetMyProposalsQuery>(print(GetMyProposalsDocument), variables));
     },
     getProposal(variables: GetProposalQueryVariables): Promise<GetProposalQuery> {
       return withWrapper(() => client.request<GetProposalQuery>(print(GetProposalDocument), variables));

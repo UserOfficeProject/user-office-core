@@ -9,8 +9,8 @@ import {
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import { VisitContextType } from 'components/visit/VisitContainer';
-import { BasicUserDetails } from 'generated/sdk';
-import { useUserProposals } from 'hooks/proposal/useUserProposals';
+import { BasicUserDetails, ProposalEndStatus } from 'generated/sdk';
+import { useMyProposals } from 'hooks/proposal/useMyProposals';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { VisitSubmissionState } from 'models/VisitSubmissionState';
 
@@ -24,7 +24,10 @@ function QuestionaryComponentVisitBasis(props: BasicComponentProps) {
   const { answer, formikProps } = props;
   const classes = useStyles();
 
-  const { proposals, loadingProposals } = useUserProposals();
+  const { proposals, loadingProposals } = useMyProposals({
+    managementDecisionSubmitted: true,
+    finalStatus: ProposalEndStatus.ACCEPTED,
+  });
 
   const { dispatch, state } = useContext(
     QuestionaryContext
