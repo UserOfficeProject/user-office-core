@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Role } from '../../models/Role';
+import { Role, Roles } from '../../models/Role';
 import {
   User,
   BasicUserDetails,
@@ -480,5 +480,17 @@ export default class PostgresUserDataSource implements UserDataSource {
       .first();
 
     return !!proposal;
+  }
+
+  async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
+    return database
+      .select()
+      .from('roles')
+      .where('short_code', roleShortCode)
+      .first()
+      .then(
+        (role: RoleRecord) =>
+          new Role(role.role_id, role.short_code, role.title)
+      );
   }
 }
