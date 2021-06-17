@@ -90,6 +90,17 @@ export default class TemplateMutations {
         break;
     }
 
+    const currentActiveTemplateId = await this.dataSource.getActiveTemplateId(
+      args.categoryId
+    );
+    if (!currentActiveTemplateId) {
+      // if there is no active template, then mark newly created template as active
+      await this.dataSource.setActiveTemplate({
+        templateCategoryId: args.categoryId,
+        templateId: newTemplate.templateId,
+      });
+    }
+
     return newTemplate;
   }
 

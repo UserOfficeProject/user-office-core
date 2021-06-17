@@ -26,6 +26,7 @@ import { Sample } from './Sample';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
 import { TechnicalReview } from './TechnicalReview';
+import { Visit } from './Visit';
 
 @ObjectType()
 @Directive('@key(fields: "id")')
@@ -206,6 +207,16 @@ export class ProposalResolver {
   ): Promise<Sample[] | null> {
     return await context.queries.sample.getSamples(context.user, {
       filter: { proposalId: proposal.id },
+    });
+  }
+
+  @FieldResolver(() => [Visit], { nullable: true })
+  async visits(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Visit[] | null> {
+    return await context.queries.visit.getMyVisits(context.user, {
+      proposalId: proposal.id,
     });
   }
 }
