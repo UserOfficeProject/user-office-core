@@ -9,9 +9,9 @@ export class Role {
 export enum Roles {
   USER = 'user',
   USER_OFFICER = 'user_officer',
-  SEP_CHAIR = 'SEP_Chair',
-  SEP_SECRETARY = 'SEP_Secretary',
-  SEP_REVIEWER = 'SEP_Reviewer',
+  SEP_CHAIR = 'sep_chair',
+  SEP_SECRETARY = 'sep_secretary',
+  SEP_REVIEWER = 'sep_reviewer',
   INSTRUMENT_SCIENTIST = 'instrument_scientist',
   SAMPLE_SAFETY_REVIEWER = 'sample_safety_reviewer',
 }

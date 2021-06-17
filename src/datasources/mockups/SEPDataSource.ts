@@ -317,7 +317,7 @@ export class SEPDataSourceMock implements SEPDataSource {
       return null;
     }
 
-    return { id: 4, shortCode: 'SEP_Chair', title: 'SEP Chair' };
+    return { id: 4, shortCode: 'sep_chair', title: 'SEP Chair' };
   }
 
   async assignProposalsToSep({ proposals, sepId }: AssignProposalsToSepArgs) {
