@@ -28,6 +28,9 @@ class PostgresVisitDataSource implements VisitDataSource {
         if (filter?.questionaryId) {
           query.where('questionary_id', filter.questionaryId);
         }
+        if (filter?.proposalId) {
+          query.where('proposal_id', filter.proposalId);
+        }
       })
       .then((visits: VisitRecord[]) =>
         visits.map((visit) => createVisitObject(visit))
