@@ -2917,7 +2917,13 @@ export type UserReviewsArgs = {
 
 
 export type UserProposalsArgs = {
+  filter?: Maybe<UserProposalsFilter>;
+};
+
+export type UserProposalsFilter = {
   instrumentId?: Maybe<Scalars['Int']>;
+  managementDecisionSubmitted?: Maybe<Scalars['Boolean']>;
+  finalStatus?: Maybe<ProposalEndStatus>;
 };
 
 export type UserQueryResult = {
@@ -4393,6 +4399,22 @@ export type GetInstrumentScientistProposalsQuery = (
         { __typename?: 'SEP' }
         & Pick<Sep, 'id' | 'code'>
       )> }
+      & ProposalFragment
+    )> }
+  )> }
+);
+
+export type GetMyProposalsQueryVariables = Exact<{
+  filter?: Maybe<UserProposalsFilter>;
+}>;
+
+
+export type GetMyProposalsQuery = (
+  { __typename?: 'Query' }
+  & { me: Maybe<(
+    { __typename?: 'User' }
+    & { proposals: Array<(
+      { __typename?: 'Proposal' }
       & ProposalFragment
     )> }
   )> }
@@ -8410,6 +8432,15 @@ export const GetInstrumentScientistProposalsDocument = gql`
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
 ${CoreTechnicalReviewFragmentDoc}`;
+export const GetMyProposalsDocument = gql`
+    query getMyProposals($filter: UserProposalsFilter) {
+  me {
+    proposals(filter: $filter) {
+      ...proposal
+    }
+  }
+}
+    ${ProposalFragmentDoc}`;
 export const GetProposalDocument = gql`
     query getProposal($id: Int!) {
   proposal(id: $id) {
@@ -8600,7 +8631,7 @@ ${RejectionFragmentDoc}`;
 export const GetUserProposalBookingsWithEventsDocument = gql`
     query getUserProposalBookingsWithEvents($endsAfter: TzLessDateTime, $status: [ProposalBookingStatus!], $instrumentId: Int) {
   me {
-    proposals(instrumentId: $instrumentId) {
+    proposals(filter: {instrumentId: $instrumentId}) {
       id
       title
       shortCode
@@ -10289,6 +10320,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getInstrumentScientistProposals(variables?: GetInstrumentScientistProposalsQueryVariables): Promise<GetInstrumentScientistProposalsQuery> {
       return withWrapper(() => client.request<GetInstrumentScientistProposalsQuery>(print(GetInstrumentScientistProposalsDocument), variables));
+    },
+    getMyProposals(variables?: GetMyProposalsQueryVariables): Promise<GetMyProposalsQuery> {
+      return withWrapper(() => client.request<GetMyProposalsQuery>(print(GetMyProposalsDocument), variables));
     },
     getProposal(variables: GetProposalQueryVariables): Promise<GetProposalQuery> {
       return withWrapper(() => client.request<GetProposalQuery>(print(GetProposalDocument), variables));
