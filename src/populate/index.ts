@@ -15,6 +15,7 @@ import ReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import SEPDataSource from '../datasources/postgres/SEPDataSource';
 import TemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import UserDataSource from '../datasources/postgres/UserDataSource';
+import { AllocationTimeUnits } from '../models/Call';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import {
@@ -159,7 +160,7 @@ const createCalls = async () => {
       surveyComment: faker.random.words(5),
       proposalWorkflowId: 1,
       templateId: dummy.positiveNumber(MAX_TEMPLATES),
-      allocationTimeUnit: 0,
+      allocationTimeUnit: AllocationTimeUnits.Day,
     });
   }, MAX_CALLS);
 };

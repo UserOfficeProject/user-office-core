@@ -26,6 +26,6 @@ export class Call {
 }
 
 export enum AllocationTimeUnits {
-  Days,
-  Hours,
+  Day = 'day',
+  Hour = 'hour',
 }

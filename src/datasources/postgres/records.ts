@@ -1,6 +1,6 @@
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
-import { Call } from '../../models/Call';
+import { AllocationTimeUnits, Call } from '../../models/Call';
 import {
   DependenciesLogicOperator,
   EvaluatorOperator,
@@ -92,7 +92,7 @@ export interface ProposalViewRecord {
   readonly instrument_id: number;
   readonly call_id: number;
   readonly submitted: boolean;
-  readonly allocation_time_unit: number;
+  readonly allocation_time_unit: AllocationTimeUnits;
 }
 
 export interface TopicRecord {
@@ -243,7 +243,7 @@ export interface CallRecord {
   readonly call_review_ended: boolean;
   readonly call_sep_review_ended: boolean;
   readonly template_id: number;
-  readonly allocation_time_unit: number;
+  readonly allocation_time_unit: AllocationTimeUnits;
 }
 
 export interface PageTextRecord {
