@@ -85,7 +85,7 @@ context('Proposal tests', () => {
 
     cy.get('[data-cy="allocation-time-unit"]').click();
 
-    cy.contains('Hours').click();
+    cy.contains('Hour').click();
 
     cy.get('[data-cy="next-step"]').click();
     cy.get('[data-cy="next-step"]').click();
