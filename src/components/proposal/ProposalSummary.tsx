@@ -25,10 +25,6 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'flex-end',
   },
-  disabled: {
-    pointerEvents: 'none',
-    opacity: 0.7,
-  },
   button: {
     marginTop: ({ proposal }: { proposal: ProposalSubsetSubmission }) =>
       proposal.status?.id === 0 ? '40px' : 'auto',
@@ -47,7 +43,7 @@ type ProposalSummaryProps = {
   confirm: WithConfirmType;
 };
 
-function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
+function ProposalReview({ confirm }: ProposalSummaryProps) {
   const { state, dispatch } = useContext(
     QuestionaryContext
   ) as ProposalContextType;
@@ -87,10 +83,7 @@ function ProposalReview({ readonly, confirm }: ProposalSummaryProps) {
 
   return (
     <>
-      <ProposalQuestionaryReview
-        data={proposal}
-        className={readonly ? classes.disabled : undefined}
-      />
+      <ProposalQuestionaryReview data={proposal} />
       <div className={classes.buttons}>
         <NavigationFragment disabled={proposal.status?.id === 0}>
           <NavigButton
