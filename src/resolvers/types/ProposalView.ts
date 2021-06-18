@@ -1,5 +1,6 @@
 import { Field, Float, Int, ObjectType } from 'type-graphql';
 
+import { AllocationTimeUnits } from '../../models/Call';
 import {
   Proposal as ProposalOrigin,
   ProposalEndStatus,
@@ -67,4 +68,7 @@ export class ProposalView implements Partial<ProposalOrigin> {
 
   @Field(() => Int)
   public callId: number;
+
+  @Field(() => AllocationTimeUnits)
+  public allocationTimeUnit: AllocationTimeUnits;
 }

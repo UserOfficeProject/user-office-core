@@ -1,4 +1,4 @@
-import { Call } from '../../models/Call';
+import { AllocationTimeUnits, Call } from '../../models/Call';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
@@ -30,7 +30,8 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.callEnded || false,
     values?.callReviewEnded || false,
     values?.callSEPReviewEnded || false,
-    values?.templateId || 1
+    values?.templateId || 1,
+    values?.allocationTimeUnit || AllocationTimeUnits.Day
   );
 };
 
@@ -55,7 +56,8 @@ export const dummyCall = new Call(
   false,
   false,
   false,
-  1
+  1,
+  AllocationTimeUnits.Day
 );
 
 export const anotherDummyCall = new Call(
@@ -79,7 +81,8 @@ export const anotherDummyCall = new Call(
   true,
   false,
   false,
-  1
+  1,
+  AllocationTimeUnits.Day
 );
 
 export const dummyCalls = [dummyCall, anotherDummyCall];
