@@ -43,6 +43,7 @@ query getSEPProposal($sepId: Int!, $proposalId: Int!) {
       call {
         id
         shortCode
+        allocationTimeUnit
       }
     }
   }

@@ -6,8 +6,9 @@ import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
 
-import FormikDropdown from 'components/common/FormikDropdown';
+import FormikDropdown, { Option } from 'components/common/FormikDropdown';
 import {
+  AllocationTimeUnits,
   CreateCallMutationVariables,
   GetProposalTemplatesQuery,
   ProposalWorkflow,
@@ -29,6 +30,13 @@ const CallGeneralInfo: React.FC<{
     text: proposalWorkflow.name,
     value: proposalWorkflow.id,
   }));
+
+  const allocationTimeUnitOptions = Object.values(AllocationTimeUnits).map(
+    (key) => ({
+      text: key,
+      value: key,
+    })
+  );
 
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
@@ -111,6 +119,12 @@ const CallGeneralInfo: React.FC<{
           'data-cy': 'call-workflow',
         }}
         isClearable
+      />
+      <FormikDropdown
+        name="allocationTimeUnit"
+        label="Allocation time unit"
+        items={allocationTimeUnitOptions as Option[]}
+        InputProps={{ 'data-cy': 'allocation-time-unit' }}
       />
     </>
   );
