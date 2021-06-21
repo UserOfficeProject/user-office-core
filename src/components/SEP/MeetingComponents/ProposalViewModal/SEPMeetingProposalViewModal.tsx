@@ -146,7 +146,7 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
                           sepTimeAllocation,
                         })
                       }
-                      proposalId={proposalData.id}
+                      proposal={proposalData}
                       sepId={sepId}
                     />
                     <ExternalReviews

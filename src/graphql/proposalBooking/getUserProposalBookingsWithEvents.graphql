@@ -4,7 +4,7 @@ query getUserProposalBookingsWithEvents(
   $instrumentId: Int
 ) {
   me {
-    proposals(instrumentId: $instrumentId) {
+    proposals(filter: { instrumentId: $instrumentId }) {
       id
       title
       shortCode
@@ -14,6 +14,9 @@ query getUserProposalBookingsWithEvents(
           endsAt
           bookingType
         }
+      }
+      visits {
+        ...visit
       }
     }
   }

@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
-import { Call } from 'generated/sdk';
+import { Call, AllocationTimeUnits } from 'generated/sdk';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
 import { useProposalsTemplates } from 'hooks/template/useProposalTemplates';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -59,6 +59,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         surveyComment: '',
         proposalWorkflowId: '',
         templateId: '',
+        allocationTimeUnit: AllocationTimeUnits.DAY,
       };
 
   const closeModal = (error: string | null | undefined, callToReturn: Call) => {

@@ -9,6 +9,7 @@ context('visits tests', () => {
 
   beforeEach(() => {
     cy.viewport(1920, 1080);
+    cy.visit('/');
   });
 
   const proposalTitle = faker.lorem.words(2);
@@ -44,6 +45,46 @@ context('visits tests', () => {
     cy.navigateToTemplatesSubmenu('Visit templates');
 
     cy.get("[title='Mark as active']").click();
+  });
+
+  it('Should not be able to create visit for proposal that is not accepted', () => {
+    cy.login('user');
+
+    cy.createProposal(proposalTitle);
+
+    cy.contains('Submit').click();
+
+    cy.contains('OK').click();
+
+    cy.contains('Visits').click();
+
+    cy.contains('Create').click();
+
+    cy.get("[id='mui-component-select-visit_basis.proposalId']")
+      .first()
+      .click();
+
+    cy.should('not.contain', proposalTitle);
+
+    cy.visit('/');
+
+    cy.logout();
+
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.get('[data-cy=view-proposal]').click();
+    cy.finishedLoading();
+    cy.get('[role="dialog"]').contains('Admin').click();
+
+    cy.get('#mui-component-select-finalStatus').click();
+
+    cy.contains('Accepted').click();
+
+    cy.get('[data-cy="is-management-decision-submitted"]').click();
+
+    cy.get('[data-cy="save-admin-decision"]').click();
   });
 
   it('Should be able to create visit', () => {
@@ -90,10 +131,6 @@ context('visits tests', () => {
     cy.notification({ variant: 'success', text: 'Saved' });
 
     cy.get('[data-cy=confirm-ok]').click();
-
-    cy.get('body').type('{esc}');
-
-    cy.contains(proposalTitle);
   });
 
   it('Should be able to delete visit', () => {

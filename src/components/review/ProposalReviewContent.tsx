@@ -15,6 +15,7 @@ import SEPMeetingDecision from 'components/SEP/MeetingComponents/ProposalViewMod
 import { UserContext } from 'context/UserContextProvider';
 import {
   CoreTechnicalReviewFragment,
+  Proposal,
   Review,
   TechnicalReview,
   UserRole,
@@ -136,7 +137,7 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
       <>
         {assignAnotherReviewerView(proposalData)}
         <ProposalTechnicalReview
-          id={proposalData.id}
+          proposal={proposalData as Proposal}
           data={proposalData.technicalReview}
           setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
             setProposalData({

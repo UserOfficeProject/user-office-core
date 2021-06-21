@@ -39,6 +39,7 @@ query getProposal($id: Int!) {
       id
       shortCode
       isActive
+      allocationTimeUnit
     }
     sep {
       id

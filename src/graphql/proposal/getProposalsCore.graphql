@@ -20,5 +20,6 @@ query getProposalsCore($filter: ProposalsFilter) {
     instrumentId
     callId
     submitted
+    allocationTimeUnit
   }
 }

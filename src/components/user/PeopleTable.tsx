@@ -12,7 +12,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
-import { InviteUserForm } from './InviteUserForm';
+import InviteUserForm from './InviteUserForm';
 
 function sendUserRequest(
   searchQuery: Query<any>,
@@ -53,6 +53,12 @@ function sendUserRequest(
     });
 }
 
+type InvitationButtonProps = {
+  title: string;
+  action: FunctionType;
+  'data-cy'?: string;
+};
+
 type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   selection: boolean;
   isLoading?: boolean;
@@ -70,7 +76,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   onRemove?: FunctionType<void, T>;
   onUpdate?: FunctionType<void, [any[]]>;
   emailInvite?: boolean;
-  invitationButtons?: { title: string; action: FunctionType }[];
+  invitationButtons?: InvitationButtonProps[];
   selectedUsers?: number[];
   mtOptions?: Options;
   columns?: Column<any>[];
@@ -298,19 +304,18 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
       )}
       {props.invitationButtons && (
         <ActionButtonContainer>
-          {props.invitationButtons?.map(
-            (item: { title: string; action: FunctionType }, i) => (
-              <Button
-                type="button"
-                variant="contained"
-                color="primary"
-                onClick={() => item.action()}
-                key={i}
-              >
-                {item.title}
-              </Button>
-            )
-          )}
+          {props.invitationButtons?.map((item: InvitationButtonProps, i) => (
+            <Button
+              type="button"
+              variant="contained"
+              color="primary"
+              onClick={() => item.action()}
+              data-cy={item['data-cy']}
+              key={i}
+            >
+              {item.title}
+            </Button>
+          ))}
         </ActionButtonContainer>
       )}
     </div>
