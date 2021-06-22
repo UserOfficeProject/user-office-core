@@ -277,6 +277,47 @@ export class StfcUserDataSource implements UserDataSource {
     };
   }
 
+  async getPreviousCollaborators(
+    userId: number,
+    filter?: string,
+    first?: number,
+    offset?: number,
+    userRole?: number,
+    subtractUsers?: [number]
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
+    if (userId == -1) {
+      return this.getUsers(filter, first, offset, userRole, subtractUsers);
+    }
+    const dbUsers: BasicUserDetails[] = (
+      await this.getPreviousCollaborators(
+        userId,
+        filter,
+        first,
+        offset,
+        userRole,
+        subtractUsers
+      )
+    ).users;
+
+    let users: BasicUserDetails[] = [];
+
+    if (dbUsers[0]) {
+      const userNumbers: string[] = dbUsers.map((record) => String(record.id));
+      const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
+        await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+      )?.return;
+
+      users = stfcBasicPeople
+        ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
+        : [];
+    }
+
+    return {
+      totalCount: users.length,
+      users,
+    };
+  }
+
   async getProposalUsers(proposalId: number): Promise<BasicUserDetails[]> {
     const users: BasicUserDetails[] = await postgresUserDataSource.getProposalUsers(
       proposalId

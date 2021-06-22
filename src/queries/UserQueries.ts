@@ -174,6 +174,26 @@ export default class UserQueries {
     );
   }
 
+  @Authorized()
+  async getPreviousCollaborators(
+    agent: UserWithRole | null,
+    userId: number,
+    filter?: string,
+    first?: number,
+    offset?: number,
+    userRole?: UserRole,
+    subtractUsers?: [number]
+  ) {
+    return this.dataSource.getPreviousCollaborators(
+      userId,
+      filter,
+      first,
+      offset,
+      userRole,
+      subtractUsers
+    );
+  }
+
   @Authorized([Roles.USER_OFFICER])
   async getRoles(agent: UserWithRole | null) {
     return this.dataSource.getRoles();

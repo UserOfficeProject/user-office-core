@@ -25,6 +25,14 @@ export interface UserDataSource {
     userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
+  getPreviousCollaborators(
+    user_id: number,
+    filter?: string,
+    first?: number,
+    offset?: number,
+    userRole?: UserRole,
+    subtractUsers?: [number]
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getRoles(): Promise<Role[]>;
   getProposalUsers(proposalId: number): Promise<BasicUserDetails[]>;
   getProposalUsersFull(proposalId: number): Promise<User[]>;

@@ -291,6 +291,18 @@ export class UserDataSourceMock implements UserDataSource {
     };
   }
 
+  async getPreviousCollaborators(
+    user_id: number,
+    filter?: string,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
+    return {
+      totalCount: 2,
+      users: [basicDummyUser, basicDummyUserNotOnProposal],
+    };
+  }
+
   async getProposalUsers(id: number) {
     return [basicDummyUser];
   }
