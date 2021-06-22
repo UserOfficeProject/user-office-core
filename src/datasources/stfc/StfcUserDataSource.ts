@@ -365,4 +365,8 @@ export class StfcUserDataSource implements UserDataSource {
   ): Promise<User> {
     throw new Error('Method not implemented.');
   }
+
+  async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
+    throw new Error('Method not implemented.');
+  }
 }

@@ -30,9 +30,6 @@ export class Visit implements Partial<VisitOrigin> {
   public questionaryId: number;
 
   @Field(() => Int)
-  public instrumentId: number;
-
-  @Field(() => Int)
   public visitorId: number;
 }
 

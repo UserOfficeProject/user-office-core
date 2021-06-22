@@ -246,7 +246,7 @@ export default class PostgresInstrumentDataSource
       (proposalInstrumentPair) => proposalInstrumentPair.proposal_id
     );
 
-    if (proposalInstrumentPairs) {
+    if (proposalInstrumentPairs?.length) {
       /**
        * NOTE: We need to return changed proposalIds because we listen to events and
        * we need to do some changes on proposals based on what is changed.

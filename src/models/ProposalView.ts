@@ -1,3 +1,4 @@
+import { AllocationTimeUnits } from './Call';
 import { TechnicalReviewStatus } from './TechnicalReview';
 export class ProposalView {
   constructor(
@@ -14,11 +15,13 @@ export class ProposalView {
     public technicalStatus: TechnicalReviewStatus,
     public instrumentName: string,
     public callShortCode: string,
+    public sepId: number,
     public sepCode: string,
     public reviewAverage: number,
     public reviewDeviation: number,
     public instrumentId: number,
     public callId: number,
-    public submitted: boolean
+    public submitted: boolean,
+    public allocationTimeUnit: AllocationTimeUnits
   ) {}
 }

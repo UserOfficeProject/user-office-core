@@ -21,6 +21,7 @@ import { CreateUnitArgs } from '../resolvers/mutations/CreateUnitMutation';
 import { DeleteApiAccessTokenInput } from '../resolvers/mutations/DeleteApiAccessTokenMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
+import { enableDefaultFeaturesForDevelopment } from '../utils/enableDefaultFeaturesForDevelopment';
 import { generateUniqueId } from '../utils/helperFunctions';
 import { signToken } from '../utils/jwt';
 
@@ -39,7 +40,10 @@ export default class AdminMutations {
     if (process.env.NODE_ENV === 'development') {
       logger.logWarn('Resetting database', {});
 
-      return this.dataSource.resetDB(includeSeeds);
+      const log = await this.dataSource.resetDB(includeSeeds);
+      enableDefaultFeaturesForDevelopment();
+
+      return log;
     } else {
       return rejection('Resetting database is not allowed');
     }
@@ -75,7 +79,7 @@ export default class AdminMutations {
   ) {
     const institution = await this.dataSource.getInstitution(args.id);
     if (!institution) {
-      return rejection('Could not retrieve insititutions');
+      return rejection('Could not retrieve institutions');
     }
 
     institution.name = args.name ?? institution.name;

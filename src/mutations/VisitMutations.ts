@@ -5,6 +5,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
+import { ProposalEndStatus } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
 import { Rejection } from '../models/Rejection';
 import { TemplateCategoryId } from '../models/Template';
@@ -42,6 +43,19 @@ export default class VisitMutations {
         args,
         agent: user,
       });
+    }
+
+    if (
+      proposal.finalStatus !== ProposalEndStatus.ACCEPTED ||
+      proposal.managementDecisionSubmitted === false
+    ) {
+      return rejection(
+        'Can not create visit, the proposal is not yet accepted',
+        {
+          args,
+          agent: user,
+        }
+      );
     }
 
     const isProposalOwner = await this.userAuthorization.hasAccessRights(

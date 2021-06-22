@@ -1,4 +1,4 @@
-import { Role } from '../models/Role';
+import { Role, Roles } from '../models/Role';
 import { User, BasicUserDetails, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
@@ -69,4 +69,5 @@ export interface UserDataSource {
     userId: number,
     proposalId: number
   ): Promise<boolean>;
+  getRoleByShortCode(roleShortCode: Roles): Promise<Role>;
 }

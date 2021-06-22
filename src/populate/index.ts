@@ -15,6 +15,7 @@ import ReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import SEPDataSource from '../datasources/postgres/SEPDataSource';
 import TemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import UserDataSource from '../datasources/postgres/UserDataSource';
+import { AllocationTimeUnits } from '../models/Call';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import {
@@ -159,6 +160,7 @@ const createCalls = async () => {
       surveyComment: faker.random.words(5),
       proposalWorkflowId: 1,
       templateId: dummy.positiveNumber(MAX_TEMPLATES),
+      allocationTimeUnit: AllocationTimeUnits.Day,
     });
   }, MAX_CALLS);
 };
@@ -333,7 +335,10 @@ const createSeps = async () => {
     const proposalIds = createUniqueIntArray(5, MAX_PROPOSALS);
     for (const proposalId of proposalIds) {
       const tmpUserId = dummy.positiveNumber(MAX_USERS);
-      await sepDataSource.assignProposal(proposalId, sep.id);
+      await sepDataSource.assignProposalsToSep({
+        proposals: [{ id: proposalId, callId: 1 }],
+        sepId: sep.id,
+      });
       await sepDataSource.assignMemberToSEPProposal(proposalId, sep.id, [
         tmpUserId,
       ]);

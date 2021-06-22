@@ -24,4 +24,5 @@ export const Tokens = {
   MailService: Symbol('MailService'),
   VisitDataSource: Symbol('VisitDataSource'),
   VisitAuthorization: Symbol('VisitAuthorization'),
+  EnableDefaultFeatures: Symbol('EnableDefaultFeatures'),
 };

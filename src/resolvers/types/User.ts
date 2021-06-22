@@ -8,9 +8,12 @@ import {
   Resolver,
   Root,
   Arg,
+  ArgsType,
+  InputType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { ProposalEndStatus } from '../../models/Proposal';
 import { ReviewerFilter, ReviewStatus } from '../../models/Review';
 import { User as UserOrigin } from '../../models/User';
 import { Instrument } from './Instrument';
@@ -18,6 +21,24 @@ import { Proposal } from './Proposal';
 import { Review } from './Review';
 import { Role } from './Role';
 import { SEP } from './SEP';
+
+@InputType()
+export class UserProposalsFilter {
+  @Field(() => Int, { nullable: true })
+  public instrumentId?: number;
+
+  @Field(() => Boolean, { nullable: true })
+  public managementDecisionSubmitted?: boolean;
+
+  @Field(() => ProposalEndStatus, { nullable: true })
+  public finalStatus?: ProposalEndStatus;
+}
+
+@ArgsType()
+export class UserProposalsArgs {
+  @Field(() => UserProposalsFilter, { nullable: true })
+  filter?: UserProposalsFilter;
+}
 
 @ObjectType()
 @Directive('@key(fields: "id")')
@@ -130,12 +151,13 @@ export class UserResolver {
   async proposals(
     @Root() user: User,
     @Ctx() context: ResolverContext,
-    @Arg('instrumentId', () => Int, { nullable: true })
-    instrumentId?: number | null
+    @Arg('filter', () => UserProposalsFilter, { nullable: true })
+    filter: UserProposalsFilter
   ) {
-    return context.queries.proposal.dataSource.getUserProposals(user.id, {
-      instrumentId,
-    });
+    return context.queries.proposal.dataSource.getUserProposals(
+      user.id,
+      filter
+    );
   }
 
   @FieldResolver(() => [SEP])
@@ -161,7 +183,7 @@ export async function resolveUserReference(...params: any): Promise<User> {
   // the order of the parameters and types are messed up,
   // it should be source, args, context, resolveInfo
   // but instead we get source, context and resolveInfo
-  // this was the easies way to make the compiler happy and use real types
+  // this was the easiest way to make the compiler happy and use real types
   const [reference, ctx]: [Pick<User, 'id'>, ResolverContext] = params;
 
   // dataSource.get can be null, even with non-null operator the compiler complains

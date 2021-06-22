@@ -8,6 +8,7 @@ import { Proposal, ProposalIdsWithNextStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
+import { UserProposalsFilter } from '../../resolvers/types/User';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
@@ -490,7 +491,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async getUserProposals(
     id: number,
-    filter?: { instrumentId?: number | null }
+    filter?: UserProposalsFilter
   ): Promise<Proposal[]> {
     return database
       .select('p.*')
@@ -506,6 +507,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             'p.proposal_id': 'ihp.proposal_id',
           });
           qb.where('ihp.instrument_id', filter.instrumentId);
+        }
+
+        if (filter?.managementDecisionSubmitted) {
+          qb.where(
+            'p.management_decision_submitted',
+            filter.managementDecisionSubmitted
+          );
+        }
+
+        if (filter?.finalStatus) {
+          qb.where('p.final_status', filter.finalStatus);
         }
       })
       .groupBy('p.proposal_id')

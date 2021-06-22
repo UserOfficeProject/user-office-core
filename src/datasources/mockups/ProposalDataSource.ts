@@ -85,6 +85,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       submitted: true,
       finalStatus: ProposalEndStatus.ACCEPTED,
       notified: true,
+      managementDecisionSubmitted: true,
     });
 
     dummyProposalWithNotActiveCall = dummyProposalFactory({
@@ -183,7 +184,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getInstrumentScientistProposals(
-    scientsitId: number,
+    scientistId: number,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number

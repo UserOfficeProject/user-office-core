@@ -14,6 +14,7 @@ import files from './src/middlewares/files';
 import apolloServer from './src/middlewares/graphql';
 import healthCheck from './src/middlewares/healthCheck';
 import readinessCheck from './src/middlewares/readinessCheck';
+import { enableDefaultFeaturesForDevelopment } from './src/utils/enableDefaultFeaturesForDevelopment';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 4000;
@@ -39,6 +40,7 @@ async function bootstrap() {
   console.info(`Running a GraphQL API server at localhost:${PORT}/graphql`);
 
   startAsyncJobs();
+  enableDefaultFeaturesForDevelopment();
 }
 
 bootstrap();

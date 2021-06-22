@@ -6,6 +6,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { AllocationTimeUnits } from '../models/Call';
 import CallMutations from './CallMutations';
 
 const callMutations = container.resolve(CallMutations);
@@ -30,6 +31,7 @@ describe('Test Call Mutations', () => {
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
         proposalWorkflowId: 1,
+        allocationTimeUnit: AllocationTimeUnits.Day,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -61,6 +63,7 @@ describe('Test Call Mutations', () => {
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
         proposalWorkflowId: 1,
+        allocationTimeUnit: AllocationTimeUnits.Day,
       })
     ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
   });
@@ -83,6 +86,7 @@ describe('Test Call Mutations', () => {
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
       proposalWorkflowId: 1,
+      allocationTimeUnit: AllocationTimeUnits.Day,
     };
 
     return expect(
@@ -108,6 +112,7 @@ describe('Test Call Mutations', () => {
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
       proposalWorkflowId: 1,
+      allocationTimeUnit: AllocationTimeUnits.Day,
     };
 
     return expect(
@@ -142,6 +147,7 @@ describe('Test Call Mutations', () => {
         cycleComment: 'Comment review update',
         surveyComment: 'Comment feedback update',
         proposalWorkflowId: 1,
+        allocationTimeUnit: AllocationTimeUnits.Day,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -165,6 +171,7 @@ describe('Test Call Mutations', () => {
       cycleComment: 'Comment review update',
       surveyComment: 'Comment feedback update',
       proposalWorkflowId: 1,
+      allocationTimeUnit: AllocationTimeUnits.Day,
     };
 
     return expect(

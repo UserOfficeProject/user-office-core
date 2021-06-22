@@ -1,4 +1,4 @@
-import { Role } from '../../models/Role';
+import { Role, Roles } from '../../models/Role';
 import { BasicUserDetails, User, UserWithRole } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
@@ -255,7 +255,7 @@ export class UserDataSourceMock implements UserDataSource {
         },
       ];
     } else if (id === 1001) {
-      return [{ id: 2, shortCode: 'SEP_Reviewer', title: 'User' }];
+      return [{ id: 2, shortCode: 'sep_reviewer', title: 'User' }];
     } else {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }
@@ -324,5 +324,9 @@ export class UserDataSourceMock implements UserDataSource {
 
   async ensureDummyUserExists(userId: number): Promise<User> {
     return dummyUser;
+  }
+
+  async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
+    return { id: 1, shortCode: 'user_officer', title: 'User Officer' };
   }
 }

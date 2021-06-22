@@ -1,6 +1,6 @@
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
-import { Call } from '../../models/Call';
+import { AllocationTimeUnits, Call } from '../../models/Call';
 import {
   DependenciesLogicOperator,
   EvaluatorOperator,
@@ -85,12 +85,14 @@ export interface ProposalViewRecord {
   readonly technical_review_status: number;
   readonly instrument_name: string;
   readonly call_short_code: string;
+  readonly sep_id: number;
   readonly sep_code: string;
   readonly average: number;
   readonly deviation: number;
   readonly instrument_id: number;
   readonly call_id: number;
   readonly submitted: boolean;
+  readonly allocation_time_unit: AllocationTimeUnits;
 }
 
 export interface TopicRecord {
@@ -241,6 +243,7 @@ export interface CallRecord {
   readonly call_review_ended: boolean;
   readonly call_sep_review_ended: boolean;
   readonly template_id: number;
+  readonly allocation_time_unit: AllocationTimeUnits;
 }
 
 export interface PageTextRecord {
@@ -561,12 +564,14 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.technical_review_status,
     proposal.instrument_name,
     proposal.call_short_code,
+    proposal.sep_id,
     proposal.sep_code,
     proposal.average,
     proposal.deviation,
     proposal.instrument_id,
     proposal.call_id,
-    proposal.submitted
+    proposal.submitted,
+    proposal.allocation_time_unit
   );
 };
 
@@ -680,7 +685,8 @@ export const createCallObject = (call: CallRecord) => {
     call.call_ended,
     call.call_review_ended,
     call.call_sep_review_ended,
-    call.template_id
+    call.template_id,
+    call.allocation_time_unit
   );
 };
 

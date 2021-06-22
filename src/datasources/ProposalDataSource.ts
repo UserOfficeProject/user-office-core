@@ -3,6 +3,7 @@ import { Call } from '../models/Call';
 import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
+import { UserProposalsFilter } from '../resolvers/types/User';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 import { ProposalEventsRecord } from './postgres/records';
 
@@ -24,7 +25,7 @@ export interface ProposalDataSource {
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
   getUserProposals(
     id: number,
-    filter?: { instrumentId?: number | null }
+    filter?: UserProposalsFilter
   ): Promise<Proposal[]>;
 
   // Write

@@ -10,7 +10,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Call as CallOrigin } from '../../models/Call';
+import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
 import { InstrumentWithAvailabilityTime } from './Instrument';
 import { ProposalWorkflow } from './ProposalWorkflow';
 
@@ -67,6 +67,9 @@ export class Call implements Partial<CallOrigin> {
 
   @Field(() => Int, { nullable: true })
   public proposalWorkflowId: number;
+
+  @Field(() => AllocationTimeUnits)
+  public allocationTimeUnit: AllocationTimeUnits;
 
   @Field(() => Int, { nullable: true })
   public templateId?: number;

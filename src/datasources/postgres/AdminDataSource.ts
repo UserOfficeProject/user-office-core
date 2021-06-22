@@ -14,6 +14,7 @@ import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource, Entry } from '../AdminDataSource';
+import { FeatureId } from './../../models/Feature';
 import { InstitutionsFilter } from './../../resolvers/queries/InstitutionsQuery';
 import database from './database';
 import {
@@ -157,6 +158,17 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .where('pagetext_id', id)
       .first()
       .then((res) => (res ? res.content : null));
+  }
+
+  async setFeatures(
+    features: FeatureId[],
+    value: boolean
+  ): Promise<FeatureId[]> {
+    await database('features')
+      .update({ is_enabled: value })
+      .whereIn('feature_id', features);
+
+    return features;
   }
 
   async setPageText(id: number, content: string): Promise<Page> {
