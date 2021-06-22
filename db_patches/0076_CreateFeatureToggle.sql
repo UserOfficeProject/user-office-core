@@ -13,9 +13,9 @@ BEGIN
       ); 
 
       INSERT INTO 
-        features(feature_id, is_enabled, description)
+        features(feature_id, description)
       VALUES
-        ('SHIPPING', true, 'Shipping feature');
+        ('SHIPPING', 'Shipping feature');
     END;
 	END IF;
 END;
