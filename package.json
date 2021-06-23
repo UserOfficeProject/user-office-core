@@ -75,7 +75,7 @@
     "request-promise": "^4.2.6",
     "sanitize-html": "^2.4.0",
     "simple-oauth2": "^4.2.0",
-    "soap": "^0.38.0",
+    "soap": "^0.39.0",
     "sparkpost": "^2.1.4",
     "tsyringe": "^4.5.0",
     "type-graphql": "^1.1.1",
