@@ -60,7 +60,7 @@ context('visits tests', () => {
 
     cy.contains('Create').click();
 
-    cy.get("[id='mui-component-select-visit_basis.proposalId']")
+    cy.get("[id='mui-component-select-visit_basis.proposalPk']")
       .first()
       .click();
 
@@ -104,7 +104,7 @@ context('visits tests', () => {
 
     cy.contains('Proposal is required');
 
-    cy.get("[id='mui-component-select-visit_basis.proposalId']")
+    cy.get("[id='mui-component-select-visit_basis.proposalPk']")
       .first()
       .click();
 

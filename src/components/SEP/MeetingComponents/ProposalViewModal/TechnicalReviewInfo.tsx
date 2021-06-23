@@ -72,7 +72,7 @@ const OverwriteTimeAllocationDialog = ({
 
   const initialValues = {
     ...sepProposalArgs,
-    proposalId: sepProposalArgs.proposal.id,
+    proposalPk: sepProposalArgs.proposal.primaryKey,
     sepTimeAllocation: timeAllocation,
   };
 

@@ -1,6 +1,6 @@
 fragment visit on Visit {
   id
-  proposalId
+  proposalPk
   status
   questionaryId
   visitorId

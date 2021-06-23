@@ -1,5 +1,5 @@
-mutation removeProposalsFromSep($proposalIds: [Int!]!, $sepId: Int!) {
-  removeProposalsFromSep(proposalIds: $proposalIds, sepId: $sepId) {
+mutation removeProposalsFromSep($proposalPks: [Int!]!, $sepId: Int!) {
+  removeProposalsFromSep(proposalPks: $proposalPks, sepId: $sepId) {
     rejection {
       ...rejection
     }

@@ -8,7 +8,7 @@ mutation saveSepMeetingDecision(
       ...rejection
     }
     sepMeetingDecision {
-      proposalId
+      proposalPk
     }
   }
 }

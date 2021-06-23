@@ -52,7 +52,7 @@ const ProposalTable = ({
     PartialProposalsDataType[] | undefined
   >([]);
   const [openCallSelection, setOpenCallSelection] = useState(false);
-  const [proposalToCloneId, setProposalToCloneId] = useState<number | null>(
+  const [proposalToClonePk, setProposalToCloneId] = useState<number | null>(
     null
   );
 
@@ -65,7 +65,7 @@ const ProposalTable = ({
   }, [searchQuery]);
 
   const columns = [
-    { title: 'Proposal ID', field: 'shortCode' },
+    { title: 'Proposal ID', field: 'proposalId' },
     { title: 'Title', field: 'title' },
     { title: 'Status', field: 'publicStatus' },
     {
@@ -76,22 +76,22 @@ const ProposalTable = ({
     { title: 'Created', field: 'created' },
   ];
 
-  const [editProposalID, setEditProposalID] = useState(0);
+  const [editProposalPk, setEditProposalPk] = useState(0);
 
-  if (editProposalID) {
-    return <Redirect push to={`/ProposalEdit/${editProposalID}`} />;
+  if (editProposalPk) {
+    return <Redirect push to={`/ProposalEdit/${editProposalPk}`} />;
   }
 
   const cloneProposalToCall = async (call: Call) => {
     setProposalToCloneId(null);
 
-    if (!call?.id || !proposalToCloneId) {
+    if (!call?.id || !proposalToClonePk) {
       return;
     }
 
     const result = await api('Proposal cloned successfully').cloneProposal({
       callId: call.id,
-      proposalToCloneId,
+      proposalToClonePk,
     });
 
     const resultProposal = result.cloneProposal.proposal;
@@ -102,12 +102,12 @@ const ProposalTable = ({
       resultProposal
     ) {
       const newClonedProposal = {
-        id: resultProposal.id,
+        primaryKey: resultProposal.primaryKey,
         title: resultProposal.title,
         status: getProposalStatus(resultProposal),
         publicStatus: resultProposal.publicStatus,
         submitted: resultProposal.submitted,
-        shortCode: resultProposal.shortCode,
+        proposalId: resultProposal.proposalId,
         created: timeAgo(resultProposal.created),
         notified: resultProposal.notified,
         proposerId: resultProposal.proposer?.id,
@@ -155,14 +155,18 @@ const ProposalTable = ({
               icon: readOnly ? () => <Visibility /> : () => <Edit />,
               tooltip: readOnly ? 'View proposal' : 'Edit proposal',
               onClick: (event, rowData) =>
-                setEditProposalID((rowData as PartialProposalsDataType).id),
+                setEditProposalPk(
+                  (rowData as PartialProposalsDataType).primaryKey
+                ),
             };
           },
           {
             icon: FileCopy,
             tooltip: 'Clone proposal',
             onClick: (event, rowData) => {
-              setProposalToCloneId((rowData as PartialProposalsDataType).id);
+              setProposalToCloneId(
+                (rowData as PartialProposalsDataType).primaryKey
+              );
               setOpenCallSelection(true);
             },
           },
@@ -171,7 +175,7 @@ const ProposalTable = ({
             tooltip: 'Download proposal',
             onClick: (event, rowData) =>
               downloadPDFProposal(
-                [(rowData as PartialProposalsDataType).id],
+                [(rowData as PartialProposalsDataType).primaryKey],
                 (rowData as PartialProposalsDataType).title
               ),
           },
@@ -193,13 +197,15 @@ const ProposalTable = ({
                   async () => {
                     const deletedProposal = (
                       await api().deleteProposal({
-                        id: (rowData as PartialProposalsDataType).id,
+                        proposalPk: (rowData as PartialProposalsDataType)
+                          .primaryKey,
                       })
                     ).deleteProposal.proposal;
                     if (deletedProposal) {
                       setPartialProposalsData(
                         partialProposalsData?.filter(
-                          (item) => item.id !== deletedProposal?.id
+                          (item) =>
+                            item.primaryKey !== deletedProposal?.primaryKey
                         )
                       );
                     }
