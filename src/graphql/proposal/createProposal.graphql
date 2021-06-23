@@ -1,11 +1,11 @@
 mutation createProposal($callId: Int!) {
   createProposal(callId: $callId) {
     proposal {
-      id
+      primaryKey
       status {
         ...proposalStatus
       }
-      shortCode
+      proposalId
       questionaryId
       questionary {
         ...questionary

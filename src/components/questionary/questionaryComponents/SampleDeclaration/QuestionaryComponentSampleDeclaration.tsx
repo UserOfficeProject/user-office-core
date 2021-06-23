@@ -49,7 +49,7 @@ const sampleToListRow = (
 function createSampleStub(
   templateId: number,
   questionarySteps: QuestionaryStep[],
-  proposalId: number,
+  proposalPk: number,
   questionId: string
 ): SampleWithQuestionary {
   return {
@@ -68,7 +68,7 @@ function createSampleStub(
     safetyComment: '',
     safetyStatus: SampleStatus.PENDING_EVALUATION,
     title: '',
-    proposalId: proposalId,
+    proposalPk: proposalPk,
   };
 }
 
@@ -164,9 +164,9 @@ function QuestionaryComponentSampleDeclaration(
                   );
                 }
 
-                const proposalId = state.proposal.id;
+                const proposalPk = state.proposal.primaryKey;
                 const questionId = props.answer.question.id;
-                if (proposalId <= 0 || !questionId) {
+                if (proposalPk <= 0 || !questionId) {
                   throw new Error(
                     'Sample Declaration is missing proposal id and/or question id'
                   );
@@ -185,7 +185,7 @@ function QuestionaryComponentSampleDeclaration(
                       const sampleStub = createSampleStub(
                         templateId,
                         blankSteps,
-                        proposalId,
+                        proposalPk,
                         questionId
                       );
                       setSelectedSample(sampleStub);
@@ -221,7 +221,7 @@ function QuestionaryComponentSampleDeclaration(
                       .getSamplesWithQuestionaryStatus({
                         filter: {
                           questionId: answer.question.id,
-                          proposalId: state.proposal.id,
+                          proposalPk: state.proposal.primaryKey,
                         },
                       })
                       .then((result) => {
