@@ -23,13 +23,13 @@ export class VisitDataSourceMock implements VisitDataSource {
     throw new Error('Method not implemented.');
   }
   async createVisit(
-    proposalId: number,
+    proposalPk: number,
     visitorId: number,
     questionaryId: number
   ): Promise<Visit> {
     const newVisit = new Visit(
       this.visits.length,
-      proposalId,
+      proposalPk,
       VisitStatus.DRAFT,
       questionaryId,
       visitorId,

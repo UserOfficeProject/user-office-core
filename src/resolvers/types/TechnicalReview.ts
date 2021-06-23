@@ -22,7 +22,7 @@ export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
   public id: number;
 
   @Field(() => Int)
-  public proposalID: number;
+  public proposalPk: number;
 
   @Field(() => String, { nullable: true })
   public comment: string;
@@ -52,7 +52,7 @@ export class TechnicalReviewResolver {
   ): Promise<Proposal | null> {
     return context.queries.proposal.get(
       context.user,
-      technicalReview.proposalID
+      technicalReview.proposalPk
     );
   }
 

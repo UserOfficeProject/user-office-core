@@ -3,7 +3,7 @@ import {
   InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../models/Instrument';
-import { ProposalIdsWithNextStatus } from '../models/Proposal';
+import { ProposalPksWithNextStatus } from '../models/Proposal';
 import { BasicUserDetails } from '../models/User';
 import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMutation';
 
@@ -25,10 +25,10 @@ export interface InstrumentDataSource {
   update(instrument: Instrument): Promise<Instrument>;
   delete(instrumentId: number): Promise<Instrument>;
   assignProposalsToInstrument(
-    proposalIds: number[],
+    proposalPks: number[],
     instrumentId: number
-  ): Promise<ProposalIdsWithNextStatus>;
-  removeProposalsFromInstrument(proposalIds: number[]): Promise<boolean>;
+  ): Promise<ProposalPksWithNextStatus>;
+  removeProposalsFromInstrument(proposalPks: number[]): Promise<boolean>;
   assignScientistsToInstrument(
     scientistIds: number[],
     instrumentId: number
@@ -38,7 +38,7 @@ export interface InstrumentDataSource {
     instrumentId: number
   ): Promise<boolean>;
   getInstrumentScientists(instrumentId: number): Promise<BasicUserDetails[]>;
-  getInstrumentByProposalId(proposalId: number): Promise<Instrument | null>;
+  getInstrumentByProposalPk(proposalPk: number): Promise<Instrument | null>;
   getInstrumentsBySepId(
     sepId: number,
     callId: number
@@ -49,7 +49,7 @@ export interface InstrumentDataSource {
     availabilityTime: number
   ): Promise<boolean>;
   submitInstrument(
-    proposalIds: number[],
+    proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentHasProposals>;
   hasInstrumentScientistInstrument(
@@ -59,7 +59,7 @@ export interface InstrumentDataSource {
   hasInstrumentScientistAccess(
     userId: number,
     instrumentId: number,
-    proposalId: number
+    proposalPk: number
   ): Promise<boolean>;
-  isProposalInstrumentSubmitted(proposalId: number): Promise<boolean>;
+  isProposalInstrumentSubmitted(proposalPk: number): Promise<boolean>;
 }

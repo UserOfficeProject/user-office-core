@@ -20,6 +20,12 @@ export const dummyApiAccessToken = new Permissions(
 export const dummyApiAccessTokens = [dummyApiAccessToken];
 
 export class AdminDataSourceMock implements AdminDataSource {
+  async setFeatures(
+    features: FeatureId[],
+    value: boolean
+  ): Promise<FeatureId[]> {
+    return features;
+  }
   updateUnit(unit: Unit): Promise<Unit | null> {
     throw new Error('Method not implemented.');
   }

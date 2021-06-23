@@ -22,7 +22,7 @@ export class UpdateVisitArgs {
   status?: VisitStatus;
 
   @Field(() => Int, { nullable: true })
-  proposalId?: number;
+  proposalPk?: number;
 
   @Field(() => [Int!], { nullable: true })
   team?: number[];

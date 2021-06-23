@@ -33,7 +33,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
     const newSample = await this.create(
       sourceSample.title,
       sourceSample.creatorId,
-      sourceSample.proposalId,
+      sourceSample.proposalPk,
       newQuestionary.questionaryId,
       sourceSample.questionId
     );
@@ -61,7 +61,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
           title: args.title,
           safety_comment: args.safetyComment,
           safety_status: args.safetyStatus,
-          proposal_id: args.proposalId,
+          proposal_pk: args.proposalPk,
           questionary_id: args.questionaryId,
           shipment_id: args.shipmentId,
         },
@@ -81,13 +81,13 @@ export default class PostgresSampleDataSource implements SampleDataSource {
   create(
     title: string,
     creator_id: number,
-    proposal_id: number,
+    proposal_pk: number,
     questionary_id: number,
     question_id: string
   ): Promise<Sample> {
     return database('samples')
       .insert(
-        { title, creator_id, proposal_id, questionary_id, question_id },
+        { title, creator_id, proposal_pk, questionary_id, question_id },
         '*'
       )
       .then((records: SampleRecord[]) => {
@@ -95,7 +95,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
           logger.logError('Could not create sample', {
             title,
             creator_id,
-            proposal_id,
+            proposal_pk,
             questionary_id,
           });
           throw new Error('Failed to insert sample');
@@ -121,7 +121,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
 
   getSamplesByCallId(callId: number): Promise<Sample[]> {
     return database('proposals')
-      .join('samples', 'proposals.proposal_id', 'samples.proposal_id')
+      .join('samples', 'proposals.proposal_pk', 'samples.proposal_pk')
       .select('samples.*')
       .where(' proposals.call_id', callId)
       .then((records: SampleRecord[]) => {
@@ -149,8 +149,8 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         if (filter?.sampleIds) {
           query.where('sample_id', 'in', filter.sampleIds);
         }
-        if (filter?.proposalId) {
-          query.where('proposal_id', filter.proposalId);
+        if (filter?.proposalPk) {
+          query.where('proposal_pk', filter.proposalPk);
         }
         if (filter?.questionId) {
           query.where('question_id', filter.questionId);

@@ -215,7 +215,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   }
 
   async updateAnswer(
-    _proposalId: number,
+    _proposalPk: number,
     questionId: string,
     answer: string
   ): Promise<string> {
@@ -237,7 +237,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     return questionId;
   }
   async insertFiles(
-    _proposalId: number,
+    _proposalPk: number,
     _questionId: string,
     files: string[]
   ): Promise<string[]> {
@@ -245,7 +245,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   }
 
   async deleteFiles(
-    _proposalId: number,
+    _proposalPk: number,
     _questionId: string
   ): Promise<string[]> {
     return ['file_id_012345'];

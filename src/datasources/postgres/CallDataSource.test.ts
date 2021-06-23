@@ -65,7 +65,7 @@ async function createCall(format?: string): Promise<Call> {
 
 async function createSubmittedProposal(
   callId: number,
-  shortCode: number,
+  proposalId: number,
   sequence: number
 ) {
   const proposal = await database('proposals')
@@ -73,7 +73,7 @@ async function createSubmittedProposal(
       title: '[IT] proposal',
       call_id: callId,
       questionary_id: -999,
-      short_code: shortCode,
+      proposal_id: proposalId,
       status_id: 1,
       submitted: true,
       reference_number_sequence: sequence,
@@ -149,7 +149,7 @@ describe('Call update', () => {
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
-      (p) => !expectedRefNums.includes(p.shortCode)
+      (p) => !expectedRefNums.includes(p.proposalId)
     );
 
     expect(invalidUpdates.length).toBe(0);
@@ -171,7 +171,7 @@ describe('Call update', () => {
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
-      (p) => !expectedRefNums.includes(p.shortCode)
+      (p) => !expectedRefNums.includes(p.proposalId)
     );
 
     expect(invalidUpdates.length).toBe(0);
@@ -194,7 +194,7 @@ describe('Call update', () => {
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
-      (p) => !expectedRefNums.includes(p.shortCode)
+      (p) => !expectedRefNums.includes(p.proposalId)
     );
 
     expect(invalidUpdates.length).toBe(0);
@@ -216,9 +216,18 @@ describe('Call update', () => {
 
     expect(getProposalsInCall(call.id)).resolves.toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: p1.id, referenceNumberSequence: 123 }),
-        expect.objectContaining({ id: p2.id, referenceNumberSequence: 456 }),
-        expect.objectContaining({ id: p3.id, referenceNumberSequence: 789 }),
+        expect.objectContaining({
+          id: p1.primaryKey,
+          referenceNumberSequence: 123,
+        }),
+        expect.objectContaining({
+          id: p2.primaryKey,
+          referenceNumberSequence: 456,
+        }),
+        expect.objectContaining({
+          id: p3.primaryKey,
+          referenceNumberSequence: 789,
+        }),
       ])
     );
   });
@@ -242,7 +251,7 @@ describe('Call update', () => {
 
     const proposals = await getProposalsInCall(call.id);
     const invalidProposals = proposals.filter(
-      (s) => !expectedRefNums.includes(s.shortCode)
+      (s) => !expectedRefNums.includes(s.proposalId)
     );
 
     expect(invalidProposals.length).toBe(0);

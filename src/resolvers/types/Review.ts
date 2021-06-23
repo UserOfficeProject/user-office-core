@@ -31,7 +31,7 @@ export class Review implements Partial<ReviewOrigin> {
   @Field(() => ReviewStatus)
   public status: ReviewStatus;
 
-  public proposalID: number;
+  public proposalPk: number;
 
   @Field(() => Int)
   public sepID: number;
@@ -58,6 +58,6 @@ export class ReviewResolver {
     @Root() review: Review,
     @Ctx() context: ResolverContext
   ): Promise<Proposal | null> {
-    return context.queries.proposal.get(context.user, review.proposalID);
+    return context.queries.proposal.get(context.user, review.proposalPk);
   }
 }

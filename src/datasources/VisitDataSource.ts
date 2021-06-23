@@ -10,7 +10,7 @@ export interface VisitDataSource {
   getTeam(visitId: number): Promise<BasicUserDetails[]>;
   // Write
   createVisit(
-    proposalId: number,
+    proposalPk: number,
     visitorId: number,
     questionaryId: number
   ): Promise<Visit>;

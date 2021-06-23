@@ -16,7 +16,7 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Instrument, InstrumentHasProposals } from '../models/Instrument';
-import { ProposalIdsWithNextStatus } from '../models/Proposal';
+import { ProposalPksWithNextStatus } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -131,7 +131,7 @@ export default class InstrumentMutations {
   async assignProposalsToInstrument(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
-  ): Promise<ProposalIdsWithNextStatus | Rejection> {
+  ): Promise<ProposalPksWithNextStatus | Rejection> {
     const allProposalsAreOnSameCallAsInstrument = await this.checkIfProposalsAreOnSameCallAsInstrument(
       args
     );
@@ -152,15 +152,15 @@ export default class InstrumentMutations {
       );
     }
 
-    const proposalIds = args.proposals.map((proposal) => proposal.id);
+    const proposalPks = args.proposals.map((proposal) => proposal.primaryKey);
 
     await this.proposalDataSource.updateProposalTechnicalReviewer({
       userId: instrument.managerUserId,
-      proposalIds: proposalIds,
+      proposalPks: proposalPks,
     });
 
     return this.dataSource
-      .assignProposalsToInstrument(proposalIds, args.instrumentId)
+      .assignProposalsToInstrument(proposalPks, args.instrumentId)
       .then((result) => result)
       .catch((error) => {
         return rejection(
@@ -177,7 +177,7 @@ export default class InstrumentMutations {
     args: RemoveProposalsFromInstrumentArgs
   ): Promise<boolean | Rejection> {
     return this.dataSource
-      .removeProposalsFromInstrument(args.proposalIds)
+      .removeProposalsFromInstrument(args.proposalPks)
       .then((result) => result)
       .catch((error) => {
         return rejection(
@@ -269,12 +269,12 @@ export default class InstrumentMutations {
       args.callId
     );
 
-    const submittedInstrumentProposalIds = allInstrumentProposals.map(
-      (sepInstrumentProposal) => sepInstrumentProposal.proposalId
+    const submittedInstrumentProposalPks = allInstrumentProposals.map(
+      (sepInstrumentProposal) => sepInstrumentProposal.proposalPk
     );
 
     const sepProposalsWithReviewsAndRanking = await this.sepDataSource.getSepProposalsWithReviewGradesAndRanking(
-      submittedInstrumentProposalIds
+      submittedInstrumentProposalPks
     );
 
     const allSepMeetingsHasRankings = sepProposalsWithReviewsAndRanking.every(
@@ -300,7 +300,7 @@ export default class InstrumentMutations {
       await Promise.all(
         allProposalsWithRankings.map((proposalWithRanking) => {
           return this.sepDataSource.saveSepMeetingDecision({
-            proposalId: proposalWithRanking.proposalId,
+            proposalPk: proposalWithRanking.proposalPk,
             rankOrder: proposalWithRanking.rankOrder,
           });
         })
@@ -308,7 +308,7 @@ export default class InstrumentMutations {
     }
 
     return this.dataSource
-      .submitInstrument(submittedInstrumentProposalIds, args.instrumentId)
+      .submitInstrument(submittedInstrumentProposalPks, args.instrumentId)
       .then((result) => result)
       .catch((error) => {
         return rejection('Could not submit instrument', { agent, args }, error);

@@ -1,7 +1,7 @@
 export class TechnicalReview {
   constructor(
     public id: number,
-    public proposalID: number,
+    public proposalPk: number,
     public comment: string,
     public publicComment: string,
     public timeAllocation: number,

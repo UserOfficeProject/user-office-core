@@ -19,10 +19,10 @@ import { RequestWithUser } from '../factory';
 
 const router = express.Router();
 
-router.get(`/${XLSXType.PROPOSAL}/:proposal_ids`, async (req, res, next) => {
+router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
   try {
     const userWithRole = (req as RequestWithUser).user;
-    const proposalIds: number[] = req.params.proposal_ids
+    const proposalPks: number[] = req.params.proposal_pks
       .split(',')
       .map((n: string) => parseInt(n))
       .filter((id: number) => !isNaN(id));
@@ -39,9 +39,9 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_ids`, async (req, res, next) => {
     };
 
     const data = await Promise.all(
-      proposalIds.map((proposalId, indx) =>
+      proposalPks.map((proposalPk, indx) =>
         collectProposalXLSXData(
-          proposalId,
+          proposalPk,
           userWithRole,
           indx === 0
             ? (filename: string) => (meta.singleFilename = filename)
