@@ -18,7 +18,7 @@ export class CloneProposalInput {
   public callId: number;
 
   @Field(() => Int)
-  public proposalToCloneId: number;
+  public proposalToClonePk: number;
 }
 
 @Resolver()

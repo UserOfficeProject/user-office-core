@@ -17,7 +17,7 @@ import { Role } from './Role';
 @ObjectType()
 export class SEPAssignment {
   @Field(() => Int)
-  public proposalId: number;
+  public proposalPk: number;
 
   @Field(() => Int, { nullable: true })
   public sepMemberUserId: number | null;
@@ -45,7 +45,7 @@ export class SEPUserResolver {
     @Root() sepAssignment: SEPAssignment,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.proposal.dataSource.get(sepAssignment.proposalId);
+    return context.queries.proposal.dataSource.get(sepAssignment.proposalPk);
   }
 
   @FieldResolver(() => Role, { nullable: true })
@@ -81,7 +81,7 @@ export class SEPUserResolver {
     return sepAssignment.sepMemberUserId
       ? context.queries.review.dataSource.getAssignmentReview(
           sepAssignment.sepId,
-          sepAssignment.proposalId,
+          sepAssignment.proposalPk,
           sepAssignment.sepMemberUserId
         )
       : null;

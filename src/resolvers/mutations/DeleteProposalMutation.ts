@@ -8,11 +8,11 @@ import { wrapResponse } from '../wrapResponse';
 export class DeleteProposalMutation {
   @Mutation(() => ProposalResponseWrap)
   deleteProposal(
-    @Arg('id', () => Int) id: number,
+    @Arg('proposalPk', () => Int) proposalPk: number,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposal.delete(context.user, { proposalId: id }),
+      context.mutations.proposal.delete(context.user, { proposalPk }),
       ProposalResponseWrap
     );
   }

@@ -103,8 +103,8 @@ export const collectSEPlXLSXData = async (
   );
 
   const instrumentsProposals = await Promise.all(
-    instrumentsSepProposals.map((sepProposalIds) => {
-      if (!sepProposalIds) {
+    instrumentsSepProposals.map((sepProposalPks) => {
+      if (!sepProposalPks) {
         const instrumentIds = instruments.map(({ id }) => id).join(', ');
 
         throw new Error(
@@ -115,8 +115,8 @@ export const collectSEPlXLSXData = async (
       }
 
       return Promise.all(
-        sepProposalIds.map(({ proposalId }) =>
-          baseContext.queries.proposal.dataSource.get(proposalId)
+        sepProposalPks.map(({ proposalPk }) =>
+          baseContext.queries.proposal.dataSource.get(proposalPk)
         )
       );
     })
@@ -127,7 +127,10 @@ export const collectSEPlXLSXData = async (
       return Promise.all(
         proposals.map((proposal) =>
           proposal
-            ? baseContext.queries.review.reviewsForProposal(user, proposal.id)
+            ? baseContext.queries.review.reviewsForProposal(
+                user,
+                proposal.primaryKey
+              )
             : null
         )
       );
@@ -141,7 +144,7 @@ export const collectSEPlXLSXData = async (
           proposal
             ? baseContext.queries.review.technicalReviewForProposal(
                 user,
-                proposal.id
+                proposal.primaryKey
               )
             : null
         )
@@ -156,7 +159,7 @@ export const collectSEPlXLSXData = async (
           proposal
             ? baseContext.queries.sep.getProposalSepMeetingDecision(
                 user,
-                proposal.id
+                proposal.primaryKey
               )
             : null
         )
@@ -198,7 +201,7 @@ export const collectSEPlXLSXData = async (
       const proposalAverageScore = average(getGrades(reviews)) || 0;
 
       return {
-        propShortCode: proposal?.shortCode,
+        propShortCode: proposal?.proposalId,
         propTitle: proposal?.title,
         principalInv: `${firstname} ${lastname}`,
         instrAvailTime: instrument.availabilityTime,

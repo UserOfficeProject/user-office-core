@@ -37,7 +37,7 @@ export default class VisitMutations {
     user: UserWithRole | null,
     args: CreateVisitArgs
   ): Promise<Visit | Rejection> {
-    const proposal = await this.proposalDataSource.get(args.proposalId);
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
     if (!proposal) {
       return rejection('Can not create visit, proposal does not exist', {
         args,
@@ -86,7 +86,7 @@ export default class VisitMutations {
       );
 
       const visit = await this.dataSource.createVisit(
-        args.proposalId,
+        args.proposalPk,
         user!.id,
         questionary.questionaryId
       );

@@ -3,7 +3,7 @@ import {
   InstrumentHasProposals,
   InstrumentWithAvailabilityTime,
 } from '../../models/Instrument';
-import { ProposalIdsWithNextStatus } from '../../models/Proposal';
+import { ProposalPksWithNextStatus } from '../../models/Proposal';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
@@ -36,7 +36,7 @@ export const dummyInstrumentHasProposals = new InstrumentHasProposals(
 );
 
 export class InstrumentDataSourceMock implements InstrumentDataSource {
-  async isProposalInstrumentSubmitted(proposalId: number): Promise<boolean> {
+  async isProposalInstrumentSubmitted(proposalPk: number): Promise<boolean> {
     return false;
   }
   async create(args: CreateInstrumentArgs): Promise<Instrument> {
@@ -85,18 +85,18 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   }
 
   async assignProposalsToInstrument(
-    proposalIds: number[],
+    proposalPks: number[],
     instrumentId: number
-  ): Promise<ProposalIdsWithNextStatus> {
-    return { proposalIds };
+  ): Promise<ProposalPksWithNextStatus> {
+    return { proposalPks };
   }
 
-  async removeProposalsFromInstrument(proposalIds: number[]): Promise<boolean> {
+  async removeProposalsFromInstrument(proposalPks: number[]): Promise<boolean> {
     return true;
   }
 
-  async getInstrumentByProposalId(
-    proposalId: number
+  async getInstrumentByProposalPk(
+    proposalPk: number
   ): Promise<Instrument | null> {
     return dummyInstrument;
   }
@@ -135,7 +135,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   }
 
   async submitInstrument(
-    proposalIds: number[],
+    proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentHasProposals> {
     return dummyInstrumentHasProposals;
@@ -151,7 +151,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   hasInstrumentScientistAccess(
     userId: number,
     instrumentId: number,
-    proposalId: number
+    proposalPk: number
   ): Promise<boolean> {
     throw new Error('Method not implemented.');
   }

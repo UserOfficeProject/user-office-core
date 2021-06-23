@@ -32,7 +32,7 @@ import { Visit, VisitStatus } from '../../models/Visit';
 // Interfaces corresponding exactly to database tables
 
 export interface ProposalUserRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly user_id: number;
 }
 
@@ -44,7 +44,7 @@ export interface QuestionaryRecord {
 }
 
 export interface ProposalRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly title: string;
   readonly abstract: string;
   readonly proposer_id: number;
@@ -52,7 +52,7 @@ export interface ProposalRecord {
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
-  readonly short_code: string;
+  readonly proposal_id: string;
   readonly final_status: number;
   readonly excellence_score: number;
   readonly safety_score: number;
@@ -71,13 +71,13 @@ export interface ProposalRecord {
 }
 
 export interface ProposalViewRecord {
-  readonly id: number;
+  readonly proposal_pk: number;
   readonly title: string;
   readonly proposer_id: number;
   readonly proposal_status_id: number;
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
-  readonly short_code: string;
+  readonly proposal_id: string;
   readonly rank_order: number;
   readonly final_status: number;
   readonly time_allocation: number;
@@ -203,7 +203,7 @@ export interface RoleRecord {
 export interface ReviewRecord {
   readonly review_id: number;
   readonly user_id: number;
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly comment: string;
   readonly grade: number;
   readonly status: number;
@@ -212,7 +212,7 @@ export interface ReviewRecord {
 
 export interface TechnicalReviewRecord {
   readonly technical_review_id: number;
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly comment: string;
   readonly public_comment: string;
   readonly time_allocation: number;
@@ -302,7 +302,7 @@ export interface SEPRecord {
 }
 
 export interface SEPProposalRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly sep_id: number;
   readonly date_assigned: Date;
   readonly sep_time_allocation: number | null;
@@ -310,7 +310,7 @@ export interface SEPProposalRecord {
 }
 
 export interface SEPAssignmentRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly sep_member_user_id: number;
   readonly sep_id: number;
   readonly date_assigned: Date;
@@ -341,7 +341,7 @@ export interface InstrumentRecord {
 
 export interface InstrumentHasProposalsRecord {
   readonly instrument_id: number;
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly submitted: boolean;
 }
 
@@ -366,7 +366,7 @@ export interface SampleRecord {
   readonly sample_id: number;
   readonly title: string;
   readonly creator_id: number;
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly questionary_id: number;
   readonly question_id: string;
   readonly safety_status: number;
@@ -378,7 +378,7 @@ export interface ShipmentRecord {
   readonly shipment_id: number;
   readonly title: string;
   readonly creator_id: number;
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly questionary_id: number;
   readonly status: string;
   readonly external_ref: string;
@@ -419,7 +419,7 @@ export interface StatusChangingEventRecord {
 }
 
 export interface SepMeetingDecisionRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly comment_for_management: string;
   readonly comment_for_user: string;
   readonly rank_order: number;
@@ -429,13 +429,13 @@ export interface SepMeetingDecisionRecord {
 }
 
 export interface SepProposalWithReviewGradesAndRankingRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly rank_order: number | null;
   readonly review_grades: number[];
 }
 
 export interface ProposalEventsRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly proposal_created: boolean;
   readonly proposal_submitted: boolean;
   readonly proposal_feasible: boolean;
@@ -486,7 +486,7 @@ export interface TokensAndPermissionsRecord {
 
 export interface VisitRecord {
   readonly visit_id: number;
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly instrument_id: number;
   readonly status: string;
   readonly questionary_id: number;
@@ -527,14 +527,14 @@ export const createProposalTemplateObject = (template: TemplateRecord) => {
 
 export const createProposalObject = (proposal: ProposalRecord) => {
   return new Proposal(
-    proposal.proposal_id,
+    proposal.proposal_pk,
     proposal.title || '',
     proposal.abstract || '',
     proposal.proposer_id,
     proposal.status_id,
     proposal.created_at,
     proposal.updated_at,
-    proposal.short_code,
+    proposal.proposal_id,
     proposal.final_status,
     proposal.call_id,
     proposal.questionary_id,
@@ -551,12 +551,12 @@ export const createProposalObject = (proposal: ProposalRecord) => {
 
 export const createProposalViewObject = (proposal: ProposalViewRecord) => {
   return new ProposalView(
-    proposal.id,
+    proposal.proposal_pk,
     proposal.title || '',
     proposal.proposal_status_id,
     proposal.proposal_status_name,
     proposal.proposal_status_description,
-    proposal.short_code,
+    proposal.proposal_id,
     proposal.rank_order,
     proposal.final_status,
     proposal.time_allocation,
@@ -713,7 +713,7 @@ export const createSampleObject = (sample: SampleRecord) => {
     sample.sample_id,
     sample.title,
     sample.creator_id,
-    sample.proposal_id,
+    sample.proposal_pk,
     sample.questionary_id,
     sample.question_id,
     sample.safety_status,
@@ -737,7 +737,7 @@ export const createShipmentObject = (shipment: ShipmentRecord) => {
     shipment.shipment_id,
     shipment.title,
     shipment.creator_id,
-    shipment.proposal_id,
+    shipment.proposal_pk,
     shipment.questionary_id,
     shipment.status as ShipmentStatus,
     shipment.external_ref,
@@ -777,7 +777,7 @@ export const createSepMeetingDecisionObject = (
   sepMeetingDecisionRecord: SepMeetingDecisionRecord
 ) => {
   return new SepMeetingDecision(
-    sepMeetingDecisionRecord.proposal_id,
+    sepMeetingDecisionRecord.proposal_pk,
     sepMeetingDecisionRecord.rank_order,
     sepMeetingDecisionRecord.recommendation,
     sepMeetingDecisionRecord.comment_for_user,
@@ -789,7 +789,7 @@ export const createSepMeetingDecisionObject = (
 
 export const createSEPProposalObject = (sepAssignment: SEPProposalRecord) => {
   return new SEPProposal(
-    sepAssignment.proposal_id,
+    sepAssignment.proposal_pk,
     sepAssignment.sep_id,
     sepAssignment.date_assigned,
     sepAssignment.sep_time_allocation,
@@ -800,7 +800,7 @@ export const createSEPAssignmentObject = (
   sepAssignment: SEPAssignmentRecord
 ) => {
   return new SEPAssignment(
-    sepAssignment.proposal_id,
+    sepAssignment.proposal_pk,
     sepAssignment.sep_member_user_id,
     sepAssignment.sep_id,
     sepAssignment.date_assigned,
@@ -821,7 +821,7 @@ export const createRoleObject = (role: RoleRecord) => {
 export const createVisitObject = (visit: VisitRecord) => {
   return new Visit(
     visit.visit_id,
-    visit.proposal_id,
+    visit.proposal_pk,
     (visit.status as any) as VisitStatus,
     visit.questionary_id,
     visit.visitor_id,

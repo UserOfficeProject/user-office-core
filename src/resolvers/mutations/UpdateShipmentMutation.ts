@@ -19,7 +19,7 @@ export class UpdateShipmentArgs {
   shipmentId: number;
 
   @Field(() => Int, { nullable: true })
-  proposalId?: number;
+  proposalPk?: number;
 
   @Field(() => String, { nullable: true })
   title?: string;

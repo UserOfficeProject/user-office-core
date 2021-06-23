@@ -25,7 +25,7 @@ export class InstrumentWithAvailabilityTime extends Instrument {
 export class InstrumentHasProposals {
   constructor(
     public instrumentId: number,
-    public proposalIds: number[],
+    public proposalPks: number[],
     public submitted: boolean
   ) {}
 }

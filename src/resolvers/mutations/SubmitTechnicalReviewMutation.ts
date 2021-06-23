@@ -17,7 +17,7 @@ import { wrapResponse } from '../wrapResponse';
 @InputType()
 export class SubmitTechnicalReviewInput implements Partial<TechnicalReview> {
   @Field(() => Int)
-  public proposalID: number;
+  public proposalPk: number;
 
   @Field(() => String, { nullable: true })
   public comment: string;

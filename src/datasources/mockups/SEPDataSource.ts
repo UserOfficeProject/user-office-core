@@ -1,6 +1,6 @@
 import {
   ProposalEndStatus,
-  ProposalIdsWithNextStatus,
+  ProposalPksWithNextStatus,
 } from '../../models/Proposal';
 import { Role } from '../../models/Role';
 import {
@@ -177,21 +177,21 @@ export class SEPDataSourceMock implements SEPDataSource {
 
   async isChairOrSecretaryOfProposal(
     userId: number,
-    proposalId: number
+    proposalPk: number
   ): Promise<boolean> {
     return false;
   }
 
   async getSEPProposal(
     sepId: number,
-    proposalId: number
+    proposalPk: number
   ): Promise<SEPProposal | null> {
     throw new Error('Method not implemented.');
   }
 
   updateTimeAllocation(
     sepId: number,
-    proposalId: number,
+    proposalPk: number,
     sepTimeAllocation: number | null
   ): Promise<SEPProposal> {
     throw new Error('Method not implemented: updateTimeAllocation');
@@ -293,18 +293,18 @@ export class SEPDataSourceMock implements SEPDataSource {
     return dummySEPProposals.filter((proposal) => proposal.sepId === sepId);
   }
 
-  async getSEPByProposalId(proposalId: number) {
+  async getSEPByProposalPk(proposalPk: number) {
     return dummySEP;
   }
 
   async getSEPProposalAssignments(
     sepId: number,
-    proposalId: number,
+    proposalPk: number,
     reviewerId: number | null
   ) {
     return dummySEPAssignments.filter(
       (assignment) =>
-        assignment.sepId === sepId && assignment.proposalId === proposalId
+        assignment.sepId === sepId && assignment.proposalPk === proposalPk
     );
   }
 
@@ -324,13 +324,13 @@ export class SEPDataSourceMock implements SEPDataSource {
     const sep = dummySEPs.find((element) => element.id === sepId);
 
     if (sep) {
-      return new ProposalIdsWithNextStatus([1]);
+      return new ProposalPksWithNextStatus([1]);
     }
 
     throw new Error(`SEP not found ${sepId}`);
   }
 
-  async removeProposalsFromSep(proposalIds: number[], sepId: number) {
+  async removeProposalsFromSep(proposalPks: number[], sepId: number) {
     const sep = dummySEPs.find((element) => element.id === sepId);
 
     if (sep) {
@@ -341,7 +341,7 @@ export class SEPDataSourceMock implements SEPDataSource {
   }
 
   async assignMemberToSEPProposal(
-    proposalId: number,
+    proposalPk: number,
     sepId: number,
     memberIds: number[]
   ) {
@@ -355,7 +355,7 @@ export class SEPDataSourceMock implements SEPDataSource {
   }
 
   async removeMemberFromSepProposal(
-    proposalId: number,
+    proposalPk: number,
     sepId: number,
     memberId: number
   ) {
@@ -376,13 +376,13 @@ export class SEPDataSourceMock implements SEPDataSource {
   }
 
   async getProposalsSepMeetingDecisions(
-    proposalIds: number[]
+    proposalPks: number[]
   ): Promise<SepMeetingDecision[]> {
     return [dummySepMeetingDecision];
   }
 
   async getSepProposalsWithReviewGradesAndRanking(
-    proposalIds: number[]
+    proposalPks: number[]
   ): Promise<SEPProposalWithReviewGradesAndRanking[]> {
     return [new SEPProposalWithReviewGradesAndRanking(1, 1, [7])];
   }

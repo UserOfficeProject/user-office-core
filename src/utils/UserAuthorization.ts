@@ -63,12 +63,14 @@ export class UserAuthorization {
       return true;
     }
 
-    return this.userDataSource.getProposalUsers(proposal.id).then((users) => {
-      return users.some((user) => user.id === agent.id);
-    });
+    return this.userDataSource
+      .getProposalUsers(proposal.primaryKey)
+      .then((users) => {
+        return users.some((user) => user.id === agent.id);
+      });
   }
 
-  async isReviewerOfProposal(agent: UserWithRole | null, proposalID: number) {
+  async isReviewerOfProposal(agent: UserWithRole | null, proposalPk: number) {
     if (agent == null || !agent.id || !agent.currentRole) {
       return false;
     }
@@ -87,17 +89,17 @@ export class UserAuthorization {
     return this.reviewDataSource
       .getUserReviews(sepIdsUserIsMemberOf)
       .then((reviews) => {
-        return reviews.some((review) => review.proposalID === proposalID);
+        return reviews.some((review) => review.proposalPk === proposalPk);
       });
   }
 
-  async isScientistToProposal(agent: User | null, proposalID: number) {
+  async isScientistToProposal(agent: User | null, proposalPk: number) {
     if (agent == null || !agent.id) {
       return false;
     }
 
     return this.userDataSource
-      .checkScientistToProposal(agent.id, proposalID)
+      .checkScientistToProposal(agent.id, proposalPk)
       .then((result) => {
         return result;
       });
@@ -122,9 +124,9 @@ export class UserAuthorization {
     return (
       this.isUserOfficer(agent) ||
       (await this.isMemberOfProposal(agent, proposal)) ||
-      (await this.isReviewerOfProposal(agent, proposal.id)) ||
-      (await this.isScientistToProposal(agent, proposal.id)) ||
-      (await this.isChairOrSecretaryOfProposal(agent, proposal.id)) ||
+      (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
+      (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
+      (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
       this.hasGetAccessByToken(agent)
     );
   }
@@ -140,14 +142,14 @@ export class UserAuthorization {
     return this.sepDataSource.isChairOrSecretaryOfSEP(agent.id, sepId);
   }
 
-  async isChairOrSecretaryOfProposal(agent: User | null, proposalId: number) {
-    if (agent == null || !agent.id || !proposalId) {
+  async isChairOrSecretaryOfProposal(agent: User | null, proposalPk: number) {
+    if (agent == null || !agent.id || !proposalPk) {
       return false;
     }
 
     return this.sepDataSource.isChairOrSecretaryOfProposal(
       agent.id,
-      proposalId
+      proposalPk
     );
   }
 

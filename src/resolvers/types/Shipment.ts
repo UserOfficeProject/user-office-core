@@ -26,7 +26,7 @@ export class Shipment implements Partial<ShipmentOrigin> {
   public title: string;
 
   @Field(() => Int)
-  public proposalId: number;
+  public proposalPk: number;
 
   @Field(() => ShipmentStatus)
   public status: ShipmentStatus;
@@ -75,7 +75,7 @@ export class ShipmentResolver {
   ): Promise<Proposal | null> {
     const proposal = await context.queries.proposal.get(
       context.user,
-      shipment.proposalId
+      shipment.proposalPk
     );
 
     return proposal;

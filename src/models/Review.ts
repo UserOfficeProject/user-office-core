@@ -3,7 +3,7 @@ import { ProposalStatus } from './ProposalStatus';
 export class Review {
   constructor(
     public id: number,
-    public proposalID: number,
+    public proposalPk: number,
     public userID: number,
     public comment: string,
     public grade: number,
@@ -25,7 +25,7 @@ export enum ReviewerFilter {
 export class ReviewWithNextProposalStatus {
   constructor(
     public id: number,
-    public proposalID: number,
+    public proposalPk: number,
     public userID: number,
     public comment: string,
     public grade: number,

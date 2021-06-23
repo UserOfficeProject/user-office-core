@@ -26,8 +26,8 @@ export interface UserDataSource {
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getRoles(): Promise<Role[]>;
-  getProposalUsers(proposalId: number): Promise<BasicUserDetails[]>;
-  getProposalUsersFull(proposalId: number): Promise<User[]>;
+  getProposalUsers(proposalPk: number): Promise<BasicUserDetails[]>;
+  getProposalUsersFull(proposalPk: number): Promise<User[]>;
   // Write
   create(
     user_title: string | undefined,
@@ -59,7 +59,7 @@ export interface UserDataSource {
   setUserNotPlaceholder(id: number): Promise<User | null>;
   checkScientistToProposal(
     userId: number,
-    proposalId: number
+    proposalPk: number
   ): Promise<boolean>;
   getRoleByShortCode(roleShortCode: Roles): Promise<Role>;
 }

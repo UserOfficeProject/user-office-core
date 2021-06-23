@@ -1,6 +1,6 @@
 export class ProposalEvents {
   constructor(
-    public proposalId: number,
+    public proposalPk: number,
     public proposalCreated: boolean,
     public proposalSubmitted: boolean,
     public callEnded: boolean,
