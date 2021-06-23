@@ -137,13 +137,13 @@ const proposalBasisPreSubmit = () => async ({
   state,
 }: SubmitActionDependencyContainer) => {
   const proposal = (state as ProposalSubmissionState).proposal;
-  const { id, title, abstract, users, proposer, callId } = proposal;
+  const { primaryKey, title, abstract, users, proposer, callId } = proposal;
 
   let returnValue = state.questionaryId;
 
-  if (id > 0) {
+  if (primaryKey > 0) {
     const result = await api.updateProposal({
-      id: id,
+      proposalPk: primaryKey,
       title: title,
       abstract: abstract,
       users: users.map((user) => user.id),
@@ -163,7 +163,7 @@ const proposalBasisPreSubmit = () => async ({
 
     if (createResult.createProposal.proposal) {
       const updateResult = await api.updateProposal({
-        id: createResult.createProposal.proposal.id,
+        proposalPk: createResult.createProposal.proposal.primaryKey,
         title: title,
         abstract: abstract,
         users: users.map((user) => user.id),

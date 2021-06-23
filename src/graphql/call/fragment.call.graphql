@@ -16,6 +16,7 @@ fragment call on Call {
   referenceNumberFormat
   proposalWorkflowId
   templateId
+  allocationTimeUnit
   instruments {
     id
     name

@@ -15,6 +15,7 @@ import SEPMeetingDecision from 'components/SEP/MeetingComponents/ProposalViewMod
 import { UserContext } from 'context/UserContextProvider';
 import {
   CoreTechnicalReviewFragment,
+  Proposal,
   Review,
   TechnicalReview,
   UserRole,
@@ -37,7 +38,7 @@ export type TabNames =
 
 type ProposalReviewContentProps = {
   tabNames: TabNames[];
-  proposalId?: number | null;
+  proposalPk?: number | null;
   reviewId?: number | null;
   sepId?: number | null;
   isInsideModal?: boolean;
@@ -55,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
-  proposalId,
+  proposalPk,
   tabNames,
   reviewId,
   sepId,
@@ -67,7 +68,7 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const { reviewData, setReviewData } = useReviewData(reviewId, sepId);
   const { proposalData, setProposalData, loading } = useProposalData(
-    proposalId || reviewData?.proposal?.id
+    proposalPk || reviewData?.proposal?.primaryKey
   );
 
   if (loading) {
@@ -136,7 +137,7 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
       <>
         {assignAnotherReviewerView(proposalData)}
         <ProposalTechnicalReview
-          id={proposalData.id}
+          proposal={proposalData as Proposal}
           data={proposalData.technicalReview}
           setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
             setProposalData({
@@ -182,7 +183,10 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
   );
 
   const EventLogsTab = isUserOfficer && (
-    <EventLogList changedObjectId={proposalData.id} eventType="PROPOSAL" />
+    <EventLogList
+      changedObjectId={proposalData.primaryKey}
+      eventType="PROPOSAL"
+    />
   );
 
   const tabsContent = tabNames.map((tab, index) => {

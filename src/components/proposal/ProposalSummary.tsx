@@ -92,7 +92,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
                 () => {
                   dispatch({
                     type: 'PROPOSAL_SUBMIT_CLICKED',
-                    proposalId: proposal.id,
+                    proposalPk: proposal.primaryKey,
                   });
                 },
                 {
@@ -108,7 +108,9 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
             {proposal.submitted ? '✔ Submitted' : 'Submit'}
           </NavigButton>
           <Button
-            onClick={() => downloadPDFProposal([proposal.id], proposal.title)}
+            onClick={() =>
+              downloadPDFProposal([proposal.primaryKey], proposal.title)
+            }
             disabled={!allStepsComplete}
             className={classes.button}
             variant="contained"

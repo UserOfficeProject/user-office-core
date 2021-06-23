@@ -9,8 +9,8 @@ import {
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import { VisitContextType } from 'components/visit/VisitContainer';
-import { BasicUserDetails } from 'generated/sdk';
-import { useUserProposals } from 'hooks/proposal/useUserProposals';
+import { BasicUserDetails, ProposalEndStatus } from 'generated/sdk';
+import { useMyProposals } from 'hooks/proposal/useMyProposals';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { VisitSubmissionState } from 'models/VisitSubmissionState';
 
@@ -24,7 +24,10 @@ function QuestionaryComponentVisitBasis(props: BasicComponentProps) {
   const { answer, formikProps } = props;
   const classes = useStyles();
 
-  const { proposals, loadingProposals } = useUserProposals();
+  const { proposals, loadingProposals } = useMyProposals({
+    managementDecisionSubmitted: true,
+    finalStatus: ProposalEndStatus.ACCEPTED,
+  });
 
   const { dispatch, state } = useContext(
     QuestionaryContext
@@ -39,20 +42,20 @@ function QuestionaryComponentVisitBasis(props: BasicComponentProps) {
   return (
     <>
       <FormikDropdown
-        name={`${questionId}.proposalId`}
+        name={`${questionId}.proposalPk`}
         label="Select proposal"
         loading={loadingProposals}
         noOptionsText="No proposals"
         items={proposals.map((proposal) => ({
           text: proposal.title,
-          value: proposal.id,
+          value: proposal.primaryKey,
         }))}
         InputProps={{ 'data-cy': 'proposal-selection' }}
         onChange={(event) => {
           dispatch({
             type: 'VISIT_MODIFIED',
             visit: {
-              proposalId: +event.target.value,
+              proposalPk: +event.target.value,
             },
           });
         }}
@@ -84,12 +87,12 @@ const visitBasisPreSubmit = () => async ({
   state,
 }: SubmitActionDependencyContainer) => {
   const visit = (state as VisitSubmissionState).visit;
-  const { proposalId, team } = visit;
+  const { proposalPk, team } = visit;
   let returnValue = state.questionaryId;
   if (visit.id > 0) {
     const result = await api.updateVisit({
       visitId: visit.id,
-      proposalId: visit.proposalId,
+      proposalPk: visit.proposalPk,
       team: visit.team.map((user) => user.id),
     });
 
@@ -101,7 +104,7 @@ const visitBasisPreSubmit = () => async ({
     }
   } else {
     const result = await api.createVisit({
-      proposalId: proposalId,
+      proposalPk: proposalPk,
       team: team.map((user) => user.id),
     });
 

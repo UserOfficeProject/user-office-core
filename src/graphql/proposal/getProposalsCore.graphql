@@ -1,11 +1,11 @@
 query getProposalsCore($filter: ProposalsFilter) {
   proposalsView(filter: $filter) {
-    id
+    primaryKey
     title
     statusId
     statusName
     statusDescription
-    shortCode
+    proposalId
     rankOrder
     finalStatus
     notified
@@ -20,5 +20,6 @@ query getProposalsCore($filter: ProposalsFilter) {
     instrumentId
     callId
     submitted
+    allocationTimeUnit
   }
 }

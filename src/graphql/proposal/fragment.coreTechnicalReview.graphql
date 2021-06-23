@@ -4,6 +4,6 @@ fragment coreTechnicalReview on TechnicalReview {
   publicComment
   timeAllocation
   status
-  proposalID
+  proposalPk
   submitted
 }

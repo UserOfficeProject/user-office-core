@@ -29,7 +29,7 @@ import {
   Proposal,
   ProposalsFilter,
   ProposalStatus,
-  ProposalIdWithCallId,
+  ProposalPkWithCallId,
   Sep,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -58,7 +58,7 @@ type ProposalTableOfficerProps = {
   confirm: WithConfirmType;
 };
 
-type ProposalWithCallInstrumentAndSepId = ProposalIdWithCallId & {
+type ProposalWithCallInstrumentAndSepId = ProposalPkWithCallId & {
   instrumentId: number | null;
   sepId: number | null;
 };
@@ -83,7 +83,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     ProposalViewData[]
   >([]);
   const [openCallSelection, setOpenCallSelection] = useState(false);
-  const [proposalToCloneId, setProposalToCloneId] = useState<number | null>(
+  const [proposalToClonePk, setProposalToClonePk] = useState<number | null>(
     null
   );
 
@@ -108,9 +108,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       setPreselectedProposalsData((preselectedProposalsData) => {
         const selected: ProposalWithCallInstrumentAndSepId[] = [];
         const preselected = preselectedProposalsData.map((proposal) => {
-          if (selection.has(proposal.id.toString())) {
+          if (selection.has(proposal.primaryKey.toString())) {
             selected.push({
-              id: proposal.id,
+              primaryKey: proposal.primaryKey,
               callId: proposal.callId,
               instrumentId: proposal.instrumentId,
               sepId: proposal.sepId,
@@ -120,7 +120,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           return {
             ...proposal,
             tableData: {
-              checked: selection.has(proposal.id.toString()),
+              checked: selection.has(proposal.primaryKey.toString()),
             },
           };
         });
@@ -171,7 +171,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           <IconButton
             data-cy="view-proposal"
             onClick={() => {
-              setUrlQueryParams({ reviewModal: rowData.id });
+              setUrlQueryParams({ reviewModal: rowData.primaryKey });
             }}
             style={iconButtonStyle}
           >
@@ -182,7 +182,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           <IconButton
             data-cy="clone-proposal"
             onClick={() => {
-              setProposalToCloneId(rowData.id);
+              setProposalToClonePk(rowData.primaryKey);
               setOpenCallSelection(true);
             }}
             style={iconButtonStyle}
@@ -193,7 +193,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         <Tooltip title="Download proposal as pdf">
           <IconButton
             data-cy="download-proposal"
-            onClick={() => downloadPDFProposal([rowData.id], rowData.title)}
+            onClick={() =>
+              downloadPDFProposal([rowData.primaryKey], rowData.title)
+            }
             style={iconButtonStyle}
           >
             <GetAppIcon />
@@ -211,15 +213,18 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       removable: false,
       render: RowActionButtons,
     },
-    { title: 'Proposal ID', field: 'shortCode' },
+    { title: 'Proposal ID', field: 'proposalId' },
     {
       title: 'Title',
       field: 'title',
       ...{ width: 'auto' },
     },
     {
-      title: 'Time(Days)',
-      field: 'timeAllocation',
+      title: 'Time allocation',
+      render: (rowData) =>
+        rowData.timeAllocation
+          ? `${rowData.timeAllocation}(${rowData.allocationTimeUnit}s)`
+          : '',
       hidden: true,
     },
     {
@@ -281,7 +286,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const {
         notifyProposal: { rejection },
       } = await api('Notification sent successfully').notifyProposal({
-        id: proposal.id,
+        proposalPk: proposal.primaryKey,
       });
 
       if (rejection) {
@@ -291,7 +296,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       setProposalsData((proposalsData) =>
         proposalsData.map((prop) => ({
           ...prop,
-          notified: prop.id === proposal.id,
+          notified: prop.primaryKey === proposal.primaryKey,
         }))
       );
     });
@@ -301,14 +306,16 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     selectedProposals.forEach(async (proposal) => {
       const {
         deleteProposal: { rejection },
-      } = await api().deleteProposal({ id: proposal.id });
+      } = await api().deleteProposal({ proposalPk: proposal.primaryKey });
 
       if (rejection) {
         return;
       }
 
       setProposalsData((proposalsData) =>
-        proposalsData.filter(({ id }) => id !== proposal.id)
+        proposalsData.filter(
+          ({ primaryKey }) => primaryKey !== proposal.primaryKey
+        )
       );
     });
   };
@@ -319,7 +326,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         'Proposal/s assigned to the selected SEP successfully!'
       ).assignProposalsToSep({
         proposals: selectedProposals.map((selectedProposal) => ({
-          id: selectedProposal.id,
+          primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
         })),
         sepId: sep.id,
@@ -332,7 +339,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           proposalsData.map((prop) => {
             if (
               selectedProposals.find(
-                (selectedProposal) => selectedProposal.id === prop.id
+                (selectedProposal) =>
+                  selectedProposal.primaryKey === prop.primaryKey
               )
             ) {
               prop.sepCode = sep.code;
@@ -352,8 +360,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const result = await api(
         'Proposal/s removed from the SEP successfully!'
       ).removeProposalsFromSep({
-        proposalIds: selectedProposals.map(
-          (selectedProposal) => selectedProposal.id
+        proposalPks: selectedProposals.map(
+          (selectedProposal) => selectedProposal.primaryKey
         ),
         sepId: selectedProposals[0].sepId as number,
       });
@@ -365,7 +373,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           proposalsData.map((prop) => {
             if (
               selectedProposals.find(
-                (selectedProposal) => selectedProposal.id === prop.id
+                (selectedProposal) =>
+                  selectedProposal.primaryKey === prop.primaryKey
               )
             ) {
               prop.sepCode = null;
@@ -387,7 +396,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         'Proposal/s assigned to the selected instrument successfully!'
       ).assignProposalsToInstrument({
         proposals: selectedProposals.map((selectedProposal) => ({
-          id: selectedProposal.id,
+          primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
         })),
         instrumentId: instrument.id,
@@ -399,7 +408,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           proposalsData.map((prop) => {
             if (
               selectedProposals.find(
-                (selectedProposal) => selectedProposal.id === prop.id
+                (selectedProposal) =>
+                  selectedProposal.primaryKey === prop.primaryKey
               )
             ) {
               prop.instrumentName = instrument.name;
@@ -414,8 +424,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const result = await api(
         'Proposal/s removed from the instrument successfully!'
       ).removeProposalsFromInstrument({
-        proposalIds: selectedProposals.map(
-          (selectedProposal) => selectedProposal.id
+        proposalPks: selectedProposals.map(
+          (selectedProposal) => selectedProposal.primaryKey
         ),
       });
 
@@ -426,7 +436,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           proposalsData.map((prop) => {
             if (
               selectedProposals.find(
-                (selectedProposal) => selectedProposal.id === prop.id
+                (selectedProposal) =>
+                  selectedProposal.primaryKey === prop.primaryKey
               )
             ) {
               prop.instrumentName = null;
@@ -441,15 +452,15 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   };
 
   const cloneProposalToCall = async (call: Call) => {
-    setProposalToCloneId(null);
+    setProposalToClonePk(null);
 
-    if (!call?.id || !proposalToCloneId) {
+    if (!call?.id || !proposalToClonePk) {
       return;
     }
 
     const result = await api('Proposal cloned successfully').cloneProposal({
       callId: call.id,
-      proposalToCloneId,
+      proposalToClonePk,
     });
 
     const resultProposal = result.cloneProposal.proposal;
@@ -472,7 +483,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         `Proposal${shouldAddPluralLetter} status changed successfully!`
       ).changeProposalsStatus({
         proposals: selectedProposals.map((selectedProposal) => ({
-          id: selectedProposal.id,
+          primaryKey: selectedProposal.primaryKey,
           callId: selectedProposal.callId,
         })),
         statusId: status.id,
@@ -487,7 +498,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           proposalsData.map((prop) => {
             if (
               selectedProposals.find(
-                (selectedProposal) => selectedProposal.id === prop.id
+                (selectedProposal) =>
+                  selectedProposal.primaryKey === prop.primaryKey
               )
             ) {
               prop.statusId = status.id;
@@ -513,7 +525,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   );
 
   const proposalToReview = proposalsData.find(
-    (proposal) => proposal.id === urlQueryParams.reviewModal
+    (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
   );
 
   const userOfficerProposalReviewTabs: TabNames[] = [
@@ -588,12 +600,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         </DialogContent>
       </Dialog>
       <ProposalReviewModal
-        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.shortCode})`}
+        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
           setProposalsData(
             proposalsData.map((proposal) => {
-              if (proposal.id === updatedProposal?.id) {
+              if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return fromProposalToProposalView(updatedProposal);
               } else {
                 return proposal;
@@ -602,10 +614,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           );
           setUrlQueryParams({ reviewModal: undefined });
         }}
-        reviewItemId={proposalToReview?.id}
+        reviewItemId={proposalToReview?.primaryKey}
       >
         <ProposalReviewContent
-          proposalId={proposalToReview?.id as number}
+          proposalPk={proposalToReview?.primaryKey as number}
           tabNames={userOfficerProposalReviewTabs}
         />
       </ProposalReviewModal>
@@ -624,7 +636,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             selection:
               selectedItems.length > 0
                 ? selectedItems.map((selectedItem) =>
-                    selectedItem.id.toString()
+                    selectedItem.primaryKey.toString()
                   )
                 : undefined,
           }));
@@ -642,7 +654,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             tooltip: 'Download proposals in PDF',
             onClick: (event, rowData): void => {
               downloadPDFProposal(
-                (rowData as ProposalViewData[]).map((row) => row.id),
+                (rowData as ProposalViewData[]).map((row) => row.primaryKey),
                 (rowData as ProposalViewData[])[0].title
               );
             },
@@ -653,7 +665,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             tooltip: 'Export proposals in Excel',
             onClick: (event, rowData): void => {
               downloadXLSXProposal(
-                (rowData as ProposalViewData[]).map((row) => row.id),
+                (rowData as ProposalViewData[]).map((row) => row.primaryKey),
                 (rowData as ProposalViewData[])[0].title
               );
             },

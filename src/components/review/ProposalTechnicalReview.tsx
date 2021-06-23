@@ -18,6 +18,7 @@ import {
   TechnicalReviewStatus,
   CoreTechnicalReviewFragment,
   UserRole,
+  Proposal,
 } from 'generated/sdk';
 import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -40,12 +41,12 @@ type TechnicalReviewFormType = {
 type ProposalTechnicalReviewProps = {
   data: CoreTechnicalReviewFragment | null | undefined;
   setReview: (data: CoreTechnicalReviewFragment) => void;
-  id: number;
+  proposal: Proposal;
   confirm: WithConfirmType;
 };
 
 const ProposalTechnicalReview = ({
-  id,
+  proposal,
   data,
   setReview,
   confirm,
@@ -88,7 +89,7 @@ const ProposalTechnicalReview = ({
         } successfully!`;
 
     const result = await api(successMessage)[method]({
-      proposalID: id,
+      proposalPk: proposal.primaryKey,
       timeAllocation: +values.timeAllocation,
       comment: values.comment,
       publicComment: values.publicComment,
@@ -100,7 +101,7 @@ const ProposalTechnicalReview = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!(result as any)[method].error) {
       setReview({
-        proposalID: data?.proposalID,
+        proposalPk: data?.proposalPk,
         timeAllocation: +values.timeAllocation,
         comment: values.comment,
         publicComment: values.publicComment,
@@ -171,7 +172,7 @@ const ProposalTechnicalReview = ({
               <Grid item sm={6} xs={12}>
                 <Field
                   name="timeAllocation"
-                  label="Time Allocation(Days)"
+                  label={`Time allocation(${proposal.call?.allocationTimeUnit}s)`}
                   type="number"
                   component={TextField}
                   margin="normal"
