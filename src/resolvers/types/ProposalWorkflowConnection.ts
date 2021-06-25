@@ -56,7 +56,7 @@ export class ProposalWorkflowConnectionGroup {
 
 @Resolver(() => ProposalWorkflowConnection)
 export class ProposalWorkflowConnectionResolver {
-  @FieldResolver(() => [StatusChangingEvent])
+  @FieldResolver(() => [StatusChangingEvent], { nullable: true })
   async statusChangingEvents(
     @Root() proposalWorkflowConnection: ProposalWorkflowConnection,
     @Ctx() context: ResolverContext
