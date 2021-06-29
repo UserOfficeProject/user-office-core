@@ -1,5 +1,5 @@
 fragment sepMeetingDecision on SepMeetingDecision {
-  proposalId
+  proposalPk
   recommendation
   commentForUser
   commentForManagement

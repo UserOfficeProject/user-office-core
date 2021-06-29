@@ -1,13 +1,13 @@
 fragment shipment on Shipment {
   id
   title
-  proposalId
+  proposalPk
   status
   externalRef
   questionaryId
   creatorId
   created
   proposal {
-    shortCode
+    proposalId
   }
 }

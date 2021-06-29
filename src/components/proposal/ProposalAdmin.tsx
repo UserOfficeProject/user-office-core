@@ -19,7 +19,7 @@ import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export type AdministrationFormData = {
-  id: number;
+  proposalPk: number;
   commentForUser: string;
   commentForManagement: string;
   finalStatus: ProposalEndStatus;
@@ -40,7 +40,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const initialValues = {
-    id: data.id,
+    proposalPk: data.primaryKey,
     finalStatus: data.finalStatus || ProposalEndStatus.UNSET,
     commentForUser: data.commentForUser || '',
     commentForManagement: data.commentForManagement || '',
@@ -70,6 +70,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
       setAdministration(administrationValues);
     }
   };
+  console.log(initialValues);
 
   return (
     <>
@@ -81,7 +82,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
         validationSchema={administrationProposalValidationSchema}
         onSubmit={async (values): Promise<void> => {
           const administrationValues = {
-            id: data.id,
+            proposalPk: data.primaryKey,
             finalStatus:
               ProposalEndStatus[values.finalStatus as ProposalEndStatus],
             commentForUser: values.commentForUser,

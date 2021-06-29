@@ -40,7 +40,7 @@ function VisitReview({ confirm }: VisitReviewProps) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const { proposalData } = useProposalData(state.visit.proposalId);
+  const { proposalData } = useProposalData(state.visit.proposalPk);
   const classes = useStyles();
 
   if (!proposalData) {
@@ -52,7 +52,7 @@ function VisitReview({ confirm }: VisitReviewProps) {
     {
       label: 'Proposal',
       value: (
-        <Link href={`/ProposalEdit/${proposalData.id}`}>
+        <Link href={`/ProposalEdit/${proposalData.primaryKey}`}>
           {proposalData.title}
         </Link>
       ),

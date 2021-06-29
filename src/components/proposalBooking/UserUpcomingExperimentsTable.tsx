@@ -139,7 +139,7 @@ export default function UserUpcomingExperimentsTable() {
           isLoading={loading}
           columns={[
             { title: 'Proposal title', field: 'proposal.title' },
-            { title: 'Proposal short code', field: 'proposal.shortCode' },
+            { title: 'Proposal ID', field: 'proposal.proposalId' },
             {
               title: 'Starts at',
               field: 'startsAt',

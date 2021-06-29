@@ -221,7 +221,7 @@ function SampleSafetyPage() {
     },
     {
       title: 'Proposal ID',
-      field: 'proposal.shortCode',
+      field: 'proposal.proposalId',
     },
     { title: 'Title', field: 'title' },
     { title: 'Status', field: 'safetyStatus' },

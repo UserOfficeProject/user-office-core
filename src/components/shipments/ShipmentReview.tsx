@@ -42,7 +42,7 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const { proposalData } = useProposalData(state.shipment.proposalId);
+  const { proposalData } = useProposalData(state.shipment.proposalPk);
   const downloadShipmentLabel = useDownloadPDFShipmentLabel();
   const classes = useStyles();
 
@@ -56,12 +56,12 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
     {
       label: 'Proposal',
       value: (
-        <Link href={`/ProposalEdit/${proposalData.id}`}>
+        <Link href={`/ProposalEdit/${proposalData.primaryKey}`}>
           {proposalData.title}
         </Link>
       ),
     },
-    { label: 'Proposal ID', value: state.shipment.proposal.shortCode },
+    { label: 'Proposal ID', value: state.shipment.proposal.proposalId },
     {
       label: 'Samples',
       value: (
