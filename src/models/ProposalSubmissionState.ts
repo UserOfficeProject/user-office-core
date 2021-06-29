@@ -5,14 +5,14 @@ import { QuestionarySubmissionState } from './QuestionarySubmissionState';
 
 export type ProposalSubsetSubmission = Pick<
   Proposal,
-  | 'id'
+  | 'primaryKey'
   | 'abstract'
   | 'proposer'
   | 'questionary'
   | 'status'
   | 'users'
   | 'title'
-  | 'shortCode'
+  | 'proposalId'
   | 'callId'
   | 'questionaryId'
   | 'submitted'

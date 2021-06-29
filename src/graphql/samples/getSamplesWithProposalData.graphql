@@ -2,8 +2,8 @@ query getSamplesWithProposalData($filter: SamplesFilter) {
   samples(filter: $filter) {
     ...sample
     proposal {
-      id
-      shortCode
+      primaryKey
+      proposalId
     }
   }
 }

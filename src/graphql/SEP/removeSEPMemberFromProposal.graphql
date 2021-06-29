@@ -1,12 +1,12 @@
 mutation removeMemberFromSEPProposal(
   $memberId: Int!
   $sepId: Int!
-  $proposalId: Int!
+  $proposalPk: Int!
 ) {
   removeMemberFromSEPProposal(
     memberId: $memberId
     sepId: $sepId
-    proposalId: $proposalId
+    proposalPk: $proposalPk
   ) {
     rejection {
       ...rejection

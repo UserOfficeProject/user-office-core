@@ -5,14 +5,14 @@ import { useDataApi } from 'hooks/common/useDataApi';
 
 export type SepProposalBasics = Pick<
   SepProposal,
-  'proposalId' | 'sepId' | 'sepTimeAllocation' | 'instrumentSubmitted'
+  'proposalPk' | 'sepId' | 'sepTimeAllocation' | 'instrumentSubmitted'
 > & {
   proposal: Proposal;
 };
 
 export function useSEPProposalData(
   sepId: number,
-  proposalId?: number | null
+  proposalPk?: number | null
 ): {
   loading: boolean;
   SEPProposalData: SepProposalBasics | null;
@@ -28,9 +28,9 @@ export function useSEPProposalData(
     let unmounted = false;
     setLoading(true);
 
-    if (proposalId && sepId) {
+    if (proposalPk && sepId) {
       api()
-        .getSEPProposal({ sepId, proposalId })
+        .getSEPProposal({ sepId, proposalPk })
         .then((data) => {
           if (unmounted) {
             return;
@@ -48,7 +48,7 @@ export function useSEPProposalData(
     return () => {
       unmounted = true;
     };
-  }, [sepId, api, proposalId]);
+  }, [sepId, api, proposalPk]);
 
   return { loading, SEPProposalData, setSEPProposalData };
 }
