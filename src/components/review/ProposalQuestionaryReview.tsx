@@ -22,7 +22,7 @@ export default function ProposalQuestionaryReview(
   const users = data.users || [];
 
   const additionalDetails: TableRowData[] = [
-    { label: 'Proposal ID', value: data.shortCode },
+    { label: 'Proposal ID', value: data.proposalId },
     { label: 'Title', value: data.title },
     { label: 'Abstract', value: data.abstract },
     {
@@ -42,7 +42,7 @@ export default function ProposalQuestionaryReview(
       questionaryId={data.questionaryId}
       additionalDetails={additionalDetails}
       title="Proposal information"
-      proposalId={data.id}
+      proposalPk={data.primaryKey}
       {...restProps}
     />
   );
