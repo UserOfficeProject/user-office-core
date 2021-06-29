@@ -98,9 +98,9 @@ context('Proposal tests', () => {
   });
 
   it('Should be able clone proposal to another call', () => {
-    const shortCode = faker.random.word().split(' ')[0]; // faker random word is buggy, it ofter returns phrases
-    const surveyComment = faker.random.word().split(' ')[0];
-    const cycleComment = faker.random.word().split(' ')[0];
+    const shortCode = faker.lorem.word();
+    const surveyComment = faker.lorem.word();
+    const cycleComment = faker.lorem.word();
     const startDate = faker.date.past().toISOString().slice(0, 10);
     const endDate = faker.date.future().toISOString().slice(0, 10);
     const template = 'default template';

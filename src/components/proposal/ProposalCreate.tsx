@@ -16,7 +16,7 @@ function createProposalStub(
   proposer: BasicUserDetails
 ): ProposalSubsetSubmission {
   return {
-    id: 0,
+    primaryKey: 0,
     title: '',
     abstract: '',
     callId: callId,
@@ -29,7 +29,7 @@ function createProposalStub(
       steps: questionarySteps,
     },
     questionaryId: 0,
-    shortCode: '',
+    proposalId: '',
     status: {
       id: 1,
       shortCode: 'DRAFT',
