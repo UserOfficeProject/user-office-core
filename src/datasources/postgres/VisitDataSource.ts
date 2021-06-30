@@ -107,6 +107,17 @@ class PostgresVisitDataSource implements VisitDataSource {
         return createVisitObject(result[0]);
       });
   }
+
+  isVisitorOfProposal(visitorId: number, proposalPk: number): Promise<boolean> {
+    return database
+      .select('*')
+      .from('visits_has_users')
+      .whereIn('visit_id', function () {
+        this.select('visit_id').from('visits').where('proposal_pk', proposalPk);
+      })
+      .andWhere('visits_has_users.user_id', visitorId)
+      .then((results) => results.length > 0);
+  }
 }
 
 export default PostgresVisitDataSource;

@@ -16,4 +16,5 @@ export interface VisitDataSource {
   ): Promise<Visit>;
   updateVisit(args: UpdateVisitArgs): Promise<Visit>;
   deleteVisit(visitId: number): Promise<Visit>;
+  isVisitorOfProposal(visitorId: number, proposalPk: number): Promise<boolean>;
 }

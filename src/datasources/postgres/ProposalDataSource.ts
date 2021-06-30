@@ -496,11 +496,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return database
       .select('p.*')
       .from('proposals as p')
-      .leftJoin('proposal_user as pc', {
-        'p.proposal_pk': 'pc.proposal_pk',
+      .where('p.proposer_id', id) // Principal investigator
+      .orWhereIn('proposal_pk', function () {
+        // co-proposer
+        this.select('proposal_pk').from('proposal_user').where('user_id', id);
       })
-      .where('pc.user_id', id)
-      .orWhere('p.proposer_id', id)
+      .orWhereIn('proposal_pk', function () {
+        // visitor
+        this.select('proposal_pk')
+          .from('visits')
+          .leftJoin(
+            'visits_has_users',
+            'visits.visit_id',
+            'visits_has_users.visit_id'
+          )
+          .where('visits_has_users.user_id', id);
+      })
       .modify((qb) => {
         if (filter?.instrumentId) {
           qb.innerJoin('instrument_has_proposals as ihp', {

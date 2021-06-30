@@ -57,4 +57,11 @@ export class VisitDataSourceMock implements VisitDataSource {
       1
     )[0];
   }
+
+  async isVisitorOfProposal(
+    visitorId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    return false;
+  }
 }
