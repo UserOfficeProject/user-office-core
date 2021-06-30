@@ -7,13 +7,15 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { User, UserWithRole } from '../models/User';
+import { VisitDataSource } from './../datasources/VisitDataSource';
 
 @injectable()
 export class UserAuthorization {
   constructor(
     @inject(Tokens.UserDataSource) private userDataSource: UserDataSource,
     @inject(Tokens.ReviewDataSource) private reviewDataSource: ReviewDataSource,
-    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource
+    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
+    @inject(Tokens.VisitDataSource) private visitDataSource: VisitDataSource
   ) {}
 
   isUserOfficer(agent: UserWithRole | null) {
@@ -127,8 +129,15 @@ export class UserAuthorization {
       (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
       (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
       (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
+      (await this.isVisitorOfProposal(agent, proposal.primaryKey)) ||
       this.hasGetAccessByToken(agent)
     );
+  }
+  isVisitorOfProposal(
+    agent: UserWithRole,
+    proposalPk: number
+  ): boolean | PromiseLike<boolean> {
+    return this.visitDataSource.isVisitorOfProposal(agent.id, proposalPk);
   }
 
   async isChairOrSecretaryOfSEP(
