@@ -115,6 +115,7 @@ context('visits tests', () => {
     cy.get('[title="Add More Visitors"]').click();
 
     cy.contains('Carlsson').parent().find('[type="checkbox"]').click();
+    cy.contains('Beckley').parent().find('[type="checkbox"]').click();
 
     cy.contains('Update').click();
 
@@ -131,6 +132,12 @@ context('visits tests', () => {
     cy.notification({ variant: 'success', text: 'Saved' });
 
     cy.get('[data-cy=confirm-ok]').click();
+  });
+
+  it('Visitor should be able to see proposal', () => {
+    cy.login({ email: 'ben@inbox.com', password: 'Test1234!' });
+
+    cy.contains(proposalTitle);
   });
 
   it('Should be able to delete visit', () => {
