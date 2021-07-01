@@ -20,7 +20,15 @@ context('Proposal tests', () => {
 
     cy.contains('New Proposal').click();
 
+    cy.contains('Carl');
     cy.get('[data-cy=edit-proposer-button]').click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy=email]').type('ben@inbox.com');
+
+    cy.get('[data-cy=findUser]').click();
+
     cy.contains('Benjamin').parent().find("[title='Select user']").click();
 
     cy.contains('Save and continue').click();

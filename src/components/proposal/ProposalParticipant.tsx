@@ -47,11 +47,13 @@ export default function ProposalParticipant(props: {
         close={() => {
           setIsPickerOpen(false);
         }}
+        selectedUsers={!!curUser ? [curUser?.id] : []}
         addParticipants={(users: BasicUserDetails[]) => {
           setCurUser(users[0]);
           props.userChanged(users[0]);
           setIsPickerOpen(false);
         }}
+        participant={true}
       />
       <FormControl margin="dense" fullWidth>
         <FormLabel component="div">

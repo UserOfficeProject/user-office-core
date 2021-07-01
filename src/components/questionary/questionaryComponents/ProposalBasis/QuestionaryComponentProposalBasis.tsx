@@ -125,6 +125,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
+        principalInvestigator={proposer?.id}
       />
       <ErrorMessage name={`${id}.users`} />
     </div>

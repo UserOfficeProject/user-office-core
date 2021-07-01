@@ -1862,6 +1862,7 @@ export type Query = {
   myVisits: Array<Visit>;
   activeTemplateId: Maybe<Scalars['Int']>;
   basicUserDetails: Maybe<BasicUserDetails>;
+  basicUserDetailsByEmail: Maybe<BasicUserDetails>;
   blankQuestionarySteps: Maybe<Array<QuestionaryStep>>;
   call: Maybe<Call>;
   checkEmailExist: Maybe<Scalars['Boolean']>;
@@ -1917,6 +1918,7 @@ export type Query = {
   user: Maybe<User>;
   me: Maybe<User>;
   users: Maybe<UserQueryResult>;
+  previousCollaborators: Maybe<UserQueryResult>;
   visit: Maybe<Visit>;
   scheduledEvents: Array<ScheduledEvent>;
   scheduledEvent: Maybe<ScheduledEvent>;
@@ -1985,6 +1987,12 @@ export type QueryActiveTemplateIdArgs = {
 
 export type QueryBasicUserDetailsArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QueryBasicUserDetailsByEmailArgs = {
+  role?: Maybe<UserRole>;
+  email: Scalars['String'];
 };
 
 
@@ -2195,6 +2203,16 @@ export type QueryUsersArgs = {
   offset?: Maybe<Scalars['Int']>;
   userRole?: Maybe<UserRole>;
   subtractUsers?: Maybe<Array<Maybe<Scalars['Int']>>>;
+};
+
+
+export type QueryPreviousCollaboratorsArgs = {
+  filter?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  userRole?: Maybe<UserRole>;
+  subtractUsers?: Maybe<Array<Maybe<Scalars['Int']>>>;
+  userId: Scalars['Int'];
 };
 
 
@@ -2546,7 +2564,7 @@ export type ScheduledEvent = {
   scheduledBy: Maybe<User>;
   description: Maybe<Scalars['String']>;
   instrument: Maybe<Instrument>;
-  equipmentId: Maybe<Scalars['Int']>;
+  equipmentId: Scalars['Int'];
   equipments: Array<EquipmentWithAssignmentStatus>;
   equipmentAssignmentStatus: Maybe<EquipmentAssignmentStatus>;
   proposalBooking: Maybe<ProposalBooking>;
@@ -6443,6 +6461,20 @@ export type GetBasicUserDetailsQuery = (
   )> }
 );
 
+export type GetBasicUserDetailsByEmailQueryVariables = Exact<{
+  email: Scalars['String'];
+  role?: Maybe<UserRole>;
+}>;
+
+
+export type GetBasicUserDetailsByEmailQuery = (
+  { __typename?: 'Query' }
+  & { basicUserDetailsByEmail: Maybe<(
+    { __typename?: 'BasicUserDetails' }
+    & BasicUserDetailsFragment
+  )> }
+);
+
 export type GetFieldsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -6482,6 +6514,28 @@ export type GetOrcIdInformationQuery = (
   & { getOrcIDInformation: Maybe<(
     { __typename?: 'OrcIDInformation' }
     & Pick<OrcIdInformation, 'firstname' | 'lastname' | 'orcid' | 'orcidHash' | 'refreshToken' | 'token'>
+  )> }
+);
+
+export type GetPreviousCollaboratorsQueryVariables = Exact<{
+  userId: Scalars['Int'];
+  filter?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  userRole?: Maybe<UserRole>;
+  subtractUsers?: Maybe<Array<Scalars['Int']> | Scalars['Int']>;
+}>;
+
+
+export type GetPreviousCollaboratorsQuery = (
+  { __typename?: 'Query' }
+  & { previousCollaborators: Maybe<(
+    { __typename?: 'UserQueryResult' }
+    & Pick<UserQueryResult, 'totalCount'>
+    & { users: Array<(
+      { __typename?: 'BasicUserDetails' }
+      & BasicUserDetailsFragment
+    )> }
   )> }
 );
 
@@ -9732,6 +9786,13 @@ export const GetBasicUserDetailsDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
+export const GetBasicUserDetailsByEmailDocument = gql`
+    query getBasicUserDetailsByEmail($email: String!, $role: UserRole) {
+  basicUserDetailsByEmail(email: $email, role: $role) {
+    ...basicUserDetails
+  }
+}
+    ${BasicUserDetailsFragmentDoc}`;
 export const GetFieldsDocument = gql`
     query getFields {
   getFields {
@@ -9767,6 +9828,23 @@ export const GetOrcIdInformationDocument = gql`
   }
 }
     `;
+export const GetPreviousCollaboratorsDocument = gql`
+    query getPreviousCollaborators($userId: Int!, $filter: String, $first: Int, $offset: Int, $userRole: UserRole, $subtractUsers: [Int!]) {
+  previousCollaborators(
+    userId: $userId
+    filter: $filter
+    first: $first
+    offset: $offset
+    userRole: $userRole
+    subtractUsers: $subtractUsers
+  ) {
+    users {
+      ...basicUserDetails
+    }
+    totalCount
+  }
+}
+    ${BasicUserDetailsFragmentDoc}`;
 export const GetRolesDocument = gql`
     query getRoles {
   roles {
@@ -10587,6 +10665,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getBasicUserDetails(variables: GetBasicUserDetailsQueryVariables): Promise<GetBasicUserDetailsQuery> {
       return withWrapper(() => client.request<GetBasicUserDetailsQuery>(print(GetBasicUserDetailsDocument), variables));
     },
+    getBasicUserDetailsByEmail(variables: GetBasicUserDetailsByEmailQueryVariables): Promise<GetBasicUserDetailsByEmailQuery> {
+      return withWrapper(() => client.request<GetBasicUserDetailsByEmailQuery>(print(GetBasicUserDetailsByEmailDocument), variables));
+    },
     getFields(variables?: GetFieldsQueryVariables): Promise<GetFieldsQuery> {
       return withWrapper(() => client.request<GetFieldsQuery>(print(GetFieldsDocument), variables));
     },
@@ -10595,6 +10676,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getOrcIDInformation(variables: GetOrcIdInformationQueryVariables): Promise<GetOrcIdInformationQuery> {
       return withWrapper(() => client.request<GetOrcIdInformationQuery>(print(GetOrcIdInformationDocument), variables));
+    },
+    getPreviousCollaborators(variables: GetPreviousCollaboratorsQueryVariables): Promise<GetPreviousCollaboratorsQuery> {
+      return withWrapper(() => client.request<GetPreviousCollaboratorsQuery>(print(GetPreviousCollaboratorsDocument), variables));
     },
     getRoles(variables?: GetRolesQueryVariables): Promise<GetRolesQuery> {
       return withWrapper(() => client.request<GetRolesQuery>(print(GetRolesDocument), variables));

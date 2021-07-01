@@ -3,7 +3,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import AddBox from '@material-ui/icons/AddBox';
 import React from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import PeopleTable from 'components/user/PeopleTable';
+import ProposalPeopleTable from 'components/user/ProposalsPeopleTable';
 import { UserRole, BasicUserDetails } from 'generated/sdk';
 
 function ParticipantModal(props: {
@@ -15,6 +17,7 @@ function ParticipantModal(props: {
   selectedUsers?: number[];
   userRole?: UserRole;
   invitationUserRole?: UserRole;
+  participant?: boolean;
 }) {
   const addUser = (rowData: BasicUserDetails) => {
     props.addParticipants([
@@ -27,6 +30,27 @@ function ParticipantModal(props: {
     ]);
   };
 
+  const someProps = {
+    title: props.title,
+    action: {
+      fn: addUser,
+      actionText: 'Select user',
+      actionIcon: <AddBox data-cy="select-user" />,
+    },
+    selectedUsers: props.selectedUsers,
+    userRole: props.userRole || ('' as UserRole),
+    emailInvite: true,
+    selection: !!props.selection,
+    onUpdate: (data: BasicUserDetails[]) => props.addParticipants(data),
+    invitationUserRole: props.invitationUserRole || props.userRole,
+  };
+
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+
+  const peopleTable = <PeopleTable {...someProps} />;
+
+  const prosalPeopleTable = <ProposalPeopleTable {...someProps} />;
+
   return (
     <Dialog
       aria-labelledby="simple-modal-title"
@@ -37,20 +61,7 @@ function ParticipantModal(props: {
       fullWidth
     >
       <DialogContent>
-        <PeopleTable
-          title={props.title}
-          action={{
-            fn: addUser,
-            actionText: 'Select user',
-            actionIcon: <AddBox data-cy="select-user" />,
-          }}
-          selectedUsers={props.selectedUsers}
-          userRole={props.userRole || ('' as UserRole)}
-          emailInvite={true}
-          selection={!!props.selection}
-          onUpdate={(data) => props.addParticipants(data as BasicUserDetails[])}
-          invitationUserRole={props.invitationUserRole || props.userRole}
-        />
+        {props.participant && !isUserOfficer ? prosalPeopleTable : peopleTable}
       </DialogContent>
     </Dialog>
   );
