@@ -1,5 +1,5 @@
-query getProposal($id: Int!) {
-  proposal(id: $id) {
+query getProposal($primaryKey: Int!) {
+  proposal(primaryKey: $primaryKey) {
     ...proposal
     proposer {
       ...basicUserDetails

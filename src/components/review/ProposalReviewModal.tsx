@@ -58,7 +58,7 @@ const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
     }
 
     return api()
-      .getProposal({ id: reviewItemId })
+      .getProposal({ primaryKey: reviewItemId })
       .then((data) => {
         return data.proposal as Proposal;
       });
