@@ -63,6 +63,7 @@ function AssignTechnicalReview({
         value={userIdToUser(selectedUser)}
         disableClearable
         data-cy="user-list"
+        disabled={proposal.technicalReview?.submitted}
       />
       <Button
         onClick={() => {
@@ -96,6 +97,7 @@ function AssignTechnicalReview({
         variant="contained"
         color="primary"
         className={classes.submitButton}
+        disabled={proposal.technicalReview?.submitted}
       >
         Assign
       </Button>
