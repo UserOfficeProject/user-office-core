@@ -8,6 +8,10 @@ export interface UserDataSource {
   addUserRole(args: AddUserRoleArgs): Promise<boolean>;
   createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
+  getBasicUserDetailsByEmail(
+    email: string,
+    role?: UserRole
+  ): Promise<BasicUserDetails | null>;
   checkEmailExist(email: string): Promise<boolean>;
   checkOrcIDExist(orcID: string): Promise<boolean>;
   // Read

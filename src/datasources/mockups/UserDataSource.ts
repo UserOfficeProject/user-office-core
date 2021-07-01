@@ -1,5 +1,10 @@
 import { Role, Roles } from '../../models/Role';
-import { BasicUserDetails, User, UserWithRole } from '../../models/User';
+import {
+  BasicUserDetails,
+  User,
+  UserRole,
+  UserWithRole,
+} from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UserDataSource } from '../UserDataSource';
@@ -189,6 +194,22 @@ export class UserDataSourceMock implements UserDataSource {
   ): Promise<import('../../models/User').BasicUserDetails | null> {
     throw new Error('Method not implemented.');
   }
+
+  async getBasicUserDetailsByEmail(
+    email: string,
+    role?: UserRole
+  ): Promise<import('../../models/User').BasicUserDetails | null> {
+    return new BasicUserDetails(
+      1,
+      'John',
+      'Smith',
+      'ESS',
+      'Manager',
+      new Date('2019-07-17 08:25:12.23043+00'),
+      false
+    );
+  }
+
   async checkOrcIDExist(orcID: string): Promise<boolean> {
     return false;
   }

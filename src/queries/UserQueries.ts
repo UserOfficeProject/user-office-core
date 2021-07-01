@@ -62,6 +62,28 @@ export default class UserQueries {
     );
   }
 
+  @Authorized()
+  async getBasicUserDetailsByEmail(
+    agent: UserWithRole | null,
+    email: string,
+    role?: UserRole
+  ) {
+    const user = await this.dataSource.getBasicUserDetailsByEmail(email, role);
+    if (!user) {
+      return null;
+    }
+
+    return new BasicUserDetails(
+      user.id,
+      user.firstname,
+      user.lastname,
+      user.organisation,
+      user.position,
+      user.created,
+      user.placeholder
+    );
+  }
+
   async checkEmailExist(agent: UserWithRole | null, email: string) {
     return this.dataSource.checkEmailExist(email);
   }

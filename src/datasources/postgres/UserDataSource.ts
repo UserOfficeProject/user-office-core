@@ -242,6 +242,28 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => createBasicUserObject(user));
   }
 
+  async getBasicUserDetailsByEmail(
+    email: string,
+    role?: UserRole
+  ): Promise<BasicUserDetails | null> {
+    return database
+      .select()
+      .from('users as u')
+      .join('institutions as i', { 'u.organisation': 'i.institution_id' })
+      .where('email', 'ilike', email)
+      .modify((query) => {
+        if (role) {
+          query.join('role_user', 'role_user.user_id', '=', 'u.user_id');
+          query.join('roles', 'roles.role_id', '=', 'role_user.role_id');
+          query.where('roles.short_code', UserRoleShortCodeMap[role]);
+        }
+      })
+      .first()
+      .then((user: UserRecord) =>
+        !!user ? createBasicUserObject(user) : null
+      );
+  }
+
   async getByUsername(username: string): Promise<User | null> {
     return database
       .select()
@@ -424,7 +446,9 @@ export default class PostgresUserDataSource implements UserDataSource {
 
     const freqCollaborators = await this.getFrequentCollaborators(userId);
 
-    const userIds = [...new Set([...lastCollaborators, ...freqCollaborators])];
+    const userIds = [
+      ...new Set([...lastCollaborators, ...freqCollaborators, userId]),
+    ];
 
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])

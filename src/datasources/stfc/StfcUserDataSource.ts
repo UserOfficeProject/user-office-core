@@ -1,6 +1,6 @@
 import { Role } from '../../models/Role';
 import { Roles } from '../../models/Role';
-import { BasicUserDetails, User } from '../../models/User';
+import { BasicUserDetails, User, UserRole } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import PostgresUserDataSource from '../postgres/UserDataSource';
@@ -113,6 +113,17 @@ export class StfcUserDataSource implements UserDataSource {
     const stfcUser = (
       await client.getBasicPersonDetailsFromUserNumber(token, id)
     )?.return;
+
+    return stfcUser ? toEssBasicUserDetails(stfcUser) : null;
+  }
+
+  async getBasicUserDetailsByEmail(
+    email: string,
+    role?: UserRole
+  ): Promise<BasicUserDetails | null> {
+    //Implement role logic
+    const stfcUser = (await client.getBasicPersonDetailsFromEmail(token, email))
+      ?.return;
 
     return stfcUser ? toEssBasicUserDetails(stfcUser) : null;
   }
