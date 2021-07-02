@@ -4,7 +4,7 @@ import DoneAll from '@material-ui/icons/DoneAll';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import RateReviewIcon from '@material-ui/icons/RateReview';
 import Visibility from '@material-ui/icons/Visibility';
-import MaterialTable from 'material-table';
+import MaterialTable, { Column } from 'material-table';
 import React, { useState, useContext, useEffect } from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
@@ -23,6 +23,7 @@ import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
+import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -216,7 +217,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     }
   ): JSX.Element => <DoneAll {...props} />;
 
-  const columns = [
+  let columns: Column<UserWithReview>[] = [
     {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
@@ -230,6 +231,12 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     { title: 'Call', field: 'callShortCode' },
     { title: 'Instrument', field: 'instrumentShortCode' },
   ];
+
+  columns = setSortDirectionOnSortColumn(
+    columns,
+    urlQueryParams.sortColumn,
+    urlQueryParams.sortDirection
+  );
 
   const updateView = () => {
     if (currentAssignment) {
@@ -370,6 +377,14 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
                   )
                 : undefined,
           }));
+        }}
+        onOrderChange={(orderedColumnId, orderDirection) => {
+          setUrlQueryParams &&
+            setUrlQueryParams((params) => ({
+              ...params,
+              sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
+              sortDirection: orderDirection ? orderDirection : undefined,
+            }));
         }}
         localization={{
           toolbar: {
