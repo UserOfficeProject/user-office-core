@@ -3,7 +3,9 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import InfoIcon from '@material-ui/icons/InfoOutlined';
 import { Editor } from '@tinymce/tinymce-react';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -117,7 +119,15 @@ const ProposalTechnicalReview = ({
   return (
     <>
       <Typography variant="h6" gutterBottom>
-        Technical Review
+        Technical Review{' '}
+        {proposal.technicalReview?.reviewer && (
+          <Tooltip
+            data-cy="reviewed-by-info"
+            title={`Reviewed by ${proposal.technicalReview?.reviewer?.firstname} ${proposal.technicalReview?.reviewer?.lastname}`}
+          >
+            <InfoIcon fontSize="small" />
+          </Tooltip>
+        )}
       </Typography>
       <Formik
         initialValues={initialValues}
