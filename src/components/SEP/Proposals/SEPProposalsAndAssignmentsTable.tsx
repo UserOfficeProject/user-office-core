@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import Grid from '@material-ui/core/Grid';
@@ -348,7 +349,11 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
             components={{
               Toolbar: Toolbar,
             }}
-            title={'SEP Proposals'}
+            title={
+              <Typography variant="h6" component="h2" gutterBottom>
+                {'SEP Proposals'}
+              </Typography>
+            }
             data={initialValues}
             isLoading={loadingSEPProposals}
             localization={{

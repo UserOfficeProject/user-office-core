@@ -74,7 +74,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
 
   return (
     <>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" component="h2" gutterBottom>
         Administration
       </Typography>
       <Formik

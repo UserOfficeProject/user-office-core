@@ -249,7 +249,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
         userRole={UserRole.SEP_REVIEWER}
       />
       <>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" component="h2" gutterBottom>
           SEP Members
         </Typography>
         <Grid container spacing={3} alignItems="center">

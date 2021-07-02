@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
@@ -78,7 +79,11 @@ const VisitsTable = (props: { confirm: WithConfirmType }) => {
         hasAccess={{ update: true, create: true, remove: true }}
         icons={tableIcons}
         localization={tableLocalization}
-        title="Visits"
+        title={
+          <Typography variant="h6" component="h2">
+            {'Visits'}
+          </Typography>
+        }
         columns={columns}
         isLoading={loadingVisits}
         data={visits}

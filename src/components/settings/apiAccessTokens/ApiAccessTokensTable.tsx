@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -73,7 +74,11 @@ const ApiAccessTokensTable: React.FC = () => {
         }}
         setData={setApiAccessTokens}
         icons={tableIcons}
-        title={'API Access Tokens'}
+        title={
+          <Typography variant="h6" component="h2">
+            {'API Access Tokens'}
+          </Typography>
+        }
         columns={columns}
         data={apiAccessTokens}
         isLoading={loadingApiAccessTokens}

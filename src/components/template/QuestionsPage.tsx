@@ -1,4 +1,4 @@
-import { Grid, Link } from '@material-ui/core';
+import { Grid, Link, Typography } from '@material-ui/core';
 import React, { useState } from 'react';
 
 import StyledModal from 'components/common/StyledModal';
@@ -103,7 +103,11 @@ function QuestionsPage() {
               }
               setData={setQuestions}
               icons={tableIcons}
-              title="Questions"
+              title={
+                <Typography variant="h6" component="h2">
+                  {'Questions'}
+                </Typography>
+              }
               columns={columns}
               isLoading={loadingQuestions}
               data={questions}

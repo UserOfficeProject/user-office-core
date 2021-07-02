@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -69,7 +70,11 @@ const InstitutionPage: React.FC = () => {
         setData={setInstitutions}
         createModal={createModal}
         icons={tableIcons}
-        title={'Institutions'}
+        title={
+          <Typography variant="h6" component="h2">
+            {'Institutions'}
+          </Typography>
+        }
         columns={columns}
         isLoading={loadingInstitutions}
         data={institutions}

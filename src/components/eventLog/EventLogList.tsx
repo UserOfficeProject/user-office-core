@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
@@ -44,7 +45,11 @@ const EventLogList: React.FC<EventLogListProps> = ({
     <div data-cy="event-logs-table">
       <MaterialTable
         icons={tableIcons}
-        title={'Event logs'}
+        title={
+          <Typography variant="h6" component="h2">
+            {'Event logs'}
+          </Typography>
+        }
         columns={columns}
         data={eventLogsData}
         isLoading={loading}

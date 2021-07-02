@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import MaterialTable from 'material-table';
 import React, { useContext, useEffect, useState } from 'react';
@@ -77,7 +78,11 @@ export default function UpdateUserRoles(props: { id: number }) {
         activeRoles={roles}
       />
       <MaterialTable
-        title="Roles"
+        title={
+          <Typography variant="h6" component="h2" gutterBottom>
+            {'Roles'}
+          </Typography>
+        }
         columns={columns}
         icons={tableIcons}
         data={roles.map((role: Role) => {
