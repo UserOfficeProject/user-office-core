@@ -370,7 +370,11 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
           <Grid data-cy="sep-reviewers-table" item xs={12}>
             <MaterialTable
               icons={tableIcons}
-              title={'Reviewers'}
+              title={
+                <Typography variant="h6" component="h3" gutterBottom>
+                  {'Reviewers'}
+                </Typography>
+              }
               columns={columns}
               data={SEPReviewersData ?? []}
               editable={
