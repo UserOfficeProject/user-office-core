@@ -64,15 +64,17 @@ const GeneralInformation: React.FC<GeneralInformationProps> = ({
         />
       )}
       {isEditable ? getEditableView() : getReadonlyView()}
-      <div className={classes.buttons}>
-        <Button
-          className={classes.button}
-          onClick={() => downloadPDFProposal([data.primaryKey], data.title)}
-          variant="contained"
-        >
-          Download PDF
-        </Button>
-      </div>
+      {!isEditable && (
+        <div className={classes.buttons}>
+          <Button
+            className={classes.button}
+            onClick={() => downloadPDFProposal([data.primaryKey], data.title)}
+            variant="contained"
+          >
+            Download PDF
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

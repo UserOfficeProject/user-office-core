@@ -13,7 +13,6 @@ import { Redirect } from 'react-router';
 import { UserContext } from 'context/UserContextProvider';
 import { Call } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
-import { getProposalStatus } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
 import { timeAgo } from 'utils/Time';
@@ -104,7 +103,7 @@ const ProposalTable = ({
       const newClonedProposal = {
         primaryKey: resultProposal.primaryKey,
         title: resultProposal.title,
-        status: getProposalStatus(resultProposal),
+        status: resultProposal.status,
         publicStatus: resultProposal.publicStatus,
         submitted: resultProposal.submitted,
         proposalId: resultProposal.proposalId,
@@ -149,7 +148,10 @@ const ProposalTable = ({
         actions={[
           (rowData) => {
             const isCallActive = rowData.call?.isActive ?? true;
-            const readOnly = !isCallActive || rowData.submitted;
+            const readOnly =
+              !isCallActive ||
+              (rowData.submitted &&
+                rowData.status?.shortCode !== 'EDITABLE_SUBMITTED');
 
             return {
               icon: readOnly ? () => <Visibility /> : () => <Edit />,
