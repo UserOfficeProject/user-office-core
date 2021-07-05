@@ -223,6 +223,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       proposal_sep_meeting_submitted: false,
       proposal_instrument_submitted: false,
       proposal_accepted: false,
+      proposal_reserved: false,
       proposal_rejected: false,
       proposal_notified: false,
     };
