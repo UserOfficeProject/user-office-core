@@ -54,6 +54,9 @@ context('Proposal administration tests', () => {
     cy.get('[data-cy=view-proposal]').click();
     cy.finishedLoading();
     cy.get('[role="dialog"]').contains('Admin').click();
+    cy.get('#mui-component-select-finalStatus').should('exist');
+    cy.get('[role="dialog"]').contains('Logs').click();
+    cy.get('[role="dialog"]').contains('Admin').click();
 
     cy.get('#mui-component-select-finalStatus').click();
 
@@ -75,6 +78,16 @@ context('Proposal administration tests', () => {
 
     cy.setTinyMceContent('commentForUser', textUser);
     cy.setTinyMceContent('commentForManagement', textManager);
+
+    cy.on('window:confirm', (str) => {
+      expect(str).to.equal(
+        'Changes you recently made in this tab will be lost! Are you sure?'
+      );
+
+      return false;
+    });
+
+    cy.contains('Proposal information').click();
 
     cy.get('[data-cy="is-management-decision-submitted"]').click();
 

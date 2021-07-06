@@ -145,9 +145,11 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                     toolbar: 'bold italic',
                     branding: false,
                   }}
-                  onEditorChange={(content: string) =>
-                    setFieldValue('commentForUser', content)
-                  }
+                  onEditorChange={(content, editor) => {
+                    if (content !== editor.startContent || editor.isDirty()) {
+                      setFieldValue('commentForUser', content);
+                    }
+                  }}
                   disabled={!isUserOfficer || isSubmitting}
                 />
               </Grid>
@@ -175,9 +177,11 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                     toolbar: 'bold italic',
                     branding: false,
                   }}
-                  onEditorChange={(content: string) =>
-                    setFieldValue('commentForManagement', content)
-                  }
+                  onEditorChange={(content, editor) => {
+                    if (content !== editor.startContent || editor.isDirty()) {
+                      setFieldValue('commentForManagement', content);
+                    }
+                  }}
                   disabled={!isUserOfficer || isSubmitting}
                 />
               </Grid>

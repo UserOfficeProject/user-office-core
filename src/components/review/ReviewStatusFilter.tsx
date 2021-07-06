@@ -36,7 +36,7 @@ const ReviewStatusFilter: React.FC<ReviewStatusFilterProps> = ({
 
   return (
     <FormControl className={classes.formControl}>
-      <InputLabel shrink>Status</InputLabel>
+      <InputLabel shrink>Review status</InputLabel>
       <Select
         onChange={(e) => onChange(e.target.value as ReviewStatus)}
         value={reviewStatus}

@@ -341,6 +341,16 @@ context('Instrument tests', () => {
     cy.finishedLoading();
     cy.get('@dialog').contains('Technical review').click();
 
+    cy.get('@dialog').find('[data-cy="timeAllocation"] input').should('exist');
+
+    cy.get('@dialog').contains('Proposal information').click();
+
+    cy.finishedLoading();
+
+    cy.get('@dialog').contains(proposal1.title);
+
+    cy.get('@dialog').contains('Technical review').click();
+
     cy.get('[data-cy="timeAllocation"] input').type('-123').blur();
     cy.contains('Must be greater than or equal to');
 
