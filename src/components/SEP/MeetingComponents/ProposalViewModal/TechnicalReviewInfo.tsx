@@ -242,11 +242,9 @@ const TechnicalReviewInfo: React.FC<TechnicalReviewInfoProps> = ({
               </TableRow>
               <TableRow key="reviewer">
                 <TableCell className={classes.textBold}>Reviewer</TableCell>
-                <TableCell
-                  dangerouslySetInnerHTML={{
-                    __html: getFullUserName(technicalReview?.reviewer),
-                  }}
-                />
+                <TableCell>
+                  {getFullUserName(technicalReview?.reviewer)}
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>

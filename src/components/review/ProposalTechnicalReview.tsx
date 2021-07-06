@@ -24,6 +24,7 @@ import {
 } from 'generated/sdk';
 import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 const useStyles = makeStyles((theme) => ({
@@ -123,7 +124,9 @@ const ProposalTechnicalReview = ({
         {proposal.technicalReview?.reviewer && (
           <Tooltip
             data-cy="reviewed-by-info"
-            title={`Reviewed by ${proposal.technicalReview?.reviewer?.firstname} ${proposal.technicalReview?.reviewer?.lastname}`}
+            title={`Reviewed by ${getFullUserName(
+              proposal.technicalReview?.reviewer
+            )}`}
           >
             <InfoIcon fontSize="small" />
           </Tooltip>
