@@ -70,7 +70,6 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
       setAdministration(administrationValues);
     }
   };
-  console.log(initialValues);
 
   return (
     <>

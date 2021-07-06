@@ -1,5 +1,6 @@
 import { Button, Link, makeStyles, Paper, Typography } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
+import clsx from 'clsx';
 import React, { Fragment, useContext, useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -53,6 +54,10 @@ const useStyles = makeStyles((theme) => ({
   showReassignLink: {
     cursor: 'pointer',
   },
+  reassignContainerDisabled: {
+    pointerEvents: 'none',
+    opacity: '0.5',
+  },
 }));
 
 const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
@@ -97,40 +102,40 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
     />
   );
 
-  const assignAnotherReviewerView = (proposal: ProposalData) => {
-    if (proposal.technicalReview?.submitted) {
-      return null;
-    }
-
-    return (
-      <Paper elevation={1} className={classes.reassignContainer}>
-        <Typography variant="h6" gutterBottom>
-          Assign to someone else?
-        </Typography>
-        If you think there is a better candidate to do the review for the
-        proposal, you can re-assign it to someone else
-        <div>
-          {showReassign ? (
-            <AssignTechnicalReview
-              proposal={proposal}
-              onProposalUpdated={(updatedProposal) => {
-                setProposalData(updatedProposal);
-                setShowReassign(false);
-              }}
-            />
-          ) : (
-            <Link
-              onClick={() => setShowReassign(true)}
-              className={classes.showReassignLink}
-              data-cy="re-assign"
-            >
-              Re-assign...
-            </Link>
-          )}
-        </div>
-      </Paper>
-    );
-  };
+  const assignAnotherReviewerView = (proposal: ProposalData) => (
+    <Paper
+      elevation={1}
+      className={clsx(
+        classes.reassignContainer,
+        proposal.technicalReview?.submitted && classes.reassignContainerDisabled
+      )}
+    >
+      <Typography variant="h6" gutterBottom>
+        Assign to someone else?
+      </Typography>
+      If you think there is a better candidate to do the review for the
+      proposal, you can re-assign it to someone else
+      <div>
+        {showReassign ? (
+          <AssignTechnicalReview
+            proposal={proposal}
+            onProposalUpdated={(updatedProposal) => {
+              setProposalData(updatedProposal);
+              setShowReassign(false);
+            }}
+          />
+        ) : (
+          <Link
+            onClick={() => setShowReassign(true)}
+            className={classes.showReassignLink}
+            data-cy="re-assign"
+          >
+            Re-assign...
+          </Link>
+        )}
+      </div>
+    </Paper>
+  );
 
   const TechnicalReviewTab =
     isUserOfficer || proposalData.technicalReviewAssignee === user.id ? (
