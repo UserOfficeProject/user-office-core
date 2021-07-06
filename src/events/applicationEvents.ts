@@ -52,6 +52,11 @@ interface ProposalRejectedEvent extends GeneralEvent {
   reason: string;
 }
 
+interface ProposalReservedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_RESERVED;
+  proposal: Proposal;
+}
+
 interface ProposalCreatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_CREATED;
   proposal: Proposal;
@@ -255,6 +260,7 @@ export type ApplicationEvent =
   | ProposalUnfeasibleEvent
   | ProposalSampleSafeEvent
   | ProposalRejectedEvent
+  | ProposalReservedEvent
   | ProposalCreatedEvent
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent
