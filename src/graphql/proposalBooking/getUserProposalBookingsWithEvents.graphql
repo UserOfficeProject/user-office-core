@@ -18,6 +18,10 @@ query getUserProposalBookingsWithEvents(
       visits {
         ...visit
       }
+      instrument {
+        id
+        name
+      }
     }
   }
 }
