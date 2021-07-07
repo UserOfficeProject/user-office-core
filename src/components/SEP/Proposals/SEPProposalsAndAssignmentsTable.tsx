@@ -351,7 +351,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
             }}
             title={
               <Typography variant="h6" component="h2" gutterBottom>
-                {'SEP Proposals'}
+                SEP Proposals
               </Typography>
             }
             data={initialValues}

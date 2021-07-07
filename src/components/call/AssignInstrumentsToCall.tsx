@@ -68,7 +68,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h1">
-            {'Instruments'}
+            Instruments
           </Typography>
         }
         columns={columns}

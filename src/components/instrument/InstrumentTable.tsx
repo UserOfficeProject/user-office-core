@@ -171,7 +171,7 @@ const InstrumentTable: React.FC = () => {
           }}
           title={
             <Typography variant="h6" component="h2">
-              {'Instruments'}
+              Instruments
             </Typography>
           }
           columns={columns}

@@ -148,7 +148,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {'Instruments with proposals'}
+            Instruments with proposals
           </Typography>
         }
         columns={columns}

@@ -125,7 +125,7 @@ const SEPsTable: React.FC = () => {
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {'Scientific evaluation panels'}
+            Scientific evaluation panels
           </Typography>
         }
         columns={columns}

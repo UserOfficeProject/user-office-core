@@ -219,7 +219,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {'Templates'}
+            Templates
           </Typography>
         }
         columns={props.columns}

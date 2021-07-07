@@ -372,7 +372,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               icons={tableIcons}
               title={
                 <Typography variant="h6" component="h3" gutterBottom>
-                  {'Reviewers'}
+                  Reviewers
                 </Typography>
               }
               columns={columns}

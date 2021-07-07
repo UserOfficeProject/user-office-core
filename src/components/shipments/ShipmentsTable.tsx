@@ -103,7 +103,7 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
         localization={tableLocalization}
         title={
           <Typography variant="h6" component="h2">
-            {'Shipments'}
+            Shipments
           </Typography>
         }
         columns={columns}

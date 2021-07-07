@@ -626,7 +626,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {'Proposals'}
+            Proposals
           </Typography>
         }
         columns={columns}

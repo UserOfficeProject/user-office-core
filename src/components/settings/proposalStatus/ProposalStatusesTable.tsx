@@ -80,7 +80,7 @@ const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {'Proposal statuses'}
+            Proposal statuses
           </Typography>
         }
         columns={columns}

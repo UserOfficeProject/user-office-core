@@ -30,7 +30,7 @@ const SamplesTable = (
       icons={tableIcons}
       title={
         <Typography variant="h6" component="h2">
-          {'Samples'}
+          Samples
         </Typography>
       }
       onSearchChange={(searchText) => {

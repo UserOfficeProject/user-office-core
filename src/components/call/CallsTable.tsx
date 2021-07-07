@@ -237,7 +237,7 @@ const CallsTable: React.FC = () => {
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {'Calls'}
+            Calls
           </Typography>
         }
         columns={columns}

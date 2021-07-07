@@ -105,7 +105,7 @@ function QuestionsPage() {
               icons={tableIcons}
               title={
                 <Typography variant="h6" component="h2">
-                  {'Questions'}
+                  Questions
                 </Typography>
               }
               columns={columns}

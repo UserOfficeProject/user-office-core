@@ -72,7 +72,7 @@ const InstitutionPage: React.FC = () => {
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {'Institutions'}
+            Institutions
           </Typography>
         }
         columns={columns}

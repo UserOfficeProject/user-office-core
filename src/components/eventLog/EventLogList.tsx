@@ -47,7 +47,7 @@ const EventLogList: React.FC<EventLogListProps> = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {'Event logs'}
+            Event logs
           </Typography>
         }
         columns={columns}

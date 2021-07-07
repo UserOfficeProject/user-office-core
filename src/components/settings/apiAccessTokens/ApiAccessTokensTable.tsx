@@ -76,7 +76,7 @@ const ApiAccessTokensTable: React.FC = () => {
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {'API Access Tokens'}
+            API Access Tokens
           </Typography>
         }
         columns={columns}

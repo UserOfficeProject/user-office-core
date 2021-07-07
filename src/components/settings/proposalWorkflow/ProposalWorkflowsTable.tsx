@@ -80,7 +80,7 @@ const ProposalWorkflowsTable: React.FC = () => {
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {'Proposal workflows'}
+            Proposal workflows
           </Typography>
         }
         columns={columns}

@@ -65,7 +65,7 @@ const UnitTable: React.FC = () => {
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            {'Units'}
+            Units
           </Typography>
         }
         columns={columns}

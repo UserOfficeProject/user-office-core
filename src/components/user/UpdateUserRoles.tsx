@@ -80,7 +80,7 @@ export default function UpdateUserRoles(props: { id: number }) {
       <MaterialTable
         title={
           <Typography variant="h6" component="h2" gutterBottom>
-            {'Roles'}
+            Roles
           </Typography>
         }
         columns={columns}
