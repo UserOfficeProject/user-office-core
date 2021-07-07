@@ -83,7 +83,7 @@ export default class ProposalSettingsQueries {
     return groupedProposalWorkflowConnections;
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized()
   async proposalWorkflowConnectionGroups(
     agent: UserWithRole | null,
     proposalWorkflowId: number

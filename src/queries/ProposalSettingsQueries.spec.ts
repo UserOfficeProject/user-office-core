@@ -60,15 +60,6 @@ describe('Test Proposal Workflows Queries', () => {
     ).resolves.toStrictEqual(dummyProposalWorkflow);
   });
 
-  test('A user can not get Proposal Workflow connections', () => {
-    return expect(
-      ProposalSettingsQueriesInstance.proposalWorkflowConnectionGroups(
-        dummyUserWithRole,
-        1
-      )
-    ).resolves.toBe(null);
-  });
-
   test('A userofficer can get Proposal Workflow connections', () => {
     return expect(
       ProposalSettingsQueriesInstance.proposalWorkflowConnectionGroups(
