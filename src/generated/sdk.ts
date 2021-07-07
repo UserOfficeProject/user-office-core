@@ -1800,7 +1800,7 @@ export type ProposalWorkflowConnection = {
   nextProposalStatusId: Maybe<Scalars['Int']>;
   prevProposalStatusId: Maybe<Scalars['Int']>;
   droppableGroupId: Scalars['String'];
-  statusChangingEvents: Array<StatusChangingEvent>;
+  statusChangingEvents: Maybe<Array<StatusChangingEvent>>;
 };
 
 export type ProposalWorkflowConnectionGroup = {
@@ -5285,10 +5285,10 @@ export type CreateProposalWorkflowMutation = (
           & { proposalStatus: (
             { __typename?: 'ProposalStatus' }
             & ProposalStatusFragment
-          ), statusChangingEvents: Array<(
+          ), statusChangingEvents: Maybe<Array<(
             { __typename?: 'StatusChangingEvent' }
             & Pick<StatusChangingEvent, 'statusChangingEventId' | 'proposalWorkflowConnectionId' | 'statusChangingEvent'>
-          )> }
+          )>> }
         )> }
       )> }
     )>, rejection: Maybe<(
@@ -5401,10 +5401,10 @@ export type GetProposalWorkflowQuery = (
         & { proposalStatus: (
           { __typename?: 'ProposalStatus' }
           & ProposalStatusFragment
-        ), statusChangingEvents: Array<(
+        ), statusChangingEvents: Maybe<Array<(
           { __typename?: 'StatusChangingEvent' }
           & Pick<StatusChangingEvent, 'statusChangingEventId' | 'proposalWorkflowConnectionId' | 'statusChangingEvent'>
-        )> }
+        )>> }
       )> }
     )> }
   )> }
@@ -5484,10 +5484,10 @@ export type UpdateProposalWorkflowMutation = (
           & { proposalStatus: (
             { __typename?: 'ProposalStatus' }
             & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-          ), statusChangingEvents: Array<(
+          ), statusChangingEvents: Maybe<Array<(
             { __typename?: 'StatusChangingEvent' }
             & Pick<StatusChangingEvent, 'statusChangingEventId' | 'proposalWorkflowConnectionId' | 'statusChangingEvent'>
-          )> }
+          )>> }
         )> }
       )> }
     )>, rejection: Maybe<(
