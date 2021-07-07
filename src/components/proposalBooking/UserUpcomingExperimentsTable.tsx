@@ -7,7 +7,10 @@ import MaterialTable from 'material-table';
 import React from 'react';
 import { useHistory } from 'react-router';
 
-import { useProposalBookingsScheduledEvents } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
+import {
+  ProposalScheduledEvent,
+  useProposalBookingsScheduledEvents,
+} from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
 import { StyledPaper } from 'styles/StyledComponents';
 import { tableIcons } from 'utils/materialIcons';
 import {
@@ -68,6 +71,28 @@ export default function UserUpcomingExperimentsTable() {
     onlyUpcoming: true,
     notDraft: true,
   });
+
+  const columns = [
+    { title: 'Proposal title', field: 'proposal.title' },
+    { title: 'Proposal ID', field: 'proposal.proposalId' },
+    { title: 'Instrument', field: 'instrument.name' },
+    {
+      title: 'Starts at',
+      field: 'startsAt',
+      render: (rowData: ProposalScheduledEvent) =>
+        parseTzLessDateTime(rowData.startsAt).format(
+          TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
+        ),
+    },
+    {
+      title: 'Ends at',
+      field: 'endsAt',
+      render: (rowData: ProposalScheduledEvent) =>
+        parseTzLessDateTime(rowData.endsAt).format(
+          TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
+        ),
+    },
+  ];
 
   // if there are no upcoming experiments
   // just hide the whole table altogether
@@ -137,26 +162,7 @@ export default function UserUpcomingExperimentsTable() {
           icons={tableIcons}
           title="Upcoming experiments"
           isLoading={loading}
-          columns={[
-            { title: 'Proposal title', field: 'proposal.title' },
-            { title: 'Proposal ID', field: 'proposal.proposalId' },
-            {
-              title: 'Starts at',
-              field: 'startsAt',
-              render: (rowData) =>
-                parseTzLessDateTime(rowData.startsAt).format(
-                  TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-                ),
-            },
-            {
-              title: 'Ends at',
-              field: 'endsAt',
-              render: (rowData) =>
-                parseTzLessDateTime(rowData.endsAt).format(
-                  TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-                ),
-            },
-          ]}
+          columns={columns}
           data={proposalScheduledEvents}
           options={{
             search: false,

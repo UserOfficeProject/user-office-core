@@ -4638,7 +4638,10 @@ export type GetUserProposalBookingsWithEventsQuery = (
       )>, visits: Maybe<Array<(
         { __typename?: 'Visit' }
         & VisitFragment
-      )>> }
+      )>>, instrument: Maybe<(
+        { __typename?: 'Instrument' }
+        & Pick<Instrument, 'id' | 'name'>
+      )> }
     )> }
   )> }
 );
@@ -8665,6 +8668,10 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
       }
       visits {
         ...visit
+      }
+      instrument {
+        id
+        name
       }
     }
   }
