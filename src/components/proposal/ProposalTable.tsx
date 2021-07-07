@@ -149,7 +149,9 @@ const ProposalTable = ({
         actions={[
           (rowData) => {
             const isCallActive = rowData.call?.isActive ?? true;
-            const readOnly = !isCallActive || rowData.submitted;
+            const readOnly =
+              !isCallActive ||
+              (rowData.submitted && rowData.status !== 'EDITABLE_SUBMITTED');
 
             return {
               icon: readOnly ? () => <Visibility /> : () => <Edit />,
