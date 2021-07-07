@@ -120,6 +120,7 @@ export default function createHandler() {
       case Event.PROPOSAL_NOTIFIED:
       case Event.PROPOSAL_ACCEPTED:
       case Event.PROPOSAL_REJECTED:
+      case Event.PROPOSAL_RESERVED:
       case Event.PROPOSAL_SEP_MEETING_SUBMITTED:
       case Event.PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED:
         try {
@@ -165,6 +166,15 @@ export default function createHandler() {
             case ProposalEndStatus.ACCEPTED:
               eventBus.publish({
                 type: Event.PROPOSAL_ACCEPTED,
+                proposal: event.proposal,
+                isRejection: false,
+                key: 'proposal',
+                loggedInUserId: event.loggedInUserId,
+              });
+              break;
+            case ProposalEndStatus.RESERVED:
+              eventBus.publish({
+                type: Event.PROPOSAL_RESERVED,
                 proposal: event.proposal,
                 isRejection: false,
                 key: 'proposal',

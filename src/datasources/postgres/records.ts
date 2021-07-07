@@ -457,6 +457,7 @@ export interface ProposalEventsRecord {
   readonly proposal_sep_meeting_submitted: boolean;
   readonly proposal_instrument_submitted: boolean;
   readonly proposal_accepted: boolean;
+  readonly proposal_reserved: boolean;
   readonly proposal_rejected: boolean;
   readonly proposal_notified: boolean;
 }
