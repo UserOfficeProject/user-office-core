@@ -1,3 +1,5 @@
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
 import Grid from '@material-ui/core/Grid';
 import Edit from '@material-ui/icons/Edit';
 import React, { useState } from 'react';
@@ -51,45 +53,57 @@ export default function PeoplePage() {
   });
 
   return (
-    <React.Fragment>
-      <ContentContainer>
-        <Grid container>
-          <Grid item xs={12} data-cy="people-table">
-            <StyledPaper>
-              {sendUserEmail.show ? (
-                <InviteUserForm
-                  title={sendUserEmail.title}
-                  userRole={sendUserEmail.userRole}
-                  close={() =>
-                    setSendUserEmail({
-                      show: false,
-                      title: '',
-                      userRole: UserRole.USER,
-                    })
-                  }
-                  action={() => {}}
-                />
-              ) : (
-                <PeopleTable
-                  title="Users"
-                  action={{
-                    fn: setUserData,
-                    actionText: 'Edit user',
-                    actionIcon: <Edit />,
-                  }}
-                  selection={false}
-                  invitationButtons={invitationButtons}
-                  onRemove={(user: { id: number }) =>
-                    api('User removed successfully!').deleteUser({
-                      id: user.id,
-                    })
-                  }
-                />
-              )}
-            </StyledPaper>
-          </Grid>
+    <ContentContainer>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={sendUserEmail.show}
+        onClose={(): void =>
+          setSendUserEmail({
+            ...sendUserEmail,
+            show: false,
+          })
+        }
+        style={{ backdropFilter: 'blur(6px)' }}
+      >
+        <DialogContent>
+          <InviteUserForm
+            title={sendUserEmail.title}
+            userRole={sendUserEmail.userRole}
+            close={() =>
+              setSendUserEmail({
+                ...sendUserEmail,
+                show: false,
+              })
+            }
+            action={(invitedUser) => {
+              console.log('action', invitedUser);
+              // setUserData([...userData, {}])
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+      <Grid container>
+        <Grid item xs={12} data-cy="people-table">
+          <StyledPaper>
+            <PeopleTable
+              title="Users"
+              action={{
+                fn: setUserData,
+                actionText: 'Edit user',
+                actionIcon: <Edit />,
+              }}
+              selection={false}
+              invitationButtons={invitationButtons}
+              onRemove={(user: { id: number }) =>
+                api('User removed successfully!').deleteUser({
+                  id: user.id,
+                })
+              }
+            />
+          </StyledPaper>
         </Grid>
-      </ContentContainer>
-    </React.Fragment>
+      </Grid>
+    </ContentContainer>
   );
 }

@@ -1059,7 +1059,7 @@ context('Template tests', () => {
 
     const templateName = faker.lorem.words(3);
 
-    cy.contains('Create template').click();
+    cy.get('[data-cy="create-new-button"]').click();
     cy.get('[data-cy="name"]').type(templateName);
     cy.get('[data-cy="description"]').type(templateName);
     cy.get('[data-cy="submit"]').click();

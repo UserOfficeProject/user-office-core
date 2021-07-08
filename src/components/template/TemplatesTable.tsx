@@ -271,7 +271,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
           onClick={() => setShow(true)}
           data-cy="create-new-button"
         >
-          Create template
+          Create
         </Button>
       </ActionButtonContainer>
     </>
