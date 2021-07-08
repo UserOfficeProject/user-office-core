@@ -125,12 +125,12 @@ export class UserAuthorization {
 
     return (
       this.isUserOfficer(agent) ||
+      this.hasGetAccessByToken(agent) ||
       (await this.isMemberOfProposal(agent, proposal)) ||
       (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
       (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
       (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
-      (await this.isVisitorOfProposal(agent, proposal.primaryKey)) ||
-      this.hasGetAccessByToken(agent)
+      (await this.isVisitorOfProposal(agent, proposal.primaryKey))
     );
   }
   isVisitorOfProposal(
