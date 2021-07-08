@@ -6,9 +6,9 @@ export class Settings implements Partial<SettingsOrigin> {
   @Field(() => SettingsId)
   public id: SettingsId;
 
-  @Field()
+  @Field({ nullable: true })
   public settingsValue: string;
 
-  @Field()
+  @Field({ nullable: true })
   public description: string;
 }
