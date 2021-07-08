@@ -1,16 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import './css/shared-stylesheet.css';
+import './index.css';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
-
-const org = process.env.REACT_APP_THEME;
-switch (org) {
-  case 'stfc':
-    require('./css/stfc-stylesheet.css');
-    break;
-}
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

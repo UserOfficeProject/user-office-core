@@ -1,6 +1,5 @@
 import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
-import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import { ProviderContext, SnackbarProvider } from 'notistack';
 import React, { ErrorInfo, useContext } from 'react';
 import { CookiesProvider } from 'react-cookie';
@@ -23,8 +22,8 @@ import { UserContext, UserContextProvider } from 'context/UserContextProvider';
 import { FeatureId, SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
-import { getTheme } from '../themes/theme';
 import DashBoard from './DashBoard';
+import Theme from './theme/theme';
 import EmailVerification from './user/EmailVerification';
 import ExternalAuth from './user/ExternalAuth';
 import ResetPassword from './user/ResetPassword';
@@ -134,13 +133,6 @@ class App extends React.Component {
     }
   }
 
-  componentDidMount() {
-    const primaryColor = getTheme().palette.primary.main;
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', primaryColor);
-  }
-
   private notistackRef = React.createRef<ProviderContext>();
 
   onClickDismiss = (key: string | number | undefined) => () => {
@@ -149,21 +141,21 @@ class App extends React.Component {
 
   render(): JSX.Element {
     return (
-      <ThemeProvider theme={getTheme()}>
-        <CookiesProvider>
-          <UserContextProvider>
-            <SnackbarProvider
-              ref={this.notistackRef}
-              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-              maxSnack={1}
-              action={(key) => (
-                <IconButton onClick={this.onClickDismiss(key)}>
-                  <Close htmlColor="white" />
-                </IconButton>
-              )}
-            >
-              <SettingsContextProvider>
-                <FeatureContextProvider>
+      <CookiesProvider>
+        <UserContextProvider>
+          <SnackbarProvider
+            ref={this.notistackRef}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            maxSnack={1}
+            action={(key) => (
+              <IconButton onClick={this.onClickDismiss(key)}>
+                <Close htmlColor="white" />
+              </IconButton>
+            )}
+          >
+            <SettingsContextProvider>
+              <FeatureContextProvider>
+                <Theme>
                   <DownloadContextProvider>
                     <ReviewAndAssignmentContextProvider>
                       <Router>
@@ -173,12 +165,12 @@ class App extends React.Component {
                       </Router>
                     </ReviewAndAssignmentContextProvider>
                   </DownloadContextProvider>
-                </FeatureContextProvider>
-              </SettingsContextProvider>
-            </SnackbarProvider>
-          </UserContextProvider>
-        </CookiesProvider>
-      </ThemeProvider>
+                </Theme>
+              </FeatureContextProvider>
+            </SettingsContextProvider>
+          </SnackbarProvider>
+        </UserContextProvider>
+      </CookiesProvider>
     );
   }
 }

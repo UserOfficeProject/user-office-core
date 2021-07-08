@@ -27,7 +27,7 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const EXTERNAL_AUTH_LOGIN_URL = settingsContext.settings.get(
     SettingsId.EXTERNAL_AUTH_LOGIN_URL
-  );
+  )?.settingsValue;
 
   useEffect(() => {
     if (!isFirstRun.current) {
@@ -45,7 +45,7 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
           window.location.href = '/';
         } else {
           if (EXTERNAL_AUTH_LOGIN_URL) {
-            window.location.href = EXTERNAL_AUTH_LOGIN_URL.settingsValue;
+            window.location.href = EXTERNAL_AUTH_LOGIN_URL;
           }
         }
       });

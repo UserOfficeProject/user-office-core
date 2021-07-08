@@ -12,9 +12,10 @@ import PropTypes from 'prop-types';
 import React, { useContext, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
+import { SettingsId } from 'generated/sdk';
 
-import { getHeaderLogo } from '../../themes/theme';
 import AccountActionButton from './AccountActionButton';
 
 const drawerWidth = 250;
@@ -27,10 +28,17 @@ type AppToolbarProps = {
 };
 
 const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
+  const { settings } = useContext(SettingsContext);
+
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
 
-  const headerLogo: string | undefined = getHeaderLogo();
+  const logoFilename = settings.get(SettingsId.HEADER_LOGO_FILENAME)
+    ?.settingsValue;
+  let logo;
+  if (logoFilename) {
+    logo = require('images/' + logoFilename).default;
+  }
 
   const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -73,9 +81,6 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
       marginLeft: 'auto',
       margin: theme.spacing(0, 0.5),
     },
-    logoContainer: {
-      ...theme.mixins.toolbar,
-    },
   }));
   const classes = useStyles();
   const { user, roles, currentRole } = useContext(UserContext);
@@ -102,9 +107,9 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
         >
           <MenuIcon />
         </IconButton>
-        {(!isTabletOrMobile || !isPortraitMode) && headerLogo && (
-          <div className={`header-logo-container ${classes.logoContainer}`}>
-            <img src={headerLogo} alt="logo" className={'header-logo'} />
+        {(!isTabletOrMobile || !isPortraitMode) && logo && (
+          <div className={'header-logo-container'}>
+            <img src={logo} alt="logo" className={'header-logo'} />
           </div>
         )}
         {(!isTabletOrMobile || !isPortraitMode) && (
