@@ -221,7 +221,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
     >
       {({ isSubmitting, values }) => (
         <Form>
-          <Typography variant="h6">
+          <Typography variant="h6" component="h1">
             {apiAccessToken ? 'Update' : 'Create new'} api access token
           </Typography>
           <Field

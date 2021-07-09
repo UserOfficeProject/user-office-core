@@ -54,57 +54,69 @@ const SettingsMenuListItem = () => {
 
   return (
     <>
-      <ListItem button onClick={toggleExpand}>
-        <ListItemIcon>
-          {isExpanded ? (
-            <>
-              <Settings />
-              <ExpandLess fontSize="small" />
-            </>
-          ) : (
-            <>
-              <Settings />
-              <ExpandMore fontSize="small" />
-            </>
-          )}
-        </ListItemIcon>
-        <ListItemText primary="Settings" />
-      </ListItem>
+      <Tooltip title="Settings">
+        <ListItem button onClick={toggleExpand}>
+          <ListItemIcon>
+            {isExpanded ? (
+              <>
+                <Settings />
+                <ExpandLess fontSize="small" />
+              </>
+            ) : (
+              <>
+                <Settings />
+                <ExpandMore fontSize="small" />
+              </>
+            )}
+          </ListItemIcon>
+          <ListItemText primary="Settings" />
+        </ListItem>
+      </Tooltip>
+
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-        <ListItem component={NavLink} to="/Units" button>
-          <ListItemIcon>
-            <FunctionsIcon />
-          </ListItemIcon>
-          <ListItemText primary="Units" />
-        </ListItem>
-        <ListItem component={NavLink} to="/ProposalStatuses" button>
-          <ListItemIcon>
-            <ProposalSettingsIcon />
-          </ListItemIcon>
-          <ListItemText primary="Proposal statuses" />
-        </ListItem>
+        <Tooltip title="Units">
+          <ListItem component={NavLink} to="/Units" button>
+            <ListItemIcon>
+              <FunctionsIcon />
+            </ListItemIcon>
+            <ListItemText primary="Units" />
+          </ListItem>
+        </Tooltip>
 
-        <ListItem
-          component={NavLink}
-          isActive={() =>
-            history.location.pathname.includes('/ProposalWorkflows') ||
-            history.location.pathname.includes('ProposalWorkflowEditor')
-          }
-          to="/ProposalWorkflows"
-          button
-        >
-          <ListItemIcon>
-            <ProposalWorkflowIcon />
-          </ListItemIcon>
-          <ListItemText primary="Proposal workflows" />
-        </ListItem>
+        <Tooltip title="Proposal statuses">
+          <ListItem component={NavLink} to="/ProposalStatuses" button>
+            <ListItemIcon>
+              <ProposalSettingsIcon />
+            </ListItemIcon>
+            <ListItemText primary="Proposal statuses" />
+          </ListItem>
+        </Tooltip>
 
-        <ListItem component={NavLink} to="/ApiAccessTokens" button>
-          <ListItemIcon>
-            <VpnKey />
-          </ListItemIcon>
-          <ListItemText primary="API access tokens" />
-        </ListItem>
+        <Tooltip title="Proposal workflows">
+          <ListItem
+            component={NavLink}
+            isActive={() =>
+              history.location.pathname.includes('/ProposalWorkflows') ||
+              history.location.pathname.includes('ProposalWorkflowEditor')
+            }
+            to="/ProposalWorkflows"
+            button
+          >
+            <ListItemIcon>
+              <ProposalWorkflowIcon />
+            </ListItemIcon>
+            <ListItemText primary="Proposal workflows" />
+          </ListItem>
+        </Tooltip>
+
+        <Tooltip title="API access tokens">
+          <ListItem component={NavLink} to="/ApiAccessTokens" button>
+            <ListItemIcon>
+              <VpnKey />
+            </ListItemIcon>
+            <ListItemText primary="API access tokens" />
+          </ListItem>
+        </Tooltip>
       </Collapse>
     </>
   );
@@ -125,59 +137,72 @@ const TemplateMenuListItem = () => {
 
   return (
     <>
-      <ListItem button onClick={toggleExpand}>
-        <ListItemIcon>
-          {isExpanded ? (
-            <>
-              <LibraryBooksIcon />
-              <ExpandLess fontSize="small" />
-            </>
-          ) : (
-            <>
-              <LibraryBooksIcon />
-              <ExpandMore fontSize="small" />
-            </>
-          )}
-        </ListItemIcon>
-        <ListItemText primary="Templates" />
-      </ListItem>
+      <Tooltip title="Templates">
+        <ListItem button onClick={toggleExpand}>
+          <ListItemIcon>
+            {isExpanded ? (
+              <>
+                <LibraryBooksIcon />
+                <ExpandLess fontSize="small" />
+              </>
+            ) : (
+              <>
+                <LibraryBooksIcon />
+                <ExpandMore fontSize="small" />
+              </>
+            )}
+          </ListItemIcon>
+          <ListItemText primary="Templates" />
+        </ListItem>
+      </Tooltip>
+
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-        <ListItem component={NavLink} to="/ProposalTemplates" button>
-          <ListItemIcon>
-            <DescriptionIcon />
-          </ListItemIcon>
-          <ListItemText primary="Proposal" title="Proposal templates" />
-        </ListItem>
-        <ListItem component={NavLink} to="/SampleDeclarationTemplates" button>
-          <ListItemIcon>
-            <InboxIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary="Sample declaration"
-            title="Sample declaration templates"
-          />
-        </ListItem>
-        {isShipmentFeatureEnabled && (
-          <ListItem
-            component={NavLink}
-            to="/ShipmentDeclarationTemplates"
-            button
-          >
+        <Tooltip title="Proposal">
+          <ListItem component={NavLink} to="/ProposalTemplates" button>
             <ListItemIcon>
-              <LocalShippingIcon />
+              <DescriptionIcon />
+            </ListItemIcon>
+            <ListItemText primary="Proposal" title="Proposal templates" />
+          </ListItem>
+        </Tooltip>
+
+        <Tooltip title="Sample declaration">
+          <ListItem component={NavLink} to="/SampleDeclarationTemplates" button>
+            <ListItemIcon>
+              <InboxIcon />
             </ListItemIcon>
             <ListItemText
-              primary="Shipment declaration"
-              title="Shipment declaration templates"
+              primary="Sample declaration"
+              title="Sample declaration templates"
             />
           </ListItem>
+        </Tooltip>
+
+        {isShipmentFeatureEnabled && (
+          <Tooltip title="Shipment declaration templates">
+            <ListItem
+              component={NavLink}
+              to="/ShipmentDeclarationTemplates"
+              button
+            >
+              <ListItemIcon>
+                <LocalShippingIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Shipment declaration"
+                title="Shipment declaration templates"
+              />
+            </ListItem>
+          </Tooltip>
         )}
-        <ListItem component={NavLink} to="/VisitTemplates" button>
-          <ListItemIcon>
-            <FlightTakeoffIcon />
-          </ListItemIcon>
-          <ListItemText primary="Visit" title="Visit templates" />
-        </ListItem>
+        <Tooltip title="Visit">
+          <ListItem component={NavLink} to="/VisitTemplates" button>
+            <ListItemIcon>
+              <FlightTakeoffIcon />
+            </ListItemIcon>
+            <ListItemText primary="Visit" title="Visit templates" />
+          </ListItem>
+        </Tooltip>
       </Collapse>
     </>
   );
@@ -185,23 +210,27 @@ const TemplateMenuListItem = () => {
 
 const SamplesMenuListItem = () => {
   return (
-    <ListItem component={NavLink} to="/SampleSafety" button>
-      <ListItemIcon>
-        <BoxIcon />
-      </ListItemIcon>
-      <ListItemText primary="Sample safety" />
-    </ListItem>
+    <Tooltip title="Sample safety">
+      <ListItem component={NavLink} to="/SampleSafety" button>
+        <ListItemIcon>
+          <BoxIcon />
+        </ListItemIcon>
+        <ListItemText primary="Sample safety" />
+      </ListItem>
+    </Tooltip>
   );
 };
 
 const ShipmentMenuListItem = () => {
   return (
-    <ListItem component={NavLink} to="/Shipments" button>
-      <ListItemIcon>
-        <LocalShippingIcon />
-      </ListItemIcon>
-      <ListItemText primary="Sample shipments" />
-    </ListItem>
+    <Tooltip title="Sample shipments">
+      <ListItem component={NavLink} to="/Shipments" button>
+        <ListItemIcon>
+          <LocalShippingIcon />
+        </ListItemIcon>
+        <ListItemText primary="Sample shipments" />
+      </ListItem>
+    </Tooltip>
   );
 };
 
@@ -263,7 +292,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           </ListItem>
         </Tooltip>
       )}
-      <Tooltip title="My Visits">
+      <Tooltip title="Visits">
         <ListItem component={NavLink} to="/MyVisits" button>
           <ListItemIcon>
             <FlightTakeoffIcon />
@@ -284,30 +313,38 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
 
   const userOfficer = (
     <div data-cy="officer-menu-items">
-      <ListItem component={NavLink} to="/ProposalPage" button>
-        <ListItemIcon>
-          <FolderOpen />
-        </ListItemIcon>
-        <ListItemText primary="Proposals" />
-      </ListItem>
-      <ListItem component={NavLink} to="/CallPage" button>
-        <ListItemIcon>
-          <CalendarToday />
-        </ListItemIcon>
-        <ListItemText primary="Calls" />
-      </ListItem>
-      <ListItem component={NavLink} to="/PeoplePage" button>
-        <ListItemIcon>
-          <People />
-        </ListItemIcon>
-        <ListItemText primary="People" />
-      </ListItem>
-      <ListItem component={NavLink} to="/InstrumentPage" button>
-        <ListItemIcon>
-          <ScienceIcon />
-        </ListItemIcon>
-        <ListItemText primary="Instruments" />
-      </ListItem>
+      <Tooltip title="Proposals">
+        <ListItem component={NavLink} to="/ProposalPage" button>
+          <ListItemIcon>
+            <FolderOpen />
+          </ListItemIcon>
+          <ListItemText primary="Proposals" />
+        </ListItem>
+      </Tooltip>
+      <Tooltip title="Calls">
+        <ListItem component={NavLink} to="/CallPage" button>
+          <ListItemIcon>
+            <CalendarToday />
+          </ListItemIcon>
+          <ListItemText primary="Calls" />
+        </ListItem>
+      </Tooltip>
+      <Tooltip title="People">
+        <ListItem component={NavLink} to="/PeoplePage" button>
+          <ListItemIcon>
+            <People />
+          </ListItemIcon>
+          <ListItemText primary="People" />
+        </ListItem>
+      </Tooltip>
+      <Tooltip title="Instruments">
+        <ListItem component={NavLink} to="/InstrumentPage" button>
+          <ListItemIcon>
+            <ScienceIcon />
+          </ListItemIcon>
+          <ListItemText primary="Instruments" />
+        </ListItem>
+      </Tooltip>
       <Tooltip title="Scientific evaluation panels">
         <ListItem component={NavLink} to="/SEPPage" button>
           <ListItemIcon>
@@ -316,25 +353,31 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="SEPs" />
         </ListItem>
       </Tooltip>
-      <ListItem component={NavLink} to="/PageEditor" button>
-        <ListItemIcon>
-          <SettingsApplications />
-        </ListItemIcon>
-        <ListItemText primary="Pages" />
-      </ListItem>
-      <ListItem component={NavLink} to="/InstitutionPage" button>
-        <ListItemIcon>
-          <AccountBalanceIcon />
-        </ListItemIcon>
-        <ListItemText primary="Institutions" />
-      </ListItem>
+      <Tooltip title="Pages">
+        <ListItem component={NavLink} to="/PageEditor" button>
+          <ListItemIcon>
+            <SettingsApplications />
+          </ListItemIcon>
+          <ListItemText primary="Pages" />
+        </ListItem>
+      </Tooltip>
+      <Tooltip title="Institutions">
+        <ListItem component={NavLink} to="/InstitutionPage" button>
+          <ListItemIcon>
+            <AccountBalanceIcon />
+          </ListItemIcon>
+          <ListItemText primary="Institutions" />
+        </ListItem>
+      </Tooltip>
       <TemplateMenuListItem />
-      <ListItem component={NavLink} to="/Questions" button>
-        <ListItemIcon>
-          <CommentQuestionIcon />
-        </ListItemIcon>
-        <ListItemText primary="Questions" />
-      </ListItem>
+      <Tooltip title="Questions">
+        <ListItem component={NavLink} to="/Questions" button>
+          <ListItemIcon>
+            <CommentQuestionIcon />
+          </ListItemIcon>
+          <ListItemText primary="Questions" />
+        </ListItem>
+      </Tooltip>
       <SamplesMenuListItem />
       {isShipmentFeatureEnabled && <ShipmentMenuListItem />}
       <SettingsMenuListItem />

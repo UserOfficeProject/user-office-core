@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Archive from '@material-ui/icons/Archive';
 import Delete from '@material-ui/icons/Delete';
@@ -216,7 +217,11 @@ export function TemplatesTable(props: TemplatesTableProps) {
       </InputDialog>
       <MaterialTable
         icons={tableIcons}
-        title="Templates"
+        title={
+          <Typography variant="h6" component="h2">
+            Templates
+          </Typography>
+        }
         columns={props.columns}
         isLoading={loadingTemplates}
         data={templates}

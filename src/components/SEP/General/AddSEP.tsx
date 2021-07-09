@@ -47,7 +47,9 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
     >
       {(): JSX.Element => (
         <Form>
-          <Typography variant="h6">Create new SEP</Typography>
+          <Typography variant="h6" component="h1">
+            Create new SEP
+          </Typography>
 
           <Field
             name="code"

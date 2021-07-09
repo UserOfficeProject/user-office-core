@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import MaterialTable, { MaterialTableProps, Column } from 'material-table';
 import React from 'react';
 import { DecodedValueMap, SetQuery, QueryParamConfig } from 'use-query-params';
@@ -27,7 +28,11 @@ const SamplesTable = (
     <MaterialTable
       columns={props.columns ? props.columns : defaultColumns}
       icons={tableIcons}
-      title="Samples"
+      title={
+        <Typography variant="h6" component="h2">
+          Samples
+        </Typography>
+      }
       onSearchChange={(searchText) => {
         props.setUrlQueryParams({
           search: searchText ? searchText : undefined,

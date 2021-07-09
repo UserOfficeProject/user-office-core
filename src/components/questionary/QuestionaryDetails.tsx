@@ -78,7 +78,7 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
   return (
     <>
       {title && (
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" component="h2" gutterBottom>
           {title}
         </Typography>
       )}

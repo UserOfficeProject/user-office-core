@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import DoneAll from '@material-ui/icons/DoneAll';
 import MaterialTable, { Options } from 'material-table';
 import { useSnackbar } from 'notistack';
@@ -145,7 +146,11 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     <div data-cy="SEP-meeting-components-table">
       <MaterialTable
         icons={tableIcons}
-        title={'Instruments with proposals'}
+        title={
+          <Typography variant="h6" component="h2">
+            Instruments with proposals
+          </Typography>
+        }
         columns={columns}
         components={{
           Toolbar: Toolbar,
