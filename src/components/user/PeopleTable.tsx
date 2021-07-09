@@ -25,6 +25,10 @@ type InvitationButtonProps = {
   'data-cy'?: string;
 };
 
+type BasicUserDetailsWithTableData = (BasicUserDetails & {
+  tableData?: { checked: boolean };
+})[];
+
 type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   selection: boolean;
   isLoading?: boolean;
@@ -81,6 +85,18 @@ const getTitle = (invitationUserRole?: UserRole): string => {
   }
 };
 
+const getUsersTableData = (
+  users: BasicUserDetailsWithTableData,
+  selectedUsers: BasicUserDetails[]
+) => {
+  const selectedUserIds = selectedUsers.map((participant) => participant.id);
+
+  return users.map((tableItem) => ({
+    ...tableItem,
+    tableData: { checked: selectedUserIds.includes(tableItem.id) },
+  }));
+};
+
 const PeopleTable: React.FC<PeopleTableProps> = (props) => {
   const [query, setQuery] = useState<
     GetUsersQueryVariables & { refreshData: boolean }
@@ -123,6 +139,14 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
 
     setCurrentPageIds(data.map(({ id }) => id));
   }, [data]);
+
+  useEffect(() => {
+    if (!usersData.users) {
+      return;
+    }
+
+    setCurrentPageIds(usersData.users.map(({ id }) => id));
+  }, [usersData]);
 
   if (sendUserEmail && props.invitationUserRole && action) {
     return (
@@ -183,6 +207,13 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     );
   }
 
+  const usersTableData = getUsersTableData(
+    props.data || usersData?.users,
+    selectedParticipants
+  );
+
+  const currentPage = (query.offset as number) / (query.first as number);
+
   return (
     <div data-cy="co-proposers" className={classes.tableWrapper}>
       <Dialog
@@ -218,7 +249,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
       <MaterialTable
         icons={tableIcons}
         title={props.title}
-        page={query.offset as number}
+        page={currentPage}
         columns={props.columns ?? columns}
         onSelectionChange={(selectedItems, selectedItem) => {
           // when the user wants to (un)select all items
@@ -264,7 +295,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
               : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
           );
         }}
-        data={props.data || usersData.users}
+        data={usersTableData}
         totalCount={usersData.totalCount}
         isLoading={loading || loadingUsersData}
         options={{
