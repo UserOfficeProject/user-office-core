@@ -47,7 +47,9 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
     >
       {() => (
         <Form>
-          <Typography variant="h6">Create new unit</Typography>
+          <Typography variant="h6" component="h1">
+            Create new unit
+          </Typography>
 
           <Field
             name="name"

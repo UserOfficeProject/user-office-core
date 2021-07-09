@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -217,7 +218,11 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
       </Dialog>
       <MaterialTable
         icons={tableIcons}
-        title={props.title}
+        title={
+          <Typography variant="h6" component="h1">
+            {props.title}
+          </Typography>
+        }
         page={query.offset as number}
         columns={props.columns ?? columns}
         onSelectionChange={(selectedItems, selectedItem) => {

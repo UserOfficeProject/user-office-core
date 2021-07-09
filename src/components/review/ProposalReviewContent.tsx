@@ -110,7 +110,7 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
         proposal.technicalReview?.submitted && classes.reassignContainerDisabled
       )}
     >
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" component="h2" gutterBottom>
         Assign to someone else?
       </Typography>
       If you think there is a better candidate to do the review for the
