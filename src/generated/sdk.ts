@@ -2614,12 +2614,13 @@ export type SepMeetingDecisionResponseWrap = {
 export type Settings = {
   __typename?: 'Settings';
   id: SettingsId;
-  settingsValue: Scalars['String'];
-  description: Scalars['String'];
+  settingsValue: Maybe<Scalars['String']>;
+  description: Maybe<Scalars['String']>;
 };
 
 export enum SettingsId {
-  EXTERNAL_AUTH_LOGIN_URL = 'EXTERNAL_AUTH_LOGIN_URL'
+  EXTERNAL_AUTH_LOGIN_URL = 'EXTERNAL_AUTH_LOGIN_URL',
+  PROFILE_PAGE_LINK = 'PROFILE_PAGE_LINK'
 }
 
 export type Shipment = {

@@ -47,7 +47,7 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   const settingsContext = useContext(SettingsContext);
   const EXTERNAL_AUTH_LOGIN_URL = settingsContext.settings.get(
     SettingsId.EXTERNAL_AUTH_LOGIN_URL
-  );
+  )?.settingsValue;
 
   return (
     <UserContext.Consumer>
@@ -56,8 +56,8 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
-              if (EXTERNAL_AUTH && EXTERNAL_AUTH_LOGIN_URL?.settingsValue) {
-                window.location.href = EXTERNAL_AUTH_LOGIN_URL.settingsValue;
+              if (EXTERNAL_AUTH && EXTERNAL_AUTH_LOGIN_URL) {
+                window.location.href = EXTERNAL_AUTH_LOGIN_URL;
 
                 return <p>Redirecting to external sign-in page...</p>;
               }
