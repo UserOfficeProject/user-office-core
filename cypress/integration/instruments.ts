@@ -429,6 +429,25 @@ context('Instrument tests', () => {
     cy.get('[data-cy="timeAllocation"] input').should('be.disabled');
   });
 
+  it('User Officer should be able to see who submitted the technical review', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals');
+
+    cy.contains(proposal1.title)
+      .parent()
+      .find('[data-cy="view-proposal"]')
+      .click();
+    cy.get('[role="dialog"]').as('dialog');
+    cy.finishedLoading();
+    cy.get('@dialog').contains('Technical review').click();
+
+    cy.get('[data-cy="reviewed-by-info"]').should('exist');
+    cy.get('[data-cy="reviewed-by-info"]')
+      .invoke('attr', 'title')
+      .should('eq', 'Reviewed by Carl Carlsson');
+  });
+
   it('User Officer should be able to re-open submitted technical review', () => {
     cy.login('officer');
 
