@@ -62,7 +62,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
         setFieldValue,
       }): JSX.Element => (
         <Form>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" component="h2" gutterBottom>
             Scientific evaluation panel
           </Typography>
           <Grid container spacing={3}>

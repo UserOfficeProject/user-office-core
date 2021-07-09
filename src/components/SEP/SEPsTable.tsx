@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import Edit from '@material-ui/icons/Edit';
 import React, { useContext, useState } from 'react';
 import { Redirect, useHistory } from 'react-router';
@@ -122,7 +123,11 @@ const SEPsTable: React.FC = () => {
         }}
         setData={setSEPs}
         icons={tableIcons}
-        title={'Scientific evaluation panels'}
+        title={
+          <Typography variant="h6" component="h2">
+            Scientific evaluation panels
+          </Typography>
+        }
         columns={columns}
         data={SEPs}
         delete={deleteSEP}

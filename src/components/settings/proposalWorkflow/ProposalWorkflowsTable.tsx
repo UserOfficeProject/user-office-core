@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import Edit from '@material-ui/icons/Edit';
 import React from 'react';
 import { useHistory } from 'react-router';
@@ -77,7 +78,11 @@ const ProposalWorkflowsTable: React.FC = () => {
         }}
         setData={setProposalWorkflows}
         icons={tableIcons}
-        title={'Proposal workflows'}
+        title={
+          <Typography variant="h6" component="h2">
+            Proposal workflows
+          </Typography>
+        }
         columns={columns}
         data={proposalWorkflows}
         isLoading={loadingProposalWorkflows}
