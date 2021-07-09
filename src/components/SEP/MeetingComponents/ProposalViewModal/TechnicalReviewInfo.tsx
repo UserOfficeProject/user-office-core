@@ -26,6 +26,7 @@ import UOLoader from 'components/common/UOLoader';
 import { Proposal, TechnicalReview } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 
 type SEPProposalProps = {
   sepId: number;
@@ -238,6 +239,12 @@ const TechnicalReviewInfo: React.FC<TechnicalReviewInfoProps> = ({
                     __html: technicalReview?.publicComment || '-',
                   }}
                 />
+              </TableRow>
+              <TableRow key="reviewer">
+                <TableCell className={classes.textBold}>Reviewer</TableCell>
+                <TableCell>
+                  {getFullUserName(technicalReview?.reviewer)}
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
