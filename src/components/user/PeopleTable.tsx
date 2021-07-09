@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
 import Email from '@material-ui/icons/Email';
 import makeStyles from '@material-ui/styles/makeStyles';
 import MaterialTable, { Options, Column } from 'material-table';
@@ -40,7 +42,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   onRemove?: FunctionType<void, T>;
   onUpdate?: FunctionType<void, [any[]]>;
   emailInvite?: boolean;
-  invitationButtons?: InvitationButtonProps[];
+  showInvitationButtons?: boolean;
   selectedUsers?: number[];
   mtOptions?: Options;
   columns?: Column<any>[];
@@ -80,17 +82,25 @@ const getTitle = (invitationUserRole?: UserRole): string => {
 };
 
 const PeopleTable: React.FC<PeopleTableProps> = (props) => {
-  const [query, setQuery] = useState<GetUsersQueryVariables>({
+  const [query, setQuery] = useState<
+    GetUsersQueryVariables & { refreshData: boolean }
+  >({
     offset: 0,
     first: 5,
     filter: '',
     subtractUsers: props.selectedUsers ? props.selectedUsers : [],
     userRole: props.userRole ? props.userRole : null,
+    refreshData: false,
   });
   const { isLoading } = props;
   const { usersData, loadingUsersData } = useUsersData(query);
   const [loading, setLoading] = useState(props.isLoading ?? false);
   const [sendUserEmail, setSendUserEmail] = useState(false);
+  const [inviteUserModal, setInviteUserModal] = useState({
+    show: false,
+    title: '',
+    userRole: UserRole.USER,
+  });
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]
   >([]);
@@ -146,25 +156,71 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
       onClick: () => setSendUserEmail(true),
     });
 
-  const tableData = (props.data || usersData?.users) as (BasicUserDetails & {
-    tableData: { checked: boolean };
-  })[];
+  const invitationButtons: InvitationButtonProps[] = [];
+
+  if (props.showInvitationButtons) {
+    invitationButtons.push(
+      {
+        title: 'Invite User',
+        action: () =>
+          setInviteUserModal({
+            show: true,
+            title: 'Invite User',
+            userRole: UserRole.USER,
+          }),
+        'data-cy': 'invite-user-button',
+      },
+      {
+        title: 'Invite Reviewer',
+        action: () =>
+          setInviteUserModal({
+            show: true,
+            title: 'Invite Reviewer',
+            userRole: UserRole.SEP_REVIEWER,
+          }),
+        'data-cy': 'invite-reviewer-button',
+      }
+    );
+  }
 
   return (
     <div data-cy="co-proposers" className={classes.tableWrapper}>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={inviteUserModal.show}
+        onClose={(): void =>
+          setInviteUserModal({
+            ...inviteUserModal,
+            show: false,
+          })
+        }
+        style={{ backdropFilter: 'blur(6px)' }}
+      >
+        <DialogContent>
+          <InviteUserForm
+            title={inviteUserModal.title}
+            userRole={inviteUserModal.userRole}
+            close={() =>
+              setInviteUserModal({
+                ...inviteUserModal,
+                show: false,
+              })
+            }
+            action={(invitedUser) => {
+              if (invitedUser) {
+                setQuery({ ...query, refreshData: !query.refreshData });
+              }
+            }}
+          />
+        </DialogContent>
+      </Dialog>
       <MaterialTable
         icons={tableIcons}
         title={props.title}
         page={query.offset as number}
         columns={props.columns ?? columns}
-        onSelectionChange={(
-          selectedItems,
-          selectedItem:
-            | (BasicUserDetails & {
-                tableData: { checked: boolean };
-              })
-            | undefined
-        ) => {
+        onSelectionChange={(selectedItems, selectedItem) => {
           // when the user wants to (un)select all items
           // `selectedItem` will be undefined
           if (!selectedItem) {
@@ -193,7 +249,9 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           }
 
           setSelectedParticipants((selectedParticipants) =>
-            selectedItem.tableData.checked
+            (selectedItem as BasicUserDetails & {
+              tableData: { checked: boolean };
+            }).tableData.checked
               ? ([
                   ...selectedParticipants,
                   {
@@ -206,8 +264,8 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
               : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
           );
         }}
-        data={tableData}
-        totalCount={usersData?.totalCount}
+        data={props.data || usersData.users}
+        totalCount={usersData.totalCount}
         isLoading={loading || loadingUsersData}
         options={{
           search: props.search,
@@ -224,6 +282,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
                   new Promise<void>((resolve) => {
                     resolve();
                     (props.onRemove as FunctionType)(oldData);
+                    setQuery({ ...query, refreshData: !query.refreshData });
                   }),
               }
             : {}
@@ -258,9 +317,9 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           </Button>
         </ActionButtonContainer>
       )}
-      {props.invitationButtons && (
+      {props.showInvitationButtons && (
         <ActionButtonContainer>
-          {props.invitationButtons?.map((item: InvitationButtonProps, i) => (
+          {invitationButtons.map((item: InvitationButtonProps, i) => (
             <Button
               type="button"
               variant="contained"
