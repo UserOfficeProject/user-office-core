@@ -119,7 +119,7 @@ const ProposalTechnicalReview = ({
 
   return (
     <>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" component="h2" gutterBottom>
         Technical Review{' '}
         {proposal.technicalReview?.reviewer && (
           <Tooltip

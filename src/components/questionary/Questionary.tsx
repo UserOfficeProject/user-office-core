@@ -60,7 +60,7 @@ function Questionary({
   const classes = useStyles();
   const { state, dispatch } = useContext(QuestionaryContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const titleRef = useRef<HTMLElement | null>(null);
+  const titleRef = useRef<HTMLHeadingElement | null>(null);
   const activeStep = state?.stepIndex;
 
   useEffect(() => {
@@ -146,6 +146,7 @@ function Questionary({
     <div className={classes.root}>
       <Typography
         variant="h4"
+        component="h2"
         className={classes.header}
         ref={titleRef}
         data-cy="questionary-title"
