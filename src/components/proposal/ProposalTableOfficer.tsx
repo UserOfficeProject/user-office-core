@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Typography } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
@@ -623,7 +624,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       </ProposalReviewModal>
       <MaterialTable
         icons={tableIcons}
-        title={'Proposals'}
+        title={
+          <Typography variant="h6" component="h2">
+            Proposals
+          </Typography>
+        }
         columns={columns}
         data={preselectedProposalsData}
         isLoading={loading}

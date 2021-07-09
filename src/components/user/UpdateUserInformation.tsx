@@ -194,7 +194,7 @@ export default function UpdateUserInformation(props: { id: number }) {
       >
         {({ isSubmitting, values }) => (
           <Form>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" component="h2" gutterBottom>
               User Information
               <Box className={classes.chipSpace}>
                 {!userData.emailVerified && (

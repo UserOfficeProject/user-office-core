@@ -63,7 +63,11 @@ const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
       >
         {({ isSubmitting, values }): JSX.Element => (
           <Form className={classes.form}>
-            <Typography className={classes.cardHeader}>
+            <Typography
+              variant="h6"
+              component="h1"
+              className={classes.cardHeader}
+            >
               Assign proposal/s to SEP
             </Typography>
 
