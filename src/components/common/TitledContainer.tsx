@@ -36,7 +36,7 @@ const TitledContainer: React.FC<
 
   return (
     <div className={classes.container}>
-      <Typography variant="h6" className={classes.heading}>
+      <Typography variant="h6" component="h2" className={classes.heading}>
         {label}
       </Typography>
       <Container className={classes.contents}>{children}</Container>
