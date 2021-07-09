@@ -4,9 +4,6 @@ ARG WINDOWS_VERSION
 # Stage 0, "build-stage", based on Node.js, to build and compile the frontend
 FROM dmsc/bisapps-node:12.19.0-servercore${WINDOWS_VERSION} as build-stage
 
-ENV REACT_APP_AUTH_TYPE=external
-ENV REACT_APP_EXTERNAL_AUTH_LOGIN_URL=https://devusers.facilities.rl.ac.uk/auth/Login.aspx
-
 WORKDIR /app
 
 COPY package*.json /app/

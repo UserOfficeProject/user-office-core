@@ -77,6 +77,40 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   );
 };
 
+const Routes: React.FC<RouteProps> = () => {
+  const featureContext = useContext(FeatureContext);
+  const EXTERNAL_AUTH = !!featureContext.features.get(FeatureId.EXTERNAL_AUTH)
+    ?.isEnabled;
+
+  if (EXTERNAL_AUTH) {
+    return (
+      <div className="App">
+        <Switch>
+          <Route path="/external-auth/:sessionId" component={ExternalAuth} />
+          <PrivateRoute path="/" component={DashBoard} />
+        </Switch>
+      </div>
+    );
+  } else {
+    return (
+      <div className="App">
+        <Switch>
+          <Route path="/SignUp" component={SignUp} />
+          <Route path="/SignIn" component={SignIn} />
+          <Route path="/shared-auth" component={SharedAuth} />
+          <Route path="/ResetPasswordEmail" component={ResetPasswordEmail} />
+          <Route path="/ResetPassword/:token" component={ResetPassword} />
+          <Route
+            path="/EmailVerification/:token"
+            component={EmailVerification}
+          />
+          <PrivateRoute path="/" component={DashBoard} />
+        </Switch>
+      </div>
+    );
+  }
+};
+
 class App extends React.Component {
   static getDerivedStateFromError(): void {
     // Update state so the next render will show the fallback UI.
@@ -114,31 +148,6 @@ class App extends React.Component {
   };
 
   render(): JSX.Element {
-    let routes;
-    if (process.env.REACT_APP_AUTH_TYPE === 'external') {
-      routes = (
-        <Switch>
-          <Route path="/external-auth/:sessionId" component={ExternalAuth} />
-          <PrivateRoute path="/" component={DashBoard} />
-        </Switch>
-      );
-    } else {
-      routes = (
-        <Switch>
-          <Route path="/SignUp" component={SignUp} />
-          <Route path="/SignIn" component={SignIn} />
-          <Route path="/shared-auth" component={SharedAuth} />
-          <Route path="/ResetPasswordEmail" component={ResetPasswordEmail} />
-          <Route path="/ResetPassword/:token" component={ResetPassword} />
-          <Route
-            path="/EmailVerification/:token"
-            component={EmailVerification}
-          />
-          <PrivateRoute path="/" component={DashBoard} />
-        </Switch>
-      );
-    }
-
     return (
       <ThemeProvider theme={getTheme()}>
         <CookiesProvider>
@@ -159,7 +168,7 @@ class App extends React.Component {
                     <ReviewAndAssignmentContextProvider>
                       <Router>
                         <QueryParamProvider ReactRouterRoute={Route}>
-                          <div className="App">{routes}</div>
+                          <Routes />
                         </QueryParamProvider>
                       </Router>
                     </ReviewAndAssignmentContextProvider>
