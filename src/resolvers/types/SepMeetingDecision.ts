@@ -6,7 +6,7 @@ import { SepMeetingDecision as SepMeetingDecisionOrigin } from '../../models/Sep
 @ObjectType()
 export class SepMeetingDecision implements Partial<SepMeetingDecisionOrigin> {
   @Field(() => Int)
-  public proposalId: number;
+  public proposalPk: number;
 
   @Field(() => ProposalEndStatus, { nullable: true })
   public recommendation: ProposalEndStatus;

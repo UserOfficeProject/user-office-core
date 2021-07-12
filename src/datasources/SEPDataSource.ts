@@ -1,4 +1,4 @@
-import { ProposalIdsWithNextStatus } from '../models/Proposal';
+import { ProposalPksWithNextStatus } from '../models/Proposal';
 import { Role } from '../models/Role';
 import {
   SEP,
@@ -38,7 +38,7 @@ export interface SEPDataSource {
     sepId?: number
   ): Promise<SEP[]>;
   getUserSeps(id: number, role: Role): Promise<SEP[]>;
-  getSEPByProposalId(proposalId: number): Promise<SEP | null>;
+  getSEPByProposalPk(proposalPk: number): Promise<SEP | null>;
   getSEPs(
     active?: boolean,
     filter?: string,
@@ -47,13 +47,13 @@ export interface SEPDataSource {
   ): Promise<{ totalCount: number; seps: SEP[] }>;
   getSEPProposalAssignments(
     sepId: number,
-    proposalId: number,
+    proposalPk: number,
     reviewerId: number | null
   ): Promise<SEPAssignment[]>;
   getSEPProposals(sepId: number, callId: number): Promise<SEPProposal[]>;
   getSEPProposal(
     sepId: number,
-    proposalId: number
+    proposalPk: number
   ): Promise<SEPProposal | null>;
   getSEPProposalsByInstrument(
     sepId: number,
@@ -73,36 +73,36 @@ export interface SEPDataSource {
   ): Promise<SEP>;
   assignProposalsToSep(
     args: AssignProposalsToSepArgs
-  ): Promise<ProposalIdsWithNextStatus>;
+  ): Promise<ProposalPksWithNextStatus>;
   removeMemberFromSepProposal(
-    proposalId: number,
+    proposalPk: number,
     sepId: number,
     memberId: number
   ): Promise<SEP>;
-  removeProposalsFromSep(proposalIds: number[], sepId: number): Promise<SEP>;
+  removeProposalsFromSep(proposalPks: number[], sepId: number): Promise<SEP>;
   assignMemberToSEPProposal(
-    proposalId: number,
+    proposalPk: number,
     sepId: number,
     memberIds: number[]
   ): Promise<SEP>;
   updateTimeAllocation(
     sepId: number,
-    proposalId: number,
+    proposalPk: number,
     sepTimeAllocation: number | null
   ): Promise<SEPProposal>;
   isChairOrSecretaryOfSEP(userId: number, sepId: number): Promise<boolean>;
   isChairOrSecretaryOfProposal(
     userId: number,
-    proposalId: number
+    proposalPk: number
   ): Promise<boolean>;
   saveSepMeetingDecision(
     saveSepMeetingDecisionInput: SaveSEPMeetingDecisionInput,
     submittedBy?: number | null
   ): Promise<SepMeetingDecision>;
   getProposalsSepMeetingDecisions(
-    proposalIds: number[]
+    proposalPks: number[]
   ): Promise<SepMeetingDecision[]>;
   getSepProposalsWithReviewGradesAndRanking(
-    proposalIds: number[]
+    proposalPks: number[]
   ): Promise<SEPProposalWithReviewGradesAndRanking[]>;
 }

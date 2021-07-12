@@ -24,7 +24,7 @@ import { UserWithRole } from '../models/User';
 import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
 import { AddTechnicalReviewInput } from '../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
-import { ProposalIdWithReviewId } from '../resolvers/mutations/SubmitProposalsReviewMutation';
+import { ProposalPkWithReviewId } from '../resolvers/mutations/SubmitProposalsReviewMutation';
 import { SubmitTechnicalReviewInput } from '../resolvers/mutations/SubmitTechnicalReviewMutation';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
@@ -59,7 +59,7 @@ export default class ReviewMutations {
 
     if (
       !(
-        (await this.userAuth.isReviewerOfProposal(agent, review.proposalID)) ||
+        (await this.userAuth.isReviewerOfProposal(agent, review.proposalPk)) ||
         (await this.userAuth.isChairOrSecretaryOfSEP(agent, review.sepID)) ||
         this.userAuth.isUserOfficer(agent)
       )
@@ -88,7 +88,7 @@ export default class ReviewMutations {
          * Based on that info get the next status that is coming in the workflow and return it for better experience on the frontend.
          */
         const allProposalReviews = await this.dataSource.getProposalReviews(
-          review.proposalID
+          review.proposalPk
         );
 
         const allOtherReviewsSubmitted = checkAllReviewsSubmittedOnProposal(
@@ -104,14 +104,14 @@ export default class ReviewMutations {
         let nextProposalStatus = null;
         if (args.status === ReviewStatus.SUBMITTED) {
           nextProposalStatus = await this.proposalSettingsDataSource.getProposalNextStatus(
-            review.proposalID,
+            review.proposalPk,
             event
           );
         }
 
         return new ReviewWithNextProposalStatus(
           review.id,
-          review.proposalID,
+          review.proposalPk,
           review.userID,
           review.comment,
           review.grade,
@@ -134,7 +134,7 @@ export default class ReviewMutations {
   @Authorized()
   async submitProposalReview(
     agent: UserWithRole | null,
-    args: ProposalIdWithReviewId
+    args: ProposalPkWithReviewId
   ): Promise<Review | Rejection> {
     const { reviewId } = args;
     const review = await this.dataSource.getReview(reviewId);
@@ -148,7 +148,7 @@ export default class ReviewMutations {
 
     if (
       !(
-        (await this.userAuth.isReviewerOfProposal(agent, review.proposalID)) ||
+        (await this.userAuth.isReviewerOfProposal(agent, review.proposalPk)) ||
         (await this.userAuth.isChairOrSecretaryOfSEP(agent, review.sepID)) ||
         this.userAuth.isUserOfficer(agent)
       )
@@ -197,7 +197,7 @@ export default class ReviewMutations {
     if (
       !(
         this.userAuth.isUserOfficer(agent) ||
-        (await this.userAuth.isScientistToProposal(agent, args.proposalID))
+        (await this.userAuth.isScientistToProposal(agent, args.proposalPk))
       )
     ) {
       return rejection(
@@ -207,7 +207,7 @@ export default class ReviewMutations {
     }
 
     const technicalReview = await this.dataSource.getTechnicalReview(
-      args.proposalID
+      args.proposalPk
     );
 
     const shouldUpdateReview = !!technicalReview?.id;
@@ -266,12 +266,12 @@ export default class ReviewMutations {
   }
 
   async isTechnicalReviewAssignee(
-    proposalIds: number[],
+    proposalPks: number[],
     assigneeUserId?: number
   ) {
-    for await (const proposalId of proposalIds) {
+    for await (const proposalPk of proposalPks) {
       const technicalReviewAssignee = (
-        await this.proposalDataSource.get(proposalId)
+        await this.proposalDataSource.get(proposalPk)
       )?.technicalReviewAssignee;
       if (technicalReviewAssignee !== assigneeUserId) {
         return false;
@@ -288,7 +288,7 @@ export default class ReviewMutations {
   ): Promise<Proposal[] | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !this.isTechnicalReviewAssignee(args.proposalIds, agent?.id)
+      !this.isTechnicalReviewAssignee(args.proposalPks, agent?.id)
     ) {
       return rejection('NOT_ALLOWED');
     }
@@ -302,7 +302,7 @@ export default class ReviewMutations {
     agent: UserWithRole | null,
     args: AddUserForReviewArgs
   ): Promise<Review | Rejection> {
-    const { proposalID, userID, sepID } = args;
+    const { proposalPk, userID, sepID } = args;
     if (
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfSEP(agent, sepID))
@@ -319,7 +319,7 @@ export default class ReviewMutations {
       .catch((err) => {
         return rejection(
           'Can not add user for review because of insufficient permissions',
-          { agent, userID, proposalID },
+          { agent, userID, proposalPk },
           err
         );
       });

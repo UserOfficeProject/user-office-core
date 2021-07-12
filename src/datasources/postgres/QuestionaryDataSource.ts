@@ -152,11 +152,11 @@ export default class PostgresQuestionaryDataSource
   }
 
   async insertFiles(
-    proposal_id: number,
+    proposal_pk: number,
     question_id: string,
     files: string[]
   ): Promise<string[]> {
-    const answerId = await this.getAnswerId(proposal_id, question_id);
+    const answerId = await this.getAnswerId(proposal_pk, question_id);
     if (!answerId) {
       throw new Error(
         `Could not insert files because answer does not exist. AnswerID ${answerId}`
@@ -171,10 +171,10 @@ export default class PostgresQuestionaryDataSource
   }
 
   async deleteFiles(
-    proposal_id: number,
+    proposal_pk: number,
     question_id: string
   ): Promise<string[]> {
-    const answerId = await this.getAnswerId(proposal_id, question_id);
+    const answerId = await this.getAnswerId(proposal_pk, question_id);
     if (!answerId) {
       throw new Error(
         `Could not delete files because answer does not exist. AnswerID ${answerId}`
@@ -188,13 +188,13 @@ export default class PostgresQuestionaryDataSource
   }
 
   private async getAnswerId(
-    proposal_id: number,
+    proposal_pk: number,
     question_id: string
   ): Promise<number | null> {
     const selectResult = await database
       .from('answers')
       .where({
-        proposal_id,
+        proposal_pk,
         question_id,
       })
       .select('answer_id');

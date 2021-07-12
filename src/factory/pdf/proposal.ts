@@ -56,12 +56,12 @@ const getTopicActiveAnswers = (
 };
 
 export const collectProposalPDFData = async (
-  proposalId: number,
+  proposalPk: number,
   user: UserWithRole,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
   const userAuthorization = baseContext.userAuthorization;
-  const proposal = await baseContext.queries.proposal.get(user, proposalId);
+  const proposal = await baseContext.queries.proposal.get(user, proposalPk);
 
   // Authenticate user
   if (!proposal || !userAuthorization.hasAccessRights(user, proposal)) {
@@ -85,7 +85,7 @@ export const collectProposalPDFData = async (
   );
   const coProposers = await baseContext.queries.user.getProposers(
     user,
-    proposalId
+    proposalPk
   );
 
   if (!principalInvestigator || !coProposers) {
@@ -95,7 +95,7 @@ export const collectProposalPDFData = async (
   const sampleAttachments: Attachment[] = [];
 
   const samples = await baseContext.queries.sample.getSamples(user, {
-    filter: { proposalId },
+    filter: { proposalPk },
   });
 
   const samplePDFData = (
@@ -110,7 +110,7 @@ export const collectProposalPDFData = async (
 
   notify?.(
     `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
-      proposal.shortCode
+      proposal.proposalId
     }.pdf`
   );
 
@@ -165,10 +165,10 @@ export const collectProposalPDFData = async (
     out.attachments.push(...sampleAttachments);
   }
 
-  if (userAuthorization.isReviewerOfProposal(user, proposal.id)) {
+  if (userAuthorization.isReviewerOfProposal(user, proposal.primaryKey)) {
     const technicalReview = await baseContext.queries.review.technicalReviewForProposal(
       user,
-      proposal.id
+      proposal.primaryKey
     );
     if (technicalReview) {
       out.technicalReview = {

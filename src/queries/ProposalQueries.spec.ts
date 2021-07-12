@@ -38,7 +38,10 @@ test('A user on the proposal can get a proposal it belongs to', () => {
 
 test('A user not on the proposal cannot get a proposal', () => {
   return expect(
-    proposalQueries.get(dummyUserNotOnProposalWithRole, dummyProposal.id)
+    proposalQueries.get(
+      dummyUserNotOnProposalWithRole,
+      dummyProposal.primaryKey
+    )
   ).resolves.toBe(null);
 });
 

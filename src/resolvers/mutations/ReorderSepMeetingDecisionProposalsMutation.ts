@@ -13,9 +13,9 @@ import { SepMeetingDecisionResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @InputType()
-export class ProposalIdWithRankOrder {
+export class ProposalPkWithRankOrder {
   @Field(() => Int)
-  public proposalId: number;
+  public proposalPk: number;
 
   @Field(() => Int)
   public rankOrder: number;
@@ -23,8 +23,8 @@ export class ProposalIdWithRankOrder {
 
 @InputType()
 export class ReorderSepMeetingDecisionProposalsInput {
-  @Field(() => [ProposalIdWithRankOrder])
-  public proposals: ProposalIdWithRankOrder[];
+  @Field(() => [ProposalPkWithRankOrder])
+  public proposals: ProposalPkWithRankOrder[];
 }
 
 @Resolver()

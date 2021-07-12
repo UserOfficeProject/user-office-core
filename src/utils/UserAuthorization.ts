@@ -7,13 +7,15 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { User, UserWithRole } from '../models/User';
+import { VisitDataSource } from './../datasources/VisitDataSource';
 
 @injectable()
 export class UserAuthorization {
   constructor(
     @inject(Tokens.UserDataSource) private userDataSource: UserDataSource,
     @inject(Tokens.ReviewDataSource) private reviewDataSource: ReviewDataSource,
-    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource
+    @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
+    @inject(Tokens.VisitDataSource) private visitDataSource: VisitDataSource
   ) {}
 
   isUserOfficer(agent: UserWithRole | null) {
@@ -63,12 +65,14 @@ export class UserAuthorization {
       return true;
     }
 
-    return this.userDataSource.getProposalUsers(proposal.id).then((users) => {
-      return users.some((user) => user.id === agent.id);
-    });
+    return this.userDataSource
+      .getProposalUsers(proposal.primaryKey)
+      .then((users) => {
+        return users.some((user) => user.id === agent.id);
+      });
   }
 
-  async isReviewerOfProposal(agent: UserWithRole | null, proposalID: number) {
+  async isReviewerOfProposal(agent: UserWithRole | null, proposalPk: number) {
     if (agent == null || !agent.id || !agent.currentRole) {
       return false;
     }
@@ -87,17 +91,17 @@ export class UserAuthorization {
     return this.reviewDataSource
       .getUserReviews(sepIdsUserIsMemberOf)
       .then((reviews) => {
-        return reviews.some((review) => review.proposalID === proposalID);
+        return reviews.some((review) => review.proposalPk === proposalPk);
       });
   }
 
-  async isScientistToProposal(agent: User | null, proposalID: number) {
+  async isScientistToProposal(agent: User | null, proposalPk: number) {
     if (agent == null || !agent.id) {
       return false;
     }
 
     return this.userDataSource
-      .checkScientistToProposal(agent.id, proposalID)
+      .checkScientistToProposal(agent.id, proposalPk)
       .then((result) => {
         return result;
       });
@@ -121,12 +125,19 @@ export class UserAuthorization {
 
     return (
       this.isUserOfficer(agent) ||
+      this.hasGetAccessByToken(agent) ||
       (await this.isMemberOfProposal(agent, proposal)) ||
-      (await this.isReviewerOfProposal(agent, proposal.id)) ||
-      (await this.isScientistToProposal(agent, proposal.id)) ||
-      (await this.isChairOrSecretaryOfProposal(agent, proposal.id)) ||
-      this.hasGetAccessByToken(agent)
+      (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
+      (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
+      (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
+      (await this.isVisitorOfProposal(agent, proposal.primaryKey))
     );
+  }
+  isVisitorOfProposal(
+    agent: UserWithRole,
+    proposalPk: number
+  ): boolean | PromiseLike<boolean> {
+    return this.visitDataSource.isVisitorOfProposal(agent.id, proposalPk);
   }
 
   async isChairOrSecretaryOfSEP(
@@ -140,14 +151,14 @@ export class UserAuthorization {
     return this.sepDataSource.isChairOrSecretaryOfSEP(agent.id, sepId);
   }
 
-  async isChairOrSecretaryOfProposal(agent: User | null, proposalId: number) {
-    if (agent == null || !agent.id || !proposalId) {
+  async isChairOrSecretaryOfProposal(agent: User | null, proposalPk: number) {
+    if (agent == null || !agent.id || !proposalPk) {
       return false;
     }
 
     return this.sepDataSource.isChairOrSecretaryOfProposal(
       agent.id,
-      proposalId
+      proposalPk
     );
   }
 

@@ -186,7 +186,7 @@ export class UserDataSourceMock implements UserDataSource {
   async createOrganisation(name: string, verified: boolean): Promise<number> {
     return 1;
   }
-  async getProposalUsersFull(proposalId: number): Promise<User[]> {
+  async getProposalUsersFull(proposalPk: number): Promise<User[]> {
     throw new Error('Method not implemented.');
   }
   async getBasicUserInfo(
@@ -251,7 +251,7 @@ export class UserDataSourceMock implements UserDataSource {
   }
   async addUserForReview(
     userID: number,
-    proposalID: number
+    proposalPk: number
   ): Promise<boolean | null> {
     return true;
   }
@@ -330,7 +330,7 @@ export class UserDataSourceMock implements UserDataSource {
 
   async checkScientistToProposal(
     scientsitId: number,
-    proposalId: number
+    proposalPk: number
   ): Promise<boolean> {
     if (scientsitId === dummyUserNotOnProposalWithRole.id) {
       return false;

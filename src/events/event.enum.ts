@@ -23,6 +23,7 @@ export enum Event {
   PROPOSAL_MANAGEMENT_DECISION_SUBMITTED = 'PROPOSAL_MANAGEMENT_DECISION_SUBMITTED',
   PROPOSAL_INSTRUMENT_SUBMITTED = 'PROPOSAL_INSTRUMENT_SUBMITTED',
   PROPOSAL_ACCEPTED = 'PROPOSAL_ACCEPTED',
+  PROPOSAL_RESERVED = 'PROPOSAL_RESERVED',
   PROPOSAL_REJECTED = 'PROPOSAL_REJECTED',
   PROPOSAL_STATUS_UPDATED = 'PROPOSAL_STATUS_UPDATED',
   CALL_ENDED = 'CALL_ENDED',
@@ -132,6 +133,7 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when proposal management decision is submitted',
   ],
   [Event.PROPOSAL_REJECTED, 'Event occurs when proposal gets rejected'],
+  [Event.PROPOSAL_RESERVED, 'Event occurs when proposal gets reserved'],
   [
     Event.PROPOSAL_STATUS_UPDATED,
     'Event occurs when proposal status gets updated manually',

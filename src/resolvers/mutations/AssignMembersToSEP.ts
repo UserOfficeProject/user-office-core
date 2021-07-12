@@ -44,7 +44,7 @@ export class AssignSepReviewersToProposalArgs {
   public sepId: number;
 
   @Field(() => Int)
-  public proposalId: number;
+  public proposalPk: number;
 }
 
 @ArgsType()
@@ -56,7 +56,7 @@ export class RemoveSepReviewerFromProposalArgs {
   public sepId: number;
 
   @Field(() => Int)
-  public proposalId: number;
+  public proposalPk: number;
 }
 
 @ArgsType()

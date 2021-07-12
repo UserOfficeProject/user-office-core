@@ -12,7 +12,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   private createReviewObject(review: ReviewRecord) {
     return new Review(
       review.review_id,
-      review.proposal_id,
+      review.proposal_pk,
       review.user_id,
       review.comment,
       review.grade,
@@ -24,7 +24,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   private createTechnicalReviewObject(technicalReview: TechnicalReviewRecord) {
     return new TechnicalReview(
       technicalReview.technical_review_id,
-      technicalReview.proposal_id,
+      technicalReview.proposal_pk,
       technicalReview.comment,
       technicalReview.public_comment,
       technicalReview.time_allocation,
@@ -39,7 +39,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     shouldUpdateReview: boolean
   ): Promise<TechnicalReview> {
     const {
-      proposalID,
+      proposalPk,
       comment,
       publicComment,
       timeAllocation,
@@ -51,7 +51,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     if (shouldUpdateReview) {
       return database
         .update({
-          proposal_id: proposalID,
+          proposal_pk: proposalPk,
           comment,
           public_comment: publicComment,
           time_allocation: timeAllocation,
@@ -60,7 +60,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           reviewer_id: reviewerId,
         })
         .from('technical_review')
-        .where('proposal_id', proposalID)
+        .where('proposal_pk', proposalPk)
         .returning('*')
         .then((records: TechnicalReviewRecord[]) =>
           this.createTechnicalReviewObject(records[0])
@@ -69,7 +69,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
 
     return database
       .insert({
-        proposal_id: proposalID,
+        proposal_pk: proposalPk,
         comment,
         public_comment: publicComment,
         time_allocation: timeAllocation,
@@ -88,7 +88,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     return database
       .select()
       .from('technical_review')
-      .where('proposal_id', id)
+      .where('proposal_pk', id)
       .first()
       .then((review: TechnicalReviewRecord) => {
         if (review === undefined) {
@@ -108,12 +108,12 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .then((review: ReviewRecord) => this.createReviewObject(review));
   }
 
-  async getAssignmentReview(sepId: number, proposalId: number, userId: number) {
+  async getAssignmentReview(sepId: number, proposalPk: number, userId: number) {
     return database
       .select()
       .from('SEP_Reviews')
       .where('sep_id', sepId)
-      .andWhere('proposal_id', proposalId)
+      .andWhere('proposal_pk', proposalPk)
       .andWhere('user_id', userId)
       .first()
       .then((review?: ReviewRecord) =>
@@ -148,7 +148,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .then((review: ReviewRecord[]) => {
         return new Review(
           reviewID,
-          review[0].proposal_id,
+          review[0].proposal_pk,
           review[0].user_id,
           comment,
           grade,
@@ -162,19 +162,19 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     return database
       .select()
       .from('SEP_Reviews')
-      .where('proposal_id', id)
+      .where('proposal_pk', id)
       .then((reviews: ReviewRecord[]) => {
         return reviews.map((review) => this.createReviewObject(review));
       });
   }
 
   async addUserForReview(args: AddUserForReviewArgs): Promise<Review> {
-    const { userID, proposalID, sepID } = args;
+    const { userID, proposalPk, sepID } = args;
 
     return database
       .insert({
         user_id: userID,
-        proposal_id: proposalID,
+        proposal_pk: proposalPk,
         status: ReviewStatus.DRAFT,
         sep_id: sepID,
       })
@@ -201,7 +201,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         // sometimes the ID 0 is sent as a equivalent of all
         if (callId) {
           qb.join('proposals', {
-            'proposals.proposal_id': 'SEP_Reviews.proposal_id',
+            'proposals.proposal_pk': 'SEP_Reviews.proposal_pk',
           });
           qb.where('proposals.call_id', callId);
         }
@@ -209,7 +209,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         // sometimes the ID 0 is sent as a equivalent of all
         if (instrumentId) {
           qb.join('instrument_has_proposals', {
-            'instrument_has_proposals.proposal_id': 'SEP_Reviews.proposal_id',
+            'instrument_has_proposals.proposal_pk': 'SEP_Reviews.proposal_pk',
           });
           qb.where('instrument_has_proposals.instrument_id', instrumentId);
         }
@@ -219,7 +219,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         }
       })
       .whereIn('sep_id', sepIds)
-      .distinctOn('SEP_Reviews.proposal_id')
+      .distinctOn('SEP_Reviews.proposal_pk')
       .then((reviews: ReviewRecord[]) => {
         return reviews.map((review) => this.createReviewObject(review));
       });

@@ -36,7 +36,7 @@ export class SampleAuthorization {
       return false;
     }
 
-    const proposal = await this.proposalDataSource.get(sample.proposalId);
+    const proposal = await this.proposalDataSource.get(sample.proposalPk);
 
     if (!proposal) {
       logger.logError('Could not find proposal for sample', {

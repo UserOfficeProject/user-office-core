@@ -13,7 +13,7 @@ import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 
 type ProposalMessageData = {
-  proposalId: number;
+  proposalPk: number;
   shortCode: string;
   title: string;
   abstract: string;
@@ -33,11 +33,13 @@ const getProposalMessageData = async (proposal: Proposal) => {
     Tokens.UserDataSource
   );
 
-  const proposalUsers = await userDataSource.getProposalUsersFull(proposal.id);
+  const proposalUsers = await userDataSource.getProposalUsersFull(
+    proposal.primaryKey
+  );
 
   const messageData: ProposalMessageData = {
-    proposalId: proposal.id,
-    shortCode: proposal.shortCode,
+    proposalPk: proposal.primaryKey,
+    shortCode: proposal.proposalId,
     title: proposal.title,
     abstract: proposal.abstract,
     members: proposalUsers.map((proposalUser) => ({
@@ -97,28 +99,31 @@ export function createPostToRabbitMQHandler() {
           ProposalStatusDefaultShortCodes.SCHEDULING
         ) {
           logger.logDebug(
-            `Proposal '${proposal.id}' status isn't 'SCHEDULING', skipping`,
+            `Proposal '${proposal.primaryKey}' status isn't 'SCHEDULING', skipping`,
             { proposal, proposalStatus }
           );
 
           return;
         }
 
-        const instrument = await instrumentDataSource.getInstrumentByProposalId(
-          proposal.id
+        const instrument = await instrumentDataSource.getInstrumentByProposalPk(
+          proposal.primaryKey
         );
 
         if (!instrument) {
-          logger.logWarn(`Proposal '${proposal.id}' has no instrument`, {
-            proposal,
-          });
+          logger.logWarn(
+            `Proposal '${proposal.primaryKey}' has no instrument`,
+            {
+              proposal,
+            }
+          );
 
           return;
         }
 
         // NOTE: maybe use shared types?
         const message = {
-          proposalId: proposal.id,
+          proposalPk: proposal.primaryKey,
           callId: proposal.callId,
           // the UI supports days
           allocatedTime: proposal.managementTimeAllocation * 24 * 60 * 60,

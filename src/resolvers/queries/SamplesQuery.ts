@@ -34,7 +34,7 @@ class SamplesFilter {
   public questionId?: string;
 
   @Field(() => Int, { nullable: true })
-  public proposalId?: number;
+  public proposalPk?: number;
 }
 
 @ArgsType()

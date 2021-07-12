@@ -10,7 +10,7 @@ import { TechnicalReviewStatus } from '../../models/TechnicalReview';
 @ObjectType()
 export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Int)
-  public id: number;
+  public primaryKey: number;
 
   @Field(() => String)
   public title: string;
@@ -25,7 +25,7 @@ export class ProposalView implements Partial<ProposalOrigin> {
   public statusDescription: string;
 
   @Field(() => String)
-  public shortCode: string;
+  public proposalId: string;
 
   @Field(() => Int, { nullable: true })
   public rankOrder: number;

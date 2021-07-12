@@ -21,7 +21,7 @@ export class Visit implements Partial<VisitOrigin> {
   public id: number;
 
   @Field(() => Int)
-  public proposalId: number;
+  public proposalPk: number;
 
   @Field(() => VisitStatus)
   public status: VisitStatus;
@@ -40,7 +40,7 @@ export class VisitResolver {
     @Root() visit: Visit,
     @Ctx() context: ResolverContext
   ): Promise<Proposal | null> {
-    return context.queries.proposal.get(context.user, visit.proposalId);
+    return context.queries.proposal.get(context.user, visit.proposalPk);
   }
 
   @FieldResolver(() => [BasicUserDetails])

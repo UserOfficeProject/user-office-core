@@ -1,6 +1,6 @@
 import { Call } from '../models/Call';
 import { InstrumentHasProposals } from '../models/Instrument';
-import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
+import { Proposal, ProposalPksWithNextStatus } from '../models/Proposal';
 import { Review, ReviewWithNextProposalStatus } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { SEP } from '../models/SEP';
@@ -50,6 +50,11 @@ interface ProposalRejectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_REJECTED;
   proposal: Proposal;
   reason: string;
+}
+
+interface ProposalReservedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_RESERVED;
+  proposal: Proposal;
 }
 
 interface ProposalCreatedEvent extends GeneralEvent {
@@ -109,17 +114,17 @@ interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SELECTED;
-  proposalidswithnextstatus: ProposalIdsWithNextStatus;
+  proposalpkswithnextstatus: ProposalPksWithNextStatus;
 }
 
 interface ProposalSEPSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_SELECTED;
-  proposalidswithnextstatus: ProposalIdsWithNextStatus;
+  proposalpkswithnextstatus: ProposalPksWithNextStatus;
 }
 
 interface ProposalStatusUpdatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_UPDATED;
-  proposalidswithnextstatus: ProposalIdsWithNextStatus;
+  proposalpkswithnextstatus: ProposalPksWithNextStatus;
 }
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
@@ -255,6 +260,7 @@ export type ApplicationEvent =
   | ProposalUnfeasibleEvent
   | ProposalSampleSafeEvent
   | ProposalRejectedEvent
+  | ProposalReservedEvent
   | ProposalCreatedEvent
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent

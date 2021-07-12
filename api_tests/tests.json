@@ -1648,8 +1648,8 @@
 						"exec": [
 							"pm.test(\"Should create proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createProposal.proposal.id).to.be.above(0)",
-							"    pm.environment.set(\"NEW_PROPOSAL_ID\", jsonData.data.createProposal.proposal.id);",
+							"    pm.expect(jsonData.data.createProposal.proposal.primaryKey).to.be.above(0)",
+							"    pm.environment.set(\"NEW_PROPOSAL_PK\", jsonData.data.createProposal.proposal.primaryKey);",
 							"    pm.environment.set(\"NEW_QUESTIONARY_ID\", jsonData.data.createProposal.proposal.questionaryId);",
 							"});",
 							"",
@@ -2088,7 +2088,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "mutation($sampleTemplateId: Int!, $proposalId: Int!, $questionId: String!) {\n\tcreateSample(title: \"My sample\", templateId: $sampleTemplateId, proposalId: $proposalId, questionId: $questionId) {\n\t\tsample {\n\t\t\tid\n\t\t\ttitle\n\t\t}\n\t\terror\n\t}\n}",
-						"variables": "{\n\t\"sampleTemplateId\": {{NEW_SAMPLE_TEMPLATE_ID}},\n\t\"proposalId\": {{NEW_PROPOSAL_ID}},\n\t\"questionId\": \"{{NEW_FIELD_ID}}\"\n}"
+						"variables": "{\n\t\"sampleTemplateId\": {{NEW_SAMPLE_TEMPLATE_ID}},\n\t\"proposalId\": {{NEW_PROPOSAL_PK}},\n\t\"questionId\": \"{{NEW_FIELD_ID}}\"\n}"
 					},
 					"options": {
 						"graphql": {}
@@ -2118,7 +2118,7 @@
 						"exec": [
 							"pm.test(\"Should get proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.proposal.id).to.eql(pm.environment.get(\"NEW_PROPOSAL_ID\"));",
+							"    pm.expect(jsonData.data.proposal.primaryKey).to.eql(pm.environment.get(\"NEW_PROPOSAL_PK\"));",
 							"});",
 							""
 						],
@@ -2184,7 +2184,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "query ($id: Int!) {\n  proposal(id: $id) {\n    id\n    title\n    abstract\n    status\n    {\n      name\n    }\n    users {\n      firstname\n      lastname\n      id\n    }\n    questionary {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            id\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n          value\n          dependencies {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n              condition\n              params\n            }\n          }\n        }\n      }\n    }\n    reviews {\n      id\n      comment\n      status\n      reviewer {\n        firstname\n        lastname\n        id\n      }\n    }\n  }\n}\n",
-						"variables": "{\n\t\"id\":{{NEW_PROPOSAL_ID}}\n}"
+						"variables": "{\n\t\"id\":{{NEW_PROPOSAL_PK}}\n}"
 					},
 					"options": {
 						"graphql": {}
@@ -2214,7 +2214,7 @@
 						"exec": [
 							"pm.test(\"Should update proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.updateProposal.proposal.id).to.eql(pm.environment.get(\"NEW_PROPOSAL_ID\"))",
+							"    pm.expect(jsonData.data.updateProposal.proposal.primaryKey).to.eql(pm.environment.get(\"NEW_PROPOSAL_PK\"))",
 							"    pm.expect(jsonData.data.updateProposal.proposal.title).to.eql(pm.environment.get(\"NEW_PROPOSAL_TITLE\"))",
 							"});"
 						],
@@ -2284,7 +2284,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "mutation ($id: Int!, $title: String, $abstract: String, $users: [Int!]) {\n      updateProposal(id: $id, title: $title, abstract: $abstract, users: $users) {\n    proposal {\n      id\n      title\n      abstract\n    }\n    error\n  }\n}\n",
-						"variables": "{\n        \"id\": {{NEW_PROPOSAL_ID}},\n        \"title\": \"{{NEW_PROPOSAL_TITLE}}\",\n        \"abstract\": \"{{NEW_PROPOSAL_ABSTRACT}}\"\n    }"
+						"variables": "{\n        \"id\": {{NEW_PROPOSAL_PK}},\n        \"title\": \"{{NEW_PROPOSAL_TITLE}}\",\n        \"abstract\": \"{{NEW_PROPOSAL_ABSTRACT}}\"\n    }"
 					},
 					"options": {
 						"graphql": {}
@@ -2512,7 +2512,7 @@
 						"exec": [
 							"pm.test(\"Should submit proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.submitProposal.proposal.id).to.equal(pm.environment.get(\"NEW_PROPOSAL_ID\"));",
+							"    pm.expect(jsonData.data.submitProposal.proposal.primaryKey).to.equal(pm.environment.get(\"NEW_PROPOSAL_PK\"));",
 							"});",
 							"",
 							""
@@ -2584,7 +2584,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "mutation($proposalId: Int!) {\n  submitProposal(id:$proposalId) {\n    proposal {\n      id\n    }\n    error\n  }\n}\n",
-						"variables": "{\n\t\"proposalId\":{{NEW_PROPOSAL_ID}}\n}"
+						"variables": "{\n\t\"proposalId\":{{NEW_PROPOSAL_PK}}\n}"
 					}
 				},
 				"url": {
@@ -2618,7 +2618,7 @@
 						"exec": [
 							"pm.test(\"Should create shipment\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createShipment.shipment.proposalId).to.equal(pm.environment.get(\"NEW_PROPOSAL_ID\"));",
+							"    pm.expect(jsonData.data.createShipment.shipment.proposalId).to.equal(pm.environment.get(\"NEW_PROPOSAL_PK\"));",
 							"",
 							"    var jsonData = pm.response.json();",
 							"    pm.environment.set(\"NEW_SHIPMENT_ID\", jsonData.data.createShipment.shipment.id);",
@@ -2693,7 +2693,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "mutation($proposalId: Int!) {\n  createShipment(\n    proposalId: $proposalId,\n    title: \"My shipment\"\n    \n  ) {\n    error\n    shipment {\n      id\n      proposalId\n      status\n      externalRef\n      creatorId\n      created\n      questionary{\n        steps {\n          fields {\n            question{\n              question\n            }\n          }\n          topic {\n           title\n            \n          }\n        }\n      }\n    }\n  }\n}\n",
-						"variables": "{\n\t\"proposalId\":{{NEW_PROPOSAL_ID}}\n}"
+						"variables": "{\n\t\"proposalId\":{{NEW_PROPOSAL_PK}}\n}"
 					}
 				},
 				"url": {
@@ -2727,7 +2727,7 @@
 						"exec": [
 							"pm.test(\"Should get shipment\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.shipment.proposalId).to.equal(pm.environment.get(\"NEW_PROPOSAL_ID\"));",
+							"    pm.expect(jsonData.data.shipment.proposalId).to.equal(pm.environment.get(\"NEW_PROPOSAL_PK\"));",
 							"});",
 							"",
 							""
@@ -3085,7 +3085,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "mutation($newUserId:Int!, $newProposalId:Int!, $newSepId:Int!) {\n  addUserForReview(userID: $newUserId, sepID: $newSepId, proposalID: $newProposalId) {\n    review {\n      id\n\t}\n    error\n  }\n}\n",
-						"variables": "{\n\t\"newUserId\":{{NEW_USER_ID}},\n\t\"newProposalId\":{{NEW_PROPOSAL_ID}},\n\t\"newSepId\":{{NEW_SEP_ID}}\n}"
+						"variables": "{\n\t\"newUserId\":{{NEW_USER_ID}},\n\t\"newProposalId\":{{NEW_PROPOSAL_PK}},\n\t\"newSepId\":{{NEW_SEP_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
@@ -3882,7 +3882,7 @@
 							"pm.test(\"Should delete proposal\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.deleteProposal.error).to.equal(null)",
-							"    pm.expect(jsonData.data.deleteProposal.proposal.id).to.be.equal(pm.environment.get(\"NEW_PROPOSAL_ID\"))",
+							"    pm.expect(jsonData.data.deleteProposal.proposal.primaryKey).to.be.equal(pm.environment.get(\"NEW_PROPOSAL_PK\"))",
 							"});"
 						],
 						"type": "text/javascript"
@@ -3953,7 +3953,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "mutation($id:Int!) {\n  deleteProposal(id:$id){\n    proposal{\n      id\n    }\n    error\n  }\n}",
-						"variables": "{\n\t\"id\":{{NEW_PROPOSAL_ID}}\n}"
+						"variables": "{\n\t\"id\":{{NEW_PROPOSAL_PK}}\n}"
 					}
 				},
 				"url": {

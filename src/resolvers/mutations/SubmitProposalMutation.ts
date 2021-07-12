@@ -8,11 +8,11 @@ import { wrapResponse } from '../wrapResponse';
 export class SubmitProposalMutation {
   @Mutation(() => ProposalResponseWrap)
   submitProposal(
-    @Arg('id', () => Int) id: number,
+    @Arg('proposalPk', () => Int) proposalPk: number,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposal.submit(context.user, { proposalId: id }),
+      context.mutations.proposal.submit(context.user, { proposalPk }),
       ProposalResponseWrap
     );
   }

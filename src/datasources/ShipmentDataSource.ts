@@ -7,7 +7,7 @@ export interface ShipmentDataSource {
   create(
     title: string,
     creatorId: number,
-    proposalId: number,
+    proposalPk: number,
     questionaryId: number
   ): Promise<Shipment>;
   getShipment(shipmentId: number): Promise<Shipment | null>;

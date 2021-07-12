@@ -16,7 +16,7 @@ import { wrapResponse } from '../wrapResponse';
 @InputType()
 export class SaveSEPMeetingDecisionInput {
   @Field(() => Int)
-  public proposalId: number;
+  public proposalPk: number;
 
   @Field(() => String, { nullable: true })
   public commentForUser?: string;

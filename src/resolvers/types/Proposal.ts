@@ -29,10 +29,10 @@ import { TechnicalReview } from './TechnicalReview';
 import { Visit } from './Visit';
 
 @ObjectType()
-@Directive('@key(fields: "id")')
+@Directive('@key(fields: "primaryKey")')
 export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => Int)
-  public id: number;
+  public primaryKey: number;
 
   @Field(() => String)
   public title: string;
@@ -50,7 +50,7 @@ export class Proposal implements Partial<ProposalOrigin> {
   public updated: Date;
 
   @Field(() => String)
-  public shortCode: string;
+  public proposalId: string;
 
   @Field(() => ProposalEndStatus, { nullable: true })
   public finalStatus?: ProposalEndStatus;
@@ -94,7 +94,7 @@ export class ProposalResolver {
   ): Promise<BasicUserDetails[]> {
     const users = await context.queries.user.getProposers(
       context.user,
-      proposal.id
+      proposal.primaryKey
     );
 
     return isRejection(users) ? [] : users;
@@ -127,7 +127,10 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<ProposalPublicStatus> {
-    return context.queries.proposal.getPublicStatus(context.user, proposal.id);
+    return context.queries.proposal.getPublicStatus(
+      context.user,
+      proposal.primaryKey
+    );
   }
 
   @FieldResolver(() => [Review], { nullable: true })
@@ -137,7 +140,7 @@ export class ProposalResolver {
   ): Promise<Review[] | null> {
     return await context.queries.review.reviewsForProposal(
       context.user,
-      proposal.id
+      proposal.primaryKey
     );
   }
 
@@ -148,7 +151,7 @@ export class ProposalResolver {
   ): Promise<TechnicalReview | null> {
     return await context.queries.review.technicalReviewForProposal(
       context.user,
-      proposal.id
+      proposal.primaryKey
     );
   }
 
@@ -157,8 +160,8 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Instrument | null> {
-    return await context.queries.instrument.dataSource.getInstrumentByProposalId(
-      proposal.id
+    return await context.queries.instrument.dataSource.getInstrumentByProposalPk(
+      proposal.primaryKey
     );
   }
 
@@ -167,7 +170,9 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<SEP | null> {
-    return await context.queries.sep.dataSource.getSEPByProposalId(proposal.id);
+    return await context.queries.sep.dataSource.getSEPByProposalPk(
+      proposal.primaryKey
+    );
   }
 
   @FieldResolver(() => Call, { nullable: true })
@@ -196,7 +201,7 @@ export class ProposalResolver {
   ): Promise<SepMeetingDecision | null> {
     return await context.queries.sep.getProposalSepMeetingDecision(
       context.user,
-      proposal.id
+      proposal.primaryKey
     );
   }
 
@@ -206,7 +211,7 @@ export class ProposalResolver {
     @Ctx() context: ResolverContext
   ): Promise<Sample[] | null> {
     return await context.queries.sample.getSamples(context.user, {
-      filter: { proposalId: proposal.id },
+      filter: { proposalPk: proposal.primaryKey },
     });
   }
 
@@ -216,7 +221,7 @@ export class ProposalResolver {
     @Ctx() context: ResolverContext
   ): Promise<Visit[] | null> {
     return await context.queries.visit.getMyVisits(context.user, {
-      proposalId: proposal.id,
+      proposalPk: proposal.primaryKey,
     });
   }
 }
@@ -229,11 +234,14 @@ export async function resolveProposalReference(
   // it should be source, args, context, resolveInfo
   // but instead we get source, context and resolveInfo
   // this was the easies way to make the compiler happy and use real types
-  const [reference, ctx]: [Pick<Proposal, 'id'>, ResolverContext] = params;
+  const [reference, ctx]: [
+    Pick<Proposal, 'primaryKey'>,
+    ResolverContext
+  ] = params;
 
   // dataSource.get can be null, even with non-null operator the compiler complains
   return (await (ctx.queries.proposal.byRef(
     ctx.user,
-    reference.id
+    reference.primaryKey
   ) as unknown)) as Proposal;
 }

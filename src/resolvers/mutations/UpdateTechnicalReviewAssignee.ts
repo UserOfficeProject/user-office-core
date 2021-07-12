@@ -18,7 +18,7 @@ export class UpdateTechnicalReviewAssigneeInput {
   public userId: number;
 
   @Field(() => [Int!]!)
-  public proposalIds: number[];
+  public proposalPks: number[];
 }
 
 @Resolver()

@@ -1,6 +1,6 @@
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
-import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
+import { Proposal, ProposalPksWithNextStatus } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { UserProposalsFilter } from '../resolvers/types/User';
@@ -10,7 +10,7 @@ import { ProposalEventsRecord } from './postgres/records';
 export interface ProposalDataSource {
   getProposalsFromView(filter?: ProposalsFilter): Promise<ProposalView[]>;
   // Read
-  get(id: number): Promise<Proposal | null>;
+  get(primaryKey: number): Promise<Proposal | null>;
 
   getProposals(
     filter?: ProposalsFilter,
@@ -36,28 +36,28 @@ export interface ProposalDataSource {
   ): Promise<Proposal>;
   update(proposal: Proposal): Promise<Proposal>;
   updateProposalStatus(
-    proposalId: number,
+    proposalPk: number,
     proposalStatusId: number
   ): Promise<Proposal>;
   updateProposalTechnicalReviewer(
     args: UpdateTechnicalReviewAssigneeInput
   ): Promise<Proposal[]>;
-  setProposalUsers(id: number, users: number[]): Promise<void>;
-  submitProposal(id: number): Promise<Proposal>;
-  deleteProposal(id: number): Promise<Proposal>;
+  setProposalUsers(proposalPk: number, users: number[]): Promise<void>;
+  submitProposal(primaryKey: number): Promise<Proposal>;
+  deleteProposal(primaryKey: number): Promise<Proposal>;
   markEventAsDoneOnProposal(
     event: Event,
-    proposalId: number
+    proposalPk: number
   ): Promise<ProposalEventsRecord | null>;
   getCount(callId: number): Promise<number>;
   cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal>;
   resetProposalEvents(
-    proposalId: number,
+    proposalPk: number,
     callId: number,
     statusId: number
   ): Promise<boolean>;
   changeProposalsStatus(
     statusId: number,
-    proposalIds: number[]
-  ): Promise<ProposalIdsWithNextStatus>;
+    proposalPks: number[]
+  ): Promise<ProposalPksWithNextStatus>;
 }

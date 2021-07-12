@@ -49,7 +49,7 @@ export default class ShipmentMutations {
       );
     }
 
-    const proposal = await this.proposalDataSource.get(args.proposalId);
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
     if (!proposal) {
       return rejection(
         'Can not create shipment because proposal was not found',
@@ -89,7 +89,7 @@ export default class ShipmentMutations {
         return this.shipmentDataSource.create(
           args.title,
           agent.id,
-          args.proposalId,
+          args.proposalPk,
           questionary.questionaryId
         );
       })

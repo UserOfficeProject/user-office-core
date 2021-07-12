@@ -71,13 +71,13 @@ export default class SEPQueries {
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getSEPProposal(
     agent: UserWithRole | null,
-    { sepId, proposalId }: { sepId: number; proposalId: number }
+    { sepId, proposalPk }: { sepId: number; proposalPk: number }
   ) {
     if (
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfSEP(agent, sepId))
     ) {
-      return this.dataSource.getSEPProposal(sepId, proposalId);
+      return this.dataSource.getSEPProposal(sepId, proposalPk);
     } else {
       return null;
     }
@@ -116,10 +116,10 @@ export default class SEPQueries {
     agent: UserWithRole | null,
     {
       sepId,
-      proposalId,
+      proposalPk,
     }: {
       sepId: number;
-      proposalId: number;
+      proposalPk: number;
     }
   ) {
     let reviewerId = null;
@@ -133,7 +133,7 @@ export default class SEPQueries {
 
     return this.dataSource.getSEPProposalAssignments(
       sepId,
-      proposalId,
+      proposalPk,
       reviewerId
     );
   }
@@ -141,11 +141,11 @@ export default class SEPQueries {
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getProposalSepMeetingDecision(
     agent: UserWithRole | null,
-    proposalId: number
+    proposalPk: number
   ) {
     const [
       sepMeetingDecision,
-    ] = await this.dataSource.getProposalsSepMeetingDecisions([proposalId]);
+    ] = await this.dataSource.getProposalsSepMeetingDecisions([proposalPk]);
 
     if (!sepMeetingDecision) {
       return null;
@@ -153,7 +153,7 @@ export default class SEPQueries {
 
     if (
       this.userAuth.isUserOfficer(agent) ||
-      (await this.userAuth.isMemberOfSEP(agent, proposalId))
+      (await this.userAuth.isMemberOfSEP(agent, proposalPk))
     ) {
       return sepMeetingDecision;
     } else {

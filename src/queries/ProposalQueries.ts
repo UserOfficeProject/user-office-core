@@ -28,8 +28,8 @@ export default class ProposalQueries {
   ) {}
 
   @Authorized()
-  async get(agent: UserWithRole | null, id: number) {
-    let proposal = await this.dataSource.get(id);
+  async get(agent: UserWithRole | null, primaryKey: number) {
+    let proposal = await this.dataSource.get(primaryKey);
 
     if (!proposal) {
       return null;

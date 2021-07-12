@@ -2,12 +2,12 @@ import { AllocationTimeUnits } from './Call';
 import { TechnicalReviewStatus } from './TechnicalReview';
 export class ProposalView {
   constructor(
-    public id: number,
+    public primaryKey: number,
     public title: string,
     public statusId: number,
     public statusName: string,
     public statusDescription: string,
-    public shortCode: string,
+    public proposalId: string,
     public rankOrder: number,
     public finalStatus: number, // Should use ProposalEndStatus enum here
     public timeAllocation: number,

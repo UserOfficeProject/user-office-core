@@ -80,7 +80,7 @@ async function getProposal(id: number): Promise<Proposal> {
   const proposal = await database
     .select()
     .table('proposals')
-    .where('proposal_id', id)
+    .where('proposal_pk', id)
     .first();
 
   return createProposalObject(proposal);
@@ -140,10 +140,10 @@ describe('Submit proposal', () => {
     const call = await createCall();
     const proposal = await createProposal(call.id);
 
-    const submission = proposalDataSource.submitProposal(proposal.id);
+    const submission = proposalDataSource.submitProposal(proposal.primaryKey);
 
     return expect(submission).resolves.toMatchObject({
-      shortCode: proposal.shortCode,
+      shortCode: proposal.proposalId,
       submitted: true,
     });
   });
@@ -151,7 +151,7 @@ describe('Submit proposal', () => {
   test("In a call without a reference number format, the call's sequence number is updated", async () => {
     const call = await createCall();
     const proposal = await createProposal(call.id);
-    await proposalDataSource.submitProposal(proposal.id);
+    await proposalDataSource.submitProposal(proposal.primaryKey);
 
     const result = getCall(call.id);
 
@@ -166,7 +166,7 @@ describe('Submit proposal', () => {
     const call = await createCall();
     const proposal = await createProposal(call.id);
 
-    const submission = proposalDataSource.submitProposal(proposal.id);
+    const submission = proposalDataSource.submitProposal(proposal.primaryKey);
 
     return expect(submission).resolves.toMatchObject({
       referenceNumberSequence: 0,
@@ -178,7 +178,7 @@ describe('Submit proposal', () => {
     const call = await createCall('211{digits:4}');
     const proposal = await createProposal(call.id);
 
-    const submission = proposalDataSource.submitProposal(proposal.id);
+    const submission = proposalDataSource.submitProposal(proposal.primaryKey);
 
     return expect(submission).resolves.toEqual(
       expect.objectContaining({
@@ -191,7 +191,7 @@ describe('Submit proposal', () => {
     const call = await createCall('211{digits:4}');
     const proposal = await createProposal(call.id);
 
-    const submission = proposalDataSource.submitProposal(proposal.id);
+    const submission = proposalDataSource.submitProposal(proposal.primaryKey);
 
     return expect(submission).resolves.toEqual(
       expect.objectContaining({
@@ -203,7 +203,7 @@ describe('Submit proposal', () => {
   test("In a call with a reference number format, the call's sequence number is updated", async () => {
     const call = await createCall('211{digits:4}');
     const proposal = await createProposal(call.id);
-    await proposalDataSource.submitProposal(proposal.id);
+    await proposalDataSource.submitProposal(proposal.primaryKey);
 
     const result = getCall(call.id);
 
@@ -219,10 +219,10 @@ describe('Submit proposal', () => {
     const preSubmitProposal = await createProposal(preSubmitCall.id);
 
     expect(async () => {
-      await proposalDataSource.submitProposal(preSubmitProposal.id);
+      await proposalDataSource.submitProposal(preSubmitProposal.primaryKey);
     }).rejects.toThrowError('Failed to submit');
     expect(await getCall(preSubmitCall.id)).toMatchObject(preSubmitCall);
-    expect(await getProposal(preSubmitProposal.id)).toMatchObject(
+    expect(await getProposal(preSubmitProposal.primaryKey)).toMatchObject(
       preSubmitProposal
     );
   });
@@ -232,10 +232,10 @@ describe('Submit proposal', () => {
     const preSubmitProposal = await createProposal(preSubmitCall.id);
 
     expect(async () => {
-      await proposalDataSource.submitProposal(preSubmitProposal.id);
+      await proposalDataSource.submitProposal(preSubmitProposal.primaryKey);
     }).rejects.toThrowError('Failed to submit');
     expect(await getCall(preSubmitCall.id)).toMatchObject(preSubmitCall);
-    expect(await getProposal(preSubmitProposal.id)).toMatchObject(
+    expect(await getProposal(preSubmitProposal.primaryKey)).toMatchObject(
       preSubmitProposal
     );
   });
@@ -244,7 +244,7 @@ describe('Submit proposal', () => {
     const call = await createCall('211{digits:4}{other:param}text');
     const proposal = await createProposal(call.id);
 
-    const submission = proposalDataSource.submitProposal(proposal.id);
+    const submission = proposalDataSource.submitProposal(proposal.primaryKey);
 
     return expect(submission).resolves.toEqual(
       expect.objectContaining({
@@ -268,14 +268,14 @@ describe('Submit proposal', () => {
 
     const submissions = await BluePromise.map(
       proposals,
-      async (p) => await proposalDataSource.submitProposal(p.id)
+      async (p) => await proposalDataSource.submitProposal(p.primaryKey)
     );
 
     const invalidSubmissions = submissions.filter(
       (s) =>
         !s.submitted ||
         !(s.referenceNumberSequence || s.referenceNumberSequence == 0) ||
-        !expectedRefNums.includes(s.shortCode)
+        !expectedRefNums.includes(s.proposalId)
     );
 
     expect(invalidSubmissions.length).toBe(0);
@@ -287,10 +287,10 @@ describe('Submit proposal', () => {
   test('In a call with a reference number format, when a cloned proposal is submitted, it is given a unique reference number', async () => {
     const call = await createCall('211{digits:4}{other:param}text');
     const original = await createProposal(call.id);
-    await proposalDataSource.submitProposal(original.id);
+    await proposalDataSource.submitProposal(original.primaryKey);
     const cloned = await proposalDataSource.cloneProposal(original);
 
-    const submission = proposalDataSource.submitProposal(cloned.id);
+    const submission = proposalDataSource.submitProposal(cloned.primaryKey);
 
     return expect(submission).resolves.toEqual(
       expect.objectContaining({

@@ -10,10 +10,11 @@ export interface VisitDataSource {
   getTeam(visitId: number): Promise<BasicUserDetails[]>;
   // Write
   createVisit(
-    proposalId: number,
+    proposalPk: number,
     visitorId: number,
     questionaryId: number
   ): Promise<Visit>;
   updateVisit(args: UpdateVisitArgs): Promise<Visit>;
   deleteVisit(visitId: number): Promise<Visit>;
+  isVisitorOfProposal(visitorId: number, proposalPk: number): Promise<boolean>;
 }

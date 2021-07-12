@@ -262,7 +262,7 @@ const createProposals = async () => {
       abstract: faker.random.words(7),
     });
     await proposalDataSource.setProposalUsers(
-      proposal.id,
+      proposal.primaryKey,
       createUniqueIntArray(3, MAX_USERS)
     );
     const questionarySteps = await questionaryDataSource.getQuestionarySteps(
@@ -284,7 +284,7 @@ const createProposals = async () => {
     }
 
     instrumentDataSource.assignProposalsToInstrument(
-      [proposal.id],
+      [proposal.primaryKey],
       dummy.positiveNumber(MAX_INSTRUMENTS)
     );
   }, MAX_PROPOSALS);
@@ -294,7 +294,7 @@ const createReviews = async () => {
   await execute(() => {
     return reviewDataSource.setTechnicalReview(
       {
-        proposalID: dummy.positiveNumber(MAX_PROPOSALS),
+        proposalPk: dummy.positiveNumber(MAX_PROPOSALS),
         comment: faker.random.words(50),
         publicComment: faker.random.words(25),
         status:
@@ -332,18 +332,18 @@ const createSeps = async () => {
       sepId: sep.id,
       memberIds: [dummy.positiveNumber(MAX_USERS)],
     });
-    const proposalIds = createUniqueIntArray(5, MAX_PROPOSALS);
-    for (const proposalId of proposalIds) {
+    const proposalPks = createUniqueIntArray(5, MAX_PROPOSALS);
+    for (const proposalPk of proposalPks) {
       const tmpUserId = dummy.positiveNumber(MAX_USERS);
       await sepDataSource.assignProposalsToSep({
-        proposals: [{ id: proposalId, callId: 1 }],
+        proposals: [{ primaryKey: proposalPk, callId: 1 }],
         sepId: sep.id,
       });
-      await sepDataSource.assignMemberToSEPProposal(proposalId, sep.id, [
+      await sepDataSource.assignMemberToSEPProposal(proposalPk, sep.id, [
         tmpUserId,
       ]);
       await reviewDataSource.addUserForReview({
-        proposalID: proposalId,
+        proposalPk: proposalPk,
         sepID: sep.id,
         userID: tmpUserId,
       });

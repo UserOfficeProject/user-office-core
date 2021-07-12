@@ -15,7 +15,7 @@ import { wrapResponse } from '../wrapResponse';
 @ArgsType()
 export class NotifyProposalArgs {
   @Field(() => Int)
-  public id: number;
+  public proposalPk: number;
 }
 
 @Resolver()
@@ -27,7 +27,9 @@ export class NotifyProposalMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposal.notify(context.user, { proposalId: args.id }),
+      context.mutations.proposal.notify(context.user, {
+        proposalPk: args.proposalPk,
+      }),
       ProposalResponseWrap
     );
   }

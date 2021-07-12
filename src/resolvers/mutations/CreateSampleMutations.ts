@@ -21,7 +21,7 @@ export class CreateSampleInput {
   templateId: number;
 
   @Field(() => Int)
-  proposalId: number;
+  proposalPk: number;
 
   @Field(() => String)
   questionId: string;

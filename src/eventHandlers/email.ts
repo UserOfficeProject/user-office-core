@@ -101,7 +101,7 @@ export default function createHandler() {
           event.proposal.proposerId
         );
         const participants = await userDataSource.getProposalUsersFull(
-          event.proposal.id
+          event.proposal.primaryKey
         );
         if (!principalInvestigator) {
           return;
@@ -114,7 +114,7 @@ export default function createHandler() {
           substitution_data: {
             piPreferredname: principalInvestigator.preferredname,
             piLastname: principalInvestigator.lastname,
-            proposalNumber: event.proposal.shortCode,
+            proposalNumber: event.proposal.proposalId,
             proposalTitle: event.proposal.title,
             coProposers: participants.map(
               (partipant) => `${partipant.preferredname} ${partipant.lastname} `
@@ -216,7 +216,7 @@ export default function createHandler() {
             substitution_data: {
               piPreferredname: principalInvestigator.preferredname,
               piLastname: principalInvestigator.lastname,
-              proposalNumber: event.proposal.shortCode,
+              proposalNumber: event.proposal.proposalId,
               proposalTitle: event.proposal.title,
               commentForUser: event.proposal.commentForUser,
             },

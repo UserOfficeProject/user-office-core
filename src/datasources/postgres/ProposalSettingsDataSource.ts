@@ -538,7 +538,7 @@ export default class PostgresProposalSettingsDataSource
       });
   }
 
-  async getProposalNextStatus(proposalId: number, event: Event) {
+  async getProposalNextStatus(proposalPk: number, event: Event) {
     const currentProposalWorkflowConnection: ProposalWorkflowConnectionRecord = await database(
       'proposals'
     )
@@ -550,7 +550,7 @@ export default class PostgresProposalSettingsDataSource
         'pwc.proposal_workflow_id': 'call.proposal_workflow_id',
         'pwc.proposal_status_id': 'proposals.status_id',
       })
-      .where('proposal_id', proposalId)
+      .where('proposal_pk', proposalPk)
       .first();
 
     if (!currentProposalWorkflowConnection) {
