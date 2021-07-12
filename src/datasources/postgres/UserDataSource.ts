@@ -493,16 +493,16 @@ export default class PostgresUserDataSource implements UserDataSource {
         .select('*')
         .from('proposal_user')
         .union(function () {
-          this.column('proposal_id', { user_id: 'proposer_id' }).from(
+          this.column('proposal_pk', { user_id: 'proposer_id' }).from(
             'proposals'
           );
         });
 
     const prop: number = await database
       .with('pu', fullProposalUserTable)
-      .max('pu.proposal_id')
+      .max('pu.proposal_pk')
       .from('pu')
-      .join('proposals as p', { 'pu.proposal_id': 'p.proposal_id' })
+      .join('proposals as p', { 'pu.proposal_pk': 'p.proposal_pk' })
       .where((query) =>
         query.where('pu.user_id', id).andWhere('p.submitted', true)
       )
@@ -514,7 +514,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .with('pu', fullProposalUserTable)
       .select('pu.user_id')
       .from('pu')
-      .where('pu.proposal_id', prop)
+      .where('pu.proposal_pk', prop)
       .limit(10)
       .then((users: { user_id: number }[]) => users.map((uid) => uid.user_id));
   }
@@ -525,28 +525,28 @@ export default class PostgresUserDataSource implements UserDataSource {
         .select('*')
         .from('proposal_user')
         .union(function () {
-          this.column('proposal_id', { user_id: 'proposer_id' }).from(
+          this.column('proposal_pk', { user_id: 'proposer_id' }).from(
             'proposals'
           );
         });
 
     const proposals: number[] = await database
       .with('pu', fullProposalUser)
-      .select('pu.proposal_id')
+      .select('pu.proposal_pk')
       .from('pu')
-      .join('proposals as p', { 'pu.proposal_id': 'p.proposal_id' })
+      .join('proposals as p', { 'pu.proposal_pk': 'p.proposal_pk' })
       .where((query) =>
         query.where('pu.user_id', id).andWhere('p.submitted', true)
       )
-      .then((props: { proposal_id: number }[]) =>
-        props.map((p) => p.proposal_id)
+      .then((props: { proposal_pk: number }[]) =>
+        props.map((p) => p.proposal_pk)
       );
 
     return await database
       .with('pu', fullProposalUser)
       .select('pu.user_id')
       .from('pu')
-      .whereIn('pu.proposal_id', proposals)
+      .whereIn('pu.proposal_pk', proposals)
       .groupBy('pu.user_id')
       .orderByRaw('count(pu.user_id) DESC')
       .limit(10)
