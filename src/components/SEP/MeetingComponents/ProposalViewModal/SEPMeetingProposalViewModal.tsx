@@ -48,7 +48,7 @@ const Transition = React.forwardRef<unknown, TransitionProps>(SlideComponent);
 
 type SEPMeetingProposalViewModalProps = {
   proposalViewModalOpen: boolean;
-  proposalId?: number | null;
+  proposalPk?: number | null;
   sepId: number;
   meetingSubmitted: (data: SepMeetingDecision) => void;
   setProposalViewModalOpen: (isOpen: boolean) => void;
@@ -56,7 +56,7 @@ type SEPMeetingProposalViewModalProps = {
 
 const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = ({
   proposalViewModalOpen,
-  proposalId,
+  proposalPk,
   sepId,
   meetingSubmitted,
   setProposalViewModalOpen,
@@ -71,7 +71,7 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
 
   const { SEPProposalData, loading, setSEPProposalData } = useSEPProposalData(
     sepId,
-    proposalId
+    proposalPk
   );
 
   const finalHasWriteAccess = SEPProposalData?.instrumentSubmitted

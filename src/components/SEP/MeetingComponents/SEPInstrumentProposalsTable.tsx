@@ -217,7 +217,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
               color="inherit"
               onClick={() =>
                 setUrlQueryParams({
-                  sepMeetingModal: rowData.proposal.id,
+                  sepMeetingModal: rowData.proposal.primaryKey,
                 })
               }
             >
@@ -242,7 +242,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     },
     {
       title: 'ID',
-      field: 'proposal.shortCode',
+      field: 'proposal.proposalId',
     },
     { title: 'Status', field: 'proposal.status.name' },
     {
@@ -313,7 +313,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
   const onMeetingSubmitted = (data: SepMeetingDecision) => {
     const newInstrumentProposalsData = instrumentProposalsData.map(
       (proposalData) => {
-        if (proposalData.proposal.id === data.proposalId) {
+        if (proposalData.proposal.primaryKey === data.proposalPk) {
           return {
             ...proposalData,
             proposal: {
@@ -345,7 +345,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
       proposal: {
         ...item.proposal,
         sepMeetingDecision: {
-          proposalId: item.proposal.id,
+          proposalPk: item.proposal.primaryKey,
           rankOrder: index + 1,
           commentForManagement:
             item.proposal.sepMeetingDecision?.commentForManagement || null,
@@ -398,7 +398,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
 
     const reorderSepMeetingDecisionProposalsInput = tableDataWithRankingsUpdated.map(
       (item) => ({
-        proposalId: item.proposal.id,
+        proposalPk: item.proposal.primaryKey,
         rankOrder: item.proposal.sepMeetingDecision?.rankOrder,
       })
     );
@@ -459,7 +459,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
           setUrlQueryParams({ sepMeetingModal: undefined });
           refreshInstrumentProposalsData();
         }}
-        proposalId={urlQueryParams.sepMeetingModal}
+        proposalPk={urlQueryParams.sepMeetingModal}
         meetingSubmitted={onMeetingSubmitted}
         sepId={sepId}
       />

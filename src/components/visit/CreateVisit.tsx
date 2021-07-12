@@ -24,7 +24,7 @@ function createVisitStub(
     status: VisitStatus.DRAFT,
     questionaryId: 0,
     visitorId: visitorId,
-    proposalId: 0,
+    proposalPk: 0,
     questionary: {
       questionaryId: 0,
       templateId: templateId,
@@ -33,12 +33,12 @@ function createVisitStub(
     },
     team: [],
     proposal: {
-      id: 0,
+      primaryKey: 0,
       title: '',
       abstract: '',
       statusId: 0,
       publicStatus: ProposalPublicStatus.UNKNOWN,
-      shortCode: '',
+      proposalId: '',
       finalStatus: ProposalEndStatus.UNSET,
       commentForUser: '',
       commentForManagement: '',

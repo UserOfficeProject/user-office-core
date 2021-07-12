@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import AssignmentInd from '@material-ui/icons/AssignmentInd';
 import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
@@ -168,7 +169,11 @@ const InstrumentTable: React.FC = () => {
             update: isUserOfficer,
             remove: isUserOfficer,
           }}
-          title={'Instruments'}
+          title={
+            <Typography variant="h6" component="h2">
+              Instruments
+            </Typography>
+          }
           columns={columns}
           data={instruments}
           isLoading={loadingInstruments}

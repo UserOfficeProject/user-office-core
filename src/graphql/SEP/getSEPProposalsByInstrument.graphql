@@ -10,9 +10,9 @@ query sepProposalsByInstrument(
   ) {
     sepTimeAllocation
     proposal {
-      id
+      primaryKey
       title
-      shortCode
+      proposalId
       status {
         ...proposalStatus
       }

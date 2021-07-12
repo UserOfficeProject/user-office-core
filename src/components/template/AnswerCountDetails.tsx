@@ -20,7 +20,7 @@ function ProposalList({ question }: { question: QuestionWithUsage }) {
       style={{ width: '100%' }}
       icons={tableIcons}
       columns={[
-        { title: 'Shortcode', field: 'shortCode' },
+        { title: 'ID', field: 'proposalId' },
         { title: 'Title', field: 'title' },
       ]}
       data={proposalsData}

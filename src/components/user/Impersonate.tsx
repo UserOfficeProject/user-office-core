@@ -24,7 +24,7 @@ export function Impersonate(props: { id: number }) {
 
   return (
     <React.Fragment>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" component="h2" gutterBottom>
         Impersonate
       </Typography>
       <div className={classes.buttons}>

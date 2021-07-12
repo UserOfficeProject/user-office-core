@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Email from '@material-ui/icons/Email';
 import makeStyles from '@material-ui/styles/makeStyles';
@@ -214,7 +215,11 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     <div data-cy="co-proposers" className={classes.tableWrapper}>
       <MaterialTable
         icons={tableIcons}
-        title={props.title}
+        title={
+          <Typography variant="h6" component="h1">
+            {props.title}
+          </Typography>
+        }
         columns={props.columns ?? columns}
         onSelectionChange={(selectedItems, selectedItem) => {
           // when the user wants to (un)select all items

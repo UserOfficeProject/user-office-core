@@ -31,7 +31,12 @@ const SEPMeetingDecision: React.FC<SEPMeetingDecisionProps> = ({
   return (
     <div data-cy="SEP-meeting-components-decision">
       <StyledPaper margin={[2, 0]}>
-        <Typography variant="h6" className={classes.heading} gutterBottom>
+        <Typography
+          variant="h6"
+          component="h2"
+          className={classes.heading}
+          gutterBottom
+        >
           SEP Meeting decision
         </Typography>
         <Table>

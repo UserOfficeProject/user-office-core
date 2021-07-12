@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { ScheduledEvent, Proposal, ProposalBookingStatus } from 'generated/sdk';
+import {
+  ScheduledEvent,
+  Proposal,
+  ProposalBookingStatus,
+  Instrument,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { toTzLessDateTime } from 'utils/Time';
 
@@ -10,9 +15,10 @@ export type ProposalScheduledEvent = Pick<
   ScheduledEvent,
   'startsAt' | 'endsAt'
 > & {
-  proposal: Pick<Proposal, 'id' | 'title' | 'shortCode'> & {
+  proposal: Pick<Proposal, 'primaryKey' | 'title' | 'proposalId'> & {
     visits: VisitFragment[] | null;
   };
+  instrument: Pick<Instrument, 'id' | 'name'> | null;
 };
 
 export function useProposalBookingsScheduledEvents({
@@ -57,11 +63,12 @@ export function useProposalBookingsScheduledEvents({
                   startsAt: scheduledEvent.startsAt,
                   endsAt: scheduledEvent.endsAt,
                   proposal: {
-                    id: proposal.id,
+                    primaryKey: proposal.primaryKey,
                     title: proposal.title,
-                    shortCode: proposal.shortCode,
+                    proposalId: proposal.proposalId,
                     visits: proposal.visits,
                   },
+                  instrument: proposal.instrument,
                 });
               }
             )

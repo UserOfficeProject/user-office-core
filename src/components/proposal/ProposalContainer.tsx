@@ -77,11 +77,19 @@ const proposalReducer = (
 const isProposalSubmitted = (proposal: Pick<Proposal, 'submitted'>) =>
   proposal.submitted;
 
-function isReadOnly(proposal: ProposalSubsetSubmission) {
+function getProposalStatus(proposal: ProposalSubsetSubmission) {
+  if (proposal.status != null) {
+    return proposal.status?.shortCode.toString();
+  } else {
+    return 'Proposal Status is null';
+  }
+}
+
+function isReadOnly(proposalToCheck: ProposalSubsetSubmission) {
   if (
-    proposal.status != null &&
-    (proposal.status.shortCode.toString() === 'DRAFT' ||
-      proposal.status.shortCode.toString() === 'EDITABLE_SUBMITTED')
+    !proposalToCheck.submitted ||
+    getProposalStatus(proposalToCheck) === 'EDITABLE_SUBMITTED' ||
+    getProposalStatus(proposalToCheck) === 'DRAFT'
   ) {
     return false;
   } else {
@@ -167,7 +175,7 @@ export default function ProposalContainer(props: {
    */
   const handleReset = async (): Promise<boolean> => {
     const proposalState = state as ProposalSubmissionState;
-    if (proposalState.proposal.id === 0) {
+    if (proposalState.proposal.primaryKey === 0) {
       // if proposal is not created yet
       dispatch({
         type: 'PROPOSAL_LOADED',
@@ -175,7 +183,7 @@ export default function ProposalContainer(props: {
       });
     } else {
       await api()
-        .getProposal({ id: proposalState.proposal.id }) // or load blankQuestionarySteps if sample is null
+        .getProposal({ primaryKey: proposalState.proposal.primaryKey }) // or load blankQuestionarySteps if sample is null
         .then((data) => {
           if (data.proposal && data.proposal.questionary?.steps) {
             dispatch({
@@ -263,8 +271,8 @@ export default function ProposalContainer(props: {
           <Questionary
             title={state.proposal.title || 'New Proposal'}
             info={
-              state.proposal.shortCode
-                ? `Proposal ID: ${state.proposal.shortCode}`
+              state.proposal.proposalId
+                ? `Proposal ID: ${state.proposal.proposalId}`
                 : 'DRAFT'
             }
             handleReset={handleReset}

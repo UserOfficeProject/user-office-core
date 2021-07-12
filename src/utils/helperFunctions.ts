@@ -49,14 +49,14 @@ export const getProposalStatus = (
 
 export const fromProposalToProposalView = (proposal: Proposal) => {
   return {
-    id: proposal.id,
+    primaryKey: proposal.primaryKey,
     title: proposal.title,
     status: proposal.status?.name || '',
     statusId: proposal.status?.id || 1,
     statusName: proposal.status?.name || '',
     statusDescription: proposal.status?.description || '',
     submitted: proposal.submitted,
-    shortCode: proposal.shortCode,
+    proposalId: proposal.proposalId,
     rankOrder: proposal.sepMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
     timeAllocation: proposal.technicalReview?.timeAllocation || null,

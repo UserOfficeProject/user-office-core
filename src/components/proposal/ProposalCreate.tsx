@@ -16,7 +16,7 @@ function createProposalStub(
   proposer: BasicUserDetails
 ): ProposalSubsetSubmission {
   return {
-    id: 0,
+    primaryKey: 0,
     title: '',
     abstract: '',
     callId: callId,
@@ -29,13 +29,12 @@ function createProposalStub(
       steps: questionarySteps,
     },
     questionaryId: 0,
-    shortCode: '',
+    proposalId: '',
     status: {
-      id: 1,
-      shortCode: 'DRAFT',
-      description:
-        'When proposal is created it gets draft status before it is submitted.',
-      name: 'DRAFT',
+      id: 0,
+      shortCode: '',
+      description: '',
+      name: '',
       isDefault: true,
     },
     submitted: false,

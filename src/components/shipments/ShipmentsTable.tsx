@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import React from 'react';
@@ -37,7 +38,7 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
   const columns = [
     {
       title: 'Proposal ID',
-      field: 'proposal.shortCode',
+      field: 'proposal.proposalId',
     },
     { title: 'Title', field: 'title' },
     { title: 'Status', field: 'status' },
@@ -100,7 +101,11 @@ const ShipmentsTable = (props: { confirm: WithConfirmType }) => {
         hasAccess={{ update: true, create: true, remove: true }}
         icons={tableIcons}
         localization={tableLocalization}
-        title="Shipments"
+        title={
+          <Typography variant="h6" component="h2">
+            Shipments
+          </Typography>
+        }
         columns={columns}
         isLoading={loadingMyShipments}
         data={myShipments}

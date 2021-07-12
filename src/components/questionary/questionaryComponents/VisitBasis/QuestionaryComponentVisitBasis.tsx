@@ -42,20 +42,20 @@ function QuestionaryComponentVisitBasis(props: BasicComponentProps) {
   return (
     <>
       <FormikDropdown
-        name={`${questionId}.proposalId`}
+        name={`${questionId}.proposalPk`}
         label="Select proposal"
         loading={loadingProposals}
         noOptionsText="No proposals"
         items={proposals.map((proposal) => ({
           text: proposal.title,
-          value: proposal.id,
+          value: proposal.primaryKey,
         }))}
         InputProps={{ 'data-cy': 'proposal-selection' }}
         onChange={(event) => {
           dispatch({
             type: 'VISIT_MODIFIED',
             visit: {
-              proposalId: +event.target.value,
+              proposalPk: +event.target.value,
             },
           });
         }}
@@ -87,12 +87,12 @@ const visitBasisPreSubmit = () => async ({
   state,
 }: SubmitActionDependencyContainer) => {
   const visit = (state as VisitSubmissionState).visit;
-  const { proposalId, team } = visit;
+  const { proposalPk, team } = visit;
   let returnValue = state.questionaryId;
   if (visit.id > 0) {
     const result = await api.updateVisit({
       visitId: visit.id,
-      proposalId: visit.proposalId,
+      proposalPk: visit.proposalPk,
       team: visit.team.map((user) => user.id),
     });
 
@@ -104,7 +104,7 @@ const visitBasisPreSubmit = () => async ({
     }
   } else {
     const result = await api.createVisit({
-      proposalId: proposalId,
+      proposalPk: proposalPk,
       team: team.map((user) => user.id),
     });
 

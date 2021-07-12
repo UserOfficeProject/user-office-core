@@ -29,7 +29,7 @@ function createShipmentStub(
     questionaryId: 0,
     created: new Date(),
     creatorId: creator.id,
-    proposalId: 0,
+    proposalPk: 0,
     questionary: {
       questionaryId: 0,
       templateId: templateId,
@@ -37,7 +37,7 @@ function createShipmentStub(
       steps: questionarySteps,
     },
     proposal: {
-      shortCode: '123456',
+      proposalId: '123456',
     },
     samples: [],
   };

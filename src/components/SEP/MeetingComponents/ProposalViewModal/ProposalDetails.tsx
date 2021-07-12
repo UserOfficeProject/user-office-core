@@ -46,7 +46,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
                 <TableCell width="25%" className={classes.textBold}>
                   ID
                 </TableCell>
-                <TableCell width="25%">{proposal.shortCode}</TableCell>
+                <TableCell width="25%">{proposal.proposalId}</TableCell>
                 <TableCell width="25%" className={classes.textBold}>
                   Title
                 </TableCell>
@@ -97,7 +97,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
                 <TableCell>
                   <Button
                     onClick={() =>
-                      downloadPDFProposal([proposal.id], proposal.title)
+                      downloadPDFProposal([proposal.primaryKey], proposal.title)
                     }
                     color="primary"
                   >

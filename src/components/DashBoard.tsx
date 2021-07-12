@@ -230,7 +230,7 @@ const Dashboard: React.FC = () => {
       </Drawer>
       <main className={classes.content}>
         <Switch>
-          <Route path="/ProposalEdit/:proposalID" component={ProposalEdit} />
+          <Route path="/ProposalEdit/:proposalPk" component={ProposalEdit} />
           <Route
             path="/ProposalSelectType"
             component={() => <ProposalChooseCall callsData={calls} />}

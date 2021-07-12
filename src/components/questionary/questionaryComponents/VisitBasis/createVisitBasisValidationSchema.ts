@@ -4,7 +4,7 @@ import { CreateYupValidation } from 'components/questionary/QuestionaryComponent
 
 export const createVisitBasisValidationSchema: CreateYupValidation = () => {
   const schema = Yup.object().shape({
-    proposalId: Yup.number().min(1, 'Proposal is required'),
+    proposalPk: Yup.number().min(1, 'Proposal is required'),
   });
 
   return schema;

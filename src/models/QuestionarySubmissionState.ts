@@ -32,7 +32,7 @@ export type Event =
   | { type: 'PROPOSAL_MODIFIED'; proposal: Partial<ProposalSubsetSubmission> }
   | { type: 'PROPOSAL_CREATED'; proposal: ProposalSubsetSubmission }
   | { type: 'PROPOSAL_LOADED'; proposal: ProposalSubsetSubmission }
-  | { type: 'PROPOSAL_SUBMIT_CLICKED'; proposalId: number }
+  | { type: 'PROPOSAL_SUBMIT_CLICKED'; proposalPk: number }
   | { type: 'SHIPMENT_CREATED'; shipment: ShipmentExtended }
   | { type: 'SHIPMENT_LOADED'; shipment: ShipmentExtended }
   | { type: 'SHIPMENT_MODIFIED'; shipment: Partial<ShipmentExtended> }
@@ -81,6 +81,9 @@ function getInitialStepIndex(state: QuestionarySubmissionState): number {
     .reverse()
     .find((step) => step.getMetadata(state, step.payload).isCompleted === true);
 
+  if (state.proposal?.status?.shortCode.toString() == 'EDITABLE_SUBMITTED') {
+    return 0;
+  }
   if (!lastFinishedStep) {
     return 0;
   }

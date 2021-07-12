@@ -7,8 +7,8 @@ export function useUserProposals(role = UserRole.USER) {
   const [proposals, setProposals] = useState<
     Pick<
       Proposal,
-      | 'id'
-      | 'shortCode'
+      | 'primaryKey'
+      | 'proposalId'
       | 'title'
       | 'publicStatus'
       | 'statusId'
@@ -40,8 +40,8 @@ export function useUserProposals(role = UserRole.USER) {
           if (data.proposalsView) {
             setProposals(
               data.proposalsView.map((proposalView) => ({
-                id: proposalView.id,
-                shortCode: proposalView.shortCode,
+                primaryKey: proposalView.primaryKey,
+                proposalId: proposalView.proposalId,
                 title: proposalView.title,
                 notified: proposalView.notified,
                 submitted: proposalView.submitted,

@@ -5,9 +5,9 @@ query getUserProposalBookingsWithEvents(
 ) {
   me {
     proposals(filter: { instrumentId: $instrumentId }) {
-      id
+      primaryKey
       title
-      shortCode
+      proposalId
       proposalBooking(filter: { status: $status }) {
         scheduledEvents(filter: { endsAfter: $endsAfter }) {
           startsAt
@@ -17,6 +17,10 @@ query getUserProposalBookingsWithEvents(
       }
       visits {
         ...visit
+      }
+      instrument {
+        id
+        name
       }
     }
   }

@@ -1,5 +1,5 @@
 fragment proposal on Proposal {
-  id
+  primaryKey
   title
   abstract
   statusId
@@ -7,7 +7,7 @@ fragment proposal on Proposal {
     ...proposalStatus
   }
   publicStatus
-  shortCode
+  proposalId
   finalStatus
   commentForUser
   commentForManagement

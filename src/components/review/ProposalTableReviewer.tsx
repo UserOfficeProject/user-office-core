@@ -4,7 +4,7 @@ import DoneAll from '@material-ui/icons/DoneAll';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import RateReviewIcon from '@material-ui/icons/RateReview';
 import Visibility from '@material-ui/icons/Visibility';
-import MaterialTable from 'material-table';
+import MaterialTable, { Column } from 'material-table';
 import React, { useState, useContext, useEffect } from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
@@ -13,7 +13,7 @@ import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import {
-  ProposalIdWithReviewId,
+  ProposalPkWithReviewId,
   ReviewerFilter,
   ReviewStatus,
   SepAssignment,
@@ -23,6 +23,7 @@ import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
+import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -37,8 +38,8 @@ import ReviewStatusFilter, {
 } from './ReviewStatusFilter';
 
 type UserWithReview = {
-  shortCode: string;
-  proposalId: number;
+  proposalId: string;
+  proposalPk: number;
   title: string;
   grade: number;
   reviewId: number;
@@ -76,7 +77,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
   });
 
   const [selectedProposals, setSelectedProposals] = useState<
-    (ProposalIdWithReviewId & { title: string })[]
+    (ProposalPkWithReviewId & { title: string })[]
   >([]);
 
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
@@ -124,8 +125,8 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         ? userData.reviews.map(
             (review) =>
               ({
-                shortCode: review?.proposal?.shortCode,
-                proposalId: review?.proposal?.id,
+                proposalId: review?.proposal?.proposalId,
+                proposalPk: review?.proposal?.primaryKey,
                 title: review?.proposal?.title,
                 grade: review.grade,
                 reviewId: review.id,
@@ -145,14 +146,14 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
 
       setPreselectedProposalsData((preselectedProposalsData) => {
         const selected: {
-          proposalId: number;
+          proposalPk: number;
           reviewId: number;
           title: string;
         }[] = [];
         const preselected = preselectedProposalsData.map((proposal) => {
-          if (selection.has(proposal.proposalId.toString())) {
+          if (selection.has(proposal.proposalPk.toString())) {
             selected.push({
-              proposalId: proposal.proposalId,
+              proposalPk: proposal.proposalPk,
               reviewId: proposal.reviewId,
               title: proposal.title,
             });
@@ -161,7 +162,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
           return {
             ...proposal,
             tableData: {
-              checked: selection.has(proposal.proposalId.toString()),
+              checked: selection.has(proposal.proposalPk.toString()),
             },
           };
         });
@@ -200,7 +201,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
       <Tooltip title="Download Proposal">
         <IconButton
           onClick={() =>
-            downloadPDFProposal([rowData.proposalId], rowData.title)
+            downloadPDFProposal([rowData.proposalPk], rowData.title)
           }
         >
           <GetAppIcon />
@@ -216,20 +217,26 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     }
   ): JSX.Element => <DoneAll {...props} />;
 
-  const columns = [
+  let columns: Column<UserWithReview>[] = [
     {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
       sorting: false,
       render: RowActionButtons,
     },
-    { title: 'Proposal ID', field: 'shortCode' },
+    { title: 'Proposal ID', field: 'proposalId' },
     { title: 'Title', field: 'title' },
     { title: 'Grade', field: 'grade' },
     { title: 'Review status', field: 'status' },
     { title: 'Call', field: 'callShortCode' },
     { title: 'Instrument', field: 'instrumentShortCode' },
   ];
+
+  columns = setSortDirectionOnSortColumn(
+    columns,
+    urlQueryParams.sortColumn,
+    urlQueryParams.sortDirection
+  );
 
   const updateView = () => {
     if (currentAssignment) {
@@ -259,7 +266,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     if (selectedProposals?.length) {
       const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
       const submitProposalReviewsInput = selectedProposals.map((proposal) => ({
-        proposalId: proposal.proposalId,
+        proposalPk: proposal.proposalPk,
         reviewId: proposal.reviewId,
       }));
 
@@ -338,7 +345,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         }}
       />
       <ProposalReviewModal
-        title={`Review proposal: ${proposalToReview?.title} (${proposalToReview?.shortCode})`}
+        title={`Review proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={() => {
           setUrlQueryParams({ reviewModal: undefined });
@@ -366,10 +373,18 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
             selection:
               selectedItems.length > 0
                 ? selectedItems.map((selectedItem) =>
-                    selectedItem.proposalId.toString()
+                    selectedItem.proposalPk.toString()
                   )
                 : undefined,
           }));
+        }}
+        onOrderChange={(orderedColumnId, orderDirection) => {
+          setUrlQueryParams &&
+            setUrlQueryParams((params) => ({
+              ...params,
+              sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
+              sortDirection: orderDirection ? orderDirection : undefined,
+            }));
         }}
         localization={{
           toolbar: {
@@ -382,7 +397,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
             tooltip: 'Download proposals',
             onClick: () => {
               downloadPDFProposal(
-                selectedProposals.map((proposal) => proposal.proposalId),
+                selectedProposals.map((proposal) => proposal.proposalPk),
                 selectedProposals[0].title
               );
             },

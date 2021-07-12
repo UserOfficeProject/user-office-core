@@ -1,5 +1,5 @@
-mutation createVisit($proposalId: Int!, $team: [Int!]) {
-  createVisit(proposalId: $proposalId, team: $team) {
+mutation createVisit($proposalPk: Int!, $team: [Int!]) {
+  createVisit(proposalPk: $proposalPk, team: $team) {
     visit {
       ...visit
 

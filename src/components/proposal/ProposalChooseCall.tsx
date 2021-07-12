@@ -54,7 +54,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
   return (
     <ContentContainer>
       <StyledPaper margin={[0]}>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" component="h2" gutterBottom>
           Select a call
         </Typography>
         <List>
@@ -71,7 +71,9 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
               >
                 <ListItemText
                   primary={
-                    <Typography variant="h6">{call.shortCode}</Typography>
+                    <Typography variant="h6" component="h3">
+                      {call.shortCode}
+                    </Typography>
                   }
                   secondary={
                     <Fragment>

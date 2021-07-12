@@ -7,18 +7,18 @@ import QuestionaryDetails, {
 import { DataType } from 'generated/sdk';
 
 interface ProposalQuestionaryDetailsProps extends QuestionaryDetailsProps {
-  proposalId: number;
+  proposalPk: number;
 }
 
 function ProposalQuestionaryDetails(props: ProposalQuestionaryDetailsProps) {
-  const { proposalId, ...restProps } = props;
+  const { proposalPk, ...restProps } = props;
 
   return (
     <QuestionaryDetails
       answerRenderer={(answer) => {
         if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
           return (
-            <SamplesAnswerRenderer proposalId={proposalId} answer={answer} />
+            <SamplesAnswerRenderer proposalPk={proposalPk} answer={answer} />
           );
         } else {
           return null;

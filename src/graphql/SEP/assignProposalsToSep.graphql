@@ -1,5 +1,5 @@
 mutation assignProposalsToSep(
-  $proposals: [ProposalIdWithCallId!]!
+  $proposals: [ProposalPkWithCallId!]!
   $sepId: Int!
 ) {
   assignProposalsToSep(proposals: $proposals, sepId: $sepId) {

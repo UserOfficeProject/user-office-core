@@ -70,7 +70,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
 
   return (
     <>
-      <Typography variant="h6">
+      <Typography variant="h6" component="h1">
         {call ? 'Update the call' : 'Create new call'}
       </Typography>
       <Wizard

@@ -65,7 +65,11 @@ const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
       >
         {({ isSubmitting, values }): JSX.Element => (
           <Form style={{ width: '240px' }}>
-            <Typography className={classes.cardHeader}>
+            <Typography
+              variant="h6"
+              component="h1"
+              className={classes.cardHeader}
+            >
               Change proposal/s status
             </Typography>
 

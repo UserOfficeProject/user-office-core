@@ -57,7 +57,7 @@ const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
     }
 
     return api()
-      .getProposal({ id: reviewItemId })
+      .getProposal({ primaryKey: reviewItemId })
       .then((data) => {
         return data.proposal as Proposal;
       });
@@ -91,7 +91,7 @@ const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
             >
               <CloseIcon />
             </IconButton>
-            <Typography variant="h6" className={classes.title}>
+            <Typography variant="h6" component="h1" className={classes.title}>
               {title}
             </Typography>
           </Toolbar>

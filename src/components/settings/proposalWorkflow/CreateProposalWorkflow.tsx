@@ -50,7 +50,9 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
     >
       {() => (
         <Form>
-          <Typography variant="h6">Create new proposal workflow</Typography>
+          <Typography variant="h6" component="h1">
+            Create new proposal workflow
+          </Typography>
           <Field
             name="name"
             id="name"
