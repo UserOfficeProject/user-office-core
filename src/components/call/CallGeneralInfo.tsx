@@ -198,7 +198,7 @@ const CallGeneralInfo: React.FC<{
                       sequence number is, including padding.It is written as
                       <code>{'{digits:x}'}</code>, where x is a the value of the
                       number. For example, if parameter is 6 (
-                      <code>{'{digits:6}'}</code>),the first proposal will be
+                      <code>{'{digits:6}'}</code>), the first proposal will be
                       numbered 000001, the second 000002, and so on.
                       <h3>Valid examples</h3>
                       <TableContainer component={Paper}>
