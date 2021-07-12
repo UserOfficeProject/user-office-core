@@ -420,8 +420,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .then((usersRecord: UserRecord[]) => {
         const users = usersRecord.map((user) => createBasicUserObject(user));
-        console.log(`Users: ${usersRecord}`);
-        console.log(usersRecord);
 
         return {
           totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
@@ -480,9 +478,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
       })
       .then((usersRecord: UserRecord[]) => {
-        console.log(`Users: ${usersRecord}`);
-        console.log(usersRecord);
-
         const users = usersRecord.map((user) => createBasicUserObject(user));
 
         return {
