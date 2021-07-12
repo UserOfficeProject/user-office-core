@@ -49,7 +49,7 @@ function ParticipantModal(props: {
 
   const peopleTable = <PeopleTable {...someProps} />;
 
-  const prosalPeopleTable = <ProposalPeopleTable {...someProps} />;
+  const proposalPeopleTable = <ProposalPeopleTable {...someProps} />;
 
   return (
     <Dialog
@@ -61,7 +61,9 @@ function ParticipantModal(props: {
       fullWidth
     >
       <DialogContent>
-        {props.participant && !isUserOfficer ? prosalPeopleTable : peopleTable}
+        {props.participant && !isUserOfficer
+          ? proposalPeopleTable
+          : peopleTable}
       </DialogContent>
     </Dialog>
   );

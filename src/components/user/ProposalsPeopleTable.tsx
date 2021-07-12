@@ -3,7 +3,6 @@ import { IconButton, Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import CloseIcon from '@material-ui/icons/Close';
 import Email from '@material-ui/icons/Email';
-// import HelpIcon from '@material-ui/icons/Help';
 import { Alert } from '@material-ui/lab';
 import makeStyles from '@material-ui/styles/makeStyles';
 import { Formik, Field, Form } from 'formik';
@@ -16,7 +15,6 @@ import MaterialTable, {
 } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-// import { useEffect } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 `1`;
@@ -31,7 +29,6 @@ import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
 import { getCurrentUser } from '../../context/UserContextProvider';
-// import { InviteUserByEmailForm } from './InviteUserByEmailForm';
 import InviteUserForm from './InviteUserForm';
 
 function sendUserRequest(
@@ -47,8 +44,6 @@ function sendUserRequest(
   const variables = {
     userId: currentUserId,
     filter: searchQuery.search,
-    // offset: searchQuery.pageSize * searchQuery.page,
-    // first: searchQuery.pageSize,
     subtractUsers: selectedUsers ? selectedUsers : [],
     userRole: userRole ? userRole : null,
   };
@@ -82,12 +77,6 @@ async function getUserByEmail(email: string, api: any) {
   return api()
     .getBasicUserDetailsByEmail({ email: email, role: UserRole.USER })
     .then((user: GetBasicUserDetailsByEmailQuery) => {
-      // const temp = {
-      //   firstname: user?.basicUserDetailsByEmail?.firstname,
-      //   lastname: user?.basicUserDetailsByEmail?.lastname,
-      //   organisation: user?.basicUserDetailsByEmail?.organisation,
-      // };
-
       const userDetails = user?.basicUserDetailsByEmail;
 
       return userDetails;
@@ -122,10 +111,7 @@ const useStyles = makeStyles({
     alignItems: 'center',
   },
   titleStyle: {
-    // noWrap: true,
-    whiteSpace: 'nowrap',
     display: 'inline',
-    overflow: 'visible',
   },
   inviteButton: {
     marginLeft: '10px',
@@ -146,7 +132,6 @@ const columns = [
 
 const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
   const tableRef = React.useRef();
-  // const tableRef = useRef();
   const sendRequest = useDataApi();
   const [loading, setLoading] = useState(false);
   const [pageSize, setPageSize] = useState(5);
@@ -158,8 +143,6 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [displayError, setDisplayError] = useState<boolean>(false);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
-
-  // useEffect(() => {}, [invitedUsers]);
 
   const userID = getCurrentUser()?.user.id;
 
@@ -175,20 +158,11 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
         close={() => setSendUserEmail(false)}
         userRole={props.invitationUserRole}
       />
-      // <InviteUserByEmailForm
-      //   title={'Find Users By Email'}
-      //   action={action.fn}
-      //   close={() => setSendUserEmail(false)}
-      //   userRole={props.invitationUserRole}
-      //   addMultipleUsers={true}
-      //   invitedUsers={invitedUsers}
-      //   selectedUsers={props.selectedUsers}
-      // />
     );
   }
   const EmailIcon = (): JSX.Element => <Email />;
 
-  // type script doesn't like this not being typed explicitly
+  // Typescript doesn't like this not being typed explicitly
   const actionArray:
     | (
         | Action<BasicUserDetails & { tableData: { checked: boolean } }>
@@ -310,7 +284,6 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
       );
       // update users array to remove any invitedUsers. We re-add them so that they appear at the top of the list
       // this helps users find someone in the list even if they are already there
-      // Effectively, searching for someone in the list reorders the list
 
       const invitedUsersFormatted = invitedUsers
         .filter(
@@ -321,7 +294,11 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
         )
         .map((user: BasicUserDetails) => ({
           ...user,
-          tableData: { checked: true && props.selection },
+          tableData: {
+            checked: selectedParticipants.some(
+              (selectedUser) => selectedUser.id == user.id
+            ),
+          },
         }));
 
       users.data = [...invitedUsersFormatted, ...users.data];
@@ -333,8 +310,6 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
       );
 
       setCurrentPageIds(users.data.map(({ id }: { id: number }) => id));
-      if (props.selection)
-        selectedParticipantsChanged(invitedUsersFormatted, undefined);
 
       return users;
     });
@@ -368,10 +343,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
               be found by this search.
             </Alert>
           )}
-          <Form
-            // onSubmit={subformik.handleSubmit}
-            className={classes.email}
-          >
+          <Form className={classes.email}>
             <Field
               name="email"
               label="E-mail"
@@ -408,16 +380,19 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
       onSubmit={async (values, { setFieldError, setFieldValue }) => {
         // If there is an email and it has not already been searched
         if (values.email && !tableEmails.includes(values.email)) {
+          setLoading(true);
           const userDetails = await getUserByEmail(values.email, sendRequest);
 
           if (!userDetails) {
             setDisplayError(true);
             setFieldError('email', 'Please enter valid email address');
+            setLoading(false);
 
             return;
           }
           if (props.selectedUsers?.includes(userDetails.id)) {
             setFieldError('email', 'User is already on the proposal');
+            setLoading(false);
 
             return;
           }
@@ -427,6 +402,8 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
             setTableEmails(tableEmails.concat([values.email]));
             setFieldValue('email', '');
 
+            setSelectedParticipants(selectedParticipants.concat([userDetails]));
+
             //This is the recommend why to refresh a table but it is unsupported in typescript and may not be supported anytime soon
             //See: Refresh Data Example https://material-table.com/#/docs/features/remote-data
             //and see: https://github.com/mbrn/material-table/issues/1752
@@ -435,6 +412,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
           } else {
             setFieldError('email', 'Could not add user to Proposal');
           }
+          setLoading(false);
         } else if (tableEmails.includes(values.email)) {
           setFieldError(
             'email',
@@ -451,12 +429,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
             tableRef={tableRef}
             icons={tableIcons}
             title={
-              <Typography
-                variant="h6"
-                component="h2"
-                // noWrap={true}
-                // classes={classes.titleStyle}
-              >
+              <Typography variant="h6" component="h2">
                 {props.title}
               </Typography>
             }
@@ -467,8 +440,6 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
             data={tableData}
             isLoading={loading}
             options={{
-              // search: false,
-              // searchFieldStyle: ,
               debounceInterval: 400,
               pageSize,
               selection: props.selection,
@@ -479,6 +450,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
               toolbar: {
                 searchPlaceholder: 'Filter',
                 searchTooltip: 'Filter Users',
+                nRowsSelected: '{0} Users(s) Selected',
               },
             }}
             components={{
@@ -504,9 +476,6 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                 data-cy="assign-selected-users"
               >
                 Update
-              </Button>
-              <Button onClick={() => console.log(selectedParticipants)}>
-                tests
               </Button>
             </ActionButtonContainer>
           )}
