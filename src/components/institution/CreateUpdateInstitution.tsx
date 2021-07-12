@@ -86,7 +86,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
     >
       {({ values, setFieldValue }) => (
         <Form>
-          <Typography variant="h6">
+          <Typography variant="h6" component="h1">
             {institution ? 'Update' : 'Create new'} institution
           </Typography>
           <Field

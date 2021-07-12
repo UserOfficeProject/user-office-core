@@ -64,7 +64,7 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
     >
       {() => (
         <Form>
-          <Typography component="h1" variant="h5">
+          <Typography variant="h5" component="h2">
             {title}
           </Typography>
           <Field

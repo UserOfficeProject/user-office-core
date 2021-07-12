@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
@@ -65,7 +66,11 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
     <>
       <MaterialTable
         icons={tableIcons}
-        title={'Instruments'}
+        title={
+          <Typography variant="h6" component="h1">
+            Instruments
+          </Typography>
+        }
         columns={columns}
         data={notAssignedInstruments}
         isLoading={loadingInstruments}

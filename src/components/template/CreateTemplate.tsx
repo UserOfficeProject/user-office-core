@@ -19,7 +19,9 @@ const CreateTemplate = (props: {
 
   return (
     <>
-      <Typography variant="h6">Create new template</Typography>
+      <Typography variant="h6" component="h1">
+        Create new template
+      </Typography>
       <Formik
         initialValues={{
           name: '',

@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -78,7 +79,11 @@ const withConfirm = <T extends Record<string, unknown>>(
           onClose={handleCancel}
         >
           {title && (
-            <DialogTitle className={classes.title}>{title}</DialogTitle>
+            <DialogTitle className={classes.title} disableTypography={true}>
+              <Typography variant="h6" component="h1" gutterBottom>
+                {title}
+              </Typography>
+            </DialogTitle>
           )}
           {description && (
             <DialogContent>

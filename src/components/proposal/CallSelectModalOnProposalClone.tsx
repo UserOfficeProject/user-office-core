@@ -62,7 +62,11 @@ const CallSelectModalOnProposalClone: React.FC<CallSelectModalOnProposalClonePro
       >
         {({ isSubmitting }): JSX.Element => (
           <Form>
-            <Typography className={classes.cardHeader}>
+            <Typography
+              variant="h6"
+              component="h1"
+              className={classes.cardHeader}
+            >
               Clone proposal to call
             </Typography>
 

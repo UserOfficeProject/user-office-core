@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -138,7 +139,11 @@ const ProposalTable = ({
       <MaterialTable
         icons={tableIcons}
         localization={tableLocalization}
-        title={title}
+        title={
+          <Typography variant="h6" component="h2">
+            {title}
+          </Typography>
+        }
         columns={columns}
         data={partialProposalsData as PartialProposalsDataType[]}
         isLoading={isLoading}
