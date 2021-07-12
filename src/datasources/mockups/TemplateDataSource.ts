@@ -134,7 +134,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return dummyProposalTemplateFactory({ templateId: templateId + 1 });
   }
 
-  async getTemplate(_templateId: number): Promise<Template | null> {
+  async getTemplate(_templateId?: number): Promise<Template | null> {
     return dummyProposalTemplate;
   }
 

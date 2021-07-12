@@ -13,6 +13,7 @@ import { ResolverContext } from '../../context';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
 import { InstrumentWithAvailabilityTime } from './Instrument';
 import { ProposalWorkflow } from './ProposalWorkflow';
+import { Template } from './Template';
 
 @ObjectType()
 @Directive('@key(fields: "id")')
@@ -89,6 +90,11 @@ export class CallInstrumentsResolver {
     return context.queries.proposalSettings.dataSource.getProposalWorkflow(
       call.proposalWorkflowId
     );
+  }
+
+  @FieldResolver(() => Template, { nullable: true })
+  async template(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.template.dataSource.getTemplate(call.templateId);
   }
 
   @FieldResolver(() => Int)
