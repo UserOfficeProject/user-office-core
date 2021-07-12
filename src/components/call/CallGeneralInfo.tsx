@@ -81,9 +81,9 @@ const CallGeneralInfo: React.FC<{
     const suffix = /({digits:[1-9]+})/;
     if (input) {
       if (input.match(regExp)) {
-      } else if (!input.match(suffix)) {
-        error = 'Invalid parameter.';
       } else if (!input.match(prefix)) {
+        error = 'Invalid prefix.';
+      } else if (!input.match(suffix)) {
         error = 'Invalid parameter.';
       }
     }
