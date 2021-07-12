@@ -2,193 +2,193 @@ import faker from 'faker';
 context('PageTable component tests', () => {
   const emails = new Array(5).fill(0).map(() => faker.internet.email());
 
-  // describe('ProposalPeopleTable component Preserve selected users', () => {
-  //   before(() => {
-  //     cy.resetDB();
-  //   });
+  describe('ProposalPeopleTable component Preserve selected users', () => {
+    before(() => {
+      cy.resetDB();
+    });
 
-  //   beforeEach(() => {
-  //     cy.viewport(1920, 1080);
-  //   });
+    beforeEach(() => {
+      cy.viewport(1920, 1080);
+    });
 
-  //   it('should add a new collaborator', () => {
-  //     cy.login('user');
+    it('should add a new collaborator', () => {
+      cy.login('user');
 
-  //     cy.contains('New Proposal').click();
+      cy.contains('New Proposal').click();
 
-  //     cy.get('[title="Add Co-Proposers"]').click();
+      cy.get('[title="Add Co-Proposers"]').click();
 
-  //     cy.get('[role="presentation"]').as('modal');
+      cy.get('[role="presentation"]').as('modal');
 
-  //     cy.get('@modal').contains('No Previous Collaborators');
+      cy.get('@modal').contains('No Previous Collaborators');
 
-  //     cy.finishedLoading();
+      cy.finishedLoading();
 
-  //     cy.get('[data-cy=email]').type('ben@inbox.com');
+      cy.get('[data-cy=email]').type('ben@inbox.com');
 
-  //     cy.get('[data-cy="findUser"]').click();
+      cy.get('[data-cy="findUser"]').click();
 
-  //     cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
+      cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
 
-  //     cy.get('@modal').contains('1 user(s) selected');
+      cy.get('@modal').contains('1 user(s) selected');
 
-  //     cy.get('[data-cy="email"]').type('Aaron_Harris49@gmail.com');
+      cy.get('[data-cy="email"]').type('Aaron_Harris49@gmail.com');
 
-  //     cy.get('[data-cy="findUser"]').click();
+      cy.get('[data-cy="findUser"]').click();
 
-  //     cy.finishedLoading();
+      cy.finishedLoading();
 
-  //     cy.get('@modal').contains('We cannot find that email');
+      cy.get('@modal').contains('We cannot find that email');
 
-  //     cy.get('@modal').contains('1 Users(s) Selected');
+      cy.get('@modal').contains('1 Users(s) Selected');
 
-  //     cy.get('[data-cy="assign-selected-users"]').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
 
-  //     cy.get('@modal').contains('Benjamin');
-  //   });
+      cy.get('@modal').contains('Benjamin');
+    });
 
-  //   it('should preserve the selected users', () => {
-  //     cy.login('user');
+    it('should preserve the selected users', () => {
+      cy.login('user');
 
-  //     cy.contains('New Proposal').click();
+      cy.contains('New Proposal').click();
 
-  //     cy.get('[title="Add Co-Proposers"]').click();
+      cy.get('[title="Add Co-Proposers"]').click();
 
-  //     cy.get('[role="presentation"]').as('modal');
+      cy.get('[role="presentation"]').as('modal');
 
-  //     cy.get('@modal').contains('0 user(s) selected');
+      cy.get('@modal').contains('0 user(s) selected');
 
-  //     cy.finishedLoading();
+      cy.finishedLoading();
 
-  //     cy.get('[data-cy=email]').type('unverified-user@example.com');
+      cy.get('[data-cy=email]').type('unverified-user@example.com');
 
-  //     cy.get('[data-cy="findUser"]').click();
+      cy.get('[data-cy="findUser"]').click();
 
-  //     cy.get('@modal').find('tr[index="0"] input').click();
+      cy.get('@modal').find('tr[index="0"] input').click();
 
-  //     cy.get('@modal').contains('0 user(s) selected');
+      cy.get('@modal').contains('0 user(s) selected');
 
-  //     cy.get('[data-cy=email]').type('ben@inbox.com');
+      cy.get('[data-cy=email]').type('ben@inbox.com');
 
-  //     cy.get('[data-cy="findUser"]').click();
+      cy.get('[data-cy="findUser"]').click();
 
-  //     cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
+      cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
 
-  //     cy.get('@modal').contains('1 user(s) selected');
+      cy.get('@modal').contains('1 user(s) selected');
 
-  //     cy.get('@modal').find('[aria-label="Search"]').type('foo bar');
+      cy.get('@modal').find('[aria-label="Search"]').type('foo bar');
 
-  //     cy.get('@modal').contains('No Previous Collaborators');
-  //     cy.get('@modal').contains('1 user(s) selected');
+      cy.get('@modal').contains('No Previous Collaborators');
+      cy.get('@modal').contains('1 user(s) selected');
 
-  //     cy.get('@modal').find('[aria-label="Search"] ~ * > button').click();
+      cy.get('@modal').find('[aria-label="Search"] ~ * > button').click();
 
-  //     cy.get('@modal').contains('1 user(s) selected');
-  //     cy.get('@modal').find('tr[index="0"] input:checked');
+      cy.get('@modal').contains('1 user(s) selected');
+      cy.get('@modal').find('tr[index="0"] input:checked');
 
-  //     cy.get('@modal').find('[aria-label="Search"]').type('Unverified email');
+      cy.get('@modal').find('[aria-label="Search"]').type('Unverified email');
 
-  //     cy.get('@modal').contains('1 user(s) selected');
-  //     cy.get('@modal').find('tr[index="0"]').contains('Unverified email');
-  //     cy.get('@modal').find('tr[index="0"] input:not(:checked)');
+      cy.get('@modal').contains('1 user(s) selected');
+      cy.get('@modal').find('tr[index="0"]').contains('Unverified email');
+      cy.get('@modal').find('tr[index="0"] input:not(:checked)');
 
-  //     cy.get('@modal').find('[aria-label="Search"]').clear().type('Benjamin');
+      cy.get('@modal').find('[aria-label="Search"]').clear().type('Benjamin');
 
-  //     cy.get('@modal').contains('1 user(s) selected');
-  //     cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
-  //     cy.get('@modal').find('tr[index="0"] input:checked');
+      cy.get('@modal').contains('1 user(s) selected');
+      cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
+      cy.get('@modal').find('tr[index="0"] input:checked');
 
-  //     cy.get('[data-cy="assign-selected-users"]').click();
-  //   });
+      cy.get('[data-cy="assign-selected-users"]').click();
+    });
 
-  //   it('should preserve the selected users after pagination', () => {
-  //     cy.wait(1000);
+    it('should preserve the selected users after pagination', () => {
+      cy.wait(1000);
 
-  //     cy.request({
-  //       url: '/graphql',
-  //       method: 'POST',
-  //       headers: {
-  //         authorization: `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`,
-  //       },
-  //       body: new Array(5).fill(0).map((elem, index) => {
-  //         return {
-  //           query: ` mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $orcid: String!, $orcidHash: String!, $refreshToken: String!, $gender: String!, $nationality: Int!, $birthdate: String!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
-  //             createUser(user_title: $user_title, firstname: $firstname, middlename: $middlename, lastname: $lastname, password: $password, preferredname: $preferredname, orcid: $orcid, orcidHash: $orcidHash, refreshToken: $refreshToken, gender: $gender, nationality: $nationality, birthdate: $birthdate, organisation: $organisation, department: $department, position: $position, email: $email, telephone: $telephone, telephone_alt: $telephone_alt, otherOrganisation: $otherOrganisation) {
-  //               user {
-  //                 id
-  //               }
-  //             }
-  //           }`,
-  //           variables: {
-  //             user_title: faker.name.prefix(),
-  //             firstname: faker.name.firstName(),
-  //             lastname: faker.name.lastName(),
-  //             password: 'Test1234!',
-  //             orcid: '0000-0000-0000-0000',
-  //             orcidHash: 'WRMVXa',
-  //             refreshToken: '-',
-  //             gender: '-',
-  //             nationality: 1,
-  //             birthdate: faker.date.between('1950', '1990'),
-  //             organisation: 1,
-  //             department: faker.commerce.department(),
-  //             position: faker.name.jobTitle(),
-  //             email: emails[index],
-  //             telephone: faker.phone.phoneNumber('0##########'),
-  //           },
-  //         };
-  //       }),
-  //     });
+      cy.request({
+        url: '/graphql',
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`,
+        },
+        body: new Array(5).fill(0).map((elem, index) => {
+          return {
+            query: ` mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $orcid: String!, $orcidHash: String!, $refreshToken: String!, $gender: String!, $nationality: Int!, $birthdate: String!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
+              createUser(user_title: $user_title, firstname: $firstname, middlename: $middlename, lastname: $lastname, password: $password, preferredname: $preferredname, orcid: $orcid, orcidHash: $orcidHash, refreshToken: $refreshToken, gender: $gender, nationality: $nationality, birthdate: $birthdate, organisation: $organisation, department: $department, position: $position, email: $email, telephone: $telephone, telephone_alt: $telephone_alt, otherOrganisation: $otherOrganisation) {
+                user {
+                  id
+                }
+              }
+            }`,
+            variables: {
+              user_title: faker.name.prefix(),
+              firstname: faker.name.firstName(),
+              lastname: faker.name.lastName(),
+              password: 'Test1234!',
+              orcid: '0000-0000-0000-0000',
+              orcidHash: 'WRMVXa',
+              refreshToken: '-',
+              gender: '-',
+              nationality: 1,
+              birthdate: faker.date.between('1950', '1990'),
+              organisation: 1,
+              department: faker.commerce.department(),
+              position: faker.name.jobTitle(),
+              email: emails[index],
+              telephone: faker.phone.phoneNumber('0##########'),
+            },
+          };
+        }),
+      });
 
-  //     cy.login('user');
+      cy.login('user');
 
-  //     cy.contains('New Proposal').click();
+      cy.contains('New Proposal').click();
 
-  //     cy.get('[title="Add Co-Proposers"]').click();
+      cy.get('[title="Add Co-Proposers"]').click();
 
-  //     cy.get('[role="presentation"]').as('modal');
+      cy.get('[role="presentation"]').as('modal');
 
-  //     for (const email of emails) {
-  //       cy.finishedLoading();
-  //       cy.get('[data-cy=email]').type(email);
+      for (const email of emails) {
+        cy.finishedLoading();
+        cy.get('[data-cy=email]').type(email);
 
-  //       cy.get('[data-cy="findUser"]').click();
-  //       cy.finishedLoading();
+        cy.get('[data-cy="findUser"]').click();
+        cy.finishedLoading();
 
-  //       cy.get('@modal').find('tr[index="0"] input').click();
-  //     }
+        cy.get('@modal').find('tr[index="0"] input').click();
+      }
 
-  //     cy.get('[data-cy=email]').type('ben@inbox.com');
+      cy.get('[data-cy=email]').type('ben@inbox.com');
 
-  //     cy.get('[data-cy="findUser"]').click();
+      cy.get('[data-cy="findUser"]').click();
 
-  //     cy.get('@modal').contains('1 user(s) selected');
-  //     cy.get('@modal').contains('1-5 of 6');
+      cy.get('@modal').contains('1 user(s) selected');
+      cy.get('@modal').contains('1-5 of 6');
 
-  //     cy.get('@modal').find('tr[index="1"] input').click();
+      cy.get('@modal').find('tr[index="1"] input').click();
 
-  //     cy.get('@modal').contains('2 user(s) selected');
+      cy.get('@modal').contains('2 user(s) selected');
 
-  //     cy.get('@modal').find('[title="Next Page"]').click();
+      cy.get('@modal').find('[title="Next Page"]').click();
 
-  //     cy.get('@modal').find('tr[index="0"] input').click();
-  //     cy.get('@modal').contains('3 user(s) selected');
+      cy.get('@modal').find('tr[index="0"] input').click();
+      cy.get('@modal').contains('3 user(s) selected');
 
-  //     cy.get('@modal').find('[title="Previous Page"]').click();
+      cy.get('@modal').find('[title="Previous Page"]').click();
 
-  //     cy.get('@modal').find('tr[index="1"] input:checked');
-  //     cy.get('@modal').contains('3 user(s) selected');
+      cy.get('@modal').find('tr[index="1"] input:checked');
+      cy.get('@modal').contains('3 user(s) selected');
 
-  //     cy.get('@modal').find('thead th input').click();
-  //     cy.get('@modal').contains('6 user(s) selected');
-  //     cy.get('@modal').find('thead th input').click();
-  //     cy.get('@modal').contains('1 user(s) selected');
+      cy.get('@modal').find('thead th input').click();
+      cy.get('@modal').contains('6 user(s) selected');
+      cy.get('@modal').find('thead th input').click();
+      cy.get('@modal').contains('1 user(s) selected');
 
-  //     cy.get('@modal').find('[title="Next Page"]').click();
-  //     cy.get('@modal').find('tr[index="0"] input:checked');
-  //     cy.get('@modal').contains('1 user(s) selected');
-  //   });
-  // });
+      cy.get('@modal').find('[title="Next Page"]').click();
+      cy.get('@modal').find('tr[index="0"] input:checked');
+      cy.get('@modal').contains('1 user(s) selected');
+    });
+  });
 
   describe('PeopleTable component preserves selected users', () => {
     before(() => {
