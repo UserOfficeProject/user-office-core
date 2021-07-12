@@ -31,11 +31,10 @@ function createProposalStub(
     questionaryId: 0,
     proposalId: '',
     status: {
-      id: 1,
-      shortCode: 'DRAFT',
-      description:
-        'When proposal is created it gets draft status before it is submitted.',
-      name: 'DRAFT',
+      id: 0,
+      shortCode: '',
+      description: '',
+      name: '',
       isDefault: true,
     },
     submitted: false,

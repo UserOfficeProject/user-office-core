@@ -77,11 +77,19 @@ const proposalReducer = (
 const isProposalSubmitted = (proposal: Pick<Proposal, 'submitted'>) =>
   proposal.submitted;
 
-function isReadOnly(proposal: ProposalSubsetSubmission) {
+function getProposalStatus(proposal: ProposalSubsetSubmission) {
+  if (proposal.status != null) {
+    return proposal.status?.shortCode.toString();
+  } else {
+    return 'Proposal Status is null';
+  }
+}
+
+function isReadOnly(proposalToCheck: ProposalSubsetSubmission) {
   if (
-    proposal.status != null &&
-    (proposal.status.shortCode.toString() === 'DRAFT' ||
-      proposal.status.shortCode.toString() === 'EDITABLE_SUBMITTED')
+    !proposalToCheck.submitted ||
+    getProposalStatus(proposalToCheck) === 'EDITABLE_SUBMITTED' ||
+    getProposalStatus(proposalToCheck) === 'DRAFT'
   ) {
     return false;
   } else {

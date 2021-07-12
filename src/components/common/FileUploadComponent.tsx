@@ -157,31 +157,33 @@ export function FileEntry(props: {
 
       <Grid item xs={5}>
         <Grid container spacing={1}>
-          <Grid item xs={6}>
-            <TextField
-              label="Figure"
-              data-cy="image-figure"
-              defaultValue={props.figure || ''}
-              className={classes.captionInput}
-              onBlur={(e) =>
-                props.onImageCaptionOrFigureAdded({
-                  id: props.metaData.fileId,
-                  caption: props.caption,
-                  figure: e.target.value,
-                })
-              }
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Tooltip title="Use figure to reference the image inside the rich text editor">
-                      <InfoOutlined className={classes.infoIcon} />
-                    </Tooltip>
-                  </InputAdornment>
-                ),
-              }}
-              fullWidth
-            />
-          </Grid>
+          {props.metaData.mimeType.startsWith('image') && (
+            <Grid item xs={6}>
+              <TextField
+                label="Figure"
+                data-cy="image-figure"
+                defaultValue={props.figure || ''}
+                className={classes.captionInput}
+                onBlur={(e) =>
+                  props.onImageCaptionOrFigureAdded({
+                    id: props.metaData.fileId,
+                    caption: props.caption,
+                    figure: e.target.value,
+                  })
+                }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Tooltip title="Use figure to reference the image inside the rich text editor">
+                        <InfoOutlined className={classes.infoIcon} />
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                }}
+                fullWidth
+              />
+            </Grid>
+          )}
           {(showCaption || props.caption) && (
             <Grid item xs={6}>
               <TextField

@@ -85,7 +85,7 @@ const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({
     >
       {() => (
         <Form>
-          <Typography variant="h6">
+          <Typography variant="h6" component="h1">
             {instrument ? 'Update' : 'Create new'} instrument
           </Typography>
           <Field

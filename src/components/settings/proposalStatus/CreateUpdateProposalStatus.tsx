@@ -80,7 +80,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
     >
       {() => (
         <Form>
-          <Typography variant="h6">
+          <Typography variant="h6" component="h1">
             {proposalStatus ? 'Update' : 'Create new'} proposal status
           </Typography>
           <Field

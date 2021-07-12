@@ -118,6 +118,123 @@ context('Settings tests', () => {
 
       cy.notification({ variant: 'success', text: 'deleted successfully' });
     });
+
+    it('User should be able to edit a submitted proposal in EDITABLE_SUBMITTED status', () => {
+      cy.viewport(1920, 2000);
+      const proposalTitle = faker.random.words(3);
+      const editedProposalTitle = faker.random.words(3);
+      const editableSubmittedWorkflow = 'Editable submitted workflow';
+
+      cy.login('officer');
+  
+      cy.contains('Settings').click();
+      cy.contains('Proposal workflows').click();
+  
+      cy.createProposalWorkflow(
+        'Editable submitted workflow',
+        'Description'
+      );
+  
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal workflow created successfully',
+      });
+  
+      cy.get('[data-cy^="status_EDITABLE_SUBMITTED"]').dragElement([
+        { direction: 'up', length: 13 },
+        { direction: 'left', length: 2 },
+        { direction: 'down', length: 1 },
+      ]);
+  
+      cy.notification({
+        variant: 'success',
+        text: 'Workflow status added successfully',
+      });
+  
+      cy.get('[data-cy^="connection_EDITABLE_SUBMITTED"]').should(
+        'contain.text',
+        'EDITABLE_SUBMITTED'
+      );
+  
+      cy.notification({
+        variant: 'success',
+        text: 'Workflow status added successfully',
+      });
+  
+      cy.addProposalStatusChangingEventToStatus('EDITABLE_SUBMITTED', [
+        'PROPOSAL_SUBMITTED',
+      ]);
+  
+      cy.contains('Calls').click();
+  
+      cy.get('[title="Edit"]').first().click();
+  
+      cy.get('#mui-component-select-proposalWorkflowId').click();
+  
+      cy.contains('Loading...').should('not.exist');
+  
+      cy.get('[role="presentation"] [role="listbox"] li')
+        .contains(editableSubmittedWorkflow)
+        .click();
+  
+      cy.get('[data-cy="next-step"]').click();
+  
+      cy.get('[data-cy="next-step"]').click();
+  
+      cy.get('[data-cy="submit"]').click();
+  
+      cy.notification({
+        variant: 'success',
+        text: 'Call updated successfully!',
+      });
+  
+      cy.logout();
+  
+      cy.login('user');
+  
+      cy.createProposal(proposalTitle);
+  
+      cy.contains('Submit').click();
+  
+      cy.on('window:confirm', (str) => {
+        expect(str).to.equal(
+          'Submit proposal? The proposal can be edited after submission.'
+        );
+  
+        return true;
+      });
+  
+      cy.contains('OK').click();
+  
+      cy.contains('Submitted');
+  
+      cy.contains('Dashboard').click();
+  
+      cy.finishedLoading();
+  
+      cy.contains(proposalTitle).parent().contains('submitted');
+  
+      cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
+        .first()
+        .then((element) => expect(element.text()).to.contain('submitted'));
+  
+      cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
+        .first()
+        .find('[title="Edit proposal"]')
+        .click();
+  
+      cy.get('[name="proposal_basis.title"]')
+        .clear()
+        .type(editedProposalTitle);
+  
+      cy.contains('Save and continue').click();
+  
+      cy.contains('Submitted');
+  
+      cy.contains('Dashboard').click();
+  
+      cy.contains(editedProposalTitle);
+    });
   });
 
   describe('Proposal workflows tests', () => {

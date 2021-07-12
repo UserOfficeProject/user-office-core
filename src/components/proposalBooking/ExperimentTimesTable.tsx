@@ -29,6 +29,7 @@ export default function ExperimentsTable({
       columns={[
         { title: 'Proposal title', field: 'proposal.title' },
         { title: 'Proposal ID', field: 'proposal.proposalId' },
+        { title: 'Instrument', field: 'instrument.name' },
         {
           title: 'Starts at',
           field: 'startsAt',

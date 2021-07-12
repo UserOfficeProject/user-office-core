@@ -63,7 +63,11 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
       >
         {({ isSubmitting, values }): JSX.Element => (
           <Form className={classes.form}>
-            <Typography className={classes.cardHeader}>
+            <Typography
+              className={classes.cardHeader}
+              variant="h6"
+              component="h1"
+            >
               Assign proposal/s to instrument
             </Typography>
 

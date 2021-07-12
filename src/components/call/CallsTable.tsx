@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import dateformat from 'dateformat';
 import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
@@ -234,7 +235,11 @@ const CallsTable: React.FC = () => {
           remove: isUserOfficer,
         }}
         icons={tableIcons}
-        title="Calls"
+        title={
+          <Typography variant="h6" component="h2">
+            Calls
+          </Typography>
+        }
         columns={columns}
         data={calls}
         isLoading={loadingCalls}

@@ -42,7 +42,7 @@ export default function UpdatePassword(props: { id: number }) {
       >
         {({ isSubmitting }) => (
           <Form>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" component="h2" gutterBottom>
               Password
             </Typography>
             <Grid container spacing={3}>

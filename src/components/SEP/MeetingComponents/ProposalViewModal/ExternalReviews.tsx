@@ -34,7 +34,12 @@ const ExternalReviews: React.FC<ExternalReviewsProps> = ({ reviews }) => {
   return (
     <div data-cy="SEP-meeting-components-external-reviews">
       <StyledPaper margin={[0]}>
-        <Typography variant="h6" className={classes.heading} gutterBottom>
+        <Typography
+          variant="h6"
+          component="h2"
+          className={classes.heading}
+          gutterBottom
+        >
           External reviews
         </Typography>
         <TableContainer>

@@ -81,6 +81,9 @@ function getInitialStepIndex(state: QuestionarySubmissionState): number {
     .reverse()
     .find((step) => step.getMetadata(state, step.payload).isCompleted === true);
 
+  if (state.proposal?.status?.shortCode.toString() == 'EDITABLE_SUBMITTED') {
+    return 0;
+  }
   if (!lastFinishedStep) {
     return 0;
   }
