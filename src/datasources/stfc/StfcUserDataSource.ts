@@ -121,7 +121,6 @@ export class StfcUserDataSource implements UserDataSource {
     email: string,
     role?: UserRole
   ): Promise<BasicUserDetails | null> {
-    //Implement role logic
     const stfcUser = (await client.getBasicPersonDetailsFromEmail(token, email))
       ?.return;
 
