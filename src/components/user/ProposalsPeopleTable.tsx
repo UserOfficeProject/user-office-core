@@ -97,7 +97,6 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   onUpdate?: FunctionType<void, [any[]]>;
   emailInvite?: boolean;
   selectedUsers?: number[];
-  addMultipleUsers?: boolean;
 };
 
 const useStyles = makeStyles({
@@ -402,7 +401,10 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
             setTableEmails(tableEmails.concat([values.email]));
             setFieldValue('email', '');
 
-            setSelectedParticipants(selectedParticipants.concat([userDetails]));
+            if (props.selection)
+              setSelectedParticipants(
+                selectedParticipants.concat([userDetails])
+              );
 
             //This is the recommend why to refresh a table but it is unsupported in typescript and may not be supported anytime soon
             //See: Refresh Data Example https://material-table.com/#/docs/features/remote-data
@@ -498,7 +500,6 @@ ProposalsPeopleTable.propTypes = {
   onUpdate: PropTypes.func,
   emailInvite: PropTypes.bool,
   selectedUsers: PropTypes.array,
-  addMultipleUsers: PropTypes.bool,
 };
 
 export default ProposalsPeopleTable;
