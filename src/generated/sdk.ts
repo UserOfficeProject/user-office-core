@@ -2565,7 +2565,7 @@ export type ScheduledEvent = {
   scheduledBy: Maybe<User>;
   description: Maybe<Scalars['String']>;
   instrument: Maybe<Instrument>;
-  equipmentId: Scalars['Int'];
+  equipmentId: Maybe<Scalars['Int']>;
   equipments: Array<EquipmentWithAssignmentStatus>;
   equipmentAssignmentStatus: Maybe<EquipmentAssignmentStatus>;
   proposalBooking: Maybe<ProposalBooking>;
