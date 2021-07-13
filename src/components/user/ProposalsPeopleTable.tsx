@@ -17,7 +17,6 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-`1`;
 import {
   BasicUserDetails,
   GetPreviousCollaboratorsQuery,
