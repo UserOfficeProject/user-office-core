@@ -126,6 +126,12 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
       <div className={classes.buttons}>
         <NavigationFragment disabled={proposal.status?.id === 0}>
           <NavigButton
+            onClick={() => dispatch({ type: 'BACK_CLICKED' })}
+            disabled={state.stepIndex === 0}
+          >
+            Back
+          </NavigButton>
+          <NavigButton
             onClick={() => {
               confirm(
                 () => {
