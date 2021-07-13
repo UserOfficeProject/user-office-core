@@ -553,8 +553,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((users: { user_id: number }[]) => users.map((uid) => uid.user_id));
   }
 
-  // async getUsersFromIds(ids: numbers):
-
   async setUserEmailVerified(id: number): Promise<User | null> {
     const [userRecord]: UserRecord[] = await database
       .update({
