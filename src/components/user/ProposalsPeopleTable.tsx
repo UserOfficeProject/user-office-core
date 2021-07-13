@@ -31,7 +31,13 @@ import { FunctionType } from 'utils/utilTypes';
 import { getCurrentUser } from '../../context/UserContextProvider';
 import InviteUserForm from './InviteUserForm';
 
-function sendUserRequest(
+// This component is for displaying and picking from a users previous collaborators to work on a proposal.
+// The table loads a users most recent and frequent collaborators for the user to choose from.
+// It also allows for a user to add any user to the proposals by there email.
+// To add the email form into the material table it uses component overriding to override the material table toolbar
+// with the StylisedToolbar. When find user is click it queries the backend for a user with that email then updates the table.
+
+function getUsersPreviousCollaborators(
   currentUserId: number | undefined,
   searchQuery: Query<any>,
   api: any,
@@ -192,6 +198,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
         rowData: BasicUserDetails | BasicUserDetails[]
       ) => action.fn(rowData),
     });
+
   props.emailInvite &&
     actionArray.push({
       icon: EmailIcon,
@@ -265,7 +272,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
   ) => {
     setPageSize(query.pageSize);
 
-    return sendUserRequest(
+    return getUsersPreviousCollaborators(
       userID,
       query,
       sendRequest,
@@ -389,6 +396,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
 
             return;
           }
+
           if (props.selectedUsers?.includes(userDetails.id)) {
             setFieldError('email', 'User is already on the proposal');
             setLoading(false);
@@ -397,16 +405,18 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
           }
 
           if (!invitedUsers.some((user) => user.id === userDetails.id)) {
+            //Add users to the table
             setInvitedUsers([userDetails].concat(invitedUsers));
             setTableEmails(tableEmails.concat([values.email]));
             setFieldValue('email', '');
 
+            //If we are selecting multiple users add the user as pre selected.
             if (props.selection)
               setSelectedParticipants(
                 selectedParticipants.concat([userDetails])
               );
 
-            //This is the recommend why to refresh a table but it is unsupported in typescript and may not be supported anytime soon
+            //This is the recommend way to refresh a table but it is unsupported in typescript and may not be supported anytime soon
             //See: Refresh Data Example https://material-table.com/#/docs/features/remote-data
             //and see: https://github.com/mbrn/material-table/issues/1752
             // @ts-ignore
