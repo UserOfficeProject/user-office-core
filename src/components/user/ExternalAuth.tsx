@@ -45,7 +45,7 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
           window.location.href = '/';
         } else {
           if (EXTERNAL_AUTH_LOGIN_URL) {
-            window.location.href = EXTERNAL_AUTH_LOGIN_URL.settingsValue;
+            window.location.href = EXTERNAL_AUTH_LOGIN_URL.settingsValue as string;
           }
         }
       });

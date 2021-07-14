@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
-import { Call, AllocationTimeUnits } from 'generated/sdk';
+import { Call, AllocationTimeUnits, UpdateCallInput } from 'generated/sdk';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
 import { useProposalsTemplates } from 'hooks/template/useProposalTemplates';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -81,15 +81,13 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
             templateId,
             proposalWorkflowId,
             ...restValues
-          } = values as Call;
+          } = values as UpdateCallInput;
           if (call) {
             const data = await api('Call updated successfully!').updateCall({
               ...restValues,
               id: id,
-              templateId: templateId ? +templateId : null,
-              proposalWorkflowId: proposalWorkflowId
-                ? +proposalWorkflowId
-                : null,
+              templateId: +templateId,
+              proposalWorkflowId: +proposalWorkflowId,
             });
             closeModal(
               data.updateCall.rejection?.reason,
@@ -98,10 +96,8 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
           } else {
             const data = await api('Call created successfully!').createCall({
               ...restValues,
-              templateId: templateId ? +templateId : null,
-              proposalWorkflowId: proposalWorkflowId
-                ? +proposalWorkflowId
-                : null,
+              templateId: +templateId,
+              proposalWorkflowId: +proposalWorkflowId,
             });
 
             closeModal(
