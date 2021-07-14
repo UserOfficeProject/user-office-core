@@ -92,7 +92,6 @@ const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
         <Tabs
           value={isInsideModal ? query.modalTab : query.tab}
           onChange={handleChange}
-          indicatorColor="primary"
           textColor="primary"
           variant="fullWidth"
           aria-label="full width tabs example"
