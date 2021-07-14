@@ -141,21 +141,21 @@ class App extends React.Component {
 
   render(): JSX.Element {
     return (
-      <CookiesProvider>
-        <UserContextProvider>
-          <SnackbarProvider
-            ref={this.notistackRef}
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            maxSnack={1}
-            action={(key) => (
-              <IconButton onClick={this.onClickDismiss(key)}>
-                <Close htmlColor="white" />
-              </IconButton>
-            )}
-          >
-            <SettingsContextProvider>
-              <FeatureContextProvider>
-                <Theme>
+      <Theme>
+        <CookiesProvider>
+          <UserContextProvider>
+            <SnackbarProvider
+              ref={this.notistackRef}
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+              maxSnack={1}
+              action={(key) => (
+                <IconButton onClick={this.onClickDismiss(key)}>
+                  <Close htmlColor="white" />
+                </IconButton>
+              )}
+            >
+              <SettingsContextProvider>
+                <FeatureContextProvider>
                   <DownloadContextProvider>
                     <ReviewAndAssignmentContextProvider>
                       <Router>
@@ -165,12 +165,12 @@ class App extends React.Component {
                       </Router>
                     </ReviewAndAssignmentContextProvider>
                   </DownloadContextProvider>
-                </Theme>
-              </FeatureContextProvider>
-            </SettingsContextProvider>
-          </SnackbarProvider>
-        </UserContextProvider>
-      </CookiesProvider>
+                </FeatureContextProvider>
+              </SettingsContextProvider>
+            </SnackbarProvider>
+          </UserContextProvider>
+        </CookiesProvider>
+      </Theme>
     );
   }
 }
