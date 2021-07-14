@@ -108,6 +108,7 @@ const CallGeneralInfo: React.FC<{
           value: template.templateId,
         }))}
         InputProps={{ 'data-cy': 'call-template' }}
+        required
       />
       <FormikDropdown
         name="proposalWorkflowId"
@@ -118,7 +119,7 @@ const CallGeneralInfo: React.FC<{
         InputProps={{
           'data-cy': 'call-workflow',
         }}
-        isClearable
+        required
       />
       <FormikDropdown
         name="allocationTimeUnit"
