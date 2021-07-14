@@ -16,10 +16,16 @@ export function QuestionaryStepButton(
       '& SVG': {
         color: theme.palette.secondary.main + '!important',
       },
+      '& .MuiStepIcon-text': {
+        fill: theme.palette.secondary.contrastText,
+      },
     },
     editable: {
       '& SVG': {
         color: theme.palette.primary.main + '!important',
+      },
+      '& .MuiStepIcon-text': {
+        fill: theme.palette.primary.contrastText,
       },
     },
   }))();
