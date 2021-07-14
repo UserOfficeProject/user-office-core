@@ -71,8 +71,8 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => AllocationTimeUnits)
   public allocationTimeUnit: AllocationTimeUnits;
 
-  @Field(() => Int, { nullable: true })
-  public templateId?: number;
+  @Field(() => Int)
+  public templateId: number;
 }
 
 @Resolver(() => Call)
