@@ -12,7 +12,7 @@ import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 @injectable()
 export default class TemplateQueries {
   constructor(
-    @inject(Tokens.TemplateDataSource) public dataSource: TemplateDataSource
+    @inject(Tokens.TemplateDataSource) private dataSource: TemplateDataSource
   ) {}
 
   @Authorized()

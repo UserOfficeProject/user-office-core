@@ -22,7 +22,7 @@ export interface TemplateDataSource {
   getTemplateCategories(): Promise<TemplateCategory[]>;
   // Template
   createTemplate(args: CreateTemplateArgs): Promise<Template>;
-  getTemplate(templateId?: number): Promise<Template | null>;
+  getTemplate(templateId: number): Promise<Template | null>;
   getTemplates(args?: TemplatesArgs): Promise<Template[]>;
   updateTemplate(values: UpdateTemplateArgs): Promise<Template | null>;
   deleteTemplate(id: number): Promise<Template>;

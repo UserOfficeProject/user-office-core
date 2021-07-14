@@ -1,3 +1,4 @@
+import { container } from 'tsyringe';
 import {
   Ctx,
   Directive,
@@ -10,6 +11,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
 import { InstrumentWithAvailabilityTime } from './Instrument';
 import { ProposalWorkflow } from './ProposalWorkflow';
@@ -72,8 +74,8 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => AllocationTimeUnits)
   public allocationTimeUnit: AllocationTimeUnits;
 
-  @Field(() => Int, { nullable: true })
-  public templateId?: number;
+  @Field(() => Int)
+  public templateId: number;
 }
 
 @Resolver(() => Call)
@@ -92,9 +94,11 @@ export class CallInstrumentsResolver {
     );
   }
 
-  @FieldResolver(() => Template, { nullable: true })
-  async template(@Root() call: Call, @Ctx() context: ResolverContext) {
-    return context.queries.template.dataSource.getTemplate(call.templateId);
+  @FieldResolver(() => Template)
+  async template(@Root() call: Call) {
+    const templateDataSource = container.resolve(TemplateDataSource);
+
+    return templateDataSource.getTemplate(call.templateId);
   }
 
   @FieldResolver(() => Int)

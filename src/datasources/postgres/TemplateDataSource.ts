@@ -153,7 +153,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async getTemplate(templateId?: number) {
+  async getTemplate(templateId: number) {
     return database('templates')
       .select('*')
       .where({ template_id: templateId })
