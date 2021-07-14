@@ -22,7 +22,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ProposalContextType } from './ProposalContainer';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end',
@@ -31,11 +31,6 @@ const useStyles = makeStyles((theme) => ({
     marginTop: ({ proposal }: { proposal: ProposalSubsetSubmission }) =>
       proposal.status?.id === 0 ? '40px' : 'auto',
     marginLeft: '10px',
-    backgroundColor: theme.palette.secondary.main,
-    color: '#ffff',
-    '&:hover': {
-      backgroundColor: theme.palette.secondary.light,
-    },
   },
 }));
 
@@ -131,6 +126,12 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
       <div className={classes.buttons}>
         <NavigationFragment disabled={proposal.status?.id === 0}>
           <NavigButton
+            onClick={() => dispatch({ type: 'BACK_CLICKED' })}
+            disabled={state.stepIndex === 0}
+          >
+            Back
+          </NavigButton>
+          <NavigButton
             onClick={() => {
               confirm(
                 () => {
@@ -158,6 +159,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
             disabled={!allStepsComplete}
             className={classes.button}
             variant="contained"
+            color="secondary"
           >
             Download PDF
           </Button>

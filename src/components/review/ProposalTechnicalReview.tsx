@@ -221,9 +221,11 @@ const ProposalTechnicalReview = ({
                     toolbar: 'bold italic',
                     branding: false,
                   }}
-                  onEditorChange={(content: string) =>
-                    setFieldValue('comment', content)
-                  }
+                  onEditorChange={(content, editor) => {
+                    if (content !== editor.startContent || editor.isDirty()) {
+                      setFieldValue('comment', content);
+                    }
+                  }}
                   disabled={shouldDisableForm(isSubmitting)}
                 />
               </Grid>
@@ -247,9 +249,11 @@ const ProposalTechnicalReview = ({
                     toolbar: 'bold italic',
                     branding: false,
                   }}
-                  onEditorChange={(content: string) =>
-                    setFieldValue('publicComment', content)
-                  }
+                  onEditorChange={(content, editor) => {
+                    if (content !== editor.startContent || editor.isDirty()) {
+                      setFieldValue('publicComment', content);
+                    }
+                  }}
                   disabled={shouldDisableForm(isSubmitting)}
                 />
               </Grid>
