@@ -74,21 +74,23 @@ const CallGeneralInfo: React.FC<{
     }
   }, [startCall, endCall, formik]);
 
-  function validateRefnumber(input: string) {
-    let error;
-    const regExp = /((([a-z|\d]+)){)({digits:[1-9]+})/;
-    const prefix = /((([a-z|\d]+)){)/;
-    const suffix = /({digits:[1-9]+})/;
-    if (input) {
-      if (input.match(regExp)) {
-      } else if (!input.match(prefix)) {
-        error = 'Invalid prefix.';
-      } else if (!input.match(suffix)) {
-        error = 'Invalid parameter.';
+  function validateRefNumFormat(input: string) {
+    let errorMessage;
+    const regExp = /^[a-z|\d]+{digits:[1-9]+}$/;
+    const prefixRegex = /[a-z|\d]+{/;
+    const parameterRegex = /{digits:[1-9]+}/;
+
+    if (input && !input.match(regExp)) {
+      if (!input.match(prefixRegex)) {
+        errorMessage = 'Invalid prefix.';
+      } else if (!input.match(parameterRegex)) {
+        errorMessage = 'Invalid parameter.';
+      } else {
+        errorMessage = 'Invalid format.';
       }
     }
 
-    return error;
+    return errorMessage;
   }
 
   const [open, setOpen] = React.useState(false);
@@ -167,7 +169,7 @@ const CallGeneralInfo: React.FC<{
         />
         <Field
           name="referenceNumberFormat"
-          validate={validateRefnumber}
+          validate={validateRefNumFormat}
           label="Reference number format"
           type="text"
           component={TextField}
