@@ -170,10 +170,10 @@ export type Call = {
   surveyComment: Scalars['String'];
   proposalWorkflowId: Maybe<Scalars['Int']>;
   allocationTimeUnit: AllocationTimeUnits;
-  templateId: Maybe<Scalars['Int']>;
+  templateId: Scalars['Int'];
   instruments: Array<InstrumentWithAvailabilityTime>;
   proposalWorkflow: Maybe<ProposalWorkflow>;
-  template: Maybe<Template>;
+  template: Template;
   proposalCount: Scalars['Int'];
   isActive: Scalars['Boolean'];
 };
@@ -3891,10 +3891,10 @@ export type CallFragment = (
   )>, proposalWorkflow: Maybe<(
     { __typename?: 'ProposalWorkflow' }
     & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
-  )>, template: Maybe<(
+  )>, template: (
     { __typename?: 'Template' }
     & Pick<Template, 'templateId' | 'name' | 'isArchived'>
-  )> }
+  ) }
 );
 
 export type GetCallQueryVariables = Exact<{
