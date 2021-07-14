@@ -12,18 +12,13 @@ import { ProposalSubsetSubmission } from 'models/ProposalSubmissionState';
 
 import ProposalContainer from './ProposalContainer';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end',
   },
   button: {
     marginTop: '20px',
-    backgroundColor: theme.palette.secondary.main,
-    color: '#ffff',
-    '&:hover': {
-      backgroundColor: theme.palette.secondary.light,
-    },
   },
 }));
 
