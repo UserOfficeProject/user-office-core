@@ -295,11 +295,8 @@ export class StfcUserDataSource implements UserDataSource {
     userRole?: number,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
-    if (userId == -1) {
-      return this.getUsers(filter, first, offset, userRole, subtractUsers);
-    }
     const dbUsers: BasicUserDetails[] = (
-      await this.getPreviousCollaborators(
+      await postgresUserDataSource.getPreviousCollaborators(
         userId,
         filter,
         first,
