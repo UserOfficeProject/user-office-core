@@ -7,7 +7,7 @@ BEGIN
 			settings(settings_id, description)
 		  VALUES(
 			'PROFILE_PAGE_LINK',
-			'P&O user profile page link'
+			'Link to external user profile'
 		  );
 		END;
 	END IF;
