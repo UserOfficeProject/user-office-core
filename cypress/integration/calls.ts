@@ -174,6 +174,7 @@ context('Calls tests', () => {
 
   it('A user-officer should be able to edit a call', () => {
     const { shortCode, startDate, endDate } = updatedCall;
+    const refNumFormat = '211{digits:5}';
 
     cy.login('officer');
 
@@ -199,7 +200,7 @@ context('Calls tests', () => {
       .should('have.value', endDate);
 
     cy.get('[data-cy=reference-number-format] input').type(
-      faker.random.word().split(' ')[0]
+      refNumFormat, {parseSpecialCharSequences: false}
     );
 
     cy.get('[data-cy="next-step"]').click();
