@@ -164,9 +164,10 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=questionnaires-list-item]').contains(sampleTitle).click();
 
-    cy.get('[role=presentation] [data-cy=questionary-title]').contains(
-      sampleTitle
-    );
+    cy.get('[data-cy="sample-declaration-modal"]').should('exist');
+    cy.get(
+      '[data-cy="sample-declaration-modal"] [data-cy=questionary-title]'
+    ).contains(sampleTitle);
   });
 
   it('User should not be able to submit proposal with unfinished sample', () => {
