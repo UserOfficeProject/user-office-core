@@ -80,7 +80,7 @@ const Theme: React.FC = (props) => {
   }, [settings]);
 
   return (
-    <StylesProvider injectFirst>
+    <StylesProvider>
       <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
     </StylesProvider>
   );
