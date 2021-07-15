@@ -1,13 +1,29 @@
 import { useEffect, useState } from 'react';
 
-import { GetUsersQuery, GetUsersQueryVariables } from 'generated/sdk';
+import {
+  BasicUserDetailsFragment,
+  GetUsersQueryVariables,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useUsersData(filter: GetUsersQueryVariables) {
-  const [usersFilter, setUsersFilter] = useState(filter);
-  const [usersData, setUsersData] = useState<GetUsersQuery['users'] | null>(
-    null
-  );
+export function useUsersData(
+  usersFilter: GetUsersQueryVariables & { refreshData?: boolean }
+) {
+  const {
+    filter,
+    offset,
+    first,
+    subtractUsers,
+    userRole,
+    refreshData,
+  } = usersFilter;
+  const [usersData, setUsersData] = useState<{
+    totalCount: number;
+    users: Array<BasicUserDetailsFragment>;
+  }>({
+    totalCount: 0,
+    users: [],
+  });
   const [loadingUsersData, setLoading] = useState(true);
 
   const api = useDataApi();
@@ -16,20 +32,26 @@ export function useUsersData(filter: GetUsersQueryVariables) {
 
     setLoading(true);
     api()
-      .getUsers(usersFilter)
+      .getUsers({
+        filter,
+        offset,
+        subtractUsers,
+        first,
+        userRole,
+      })
       .then((data) => {
         if (unmounted) {
           return;
         }
 
-        setUsersData(data.users);
+        setUsersData(data.users || { totalCount: 0, users: [] });
         setLoading(false);
       });
 
     return () => {
       unmounted = true;
     };
-  }, [usersFilter, api]);
+  }, [filter, offset, subtractUsers, first, userRole, api, refreshData]);
 
-  return { loadingUsersData, usersData, setUsersFilter };
+  return { loadingUsersData, usersData, setUsersData };
 }
