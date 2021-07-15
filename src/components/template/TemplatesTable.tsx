@@ -11,12 +11,7 @@ import { useHistory } from 'react-router';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
-import {
-  GetTemplatesQuery,
-  Template,
-  TemplateCategoryId,
-  TemplateMetadataFragment,
-} from 'generated/sdk';
+import { GetTemplatesQuery, Template, TemplateCategoryId } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { WithConfirmType } from 'utils/withConfirm';
@@ -36,7 +31,14 @@ interface TemplatesTableProps {
   confirm: WithConfirmType;
   actions?: MaterialTableProps<TemplateRowDataType>['actions'];
 }
-export function TemplatesTable(props: TemplatesTableProps) {
+export function TemplatesTable({
+  dataProvider,
+  columns,
+  templateCategory,
+  isRowRemovable,
+  confirm,
+  actions,
+}: TemplatesTableProps) {
   const [templates, setTemplates] = useState<TemplateRowDataType[]>([]);
   const { api } = useDataApiWithFeedback();
   const history = useHistory();
@@ -44,11 +46,11 @@ export function TemplatesTable(props: TemplatesTableProps) {
   const [loadingTemplates, setLoadingTemplates] = useState(true);
 
   useEffect(() => {
-    props.dataProvider().then((data) => {
+    dataProvider().then((data) => {
       data && setTemplates(data);
       setLoadingTemplates(false);
     });
-  }, [props]);
+  }, [dataProvider]);
 
   const UnarchiveIconComponent = () => <UnarchiveIcon />;
   const getUnarchiveButton = () => {
@@ -59,7 +61,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
         event: React.MouseEvent<HTMLButtonElement>,
         data: TemplateRowDataType | TemplateRowDataType[]
       ) => {
-        props.confirm(
+        confirm(
           () => {
             api()
               .updateTemplate({
@@ -74,8 +76,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
                       elem.templateId ===
                       response.updateTemplate.template?.templateId
                   ),
-                  1,
-                  response.updateTemplate.template as TemplateMetadataFragment
+                  1
                 );
                 setTemplates(data);
               });
@@ -102,7 +103,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
         event: React.MouseEvent<HTMLButtonElement>,
         data: TemplateRowDataType | TemplateRowDataType[]
       ) => {
-        props.confirm(
+        confirm(
           () => {
             api('Template archived successfully')
               .updateTemplate({
@@ -117,8 +118,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
                       elem.templateId ===
                       response.updateTemplate.template?.templateId
                   ),
-                  1,
-                  response.updateTemplate.template as TemplateMetadataFragment
+                  1
                 );
                 setTemplates(data);
               });
@@ -145,7 +145,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
         event: React.MouseEvent<HTMLButtonElement>,
         data: TemplateRowDataType | TemplateRowDataType[]
       ) => {
-        props.confirm(
+        confirm(
           () => {
             api()
               .deleteTemplate({
@@ -181,7 +181,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
     if (rowData.isArchived) {
       return getUnarchiveButton();
     } else {
-      const isRemovable = props.isRowRemovable(rowData);
+      const isRemovable = isRowRemovable(rowData);
       if (isRemovable) {
         return getDeleteButton();
       } else {
@@ -194,7 +194,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
     history.push(`/QuestionaryEditor/${templateId}`);
   };
 
-  const customActions = props.actions || [];
+  const customActions = actions || [];
   const EditIconComponent = () => <Edit />;
   const FileCopyIconComponent = () => <FileCopy />;
 
@@ -212,7 +212,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
             }
             setShow(false);
           }}
-          categoryId={props.templateCategory}
+          categoryId={templateCategory}
         />
       </InputDialog>
       <MaterialTable
@@ -222,7 +222,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
             Templates
           </Typography>
         }
-        columns={props.columns}
+        columns={columns}
         isLoading={loadingTemplates}
         data={templates}
         actions={[
@@ -238,7 +238,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
             hidden: false,
             tooltip: 'Clone',
             onClick: (event, data) => {
-              props.confirm(
+              confirm(
                 () => {
                   api()
                     .cloneTemplate({
