@@ -15,12 +15,12 @@ const notification = ({ variant, text }) => {
   switch (variant) {
     case 'error':
       notificationQuerySelector = '.snackbar-error [role="alert"]';
-      bgColor = 'rgb(244, 67, 54)';
+      bgColor = 'rgb(211, 47, 47)';
       break;
 
     default:
       notificationQuerySelector = '.snackbar-success [role="alert"]';
-      bgColor = 'rgb(76, 175, 80)';
+      bgColor = 'rgb(67, 160, 71)';
       break;
   }
   let notification = cy
