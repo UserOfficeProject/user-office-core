@@ -46,7 +46,7 @@ export enum Event {
   PROPOSAL_CLONED = 'PROPOSAL_CLONED',
   PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
   PROPOSAL_STATUS_CHANGED_BY_USER = 'PROPOSAL_STATUS_CHANGED_BY_USER',
-  PROPOSAL_TOPIC_ANSWERED = 'PROPOSAL_TOPIC_ANSWERED',
+  TOPIC_ANSWERED = 'TOPIC_ANSWERED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -190,7 +190,7 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when the proposal status was changed by the user',
   ],
   [
-    Event.PROPOSAL_TOPIC_ANSWERED,
-    'Event occurs when the user clicks save on a proposal',
+    Event.TOPIC_ANSWERED,
+    'Event occurs when the user clicks save on a topic in any questionary',
   ],
 ]);

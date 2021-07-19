@@ -55,7 +55,7 @@ export default class QuestionaryMutations {
   }
 
   @Authorized()
-  @EventBus(Event.PROPOSAL_TOPIC_ANSWERED)
+  @EventBus(Event.TOPIC_ANSWERED)
   async answerTopic(agent: UserWithRole | null, args: AnswerTopicArgs) {
     const { questionaryId, topicId, answers, isPartialSave } = args;
 

@@ -171,7 +171,7 @@ export function createPostToRabbitMQHandler() {
         await rabbitMQ.sendBroadcast(Event.PROPOSAL_CREATED, json);
         break;
       }
-      case Event.PROPOSAL_TOPIC_ANSWERED: {
+      case Event.TOPIC_ANSWERED: {
         const proposal = await proposalDataSource.getProposals({
           questionaryIds: [event.questionarystep.questionaryId],
         });
@@ -191,7 +191,7 @@ export function createPostToRabbitMQHandler() {
         });
 
         const json = JSON.stringify(answers);
-        await rabbitMQ.sendBroadcast(Event.PROPOSAL_TOPIC_ANSWERED, json);
+        await rabbitMQ.sendBroadcast(Event.TOPIC_ANSWERED, json);
         break;
       }
     }
