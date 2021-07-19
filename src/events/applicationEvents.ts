@@ -164,7 +164,7 @@ interface ProposalSEPMeetingReorderEvent extends GeneralEvent {
 }
 
 interface ProposalTopicAnsweredEvent extends GeneralEvent {
-  type: Event.PROPOSAL_TOPIC_ANSWERED;
+  type: Event.TOPIC_ANSWERED;
   questionarystep: QuestionaryStep;
 }
 
