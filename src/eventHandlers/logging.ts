@@ -89,7 +89,7 @@ export default function createHandler() {
             event.sepmeetingdecision.proposalPk.toString()
           );
           break;
-        case Event.PROPOSAL_TOPIC_ANSWERED:
+        case Event.TOPIC_ANSWERED:
           await eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,
