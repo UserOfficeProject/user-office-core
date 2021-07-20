@@ -184,7 +184,7 @@ export function createPostToRabbitMQHandler() {
           return {
             proposalId: proposal.proposals[0].proposalId,
             question: field.question.question,
-            questionId: field.question.id,
+            questionId: field.question.naturalKey,
             dataType: field.question.dataType,
             answer: field.value,
           };
