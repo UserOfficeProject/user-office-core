@@ -365,6 +365,7 @@ export default class PostgresQuestionaryDataSource
     topicRecords.forEach((topic) => {
       steps.push(
         new QuestionaryStep(
+          questionaryId,
           createTopicObject(topic),
           topic.is_complete || false,
           fields.filter((field) => field.topicId === topic.topic_id)

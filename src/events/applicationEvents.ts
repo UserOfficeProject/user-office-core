@@ -1,6 +1,7 @@
 import { Call } from '../models/Call';
 import { InstrumentHasProposals } from '../models/Instrument';
 import { Proposal, ProposalPksWithNextStatus } from '../models/Proposal';
+import { QuestionaryStep } from '../models/Questionary';
 import { Review, ReviewWithNextProposalStatus } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { SEP } from '../models/SEP';
@@ -162,6 +163,11 @@ interface ProposalSEPMeetingReorderEvent extends GeneralEvent {
   sepmeetingdecision: SepMeetingDecision;
 }
 
+interface ProposalTopicAnsweredEvent extends GeneralEvent {
+  type: Event.TOPIC_ANSWERED;
+  questionarystep: QuestionaryStep;
+}
+
 interface UserResetPasswordEmailEvent extends GeneralEvent {
   type: Event.USER_PASSWORD_RESET_EMAIL;
   userlinkresponse: {
@@ -297,4 +303,5 @@ export type ApplicationEvent =
   | ProposalStatusChangedByUserEvent
   | ProposalSEPMeetingSavedEvent
   | ProposalSEPMeetingRankingOverwrittenEvent
-  | ProposalSEPMeetingReorderEvent;
+  | ProposalSEPMeetingReorderEvent
+  | ProposalTopicAnsweredEvent;
