@@ -88,7 +88,7 @@ async function getUserByEmail(email: string, api: any) {
     });
 }
 
-type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
+type PeopleTableProps = {
   selection: boolean;
   title?: string;
   userRole?: UserRole;
@@ -434,7 +434,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
         }
       }}
     >
-      {(subformik) => (
+      {() => (
         <div data-cy="co-proposers" className={classes.tableWrapper}>
           <MaterialTable
             tableRef={tableRef}

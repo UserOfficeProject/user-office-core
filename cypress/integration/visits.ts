@@ -115,7 +115,12 @@ context('visits tests', () => {
     cy.get('[title="Add More Visitors"]').click();
 
     cy.contains('Carlsson').parent().find('[type="checkbox"]').click();
-    cy.contains('Beckley').parent().find('[type="checkbox"]').click();
+
+    cy.get('[data-cy=email]').type('ben@inbox.com');
+
+    cy.get('[data-cy=findUser]').click();
+
+    cy.contains('Beckley');
 
     cy.contains('Update').click();
 
