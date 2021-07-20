@@ -34,6 +34,15 @@ context('User administration tests', () => {
     cy.notification({ variant: 'success', text: 'Email verified' });
 
     cy.contains('Email not verified').should('not.exist');
+
+    cy.logout();
+
+    cy.login('placeholderUser');
+
+    cy.get('[data-cy="active-user-profile"]').click();
+
+    cy.contains('Email not verified').should('not.exist');
+    cy.contains('Placeholder').should('exist');
   });
 
   it('should be able to remove the placeholder flag', () => {
@@ -54,6 +63,15 @@ context('User administration tests', () => {
       text: 'User is no longer placeholder',
     });
 
+    cy.contains('Placeholder user').should('not.exist');
+
+    cy.logout();
+
+    cy.login('placeholderUser');
+
+    cy.get('[data-cy="active-user-profile"]').click();
+
+    cy.contains('Email not verified').should('not.exist');
     cy.contains('Placeholder user').should('not.exist');
   });
 

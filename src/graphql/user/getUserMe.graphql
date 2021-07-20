@@ -16,5 +16,7 @@ query getUserMe {
     telephone
     telephone_alt
     orcid
+    emailVerified
+    placeholder
   }
 }

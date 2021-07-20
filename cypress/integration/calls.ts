@@ -13,6 +13,7 @@ context('Calls tests', () => {
     shortCode: faker.random.alphaNumeric(15),
     startDate: faker.date.past().toISOString().slice(0, 10),
     endDate: faker.date.future().toISOString().slice(0, 10),
+    template: 'default template',
   };
 
   const updatedCall = {
@@ -153,7 +154,7 @@ context('Calls tests', () => {
   });
 
   it('A user-officer should be able to create a call', () => {
-    const { shortCode, startDate, endDate } = newCall;
+    const { shortCode, startDate, endDate, template } = newCall;
 
     cy.login('officer');
 
@@ -163,6 +164,7 @@ context('Calls tests', () => {
       shortCode,
       startDate,
       endDate,
+      template,
     });
 
     cy.contains(shortCode)
@@ -174,6 +176,7 @@ context('Calls tests', () => {
 
   it('A user-officer should be able to edit a call', () => {
     const { shortCode, startDate, endDate } = updatedCall;
+    const refNumFormat = '211{digits:5}';
 
     cy.login('officer');
 
@@ -198,9 +201,9 @@ context('Calls tests', () => {
       .type(endDate)
       .should('have.value', endDate);
 
-    cy.get('[data-cy=reference-number-format] input').type(
-      faker.random.word().split(' ')[0]
-    );
+    cy.get('[data-cy=reference-number-format] input').type(refNumFormat, {
+      parseSpecialCharSequences: false,
+    });
 
     cy.get('[data-cy="next-step"]').click();
 

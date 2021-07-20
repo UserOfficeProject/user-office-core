@@ -27,6 +27,10 @@ describe('PageTable component tests', () => {
 
       cy.get('@modal').find('[aria-label="Search"]').type('foo bar');
 
+      cy.wait(500);
+
+      cy.finishedLoading();
+
       cy.get('@modal').contains('No records to display');
       cy.get('@modal').contains('1 user(s) selected');
 
@@ -37,11 +41,19 @@ describe('PageTable component tests', () => {
 
       cy.get('@modal').find('[aria-label="Search"]').type('Carlsson');
 
+      cy.wait(500);
+
+      cy.finishedLoading();
+
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal').find('tr[index="0"]').contains('Carlsson');
       cy.get('@modal').find('tr[index="0"] input:not(:checked)');
 
       cy.get('@modal').find('[aria-label="Search"]').clear().type('Benjamin');
+
+      cy.wait(500);
+
+      cy.finishedLoading();
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal').find('tr[index="0"]').contains('Benjamin');

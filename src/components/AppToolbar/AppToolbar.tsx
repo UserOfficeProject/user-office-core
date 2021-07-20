@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import AppBar from '@material-ui/core/AppBar';
 import IconButton from '@material-ui/core/IconButton';
 import MuiLink from '@material-ui/core/Link';
@@ -27,8 +28,17 @@ type AppToolbarProps = {
 };
 
 const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
+  const { settings } = useContext(SettingsContext);
+
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
+
+  const logoFilename = settings.get(SettingsId.HEADER_LOGO_FILENAME)
+    ?.settingsValue;
+  let logo;
+  if (logoFilename) {
+    logo = require('images/' + logoFilename).default;
+  }
 
   const useStyles = makeStyles((theme) => ({
     appBar: {
@@ -101,6 +111,11 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
         >
           <MenuIcon />
         </IconButton>
+        {(!isTabletOrMobile || !isPortraitMode) && logo && (
+          <div className={'header-logo-container'}>
+            <img src={logo} alt="logo" className={'header-logo'} />
+          </div>
+        )}
         {(!isTabletOrMobile || !isPortraitMode) && (
           <Typography
             component="h1"
