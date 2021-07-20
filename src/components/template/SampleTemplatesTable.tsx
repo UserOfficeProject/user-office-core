@@ -6,7 +6,9 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
-type SampleTemplateRowDataType = TemplateRowDataType & Record<string, unknown>;
+type SampleTemplateRowDataType = TemplateRowDataType & {
+  questionaryCount?: number;
+};
 
 type SampleTemplatesTableProps = {
   dataProvider: () => Promise<
@@ -30,8 +32,10 @@ function SampleTemplatesTable(props: SampleTemplatesTableProps) {
       <TemplatesTable
         columns={columns}
         templateCategory={TemplateCategoryId.SAMPLE_DECLARATION}
-        isRowRemovable={() => {
-          return true;
+        isRowRemovable={(rowData) => {
+          const sampleTemplateRowData = rowData as SampleTemplateRowDataType;
+
+          return sampleTemplateRowData.questionaryCount === 0;
         }}
         dataProvider={props.dataProvider}
         confirm={props.confirm}
