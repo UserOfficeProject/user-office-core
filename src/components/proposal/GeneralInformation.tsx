@@ -12,18 +12,13 @@ import { ProposalSubsetSubmission } from 'models/ProposalSubmissionState';
 
 import ProposalContainer from './ProposalContainer';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end',
   },
   button: {
     marginTop: '20px',
-    backgroundColor: theme.palette.secondary.main,
-    color: '#ffff',
-    '&:hover': {
-      backgroundColor: theme.palette.secondary.light,
-    },
   },
 }));
 
@@ -64,15 +59,17 @@ const GeneralInformation: React.FC<GeneralInformationProps> = ({
         />
       )}
       {isEditable ? getEditableView() : getReadonlyView()}
-      <div className={classes.buttons}>
-        <Button
-          className={classes.button}
-          onClick={() => downloadPDFProposal([data.primaryKey], data.title)}
-          variant="contained"
-        >
-          Download PDF
-        </Button>
-      </div>
+      {!isEditable && (
+        <div className={classes.buttons}>
+          <Button
+            className={classes.button}
+            onClick={() => downloadPDFProposal([data.primaryKey], data.title)}
+            variant="contained"
+          >
+            Download PDF
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
