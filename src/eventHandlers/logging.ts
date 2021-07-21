@@ -89,6 +89,14 @@ export default function createHandler() {
             event.sepmeetingdecision.proposalPk.toString()
           );
           break;
+        case Event.TOPIC_ANSWERED:
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            event.questionarystep.questionaryId.toString()
+          );
+          break;
         default:
           const changedObjectId =
             (event as any)[event.key].id ||

@@ -133,13 +133,15 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async getTemplates(args: TemplatesArgs): Promise<Template[]> {
     return database('templates')
       .select('*')
-      .where({ is_archived: args.filter?.isArchived || false })
       .modify((query) => {
+        if (args.filter?.isArchived !== undefined) {
+          query.where({ is_archived: args.filter?.isArchived });
+        }
         if (args.filter?.category) {
           query.where({ category_id: args.filter?.category || undefined });
         }
         if (args.filter?.templateIds) {
-          query.where('template_id', 'in', args.filter.templateIds);
+          query.orWhereIn('template_id', args.filter.templateIds);
         }
       })
       .then((resultSet: TemplateRecord[]) => {

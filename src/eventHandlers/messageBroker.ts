@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -65,6 +66,10 @@ const getProposalMessageData = async (proposal: Proposal) => {
 export function createPostToRabbitMQHandler() {
   const proposalSettingsDataSource = container.resolve<ProposalSettingsDataSource>(
     Tokens.ProposalSettingsDataSource
+  );
+
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
   );
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
@@ -146,11 +151,7 @@ export function createPostToRabbitMQHandler() {
           case ProposalEndStatus.ACCEPTED:
             const json = await getProposalMessageData(event.proposal);
 
-            await rabbitMQ.sendMessage(
-              Queue.PROPOSAL,
-              Event.PROPOSAL_ACCEPTED,
-              json
-            );
+            await rabbitMQ.sendBroadcast(Event.PROPOSAL_ACCEPTED, json);
             break;
           default:
             break;
@@ -161,11 +162,36 @@ export function createPostToRabbitMQHandler() {
       case Event.PROPOSAL_UPDATED: {
         const json = await getProposalMessageData(event.proposal);
 
-        await rabbitMQ.sendMessage(
-          Queue.PROPOSAL,
-          Event.PROPOSAL_UPDATED,
-          json
-        );
+        await rabbitMQ.sendBroadcast(Event.PROPOSAL_UPDATED, json);
+        break;
+      }
+      case Event.PROPOSAL_CREATED: {
+        const json = await getProposalMessageData(event.proposal);
+
+        await rabbitMQ.sendBroadcast(Event.PROPOSAL_CREATED, json);
+        break;
+      }
+      case Event.TOPIC_ANSWERED: {
+        const proposal = await proposalDataSource.getProposals({
+          questionaryIds: [event.questionarystep.questionaryId],
+        });
+
+        if (proposal.proposals.length !== 1) {
+          // this checks if the questionary answered is attached to proposal
+          return;
+        }
+        const answers = event.questionarystep.fields.map((field) => {
+          return {
+            proposalId: proposal.proposals[0].proposalId,
+            question: field.question.question,
+            questionId: field.question.naturalKey,
+            dataType: field.question.dataType,
+            answer: field.value,
+          };
+        });
+
+        const json = JSON.stringify(answers);
+        await rabbitMQ.sendBroadcast(Event.TOPIC_ANSWERED, json);
         break;
       }
     }

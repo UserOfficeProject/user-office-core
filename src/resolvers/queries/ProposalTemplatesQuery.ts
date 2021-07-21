@@ -6,6 +6,7 @@ import {
   InputType,
   Field,
   ArgsType,
+  Int,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -15,6 +16,9 @@ import { ProposalTemplate } from '../types/ProposalTemplate';
 class ProposalTemplatesFilter {
   @Field({ nullable: true })
   public isArchived?: boolean;
+
+  @Field(() => [Int], { nullable: true })
+  public templateIds?: number[];
 }
 
 @ArgsType()
