@@ -84,12 +84,16 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
   }));
   const classes = useStyles();
   const { user, roles, currentRole } = useContext(UserContext);
+  const settingsContext = useContext(SettingsContext);
   const humanReadableActiveRole = useMemo(
     () =>
       roles.find(({ shortCode }) => shortCode.toUpperCase() === currentRole)
         ?.title ?? 'Unknown',
     [roles, currentRole]
   );
+  const externalProfileLink = settingsContext.settings.get(
+    SettingsId.PROFILE_PAGE_LINK
+  )?.settingsValue;
 
   return (
     <AppBar
@@ -125,14 +129,25 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
         )}
         <div className={classes.horizontalSpacing}>
           Logged in as{' '}
-          <MuiLink
-            data-cy="active-user-profile"
-            component={Link}
-            to={`/ProfilePage/${user.id}`}
-            className={classes.profileLink}
-          >
-            {user.email}
-          </MuiLink>
+          {externalProfileLink ? (
+            <a
+              href={externalProfileLink}
+              target="_blank"
+              rel="noreferrer"
+              className={classes.profileLink}
+            >
+              {user.email}
+            </a>
+          ) : (
+            <MuiLink
+              data-cy="active-user-profile"
+              component={Link}
+              to={`/ProfilePage/${user.id}`}
+              className={classes.profileLink}
+            >
+              {user.email}
+            </MuiLink>
+          )}
           {roles.length > 1 && ` (${humanReadableActiveRole})`}
         </div>
         <AccountActionButton />
