@@ -29,6 +29,7 @@ export class Answer extends QuestionTemplateRelation {
 
 export class QuestionaryStep {
   constructor(
+    public questionaryId: number,
     public topic: Topic,
     public isCompleted: boolean,
     public fields: Answer[]
