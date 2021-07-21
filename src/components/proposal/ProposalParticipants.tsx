@@ -50,7 +50,7 @@ const Participants: React.FC<ParticipantsProps> = ({
       !!principalInvestigator &&
       users.map((user) => user.id).includes(principalInvestigator)
     ) {
-      const user = users.find((u) => (u.id = principalInvestigator));
+      const user = users.find((u) => u.id === principalInvestigator);
       removeUser(user as BasicUserDetails);
     }
   });
