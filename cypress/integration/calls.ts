@@ -57,6 +57,11 @@ context('Calls tests', () => {
 
     cy.login('officer');
 
+    cy.createProposalWorkflow(
+      proposalWorkflow.name,
+      proposalWorkflow.description
+    );
+
     cy.contains('Proposals');
 
     cy.contains('Calls').click();
@@ -86,6 +91,12 @@ context('Calls tests', () => {
       .clear()
       .type(endDate)
       .should('have.value', endDate);
+
+    cy.get('[data-cy="call-template"]').click();
+    cy.get('[role="presentation"]').contains('default template').click();
+
+    cy.get('[data-cy="call-workflow"]').click();
+    cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
     cy.get('[data-cy="next-step"]').click();
 
@@ -165,6 +176,7 @@ context('Calls tests', () => {
       startDate,
       endDate,
       template,
+      workflow: proposalWorkflow.name,
     });
 
     cy.contains(shortCode)
@@ -354,14 +366,6 @@ context('Calls tests', () => {
     cy.login('officer');
 
     cy.contains('Settings').click();
-    cy.contains('Proposal workflows').click();
-
-    cy.contains('Create').click();
-    cy.get('#name').type(proposalWorkflow.name);
-    cy.get('#description').type(proposalWorkflow.description);
-    cy.get('[data-cy="submit"]').click();
-
-    cy.notification({ variant: 'success', text: 'created successfully' });
 
     cy.contains('Calls').click();
 
@@ -384,30 +388,6 @@ context('Calls tests', () => {
     cy.notification({ variant: 'success', text: 'Call updated successfully!' });
 
     cy.contains(updatedCall.shortCode).parent().contains(proposalWorkflow.name);
-  });
-
-  it('A user-officer should be able to remove proposal workflow from a call', () => {
-    cy.login('officer');
-
-    cy.contains('Calls').click();
-
-    cy.contains(updatedCall.shortCode).parent().find('[title="Edit"]').click();
-
-    cy.contains('Loading...').should('not.exist');
-
-    cy.get('[data-cy="call-workflow"] [data-cy="clear-selection"]').click();
-
-    cy.get('[data-cy="next-step"]').click();
-
-    cy.get('[data-cy="next-step"]').click();
-
-    cy.get('[data-cy="submit"]').click();
-
-    cy.notification({ variant: 'success', text: 'Call updated successfully!' });
-
-    cy.contains(updatedCall.shortCode)
-      .parent()
-      .should('not.contain.text', proposalWorkflow.name);
   });
 
   it('User officer can filter calls by their status', () => {

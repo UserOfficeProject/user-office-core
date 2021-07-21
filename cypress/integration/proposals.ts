@@ -7,6 +7,11 @@ context('Proposal tests', () => {
   const proposalToCloneAbstract = faker.lorem.words(3);
   const clonedProposalTitle = `Copy of ${proposalToCloneTitle}`;
 
+  const proposalWorkflow = {
+    name: faker.random.words(2),
+    description: faker.random.words(5),
+  };
+
   before(() => {
     cy.resetDB();
   });
@@ -106,6 +111,11 @@ context('Proposal tests', () => {
     const template = 'default template';
 
     cy.login('officer');
+
+    cy.createProposalWorkflow(
+      proposalWorkflow.name,
+      proposalWorkflow.description
+    );
 
     cy.contains('Proposals');
 
