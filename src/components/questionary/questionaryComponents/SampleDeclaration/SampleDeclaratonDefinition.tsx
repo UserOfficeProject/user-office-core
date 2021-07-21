@@ -4,7 +4,6 @@ import * as Yup from 'yup';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType, SubTemplateConfig } from 'generated/sdk';
-import { SampleWithQuestionary } from 'models/Sample';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import QuestionaryComponentSampleDeclaration from './QuestionaryComponentSampleDeclaration';
@@ -27,7 +26,7 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
   },
   createYupValidationSchema: (answer) => {
     const config = answer.config as SubTemplateConfig;
-    let schema = Yup.array().of(Yup.object<SampleWithQuestionary>());
+    let schema = Yup.array().of<Yup.AnyObjectSchema>(Yup.object());
 
     if (config.minEntries) {
       schema = schema.min(

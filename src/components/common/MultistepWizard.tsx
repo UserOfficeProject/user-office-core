@@ -157,5 +157,5 @@ export const Wizard: React.FC<WizardProps> = ({
 
 export const WizardStep: React.FC<{
   title: string;
-  validationSchema: Yup.ObjectSchema;
+  validationSchema: Yup.AnyObjectSchema;
 }> = ({ children }) => <>{children}</>;
