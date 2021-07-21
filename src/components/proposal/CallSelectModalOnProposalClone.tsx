@@ -36,7 +36,7 @@ const CallSelectModalOnProposalClone: React.FC<CallSelectModalOnProposalClonePro
   cloneProposalToCall,
 }) => {
   const classes = useStyles();
-  const { calls } = useCallsData({ isActive: true });
+  const { calls, loadingCalls } = useCallsData({ isActive: true });
 
   return (
     <Container component="main" maxWidth="xs">
@@ -79,6 +79,7 @@ const CallSelectModalOnProposalClone: React.FC<CallSelectModalOnProposalClonePro
                     value: call.id.toString(),
                     text: call.shortCode,
                   }))}
+                  loading={loadingCalls}
                   required
                 />
               </Grid>

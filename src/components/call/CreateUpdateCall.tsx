@@ -4,7 +4,7 @@ import {
 } from '@esss-swap/duo-validation/lib/Call';
 import Typography from '@material-ui/core/Typography';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
 import { Call, AllocationTimeUnits, UpdateCallInput } from 'generated/sdk';
@@ -23,7 +23,15 @@ type CreateUpdateCallProps = {
 
 const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { api } = useDataApiWithFeedback();
-  const { templates, loadingTemplates } = useProposalsTemplates(false);
+  const templateIds = useMemo(
+    () =>
+      call?.template?.isArchived && call.templateId ? [call.templateId] : null,
+    [call]
+  );
+  const { templates, loadingTemplates } = useProposalsTemplates(
+    false,
+    templateIds
+  );
   const {
     proposalWorkflows,
     loadingProposalWorkflows,

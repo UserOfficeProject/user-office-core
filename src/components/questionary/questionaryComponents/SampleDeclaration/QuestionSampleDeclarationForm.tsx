@@ -71,16 +71,22 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
                 component={Select}
                 data-cy="template-id"
               >
-                {templates.map((template) => {
-                  return (
-                    <MenuItem
-                      value={template.templateId}
-                      key={template.templateId}
-                    >
-                      {template.name}
-                    </MenuItem>
-                  );
-                })}
+                {templates.length ? (
+                  templates.map((template) => {
+                    return (
+                      <MenuItem
+                        value={template.templateId}
+                        key={template.templateId}
+                      >
+                        {template.name}
+                      </MenuItem>
+                    );
+                  })
+                ) : (
+                  <MenuItem value="noTemplates" key="noTemplates" disabled>
+                    No active templates
+                  </MenuItem>
+                )}
               </Field>
               <Link href="/SampleDeclarationTemplates/" target="blank">
                 View all templates

@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { TemplateCategoryId } from 'generated/sdk';
+import { SubTemplateConfig, TemplateCategoryId } from 'generated/sdk';
 import { useTemplates } from 'hooks/template/useTemplates';
 
 import QuestionDependencyList from '../QuestionDependencyList';
@@ -19,9 +19,12 @@ import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFo
 export const QuestionTemplateRelationSampleDeclarationForm: FC<QuestionTemplateRelationFormProps> = (
   props
 ) => {
+  const templateId = (props.questionRel.question.config as SubTemplateConfig)
+    .templateId;
   const { templates } = useTemplates({
     isArchived: false,
     category: TemplateCategoryId.SAMPLE_DECLARATION,
+    templateIds: templateId ? [templateId] : null,
   });
 
   if (!templates) {
@@ -90,16 +93,22 @@ export const QuestionTemplateRelationSampleDeclarationForm: FC<QuestionTemplateR
                 data-cy="templateId"
                 defaultValue={''}
               >
-                {templates.map((template) => {
-                  return (
-                    <MenuItem
-                      value={template.templateId}
-                      key={template.templateId}
-                    >
-                      {template.name}
-                    </MenuItem>
-                  );
-                })}
+                {templates.length ? (
+                  templates.map((template) => {
+                    return (
+                      <MenuItem
+                        value={template.templateId}
+                        key={template.templateId}
+                      >
+                        {template.name}
+                      </MenuItem>
+                    );
+                  })
+                ) : (
+                  <MenuItem value="noTemplates" key="noTemplates" disabled>
+                    No active templates
+                  </MenuItem>
+                )}
               </Field>
               <Link href="/SampleDeclarationTemplates/" target="blank">
                 View all templates
