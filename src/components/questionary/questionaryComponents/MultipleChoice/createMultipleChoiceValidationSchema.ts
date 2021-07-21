@@ -6,7 +6,8 @@ import { SelectionFromOptionsConfig } from 'generated/sdk';
 export const createMultipleChoiceValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = (
   answer
 ) => {
-  let schema = Yup.string();
+  console.log(answer);
+  let schema = Yup.array().of(Yup.string());
   const config = answer.config as SelectionFromOptionsConfig;
   config.required && (schema = schema.required(`This is a required field`));
 
