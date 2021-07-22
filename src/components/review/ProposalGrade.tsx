@@ -145,9 +145,16 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               toolbar: 'bold italic',
               branding: false,
             }}
-            onEditorChange={(content: string) =>
-              setFieldValue('comment', content)
-            }
+            onEditorChange={(content, editor) => {
+              const normalizedContent = content.replace(/(?:\r\n|\r|\n)/g, '');
+
+              if (
+                normalizedContent !== editor.startContent ||
+                editor.isDirty()
+              ) {
+                setFieldValue('comment', content);
+              }
+            }}
             disabled={isDisabled(isSubmitting)}
           />
           <Box marginTop={1} width={150}>

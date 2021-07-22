@@ -222,7 +222,16 @@ const ProposalTechnicalReview = ({
                     branding: false,
                   }}
                   onEditorChange={(content, editor) => {
-                    if (content !== editor.startContent || editor.isDirty()) {
+                    // NOTE: Remove \n (newline) characters to be able to compare because they are a bit problematic.
+                    const normalizedContent = content.replace(
+                      /(?:\r\n|\r|\n)/g,
+                      ''
+                    );
+
+                    if (
+                      normalizedContent !== editor.startContent ||
+                      editor.isDirty()
+                    ) {
                       setFieldValue('comment', content);
                     }
                   }}
@@ -250,7 +259,16 @@ const ProposalTechnicalReview = ({
                     branding: false,
                   }}
                   onEditorChange={(content, editor) => {
-                    if (content !== editor.startContent || editor.isDirty()) {
+                    // NOTE: Remove \n (newline) characters to be able to compare because they are a bit problematic.
+                    const normalizedContent = content.replace(
+                      /(?:\r\n|\r|\n)/g,
+                      ''
+                    );
+
+                    if (
+                      normalizedContent !== editor.startContent ||
+                      editor.isDirty()
+                    ) {
                       setFieldValue('publicComment', content);
                     }
                   }}
