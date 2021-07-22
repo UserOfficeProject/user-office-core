@@ -804,8 +804,11 @@ context('Template tests', () => {
     cy.get('[data-cy="call-template"]').click();
     cy.contains('Proposal template 1').click();
 
-    cy.get('[data-cy="workflow-template"]').click();
-    cy.contains(proposalWorkflow.name).click();
+    cy.get('#mui-component-select-proposalWorkflowId').click();
+    cy.contains('Loading...').should('not.exist');
+    cy.get('[role="presentation"] [role="listbox"] li')
+      .contains(proposalWorkflow.name)
+      .click();
 
     cy.get('[data-cy="next-step"]').click();
     cy.get('[data-cy="next-step"]').click();
