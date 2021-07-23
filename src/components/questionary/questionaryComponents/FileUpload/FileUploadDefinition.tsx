@@ -25,7 +25,8 @@ export const fileUploadDefinition: QuestionaryComponentDefinition = {
     answerRenderer: FilesAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: () => Yup.array().of(Yup.string()),
+  createYupValidationSchema: () =>
+    Yup.array().of(Yup.object({ id: Yup.string().required() })),
   getYupInitialValue: ({ answer }) => answer.value || [],
   searchCriteriaComponent: FileUploadSearchCriteriaInput,
 };

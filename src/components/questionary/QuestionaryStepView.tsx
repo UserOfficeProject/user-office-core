@@ -44,11 +44,10 @@ export const createFormikConfigObjects = (
   state: QuestionarySubmissionState,
   api: () => Sdk
 ): {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  validationSchema: object;
+  validationSchema: Record<string, Yup.AnySchema>;
   initialValues: Record<string, unknown>;
 } => {
-  const validationSchema: Record<string, unknown> = {};
+  const validationSchema: Record<string, Yup.AnySchema> = {};
   const initialValues: Record<string, unknown> = {};
 
   answers.forEach((answer) => {
@@ -66,7 +65,10 @@ export const createFormikConfigObjects = (
     }
   });
 
-  return { initialValues, validationSchema };
+  return {
+    initialValues,
+    validationSchema,
+  };
 };
 
 const PromptIfDirty = ({ isDirty }: { isDirty: boolean }) => {
