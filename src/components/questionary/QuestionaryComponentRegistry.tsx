@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { FormikProps } from 'formik';
 import React, { FC } from 'react';
+import * as Yup from 'yup';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
@@ -61,7 +62,7 @@ export type CreateYupValidation =
       field: Answer,
       state: QuestionarySubmissionState,
       api?: () => Sdk
-    ) => object)
+    ) => Yup.AnySchema)
   | null;
 
 export type GetYupInitialValue = (props: {

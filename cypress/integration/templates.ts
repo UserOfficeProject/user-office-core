@@ -6,7 +6,7 @@ context('Template tests', () => {
   });
 
   beforeEach(() => {
-    cy.viewport(1920, 1080);
+    cy.viewport(1920, 1380);
   });
 
   let boolId: string;
@@ -46,6 +46,11 @@ context('Template tests', () => {
 
   const minimumCharacters = 1000;
   const richTextEditorMaxChars = 200;
+
+  const proposalWorkflow = {
+    name: faker.random.words(2),
+    description: faker.random.words(5),
+  };
 
   it('User officer should be able to create sample declaration template', () => {
     cy.login('officer');
@@ -710,6 +715,11 @@ context('Template tests', () => {
   it('User officer can add multiple choice question as a dependency', () => {
     cy.login('officer');
 
+    cy.createProposalWorkflow(
+      proposalWorkflow.name,
+      proposalWorkflow.description
+    );
+
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
     cy.get('[data-cy="create-new-button"]').click();
@@ -793,6 +803,12 @@ context('Template tests', () => {
 
     cy.get('[data-cy="call-template"]').click();
     cy.contains('Proposal template 1').click();
+
+    cy.get('#mui-component-select-proposalWorkflowId').click();
+    cy.contains('Loading...').should('not.exist');
+    cy.get('[role="presentation"] [role="listbox"] li')
+      .contains(proposalWorkflow.name)
+      .click();
 
     cy.get('[data-cy="next-step"]').click();
     cy.get('[data-cy="next-step"]').click();

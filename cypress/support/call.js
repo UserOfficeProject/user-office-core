@@ -44,7 +44,7 @@ const createCall = ({
 
     cy.contains('Loading...').should('not.exist');
 
-    cy.contains(workflow).click();
+    cy.get('[role="presentation"]').contains(workflow).click();
   }
 
   cy.get('[data-cy="next-step"]').click();

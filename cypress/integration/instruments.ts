@@ -25,11 +25,17 @@ context('Instrument tests', () => {
     abstract: faker.random.words(5),
   };
 
+  const proposalWorkflow = {
+    name: faker.random.words(2),
+    description: faker.random.words(5),
+  };
+
   const call2 = {
     shortCode: faker.random.alphaNumeric(10),
     startDate: faker.date.past().toISOString().slice(0, 10),
     endDate: faker.date.future().toISOString().slice(0, 10),
     template: 'default template',
+    workflow: proposalWorkflow.name,
   };
 
   const scientist1 = 'Carlsson';
@@ -96,7 +102,10 @@ context('Instrument tests', () => {
   it('User Officer should be able to assign proposal to existing instrument', () => {
     cy.login('officer');
 
-    cy.contains('Calls').click();
+    cy.createProposalWorkflow(
+      proposalWorkflow.name,
+      proposalWorkflow.description
+    );
 
     cy.createCall(call2);
 
