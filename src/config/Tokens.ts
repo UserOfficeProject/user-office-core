@@ -25,4 +25,5 @@ export const Tokens = {
   VisitDataSource: Symbol('VisitDataSource'),
   VisitAuthorization: Symbol('VisitAuthorization'),
   EnableDefaultFeatures: Symbol('EnableDefaultFeatures'),
+  SetColourTheme: Symbol('SetColourTheme'),
 };
