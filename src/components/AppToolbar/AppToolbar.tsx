@@ -124,7 +124,7 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
             noWrap
             className={classes.title}
           >
-            User Office
+            | User Office
           </Typography>
         )}
         <div className={classes.horizontalSpacing}>
