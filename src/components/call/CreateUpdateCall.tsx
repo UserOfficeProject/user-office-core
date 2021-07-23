@@ -84,29 +84,18 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       <Wizard
         initialValues={initialValues}
         onSubmit={async (values) => {
-          const {
-            id,
-            templateId,
-            proposalWorkflowId,
-            ...restValues
-          } = values as UpdateCallInput;
           if (call) {
-            const data = await api('Call updated successfully!').updateCall({
-              ...restValues,
-              id: id,
-              templateId: +templateId,
-              proposalWorkflowId: +proposalWorkflowId,
-            });
+            const data = await api('Call updated successfully!').updateCall(
+              values as UpdateCallInput
+            );
             closeModal(
               data.updateCall.rejection?.reason,
               data.updateCall.call as Call
             );
           } else {
-            const data = await api('Call created successfully!').createCall({
-              ...restValues,
-              templateId: +templateId,
-              proposalWorkflowId: +proposalWorkflowId,
-            });
+            const data = await api('Call created successfully!').createCall(
+              values as UpdateCallInput
+            );
 
             closeModal(
               data.createCall.rejection?.reason,
