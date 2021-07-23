@@ -21,7 +21,7 @@ import { CreateUnitArgs } from '../resolvers/mutations/CreateUnitMutation';
 import { DeleteApiAccessTokenInput } from '../resolvers/mutations/DeleteApiAccessTokenMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
-import { enableDefaultFeaturesForDevelopment } from '../utils/enableDefaultFeaturesForDevelopment';
+import { configureDevelopmentEnvironment } from '../utils/configureDevelopmentEnvironment';
 import { generateUniqueId } from '../utils/helperFunctions';
 import { signToken } from '../utils/jwt';
 
@@ -41,7 +41,7 @@ export default class AdminMutations {
       logger.logWarn('Resetting database', {});
 
       const log = await this.dataSource.resetDB(includeSeeds);
-      enableDefaultFeaturesForDevelopment();
+      configureDevelopmentEnvironment();
 
       return log;
     } else {
