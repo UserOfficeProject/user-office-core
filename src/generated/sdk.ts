@@ -203,9 +203,9 @@ export type CheckExternalTokenWrap = {
   token: Maybe<Scalars['String']>;
 };
 
-export type CloneProposalInput = {
+export type CloneProposalsInput = {
   callId: Scalars['Int'];
-  proposalToClonePk: Scalars['Int'];
+  proposalsToClonePk: Array<Scalars['Int']>;
 };
 
 export type ConfirmEquipmentAssignmentInput = {
@@ -640,7 +640,7 @@ export type Mutation = {
   setInstrumentAvailabilityTime: SuccessResponseWrap;
   submitInstrument: SuccessResponseWrap;
   administrationProposal: ProposalResponseWrap;
-  cloneProposal: ProposalResponseWrap;
+  cloneProposals: ProposalsResponseWrap;
   updateProposal: ProposalResponseWrap;
   addProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
   addStatusChangingEventsToConnection: ProposalStatusChangingEventResponseWrap;
@@ -869,8 +869,8 @@ export type MutationAdministrationProposalArgs = {
 };
 
 
-export type MutationCloneProposalArgs = {
-  cloneProposalInput: CloneProposalInput;
+export type MutationCloneProposalsArgs = {
+  cloneProposalsInput: CloneProposalsInput;
 };
 
 
@@ -4272,17 +4272,17 @@ export type ChangeProposalsStatusMutation = (
   ) }
 );
 
-export type CloneProposalMutationVariables = Exact<{
-  proposalToClonePk: Scalars['Int'];
+export type CloneProposalsMutationVariables = Exact<{
+  proposalsToClonePk: Array<Scalars['Int']> | Scalars['Int'];
   callId: Scalars['Int'];
 }>;
 
 
-export type CloneProposalMutation = (
+export type CloneProposalsMutation = (
   { __typename?: 'Mutation' }
-  & { cloneProposal: (
-    { __typename?: 'ProposalResponseWrap' }
-    & { proposal: Maybe<(
+  & { cloneProposals: (
+    { __typename?: 'ProposalsResponseWrap' }
+    & { proposals: Array<(
       { __typename?: 'Proposal' }
       & { proposer: Maybe<(
         { __typename?: 'BasicUserDetails' }
@@ -8330,12 +8330,12 @@ export const ChangeProposalsStatusDocument = gql`
   }
 }
     ${RejectionFragmentDoc}`;
-export const CloneProposalDocument = gql`
-    mutation cloneProposal($proposalToClonePk: Int!, $callId: Int!) {
-  cloneProposal(
-    cloneProposalInput: {proposalToClonePk: $proposalToClonePk, callId: $callId}
+export const CloneProposalsDocument = gql`
+    mutation cloneProposals($proposalsToClonePk: [Int!]!, $callId: Int!) {
+  cloneProposals(
+    cloneProposalsInput: {proposalsToClonePk: $proposalsToClonePk, callId: $callId}
   ) {
-    proposal {
+    proposals {
       ...proposal
       proposer {
         ...basicUserDetails
@@ -10367,8 +10367,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     changeProposalsStatus(variables: ChangeProposalsStatusMutationVariables): Promise<ChangeProposalsStatusMutation> {
       return withWrapper(() => client.request<ChangeProposalsStatusMutation>(print(ChangeProposalsStatusDocument), variables));
     },
-    cloneProposal(variables: CloneProposalMutationVariables): Promise<CloneProposalMutation> {
-      return withWrapper(() => client.request<CloneProposalMutation>(print(CloneProposalDocument), variables));
+    cloneProposals(variables: CloneProposalsMutationVariables): Promise<CloneProposalsMutation> {
+      return withWrapper(() => client.request<CloneProposalsMutation>(print(CloneProposalsDocument), variables));
     },
     createProposal(variables: CreateProposalMutationVariables): Promise<CreateProposalMutation> {
       return withWrapper(() => client.request<CreateProposalMutation>(print(CreateProposalDocument), variables));

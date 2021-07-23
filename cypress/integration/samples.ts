@@ -162,7 +162,7 @@ context('Samples tests', () => {
 
     cy.notification({
       variant: 'success',
-      text: 'Proposal cloned successfully',
+      text: 'Proposal/s cloned successfully',
     });
 
     cy.contains(`Copy of ${proposalTitle}`)
