@@ -65,7 +65,10 @@ export const createFormikConfigObjects = (
     }
   });
 
-  return { initialValues, validationSchema };
+  return {
+    initialValues,
+    validationSchema,
+  };
 };
 
 const PromptIfDirty = ({ isDirty }: { isDirty: boolean }) => {

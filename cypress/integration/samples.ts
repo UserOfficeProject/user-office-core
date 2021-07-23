@@ -18,6 +18,10 @@ context('Samples tests', () => {
   const sampleTitle = faker.lorem.words(2);
   const proposalTitleUpdated = faker.lorem.words(2);
   const sampleQuestionaryQuestion = faker.lorem.words(2);
+  const proposalWorkflow = {
+    name: faker.random.words(2),
+    description: faker.random.words(5),
+  };
 
   it('Should be able to create proposal template with sample', () => {
     cy.login('officer');
@@ -55,6 +59,11 @@ context('Samples tests', () => {
   it('Should be possible to change template in a call', () => {
     cy.login('officer');
 
+    cy.createProposalWorkflow(
+      proposalWorkflow.name,
+      proposalWorkflow.description
+    );
+
     cy.contains('Calls').click();
 
     cy.get('[title="Edit"]').click();
@@ -62,6 +71,9 @@ context('Samples tests', () => {
     cy.get('[data-cy=call-template]').click();
 
     cy.contains(proposalTemplateName).click();
+
+    cy.get('[data-cy="call-workflow"]').click();
+    cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
     cy.get('[data-cy="next-step"]').click();
 
