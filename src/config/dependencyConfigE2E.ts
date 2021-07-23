@@ -1,7 +1,5 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
 
-import { AdminDataSource } from '../datasources/AdminDataSource';
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
@@ -20,13 +18,14 @@ import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import { createSkipPostingHandler } from '../eventHandlers/messageBroker';
-import { FeatureId } from '../models/Feature';
 import { SkipAssetRegistrar } from '../utils/EAM_service';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { VisitAuthorization } from '../utils/VisitAuthorization';
+import enableDefaultEssFeatures from './ess/enableDefaultEssFeatures';
+import setEssColourTheme from './ess/setEssColourTheme';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
@@ -59,7 +58,6 @@ mapClass(Tokens.MailService, SkipSendMailService);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 
-mapValue(Tokens.EnableDefaultFeatures, () => {
-  const dataSource = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
-  dataSource.setFeatures([FeatureId.SCHEDULER, FeatureId.SHIPPING], true);
-});
+mapValue(Tokens.EnableDefaultFeatures, enableDefaultEssFeatures);
+
+mapValue(Tokens.SetColourTheme, setEssColourTheme);
