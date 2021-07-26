@@ -12,9 +12,12 @@ const createTopic = (title) => {
 
   cy.wait(500);
 
-  cy.get('[data-cy=topic-title]').last().click();
+  cy.get('[data-cy="topic-title-edit"]').last().click();
 
-  cy.get('[data-cy=topic-title-input]').last().clear().type(`${title}{enter}`);
+  cy.get('[data-cy=topic-title-input] input')
+    .last()
+    .clear()
+    .type(`${title}{enter}`);
 };
 
 function createTemplate(type, title, description) {

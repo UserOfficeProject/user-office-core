@@ -1,4 +1,5 @@
 import AppBar from '@material-ui/core/AppBar';
+import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import Fade from '@material-ui/core/Fade';
 import Grid from '@material-ui/core/Grid';
@@ -10,8 +11,11 @@ import useTheme from '@material-ui/core/styles/useTheme';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
+import EditIcon from '@material-ui/icons/Edit';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import { Field, Form, Formik } from 'formik';
+import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import {
@@ -20,6 +24,7 @@ import {
   Droppable,
   NotDraggingStyle,
 } from 'react-beautiful-dnd';
+import * as Yup from 'yup';
 
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
@@ -128,10 +133,20 @@ export default function QuestionaryEditorTopic(props: {
       borderWidth: '1px',
       borderStyle: 'dashed',
     },
+    button: {
+      '&:first-child': {
+        marginLeft: '0',
+      },
+      '&:last-child': {
+        marginRight: '0',
+      },
+    },
+    title: {
+      margin: 0,
+    },
   })();
 
   const { data, dispatch, index } = props;
-  const [title, setTitle] = useState<string>(data.topic.title);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | SVGSVGElement>(null);
   const open = Boolean(anchorEl);
@@ -150,39 +165,85 @@ export default function QuestionaryEditorTopic(props: {
     ...draggableStyle,
   });
 
-  const titleJsx = isEditMode ? (
-    <input
-      type="text"
-      value={title}
-      data-cy="topic-title-input"
-      className={classes.inputHeading}
-      onChange={(event) => setTitle(event.target.value)}
-      onBlur={() => {
-        setIsEditMode(false);
+  const titleJsx = (
+    <Formik
+      initialValues={{ title: data.topic.title }}
+      validationSchema={Yup.object().shape({
+        title: Yup.string().min(1),
+      })}
+      onSubmit={async (values): Promise<void> => {
         dispatch({
           type: EventType.UPDATE_TOPIC_TITLE_REQUESTED,
           payload: {
             topicId: data.topic.id,
-            title: title,
+            title: values.title,
             sortOrder: data.topic.sortOrder,
           },
         });
+        setIsEditMode(false);
       }}
-      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-          e.currentTarget.blur();
-        }
-      }}
-    />
-  ) : (
-    <span
-      onClick={() => {
-        setIsEditMode(true);
-      }}
-      data-cy="topic-title"
     >
-      {title}
-    </span>
+      {({ isSubmitting, handleChange, values }) => (
+        <Form>
+          {isEditMode ? (
+            <Grid container alignItems="center">
+              <Grid item xs={8}>
+                <Field
+                  name="title"
+                  id="title"
+                  type="text"
+                  component={TextField}
+                  className={classes.title}
+                  value={values.title}
+                  onChange={handleChange}
+                  margin="normal"
+                  fullWidth
+                  data-cy="topic-title-input"
+                  required
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <Button
+                  disabled={isSubmitting}
+                  variant="text"
+                  size="small"
+                  color="secondary"
+                  onClick={() => setIsEditMode(false)}
+                  className={classes.button}
+                  data-cy="topic-title-cancel-update"
+                >
+                  Cancel
+                </Button>
+              </Grid>
+              <Grid item xs={2}>
+                <Button
+                  disabled={isSubmitting}
+                  type="submit"
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  className={classes.button}
+                  data-cy="topic-title-update"
+                >
+                  Update
+                </Button>
+              </Grid>
+            </Grid>
+          ) : (
+            <div>
+              <span data-cy="topic-title">{values.title}</span>{' '}
+              <EditIcon
+                fontSize="small"
+                data-cy="topic-title-edit"
+                onClick={() => {
+                  setIsEditMode(true);
+                }}
+              />
+            </div>
+          )}
+        </Form>
+      )}
+    </Formik>
   );
 
   const getItems = () => {

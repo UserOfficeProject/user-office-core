@@ -42,11 +42,17 @@ export function TemplateMetadataEditor(props: {
         marginRight: '0',
       },
     },
+    label: {
+      color: theme.palette.grey[500],
+      fontSize: 'small',
+    },
   }))();
 
   const staticJSX = (
     <div>
+      <label className={classes.label}>Name</label>
       <div className={classes.templateName}>{template.name}</div>
+      <label className={classes.label}>Description</label>
       <div className={classes.templateDescription}>{template.description}</div>
       <ButtonContainer>
         <Button
