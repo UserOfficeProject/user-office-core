@@ -1,8 +1,8 @@
 import { GraphQLClient } from 'graphql-request';
 
-const resetDB = () => {
-  const query = `mutation {
-      prepareDB {
+const resetDB = (includeSeeds = false) => {
+  const query = `mutation($includeSeeds: Boolean) {
+      prepareDB(includeSeeds: $includeSeeds) {
         log
         rejection {
           reason
@@ -12,7 +12,7 @@ const resetDB = () => {
   const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
   const request = new GraphQLClient('/graphql', {
     headers: { authorization: authHeader },
-  }).rawRequest(query, null);
+  }).rawRequest(query, { includeSeeds });
 
   cy.wrap(request);
 };

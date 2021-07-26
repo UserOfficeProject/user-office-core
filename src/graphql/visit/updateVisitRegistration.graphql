@@ -1,0 +1,19 @@
+mutation updateVisitRegistration(
+  $visitId: Int!
+  $trainingExpiryDate: DateTime
+  $isRegistrationSubmitted: Boolean
+) {
+  updateVisitRegistration(
+    visitId: $visitId
+    trainingExpiryDate: $trainingExpiryDate
+    isRegistrationSubmitted: $isRegistrationSubmitted
+  ) {
+    registration {
+      ...visitRegistration
+    }
+
+    rejection {
+      ...rejection
+    }
+  }
+}
