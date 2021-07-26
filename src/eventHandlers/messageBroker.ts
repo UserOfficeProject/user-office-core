@@ -3,6 +3,7 @@ import { Queue, RabbitMQMessageBroker } from '@esss-swap/duo-message-broker';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
@@ -10,6 +11,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
+import { AllocationTimeUnits } from '../models/Call';
 import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 
@@ -74,6 +76,9 @@ export function createPostToRabbitMQHandler() {
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
   );
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
+  );
 
   const rabbitMQ = new RabbitMQMessageBroker();
 
@@ -126,12 +131,29 @@ export function createPostToRabbitMQHandler() {
           return;
         }
 
+        const call = await callDataSource.getCall(proposal.callId);
+
+        if (!call) {
+          logger.logWarn(`Proposal '${proposal.primaryKey}' has no call`, {
+            proposal,
+          });
+
+          return;
+        }
+
+        // NOTE: Default allocation unit is Days. The UI supports Days and Hours.
+        let proposalAllocatedTime =
+          proposal.managementTimeAllocation * 24 * 60 * 60;
+
+        if (call.allocationTimeUnit === AllocationTimeUnits.Hour) {
+          proposalAllocatedTime = proposal.managementTimeAllocation * 60 * 60;
+        }
+
         // NOTE: maybe use shared types?
         const message = {
           proposalPk: proposal.primaryKey,
           callId: proposal.callId,
-          // the UI supports days
-          allocatedTime: proposal.managementTimeAllocation * 24 * 60 * 60,
+          allocatedTime: proposalAllocatedTime,
           instrumentId: instrument.id,
         };
 
