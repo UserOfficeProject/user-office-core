@@ -151,8 +151,10 @@ context('Samples tests', () => {
 
     cy.contains(proposalTitle)
       .parent()
-      .find('[title="Clone proposal"]')
+      .find('input[type="checkbox"]')
       .click();
+
+    cy.get('[title="Clone proposals to call"]').click();
 
     cy.get('#mui-component-select-selectedCallId').click();
 

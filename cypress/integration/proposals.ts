@@ -154,7 +154,7 @@ context('Proposal tests', () => {
 
     cy.notification({
       variant: 'success',
-      text: 'Proposal/s cloned successfully',
+      text: 'Proposal cloned successfully',
     });
 
     cy.contains(clonedProposalTitle).parent().should('contain.text', shortCode);
