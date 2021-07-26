@@ -292,6 +292,7 @@ export default function QuestionaryStepView(props: {
                     async (isValid: boolean) => {
                       if (isValid) {
                         const goNextStep = await performSave(false);
+
                         if (!goNextStep) {
                           setSubmitting(false);
 

@@ -17,15 +17,17 @@ context('User administration tests', () => {
   const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.phoneNumber('0##########');
   const newTelephoneAlt = faker.phone.phoneNumber('0##########');
+  const unverifiedEmailUserName = 'Unverified email';
 
   it('should be able to verify email manually', () => {
     cy.login('officer');
 
     cy.contains('People').click();
 
-    cy.get('input[aria-label=Search]').type('placeholder');
-
-    cy.get("[title='Edit user']").first().click();
+    cy.contains(unverifiedEmailUserName)
+      .parent()
+      .find("[title='Edit user']")
+      .click();
 
     cy.contains('Email not verified');
 
@@ -52,7 +54,10 @@ context('User administration tests', () => {
 
     cy.get('input[aria-label=Search]').type('placeholder');
 
-    cy.get("[title='Edit user']").first().click();
+    cy.contains(unverifiedEmailUserName)
+      .parent()
+      .find("[title='Edit user']")
+      .click();
 
     cy.contains('Placeholder user');
 
@@ -200,10 +205,12 @@ context('User administration tests', () => {
 
   it('Should be able to delete user information', () => {
     cy.contains('People').click();
+    cy.contains(unverifiedEmailUserName)
+      .parent()
+      .find("[title='Delete']")
+      .click();
 
-    cy.get("[title='Delete']").first().click();
-
-    cy.get("[title='Save']").first().click();
+    cy.get("[data-cy=co-proposers] [title='Save']").click();
 
     cy.notification({ variant: 'success', text: 'User removed successfully' });
 

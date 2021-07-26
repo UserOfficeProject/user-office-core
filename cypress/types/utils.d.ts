@@ -90,6 +90,19 @@ declare global {
        *    cy.getTinyMceContent('editorId')
        */
       getTinyMceContent: (tinyMceId: string) => Promise<string>;
+
+      /**
+       * Tests if action button in experiments table has the right state
+       *
+       * @returns {typeof getTinyMceContent}
+       * @memberof Chainable
+       * @example
+       *    cy.testActionButton('Define your own visit', 'completed')
+       */
+      testActionButton: (
+        title: string,
+        state: 'completed' | 'active' | 'inactive' | 'neutral' | 'invisible'
+      ) => Promise<void>;
     }
   }
 

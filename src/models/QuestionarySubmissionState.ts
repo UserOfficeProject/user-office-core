@@ -13,7 +13,7 @@ import { ProposalSubsetSubmission } from './ProposalSubmissionState';
 import { getFieldById } from './QuestionaryFunctions';
 import { SampleWithQuestionary } from './Sample';
 import { ShipmentExtended } from './ShipmentSubmissionState';
-import { VisitExtended } from './VisitSubmissionState';
+import { RegistrationExtended } from './VisitSubmissionState';
 
 export type Event =
   | { type: 'FIELD_CHANGED'; id: string; newValue: any }
@@ -36,9 +36,11 @@ export type Event =
   | { type: 'SHIPMENT_CREATED'; shipment: ShipmentExtended }
   | { type: 'SHIPMENT_LOADED'; shipment: ShipmentExtended }
   | { type: 'SHIPMENT_MODIFIED'; shipment: Partial<ShipmentExtended> }
-  | { type: 'VISIT_CREATED'; visit: VisitExtended }
-  | { type: 'VISIT_LOADED'; visit: VisitExtended }
-  | { type: 'VISIT_MODIFIED'; visit: Partial<VisitExtended> };
+  | { type: 'SHIPMENT_SUBMITTED'; shipment: Partial<ShipmentExtended> }
+  | { type: 'REGISTRATION_CREATED'; visit: RegistrationExtended }
+  | { type: 'REGISTRATION_LOADED'; visit: RegistrationExtended }
+  | { type: 'REGISTRATION_MODIFIED'; visit: Partial<RegistrationExtended> }
+  | { type: 'REGISTRATION_SUBMITTED'; visit: Partial<RegistrationExtended> };
 
 export interface WizardStepMetadata {
   title: string;

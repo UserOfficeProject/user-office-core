@@ -16,13 +16,11 @@ import { ShipmentStatus } from 'generated/sdk';
 import { useDownloadPDFShipmentLabel } from 'hooks/proposal/useDownloadPDFShipmentLabel';
 import { useProposalData } from 'hooks/proposal/useProposalData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ShipmentContextType } from './ShipmentContainer';
 
 type ShipmentReviewProps = {
-  onComplete?: FunctionType<void>;
   confirm: WithConfirmType;
 };
 
@@ -96,6 +94,10 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
                 }
                 dispatch({
                   type: 'SHIPMENT_MODIFIED',
+                  shipment: result.submitShipment.shipment,
+                });
+                dispatch({
+                  type: 'SHIPMENT_SUBMITTED',
                   shipment: result.submitShipment.shipment,
                 });
               },

@@ -1,11 +1,24 @@
-import { GetVisitQuery } from 'generated/sdk';
+import { ExcludeTypeName, ExcludeNull } from 'utils/utilTypes';
 
-import { VisitFragment } from './../generated/sdk';
+import {
+  GetVisitRegistrationQuery,
+  GetUserProposalBookingsWithEventsQuery,
+} from './../generated/sdk';
 import { QuestionarySubmissionState } from './QuestionarySubmissionState';
 
-export type VisitBasic = VisitFragment;
+export type RegistrationBasic = ExcludeTypeName<
+  ExcludeNull<
+    ExcludeNull<
+      ExcludeNull<
+        ExcludeNull<GetUserProposalBookingsWithEventsQuery['me']>['proposals']
+      >[0]['proposalBooking']
+    >['scheduledEvents'][0]['visit']
+  >['registrations'][0]
+>;
 
-export type VisitExtended = Exclude<GetVisitQuery['visit'], null>;
+export type RegistrationExtended = ExcludeNull<
+  GetVisitRegistrationQuery['visitRegistration']
+>;
 export interface VisitSubmissionState extends QuestionarySubmissionState {
-  visit: VisitExtended;
+  registration: RegistrationExtended;
 }

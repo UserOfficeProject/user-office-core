@@ -8,10 +8,13 @@ import ShipmentContainer from './ShipmentContainer';
 
 interface UpdateShipmentProps {
   shipment: ShipmentBasic;
-  close: (shipment: ShipmentBasic | null) => void;
+  onShipmentSubmitted: (shipment: ShipmentBasic) => void;
 }
 
-function UpdateShipment({ close, shipment: { id } }: UpdateShipmentProps) {
+function UpdateShipment({
+  shipment: { id },
+  onShipmentSubmitted,
+}: UpdateShipmentProps) {
   const { shipment } = useShipment(id);
 
   if (!shipment) {
@@ -21,7 +24,7 @@ function UpdateShipment({ close, shipment: { id } }: UpdateShipmentProps) {
   return (
     <ShipmentContainer
       shipment={shipment}
-      done={(shipment) => close({ ...shipment })}
+      onShipmentSubmitted={onShipmentSubmitted}
     />
   );
 }

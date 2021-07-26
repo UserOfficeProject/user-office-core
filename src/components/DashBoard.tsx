@@ -45,9 +45,6 @@ import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage
 import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
 import UnitTablePage from './settings/unitList/UnitTablePage';
-import ShipmentCreate from './shipments/CreateUpdateShipment';
-import MyShipments from './shipments/MyShipments';
-import ShipmentsPage from './shipments/ShipmentsPage';
 import ProposalTemplates from './template/ProposalTemplates';
 import QuestionsPage from './template/QuestionsPage';
 import SampleTemplatesPage from './template/SampleTemplates';
@@ -57,7 +54,6 @@ import VisitTemplatesPage from './template/VisitTemplatesPage';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
-import MyVisits from './visit/MyVisits';
 
 type BottomNavItemProps = {
   /** Content of the information modal. */
@@ -159,8 +155,6 @@ const Dashboard: React.FC = () => {
   ]);
 
   const featureContext = useContext(FeatureContext);
-  const isShipmentEnabled = !!featureContext.features.get(FeatureId.SHIPPING)
-    ?.isEnabled;
   const isSchedulerEnabled = featureContext.features.get(FeatureId.SCHEDULER)
     ?.isEnabled;
 
@@ -239,13 +233,6 @@ const Dashboard: React.FC = () => {
             path="/ProposalCreate/:callId/:templateId"
             component={ProposalCreate}
           />
-          {isShipmentEnabled && (
-            <Route path="/ShipmentCreate" component={ShipmentCreate} />
-          )}
-          {isShipmentEnabled && (
-            <Route path="/MyShipments" component={MyShipments} />
-          )}
-          <Route path="/MyVisits" component={MyVisits} />
           <Route path="/ProfilePage/:id" component={ProfilePage} />
           {isUserOfficer && (
             <Route path="/PeoplePage/:id" component={UserPage} />
@@ -296,9 +283,7 @@ const Dashboard: React.FC = () => {
           {(isSampleSafetyReviewer || isUserOfficer) && (
             <Route path="/SampleSafety" component={SampleSafetyPage} />
           )}
-          {isUserOfficer && (
-            <Route path="/Shipments" component={ShipmentsPage} />
-          )}
+
           {isUserOfficer && (
             <Route path="/ApiAccessTokens" component={ApiAccessTokensPage} />
           )}

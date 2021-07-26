@@ -29,6 +29,21 @@ declare global {
         statusName?: string,
         proposalTitle?: string
       ) => void;
+
+      /**
+       * Allocates time for the proposal and optionally submits
+       * management decision
+       *
+       * @returns {typeof changeProposalStatus}
+       * @memberof Chainable
+       * @example
+       *        cy.allocateProposalTime({proposalTitle:proposalTitle, timeToAllocate:2, submitManagementDecision:true});
+       */
+      allocateProposalTime: (params: {
+        proposalTitle: string;
+        timeToAllocate: number;
+        submitManagementDecision?: boolean;
+      }) => void;
     }
   }
 }

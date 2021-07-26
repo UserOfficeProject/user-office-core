@@ -5,8 +5,10 @@ import { UserContext } from 'context/UserContextProvider';
 import {
   BasicUserDetails,
   QuestionaryStep,
+  ShipmentFragment,
   ShipmentStatus,
   TemplateCategoryId,
+  VisitFragment,
 } from 'generated/sdk';
 import {
   ShipmentBasic,
@@ -19,7 +21,9 @@ import ShipmentContainer from './ShipmentContainer';
 function createShipmentStub(
   creator: BasicUserDetails,
   questionarySteps: QuestionaryStep[],
-  templateId: number
+  templateId: number,
+  visitId: number,
+  proposalPk: number
 ): ShipmentExtended {
   return {
     id: 0,
@@ -27,9 +31,10 @@ function createShipmentStub(
     status: ShipmentStatus.DRAFT,
     externalRef: '',
     questionaryId: 0,
+    visitId: visitId,
     created: new Date(),
     creatorId: creator.id,
-    proposalPk: 0,
+    proposalPk: proposalPk,
     questionary: {
       questionaryId: 0,
       templateId: templateId,
@@ -44,9 +49,12 @@ function createShipmentStub(
 }
 
 interface CreateShipmentProps {
-  close: (shipment: ShipmentBasic | null) => void;
+  visit: VisitFragment & {
+    shipments: ShipmentFragment[];
+  };
+  onShipmentSubmitted: (shipment: ShipmentBasic) => void;
 }
-function CreateShipment({ close }: CreateShipmentProps) {
+function CreateShipment({ visit, onShipmentSubmitted }: CreateShipmentProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [blankShipment, setBlankShipment] = useState<ShipmentExtended>();
@@ -69,7 +77,9 @@ function CreateShipment({ close }: CreateShipmentProps) {
                 const blankShipment = createShipmentStub(
                   user,
                   result.blankQuestionarySteps,
-                  data.activeTemplateId as number
+                  data.activeTemplateId!,
+                  visit.id,
+                  visit.proposalPk
                 );
                 setBlankShipment(blankShipment);
               }
@@ -79,7 +89,7 @@ function CreateShipment({ close }: CreateShipmentProps) {
           setNoActiveShipmentTemplates(true);
         }
       });
-  }, [setBlankShipment, api, user]);
+  }, [setBlankShipment, api, user, visit]);
 
   if (noActiveShipmentTemplates) {
     return <div>No active templates found</div>;
@@ -92,7 +102,7 @@ function CreateShipment({ close }: CreateShipmentProps) {
   return (
     <ShipmentContainer
       shipment={blankShipment}
-      done={(shipment) => close({ ...shipment })} // because of immer immutable object we clone it before sending out
+      onShipmentSubmitted={onShipmentSubmitted}
     />
   );
 }
