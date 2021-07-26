@@ -67,9 +67,9 @@ context('Template tests', () => {
 
     cy.contains(sampleDeclarationName);
 
-    cy.get('[data-cy=topic-title]').click();
+    cy.get('[data-cy="topic-title-edit"]').click();
 
-    cy.get('[data-cy=topic-title-input]')
+    cy.get('[data-cy=topic-title-input] input')
       .clear()
       .type(`${faker.random.words(1)}{enter}`);
 
