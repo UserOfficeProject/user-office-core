@@ -1,5 +1,5 @@
-mutation createShipment($title: String!, $proposalPk: Int!) {
-  createShipment(title: $title, proposalPk: $proposalPk) {
+mutation createShipment($title: String!, $proposalPk: Int!, $visitId: Int!) {
+  createShipment(title: $title, proposalPk: $proposalPk, visitId: $visitId) {
     shipment {
       ...shipment
       questionary {

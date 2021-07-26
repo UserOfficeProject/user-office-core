@@ -5,20 +5,46 @@ import {
   Proposal,
   ProposalBookingStatus,
   Instrument,
+  VisitFragment,
+  Questionary,
+  Maybe,
+  Visit,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { RegistrationBasic } from 'models/VisitSubmissionState';
 import { toTzLessDateTime } from 'utils/Time';
 
-import { VisitFragment } from './../../generated/sdk';
+import {
+  BasicUserDetailsFragment,
+  ShipmentFragment,
+} from './../../generated/sdk';
 
 export type ProposalScheduledEvent = Pick<
   ScheduledEvent,
-  'startsAt' | 'endsAt'
+  'startsAt' | 'endsAt' | 'id'
 > & {
-  proposal: Pick<Proposal, 'primaryKey' | 'title' | 'proposalId'> & {
-    visits: VisitFragment[] | null;
+  proposal: Pick<
+    Proposal,
+    | 'primaryKey'
+    | 'title'
+    | 'proposalId'
+    | 'finalStatus'
+    | 'managementDecisionSubmitted'
+  > & {
+    proposer: BasicUserDetailsFragment | null;
+  } & {
+    users: BasicUserDetailsFragment[];
+  } & {
+    riskAssessmentQuestionary: Maybe<Pick<Questionary, 'questionaryId'>>;
   };
   instrument: Pick<Instrument, 'id' | 'name'> | null;
+} & {
+  visit:
+    | (VisitFragment & {
+        registrations: RegistrationBasic[];
+        shipments: ShipmentFragment[];
+      } & Pick<Visit, 'teamLead'>)
+    | null;
 };
 
 export function useProposalBookingsScheduledEvents({
@@ -60,15 +86,23 @@ export function useProposalBookingsScheduledEvents({
             proposal.proposalBooking?.scheduledEvents.forEach(
               (scheduledEvent) => {
                 proposalScheduledEvent.push({
+                  id: scheduledEvent.id,
                   startsAt: scheduledEvent.startsAt,
                   endsAt: scheduledEvent.endsAt,
                   proposal: {
                     primaryKey: proposal.primaryKey,
                     title: proposal.title,
                     proposalId: proposal.proposalId,
-                    visits: proposal.visits,
+                    proposer: proposal.proposer,
+                    users: proposal.users,
+                    riskAssessmentQuestionary:
+                      proposal.riskAssessmentQuestionary,
+                    finalStatus: proposal.finalStatus,
+                    managementDecisionSubmitted:
+                      proposal.managementDecisionSubmitted,
                   },
                   instrument: proposal.instrument,
+                  visit: scheduledEvent.visit,
                 });
               }
             )
@@ -85,5 +119,5 @@ export function useProposalBookingsScheduledEvents({
     };
   }, [onlyUpcoming, notDraft, instrumentId, api]);
 
-  return { loading, proposalScheduledEvents };
+  return { loading, proposalScheduledEvents, setProposalScheduledEvents };
 }

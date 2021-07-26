@@ -84,6 +84,7 @@ function Questionary({
         nonLinear
         activeStep={state.stepIndex}
         className={classes.stepper}
+        data-cy="questionary-stepper"
       >
         {state.wizardSteps.map((wizardStep, index) => {
           const stepMetadata = wizardStep.getMetadata(
