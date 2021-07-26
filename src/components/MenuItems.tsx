@@ -221,19 +221,6 @@ const SamplesMenuListItem = () => {
   );
 };
 
-const ShipmentMenuListItem = () => {
-  return (
-    <Tooltip title="Sample shipments">
-      <ListItem component={NavLink} to="/Shipments" button>
-        <ListItemIcon>
-          <LocalShippingIcon />
-        </ListItemIcon>
-        <ListItemText primary="Sample shipments" />
-      </ListItem>
-    </Tooltip>
-  );
-};
-
 const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const proposalDisabled = callsData.length === 0;
   const multipleCalls = callsData.length > 1;
@@ -292,14 +279,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           </ListItem>
         </Tooltip>
       )}
-      <Tooltip title="Visits">
-        <ListItem component={NavLink} to="/MyVisits" button>
-          <ListItemIcon>
-            <FlightTakeoffIcon />
-          </ListItemIcon>
-          <ListItemText primary="Visits" />
-        </ListItem>
-      </Tooltip>
+
       <Tooltip title="Help">
         <ListItem component={NavLink} to="/HelpPage" button>
           <ListItemIcon>
@@ -379,7 +359,6 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       <SamplesMenuListItem />
-      {isShipmentFeatureEnabled && <ShipmentMenuListItem />}
       <SettingsMenuListItem />
     </div>
   );

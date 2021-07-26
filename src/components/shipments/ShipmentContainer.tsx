@@ -16,6 +16,7 @@ import {
   WizardStep,
 } from 'models/QuestionarySubmissionState';
 import {
+  ShipmentBasic,
   ShipmentExtended,
   ShipmentSubmissionState,
 } from 'models/ShipmentSubmissionState';
@@ -105,7 +106,7 @@ const createReviewWizardStep = (): WizardStep => ({
 });
 export default function ShipmentContainer(props: {
   shipment: ShipmentExtended;
-  done?: (shipment: ShipmentExtended) => void;
+  onShipmentSubmitted?: (shipment: ShipmentBasic) => void;
 }) {
   const { api } = useDataApiWithFeedback();
 
@@ -131,15 +132,10 @@ export default function ShipmentContainer(props: {
           <QuestionaryStepView
             readonly={isReadonly}
             topicId={metadata.payload.topicId}
-            onStepComplete={() => {
-              props.done?.(state.shipment);
-            }}
           />
         );
       case 'ShipmentReview':
-        return (
-          <ShipmentReview onComplete={() => props.done?.(state.shipment)} />
-        );
+        return <ShipmentReview />;
 
       default:
         throw new Error(`Unknown step type ${metadata.type}`);
@@ -195,6 +191,10 @@ export default function ShipmentContainer(props: {
 
         case 'RESET_CLICKED':
           handleReset();
+          break;
+
+        case 'SHIPMENT_SUBMITTED':
+          props.onShipmentSubmitted?.(state.shipment);
           break;
       }
     };

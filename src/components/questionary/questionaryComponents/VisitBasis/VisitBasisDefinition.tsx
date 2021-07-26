@@ -23,6 +23,6 @@ export const visitBasisDefinition: QuestionaryComponentDefinition = {
   getYupInitialValue: ({ state }) => {
     const visitState = state as VisitSubmissionState;
 
-    return visitState.visit;
+    return visitState.registration;
   },
 };
