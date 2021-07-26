@@ -2,11 +2,16 @@ import * as Yup from 'yup';
 
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { getCurrentUser } from 'context/UserContextProvider';
+import { UserRole } from 'generated/sdk';
 
 export const createProposalBasisValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] = () => {
   const MAX_TITLE_LEN = 175;
   const MAX_ABSTRACT_LEN = 1500;
   const currentUser = getCurrentUser();
+  const isUserOfficer =
+    currentUser?.roles
+      .map((role) => role.shortCode.toUpperCase())
+      .includes(UserRole.USER_OFFICER.toUpperCase()) || false;
 
   const schema = Yup.object().shape({
     title: Yup.string()
@@ -25,7 +30,8 @@ export const createProposalBasisValidationSchema: QuestionaryComponentDefinition
     users: Yup.array()
       .of(Yup.number())
       .when('proposer', {
-        is: (proposerId: number) => proposerId !== currentUser?.user.id,
+        is: (proposerId: number) =>
+          proposerId !== currentUser?.user.id && !isUserOfficer,
         then: Yup.array()
           .of(Yup.number())
           .test(

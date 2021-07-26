@@ -1,13 +1,11 @@
 query getVisit($visitId: Int!) {
   visit(visitId: $visitId) {
     ...visit
-    questionary {
-      ...questionary
-    }
-    team {
-      id
-      firstname
-      lastname
+    registrations {
+      ...visitRegistration
+      user {
+        ...basicUserDetails
+      }
     }
     proposal {
       ...proposal

@@ -38,3 +38,13 @@ export type Unpacked<T> = T extends (infer U)[] ? U : T;
 export type FunctionType<T = void, U = unknown[]> = (
   ...args: U extends unknown[] ? U : [U]
 ) => T;
+
+/**
+ * Exclude null from the type
+ * */
+export type ExcludeNull<T> = Exclude<T, null>;
+
+/**
+ * Exclude type graphql added property __typename
+ * */
+export type ExcludeTypeName<T> = Exclude<T, '__typename'>;
