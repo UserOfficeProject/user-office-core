@@ -6,9 +6,14 @@ import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
-import { BasicUserDetails, UserWithRole } from '../models/User';
+import { UserWithRole } from '../models/User';
+import { VisitRegistration } from '../models/VisitRegistration';
 import { VisitsFilter } from '../resolvers/queries/VisitsQuery';
 import { VisitAuthorization } from './../utils/VisitAuthorization';
+export interface GetRegistrationsFilter {
+  questionaryIds?: number[];
+  visitId?: number;
+}
 
 @injectable()
 export default class VisitQueries {
@@ -23,7 +28,7 @@ export default class VisitQueries {
     public visitAuth: VisitAuthorization
   ) {}
 
-  @Authorized([Roles.USER])
+  @Authorized()
   async getVisit(agent: UserWithRole | null, id: number) {
     const hasRights = await this.visitAuth.hasReadRights(agent, id);
     if (hasRights === false) {
@@ -38,16 +43,32 @@ export default class VisitQueries {
     return this.dataSource.getVisits(filter);
   }
 
-  @Authorized([Roles.USER])
+  @Authorized()
   async getMyVisits(agent: UserWithRole | null, filter?: VisitsFilter) {
     // TODO return also visits you are part of the team
-    return this.dataSource.getVisits({ ...filter, visitorId: agent!.id });
+    return this.dataSource.getVisits({ ...filter, creatorId: agent!.id });
   }
 
-  async getTeam(
+  async getRegistrations(
+    user: UserWithRole | null,
+    filter: GetRegistrationsFilter
+  ): Promise<VisitRegistration[]> {
+    return this.dataSource.getRegistrations(filter);
+  }
+
+  @Authorized()
+  async getRegistration(
     user: UserWithRole | null,
     visitId: number
-  ): Promise<BasicUserDetails[]> {
-    return this.dataSource.getTeam(visitId);
+  ): Promise<VisitRegistration | null> {
+    return this.dataSource.getRegistration(user!.id, visitId);
+  }
+
+  @Authorized()
+  async getVisitByScheduledEventId(
+    agent: UserWithRole | null,
+    eventId: number
+  ) {
+    return this.dataSource.getVisitByScheduledEventId(eventId);
   }
 }

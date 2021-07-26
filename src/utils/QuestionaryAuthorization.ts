@@ -200,16 +200,17 @@ class VisitQuestionaryAuthorizer implements QuestionaryAuthorizer {
       return true;
     }
 
-    const visit = (
-      await this.visitDataSource.getVisits({
-        questionaryId: questionaryId,
+    const registration = (
+      await this.visitDataSource.getRegistrations({
+        questionaryIds: [questionaryId],
       })
     )[0];
-    if (!visit) {
+
+    if (!registration) {
       return false;
     }
 
-    return this.visitAuth.hasReadRights(agent, visit.id);
+    return this.visitAuth.hasReadRights(agent, registration.visitId);
   }
   async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
     if (!agent) {
@@ -220,16 +221,27 @@ class VisitQuestionaryAuthorizer implements QuestionaryAuthorizer {
       return true;
     }
 
-    const visit = (
-      await this.visitDataSource.getVisits({
-        questionaryId: questionaryId,
+    const registration = (
+      await this.visitDataSource.getRegistrations({
+        questionaryIds: [questionaryId],
       })
     )[0];
-    if (!visit) {
+
+    if (!registration) {
       return false;
     }
 
-    return this.visitAuth.hasWriteRights(agent, visit.id);
+    if (registration.isRegistrationSubmitted) {
+      logger.logError('User tried to update visit that is already submitted', {
+        agent,
+        questionaryId,
+        registration,
+      });
+
+      return false;
+    }
+
+    return registration.userId === agent.id;
   }
 }
 

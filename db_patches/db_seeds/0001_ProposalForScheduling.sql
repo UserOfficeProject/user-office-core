@@ -9,12 +9,11 @@ BEGIN
   INSERT INTO call_has_instruments (call_id, instrument_id, availability_time, submitted) VALUES (1, 1, NULL, false);
   INSERT INTO call_has_instruments (call_id, instrument_id, availability_time, submitted) VALUES (1, 3, NULL, false);
 
-  INSERT INTO questionaries(questionary_id, template_id, created_at, creator_id) VALUES (1, 1, NOW(), 1);
+  INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (1, NOW(), 1);
 
   INSERT INTO proposals 
     (
-       proposal_pk
-     , title
+       title
      , abstract
      , status_id
      , proposer_id
@@ -31,8 +30,7 @@ BEGIN
     )
     VALUES 
     (
-       1                  -- proposal_pk
-     , 'Test proposal'    -- title
+       'Test proposal'    -- title
      , 'Lorem ipsum'      -- abstract
      , 8                  -- status_id
      , 1                  -- proposer_id

@@ -47,6 +47,7 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.referenceNumberSequence || 0,
     values?.managementTimeAllocation || 0,
     values?.managementDecisionSubmitted || false,
+    values?.technicalReviewAssignee || null,
     0
   );
 };

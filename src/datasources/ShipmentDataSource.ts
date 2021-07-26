@@ -8,7 +8,8 @@ export interface ShipmentDataSource {
     title: string,
     creatorId: number,
     proposalPk: number,
-    questionaryId: number
+    questionaryId: number,
+    visitId: number
   ): Promise<Shipment>;
   getShipment(shipmentId: number): Promise<Shipment | null>;
   getShipments(args: ShipmentsArgs): Promise<Shipment[]>;

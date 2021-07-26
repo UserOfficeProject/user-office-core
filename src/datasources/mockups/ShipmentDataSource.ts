@@ -18,6 +18,7 @@ export class ShipmentDataSourceMock implements ShipmentDataSource {
         1,
         1,
         1,
+        1,
         ShipmentStatus.DRAFT,
         'abc',
         new Date()
@@ -40,7 +41,8 @@ export class ShipmentDataSourceMock implements ShipmentDataSource {
     title: string,
     creatorId: number,
     proposalPk: number,
-    questionaryId: number
+    questionaryId: number,
+    visitId: number
   ): Promise<Shipment> {
     return new Shipment(
       1,
@@ -48,6 +50,7 @@ export class ShipmentDataSourceMock implements ShipmentDataSource {
       creatorId,
       proposalPk,
       questionaryId,
+      visitId,
       ShipmentStatus.DRAFT,
       '',
       new Date()

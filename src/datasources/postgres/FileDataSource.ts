@@ -146,10 +146,8 @@ export default class PostgresFileDataSource implements FileDataSource {
         connection.emit('error', err);
         database.client.releaseConnection(connection);
 
-        return reject(`Could not create readale stream \n${err}`);
+        return reject(`Could not create readable stream \n${err}`);
       }
-
-      console.log('Streaming a large object with a total size of', size);
 
       stream.on('end', function () {
         connection?.query('COMMIT', () => resolve());
