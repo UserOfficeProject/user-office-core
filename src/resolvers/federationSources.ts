@@ -6,6 +6,7 @@ import { resolveBasicUserReference } from './types/BasicUserDetails';
 import { resolveCallReference } from './types/Call';
 import { resolveInstrumentReference } from './types/Instrument';
 import { resolveProposalReference } from './types/Proposal';
+import { ScheduledEvent } from './types/ScheduledEvent';
 import { resolveUserReference } from './types/User';
 
 export default function federationSources(): {
@@ -13,7 +14,7 @@ export default function federationSources(): {
   referenceResolvers: GraphQLResolverMap<ResolverContext>;
 } {
   return {
-    orphanedTypes: [],
+    orphanedTypes: [ScheduledEvent],
     referenceResolvers: {
       User: { __resolveReference: resolveUserReference },
       BasicUser: { __resolveReference: resolveBasicUserReference },

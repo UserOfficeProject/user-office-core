@@ -489,6 +489,7 @@ export default class ProposalMutations {
         managementTimeAllocation: 0,
         managementDecisionSubmitted: false,
         technicalReviewAssignee: clonedProposal.technicalReviewAssignee,
+        riskAssessmentQuestionaryId: null,
       });
 
       const proposalUsers = await this.userDataSource.getProposalUsers(

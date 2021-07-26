@@ -17,8 +17,14 @@ export class CreateVisitArgs {
   @Field(() => Int)
   proposalPk: number;
 
-  @Field(() => [Int], { nullable: true })
-  team?: number[];
+  @Field(() => Int)
+  scheduledEventId: number;
+
+  @Field(() => [Int!])
+  team: number[];
+
+  @Field(() => Int)
+  teamLeadUserId: number;
 }
 
 @Resolver()
