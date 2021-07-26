@@ -90,7 +90,8 @@ export default class ShipmentMutations {
           args.title,
           agent.id,
           args.proposalPk,
-          questionary.questionaryId
+          questionary.questionaryId,
+          args.visitId
         );
       })
       .catch((error) => {

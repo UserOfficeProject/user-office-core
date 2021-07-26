@@ -13,7 +13,8 @@ import { Visit as VisitOrigin } from '../../models/Visit';
 import { VisitStatus } from '../../models/Visit';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Proposal } from './Proposal';
-import { Questionary } from './Questionary';
+import { Shipment } from './Shipment';
+import { VisitRegistration } from './VisitRegistration';
 
 @ObjectType()
 export class Visit implements Partial<VisitOrigin> {
@@ -27,10 +28,10 @@ export class Visit implements Partial<VisitOrigin> {
   public status: VisitStatus;
 
   @Field(() => Int)
-  public questionaryId: number;
+  public creatorId: number;
 
   @Field(() => Int)
-  public visitorId: number;
+  public teamLeadUserId: number;
 }
 
 @Resolver(() => Visit)
@@ -43,22 +44,31 @@ export class VisitResolver {
     return context.queries.proposal.get(context.user, visit.proposalPk);
   }
 
-  @FieldResolver(() => [BasicUserDetails])
-  async team(
+  @FieldResolver(() => [VisitRegistration])
+  async registrations(
     @Root() visit: Visit,
     @Ctx() context: ResolverContext
-  ): Promise<BasicUserDetails[] | null> {
-    return context.queries.visit.getTeam(context.user, visit.id);
+  ): Promise<VisitRegistration[] | null> {
+    return context.queries.visit.getRegistrations(context.user, {
+      visitId: visit.id,
+    });
   }
 
-  @FieldResolver(() => Questionary)
-  async questionary(
+  @FieldResolver(() => BasicUserDetails)
+  async teamLead(
     @Root() visit: Visit,
     @Ctx() context: ResolverContext
-  ): Promise<Questionary | null> {
-    return context.queries.questionary.getQuestionary(
-      context.user,
-      visit.questionaryId
-    );
+  ): Promise<BasicUserDetails | null> {
+    return context.queries.user.getBasic(context.user, visit.teamLeadUserId);
+  }
+
+  @FieldResolver(() => [Shipment])
+  async shipments(
+    @Root() visit: Visit,
+    @Ctx() context: ResolverContext
+  ): Promise<Shipment[] | null> {
+    return context.queries.shipment.getShipments(context.user, {
+      filter: { visitId: visit.id },
+    });
   }
 }
