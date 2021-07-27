@@ -175,6 +175,68 @@ context('Proposal tests', () => {
       .should('contain.text', 'SEP Meeting');
   });
 
+  it('User officer should be able to see proposal status when opening change status modal', () => {
+    cy.login('officer');
+
+    cy.contains(clonedProposalTitle).parent().find('[type="checkbox"]').check();
+
+    cy.get('[data-cy="change-proposal-status"]').click();
+
+    cy.finishedLoading();
+
+    cy.get('[role="presentation"]')
+      .find('input[name="selectedStatusId"]')
+      .should('have.value', '12');
+    cy.get('#mui-component-select-selectedStatusId').should(
+      'have.text',
+      'SEP Meeting'
+    );
+
+    // Close the modal
+    cy.get('body').trigger('keydown', { keyCode: 27 });
+
+    cy.contains(proposalToCloneTitle)
+      .parent()
+      .find('[type="checkbox"]')
+      .check();
+
+    cy.get('[data-cy="change-proposal-status"]').click();
+
+    cy.finishedLoading();
+
+    cy.get('[role="presentation"]')
+      .find('input[name="selectedStatusId"]')
+      .should('have.value', '12');
+
+    cy.get('#mui-component-select-selectedStatusId').should(
+      'have.text',
+      'SEP Meeting'
+    );
+
+    // Close the modal
+    cy.get('body').trigger('keydown', { keyCode: 27 });
+
+    cy.changeProposalStatus('SEP_REVIEW', clonedProposalTitle);
+
+    cy.contains(proposalToCloneTitle)
+      .parent()
+      .find('[type="checkbox"]')
+      .check();
+
+    cy.get('[data-cy="change-proposal-status"]').click();
+
+    cy.get('[role="presentation"]')
+      .find('input[name="selectedStatusId"]')
+      .should('not.have.value');
+
+    cy.get('[data-cy="proposal-different-statuses-change"]')
+      .should('exist')
+      .should(
+        'have.text',
+        'Be aware that selected proposals have different statuses and changing status will affect all of them.'
+      );
+  });
+
   it('Should be able to delete proposal', () => {
     cy.login('user');
 
