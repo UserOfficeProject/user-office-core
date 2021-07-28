@@ -2,7 +2,6 @@ import {
   createMuiTheme,
   responsiveFontSizes,
   useTheme,
-  StylesProvider,
 } from '@material-ui/core';
 import createPalette from '@material-ui/core/styles/createPalette';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
@@ -67,8 +66,7 @@ const Theme: React.FC = (props) => {
     })
   );
 
-  useEffect(() => {
-    // Update root CSS variables when settings are changed
+  async function updateCssPalette() {
     settings.forEach((setting) => {
       if (setting.id.startsWith('PALETTE')) {
         document.documentElement.style.setProperty(
@@ -77,13 +75,15 @@ const Theme: React.FC = (props) => {
         );
       }
     });
+  }
+
+  updateCssPalette();
+
+  useEffect(() => {
+    updateCssPalette();
   }, [settings]);
 
-  return (
-    <StylesProvider>
-      <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
-    </StylesProvider>
-  );
+  return <ThemeProvider theme={theme}>{props.children}</ThemeProvider>;
 };
 
 export default Theme;
