@@ -165,4 +165,22 @@ context('visits tests', () => {
 
     cy.testActionButton(registerVisitTitle, 'completed');
   });
+
+  it('User should not see register for visit button if he is not a visitor', () => {
+    cy.login({ email: 'Javon4@hotmail.com', password: 'Test1234!' });
+
+    cy.contains(/Upcoming experiments/i).should('exist');
+
+    cy.testActionButton(registerVisitTitle, 'completed');
+
+    cy.get(`[title="${formTeamTitle}"]`).click();
+
+    cy.contains('Carlsson').parent().find('[title=Delete]').click();
+
+    cy.get('[title="Save"]').click();
+
+    cy.get('[data-cy=create-visit-button]').click();
+
+    cy.testActionButton(registerVisitTitle, 'invisible');
+  });
 });
