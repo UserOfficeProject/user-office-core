@@ -1,3 +1,4 @@
+import { booleanQuestionValidationSchema } from '@esss-swap/duo-validation';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import React from 'react';
 
@@ -7,7 +8,6 @@ import { DataType } from 'generated/sdk';
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import BooleanAnswerRenderer from './BooleanAnswerRenderer';
 import BooleanSearchCriteriaInput from './BooleanSearchCriteriaInput';
-import { createBooleanValidationSchema } from './createBooleanValidationSchema';
 import { QuestionaryComponentBoolean } from './QuestionaryComponentBoolean';
 import { QuestionBooleanForm } from './QuestionBooleanForm';
 import { QuestionTemplateRelationBooleanForm } from './QuestionTemplateRelationBooleanForm';
@@ -25,7 +25,7 @@ export const booleanDefinition: QuestionaryComponentDefinition = {
     questionRenderer: defaultRenderer.questionRenderer,
     answerRenderer: BooleanAnswerRenderer,
   },
-  createYupValidationSchema: createBooleanValidationSchema,
+  createYupValidationSchema: booleanQuestionValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || false,
   searchCriteriaComponent: BooleanSearchCriteriaInput,
 };

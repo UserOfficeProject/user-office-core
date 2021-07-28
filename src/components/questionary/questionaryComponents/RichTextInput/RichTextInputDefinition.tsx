@@ -1,10 +1,10 @@
+import { richTextInputQuestionValidationSchema } from '@esss-swap/duo-validation';
 import TextFormatIcon from '@material-ui/icons/TextFormat';
 import React from 'react';
 
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { DataType } from 'generated/sdk';
 
-import { createRichTextInputValidationSchema } from './createRichTextInputValidationSchema';
 import { QuestionaryComponentRichTextInput } from './QuestionaryComponentRichTextInput';
 import { QuestionRichTextInputForm } from './QuestionRichTextInputForm';
 import { QuestionTemplateRelationRichTextInputForm } from './QuestionTemplateRelationRichTextInputForm';
@@ -26,6 +26,6 @@ export const richTextInputDefinition: QuestionaryComponentDefinition = {
     questionRenderer: RichTextInputQuestionRenderer,
     answerRenderer: RichTextInputAnswerRenderer,
   },
-  createYupValidationSchema: createRichTextInputValidationSchema,
+  createYupValidationSchema: richTextInputQuestionValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || '',
 };

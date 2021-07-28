@@ -1,3 +1,4 @@
+import { dateQuestionValidationSchema } from '@esss-swap/duo-validation';
 import TodayIcon from '@material-ui/icons/Today';
 import React from 'react';
 
@@ -5,7 +6,6 @@ import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
-import { createDateValidationSchema } from './createDateValidationSchema';
 import DateAnswerRenderer from './DateAnswerRenderer';
 import DateSearchCriteriaInput from './DateSearchCriteriaInput';
 import { preSubmitDateTransform } from './preSubmitDateTransform';
@@ -26,7 +26,7 @@ export const dateDefinition: QuestionaryComponentDefinition = {
     questionRenderer: defaultRenderer.questionRenderer,
     answerRenderer: DateAnswerRenderer,
   },
-  createYupValidationSchema: createDateValidationSchema,
+  createYupValidationSchema: dateQuestionValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value,
   searchCriteriaComponent: DateSearchCriteriaInput,
   preSubmitTransform: preSubmitDateTransform,
