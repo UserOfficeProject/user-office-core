@@ -5,6 +5,7 @@ export class Shipment {
     public creatorId: number,
     public proposalPk: number,
     public questionaryId: number,
+    public visitId: number,
     public status: ShipmentStatus,
     public externalRef: string,
     public created: Date

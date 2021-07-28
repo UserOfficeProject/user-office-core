@@ -100,7 +100,7 @@ export class TextInputConfig extends ConfigBase {
 export class ShipmentBasisConfig extends ConfigBase {}
 
 @ObjectType()
-export class SubtemplateConfig {
+export class SubTemplateConfig {
   @Field(() => Int, { nullable: true })
   minEntries: number | null;
 
@@ -166,7 +166,7 @@ export const FieldConfigType = createUnionType({
     SelectionFromOptionsConfig,
     TextInputConfig,
     SampleBasisConfig,
-    SubtemplateConfig,
+    SubTemplateConfig,
     ProposalBasisConfig,
     IntervalConfig,
     NumberInputConfig,

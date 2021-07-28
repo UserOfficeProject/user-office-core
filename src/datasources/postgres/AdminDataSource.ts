@@ -15,6 +15,7 @@ import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAc
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource, Entry } from '../AdminDataSource';
 import { FeatureId } from './../../models/Feature';
+import { SettingsId } from './../../models/Settings';
 import { InstitutionsFilter } from './../../resolvers/queries/InstitutionsQuery';
 import database from './database';
 import {
@@ -483,6 +484,18 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       permissionRules.access_token,
       JSON.stringify(permissionRules.access_permissions)
     );
+  }
+
+  async updateSettings(
+    id: SettingsId,
+    value?: string,
+    description?: string
+  ): Promise<Settings> {
+    return database('settings')
+      .update({ settings_value: value, description: description })
+      .where('settings_id', id)
+      .returning('*')
+      .then((records: SettingsRecord[]) => createSettingsObject(records[0]));
   }
 
   async deleteApiAccessToken(accessTokenId: string): Promise<boolean> {

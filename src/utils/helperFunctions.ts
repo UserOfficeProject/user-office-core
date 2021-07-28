@@ -25,7 +25,7 @@ export const omit: Omit = (obj, ...keys) => {
   return ret;
 };
 
-export const mergeValidationSchemas = (...schemas: Yup.ObjectSchema[]) => {
+export const mergeValidationSchemas = (...schemas: Yup.AnyObjectSchema[]) => {
   const [first, ...rest] = schemas;
 
   const merged = rest.reduce(

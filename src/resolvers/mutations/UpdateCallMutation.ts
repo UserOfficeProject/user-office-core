@@ -66,7 +66,7 @@ export class UpdateCallInput {
   @Field(() => AllocationTimeUnits)
   public allocationTimeUnit: AllocationTimeUnits;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   public proposalWorkflowId: number;
 
   @Field(() => Int, { nullable: true })
@@ -78,8 +78,8 @@ export class UpdateCallInput {
   @Field(() => Int, { nullable: true })
   public callSEPReviewEnded?: boolean;
 
-  @Field(() => Int, { nullable: true })
-  public templateId?: number;
+  @Field(() => Int)
+  public templateId: number;
 }
 
 @InputType()

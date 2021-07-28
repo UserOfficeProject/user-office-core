@@ -5,7 +5,10 @@ import { sanitizerConfig } from '../models/questionTypes/RichTextInput';
 import { Rejection, rejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
 
-const schemaValidation = async (schema: Yup.ObjectSchema, inputArgs: any) => {
+const schemaValidation = async (
+  schema: Yup.AnyObjectSchema,
+  inputArgs: unknown
+) => {
   try {
     await schema.validate(inputArgs, { abortEarly: false });
   } catch (error) {
@@ -15,15 +18,18 @@ const schemaValidation = async (schema: Yup.ObjectSchema, inputArgs: any) => {
   return null;
 };
 
-const ValidateArgs = (schema: Yup.ObjectSchema, sanitizeInput?: string[]) => {
+const ValidateArgs = (
+  schema: Yup.AnyObjectSchema,
+  sanitizeInput?: string[]
+) => {
   return (
-    target: any,
+    target: unknown,
     name: string,
     descriptor: {
       value?: (
         agent: UserWithRole | null,
         args: any
-      ) => Promise<Rejection | any>;
+      ) => Promise<Rejection | unknown>;
     }
   ) => {
     const originalMethod = descriptor.value;
