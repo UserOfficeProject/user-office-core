@@ -5,7 +5,7 @@ import {
 } from '@material-ui/core';
 import createPalette from '@material-ui/core/styles/createPalette';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
-import React, { useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { useEffect } from 'react';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
@@ -66,22 +66,23 @@ const Theme: React.FC = (props) => {
     })
   );
 
-  async function updateCssPalette() {
-    settings.forEach((setting) => {
-      if (setting.id.startsWith('PALETTE')) {
-        document.documentElement.style.setProperty(
-          '--' + setting.id,
-          setting.settingsValue
-        );
-      }
-    });
-  }
-
-  updateCssPalette();
+  const updateCssPalette = useCallback(
+    async function () {
+      settings.forEach((setting) => {
+        if (setting.id.startsWith('PALETTE')) {
+          document.documentElement.style.setProperty(
+            '--' + setting.id,
+            setting.settingsValue
+          );
+        }
+      });
+    },
+    [settings]
+  );
 
   useEffect(() => {
     updateCssPalette();
-  }, [settings]);
+  }, [updateCssPalette]);
 
   return <ThemeProvider theme={theme}>{props.children}</ThemeProvider>;
 };
