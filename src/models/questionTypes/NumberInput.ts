@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import * as Yup from 'yup';
+import { numberInputQuestionValidationSchema } from '@esss-swap/duo-validation';
 
 import {
   NumberInputConfig,
@@ -25,37 +25,10 @@ export const numberInputDefinition: Question = {
       throw new Error('DataType should be NUMBER_INPUT');
     }
 
-    const config = field.config as NumberInputConfig;
-
-    let valueScheme = Yup.number().transform((value) =>
-      isNaN(value) ? undefined : value
-    );
-
-    if (config.required) {
-      valueScheme = valueScheme.required();
-    }
-
-    if (config.numberValueConstraint === NumberValueConstraint.ONLY_NEGATIVE) {
-      valueScheme = valueScheme.negative();
-    }
-
-    if (config.numberValueConstraint === NumberValueConstraint.ONLY_POSITIVE) {
-      valueScheme = valueScheme.positive();
-    }
-
-    let unitScheme = Yup.string().nullable();
-
-    // available units are specified and the field is required
-    if (config.units?.length && config.required) {
-      unitScheme = unitScheme.required('Please specify unit');
-    }
-
-    return Yup.object()
-      .shape({
-        value: valueScheme,
-        unit: unitScheme,
-      })
-      .isValidSync(value);
+    return numberInputQuestionValidationSchema(
+      field,
+      NumberValueConstraint
+    ).isValidSync(value);
   },
   createBlankConfig: (): NumberInputConfig => {
     const config = new NumberInputConfig();

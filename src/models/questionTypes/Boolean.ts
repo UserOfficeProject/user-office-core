@@ -1,4 +1,6 @@
 /* eslint-disable quotes */
+import { booleanQuestionValidationSchema } from '@esss-swap/duo-validation';
+
 import { BooleanConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -6,17 +8,12 @@ import { Question } from './QuestionRegistry';
 
 export const booleanDefinition: Question = {
   dataType: DataType.BOOLEAN,
-  validate: (field: QuestionTemplateRelation, value: any) => {
+  validate: (field: QuestionTemplateRelation, value: boolean) => {
     if (field.question.dataType !== DataType.BOOLEAN) {
       throw new Error('DataType should be BOOLEAN');
     }
 
-    const config = field.config as BooleanConfig;
-    if (config.required && !value) {
-      return false;
-    }
-
-    return true;
+    return booleanQuestionValidationSchema(field).isValidSync(value);
   },
   createBlankConfig: (): BooleanConfig => {
     const config = new BooleanConfig();

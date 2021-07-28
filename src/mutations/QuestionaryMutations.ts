@@ -110,7 +110,7 @@ export default class QuestionaryMutations {
           !isMatchingConstraints(questionTemplateRelation, value)
         ) {
           return rejection(
-            'Can not answer topic because provided value is not sattisfying constraint',
+            'Can not answer topic because provided value is not satisfying constraint',
             { answer, questionTemplateRelation }
           );
         }
