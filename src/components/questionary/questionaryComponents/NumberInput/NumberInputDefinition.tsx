@@ -1,11 +1,11 @@
+import { numberInputQuestionValidationSchema } from '@esss-swap/duo-validation';
 import ExposureZeroIcon from '@material-ui/icons/ExposureZero';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
-import { DataType } from 'generated/sdk';
+import { DataType, NumberValueConstraint } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
-import { createNumberInputValidationSchema } from './createNumberInputValidationSchema';
 import NumberInputAnswerRenderer from './NumberInputAnswerRenderer';
 import NumberSearchCriteriaComponent from './NumberSearchCriteriaComponent';
 import { QuestionaryComponentNumber } from './QuestionaryComponentNumberInput';
@@ -26,7 +26,8 @@ export const numberInputDefinition: QuestionaryComponentDefinition = {
     questionRenderer: defaultRenderer.questionRenderer,
   },
 
-  createYupValidationSchema: createNumberInputValidationSchema,
+  createYupValidationSchema: (field) =>
+    numberInputQuestionValidationSchema(field, NumberValueConstraint),
   getYupInitialValue: ({ answer }) => answer.value || { value: '', unit: null },
   searchCriteriaComponent: NumberSearchCriteriaComponent,
 };
