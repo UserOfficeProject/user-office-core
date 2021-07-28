@@ -32,6 +32,7 @@ describe('Test Call Mutations', () => {
         surveyComment: 'Comment feedback',
         proposalWorkflowId: 1,
         allocationTimeUnit: AllocationTimeUnits.Day,
+        templateId: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -64,6 +65,7 @@ describe('Test Call Mutations', () => {
         surveyComment: 'Comment feedback',
         proposalWorkflowId: 1,
         allocationTimeUnit: AllocationTimeUnits.Day,
+        templateId: 1,
       })
     ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
   });
@@ -87,6 +89,7 @@ describe('Test Call Mutations', () => {
       surveyComment: 'Comment feedback',
       proposalWorkflowId: 1,
       allocationTimeUnit: AllocationTimeUnits.Day,
+      templateId: 1,
     };
 
     return expect(
@@ -113,6 +116,7 @@ describe('Test Call Mutations', () => {
       surveyComment: 'Comment feedback',
       proposalWorkflowId: 1,
       allocationTimeUnit: AllocationTimeUnits.Day,
+      templateId: 1,
     };
 
     return expect(
@@ -148,6 +152,7 @@ describe('Test Call Mutations', () => {
         surveyComment: 'Comment feedback update',
         proposalWorkflowId: 1,
         allocationTimeUnit: AllocationTimeUnits.Day,
+        templateId: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -172,6 +177,7 @@ describe('Test Call Mutations', () => {
       surveyComment: 'Comment feedback update',
       proposalWorkflowId: 1,
       allocationTimeUnit: AllocationTimeUnits.Day,
+      templateId: 1,
     };
 
     return expect(

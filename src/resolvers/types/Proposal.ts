@@ -83,6 +83,7 @@ export class Proposal implements Partial<ProposalOrigin> {
   public technicalReviewAssignee: number | null;
 
   public proposerId: number;
+  public riskAssessmentQuestionaryId: number | null;
 }
 
 @Resolver(() => Proposal)
@@ -223,6 +224,21 @@ export class ProposalResolver {
     return await context.queries.visit.getMyVisits(context.user, {
       proposalPk: proposal.primaryKey,
     });
+  }
+
+  @FieldResolver(() => Questionary, { nullable: true })
+  async riskAssessmentQuestionary(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Questionary | null> {
+    if (!proposal.riskAssessmentQuestionaryId) {
+      return null;
+    }
+
+    return await context.queries.questionary.getQuestionary(
+      context.user,
+      proposal.riskAssessmentQuestionaryId
+    );
   }
 }
 

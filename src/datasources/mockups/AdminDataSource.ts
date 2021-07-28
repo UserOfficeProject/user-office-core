@@ -148,6 +148,18 @@ export class AdminDataSourceMock implements AdminDataSource {
     return apiAccessToken;
   }
 
+  async updateSettings(
+    id: SettingsId,
+    value?: string,
+    description?: string
+  ): Promise<Settings> {
+    return {
+      id: id,
+      settingsValue: value || '',
+      description: description || '',
+    };
+  }
+
   async deleteApiAccessToken(accessTokenId: string): Promise<boolean> {
     return true;
   }

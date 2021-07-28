@@ -19,25 +19,43 @@ beforeEach(() => {
 
 test('User can create visit for his proposal', async () => {
   await expect(
-    mutations.createVisit(dummyUserWithRole, { proposalPk: 2 })
+    mutations.createVisit(dummyUserWithRole, {
+      proposalPk: 2,
+      scheduledEventId: 2,
+      teamLeadUserId: 1,
+      team: [1],
+    })
   ).resolves.toBeInstanceOf(Visit);
 });
 
 test('User can not create visit for proposal that is not accepted', async () => {
   await expect(
-    mutations.createVisit(dummyUserWithRole, { proposalPk: 1 })
+    mutations.createVisit(dummyUserWithRole, {
+      proposalPk: 1,
+      scheduledEventId: 1,
+      teamLeadUserId: dummyUserWithRole.id,
+      team: [dummyUserWithRole.id],
+    })
   ).resolves.toBeInstanceOf(Rejection);
 });
 
 test('User can not create visit for someone elses proposal', async () => {
   await expect(
-    mutations.createVisit(dummyUserWithRole, { proposalPk: 99 })
+    mutations.createVisit(dummyUserWithRole, {
+      proposalPk: 99,
+      scheduledEventId: 1,
+      teamLeadUserId: dummyUserWithRole.id,
+      team: [dummyUserWithRole.id],
+    })
   ).resolves.toBeInstanceOf(Rejection);
 });
 
 test('User can update visit', async () => {
   const visit = (await mutations.createVisit(dummyUserWithRole, {
     proposalPk: 2,
+    scheduledEventId: 2,
+    teamLeadUserId: dummyUserWithRole.id,
+    team: [dummyUserWithRole.id],
   })) as Visit;
 
   expect(visit.status).toEqual(VisitStatus.DRAFT);

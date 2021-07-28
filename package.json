@@ -44,7 +44,7 @@
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-logger": "^1.1.0",
     "@esss-swap/duo-message-broker": "^1.0.5",
-    "@esss-swap/duo-validation": "^2.0.4",
+    "@esss-swap/duo-validation": "^2.0.5",
     "apollo-server": "^2.25.1",
     "apollo-server-core": "^2.25.1",
     "apollo-server-express": "^2.25.1",
@@ -80,7 +80,7 @@
     "tsyringe": "^4.5.0",
     "type-graphql": "^1.1.1",
     "typedi": "^0.10.0",
-    "yup": "^0.31.1"
+    "yup": "^0.32.9"
   },
   "devDependencies": {
     "@stfc-user-programme/uows_client_generator": "^1.0.15",

@@ -35,6 +35,9 @@ class ShipmentsFilter {
 
   @Field(() => [Int], { nullable: true })
   public shipmentIds?: number[];
+
+  @Field(() => Int, { nullable: true })
+  public visitId?: number;
 }
 
 @ArgsType()
