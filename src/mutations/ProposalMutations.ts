@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import {
   administrationProposalValidationSchema,
   createProposalValidationSchema,
@@ -156,13 +157,30 @@ export default class ProposalMutations {
       proposal.proposerId = proposerId;
     }
 
-    return this.proposalDataSource.update(proposal).catch((err) => {
-      return rejection(
-        'Could not update proposal',
-        { agent, primaryKey: proposalPk },
-        err
-      );
-    });
+    return this.proposalDataSource
+      .update(proposal)
+      .then((proposal) => {
+        logger.logInfo('User Updated Proposal Details:', {
+          proposalId: proposal.proposalId,
+          title: proposal.title,
+          userId: proposal.proposerId,
+        });
+
+        return proposal;
+      })
+      .catch((err) => {
+        return rejection(
+          'Could not update proposal',
+          {
+            agent,
+            primaryKey: proposalPk,
+            proposalId: proposal.proposalId,
+            title: proposal.title,
+            userId: proposal.proposerId,
+          },
+          err
+        );
+      });
   }
 
   @ValidateArgs(submitProposalValidationSchema)
@@ -202,13 +220,30 @@ export default class ProposalMutations {
       });
     }
 
-    return this.proposalDataSource.submitProposal(proposalPk).catch((error) => {
-      return rejection(
-        'Could not submit proposal',
-        { agent, proposalPk },
-        error
-      );
-    });
+    return this.proposalDataSource
+      .submitProposal(proposalPk)
+      .then((proposal) => {
+        logger.logInfo('User Submitted a Proposal:', {
+          proposalId: proposal.proposalId,
+          title: proposal.title,
+          userId: proposal.proposerId,
+        });
+
+        return proposal;
+      })
+      .catch((error) => {
+        return rejection(
+          'Could not submit proposal',
+          {
+            agent,
+            proposalPk,
+            proposalId: proposal.proposalId,
+            title: proposal.title,
+            userId: proposal.proposerId,
+          },
+          error
+        );
+      });
   }
 
   @ValidateArgs(deleteProposalValidationSchema)
