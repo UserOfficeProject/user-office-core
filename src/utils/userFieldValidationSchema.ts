@@ -8,7 +8,7 @@ export function useNaturalKeySchema(initialValue: string) {
   return Yup.string()
     .matches(/^[A-Za-z\d_]*$/, 'You can use letters, numbers and underscore')
     .max(128)
-    .required('This field is required')
+    .required('This is a required field')
     .test('checkDuplNaturalKey', 'This key is already used', function (value) {
       if (!value) {
         return this.createError({ message: 'Please specify key' });

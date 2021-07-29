@@ -96,7 +96,15 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <GroupIcon />,
       buttonState,
       () => {
-        openModal(<CreateUpdateVisit event={event} close={closeModal} />);
+        openModal(
+          <CreateUpdateVisit
+            event={event}
+            close={(updatedEvent) => {
+              eventUpdated(updatedEvent);
+              closeModal();
+            }}
+          />
+        );
       }
     );
   };
@@ -105,14 +113,17 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let buttonState: ActionButtonState;
 
     if (event.visit !== null) {
-      if (
-        event.visit.registrations.find(
-          (registration) => registration.userId === user.id
-        )?.isRegistrationSubmitted
-      ) {
-        buttonState = 'completed';
+      const userVisit = event.visit.registrations.find(
+        (registration) => registration.userId === user.id
+      );
+      if (!userVisit) {
+        buttonState = 'invisible';
       } else {
-        buttonState = 'active';
+        if (userVisit.isRegistrationSubmitted) {
+          buttonState = 'completed';
+        } else {
+          buttonState = 'active';
+        }
       }
     } else {
       buttonState = 'inactive';
