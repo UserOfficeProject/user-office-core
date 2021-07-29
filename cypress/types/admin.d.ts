@@ -9,7 +9,7 @@ declare global {
        * @example
        *    cy.resetDB()
        */
-      resetDB: () => void;
+      resetDB: (includeSeeds?: boolean) => void;
 
       /**
        * Resets the scheduler database

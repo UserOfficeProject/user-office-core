@@ -127,9 +127,6 @@ context('Settings tests', () => {
 
       cy.login('officer');
   
-      cy.contains('Settings').click();
-      cy.contains('Proposal workflows').click();
-  
       cy.createProposalWorkflow(
         'Editable submitted workflow',
         'Description'
@@ -260,8 +257,6 @@ context('Settings tests', () => {
     it('User Officer should be able to create proposal workflow and it should contain default DRAFT status', () => {
       cy.login('officer');
 
-      cy.contains('Settings').click();
-
       cy.createProposalWorkflow(workflowName, workflowDescription);
 
       cy.get('[data-cy^="connection_DRAFT"]').should('contain.text', 'DRAFT');
@@ -340,8 +335,6 @@ context('Settings tests', () => {
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
       cy.login('officer');
-
-      cy.contains('Settings').click();
 
       cy.createProposalWorkflow(
         fastTrackWorkflowName,
@@ -664,8 +657,6 @@ context('Settings tests', () => {
 
     it('User Officer should be able to create multi-column proposal workflow', () => {
       cy.login('officer');
-
-      cy.contains('Settings').click();
 
       cy.createProposalWorkflow(
         multiColumnWorkflowName,

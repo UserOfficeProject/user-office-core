@@ -55,6 +55,10 @@ const login = (roleOrCredentials) => {
       email: 'ben@inbox.com',
       password: 'Test1234!',
     },
+    placeholderUser: {
+      email: 'unverified-user@example.com',
+      password: 'Test1234!',
+    },
   };
 
   const credentials =

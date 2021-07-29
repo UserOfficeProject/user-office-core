@@ -36,7 +36,7 @@ const createCall = ({
 
   if (template) {
     cy.get('[data-cy="call-template"]').click();
-    cy.contains(template).click();
+    cy.get('[role="presentation"]').contains(template).click();
   }
 
   if (workflow) {
@@ -44,7 +44,7 @@ const createCall = ({
 
     cy.contains('Loading...').should('not.exist');
 
-    cy.contains(workflow).click();
+    cy.get('[role="presentation"]').contains(workflow).click();
   }
 
   cy.get('[data-cy="next-step"]').click();

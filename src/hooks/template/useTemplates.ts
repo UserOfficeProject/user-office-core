@@ -6,7 +6,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 interface TemplatesFilter {
   isArchived?: boolean;
   category?: TemplateCategoryId;
-  templateIds?: number[];
+  templateIds?: number[] | null;
 }
 export function useTemplates(filter: TemplatesFilter) {
   const [templatesFilter, setTemplatesFilter] = useState(filter);

@@ -15,8 +15,8 @@ mutation updateCall(
   $surveyComment: String!
   $allocationTimeUnit: AllocationTimeUnits!
   $referenceNumberFormat: String
-  $proposalWorkflowId: Int
-  $templateId: Int
+  $proposalWorkflowId: Int!
+  $templateId: Int!
 ) {
   updateCall(
     updateCallInput: {

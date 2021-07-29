@@ -4,10 +4,10 @@ import {
 } from '@esss-swap/duo-validation/lib/Call';
 import Typography from '@material-ui/core/Typography';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
-import { Call, AllocationTimeUnits } from 'generated/sdk';
+import { Call, AllocationTimeUnits, UpdateCallInput } from 'generated/sdk';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
 import { useProposalsTemplates } from 'hooks/template/useProposalTemplates';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -23,7 +23,15 @@ type CreateUpdateCallProps = {
 
 const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { api } = useDataApiWithFeedback();
-  const { templates, loadingTemplates } = useProposalsTemplates(false);
+  const templateIds = useMemo(
+    () =>
+      call?.template?.isArchived && call.templateId ? [call.templateId] : null,
+    [call]
+  );
+  const { templates, loadingTemplates } = useProposalsTemplates(
+    false,
+    templateIds
+  );
   const {
     proposalWorkflows,
     loadingProposalWorkflows,
@@ -76,33 +84,18 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       <Wizard
         initialValues={initialValues}
         onSubmit={async (values) => {
-          const {
-            id,
-            templateId,
-            proposalWorkflowId,
-            ...restValues
-          } = values as Call;
           if (call) {
-            const data = await api('Call updated successfully!').updateCall({
-              ...restValues,
-              id: id,
-              templateId: templateId ? +templateId : null,
-              proposalWorkflowId: proposalWorkflowId
-                ? +proposalWorkflowId
-                : null,
-            });
+            const data = await api('Call updated successfully!').updateCall(
+              values as UpdateCallInput
+            );
             closeModal(
               data.updateCall.rejection?.reason,
               data.updateCall.call as Call
             );
           } else {
-            const data = await api('Call created successfully!').createCall({
-              ...restValues,
-              templateId: templateId ? +templateId : null,
-              proposalWorkflowId: proposalWorkflowId
-                ? +proposalWorkflowId
-                : null,
-            });
+            const data = await api('Call created successfully!').createCall(
+              values as UpdateCallInput
+            );
 
             closeModal(
               data.createCall.rejection?.reason,

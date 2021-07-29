@@ -1,64 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
 import Email from '@material-ui/icons/Email';
 import makeStyles from '@material-ui/styles/makeStyles';
-import MaterialTable, { Query, Options, Column } from 'material-table';
-import PropTypes from 'prop-types';
+import MaterialTable, { Options, Column } from 'material-table';
 import React, { useState, useEffect } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { BasicUserDetails, GetUsersQuery, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import {
+  BasicUserDetails,
+  GetUsersQueryVariables,
+  UserRole,
+} from 'generated/sdk';
+import { useUsersData } from 'hooks/user/useUsersData';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
 import InviteUserForm from './InviteUserForm';
-
-function sendUserRequest(
-  searchQuery: Query<any>,
-  api: any,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  selectedUsers: number[] | undefined,
-  userRole: UserRole | undefined,
-  selectedParticipants: number[]
-) {
-  const variables = {
-    filter: searchQuery.search,
-    offset: searchQuery.pageSize * searchQuery.page,
-    first: searchQuery.pageSize,
-    subtractUsers: selectedUsers ? selectedUsers : [],
-    userRole: userRole ? userRole : null,
-  };
-
-  setLoading(true);
-
-  return api()
-    .getUsers(variables)
-    .then((data: GetUsersQuery) => {
-      setLoading(false);
-
-      return {
-        page: searchQuery.page,
-        totalCount: data?.users?.totalCount,
-        data: data?.users?.users.map((user: BasicUserDetails) => {
-          return {
-            firstname: user.firstname,
-            lastname: user.lastname,
-            organisation: user.organisation,
-            id: user.id,
-            tableData: { checked: selectedParticipants.includes(user.id) },
-          };
-        }),
-      };
-    });
-}
 
 type InvitationButtonProps = {
   title: string;
   action: FunctionType;
   'data-cy'?: string;
 };
+
+type BasicUserDetailsWithTableData = (BasicUserDetails & {
+  tableData?: { checked: boolean };
+})[];
 
 type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   selection: boolean;
@@ -77,7 +47,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   onRemove?: FunctionType<void, T>;
   onUpdate?: FunctionType<void, [any[]]>;
   emailInvite?: boolean;
-  invitationButtons?: InvitationButtonProps[];
+  showInvitationButtons?: boolean;
   selectedUsers?: number[];
   mtOptions?: Options;
   columns?: Column<any>[];
@@ -116,16 +86,41 @@ const getTitle = (invitationUserRole?: UserRole): string => {
   }
 };
 
+const getUsersTableData = (
+  users: BasicUserDetailsWithTableData,
+  selectedUsers: BasicUserDetails[]
+) => {
+  const selectedUserIds = selectedUsers.map((participant) => participant.id);
+
+  return users.map((tableItem) => ({
+    ...tableItem,
+    tableData: { checked: selectedUserIds.includes(tableItem.id) },
+  }));
+};
+
 const PeopleTable: React.FC<PeopleTableProps> = (props) => {
+  const [query, setQuery] = useState<
+    GetUsersQueryVariables & { refreshData: boolean }
+  >({
+    offset: 0,
+    first: 5,
+    filter: '',
+    subtractUsers: props.selectedUsers ? props.selectedUsers : [],
+    userRole: props.userRole ? props.userRole : null,
+    refreshData: false,
+  });
   const { isLoading } = props;
-  const sendRequest = useDataApi();
+  const { usersData, loadingUsersData } = useUsersData(query);
   const [loading, setLoading] = useState(props.isLoading ?? false);
-  const [pageSize, setPageSize] = useState(5);
   const [sendUserEmail, setSendUserEmail] = useState(false);
+  const [inviteUserModal, setInviteUserModal] = useState({
+    show: false,
+    title: '',
+    userRole: UserRole.USER,
+  });
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]
   >([]);
-  const [searchText, setSearchText] = useState('');
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
 
   const classes = useStyles();
@@ -145,6 +140,14 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
 
     setCurrentPageIds(data.map(({ id }) => id));
   }, [data]);
+
+  useEffect(() => {
+    if (!usersData.users) {
+      return;
+    }
+
+    setCurrentPageIds(usersData.users.map(({ id }) => id));
+  }, [usersData]);
 
   if (sendUserEmail && props.invitationUserRole && action) {
     return (
@@ -178,41 +181,72 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
       onClick: () => setSendUserEmail(true),
     });
 
-  const tableData = props.data
-    ? (props.data as (BasicUserDetails & {
-        tableData: { checked: boolean };
-      })[])
-    : (
-        query: Query<
-          BasicUserDetails & {
-            tableData: {
-              checked: boolean;
-            };
-          }
-        >
-      ) => {
-        if (searchText !== query.search) {
-          setSearchText(query.search);
-        }
+  const invitationButtons: InvitationButtonProps[] = [];
 
-        setPageSize(query.pageSize);
+  if (props.showInvitationButtons) {
+    invitationButtons.push(
+      {
+        title: 'Invite User',
+        action: () =>
+          setInviteUserModal({
+            show: true,
+            title: 'Invite User',
+            userRole: UserRole.USER,
+          }),
+        'data-cy': 'invite-user-button',
+      },
+      {
+        title: 'Invite Reviewer',
+        action: () =>
+          setInviteUserModal({
+            show: true,
+            title: 'Invite Reviewer',
+            userRole: UserRole.SEP_REVIEWER,
+          }),
+        'data-cy': 'invite-reviewer-button',
+      }
+    );
+  }
 
-        return sendUserRequest(
-          query,
-          sendRequest,
-          setLoading,
-          props.selectedUsers,
-          props.userRole,
-          selectedParticipants.map(({ id }) => id)
-        ).then((users: any) => {
-          setCurrentPageIds(users.data.map(({ id }: { id: number }) => id));
+  const usersTableData = getUsersTableData(
+    props.data || usersData?.users,
+    selectedParticipants
+  );
 
-          return users;
-        });
-      };
+  const currentPage = (query.offset as number) / (query.first as number);
 
   return (
     <div data-cy="co-proposers" className={classes.tableWrapper}>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={inviteUserModal.show}
+        onClose={(): void =>
+          setInviteUserModal({
+            ...inviteUserModal,
+            show: false,
+          })
+        }
+        style={{ backdropFilter: 'blur(6px)' }}
+      >
+        <DialogContent>
+          <InviteUserForm
+            title={inviteUserModal.title}
+            userRole={inviteUserModal.userRole}
+            close={() =>
+              setInviteUserModal({
+                ...inviteUserModal,
+                show: false,
+              })
+            }
+            action={(invitedUser) => {
+              if (invitedUser) {
+                setQuery({ ...query, refreshData: !query.refreshData });
+              }
+            }}
+          />
+        </DialogContent>
+      </Dialog>
       <MaterialTable
         icons={tableIcons}
         title={
@@ -220,6 +254,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             {props.title}
           </Typography>
         }
+        page={currentPage}
         columns={props.columns ?? columns}
         onSelectionChange={(selectedItems, selectedItem) => {
           // when the user wants to (un)select all items
@@ -250,7 +285,9 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           }
 
           setSelectedParticipants((selectedParticipants) =>
-            selectedItem.tableData.checked
+            (selectedItem as BasicUserDetails & {
+              tableData: { checked: boolean };
+            }).tableData.checked
               ? ([
                   ...selectedParticipants,
                   {
@@ -263,12 +300,13 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
               : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
           );
         }}
-        data={tableData}
-        isLoading={loading}
+        data={usersTableData}
+        totalCount={usersData.totalCount}
+        isLoading={loading || loadingUsersData}
         options={{
           search: props.search,
           debounceInterval: 400,
-          pageSize,
+          pageSize: query.first as number,
           selection: props.selection,
           ...props.mtOptions,
         }}
@@ -280,6 +318,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
                   new Promise<void>((resolve) => {
                     resolve();
                     (props.onRemove as FunctionType)(oldData);
+                    setQuery({ ...query, refreshData: !query.refreshData });
                   }),
               }
             : {}
@@ -290,6 +329,13 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             nRowsSelected: '{0} Users(s) Selected',
           },
         }}
+        onChangePage={(page) =>
+          setQuery({ ...query, offset: page * (query.first as number) })
+        }
+        onSearchChange={(search) => setQuery({ ...query, filter: search })}
+        onChangeRowsPerPage={(rowsPerPage) =>
+          setQuery({ ...query, first: rowsPerPage })
+        }
       />
       {props.selection && (
         <ActionButtonContainer>
@@ -313,9 +359,9 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           </Button>
         </ActionButtonContainer>
       )}
-      {props.invitationButtons && (
+      {props.showInvitationButtons && (
         <ActionButtonContainer>
-          {props.invitationButtons?.map((item: InvitationButtonProps, i) => (
+          {invitationButtons.map((item: InvitationButtonProps, i) => (
             <Button
               type="button"
               variant="contained"
@@ -331,29 +377,6 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
       )}
     </div>
   );
-};
-
-PeopleTable.propTypes = {
-  title: PropTypes.string,
-  action: PropTypes.shape({
-    fn: PropTypes.func.isRequired,
-    actionIcon: PropTypes.element.isRequired,
-    actionText: PropTypes.string.isRequired,
-  }),
-  selection: PropTypes.bool.isRequired,
-  isFreeAction: PropTypes.bool,
-  userRole: PropTypes.any,
-  invitationUserRole: PropTypes.any,
-  data: PropTypes.array,
-  search: PropTypes.bool,
-  onRemove: PropTypes.func,
-  onUpdate: PropTypes.func,
-  emailInvite: PropTypes.bool,
-  invitationButtons: PropTypes.array,
-  selectedUsers: PropTypes.array,
-  mtOptions: PropTypes.object,
-  isLoading: PropTypes.bool,
-  columns: PropTypes.array,
 };
 
 export default PeopleTable;

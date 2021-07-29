@@ -1,12 +1,13 @@
 import faker from 'faker';
 context('PageTable component tests', () => {
   const emails = new Array(5).fill(0).map(() => faker.internet.email());
+  const username1 = 'Benjamin';
+  const username2 = 'Carlsson';
+  before(() => {
+    cy.resetDB();
+  });
 
   describe('ProposalPeopleTable component Preserve selected users', () => {
-    before(() => {
-      cy.resetDB();
-    });
-
     beforeEach(() => {
       cy.viewport(1920, 1080);
     });
@@ -223,10 +224,15 @@ context('PageTable component tests', () => {
       cy.get('@modal').contains('0 user(s) selected');
 
       cy.get('@modal').find('tr[index="1"] input').click();
+      cy.get('@modal').contains(username1).parent().find('input').click();
 
       cy.get('@modal').contains('1 user(s) selected');
 
       cy.get('@modal').find('[aria-label="Search"]').type('foo bar');
+
+      cy.wait(500);
+
+      cy.finishedLoading();
 
       cy.get('@modal').contains('No Users Found');
       cy.get('@modal').contains('1 user(s) selected');
@@ -234,19 +240,43 @@ context('PageTable component tests', () => {
       cy.get('@modal').find('[aria-label="Search"] ~ * > button').click();
 
       cy.get('@modal').contains('1 user(s) selected');
-      cy.get('@modal').find('tr[index="1"] input:checked');
 
       cy.get('@modal').find('[aria-label="Search"]').type('Unverified email');
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal').find('tr[index="0"]').contains('Unverified email');
       cy.get('@modal').find('tr[index="0"] input:not(:checked)');
+      cy.get('@modal')
+        .contains(username1)
+        .parent()
+        .find('input')
+        .should('be.checked');
 
-      cy.get('@modal').find('[aria-label="Search"]').clear().type('Benjamin');
+      cy.get('@modal').find('[aria-label="Search"]').type(username2);
+
+      cy.wait(500);
+
+      cy.finishedLoading();
 
       cy.get('@modal').contains('1 user(s) selected');
-      cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
-      cy.get('@modal').find('tr[index="0"] input:checked');
+      cy.get('@modal')
+        .contains(username2)
+        .parent()
+        .find('input')
+        .should('not.be.checked');
+
+      cy.get('@modal').find('[aria-label="Search"]').clear().type(username1);
+
+      cy.wait(500);
+
+      cy.finishedLoading();
+
+      cy.get('@modal').contains('1 user(s) selected');
+      cy.get('@modal')
+        .contains(username1)
+        .parent()
+        .find('input')
+        .should('be.checked');
 
       cy.get('[data-cy="assign-selected-users"]').click();
     });
@@ -302,7 +332,7 @@ context('PageTable component tests', () => {
       cy.get('[role="presentation"]').as('modal');
 
       cy.get('@modal').contains('0 user(s) selected');
-      cy.get('@modal').contains('1-5 of 7');
+      cy.get('@modal').contains(/1-5 of [0-9]+/);
 
       cy.get('@modal').find('tr[index="1"] input').click();
 

@@ -14,7 +14,7 @@ import {
   Answer,
   QuestionaryStep,
   SampleStatus,
-  SubtemplateConfig,
+  SubTemplateConfig,
 } from 'generated/sdk';
 import {
   SampleWithQuestionaryStatus,
@@ -84,7 +84,7 @@ function QuestionaryComponentSampleDeclaration(
 ) {
   const { answer, confirm } = props;
   const answerId = answer.question.id;
-  const config = answer.config as SubtemplateConfig;
+  const config = answer.config as SubTemplateConfig;
   const { state } = useContext(QuestionaryContext) as ProposalContextType;
 
   const { api } = useDataApiWithFeedback();

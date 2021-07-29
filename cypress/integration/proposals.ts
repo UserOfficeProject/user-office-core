@@ -7,6 +7,11 @@ context('Proposal tests', () => {
   const proposalToCloneAbstract = faker.lorem.words(3);
   const clonedProposalTitle = `Copy of ${proposalToCloneTitle}`;
 
+  const proposalWorkflow = {
+    name: faker.random.words(2),
+    description: faker.random.words(5),
+  };
+
   before(() => {
     cy.resetDB();
   });
@@ -62,6 +67,10 @@ context('Proposal tests', () => {
 
   it('Should be able to see proposal allocation time unit on the proposal', () => {
     cy.login('officer');
+    cy.createProposalWorkflow(
+      proposalWorkflow.name,
+      proposalWorkflow.description
+    );
 
     cy.contains('Proposals').click();
 
@@ -90,6 +99,9 @@ context('Proposal tests', () => {
     cy.finishedLoading();
 
     cy.get('[title="Edit"]').first().click();
+
+    cy.get('[data-cy="call-workflow"]').click();
+    cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
     cy.get('[data-cy="allocation-time-unit"]').click();
 
@@ -124,6 +136,7 @@ context('Proposal tests', () => {
       template,
       surveyComment,
       cycleComment,
+      workflow: proposalWorkflow.name,
     });
 
     cy.logout();
@@ -143,7 +156,7 @@ context('Proposal tests', () => {
 
     cy.get('#mui-component-select-selectedCallId').click();
 
-    cy.contains(shortCode).click();
+    cy.get('#menu-selectedCallId').contains(shortCode).click();
 
     cy.get('[data-cy="submit"]').click();
 

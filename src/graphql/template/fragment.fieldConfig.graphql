@@ -52,7 +52,7 @@ fragment fieldConfig on FieldConfig {
     titlePlaceholder
   }
 
-  ... on SubtemplateConfig {
+  ... on SubTemplateConfig {
     addEntryButtonLabel
     minEntries
     maxEntries

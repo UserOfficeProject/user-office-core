@@ -1,12 +1,10 @@
-import { Badge, BadgeProps, makeStyles } from '@material-ui/core';
+import { Dialog, DialogContent } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
-import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
-import GroupIcon from '@material-ui/icons/Group';
-import SchoolIcon from '@material-ui/icons/School';
 import MaterialTable from 'material-table';
-import React from 'react';
-import { useHistory } from 'react-router';
+import React, { useState } from 'react';
+import { ReactNode } from 'react';
 
+import { useActionButtons } from 'hooks/proposalBooking/useActionButtons';
 import {
   ProposalScheduledEvent,
   useProposalBookingsScheduledEvents,
@@ -18,58 +16,34 @@ import {
   TZ_LESS_DATE_TIME_LOW_PREC_FORMAT,
 } from 'utils/Time';
 
-import BoxIcon from '../common/icons/BoxIcon';
-
-const useStyles = makeStyles(() => ({
-  completed: {
-    color: '#000',
-  },
-  active: {
-    color: '#000',
-    '& .MuiBadge-dot': {
-      background: 'red',
-    },
-  },
-  inactive: {
-    color: '#BBB',
-    pointerEvents: 'none',
-  },
-}));
-
-function DotBadge({ children, ...rest }: BadgeProps) {
-  return (
-    <Badge variant="dot" overlap="circle" {...rest}>
-      {children}
-    </Badge>
-  );
-}
-
-interface ActionButtonProps {
-  children: React.ReactNode;
-  variant: 'completed' | 'active' | 'inactive';
-}
-function ActionButton({ children, variant: state }: ActionButtonProps) {
-  const classes = useStyles();
-
-  switch (state) {
-    case 'completed':
-      return <DotBadge className={classes.completed}>{children}</DotBadge>;
-    case 'active':
-      return <DotBadge className={classes.active}>{children}</DotBadge>;
-    case 'inactive':
-      return <DotBadge className={classes.inactive}>{children}</DotBadge>;
-  }
-}
-
 export default function UserUpcomingExperimentsTable() {
-  const history = useHistory();
-
   const {
     loading,
     proposalScheduledEvents,
+    setProposalScheduledEvents,
   } = useProposalBookingsScheduledEvents({
     onlyUpcoming: true,
     notDraft: true,
+  });
+
+  const [modalContents, setModalContents] = useState<ReactNode>(null);
+
+  const {
+    formTeamAction,
+    registerVisitAction: defineVisitAction,
+    individualTrainingAction,
+    declareShipmentAction: riskAssessmentAction,
+  } = useActionButtons({
+    openModal: (contents) => setModalContents(contents),
+    closeModal: () => {
+      setModalContents(null);
+    },
+    eventUpdated: (updatedEvent) => {
+      const updatedEvents = proposalScheduledEvents.map((event) =>
+        event?.id === updatedEvent?.id ? updatedEvent : event
+      );
+      setProposalScheduledEvents(updatedEvents);
+    },
   });
 
   const columns = [
@@ -105,59 +79,10 @@ export default function UserUpcomingExperimentsTable() {
       <StyledPaper margin={[0]}>
         <MaterialTable
           actions={[
-            {
-              tooltip: 'Define who is coming',
-              // eslint-disable-next-line
-              icon: () => (
-                <ActionButton variant="inactive">
-                  <GroupIcon />
-                </ActionButton>
-              ),
-
-              onClick: () => {
-                /* TODO */
-              },
-            },
-            (rowData) => {
-              const variant = rowData.proposal.visits ? 'completed' : 'active';
-
-              return {
-                tooltip: 'Define your own visit',
-                // eslint-disable-next-line
-                icon: () => (
-                  <ActionButton variant={variant}>
-                    <FlightTakeoffIcon />
-                  </ActionButton>
-                ),
-                onClick: () => {
-                  history.push('/MyVisits');
-                },
-              };
-            },
-            {
-              tooltip: 'Finish individual training',
-              // eslint-disable-next-line
-              icon: () => (
-                <ActionButton variant="inactive">
-                  <SchoolIcon />
-                </ActionButton>
-              ),
-              onClick: () => {
-                /* TODO */
-              },
-            },
-            {
-              tooltip: 'Finish risk assessment',
-              // eslint-disable-next-line
-              icon: () => (
-                <ActionButton variant="inactive">
-                  <BoxIcon />
-                </ActionButton>
-              ),
-              onClick: () => {
-                /* TODO */
-              },
-            },
+            formTeamAction,
+            defineVisitAction,
+            individualTrainingAction,
+            riskAssessmentAction,
           ]}
           icons={tableIcons}
           title="Upcoming experiments"
@@ -174,6 +99,12 @@ export default function UserUpcomingExperimentsTable() {
           }}
         />
       </StyledPaper>
+      <Dialog
+        open={modalContents !== null}
+        onClose={() => setModalContents(null)}
+      >
+        <DialogContent>{modalContents}</DialogContent>
+      </Dialog>
     </Grid>
   );
 }

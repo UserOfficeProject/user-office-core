@@ -1,4 +1,5 @@
 const createProposalWorkflow = (workflowName, workflowDescription) => {
+  cy.contains('Settings').click();
   cy.contains('Proposal workflows').click();
   cy.contains('Create').click();
 
