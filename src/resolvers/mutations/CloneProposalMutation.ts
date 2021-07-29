@@ -9,29 +9,40 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalResponseWrap } from '../types/CommonWrappers';
+import { ProposalsResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
+export interface CloneProposalInput {
+  callId: number;
+  proposalToClonePk: number;
+}
+
 @InputType()
-export class CloneProposalInput {
+export class CloneProposalsInput {
   @Field(() => Int)
   public callId: number;
 
-  @Field(() => Int)
-  public proposalToClonePk: number;
+  @Field(() => [Int])
+  public proposalsToClonePk: number[];
 }
 
 @Resolver()
-export class CloneProposalMutation {
-  @Mutation(() => ProposalResponseWrap)
-  cloneProposal(
-    @Arg('cloneProposalInput')
-    cloneProposalInput: CloneProposalInput,
+export class CloneProposalsMutation {
+  @Mutation(() => ProposalsResponseWrap)
+  async cloneProposals(
+    @Arg('cloneProposalsInput')
+    cloneProposalsInput: CloneProposalsInput,
     @Ctx() context: ResolverContext
   ) {
-    return wrapResponse(
-      context.mutations.proposal.clone(context.user, cloneProposalInput),
-      ProposalResponseWrap
+    const result = Promise.all(
+      cloneProposalsInput.proposalsToClonePk.map((proposalPk) => {
+        return context.mutations.proposal.clone(context.user, {
+          callId: cloneProposalsInput.callId,
+          proposalToClonePk: proposalPk,
+        });
+      })
     );
+
+    return wrapResponse(result, ProposalsResponseWrap);
   }
 }
