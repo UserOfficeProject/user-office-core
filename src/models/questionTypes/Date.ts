@@ -1,18 +1,10 @@
 /* eslint-disable quotes */
-import * as Yup from 'yup';
+import { dateQuestionValidationSchema } from '@esss-swap/duo-validation';
 
 import { DateConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { Question } from './QuestionRegistry';
-
-function normalizeDate(date: Date) {
-  date.setHours(12);
-  date.setMinutes(0);
-  date.setMilliseconds(0);
-
-  return date;
-}
 
 export const dateDefinition: Question = {
   dataType: DataType.DATE,
@@ -21,37 +13,7 @@ export const dateDefinition: Question = {
       throw new Error('DataType should be DATE');
     }
 
-    const config = field.config as DateConfig;
-
-    // if left blank
-    if (value === null) {
-      if (config.required) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-    // else if date specified
-    else {
-      let scheme = Yup.date().transform(function (value: Date) {
-        return normalizeDate(value);
-      });
-      if (config.required) {
-        scheme = scheme.required();
-      }
-
-      if (config.minDate) {
-        const minDate = normalizeDate(new Date(config.minDate));
-        scheme = scheme.min(minDate);
-      }
-
-      if (config.maxDate) {
-        const maxDate = normalizeDate(new Date(config.maxDate));
-        scheme = scheme.max(maxDate);
-      }
-
-      return scheme.isValidSync(value);
-    }
+    return dateQuestionValidationSchema(field).isValidSync(value);
   },
   createBlankConfig: (): DateConfig => {
     const config = new DateConfig();

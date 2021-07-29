@@ -1,4 +1,6 @@
 /* eslint-disable quotes */
+import { textInputQuestionValidationSchema } from '@esss-swap/duo-validation';
+
 import { ConfigBase, TextInputConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -10,19 +12,8 @@ export const textInputDefinition: Question = {
     if (field.question.dataType !== DataType.TEXT_INPUT) {
       throw new Error('DataType should be TEXT_INPUT');
     }
-    const config = field.config as TextInputConfig;
-    if (config.required && !value) {
-      return false;
-    }
 
-    if (config.min && value && value.length < config.min) {
-      return false;
-    }
-    if (config.max && value && value.length > config.max) {
-      return false;
-    }
-
-    return true;
+    return textInputQuestionValidationSchema(field).isValidSync(value);
   },
   createBlankConfig: (): ConfigBase => {
     const config = new TextInputConfig();
