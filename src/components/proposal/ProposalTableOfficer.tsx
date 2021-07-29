@@ -48,7 +48,7 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import CallSelectModalOnProposalClone from './CallSelectModalOnProposalClone';
+import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import ChangeProposalStatus from './ChangeProposalStatus';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
 
@@ -84,9 +84,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     ProposalViewData[]
   >([]);
   const [openCallSelection, setOpenCallSelection] = useState(false);
-  const [proposalToClonePk, setProposalToClonePk] = useState<number | null>(
-    null
-  );
 
   const downloadPDFProposal = useDownloadPDFProposal();
   const downloadXLSXProposal = useDownloadXLSXProposal();
@@ -177,18 +174,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             style={iconButtonStyle}
           >
             <Visibility />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Clone proposal">
-          <IconButton
-            data-cy="clone-proposal"
-            onClick={() => {
-              setProposalToClonePk(rowData.primaryKey);
-              setOpenCallSelection(true);
-            }}
-            style={iconButtonStyle}
-          >
-            <FileCopy />
           </IconButton>
         </Tooltip>
         <Tooltip title="Download proposal as pdf">
@@ -452,26 +437,27 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     }
   };
 
-  const cloneProposalToCall = async (call: Call) => {
-    setProposalToClonePk(null);
-
-    if (!call?.id || !proposalToClonePk) {
+  const cloneProposalsToCall = async (call: Call) => {
+    if (!call?.id || !selectedProposals.length) {
       return;
     }
 
-    const result = await api('Proposal cloned successfully').cloneProposal({
+    const proposalsToClonePk = selectedProposals.map(
+      (selectedProposal) => selectedProposal.primaryKey
+    );
+
+    const result = await api('Proposal/s cloned successfully').cloneProposals({
       callId: call.id,
-      proposalToClonePk,
+      proposalsToClonePk,
     });
+    const resultProposals = result.cloneProposals.proposals;
 
-    const resultProposal = result.cloneProposal.proposal;
-
-    if (!result.cloneProposal.rejection && proposalsData && resultProposal) {
-      const newClonedProposal = fromProposalToProposalView(
-        resultProposal as Proposal
+    if (!result.cloneProposals.rejection && proposalsData && resultProposals) {
+      const newClonedProposals = resultProposals.map((resultProposal) =>
+        fromProposalToProposalView(resultProposal as Proposal)
       );
 
-      const newProposalsData = [newClonedProposal, ...proposalsData];
+      const newProposalsData = [...newClonedProposals, ...proposalsData];
 
       setProposalsData(newProposalsData);
     }
@@ -594,8 +580,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         onClose={(): void => setOpenCallSelection(false)}
       >
         <DialogContent>
-          <CallSelectModalOnProposalClone
-            cloneProposalToCall={cloneProposalToCall}
+          <CallSelectModalOnProposalsClone
+            cloneProposalsToCall={cloneProposalsToCall}
             close={(): void => setOpenCallSelection(false)}
           />
         </DialogContent>
@@ -654,6 +640,14 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           columnsButton: true,
         }}
         actions={[
+          {
+            icon: FileCopy,
+            tooltip: 'Clone proposals to call',
+            onClick: () => {
+              setOpenCallSelection(true);
+            },
+            position: 'toolbarOnSelect',
+          },
           {
             icon: GetAppIconComponent,
             tooltip: 'Download proposals in PDF',

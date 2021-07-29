@@ -151,8 +151,10 @@ context('Samples tests', () => {
 
     cy.contains(proposalTitle)
       .parent()
-      .find('[title="Clone proposal"]')
+      .find('input[type="checkbox"]')
       .click();
+
+    cy.get('[title="Clone proposals to call"]').click();
 
     cy.get('#mui-component-select-selectedCallId').click();
 
@@ -162,7 +164,7 @@ context('Samples tests', () => {
 
     cy.notification({
       variant: 'success',
-      text: 'Proposal cloned successfully',
+      text: 'Proposal/s cloned successfully',
     });
 
     cy.contains(`Copy of ${proposalTitle}`)
