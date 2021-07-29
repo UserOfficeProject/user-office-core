@@ -196,18 +196,14 @@ export function useActionButtons(args: UseActionButtonsArgs) {
   const declareShipmentAction = (event: ProposalScheduledEvent) => {
     let buttonState: ActionButtonState;
 
-    if (isPiOrCoProposer(user, event)) {
-      if (event.visit !== null) {
-        if (event.visit.shipments.length > 0) {
-          buttonState = 'completed';
-        } else {
-          buttonState = 'neutral';
-        }
+    if (event.visit !== null) {
+      if (event.visit.shipments.length > 0) {
+        buttonState = 'completed';
       } else {
-        buttonState = 'inactive';
+        buttonState = 'neutral';
       }
     } else {
-      buttonState = 'invisible';
+      buttonState = 'inactive';
     }
 
     return createActionButton(
