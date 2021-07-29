@@ -1,11 +1,11 @@
-mutation cloneProposal($proposalToClonePk: Int!, $callId: Int!) {
-  cloneProposal(
-    cloneProposalInput: {
-      proposalToClonePk: $proposalToClonePk
+mutation cloneProposals($proposalsToClonePk: [Int!]!, $callId: Int!) {
+  cloneProposals(
+    cloneProposalsInput: {
+      proposalsToClonePk: $proposalsToClonePk
       callId: $callId
     }
   ) {
-    proposal {
+    proposals {
       ...proposal
       proposer {
         ...basicUserDetails
