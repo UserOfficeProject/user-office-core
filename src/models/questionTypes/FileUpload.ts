@@ -1,4 +1,6 @@
 /* eslint-disable quotes */
+import { fileUploadQuestionValidationSchema } from '@esss-swap/duo-validation';
+
 import { FileUploadConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionTemplateRelation } from '../../resolvers/types/QuestionTemplateRelation';
 import { QuestionFilterCompareOperator } from '../Questionary';
@@ -11,12 +13,8 @@ export const fileUploadDefinition: Question = {
     if (field.question.dataType !== DataType.FILE_UPLOAD) {
       throw new Error('DataType should be FILE_UPLOAD');
     }
-    const config = field.config as FileUploadConfig;
-    if (config.required && !value) {
-      return false;
-    }
 
-    return true;
+    return fileUploadQuestionValidationSchema(field).isValidSync(value);
   },
   createBlankConfig: (): FileUploadConfig => {
     const config = new FileUploadConfig();

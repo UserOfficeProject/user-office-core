@@ -95,6 +95,7 @@ class PostgresVisitDataSource implements VisitDataSource {
           await database('visits_has_users')
             .delete()
             .where({ visit_id: args.visitId })
+            .whereNotIn('user_id', args.team)
             .transacting(trx);
 
           await database('visits_has_users')
@@ -104,6 +105,8 @@ class PostgresVisitDataSource implements VisitDataSource {
                 user_id: userId,
               }))
             )
+            .onConflict(['user_id', 'visit_id'])
+            .ignore()
             .transacting(trx);
         }
         if (args.status || args.proposalPkAndEventId || args.teamLeadUserId) {
