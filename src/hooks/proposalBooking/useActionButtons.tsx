@@ -113,13 +113,13 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let buttonState: ActionButtonState;
 
     if (event.visit !== null) {
-      const userVisit = event.visit.registrations.find(
+      const registration = event.visit.registrations.find(
         (registration) => registration.userId === user.id
       );
-      if (!userVisit) {
+      if (!registration) {
         buttonState = 'invisible';
       } else {
-        if (userVisit.isRegistrationSubmitted) {
+        if (registration.isRegistrationSubmitted) {
           buttonState = 'completed';
         } else {
           buttonState = 'active';
@@ -167,13 +167,17 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       const registration = event.visit.registrations.find(
         (reg) => reg.userId === user.id
       );
-      const trainingExpiryDate: Date | null =
-        registration?.trainingExpiryDate || null;
+      if (registration) {
+        const trainingExpiryDate: Date | null =
+          registration.trainingExpiryDate || null;
 
-      if (moment(trainingExpiryDate) > parseTzLessDateTime(event.startsAt)) {
-        buttonState = 'completed';
+        if (moment(trainingExpiryDate) > parseTzLessDateTime(event.startsAt)) {
+          buttonState = 'completed';
+        } else {
+          buttonState = 'active';
+        }
       } else {
-        buttonState = 'active';
+        buttonState = 'invisible';
       }
     } else {
       buttonState = 'inactive';
