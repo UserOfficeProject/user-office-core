@@ -34,8 +34,7 @@ const Participants: React.FC<ParticipantsProps> = ({
   };
 
   const removeUser = (user: BasicUserDetails) => {
-    const newUsers = [...users];
-    newUsers.splice(newUsers.indexOf(user), 1);
+    const newUsers = users.filter((u) => u.id !== user.id);
     setUsers(newUsers);
   };
 
