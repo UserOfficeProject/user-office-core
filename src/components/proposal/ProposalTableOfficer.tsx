@@ -176,18 +176,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             <Visibility />
           </IconButton>
         </Tooltip>
-        {/* <Tooltip title="Clone proposal">
-          <IconButton
-            data-cy="clone-proposal"
-            onClick={() => {
-              setProposalToClonePk(rowData.primaryKey);
-              setOpenCallSelection(true);
-            }}
-            style={iconButtonStyle}
-          >
-            <FileCopy />
-          </IconButton>
-        </Tooltip> */}
         <Tooltip title="Download proposal as pdf">
           <IconButton
             data-cy="download-proposal"
