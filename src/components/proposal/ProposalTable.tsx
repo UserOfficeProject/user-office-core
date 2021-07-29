@@ -20,7 +20,7 @@ import { timeAgo } from 'utils/Time';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import CallSelectModalOnProposalClone from './CallSelectModalOnProposalClone';
+import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import {
   PartialProposalsDataType,
   UserProposalDataType,
@@ -82,22 +82,22 @@ const ProposalTable = ({
     return <Redirect push to={`/ProposalEdit/${editProposalPk}`} />;
   }
 
-  const cloneProposalToCall = async (call: Call) => {
+  const cloneProposalsToCall = async (call: Call) => {
     setProposalToCloneId(null);
 
     if (!call?.id || !proposalToClonePk) {
       return;
     }
 
-    const result = await api('Proposal cloned successfully').cloneProposal({
+    const result = await api('Proposal cloned successfully').cloneProposals({
       callId: call.id,
-      proposalToClonePk,
+      proposalsToClonePk: [proposalToClonePk],
     });
 
-    const resultProposal = result.cloneProposal.proposal;
+    const [resultProposal] = result.cloneProposals.proposals;
 
     if (
-      !result.cloneProposal.rejection &&
+      !result.cloneProposals.rejection &&
       partialProposalsData &&
       resultProposal
     ) {
@@ -129,8 +129,8 @@ const ProposalTable = ({
         onClose={(): void => setOpenCallSelection(false)}
       >
         <DialogContent>
-          <CallSelectModalOnProposalClone
-            cloneProposalToCall={cloneProposalToCall}
+          <CallSelectModalOnProposalsClone
+            cloneProposalsToCall={cloneProposalsToCall}
             close={(): void => setOpenCallSelection(false)}
           />
         </DialogContent>
