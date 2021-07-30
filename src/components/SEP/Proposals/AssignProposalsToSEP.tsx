@@ -40,7 +40,12 @@ const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
   const classes = useStyles();
   const { currentRole } = useContext(UserContext);
   const { SEPs, loadingSEPs } = useSEPsData('', true, currentRole as UserRole);
-  const [firstSepId] = sepIds;
+  const allSelectedProposalsHaveSameSep = sepIds.every(
+    (item) => item === sepIds[0]
+  );
+
+  const selectedProposalsSep =
+    allSelectedProposalsHaveSameSep && sepIds[0] ? sepIds[0].toString() : '';
 
   return (
     <Container
@@ -50,7 +55,7 @@ const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
     >
       <Formik
         initialValues={{
-          selectedSEPId: firstSepId || 0,
+          selectedSEPId: selectedProposalsSep,
         }}
         onSubmit={async (values): Promise<void> => {
           const selectedSEP = SEPs.find(

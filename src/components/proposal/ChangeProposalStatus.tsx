@@ -29,11 +29,13 @@ const useStyles = makeStyles((theme) => ({
 type ChangeProposalStatusProps = {
   close: () => void;
   changeStatusOnProposals: (status: ProposalStatus) => Promise<void>;
+  selectedProposalStatuses: number[];
 };
 
 const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
   close,
   changeStatusOnProposals,
+  selectedProposalStatuses,
 }) => {
   const classes = useStyles();
   const {
@@ -41,11 +43,19 @@ const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
     loadingProposalStatuses,
   } = useProposalStatusesData();
 
+  const allSelectedProposalsHaveSameStatus = selectedProposalStatuses.every(
+    (item) => item === selectedProposalStatuses[0]
+  );
+
+  const selectedProposalsStatus = allSelectedProposalsHaveSameStatus
+    ? selectedProposalStatuses[0].toString()
+    : '';
+
   return (
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
-          selectedStatusId: '',
+          selectedStatusId: selectedProposalsStatus,
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const selectedStatus = proposalStatuses.find(
@@ -92,6 +102,15 @@ const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
               <Alert severity="warning">
                 Be aware that changing status to &quot;DRAFT&quot; will reopen
                 proposal for changes and submission.
+              </Alert>
+            )}
+            {!values.selectedStatusId && (
+              <Alert
+                severity="warning"
+                data-cy="proposal-different-statuses-change"
+              >
+                Be aware that selected proposals have different statuses and
+                changing status will affect all of them.
               </Alert>
             )}
             <Button
