@@ -24,7 +24,7 @@
     "@types/react-beautiful-dnd": "^13.1.1",
     "@types/react-router": "^5.1.15",
     "@types/react-dom": "^17.0.9",
-    "@types/react-router-dom": "^5.1.7",
+    "@types/react-router-dom": "^5.1.8",
     "@types/tinymce": "^4.6.4",
     "@types/yup": "~0.29.13",
     "clsx": "^1.1.1",
