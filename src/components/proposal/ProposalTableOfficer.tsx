@@ -62,6 +62,7 @@ type ProposalTableOfficerProps = {
 type ProposalWithCallInstrumentAndSepId = ProposalPkWithCallId & {
   instrumentId: number | null;
   sepId: number | null;
+  statusId: number;
 };
 
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
@@ -112,6 +113,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               callId: proposal.callId,
               instrumentId: proposal.instrumentId,
               sepId: proposal.sepId,
+              statusId: proposal.statusId,
             });
           }
 
@@ -570,6 +572,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           <ChangeProposalStatus
             changeStatusOnProposals={changeStatusOnProposals}
             close={(): void => setOpenChangeProposalStatus(false)}
+            selectedProposalStatuses={selectedProposals.map(
+              (selectedProposal) => selectedProposal.statusId
+            )}
           />
         </DialogContent>
       </Dialog>
