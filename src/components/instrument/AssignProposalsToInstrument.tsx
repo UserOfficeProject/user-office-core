@@ -40,7 +40,15 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
 }) => {
   const classes = useStyles();
   const { instruments, loadingInstruments } = useInstrumentsData(callIds);
-  const [firstInstrumentId] = instrumentIds;
+
+  const allSelectedProposalsHaveSameInstrument = instrumentIds.every(
+    (item) => item === instrumentIds[0]
+  );
+
+  const selectedProposalsInstrument =
+    allSelectedProposalsHaveSameInstrument && instrumentIds[0]
+      ? instrumentIds[0].toString()
+      : '';
 
   return (
     <Container
@@ -50,7 +58,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
     >
       <Formik
         initialValues={{
-          selectedInstrumentId: firstInstrumentId || 0,
+          selectedInstrumentId: selectedProposalsInstrument,
         }}
         onSubmit={async (values): Promise<void> => {
           const selectedInstrument = instruments.find(
