@@ -1946,6 +1946,7 @@ export type Query = {
   user: Maybe<User>;
   me: Maybe<User>;
   users: Maybe<UserQueryResult>;
+  previousCollaborators: Maybe<UserQueryResult>;
   visitRegistration: Maybe<VisitRegistration>;
   visit: Maybe<Visit>;
   scheduledEvents: Array<ScheduledEvent>;
@@ -2231,6 +2232,16 @@ export type QueryUsersArgs = {
   offset?: Maybe<Scalars['Int']>;
   userRole?: Maybe<UserRole>;
   subtractUsers?: Maybe<Array<Maybe<Scalars['Int']>>>;
+};
+
+
+export type QueryPreviousCollaboratorsArgs = {
+  filter?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+  userRole?: Maybe<UserRole>;
+  subtractUsers?: Maybe<Array<Maybe<Scalars['Int']>>>;
+  userId: Scalars['Int'];
 };
 
 
