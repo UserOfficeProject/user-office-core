@@ -3,6 +3,9 @@ context('PageTable component tests', () => {
   const emails = new Array(5).fill(0).map(() => faker.internet.email());
   const username1 = 'Benjamin';
   const username2 = 'Unverified';
+  const title = faker.random.words(3);
+  const abstract = faker.random.words(8);
+
   before(() => {
     cy.resetDB();
   });
@@ -36,7 +39,6 @@ context('PageTable component tests', () => {
       cy.get('@modal').contains('1 user(s) selected');
 
       cy.finishedLoading();
-
       cy.get('[data-cy="email"]').type('Aaron_Harris49@gmail.com');
 
       cy.get('[data-cy="findUser"]').click();
@@ -50,6 +52,33 @@ context('PageTable component tests', () => {
       cy.get('[data-cy="assign-selected-users"]').click();
 
       cy.get('@modal').contains('Benjamin');
+
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+
+      cy.get('[data-cy=save-and-continue-button]').click();
+
+      cy.finishedLoading();
+
+      cy.notification({ variant: 'success', text: 'Saved' });
+
+      cy.contains('Submit').click();
+
+      cy.get('[data-cy=confirm-ok]').click();
+
+      cy.contains('Dashboard').click();
+
+      cy.contains('New Proposal').click();
+
+      cy.get('[title="Add Co-Proposers"]').click();
+
+      cy.get('[role="presentation"]')
+        .find('tr[index="0"]')
+        .contains('Benjamin');
     });
 
     it('should preserve the selected users', () => {
@@ -235,9 +264,9 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=view-proposal]').click();
 
-      cy.contains('Edit proposal').click();
+      cy.get('[data-cy=toggle-edit-proposal]').click();
 
-      cy.contains('New proposal').click();
+      cy.get('[data-cy=questionary-stepper]').contains('New proposal').click();
 
       cy.get('[title="Add Co-Proposers"]').click();
 
@@ -265,11 +294,6 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').contains('1 user(s) selected');
 
-      // cy.get('@modal').find('[aria-label="Search"]').type('Unverified email');
-
-      // cy.get('@modal').contains('1 user(s) selected');
-      // cy.get('@modal').find('tr[index="0"]').contains('Unverified email');
-      // cy.get('@modal').find('tr[index="0"] input:not(:checked)');
       cy.get('@modal')
         .contains(username1)
         .parent()
@@ -349,9 +373,9 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=view-proposal]').click();
 
-      cy.contains('Edit proposal').click();
+      cy.get('[data-cy=toggle-edit-proposal]').click();
 
-      cy.contains('New proposal').click();
+      cy.get('[data-cy=questionary-stepper]').contains('New proposal').click();
 
       cy.get('[title="Add Co-Proposers"]').click();
 

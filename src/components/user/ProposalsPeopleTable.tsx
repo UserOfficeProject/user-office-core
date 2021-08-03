@@ -71,9 +71,6 @@ const getUsersTableData = (
   users = [...invitedUsersFormatted, ...users];
   const totalCount = users.length;
 
-  console.log(query.offset);
-  console.log(query.first);
-
   if (typeof query.first === 'number' && typeof query.offset === 'number')
     users = users.slice(query.offset, query.offset + query.first);
 
@@ -139,9 +136,12 @@ const columns = [
   { title: 'Organisation', field: 'organisation' },
 ];
 
+// StylisedToolbar is defined outside the component as when the component re renders it will lose
+// focuses of textbooks in the StylisedToolbar if it is defined within the functional component.
+//  This specificity effect the search box as when a search is done the query is updated so component
+// renders and loses focus of the box.
 const StylisedToolbar: React.FC = (props) => {
   const classes = useStyles();
-  console.log(props);
 
   return (
     <>
@@ -205,11 +205,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
 
   const { action } = props;
 
-  console.log(`rendered ${loading}`);
-
   useEffect(() => {
-    console.log('Effect triggered');
-
     if (!prevColabUsers.users) {
       return;
     }
@@ -223,7 +219,6 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
     );
 
     setCurrentPageIds(currentPage.map(({ id }) => id));
-    console.log('ides set');
   }, [invitedUsers, prevColabUsers, query.first, query.offset]);
 
   if (sendUserEmail && props.invitationUserRole && action) {

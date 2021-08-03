@@ -144,13 +144,8 @@ context('visits tests', () => {
   it('PI should be able to register for a visit', () => {
     cy.login({ email: 'Javon4@hotmail.com', password: 'Test1234!' });
 
-    // cy.contains('Carlsson').parent().find('[type="checkbox"]').click();
+    cy.contains('Carlsson').parent().find('[type="checkbox"]').click();
 
-    // cy.get('[data-cy=email]').type('ben@inbox.com');
-
-    // cy.get('[data-cy=findUser]').click();
-
-    // cy.contains('Beckley');
     // test if the actions are available after co-proposer defined the team
     cy.testActionButton(formTeamTitle, 'completed');
     cy.testActionButton(registerVisitTitle, 'active');
