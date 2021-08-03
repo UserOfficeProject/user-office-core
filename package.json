@@ -40,7 +40,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@apollo/federation": "^0.25.2",
+    "@apollo/federation": "^0.26.0",
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-logger": "^1.1.0",
     "@esss-swap/duo-message-broker": "^1.0.5",
@@ -75,9 +75,9 @@
     "request-promise": "^4.2.6",
     "sanitize-html": "^2.4.0",
     "simple-oauth2": "^4.2.0",
-    "soap": "^0.39.0",
+    "soap": "^0.40.0",
     "sparkpost": "^2.1.4",
-    "tsyringe": "^4.5.0",
+    "tsyringe": "^4.6.0",
     "type-graphql": "^1.1.1",
     "typedi": "^0.10.0",
     "yup": "^0.32.9"
