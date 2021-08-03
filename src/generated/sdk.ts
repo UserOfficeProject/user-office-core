@@ -640,6 +640,7 @@ export type Mutation = {
   setInstrumentAvailabilityTime: SuccessResponseWrap;
   submitInstrument: SuccessResponseWrap;
   administrationProposal: ProposalResponseWrap;
+  cloneProposals: ProposalsResponseWrap;
   updateProposal: ProposalResponseWrap;
   addProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
   addStatusChangingEventsToConnection: ProposalStatusChangingEventResponseWrap;
@@ -698,7 +699,6 @@ export type Mutation = {
   addTechnicalReview: TechnicalReviewResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   checkExternalToken: CheckExternalTokenWrap;
-  cloneProposals: ProposalsResponseWrap;
   cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   createProposal: ProposalResponseWrap;
@@ -868,6 +868,11 @@ export type MutationAdministrationProposalArgs = {
   statusId?: Maybe<Scalars['Int']>;
   managementTimeAllocation?: Maybe<Scalars['Int']>;
   managementDecisionSubmitted?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationCloneProposalsArgs = {
+  cloneProposalsInput: CloneProposalsInput;
 };
 
 
@@ -1278,11 +1283,6 @@ export type MutationAddTechnicalReviewArgs = {
 
 export type MutationCheckExternalTokenArgs = {
   externalToken: Scalars['String'];
-};
-
-
-export type MutationCloneProposalsArgs = {
-  cloneProposalsInput: CloneProposalsInput;
 };
 
 
