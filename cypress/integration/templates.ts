@@ -662,6 +662,53 @@ context('Template tests', () => {
     });
   });
 
+  it('File Upload field could be set as required', () => {
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    cy.get("[title='Edit']").first().click();
+
+    cy.contains(fileQuestion).click();
+
+    cy.contains('Is required').click();
+
+    cy.contains('Update').click();
+
+    cy.contains(fileQuestion)
+      .parent()
+      .dragElement([{ direction: 'left', length: 1 }]);
+
+    cy.logout();
+
+    cy.login('user');
+
+    cy.contains('New Proposal').click();
+
+    cy.contains(fileQuestion);
+    cy.get('body').then(() => {
+      cy.contains('Save and continue').click();
+      cy.contains(fileQuestion)
+        .parent()
+        .contains('field must have at least 1 items');
+
+      cy.fixture('file_upload_test.png').then((fileContent) => {
+        // NOTE: Using "cypress-file-upload" version "^3.5.3" because this(https://github.com/abramenal/cypress-file-upload/issues/179) should be fixed before upgrading to the latest
+        cy.get('input[type="file"]').upload({
+          fileContent: fileContent.toString(),
+          fileName: 'file_upload_test.png',
+          mimeType: 'image/png',
+        });
+
+        cy.contains('file_upload_test');
+
+        cy.contains(fileQuestion)
+          .parent()
+          .should('not.contain.text', 'field must have at least 1 items');
+      });
+    });
+  });
+
   it('Officer can save proposal column selection', () => {
     cy.login('officer');
 

@@ -3,6 +3,7 @@ import { TextField } from 'formik-material-ui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
+import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -44,6 +45,14 @@ export const QuestionTemplateRelationFileUploadForm: FC<QuestionTemplateRelation
           </TitledContainer>
 
           <TitledContainer label="Constraints">
+            <Field
+              name="config.required"
+              label="Is required"
+              component={FormikUICustomCheckbox}
+              margin="normal"
+              fullWidth
+              data-cy="required"
+            />
             <Field
               name="config.file_type"
               label="Accepted file types (leave empty for any)"
