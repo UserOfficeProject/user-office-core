@@ -141,7 +141,7 @@ export default class ProposalMutations {
     }
 
     if (users !== undefined) {
-      this.proposalDataSource
+      await this.proposalDataSource
         .setProposalUsers(proposalPk, users)
         .catch((error) => {
           return rejection(
