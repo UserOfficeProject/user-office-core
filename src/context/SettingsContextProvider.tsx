@@ -1,7 +1,6 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React from 'react';
 
-import UOLoader from 'components/common/UOLoader';
 import { Settings, SettingsId } from 'generated/sdk';
 import { useSettings } from 'hooks/admin/useSettings';
 
@@ -32,11 +31,7 @@ export const SettingsContextProvider: React.FC = (props) => {
   const classes = useStyles();
 
   if (loadingSettings) {
-    return (
-      <div className={classes.loader}>
-        <UOLoader size={40} />
-      </div>
-    );
+    return <div className={classes.loader}>Loading...</div>;
   }
 
   const settingsMap = settings?.reduce(function (settingsMap, settings) {

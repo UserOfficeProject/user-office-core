@@ -1,7 +1,6 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React from 'react';
 
-import UOLoader from 'components/common/UOLoader';
 import { Feature, FeatureId } from 'generated/sdk';
 import { useFeatures } from 'hooks/admin/useFeatures';
 
@@ -32,11 +31,7 @@ export const FeatureContextProvider: React.FC = (props) => {
   const classes = useStyles();
 
   if (loadingFeatures) {
-    return (
-      <div className={classes.loader}>
-        <UOLoader size={40} />
-      </div>
-    );
+    return <div className={classes.loader}>Loading...</div>;
   }
 
   const featuresMap = features?.reduce(function (featuresMap, feature) {
