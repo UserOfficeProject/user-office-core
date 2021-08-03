@@ -44,7 +44,7 @@
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-logger": "^1.1.0",
     "@esss-swap/duo-message-broker": "^1.0.5",
-    "@esss-swap/duo-validation": "^2.0.6",
+    "@esss-swap/duo-validation": "^2.0.8",
     "apollo-server": "^2.25.1",
     "apollo-server-core": "^2.25.1",
     "apollo-server-express": "^2.25.1",
