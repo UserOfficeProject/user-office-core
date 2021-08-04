@@ -31,9 +31,10 @@ export class QuestionaryResolver {
     @Root() questionary: Questionary,
     @Ctx() context: ResolverContext
   ): Promise<QuestionaryStep[] | null> {
-    return context.queries.questionary.getQuestionarySteps(
+    return context.queries.questionary.getQuestionaryStepsOrDefault(
       context.user,
-      questionary.questionaryId
+      questionary.questionaryId,
+      questionary.templateId
     );
   }
 

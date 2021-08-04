@@ -8,6 +8,7 @@ import { Questionary, QuestionaryStep } from '../models/Questionary';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
+import { TemplateCategoryId } from './../models/Template';
 
 @injectable()
 export default class QuestionaryQueries {
@@ -34,6 +35,26 @@ export default class QuestionaryQueries {
     }
 
     return this.dataSource.getQuestionary(questionaryId);
+  }
+
+  @Authorized()
+  async getQuestionaryOrDefault(
+    agent: UserWithRole | null,
+    questionaryId: number,
+    templateCategory: TemplateCategoryId
+  ): Promise<Questionary> {
+    const questionary = await this.dataSource.getQuestionary(questionaryId);
+
+    if (questionary) {
+      return questionary;
+    }
+
+    return {
+      questionaryId: 0,
+      templateId: templateCategory,
+      creatorId: agent!.id,
+      created: new Date(),
+    };
   }
 
   @Authorized()
@@ -79,5 +100,19 @@ export default class QuestionaryQueries {
     templateId: number
   ): Promise<QuestionaryStep[]> {
     return this.dataSource.getBlankQuestionarySteps(templateId);
+  }
+
+  async getQuestionaryStepsOrDefault(
+    agent: UserWithRole | null,
+    questionaryId: number,
+    templateId: TemplateCategoryId
+  ): Promise<QuestionaryStep[]> {
+    const steps = await this.getQuestionarySteps(agent, questionaryId);
+
+    if (steps) {
+      return steps;
+    }
+
+    return this.getBlankQuestionarySteps(agent, templateId);
   }
 }
