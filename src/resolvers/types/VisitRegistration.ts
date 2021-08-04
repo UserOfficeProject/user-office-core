@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { TemplateCategoryId } from '../../models/Template';
 import { VisitRegistration as VisitRegistrationOrig } from '../../models/VisitRegistration';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Questionary } from './Questionary';
@@ -41,18 +42,15 @@ export class UserVisitResolver {
     return context.queries.user.getBasic(context.user, userVisit.userId);
   }
 
-  @FieldResolver(() => Questionary, { nullable: true })
+  @FieldResolver(() => Questionary)
   async questionary(
     @Root() userVisit: VisitRegistration,
     @Ctx() context: ResolverContext
-  ): Promise<Questionary | null> {
-    if (!userVisit.registrationQuestionaryId) {
-      return null;
-    }
-
-    return context.queries.questionary.getQuestionary(
+  ): Promise<Questionary> {
+    return context.queries.questionary.getQuestionaryOrDefault(
       context.user,
-      userVisit.registrationQuestionaryId
+      userVisit.registrationQuestionaryId || 0,
+      TemplateCategoryId.VISIT
     );
   }
 }

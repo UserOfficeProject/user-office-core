@@ -12,11 +12,6 @@ import { ResolverContext } from '../../context';
 import { ProposalsResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
-export interface CloneProposalInput {
-  callId: number;
-  proposalToClonePk: number;
-}
-
 @InputType()
 export class CloneProposalsInput {
   @Field(() => Int)
@@ -34,15 +29,12 @@ export class CloneProposalsMutation {
     cloneProposalsInput: CloneProposalsInput,
     @Ctx() context: ResolverContext
   ) {
-    const result = Promise.all(
-      cloneProposalsInput.proposalsToClonePk.map((proposalPk) => {
-        return context.mutations.proposal.clone(context.user, {
-          callId: cloneProposalsInput.callId,
-          proposalToClonePk: proposalPk,
-        });
-      })
+    return wrapResponse(
+      context.mutations.proposal.cloneProposals(
+        context.user,
+        cloneProposalsInput
+      ),
+      ProposalsResponseWrap
     );
-
-    return wrapResponse(result, ProposalsResponseWrap);
   }
 }
