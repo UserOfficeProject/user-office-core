@@ -66,7 +66,7 @@ const sampleBasisPreSubmit = () => async ({
   const sample = (state as SampleSubmissionState).sample;
   const title = sample.title;
 
-  let returnValue = state.questionaryId;
+  let returnValue = state.questionary.questionaryId;
 
   if (sample.id > 0) {
     const result = await api.updateSample({
@@ -82,7 +82,7 @@ const sampleBasisPreSubmit = () => async ({
   } else {
     const result = await api.createSample({
       title: title,
-      templateId: state.templateId,
+      templateId: state.questionary.templateId,
       proposalPk: sample.proposalPk,
       questionId: sample.questionId,
     });

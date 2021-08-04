@@ -6,14 +6,13 @@ import {
   QuestionaryContext,
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
-import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
-import { QuestionaryStep, ShipmentStatus } from 'generated/sdk';
+import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
+import { TemplateCategoryId } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import {
   Event,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
-  WizardStep,
 } from 'models/QuestionarySubmissionState';
 import {
   ShipmentBasic,
@@ -23,8 +22,6 @@ import {
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
-
-import ShipmentReview from './ShipmentReview';
 
 export interface ShipmentContextType extends QuestionaryContextType {
   state: ShipmentSubmissionState | null;
@@ -40,10 +37,7 @@ const shipmentReducer = (
     case 'SHIPMENT_LOADED':
       const shipment: ShipmentExtended = action.shipment;
       draftState.isDirty = false;
-      draftState.questionaryId = shipment.questionaryId;
-      draftState.shipment = shipment;
-      draftState.steps = shipment.questionary.steps;
-      draftState.templateId = shipment.questionary.templateId;
+      draftState.itemWithQuestionary = shipment;
       break;
     case 'SHIPMENT_MODIFIED':
       draftState.shipment = {
@@ -52,58 +46,11 @@ const shipmentReducer = (
       };
       draftState.isDirty = true;
       break;
-    case 'STEPS_LOADED': {
-      draftState.shipment.questionary.steps = action.steps;
-      break;
-    }
-    case 'STEP_ANSWERED':
-      const updatedStep = action.step;
-      const stepIndex = draftState.shipment.questionary.steps.findIndex(
-        (step) => step.topic.id === updatedStep.topic.id
-      );
-      draftState.shipment.questionary.steps[stepIndex] = updatedStep;
-
-      break;
   }
 
   return draftState;
 };
 
-const isShipmentSubmitted = (shipment: { status: ShipmentStatus }) =>
-  shipment.status === ShipmentStatus.SUBMITTED;
-
-const createQuestionaryWizardStep = (
-  step: QuestionaryStep,
-  index: number
-): WizardStep => ({
-  type: 'QuestionaryStep',
-  payload: { topicId: step.topic.id, questionaryStepIndex: index },
-  getMetadata: (state, payload) => {
-    const shipmentState = state as ShipmentSubmissionState;
-    const questionaryStep = state.steps[payload.questionaryStepIndex];
-
-    return {
-      title: questionaryStep.topic.title,
-      isCompleted: questionaryStep.isCompleted,
-      isReadonly:
-        isShipmentSubmitted(shipmentState.shipment) ||
-        (index > 0 && state.steps[index - 1].isCompleted === false),
-    };
-  },
-});
-
-const createReviewWizardStep = (): WizardStep => ({
-  type: 'ShipmentReview',
-  getMetadata: (state) => {
-    const shipmentState = state as ShipmentSubmissionState;
-
-    return {
-      title: 'Review',
-      isCompleted: isShipmentSubmitted(shipmentState.shipment),
-      isReadonly: false,
-    };
-  },
-});
 export default function ShipmentContainer(props: {
   shipment: ShipmentExtended;
   onShipmentSubmitted?: (shipment: ShipmentBasic) => void;
@@ -112,35 +59,7 @@ export default function ShipmentContainer(props: {
 
   const previousInitialShipment = usePrevious(props.shipment);
 
-  const createShipmentWizardSteps = (): WizardStep[] => {
-    const wizardSteps: WizardStep[] = [];
-    const questionarySteps = props.shipment.questionary.steps;
-
-    questionarySteps.forEach((step, index) =>
-      wizardSteps.push(createQuestionaryWizardStep(step, index))
-    );
-
-    wizardSteps.push(createReviewWizardStep());
-
-    return wizardSteps;
-  };
-
-  const displayElementFactory = (metadata: WizardStep, isReadonly: boolean) => {
-    switch (metadata.type) {
-      case 'QuestionaryStep':
-        return (
-          <QuestionaryStepView
-            readonly={isReadonly}
-            topicId={metadata.payload.topicId}
-          />
-        );
-      case 'ShipmentReview':
-        return <ShipmentReview />;
-
-      default:
-        throw new Error(`Unknown step type ${metadata.type}`);
-    }
-  };
+  const def = getQuestionaryDefinition(TemplateCategoryId.SHIPMENT_DECLARATION);
 
   /**
    * Returns true if reset was performed, false otherwise
@@ -199,16 +118,12 @@ export default function ShipmentContainer(props: {
       }
     };
   };
-  const initialState: ShipmentSubmissionState = {
-    shipment: props.shipment,
-    templateId: props.shipment.questionary.templateId,
-    isDirty: false,
-    questionaryId: props.shipment.questionary.questionaryId,
-    stepIndex: 0,
-    steps: props.shipment.questionary.steps,
-    wizardSteps: createShipmentWizardSteps(),
-  };
-
+  const initialState = new ShipmentSubmissionState(
+    props.shipment,
+    0,
+    false,
+    def.wizardStepFactory.getWizardSteps(props.shipment.questionary.steps)
+  );
   const {
     state,
     dispatch,
@@ -239,7 +154,7 @@ export default function ShipmentContainer(props: {
         title={state.shipment.title || 'New Shipment'}
         info={state.shipment.status}
         handleReset={handleReset}
-        displayElementFactory={displayElementFactory}
+        displayElementFactory={def.displayElementFactory}
       />
     </QuestionaryContext.Provider>
   );

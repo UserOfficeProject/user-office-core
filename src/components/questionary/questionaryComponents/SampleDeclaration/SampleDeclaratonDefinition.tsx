@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType, SubTemplateConfig } from 'generated/sdk';
+import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import QuestionaryComponentSampleDeclaration from './QuestionaryComponentSampleDeclaration';
@@ -51,8 +52,10 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
     return schema;
   },
   getYupInitialValue: ({ state, answer }) => {
+    const samplesState = state as ProposalSubmissionState;
+
     return (
-      state.proposal?.samples?.filter(
+      samplesState.proposal.samples?.filter(
         (sample) => sample.questionId === answer.question.id
       ) ?? []
     );
