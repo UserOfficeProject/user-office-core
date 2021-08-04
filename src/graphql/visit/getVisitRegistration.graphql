@@ -6,6 +6,7 @@ query getVisitRegistration($visitId: Int!) {
     }
     questionary {
       ...questionary
+      isCompleted
     }
   }
 }

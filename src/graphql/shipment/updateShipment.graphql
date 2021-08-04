@@ -17,6 +17,7 @@ mutation updateShipment(
       ...shipment
       questionary {
         ...questionary
+        isCompleted
       }
     }
   }

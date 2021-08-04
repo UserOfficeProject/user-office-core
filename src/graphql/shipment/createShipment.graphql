@@ -4,6 +4,7 @@ mutation createShipment($title: String!, $proposalPk: Int!, $visitId: Int!) {
       ...shipment
       questionary {
         ...questionary
+        isCompleted
       }
       samples {
         ...sample

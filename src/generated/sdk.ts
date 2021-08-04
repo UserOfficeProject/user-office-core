@@ -640,6 +640,7 @@ export type Mutation = {
   setInstrumentAvailabilityTime: SuccessResponseWrap;
   submitInstrument: SuccessResponseWrap;
   administrationProposal: ProposalResponseWrap;
+  cloneProposals: ProposalsResponseWrap;
   updateProposal: ProposalResponseWrap;
   addProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
   addStatusChangingEventsToConnection: ProposalStatusChangingEventResponseWrap;
@@ -698,7 +699,6 @@ export type Mutation = {
   addTechnicalReview: TechnicalReviewResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   checkExternalToken: CheckExternalTokenWrap;
-  cloneProposals: ProposalsResponseWrap;
   cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   createProposal: ProposalResponseWrap;
@@ -868,6 +868,11 @@ export type MutationAdministrationProposalArgs = {
   statusId?: Maybe<Scalars['Int']>;
   managementTimeAllocation?: Maybe<Scalars['Int']>;
   managementDecisionSubmitted?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationCloneProposalsArgs = {
+  cloneProposalsInput: CloneProposalsInput;
 };
 
 
@@ -1281,11 +1286,6 @@ export type MutationCheckExternalTokenArgs = {
 };
 
 
-export type MutationCloneProposalsArgs = {
-  cloneProposalsInput: CloneProposalsInput;
-};
-
-
 export type MutationCloneSampleArgs = {
   sampleId: Scalars['Int'];
 };
@@ -1634,7 +1634,7 @@ export type Proposal = {
   instrument: Maybe<Instrument>;
   sep: Maybe<Sep>;
   call: Maybe<Call>;
-  questionary: Maybe<Questionary>;
+  questionary: Questionary;
   sepMeetingDecision: Maybe<SepMeetingDecision>;
   samples: Maybe<Array<Sample>>;
   visits: Maybe<Array<Visit>>;
@@ -3038,7 +3038,7 @@ export type VisitRegistration = {
   isRegistrationSubmitted: Scalars['Boolean'];
   trainingExpiryDate: Maybe<Scalars['DateTime']>;
   user: BasicUserDetails;
-  questionary: Maybe<Questionary>;
+  questionary: Questionary;
 };
 
 export type VisitRegistrationResponseWrap = {
@@ -3295,10 +3295,10 @@ export type GetSepProposalQuery = (
       )>, users: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
-      )>, questionary: Maybe<(
+      )>, questionary: (
         { __typename?: 'Questionary' }
         & QuestionaryFragment
-      )>, technicalReview: Maybe<(
+      ), technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
         & { reviewer: Maybe<(
           { __typename?: 'BasicUserDetails' }
@@ -4341,10 +4341,11 @@ export type CloneProposalsMutation = (
       )>, users: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
-      )>, questionary: Maybe<(
+      )>, questionary: (
         { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
         & QuestionaryFragment
-      )>, technicalReview: Maybe<(
+      ), technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
         & CoreTechnicalReviewFragment
       )>, reviews: Maybe<Array<(
@@ -4384,11 +4385,11 @@ export type CreateProposalMutation = (
       & { status: Maybe<(
         { __typename?: 'ProposalStatus' }
         & ProposalStatusFragment
-      )>, questionary: Maybe<(
+      )>, questionary: (
         { __typename?: 'Questionary' }
         & Pick<Questionary, 'isCompleted'>
         & QuestionaryFragment
-      )>, proposer: Maybe<(
+      ), proposer: Maybe<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
       )>, users: Array<(
@@ -4519,11 +4520,11 @@ export type GetProposalQuery = (
     )>, users: Array<(
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
-    )>, questionary: Maybe<(
+    )>, questionary: (
       { __typename?: 'Questionary' }
       & Pick<Questionary, 'isCompleted'>
       & QuestionaryFragment
-    )>, technicalReview: Maybe<(
+    ), technicalReview: Maybe<(
       { __typename?: 'TechnicalReview' }
       & { reviewer: Maybe<(
         { __typename?: 'BasicUserDetails' }
@@ -4777,6 +4778,7 @@ export type CreateQuestionaryMutation = (
     { __typename?: 'QuestionaryResponseWrap' }
     & { questionary: Maybe<(
       { __typename?: 'Questionary' }
+      & Pick<Questionary, 'isCompleted'>
       & QuestionaryFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
@@ -5634,6 +5636,7 @@ export type CreateShipmentMutation = (
       { __typename?: 'Shipment' }
       & { questionary: (
         { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
         & QuestionaryFragment
       ), samples: Array<(
         { __typename?: 'Sample' }
@@ -5694,6 +5697,7 @@ export type GetShipmentQuery = (
     { __typename?: 'Shipment' }
     & { questionary: (
       { __typename?: 'Questionary' }
+      & Pick<Questionary, 'isCompleted'>
       & QuestionaryFragment
     ), samples: Array<(
       { __typename?: 'Sample' }
@@ -5772,6 +5776,7 @@ export type UpdateShipmentMutation = (
       { __typename?: 'Shipment' }
       & { questionary: (
         { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
         & QuestionaryFragment
       ) }
       & ShipmentFragment
@@ -6965,10 +6970,11 @@ export type CreateVisitRegistrationQuestionaryMutation = (
       & { user: (
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
-      ), questionary: Maybe<(
+      ), questionary: (
         { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
         & QuestionaryFragment
-      )> }
+      ) }
       & VisitRegistrationFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
@@ -7046,10 +7052,11 @@ export type GetVisitRegistrationQuery = (
     & { user: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
-    ), questionary: Maybe<(
+    ), questionary: (
       { __typename?: 'Questionary' }
+      & Pick<Questionary, 'isCompleted'>
       & QuestionaryFragment
-    )> }
+    ) }
     & VisitRegistrationFragment
   )> }
 );
@@ -8504,6 +8511,7 @@ export const CloneProposalsDocument = gql`
       }
       questionary {
         ...questionary
+        isCompleted
       }
       technicalReview {
         ...coreTechnicalReview
@@ -8914,6 +8922,7 @@ export const CreateQuestionaryDocument = gql`
   createQuestionary(templateId: $templateId) {
     questionary {
       ...questionary
+      isCompleted
     }
     rejection {
       ...rejection
@@ -9492,6 +9501,7 @@ export const CreateShipmentDocument = gql`
       ...shipment
       questionary {
         ...questionary
+        isCompleted
       }
       samples {
         ...sample
@@ -9528,6 +9538,7 @@ export const GetShipmentDocument = gql`
     ...shipment
     questionary {
       ...questionary
+      isCompleted
     }
     samples {
       ...sample
@@ -9585,6 +9596,7 @@ export const UpdateShipmentDocument = gql`
       ...shipment
       questionary {
         ...questionary
+        isCompleted
       }
     }
   }
@@ -10289,6 +10301,7 @@ export const CreateVisitRegistrationQuestionaryDocument = gql`
       }
       questionary {
         ...questionary
+        isCompleted
       }
     }
     rejection {
@@ -10344,6 +10357,7 @@ export const GetVisitRegistrationDocument = gql`
     }
     questionary {
       ...questionary
+      isCompleted
     }
   }
 }

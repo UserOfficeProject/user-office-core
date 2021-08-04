@@ -139,7 +139,7 @@ const proposalBasisPreSubmit = () => async ({
   const proposal = (state as ProposalSubmissionState).proposal;
   const { primaryKey, title, abstract, users, proposer, callId } = proposal;
 
-  let returnValue = state.questionaryId;
+  let returnValue = state.questionary.questionaryId;
 
   if (primaryKey > 0) {
     const result = await api.updateProposal({

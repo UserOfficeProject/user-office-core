@@ -15,6 +15,7 @@ mutation cloneProposals($proposalsToClonePk: [Int!]!, $callId: Int!) {
       }
       questionary {
         ...questionary
+        isCompleted
       }
       technicalReview {
         ...coreTechnicalReview
