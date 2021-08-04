@@ -28,7 +28,7 @@ import { SampleStatus } from '../models/Sample';
 import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
-import { CloneProposalInput } from '../resolvers/mutations/CloneProposalMutation';
+import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
@@ -404,17 +404,32 @@ export default class ProposalMutations {
   }
 
   @Authorized()
-  @EventBus(Event.PROPOSAL_CLONED)
-  async clone(
+  async cloneProposals(
     agent: UserWithRole | null,
-    { callId, proposalToClonePk: proposalToCloneId }: CloneProposalInput
+    { callId, proposalsToClonePk }: CloneProposalsInput
+  ): Promise<(Proposal | Rejection)[]> {
+    return Promise.all(
+      proposalsToClonePk.map((proposalPk) => {
+        return this.clone(agent, {
+          callId: callId,
+          proposalToClonePk: proposalPk,
+        });
+      })
+    );
+  }
+
+  @Authorized()
+  @EventBus(Event.PROPOSAL_CLONED)
+  private async clone(
+    agent: UserWithRole | null,
+    { callId, proposalToClonePk }: { callId: number; proposalToClonePk: number }
   ): Promise<Proposal | Rejection> {
-    const sourceProposal = await this.proposalDataSource.get(proposalToCloneId);
+    const sourceProposal = await this.proposalDataSource.get(proposalToClonePk);
 
     if (!sourceProposal) {
       return rejection(
         'Can not clone proposal because source proposal does not exist',
-        { proposalToCloneId }
+        { proposalToClonePk }
       );
     }
 
@@ -520,7 +535,7 @@ export default class ProposalMutations {
     } catch (error) {
       return rejection(
         'Could not clone the proposal',
-        { proposalToCloneId },
+        { proposalToClonePk },
         error
       );
     }
