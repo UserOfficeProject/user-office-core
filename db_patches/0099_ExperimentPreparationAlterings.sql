@@ -23,6 +23,7 @@ BEGIN
 		ALTER TABLE proposals ADD COLUMN risk_assessment_questionary_id INTEGER REFERENCES questionaries(questionary_id) DEFAULT NULL;
 
 		/* shipments */
+
 		DELETE FROM shipments; /* Delete all existing shipments, because shipment must have associated visit_id */
 		ALTER TABLE shipments ADD COLUMN visit_id INTEGER REFERENCES visits(visit_id) NOT NULL;
 
