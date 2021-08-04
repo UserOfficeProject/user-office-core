@@ -108,9 +108,9 @@ context('visits tests', () => {
 
     // add visitors
     cy.get('[data-cy=add-participant-button]').click();
+    cy.get('[name=email]').type('david@teleworm.us{enter}');
     cy.contains('Beckley').parent().find('[type=checkbox]').click();
     cy.contains('Carlsson').parent().find('[type=checkbox]').click();
-    cy.contains('Dawson').parent().find('[type=checkbox]').click();
     cy.get('[data-cy=assign-selected-users]').click();
 
     // specify team lead
@@ -143,8 +143,6 @@ context('visits tests', () => {
 
   it('Visitor should be able to register for a visit', () => {
     cy.login({ email: 'david@teleworm.us', password: 'Test1234!' });
-
-    cy.contains('Carlsson').parent().find('[type="checkbox"]').click();
 
     // test if the actions are available after co-proposer defined the team
     cy.testActionButton(registerVisitTitle, 'active');
