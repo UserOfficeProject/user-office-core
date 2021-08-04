@@ -167,7 +167,7 @@ const shipmentBasisPreSubmit = () => async ({
   const shipment = (state as ShipmentSubmissionState).shipment;
   const title = shipment.title;
   let shipmentId = shipment.id;
-  let returnValue = state.questionaryId;
+  let returnValue = state.questionary.questionaryId;
   if (shipmentId > 0) {
     const result = await api.updateShipment({
       title: title,

@@ -6,8 +6,8 @@ import {
   QuestionaryContext,
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
-import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
-import { Proposal, QuestionaryStep } from 'generated/sdk';
+import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
+import { TemplateCategoryId } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import { usePersistProposalModel } from 'hooks/proposal/usePersistProposalModel';
 import {
@@ -18,14 +18,11 @@ import {
   Event,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
-  WizardStep,
 } from 'models/QuestionarySubmissionState';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
-
-import ProposalSummary from './ProposalSummary';
 
 export interface ProposalContextType extends QuestionaryContextType {
   state: ProposalSubmissionState | null;
@@ -41,95 +38,19 @@ const proposalReducer = (
     case 'PROPOSAL_LOADED':
       const proposal = action.proposal;
       draftState.isDirty = false;
-      draftState.questionaryId = proposal.questionaryId;
-      draftState.proposal = proposal;
-      draftState.steps = proposal.questionary?.steps || [];
-      draftState.templateId = proposal.questionary?.templateId || 0;
+      draftState.itemWithQuestionary = proposal;
       break;
     case 'PROPOSAL_MODIFIED':
-      draftState.proposal = {
-        ...draftState.proposal,
+      draftState.itemWithQuestionary = {
+        ...draftState.itemWithQuestionary,
         ...action.proposal,
       };
       draftState.isDirty = true;
-      break;
-    case 'STEPS_LOADED': {
-      if (draftState.proposal.questionary) {
-        draftState.proposal.questionary.steps = action.steps;
-      }
-      break;
-    }
-    case 'STEP_ANSWERED':
-      const updatedStep = action.step;
-      if (draftState.proposal.questionary) {
-        const stepIndex = draftState.proposal.questionary.steps.findIndex(
-          (step) => step.topic.id === updatedStep.topic.id
-        );
-        draftState.proposal.questionary.steps[stepIndex] = updatedStep;
-      }
-
       break;
   }
 
   return draftState;
 };
-
-const isProposalSubmitted = (proposal: Pick<Proposal, 'submitted'>) =>
-  proposal.submitted;
-
-function getProposalStatus(proposal: ProposalSubsetSubmission) {
-  if (proposal.status != null) {
-    return proposal.status?.shortCode.toString();
-  } else {
-    return 'Proposal Status is null';
-  }
-}
-
-function isReadOnly(proposalToCheck: ProposalSubsetSubmission) {
-  if (
-    !proposalToCheck.submitted ||
-    getProposalStatus(proposalToCheck) === 'EDITABLE_SUBMITTED' ||
-    getProposalStatus(proposalToCheck) === 'DRAFT'
-  ) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
-const createQuestionaryWizardStep = (
-  step: QuestionaryStep,
-  index: number
-): WizardStep => ({
-  type: 'QuestionaryStep',
-  payload: { topicId: step.topic.id, questionaryStepIndex: index },
-  getMetadata: (state, payload) => {
-    const proposalState = state as ProposalSubmissionState;
-    const questionaryStep = state.steps[payload.questionaryStepIndex];
-
-    return {
-      title: questionaryStep.topic.title,
-      isCompleted: questionaryStep.isCompleted,
-      isReadonly: isReadOnly(proposalState.proposal),
-    };
-  },
-});
-
-const createReviewWizardStep = (): WizardStep => ({
-  type: 'ProposalReview',
-  getMetadata: (state) => {
-    const proposalState = state as ProposalSubmissionState;
-    const lastProposalStep = proposalState.steps[state.steps.length - 1];
-
-    return {
-      title: 'Review',
-      isCompleted: isProposalSubmitted(proposalState.proposal),
-      isReadonly:
-        isReadOnly(proposalState.proposal) &&
-        lastProposalStep.isCompleted === true,
-    };
-  },
-});
 
 export default function ProposalContainer(props: {
   proposal: ProposalSubsetSubmission;
@@ -140,35 +61,7 @@ export default function ProposalContainer(props: {
   const { persistModel: persistProposalModel } = usePersistProposalModel();
   const previousInitialProposal = usePrevious(props.proposal);
 
-  const createProposalWizardSteps = (): WizardStep[] => {
-    const wizardSteps: WizardStep[] = [];
-    const questionarySteps = props.proposal.questionary?.steps;
-
-    questionarySteps?.forEach((step, index) =>
-      wizardSteps.push(createQuestionaryWizardStep(step, index))
-    );
-
-    wizardSteps.push(createReviewWizardStep());
-
-    return wizardSteps;
-  };
-
-  const displayElementFactory = (metadata: WizardStep, isReadonly: boolean) => {
-    switch (metadata.type) {
-      case 'QuestionaryStep':
-        return (
-          <QuestionaryStepView
-            readonly={isReadonly}
-            topicId={metadata.payload.topicId}
-          />
-        );
-      case 'ProposalReview':
-        return <ProposalSummary data={state} readonly={isReadonly} />;
-
-      default:
-        throw new Error(`Unknown step type ${metadata.type}`);
-    }
-  };
+  const def = getQuestionaryDefinition(TemplateCategoryId.PROPOSAL_QUESTIONARY);
 
   /**
    * Returns true if reset was performed, false otherwise
@@ -228,15 +121,12 @@ export default function ProposalContainer(props: {
       }
     };
   };
-  const initialState: ProposalSubmissionState = {
-    proposal: props.proposal,
-    templateId: props.proposal.questionary?.templateId || 0,
-    isDirty: false,
-    questionaryId: props.proposal.questionary?.questionaryId || null,
-    stepIndex: 0,
-    steps: props.proposal.questionary?.steps || [],
-    wizardSteps: createProposalWizardSteps(),
-  };
+  const initialState = new ProposalSubmissionState(
+    props.proposal,
+    0,
+    false,
+    def.wizardStepFactory.getWizardSteps(props.proposal.questionary.steps)
+  );
 
   const {
     state,
@@ -276,7 +166,7 @@ export default function ProposalContainer(props: {
                 : 'DRAFT'
             }
             handleReset={handleReset}
-            displayElementFactory={displayElementFactory}
+            displayElementFactory={def.displayElementFactory}
           />
         </StyledPaper>
       </ContentContainer>

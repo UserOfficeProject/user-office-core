@@ -2,7 +2,8 @@
 import produce, { Draft } from 'immer';
 import { Reducer } from 'react';
 
-import { Answer, QuestionaryStep } from 'generated/sdk';
+import { Answer, Questionary, QuestionaryStep } from 'generated/sdk';
+import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import { clamp } from 'utils/Math';
 import {
   ReducerMiddleware,
@@ -10,6 +11,7 @@ import {
 } from 'utils/useReducerWithMiddleWares';
 
 import { ProposalSubsetSubmission } from './ProposalSubmissionState';
+import { StepType } from './questionary/StepType';
 import { getFieldById } from './QuestionaryFunctions';
 import { SampleWithQuestionary } from './Sample';
 import { ShipmentExtended } from './ShipmentSubmissionState';
@@ -29,6 +31,7 @@ export type Event =
   | { type: 'SAMPLE_UPDATED'; sample: Partial<SampleWithQuestionary> }
   | { type: 'SAMPLE_LOADED'; sample: SampleWithQuestionary }
   | { type: 'SAMPLE_MODIFIED'; sample: Partial<SampleWithQuestionary> }
+  | { type: 'SAMPLE_SUBMITTED'; sample: Partial<SampleWithQuestionary> }
   | { type: 'PROPOSAL_MODIFIED'; proposal: Partial<ProposalSubsetSubmission> }
   | { type: 'PROPOSAL_CREATED'; proposal: ProposalSubsetSubmission }
   | { type: 'PROPOSAL_LOADED'; proposal: ProposalSubsetSubmission }
@@ -49,7 +52,7 @@ export interface WizardStepMetadata {
 }
 
 export interface WizardStep {
-  type: 'QuestionaryStep' | 'ProposalReview' | 'ShipmentReview' | 'VisitReview';
+  type: StepType;
   payload?: any;
   getMetadata: (
     state: QuestionarySubmissionState,
@@ -57,14 +60,21 @@ export interface WizardStep {
   ) => WizardStepMetadata;
 }
 
-export interface QuestionarySubmissionState {
-  questionaryId: number | null; // null if questionary not created yet
-  steps: QuestionaryStep[]; // blank of filled out steps. If blank, then questionaryId will be null
-  templateId: number;
-  stepIndex: number;
-  isDirty: boolean;
-  wizardSteps: WizardStep[];
-  proposal?: ProposalSubsetSubmission;
+export abstract class QuestionarySubmissionState {
+  constructor(
+    public stepIndex: number,
+    public isDirty: boolean,
+    public wizardSteps: WizardStep[]
+  ) {}
+  abstract itemWithQuestionary: { questionary: Questionary };
+
+  get questionary() {
+    return this.itemWithQuestionary.questionary;
+  }
+
+  set questionary(questionary) {
+    this.itemWithQuestionary.questionary = questionary;
+  }
 }
 
 const clamStepIndex = (stepIndex: number, stepCount: number) => {
@@ -83,7 +93,10 @@ function getInitialStepIndex(state: QuestionarySubmissionState): number {
     .reverse()
     .find((step) => step.getMetadata(state, step.payload).isCompleted === true);
 
-  if (state.proposal?.status?.shortCode.toString() == 'EDITABLE_SUBMITTED') {
+  if (
+    (state as ProposalSubmissionState).proposal?.status?.shortCode.toString() ==
+    'EDITABLE_SUBMITTED'
+  ) {
     return 0;
   }
   if (!lastFinishedStep) {
@@ -107,7 +120,10 @@ export function QuestionarySubmissionModel<
     return produce(state, (draftState) => {
       switch (action.type) {
         case 'FIELD_CHANGED':
-          const field = getFieldById(draftState.steps, action.id) as Answer;
+          const field = getFieldById(
+            draftState.questionary.steps,
+            action.id
+          ) as Answer;
           field.value = action.newValue;
           draftState.isDirty = true;
           break;
@@ -140,7 +156,7 @@ export function QuestionarySubmissionModel<
           break;
 
         case 'STEPS_LOADED': {
-          draftState.steps = action.steps;
+          draftState.questionary.steps = action.steps;
           const stepIndex =
             action.stepIndex !== undefined
               ? action.stepIndex
@@ -151,10 +167,10 @@ export function QuestionarySubmissionModel<
         }
         case 'STEP_ANSWERED':
           const updatedStep = action.step;
-          const stepIndex = draftState.steps.findIndex(
+          const stepIndex = draftState.questionary.steps.findIndex(
             (step) => step.topic.id === updatedStep.topic.id
           );
-          draftState.steps[stepIndex] = updatedStep;
+          draftState.questionary.steps[stepIndex] = updatedStep;
 
           draftState.isDirty = false;
 

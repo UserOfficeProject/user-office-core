@@ -4,8 +4,8 @@ import React, { useContext, useRef, useEffect } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
-import { WizardStep } from 'models/QuestionarySubmissionState';
 
+import { StepDisplayElementFactory } from './DefaultStepDisplayElementFactory';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
@@ -15,10 +15,7 @@ import { QuestionaryStepButton } from './QuestionaryStepButton';
 interface QuestionaryProps {
   title: string;
   info?: string;
-  displayElementFactory: (
-    metadata: WizardStep,
-    isReadonly: boolean
-  ) => React.ReactNode;
+  displayElementFactory: StepDisplayElementFactory;
   handleReset: () => Promise<boolean>;
 }
 
@@ -137,7 +134,7 @@ function Questionary({
       return null;
     }
 
-    return displayElementFactory(
+    return displayElementFactory.getDisplayElement(
       currentStep,
       stepMetadata.isReadonly && !isUserOfficer
     );
