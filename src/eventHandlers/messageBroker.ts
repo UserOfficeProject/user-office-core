@@ -65,6 +65,19 @@ const getProposalMessageData = async (proposal: Proposal) => {
   return JSON.stringify(messageData);
 };
 
+const getSecondsPerAllocationTimeUnit = (
+  timeAllocation: number,
+  unit: AllocationTimeUnits
+) => {
+  // NOTE: Default AllocationTimeUnit is 'Day'. The UI supports Days and Hours.
+  switch (unit) {
+    case AllocationTimeUnits.Hour:
+      return timeAllocation * 60 * 60;
+    default:
+      return timeAllocation * 24 * 60 * 60;
+  }
+};
+
 export function createPostToRabbitMQHandler() {
   const proposalSettingsDataSource = container.resolve<ProposalSettingsDataSource>(
     Tokens.ProposalSettingsDataSource
@@ -141,13 +154,10 @@ export function createPostToRabbitMQHandler() {
           return;
         }
 
-        // NOTE: Default allocation unit is Days. The UI supports Days and Hours.
-        let proposalAllocatedTime =
-          proposal.managementTimeAllocation * 24 * 60 * 60;
-
-        if (call.allocationTimeUnit === AllocationTimeUnits.Hour) {
-          proposalAllocatedTime = proposal.managementTimeAllocation * 60 * 60;
-        }
+        const proposalAllocatedTime = getSecondsPerAllocationTimeUnit(
+          proposal.managementTimeAllocation,
+          call.allocationTimeUnit
+        );
 
         // NOTE: maybe use shared types?
         const message = {
