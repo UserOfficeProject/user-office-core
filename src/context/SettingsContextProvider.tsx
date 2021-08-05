@@ -31,7 +31,11 @@ export const SettingsContextProvider: React.FC = (props) => {
   const classes = useStyles();
 
   if (loadingSettings) {
-    return <div className={classes.loader}>Loading...</div>;
+    return (
+      <div className={classes.loader} data-cy="loading">
+        Loading...
+      </div>
+    );
   }
 
   const settingsMap = settings?.reduce(function (settingsMap, settings) {

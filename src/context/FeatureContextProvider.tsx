@@ -31,7 +31,11 @@ export const FeatureContextProvider: React.FC = (props) => {
   const classes = useStyles();
 
   if (loadingFeatures) {
-    return <div className={classes.loader}>Loading...</div>;
+    return (
+      <div className={classes.loader} data-cy="loading">
+        Loading...
+      </div>
+    );
   }
 
   const featuresMap = features?.reduce(function (featuresMap, feature) {
