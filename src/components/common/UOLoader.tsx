@@ -22,6 +22,7 @@ const UOLoader: React.FC<
   return (
     <CircularProgress
       className={clsx({ [classes.button]: buttonSized })}
+      data-cy="UO-loader"
       {...props}
     />
   );
