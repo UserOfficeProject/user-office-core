@@ -8,6 +8,7 @@ export default function setStfcColourTheme() {
   const dataSource = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
   dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_DARK, '#2e2d62');
   dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_MAIN, '#003088');
+  dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_ACCENT, '#003088');
   dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_LIGHT, '#1e5df8');
   dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_CONTRAST, '#ffffff');
   dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_DARK, '#d77900');

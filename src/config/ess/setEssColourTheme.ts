@@ -6,12 +6,13 @@ import { Tokens } from '../Tokens';
 
 export default function setEssColourTheme() {
   const dataSource = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
-  dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_DARK, '#b33739');
+  dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_DARK, '#B33739');
   dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_MAIN, '#FF4E50');
+  dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_ACCENT, '#0000008A');
   dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_LIGHT, '#FC913A');
   dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_CONTRAST, '#ffffff');
-  dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_DARK, '#F9D423');
-  dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_MAIN, '#F9D423');
+  dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_DARK, '#B33739');
+  dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_MAIN, '#FF4E50');
   dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_LIGHT, '#E1F5C4');
   dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_CONTRAST, '#ffffff');
   dataSource.updateSettings(SettingsId.PALETTE_ERROR_MAIN, '#f44336');
