@@ -10,6 +10,9 @@ export class VisitsFilter {
 
   @Field(() => Int, { nullable: true })
   public proposalPk?: number;
+
+  @Field(() => Int, { nullable: true })
+  public scheduledEventId?: number;
 }
 
 @Resolver()
