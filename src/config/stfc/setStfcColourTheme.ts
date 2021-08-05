@@ -16,7 +16,7 @@ export default function setStfcColourTheme() {
   dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_LIGHT, '#fbbe10');
   dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_CONTRAST, '#000000');
   dataSource.updateSettings(SettingsId.PALETTE_ERROR_MAIN, '#a91b2e');
-  dataSource.updateSettings(SettingsId.PALETTE_SUCCESS_MAIN, '#3e863e');
+  dataSource.updateSettings(SettingsId.PALETTE_SUCCESS_MAIN, '#157846');
   dataSource.updateSettings(SettingsId.PALETTE_WARNING_MAIN, '#fbbe10');
   dataSource.updateSettings(SettingsId.PALETTE_INFO_MAIN, '#1e5df8');
   dataSource.updateSettings(
