@@ -48,7 +48,14 @@ const closeModal = () => {
 };
 
 const finishedLoading = () => {
-  cy.get('[role="progressbar"]').should('not.exist');
+  cy.get('[role="progressbar"]')
+    .should('not.exist')
+    .get('[data-cy="loading"]')
+    .should('not.exist')
+    .get('[data-cy="UO-loader"]')
+    .should('not.exist')
+    .get('.MuiPaper-root [role="progressbar"]')
+    .should('not.exist');
 };
 
 function presentationMode() {

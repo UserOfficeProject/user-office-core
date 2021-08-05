@@ -1,7 +1,6 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React from 'react';
 
-import UOLoader from 'components/common/UOLoader';
 import { Settings, SettingsId } from 'generated/sdk';
 import { useSettings } from 'hooks/admin/useSettings';
 
@@ -33,8 +32,8 @@ export const SettingsContextProvider: React.FC = (props) => {
 
   if (loadingSettings) {
     return (
-      <div className={classes.loader}>
-        <UOLoader size={40} />
+      <div className={classes.loader} data-cy="loading">
+        Loading...
       </div>
     );
   }
