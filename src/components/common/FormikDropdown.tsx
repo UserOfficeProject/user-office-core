@@ -110,6 +110,7 @@ const FormikDropdown: React.FC<
       type="text"
       name={name}
       label={label}
+      id={name + '-input'}
       select
       margin="normal"
       component={TextField}
