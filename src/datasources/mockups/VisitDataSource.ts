@@ -1,38 +1,88 @@
-import { BasicUserDetails } from '../../models/User';
 import { Visit, VisitStatus } from '../../models/Visit';
+import { VisitRegistration } from '../../models/VisitRegistration';
+import { GetRegistrationsFilter } from '../../queries/VisitQueries';
 import { UpdateVisitArgs } from '../../resolvers/mutations/UpdateVisitMutation';
+import { UpdateVisitRegistrationArgs } from '../../resolvers/mutations/UpdateVisitRegistration';
 import { VisitsFilter } from '../../resolvers/queries/VisitsQuery';
 import { VisitDataSource } from '../VisitDataSource';
+import { CreateVisitArgs } from './../../resolvers/mutations/CreateVisitMutation';
 import { dummyUserWithRole } from './UserDataSource';
 
 export class VisitDataSourceMock implements VisitDataSource {
   private visits: Visit[];
+  private visitsHasVisitors: VisitRegistration[];
   init() {
     this.visits = [
-      new Visit(1, 1, VisitStatus.DRAFT, 1, dummyUserWithRole.id, new Date()),
+      new Visit(
+        1,
+        1,
+        VisitStatus.DRAFT,
+        1,
+        dummyUserWithRole.id,
+        1,
+        new Date()
+      ),
+    ];
+
+    this.visitsHasVisitors = [
+      new VisitRegistration(
+        1,
+        1,
+        1,
+        false,
+        new Date('2033-07-19T00:00:00.0000')
+      ),
     ];
   }
 
   async getVisit(visitId: number): Promise<Visit | null> {
     return this.visits.find((visit) => visit.id === visitId) ?? null;
   }
-  getVisits(filter?: VisitsFilter): Promise<Visit[]> {
-    throw new Error('Method not implemented.');
+  async getVisits(filter?: VisitsFilter): Promise<Visit[]> {
+    return this.visits.reduce((matchingVisits, currentVisit) => {
+      if (filter?.creatorId && currentVisit.creatorId === filter.creatorId) {
+        matchingVisits.push(currentVisit);
+      }
+
+      if (filter?.proposalPk && currentVisit.proposalPk === filter.proposalPk) {
+        matchingVisits.push(currentVisit);
+      }
+
+      return matchingVisits;
+    }, new Array<Visit>());
   }
-  getTeam(visitId: number): Promise<BasicUserDetails[]> {
-    throw new Error('Method not implemented.');
+
+  getVisitByScheduledEventId(eventId: number): Promise<Visit | null> {
+    throw new Error('Method not implemented 2.');
   }
+  async getRegistration(
+    userId: number,
+    visitId: number
+  ): Promise<VisitRegistration | null> {
+    return (
+      this.visitsHasVisitors.find(
+        (registration) =>
+          registration.userId === userId && registration.visitId === visitId
+      ) || null
+    );
+  }
+  getRegistrations(
+    filter: GetRegistrationsFilter
+  ): Promise<VisitRegistration[]> {
+    throw new Error('Method not implemented 3');
+  }
+
   async createVisit(
-    proposalPk: number,
-    visitorId: number,
-    questionaryId: number
+    { proposalPk, teamLeadUserId, scheduledEventId }: CreateVisitArgs,
+    creatorId: number
   ): Promise<Visit> {
     const newVisit = new Visit(
       this.visits.length,
       proposalPk,
       VisitStatus.DRAFT,
-      questionaryId,
-      visitorId,
+      creatorId,
+      teamLeadUserId,
+      scheduledEventId,
       new Date()
     );
 
@@ -40,6 +90,7 @@ export class VisitDataSourceMock implements VisitDataSource {
 
     return newVisit;
   }
+
   async updateVisit(args: UpdateVisitArgs): Promise<Visit> {
     this.visits = this.visits.map((visit) => {
       if (visit && visit.id === args.visitId) {
@@ -50,6 +101,12 @@ export class VisitDataSourceMock implements VisitDataSource {
     });
 
     return (await this.getVisit(args.visitId))!;
+  }
+  updateRegistration(
+    userId: number,
+    args: UpdateVisitRegistrationArgs
+  ): Promise<VisitRegistration> {
+    throw new Error('Method not implemented 4.');
   }
   async deleteVisit(visitId: number): Promise<Visit> {
     return this.visits.splice(
@@ -63,5 +120,14 @@ export class VisitDataSourceMock implements VisitDataSource {
     proposalPk: number
   ): Promise<boolean> {
     return false;
+  }
+
+  async isVisitorOfVisit(visitorId: number, visitId: number): Promise<boolean> {
+    return this.visitsHasVisitors.find(
+      (registration) =>
+        registration.userId === visitorId && registration.visitId === visitId
+    )
+      ? true
+      : false;
   }
 }

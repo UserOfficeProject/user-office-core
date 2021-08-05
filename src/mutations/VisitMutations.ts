@@ -5,14 +5,17 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
+import { Authorized } from '../decorators';
 import { ProposalEndStatus } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
 import { Rejection } from '../models/Rejection';
 import { TemplateCategoryId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { Visit, VisitStatus } from '../models/Visit';
+import { VisitRegistration } from '../models/VisitRegistration';
 import { CreateVisitArgs } from '../resolvers/mutations/CreateVisitMutation';
 import { UpdateVisitArgs } from '../resolvers/mutations/UpdateVisitMutation';
+import { UpdateVisitRegistrationArgs } from '../resolvers/mutations/UpdateVisitRegistration';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { VisitAuthorization } from './../utils/VisitAuthorization';
 
@@ -33,6 +36,7 @@ export default class VisitMutations {
     private userAuthorization: UserAuthorization
   ) {}
 
+  @Authorized()
   async createVisit(
     user: UserWithRole | null,
     args: CreateVisitArgs
@@ -58,6 +62,20 @@ export default class VisitMutations {
       );
     }
 
+    const visitAlreadyExists =
+      (
+        await this.dataSource.getVisits({
+          scheduledEventId: args.scheduledEventId,
+        })
+      ).length > 0;
+
+    if (visitAlreadyExists) {
+      return rejection(
+        'Can not create visit because visit for the experiment that already exists',
+        { args }
+      );
+    }
+
     const isProposalOwner = await this.userAuthorization.hasAccessRights(
       user,
       proposal
@@ -69,27 +87,9 @@ export default class VisitMutations {
       );
     }
 
-    const activeTemplate = await this.templateDataSource.getActiveTemplateId(
-      TemplateCategoryId.VISIT
-    );
-    if (!activeTemplate) {
-      return rejection(
-        'Could not create visit because system has no active visit template',
-        { args, agent: user }
-      );
-    }
-
+    // TODO verify that provided scheduledEventId exists
     try {
-      const questionary = await this.questionaryDataSource.create(
-        user!.id,
-        activeTemplate
-      );
-
-      const visit = await this.dataSource.createVisit(
-        args.proposalPk,
-        user!.id,
-        questionary.questionaryId
-      );
+      const visit = await this.dataSource.createVisit(args, user!.id);
 
       if (args.team && args.team.length > 0) {
         await this.dataSource.updateVisit({
@@ -108,14 +108,27 @@ export default class VisitMutations {
     }
   }
 
+  @Authorized()
   async updateVisit(
     user: UserWithRole | null,
     args: UpdateVisitArgs
   ): Promise<Visit | Rejection> {
-    const hasRights = await this.visitAuthorization.hasWriteRights(
-      user,
-      args.visitId
-    );
+    if (!user) {
+      return rejection(
+        'Could not update visit because request is not authorized',
+        { args }
+      );
+    }
+    const visit = await this.dataSource.getVisit(args.visitId);
+
+    if (!visit) {
+      return rejection(
+        'Could not update visit because specified visit does not exist',
+        { args }
+      );
+    }
+
+    const hasRights = await this.visitAuthorization.hasWriteRights(user, visit);
 
     if (hasRights === false) {
       return rejection(
@@ -136,6 +149,7 @@ export default class VisitMutations {
     return this.dataSource.updateVisit(args);
   }
 
+  @Authorized()
   async deleteVisit(
     user: UserWithRole | null,
     visitId: number
@@ -152,5 +166,53 @@ export default class VisitMutations {
     }
 
     return this.dataSource.deleteVisit(visitId);
+  }
+  @Authorized()
+  async createVisitRegistrationQuestionary(
+    user: UserWithRole | null,
+    visitId: number
+  ): Promise<VisitRegistration | Rejection> {
+    if (!user) {
+      return rejection(
+        'Can not create visit registration questionary, because the request is not authorized'
+      );
+    }
+
+    if (!visitId) {
+      return rejection(
+        'Can not create visit registration questionary, visit id not specified'
+      );
+    }
+
+    const activeTemplate = await this.templateDataSource.getActiveTemplateId(
+      TemplateCategoryId.VISIT
+    );
+    if (!activeTemplate) {
+      return rejection(
+        'Could not create visit registration questionary, because no active template for visit is set',
+        { visitId }
+      );
+    }
+    const questionary = await this.questionaryDataSource.create(
+      user.id,
+      activeTemplate
+    );
+
+    return this.dataSource.updateRegistration(user.id, {
+      visitId: visitId,
+      registrationQuestionaryId: questionary.questionaryId,
+    });
+  }
+
+  @Authorized()
+  async updateVisitRegistration(
+    user: UserWithRole | null,
+    args: UpdateVisitRegistrationArgs
+  ): Promise<any> {
+    if (!user) {
+      return null;
+    }
+
+    return this.dataSource.updateRegistration(user.id, args);
   }
 }

@@ -1,7 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
-import { container } from 'tsyringe';
-
-import { AdminDataSource } from '../datasources/AdminDataSource';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
@@ -19,7 +17,6 @@ import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSourc
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import { createSkipPostingHandler } from '../eventHandlers/messageBroker';
-import { FeatureId } from '../models/Feature';
 import { SkipAssetRegistrar } from '../utils/EAM_service';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
@@ -59,7 +56,6 @@ mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 
 mapClass(Tokens.MailService, SkipSendMailService);
 
-mapValue(Tokens.EnableDefaultFeatures, () => {
-  const dataSource = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
-  dataSource.setFeatures([FeatureId.SCHEDULER, FeatureId.SHIPPING], true);
-});
+mapValue(Tokens.EnableDefaultFeatures, () => {});
+
+mapValue(Tokens.SetColourTheme, () => {});

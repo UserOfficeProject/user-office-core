@@ -6,13 +6,13 @@ import { Visit } from '../types/Visit';
 @InputType()
 export class VisitsFilter {
   @Field(() => Int, { nullable: true })
-  public visitorId?: number;
-
-  @Field(() => Int, { nullable: true })
-  public questionaryId?: number;
+  public creatorId?: number;
 
   @Field(() => Int, { nullable: true })
   public proposalPk?: number;
+
+  @Field(() => Int, { nullable: true })
+  public scheduledEventId?: number;
 }
 
 @Resolver()

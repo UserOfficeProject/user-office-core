@@ -1,5 +1,6 @@
 /* eslint-disable quotes */
-import * as Yup from 'yup';
+
+import { intervalQuestionValidationSchema } from '@esss-swap/duo-validation';
 
 import { IntervalConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
@@ -22,34 +23,8 @@ export const intervalDefinition: Question = {
     if (field.question.dataType !== DataType.INTERVAL) {
       throw new Error('DataType should be INTERVAL');
     }
-    const config = field.config as IntervalConfig;
 
-    let minSchema = Yup.number().transform((value) =>
-      isNaN(value) ? undefined : value
-    );
-    let maxSchema = Yup.number().transform((value) =>
-      isNaN(value) ? undefined : value
-    );
-
-    if (config.required) {
-      minSchema = minSchema.required();
-      maxSchema = maxSchema.required();
-    }
-
-    let unitSchema = Yup.string().nullable();
-
-    // available units are specified and the field is required
-    if (config.units?.length && config.required) {
-      unitSchema = unitSchema.required();
-    }
-
-    return Yup.object()
-      .shape({
-        min: minSchema,
-        max: maxSchema,
-        unit: unitSchema,
-      })
-      .isValidSync(value);
+    return intervalQuestionValidationSchema(field).isValidSync(value);
   },
   createBlankConfig: (): IntervalConfig => {
     const config = new IntervalConfig();

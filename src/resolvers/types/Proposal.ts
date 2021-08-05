@@ -16,6 +16,7 @@ import {
   ProposalPublicStatus,
 } from '../../models/Proposal';
 import { isRejection } from '../../models/Rejection';
+import { TemplateCategoryId } from '../../models/Template';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Instrument } from './Instrument';
@@ -83,6 +84,7 @@ export class Proposal implements Partial<ProposalOrigin> {
   public technicalReviewAssignee: number | null;
 
   public proposerId: number;
+  public riskAssessmentQuestionaryId: number | null;
 }
 
 @Resolver(() => Proposal)
@@ -183,14 +185,15 @@ export class ProposalResolver {
     return await context.queries.call.dataSource.getCall(proposal.callId);
   }
 
-  @FieldResolver(() => Questionary, { nullable: true })
+  @FieldResolver(() => Questionary)
   async questionary(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Questionary | null> {
-    return context.queries.questionary.getQuestionary(
+  ): Promise<Questionary> {
+    return context.queries.questionary.getQuestionaryOrDefault(
       context.user,
-      proposal.questionaryId
+      proposal.questionaryId,
+      TemplateCategoryId.PROPOSAL_QUESTIONARY
     );
   }
 
@@ -223,6 +226,21 @@ export class ProposalResolver {
     return await context.queries.visit.getMyVisits(context.user, {
       proposalPk: proposal.primaryKey,
     });
+  }
+
+  @FieldResolver(() => Questionary, { nullable: true })
+  async riskAssessmentQuestionary(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Questionary | null> {
+    if (!proposal.riskAssessmentQuestionaryId) {
+      return null;
+    }
+
+    return await context.queries.questionary.getQuestionary(
+      context.user,
+      proposal.riskAssessmentQuestionaryId
+    );
   }
 }
 

@@ -28,6 +28,7 @@ import {
 } from '../../models/Template';
 import { BasicUserDetails, User } from '../../models/User';
 import { Visit, VisitStatus } from '../../models/Visit';
+import { VisitRegistration } from '../../models/VisitRegistration';
 
 // Interfaces corresponding exactly to database tables
 
@@ -68,6 +69,7 @@ export interface ProposalRecord {
   readonly management_time_allocation: number;
   readonly management_decision_submitted: boolean;
   readonly technical_review_assignee: number;
+  readonly risk_assessment_questionary_id: number;
 }
 
 export interface ProposalViewRecord {
@@ -192,6 +194,14 @@ export interface UserRecord {
   readonly institution: string;
   readonly placeholder: boolean;
   readonly orcid_refreshtoken: string;
+}
+
+export interface VisitRegistrationRecord {
+  user_id: number;
+  visit_id: number;
+  registration_questionary_id: number | null;
+  is_registration_submitted: boolean;
+  training_expiry_date: Date | null;
 }
 
 export interface RoleRecord {
@@ -375,6 +385,7 @@ export interface SampleRecord {
 }
 
 export interface ShipmentRecord {
+  readonly visit_id: number;
   readonly shipment_id: number;
   readonly title: string;
   readonly creator_id: number;
@@ -491,7 +502,9 @@ export interface VisitRecord {
   readonly instrument_id: number;
   readonly status: string;
   readonly questionary_id: number;
-  readonly visitor_id: number;
+  readonly creator_id: number;
+  readonly team_lead_user_id: number;
+  readonly scheduled_event_id: number;
   readonly created_at: Date;
 }
 
@@ -546,7 +559,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.reference_number_sequence,
     proposal.management_time_allocation,
     proposal.management_decision_submitted,
-    proposal.technical_review_assignee
+    proposal.technical_review_assignee,
+    proposal.risk_assessment_questionary_id
   );
 };
 
@@ -664,6 +678,18 @@ export const createBasicUserObject = (user: UserRecord) => {
   );
 };
 
+export const createVisitRegistrationObject = (
+  record: VisitRegistrationRecord
+) => {
+  return new VisitRegistration(
+    record.user_id,
+    record.visit_id,
+    record.registration_questionary_id,
+    record.is_registration_submitted,
+    record.training_expiry_date
+  );
+};
+
 export const createCallObject = (call: CallRecord) => {
   return new Call(
     call.call_id,
@@ -740,6 +766,7 @@ export const createShipmentObject = (shipment: ShipmentRecord) => {
     shipment.creator_id,
     shipment.proposal_pk,
     shipment.questionary_id,
+    shipment.visit_id,
     shipment.status as ShipmentStatus,
     shipment.external_ref,
     shipment.created_at
@@ -824,8 +851,9 @@ export const createVisitObject = (visit: VisitRecord) => {
     visit.visit_id,
     visit.proposal_pk,
     (visit.status as any) as VisitStatus,
-    visit.questionary_id,
-    visit.visitor_id,
+    visit.creator_id,
+    visit.team_lead_user_id,
+    visit.scheduled_event_id,
     visit.created_at
   );
 };

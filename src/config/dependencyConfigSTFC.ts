@@ -1,9 +1,6 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
 
-import AdminDataSource, {
-  PostgresAdminDataSourceWithAutoUpgrade,
-} from '../datasources/postgres/AdminDataSource';
+import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
@@ -21,13 +18,14 @@ import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
 import { createSkipPostingHandler } from '../eventHandlers/messageBroker';
-import { FeatureId } from '../models/Feature';
 import { SkipAssetRegistrar } from '../utils/EAM_service';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { VisitAuthorization } from '../utils/VisitAuthorization';
+import enableDefaultStfcFeatures from './stfc/enableDefaultStfcFeatures';
+import setStfcColourTheme from './stfc/setStfcColourTheme';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
@@ -60,7 +58,6 @@ mapClass(Tokens.MailService, SMTPMailService);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 
-mapValue(Tokens.EnableDefaultFeatures, () => {
-  const dataSource = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
-  dataSource.setFeatures([FeatureId.EXTERNAL_AUTH], true);
-});
+mapValue(Tokens.EnableDefaultFeatures, enableDefaultStfcFeatures);
+
+mapValue(Tokens.SetColourTheme, setStfcColourTheme);
