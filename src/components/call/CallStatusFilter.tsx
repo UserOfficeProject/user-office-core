@@ -40,6 +40,7 @@ const CallStatusFilter: React.FC<CallStatusFilterProps> = ({
     <FormControl className={classes.formControl}>
       <InputLabel shrink>Status</InputLabel>
       <Select
+        id="call-status-select"
         onChange={(e) => onChange(e.target.value as CallStatus)}
         value={callStatus}
         data-cy="call-status-filter"

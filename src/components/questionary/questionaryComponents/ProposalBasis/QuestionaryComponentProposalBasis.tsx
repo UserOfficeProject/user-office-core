@@ -72,6 +72,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           component={TextField}
           data-cy="title"
           margin="dense"
+          id="title-input"
         />
       </div>
       <div className={classes.container}>
@@ -96,6 +97,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           component={TextFieldNoSubmit}
           data-cy="abstract"
           margin="dense"
+          id="abstract-input"
         />
       </div>
       <ProposalParticipant

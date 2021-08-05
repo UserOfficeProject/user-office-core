@@ -59,6 +59,7 @@ const CallFilter: React.FC<CallFilterProps> = ({
           <div className={classes.loadingText}>Loading...</div>
         ) : (
           <Select
+            id="call-select"
             onChange={(call) => {
               setQuery({
                 call: call.target.value

@@ -59,6 +59,7 @@ const InstrumentFilter: React.FC<InstrumentFilterProps> = ({
           <div className={classes.loadingText}>Loading...</div>
         ) : (
           <Select
+            id="instrument-select"
             onChange={(instrument) => {
               setQuery({
                 instrument: instrument.target.value

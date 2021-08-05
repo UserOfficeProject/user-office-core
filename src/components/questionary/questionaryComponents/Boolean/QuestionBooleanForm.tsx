@@ -34,6 +34,7 @@ export const QuestionBooleanForm: FC<QuestionFormProps> = (props) => {
             margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
+            id="boolean-key-input"
           />
           <Field
             name="question"
@@ -43,6 +44,7 @@ export const QuestionBooleanForm: FC<QuestionFormProps> = (props) => {
             margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
+            id="boolean-question-input"
           />
 
           <TitledContainer label="Constraints">

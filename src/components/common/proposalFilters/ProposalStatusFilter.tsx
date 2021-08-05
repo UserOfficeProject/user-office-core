@@ -59,6 +59,7 @@ const ProposalStatusFilter: React.FC<ProposalStatusFilterProps> = ({
           <div className={classes.loadingText}>Loading...</div>
         ) : (
           <Select
+            id="proposal-status-select"
             onChange={(proposalStatus) => {
               setQuery({
                 proposalStatus: proposalStatus.target.value
