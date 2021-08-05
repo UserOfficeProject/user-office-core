@@ -9,27 +9,27 @@ context('Proposal administration tests', () => {
     cy.viewport(1920, 1080);
   });
 
-  const proposalName1 = faker.random.words(3);
-  const proposalName2 = faker.random.words(3);
-  const proposalFixedName = 'Aaaaaaaaa test proposal title';
+  const proposalName1 = faker.lorem.words(3);
+  const proposalName2 = faker.lorem.words(3);
+  const proposalFixedName = '0000. Alphabetically first title';
 
-  const textUser = faker.random.words(5);
-  const textManager = faker.random.words(5);
+  const textUser = faker.lorem.words(5);
+  const textManager = faker.lorem.words(5);
 
   const answerDate = '2030-01-01';
   const answerMultipleChoice = 'One';
-  const answerText = faker.random.words(3);
+  const answerText = faker.lorem.words(3);
   const answerNumberInput = 99.9;
   const answerIntervalMin = 1;
   const answerIntervalMax = 100;
 
-  const textQuestion = faker.random.words(3);
-  const dateQuestion = faker.random.words(3);
-  const boolQuestion = faker.random.words(3);
-  const multipleChoiceQuestion = faker.random.words(3);
-  const numberInputQuestion = faker.random.words(3);
-  const fileUploadQuestion = faker.random.words(3);
-  const intervalQuestion = faker.random.words(3);
+  const textQuestion = faker.lorem.words(3);
+  const dateQuestion = faker.lorem.words(3);
+  const boolQuestion = faker.lorem.words(3);
+  const multipleChoiceQuestion = faker.lorem.words(3);
+  const numberInputQuestion = faker.lorem.words(3);
+  const fileUploadQuestion = faker.lorem.words(3);
+  const intervalQuestion = faker.lorem.words(3);
 
   let textQuestionId: string;
   let dateQuestionId: string;
@@ -467,7 +467,7 @@ context('Proposal administration tests', () => {
 
     cy.contains(textQuestion).click();
 
-    cy.get('[name=value]').clear().type(faker.random.words(3));
+    cy.get('[name=value]').clear().type(faker.lorem.words(3));
 
     cy.contains('Search').click();
 
