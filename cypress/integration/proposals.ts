@@ -40,9 +40,6 @@ context('Proposal tests', () => {
 
     cy.contains('Title is required');
     cy.contains('Abstract is required');
-    cy.contains(
-      'You must be part of the proposal. Either add yourself as Principal Investigator or a Co-Proposer!'
-    );
 
     const proposer = 'Carl';
 

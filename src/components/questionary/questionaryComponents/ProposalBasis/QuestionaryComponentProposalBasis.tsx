@@ -103,7 +103,10 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           formikProps.setFieldValue(`${id}.proposer`, user.id);
           dispatch({
             type: 'PROPOSAL_MODIFIED',
-            proposal: { proposer: user },
+            proposal: {
+              proposer: user,
+              users: users.concat(proposer as BasicUserDetails),
+            },
           });
         }}
         className={classes.container}
