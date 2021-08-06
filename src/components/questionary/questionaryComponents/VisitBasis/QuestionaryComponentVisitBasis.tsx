@@ -27,7 +27,7 @@ const visitBasisPreSubmit = () => async ({
 }: SubmitActionDependencyContainer) => {
   const registration = (state as VisitSubmissionState).registration;
 
-  let returnValue = state.questionaryId;
+  let returnValue = state.questionary.questionaryId;
   if (registration.registrationQuestionaryId) {
     // Already has questionary
     return registration.registrationQuestionaryId;

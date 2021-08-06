@@ -299,6 +299,16 @@ export function NewFileEntry(props: {
   return <div>Unknown state</div>;
 }
 
+const useStyles = makeStyles(() => ({
+  questionnairesList: {
+    listStyle: 'none',
+    padding: 0,
+    marginBottom: 0,
+    '& li': {
+      paddingLeft: 0,
+    },
+  },
+}));
 export function FileUploadComponent(props: {
   maxFiles?: number;
   id?: string;
@@ -309,16 +319,7 @@ export function FileUploadComponent(props: {
   const fileIds = props.value.map((fileItem) => fileItem.id);
   const { files, setFiles } = useFileMetadata(fileIds);
 
-  const classes = makeStyles(() => ({
-    questionnairesList: {
-      listStyle: 'none',
-      padding: 0,
-      marginBottom: 0,
-      '& li': {
-        paddingLeft: 0,
-      },
-    },
-  }))();
+  const classes = useStyles();
 
   const onUploadComplete = (newFile: FileMetaData): void => {
     const newValue = files.concat(newFile);

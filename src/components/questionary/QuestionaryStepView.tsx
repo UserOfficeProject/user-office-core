@@ -4,11 +4,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
 import * as Yup from 'yup';
 
-import { useCheckAccess } from 'components/common/Can';
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import { NavigButton } from 'components/common/NavigButton';
 import UOLoader from 'components/common/UOLoader';
-import { Answer, QuestionaryStep, Sdk, UserRole } from 'generated/sdk';
+import { Answer, QuestionaryStep, Sdk } from 'generated/sdk';
 import { usePreSubmitActions } from 'hooks/questionary/useSubmitActions';
 import {
   areDependenciesSatisfied,
@@ -95,17 +94,11 @@ export default function QuestionaryStepView(props: {
 
   const { state, dispatch } = useContext(QuestionaryContext);
 
-  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const isCallActive = state.proposal?.call?.isActive ?? true;
-
-  const readOnly = !isUserOfficer && (!isCallActive || props.readonly);
-
-  const questionaryStep = getStepByTopicId(state.steps, topicId) as
+  const questionaryStep = getStepByTopicId(state.questionary.steps, topicId) as
     | QuestionaryStep
     | undefined;
 
@@ -116,7 +109,7 @@ export default function QuestionaryStepView(props: {
   }
 
   const activeFields = questionaryStep.fields.filter((field) => {
-    return areDependenciesSatisfied(state.steps, field.question.id);
+    return areDependenciesSatisfied(state.questionary.steps, field.question.id);
   });
 
   const { initialValues, validationSchema } = createFormikConfigObjects(
@@ -170,7 +163,7 @@ export default function QuestionaryStepView(props: {
             async (f) => await f({ state, dispatch, api: api() })
           )
         )
-      ).pop() || state.questionaryId; // TODO obtain newly created questionary ID some other way
+      ).pop() || state.questionary.questionaryId; // TODO obtain newly created questionary ID some other way
 
     if (!questionaryId) {
       return false;
@@ -236,7 +229,7 @@ export default function QuestionaryStepView(props: {
         } = formikProps;
 
         return (
-          <form className={readOnly ? classes.disabled : undefined}>
+          <form className={props.readonly ? classes.disabled : undefined}>
             <PromptIfDirty isDirty={state.isDirty} />
             {activeFields.map((field) => {
               return (
@@ -261,7 +254,10 @@ export default function QuestionaryStepView(props: {
                 </div>
               );
             })}
-            <NavigationFragment disabled={readOnly} isLoading={isSubmitting}>
+            <NavigationFragment
+              disabled={props.readonly}
+              isLoading={isSubmitting}
+            >
               <NavigButton
                 onClick={backHandler}
                 disabled={state.stepIndex === 0}

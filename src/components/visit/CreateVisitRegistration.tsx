@@ -33,6 +33,7 @@ function createRegistrationStub(
       position: '',
     },
     questionary: {
+      isCompleted: false,
       questionaryId: 0,
       templateId: templateId,
       created: new Date(),

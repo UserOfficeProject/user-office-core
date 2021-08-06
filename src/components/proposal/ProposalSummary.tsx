@@ -14,10 +14,7 @@ import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryRevi
 import { UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
-import {
-  ProposalSubmissionState,
-  ProposalSubsetSubmission,
-} from 'models/ProposalSubmissionState';
+import { ProposalSubsetSubmission } from 'models/ProposalSubmissionState';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ProposalContextType } from './ProposalContainer';
@@ -35,8 +32,6 @@ const useStyles = makeStyles(() => ({
 }));
 
 type ProposalSummaryProps = {
-  data: ProposalSubmissionState;
-  readonly: boolean;
   confirm: WithConfirmType;
 };
 

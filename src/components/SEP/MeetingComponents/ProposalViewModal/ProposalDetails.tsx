@@ -19,19 +19,21 @@ type ProposalDetailsProps = {
   proposal: Proposal;
 };
 
+const useStyles = makeStyles((theme) => ({
+  heading: {
+    marginTop: theme.spacing(2),
+  },
+  textBold: {
+    fontWeight: 'bold',
+  },
+  table: {
+    minWidth: 500,
+  },
+}));
+
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
   const downloadPDFProposal = useDownloadPDFProposal();
-  const classes = makeStyles((theme) => ({
-    heading: {
-      marginTop: theme.spacing(2),
-    },
-    textBold: {
-      fontWeight: 'bold',
-    },
-    table: {
-      minWidth: 500,
-    },
-  }))();
+  const classes = useStyles();
 
   return (
     <div data-cy="SEP-meeting-components-proposal-details">

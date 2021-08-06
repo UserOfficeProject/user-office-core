@@ -40,6 +40,7 @@ function createShipmentStub(
       templateId: templateId,
       created: new Date(),
       steps: questionarySteps,
+      isCompleted: false,
     },
     proposal: {
       proposalId: '123456',
