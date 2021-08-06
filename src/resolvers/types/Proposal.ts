@@ -16,6 +16,7 @@ import {
   ProposalPublicStatus,
 } from '../../models/Proposal';
 import { isRejection } from '../../models/Rejection';
+import { TemplateCategoryId } from '../../models/Template';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Instrument } from './Instrument';
@@ -184,14 +185,15 @@ export class ProposalResolver {
     return await context.queries.call.dataSource.getCall(proposal.callId);
   }
 
-  @FieldResolver(() => Questionary, { nullable: true })
+  @FieldResolver(() => Questionary)
   async questionary(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Questionary | null> {
-    return context.queries.questionary.getQuestionary(
+  ): Promise<Questionary> {
+    return context.queries.questionary.getQuestionaryOrDefault(
       context.user,
-      proposal.questionaryId
+      proposal.questionaryId,
+      TemplateCategoryId.PROPOSAL_QUESTIONARY
     );
   }
 

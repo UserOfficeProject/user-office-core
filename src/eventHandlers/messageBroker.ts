@@ -3,6 +3,7 @@ import { Queue, RabbitMQMessageBroker } from '@esss-swap/duo-message-broker';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
@@ -10,6 +11,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
+import { AllocationTimeUnits } from '../models/Call';
 import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 
@@ -63,6 +65,19 @@ const getProposalMessageData = async (proposal: Proposal) => {
   return JSON.stringify(messageData);
 };
 
+const getSecondsPerAllocationTimeUnit = (
+  timeAllocation: number,
+  unit: AllocationTimeUnits
+) => {
+  // NOTE: Default AllocationTimeUnit is 'Day'. The UI supports Days and Hours.
+  switch (unit) {
+    case AllocationTimeUnits.Hour:
+      return timeAllocation * 60 * 60;
+    default:
+      return timeAllocation * 24 * 60 * 60;
+  }
+};
+
 export function createPostToRabbitMQHandler() {
   const proposalSettingsDataSource = container.resolve<ProposalSettingsDataSource>(
     Tokens.ProposalSettingsDataSource
@@ -73,6 +88,9 @@ export function createPostToRabbitMQHandler() {
   );
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
+  );
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
   );
 
   const rabbitMQ = new RabbitMQMessageBroker();
@@ -126,12 +144,26 @@ export function createPostToRabbitMQHandler() {
           return;
         }
 
+        const call = await callDataSource.getCall(proposal.callId);
+
+        if (!call) {
+          logger.logWarn(`Proposal '${proposal.primaryKey}' has no call`, {
+            proposal,
+          });
+
+          return;
+        }
+
+        const proposalAllocatedTime = getSecondsPerAllocationTimeUnit(
+          proposal.managementTimeAllocation,
+          call.allocationTimeUnit
+        );
+
         // NOTE: maybe use shared types?
         const message = {
           proposalPk: proposal.primaryKey,
           callId: proposal.callId,
-          // the UI supports days
-          allocatedTime: proposal.managementTimeAllocation * 24 * 60 * 60,
+          allocatedTime: proposalAllocatedTime,
           instrumentId: instrument.id,
         };
 

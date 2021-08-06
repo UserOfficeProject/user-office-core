@@ -8,6 +8,7 @@ export default function setStfcColourTheme() {
   const dataSource = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
   dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_DARK, '#2e2d62');
   dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_MAIN, '#003088');
+  dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_ACCENT, '#003088');
   dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_LIGHT, '#1e5df8');
   dataSource.updateSettings(SettingsId.PALETTE_PRIMARY_CONTRAST, '#ffffff');
   dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_DARK, '#d77900');
@@ -15,7 +16,7 @@ export default function setStfcColourTheme() {
   dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_LIGHT, '#fbbe10');
   dataSource.updateSettings(SettingsId.PALETTE_SECONDARY_CONTRAST, '#000000');
   dataSource.updateSettings(SettingsId.PALETTE_ERROR_MAIN, '#a91b2e');
-  dataSource.updateSettings(SettingsId.PALETTE_SUCCESS_MAIN, '#3e863e');
+  dataSource.updateSettings(SettingsId.PALETTE_SUCCESS_MAIN, '#157846');
   dataSource.updateSettings(SettingsId.PALETTE_WARNING_MAIN, '#fbbe10');
   dataSource.updateSettings(SettingsId.PALETTE_INFO_MAIN, '#1e5df8');
   dataSource.updateSettings(
