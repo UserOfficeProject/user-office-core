@@ -37,6 +37,15 @@ import QuestionTemplateRelationEditor from './QuestionTemplateRelationEditor';
 import { TemplateMetadataEditor } from './TemplateMetadataEditor';
 import QuestionaryEditorTopic from './TemplateTopicEditor';
 
+const useStyles = makeStyles(() => ({
+  modalContainer: {
+    backgroundColor: 'white',
+  },
+  centeredButton: {
+    display: 'flex',
+    margin: '10px auto',
+  },
+}));
 export default function TemplateEditor() {
   const { enqueueSnackbar } = useSnackbar();
   const { api } = useDataApiWithFeedback();
@@ -108,15 +117,7 @@ export default function TemplateEditor() {
 
   const theme = useTheme();
   const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
-  const classes = makeStyles(() => ({
-    modalContainer: {
-      backgroundColor: 'white',
-    },
-    centeredButton: {
-      display: 'flex',
-      margin: '10px auto',
-    },
-  }))();
+  const classes = useStyles();
 
   const getTopicListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver
