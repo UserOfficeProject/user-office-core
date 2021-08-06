@@ -3080,6 +3080,7 @@ export enum VisitStatus {
 export type VisitsFilter = {
   creatorId?: Maybe<Scalars['Int']>;
   proposalPk?: Maybe<Scalars['Int']>;
+  scheduledEventId?: Maybe<Scalars['Int']>;
 };
 
 export type AssignProposalsToSepMutationVariables = Exact<{
