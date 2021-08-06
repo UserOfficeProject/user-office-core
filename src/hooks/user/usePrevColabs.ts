@@ -19,7 +19,7 @@ export function usePrevColabs(
     userRole,
     refreshData,
   } = usersFilter;
-  const userId = getCurrentUser()?.user.id ?? 1;
+  const userId = getCurrentUser()?.user.id as number;
 
   const [prevColabUsers, setPrevColabUsers] = useState<{
     totalCount: number;
