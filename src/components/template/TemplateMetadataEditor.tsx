@@ -12,6 +12,34 @@ import { Template } from 'generated/sdk';
 import { Event, EventType } from 'models/QuestionaryEditorModel';
 import { ButtonContainer } from 'styles/StyledComponents';
 
+const useStyles = makeStyles((theme) => ({
+  templateName: {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    paddingBottom: '5px',
+  },
+  templateDescription: {
+    fontSize: '16px',
+    whiteSpace: 'pre-wrap',
+  },
+  container: {
+    padding: theme.spacing(3),
+    marginBottom: theme.spacing(3),
+  },
+  button: {
+    margin: '25px 10px 0 10px',
+    '&:first-child': {
+      marginLeft: '0',
+    },
+    '&:last-child': {
+      marginRight: '0',
+    },
+  },
+  label: {
+    color: theme.palette.grey[500],
+    fontSize: 'small',
+  },
+}));
 export function TemplateMetadataEditor(props: {
   template: Template;
   dispatch: React.Dispatch<Event>;
@@ -19,34 +47,7 @@ export function TemplateMetadataEditor(props: {
   const { template, dispatch } = props;
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const classes = makeStyles((theme) => ({
-    templateName: {
-      fontSize: '24px',
-      fontWeight: 'bold',
-      paddingBottom: '5px',
-    },
-    templateDescription: {
-      fontSize: '16px',
-      whiteSpace: 'pre-wrap',
-    },
-    container: {
-      padding: theme.spacing(3),
-      marginBottom: theme.spacing(3),
-    },
-    button: {
-      margin: '25px 10px 0 10px',
-      '&:first-child': {
-        marginLeft: '0',
-      },
-      '&:last-child': {
-        marginRight: '0',
-      },
-    },
-    label: {
-      color: theme.palette.grey[500],
-      fontSize: 'small',
-    },
-  }))();
+  const classes = useStyles();
 
   const staticJSX = (
     <div>
