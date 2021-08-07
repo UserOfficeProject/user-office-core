@@ -20,6 +20,7 @@ export class VisitAuthorization {
     private userAuthorization: UserAuthorization
   ) {}
 
+  // TODO add overload for visitId to accept also a visit object
   async hasReadRights(agent: UserWithRole | null, visitId: number) {
     if (!agent) {
       return false;

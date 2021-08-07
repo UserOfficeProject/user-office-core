@@ -7,6 +7,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { User, UserWithRole } from '../models/User';
+import { ProposalDataSource } from './../datasources/ProposalDataSource';
 import { VisitDataSource } from './../datasources/VisitDataSource';
 
 @injectable()
@@ -15,7 +16,9 @@ export class UserAuthorization {
     @inject(Tokens.UserDataSource) private userDataSource: UserDataSource,
     @inject(Tokens.ReviewDataSource) private reviewDataSource: ReviewDataSource,
     @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
-    @inject(Tokens.VisitDataSource) private visitDataSource: VisitDataSource
+    @inject(Tokens.VisitDataSource) private visitDataSource: VisitDataSource,
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource
   ) {}
 
   isUserOfficer(agent: UserWithRole | null) {
@@ -56,9 +59,31 @@ export class UserAuthorization {
     }
   }
 
-  async isMemberOfProposal(agent: User | null, proposal: Proposal | null) {
-    if (agent == null || proposal == null) {
+  async isMemberOfProposal(
+    agent: User | null,
+    proposalPk: number
+  ): Promise<boolean>;
+  async isMemberOfProposal(
+    agent: User | null,
+    proposal: Proposal | null
+  ): Promise<boolean>;
+  async isMemberOfProposal(
+    agent: User | null,
+    proposalOrPk: Proposal | number | null
+  ) {
+    if (agent == null || proposalOrPk == null) {
       return false;
+    }
+
+    let proposal: Proposal;
+    if (typeof proposalOrPk === 'number') {
+      const proposalFromDb = await this.proposalDataSource.get(proposalOrPk);
+      if (!proposalFromDb) {
+        return false;
+      }
+      proposal = proposalFromDb;
+    } else {
+      proposal = proposalOrPk;
     }
 
     if (this.isPrincipalInvestigatorOfProposal(agent, proposal)) {

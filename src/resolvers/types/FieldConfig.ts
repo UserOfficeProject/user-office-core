@@ -22,6 +22,9 @@ export class SampleBasisConfig {
 export class VisitBasisConfig extends ConfigBase {}
 
 @ObjectType()
+export class RiskAssessmentBasisConfig extends ConfigBase {}
+
+@ObjectType()
 export class BooleanConfig extends ConfigBase {}
 
 @ObjectType()
@@ -173,5 +176,6 @@ export const FieldConfigType = createUnionType({
     ShipmentBasisConfig,
     RichTextInputConfig,
     VisitBasisConfig,
+    RiskAssessmentBasisConfig,
   ], // function that returns array of object types classes
 });

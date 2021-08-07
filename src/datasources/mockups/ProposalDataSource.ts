@@ -47,8 +47,7 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.referenceNumberSequence || 0,
     values?.managementTimeAllocation || 0,
     values?.managementDecisionSubmitted || false,
-    values?.technicalReviewAssignee || null,
-    0
+    values?.technicalReviewAssignee || null
   );
 };
 
@@ -135,11 +134,14 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     proposalPk: number,
     proposalStatusId: number
   ): Promise<Proposal> {
-    if (proposalPk !== dummyProposal.primaryKey) {
+    const proposal = await this.get(proposalPk);
+
+    if (!proposal) {
       throw new Error('Proposal does not exist');
     }
+    proposal.statusId = proposalStatusId;
 
-    return dummyProposal;
+    return proposal;
   }
 
   async setProposalUsers(proposalPk: number, users: number[]): Promise<void> {
