@@ -42,8 +42,8 @@ query getUserProposalBookingsWithEvents(
       visits {
         ...visit
       }
-      riskAssessmentQuestionary {
-        questionaryId
+      riskAssessment {
+        ...riskAssessment
       }
       instrument {
         id
