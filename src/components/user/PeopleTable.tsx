@@ -52,7 +52,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   selectedUsers?: number[];
   mtOptions?: Options;
   columns?: Column<any>[];
-  selfDelete?: boolean;
+  preserveSelf?: boolean;
 };
 
 const useStyles = makeStyles({
@@ -324,8 +324,8 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
                   }),
                 isDeletable: (rowData) => {
                   return (
-                    getCurrentUser()?.user.id !== rowData.id &&
-                    !!props.selfDelete
+                    getCurrentUser()?.user.id !== rowData.id ||
+                    !props.preserveSelf
                   );
                 },
               }

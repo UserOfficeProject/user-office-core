@@ -19,7 +19,7 @@ type ParticipantsProps = {
   className?: string;
   title: string;
   principalInvestigator?: number;
-  selfDelete?: boolean;
+  preserveSelf?: boolean;
 };
 
 const Participants: React.FC<ParticipantsProps> = ({
@@ -28,7 +28,7 @@ const Participants: React.FC<ParticipantsProps> = ({
   className,
   title,
   principalInvestigator,
-  selfDelete,
+  preserveSelf,
 }) => {
   const [modalOpen, setOpen] = useState(false);
 
@@ -95,7 +95,7 @@ const Participants: React.FC<ParticipantsProps> = ({
           userRole={UserRole.USER}
           invitationUserRole={UserRole.USER}
           onRemove={removeUser}
-          selfDelete={!!selfDelete}
+          preserveSelf={preserveSelf}
         />
       </FormControl>
     </div>
