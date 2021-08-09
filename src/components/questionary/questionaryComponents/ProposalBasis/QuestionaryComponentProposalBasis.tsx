@@ -125,6 +125,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             proposal: { users: users },
           });
         }}
+        selfDelete={true}
         // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
