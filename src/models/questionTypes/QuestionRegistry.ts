@@ -11,6 +11,7 @@ import { intervalDefinition } from './Interval';
 import { numberInputDefinition } from './NumberInput';
 import { proposalBasisDefinition } from './ProposalBasis';
 import { richTextInputDefinition } from './RichTextInput';
+import { riskAssessmentBasisDefinition } from './RiskAssessmentBasis';
 import { sampleBasisDefinition } from './SampleBasis';
 import { sampleDeclarationDefinition } from './SampleDeclaration';
 import { selectionFromOptionsDefinition } from './SelectionFromOptions';
@@ -74,6 +75,7 @@ const registry = [
   shipmentBasis,
   richTextInputDefinition,
   visitBasisDefinition,
+  riskAssessmentBasisDefinition,
 ];
 
 Object.freeze(registry);

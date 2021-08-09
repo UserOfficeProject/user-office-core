@@ -23,6 +23,7 @@ import { Instrument } from './Instrument';
 import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
+import { RiskAssessment } from './RiskAssessment';
 import { Sample } from './Sample';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
@@ -84,7 +85,6 @@ export class Proposal implements Partial<ProposalOrigin> {
   public technicalReviewAssignee: number | null;
 
   public proposerId: number;
-  public riskAssessmentQuestionaryId: number | null;
 }
 
 @Resolver(() => Proposal)
@@ -228,19 +228,21 @@ export class ProposalResolver {
     });
   }
 
-  @FieldResolver(() => Questionary, { nullable: true })
-  async riskAssessmentQuestionary(
+  @FieldResolver(() => RiskAssessment, { nullable: true })
+  async riskAssessment(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Questionary | null> {
-    if (!proposal.riskAssessmentQuestionaryId) {
+  ): Promise<RiskAssessment | null> {
+    const riskAssessments = await context.queries.riskAssessment.getRiskAssessments(
+      context.user,
+      { proposalPk: proposal.primaryKey }
+    );
+
+    if (riskAssessments.length === 0) {
       return null;
     }
 
-    return await context.queries.questionary.getQuestionary(
-      context.user,
-      proposal.riskAssessmentQuestionaryId
-    );
+    return riskAssessments[0];
   }
 }
 
