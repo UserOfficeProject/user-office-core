@@ -1,0 +1,14 @@
+mutation updateRiskAssessment(
+  $riskAssessmentId: Int!
+  $status: RiskAssessmentStatus
+) {
+  updateRiskAssessment(riskAssessmentId: $riskAssessmentId, status: $status) {
+    riskAssessment {
+      ...riskAssessment
+    }
+
+    rejection {
+      ...rejection
+    }
+  }
+}

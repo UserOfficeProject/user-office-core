@@ -28,6 +28,8 @@ function createTemplate(type, title, description) {
   typeToMenuTitle.set('proposal', 'Proposal templates');
   typeToMenuTitle.set('sample', 'Sample declaration templates');
   typeToMenuTitle.set('shipment', 'Shipment declaration templates');
+  typeToMenuTitle.set('visit', 'Visit templates');
+  typeToMenuTitle.set('riskAssessment', 'Risk assessment templates');
 
   const menuTitle = typeToMenuTitle.get(type);
   if (!menuTitle) {

@@ -30,9 +30,10 @@ export default function UserUpcomingExperimentsTable() {
 
   const {
     formTeamAction,
-    registerVisitAction: defineVisitAction,
+    finishRiskAssessment,
+    registerVisitAction,
     individualTrainingAction,
-    declareShipmentAction: riskAssessmentAction,
+    declareShipmentAction,
   } = useActionButtons({
     openModal: (contents) => setModalContents(contents),
     closeModal: () => {
@@ -80,9 +81,10 @@ export default function UserUpcomingExperimentsTable() {
         <MaterialTable
           actions={[
             formTeamAction,
-            defineVisitAction,
+            finishRiskAssessment,
+            registerVisitAction,
             individualTrainingAction,
-            riskAssessmentAction,
+            declareShipmentAction,
           ]}
           icons={tableIcons}
           title="Upcoming experiments"

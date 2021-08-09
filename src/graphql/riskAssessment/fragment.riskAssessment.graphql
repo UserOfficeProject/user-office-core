@@ -1,0 +1,5 @@
+fragment riskAssessment on RiskAssessment {
+  riskAssessmentId
+  proposalPk
+  status
+}

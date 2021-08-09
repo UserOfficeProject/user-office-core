@@ -103,4 +103,10 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
   }
+
+  ... on RiskAssessmentBasisConfig {
+    small_label
+    required
+    tooltip
+  }
 }

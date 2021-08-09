@@ -242,7 +242,7 @@ export function usePersistQuestionaryEditorModel() {
 
             const previousStep = state.steps[stepIndex];
 
-            sortOrder = previousStep.topic.sortOrder + 1;
+            sortOrder = previousStep ? previousStep.topic.sortOrder + 1 : 0;
           }
 
           executeAndMonitorCall(async () => {

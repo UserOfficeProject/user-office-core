@@ -23,7 +23,7 @@ export type TemplateRowDataType = Pick<
   'templateId' | 'name' | 'description' | 'isArchived'
 >;
 
-interface TemplatesTableProps {
+export interface TemplatesTableProps {
   columns: Column<TemplateRowDataType>[];
   templateCategory: TemplateCategoryId;
   dataProvider: () => Promise<Exclude<GetTemplatesQuery['templates'], null>>;
