@@ -5,12 +5,12 @@ import { Template, TemplateCategoryId } from 'generated/sdk';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
+import withMarkTemplateAsActiveAction from './withMarkTemplateAsActiveAction';
 
-type SampleTemplateRowDataType = TemplateRowDataType & {
-  questionaryCount?: number;
-};
+type RiskAssessmentTemplateRowDataType = TemplateRowDataType &
+  Record<string, unknown>;
 
-type SampleTemplatesTableProps = {
+type RiskAssessmentTemplatesTableProps = {
   dataProvider: () => Promise<
     Pick<
       Template,
@@ -20,21 +20,23 @@ type SampleTemplatesTableProps = {
   confirm: WithConfirmType;
 };
 
-function SampleTemplatesTable(props: SampleTemplatesTableProps) {
-  const columns: Column<SampleTemplateRowDataType>[] = [
+function RiskAssessmentTemplatesTable(
+  props: RiskAssessmentTemplatesTableProps
+) {
+  const columns: Column<RiskAssessmentTemplateRowDataType>[] = [
     { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },
-    { title: '# samples', field: 'questionaryCount' },
+    { title: '# Risk assessments', field: 'questionaryCount' },
   ];
 
-  return (
-    <TemplatesTable
-      columns={columns}
-      templateCategory={TemplateCategoryId.SAMPLE_DECLARATION}
-      isRowRemovable={(rowData) => {
-        const sampleTemplateRowData = rowData as SampleTemplateRowDataType;
+  const Table = withMarkTemplateAsActiveAction(TemplatesTable);
 
-        return sampleTemplateRowData.questionaryCount === 0;
+  return (
+    <Table
+      columns={columns}
+      templateCategory={TemplateCategoryId.RISK_ASSESSMENT}
+      isRowRemovable={() => {
+        return true;
       }}
       dataProvider={props.dataProvider}
       confirm={props.confirm}
@@ -42,4 +44,4 @@ function SampleTemplatesTable(props: SampleTemplatesTableProps) {
   );
 }
 
-export default withConfirm(SampleTemplatesTable);
+export default withConfirm(RiskAssessmentTemplatesTable);

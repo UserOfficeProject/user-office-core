@@ -13,6 +13,10 @@ import {
 import { ProposalSubsetSubmission } from './ProposalSubmissionState';
 import { StepType } from './questionary/StepType';
 import { getFieldById } from './QuestionaryFunctions';
+import {
+  RiskAssessmentWithQuestionary,
+  RiskAssessmentCore,
+} from './RiskAssessmentSubmissionState';
 import { SampleWithQuestionary } from './Sample';
 import { ShipmentExtended } from './ShipmentSubmissionState';
 import { RegistrationExtended } from './VisitSubmissionState';
@@ -43,7 +47,23 @@ export type Event =
   | { type: 'REGISTRATION_CREATED'; visit: RegistrationExtended }
   | { type: 'REGISTRATION_LOADED'; visit: RegistrationExtended }
   | { type: 'REGISTRATION_MODIFIED'; visit: Partial<RegistrationExtended> }
-  | { type: 'REGISTRATION_SUBMITTED'; visit: Partial<RegistrationExtended> };
+  | { type: 'REGISTRATION_SUBMITTED'; visit: Partial<RegistrationExtended> }
+  | {
+      type: 'RISK_ASSESSMENT_CREATED';
+      riskAssessment: RiskAssessmentWithQuestionary;
+    }
+  | {
+      type: 'RISK_ASSESSMENT_LOADED';
+      riskAssessment: RiskAssessmentWithQuestionary;
+    }
+  | {
+      type: 'RISK_ASSESSMENT_MODIFIED';
+      riskAssessment: RiskAssessmentCore;
+    }
+  | {
+      type: 'RISK_ASSESSMENT_SUBMITTED';
+      riskAssessment: RiskAssessmentCore;
+    };
 
 export interface WizardStepMetadata {
   title: string;

@@ -34,6 +34,7 @@ import BoxIcon from './common/icons/BoxIcon';
 import CommentQuestionIcon from './common/icons/CommentQuestionIcon';
 import ProposalSettingsIcon from './common/icons/ProposalSettingsIcon';
 import ProposalWorkflowIcon from './common/icons/ProposalWorkflowIcon';
+import RiskAssessmentIcon from './common/icons/RiskAssessmentIcon';
 import ScienceIcon from './common/icons/ScienceIcon';
 
 type MenuItemsProps = {
@@ -201,6 +202,17 @@ const TemplateMenuListItem = () => {
               <FlightTakeoffIcon />
             </ListItemIcon>
             <ListItemText primary="Visit" title="Visit templates" />
+          </ListItem>
+        </Tooltip>
+        <Tooltip title="Risk assessment">
+          <ListItem component={NavLink} to="/RiskAssessmentTemplates" button>
+            <ListItemIcon>
+              <RiskAssessmentIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Risk assessment"
+              title="Risk assessment templates"
+            />
           </ListItem>
         </Tooltip>
       </Collapse>
