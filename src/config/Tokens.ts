@@ -26,4 +26,6 @@ export const Tokens = {
   VisitAuthorization: Symbol('VisitAuthorization'),
   EnableDefaultFeatures: Symbol('EnableDefaultFeatures'),
   SetColourTheme: Symbol('SetColourTheme'),
+  RiskAssessmentDataSource: Symbol('RiskAssessmentDataSource'),
+  RiskAssessmentAuthorization: Symbol('RiskAssessmentAuthorization'),
 };
