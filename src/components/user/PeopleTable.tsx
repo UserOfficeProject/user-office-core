@@ -322,7 +322,10 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
                     setQuery({ ...query, refreshData: !query.refreshData });
                   }),
                 isDeletable: (rowData) => {
-                  return getCurrentUser()?.user.id !== rowData.id;
+                  return (
+                    getCurrentUser()?.user.id !== rowData.id &&
+                    !props.title?.includes('visit')
+                  );
                 },
               }
             : {}
