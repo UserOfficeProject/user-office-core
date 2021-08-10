@@ -36,15 +36,7 @@ context('Samples tests', () => {
 
     cy.visit('/');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
-
-    cy.get('[data-cy=create-new-button]').click();
-
-    cy.get('[data-cy=name] input')
-      .type(proposalTemplateName)
-      .should('have.value', proposalTemplateName);
-
-    cy.get('[data-cy=submit]').click();
+    cy.createTemplate('proposal', proposalTemplateName);
 
     cy.createTopic('New topic');
 
@@ -149,10 +141,7 @@ context('Samples tests', () => {
 
     cy.contains('Proposals').click();
 
-    cy.contains(proposalTitle)
-      .parent()
-      .find('input[type="checkbox"]')
-      .click();
+    cy.contains(proposalTitle).parent().find('input[type="checkbox"]').click();
 
     cy.get('[title="Clone proposals to call"]').click();
 

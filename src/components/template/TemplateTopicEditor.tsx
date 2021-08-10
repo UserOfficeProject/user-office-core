@@ -67,6 +67,74 @@ class TemplateTopicEditor implements TemplateTopicEditorData {
   }
 }
 
+const useStyles = makeStyles((theme) => ({
+  container: {
+    alignItems: 'flex-start',
+    alignContent: 'flex-start',
+    background: '#FFF',
+    flexBasis: '100%',
+    height: '100%',
+  },
+  appBar: {
+    background: 'transparent',
+    boxShadow: 'none',
+    paddingRight: 0,
+  },
+  toolbar: {
+    minHeight: '36px',
+    padding: '0 6px',
+  },
+  inputHeading: {
+    fontSize: '15px',
+    color: theme.palette.grey[600],
+    fontWeight: 600,
+    width: '100%',
+    height: '36px',
+  },
+  itemContainer: {
+    minHeight: '180px',
+    height: 'calc(100% - 36px)',
+    padding: '1px',
+  },
+  topic: {
+    fontSize: '15px',
+    padding: '0 5px',
+    color: theme.palette.grey[600],
+    fontWeight: 600,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  addQuestionMenuItem: {
+    minHeight: 0,
+  },
+  toolbarButton: {
+    cursor: 'pointer',
+    color: theme.palette.grey[600],
+  },
+  addIcon: {
+    textAlign: 'right',
+    paddingRight: '8px',
+  },
+  dragMode: {
+    borderColor: theme.palette.grey[400],
+    padding: '5px',
+    borderWidth: '1px',
+    borderStyle: 'dashed',
+  },
+  button: {
+    '&:first-child': {
+      marginLeft: '0',
+    },
+    '&:last-child': {
+      marginRight: '0',
+    },
+  },
+  title: {
+    margin: 0,
+  },
+}));
+
 export default function QuestionaryEditorTopic(props: {
   data: TemplateStep;
   dispatch: React.Dispatch<Event>;
@@ -77,74 +145,7 @@ export default function QuestionaryEditorTopic(props: {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
-  const classes = makeStyles({
-    // TODO move out styles
-    container: {
-      alignItems: 'flex-start',
-      alignContent: 'flex-start',
-      background: '#FFF',
-      flexBasis: '100%',
-      height: '100%',
-    },
-    appBar: {
-      background: 'transparent',
-      boxShadow: 'none',
-      paddingRight: 0,
-    },
-    toolbar: {
-      minHeight: '36px',
-      padding: '0 6px',
-    },
-    inputHeading: {
-      fontSize: '15px',
-      color: theme.palette.grey[600],
-      fontWeight: 600,
-      width: '100%',
-      height: '36px',
-    },
-    itemContainer: {
-      minHeight: '180px',
-      height: 'calc(100% - 36px)',
-      padding: '1px',
-    },
-    topic: {
-      fontSize: '15px',
-      padding: '0 5px',
-      color: theme.palette.grey[600],
-      fontWeight: 600,
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    },
-    addQuestionMenuItem: {
-      minHeight: 0,
-    },
-    toolbarButton: {
-      cursor: 'pointer',
-      color: theme.palette.grey[600],
-    },
-    addIcon: {
-      textAlign: 'right',
-      paddingRight: '8px',
-    },
-    dragMode: {
-      borderColor: theme.palette.grey[400],
-      padding: '5px',
-      borderWidth: '1px',
-      borderStyle: 'dashed',
-    },
-    button: {
-      '&:first-child': {
-        marginLeft: '0',
-      },
-      '&:last-child': {
-        marginRight: '0',
-      },
-    },
-    title: {
-      margin: 0,
-    },
-  })();
+  const classes = useStyles();
 
   const { data, dispatch, index } = props;
   const [isEditMode, setIsEditMode] = useState<boolean>(false);

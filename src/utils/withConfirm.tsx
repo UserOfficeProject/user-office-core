@@ -22,15 +22,17 @@ const defaultOptions = {
   onCancel: (): void => {},
 };
 
+const useStyles = makeStyles(() => ({
+  title: {
+    marginTop: '12px',
+  },
+}));
+
 const withConfirm = <T extends Record<string, unknown>>(
   WrappedComponent: React.ComponentType<T>
 ) => {
   return function WithConfirmComponent(props: Omit<T, 'confirm'>): JSX.Element {
-    const classes = makeStyles(() => ({
-      title: {
-        marginTop: '12px',
-      },
-    }))();
+    const classes = useStyles();
     const [onConfirm, setOnConfirm] = useState<FunctionType | null>(null);
     const [options, setOptions] = useState(defaultOptions);
     const {

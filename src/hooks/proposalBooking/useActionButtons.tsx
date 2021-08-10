@@ -7,14 +7,21 @@ import React, { ReactNode, useContext } from 'react';
 import { useHistory } from 'react-router';
 
 import BoxIcon from 'components/common/icons/BoxIcon';
+import RiskAssessmentIcon from 'components/common/icons/RiskAssessmentIcon';
 import ActionButton, {
   ActionButtonState,
 } from 'components/proposalBooking/ActionButton';
 import CreateUpdateVisit from 'components/proposalBooking/CreateUpdateVisit';
+import CreateRiskAssessment from 'components/riskAssessment/CreateRiskAssessment';
+import UpdateRiskAssessment from 'components/riskAssessment/UpdateRiskAssessment';
 import CreateUpdateShipment from 'components/shipments/CreateUpdateShipment';
 import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
 import { UserContext } from 'context/UserContextProvider';
-import { ProposalEndStatus } from 'generated/sdk';
+import {
+  ProposalEndStatus,
+  RiskAssessmentFragment,
+  RiskAssessmentStatus,
+} from 'generated/sdk';
 import { User } from 'models/User';
 import { parseTzLessDateTime } from 'utils/Time';
 
@@ -105,6 +112,75 @@ export function useActionButtons(args: UseActionButtonsArgs) {
             }}
           />
         );
+      }
+    );
+  };
+
+  const finishRiskAssessment = (event: ProposalScheduledEvent) => {
+    let buttonState: ActionButtonState;
+
+    if (isPiOrCoProposer(user, event)) {
+      if (
+        event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
+        event.proposal.managementDecisionSubmitted
+      ) {
+        if (
+          event.proposal.riskAssessment?.status ===
+          RiskAssessmentStatus.SUBMITTED
+        ) {
+          buttonState = 'completed';
+        } else {
+          buttonState = 'active';
+        }
+      } else {
+        buttonState = 'inactive';
+      }
+    } else {
+      buttonState = 'invisible';
+    }
+
+    const createNewEventObject = (
+      oldEvent: ProposalScheduledEvent,
+      riskAssessment: RiskAssessmentFragment
+    ): ProposalScheduledEvent => ({
+      ...oldEvent,
+      proposal: {
+        ...oldEvent.proposal,
+        riskAssessment: riskAssessment,
+      },
+    });
+
+    return createActionButton(
+      'Finish risk assessment',
+      <RiskAssessmentIcon />,
+      buttonState,
+      () => {
+        if (event.proposal.riskAssessment) {
+          openModal(
+            <UpdateRiskAssessment
+              riskAssessment={event.proposal.riskAssessment}
+              onSubmitted={(submittedRiskAssessment) => {
+                const updatedEvent = createNewEventObject(
+                  event,
+                  submittedRiskAssessment
+                );
+                eventUpdated(updatedEvent);
+                closeModal();
+              }}
+            />
+          );
+        } else {
+          openModal(
+            <CreateRiskAssessment
+              proposalPk={event.proposal.primaryKey}
+              onSubmitted={(newRiskAssessment) => {
+                const newEvent = createNewEventObject(event, newRiskAssessment);
+                eventUpdated(newEvent);
+                closeModal();
+              }}
+            />
+          );
+        }
       }
     );
   };
@@ -231,6 +307,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
 
   return {
     formTeamAction,
+    finishRiskAssessment,
     registerVisitAction,
     individualTrainingAction,
     declareShipmentAction,

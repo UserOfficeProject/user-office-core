@@ -47,38 +47,36 @@ function ShipmentTemplatesTable(props: ShipmentTemplatesTableProps) {
   ];
 
   return (
-    <>
-      <TemplatesTable
-        columns={columns}
-        templateCategory={TemplateCategoryId.SHIPMENT_DECLARATION}
-        isRowRemovable={() => {
-          return true;
-        }}
-        dataProvider={props.dataProvider}
-        confirm={props.confirm}
-        actions={[
-          (rowData) => ({
-            icon: function DoneIconComponent() {
-              return rowData.templateId === activeTemplateId ? (
-                <DoneIcon />
-              ) : (
-                <DoneIcon className={classes.inactive} />
-              );
-            },
-            tooltip: 'Mark as active',
-            onClick: async (event, data) => {
-              const newActiveTemplateId = (data as Pick<Template, 'templateId'>)
-                .templateId;
-              await api().setActiveTemplate({
-                templateCategoryId: TemplateCategoryId.SHIPMENT_DECLARATION,
-                templateId: newActiveTemplateId,
-              });
-              setActiveTemplateId(newActiveTemplateId);
-            },
-          }),
-        ]}
-      />
-    </>
+    <TemplatesTable
+      columns={columns}
+      templateCategory={TemplateCategoryId.SHIPMENT_DECLARATION}
+      isRowRemovable={() => {
+        return true;
+      }}
+      dataProvider={props.dataProvider}
+      confirm={props.confirm}
+      actions={[
+        (rowData) => ({
+          icon: function DoneIconComponent() {
+            return rowData.templateId === activeTemplateId ? (
+              <DoneIcon />
+            ) : (
+              <DoneIcon className={classes.inactive} />
+            );
+          },
+          tooltip: 'Mark as active',
+          onClick: async (event, data) => {
+            const newActiveTemplateId = (data as Pick<Template, 'templateId'>)
+              .templateId;
+            await api().setActiveTemplate({
+              templateCategoryId: TemplateCategoryId.SHIPMENT_DECLARATION,
+              templateId: newActiveTemplateId,
+            });
+            setActiveTemplateId(newActiveTemplateId);
+          },
+        }),
+      ]}
+    />
   );
 }
 

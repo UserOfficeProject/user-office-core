@@ -271,7 +271,8 @@ export enum DataType {
   NUMBER_INPUT = 'NUMBER_INPUT',
   SHIPMENT_BASIS = 'SHIPMENT_BASIS',
   RICH_TEXT_INPUT = 'RICH_TEXT_INPUT',
-  VISIT_BASIS = 'VISIT_BASIS'
+  VISIT_BASIS = 'VISIT_BASIS',
+  RISK_ASSESSMENT_BASIS = 'RISK_ASSESSMENT_BASIS'
 }
 
 export type DateConfig = {
@@ -486,7 +487,7 @@ export type FieldConditionInput = {
   params: Scalars['String'];
 };
 
-export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubTemplateConfig | ProposalBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig | RichTextInputConfig | VisitBasisConfig;
+export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubTemplateConfig | ProposalBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig | RichTextInputConfig | VisitBasisConfig | RiskAssessmentBasisConfig;
 
 export type FieldDependency = {
   __typename?: 'FieldDependency';
@@ -657,6 +658,8 @@ export type Mutation = {
   addUserForReview: ReviewResponseWrap;
   submitProposalsReview: SuccessResponseWrap;
   updateTechnicalReviewAssignee: ProposalsResponseWrap;
+  createRiskAssessment: RiskAssessmentResponseWrap;
+  updateRiskAssessment: RiskAssessmentResponseWrap;
   createSample: SampleResponseWrap;
   updateSample: SampleResponseWrap;
   assignChairOrSecretary: SepResponseWrap;
@@ -708,6 +711,7 @@ export type Mutation = {
   deleteInstrument: InstrumentResponseWrap;
   deleteProposal: ProposalResponseWrap;
   deleteQuestion: QuestionResponseWrap;
+  deleteRiskAssessment: RiskAssessmentResponseWrap;
   deleteSample: SampleResponseWrap;
   deleteSEP: SepResponseWrap;
   deleteShipment: ShipmentResponseWrap;
@@ -968,6 +972,17 @@ export type MutationSubmitProposalsReviewArgs = {
 export type MutationUpdateTechnicalReviewAssigneeArgs = {
   userId: Scalars['Int'];
   proposalPks: Array<Scalars['Int']>;
+};
+
+
+export type MutationCreateRiskAssessmentArgs = {
+  proposalPk: Scalars['Int'];
+};
+
+
+export type MutationUpdateRiskAssessmentArgs = {
+  riskAssessmentId: Scalars['Int'];
+  status?: Maybe<RiskAssessmentStatus>;
 };
 
 
@@ -1331,6 +1346,11 @@ export type MutationDeleteQuestionArgs = {
 };
 
 
+export type MutationDeleteRiskAssessmentArgs = {
+  riskAssessmentId: Scalars['Int'];
+};
+
+
 export type MutationDeleteSampleArgs = {
   sampleId: Scalars['Int'];
 };
@@ -1638,7 +1658,7 @@ export type Proposal = {
   sepMeetingDecision: Maybe<SepMeetingDecision>;
   samples: Maybe<Array<Sample>>;
   visits: Maybe<Array<Visit>>;
-  riskAssessmentQuestionary: Maybe<Questionary>;
+  riskAssessment: Maybe<RiskAssessment>;
   proposalBooking: Maybe<ProposalBooking>;
 };
 
@@ -1923,6 +1943,7 @@ export type Query = {
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
   proposalReviews: Maybe<Array<Review>>;
+  riskAssessment: RiskAssessment;
   roles: Maybe<Array<Role>>;
   sample: Maybe<Sample>;
   samplesByCallId: Maybe<Array<Sample>>;
@@ -2138,6 +2159,11 @@ export type QueryReviewArgs = {
 
 export type QueryProposalReviewsArgs = {
   proposalPk: Scalars['Int'];
+};
+
+
+export type QueryRiskAssessmentArgs = {
+  riskAssessmentId: Scalars['Int'];
 };
 
 
@@ -2445,6 +2471,34 @@ export type RichTextInputConfig = {
   tooltip: Scalars['String'];
   max: Maybe<Scalars['Int']>;
 };
+
+export type RiskAssessment = {
+  __typename?: 'RiskAssessment';
+  riskAssessmentId: Scalars['Int'];
+  proposalPk: Scalars['Int'];
+  creatorUserId: Scalars['Int'];
+  questionaryId: Scalars['Int'];
+  status: RiskAssessmentStatus;
+  questionary: Questionary;
+};
+
+export type RiskAssessmentBasisConfig = {
+  __typename?: 'RiskAssessmentBasisConfig';
+  small_label: Scalars['String'];
+  required: Scalars['Boolean'];
+  tooltip: Scalars['String'];
+};
+
+export type RiskAssessmentResponseWrap = {
+  __typename?: 'RiskAssessmentResponseWrap';
+  rejection: Maybe<Rejection>;
+  riskAssessment: Maybe<RiskAssessment>;
+};
+
+export enum RiskAssessmentStatus {
+  DRAFT = 'DRAFT',
+  SUBMITTED = 'SUBMITTED'
+}
 
 export type Role = {
   __typename?: 'Role';
@@ -2816,7 +2870,8 @@ export enum TemplateCategoryId {
   PROPOSAL_QUESTIONARY = 'PROPOSAL_QUESTIONARY',
   SAMPLE_DECLARATION = 'SAMPLE_DECLARATION',
   SHIPMENT_DECLARATION = 'SHIPMENT_DECLARATION',
-  VISIT = 'VISIT'
+  VISIT = 'VISIT',
+  RISK_ASSESSMENT = 'RISK_ASSESSMENT'
 }
 
 export type TemplateResponseWrap = {
@@ -3062,6 +3117,7 @@ export enum VisitStatus {
 export type VisitsFilter = {
   creatorId?: Maybe<Scalars['Int']>;
   proposalPk?: Maybe<Scalars['Int']>;
+  scheduledEventId?: Maybe<Scalars['Int']>;
 };
 
 export type AssignProposalsToSepMutationVariables = Exact<{
@@ -4734,9 +4790,9 @@ export type GetUserProposalBookingsWithEventsQuery = (
       )>, visits: Maybe<Array<(
         { __typename?: 'Visit' }
         & VisitFragment
-      )>>, riskAssessmentQuestionary: Maybe<(
-        { __typename?: 'Questionary' }
-        & Pick<Questionary, 'questionaryId'>
+      )>>, riskAssessment: Maybe<(
+        { __typename?: 'RiskAssessment' }
+        & RiskAssessmentFragment
       )>, instrument: Maybe<(
         { __typename?: 'Instrument' }
         & Pick<Instrument, 'id' | 'name'>
@@ -4835,6 +4891,9 @@ export type AnswerFragment = (
   ) | (
     { __typename?: 'VisitBasisConfig' }
     & FieldConfigVisitBasisConfigFragment
+  ) | (
+    { __typename?: 'RiskAssessmentBasisConfig' }
+    & FieldConfigRiskAssessmentBasisConfigFragment
   ), dependencies: Array<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -5129,6 +5188,73 @@ export type UserWithReviewsQuery = (
       )> }
     )> }
   )> }
+);
+
+export type CreateRiskAssessmentMutationVariables = Exact<{
+  proposalPk: Scalars['Int'];
+}>;
+
+
+export type CreateRiskAssessmentMutation = (
+  { __typename?: 'Mutation' }
+  & { createRiskAssessment: (
+    { __typename?: 'RiskAssessmentResponseWrap' }
+    & { riskAssessment: Maybe<(
+      { __typename?: 'RiskAssessment' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ) }
+      & RiskAssessmentFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type RiskAssessmentFragment = (
+  { __typename?: 'RiskAssessment' }
+  & Pick<RiskAssessment, 'riskAssessmentId' | 'proposalPk' | 'status'>
+);
+
+export type GetRiskAssessmentQueryVariables = Exact<{
+  riskAssessmentId: Scalars['Int'];
+}>;
+
+
+export type GetRiskAssessmentQuery = (
+  { __typename?: 'Query' }
+  & { riskAssessment: (
+    { __typename?: 'RiskAssessment' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & Pick<Questionary, 'isCompleted'>
+      & QuestionaryFragment
+    ) }
+    & RiskAssessmentFragment
+  ) }
+);
+
+export type UpdateRiskAssessmentMutationVariables = Exact<{
+  riskAssessmentId: Scalars['Int'];
+  status?: Maybe<RiskAssessmentStatus>;
+}>;
+
+
+export type UpdateRiskAssessmentMutation = (
+  { __typename?: 'Mutation' }
+  & { updateRiskAssessment: (
+    { __typename?: 'RiskAssessmentResponseWrap' }
+    & { riskAssessment: Maybe<(
+      { __typename?: 'RiskAssessment' }
+      & RiskAssessmentFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
 );
 
 export type CloneSampleMutationVariables = Exact<{
@@ -6035,7 +6161,12 @@ type FieldConfigVisitBasisConfigFragment = (
   & Pick<VisitBasisConfig, 'small_label' | 'required' | 'tooltip'>
 );
 
-export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubTemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment | FieldConfigVisitBasisConfigFragment;
+type FieldConfigRiskAssessmentBasisConfigFragment = (
+  { __typename?: 'RiskAssessmentBasisConfig' }
+  & Pick<RiskAssessmentBasisConfig, 'small_label' | 'required' | 'tooltip'>
+);
+
+export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubTemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment | FieldConfigVisitBasisConfigFragment | FieldConfigRiskAssessmentBasisConfigFragment;
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
@@ -6082,6 +6213,9 @@ export type QuestionFragment = (
   ) | (
     { __typename?: 'VisitBasisConfig' }
     & FieldConfigVisitBasisConfigFragment
+  ) | (
+    { __typename?: 'RiskAssessmentBasisConfig' }
+    & FieldConfigRiskAssessmentBasisConfigFragment
   ) }
 );
 
@@ -6133,6 +6267,9 @@ export type QuestionTemplateRelationFragment = (
   ) | (
     { __typename?: 'VisitBasisConfig' }
     & FieldConfigVisitBasisConfigFragment
+  ) | (
+    { __typename?: 'RiskAssessmentBasisConfig' }
+    & FieldConfigRiskAssessmentBasisConfigFragment
   ), dependencies: Array<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -6267,6 +6404,9 @@ export type GetQuestionsQuery = (
     ) | (
       { __typename?: 'VisitBasisConfig' }
       & FieldConfigVisitBasisConfigFragment
+    ) | (
+      { __typename?: 'RiskAssessmentBasisConfig' }
+      & FieldConfigRiskAssessmentBasisConfigFragment
     ), answers: Array<(
       { __typename?: 'AnswerBasic' }
       & Pick<AnswerBasic, 'questionaryId'>
@@ -7370,6 +7510,11 @@ export const FieldConfigFragmentDoc = gql`
     required
     tooltip
   }
+  ... on RiskAssessmentBasisConfig {
+    small_label
+    required
+    tooltip
+  }
 }
     `;
 export const QuestionFragmentDoc = gql`
@@ -7445,6 +7590,13 @@ export const CoreReviewFragmentDoc = gql`
   comment
   grade
   sepID
+}
+    `;
+export const RiskAssessmentFragmentDoc = gql`
+    fragment riskAssessment on RiskAssessment {
+  riskAssessmentId
+  proposalPk
+  status
 }
     `;
 export const SampleFragmentDoc = gql`
@@ -8885,8 +9037,8 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
       visits {
         ...visit
       }
-      riskAssessmentQuestionary {
-        questionaryId
+      riskAssessment {
+        ...riskAssessment
       }
       instrument {
         id
@@ -8898,7 +9050,8 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
     ${BasicUserDetailsFragmentDoc}
 ${VisitFragmentDoc}
 ${ShipmentFragmentDoc}
-${VisitRegistrationFragmentDoc}`;
+${VisitRegistrationFragmentDoc}
+${RiskAssessmentFragmentDoc}`;
 export const AnswerTopicDocument = gql`
     mutation answerTopic($questionaryId: Int!, $topicId: Int!, $answers: [AnswerInput!]!, $isPartialSave: Boolean) {
   answerTopic(
@@ -9120,6 +9273,49 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
+export const CreateRiskAssessmentDocument = gql`
+    mutation createRiskAssessment($proposalPk: Int!) {
+  createRiskAssessment(proposalPk: $proposalPk) {
+    riskAssessment {
+      ...riskAssessment
+      questionary {
+        ...questionary
+        isCompleted
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${RiskAssessmentFragmentDoc}
+${QuestionaryFragmentDoc}
+${RejectionFragmentDoc}`;
+export const GetRiskAssessmentDocument = gql`
+    query getRiskAssessment($riskAssessmentId: Int!) {
+  riskAssessment(riskAssessmentId: $riskAssessmentId) {
+    ...riskAssessment
+    questionary {
+      ...questionary
+      isCompleted
+    }
+  }
+}
+    ${RiskAssessmentFragmentDoc}
+${QuestionaryFragmentDoc}`;
+export const UpdateRiskAssessmentDocument = gql`
+    mutation updateRiskAssessment($riskAssessmentId: Int!, $status: RiskAssessmentStatus) {
+  updateRiskAssessment(riskAssessmentId: $riskAssessmentId, status: $status) {
+    riskAssessment {
+      ...riskAssessment
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${RiskAssessmentFragmentDoc}
+${RejectionFragmentDoc}`;
 export const CloneSampleDocument = gql`
     mutation cloneSample($sampleId: Int!) {
   cloneSample(sampleId: $sampleId) {
@@ -10706,6 +10902,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return withWrapper(() => client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables));
+    },
+    createRiskAssessment(variables: CreateRiskAssessmentMutationVariables): Promise<CreateRiskAssessmentMutation> {
+      return withWrapper(() => client.request<CreateRiskAssessmentMutation>(print(CreateRiskAssessmentDocument), variables));
+    },
+    getRiskAssessment(variables: GetRiskAssessmentQueryVariables): Promise<GetRiskAssessmentQuery> {
+      return withWrapper(() => client.request<GetRiskAssessmentQuery>(print(GetRiskAssessmentDocument), variables));
+    },
+    updateRiskAssessment(variables: UpdateRiskAssessmentMutationVariables): Promise<UpdateRiskAssessmentMutation> {
+      return withWrapper(() => client.request<UpdateRiskAssessmentMutation>(print(UpdateRiskAssessmentDocument), variables));
     },
     cloneSample(variables: CloneSampleMutationVariables): Promise<CloneSampleMutation> {
       return withWrapper(() => client.request<CloneSampleMutation>(print(CloneSampleDocument), variables));
