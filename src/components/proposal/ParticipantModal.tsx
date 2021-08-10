@@ -30,7 +30,7 @@ function ParticipantModal(props: {
     ]);
   };
 
-  const someProps = {
+  const userTableProps = {
     title: props.title,
     action: {
       fn: addUser,
@@ -47,9 +47,9 @@ function ParticipantModal(props: {
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const peopleTable = <PeopleTable {...someProps} />;
+  const peopleTable = <PeopleTable {...userTableProps} />;
 
-  const proposalPeopleTable = <ProposalPeopleTable {...someProps} />;
+  const proposalPeopleTable = <ProposalPeopleTable {...userTableProps} />;
 
   return (
     <Dialog
