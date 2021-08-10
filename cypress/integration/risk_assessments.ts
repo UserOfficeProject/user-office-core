@@ -3,7 +3,9 @@ import faker from 'faker';
 faker.seed(1);
 
 const coProposerName = 'Benjamin';
+const coProposerEmail = 'ben@inbox.com';
 const visitorName = 'Dawson';
+const visitorEmail = 'david@teleworm.us';
 
 const questionTitle = faker.lorem.words(3);
 const answer = faker.lorem.words(3);
@@ -44,7 +46,7 @@ context('visits tests', () => {
     cy.login('user');
     cy.defineExperimentTeam({
       proposalTitle,
-      users: [coProposerName, visitorName],
+      usersEmails: [coProposerEmail, visitorEmail],
       teamLead: coProposerName,
     });
     cy.logout();
