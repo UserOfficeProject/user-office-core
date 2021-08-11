@@ -3,7 +3,7 @@ import React from 'react';
 import {
   Event,
   QuestionarySubmissionState,
-} from 'models/QuestionarySubmissionState';
+} from 'models/questionary/QuestionarySubmissionState';
 
 export interface QuestionaryContextType {
   state: QuestionarySubmissionState | null;

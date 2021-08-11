@@ -2,7 +2,7 @@ import React from 'react';
 
 import RiskAssessmentIcon from 'components/common/icons/RiskAssessmentIcon';
 import { DataType } from 'generated/sdk';
-import { RiskAssessmentSubmissionState } from 'models/RiskAssessmentSubmissionState';
+import { RiskAssessmentSubmissionState } from 'models/questionary/riskAssessment/RiskAssessmentSubmissionState';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createRiskAssessmentBasisValidationSchema } from './createRiskAssessmentValidationSchema';

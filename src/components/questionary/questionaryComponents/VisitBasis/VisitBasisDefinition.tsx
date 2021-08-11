@@ -2,7 +2,7 @@ import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';
-import { VisitSubmissionState } from 'models/VisitSubmissionState';
+import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createVisitBasisValidationSchema } from './createVisitBasisValidationSchema';
@@ -21,7 +21,7 @@ export const visitBasisDefinition: QuestionaryComponentDefinition = {
   icon: <FlightTakeoffIcon />,
   createYupValidationSchema: createVisitBasisValidationSchema,
   getYupInitialValue: ({ state }) => {
-    const visitState = state as VisitSubmissionState;
+    const visitState = state as VisitRegistrationSubmissionState;
 
     return visitState.registration;
   },

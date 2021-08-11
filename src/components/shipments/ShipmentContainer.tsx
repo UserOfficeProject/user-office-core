@@ -13,12 +13,10 @@ import {
   Event,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
-} from 'models/QuestionarySubmissionState';
-import {
-  ShipmentBasic,
-  ShipmentExtended,
-  ShipmentSubmissionState,
-} from 'models/ShipmentSubmissionState';
+} from 'models/questionary/QuestionarySubmissionState';
+import { ShipmentCore } from 'models/questionary/shipment/ShipmentCore';
+import { ShipmentSubmissionState } from 'models/questionary/shipment/ShipmentSubmissionState';
+import { ShipmentWithQuestionary } from 'models/questionary/shipment/ShipmentWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
@@ -35,7 +33,7 @@ const shipmentReducer = (
   switch (action.type) {
     case 'SHIPMENT_CREATED':
     case 'SHIPMENT_LOADED':
-      const shipment: ShipmentExtended = action.shipment;
+      const shipment: ShipmentWithQuestionary = action.shipment;
       draftState.isDirty = false;
       draftState.itemWithQuestionary = shipment;
       break;
@@ -52,8 +50,8 @@ const shipmentReducer = (
 };
 
 export default function ShipmentContainer(props: {
-  shipment: ShipmentExtended;
-  onShipmentSubmitted?: (shipment: ShipmentBasic) => void;
+  shipment: ShipmentWithQuestionary;
+  onShipmentSubmitted?: (shipment: ShipmentCore) => void;
 }) {
   const { api } = useDataApiWithFeedback();
 

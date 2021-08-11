@@ -32,7 +32,7 @@ import {
   QuestionTemplateRelation,
   TemplateStep,
 } from 'generated/sdk';
-import { Event, EventType } from 'models/QuestionaryEditorModel';
+import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 
 import TemplateQuestionEditor, {
   TemplateTopicEditorData,

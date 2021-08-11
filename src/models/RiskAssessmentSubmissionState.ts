@@ -8,7 +8,7 @@ import {
 import {
   QuestionarySubmissionState,
   WizardStep,
-} from './QuestionarySubmissionState';
+} from './questionary/QuestionarySubmissionState';
 
 export type RiskAssessmentCore = RiskAssessmentFragment;
 
@@ -16,9 +16,6 @@ export type RiskAssessmentWithQuestionary = Exclude<
   GetRiskAssessmentQuery['riskAssessment'],
   null
 >;
-
-// TODO make all XCore and XWithQuestionary follow the same naming convention and file structure
-
 export class RiskAssessmentSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
   constructor(

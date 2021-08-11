@@ -13,11 +13,9 @@ import {
   Event,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
-} from 'models/QuestionarySubmissionState';
-import {
-  RiskAssessmentSubmissionState,
-  RiskAssessmentWithQuestionary,
-} from 'models/RiskAssessmentSubmissionState';
+} from 'models/questionary/QuestionarySubmissionState';
+import { RiskAssessmentSubmissionState } from 'models/questionary/riskAssessment/RiskAssessmentSubmissionState';
+import { RiskAssessmentWithQuestionary } from 'models/questionary/riskAssessment/RiskAssessmentWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
@@ -34,14 +32,14 @@ const riskAssessmentReducer = (
   switch (action.type) {
     case 'RISK_ASSESSMENT_CREATED':
     case 'RISK_ASSESSMENT_LOADED':
-      const riskAssessment = action.riskAssessment;
+      const riskAssessment = action.assessment;
       draftState.isDirty = false;
       draftState.itemWithQuestionary = riskAssessment;
       break;
     case 'RISK_ASSESSMENT_MODIFIED':
       draftState.riskAssessment = {
         ...draftState.riskAssessment,
-        ...action.riskAssessment,
+        ...action.assessment,
       };
       draftState.isDirty = true;
       break;
@@ -75,7 +73,7 @@ export default function RiskAssessmentContainer(
       // if riskAssessment is not created yet
       dispatch({
         type: 'RISK_ASSESSMENT_LOADED',
-        riskAssessment: initialState.riskAssessment,
+        assessment: initialState.riskAssessment,
       });
     } else {
       await api()
@@ -86,7 +84,7 @@ export default function RiskAssessmentContainer(
           if (data.riskAssessment && data.riskAssessment.questionary!.steps) {
             dispatch({
               type: 'RISK_ASSESSMENT_LOADED',
-              riskAssessment: data.riskAssessment,
+              assessment: data.riskAssessment,
             });
             dispatch({
               type: 'STEPS_LOADED',
@@ -153,7 +151,7 @@ export default function RiskAssessmentContainer(
     if (isComponentMountedForTheFirstTime) {
       dispatch({
         type: 'RISK_ASSESSMENT_LOADED',
-        riskAssessment: props.riskAssessment,
+        assessment: props.riskAssessment,
       });
       dispatch({
         type: 'STEPS_LOADED',

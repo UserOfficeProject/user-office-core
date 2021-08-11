@@ -2,15 +2,15 @@ import { SetStateAction, useEffect, useState } from 'react';
 
 import { ShipmentsFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { ShipmentBasic } from 'models/ShipmentSubmissionState';
+import { ShipmentCore } from 'models/questionary/shipment/ShipmentCore';
 
 export function useShipments(filter?: ShipmentsFilter) {
   const api = useDataApi();
   const [shipmentsFilter, setShipmentsFilter] = useState(filter);
-  const [shipments, setShipments] = useState<ShipmentBasic[]>([]);
+  const [shipments, setShipments] = useState<ShipmentCore[]>([]);
   const [loadingShipments, setLoadingShipments] = useState(true);
 
-  const setShipmentsWithLoading = (data: SetStateAction<ShipmentBasic[]>) => {
+  const setShipmentsWithLoading = (data: SetStateAction<ShipmentCore[]>) => {
     setLoadingShipments(true);
     setShipments(data);
     setLoadingShipments(false);

@@ -5,7 +5,7 @@ import { DataType } from 'generated/sdk';
 import {
   ShipmentBasisFormikData,
   ShipmentSubmissionState,
-} from 'models/ShipmentSubmissionState';
+} from 'models/questionary/shipment/ShipmentSubmissionState';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createShipmentBasisValidationSchema } from './createShipmentBasisValidationSchema';

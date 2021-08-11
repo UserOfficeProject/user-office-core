@@ -1,4 +1,4 @@
-import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
+import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
@@ -6,7 +6,7 @@ import { FunctionType } from 'utils/utilTypes';
 import {
   Event,
   QuestionarySubmissionState,
-} from '../../models/QuestionarySubmissionState';
+} from '../../models/questionary/QuestionarySubmissionState';
 
 export function usePersistProposalModel() {
   const { api, isExecutingCall } = useDataApiWithFeedback();

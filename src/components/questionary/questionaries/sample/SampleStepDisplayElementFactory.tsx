@@ -7,7 +7,7 @@ import {
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
-import { WizardStep } from 'models/QuestionarySubmissionState';
+import { WizardStep } from 'models/questionary/QuestionarySubmissionState';
 
 const SampleQuestionaryStepView = ({
   topicId,

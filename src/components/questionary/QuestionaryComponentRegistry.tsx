@@ -12,8 +12,8 @@ import {
   Sdk,
   Template,
 } from 'generated/sdk';
-import { Question } from 'models/Question';
-import { QuestionarySubmissionState } from 'models/QuestionarySubmissionState';
+import { Question } from 'models/questionary/Question';
+import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
 
 import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefinition';
 import { dateDefinition } from './questionaryComponents/DatePicker/DatePickerDefinition';

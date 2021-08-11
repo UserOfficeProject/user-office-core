@@ -19,7 +19,7 @@ import CallFilter from 'components/common/proposalFilters/CallFilter';
 import { Maybe, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useDownloadPDFSample } from 'hooks/sample/useDownloadPDFSample';
-import { SampleWithProposalData } from 'models/Sample';
+import { SampleWithProposalData } from 'models/questionary/sample/SampleWithProposalData';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
