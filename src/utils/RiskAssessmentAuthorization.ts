@@ -19,6 +19,22 @@ export class RiskAssessmentAuthorization {
     private userAuthorization: UserAuthorization
   ) {}
 
+  private async resolveRiskAssessment(
+    assessmentOrId: RiskAssessment | number
+  ): Promise<RiskAssessment | null> {
+    let riskAssessment;
+
+    if (typeof assessmentOrId === 'number') {
+      riskAssessment = await this.riskAssessmentDataSource.getRiskAssessment(
+        assessmentOrId
+      );
+    } else {
+      riskAssessment = assessmentOrId;
+    }
+
+    return riskAssessment;
+  }
+
   async hasReadRights(
     agent: UserWithRole | null,
     riskAssessment: RiskAssessment
@@ -35,36 +51,30 @@ export class RiskAssessmentAuthorization {
       return false;
     }
 
+    // User officer has access
     if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
-    let riskAssessment: RiskAssessment;
-    if (typeof riskAssessmentOrId === 'number') {
-      const riskAssessmentFromDb = await this.riskAssessmentDataSource.getRiskAssessment(
-        riskAssessmentOrId
-      );
-      if (!riskAssessmentFromDb) {
-        return false;
-      }
-      riskAssessment = riskAssessmentFromDb;
-    } else {
-      riskAssessment = riskAssessmentOrId;
-    }
+    const assessment = await this.resolveRiskAssessment(riskAssessmentOrId);
 
-    if (!riskAssessment) {
+    if (!assessment) {
       return false;
     }
 
+    /**
+     * User has read access for the risk assessment if he is
+     * a member of the associated proposal or a visitor
+     * */
     return (
-      riskAssessment.creatorUserId === agent.id ||
+      assessment.creatorUserId === agent.id ||
       (await this.userAuthorization.isMemberOfProposal(
         agent,
-        riskAssessment.proposalPk
+        assessment.proposalPk
       )) ||
       (await this.userAuthorization.isVisitorOfProposal(
         agent,
-        riskAssessment.proposalPk
+        assessment.proposalPk
       ))
     );
   }
@@ -85,45 +95,43 @@ export class RiskAssessmentAuthorization {
       return false;
     }
 
+    // User officer has access
     if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
-    let riskAssessment: RiskAssessment;
-    if (typeof riskAssessmentOrId === 'number') {
-      const riskAssessmentFromDb = await this.riskAssessmentDataSource.getRiskAssessment(
-        riskAssessmentOrId
-      );
-      if (!riskAssessmentFromDb) {
-        return false;
-      }
-      riskAssessment = riskAssessmentFromDb;
-    } else {
-      riskAssessment = riskAssessmentOrId;
+    const assessment = await this.resolveRiskAssessment(riskAssessmentOrId);
+
+    if (!assessment) {
+      return false;
     }
 
-    const proposal = await this.proposalDataSource.get(
-      riskAssessment.proposalPk
-    );
-
-    if (this.userAuthorization.isMemberOfProposal(agent, proposal)) {
-      if (riskAssessment.status === RiskAssessmentStatus.SUBMITTED) {
-        logger.logError('User tried to change submitted risk assessment', {
-          agent,
-          riskAssessment,
-        });
-
-        return false;
-      }
-
-      return true;
-    }
-
-    logger.logError('User tried to change visit that he is not a member of', {
+    /**
+     * User has write access for the risk assessment if he is a member
+     * of the associated proposal and the assessment is not yet submitted
+     * */
+    const isMemberOfProposal = await this.userAuthorization.isMemberOfProposal(
       agent,
-      riskAssessment,
-    });
+      assessment.proposalPk
+    );
+    if (!isMemberOfProposal) {
+      logger.logError('User tried to change visit that he is not a member of', {
+        agent,
+        riskAssessment: assessment,
+      });
 
-    return false;
+      return false;
+    }
+
+    if (assessment.status === RiskAssessmentStatus.SUBMITTED) {
+      logger.logError('User tried to change submitted risk assessment', {
+        agent,
+        riskAssessment: assessment,
+      });
+
+      return false;
+    }
+
+    return true;
   }
 }

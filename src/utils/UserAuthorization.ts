@@ -21,6 +21,7 @@ export class UserAuthorization {
     private proposalDataSource: ProposalDataSource
   ) {}
 
+  // User officer has access
   isUserOfficer(agent: UserWithRole | null) {
     if (agent == null) {
       return false;
@@ -140,11 +141,38 @@ export class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.SAMPLE_SAFETY_REVIEWER;
   }
 
+  private async resolveProposal(
+    proposalOrProposalId: Proposal | number
+  ): Promise<Proposal | null> {
+    let proposal;
+
+    if (typeof proposalOrProposalId === 'number') {
+      proposal = await this.proposalDataSource.get(proposalOrProposalId);
+    } else {
+      proposal = proposalOrProposalId;
+    }
+
+    return proposal;
+  }
   async hasAccessRights(
     agent: UserWithRole | null,
     proposal: Proposal
+  ): Promise<boolean>;
+  async hasAccessRights(
+    agent: UserWithRole | null,
+    proposalId: number
+  ): Promise<boolean>;
+  async hasAccessRights(
+    agent: UserWithRole | null,
+    proposalOrProposalId: Proposal | number
   ): Promise<boolean> {
     if (!agent) {
+      return false;
+    }
+
+    const proposal = await this.resolveProposal(proposalOrProposalId);
+
+    if (!proposal) {
       return false;
     }
 
