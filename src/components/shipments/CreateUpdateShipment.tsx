@@ -1,15 +1,15 @@
 import React from 'react';
 
 import { VisitFragment } from 'generated/sdk';
-import { ShipmentBasic } from 'models/ShipmentSubmissionState';
+import { ShipmentCore } from 'models/questionary/shipment/ShipmentCore';
 
 import CreateShipment from './CreateShipment';
 import UpdateShipment from './UpdateShipment';
 
 type CreateUpdateShipmentProps = {
-  onShipmentSubmitted: (shipment: ShipmentBasic) => void;
+  onShipmentSubmitted: (shipment: ShipmentCore) => void;
   visit: VisitFragment & {
-    shipments: ShipmentBasic[];
+    shipments: ShipmentCore[];
   };
 };
 

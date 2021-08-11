@@ -14,14 +14,15 @@ type TechnicalReviewInformationProps = {
   data: TechnicalReview | null | undefined;
 };
 
+const useStyles = makeStyles((theme) => ({
+  heading: {
+    marginTop: theme.spacing(2),
+  },
+}));
 const TechnicalReviewInformation: React.FC<TechnicalReviewInformationProps> = (
   props
 ) => {
-  const classes = makeStyles((theme) => ({
-    heading: {
-      marginTop: theme.spacing(2),
-    },
-  }))();
+  const classes = useStyles();
 
   if (!props.data) {
     return <p>Proposal has no technical review</p>;

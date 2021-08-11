@@ -28,19 +28,17 @@ function SampleTemplatesTable(props: SampleTemplatesTableProps) {
   ];
 
   return (
-    <>
-      <TemplatesTable
-        columns={columns}
-        templateCategory={TemplateCategoryId.SAMPLE_DECLARATION}
-        isRowRemovable={(rowData) => {
-          const sampleTemplateRowData = rowData as SampleTemplateRowDataType;
+    <TemplatesTable
+      columns={columns}
+      templateCategory={TemplateCategoryId.SAMPLE_DECLARATION}
+      isRowRemovable={(rowData) => {
+        const sampleTemplateRowData = rowData as SampleTemplateRowDataType;
 
-          return sampleTemplateRowData.questionaryCount === 0;
-        }}
-        dataProvider={props.dataProvider}
-        confirm={props.confirm}
-      />
-    </>
+        return sampleTemplateRowData.questionaryCount === 0;
+      }}
+      dataProvider={props.dataProvider}
+      confirm={props.confirm}
+    />
   );
 }
 

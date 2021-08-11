@@ -5,12 +5,13 @@ import { Questionary } from 'generated/sdk';
 import {
   QuestionarySubmissionState,
   WizardStep,
-} from './QuestionarySubmissionState';
-import { SampleWithQuestionary } from './Sample';
-export class SampleSubmissionState extends QuestionarySubmissionState {
+} from '../QuestionarySubmissionState';
+import { ProposalWithQuestionary } from './ProposalWithQuestionary';
+
+export class ProposalSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
   constructor(
-    public sample: SampleWithQuestionary,
+    public proposal: ProposalWithQuestionary,
     stepIndex: number,
     isDirty: boolean,
     wizardSteps: WizardStep[]
@@ -19,10 +20,10 @@ export class SampleSubmissionState extends QuestionarySubmissionState {
   }
 
   get itemWithQuestionary() {
-    return this.sample;
+    return this.proposal;
   }
 
   set itemWithQuestionary(item: { questionary: Questionary }) {
-    this.sample = { ...this.sample, ...item };
+    this.proposal = { ...this.proposal, ...item };
   }
 }

@@ -9,6 +9,7 @@ import MaterialTable, { Options, Column } from 'material-table';
 import React, { useState, useEffect } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { getCurrentUser } from 'context/UserContextProvider';
 import {
   BasicUserDetails,
   GetUsersQueryVariables,
@@ -51,6 +52,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   selectedUsers?: number[];
   mtOptions?: Options;
   columns?: Column<any>[];
+  preserveSelf?: boolean;
 };
 
 const useStyles = makeStyles({
@@ -320,9 +322,21 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
                     (props.onRemove as FunctionType)(oldData);
                     setQuery({ ...query, refreshData: !query.refreshData });
                   }),
+                isDeletable: (rowData) => {
+                  return (
+                    getCurrentUser()?.user.id !== rowData.id ||
+                    !props.preserveSelf
+                  );
+                },
               }
             : {}
         }
+        localization={{
+          body: { emptyDataSourceMessage: 'No Users Found' },
+          toolbar: {
+            nRowsSelected: '{0} Users(s) Selected',
+          },
+        }}
         onChangePage={(page) =>
           setQuery({ ...query, offset: page * (query.first as number) })
         }

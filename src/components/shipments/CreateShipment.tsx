@@ -5,15 +5,12 @@ import { UserContext } from 'context/UserContextProvider';
 import {
   BasicUserDetails,
   QuestionaryStep,
-  ShipmentFragment,
   ShipmentStatus,
   TemplateCategoryId,
   VisitFragment,
 } from 'generated/sdk';
-import {
-  ShipmentBasic,
-  ShipmentExtended,
-} from 'models/ShipmentSubmissionState';
+import { ShipmentCore } from 'models/questionary/shipment/ShipmentCore';
+import { ShipmentWithQuestionary } from 'models/questionary/shipment/ShipmentWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import ShipmentContainer from './ShipmentContainer';
@@ -24,7 +21,7 @@ function createShipmentStub(
   templateId: number,
   visitId: number,
   proposalPk: number
-): ShipmentExtended {
+): ShipmentWithQuestionary {
   return {
     id: 0,
     title: '',
@@ -51,14 +48,16 @@ function createShipmentStub(
 
 interface CreateShipmentProps {
   visit: VisitFragment & {
-    shipments: ShipmentFragment[];
+    // potentially we will have many shipments associated with the visit
+    shipments: ShipmentCore[];
   };
-  onShipmentSubmitted: (shipment: ShipmentBasic) => void;
+  // for now only one shipment
+  onShipmentSubmitted: (shipment: ShipmentCore) => void;
 }
 function CreateShipment({ visit, onShipmentSubmitted }: CreateShipmentProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
-  const [blankShipment, setBlankShipment] = useState<ShipmentExtended>();
+  const [blankShipment, setBlankShipment] = useState<ShipmentWithQuestionary>();
   const [
     noActiveShipmentTemplates,
     setNoActiveShipmentTemplates,

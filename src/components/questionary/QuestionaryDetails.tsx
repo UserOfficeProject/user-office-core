@@ -11,7 +11,7 @@ import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import {
   areDependenciesSatisfied,
   getAllFields,
-} from 'models/QuestionaryFunctions';
+} from 'models/questionary/QuestionaryFunctions';
 
 import { getQuestionaryComponentDefinition } from './QuestionaryComponentRegistry';
 

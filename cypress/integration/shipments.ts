@@ -2,15 +2,10 @@ import faker from 'faker';
 
 faker.seed(1);
 
-const scientistName = 'Carlsson';
-
-const instrumentName = faker.lorem.word();
+const declareShipmentTitle = 'Declare shipment(s)';
 
 const proposalTitle = 'Test proposal';
 
-const sampleTemplateName = faker.lorem.words(2);
-const sampleTemplateDescription = faker.lorem.words(3);
-const sampleQuestion = faker.lorem.words(2);
 const sampleTitle = /My sample title/i;
 
 const shipmentTitle = faker.lorem.words(2);
@@ -44,7 +39,7 @@ context('Shipments tests', () => {
     cy.login('user');
     cy.defineExperimentTeam({
       proposalTitle: proposalTitle,
-      users: ['Carlsson'],
+      usersEmails: ['Javon4@hotmail.com', 'david@teleworm.us'],
       teamLead: 'Carlsson',
     });
     cy.logout();
@@ -72,14 +67,24 @@ context('Shipments tests', () => {
     cy.contains('New shipment');
   });
 
-  it('Should be able to declare shipment', () => {
+  it('Co-proposer should see that he can declare shipment', () => {
+    cy.login('user');
+    cy.testActionButton(declareShipmentTitle, 'neutral');
+  });
+
+  it('Visitor should see that he can declare shipment', () => {
+    cy.login({ email: 'david@teleworm.us', password: 'Test1234!' });
+    cy.testActionButton(declareShipmentTitle, 'neutral');
+  });
+
+  it('PI should be able to declare shipment', () => {
     cy.login('user');
 
-    cy.testActionButton('Declare shipment(s)', 'neutral');
+    cy.testActionButton(declareShipmentTitle, 'neutral');
 
     cy.contains(proposalTitle)
       .parent()
-      .find('[title="Declare shipment(s)"]')
+      .find(`[title="${declareShipmentTitle}"]`)
       .click();
 
     cy.get('[data-cy=title-input] input')
@@ -116,6 +121,6 @@ context('Shipments tests', () => {
 
     cy.visit('/');
 
-    cy.testActionButton('Declare shipment(s)', 'completed');
+    cy.testActionButton(declareShipmentTitle, 'completed');
   });
 });

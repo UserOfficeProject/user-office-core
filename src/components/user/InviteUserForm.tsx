@@ -17,6 +17,17 @@ type InviteUserFormProps = {
   close: FunctionType;
 };
 
+const useStyles = makeStyles({
+  buttons: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
+  button: {
+    marginTop: '25px',
+    marginLeft: '10px',
+  },
+});
+
 const InviteUserForm: React.FC<InviteUserFormProps> = ({
   action,
   title,
@@ -24,16 +35,7 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
   close,
 }) => {
   const { api } = useDataApiWithFeedback();
-  const classes = makeStyles({
-    buttons: {
-      display: 'flex',
-      justifyContent: 'flex-end',
-    },
-    button: {
-      marginTop: '25px',
-      marginLeft: '10px',
-    },
-  })();
+  const classes = useStyles();
 
   return (
     <Formik

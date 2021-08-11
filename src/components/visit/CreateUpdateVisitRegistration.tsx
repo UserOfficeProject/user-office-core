@@ -1,15 +1,15 @@
 import React from 'react';
 
-import { RegistrationBasic } from 'models/VisitSubmissionState';
+import { VisitRegistrationCore } from 'models/questionary/visit/VisitRegistrationCore';
 
 import CreateVisitRegistration from './CreateVisitRegistration';
 import UpdateVisitRegistration from './UpdateVisitRegistration';
 
 type CreateUpdateVisitRegistrationProps = {
-  onCreate?: (registration: RegistrationBasic) => void;
-  onUpdate?: (registration: RegistrationBasic) => void;
-  onSubmitted?: (registration: RegistrationBasic) => void;
-  registration: RegistrationBasic;
+  onCreate?: (registration: VisitRegistrationCore) => void;
+  onUpdate?: (registration: VisitRegistrationCore) => void;
+  onSubmitted?: (registration: VisitRegistrationCore) => void;
+  registration: VisitRegistrationCore;
 };
 
 function CreateUpdateVisitRegistration({

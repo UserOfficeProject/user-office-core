@@ -2,7 +2,7 @@ import InboxIcon from '@material-ui/icons/Inbox';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';
-import { SampleSubmissionState } from 'models/SampleSubmissionState';
+import { SampleSubmissionState } from 'models/questionary/sample/SampleSubmissionState';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createSampleBasisValidationSchema } from './createSampleBasisValidationSchema';

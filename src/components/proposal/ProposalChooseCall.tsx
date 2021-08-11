@@ -57,7 +57,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
         <Typography variant="h6" component="h2" gutterBottom>
           Select a call
         </Typography>
-        <List>
+        <List data-cy="call-list">
           {callsData.map((call) => {
             const daysRemainingNum = daysRemaining(new Date(call.endCall));
             const daysRemainingText = getDaysRemainingText(daysRemainingNum);

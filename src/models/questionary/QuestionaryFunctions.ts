@@ -8,7 +8,8 @@ import {
   QuestionTemplateRelation,
   TemplateStep,
 } from 'generated/sdk';
-import { ConditionEvaluator } from 'models/ConditionEvaluator';
+
+import { ConditionEvaluator } from './ConditionEvaluator';
 
 export type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = Array<TemplateStep | QuestionaryStep>;

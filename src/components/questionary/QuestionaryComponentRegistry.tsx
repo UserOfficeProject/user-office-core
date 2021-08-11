@@ -12,8 +12,8 @@ import {
   Sdk,
   Template,
 } from 'generated/sdk';
-import { Question } from 'models/Question';
-import { QuestionarySubmissionState } from 'models/QuestionarySubmissionState';
+import { Question } from 'models/questionary/Question';
+import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
 
 import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefinition';
 import { dateDefinition } from './questionaryComponents/DatePicker/DatePickerDefinition';
@@ -24,6 +24,7 @@ import { multipleChoiceDefinition as multiChoiceDefinition } from './questionary
 import { numberInputDefinition } from './questionaryComponents/NumberInput/NumberInputDefinition';
 import { proposalBasisDefinition } from './questionaryComponents/ProposalBasis/ProposalBasisDefinition';
 import { richTextInputDefinition } from './questionaryComponents/RichTextInput/RichTextInputDefinition';
+import { riskAssessmentBasisDefinition } from './questionaryComponents/RiskAssessmentBasis/RiskAssessmentBasisDefinition';
 import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/SampleBasisDefinition';
 import { sampleDeclarationDefinition } from './questionaryComponents/SampleDeclaration/SampleDeclaratonDefinition';
 import { shipmentBasisDefinition } from './questionaryComponents/ShipmentBasis/ShipmentBasisDefinition';
@@ -157,6 +158,7 @@ const registry = [
   shipmentBasisDefinition,
   richTextInputDefinition,
   visitBasisDefinition,
+  riskAssessmentBasisDefinition,
 ];
 
 Object.freeze(registry);

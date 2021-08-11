@@ -15,7 +15,7 @@ import {
 } from 'components/questionary/QuestionaryContext';
 import { BasicUserDetails } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
-import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
+import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
 const TextFieldNoSubmit = withPreventSubmit(TextField);
 
@@ -103,7 +103,10 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           formikProps.setFieldValue(`${id}.proposer`, user.id);
           dispatch({
             type: 'PROPOSAL_MODIFIED',
-            proposal: { proposer: user },
+            proposal: {
+              proposer: user,
+              users: users.concat(proposer as BasicUserDetails),
+            },
           });
         }}
         className={classes.container}
@@ -122,9 +125,11 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             proposal: { users: users },
           });
         }}
+        preserveSelf={true}
         // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
+        principalInvestigator={proposer?.id}
       />
       <ErrorMessage name={`${id}.users`} />
     </div>

@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import { SamplesFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-import { SampleWithQuestionaryStatus } from '../../models/Sample';
+import { SampleCore } from '../../models/questionary/sample/SampleCore';
 
 export function useSamplesWithQuestionaryStatus(filter?: SamplesFilter) {
-  const [samples, setSamples] = useState<SampleWithQuestionaryStatus[]>([]);
+  const [samples, setSamples] = useState<SampleCore[]>([]);
 
   const [samplesFilter, setSamplesFilter] = useState(filter);
   const [loadingSamples, setLoadingSamples] = useState(false);

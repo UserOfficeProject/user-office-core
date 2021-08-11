@@ -1,21 +1,18 @@
 import { immerable } from 'immer';
 
-import { GetShipmentQuery, Questionary, ShipmentFragment } from 'generated/sdk';
+import { Questionary, SampleFragment } from 'generated/sdk';
 
-import { SampleFragment } from './../generated/sdk';
 import {
   QuestionarySubmissionState,
   WizardStep,
-} from './QuestionarySubmissionState';
+} from '../QuestionarySubmissionState';
+import { ShipmentWithQuestionary } from './ShipmentWithQuestionary';
 
-export type ShipmentBasic = ShipmentFragment;
-
-export type ShipmentExtended = Exclude<GetShipmentQuery['shipment'], null>;
 export class ShipmentSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
 
   constructor(
-    public shipment: ShipmentExtended,
+    public shipment: ShipmentWithQuestionary,
     stepIndex: number,
     isDirty: boolean,
     wizardSteps: WizardStep[]

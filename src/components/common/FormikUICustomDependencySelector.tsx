@@ -19,9 +19,18 @@ import {
   getAllFields,
   getFieldById,
   AbstractField,
-} from 'models/QuestionaryFunctions';
+} from 'models/questionary/QuestionaryFunctions';
 import { FunctionType } from 'utils/utilTypes';
 
+const useStyles = makeStyles((theme) => ({
+  menuItem: {
+    display: 'flex',
+    alignItems: 'center',
+    '& SVG': {
+      marginRight: theme.spacing(1),
+    },
+  },
+}));
 const FormikUICustomDependencySelector = ({
   field,
   template,
@@ -51,15 +60,7 @@ const FormikUICustomDependencySelector = ({
 
   const [availableValues, setAvailableValues] = useState<Option[]>([]);
 
-  const classes = makeStyles((theme) => ({
-    menuItem: {
-      display: 'flex',
-      alignItems: 'center',
-      '& SVG': {
-        marginRight: theme.spacing(1),
-      },
-    },
-  }))();
+  const classes = useStyles();
 
   useEffect(() => {
     setDependencyId(dependency.dependencyId);

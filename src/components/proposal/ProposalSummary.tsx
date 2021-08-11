@@ -14,7 +14,7 @@ import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryRevi
 import { UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
-import { ProposalSubsetSubmission } from 'models/ProposalSubmissionState';
+import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ProposalContextType } from './ProposalContainer';
@@ -25,7 +25,7 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'flex-end',
   },
   button: {
-    marginTop: ({ proposal }: { proposal: ProposalSubsetSubmission }) =>
+    marginTop: ({ proposal }: { proposal: ProposalWithQuestionary }) =>
       proposal.status?.id === 0 ? '40px' : 'auto',
     marginLeft: '10px',
   },

@@ -3,7 +3,7 @@ import { DefaultStepDisplayElementFactory } from 'components/questionary/Default
 import { DefaultWizardStepFactory } from 'components/questionary/DefaultWizardStepFactory';
 import VisitRegistrationReview from 'components/visit/VisitRegistrationReview';
 import { TemplateCategoryId } from 'generated/sdk';
-import { VisitSubmissionState } from 'models/VisitSubmissionState';
+import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
 import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 import { VisitRegistrationWizardStep } from './VisitRegistrationWizardStep';
@@ -19,7 +19,8 @@ export const visitRegistrationQuestionaryDefinition: QuestionaryDefinition = {
     VisitRegistrationWizardStep,
     new DefaultReviewWizardStep(
       (state) =>
-        (state as VisitSubmissionState).registration.isRegistrationSubmitted
+        (state as VisitRegistrationSubmissionState).registration
+          .isRegistrationSubmitted
     )
   ),
 };
