@@ -195,6 +195,10 @@ class VisitQuestionaryAuthorizer implements QuestionaryAuthorizer {
     @inject(Tokens.UserAuthorization)
     private userAuthorization: UserAuthorization
   ) {}
+  /**
+   * Visitor has read rights on his and other visitor questionaries
+   * that ar in the same visit
+   * */
   async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     if (!agent) {
       return false;
@@ -216,6 +220,10 @@ class VisitQuestionaryAuthorizer implements QuestionaryAuthorizer {
 
     return this.visitAuth.hasReadRights(agent, registration.visitId);
   }
+
+  /**
+   * Visitor has write rights only his questionary
+   * */
   async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
     if (!agent) {
       return false;

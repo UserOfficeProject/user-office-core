@@ -20,25 +20,55 @@ export class VisitAuthorization {
     private userAuthorization: UserAuthorization
   ) {}
 
-  // TODO add overload for visitId to accept also a visit object
-  async hasReadRights(agent: UserWithRole | null, visitId: number) {
+  private async resolveVisit(
+    visitOrVisitId: Visit | number
+  ): Promise<Visit | null> {
+    let visit;
+
+    if (typeof visitOrVisitId === 'number') {
+      visit = await this.visitDataSource.getVisit(visitOrVisitId);
+    } else {
+      visit = visitOrVisitId;
+    }
+
+    return visit;
+  }
+
+  async hasReadRights(
+    agent: UserWithRole | null,
+    visit: Visit
+  ): Promise<boolean>;
+  async hasReadRights(
+    agent: UserWithRole | null,
+    visitId: number
+  ): Promise<boolean>;
+  async hasReadRights(
+    agent: UserWithRole | null,
+    visitOrVisitId: Visit | number
+  ): Promise<boolean> {
     if (!agent) {
       return false;
     }
 
+    // User officer has access
     if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
-    const visit = await this.visitDataSource.getVisit(visitId);
+    const visit = await this.resolveVisit(visitOrVisitId);
 
     if (!visit) {
       return false;
     }
 
+    /*
+     * User can read the visit if he is a participant of a proposal
+     * or on the visitor list
+     */
     return (
       visit.creatorId === agent.id ||
-      this.visitDataSource.isVisitorOfVisit(agent.id, visitId)
+      this.userAuthorization.isMemberOfProposal(agent, visit.proposalPk) ||
+      this.visitDataSource.isVisitorOfVisit(agent.id, visit.id)
     );
   }
 
@@ -58,23 +88,23 @@ export class VisitAuthorization {
       return false;
     }
 
+    // User officer has access
     if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
-    let visit: Visit;
-    if (typeof visitOrVisitId === 'number') {
-      const visitFromDb = await this.visitDataSource.getVisit(visitOrVisitId);
-      if (!visitFromDb) {
-        return false;
-      }
-      visit = visitFromDb;
-    } else {
-      visit = visitOrVisitId;
+    const visit = await this.resolveVisit(visitOrVisitId);
+
+    if (!visit) {
+      return false;
     }
 
     const proposal = await this.proposalDataSource.get(visit.proposalPk);
 
+    /*
+     * User can modify the visit if he is a participant of a proposal
+     * and the visit is not yet accepted
+     */
     if (this.userAuthorization.isMemberOfProposal(agent, proposal)) {
       if (visit.status === VisitStatus.ACCEPTED) {
         logger.logError('User tried to change accepted visit', {
