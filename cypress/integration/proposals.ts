@@ -25,16 +25,21 @@ context('Proposal tests', () => {
 
     cy.contains('New Proposal').click();
 
+    cy.contains('Carl');
     cy.get('[data-cy=edit-proposer-button]').click();
+
+    cy.finishedLoading();
+
+    cy.get('[data-cy=email]').type('ben@inbox.com');
+
+    cy.get('[data-cy=findUser]').click();
+
     cy.contains('Benjamin').parent().find("[title='Select user']").click();
 
     cy.contains('Save and continue').click();
 
     cy.contains('Title is required');
     cy.contains('Abstract is required');
-    cy.contains(
-      'You must be part of the proposal. Either add yourself as Principal Investigator or a Co-Proposer!'
-    );
 
     const proposer = 'Carl';
 

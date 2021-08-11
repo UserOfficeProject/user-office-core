@@ -93,9 +93,9 @@ context('visits tests', () => {
 
     // add visitors
     cy.get('[data-cy=add-participant-button]').click();
+    cy.get('[name=email]').type('david@teleworm.us{enter}');
     cy.contains('Beckley').parent().find('[type=checkbox]').click();
     cy.contains('Carlsson').parent().find('[type=checkbox]').click();
-    cy.contains('Dawson').parent().find('[type=checkbox]').click();
     cy.get('[data-cy=assign-selected-users]').click();
 
     // specify team lead

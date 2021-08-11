@@ -39,7 +39,7 @@ context('Shipments tests', () => {
     cy.login('user');
     cy.defineExperimentTeam({
       proposalTitle: proposalTitle,
-      users: ['Carlsson', 'Dawson'],
+      usersEmails: ['Javon4@hotmail.com', 'david@teleworm.us'],
       teamLead: 'Carlsson',
     });
     cy.logout();

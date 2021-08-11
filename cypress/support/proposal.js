@@ -24,7 +24,13 @@ const createProposal = (
 
   if (proposer) {
     cy.get('[data-cy=edit-proposer-button]').click();
-    cy.contains(proposer).parent().find("[title='Select user']").click();
+    cy.get('[role="presentation"]').as('modal');
+
+    cy.get('@modal')
+      .contains(proposer)
+      .parent()
+      .find("[title='Select user']")
+      .click();
   }
 
   cy.contains('Save and continue').click();

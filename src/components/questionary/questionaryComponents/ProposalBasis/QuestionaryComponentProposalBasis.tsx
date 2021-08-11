@@ -103,7 +103,10 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           formikProps.setFieldValue(`${id}.proposer`, user.id);
           dispatch({
             type: 'PROPOSAL_MODIFIED',
-            proposal: { proposer: user },
+            proposal: {
+              proposer: user,
+              users: users.concat(proposer as BasicUserDetails),
+            },
           });
         }}
         className={classes.container}
@@ -122,9 +125,11 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             proposal: { users: users },
           });
         }}
+        preserveSelf={true}
         // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
+        principalInvestigator={proposer?.id}
       />
       <ErrorMessage name={`${id}.users`} />
     </div>
