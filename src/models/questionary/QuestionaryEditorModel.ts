@@ -14,7 +14,7 @@ import {
   getFieldById,
   getQuestionaryStepByTopicId,
   getTopicById,
-} from 'models/QuestionaryFunctions';
+} from 'models/questionary/QuestionaryFunctions';
 import {
   ReducerMiddleware,
   useReducerWithMiddleWares,

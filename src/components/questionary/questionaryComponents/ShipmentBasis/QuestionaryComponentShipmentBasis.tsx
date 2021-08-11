@@ -26,7 +26,7 @@ import { useProposalSamples } from 'hooks/sample/useProposalSamples';
 import {
   ShipmentBasisFormikData,
   ShipmentSubmissionState,
-} from 'models/ShipmentSubmissionState';
+} from 'models/questionary/shipment/ShipmentSubmissionState';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {

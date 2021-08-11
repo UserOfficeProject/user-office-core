@@ -7,7 +7,7 @@ import {
   RiskAssessmentStatus,
   TemplateCategoryId,
 } from 'generated/sdk';
-import { RiskAssessmentWithQuestionary } from 'models/RiskAssessmentSubmissionState';
+import { RiskAssessmentWithQuestionary } from 'models/questionary/riskAssessment/RiskAssessmentWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import RiskAssessmentContainer from './RiskAssessmentContainer';

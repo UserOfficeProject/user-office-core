@@ -2,7 +2,7 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';
-import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
+import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createProposalBasisValidationSchema } from './createProposalBasisValidationSchema';

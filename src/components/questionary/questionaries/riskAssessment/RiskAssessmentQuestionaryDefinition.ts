@@ -3,7 +3,7 @@ import { DefaultStepDisplayElementFactory } from 'components/questionary/Default
 import { DefaultWizardStepFactory } from 'components/questionary/DefaultWizardStepFactory';
 import RiskAssessmentReview from 'components/riskAssessment/RiskAssessmentReview';
 import { RiskAssessmentStatus, TemplateCategoryId } from 'generated/sdk';
-import { RiskAssessmentSubmissionState } from 'models/RiskAssessmentSubmissionState';
+import { RiskAssessmentSubmissionState } from 'models/questionary/riskAssessment/RiskAssessmentSubmissionState';
 
 import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 import { RiskAssessmentWizardStep } from './RiskAssessmentWizardStep';

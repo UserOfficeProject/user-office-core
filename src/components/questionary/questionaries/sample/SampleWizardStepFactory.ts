@@ -1,5 +1,5 @@
 import { QuestionaryStep } from 'generated/sdk';
-import { WizardStep } from 'models/QuestionarySubmissionState';
+import { WizardStep } from 'models/questionary/QuestionarySubmissionState';
 
 import { SampleQuestionaryWizardStep } from './SampleQuestionaryWizardStep';
 

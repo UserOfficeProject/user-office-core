@@ -21,11 +21,11 @@ import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQu
 import QuestionaryEditorModel, {
   Event,
   EventType,
-} from 'models/QuestionaryEditorModel';
+} from 'models/questionary/QuestionaryEditorModel';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
-} from 'models/QuestionaryFunctions';
+} from 'models/questionary/QuestionaryFunctions';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';

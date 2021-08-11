@@ -9,7 +9,7 @@ import {
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
-import { SampleSubmissionState } from 'models/SampleSubmissionState';
+import { SampleSubmissionState } from 'models/questionary/sample/SampleSubmissionState';
 
 import { SampleContextType } from '../SampleDeclaration/SampleDeclarationContainer';
 

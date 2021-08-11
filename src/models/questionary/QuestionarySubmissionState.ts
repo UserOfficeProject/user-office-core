@@ -3,23 +3,20 @@ import produce, { Draft } from 'immer';
 import { Reducer } from 'react';
 
 import { Answer, Questionary, QuestionaryStep } from 'generated/sdk';
-import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import { clamp } from 'utils/Math';
 import {
   ReducerMiddleware,
   useReducerWithMiddleWares,
 } from 'utils/useReducerWithMiddleWares';
 
-import { ProposalSubsetSubmission } from './ProposalSubmissionState';
-import { StepType } from './questionary/StepType';
+import { ProposalSubmissionState } from './proposal/ProposalSubmissionState';
+import { ProposalWithQuestionary } from './proposal/ProposalWithQuestionary';
 import { getFieldById } from './QuestionaryFunctions';
-import {
-  RiskAssessmentWithQuestionary,
-  RiskAssessmentCore,
-} from './RiskAssessmentSubmissionState';
-import { SampleWithQuestionary } from './Sample';
-import { ShipmentExtended } from './ShipmentSubmissionState';
-import { RegistrationExtended } from './VisitSubmissionState';
+import { RiskAssessmentWithQuestionary as AssessmentWQ } from './riskAssessment/RiskAssessmentWithQuestionary';
+import { SampleWithQuestionary } from './sample/SampleWithQuestionary';
+import { ShipmentWithQuestionary } from './shipment/ShipmentWithQuestionary';
+import { StepType } from './StepType';
+import { RegistrationWithQuestionary as RegistrationWQ } from './visit/VisitRegistrationWithQuestionary';
 
 export type Event =
   | { type: 'FIELD_CHANGED'; id: string; newValue: any }
@@ -31,39 +28,32 @@ export type Event =
   | { type: 'GO_TO_STEP'; stepIndex: number }
   | { type: 'STEPS_LOADED'; steps: QuestionaryStep[]; stepIndex?: number }
   | { type: 'STEP_ANSWERED'; step: QuestionaryStep }
+  // sample
   | { type: 'SAMPLE_CREATED'; sample: SampleWithQuestionary }
-  | { type: 'SAMPLE_UPDATED'; sample: Partial<SampleWithQuestionary> }
   | { type: 'SAMPLE_LOADED'; sample: SampleWithQuestionary }
+  | { type: 'SAMPLE_UPDATED'; sample: Partial<SampleWithQuestionary> }
   | { type: 'SAMPLE_MODIFIED'; sample: Partial<SampleWithQuestionary> }
   | { type: 'SAMPLE_SUBMITTED'; sample: Partial<SampleWithQuestionary> }
-  | { type: 'PROPOSAL_MODIFIED'; proposal: Partial<ProposalSubsetSubmission> }
-  | { type: 'PROPOSAL_CREATED'; proposal: ProposalSubsetSubmission }
-  | { type: 'PROPOSAL_LOADED'; proposal: ProposalSubsetSubmission }
+  // proposal
+  | { type: 'PROPOSAL_CREATED'; proposal: ProposalWithQuestionary }
+  | { type: 'PROPOSAL_LOADED'; proposal: ProposalWithQuestionary }
+  | { type: 'PROPOSAL_MODIFIED'; proposal: Partial<ProposalWithQuestionary> }
   | { type: 'PROPOSAL_SUBMIT_CLICKED'; proposalPk: number }
-  | { type: 'SHIPMENT_CREATED'; shipment: ShipmentExtended }
-  | { type: 'SHIPMENT_LOADED'; shipment: ShipmentExtended }
-  | { type: 'SHIPMENT_MODIFIED'; shipment: Partial<ShipmentExtended> }
-  | { type: 'SHIPMENT_SUBMITTED'; shipment: Partial<ShipmentExtended> }
-  | { type: 'REGISTRATION_CREATED'; visit: RegistrationExtended }
-  | { type: 'REGISTRATION_LOADED'; visit: RegistrationExtended }
-  | { type: 'REGISTRATION_MODIFIED'; visit: Partial<RegistrationExtended> }
-  | { type: 'REGISTRATION_SUBMITTED'; visit: Partial<RegistrationExtended> }
-  | {
-      type: 'RISK_ASSESSMENT_CREATED';
-      riskAssessment: RiskAssessmentWithQuestionary;
-    }
-  | {
-      type: 'RISK_ASSESSMENT_LOADED';
-      riskAssessment: RiskAssessmentWithQuestionary;
-    }
-  | {
-      type: 'RISK_ASSESSMENT_MODIFIED';
-      riskAssessment: RiskAssessmentCore;
-    }
-  | {
-      type: 'RISK_ASSESSMENT_SUBMITTED';
-      riskAssessment: RiskAssessmentCore;
-    };
+  // shipment
+  | { type: 'SHIPMENT_CREATED'; shipment: ShipmentWithQuestionary }
+  | { type: 'SHIPMENT_LOADED'; shipment: ShipmentWithQuestionary }
+  | { type: 'SHIPMENT_MODIFIED'; shipment: Partial<ShipmentWithQuestionary> }
+  | { type: 'SHIPMENT_SUBMITTED'; shipment: Partial<ShipmentWithQuestionary> }
+  // registration
+  | { type: 'REGISTRATION_CREATED'; visit: RegistrationWQ }
+  | { type: 'REGISTRATION_LOADED'; visit: RegistrationWQ }
+  | { type: 'REGISTRATION_MODIFIED'; visit: Partial<RegistrationWQ> }
+  | { type: 'REGISTRATION_SUBMITTED'; visit: Partial<RegistrationWQ> }
+  // risk assessment
+  | { type: 'RISK_ASSESSMENT_CREATED'; assessment: AssessmentWQ }
+  | { type: 'RISK_ASSESSMENT_LOADED'; assessment: AssessmentWQ }
+  | { type: 'RISK_ASSESSMENT_MODIFIED'; assessment: Partial<AssessmentWQ> }
+  | { type: 'RISK_ASSESSMENT_SUBMITTED'; assessment: Partial<AssessmentWQ> };
 
 export interface WizardStepMetadata {
   title: string;
@@ -106,6 +96,7 @@ const clamStepIndex = (stepIndex: number, stepCount: number) => {
 
 /** returns the index the form should start on, for new questionary it's 0,
  * but for unfinished it's the first unfinished step */
+// TODO move getInitialStepIndex to the Questionary definition
 function getInitialStepIndex(state: QuestionarySubmissionState): number {
   const wizardSteps = state.wizardSteps;
   const lastFinishedStep = state.wizardSteps

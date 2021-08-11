@@ -3,9 +3,9 @@ import { DefaultStepDisplayElementFactory } from 'components/questionary/Default
 import { DefaultWizardStepFactory } from 'components/questionary/DefaultWizardStepFactory';
 import ShipmentReview from 'components/shipments/ShipmentReview';
 import { ShipmentStatus, TemplateCategoryId } from 'generated/sdk';
+import { ShipmentSubmissionState } from 'models/questionary/shipment/ShipmentSubmissionState';
 
 import { QuestionaryDefinition } from '../../QuestionaryRegistry';
-import { ShipmentSubmissionState } from './../../../../models/ShipmentSubmissionState';
 import { ShipmentQuestionaryWizardStep } from './ShipmentQuestionaryWizardStep';
 
 export const shipmentQuestionaryDefinition: QuestionaryDefinition = {

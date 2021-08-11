@@ -5,7 +5,7 @@ import React from 'react';
 import { FileIdWithCaptionAndFigure } from 'components/common/FileUploadComponent';
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
 import { useFileMetadata } from 'hooks/file/useFileMetadata';
-import { FileMetaData } from 'models/FileUpload';
+import { FileMetaData } from 'models/questionary/FileUpload';
 
 const useStyles = makeStyles((theme) => ({
   list: {

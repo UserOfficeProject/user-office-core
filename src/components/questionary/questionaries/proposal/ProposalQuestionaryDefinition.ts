@@ -3,7 +3,7 @@ import { DefaultReviewWizardStep } from 'components/questionary/createDefaultRev
 import { DefaultStepDisplayElementFactory } from 'components/questionary/DefaultStepDisplayElementFactory';
 import { DefaultWizardStepFactory } from 'components/questionary/DefaultWizardStepFactory';
 import { TemplateCategoryId } from 'generated/sdk';
-import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
+import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
 import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 import { ProposalQuestionaryWizardStep } from './ProposalQuestionaryWizardStep';

@@ -6,7 +6,7 @@ import {
 } from 'components/questionary/QuestionaryContext';
 import { VisitRegistrationContextType } from 'components/visit/VisitRegistrationContainer';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
-import { VisitSubmissionState } from 'models/VisitSubmissionState';
+import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
 function QuestionaryComponentVisitBasis() {
   const { dispatch, state } = useContext(
@@ -25,7 +25,7 @@ const visitBasisPreSubmit = () => async ({
   dispatch,
   state,
 }: SubmitActionDependencyContainer) => {
-  const registration = (state as VisitSubmissionState).registration;
+  const registration = (state as VisitRegistrationSubmissionState).registration;
 
   let returnValue = state.questionary.questionaryId;
   if (registration.registrationQuestionaryId) {
