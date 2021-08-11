@@ -16,10 +16,8 @@ import {
   SampleStatus,
   SubTemplateConfig,
 } from 'generated/sdk';
-import {
-  SampleWithQuestionaryStatus,
-  SampleWithQuestionary,
-} from 'models/Sample';
+import { SampleCore } from 'models/questionary/sample/SampleCore';
+import { SampleWithQuestionary } from 'models/questionary/sample/SampleWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -36,9 +34,7 @@ const useStyles = makeStyles(() => ({
     fontSize: '1rem',
   },
 }));
-const sampleToListRow = (
-  sample: SampleWithQuestionaryStatus
-): QuestionnairesListRow => {
+const sampleToListRow = (sample: SampleCore): QuestionnairesListRow => {
   return {
     id: sample.id,
     label: sample.title,

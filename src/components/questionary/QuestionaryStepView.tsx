@@ -13,8 +13,8 @@ import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
   prepareAnswers,
-} from 'models/QuestionaryFunctions';
-import { QuestionarySubmissionState } from 'models/QuestionarySubmissionState';
+} from 'models/questionary/QuestionaryFunctions';
+import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 

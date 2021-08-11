@@ -3,10 +3,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { QuestionaryStep, TemplateCategoryId } from 'generated/sdk';
-import {
-  RegistrationBasic,
-  RegistrationExtended,
-} from 'models/VisitSubmissionState';
+import { VisitRegistrationCore } from 'models/questionary/visit/VisitRegistrationCore';
+import { RegistrationWithQuestionary } from 'models/questionary/visit/VisitRegistrationWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import VisitRegistrationContainer from './VisitRegistrationContainer';
@@ -16,7 +14,7 @@ function createRegistrationStub(
   templateId: number,
   questionarySteps: QuestionaryStep[],
   visitId: number
-): RegistrationExtended {
+): RegistrationWithQuestionary {
   return {
     userId: userId,
     registrationQuestionaryId: 0,
@@ -43,9 +41,9 @@ function createRegistrationStub(
 }
 
 interface CreateVisitProps {
-  onCreate?: (visit: RegistrationBasic) => void;
-  onUpdate?: (visit: RegistrationBasic) => void;
-  onSubmitted?: (visit: RegistrationBasic) => void;
+  onCreate?: (visit: VisitRegistrationCore) => void;
+  onUpdate?: (visit: VisitRegistrationCore) => void;
+  onSubmitted?: (visit: VisitRegistrationCore) => void;
   visitId: number;
 }
 function CreateVisit({
@@ -59,7 +57,7 @@ function CreateVisit({
   const [
     blankRegistration,
     setBlankRegistration,
-  ] = useState<RegistrationExtended>();
+  ] = useState<RegistrationWithQuestionary>();
 
   useEffect(() => {
     api()

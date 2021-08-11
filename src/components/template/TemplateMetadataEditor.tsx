@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { Template } from 'generated/sdk';
-import { Event, EventType } from 'models/QuestionaryEditorModel';
+import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 import { ButtonContainer } from 'styles/StyledComponents';
 
 const useStyles = makeStyles((theme) => ({

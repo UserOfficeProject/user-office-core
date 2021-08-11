@@ -12,7 +12,7 @@ const createProposal = (
   cy.contains('New Proposal').click();
 
   if (call) {
-    cy.contains(call).click();
+    cy.get('[data-cy=call-list]').contains(call).click();
   }
 
   cy.get('[data-cy=title] input').type(title).should('have.value', title);

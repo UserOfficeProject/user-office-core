@@ -1,8 +1,8 @@
-import { StepType } from 'models/questionary/StepType';
 import {
   QuestionarySubmissionState,
   WizardStep,
-} from 'models/QuestionarySubmissionState';
+} from 'models/questionary/QuestionarySubmissionState';
+import { StepType } from 'models/questionary/StepType';
 
 export class DefaultReviewWizardStep implements WizardStep {
   public type: StepType = 'VisitReview';

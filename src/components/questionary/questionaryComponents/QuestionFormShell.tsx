@@ -9,7 +9,7 @@ import {
   getQuestionaryComponentDefinition,
   QuestionFormProps,
 } from 'components/questionary/QuestionaryComponentRegistry';
-import { Question } from 'models/Question';
+import { Question } from 'models/questionary/Question';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles((theme) => ({

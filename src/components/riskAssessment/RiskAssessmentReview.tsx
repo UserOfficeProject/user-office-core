@@ -58,11 +58,11 @@ function RiskAssessmentReview({ confirm }: RiskAssessmentReviewProps) {
                 }
                 dispatch({
                   type: 'RISK_ASSESSMENT_MODIFIED',
-                  riskAssessment: result.updateRiskAssessment.riskAssessment,
+                  assessment: result.updateRiskAssessment.riskAssessment,
                 });
                 dispatch({
                   type: 'RISK_ASSESSMENT_SUBMITTED',
-                  riskAssessment: result.updateRiskAssessment.riskAssessment,
+                  assessment: result.updateRiskAssessment.riskAssessment,
                 });
               },
               {

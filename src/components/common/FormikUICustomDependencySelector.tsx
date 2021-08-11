@@ -19,7 +19,7 @@ import {
   getAllFields,
   getFieldById,
   AbstractField,
-} from 'models/QuestionaryFunctions';
+} from 'models/questionary/QuestionaryFunctions';
 import { FunctionType } from 'utils/utilTypes';
 
 const useStyles = makeStyles((theme) => ({

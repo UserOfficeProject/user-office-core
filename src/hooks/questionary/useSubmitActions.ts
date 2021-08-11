@@ -7,7 +7,7 @@ import { Answer, DataType, Sdk } from 'generated/sdk';
 import {
   Event,
   QuestionarySubmissionState,
-} from 'models/QuestionarySubmissionState';
+} from 'models/questionary/QuestionarySubmissionState';
 
 export type SubmitActionDependencyContainer = {
   state: QuestionarySubmissionState;
