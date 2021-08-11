@@ -18,10 +18,11 @@ export default class ShipmentQueries {
   ) {}
 
   async getShipment(agent: UserWithRole | null, shipmentId: number) {
-    if (
-      (await this.shipmentAuthorization.hasReadRights(agent, shipmentId)) !==
-      true
-    ) {
+    const hasRights = await this.shipmentAuthorization.hasReadRights(
+      agent,
+      shipmentId
+    );
+    if (hasRights == false) {
       logger.logWarn('Unauthorized getShipment access', { agent, shipmentId });
 
       return null;
@@ -36,7 +37,7 @@ export default class ShipmentQueries {
 
     shipments = await Promise.all(
       shipments.map((shipment) =>
-        this.shipmentAuthorization.hasReadRights(agent, shipment.id)
+        this.shipmentAuthorization.hasReadRights(agent, shipment)
       )
     ).then((results) => shipments.filter((_v, index) => results[index]));
 
@@ -56,7 +57,7 @@ export default class ShipmentQueries {
 
     shipments = await Promise.all(
       shipments.map((shipment) =>
-        this.shipmentAuthorization.hasReadRights(agent, shipment.id)
+        this.shipmentAuthorization.hasReadRights(agent, shipment)
       )
     ).then((results) => shipments.filter((_v, index) => results[index]));
 
