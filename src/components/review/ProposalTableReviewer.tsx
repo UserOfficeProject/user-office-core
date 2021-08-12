@@ -23,7 +23,10 @@ import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
-import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
+import {
+  capitalize,
+  setSortDirectionOnSortColumn,
+} from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -227,7 +230,11 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     { title: 'Proposal ID', field: 'proposalId' },
     { title: 'Title', field: 'title' },
     { title: 'Grade', field: 'grade' },
-    { title: 'Review status', field: 'status' },
+    {
+      title: 'Review status',
+      render: (user) => capitalize(user.status),
+      customSort: (a, b) => a.status.localeCompare(b.status),
+    },
     { title: 'Call', field: 'callShortCode' },
     { title: 'Instrument', field: 'instrumentShortCode' },
   ];

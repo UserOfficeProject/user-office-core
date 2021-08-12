@@ -74,3 +74,6 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
     allocationTimeUnit: proposal.call?.allocationTimeUnit,
   } as ProposalViewData;
 };
+
+export const capitalize = (s: string) =>
+  s && s[0].toUpperCase() + s.slice(1).toLocaleLowerCase();
