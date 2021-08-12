@@ -13,6 +13,13 @@ export class SMTPMailService extends MailService {
     this._email = new EmailTemplates({
       message: {
         from: process.env.EMAIL_SENDER,
+        attachments: [
+          {
+            filename: 'STFC-Logo.png',
+            path: 'C:/FBS/emails/proposal-submitted/STFC-Logo.png',
+            cid: 'logo1',
+          },
+        ],
       },
       send: true,
       transport: nodemailer.createTransport({
