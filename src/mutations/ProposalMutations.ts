@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import {
   administrationProposalValidationSchema,
   createProposalValidationSchema,
@@ -156,13 +157,28 @@ export default class ProposalMutations {
       proposal.proposerId = proposerId;
     }
 
-    return this.proposalDataSource.update(proposal).catch((err) => {
+    try {
+      const updatedProposal = await this.proposalDataSource.update(proposal);
+      logger.logInfo('User Updated Proposal Details:', {
+        proposalId: proposal.proposalId,
+        title: proposal.title,
+        userId: proposal.proposerId,
+      });
+
+      return updatedProposal;
+    } catch (err) {
       return rejection(
         'Could not update proposal',
-        { agent, primaryKey: proposalPk },
+        {
+          agent,
+          primaryKey: proposalPk,
+          proposalId: proposal.proposalId,
+          title: proposal.title,
+          userId: proposal.proposerId,
+        },
         err
       );
-    });
+    }
   }
 
   @ValidateArgs(submitProposalValidationSchema)
@@ -202,13 +218,30 @@ export default class ProposalMutations {
       });
     }
 
-    return this.proposalDataSource.submitProposal(proposalPk).catch((error) => {
+    try {
+      const submitProposal = await this.proposalDataSource.submitProposal(
+        proposalPk
+      );
+      logger.logInfo('User Submitted a Proposal:', {
+        proposalId: proposal.proposalId,
+        title: proposal.title,
+        userId: proposal.proposerId,
+      });
+
+      return submitProposal;
+    } catch (err) {
       return rejection(
         'Could not submit proposal',
-        { agent, proposalPk },
-        error
+        {
+          agent,
+          proposalPk,
+          proposalId: proposal.proposalId,
+          title: proposal.title,
+          userId: proposal.proposerId,
+        },
+        err
       );
-    });
+    }
   }
 
   @ValidateArgs(deleteProposalValidationSchema)
