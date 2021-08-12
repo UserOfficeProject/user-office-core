@@ -1,3 +1,4 @@
+import { Collapse } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Divider from '@material-ui/core/Divider';
 import Fade from '@material-ui/core/Fade';
@@ -13,7 +14,9 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import CloseIcon from '@material-ui/icons/Close';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import React from 'react';
+import Search from '@material-ui/icons/Search';
+import clsx from 'clsx';
+import React, { useState } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
 import {
@@ -30,6 +33,7 @@ import {
 } from 'generated/sdk';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 
+import QuestionPickerFilter from './QuestionPickerFilter';
 import TemplateQuestionEditor, {
   TemplateTopicEditorData,
 } from './TemplateQuestionEditor';
@@ -63,12 +67,21 @@ class QuestionItemAdapter implements TemplateTopicEditorData {
   }
 }
 
+export interface QuestionFilter {
+  searchText: string;
+  dataType: DataType | 'all';
+}
+
 export const QuestionPicker = (props: QuestionPickerProps) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | SVGSVGElement>(null);
   const open = Boolean(anchorEl);
   const { dispatch, template, closeMe } = props;
   const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
+  const [questionFilter, setQuestionFilter] = useState<QuestionFilter | null>(
+    null
+  );
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const classes = makeStyles(() => ({
     container: {
@@ -109,6 +122,12 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
       cursor: 'pointer',
       color: theme.palette.grey[600],
     },
+    activeToolbarButton: {
+      color: theme.palette.primary.main,
+    },
+    fullWidthContainer: {
+      width: '100%',
+    },
   }))();
 
   const getListStyle = (isDraggingOver: boolean) => ({
@@ -116,37 +135,54 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
   });
 
-  const getItems = () => {
-    return template.complementaryQuestions.map((question, index) => (
-      <TemplateQuestionEditor
-        index={index}
-        data={new QuestionItemAdapter(question)}
-        dispatch={dispatch}
-        onClick={(item) => {
-          const isAltDown = (window.event as MouseEvent)?.altKey;
+  const isQuestionMatchingFilter = (question: Question) => {
+    if (!questionFilter) {
+      return true;
+    }
 
-          // NOTE: sortOrder is always 0 because we add at that position using alt key and after that you can reorder if you want.
-          if (isAltDown) {
-            dispatch({
-              type: EventType.CREATE_QUESTION_REL_REQUESTED,
-              payload: {
-                topicId: props.topic.id,
-                questionId: item.id,
-                sortOrder: 0,
-                templateId: template.templateId,
-              },
-            });
-          } else {
-            props.dispatch({
-              type: EventType.OPEN_QUESTION_EDITOR,
-              payload: question,
-            });
-          }
-        }}
-        key={question.id.toString()}
-      />
-    ));
+    const textMatch = question.question
+      .toLowerCase()
+      .includes(questionFilter.searchText.toLowerCase());
+    const dataTypeMatch =
+      questionFilter.dataType === 'all'
+        ? true
+        : question.dataType === questionFilter.dataType;
+
+    return textMatch && dataTypeMatch;
   };
+
+  const getItems = () =>
+    template.complementaryQuestions
+      .filter(isQuestionMatchingFilter)
+      .map((question, index) => (
+        <TemplateQuestionEditor
+          index={index}
+          data={new QuestionItemAdapter(question)}
+          dispatch={dispatch}
+          onClick={(item) => {
+            const isAltDown = (window.event as MouseEvent)?.altKey;
+
+            // NOTE: sortOrder is always 0 because we add at that position using alt key and after that you can reorder if you want.
+            if (isAltDown) {
+              dispatch({
+                type: EventType.CREATE_QUESTION_REL_REQUESTED,
+                payload: {
+                  topicId: props.topic.id,
+                  questionId: item.id,
+                  sortOrder: 0,
+                  templateId: template.templateId,
+                },
+              });
+            } else {
+              props.dispatch({
+                type: EventType.OPEN_QUESTION_EDITOR,
+                payload: question,
+              });
+            }
+          }}
+          key={question.id.toString()}
+        />
+      ));
 
   const onCreateNewQuestionClicked = (dataType: DataType) => {
     dispatch({
@@ -166,6 +202,14 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
       <AppBar position="static" className={classes.appbar}>
         <Toolbar className={classes.toolbar}>
           <span className={classes.title}>Question drawer</span>
+          <Search
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className={clsx(
+              classes.toolbarButton,
+              isFilterOpen && classes.activeToolbarButton
+            )}
+            data-cy="search-button"
+          />
           <MoreVertIcon
             onClick={(event: React.MouseEvent<SVGSVGElement>) =>
               setAnchorEl(event.currentTarget)
@@ -208,9 +252,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
                   </MenuItem>
                 );
               })}
-
             <Divider />
-
             <MenuItem className={classes.addQuestionMenuItem} onClick={closeMe}>
               <ListItemIcon>
                 <HighlightOffIcon />
@@ -220,6 +262,13 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
           </Menu>
         </Toolbar>
       </AppBar>
+      <Collapse
+        in={isFilterOpen}
+        className={classes.fullWidthContainer}
+        unmountOnExit
+      >
+        <QuestionPickerFilter onChange={setQuestionFilter} />
+      </Collapse>
       <Droppable droppableId="questionPicker" type="field">
         {(provided, snapshot) => (
           <Grid
@@ -228,6 +277,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             ref={provided.innerRef}
             style={getListStyle(snapshot.isDraggingOver)}
             className={`${classes.itemContainer} tinyScroll`}
+            data-cy="question-list"
           >
             {getItems()}
             {provided.placeholder}
