@@ -47,6 +47,8 @@ context('Template tests', () => {
   const minimumCharacters = 1000;
   const richTextEditorMaxChars = 200;
 
+  const searchQuestionsTemplateName = faker.lorem.words(2);
+
   const proposalWorkflow = {
     name: faker.random.words(2),
     description: faker.random.words(5),
@@ -92,7 +94,7 @@ context('Template tests', () => {
 
     cy.contains('default template')
       .parent()
-      .get("[title='Edit']")
+      .find("[title='Edit']")
       .first()
       .click();
 
@@ -322,6 +324,88 @@ context('Template tests', () => {
     cy.contains(timeQuestion);
   });
 
+  it('User officer should be able to search questions', function () {
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    // Create an empty template so we can search all question from the question picker
+
+    cy.get('[data-cy=create-new-button]').click();
+
+    cy.get('[data-cy="name"]').type(searchQuestionsTemplateName);
+
+    cy.get('[data-cy="description"]').type(faker.lorem.words(3));
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.get('[data-cy=show-more-button]').click();
+
+    // Search questions
+    cy.contains('Add question').click();
+
+    cy.get('[data-cy=search-button]').click();
+
+    // after entering textQuestion, dateQuestion should not be visible
+    cy.contains(dateQuestion);
+    cy.get('[data-cy=search-text] input').clear().type(textQuestion);
+    cy.contains(textQuestion).should('exist');
+    cy.contains(dateQuestion).should('not.exist');
+
+    cy.get('[data-cy=search-text] input').clear();
+
+    // after entering dateQuestion, textQuestion should not be visible
+    cy.contains(textQuestion);
+    cy.get('[data-cy=search-text] input').clear().type(dateQuestion);
+    cy.contains(dateQuestion).should('exist');
+    cy.contains(textQuestion).should('not.exist');
+
+    cy.get('[data-cy=search-text] input').clear();
+
+    // searching by categories
+
+    // Boolean
+    cy.get('[data-cy=data-type]').click();
+    cy.get('[role=listbox]').contains('Boolean').click();
+    cy.get('[data-cy=question-list]').contains(booleanQuestion).should('exist');
+    cy.get('[data-cy=question-list]')
+      .contains(textQuestion)
+      .should('not.exist');
+
+    // Date
+    cy.get('[data-cy=data-type]').click();
+    cy.get('[role=listbox]').contains('Date').click();
+    cy.get('[data-cy=question-list]').contains(dateQuestion).should('exist');
+    cy.get('[data-cy=question-list]')
+      .contains(textQuestion)
+      .should('not.exist');
+
+    // All question types
+    cy.get('[data-cy=data-type]').click();
+    cy.get('[role=listbox]').contains('All').click();
+    cy.get('[data-cy=question-list]').contains(dateQuestion).should('exist');
+    cy.get('[data-cy=question-list]').contains(textQuestion).should('exist');
+
+    // filter with no results
+    cy.get('[data-cy=search-text] input').clear().type(faker.lorem.words(5));
+    cy.get('[data-cy=question-list] div').should('have.length', 0);
+
+    // closing resets the filter
+    cy.get('[data-cy=search-button]').click();
+    cy.get('[data-cy=question-list] div').should('have.length.above', 0);
+
+    // cleanup temporary template
+    cy.navigateToTemplatesSubmenu('Proposal templates');
+
+    cy.contains(searchQuestionsTemplateName)
+      .parent()
+      .find("[title='Delete']")
+      .first()
+      .click();
+
+    cy.contains('Yes').click();
+  });
+
   it('User officer can clone template', () => {
     cy.login('officer');
 
@@ -461,7 +545,11 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get("[title='Edit']").first().click();
+    cy.contains('default template')
+      .parent()
+      .find("[title='Edit']")
+      .first()
+      .click();
 
     cy.get('[data-cy=show-more-button]').first().click();
 
@@ -545,7 +633,11 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get("[title='Edit']").first().click();
+    cy.contains('default template')
+      .parent()
+      .find("[title='Edit']")
+      .first()
+      .click();
 
     cy.get('[data-cy=show-more-button]').first().click();
 
@@ -667,7 +759,11 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get("[title='Edit']").first().click();
+    cy.contains('default template')
+      .parent()
+      .find("[title='Edit']")
+      .first()
+      .click();
 
     cy.contains(fileQuestion).click();
 
@@ -744,7 +840,11 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get("[title='Edit']").first().click();
+    cy.contains('default template')
+      .parent()
+      .find("[title='Edit']")
+      .first()
+      .click();
 
     cy.contains(textQuestion).click();
     cy.get("[data-cy='delete']").click();
