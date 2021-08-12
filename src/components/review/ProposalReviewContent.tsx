@@ -174,6 +174,7 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
       <ExternalReviews reviews={proposalData.reviews as Review[]} />
       <SEPMeetingDecision
         sepMeetingDecision={proposalData.sepMeetingDecision}
+        sep={proposalData.sep}
       />
     </>
   );
