@@ -30,12 +30,16 @@ export default class VisitQueries {
 
   @Authorized()
   async getVisit(agent: UserWithRole | null, id: number) {
-    const hasRights = await this.visitAuth.hasReadRights(agent, id);
+    const visit = await this.dataSource.getVisit(id);
+    if (!visit) {
+      return null;
+    }
+    const hasRights = await this.visitAuth.hasReadRights(agent, visit);
     if (hasRights === false) {
       return null;
     }
 
-    return this.dataSource.getVisit(id);
+    return visit;
   }
 
   @Authorized([Roles.USER_OFFICER])

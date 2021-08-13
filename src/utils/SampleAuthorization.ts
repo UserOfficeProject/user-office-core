@@ -1,51 +1,84 @@
-import { logger } from '@esss-swap/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { UserWithRole } from '../models/User';
+import { Sample } from './../resolvers/types/Sample';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class SampleAuthorization {
   constructor(
-    @inject(Tokens.SampleDataSource) private sampleDataSource: SampleDataSource,
-    @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.SampleDataSource)
+    private sampleDataSource: SampleDataSource,
+
     @inject(Tokens.UserAuthorization)
     private userAuthorization: UserAuthorization
   ) {}
 
-  async hasReadRights(agent: UserWithRole | null, sampleId: number) {
-    return this.hasAccessRights(agent, sampleId);
+  private async resolveSample(
+    sampleOrSampleId: Sample | number
+  ): Promise<Sample | null> {
+    let sample;
+
+    if (typeof sampleOrSampleId === 'number') {
+      sample = await this.sampleDataSource.getSample(sampleOrSampleId);
+    } else {
+      sample = sampleOrSampleId;
+    }
+
+    return sample;
   }
 
-  async hasWriteRights(agent: UserWithRole | null, sampleId: number) {
-    return this.hasAccessRights(agent, sampleId);
+  async hasReadRights(
+    agent: UserWithRole | null,
+    sample: Sample
+  ): Promise<boolean>;
+  async hasReadRights(
+    agent: UserWithRole | null,
+    sampleId: number
+  ): Promise<boolean>;
+  async hasReadRights(
+    agent: UserWithRole | null,
+    sampleOrSampleId: Sample | number
+  ): Promise<boolean> {
+    return this.hasAccessRights(agent, sampleOrSampleId);
   }
 
-  private async hasAccessRights(agent: UserWithRole | null, sampleId: number) {
+  async hasWriteRights(
+    agent: UserWithRole | null,
+    sample: Sample
+  ): Promise<boolean>;
+  async hasWriteRights(
+    agent: UserWithRole | null,
+    sampleId: number
+  ): Promise<boolean>;
+  async hasWriteRights(
+    agent: UserWithRole | null,
+    sampleOrSampleId: Sample | number
+  ): Promise<boolean> {
+    return this.hasAccessRights(agent, sampleOrSampleId);
+  }
+
+  private async hasAccessRights(
+    agent: UserWithRole | null,
+    sampleOrSampleId: Sample | number
+  ) {
+    // User officer has access
     if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
-    const sample = await this.sampleDataSource.getSample(sampleId);
+    const sample = await this.resolveSample(sampleOrSampleId);
 
     if (!sample) {
       return false;
     }
 
-    const proposal = await this.proposalDataSource.get(sample.proposalPk);
-
-    if (!proposal) {
-      logger.logError('Could not find proposal for sample', {
-        sampleId,
-      });
-
-      return false;
-    }
-
-    return this.userAuthorization.hasAccessRights(agent, proposal);
+    /*
+     * For the sample the authorization follows the business logic for the proposal
+     * authorization that the sample is associated with
+     */
+    return this.userAuthorization.hasAccessRights(agent, sample.proposalPk);
   }
 }
