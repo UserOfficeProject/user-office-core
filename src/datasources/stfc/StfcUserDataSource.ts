@@ -117,6 +117,15 @@ export class StfcUserDataSource implements UserDataSource {
     return stfcUser ? toEssBasicUserDetails(stfcUser) : null;
   }
 
+  async getBasicUserDetailsByEmail(
+    email: string
+  ): Promise<BasicUserDetails | null> {
+    const stfcUser = (await client.getBasicPersonDetailsFromEmail(token, email))
+      ?.return;
+
+    return stfcUser ? toEssBasicUserDetails(stfcUser) : null;
+  }
+
   async checkOrcIDExist(orcID: string): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
@@ -250,6 +259,44 @@ export class StfcUserDataSource implements UserDataSource {
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     const dbUsers: BasicUserDetails[] = (
       await postgresUserDataSource.getUsers(
+        filter,
+        first,
+        offset,
+        userRole,
+        subtractUsers
+      )
+    ).users;
+
+    let users: BasicUserDetails[] = [];
+
+    if (dbUsers[0]) {
+      const userNumbers: string[] = dbUsers.map((record) => String(record.id));
+      const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
+        await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+      )?.return;
+
+      users = stfcBasicPeople
+        ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
+        : [];
+    }
+
+    return {
+      totalCount: users.length,
+      users,
+    };
+  }
+
+  async getPreviousCollaborators(
+    userId: number,
+    filter?: string,
+    first?: number,
+    offset?: number,
+    userRole?: number,
+    subtractUsers?: [number]
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
+    const dbUsers: BasicUserDetails[] = (
+      await postgresUserDataSource.getPreviousCollaborators(
+        userId,
         filter,
         first,
         offset,

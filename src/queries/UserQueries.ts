@@ -62,6 +62,28 @@ export default class UserQueries {
     );
   }
 
+  @Authorized()
+  async getBasicUserDetailsByEmail(
+    agent: UserWithRole | null,
+    email: string,
+    role?: UserRole
+  ) {
+    const user = await this.dataSource.getBasicUserDetailsByEmail(email, role);
+    if (!user) {
+      return null;
+    }
+
+    return new BasicUserDetails(
+      user.id,
+      user.firstname,
+      user.lastname,
+      user.organisation,
+      user.position,
+      user.created,
+      user.placeholder
+    );
+  }
+
   async checkEmailExist(agent: UserWithRole | null, email: string) {
     return this.dataSource.checkEmailExist(email);
   }
@@ -166,6 +188,26 @@ export default class UserQueries {
     subtractUsers?: [number]
   ) {
     return this.dataSource.getUsers(
+      filter,
+      first,
+      offset,
+      userRole,
+      subtractUsers
+    );
+  }
+
+  @Authorized()
+  async getPreviousCollaborators(
+    agent: UserWithRole | null,
+    userId: number,
+    filter?: string,
+    first?: number,
+    offset?: number,
+    userRole?: UserRole,
+    subtractUsers?: [number]
+  ) {
+    return this.dataSource.getPreviousCollaborators(
+      userId,
       filter,
       first,
       offset,
