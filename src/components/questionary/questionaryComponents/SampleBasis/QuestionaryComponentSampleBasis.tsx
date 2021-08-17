@@ -36,6 +36,7 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
     <>
       <Field
         name={id}
+        id={`${id}-field`}
         label={props.answer.question.question}
         inputProps={{
           onChange: (event: ChangeEvent<HTMLInputElement>) => {

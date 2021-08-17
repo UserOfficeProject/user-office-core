@@ -54,6 +54,7 @@ export const QuestionTemplateRelationNumberForm: FC<QuestionTemplateRelationForm
             <Field
               name="config.small_label"
               label="Small label"
+              id="small-label-id"
               type="text"
               component={TextField}
               margin="normal"

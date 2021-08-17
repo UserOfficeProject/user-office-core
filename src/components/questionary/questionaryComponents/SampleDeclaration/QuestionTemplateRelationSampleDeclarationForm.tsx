@@ -51,6 +51,7 @@ export const QuestionTemplateRelationSampleDeclarationForm: FC<QuestionTemplateR
             <Field
               name="config.addEntryButtonLabel"
               label="Add button label"
+              id="add-button-input"
               placeholder='(e.g. "add new")'
               type="text"
               component={TextField}
@@ -64,6 +65,7 @@ export const QuestionTemplateRelationSampleDeclarationForm: FC<QuestionTemplateR
             <Field
               name="config.minEntries"
               label="Min entries"
+              id="Min-input"
               placeholder="(e.g. 1, leave blank for unlimited)"
               type="text"
               component={TextField}
@@ -74,6 +76,7 @@ export const QuestionTemplateRelationSampleDeclarationForm: FC<QuestionTemplateR
             <Field
               name="config.maxEntries"
               label="Max entries"
+              id="Max-input"
               type="text"
               component={TextField}
               margin="normal"

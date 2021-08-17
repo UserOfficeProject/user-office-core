@@ -153,6 +153,7 @@ const StylisedToolbar: React.FC = (props) => {
           <Field
             name="email"
             label="E-mail"
+            id="Email-input"
             type="email"
             component={TextField}
             margin="normal"
@@ -438,6 +439,12 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                 debounceInterval: 400,
                 pageSize,
                 selection: props.selection,
+                selectionProps: (data: any) =>
+                  // return { 'aria-label': `${data.firstname}-select` };
+                  // id: `${data.firstname}-select`,
+                  ({
+                    'aria-label': `${data.firstname}-select`,
+                  }),
               }}
               actions={actionArray}
               localization={{

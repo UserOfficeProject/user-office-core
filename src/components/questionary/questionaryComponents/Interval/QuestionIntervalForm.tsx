@@ -42,6 +42,7 @@ export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
           <Field
             name="naturalKey"
             label="Key"
+            id="Key-input"
             type="text"
             component={TextField}
             margin="normal"
@@ -51,6 +52,7 @@ export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
           <Field
             name="question"
             label="Question"
+            id="Question-input"
             type="text"
             component={TextField}
             margin="normal"
@@ -61,6 +63,7 @@ export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
           <Field
             name="config.small_label"
             label="Small label"
+            id="Small-label-input"
             type="text"
             component={TextField}
             margin="normal"

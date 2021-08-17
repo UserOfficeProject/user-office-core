@@ -55,7 +55,7 @@ context('Template tests', () => {
   it('User officer should be able to create sample declaration template', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Sample declaration templates');
+    cy.navigateToTemplatesSubmenu('Sample declaration');
 
     cy.get('[data-cy="create-new-button"]').click();
 
@@ -88,7 +88,7 @@ context('Template tests', () => {
   it('User officer can modify proposal template', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.contains('default template')
       .parent()
@@ -325,7 +325,7 @@ context('Template tests', () => {
   it('User officer can clone template', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.contains('default template')
       .parent()
@@ -341,7 +341,7 @@ context('Template tests', () => {
   it('User officer can delete template', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.contains('Copy of default template')
       .parent()
@@ -357,7 +357,7 @@ context('Template tests', () => {
   it('User officer archive template', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.contains('default template')
       .parent()
@@ -459,7 +459,7 @@ context('Template tests', () => {
 
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.get("[title='Edit']").first().click();
 
@@ -543,7 +543,7 @@ context('Template tests', () => {
 
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.get("[title='Edit']").first().click();
 
@@ -665,7 +665,7 @@ context('Template tests', () => {
   it('File Upload field could be set as required', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.get("[title='Edit']").first().click();
 
@@ -742,7 +742,7 @@ context('Template tests', () => {
   it('Officer can delete proposal questions', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.get("[title='Edit']").first().click();
 
@@ -767,7 +767,7 @@ context('Template tests', () => {
       proposalWorkflow.description
     );
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.get('[data-cy="create-new-button"]').click();
 
@@ -851,7 +851,7 @@ context('Template tests', () => {
     cy.get('[data-cy="call-template"]').click();
     cy.contains('Proposal template 1').click();
 
-    cy.get('#mui-component-select-proposalWorkflowId').click();
+    cy.get('#proposalWorkflowId-input').click();
     cy.contains('Loading...').should('not.exist');
     cy.get('[role="presentation"] [role="listbox"] li')
       .contains(proposalWorkflow.name)
@@ -892,7 +892,7 @@ context('Template tests', () => {
   it('User officer can add multiple dependencies on a question', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.get('[title="Edit"]').last().click();
 
@@ -985,7 +985,7 @@ context('Template tests', () => {
   it('User officer can change dependency logic operator', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.get('[title="Edit"]').last().click();
 
@@ -1042,7 +1042,7 @@ context('Template tests', () => {
   it('User can add captions after uploading image/* file', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.get('[title="Edit"]').last().click();
 
@@ -1118,7 +1118,7 @@ context('Template tests', () => {
   it('should not let you create circular dependency chain', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     const templateName = faker.lorem.words(3);
 

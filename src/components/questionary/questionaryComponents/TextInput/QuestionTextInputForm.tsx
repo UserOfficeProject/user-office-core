@@ -39,6 +39,7 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
         <>
           <Field
             name="naturalKey"
+            id="Key-Input"
             label="Key"
             type="text"
             component={TextField}
@@ -48,6 +49,7 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
           />
           <Field
             name="question"
+            id="Question-Input"
             label="Question"
             type="text"
             component={TextField}
@@ -68,6 +70,7 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
 
             <Field
               name="config.min"
+              id="Min-Input"
               label="Min"
               type="text"
               component={TextField}
@@ -78,6 +81,7 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
 
             <Field
               name="config.max"
+              id="Max-Input"
               label="Max"
               type="text"
               component={TextField}
@@ -89,6 +93,7 @@ export const QuestionTextInputForm: FC<QuestionFormProps> = (props) => {
           <TitledContainer label="Options">
             <Field
               name="config.placeholder"
+              id="Placeholder-Input"
               label="Placeholder text"
               type="text"
               component={TextField}

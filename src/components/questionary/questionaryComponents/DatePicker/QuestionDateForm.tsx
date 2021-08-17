@@ -31,6 +31,7 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
           <Field
             name="naturalKey"
             label="Key"
+            id="Key-Input"
             type="text"
             component={TextField}
             margin="normal"
@@ -40,6 +41,7 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
           <Field
             name="question"
             label="Question"
+            id="Question-Input"
             type="text"
             component={TextField}
             margin="normal"
@@ -48,6 +50,7 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
           />
           <Field
             name="config.includeTime"
+            id="Include-time-Input"
             label="Include time"
             component={FormikUICustomCheckbox}
             margin="normal"
@@ -56,6 +59,7 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
           />
           <Field
             name="config.tooltip"
+            id="Tooltip-Input"
             label="Tooltip"
             type="text"
             component={TextField}
@@ -67,6 +71,7 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
+              id="Is-Required-Input"
               label="Is required"
               component={FormikUICustomCheckbox}
               margin="normal"
@@ -76,6 +81,7 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <Field
                 name="config.minDate"
+                id="Min-Time-Input"
                 label="Min"
                 format="yyyy-MM-dd"
                 component={KeyboardDatePicker}
@@ -85,6 +91,7 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
               />
               <Field
                 name="config.maxDate"
+                id="Max-Time-Input"
                 label="Max"
                 format="yyyy-MM-dd"
                 component={KeyboardDatePicker}
@@ -94,6 +101,7 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
               />
               <Field
                 name="config.defaultDate"
+                id="Default-Time-Input"
                 label="Default"
                 format="yyyy-MM-dd"
                 component={KeyboardDatePicker}

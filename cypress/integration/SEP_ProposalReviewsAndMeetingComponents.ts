@@ -200,12 +200,8 @@ context(
 
       cy.get("[title='Assign proposals to SEP']").first().click();
 
-      cy.get("[id='mui-component-select-selectedSEPId']").should(
-        'not.have.class',
-        'Mui-disabled'
-      );
-
-      cy.get("[id='mui-component-select-selectedSEPId']").first().click();
+      cy.get('#selectedSEPId-input').should('not.have.class', 'Mui-disabled');
+      cy.get('#selectedSEPId-input').first().click();
 
       cy.get("[id='menu-selectedSEPId'] li").first().click();
 
@@ -723,12 +719,9 @@ context(
 
       cy.get("[title='Assign proposals to SEP']").first().click();
 
-      cy.get("[id='mui-component-select-selectedSEPId']").should(
-        'not.have.class',
-        'Mui-disabled'
-      );
+      cy.get('#selectedSEPId-input').should('not.have.class', 'Mui-disabled');
 
-      cy.get("[id='mui-component-select-selectedSEPId']").first().click();
+      cy.get('#selectedSEPId-input').first().click();
 
       cy.get("[id='menu-selectedSEPId'] li").first().click();
 
@@ -738,12 +731,12 @@ context(
 
       cy.get("[title='Assign/Remove instrument']").first().click();
 
-      cy.get("[id='mui-component-select-selectedInstrumentId']").should(
+      cy.get("#selectedInstrumentId-input").should(
         'not.have.class',
         'Mui-disabled'
       );
 
-      cy.get("[id='mui-component-select-selectedInstrumentId']")
+      cy.get("#selectedInstrumentId-input")
         .first()
         .click();
 

@@ -52,7 +52,7 @@ context('Shipments tests', () => {
   it('Should be able to create shipments template', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Shipment declaration templates');
+    cy.navigateToTemplatesSubmenu('Shipment declaration');
 
     cy.get('[data-cy=create-new-button]').click();
 

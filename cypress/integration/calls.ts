@@ -44,7 +44,8 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="user-menu-items"]')
       .find('.MuiListItem-root')
-      .should('have.length', 5);
+      .should('have.length', 3);
+    // .should('have.length', 5);
 
     cy.visit('/CallPage');
     cy.contains('My proposals');
@@ -371,7 +372,7 @@ context('Calls tests', () => {
 
     cy.contains(updatedCall.shortCode).parent().find('[title="Edit"]').click();
 
-    cy.get('#mui-component-select-proposalWorkflowId').click();
+    cy.get('#proposalWorkflowId-input').click();
 
     cy.contains('Loading...').should('not.exist');
 

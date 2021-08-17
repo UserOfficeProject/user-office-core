@@ -35,6 +35,7 @@ export const QuestionTemplateRelationFileUploadForm: FC<QuestionTemplateRelation
             <Field
               name="config.small_label"
               label="Helper text"
+              id="helper-text-id"
               placeholder="(e.g. only PDF accepted)"
               type="text"
               component={TextField}
@@ -73,6 +74,7 @@ export const QuestionTemplateRelationFileUploadForm: FC<QuestionTemplateRelation
             <Field
               name="config.max_files"
               label="Max number of files"
+              id="Max-files-id"
               type="text"
               component={TextField}
               margin="normal"
