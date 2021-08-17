@@ -114,7 +114,7 @@ export function TemplateMetadataEditor(props: {
             <Button
               disabled={isSubmitting}
               variant="text"
-              color="secondary"
+              color="primary" // secondary + text variant is bad for contrast
               onClick={() => setIsEditMode(false)}
               className={classes.button}
             >
