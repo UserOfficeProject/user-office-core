@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   label: {
-    color: theme.palette.grey[500],
+    color: theme.palette.grey[900],
     fontSize: 'small',
   },
 }));
