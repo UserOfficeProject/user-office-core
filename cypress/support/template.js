@@ -28,7 +28,7 @@ function createTemplate(type, title, description) {
   const typeToMenuTitle = new Map();
   typeToMenuTitle.set('proposal', 'Proposal');
   typeToMenuTitle.set('sample', 'Sample declaration');
-  typeToMenuTitle.set('shipment', 'Shipment declaration');
+  typeToMenuTitle.set('shipment', 'Shipment declaration templates');
   typeToMenuTitle.set('visit', 'Visit');
   typeToMenuTitle.set('riskAssessment', 'Risk assessment');
 

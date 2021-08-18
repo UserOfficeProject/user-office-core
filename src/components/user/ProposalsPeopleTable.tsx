@@ -439,12 +439,11 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                 debounceInterval: 400,
                 pageSize,
                 selection: props.selection,
-                selectionProps: (data: any) =>
-                  // return { 'aria-label': `${data.firstname}-select` };
-                  // id: `${data.firstname}-select`,
-                  ({
-                    'aria-label': `${data.firstname}-select`,
-                  }),
+                selectionProps: (rowdata: any) => ({
+                  inputProps: {
+                    'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
+                  },
+                }),
               }}
               actions={actionArray}
               localization={{
@@ -453,6 +452,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                   searchPlaceholder: 'Filter',
                   searchTooltip: 'Filter Users',
                   nRowsSelected: '{0} Users(s) Selected',
+                  showColumnsAriaLabel: 'testtest',
                 },
               }}
               onChangePage={(page) =>

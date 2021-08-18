@@ -327,7 +327,7 @@ context('Template tests', () => {
   it('User officer should be able to search questions', function () {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     // Create an empty template so we can search all question from the question picker
 
