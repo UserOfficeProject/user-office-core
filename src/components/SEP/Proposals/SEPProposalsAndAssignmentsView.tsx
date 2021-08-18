@@ -18,7 +18,7 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   const { loadingCalls, calls } = useCallsData();
   const [selectedCallId, setSelectedCallId] = useState<number>(0);
 
-  const Toolbar = (data: Options): JSX.Element => (
+  const Toolbar = (data: Options<any>): JSX.Element => (
     <>
       <MTableToolbar {...data} />
       <CallFilter

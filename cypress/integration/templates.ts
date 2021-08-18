@@ -395,6 +395,7 @@ context('Template tests', () => {
     cy.get('[data-cy=question-list] div').should('have.length.above', 0);
 
     // cleanup temporary template
+    // Note this only works when cypress is going fast as it will click the templates button the sidebar but before it disappears it will click the Proposals button
     cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.contains(searchQuestionsTemplateName)

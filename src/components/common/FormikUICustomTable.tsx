@@ -79,7 +79,7 @@ export const FormikUICustomTable = ({
     </div>
   );
 
-  const StyledToolbar = (props: Options) => (
+  const StyledToolbar = (props: Options<any>) => (
     <div className={classes.customToolbar}>
       <MTableToolbar {...props} />
     </div>

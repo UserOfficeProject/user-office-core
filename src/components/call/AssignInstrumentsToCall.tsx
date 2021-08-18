@@ -85,6 +85,9 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
             inputProps: {
               'aria-label': `${rowdata.name}-${rowdata.shortCode}-select`,
             },
+            headerSelectionProps: {
+              inputProps: { 'aria-label': 'Checkbox Select All' },
+            },
           }),
         }}
       />

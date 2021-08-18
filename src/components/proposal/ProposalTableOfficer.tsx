@@ -648,6 +648,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               'aria-label': `${rowdata.title}-select`,
             },
           }),
+          headerSelectionProps: {
+            inputProps: { 'aria-label': 'Checkbox Select All' },
+          },
         }}
         actions={[
           {

@@ -31,7 +31,7 @@ const SEPMeetingComponentsView: React.FC<SEPMeetingComponentsViewProps> = ({
   // NOTE: Default call is with id=1
   const [selectedCallId, setSelectedCallId] = useState<number>(1);
 
-  const Toolbar = (data: Options): JSX.Element => (
+  const Toolbar = (data: Options<any>): JSX.Element => (
     <>
       <MTableToolbar {...data} />
       <CallFilter
