@@ -395,7 +395,7 @@ context('Template tests', () => {
     cy.get('[data-cy=question-list] div').should('have.length.above', 0);
 
     // cleanup temporary template
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.contains(searchQuestionsTemplateName)
       .parent()

@@ -2,7 +2,6 @@ import faker from 'faker';
 
 const navigateToTemplatesSubmenu = (submenuName) => {
   cy.contains('Templates').click();
-  cy.wait(500);
   cy.get(`[title='${submenuName}']`).first().click();
 };
 
