@@ -530,7 +530,7 @@ context(
 
       cy.finishedLoading();
 
-      cy.contains(proposal1.proposalTitle).parent().contains('DRAFT');
+      cy.contains(proposal1.proposalTitle).parent().contains('Draft');
 
       cy.contains(proposal1.proposalTitle)
         .parent()
@@ -546,7 +546,7 @@ context(
         text: 'Proposal review submitted successfully!',
       });
 
-      cy.contains(proposal1.proposalTitle).parent().contains('SUBMITTED');
+      cy.contains(proposal1.proposalTitle).parent().contains('Submitted');
     });
 
     it('Officer should get error when trying to delete proposal which has dependencies (like reviews)', () => {
