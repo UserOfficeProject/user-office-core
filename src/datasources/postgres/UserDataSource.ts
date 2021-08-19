@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { QueryBuilder } from 'knex';
+
 import { Role, Roles } from '../../models/Role';
 import {
   User,
@@ -240,6 +242,28 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => createBasicUserObject(user));
   }
 
+  async getBasicUserDetailsByEmail(
+    email: string,
+    role?: UserRole
+  ): Promise<BasicUserDetails | null> {
+    return database
+      .select()
+      .from('users as u')
+      .join('institutions as i', { 'u.organisation': 'i.institution_id' })
+      .where('email', 'ilike', email)
+      .modify((query) => {
+        if (role) {
+          query.join('role_user', 'role_user.user_id', '=', 'u.user_id');
+          query.join('roles', 'roles.role_id', '=', 'role_user.role_id');
+          query.where('roles.short_code', UserRoleShortCodeMap[role]);
+        }
+      })
+      .first()
+      .then((user: UserRecord) =>
+        !!user ? createBasicUserObject(user) : null
+      );
+  }
+
   async getByUsername(username: string): Promise<User | null> {
     return database
       .select()
@@ -402,6 +426,131 @@ export default class PostgresUserDataSource implements UserDataSource {
           users,
         };
       });
+  }
+
+  async getPreviousCollaborators(
+    userId: number,
+    filter?: string,
+    first?: number,
+    offset?: number,
+    userRole?: UserRole,
+    subtractUsers?: [number]
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
+    if (userId == -1) {
+      return this.getUsers(filter, first, offset, userRole, subtractUsers);
+    }
+
+    const lastCollaborators = await this.getMostRecentCollaborators(userId);
+
+    const freqCollaborators = await this.getFrequentCollaborators(userId);
+
+    const userIds = [
+      ...new Set([...lastCollaborators, ...freqCollaborators, userId]),
+    ];
+
+    return database
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('users')
+      .join('institutions as i', { organisation: 'i.institution_id' })
+      .whereIn('users.user_id', userIds)
+      .modify((query) => {
+        if (filter) {
+          query.andWhere((qb) => {
+            qb.where('institution', 'ilike', `%${filter}%`)
+              .orWhere('firstname', 'ilike', `%${filter}%`)
+              .orWhere('preferredname', 'ilike', `%${filter}%`)
+              .orWhere('lastname', 'ilike', `%${filter}%`);
+          });
+        }
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
+        if (userRole) {
+          query.join('role_user', 'role_user.user_id', '=', 'users.user_id');
+          query.join('roles', 'roles.role_id', '=', 'role_user.role_id');
+          query.where('roles.short_code', UserRoleShortCodeMap[userRole]);
+        }
+        if (subtractUsers) {
+          query.whereNotIn('users.user_id', subtractUsers);
+        }
+      })
+      .then((usersRecord: UserRecord[]) => {
+        const users = usersRecord.map((user) => createBasicUserObject(user));
+
+        return {
+          totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
+          users,
+        };
+      });
+  }
+
+  async getMostRecentCollaborators(id: number): Promise<number[]> {
+    const fullProposalUserTable = (query: QueryBuilder) =>
+      query
+        .select('*')
+        .from('proposal_user')
+        .union(function () {
+          this.column('proposal_pk', { user_id: 'proposer_id' }).from(
+            'proposals'
+          );
+        });
+
+    const prop: number = await database
+      .with('pu', fullProposalUserTable)
+      .max('pu.proposal_pk')
+      .from('pu')
+      .join('proposals as p', { 'pu.proposal_pk': 'p.proposal_pk' })
+      .where((query) =>
+        query.where('pu.user_id', id).andWhere('p.submitted', true)
+      )
+      .then((p) => {
+        return p[0].max;
+      });
+
+    return await database
+      .with('pu', fullProposalUserTable)
+      .select('pu.user_id')
+      .from('pu')
+      .where('pu.proposal_pk', prop)
+      .limit(10)
+      .then((users: { user_id: number }[]) => users.map((uid) => uid.user_id));
+  }
+
+  async getFrequentCollaborators(id: number): Promise<number[]> {
+    const fullProposalUser = (query: QueryBuilder) =>
+      query
+        .select('*')
+        .from('proposal_user')
+        .union(function () {
+          this.column('proposal_pk', { user_id: 'proposer_id' }).from(
+            'proposals'
+          );
+        });
+
+    const proposals: number[] = await database
+      .with('pu', fullProposalUser)
+      .select('pu.proposal_pk')
+      .from('pu')
+      .join('proposals as p', { 'pu.proposal_pk': 'p.proposal_pk' })
+      .where((query) =>
+        query.where('pu.user_id', id).andWhere('p.submitted', true)
+      )
+      .then((props: { proposal_pk: number }[]) =>
+        props.map((p) => p.proposal_pk)
+      );
+
+    return await database
+      .with('pu', fullProposalUser)
+      .select('pu.user_id')
+      .from('pu')
+      .whereIn('pu.proposal_pk', proposals)
+      .groupBy('pu.user_id')
+      .orderByRaw('count(pu.user_id) DESC')
+      .limit(10)
+      .then((users: { user_id: number }[]) => users.map((uid) => uid.user_id));
   }
 
   async setUserEmailVerified(id: number): Promise<User | null> {

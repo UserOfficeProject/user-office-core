@@ -57,10 +57,11 @@ export default class SampleQueries {
     user: UserWithRole | null,
     shipmentId: number
   ): Promise<Sample[] | null> {
-    if (
-      (await this.shipmentAuthorization.hasReadRights(user, shipmentId)) ===
-      false
-    ) {
+    const hasRights = await this.shipmentAuthorization.hasReadRights(
+      user,
+      shipmentId
+    );
+    if (hasRights === false) {
       logger.logWarn('Unauthorized getSamplesByShipmentId access', {
         user,
         shipmentId,

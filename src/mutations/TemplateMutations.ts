@@ -88,6 +88,14 @@ export default class TemplateMutations {
           'visit_basis'
         );
         break;
+      case TemplateCategoryId.RISK_ASSESSMENT:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New risk assessment',
+          'risk_assessment_basis'
+        );
+        break;
     }
 
     const currentActiveTemplateId = await this.dataSource.getActiveTemplateId(

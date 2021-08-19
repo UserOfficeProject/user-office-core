@@ -1,10 +1,10 @@
-import { logger } from '@esss-swap/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { UserWithRole } from '../models/User';
+import { Shipment } from './../resolvers/types/Shipment';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
@@ -18,64 +18,70 @@ export class ShipmentAuthorization {
     private userAuthorization: UserAuthorization
   ) {}
 
+  private async resolveShipment(
+    shipmentOrShipmentId: Shipment | number
+  ): Promise<Shipment | null> {
+    let shipment;
+
+    if (typeof shipmentOrShipmentId === 'number') {
+      shipment = await this.shipmentDataSource.getShipment(
+        shipmentOrShipmentId
+      );
+    } else {
+      shipment = shipmentOrShipmentId;
+    }
+
+    return shipment;
+  }
+
   async hasReadRights(
     agent: UserWithRole | null,
-    shipmentId: number | number[]
-  ) {
-    return this.hasAccessRights(agent, shipmentId);
+    shipment: Shipment
+  ): Promise<boolean>;
+  async hasReadRights(
+    agent: UserWithRole | null,
+    shipmentId: number
+  ): Promise<boolean>;
+  async hasReadRights(
+    agent: UserWithRole | null,
+    shipmentOrShipmentId: Shipment | number
+  ): Promise<boolean> {
+    return this.hasAccessRights(agent, shipmentOrShipmentId);
   }
 
   async hasWriteRights(
     agent: UserWithRole | null,
-    shipmentId: number | number[]
-  ) {
-    return await this.hasAccessRights(agent, shipmentId);
+    shipment: Shipment
+  ): Promise<boolean>;
+  async hasWriteRights(
+    agent: UserWithRole | null,
+    shipmentId: number
+  ): Promise<boolean>;
+  async hasWriteRights(
+    agent: UserWithRole | null,
+    shipmentOrShipmentId: Shipment | number
+  ): Promise<boolean> {
+    return await this.hasAccessRights(agent, shipmentOrShipmentId);
   }
 
   private async hasAccessRights(
     agent: UserWithRole | null,
-    shipmentId: number | number[]
+    shipmentOrShipmentId: Shipment | number
   ) {
+    // User officer has read/write rights
     if (this.userAuthorization.isUserOfficer(agent)) {
       return true;
     }
 
-    if (typeof shipmentId === 'number') {
-      return this.hasAccessToShipment(agent, shipmentId);
-    }
-
-    if (Array.isArray(shipmentId)) {
-      return Promise.all(
-        shipmentId.map((id) => this.hasAccessToShipment(agent, id))
-      );
-    }
-
-    throw new Error('Unsupported datatype');
-  }
-
-  private async hasAccessToShipment(
-    agent: UserWithRole | null,
-    shipmentId: number
-  ) {
-    const shipment = await this.shipmentDataSource.getShipment(shipmentId);
+    const shipment = await this.resolveShipment(shipmentOrShipmentId);
     if (!shipment) {
-      logger.logError('Could not find shipment', {
-        shipmentId,
-      });
-
       return false;
     }
 
-    const proposal = await this.proposalDataSource.get(shipment.proposalPk);
-
-    if (!proposal) {
-      logger.logError('Could not find proposal for shipment', {
-        shipmentId,
-      });
-
-      return false;
-    }
-
-    return this.userAuthorization.hasAccessRights(agent, proposal);
+    /*
+     * For the shipment the authorization follows the business logic for the proposal
+     * authorization that the shipment is associated with
+     */
+    return this.userAuthorization.hasAccessRights(agent, shipment.proposalPk);
   }
 }

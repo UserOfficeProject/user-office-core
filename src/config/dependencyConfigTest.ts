@@ -19,16 +19,19 @@ import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailSe
 import { createSkipPostingHandler } from '../eventHandlers/messageBroker';
 import { SkipAssetRegistrar } from '../utils/EAM_service';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
+import { RiskAssessmentAuthorization } from '../utils/RiskAssessmentAuthorization';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { VisitAuthorization } from '../utils/VisitAuthorization';
+import { RiskAssessmentDataSourceMock } from './../datasources/mockups/RiskAssessmentDataSource';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.UserAuthorization, UserAuthorization);
 mapClass(Tokens.QuestionaryAuthorization, QuestionaryAuthorization);
+mapClass(Tokens.RiskAssessmentAuthorization, RiskAssessmentAuthorization);
 mapClass(Tokens.SampleAuthorization, SampleAuthorization);
 mapClass(Tokens.ShipmentAuthorization, ShipmentAuthorization);
 mapClass(Tokens.VisitAuthorization, VisitAuthorization);
@@ -41,6 +44,7 @@ mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);
 mapClass(Tokens.ProposalSettingsDataSource, ProposalSettingsDataSourceMock);
 mapClass(Tokens.QuestionaryDataSource, QuestionaryDataSourceMock);
 mapClass(Tokens.ReviewDataSource, ReviewDataSourceMock);
+mapClass(Tokens.RiskAssessmentDataSource, RiskAssessmentDataSourceMock);
 mapClass(Tokens.SampleDataSource, SampleDataSourceMock);
 mapClass(Tokens.SEPDataSource, SEPDataSourceMock);
 mapClass(Tokens.ShipmentDataSource, ShipmentDataSourceMock);

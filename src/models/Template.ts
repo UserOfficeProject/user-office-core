@@ -29,6 +29,7 @@ export enum DataType {
   SHIPMENT_BASIS = 'SHIPMENT_BASIS',
   RICH_TEXT_INPUT = 'RICH_TEXT_INPUT',
   VISIT_BASIS = 'VISIT_BASIS',
+  RISK_ASSESSMENT_BASIS = 'RISK_ASSESSMENT_BASIS',
 }
 
 export class Topic {
@@ -89,6 +90,7 @@ export enum TemplateCategoryId {
   SAMPLE_DECLARATION,
   SHIPMENT_DECLARATION,
   VISIT,
+  RISK_ASSESSMENT,
 }
 
 export class FieldCondition {
