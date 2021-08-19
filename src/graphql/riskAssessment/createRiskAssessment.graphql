@@ -1,0 +1,15 @@
+mutation createRiskAssessment($proposalPk: Int!) {
+  createRiskAssessment(proposalPk: $proposalPk) {
+    riskAssessment {
+      ...riskAssessment
+      questionary {
+        ...questionary
+        isCompleted
+      }
+    }
+
+    rejection {
+      ...rejection
+    }
+  }
+}

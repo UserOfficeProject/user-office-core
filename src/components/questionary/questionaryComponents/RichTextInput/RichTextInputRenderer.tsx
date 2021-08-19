@@ -4,6 +4,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import React, { useState } from 'react';
 
@@ -12,19 +13,30 @@ import {
   QuestionRenderer,
 } from 'components/questionary/QuestionaryComponentRegistry';
 
+const useStyles = makeStyles(() => ({
+  visibilityIconAligned: {
+    marginLeft: '-12px',
+  },
+}));
+
 export const RichTextInputRendererComponent: React.FC<{
   id: string;
   title: string;
   valueToRender: string;
 }> = ({ id, title, valueToRender }) => {
   const [open, setOpen] = useState(false);
+  const classes = useStyles();
 
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   return (
     <span>
-      <IconButton onClick={handleClickOpen} data-cy={`${id}_open`}>
+      <IconButton
+        onClick={handleClickOpen}
+        data-cy={`${id}_open`}
+        className={classes.visibilityIconAligned}
+      >
         <VisibilityIcon />
       </IconButton>
       <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>

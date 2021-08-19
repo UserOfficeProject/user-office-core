@@ -13,12 +13,9 @@ import {
   Event,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
-} from 'models/QuestionarySubmissionState';
-import {
-  RegistrationExtended,
-  VisitSubmissionState as VisitRegistrationSubmissionState,
-  VisitSubmissionState,
-} from 'models/VisitSubmissionState';
+} from 'models/questionary/QuestionarySubmissionState';
+import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
+import { RegistrationWithQuestionary } from 'models/questionary/visit/VisitRegistrationWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
@@ -51,10 +48,10 @@ const visitReducer = (
 };
 
 export interface VisitRegistrationContainerProps {
-  registration: RegistrationExtended;
-  onCreate?: (registration: RegistrationExtended) => void;
-  onUpdate?: (registration: RegistrationExtended) => void;
-  onSubmitted?: (registration: RegistrationExtended) => void;
+  registration: RegistrationWithQuestionary;
+  onCreate?: (registration: RegistrationWithQuestionary) => void;
+  onUpdate?: (registration: RegistrationWithQuestionary) => void;
+  onSubmitted?: (registration: RegistrationWithQuestionary) => void;
 }
 export default function VisitRegistrationContainer(
   props: VisitRegistrationContainerProps
@@ -135,7 +132,7 @@ export default function VisitRegistrationContainer(
       }
     };
   };
-  const initialState = new VisitSubmissionState(
+  const initialState = new VisitRegistrationSubmissionState(
     props.registration,
     0,
     false,

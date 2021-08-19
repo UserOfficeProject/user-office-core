@@ -2,14 +2,14 @@ import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { useVisitRegistration } from 'hooks/visit/useVisitRegistration';
-import { RegistrationBasic } from 'models/VisitSubmissionState';
+import { VisitRegistrationCore } from 'models/questionary/visit/VisitRegistrationCore';
 
 import VisitRegistrationContainer from './VisitRegistrationContainer';
 
 interface UpdateVisitRegistrationProps {
-  visitRegistration: RegistrationBasic;
-  onUpdate?: (registration: RegistrationBasic) => void;
-  onSubmitted?: (registration: RegistrationBasic) => void;
+  visitRegistration: VisitRegistrationCore;
+  onUpdate?: (registration: VisitRegistrationCore) => void;
+  onSubmitted?: (registration: VisitRegistrationCore) => void;
 }
 
 function UpdateVisitRegistration({

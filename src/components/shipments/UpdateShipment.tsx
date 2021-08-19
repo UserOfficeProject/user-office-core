@@ -2,13 +2,13 @@ import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { useShipment } from 'hooks/shipment/useShipment';
-import { ShipmentBasic } from 'models/ShipmentSubmissionState';
+import { ShipmentCore } from 'models/questionary/shipment/ShipmentCore';
 
 import ShipmentContainer from './ShipmentContainer';
 
 interface UpdateShipmentProps {
-  shipment: ShipmentBasic;
-  onShipmentSubmitted: (shipment: ShipmentBasic) => void;
+  shipment: ShipmentCore;
+  onShipmentSubmitted: (shipment: ShipmentCore) => void;
 }
 
 function UpdateShipment({

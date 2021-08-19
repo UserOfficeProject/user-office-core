@@ -8,7 +8,7 @@ import {
   TemplateCategoryId,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { Event, EventType } from 'models/QuestionaryEditorModel';
+import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
 
@@ -242,7 +242,7 @@ export function usePersistQuestionaryEditorModel() {
 
             const previousStep = state.steps[stepIndex];
 
-            sortOrder = previousStep.topic.sortOrder + 1;
+            sortOrder = previousStep ? previousStep.topic.sortOrder + 1 : 0;
           }
 
           executeAndMonitorCall(async () => {

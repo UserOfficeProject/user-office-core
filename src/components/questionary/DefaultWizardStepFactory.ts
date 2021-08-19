@@ -1,9 +1,9 @@
 import { QuestionaryStep } from 'generated/sdk';
-import { StepType } from 'models/questionary/StepType';
 import {
   QuestionarySubmissionState,
   WizardStep,
-} from 'models/QuestionarySubmissionState';
+} from 'models/questionary/QuestionarySubmissionState';
+import { StepType } from 'models/questionary/StepType';
 
 /**
  * Default WizardStepsFactory

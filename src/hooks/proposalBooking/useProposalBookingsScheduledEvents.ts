@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 
 import {
-  ScheduledEvent,
+  Instrument,
+  Maybe,
   Proposal,
   ProposalBookingStatus,
-  Instrument,
-  VisitFragment,
-  Questionary,
-  Maybe,
+  RiskAssessmentFragment,
+  ScheduledEvent,
   Visit,
+  VisitFragment,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { RegistrationBasic } from 'models/VisitSubmissionState';
+import { VisitRegistrationCore } from 'models/questionary/visit/VisitRegistrationCore';
 import { toTzLessDateTime } from 'utils/Time';
 
 import {
@@ -35,13 +35,13 @@ export type ProposalScheduledEvent = Pick<
   } & {
     users: BasicUserDetailsFragment[];
   } & {
-    riskAssessmentQuestionary: Maybe<Pick<Questionary, 'questionaryId'>>;
+    riskAssessment: Maybe<RiskAssessmentFragment>;
   };
   instrument: Pick<Instrument, 'id' | 'name'> | null;
 } & {
   visit:
     | (VisitFragment & {
-        registrations: RegistrationBasic[];
+        registrations: VisitRegistrationCore[];
         shipments: ShipmentFragment[];
       } & Pick<Visit, 'teamLead'>)
     | null;
@@ -95,8 +95,7 @@ export function useProposalBookingsScheduledEvents({
                     proposalId: proposal.proposalId,
                     proposer: proposal.proposer,
                     users: proposal.users,
-                    riskAssessmentQuestionary:
-                      proposal.riskAssessmentQuestionary,
+                    riskAssessment: proposal.riskAssessment,
                     finalStatus: proposal.finalStatus,
                     managementDecisionSubmitted:
                       proposal.managementDecisionSubmitted,

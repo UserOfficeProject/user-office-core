@@ -15,7 +15,7 @@ declare global {
        */
       defineExperimentTeam: (params: {
         proposalTitle: string;
-        users: string[];
+        usersEmails: string[];
         teamLead: string;
       }) => void;
     }

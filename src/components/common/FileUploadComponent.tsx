@@ -25,7 +25,7 @@ import React, { ChangeEvent, useState } from 'react';
 
 import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
 import { useFileMetadata } from 'hooks/file/useFileMetadata';
-import { FileMetaData } from 'models/FileUpload';
+import { FileMetaData } from 'models/questionary/FileUpload';
 import { FunctionType } from 'utils/utilTypes';
 
 import UOLoader from './UOLoader';

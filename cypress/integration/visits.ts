@@ -38,9 +38,6 @@ context('visits tests', () => {
     cy.visit('/');
   });
 
-  const visitTemplateName = faker.lorem.words(2);
-  const visitTemplateDescription = faker.lorem.words(3);
-
   const startDateQuestionTitle = 'Visit start';
   const endDateQuestionTitle = 'Visit end';
 
@@ -52,19 +49,7 @@ context('visits tests', () => {
   it('Should be able to create visits template', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Visit templates');
-
-    cy.get('[data-cy=create-new-button]').click();
-
-    cy.get('[data-cy=name] input')
-      .type(visitTemplateName)
-      .should('have.value', visitTemplateName);
-
-    cy.get('[data-cy=description]').type(visitTemplateDescription);
-
-    cy.get('[data-cy=submit]').click();
-
-    cy.contains('New visit');
+    cy.createTemplate('visit');
 
     cy.createDateQuestion(startDateQuestionTitle);
     cy.createDateQuestion(endDateQuestionTitle);
@@ -108,9 +93,9 @@ context('visits tests', () => {
 
     // add visitors
     cy.get('[data-cy=add-participant-button]').click();
+    cy.get('[name=email]').type('david@teleworm.us{enter}');
     cy.contains('Beckley').parent().find('[type=checkbox]').click();
     cy.contains('Carlsson').parent().find('[type=checkbox]').click();
-    cy.contains('Dawson').parent().find('[type=checkbox]').click();
     cy.get('[data-cy=assign-selected-users]').click();
 
     // specify team lead

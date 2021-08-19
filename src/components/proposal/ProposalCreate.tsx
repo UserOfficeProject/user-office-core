@@ -5,7 +5,7 @@ import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, QuestionaryStep } from 'generated/sdk';
 import { useBlankQuestionaryStepsData } from 'hooks/questionary/useBlankQuestionaryStepsData';
-import { ProposalSubsetSubmission } from 'models/ProposalSubmissionState';
+import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
 
 import ProposalContainer from './ProposalContainer';
 
@@ -14,7 +14,7 @@ function createProposalStub(
   templateId: number,
   questionarySteps: QuestionaryStep[],
   proposer: BasicUserDetails
-): ProposalSubsetSubmission {
+): ProposalWithQuestionary {
   return {
     primaryKey: 0,
     title: '',
