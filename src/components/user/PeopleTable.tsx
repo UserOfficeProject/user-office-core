@@ -50,7 +50,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   emailInvite?: boolean;
   showInvitationButtons?: boolean;
   selectedUsers?: number[];
-  mtOptions?: Options<any>;
+  mtOptions?: Options;
   columns?: Column<any>[];
   preserveSelf?: boolean;
 };
@@ -316,9 +316,6 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
               'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
             },
           }),
-          headerSelectionProps: {
-            inputProps: { 'aria-label': 'Checkbox Select All' },
-          },
         }}
         actions={actionArray}
         editable={

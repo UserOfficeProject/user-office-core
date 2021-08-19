@@ -62,9 +62,6 @@ const RoleTable: React.FC<RoleTableProps> = ({ add, activeRoles }) => {
               'aria-label': `${rowdata.title}-select`,
             },
           }),
-          headerSelectionProps: {
-            inputProps: { 'aria-label': 'Checkbox Select All' },
-          },
         }}
         localization={{
           toolbar: {

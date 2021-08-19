@@ -378,9 +378,6 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
               'aria-label': `${rowdata.title}-select`,
             },
           }),
-          headerSelectionProps: {
-            inputProps: { 'aria-label': 'Checkbox Select All' },
-          },
         }}
         onSelectionChange={(selectedItems) => {
           setUrlQueryParams((params) => ({

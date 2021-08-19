@@ -12,7 +12,7 @@ type ExperimentTimesTableProps = {
   title: string;
   isLoading: boolean;
   proposalScheduledEvents: ProposalScheduledEvent[];
-  options?: Partial<Options<any>>;
+  options?: Partial<Options>;
 };
 
 export default function ExperimentsTable({
