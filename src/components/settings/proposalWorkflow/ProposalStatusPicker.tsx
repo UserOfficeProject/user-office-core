@@ -42,7 +42,7 @@ const ProposalStatusPicker: React.FC<{
     },
     title: {
       flexGrow: 1,
-      color: theme.palette.grey[600],
+      color: theme.palette.grey[900],
       fontWeight: 'bold',
       padding: '12px 8px 8px 8px',
     },
@@ -84,7 +84,7 @@ const ProposalStatusPicker: React.FC<{
             className={classes.item}
           >
             <Box fontSize="1rem">{proposalStatus.name}</Box>
-            <Box fontSize="small" mt={1} color={theme.palette.grey[400]}>
+            <Box fontSize="small" mt={1} color={theme.palette.grey[800]}>
               {proposalStatus.description}
             </Box>
           </Grid>
