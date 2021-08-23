@@ -208,7 +208,7 @@ export default function QuestionaryEditorTopic(props: {
                   disabled={isSubmitting}
                   variant="text"
                   size="small"
-                  color="secondary"
+                  color="primary" // secondary + text variant is bad for contrast
                   onClick={() => setIsEditMode(false)}
                   className={classes.button}
                   data-cy="topic-title-cancel-update"

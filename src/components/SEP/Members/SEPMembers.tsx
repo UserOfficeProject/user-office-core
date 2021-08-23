@@ -28,6 +28,11 @@ const useStyles = makeStyles(() => ({
       color: 'rgba(0, 0, 0, 0.7) !important',
     },
   },
+  defaultTextField: {
+    '& .MuiFormLabel-root': {
+      color: 'black',
+    },
+  },
 }));
 
 type BasicUserDetailsWithRole = BasicUserDetails & { roleId: UserRole };
@@ -266,8 +271,10 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               required
               disabled
               className={
-                sepData.sepChair ? classes.darkerDisabledTextField : ''
-              }
+                sepData.sepChair
+                  ? classes.darkerDisabledTextField
+                  : classes.defaultTextField
+              } // original behaviour preserved but labels legible by default
               InputProps={{
                 endAdornment: isUserOfficer && (
                   <>
@@ -322,8 +329,10 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               required
               disabled
               className={
-                sepData.sepSecretary ? classes.darkerDisabledTextField : ''
-              }
+                sepData.sepSecretary
+                  ? classes.darkerDisabledTextField
+                  : classes.defaultTextField
+              } // original behaviour preserved but labels legible by default
               InputProps={{
                 endAdornment: isUserOfficer && (
                   <>

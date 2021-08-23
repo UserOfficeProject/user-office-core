@@ -78,7 +78,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
     },
     title: {
       flexGrow: 1,
-      color: theme.palette.grey[600],
+      color: theme.palette.grey[900],
       fontWeight: 'bold',
       padding: '12px 8px 8px 8px',
     },
