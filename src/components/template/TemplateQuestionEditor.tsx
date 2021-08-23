@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
   questionId: {
     fontSize: '12px',
     fontWeight: 'bold',
-    color: theme.palette.grey[900],
+    color: theme.palette.grey[800],
   },
   dependencies: {
     fontSize: '12px',
