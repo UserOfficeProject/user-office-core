@@ -10,9 +10,20 @@ export class SMTPMailService extends MailService {
   constructor() {
     super();
 
+    const attachments = [];
+
+    if (process.env.EMAIL_FOOTER_IMAGE_PATH !== undefined) {
+      attachments.push({
+        filename: 'logo.png',
+        path: process.env.EMAIL_FOOTER_IMAGE_PATH,
+        cid: 'logo1',
+      });
+    }
+
     this._email = new EmailTemplates({
       message: {
         from: process.env.EMAIL_SENDER,
+        attachments,
       },
       send: true,
       transport: nodemailer.createTransport({
