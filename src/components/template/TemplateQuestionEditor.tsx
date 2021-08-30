@@ -38,11 +38,11 @@ const useStyles = makeStyles((theme) => ({
   questionId: {
     fontSize: '12px',
     fontWeight: 'bold',
-    color: theme.palette.grey[400],
+    color: theme.palette.grey[800],
   },
   dependencies: {
     fontSize: '12px',
-    color: theme.palette.grey[400],
+    color: theme.palette.grey[900],
     display: 'flex',
     padding: '10px 0 5px 0',
     '& div': {

@@ -1,0 +1,6 @@
+FROM node:12-alpine
+
+# The Git repo should be mounted from the host into this directory
+WORKDIR /app
+
+CMD ["npm", "run", "dev:docker"]
