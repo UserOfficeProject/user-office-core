@@ -371,7 +371,7 @@ context('Calls tests', () => {
 
     cy.contains(updatedCall.shortCode).parent().find('[title="Edit"]').click();
 
-    cy.get('#mui-component-select-proposalWorkflowId').click();
+    cy.get('#proposalWorkflowId-input').click();
 
     cy.contains('Loading...').should('not.exist');
 

@@ -30,6 +30,7 @@ export const QuestionRichTextInputForm: FC<QuestionFormProps> = (props) => {
           <Field
             name="naturalKey"
             label="Key"
+            id="Key-input"
             type="text"
             component={TextField}
             margin="normal"
@@ -39,6 +40,7 @@ export const QuestionRichTextInputForm: FC<QuestionFormProps> = (props) => {
           <Field
             name="question"
             label="Question"
+            id="Question-input"
             type="text"
             component={TextField}
             margin="normal"
@@ -59,6 +61,7 @@ export const QuestionRichTextInputForm: FC<QuestionFormProps> = (props) => {
               name="config.max"
               label="Max"
               type="text"
+              id="Max-input"
               component={TextField}
               margin="normal"
               fullWidth

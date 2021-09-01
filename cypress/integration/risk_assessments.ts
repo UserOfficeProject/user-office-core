@@ -30,7 +30,7 @@ context('visits tests', () => {
     cy.get('[data-cy=save-and-continue-button]').click();
     // allocate time for the test proposal
     cy.get('[role="dialog"]').contains('Admin').click();
-    cy.get('#mui-component-select-finalStatus').click();
+    cy.get('#finalStatus-input').click();
     cy.get('[role="listbox"]').contains('Accepted').click();
     cy.get('[data-cy="is-management-decision-submitted"]').click();
     cy.get('[data-cy="save-admin-decision"]').click();

@@ -91,7 +91,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
                 <ListItemSecondaryAction>
                   <IconButton
                     edge="end"
-                    aria-label="comments"
+                    aria-label={'Select ' + call.shortCode}
                     onClick={() => handleSelect(call.id, call.templateId)}
                   >
                     <NavigateNext />

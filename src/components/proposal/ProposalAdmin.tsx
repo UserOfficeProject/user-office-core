@@ -116,6 +116,7 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                 <Field
                   name="managementTimeAllocation"
                   label={`Management time allocation(${data.call?.allocationTimeUnit}s)`}
+                  id="time-managemment-input"
                   type="number"
                   component={TextField}
                   margin="normal"

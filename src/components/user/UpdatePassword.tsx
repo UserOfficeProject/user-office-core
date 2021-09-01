@@ -50,6 +50,7 @@ export default function UpdatePassword(props: { id: number }) {
                 <Field
                   name="password"
                   label="New Password"
+                  id="password-input"
                   type="password"
                   component={TextField}
                   margin="normal"
@@ -63,6 +64,7 @@ export default function UpdatePassword(props: { id: number }) {
                 <Field
                   name="confirmPassword"
                   label="Confirm Password"
+                  id="confirm-password-input"
                   type="password"
                   component={TextField}
                   margin="normal"

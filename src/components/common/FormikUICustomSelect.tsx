@@ -85,7 +85,7 @@ const FormikUICustomSelect = ({
 
   return (
     <>
-      <InputLabel htmlFor={id} shrink>
+      <InputLabel id={`${id}-label`} shrink>
         {label}
       </InputLabel>
       <Select
@@ -105,6 +105,7 @@ const FormikUICustomSelect = ({
         }}
         MenuProps={MenuProps}
         id={id}
+        labelId={`${id}-label`}
         {...props}
       >
         {availableOptionsNormalized.map((curOption) => (

@@ -118,6 +118,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
         <Grid item xs={3} className={classes.unitField}>
           <TextField
             label="Min"
+            id={`${id}-Min`}
             onChange={(e) =>
               setStateValue({
                 ...stateValue,
@@ -138,6 +139,7 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
         <Grid item xs={3} className={classes.unitField}>
           <TextField
             label="Max"
+            id={`${id}-Max`}
             onChange={(e) =>
               setStateValue({
                 ...stateValue,

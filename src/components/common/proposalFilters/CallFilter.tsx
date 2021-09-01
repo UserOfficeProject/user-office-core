@@ -54,11 +54,15 @@ const CallFilter: React.FC<CallFilterProps> = ({
   return (
     <>
       <FormControl className={classes.formControl}>
-        <InputLabel shrink>Call</InputLabel>
+        <InputLabel id="call-select-label" shrink>
+          Call
+        </InputLabel>
         {isLoading ? (
           <div className={classes.loadingText}>Loading...</div>
         ) : (
           <Select
+            id="call-select"
+            aria-labelledby="call-select-label"
             onChange={(call) => {
               setQuery({
                 call: call.target.value

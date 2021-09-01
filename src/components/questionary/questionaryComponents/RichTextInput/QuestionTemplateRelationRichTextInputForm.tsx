@@ -42,6 +42,7 @@ export const QuestionTemplateRelationRichTextInputForm: FC<QuestionTemplateRelat
             <Field
               name="config.max"
               label="Max"
+              id="Max-input"
               type="text"
               component={TextField}
               margin="normal"

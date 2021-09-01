@@ -54,11 +54,15 @@ const ProposalStatusFilter: React.FC<ProposalStatusFilterProps> = ({
   return (
     <>
       <FormControl className={classes.formControl}>
-        <InputLabel shrink>Status</InputLabel>
+        <InputLabel id="proposal-status-select-label" shrink>
+          Status
+        </InputLabel>
         {isLoading ? (
           <div className={classes.loadingText}>Loading...</div>
         ) : (
           <Select
+            id="proposal-status-select"
+            aria-labelledby="proposal-status-select-label"
             onChange={(proposalStatus) => {
               setQuery({
                 proposalStatus: proposalStatus.target.value

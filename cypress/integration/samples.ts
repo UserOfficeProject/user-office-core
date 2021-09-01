@@ -145,8 +145,7 @@ context('Samples tests', () => {
 
     cy.get('[title="Clone proposals to call"]').click();
 
-    cy.get('#mui-component-select-selectedCallId').click();
-
+    cy.get('#selectedCallId-input').click();
     cy.get('[role="presentation"]').contains('call 1').click();
 
     cy.get('[data-cy="submit"]').click();

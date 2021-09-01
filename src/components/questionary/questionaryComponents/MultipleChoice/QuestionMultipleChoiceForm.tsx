@@ -40,6 +40,7 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
           <Field
             name="naturalKey"
             label="Key"
+            id="Key-input"
             type="text"
             component={TextField}
             margin="normal"
@@ -48,6 +49,7 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
           />
           <Field
             name="question"
+            id="Question-input"
             label="Question"
             type="text"
             component={TextField}

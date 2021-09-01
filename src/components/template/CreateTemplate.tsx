@@ -45,6 +45,7 @@ const CreateTemplate = (props: {
         {() => (
           <Form>
             <Field
+              id="name-field"
               name="name"
               label="Name"
               component={TextField}
@@ -53,6 +54,7 @@ const CreateTemplate = (props: {
               data-cy="name"
             />
             <Field
+              id="description-field"
               name="description"
               label="Description"
               component={TextField}

@@ -109,7 +109,7 @@ context('Instrument tests', () => {
 
     cy.createCall(call2);
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.contains('default template').parent().get("[title='Edit']").click();
 

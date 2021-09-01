@@ -373,6 +373,11 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         options={{
           search: false,
           selection: true,
+          selectionProps: (rowdata: any) => ({
+            inputProps: {
+              'aria-label': `${rowdata.title}-select`,
+            },
+          }),
         }}
         onSelectionChange={(selectedItems) => {
           setUrlQueryParams((params) => ({

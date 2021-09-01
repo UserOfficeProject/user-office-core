@@ -25,17 +25,18 @@ function createTemplate(type, title, description) {
   const templateDescription = description || faker.random.words(3);
 
   const typeToMenuTitle = new Map();
-  typeToMenuTitle.set('proposal', 'Proposal templates');
-  typeToMenuTitle.set('sample', 'Sample declaration templates');
+  typeToMenuTitle.set('proposal', 'Proposal');
+  typeToMenuTitle.set('sample', 'Sample declaration');
   typeToMenuTitle.set('shipment', 'Shipment declaration templates');
-  typeToMenuTitle.set('visit', 'Visit templates');
-  typeToMenuTitle.set('riskAssessment', 'Risk assessment templates');
+  typeToMenuTitle.set('visit', 'Visit');
+  typeToMenuTitle.set('riskAssessment', 'Risk assessment');
 
   const menuTitle = typeToMenuTitle.get(type);
   if (!menuTitle) {
     throw new Error(`Type ${type} not supported`);
   }
 
+  cy.log(`${menuTitle}`);
   cy.navigateToTemplatesSubmenu(menuTitle);
 
   cy.get('[data-cy=create-new-button]').click();

@@ -44,6 +44,7 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
         <>
           <Field
             name="naturalKey"
+            id="Key-Input"
             label="Key"
             type="text"
             component={TextField}
@@ -54,6 +55,7 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
 
           <Field
             name="question"
+            id="Question-Input"
             label="Question"
             type="text"
             component={TextField}
@@ -67,6 +69,7 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
               <InputLabel htmlFor="config.templateId">Template name</InputLabel>
               <Field
                 name="config.templateId"
+                id="config.templateId"
                 type="text"
                 component={Select}
                 data-cy="template-id"
@@ -95,6 +98,7 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
 
             <Field
               name="config.addEntryButtonLabel"
+              id="Add-button-label-Input"
               label="Add button label"
               placeholder='(e.g. "add new")'
               type="text"
@@ -105,6 +109,7 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
             />
             <Field
               name="config.minEntries"
+              id="Min-Input"
               label="Min entries"
               placeholder="(e.g. 1, leave blank for unlimited)"
               type="text"
@@ -115,6 +120,7 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
             />
             <Field
               name="config.maxEntries"
+              id="Max-Input"
               label="Max entries"
               placeholder="(e.g. 4, leave blank for unlimited)"
               type="text"

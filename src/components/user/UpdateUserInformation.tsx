@@ -244,6 +244,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                     <Field
                       name="firstname"
                       label="Firstname"
+                      id="firstname-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -253,6 +254,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                     <Field
                       name="middlename"
                       label="Middle name"
+                      id="middlename-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -262,6 +264,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                     <Field
                       name="lastname"
                       label="Lastname"
+                      id="lastname-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -271,6 +274,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                     <Field
                       name="preferredname"
                       label="Preferred name"
+                      id="preferredname-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -291,6 +295,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                       <Field
                         name="othergender"
                         label="Please specify gender"
+                        id="othergender-input"
                         type="text"
                         component={TextField}
                         margin="normal"
@@ -309,6 +314,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                     <Field
                       name="birthdate"
                       label="Birthdate"
+                      id="birthdate-input"
                       format="yyyy-MM-dd"
                       component={KeyboardDatePicker}
                       margin="normal"
@@ -339,6 +345,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                 <Field
                   name="username"
                   label="Username"
+                  id="username-input"
                   type="text"
                   component={TextField}
                   margin="normal"
@@ -356,6 +363,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                 <Field
                   name="department"
                   label="Department"
+                  id="department-input"
                   type="text"
                   component={TextField}
                   margin="normal"
@@ -365,6 +373,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                 <Field
                   name="position"
                   label="Position"
+                  id="position-input"
                   type="text"
                   component={TextField}
                   margin="normal"
@@ -374,6 +383,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                 <Field
                   name="email"
                   label="E-mail"
+                  id="email-input"
                   type="email"
                   component={TextField}
                   margin="normal"
@@ -383,6 +393,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                 <Field
                   name="telephone"
                   label="Telephone"
+                  id="telephone-input"
                   type="text"
                   component={TextField}
                   margin="normal"
@@ -392,6 +403,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                 <Field
                   name="telephone_alt"
                   label="Telephone Alt."
+                  id="telephone-alt-input"
                   type="text"
                   component={TextField}
                   margin="normal"

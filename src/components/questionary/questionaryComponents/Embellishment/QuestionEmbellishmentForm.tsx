@@ -31,6 +31,7 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
           <Field
             name="naturalKey"
             label="Key"
+            id="naturalKey-Input"
             type="text"
             component={TextField}
             margin="normal"
@@ -39,6 +40,7 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
           />
           <Field
             name="config.html"
+            id="HTML-Input"
             type="text"
             component={FormikUICustomEditor}
             margin="normal"
@@ -55,6 +57,7 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
 
           <Field
             name="config.plain"
+            id="Plain-Description-Input"
             label="Plain description"
             type="text"
             component={TextField}
@@ -65,6 +68,7 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
 
           <Field
             name="config.omitFromPdf"
+            id="Omit-from-pdf-checkbox"
             checked={
               (formikProps.values.config as EmbellishmentConfig).omitFromPdf
             }

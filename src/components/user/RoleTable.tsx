@@ -57,6 +57,11 @@ const RoleTable: React.FC<RoleTableProps> = ({ add, activeRoles }) => {
         options={{
           search: true,
           selection: true,
+          selectionProps: (rowdata: any) => ({
+            inputProps: {
+              'aria-label': `${rowdata.title}-select`,
+            },
+          }),
         }}
         localization={{
           toolbar: {

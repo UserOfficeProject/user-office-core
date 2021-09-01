@@ -51,6 +51,7 @@ export const QuestionTemplateRelationTextInputForm: FC<QuestionTemplateRelationF
             <Field
               name="config.min"
               label="Min"
+              id="Min-input"
               type="text"
               component={TextField}
               margin="normal"
@@ -61,6 +62,7 @@ export const QuestionTemplateRelationTextInputForm: FC<QuestionTemplateRelationF
             <Field
               name="config.max"
               label="Max"
+              id="Max-input"
               type="text"
               component={TextField}
               margin="normal"
@@ -72,6 +74,7 @@ export const QuestionTemplateRelationTextInputForm: FC<QuestionTemplateRelationF
             <Field
               name="config.placeholder"
               label="Placeholder text"
+              id="Placeholder-input"
               type="text"
               component={TextField}
               margin="normal"

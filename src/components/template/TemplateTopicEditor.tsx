@@ -192,6 +192,7 @@ export default function QuestionaryEditorTopic(props: {
                 <Field
                   name="title"
                   id="title"
+                  label="Topic Title"
                   type="text"
                   component={TextField}
                   className={classes.title}

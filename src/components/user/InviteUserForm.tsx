@@ -70,6 +70,7 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
             {title}
           </Typography>
           <Field
+            id="firstname-input"
             name="firstname"
             label="First name"
             type="text"
@@ -79,6 +80,7 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
             data-cy="firstname"
           />
           <Field
+            id="lastname-input"
             name="lastname"
             label="Last name"
             type="text"
@@ -88,6 +90,7 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
             data-cy="lastname"
           />
           <Field
+            id="email-input"
             name="email"
             label="E-mail"
             type="email"
