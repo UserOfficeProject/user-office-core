@@ -21,6 +21,9 @@ export class UpdateRiskAssessmentArgs {
   @Field(() => RiskAssessmentStatus, { nullable: true })
   status?: RiskAssessmentStatus;
 
+  @Field(() => [Int], { nullable: true })
+  sampleIds?: number[];
+
   questionaryId?: number;
 }
 

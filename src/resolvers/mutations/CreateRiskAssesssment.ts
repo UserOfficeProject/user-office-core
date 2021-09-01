@@ -16,6 +16,9 @@ import { wrapResponse } from '../wrapResponse';
 export class CreateRiskAssessmentArgs {
   @Field(() => Int)
   proposalPk: number;
+
+  @Field(() => Int)
+  scheduledEventId: number;
 }
 
 @Resolver()

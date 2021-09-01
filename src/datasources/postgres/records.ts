@@ -512,6 +512,7 @@ export interface VisitRecord {
 export interface RiskAssessmentRecord {
   readonly risk_assessment_id: number;
   readonly proposal_pk: number;
+  readonly scheduled_event_id: number;
   readonly creator_user_id: number;
   readonly questionary_id: number;
   readonly status: string;
@@ -873,6 +874,7 @@ export const createRiskAssessmentObject = (
   return new RiskAssessment(
     riskAssessment.risk_assessment_id,
     riskAssessment.proposal_pk,
+    riskAssessment.scheduled_event_id,
     riskAssessment.creator_user_id,
     riskAssessment.questionary_id,
     (riskAssessment.status as any) as RiskAssessmentStatus,

@@ -10,6 +10,7 @@ import { RiskAssessmentAuthorization } from '../utils/RiskAssessmentAuthorizatio
 import { UserAuthorization } from './../utils/UserAuthorization';
 
 export interface RiskAssessmentsFilter {
+  scheduledEventId?: number;
   proposalPk?: number;
   questionaryIds?: number[];
 }
@@ -53,5 +54,18 @@ export default class RiskAssessmentQueries {
     ).then((results) => riskAssessments.filter((_v, index) => results[index]));
 
     return riskAssessments;
+  }
+
+  @Authorized()
+  async getSamples(agent: UserWithRole | null, riskAssessmentId: number) {
+    const hasRights = await this.riskAssessmentAuth.hasReadRights(
+      agent,
+      riskAssessmentId
+    );
+    if (hasRights === false) {
+      return [];
+    }
+
+    return this.dataSource.getRiskAssessmentSamples(riskAssessmentId);
   }
 }
