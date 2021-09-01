@@ -173,6 +173,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
           openModal(
             <CreateRiskAssessment
               proposalPk={event.proposal.primaryKey}
+              scheduledEventId={event.id}
               onSubmitted={(newRiskAssessment) => {
                 const newEvent = createNewEventObject(event, newRiskAssessment);
                 eventUpdated(newEvent);

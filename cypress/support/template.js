@@ -6,9 +6,9 @@ const navigateToTemplatesSubmenu = (submenuName) => {
 };
 
 const createTopic = (title) => {
-  cy.get('[data-cy=show-more-button]').click();
+  cy.get('[data-cy=show-more-button]').last().click();
 
-  cy.get('[data-cy=add-topic-menu-item]').click();
+  cy.get('[data-cy=add-topic-menu-item]').last().click();
 
   cy.wait(500);
 

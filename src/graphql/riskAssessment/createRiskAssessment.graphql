@@ -1,10 +1,18 @@
-mutation createRiskAssessment($proposalPk: Int!) {
-  createRiskAssessment(proposalPk: $proposalPk) {
+mutation createRiskAssessment($proposalPk: Int!, $scheduledEventId: Int!) {
+  createRiskAssessment(
+    proposalPk: $proposalPk
+    scheduledEventId: $scheduledEventId
+  ) {
     riskAssessment {
       ...riskAssessment
+
       questionary {
         ...questionary
         isCompleted
+      }
+
+      samples {
+        ...sample
       }
     }
 

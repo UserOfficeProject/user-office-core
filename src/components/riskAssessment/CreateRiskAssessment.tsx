@@ -14,13 +14,16 @@ import RiskAssessmentContainer from './RiskAssessmentContainer';
 
 function createRiskAssessmentStub(
   proposalPk: number,
+  scheduledEventId: number,
   templateId: number,
   questionarySteps: QuestionaryStep[]
 ): RiskAssessmentWithQuestionary {
   return {
     riskAssessmentId: 0,
     proposalPk: proposalPk,
+    scheduledEventId: scheduledEventId,
     status: RiskAssessmentStatus.DRAFT,
+    samples: [],
     questionary: {
       isCompleted: false,
       questionaryId: 0,
@@ -36,12 +39,14 @@ interface CreateRiskAssessmentProps {
   onUpdate?: (riskAssessment: RiskAssessmentWithQuestionary) => void;
   onSubmitted?: (riskAssessment: RiskAssessmentWithQuestionary) => void;
   proposalPk: number;
+  scheduledEventId: number;
 }
 function CreateRiskAssessment({
   onCreate,
   onUpdate,
   onSubmitted,
   proposalPk,
+  scheduledEventId,
 }: CreateRiskAssessmentProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
@@ -63,6 +68,7 @@ function CreateRiskAssessment({
               if (result.blankQuestionarySteps) {
                 const blankRiskAssessment = createRiskAssessmentStub(
                   proposalPk,
+                  scheduledEventId,
                   activeTemplateId,
                   result.blankQuestionarySteps
                 );
@@ -71,7 +77,7 @@ function CreateRiskAssessment({
             });
         }
       });
-  }, [setBlankRiskAssessment, api, user, proposalPk]);
+  }, [setBlankRiskAssessment, api, user, proposalPk, scheduledEventId]);
 
   if (!blankRiskAssessment) {
     return <UOLoader />;
