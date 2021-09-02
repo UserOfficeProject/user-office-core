@@ -30,7 +30,7 @@ code {
 }
 
 .MuiFormLabel-asterisk {
-  color: #B40000;
+  color: #b40000;
 }
 
 .MuiList-root .MuiListItem-root.active {
@@ -120,10 +120,26 @@ h6 {
 .MuiBox-root .MuiIconButton-root:not(.Mui-disabled) {
   color: var(--PALETTE_PRIMARY_ACCENT);
 }
+.MuiBox-root .MuiIconButton-root:not(.Mui-disabled).MuiSwitch-switchBase {
+  color: var(--PALETTE_SECONDARY_MAIN);
+}
+.MuiBox-root .MuiIconButton-root:not(.Mui-disabled).Mui-checked {
+  color: var(--PALETTE_SECONDARY_MAIN);
+}
 
 /* Role icons */
 .MuiList-root .MuiMenuItem-root:not(.Mui-disabled) svg {
   fill: var(--PALETTE_PRIMARY_ACCENT);
+}
+
+/* Checkbox checked icon */
+.MuiCheckbox-root.Mui-checked {
+  color: var(--PALETTE_SECONDARY_MAIN);
+}
+.MuiTable-root
+  .MuiTableRow-root
+  .MuiIconButton-root:not(.Mui-disabled).Mui-checked {
+  color: var(--PALETTE_SECONDARY_MAIN);
 }
 
 /* Logo image - ensures min 1/4 of the height is padding */
