@@ -3,6 +3,7 @@ import {
   RiskAssessment,
   RiskAssessmentStatus,
 } from '../../models/RiskAssessment';
+import { Sample } from '../../models/Sample';
 import { RiskAssessmentsFilter } from '../../queries/RiskAssessmentQueries';
 import { CreateRiskAssessmentArgs } from '../../resolvers/mutations/CreateRiskAssesssment';
 import { UpdateRiskAssessmentArgs } from '../../resolvers/mutations/UpdateRiskAssessmentMutation';
@@ -23,11 +24,13 @@ export class RiskAssessmentDataSourceMock implements RiskAssessmentDataSource {
         1,
         1,
         1,
+        1,
         RiskAssessmentStatus.DRAFT,
         new Date()
       ),
       new RiskAssessment(
         RiskAssessmentDataSourceMock.SUBMITTED_RISK_ASSESSMENT_ID,
+        2,
         2,
         1,
         2,
@@ -48,6 +51,7 @@ export class RiskAssessmentDataSourceMock implements RiskAssessmentDataSource {
     const newAssessment = new RiskAssessment(
       maxId + 1,
       args.proposalPk,
+      args.scheduledEventId,
       creatorId,
       2,
       RiskAssessmentStatus.DRAFT,
@@ -74,9 +78,17 @@ export class RiskAssessmentDataSourceMock implements RiskAssessmentDataSource {
       if (filter.proposalPk) {
         matchFilter = ra.proposalPk === filter.proposalPk;
       }
+      if (filter.scheduledEventId) {
+        matchFilter =
+          matchFilter && ra.scheduledEventId === filter.scheduledEventId;
+      }
 
       return matchFilter;
     });
+  }
+
+  getRiskAssessmentSamples(riskAssessmentId: number): Promise<Sample[]> {
+    throw new Error('Method not implemented.');
   }
 
   async updateRiskAssessment(

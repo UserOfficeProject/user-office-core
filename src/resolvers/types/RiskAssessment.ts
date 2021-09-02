@@ -15,6 +15,7 @@ import {
 } from '../../models/RiskAssessment';
 import { TemplateCategoryId } from '../../models/Template';
 import { Questionary } from './Questionary';
+import { Sample } from './Sample';
 
 @ObjectType()
 export class RiskAssessment implements Partial<RiskAssessmentOrig> {
@@ -23,6 +24,9 @@ export class RiskAssessment implements Partial<RiskAssessmentOrig> {
 
   @Field(() => Int)
   public proposalPk: number;
+
+  @Field(() => Int)
+  public scheduledEventId: number;
 
   @Field(() => Int)
   public creatorUserId: number;
@@ -45,6 +49,17 @@ export class RiskAssessmentResolver {
       context.user,
       riskAssessment.questionaryId,
       TemplateCategoryId.PROPOSAL_QUESTIONARY
+    );
+  }
+
+  @FieldResolver(() => [Sample])
+  async samples(
+    @Root() riskAssessment: RiskAssessment,
+    @Ctx() context: ResolverContext
+  ): Promise<Sample[]> {
+    return context.queries.riskAssessment.getSamples(
+      context.user,
+      riskAssessment.riskAssessmentId
     );
   }
 }
