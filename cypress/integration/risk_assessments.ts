@@ -1,20 +1,20 @@
 import faker from 'faker';
 
-faker.seed(1);
-
 const coProposerName = 'Benjamin';
 const coProposerEmail = 'ben@inbox.com';
-const visitorName = 'Dawson';
 const visitorEmail = 'david@teleworm.us';
 
 const questionTitle = faker.lorem.words(3);
 const answer = faker.lorem.words(3);
+
+const sampleTitle = /My sample title/i;
 
 const proposalTitle = 'Test proposal';
 const riskAssessmentButtonTitle = 'Finish risk assessment';
 
 context('visits tests', () => {
   before(() => {
+    cy.viewport(1920, 1080);
     // reset data and add seeds with test proposal
     cy.resetDB(true);
     cy.resetSchedulerDB(true);
@@ -22,6 +22,7 @@ context('visits tests', () => {
     cy.login('officer');
     cy.contains('999999').parent().find('[title="View proposal"]').click();
     cy.get('[data-cy=toggle-edit-proposal]').click();
+
     cy.get('[data-cy=questionary-stepper]').contains('New proposal').click();
     cy.get('[data-cy=add-participant-button]').click();
     cy.contains(coProposerName).parent().find('[type=checkbox]').click();
@@ -86,6 +87,10 @@ context('visits tests', () => {
   it('Should be able to do risk assessment', () => {
     cy.login('user');
     cy.get(`[title='${riskAssessmentButtonTitle}']`).click();
+    cy.get('[data-cy=samples-dropdown]').click();
+    cy.get('[role=listbox]').contains(sampleTitle).click();
+
+    cy.get('body').type('{esc}');
     cy.contains(questionTitle).then(($elem: any) => {
       cy.get(`#${$elem.attr('for')}`).type(answer);
     });
