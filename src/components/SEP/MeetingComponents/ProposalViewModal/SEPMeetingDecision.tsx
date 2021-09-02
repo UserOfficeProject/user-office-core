@@ -6,7 +6,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
 
-import { Maybe, SepMeetingDecision } from 'generated/sdk';
+import { Maybe, Sep, SepMeetingDecision } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 
 const useStyles = makeStyles((theme) => ({
@@ -18,13 +18,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// TODO: This should be populated after https://jira.esss.lu.se/browse/SWAP-1460
 type SEPMeetingDecisionProps = {
   sepMeetingDecision: Maybe<SepMeetingDecision>;
+  sep: Maybe<Pick<Sep, 'id' | 'code'>>;
 };
 
 const SEPMeetingDecision: React.FC<SEPMeetingDecisionProps> = ({
   sepMeetingDecision,
+  sep,
 }) => {
   const classes = useStyles();
 
@@ -37,7 +38,7 @@ const SEPMeetingDecision: React.FC<SEPMeetingDecisionProps> = ({
           className={classes.heading}
           gutterBottom
         >
-          SEP Meeting decision
+          {sep?.code} - SEP Meeting decision
         </Typography>
         <Table>
           <TableBody>
