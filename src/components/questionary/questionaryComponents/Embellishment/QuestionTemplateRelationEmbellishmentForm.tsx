@@ -47,6 +47,7 @@ export const QuestionTemplateRelationEmbellishmentForm: FC<QuestionTemplateRelat
           <Field
             name="config.plain"
             label="Plain description"
+            id="plain-description-input"
             type="text"
             component={TextField}
             margin="normal"

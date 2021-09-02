@@ -54,11 +54,11 @@ context('Proposal administration tests', () => {
     cy.get('[data-cy=view-proposal]').click();
     cy.finishedLoading();
     cy.get('[role="dialog"]').contains('Admin').click();
-    cy.get('#mui-component-select-finalStatus').should('exist');
+    cy.get('#finalStatus-input').should('exist');
     cy.get('[role="dialog"]').contains('Logs').click();
     cy.get('[role="dialog"]').contains('Admin').click();
 
-    cy.get('#mui-component-select-finalStatus').click();
+    cy.get('#finalStatus-input').click();
 
     cy.contains('Accepted').click();
 
@@ -277,7 +277,7 @@ context('Proposal administration tests', () => {
   it('Should be able to prepare proposal template', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.contains('default template')
       .parent()

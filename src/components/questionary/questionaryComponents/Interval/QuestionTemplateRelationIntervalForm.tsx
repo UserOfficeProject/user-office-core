@@ -45,6 +45,7 @@ export const QuestionTemplateRelationIntervalForm: FC<QuestionTemplateRelationFo
           <Field
             name="config.small_label"
             label="Small label"
+            id="small-label-input"
             type="text"
             component={TextField}
             margin="normal"

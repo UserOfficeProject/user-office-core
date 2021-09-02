@@ -186,6 +186,7 @@ const ProposalTechnicalReview = ({
                 <Field
                   name="timeAllocation"
                   label={`Time allocation(${proposal.call?.allocationTimeUnit}s)`}
+                  id="time-allocation-input"
                   type="number"
                   component={TextField}
                   margin="normal"

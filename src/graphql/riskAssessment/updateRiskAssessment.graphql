@@ -1,10 +1,19 @@
 mutation updateRiskAssessment(
   $riskAssessmentId: Int!
   $status: RiskAssessmentStatus
+  $sampleIds: [Int!]
 ) {
-  updateRiskAssessment(riskAssessmentId: $riskAssessmentId, status: $status) {
+  updateRiskAssessment(
+    riskAssessmentId: $riskAssessmentId
+    status: $status
+    sampleIds: $sampleIds
+  ) {
     riskAssessment {
       ...riskAssessment
+
+      samples {
+        ...sample
+      }
     }
 
     rejection {

@@ -163,7 +163,7 @@ const TemplateMenuListItem = () => {
             <ListItemIcon>
               <DescriptionIcon />
             </ListItemIcon>
-            <ListItemText primary="Proposal" title="Proposal templates" />
+            <ListItemText primary="Proposal" />
           </ListItem>
         </Tooltip>
 
@@ -172,10 +172,7 @@ const TemplateMenuListItem = () => {
             <ListItemIcon>
               <InboxIcon />
             </ListItemIcon>
-            <ListItemText
-              primary="Sample declaration"
-              title="Sample declaration templates"
-            />
+            <ListItemText primary="Sample declaration" />
           </ListItem>
         </Tooltip>
 
@@ -189,10 +186,7 @@ const TemplateMenuListItem = () => {
               <ListItemIcon>
                 <LocalShippingIcon />
               </ListItemIcon>
-              <ListItemText
-                primary="Shipment declaration"
-                title="Shipment declaration templates"
-              />
+              <ListItemText primary="Shipment declaration" />
             </ListItem>
           </Tooltip>
         )}
@@ -201,7 +195,7 @@ const TemplateMenuListItem = () => {
             <ListItemIcon>
               <FlightTakeoffIcon />
             </ListItemIcon>
-            <ListItemText primary="Visit" title="Visit templates" />
+            <ListItemText primary="Visit" />
           </ListItem>
         </Tooltip>
         <Tooltip title="Risk assessment">

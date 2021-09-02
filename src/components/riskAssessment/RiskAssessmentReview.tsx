@@ -1,3 +1,4 @@
+import { makeStyles } from '@material-ui/core';
 import React, { useContext } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
@@ -16,6 +17,13 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { RiskAssessmentContextType } from './RiskAssessmentContainer';
 
+const useStyles = makeStyles(() => ({
+  sampleList: {
+    listStyle: 'none',
+    padding: 0,
+  },
+}));
+
 type RiskAssessmentReviewProps = {
   onComplete?: FunctionType<void>;
   confirm: WithConfirmType;
@@ -23,6 +31,8 @@ type RiskAssessmentReviewProps = {
 
 function RiskAssessmentReview({ confirm }: RiskAssessmentReviewProps) {
   const { api, isExecutingCall } = useDataApiWithFeedback();
+  const classes = useStyles();
+
   const { state, dispatch } = useContext(
     QuestionaryContext
   ) as RiskAssessmentContextType;
@@ -35,6 +45,16 @@ function RiskAssessmentReview({ confirm }: RiskAssessmentReviewProps) {
 
   const additionalDetails: TableRowData[] = [
     { label: 'Status', value: isSubmitted ? 'Submitted' : 'Draft' },
+    {
+      label: 'Samples',
+      value: (
+        <ul className={classes.sampleList}>
+          {state.riskAssessment.samples.map((sample) => (
+            <li key={sample.id}>{sample.title}</li>
+          ))}
+        </ul>
+      ),
+    },
   ];
 
   return (

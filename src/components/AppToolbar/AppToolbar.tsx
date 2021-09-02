@@ -113,7 +113,7 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
         </IconButton>
         {(!isTabletOrMobile || !isPortraitMode) && logo && (
           <Link className={'header-logo-container'} to="/">
-            <img src={logo} alt="logo" className={'header-logo'} />
+            <img src={logo} alt="Organisation logo" className={'header-logo'} />
           </Link>
         )}
         {(!isTabletOrMobile || !isPortraitMode) && (

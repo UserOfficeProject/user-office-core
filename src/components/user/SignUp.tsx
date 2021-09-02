@@ -367,6 +367,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                     <Field
                       name="email"
                       label="E-mail"
+                      id="email-input"
                       type="email"
                       component={TextField}
                       margin="normal"
@@ -378,6 +379,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                     <Field
                       name="password"
                       label="Password"
+                      id="password-input"
                       type="password"
                       component={TextField}
                       margin="normal"
@@ -391,6 +393,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                     <Field
                       name="confirmPassword"
                       label="Confirm Password"
+                      id="confirm-password-input"
                       type="password"
                       component={TextField}
                       margin="normal"
@@ -426,6 +429,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                     <Field
                       name="firstname"
                       label="First name"
+                      id="fname-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -437,6 +441,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                     <Field
                       name="middlename"
                       label="Middle name"
+                      id="mname-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -447,6 +452,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                     <Field
                       name="lastname"
                       label="Last name"
+                      id="lname-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -458,6 +464,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                     <Field
                       name="preferredname"
                       label="Preferred name"
+                      id="pname-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -481,6 +488,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       <Field
                         name="othergender"
                         label="Please specify gender"
+                        id="gender-input"
                         type="text"
                         component={TextField}
                         margin="normal"
@@ -501,6 +509,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                     <Field
                       name="birthdate"
                       label="Birthdate"
+                      id="birthdate-input"
                       type="date"
                       component={TextField}
                       margin="normal"
@@ -524,6 +533,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       <Field
                         name="position"
                         label="Position"
+                        id="position-input"
                         type="text"
                         component={TextField}
                         margin="normal"
@@ -535,6 +545,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       <Field
                         name="department"
                         label="Department"
+                        id="department-input"
                         type="text"
                         component={TextField}
                         margin="normal"
@@ -555,6 +566,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                         <Field
                           name="otherOrganisation"
                           label="Please specify organisation"
+                          id="organisation-input"
                           type="text"
                           component={TextField}
                           margin="normal"
@@ -577,6 +589,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       <Field
                         name="telephone"
                         label="Telephone"
+                        id="telephone-input"
                         type="text"
                         component={TextField}
                         margin="normal"
@@ -588,6 +601,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       <Field
                         name="telephone_alt"
                         label="Telephone Alt."
+                        id="telephone-input-alt"
                         type="text"
                         component={TextField}
                         margin="normal"

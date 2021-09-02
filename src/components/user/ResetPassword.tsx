@@ -89,6 +89,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
             <Field
               name="password"
               label="Password"
+              id="password-input"
               type="password"
               component={TextField}
               margin="normal"
@@ -99,6 +100,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
             <Field
               name="confirmPassword"
               label="Confirm Password"
+              id="confirm-password-input"
               type="password"
               component={TextField}
               autoComplete="new-password"

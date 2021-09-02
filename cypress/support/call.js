@@ -40,7 +40,7 @@ const createCall = ({
   }
 
   if (workflow) {
-    cy.get('#mui-component-select-proposalWorkflowId').click();
+    cy.get('#proposalWorkflowId-input').click();
 
     cy.contains('Loading...').should('not.exist');
 

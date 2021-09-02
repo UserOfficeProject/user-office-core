@@ -30,6 +30,7 @@ export const QuestionRiskAssessmentBasisForm: FC<QuestionFormProps> = (
           <Field
             name="naturalKey"
             label="Key"
+            id="naturalKey-input"
             type="text"
             component={TextField}
             margin="normal"
@@ -39,6 +40,7 @@ export const QuestionRiskAssessmentBasisForm: FC<QuestionFormProps> = (
           <Field
             name="question"
             label="Question"
+            id="Question-input"
             type="text"
             component={TextField}
             margin="normal"

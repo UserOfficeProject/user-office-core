@@ -9,7 +9,7 @@ declare global {
        * @example
        * cy.defineExperimentTeam({
        *    proposalTitle: proposalTitle,
-       *    users: ['Carlsson'],
+       *    usersEmails: ['ben@inbox.com'],
        *    teamLead: 'Carlsson',
        * });
        */

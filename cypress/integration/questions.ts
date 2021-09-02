@@ -14,7 +14,7 @@ context('Questions tests', () => {
   it('User officer search questions', () => {
     cy.login('officer');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.contains('default template').parent().get("[title='Edit']").click();
 

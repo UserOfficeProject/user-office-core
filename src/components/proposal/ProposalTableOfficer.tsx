@@ -643,6 +643,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           selection: true,
           debounceInterval: 400,
           columnsButton: true,
+          selectionProps: (rowdata: any) => ({
+            inputProps: {
+              'aria-label': `${rowdata.title}-select`,
+            },
+          }),
         }}
         actions={[
           {

@@ -311,6 +311,11 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           pageSize: query.first as number,
           selection: props.selection,
           ...props.mtOptions,
+          selectionProps: (rowdata: any) => ({
+            inputProps: {
+              'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
+            },
+          }),
         }}
         actions={actionArray}
         editable={

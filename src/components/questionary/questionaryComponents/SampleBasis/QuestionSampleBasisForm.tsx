@@ -28,6 +28,7 @@ export const QuestionSampleBasisForm: FC<QuestionFormProps> = (props) => {
           <Field
             name="naturalKey"
             label="Key"
+            id="Key-input"
             type="text"
             component={TextField}
             margin="normal"
@@ -37,6 +38,7 @@ export const QuestionSampleBasisForm: FC<QuestionFormProps> = (props) => {
           <Field
             name="question"
             label="Question"
+            id="Question-input"
             type="text"
             component={TextField}
             margin="normal"

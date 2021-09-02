@@ -55,7 +55,7 @@ const assignInstrumentToProposal = (proposal, instrument) => {
     .contains('Loading...')
     .should('not.exist');
 
-  cy.get("[id='mui-component-select-selectedInstrumentId']").first().click();
+  cy.get('#selectedInstrumentId-input').first().click();
 
   cy.get("[id='menu-selectedInstrumentId'] li").contains(instrument).click();
 

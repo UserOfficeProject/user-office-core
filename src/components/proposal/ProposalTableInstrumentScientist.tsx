@@ -288,6 +288,11 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           selection: true,
           debounceInterval: 400,
           columnsButton: true,
+          selectionProps: (rowdata: any) => ({
+            inputProps: {
+              'aria-label': `${rowdata.title}-select`,
+            },
+          }),
         }}
         onSearchChange={(searchText) => {
           setUrlQueryParams({ search: searchText ? searchText : undefined });

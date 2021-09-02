@@ -81,6 +81,11 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
           search: true,
           selection: true,
           debounceInterval: 400,
+          selectionProps: (rowdata: any) => ({
+            inputProps: {
+              'aria-label': `${rowdata.name}-${rowdata.shortCode}-select`,
+            },
+          }),
         }}
       />
       <ActionButtonContainer>

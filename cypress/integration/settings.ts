@@ -126,110 +126,105 @@ context('Settings tests', () => {
       const editableSubmittedWorkflow = 'Editable submitted workflow';
 
       cy.login('officer');
-  
-      cy.createProposalWorkflow(
-        'Editable submitted workflow',
-        'Description'
-      );
-  
+
+      cy.createProposalWorkflow('Editable submitted workflow', 'Description');
+
       cy.notification({
         variant: 'success',
         text: 'Proposal workflow created successfully',
       });
-  
+
       cy.get('[data-cy^="status_EDITABLE_SUBMITTED"]').dragElement([
         { direction: 'up', length: 13 },
         { direction: 'left', length: 2 },
         { direction: 'down', length: 1 },
       ]);
-  
+
       cy.notification({
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-  
+
       cy.get('[data-cy^="connection_EDITABLE_SUBMITTED"]').should(
         'contain.text',
         'EDITABLE_SUBMITTED'
       );
-  
+
       cy.notification({
         variant: 'success',
         text: 'Workflow status added successfully',
       });
-  
+
       cy.addProposalStatusChangingEventToStatus('EDITABLE_SUBMITTED', [
         'PROPOSAL_SUBMITTED',
       ]);
-  
+
       cy.contains('Calls').click();
-  
+
       cy.get('[title="Edit"]').first().click();
-  
-      cy.get('#mui-component-select-proposalWorkflowId').click();
-  
+
+      cy.get('#proposalWorkflowId-input').click();
+
       cy.contains('Loading...').should('not.exist');
-  
+
       cy.get('[role="presentation"] [role="listbox"] li')
         .contains(editableSubmittedWorkflow)
         .click();
-  
+
       cy.get('[data-cy="next-step"]').click();
-  
+
       cy.get('[data-cy="next-step"]').click();
-  
+
       cy.get('[data-cy="submit"]').click();
-  
+
       cy.notification({
         variant: 'success',
         text: 'Call updated successfully!',
       });
-  
+
       cy.logout();
-  
+
       cy.login('user');
-  
+
       cy.createProposal(proposalTitle);
-  
+
       cy.contains('Submit').click();
-  
+
       cy.on('window:confirm', (str) => {
         expect(str).to.equal(
           'Submit proposal? The proposal can be edited after submission.'
         );
-  
+
         return true;
       });
-  
+
       cy.contains('OK').click();
-  
+
       cy.contains('Submitted');
-  
+
       cy.contains('Dashboard').click();
-  
+
       cy.finishedLoading();
-  
+
       cy.contains(proposalTitle).parent().contains('submitted');
-  
+
       cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
         .first()
         .then((element) => expect(element.text()).to.contain('submitted'));
-  
+
       cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
         .first()
         .find('[title="Edit proposal"]')
         .click();
-  
-      cy.get('[name="proposal_basis.title"]')
-        .clear()
-        .type(editedProposalTitle);
-  
+
+      cy.get('[name="proposal_basis.title"]').clear().type(editedProposalTitle);
+
       cy.contains('Save and continue').click();
-  
+
       cy.contains('Submitted');
-  
+
       cy.contains('Dashboard').click();
-  
+
       cy.contains(editedProposalTitle);
     });
   });
@@ -424,7 +419,7 @@ context('Settings tests', () => {
 
       cy.get('[title="Edit"]').first().click();
 
-      cy.get('#mui-component-select-proposalWorkflowId').click();
+      cy.get('#proposalWorkflowId-input').click();
 
       cy.contains('Loading...').should('not.exist');
 
@@ -529,12 +524,9 @@ context('Settings tests', () => {
 
       cy.get("[title='Assign proposals to SEP']").first().click();
 
-      cy.get("[id='mui-component-select-selectedSEPId']").should(
-        'not.have.class',
-        'Mui-disabled'
-      );
+      cy.get('#selectedSEPId-input').should('not.have.class', 'Mui-disabled');
 
-      cy.get("[id='mui-component-select-selectedSEPId']").first().click();
+      cy.get('#selectedSEPId-input').first().click();
 
       cy.get("[id='menu-selectedSEPId'] li").first().click();
 
@@ -675,12 +667,12 @@ context('Settings tests', () => {
 
       cy.contains('Add multi-column row').click();
 
-      cy.get('#mui-component-select-selectedParentDroppableId').click();
+      cy.get('#selectedParentDroppableId-input').click();
       cy.get(
         '[role="presentation"] [data-value="proposalWorkflowConnections_0"]'
       ).click();
 
-      cy.get('#mui-component-select-numberOfColumns').click();
+      cy.get('#numberOfColumns-input').click();
       cy.get('[role="presentation"] [data-value="2"]').click();
 
       cy.contains('Add row').click();
@@ -748,7 +740,7 @@ context('Settings tests', () => {
 
       cy.get('[title="Edit"]').first().click();
 
-      cy.get('#mui-component-select-proposalWorkflowId').click();
+      cy.get('#proposalWorkflowId-input').click();
 
       cy.contains('Loading...').should('not.exist');
 

@@ -67,6 +67,7 @@ export default function ResetPasswordEmail() {
             <Field
               name="email"
               label="Email"
+              id="email-id"
               type="email"
               component={TextField}
               margin="normal"

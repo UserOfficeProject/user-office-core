@@ -137,6 +137,7 @@ const CallGeneralInfo: React.FC<{
       <Field
         name="shortCode"
         label="Short Code"
+        id="short-code-input"
         type="text"
         component={TextField}
         margin="normal"
@@ -148,6 +149,7 @@ const CallGeneralInfo: React.FC<{
         <Field
           name="startCall"
           label="Start"
+          id="start-call-input"
           format="yyyy-MM-dd"
           component={KeyboardDatePicker}
           margin="normal"
@@ -159,6 +161,7 @@ const CallGeneralInfo: React.FC<{
         <Field
           name="endCall"
           label="End"
+          id="end-call-input"
           format="yyyy-MM-dd"
           component={KeyboardDatePicker}
           margin="normal"
@@ -171,6 +174,7 @@ const CallGeneralInfo: React.FC<{
           name="referenceNumberFormat"
           validate={validateRefNumFormat}
           label="Reference number format"
+          id="reference-number-format-input"
           type="text"
           component={TextField}
           InputProps={{

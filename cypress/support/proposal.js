@@ -55,10 +55,10 @@ const changeProposalStatus = (statusName = 'DRAFT', proposalTitle) => {
   cy.get('@dialog').contains('Change proposal/s status');
 
   cy.get('@dialog')
-    .find('#mui-component-select-selectedStatusId')
+    .find('#selectedStatusId-input')
     .should('not.have.class', 'Mui-disabled');
 
-  cy.get('@dialog').find('#mui-component-select-selectedStatusId').click();
+  cy.get('@dialog').find('#selectedStatusId-input').click();
 
   cy.get('[role="listbox"]').contains(statusName).click();
 
@@ -83,7 +83,7 @@ const allocateProposalTime = ({
 }) => {
   cy.contains(proposalTitle).parent().find('[title="View proposal"]').click();
   cy.get('[role="dialog"]').contains('Admin').click();
-  cy.get('#mui-component-select-finalStatus').click();
+  cy.get('#finalStatus-input').click();
   cy.get('[role="listbox"]').contains('Accepted').click();
   cy.get('[data-cy="managementTimeAllocation"] input').type(
     timeToAllocate.toString()

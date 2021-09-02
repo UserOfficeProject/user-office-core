@@ -1,9 +1,14 @@
 query getRiskAssessment($riskAssessmentId: Int!) {
   riskAssessment(riskAssessmentId: $riskAssessmentId) {
     ...riskAssessment
+
     questionary {
       ...questionary
       isCompleted
+    }
+
+    samples {
+      ...sample
     }
   }
 }

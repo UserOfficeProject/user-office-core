@@ -151,8 +151,7 @@ context('Proposal tests', () => {
 
     cy.get('[title="Clone proposal"]').first().click();
 
-    cy.get('#mui-component-select-selectedCallId').click();
-
+    cy.get('#selectedCallId-input').click();
     cy.get('#menu-selectedCallId').contains(shortCode).click();
 
     cy.get('[data-cy="submit"]').click();
@@ -192,10 +191,8 @@ context('Proposal tests', () => {
     cy.get('[role="presentation"]')
       .find('input[name="selectedStatusId"]')
       .should('have.value', '12');
-    cy.get('#mui-component-select-selectedStatusId').should(
-      'have.text',
-      'SEP Meeting'
-    );
+
+    cy.get('#selectedStatusId-input').should('have.text', 'SEP Meeting');
 
     // Close the modal
     cy.get('body').trigger('keydown', { keyCode: 27 });
@@ -213,10 +210,7 @@ context('Proposal tests', () => {
       .find('input[name="selectedStatusId"]')
       .should('have.value', '12');
 
-    cy.get('#mui-component-select-selectedStatusId').should(
-      'have.text',
-      'SEP Meeting'
-    );
+    cy.get('#selectedStatusId-input').should('have.text', 'SEP Meeting');
 
     // Close the modal
     cy.get('body').trigger('keydown', { keyCode: 27 });
@@ -262,7 +256,7 @@ context('Proposal tests', () => {
     const textQuestion = faker.random.words(2);
     const proposalName = faker.random.words(3);
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.get('[title="Edit"]').first().click();
 

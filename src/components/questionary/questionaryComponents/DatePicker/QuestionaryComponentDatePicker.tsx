@@ -28,6 +28,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
     <Field
       required={required}
       data-cy={`${id}.value`}
+      id={`${id}-id`}
       name={id}
       label={question}
       format={dateFormat}
@@ -47,6 +48,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
       <Field
         required={required}
         data-cy={`${id}.value`}
+        id={`${id}-id`}
         name={id}
         label={question}
         format={timeFormat}

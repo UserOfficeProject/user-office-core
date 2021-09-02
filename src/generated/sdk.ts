@@ -977,12 +977,14 @@ export type MutationUpdateTechnicalReviewAssigneeArgs = {
 
 export type MutationCreateRiskAssessmentArgs = {
   proposalPk: Scalars['Int'];
+  scheduledEventId: Scalars['Int'];
 };
 
 
 export type MutationUpdateRiskAssessmentArgs = {
   riskAssessmentId: Scalars['Int'];
   status?: Maybe<RiskAssessmentStatus>;
+  sampleIds?: Maybe<Array<Scalars['Int']>>;
 };
 
 
@@ -2494,10 +2496,12 @@ export type RiskAssessment = {
   __typename?: 'RiskAssessment';
   riskAssessmentId: Scalars['Int'];
   proposalPk: Scalars['Int'];
+  scheduledEventId: Scalars['Int'];
   creatorUserId: Scalars['Int'];
   questionaryId: Scalars['Int'];
   status: RiskAssessmentStatus;
   questionary: Questionary;
+  samples: Array<Sample>;
 };
 
 export type RiskAssessmentBasisConfig = {
@@ -5210,6 +5214,7 @@ export type UserWithReviewsQuery = (
 
 export type CreateRiskAssessmentMutationVariables = Exact<{
   proposalPk: Scalars['Int'];
+  scheduledEventId: Scalars['Int'];
 }>;
 
 
@@ -5223,7 +5228,10 @@ export type CreateRiskAssessmentMutation = (
         { __typename?: 'Questionary' }
         & Pick<Questionary, 'isCompleted'>
         & QuestionaryFragment
-      ) }
+      ), samples: Array<(
+        { __typename?: 'Sample' }
+        & SampleFragment
+      )> }
       & RiskAssessmentFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
@@ -5234,7 +5242,7 @@ export type CreateRiskAssessmentMutation = (
 
 export type RiskAssessmentFragment = (
   { __typename?: 'RiskAssessment' }
-  & Pick<RiskAssessment, 'riskAssessmentId' | 'proposalPk' | 'status'>
+  & Pick<RiskAssessment, 'riskAssessmentId' | 'proposalPk' | 'scheduledEventId' | 'status'>
 );
 
 export type GetRiskAssessmentQueryVariables = Exact<{
@@ -5250,7 +5258,10 @@ export type GetRiskAssessmentQuery = (
       { __typename?: 'Questionary' }
       & Pick<Questionary, 'isCompleted'>
       & QuestionaryFragment
-    ) }
+    ), samples: Array<(
+      { __typename?: 'Sample' }
+      & SampleFragment
+    )> }
     & RiskAssessmentFragment
   ) }
 );
@@ -5258,6 +5269,7 @@ export type GetRiskAssessmentQuery = (
 export type UpdateRiskAssessmentMutationVariables = Exact<{
   riskAssessmentId: Scalars['Int'];
   status?: Maybe<RiskAssessmentStatus>;
+  sampleIds?: Maybe<Array<Scalars['Int']> | Scalars['Int']>;
 }>;
 
 
@@ -5267,6 +5279,10 @@ export type UpdateRiskAssessmentMutation = (
     { __typename?: 'RiskAssessmentResponseWrap' }
     & { riskAssessment: Maybe<(
       { __typename?: 'RiskAssessment' }
+      & { samples: Array<(
+        { __typename?: 'Sample' }
+        & SampleFragment
+      )> }
       & RiskAssessmentFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
@@ -7650,6 +7666,7 @@ export const RiskAssessmentFragmentDoc = gql`
     fragment riskAssessment on RiskAssessment {
   riskAssessmentId
   proposalPk
+  scheduledEventId
   status
 }
     `;
@@ -9328,13 +9345,19 @@ export const UserWithReviewsDocument = gql`
 }
     `;
 export const CreateRiskAssessmentDocument = gql`
-    mutation createRiskAssessment($proposalPk: Int!) {
-  createRiskAssessment(proposalPk: $proposalPk) {
+    mutation createRiskAssessment($proposalPk: Int!, $scheduledEventId: Int!) {
+  createRiskAssessment(
+    proposalPk: $proposalPk
+    scheduledEventId: $scheduledEventId
+  ) {
     riskAssessment {
       ...riskAssessment
       questionary {
         ...questionary
         isCompleted
+      }
+      samples {
+        ...sample
       }
     }
     rejection {
@@ -9344,6 +9367,7 @@ export const CreateRiskAssessmentDocument = gql`
 }
     ${RiskAssessmentFragmentDoc}
 ${QuestionaryFragmentDoc}
+${SampleFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const GetRiskAssessmentDocument = gql`
     query getRiskAssessment($riskAssessmentId: Int!) {
@@ -9353,15 +9377,26 @@ export const GetRiskAssessmentDocument = gql`
       ...questionary
       isCompleted
     }
+    samples {
+      ...sample
+    }
   }
 }
     ${RiskAssessmentFragmentDoc}
-${QuestionaryFragmentDoc}`;
+${QuestionaryFragmentDoc}
+${SampleFragmentDoc}`;
 export const UpdateRiskAssessmentDocument = gql`
-    mutation updateRiskAssessment($riskAssessmentId: Int!, $status: RiskAssessmentStatus) {
-  updateRiskAssessment(riskAssessmentId: $riskAssessmentId, status: $status) {
+    mutation updateRiskAssessment($riskAssessmentId: Int!, $status: RiskAssessmentStatus, $sampleIds: [Int!]) {
+  updateRiskAssessment(
+    riskAssessmentId: $riskAssessmentId
+    status: $status
+    sampleIds: $sampleIds
+  ) {
     riskAssessment {
       ...riskAssessment
+      samples {
+        ...sample
+      }
     }
     rejection {
       ...rejection
@@ -9369,6 +9404,7 @@ export const UpdateRiskAssessmentDocument = gql`
   }
 }
     ${RiskAssessmentFragmentDoc}
+${SampleFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const CloneSampleDocument = gql`
     mutation cloneSample($sampleId: Int!) {
