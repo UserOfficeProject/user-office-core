@@ -1,6 +1,6 @@
+import MaterialTable, { Options } from '@material-table/core';
 import { Typography } from '@material-ui/core';
 import DoneAll from '@material-ui/icons/DoneAll';
-import MaterialTable, { Options } from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -16,7 +16,7 @@ import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
 
 type SEPMeetingInstrumentsTableProps = {
   sepId: number;
-  Toolbar: (data: Options) => JSX.Element;
+  Toolbar: (data: Options<JSX.Element>) => JSX.Element;
   selectedCallId: number;
   confirm: WithConfirmType;
 };
@@ -161,7 +161,8 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         detailPanel={[
           {
             tooltip: 'Show proposals',
-            render: SEPInstrumentProposalsTableComponent,
+            render: ({ rowData }) =>
+              SEPInstrumentProposalsTableComponent(rowData),
           },
         ]}
         options={{

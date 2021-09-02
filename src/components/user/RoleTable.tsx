@@ -1,5 +1,5 @@
+import MaterialTable from '@material-table/core';
 import Button from '@material-ui/core/Button';
-import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 

@@ -1,10 +1,10 @@
+import MaterialTable, { Column } from '@material-table/core';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DoneAll from '@material-ui/icons/DoneAll';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import RateReviewIcon from '@material-ui/icons/RateReview';
 import Visibility from '@material-ui/icons/Visibility';
-import MaterialTable, { Column } from 'material-table';
 import React, { useState, useContext, useEffect } from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
 

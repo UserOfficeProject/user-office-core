@@ -1,3 +1,4 @@
+import MaterialTable, { Options } from '@material-table/core';
 import { Typography } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -6,7 +7,6 @@ import AssignmentInd from '@material-ui/icons/AssignmentInd';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import Visibility from '@material-ui/icons/Visibility';
 import dateformat from 'dateformat';
-import MaterialTable, { Options } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
@@ -39,7 +39,7 @@ type SEPProposalsAndAssignmentsTableProps = {
   /** Id of the SEP we are assigning members to */
   sepId: number;
   /** Toolbar component shown in the table */
-  Toolbar: (data: Options) => JSX.Element;
+  Toolbar: (data: Options<JSX.Element>) => JSX.Element;
   /** Call id that we want to filter by */
   selectedCallId: number;
 };
@@ -364,7 +364,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
             detailPanel={[
               {
                 tooltip: 'Show Reviewers',
-                render: ReviewersTable,
+                render: ({ rowData }) => ReviewersTable(rowData),
               },
             ]}
             actions={

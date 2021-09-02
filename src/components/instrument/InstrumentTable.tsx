@@ -181,7 +181,7 @@ const InstrumentTable: React.FC = () => {
           detailPanel={[
             {
               tooltip: 'Show Scientists',
-              render: AssignedScientists,
+              render: ({ rowData }) => AssignedScientists(rowData),
             },
           ]}
           options={{

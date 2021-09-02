@@ -251,7 +251,7 @@ const CallsTable: React.FC = () => {
         detailPanel={[
           {
             tooltip: 'Show Instruments',
-            render: AssignedInstruments,
+            render: ({ rowData }) => AssignedInstruments(rowData),
           },
         ]}
         options={{

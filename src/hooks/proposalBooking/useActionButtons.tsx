@@ -1,7 +1,7 @@
+import { Action } from '@material-table/core';
 import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
 import GroupIcon from '@material-ui/icons/Group';
 import SchoolIcon from '@material-ui/icons/School';
-import { Action } from 'material-table';
 import moment from 'moment';
 import React, { ReactNode, useContext } from 'react';
 import { useHistory } from 'react-router';

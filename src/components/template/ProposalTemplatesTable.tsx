@@ -1,7 +1,7 @@
+import MaterialTable, { Column } from '@material-table/core';
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
 import dateformat from 'dateformat';
-import MaterialTable, { Column } from 'material-table';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import MaterialTable, { MTableToolbar, Options } from '@material-table/core';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import { FormikHelpers, FormikValues } from 'formik';
-import MaterialTable, { MTableToolbar, Options } from 'material-table';
 import React, { forwardRef } from 'react';
 
 import { tableIcons } from 'utils/materialIcons';
@@ -79,7 +79,7 @@ export const FormikUICustomTable = ({
     </div>
   );
 
-  const StyledToolbar = (props: Options) => (
+  const StyledToolbar = (props: Options<JSX.Element>) => (
     <div className={classes.customToolbar}>
       <MTableToolbar {...props} />
     </div>

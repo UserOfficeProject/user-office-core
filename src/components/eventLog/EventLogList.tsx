@@ -1,6 +1,6 @@
+import MaterialTable from '@material-table/core';
 import { Typography } from '@material-ui/core';
 import dateformat from 'dateformat';
-import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 

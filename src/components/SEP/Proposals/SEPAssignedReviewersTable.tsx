@@ -1,8 +1,8 @@
+import MaterialTable from '@material-table/core';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import RateReviewIcon from '@material-ui/icons/RateReview';
 import Visibility from '@material-ui/icons/Visibility';
 import dateformat from 'dateformat';
-import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState, useContext } from 'react';
 

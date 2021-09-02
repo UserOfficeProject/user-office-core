@@ -1,3 +1,4 @@
+import MaterialTable, { MTableBodyRow } from '@material-table/core';
 import IconButton from '@material-ui/core/IconButton';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
@@ -6,7 +7,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DragHandle from '@material-ui/icons/DragHandle';
 import Visibility from '@material-ui/icons/Visibility';
 import clsx from 'clsx';
-import MaterialTable, { MTableBodyRow } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useContext, DragEvent, useState, useEffect } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';

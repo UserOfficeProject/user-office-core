@@ -1,4 +1,4 @@
-import MaterialTable from 'material-table';
+import MaterialTable from '@material-table/core';
 import React, { useMemo } from 'react';
 
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
