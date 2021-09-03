@@ -1,14 +1,14 @@
 import { logger } from '@esss-swap/duo-logger';
 import cookieParser from 'cookie-parser';
 import express from 'express';
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import './src/env-loader.js';
 import './src/config';
-import 'reflect-metadata';
 
 import { startAsyncJobs } from './src/asyncJobs/startAsyncJobs';
-import { Tokens } from './src/config/Tokens.js';
+import { Tokens } from './src/config/Tokens';
 import authorization from './src/middlewares/authorization';
 import exceptionHandler from './src/middlewares/exceptionHandler';
 import factory from './src/middlewares/factory';
