@@ -28,4 +28,5 @@ export const Tokens = {
   SetColourTheme: Symbol('SetColourTheme'),
   RiskAssessmentDataSource: Symbol('RiskAssessmentDataSource'),
   RiskAssessmentAuthorization: Symbol('RiskAssessmentAuthorization'),
+  ConfigureProductionEnvironment: Symbol('ConfigureProductionEnvironment'),
 };

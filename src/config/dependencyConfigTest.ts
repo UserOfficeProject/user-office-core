@@ -63,3 +63,7 @@ mapClass(Tokens.MailService, SkipSendMailService);
 mapValue(Tokens.EnableDefaultFeatures, () => {});
 
 mapValue(Tokens.SetColourTheme, () => {});
+
+mapValue(Tokens.ConfigureProductionEnvironment, () => {
+  return;
+});

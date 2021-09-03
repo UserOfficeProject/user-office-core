@@ -16,6 +16,7 @@ import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSour
 import PostgreSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
+import { configureSTFCProductionEnvironment } from './stfc/configureSTFCProductionEnvironment';
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
 import { createSkipPostingHandler } from '../eventHandlers/messageBroker';
@@ -65,3 +66,8 @@ mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 mapValue(Tokens.EnableDefaultFeatures, enableDefaultStfcFeatures);
 
 mapValue(Tokens.SetColourTheme, setStfcColourTheme);
+
+mapValue(
+  Tokens.ConfigureProductionEnvironment,
+  configureSTFCProductionEnvironment
+);

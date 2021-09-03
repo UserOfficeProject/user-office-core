@@ -7,7 +7,7 @@ private wsdlDesc: any = {"UserOfficeWebService":{"UserOfficeWebServicePort":{"ge
 
    public constructor(wsdlUrl?: string) {
               if(wsdlUrl == null)
-                  this.wsdlUrl = 'https://devapis.facilities.rl.ac.uk/ws/UserOfficeWebService?wsdl';
+                  this.wsdlUrl = process.env.UOWS_URL ?? 'https://devapis.facilities.rl.ac.uk/ws/UserOfficeWebService?wsdl';
               else
                   this.wsdlUrl = wsdlUrl;
           }

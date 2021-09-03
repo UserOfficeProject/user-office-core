@@ -64,3 +64,7 @@ mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
 mapValue(Tokens.EnableDefaultFeatures, enableDefaultEssFeatures);
 
 mapValue(Tokens.SetColourTheme, setEssColourTheme);
+
+mapValue(Tokens.ConfigureProductionEnvironment, () => {
+  return;
+});

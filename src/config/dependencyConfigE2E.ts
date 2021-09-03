@@ -65,3 +65,7 @@ mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 mapValue(Tokens.EnableDefaultFeatures, enableDefaultEssFeatures);
 
 mapValue(Tokens.SetColourTheme, setEssColourTheme);
+
+mapValue(Tokens.ConfigureProductionEnvironment, () => {
+  return;
+});
