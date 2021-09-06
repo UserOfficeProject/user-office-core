@@ -1,5 +1,6 @@
 import { Rejection } from '../models/Rejection';
 import { RiskAssessment } from '../models/RiskAssessment';
+import { Sample } from '../models/Sample';
 import { RiskAssessmentsFilter } from '../queries/RiskAssessmentQueries';
 import { CreateRiskAssessmentArgs } from '../resolvers/mutations/CreateRiskAssesssment';
 import { UpdateRiskAssessmentArgs } from '../resolvers/mutations/UpdateRiskAssessmentMutation';
@@ -14,6 +15,7 @@ export interface RiskAssessmentDataSource {
   // Read
   getRiskAssessment(riskAssessmentId: number): Promise<RiskAssessment | null>;
   getRiskAssessments(filter: RiskAssessmentsFilter): Promise<RiskAssessment[]>;
+  getRiskAssessmentSamples(riskAssessmentId: number): Promise<Sample[]>;
 
   // Update
   updateRiskAssessment(

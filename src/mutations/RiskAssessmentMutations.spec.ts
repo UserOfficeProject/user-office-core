@@ -23,13 +23,19 @@ beforeEach(() => {
 
 test('User should not be able to create risk assessment for not accepted proposal', async () => {
   return expect(
-    mutations.createRiskAssessment(dummyUserWithRole, { proposalPk: 1 })
+    mutations.createRiskAssessment(dummyUserWithRole, {
+      proposalPk: 1,
+      scheduledEventId: 1,
+    })
   ).resolves.toBeInstanceOf(Rejection);
 });
 
 test('User should be able to create risk assessment for accepted proposal', async () => {
   return expect(
-    mutations.createRiskAssessment(dummyUserWithRole, { proposalPk: 2 })
+    mutations.createRiskAssessment(dummyUserWithRole, {
+      proposalPk: 2,
+      scheduledEventId: 2,
+    })
   ).resolves.toBeInstanceOf(RiskAssessment);
 });
 
@@ -37,6 +43,7 @@ test('User not on proposal should not be able to create risk assessment', () => 
   return expect(
     mutations.createRiskAssessment(dummyUserNotOnProposalWithRole, {
       proposalPk: 2,
+      scheduledEventId: 2,
     })
   ).resolves.toBeInstanceOf(Rejection);
 });

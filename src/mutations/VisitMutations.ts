@@ -130,19 +130,19 @@ export default class VisitMutations {
 
     const hasRights = await this.visitAuthorization.hasWriteRights(user, visit);
 
+    if (
+      this.userAuthorization.isUser(user) &&
+      args.status === VisitStatus.ACCEPTED
+    ) {
+      return rejection(
+        'Can not update visit status because of insufficient permissions'
+      );
+    }
+
     if (hasRights === false) {
       return rejection(
         'Can not update visit because of insufficient permissions',
         { args, agent: user }
-      );
-    }
-
-    if (
-      args.status === VisitStatus.ACCEPTED &&
-      !this.userAuthorization.isUserOfficer(user)
-    ) {
-      return rejection(
-        'Can not update proposal status because of insufficient permissions'
       );
     }
 

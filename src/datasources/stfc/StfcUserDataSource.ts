@@ -196,6 +196,12 @@ export class StfcUserDataSource implements UserDataSource {
     const stfcRolesToEssRoleDefinitions = new Map<string, Roles>([
       ['User Officer', Roles.USER_OFFICER],
       ['ISIS Instrument Scientist', Roles.INSTRUMENT_SCIENTIST],
+      ['CLF Artemis FAP Secretary', Roles.USER_OFFICER],
+      ['CLF Artemis Link Scientist', Roles.INSTRUMENT_SCIENTIST],
+      ['CLF HPL FAP Secretary', Roles.USER_OFFICER],
+      ['CLF HPL Link Scientist', Roles.INSTRUMENT_SCIENTIST],
+      ['CLF LSF FAP Secretary', Roles.USER_OFFICER],
+      ['CLF LSF Link Scientist', Roles.INSTRUMENT_SCIENTIST],
     ]);
 
     const roles: Role[] = [];
