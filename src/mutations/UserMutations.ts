@@ -432,9 +432,10 @@ export default class UserMutations {
       const dummyUser = await this.dataSource.ensureDummyUserExists(userNumber);
       const roles = await this.dataSource.getUserRoles(dummyUser.id);
 
-      // add data to dummmyUser for UserContext
+      // add user info to dummmyUser for UserContext
       dummyUser.email = stfcUser.email;
       dummyUser.firstname = stfcUser.givenName;
+      dummyUser.preferredname = stfcUser.firstNameKnownAs;
       dummyUser.lastname = stfcUser.familyName;
 
       const proposalsToken = signToken<AuthJwtPayload>({
