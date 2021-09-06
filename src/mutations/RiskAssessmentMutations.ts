@@ -49,6 +49,8 @@ export default class RiskAssessmentMutations {
       );
     }
 
+    // TODO check if scheduled event ID exists
+
     if (
       proposal.finalStatus !== ProposalEndStatus.ACCEPTED ||
       proposal.managementDecisionSubmitted === false
@@ -85,7 +87,7 @@ export default class RiskAssessmentMutations {
       );
       if (!activeTemplate) {
         return rejection(
-          'Could not create visit registration questionary, because no active template for visit is set',
+          'Could not create visit registration questionary, because no active template for risk assessment is set',
           { args }
         );
       }
@@ -137,15 +139,13 @@ export default class RiskAssessmentMutations {
         { args, agent: user }
       );
     }
-
     try {
       return this.dataSource.updateRiskAssessment(args);
     } catch (error) {
-      return rejection(
-        'Could not update risk assessment because of an error',
-        { args },
-        error
-      );
+      return rejection('Could not update risk assessment', {
+        args: args,
+        error: error,
+      });
     }
   }
 
