@@ -126,22 +126,7 @@ context('Scheduler tests', () => {
   });
 
   it('User should be able to see upcoming experiments in BOOKED', () => {
-    const query = `
-      mutation activateProposalBooking($id: ID!
-        ) {
-          activateProposalBooking(id: $id) {
-            error
-          }
-        }
-      `;
-    const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
-    const request = new GraphQLClient('/graphql', {
-      headers: { authorization: authHeader },
-    }).rawRequest(query, {
-      id: 1,
-    });
-
-    cy.wrap(request);
+    cy.activateBooking(1);
 
     cy.login('user');
 
@@ -172,7 +157,7 @@ context('Scheduler tests', () => {
 
   it('User should be able to see upcoming experiments in CLOSED', () => {
     const query = `
-      mutation finalizeProposalBooking($id: ID!, $action: ProposalBookingFinalizeAction!) {
+      mutation finalizeProposalBooking($id: Int!, $action: ProposalBookingFinalizeAction!) {
           finalizeProposalBooking(id: $id, action: $action) {
             error
           }
