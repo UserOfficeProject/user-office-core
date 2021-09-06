@@ -49,7 +49,7 @@
     "apollo-server-core": "^2.25.2",
     "apollo-server-express": "^2.25.2",
     "await-to-js": "^2.1.1",
-    "axios": "^0.21.1",
+    "axios": "^0.21.3",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
     "cache-pug-templates": "^2.0.3",
