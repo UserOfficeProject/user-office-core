@@ -432,7 +432,9 @@ export default class UserMutations {
       const dummyUser = await this.dataSource.ensureDummyUserExists(userNumber);
       const roles = await this.dataSource.getUserRoles(dummyUser.id);
 
-      // add user info to dummmyUser for UserContext
+      // With dummyUser created and written (ensureDummyUserExists), info can now
+      // be added to it without persisting it to the database, which is not wanted.
+      // This info is used in the userContext.
       dummyUser.email = stfcUser.email;
       dummyUser.firstname = stfcUser.givenName;
       dummyUser.preferredname = stfcUser.firstNameKnownAs;
