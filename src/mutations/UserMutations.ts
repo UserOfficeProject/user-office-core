@@ -415,7 +415,7 @@ export default class UserMutations {
 
   async checkExternalToken(externalToken: string): Promise<string | Rejection> {
     try {
-      const client = new UOWSSoapClient();
+      const client = new UOWSSoapClient(process.env.UOWS_URL);
 
       const rawStfcUser = await client.getPersonDetailsFromSessionId(
         externalToken
