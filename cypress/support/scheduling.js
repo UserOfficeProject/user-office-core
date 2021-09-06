@@ -35,7 +35,7 @@ const activateBooking = (proposalBookingId) => {
   const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
 
   const activateBookingQuery = `
-      mutation activateProposalBooking($id: ID!
+      mutation activateProposalBooking($id: Int!
         ) {
           activateProposalBooking(id: $id) {
             error
