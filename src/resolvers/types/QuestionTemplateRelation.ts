@@ -8,7 +8,8 @@ import { Question } from './Question';
 
 @ObjectType()
 export class QuestionTemplateRelation
-  implements Partial<QuestionTemplateRelationOrigin> {
+  implements Partial<QuestionTemplateRelationOrigin>
+{
   @Field(() => Question)
   public question: Question;
 

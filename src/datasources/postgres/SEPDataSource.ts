@@ -400,9 +400,8 @@ export default class PostgresSEPDataSource implements SEPDataSource {
 
       await trx<SEPRecord>('SEPs')
         .update({
-          [isChairAssignment
-            ? 'sep_chair_user_id'
-            : 'sep_secretary_user_id']: args.userId,
+          [isChairAssignment ? 'sep_chair_user_id' : 'sep_secretary_user_id']:
+            args.userId,
         })
         .where('sep_id', args.sepId);
 
@@ -804,14 +803,15 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         (
           SepProposalWithReviewGradesAndRankingRecords: SepProposalWithReviewGradesAndRankingRecord[]
         ) => {
-          const sepProposalWithReviewGradesAndRanking = SepProposalWithReviewGradesAndRankingRecords.map(
-            (SepProposalWithReviewGradesAndRankingRecord) =>
-              new SEPProposalWithReviewGradesAndRanking(
-                SepProposalWithReviewGradesAndRankingRecord.proposal_pk,
-                SepProposalWithReviewGradesAndRankingRecord.rank_order,
-                SepProposalWithReviewGradesAndRankingRecord.review_grades
-              )
-          );
+          const sepProposalWithReviewGradesAndRanking =
+            SepProposalWithReviewGradesAndRankingRecords.map(
+              (SepProposalWithReviewGradesAndRankingRecord) =>
+                new SEPProposalWithReviewGradesAndRanking(
+                  SepProposalWithReviewGradesAndRankingRecord.proposal_pk,
+                  SepProposalWithReviewGradesAndRankingRecord.rank_order,
+                  SepProposalWithReviewGradesAndRankingRecord.review_grades
+                )
+            );
 
           return sepProposalWithReviewGradesAndRanking;
         }

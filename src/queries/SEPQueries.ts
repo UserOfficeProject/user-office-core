@@ -143,9 +143,8 @@ export default class SEPQueries {
     agent: UserWithRole | null,
     proposalPk: number
   ) {
-    const [
-      sepMeetingDecision,
-    ] = await this.dataSource.getProposalsSepMeetingDecisions([proposalPk]);
+    const [sepMeetingDecision] =
+      await this.dataSource.getProposalsSepMeetingDecisions([proposalPk]);
 
     if (!sepMeetingDecision) {
       return null;

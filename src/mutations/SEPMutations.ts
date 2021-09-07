@@ -184,10 +184,11 @@ export default class SEPMutations {
       );
     }
 
-    const isMemberChairOrSecretaryOfSEP = await this.userAuth.isChairOrSecretaryOfSEP(
-      { id: args.memberId } as User,
-      args.sepId
-    );
+    const isMemberChairOrSecretaryOfSEP =
+      await this.userAuth.isChairOrSecretaryOfSEP(
+        { id: args.memberId } as User,
+        args.sepId
+      );
 
     // SEP Chair and SEP Secretary can not
     // modify SEP Chair and SEP Secretary members
@@ -221,10 +222,11 @@ export default class SEPMutations {
     return this.dataSource
       .assignProposalsToSep(args)
       .then(async (result) => {
-        const nextProposalStatus = await this.proposalSettingsDataSource.getProposalNextStatus(
-          args.proposals[0].primaryKey,
-          Event.PROPOSAL_SEP_SELECTED
-        );
+        const nextProposalStatus =
+          await this.proposalSettingsDataSource.getProposalNextStatus(
+            args.proposals[0].primaryKey,
+            Event.PROPOSAL_SEP_SELECTED
+          );
 
         return new ProposalPksWithNextStatus(
           result.proposalPks,
@@ -361,9 +363,8 @@ export default class SEPMutations {
       );
     }
 
-    const isProposalInstrumentSubmitted = await this.instrumentDataSource.isProposalInstrumentSubmitted(
-      proposalPk
-    );
+    const isProposalInstrumentSubmitted =
+      await this.instrumentDataSource.isProposalInstrumentSubmitted(proposalPk);
 
     if (isProposalInstrumentSubmitted && !isUserOfficer) {
       return rejection(
@@ -393,10 +394,8 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     args: SaveSEPMeetingDecisionInput
   ): Promise<SepMeetingDecision | Rejection> {
-    const isChairOrSecretaryOfProposal = await this.userAuth.isChairOrSecretaryOfProposal(
-      agent,
-      args.proposalPk
-    );
+    const isChairOrSecretaryOfProposal =
+      await this.userAuth.isChairOrSecretaryOfProposal(agent, args.proposalPk);
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
 
     if (!isChairOrSecretaryOfProposal && !isUserOfficer) {

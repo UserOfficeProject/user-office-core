@@ -172,7 +172,8 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   }
 
   public init() {
-    dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
+    dummyQuestionarySteps =
+      create1Topic3FieldWithDependenciesQuestionarySteps();
     dummyQuestionary = createDummyQuestionary();
   }
 

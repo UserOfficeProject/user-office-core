@@ -393,9 +393,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   async getTokenAndPermissionsById(
     accessTokenId: string
   ): Promise<Permissions> {
-    const [
-      permissionRules,
-    ]: TokensAndPermissionsRecord[] = await database
+    const [permissionRules]: TokensAndPermissionsRecord[] = await database
       .select()
       .from('api_permissions')
       .where('access_token_id', accessTokenId);
@@ -415,9 +413,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async getAllTokensAndPermissions(): Promise<Permissions[]> {
-    const accessTokensWithPermissions: TokensAndPermissionsRecord[] = await database
-      .select()
-      .from('api_permissions');
+    const accessTokensWithPermissions: TokensAndPermissionsRecord[] =
+      await database.select().from('api_permissions');
 
     return accessTokensWithPermissions.map(
       (accessTokenWithPermissions) =>

@@ -233,10 +233,10 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<RiskAssessment | null> {
-    const riskAssessments = await context.queries.riskAssessment.getRiskAssessments(
-      context.user,
-      { proposalPk: proposal.primaryKey }
-    );
+    const riskAssessments =
+      await context.queries.riskAssessment.getRiskAssessments(context.user, {
+        proposalPk: proposal.primaryKey,
+      });
 
     if (riskAssessments.length === 0) {
       return null;
@@ -254,10 +254,8 @@ export async function resolveProposalReference(
   // it should be source, args, context, resolveInfo
   // but instead we get source, context and resolveInfo
   // this was the easies way to make the compiler happy and use real types
-  const [reference, ctx]: [
-    Pick<Proposal, 'primaryKey'>,
-    ResolverContext
-  ] = params;
+  const [reference, ctx]: [Pick<Proposal, 'primaryKey'>, ResolverContext] =
+    params;
 
   // dataSource.get can be null, even with non-null operator the compiler complains
   return (await (ctx.queries.proposal.byRef(

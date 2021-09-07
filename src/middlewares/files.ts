@@ -37,12 +37,8 @@ const files = () => {
 
   const fileUploadHandler = async (req: Request, res: Response) => {
     try {
-      const {
-        originalname,
-        size,
-        mimetype,
-        path,
-      } = req.file as Express.Multer.File;
+      const { originalname, size, mimetype, path } =
+        req.file as Express.Multer.File;
       const result = await baseContext.mutations.file.put(
         originalname,
         mimetype,

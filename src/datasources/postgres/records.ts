@@ -860,7 +860,7 @@ export const createVisitObject = (visit: VisitRecord) => {
   return new Visit(
     visit.visit_id,
     visit.proposal_pk,
-    (visit.status as any) as VisitStatus,
+    visit.status as any as VisitStatus,
     visit.creator_id,
     visit.team_lead_user_id,
     visit.scheduled_event_id,
@@ -877,7 +877,7 @@ export const createRiskAssessmentObject = (
     riskAssessment.scheduled_event_id,
     riskAssessment.creator_user_id,
     riskAssessment.questionary_id,
-    (riskAssessment.status as any) as RiskAssessmentStatus,
+    riskAssessment.status as any as RiskAssessmentStatus,
     riskAssessment.created_at
   );
 };

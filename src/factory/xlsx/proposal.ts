@@ -56,20 +56,22 @@ export const collectProposalXLSXData = async (
     );
   }
 
-  const technicalReview = await baseContext.queries.review.technicalReviewForProposal(
-    user,
-    proposal.primaryKey
-  );
+  const technicalReview =
+    await baseContext.queries.review.technicalReviewForProposal(
+      user,
+      proposal.primaryKey
+    );
 
   const reviews = await baseContext.queries.review.reviewsForProposal(
     user,
     proposalPk
   );
 
-  const sepMeetingDecision = await baseContext.queries.sep.getProposalSepMeetingDecision(
-    user,
-    proposal.primaryKey
-  );
+  const sepMeetingDecision =
+    await baseContext.queries.sep.getProposalSepMeetingDecision(
+      user,
+      proposal.primaryKey
+    );
 
   return [
     proposal.proposalId,

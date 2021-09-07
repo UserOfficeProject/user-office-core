@@ -108,10 +108,11 @@ export default class InstrumentMutations {
     const proposalCallIds = inputArguments.proposals.map(
       (proposal) => proposal.callId
     );
-    const proposalCallsWithInstrument = await this.dataSource.getCallsByInstrumentId(
-      inputArguments.instrumentId,
-      proposalCallIds
-    );
+    const proposalCallsWithInstrument =
+      await this.dataSource.getCallsByInstrumentId(
+        inputArguments.instrumentId,
+        proposalCallIds
+      );
 
     const proposalsOnSameCallAsInstrument = inputArguments.proposals.filter(
       (proposal) =>
@@ -132,9 +133,8 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
   ): Promise<ProposalPksWithNextStatus | Rejection> {
-    const allProposalsAreOnSameCallAsInstrument = await this.checkIfProposalsAreOnSameCallAsInstrument(
-      args
-    );
+    const allProposalsAreOnSameCallAsInstrument =
+      await this.checkIfProposalsAreOnSameCallAsInstrument(args);
 
     if (!allProposalsAreOnSameCallAsInstrument) {
       return rejection(
@@ -263,19 +263,21 @@ export default class InstrumentMutations {
       });
     }
 
-    const allInstrumentProposals = await this.sepDataSource.getSEPProposalsByInstrument(
-      args.sepId,
-      args.instrumentId,
-      args.callId
-    );
+    const allInstrumentProposals =
+      await this.sepDataSource.getSEPProposalsByInstrument(
+        args.sepId,
+        args.instrumentId,
+        args.callId
+      );
 
     const submittedInstrumentProposalPks = allInstrumentProposals.map(
       (sepInstrumentProposal) => sepInstrumentProposal.proposalPk
     );
 
-    const sepProposalsWithReviewsAndRanking = await this.sepDataSource.getSepProposalsWithReviewGradesAndRanking(
-      submittedInstrumentProposalPks
-    );
+    const sepProposalsWithReviewsAndRanking =
+      await this.sepDataSource.getSepProposalsWithReviewGradesAndRanking(
+        submittedInstrumentProposalPks
+      );
 
     const allSepMeetingsHasRankings = sepProposalsWithReviewsAndRanking.every(
       (sepProposalWithReviewsAndRanking) =>

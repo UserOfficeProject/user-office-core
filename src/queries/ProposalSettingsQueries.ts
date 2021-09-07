@@ -88,13 +88,13 @@ export default class ProposalSettingsQueries {
     agent: UserWithRole | null,
     proposalWorkflowId: number
   ) {
-    const proposalWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
-      proposalWorkflowId
-    );
+    const proposalWorkflowConnections =
+      await this.dataSource.getProposalWorkflowConnections(proposalWorkflowId);
 
-    const groupedProposalWorkflowConnections = this.groupProposalWorkflowConnectionsByDroppableArea(
-      proposalWorkflowConnections
-    );
+    const groupedProposalWorkflowConnections =
+      this.groupProposalWorkflowConnectionsByDroppableArea(
+        proposalWorkflowConnections
+      );
 
     return groupedProposalWorkflowConnections;
   }
@@ -104,9 +104,10 @@ export default class ProposalSettingsQueries {
     agent: UserWithRole | null,
     proposalWorkflowConnectionId: number
   ) {
-    const statusChangingEvents = await this.dataSource.getStatusChangingEventsByConnectionIds(
-      [proposalWorkflowConnectionId]
-    );
+    const statusChangingEvents =
+      await this.dataSource.getStatusChangingEventsByConnectionIds([
+        proposalWorkflowConnectionId,
+      ]);
 
     return statusChangingEvents;
   }
