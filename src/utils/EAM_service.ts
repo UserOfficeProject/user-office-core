@@ -105,7 +105,8 @@ export class EAMAssetRegistrar implements AssetRegistrar {
   async register() {
     const response = await this.performApiRequest(this.addAssetSoapRequest);
 
-    const regexFindEquipmentCode = /<ns2:EQUIPMENTCODE>([0-9]*)<\/ns2:EQUIPMENTCODE>/;
+    const regexFindEquipmentCode =
+      /<ns2:EQUIPMENTCODE>([0-9]*)<\/ns2:EQUIPMENTCODE>/;
     const result = response.match(regexFindEquipmentCode);
 
     if (!result || result.length < 2) {

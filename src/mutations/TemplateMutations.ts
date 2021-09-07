@@ -307,11 +307,12 @@ export default class TemplateMutations {
       | CreateQuestionTemplateRelationArgs
       | UpdateQuestionTemplateRelationArgs
   ) {
-    const allOtherTopicQuestions = await this.dataSource.getQuestionTemplateRelations(
-      changingQuestionRel.templateId,
-      changingQuestionRel.topicId as number,
-      changingQuestionRel.questionId
-    );
+    const allOtherTopicQuestions =
+      await this.dataSource.getQuestionTemplateRelations(
+        changingQuestionRel.templateId,
+        changingQuestionRel.topicId as number,
+        changingQuestionRel.questionId
+      );
 
     let dataToUpsert: TemplatesHasQuestions[] = [];
 

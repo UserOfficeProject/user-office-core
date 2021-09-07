@@ -78,13 +78,11 @@ export const collectSEPlXLSXData = async (
   // TODO: decide on filename
   const filename = `SEP-${sep?.code}-${call?.shortCode}.xlsx`;
 
-  const instruments = await baseContext.queries.instrument.getInstrumentsBySepId(
-    user,
-    {
+  const instruments =
+    await baseContext.queries.instrument.getInstrumentsBySepId(user, {
       sepId,
       callId,
-    }
-  );
+    });
 
   if (!instruments) {
     throw new Error(

@@ -50,23 +50,24 @@ export const dummyProposalWorkflowConnection = new ProposalWorkflowConnection(
   null
 );
 
-export const anotherDummyProposalWorkflowConnection = new ProposalWorkflowConnection(
-  2,
-  2,
-  1,
-  2,
-  {
-    id: 2,
-    shortCode: 'TEST_STATUS_2',
-    name: 'Test status 2',
-    description: 'Test status 2',
-    isDefault: false,
-  },
-  null,
-  1,
-  'proposalWorkflowConnections_0',
-  null
-);
+export const anotherDummyProposalWorkflowConnection =
+  new ProposalWorkflowConnection(
+    2,
+    2,
+    1,
+    2,
+    {
+      id: 2,
+      shortCode: 'TEST_STATUS_2',
+      name: 'Test status 2',
+      description: 'Test status 2',
+      isDefault: false,
+    },
+    null,
+    1,
+    'proposalWorkflowConnections_0',
+    null
+  );
 
 export const dummyStatusChangingEvent = new StatusChangingEvent(
   1,
@@ -75,7 +76,8 @@ export const dummyStatusChangingEvent = new StatusChangingEvent(
 );
 
 export class ProposalSettingsDataSourceMock
-  implements ProposalSettingsDataSource {
+  implements ProposalSettingsDataSource
+{
   async createProposalStatus(
     newProposalStatusInput: CreateProposalStatusInput
   ): Promise<ProposalStatus> {

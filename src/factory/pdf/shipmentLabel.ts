@@ -34,10 +34,11 @@ export async function collectShipmentPDFData(
     );
   }
 
-  const questionarySteps = await baseContext.queries.questionary.getQuestionarySteps(
-    user,
-    shipment.questionaryId
-  );
+  const questionarySteps =
+    await baseContext.queries.questionary.getQuestionarySteps(
+      user,
+      shipment.questionaryId
+    );
 
   if (!questionarySteps) {
     throw new Error(

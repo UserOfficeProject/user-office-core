@@ -15,7 +15,8 @@ import { wrapResponse } from '../../wrapResponse';
 
 @InputType()
 export class AddProposalWorkflowStatusInput
-  implements Partial<ProposalWorkflowConnection> {
+  implements Partial<ProposalWorkflowConnection>
+{
   @Field(() => Int)
   public proposalWorkflowId: number;
 

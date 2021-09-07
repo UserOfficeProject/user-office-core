@@ -42,9 +42,7 @@ export class SMTPMailService extends MailService {
     });
   }
 
-  async sendMail(
-    options: EmailSettings
-  ): Promise<{
+  async sendMail(options: EmailSettings): Promise<{
     results: SendMailResults;
   }> {
     const emailPromises: Promise<SendMailResults>[] = [];

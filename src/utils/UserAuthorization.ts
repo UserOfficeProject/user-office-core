@@ -103,10 +103,11 @@ export class UserAuthorization {
       return false;
     }
 
-    const sepsUserIsMemberOf = await this.sepDataSource.getUserSepsByRoleAndSepId(
-      agent.id,
-      agent.currentRole
-    );
+    const sepsUserIsMemberOf =
+      await this.sepDataSource.getUserSepsByRoleAndSepId(
+        agent.id,
+        agent.currentRole
+      );
 
     const sepIdsUserIsMemberOf = sepsUserIsMemberOf.map((sep) => sep.id);
 

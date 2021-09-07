@@ -166,10 +166,11 @@ export const collectProposalPDFData = async (
   }
 
   if (userAuthorization.isReviewerOfProposal(user, proposal.primaryKey)) {
-    const technicalReview = await baseContext.queries.review.technicalReviewForProposal(
-      user,
-      proposal.primaryKey
-    );
+    const technicalReview =
+      await baseContext.queries.review.technicalReviewForProposal(
+        user,
+        proposal.primaryKey
+      );
     if (technicalReview) {
       out.technicalReview = {
         ...technicalReview,
