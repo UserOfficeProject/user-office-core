@@ -16,7 +16,6 @@ import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSour
 import PostgreSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
-import { configureSTFCProductionEnvironment } from './stfc/configureSTFCProductionEnvironment';
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
 import { createSkipPostingHandler } from '../eventHandlers/messageBroker';
@@ -27,8 +26,7 @@ import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { VisitAuthorization } from '../utils/VisitAuthorization';
-import enableDefaultStfcFeatures from './stfc/enableDefaultStfcFeatures';
-import setStfcColourTheme from './stfc/setStfcColourTheme';
+import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
@@ -63,11 +61,4 @@ mapClass(Tokens.MailService, SMTPMailService);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 
-mapValue(Tokens.EnableDefaultFeatures, enableDefaultStfcFeatures);
-
-mapValue(Tokens.SetColourTheme, setStfcColourTheme);
-
-mapValue(
-  Tokens.ConfigureProductionEnvironment,
-  configureSTFCProductionEnvironment
-);
+mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);

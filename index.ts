@@ -16,7 +16,6 @@ import files from './src/middlewares/files';
 import apolloServer from './src/middlewares/graphql';
 import healthCheck from './src/middlewares/healthCheck';
 import readinessCheck from './src/middlewares/readinessCheck';
-import { configureDevelopmentEnvironment } from './src/utils/configureDevelopmentEnvironment';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 4000;
@@ -42,9 +41,7 @@ async function bootstrap() {
   console.info(`Running a GraphQL API server at localhost:${PORT}/graphql`);
 
   startAsyncJobs();
-  process.env.NODE_ENV === 'production'
-    ? container.resolve<() => void>(Tokens.ConfigureProductionEnvironment)()
-    : configureDevelopmentEnvironment();
+  container.resolve<() => void>(Tokens.ConfigureEnvironment)();
 }
 
 bootstrap();

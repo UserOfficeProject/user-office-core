@@ -4,7 +4,7 @@ import {
   createApiAccessTokenValidationSchema,
   updateApiAccessTokenValidationSchema,
 } from '@esss-swap/duo-validation';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
@@ -21,7 +21,6 @@ import { CreateUnitArgs } from '../resolvers/mutations/CreateUnitMutation';
 import { DeleteApiAccessTokenInput } from '../resolvers/mutations/DeleteApiAccessTokenMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
-import { configureDevelopmentEnvironment } from '../utils/configureDevelopmentEnvironment';
 import { generateUniqueId } from '../utils/helperFunctions';
 import { signToken } from '../utils/jwt';
 
@@ -41,7 +40,7 @@ export default class AdminMutations {
       logger.logWarn('Resetting database', {});
 
       const log = await this.dataSource.resetDB(includeSeeds);
-      configureDevelopmentEnvironment();
+      container.resolve<() => void>(Tokens.ConfigureEnvironment)();
 
       return log;
     } else {
