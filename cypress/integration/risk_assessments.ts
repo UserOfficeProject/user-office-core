@@ -8,6 +8,7 @@ const questionTitle = faker.lorem.words(3);
 const answer = faker.lorem.words(3);
 
 const sampleTitle = /My sample title/i;
+const newSampleTitle = faker.lorem.words(3);
 
 const proposalTitle = 'Test proposal';
 const riskAssessmentButtonTitle = 'Finish risk assessment';
@@ -86,11 +87,24 @@ context('visits tests', () => {
 
   it('Should be able to do risk assessment', () => {
     cy.login('user');
+    // select sample from dropdown
     cy.get(`[title='${riskAssessmentButtonTitle}']`).click();
     cy.get('[data-cy=samples-dropdown]').click();
     cy.get('[role=listbox]').contains(sampleTitle).click();
-
     cy.get('body').type('{esc}');
+
+    // add new sample and select it from dropdown
+    cy.get('[data-cy=add-more-samples-btn]').click();
+    cy.get('[data-cy=add-button]').click();
+    cy.get('[name=sample_basis]').type(newSampleTitle);
+    cy.get('[data-cy=sample-declaration-modal]')
+      .find('[data-cy=save-and-continue-button]')
+      .click();
+    cy.get('[data-cy=close-edit-proposal-samples]').click();
+    cy.get('[data-cy=samples-dropdown]').click();
+    cy.get('[role=listbox]').contains(newSampleTitle).click();
+    cy.get('body').type('{esc}');
+
     cy.contains(questionTitle).then(($elem: any) => {
       cy.get(`#${$elem.attr('for')}`).type(answer);
     });
