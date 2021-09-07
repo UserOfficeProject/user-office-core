@@ -79,9 +79,10 @@ const getSecondsPerAllocationTimeUnit = (
 };
 
 export function createPostToRabbitMQHandler() {
-  const proposalSettingsDataSource = container.resolve<ProposalSettingsDataSource>(
-    Tokens.ProposalSettingsDataSource
-  );
+  const proposalSettingsDataSource =
+    container.resolve<ProposalSettingsDataSource>(
+      Tokens.ProposalSettingsDataSource
+    );
 
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
@@ -112,9 +113,8 @@ export function createPostToRabbitMQHandler() {
       case Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW:
       case Event.PROPOSAL_STATUS_CHANGED_BY_USER: {
         const proposal = event.proposal;
-        const proposalStatus = await proposalSettingsDataSource.getProposalStatus(
-          proposal.statusId
-        );
+        const proposalStatus =
+          await proposalSettingsDataSource.getProposalStatus(proposal.statusId);
 
         // if the new status isn't 'SCHEDULING' ignore the event
         if (

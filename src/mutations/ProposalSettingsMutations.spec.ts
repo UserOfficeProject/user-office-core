@@ -21,10 +21,11 @@ const ProposalSettingsMutationsInstance = container.resolve(
 
 describe('Test Proposal settings mutations', () => {
   test('A user can not create proposal status', async () => {
-    const result = (await ProposalSettingsMutationsInstance.createProposalStatus(
-      dummyUserWithRole,
-      dummyProposalStatus
-    )) as Rejection;
+    const result =
+      (await ProposalSettingsMutationsInstance.createProposalStatus(
+        dummyUserWithRole,
+        dummyProposalStatus
+      )) as Rejection;
 
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
   });
@@ -52,10 +53,11 @@ describe('Test Proposal settings mutations', () => {
   });
 
   test('A user cannot update proposal status', async () => {
-    const result = (await ProposalSettingsMutationsInstance.updateProposalStatus(
-      dummyUserWithRole,
-      dummyProposalStatus
-    )) as Rejection;
+    const result =
+      (await ProposalSettingsMutationsInstance.updateProposalStatus(
+        dummyUserWithRole,
+        dummyProposalStatus
+      )) as Rejection;
 
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
   });
@@ -79,10 +81,11 @@ describe('Test Proposal settings mutations', () => {
   });
 
   test('A user can not create proposal workflow', async () => {
-    const result = (await ProposalSettingsMutationsInstance.createProposalWorkflow(
-      dummyUserWithRole,
-      dummyProposalWorkflow
-    )) as Rejection;
+    const result =
+      (await ProposalSettingsMutationsInstance.createProposalWorkflow(
+        dummyUserWithRole,
+        dummyProposalWorkflow
+      )) as Rejection;
 
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
   });
@@ -109,10 +112,11 @@ describe('Test Proposal settings mutations', () => {
   });
 
   test('A user cannot update proposal workflow', async () => {
-    const result = (await ProposalSettingsMutationsInstance.updateProposalWorkflow(
-      dummyUserWithRole,
-      dummyProposalWorkflow
-    )) as Rejection;
+    const result =
+      (await ProposalSettingsMutationsInstance.updateProposalWorkflow(
+        dummyUserWithRole,
+        dummyProposalWorkflow
+      )) as Rejection;
 
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
   });

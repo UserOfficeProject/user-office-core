@@ -35,10 +35,8 @@ export async function resolveBasicUserReference(
   // it should be source, args, context, resolveInfo
   // but instead we get source, context and resolveInfo
   // this was the easiest way to make the compiler happy and use real types
-  const [reference, ctx]: [
-    Pick<BasicUserDetails, 'id'>,
-    ResolverContext
-  ] = params;
+  const [reference, ctx]: [Pick<BasicUserDetails, 'id'>, ResolverContext] =
+    params;
 
   // dataSource.get can be null, even with non-null operator the compiler complains
   return (await (ctx.queries.user.byRef(

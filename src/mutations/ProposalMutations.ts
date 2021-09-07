@@ -120,9 +120,10 @@ export default class ProposalMutations {
       return rejection('Unauthorized proposal update', { args });
     }
 
-    const proposalStatus = await this.proposalSettingsDataSource.getProposalStatus(
-      proposal.statusId
-    );
+    const proposalStatus =
+      await this.proposalSettingsDataSource.getProposalStatus(
+        proposal.statusId
+      );
 
     if (
       proposalStatus?.shortCode !==
@@ -328,10 +329,8 @@ export default class ProposalMutations {
       managementTimeAllocation,
       managementDecisionSubmitted,
     } = args;
-    const isChairOrSecretaryOfProposal = await this.userAuth.isChairOrSecretaryOfProposal(
-      agent,
-      primaryKey
-    );
+    const isChairOrSecretaryOfProposal =
+      await this.userAuth.isChairOrSecretaryOfProposal(agent, primaryKey);
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
 
     if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
@@ -350,9 +349,8 @@ export default class ProposalMutations {
       );
     }
 
-    const isProposalInstrumentSubmitted = await this.instrumentDataSource.isProposalInstrumentSubmitted(
-      primaryKey
-    );
+    const isProposalInstrumentSubmitted =
+      await this.instrumentDataSource.isProposalInstrumentSubmitted(primaryKey);
 
     if (isProposalInstrumentSubmitted && !isUserOfficer) {
       return rejection(

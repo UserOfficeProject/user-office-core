@@ -1,9 +1,7 @@
 import EmailSettings from './EmailSettings';
 
 export abstract class MailService {
-  abstract sendMail(
-    options: EmailSettings
-  ): Promise<{
+  abstract sendMail(options: EmailSettings): Promise<{
     results: SendMailResults;
   }>;
 }

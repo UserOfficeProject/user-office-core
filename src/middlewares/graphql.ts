@@ -68,11 +68,10 @@ const apolloServer = async (app: Express) => {
 
       if (req.user) {
         if (accessTokenId) {
-          const {
-            accessPermissions,
-          } = await baseContext.queries.admin.getPermissionsByToken(
-            accessTokenId
-          );
+          const { accessPermissions } =
+            await baseContext.queries.admin.getPermissionsByToken(
+              accessTokenId
+            );
 
           user = {
             accessPermissions: accessPermissions

@@ -49,9 +49,10 @@ export class InstrumentResolver {
     @Root() instrument: Instrument,
     @Ctx() context: ResolverContext
   ): Promise<BasicUserDetails[] | null> {
-    const scientists = context.queries.instrument.dataSource.getInstrumentScientists(
-      instrument.id
-    );
+    const scientists =
+      context.queries.instrument.dataSource.getInstrumentScientists(
+        instrument.id
+      );
 
     return isRejection(scientists) ? [] : scientists;
   }

@@ -22,7 +22,8 @@ import {
 
 @injectable()
 export default class PostgresInstrumentDataSource
-  implements InstrumentDataSource {
+  implements InstrumentDataSource
+{
   constructor(
     @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource
   ) {}
@@ -298,14 +299,16 @@ export default class PostgresInstrumentDataSource
     sepId: number,
     callId: number
   ): Promise<InstrumentWithAvailabilityTimeRecord[]> {
-    const instrumentsWithSubmittedFlag: InstrumentWithAvailabilityTimeRecord[] = [];
+    const instrumentsWithSubmittedFlag: InstrumentWithAvailabilityTimeRecord[] =
+      [];
 
     for (const instrument of instruments) {
-      const allProposalsOnInstrument = await this.sepDataSource.getSEPProposalsByInstrument(
-        sepId,
-        instrument.instrument_id,
-        callId
-      );
+      const allProposalsOnInstrument =
+        await this.sepDataSource.getSEPProposalsByInstrument(
+          sepId,
+          instrument.instrument_id,
+          callId
+        );
 
       const allProposalsOnInstrumentSubmitted = allProposalsOnInstrument.every(
         (item) => item.instrumentSubmitted
@@ -357,11 +360,12 @@ export default class PostgresInstrumentDataSource
         )
       )
       .then(async (instruments: InstrumentWithAvailabilityTimeRecord[]) => {
-        const instrumentsWithSubmittedFlag = await this.checkIfAllProposalsOnInstrumentSubmitted(
-          instruments,
-          sepId,
-          callId
-        );
+        const instrumentsWithSubmittedFlag =
+          await this.checkIfAllProposalsOnInstrumentSubmitted(
+            instruments,
+            sepId,
+            callId
+          );
 
         const result = instrumentsWithSubmittedFlag.map((instrument) => {
           const calculatedInstrumentAvailabilityTimePerSEP = Math.round(
@@ -482,17 +486,16 @@ export default class PostgresInstrumentDataSource
     userId: number,
     instrumentId: number
   ): Promise<boolean> {
-    const result:
-      | { count?: string | number | undefined }
-      | undefined = await database
-      .count({ count: '*' })
-      .from('instruments as i')
-      .join('instrument_has_scientists as ihs', {
-        'i.instrument_id': 'ihs.instrument_id',
-      })
-      .where('ihs.user_id', userId)
-      .where('i.instrument_id', instrumentId)
-      .first();
+    const result: { count?: string | number | undefined } | undefined =
+      await database
+        .count({ count: '*' })
+        .from('instruments as i')
+        .join('instrument_has_scientists as ihs', {
+          'i.instrument_id': 'ihs.instrument_id',
+        })
+        .where('ihs.user_id', userId)
+        .where('i.instrument_id', instrumentId)
+        .first();
 
     return result?.count === '1';
   }

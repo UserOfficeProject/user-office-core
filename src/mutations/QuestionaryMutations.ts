@@ -91,10 +91,11 @@ export default class QuestionaryMutations {
 
     for (const answer of answers) {
       if (answer.value !== undefined) {
-        const questionTemplateRelation = await this.templateDataSource.getQuestionTemplateRelation(
-          answer.questionId,
-          questionary.templateId
-        );
+        const questionTemplateRelation =
+          await this.templateDataSource.getQuestionTemplateRelation(
+            answer.questionId,
+            questionary.templateId
+          );
         if (!questionTemplateRelation) {
           return rejection(
             'Can not answer topic because could not find QuestionTemplateRelation',

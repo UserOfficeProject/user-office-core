@@ -229,9 +229,7 @@ export default class UserQueries {
     return this.dataSource.getProposalUsers(proposalPk);
   }
 
-  async checkToken(
-    token: string
-  ): Promise<{
+  async checkToken(token: string): Promise<{
     isValid: boolean;
     payload: AuthJwtPayload | AuthJwtApiTokenPayload | null;
   }> {

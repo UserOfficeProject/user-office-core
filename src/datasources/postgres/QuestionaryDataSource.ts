@@ -25,7 +25,8 @@ import {
 } from './records';
 
 export default class PostgresQuestionaryDataSource
-  implements QuestionaryDataSource {
+  implements QuestionaryDataSource
+{
   async getIsCompleted(questionaryId: number): Promise<boolean> {
     const unFinishedTopics: Topic[] = (
       await database.raw(
@@ -118,16 +119,15 @@ export default class PostgresQuestionaryDataSource
     question_id: string,
     answer: string
   ): Promise<string> {
-    const results:
-      | { count?: string | number | undefined }
-      | undefined = await database
-      .count()
-      .from('answers')
-      .where({
-        questionary_id,
-        question_id,
-      })
-      .first();
+    const results: { count?: string | number | undefined } | undefined =
+      await database
+        .count()
+        .from('answers')
+        .where({
+          questionary_id,
+          question_id,
+        })
+        .first();
 
     const hasEntry = results && results.count !== '0';
     if (hasEntry) {

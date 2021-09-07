@@ -131,7 +131,8 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
 
 @injectable()
 class ShipmentDeclarationQuestionaryAuthorizer
-  implements QuestionaryAuthorizer {
+  implements QuestionaryAuthorizer
+{
   constructor(
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,

@@ -18,7 +18,8 @@ import {
 } from './records';
 
 export default class PostgresProposalSettingsDataSource
-  implements ProposalSettingsDataSource {
+  implements ProposalSettingsDataSource
+{
   // ----------- Proposal statuses ---------->
   private createProposalStatusObject(proposalStatus: ProposalStatusRecord) {
     return new ProposalStatus(
@@ -130,9 +131,7 @@ export default class PostgresProposalSettingsDataSource
   async createProposalWorkflow(
     args: CreateProposalWorkflowInput
   ): Promise<ProposalWorkflow> {
-    const [
-      proposalWorkflowRecord,
-    ]: ProposalWorkflowRecord[] = await database
+    const [proposalWorkflowRecord]: ProposalWorkflowRecord[] = await database
       .insert(args)
       .into('proposal_workflows')
       .returning('*');
@@ -366,26 +365,27 @@ export default class PostgresProposalSettingsDataSource
   ): Promise<ProposalWorkflowConnection> {
     const [
       proposalWorkflowConnectionRecord,
-    ]: (ProposalWorkflowConnectionRecord &
-      ProposalStatusRecord)[] = await database
-      .insert({
-        proposal_workflow_id: newProposalWorkflowStatusInput.proposalWorkflowId,
-        proposal_status_id: newProposalWorkflowStatusInput.proposalStatusId,
-        next_proposal_status_id:
-          newProposalWorkflowStatusInput.nextProposalStatusId,
-        prev_proposal_status_id:
-          newProposalWorkflowStatusInput.prevProposalStatusId,
-        sort_order: newProposalWorkflowStatusInput.sortOrder,
-        droppable_group_id: newProposalWorkflowStatusInput.droppableGroupId,
-        parent_droppable_group_id:
-          newProposalWorkflowStatusInput.parentDroppableGroupId,
-      })
-      .into('proposal_workflow_connections as pwc')
-      .returning('*')
-      .join('proposal_statuses as ps', {
-        'ps.proposal_status_id':
-          newProposalWorkflowStatusInput.proposalStatusId,
-      });
+    ]: (ProposalWorkflowConnectionRecord & ProposalStatusRecord)[] =
+      await database
+        .insert({
+          proposal_workflow_id:
+            newProposalWorkflowStatusInput.proposalWorkflowId,
+          proposal_status_id: newProposalWorkflowStatusInput.proposalStatusId,
+          next_proposal_status_id:
+            newProposalWorkflowStatusInput.nextProposalStatusId,
+          prev_proposal_status_id:
+            newProposalWorkflowStatusInput.prevProposalStatusId,
+          sort_order: newProposalWorkflowStatusInput.sortOrder,
+          droppable_group_id: newProposalWorkflowStatusInput.droppableGroupId,
+          parent_droppable_group_id:
+            newProposalWorkflowStatusInput.parentDroppableGroupId,
+        })
+        .into('proposal_workflow_connections as pwc')
+        .returning('*')
+        .join('proposal_statuses as ps', {
+          'ps.proposal_status_id':
+            newProposalWorkflowStatusInput.proposalStatusId,
+        });
 
     if (!proposalWorkflowConnectionRecord) {
       throw new Error('Could not create proposal workflow status');
@@ -511,11 +511,10 @@ export default class PostgresProposalSettingsDataSource
       .where('proposal_workflow_connection_id', proposalWorkflowConnectionId)
       .del();
 
-    const statusChangingEventsResult: StatusChangingEventRecord[] = await database(
-      'status_changing_events'
-    )
-      .insert(eventsToInsert)
-      .returning(['*']);
+    const statusChangingEventsResult: StatusChangingEventRecord[] =
+      await database('status_changing_events')
+        .insert(eventsToInsert)
+        .returning(['*']);
 
     return (
       statusChangingEventsResult?.map((statusChangingEventResult) =>
@@ -539,19 +538,18 @@ export default class PostgresProposalSettingsDataSource
   }
 
   async getProposalNextStatus(proposalPk: number, event: Event) {
-    const currentProposalWorkflowConnection: ProposalWorkflowConnectionRecord = await database(
-      'proposals'
-    )
-      .select(['pwc.*'])
-      .join('call', {
-        'call.call_id': 'proposals.call_id',
-      })
-      .join('proposal_workflow_connections as pwc', {
-        'pwc.proposal_workflow_id': 'call.proposal_workflow_id',
-        'pwc.proposal_status_id': 'proposals.status_id',
-      })
-      .where('proposal_pk', proposalPk)
-      .first();
+    const currentProposalWorkflowConnection: ProposalWorkflowConnectionRecord =
+      await database('proposals')
+        .select(['pwc.*'])
+        .join('call', {
+          'call.call_id': 'proposals.call_id',
+        })
+        .join('proposal_workflow_connections as pwc', {
+          'pwc.proposal_workflow_id': 'call.proposal_workflow_id',
+          'pwc.proposal_status_id': 'proposals.status_id',
+        })
+        .where('proposal_pk', proposalPk)
+        .first();
 
     if (!currentProposalWorkflowConnection) {
       return null;
