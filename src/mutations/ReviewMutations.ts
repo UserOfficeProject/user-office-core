@@ -103,10 +103,11 @@ export default class ReviewMutations {
 
         let nextProposalStatus = null;
         if (args.status === ReviewStatus.SUBMITTED) {
-          nextProposalStatus = await this.proposalSettingsDataSource.getProposalNextStatus(
-            review.proposalPk,
-            event
-          );
+          nextProposalStatus =
+            await this.proposalSettingsDataSource.getProposalNextStatus(
+              review.proposalPk,
+              event
+            );
         }
 
         return new ReviewWithNextProposalStatus(

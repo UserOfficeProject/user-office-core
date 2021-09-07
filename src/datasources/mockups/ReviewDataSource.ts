@@ -6,16 +6,8 @@ import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReview
 import { ReviewDataSource } from '../ReviewDataSource';
 
 export const dummyReview = new Review(4, 10, 1, 'Good proposal', 9, 0, 1);
-export const dummyReviewWithNextProposalStatus = new ReviewWithNextProposalStatus(
-  4,
-  10,
-  1,
-  'Good proposal',
-  9,
-  0,
-  1,
-  null
-);
+export const dummyReviewWithNextProposalStatus =
+  new ReviewWithNextProposalStatus(4, 10, 1, 'Good proposal', 9, 0, 1, null);
 
 export const dummyReviewBad = new Review(1, 9, 1, 'bad proposal', 1, 0, 1);
 

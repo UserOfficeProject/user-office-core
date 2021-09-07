@@ -210,9 +210,8 @@ export class StfcUserDataSource implements UserDataSource {
     roles.push(userRole);
 
     stfcRoles.forEach((stfcRole: stfcRole) => {
-      const essRoleDefinition:
-        | Roles
-        | undefined = stfcRolesToEssRoleDefinitions.get(stfcRole.name);
+      const essRoleDefinition: Roles | undefined =
+        stfcRolesToEssRoleDefinitions.get(stfcRole.name);
       if (essRoleDefinition) {
         const essRole: Role | undefined = roleDefinitions.find(
           (role) => role.shortCode == essRoleDefinition
@@ -331,9 +330,8 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getProposalUsers(proposalPk: number): Promise<BasicUserDetails[]> {
-    const users: BasicUserDetails[] = await postgresUserDataSource.getProposalUsers(
-      proposalPk
-    );
+    const users: BasicUserDetails[] =
+      await postgresUserDataSource.getProposalUsers(proposalPk);
     const userNumbers: string[] = users.map((user) => String(user.id));
 
     const stfcBasicPeople: StfcBasicPersonDetails[] | null = (

@@ -35,10 +35,11 @@ export default function createHandler() {
       eventType: Event,
       proposal: WorkflowEngineProposalType
     ) => {
-      const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposal(
-        eventType,
-        proposal.primaryKey
-      );
+      const allProposalEvents =
+        await proposalDataSource.markEventAsDoneOnProposal(
+          eventType,
+          proposal.primaryKey
+        );
 
       const updatedProposals = await workflowEngine({
         ...proposal,
@@ -462,9 +463,10 @@ export default function createHandler() {
       case Event.CALL_REVIEW_ENDED:
       case Event.CALL_SEP_REVIEW_ENDED:
         try {
-          const allProposalsOnCall = await proposalDataSource.getProposalsFromView(
-            { callId: event.call.id }
-          );
+          const allProposalsOnCall =
+            await proposalDataSource.getProposalsFromView({
+              callId: event.call.id,
+            });
 
           if (allProposalsOnCall && allProposalsOnCall.length) {
             await Promise.all(

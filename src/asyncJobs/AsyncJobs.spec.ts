@@ -112,9 +112,8 @@ describe('Test if predefined async jobs are running correctly', () => {
 
   it('Should run callSEPReviewEnded job once in 24 hours', (done) => {
     const functionWithMockedDataSource = async () => {
-      const callsWithEndedSEPReview = await checkCallsSEPReviewEndedJob.functionToRun(
-        callDataSourceMock
-      );
+      const callsWithEndedSEPReview =
+        await checkCallsSEPReviewEndedJob.functionToRun(callDataSourceMock);
 
       expect(callsWithEndedSEPReview.length).toBeGreaterThan(0);
 
