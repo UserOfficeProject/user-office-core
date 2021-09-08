@@ -26,8 +26,7 @@ import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { VisitAuthorization } from '../utils/VisitAuthorization';
-import enableDefaultStfcFeatures from './stfc/enableDefaultStfcFeatures';
-import setStfcColourTheme from './stfc/setStfcColourTheme';
+import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
@@ -62,6 +61,4 @@ mapClass(Tokens.MailService, SMTPMailService);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 
-mapValue(Tokens.EnableDefaultFeatures, enableDefaultStfcFeatures);
-
-mapValue(Tokens.SetColourTheme, setStfcColourTheme);
+mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);

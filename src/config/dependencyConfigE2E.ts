@@ -26,8 +26,7 @@ import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { VisitAuthorization } from '../utils/VisitAuthorization';
-import enableDefaultEssFeatures from './ess/enableDefaultEssFeatures';
-import setEssColourTheme from './ess/setEssColourTheme';
+import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
@@ -62,6 +61,4 @@ mapClass(Tokens.MailService, SkipSendMailService);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 
-mapValue(Tokens.EnableDefaultFeatures, enableDefaultEssFeatures);
-
-mapValue(Tokens.SetColourTheme, setEssColourTheme);
+mapValue(Tokens.ConfigureEnvironment, configureESSDevelopmentEnvironment);

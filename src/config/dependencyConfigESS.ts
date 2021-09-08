@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
@@ -25,10 +26,11 @@ import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { VisitAuthorization } from './../utils/VisitAuthorization';
-import enableDefaultEssFeatures from './ess/enableDefaultEssFeatures';
-import setEssColourTheme from './ess/setEssColourTheme';
+import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 mapClass(Tokens.UserAuthorization, UserAuthorization);
 mapClass(Tokens.QuestionaryAuthorization, QuestionaryAuthorization);
@@ -61,6 +63,7 @@ mapClass(Tokens.MailService, SparkPostMailService);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
 
-mapValue(Tokens.EnableDefaultFeatures, enableDefaultEssFeatures);
-
-mapValue(Tokens.SetColourTheme, setEssColourTheme);
+mapValue(
+  Tokens.ConfigureEnvironment,
+  isProduction ? () => {} : configureESSDevelopmentEnvironment
+);
