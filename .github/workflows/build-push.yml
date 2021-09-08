@@ -71,3 +71,7 @@ jobs:
             echo "Failed to trigger Gitlab pipeline: $RESULT"
             exit 1
           fi
+
+      - name: Trigger Jenkins
+        run: |
+          curl -k -l -u ${{ secrets.STFC_CI_TRIGGER_USERNAME }}:${{ secrets.STFC_CI_TRIGGER_TOKEN }} "${{ secrets.STFC_CI_TRIGGER_BASE_URL }}/Dev_Deploy_ProposalFrontend.LatestImage/build?token=${{ secrets.STFC_CI_TRIGGER_URL_TOKEN }}"
