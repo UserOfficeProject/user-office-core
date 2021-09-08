@@ -57,9 +57,9 @@ const RoleTable: React.FC<RoleTableProps> = ({ add, activeRoles }) => {
         options={{
           search: true,
           selection: true,
-          selectionProps: (rowdata: any) => ({
+          selectionProps: (rowData: Role) => ({
             inputProps: {
-              'aria-label': `${rowdata.title}-select`,
+              'aria-label': `${rowData.title}-select`,
             },
           }),
         }}
