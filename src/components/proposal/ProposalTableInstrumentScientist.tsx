@@ -288,9 +288,9 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           selection: true,
           debounceInterval: 400,
           columnsButton: true,
-          selectionProps: (rowdata: any) => ({
+          selectionProps: (rowData: Proposal) => ({
             inputProps: {
-              'aria-label': `${rowdata.title}-select`,
+              'aria-label': `${rowData.title}-select`,
             },
           }),
         }}

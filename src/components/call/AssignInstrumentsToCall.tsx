@@ -81,9 +81,9 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
           search: true,
           selection: true,
           debounceInterval: 400,
-          selectionProps: (rowdata: any) => ({
+          selectionProps: (rowData: InstrumentWithAvailabilityTime) => ({
             inputProps: {
-              'aria-label': `${rowdata.name}-${rowdata.shortCode}-select`,
+              'aria-label': `${rowData.name}-${rowData.shortCode}-select`,
             },
           }),
         }}

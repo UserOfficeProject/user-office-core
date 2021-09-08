@@ -373,9 +373,9 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         options={{
           search: false,
           selection: true,
-          selectionProps: (rowdata: any) => ({
+          selectionProps: (rowData: UserWithReview) => ({
             inputProps: {
-              'aria-label': `${rowdata.title}-select`,
+              'aria-label': `${rowData.title}-select`,
             },
           }),
         }}
