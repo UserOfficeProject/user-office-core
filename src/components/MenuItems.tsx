@@ -132,6 +132,9 @@ const TemplateMenuListItem = () => {
   const context = useContext(FeatureContext);
   const isShipmentFeatureEnabled = !!context.features.get(FeatureId.SHIPPING)
     ?.isEnabled;
+  const isRiskAssessmentFeatureEnabled = !!context.features.get(
+    FeatureId.RISK_ASSESSMENT
+  )?.isEnabled;
   function toggleExpand() {
     setIsExpanded(!isExpanded);
   }
@@ -198,17 +201,19 @@ const TemplateMenuListItem = () => {
             <ListItemText primary="Visit" />
           </ListItem>
         </Tooltip>
-        <Tooltip title="Risk assessment">
-          <ListItem component={NavLink} to="/RiskAssessmentTemplates" button>
-            <ListItemIcon>
-              <RiskAssessmentIcon />
-            </ListItemIcon>
-            <ListItemText
-              primary="Risk assessment"
-              title="Risk assessment templates"
-            />
-          </ListItem>
-        </Tooltip>
+        {isRiskAssessmentFeatureEnabled && (
+          <Tooltip title="Risk assessment">
+            <ListItem component={NavLink} to="/RiskAssessmentTemplates" button>
+              <ListItemIcon>
+                <RiskAssessmentIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Risk assessment"
+                title="Risk assessment templates"
+              />
+            </ListItem>
+          </Tooltip>
+        )}
       </Collapse>
     </>
   );
