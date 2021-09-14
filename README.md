@@ -15,4 +15,3 @@ Lints typescript code and log if there are any errors.<br>
 ## Contribution and release versioning
 
 Please reffer to the [Contribution guide](CONTRIBUTING.md) to get information about contributing and versioning.
-
