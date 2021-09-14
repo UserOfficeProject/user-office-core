@@ -13,14 +13,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export function ActionButtonContainer(
-  props: PropsWithChildren<Record<string, unknown>>
-) {
+export function ActionButtonContainer({
+  children,
+  ...rest
+}: PropsWithChildren<Record<string, unknown>>) {
   const classes = useStyles();
 
   return (
-    <ButtonContainer className={classes.buttonContainer}>
-      {props.children}
+    <ButtonContainer className={classes.buttonContainer} {...rest}>
+      {children}
     </ButtonContainer>
   );
 }
