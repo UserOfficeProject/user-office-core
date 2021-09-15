@@ -96,7 +96,8 @@ export default function TemplateQuestionEditor(props: {
       : 'inherit',
     outlineOffset: '-1px',
     transitionDuration: '300ms',
-    margin: '0',
+    margin: '0 0 1px 0',
+    borderTop: '1px solid white',
     backgroundColor: isDragging
       ? theme.palette.grey[200]
       : isHover

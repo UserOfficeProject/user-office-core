@@ -12,6 +12,7 @@ const createProposal = (
   cy.contains('New Proposal').click();
 
   if (call) {
+    cy.get('body').click(0, 0); // fix for flaky test where item can't be clicked if tooltip is visible
     cy.get('[data-cy=call-list]').contains(call).click();
   }
 

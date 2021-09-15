@@ -75,6 +75,7 @@ function QuestionPickerFilter({ onChange }: QuestionPickerProps) {
               }, 500)
             );
           }}
+          autoFocus
         />
       </FormControl>
       <FormControl fullWidth className={classes.formItem}>
