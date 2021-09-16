@@ -227,7 +227,9 @@ export function TemplatesTable({
         }
         columns={columns}
         isLoading={loadingTemplates}
-        data={templates}
+        data={templates.map((template) =>
+          Object.assign(template, { id: template.templateId })
+        )}
         actions={[
           {
             icon: EditIconComponent,

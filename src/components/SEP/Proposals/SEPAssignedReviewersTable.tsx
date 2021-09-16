@@ -97,7 +97,10 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
         icons={tableIcons}
         columns={assignmentColumns}
         title={'Assigned reviewers'}
-        data={sepProposal.assignments as SepAssignment[]}
+        data={(sepProposal.assignments as SepAssignment[]).map(
+          (sepAssignment) =>
+            Object.assign(sepAssignment, { id: sepAssignment.sepMemberUserId })
+        )}
         editable={
           hasAccessRights
             ? {

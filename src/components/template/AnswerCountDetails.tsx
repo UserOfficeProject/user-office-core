@@ -23,7 +23,9 @@ function ProposalList({ question }: { question: QuestionWithUsage }) {
         { title: 'ID', field: 'proposalId' },
         { title: 'Title', field: 'title' },
       ]}
-      data={proposalsData}
+      data={proposalsData.map((proposal) =>
+        Object.assign(proposal, { id: proposal.primaryKey })
+      )}
       title="Proposals"
       options={{ paging: false }}
     />

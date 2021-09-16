@@ -56,14 +56,17 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     },
   ];
 
-  const SEPInstrumentProposalsTableComponent = (
-    instrument: InstrumentWithAvailabilityTime
-  ) => (
-    <SEPInstrumentProposalsTable
-      sepId={sepId}
-      sepInstrument={instrument}
-      selectedCallId={selectedCallId}
-    />
+  const SEPInstrumentProposalsTableComponent = React.useCallback(
+    ({ rowData }) => {
+      return (
+        <SEPInstrumentProposalsTable
+          sepId={sepId}
+          sepInstrument={rowData}
+          selectedCallId={selectedCallId}
+        />
+      );
+    },
+    [sepId, selectedCallId]
   );
 
   const submitInstrument = async (
@@ -161,8 +164,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         detailPanel={[
           {
             tooltip: 'Show proposals',
-            render: ({ rowData }) =>
-              SEPInstrumentProposalsTableComponent(rowData),
+            render: SEPInstrumentProposalsTableComponent,
           },
         ]}
         options={{

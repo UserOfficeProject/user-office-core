@@ -385,7 +385,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                 </Typography>
               }
               columns={columns}
-              data={SEPReviewersData ?? []}
+              data={(SEPReviewersData ?? []).map((sepReviewer) =>
+                Object.assign(sepReviewer, { id: sepReviewer.userId })
+              )}
               editable={
                 hasAccessRights
                   ? {

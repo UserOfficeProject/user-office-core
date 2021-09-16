@@ -467,7 +467,9 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         icons={tableIcons}
         columns={assignmentColumns}
         title={'Assigned reviewers'}
-        data={sortedProposalsWithAverageScore}
+        data={sortedProposalsWithAverageScore.map((proposal) =>
+          Object.assign(proposal, { id: proposal.proposalPk })
+        )}
         isLoading={loadingInstrumentProposals || savingOrder}
         components={{
           Row: RowDraggableComponent,

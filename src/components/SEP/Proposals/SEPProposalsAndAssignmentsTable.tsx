@@ -145,47 +145,6 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     );
   };
 
-  const removeAssignedReviewer = async (
-    assignedReviewer: SepAssignment,
-    proposalPk: number
-  ): Promise<void> => {
-    /**
-     * TODO(asztalos): merge `removeMemberFromSEPProposal` and `removeUserForReview` (same goes for creation)
-     *                otherwise if one of them fails we may end up with an broken state
-     */
-    await api('Reviewer removed').removeMemberFromSEPProposal({
-      proposalPk,
-      sepId,
-      memberId: assignedReviewer.sepMemberUserId as number,
-    });
-
-    assignedReviewer.review &&
-      (await api().removeUserForReview({
-        reviewId: assignedReviewer.review.id,
-        sepId,
-      }));
-
-    setSEPProposalsData((sepProposalData) =>
-      sepProposalData.map((proposalItem) => {
-        if (proposalItem.proposalPk === proposalPk) {
-          const newAssignments =
-            proposalItem.assignments?.filter(
-              (oldAssignment) =>
-                oldAssignment.sepMemberUserId !==
-                assignedReviewer.sepMemberUserId
-            ) || [];
-
-          return {
-            ...proposalItem,
-            assignments: newAssignments,
-          };
-        } else {
-          return proposalItem;
-        }
-      })
-    );
-  };
-
   const assignMemberToSEPProposal = async (
     assignedMembers: SepAssignedMember[]
   ) => {
@@ -251,60 +210,108 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     (assignment) => assignment.proposalPk === proposalPk
   )?.assignments;
 
-  const updateReviewStatusAndGrade = (
-    sepProposalData: SEPProposalType[],
-    editingProposalData: SEPProposalType,
-    currentAssignment: SepAssignment
-  ) => {
-    const newProposalsData =
-      sepProposalData?.map((sepProposalsData) => {
-        if (sepProposalsData.proposalPk === editingProposalData.proposalPk) {
-          const editingProposalStatus = (currentAssignment.review as ReviewWithNextProposalStatus)
-            .nextProposalStatus
-            ? ((currentAssignment.review as ReviewWithNextProposalStatus)
-                .nextProposalStatus as ProposalStatus)
-            : editingProposalData.proposal.status;
+  const ReviewersTable = React.useCallback(
+    ({ rowData }: Record<'rowData', SEPProposalType>) => {
+      const updateReviewStatusAndGrade = (
+        sepProposalData: SEPProposalType[],
+        editingProposalData: SEPProposalType,
+        currentAssignment: SepAssignment
+      ) => {
+        const newProposalsData =
+          sepProposalData?.map((sepProposalsData) => {
+            if (
+              sepProposalsData.proposalPk === editingProposalData.proposalPk
+            ) {
+              const editingProposalStatus = (currentAssignment.review as ReviewWithNextProposalStatus)
+                .nextProposalStatus
+                ? ((currentAssignment.review as ReviewWithNextProposalStatus)
+                    .nextProposalStatus as ProposalStatus)
+                : editingProposalData.proposal.status;
 
-          return {
-            ...editingProposalData,
-            proposal: {
-              ...editingProposalData.proposal,
-              status: editingProposalStatus,
-            },
-            assignments:
-              editingProposalData.assignments?.map((proposalAssignment) => {
-                if (
-                  proposalAssignment?.review?.id ===
-                  currentAssignment?.review?.id
-                ) {
-                  return currentAssignment;
-                } else {
-                  return proposalAssignment;
-                }
-              }) ?? [],
-          };
-        } else {
-          return sepProposalsData;
-        }
-      }) || [];
+              return {
+                ...editingProposalData,
+                proposal: {
+                  ...editingProposalData.proposal,
+                  status: editingProposalStatus,
+                },
+                assignments:
+                  editingProposalData.assignments?.map((proposalAssignment) => {
+                    if (
+                      proposalAssignment?.review?.id ===
+                      currentAssignment?.review?.id
+                    ) {
+                      return currentAssignment;
+                    } else {
+                      return proposalAssignment;
+                    }
+                  }) ?? [],
+              };
+            } else {
+              return sepProposalsData;
+            }
+          }) || [];
 
-    return newProposalsData;
-  };
+        return newProposalsData;
+      };
 
-  const ReviewersTable = (rowData: SEPProposalType) => (
-    <SEPAssignedReviewersTable
-      sepProposal={rowData}
-      removeAssignedReviewer={removeAssignedReviewer}
-      updateView={(currentAssignment) => {
+      const removeAssignedReviewer = async (
+        assignedReviewer: SepAssignment,
+        proposalPk: number
+      ): Promise<void> => {
+        /**
+         * TODO(asztalos): merge `removeMemberFromSEPProposal` and `removeUserForReview` (same goes for creation)
+         *                otherwise if one of them fails we may end up with an broken state
+         */
+        await api('Reviewer removed').removeMemberFromSEPProposal({
+          proposalPk,
+          sepId,
+          memberId: assignedReviewer.sepMemberUserId as number,
+        });
+
+        assignedReviewer.review &&
+          (await api().removeUserForReview({
+            reviewId: assignedReviewer.review.id,
+            sepId,
+          }));
+
         setSEPProposalsData((sepProposalData) =>
-          updateReviewStatusAndGrade(
-            sepProposalData,
-            rowData,
-            currentAssignment
-          )
+          sepProposalData.map((proposalItem) => {
+            if (proposalItem.proposalPk === proposalPk) {
+              const newAssignments =
+                proposalItem.assignments?.filter(
+                  (oldAssignment) =>
+                    oldAssignment.sepMemberUserId !==
+                    assignedReviewer.sepMemberUserId
+                ) || [];
+
+              return {
+                ...proposalItem,
+                assignments: newAssignments,
+              };
+            } else {
+              return proposalItem;
+            }
+          })
         );
-      }}
-    />
+      };
+
+      return (
+        <SEPAssignedReviewersTable
+          sepProposal={rowData}
+          removeAssignedReviewer={removeAssignedReviewer}
+          updateView={(currentAssignment) => {
+            setSEPProposalsData((sepProposalData) =>
+              updateReviewStatusAndGrade(
+                sepProposalData,
+                rowData,
+                currentAssignment
+              )
+            );
+          }}
+        />
+      );
+    },
+    [setSEPProposalsData, sepId, api]
   );
 
   return (
@@ -354,7 +361,9 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
                 SEP Proposals
               </Typography>
             }
-            data={initialValues}
+            data={initialValues.map((sepProposal) =>
+              Object.assign(sepProposal, { id: sepProposal.proposalPk })
+            )}
             isLoading={loadingSEPProposals}
             localization={{
               toolbar: {
@@ -364,7 +373,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
             detailPanel={[
               {
                 tooltip: 'Show Reviewers',
-                render: ({ rowData }) => ReviewersTable(rowData),
+                render: ReviewersTable,
               },
             ]}
             actions={

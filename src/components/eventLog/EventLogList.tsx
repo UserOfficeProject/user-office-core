@@ -51,7 +51,9 @@ const EventLogList: React.FC<EventLogListProps> = ({
           </Typography>
         }
         columns={columns}
-        data={eventLogsData}
+        data={eventLogsData.map((changedObject) =>
+          Object.assign(changedObject, { id: changedObject.changedObjectId })
+        )}
         isLoading={loading}
         options={{
           search: true,

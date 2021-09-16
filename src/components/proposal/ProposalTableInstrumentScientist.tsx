@@ -280,7 +280,9 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         icons={tableIcons}
         title={'Proposals'}
         columns={columns}
-        data={proposalsData}
+        data={proposalsData.map((proposal) =>
+          Object.assign(proposal, { id: proposal.primaryKey })
+        )}
         isLoading={loading}
         options={{
           search: true,

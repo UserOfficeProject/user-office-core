@@ -28,7 +28,9 @@ function TemplateCountDetails({ question }: TemplateCountDetailsProps) {
         { title: 'Description', field: 'description' },
         { title: 'Is Archived', field: 'isArchived' },
       ]}
-      data={templates}
+      data={templates.map((template) =>
+        Object.assign(template, { id: template.templateId })
+      )}
       title="Templates"
       options={{ paging: false }}
     />

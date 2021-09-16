@@ -621,7 +621,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           </Typography>
         }
         columns={columns}
-        data={preselectedProposalsData}
+        data={preselectedProposalsData.map((proposal) =>
+          Object.assign(proposal, { id: proposal.primaryKey })
+        )}
         isLoading={loading}
         onSearchChange={(searchText) => {
           setUrlQueryParams({ search: searchText ? searchText : undefined });
