@@ -40,3 +40,27 @@ export const IntStringDateBoolArray = new GraphQLScalarType({
     return undefined;
   },
 });
+
+const TZ_LESS_DATE_TIME = 'yyyy-MM-dd HH:mm:ss';
+
+function parseTzLessDateTime(value: string) {
+  return new Date(value);
+}
+
+export const TzLessDateTime = new GraphQLScalarType({
+  name: 'TzLessDateTime',
+  description: `DateTime without timezone in '${TZ_LESS_DATE_TIME}' format`,
+  serialize(value: Date) {
+    return new Date(value);
+  },
+  parseValue(value: string) {
+    return parseTzLessDateTime(value);
+  },
+  parseLiteral(ast) {
+    if (ast.kind !== Kind.STRING) {
+      return null;
+    }
+
+    return parseTzLessDateTime(ast.value);
+  },
+});
