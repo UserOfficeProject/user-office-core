@@ -71,7 +71,7 @@ export function useProposalBookingsScheduledEvents({
       .getUserProposalBookingsWithEvents({
         ...(onlyUpcoming ? { endsAfter: toTzLessDateTime(new Date()) } : null),
         status: notDraft
-          ? [ProposalBookingStatus.BOOKED, ProposalBookingStatus.CLOSED]
+          ? [ProposalBookingStatus.ACTIVE, ProposalBookingStatus.COMPLETED]
           : null,
         instrumentId,
       })
