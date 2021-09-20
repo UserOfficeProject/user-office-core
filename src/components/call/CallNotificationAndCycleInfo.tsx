@@ -82,6 +82,7 @@ const CallCycleInfo: React.FC = () => {
         required
         fullWidth
         data-cy="cycle-comment"
+        inputProps={{ maxLength: '100' }}
       />
     </>
   );
