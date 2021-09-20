@@ -1726,7 +1726,7 @@ export type ProposalBookingScheduledEventsArgs = {
 };
 
 export enum ProposalBookingFinalizeAction {
-  CLOSE = 'CLOSE',
+  COMPLETE = 'COMPLETE',
   RESTART = 'RESTART'
 }
 
@@ -1744,8 +1744,8 @@ export type ProposalBookingScheduledEventFilter = {
 
 export enum ProposalBookingStatus {
   DRAFT = 'DRAFT',
-  BOOKED = 'BOOKED',
-  CLOSED = 'CLOSED'
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED'
 }
 
 export enum ProposalEndStatus {
