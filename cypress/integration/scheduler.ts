@@ -125,7 +125,7 @@ context('Scheduler tests', () => {
     cy.contains('No records to display');
   });
 
-  it('User should be able to see upcoming experiments in BOOKED', () => {
+  it('User should be able to see upcoming experiments in ACTIVE', () => {
     cy.activateBooking(1);
 
     cy.login('user');
@@ -140,7 +140,7 @@ context('Scheduler tests', () => {
     cy.logout();
   });
 
-  it('Instrument scientist should be able to see upcoming experiments in BOOKED', () => {
+  it('Instrument scientist should be able to see upcoming experiments in ACTIVE', () => {
     cy.login('user');
     cy.changeActiveRole('Instrument Scientist');
 
@@ -155,7 +155,7 @@ context('Scheduler tests', () => {
     cy.logout();
   });
 
-  it('User should be able to see upcoming experiments in CLOSED', () => {
+  it('User should be able to see upcoming experiments in COMPLETE', () => {
     const query = `
       mutation finalizeProposalBooking($id: Int!, $action: ProposalBookingFinalizeAction!) {
           finalizeProposalBooking(id: $id, action: $action) {
@@ -168,7 +168,7 @@ context('Scheduler tests', () => {
       headers: { authorization: authHeader },
     }).rawRequest(query, {
       id: 1,
-      action: 'CLOSE',
+      action: 'COMPLETE',
     });
 
     cy.wrap(request);
