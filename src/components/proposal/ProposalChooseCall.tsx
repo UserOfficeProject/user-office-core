@@ -63,7 +63,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
             const daysRemainingText = getDaysRemainingText(daysRemainingNum);
 
             const header =
-              call.title === null ? (
+              call.title === null || call.title === '' ? (
                 <Typography variant="h6" component="h3">
                   {call.shortCode}
                 </Typography>
@@ -90,10 +90,10 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
                         )} ${daysRemainingText}`}
                       </Typography>
                       <Typography component="div">
-                        {call.cycleComment}
+                        {call.description}
                       </Typography>
                       <Typography component="div">
-                        {call.description}
+                        {call.cycleComment}
                       </Typography>
                     </Fragment>
                   }
