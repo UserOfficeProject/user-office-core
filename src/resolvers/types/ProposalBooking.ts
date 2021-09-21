@@ -10,12 +10,14 @@ import {
   InputType,
 } from 'type-graphql';
 
-import { ResolverContext } from '../../../context';
-import { TzLessDateTime } from '../../CustomScalars';
-import { Proposal } from '../Proposal';
-import { ScheduledEvent } from '../ScheduledEvent';
+import { ResolverContext } from '../../context';
+import { TzLessDateTime } from '../CustomScalars';
+import { ScheduledEventCore } from './ScheduledEvent';
 
-function If(condition: boolean, decorator: MethodDecorator): MethodDecorator {
+export function If(
+  condition: boolean,
+  decorator: MethodDecorator
+): MethodDecorator {
   return (...args) => {
     if (condition) {
       return decorator(...args);
@@ -44,7 +46,7 @@ export enum EquipmentAssignmentStatus {
 }
 
 @ObjectType()
-export class ProposalBooking {
+export class ProposalBookingCore {
   @Field(() => Int)
   id: number;
 }
@@ -62,35 +64,26 @@ export class ProposalBookingScheduledEventFilter {
 }
 
 @InputType()
-export class ProposalProposalBookingFilter {
+export class ProposalBookingFilter {
   @Field(() => [ProposalBookingStatus], { nullable: true })
   status?: ProposalBookingStatus[] | null;
 }
 
-@Resolver(() => ProposalBooking)
+@Resolver(() => ProposalBookingCore)
 export class ProposalBookingResolvers {
-  @FieldResolver(() => [ScheduledEvent], { nullable: true })
+  @FieldResolver(() => [ScheduledEventCore])
   scheduledEvents(
     @Ctx() ctx: ResolverContext,
-    @Root() proposalBooking: ProposalBooking,
+    @Root() proposalBooking: ProposalBookingCore,
     @Arg('filter') filter: ProposalBookingScheduledEventFilter
-  ): Promise<ScheduledEvent[]> | null {
-    return null;
-  }
-}
-
-@Resolver(() => Proposal)
-export class ProposalExtended {
-  @If(
-    process.env.DEPENDENCY_CONFIG === 'stfc',
-    FieldResolver(() => ProposalBooking, { nullable: true })
-  )
-  async proposalBooking(
-    @Root() proposal: Proposal,
-    @Ctx() context: ResolverContext,
-    @Arg('filter', () => ProposalProposalBookingFilter, { nullable: true })
-    filter?: ProposalProposalBookingFilter
-  ): Promise<any | null> {
-    return null;
+  ): Promise<ScheduledEventCore[] | null> {
+    return ctx.queries.proposal.proposalBookingScheduledEvents(ctx.user, {
+      proposalBookingId: proposalBooking.id,
+      filter: {
+        ...filter,
+        bookingType:
+          filter.bookingType ?? ScheduledEventBookingType.USER_OPERATIONS,
+      },
+    });
   }
 }

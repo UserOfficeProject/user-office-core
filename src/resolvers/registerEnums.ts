@@ -19,12 +19,12 @@ import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { DataType, TemplateCategoryId } from '../models/Template';
 import { UserRole } from '../models/User';
 import { VisitStatus } from '../models/Visit';
+import { NumberValueConstraint } from './types/FieldConfig';
 import {
   EquipmentAssignmentStatus,
   ProposalBookingStatus,
   ScheduledEventBookingType,
-} from './types/conditionalTypes/ProposalBooking';
-import { NumberValueConstraint } from './types/FieldConfig';
+} from './types/ProposalBooking';
 
 export const registerEnums = () => {
   registerEnumType(TemplateCategoryId, { name: 'TemplateCategoryId' });

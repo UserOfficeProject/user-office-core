@@ -47,6 +47,8 @@ export enum Event {
   PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
   PROPOSAL_STATUS_CHANGED_BY_USER = 'PROPOSAL_STATUS_CHANGED_BY_USER',
   TOPIC_ANSWERED = 'TOPIC_ANSWERED',
+  PROPOSAL_BOOKING_TIME_SLOT_ADDED = 'PROPOSAL_BOOKING_TIME_SLOT_ADDED',
+  PROPOSAL_BOOKING_TIME_SLOTS_REMOVED = 'PROPOSAL_BOOKING_TIME_SLOTS_REMOVED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -192,5 +194,13 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.TOPIC_ANSWERED,
     'Event occurs when the user clicks save on a topic in any questionary',
+  ],
+  [
+    Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED,
+    'Event occurs when the new time slot is booked in the scheduler',
+  ],
+  [
+    Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED,
+    'Event occurs when the time slots are removed in the scheduler',
   ],
 ]);
