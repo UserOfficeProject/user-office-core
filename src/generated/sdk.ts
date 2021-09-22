@@ -149,11 +149,6 @@ export type BulkUpsertLostTimesInput = {
   lostTimes: Array<SimpleLostTimeInput>;
 };
 
-export type BulkUpsertScheduledEventsInput = {
-  proposalBookingId: Scalars['Int'];
-  scheduledEvents: Array<SimpleScheduledEventInput>;
-};
-
 export type Call = {
   __typename?: 'Call';
   id: Scalars['Int'];
@@ -313,6 +308,12 @@ export type DeleteProposalWorkflowStatusInput = {
   sortOrder: Scalars['Int'];
 };
 
+export type DeleteScheduledEventsInput = {
+  ids: Array<Scalars['Int']>;
+  proposalBookingId: Scalars['Int'];
+  instrumentId: Scalars['Int'];
+};
+
 export enum DependenciesLogicOperator {
   AND = 'AND',
   OR = 'OR'
@@ -454,7 +455,9 @@ export enum Event {
   PROPOSAL_CLONED = 'PROPOSAL_CLONED',
   PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
   PROPOSAL_STATUS_CHANGED_BY_USER = 'PROPOSAL_STATUS_CHANGED_BY_USER',
-  TOPIC_ANSWERED = 'TOPIC_ANSWERED'
+  TOPIC_ANSWERED = 'TOPIC_ANSWERED',
+  PROPOSAL_BOOKING_TIME_SLOT_ADDED = 'PROPOSAL_BOOKING_TIME_SLOT_ADDED',
+  PROPOSAL_BOOKING_TIME_SLOTS_REMOVED = 'PROPOSAL_BOOKING_TIME_SLOTS_REMOVED'
 }
 
 export type EventLog = {
@@ -756,7 +759,7 @@ export type Mutation = {
   addEquipmentResponsible: Scalars['Boolean'];
   bulkUpsertLostTimes: LostTimesResponseWrap;
   createScheduledEvent: ScheduledEventResponseWrap;
-  bulkUpsertScheduledEvents: ScheduledEventsResponseWrap;
+  deleteScheduledEvents: ScheduledEventsResponseWrap;
   updateScheduledEvent: ScheduledEventResponseWrap;
   activateScheduledEvent: ScheduledEventResponseWrap;
   finalizeScheduledEvent: ScheduledEventResponseWrap;
@@ -1539,8 +1542,8 @@ export type MutationCreateScheduledEventArgs = {
 };
 
 
-export type MutationBulkUpsertScheduledEventsArgs = {
-  bulkUpsertScheduledEvents: BulkUpsertScheduledEventsInput;
+export type MutationDeleteScheduledEventsArgs = {
+  deleteScheduledEventsInput: DeleteScheduledEventsInput;
 };
 
 
@@ -1580,6 +1583,7 @@ export type NewScheduledEventInput = {
   endsAt: Scalars['TzLessDateTime'];
   description?: Maybe<Scalars['String']>;
   instrumentId: Scalars['Int'];
+  proposalBookingId?: Maybe<Scalars['Int']>;
 };
 
 export type NextProposalStatus = {
@@ -2746,7 +2750,7 @@ export type ScheduledEventResponseWrap = {
 export type ScheduledEventsResponseWrap = {
   __typename?: 'ScheduledEventsResponseWrap';
   error: Maybe<Scalars['String']>;
-  scheduledEvent: Maybe<Array<ScheduledEvent>>;
+  scheduledEvents: Maybe<Array<ScheduledEvent>>;
 };
 
 export type SchedulerConfig = {
@@ -2858,13 +2862,6 @@ export type SimpleLostTimeInput = {
   endsAt: Scalars['TzLessDateTime'];
   newlyCreated?: Maybe<Scalars['Boolean']>;
   scheduledEventId?: Maybe<Scalars['Int']>;
-};
-
-export type SimpleScheduledEventInput = {
-  id: Scalars['Int'];
-  startsAt: Scalars['TzLessDateTime'];
-  endsAt: Scalars['TzLessDateTime'];
-  newlyCreated?: Maybe<Scalars['Boolean']>;
 };
 
 export type StatusChangingEvent = {
