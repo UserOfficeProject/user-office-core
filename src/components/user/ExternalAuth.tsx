@@ -26,7 +26,6 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
   const sessionId: string = !!values.sessionid
     ? values.sessionid.toString()
     : match.params.sessionId;
-  console.log(sessionId);
 
   const isFirstRun = useRef<boolean>(true);
 
@@ -52,14 +51,13 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
           window.location.href = '/';
         } else {
           if (EXTERNAL_AUTH_LOGIN_URL) {
-            // window.location.href = EXTERNAL_AUTH_LOGIN_URL;
-            return <p>Redirected back {sessionId}</p>;
+            window.location.href = EXTERNAL_AUTH_LOGIN_URL;
           }
         }
       });
   }, [token, handleLogin, sessionId, unauthorizedApi, EXTERNAL_AUTH_LOGIN_URL]);
 
-  return <p>Logging in with external service... SessionID: {sessionId}</p>;
+  return <p>Logging in with external service... </p>;
 };
 
 ExternalAuth.propTypes = ExternalAuthPropTypes;
