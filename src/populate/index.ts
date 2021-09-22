@@ -161,6 +161,8 @@ const createCalls = async () => {
       proposalWorkflowId: 1,
       templateId: dummy.positiveNumber(MAX_TEMPLATES),
       allocationTimeUnit: AllocationTimeUnits.Day,
+      title: faker.random.words(8),
+      description: faker.random.words(10),
     });
   }, MAX_CALLS);
 };

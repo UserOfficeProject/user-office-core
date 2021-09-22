@@ -68,6 +68,12 @@ export class CreateCallInput {
 
   @Field(() => Int)
   public templateId: number;
+
+  @Field({ nullable: true })
+  public title: string;
+
+  @Field({ nullable: true })
+  public description: string;
 }
 
 @Resolver()
