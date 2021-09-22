@@ -794,6 +794,28 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
   }
 
+  async updateProposalBookingScheduledEvent(
+    eventToUpdate: ScheduledEventCore
+  ): Promise<void> {
+    const [updatedScheduledEvent]: ScheduledEventRecord[] = await database(
+      'scheduled_events'
+    )
+      .update({
+        starts_at: eventToUpdate.startsAt,
+        ends_at: eventToUpdate.endsAt,
+        status: eventToUpdate.status,
+      })
+      .where('scheduled_event_id', eventToUpdate.id)
+      .andWhere('proposal_booking_id', eventToUpdate.proposalBookingId)
+      .returning(['*']);
+
+    if (!updatedScheduledEvent) {
+      throw new Error(
+        `Failed to add proposal booking scheduled event '${eventToUpdate.id}'`
+      );
+    }
+  }
+
   async removeProposalBookingScheduledEvents(
     eventMessage: ScheduledEventCore[]
   ): Promise<void> {

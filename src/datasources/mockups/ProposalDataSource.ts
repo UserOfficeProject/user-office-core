@@ -297,4 +297,10 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   ): Promise<void> {
     // Not implemented
   }
+
+  async updateProposalBookingScheduledEvent(
+    eventMessage: ScheduledEventCore
+  ): Promise<void> {
+    // Not implemented
+  }
 }

@@ -257,6 +257,7 @@ export function createListenToRabbitMQHandler() {
             message,
           }
         );
+
         const scheduledEventToAdd = {
           id: message.id,
           bookingType: message.bookingType,
@@ -294,6 +295,29 @@ export function createListenToRabbitMQHandler() {
 
         await proposalDataSource.removeProposalBookingScheduledEvents(
           scheduledEventsToRemove
+        );
+
+        return;
+
+      case Event.PROPOSAL_BOOKING_TIME_ACTIVATED:
+      case Event.PROPOSAL_BOOKING_TIME_COMPLETED:
+        logger.logDebug(
+          `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
+          {
+            type,
+            message,
+          }
+        );
+        const scheduledEventToUpdate = {
+          id: message.id,
+          proposalBookingId: message.proposalBookingId,
+          startsAt: message.startsAt,
+          endsAt: message.endsAt,
+          status: message.status,
+        };
+
+        await proposalDataSource.updateProposalBookingScheduledEvent(
+          scheduledEventToUpdate as ScheduledEventCore
         );
 
         return;

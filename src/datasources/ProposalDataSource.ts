@@ -79,4 +79,7 @@ export interface ProposalDataSource {
   removeProposalBookingScheduledEvents(
     eventMessage: ScheduledEventCore[]
   ): Promise<void>;
+  updateProposalBookingScheduledEvent(
+    eventMessage: ScheduledEventCore
+  ): Promise<void>;
 }
