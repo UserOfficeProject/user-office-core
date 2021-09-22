@@ -1322,6 +1322,7 @@ export type MutationCheckExternalTokenArgs = {
 
 
 export type MutationCloneSampleArgs = {
+  title?: Maybe<Scalars['String']>;
   sampleId: Scalars['Int'];
 };
 
@@ -5341,6 +5342,7 @@ export type UpdateRiskAssessmentMutation = (
 
 export type CloneSampleMutationVariables = Exact<{
   sampleId: Scalars['Int'];
+  title?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -9457,8 +9459,8 @@ export const UpdateRiskAssessmentDocument = gql`
 ${SampleFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const CloneSampleDocument = gql`
-    mutation cloneSample($sampleId: Int!) {
-  cloneSample(sampleId: $sampleId) {
+    mutation cloneSample($sampleId: Int!, $title: String) {
+  cloneSample(sampleId: $sampleId, title: $title) {
     sample {
       ...sample
       questionary {

@@ -68,6 +68,7 @@ export function QuestionnairesListItem(props: {
           edge="start"
           aria-label="clone"
           data-cy="clone"
+          title="Copy"
           onClick={(e: MouseEvent) => {
             e.stopPropagation();
             props.onCloneClick(props.record);
@@ -81,6 +82,7 @@ export function QuestionnairesListItem(props: {
           edge="end"
           aria-label="delete"
           data-cy="delete"
+          title="Remove"
           onClick={(e: MouseEvent) => {
             e.stopPropagation();
             props.onDeleteClick(props.record);
