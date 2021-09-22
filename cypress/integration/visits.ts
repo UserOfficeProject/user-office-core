@@ -29,8 +29,11 @@ context('visits tests', () => {
     cy.createScheduledEvent(1, {
       startsAt: `${eventDate} 10:00`,
       endsAt: `${eventDate} 11:00`,
+    }).then((data: any) => {
+      cy.activateScheduledEvent(
+        data.data.createScheduledEvent.scheduledEvent.id
+      );
     });
-    cy.activateBooking(1);
   });
 
   beforeEach(() => {

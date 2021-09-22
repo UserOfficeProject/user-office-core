@@ -24,6 +24,9 @@ context('Scheduler tests', () => {
 
   const proposalTitle = faker.random.words(2);
 
+  let firstScheduledEventId: number;
+  let secondScheduledEventId: number;
+
   before(() => {
     cy.resetDB();
     cy.resetSchedulerDB(true);
@@ -70,37 +73,18 @@ context('Scheduler tests', () => {
   });
 
   it('User should not be able to see upcoming experiments in DRAFT state', () => {
-    const query = `
-      mutation bulkUpsertScheduledEvents($input: BulkUpsertScheduledEventsInput!) {
-        bulkUpsertScheduledEvents(bulkUpsertScheduledEvents: $input) {
-          error
-        }
-      }
-      `;
-    const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
-    const request = new GraphQLClient('/graphql', {
-      headers: { authorization: authHeader },
-    }).rawRequest(query, {
-      input: {
-        proposalBookingId: 1,
-        scheduledEvents: [
-          {
-            id: 1,
-            newlyCreated: true,
-            startsAt: `${upcoming.startsAt}:00`,
-            endsAt: `${upcoming.endsAt}:00`,
-          },
-          {
-            id: 2,
-            newlyCreated: true,
-            startsAt: `${ended.startsAt}:00`,
-            endsAt: `${ended.endsAt}:00`,
-          },
-        ],
-      },
+    cy.createScheduledEvent(1, {
+      startsAt: upcoming.startsAt,
+      endsAt: upcoming.endsAt,
+    }).then((data: any) => {
+      firstScheduledEventId = data.data.createScheduledEvent.scheduledEvent.id;
     });
-
-    cy.wrap(request);
+    cy.createScheduledEvent(1, {
+      startsAt: ended.startsAt,
+      endsAt: ended.endsAt,
+    }).then((data: any) => {
+      secondScheduledEventId = data.data.createScheduledEvent.scheduledEvent.id;
+    });
 
     cy.login('user');
 
@@ -126,7 +110,8 @@ context('Scheduler tests', () => {
   });
 
   it('User should be able to see upcoming experiments in ACTIVE', () => {
-    cy.activateBooking(1);
+    cy.activateScheduledEvent(firstScheduledEventId);
+    cy.activateScheduledEvent(secondScheduledEventId);
 
     cy.login('user');
 
