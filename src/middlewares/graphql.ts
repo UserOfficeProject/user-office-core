@@ -46,7 +46,10 @@ const apolloServer = async (app: Express) => {
   );
 
   schema = applyMiddleware(schema, rejectionLogger);
-  if (process.env.NODE_ENV === 'production') {
+
+  const env = process.env.NODE_ENV;
+
+  if (env === 'production') {
     // prevent exposing too much information when running in production
     schema = applyMiddleware(schema, rejectionSanitizer);
   }
@@ -55,9 +58,10 @@ const apolloServer = async (app: Express) => {
     schema: schema,
     tracing: false,
     // Explicitly disable playground in prod
-    playground: process.env.NODE_ENV !== 'production'
-      ? {settings: {'schema.polling.enable': false}}
-      : false,
+    playground:
+      env !== 'production'
+        ? { settings: { 'schema.polling.enable': false } }
+        : false,
     plugins: [ApolloServerPluginInlineTraceDisabled()],
 
     context: async ({ req }: { req: Req }) => {
