@@ -1215,7 +1215,7 @@ context('Template tests', () => {
     });
   });
 
-  it('should not let you create circular dependency chain', () => {
+  it('Should not let you create circular dependency chain', () => {
     cy.login('officer');
 
     cy.navigateToTemplatesSubmenu('Proposal');
