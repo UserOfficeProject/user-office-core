@@ -52,7 +52,7 @@ export class ProposalBookingCore {
 }
 
 @InputType()
-export class ProposalBookingScheduledEventFilter {
+export class ProposalBookingScheduledEventFilterCore {
   @Field(() => ScheduledEventBookingType, { nullable: true })
   bookingType?: ScheduledEventBookingType | null;
 
@@ -61,6 +61,9 @@ export class ProposalBookingScheduledEventFilter {
 
   @Field(() => TzLessDateTime, { nullable: true })
   endsBefore?: Date;
+
+  @Field(() => [ProposalBookingStatus], { nullable: true })
+  status?: ProposalBookingStatus[] | null;
 }
 
 @InputType()
@@ -75,7 +78,7 @@ export class ProposalBookingResolvers {
   scheduledEvents(
     @Ctx() ctx: ResolverContext,
     @Root() proposalBooking: ProposalBookingCore,
-    @Arg('filter') filter: ProposalBookingScheduledEventFilter
+    @Arg('filter') filter: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null> {
     return ctx.queries.proposal.proposalBookingScheduledEvents(ctx.user, {
       proposalBookingId: proposalBooking.id,

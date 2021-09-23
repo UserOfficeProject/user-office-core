@@ -12,7 +12,7 @@ import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import {
   ProposalBookingFilter,
-  ProposalBookingScheduledEventFilter,
+  ProposalBookingScheduledEventFilterCore,
   ProposalBookingStatus,
   ScheduledEventBookingType,
 } from '../../resolvers/types/ProposalBooking';
@@ -281,7 +281,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async proposalBookingScheduledEvents(
     proposalBookingId: number,
-    filter?: ProposalBookingScheduledEventFilter
+    filter?: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null> {
     return [dummyScheduledEventCore];
   }

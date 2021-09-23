@@ -13,7 +13,7 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import {
   ProposalBookingFilter,
-  ProposalBookingScheduledEventFilter,
+  ProposalBookingScheduledEventFilterCore,
 } from '../resolvers/types/ProposalBooking';
 import { omit } from '../utils/helperFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -156,7 +156,7 @@ export default class ProposalQueries {
       filter,
     }: {
       proposalBookingId: number;
-      filter?: ProposalBookingScheduledEventFilter;
+      filter?: ProposalBookingScheduledEventFilterCore;
     }
   ) {
     const proposalBookingScheduledEvents =

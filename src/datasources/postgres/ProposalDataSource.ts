@@ -11,7 +11,7 @@ import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import {
   ProposalBookingFilter,
-  ProposalBookingScheduledEventFilter,
+  ProposalBookingScheduledEventFilterCore,
 } from '../../resolvers/types/ProposalBooking';
 import { UserProposalsFilter } from '../../resolvers/types/User';
 import { ProposalDataSource } from '../ProposalDataSource';
@@ -747,7 +747,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async proposalBookingScheduledEvents(
     proposalBookingId: number,
-    filter?: ProposalBookingScheduledEventFilter
+    filter?: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null> {
     const scheduledEventRecords: ScheduledEventRecord[] =
       await database<ScheduledEventRecord>('scheduled_events')
@@ -755,6 +755,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         .where('proposal_booking_id', proposalBookingId)
         .orderBy('starts_at', 'asc')
         .modify((qb) => {
+          if (filter?.status) {
+            qb.whereIn('status', filter.status);
+          }
           if (filter?.bookingType) {
             qb.where('booking_type', filter.bookingType);
           }

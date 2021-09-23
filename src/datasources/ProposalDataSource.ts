@@ -6,7 +6,7 @@ import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import {
   ProposalBookingFilter,
-  ProposalBookingScheduledEventFilter,
+  ProposalBookingScheduledEventFilterCore,
 } from '../resolvers/types/ProposalBooking';
 import { UserProposalsFilter } from '../resolvers/types/User';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
@@ -71,7 +71,7 @@ export interface ProposalDataSource {
   ): Promise<{ id: number } | null>;
   proposalBookingScheduledEvents(
     proposalBookingId: number,
-    filter?: ProposalBookingScheduledEventFilter
+    filter?: ProposalBookingScheduledEventFilterCore
   ): Promise<ScheduledEventCore[] | null>;
   addProposalBookingScheduledEvent(
     eventMessage: ScheduledEventCore

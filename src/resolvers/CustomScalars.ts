@@ -1,4 +1,5 @@
 import { GraphQLScalarType, Kind } from 'graphql';
+import moment from 'moment';
 
 export type AnswerType = number | string | Date | boolean | number[];
 
@@ -41,17 +42,23 @@ export const IntStringDateBoolArray = new GraphQLScalarType({
   },
 });
 
-const TZ_LESS_DATE_TIME = 'yyyy-MM-dd HH:mm:ss';
+const TZ_LESS_DATE_TIME = 'yyyy-MM-DD HH:mm:ss';
 
 function parseTzLessDateTime(value: string) {
-  return new Date(value);
+  const parsed = moment(value, TZ_LESS_DATE_TIME);
+
+  if (!parsed.isValid()) {
+    throw new Error('Invalid date/format');
+  }
+
+  return parsed.toDate();
 }
 
 export const TzLessDateTime = new GraphQLScalarType({
   name: 'TzLessDateTime',
   description: `DateTime without timezone in '${TZ_LESS_DATE_TIME}' format`,
   serialize(value: Date) {
-    return new Date(value);
+    return moment(value).format(TZ_LESS_DATE_TIME);
   },
   parseValue(value: string) {
     return parseTzLessDateTime(value);
