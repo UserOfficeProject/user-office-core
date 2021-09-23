@@ -20,6 +20,7 @@ import { SampleCore } from 'models/questionary/sample/SampleCore';
 import { SampleWithQuestionary } from 'models/questionary/sample/SampleWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
+import withPrompt, { WithPromptType } from 'utils/withPrompt';
 
 import {
   QuestionnairesList,
@@ -72,12 +73,13 @@ type QuestionaryComponentSampleDeclarationProps = {
   answer: Answer;
   formikProps: FormikProps<Record<string, unknown>>;
   confirm: WithConfirmType;
+  prompt: WithPromptType;
 };
 
 function QuestionaryComponentSampleDeclaration(
   props: QuestionaryComponentSampleDeclarationProps
 ) {
-  const { answer, confirm } = props;
+  const { answer, confirm, prompt } = props;
   const answerId = answer.question.id;
   const config = answer.config as SubTemplateConfig;
   const { state } = useContext(QuestionaryContext) as ProposalContextType;
@@ -97,9 +99,9 @@ function QuestionaryComponentSampleDeclaration(
   return (
     <Field name={answerId}>
       {({ field, form }: FieldProps<SampleWithQuestionary[]>) => {
-        const copySample = (id: number) =>
+        const copySample = (id: number, title: string) =>
           api()
-            .cloneSample({ sampleId: id })
+            .cloneSample({ sampleId: id, title: title })
             .then((response) => {
               const clonedSample = response.cloneSample.sample;
               if (clonedSample) {
@@ -145,10 +147,9 @@ function QuestionaryComponentSampleDeclaration(
                 })();
               }}
               onCloneClick={(item) => {
-                confirm(() => copySample(item.id), {
-                  title: 'Copy Sample',
-                  description:
-                    'This action will copy the sample and all data associated with it',
+                prompt((answer) => copySample(item.id, answer), {
+                  question: 'Title',
+                  prefilledAnswer: `Copy of ${item.label}`,
                 })();
               }}
               onAddNewClick={() => {
@@ -237,4 +238,4 @@ function QuestionaryComponentSampleDeclaration(
   );
 }
 
-export default withConfirm(QuestionaryComponentSampleDeclaration);
+export default withConfirm(withPrompt(QuestionaryComponentSampleDeclaration));

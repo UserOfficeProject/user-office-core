@@ -141,6 +141,7 @@ const CallGeneralInfo: React.FC<{
         type="text"
         component={TextField}
         margin="normal"
+        inputProps={{ maxLength: '20' }}
         fullWidth
         required
         data-cy="short-code"
@@ -277,6 +278,28 @@ const CallGeneralInfo: React.FC<{
         label="Allocation time unit"
         items={allocationTimeUnitOptions as Option[]}
         InputProps={{ 'data-cy': 'allocation-time-unit' }}
+      />
+      <Field
+        name="title"
+        label="Title (public)"
+        id="title-input"
+        type="text"
+        component={TextField}
+        margin="normal"
+        fullWidth
+        inputProps={{ maxLength: '100' }}
+        data-cy="title"
+      />
+      <Field
+        name="description"
+        label="Description (public)"
+        id="description-input"
+        type="text"
+        component={TextField}
+        margin="normal"
+        multiline
+        fullWidth
+        data-cy="description"
       />
     </>
   );
