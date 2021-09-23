@@ -1747,7 +1747,7 @@ export type ProposalBookingCore = {
 
 
 export type ProposalBookingCoreScheduledEventsArgs = {
-  filter: ProposalBookingScheduledEventFilter;
+  filter: ProposalBookingScheduledEventFilterCore;
 };
 
 export type ProposalBookingFilter = {
@@ -1769,6 +1769,13 @@ export type ProposalBookingScheduledEventFilter = {
   bookingType?: Maybe<ScheduledEventBookingType>;
   endsAfter?: Maybe<Scalars['TzLessDateTime']>;
   endsBefore?: Maybe<Scalars['TzLessDateTime']>;
+};
+
+export type ProposalBookingScheduledEventFilterCore = {
+  bookingType?: Maybe<ScheduledEventBookingType>;
+  endsAfter?: Maybe<Scalars['TzLessDateTime']>;
+  endsBefore?: Maybe<Scalars['TzLessDateTime']>;
+  status?: Maybe<Array<ProposalBookingStatus>>;
 };
 
 export enum ProposalBookingStatus {
@@ -9164,7 +9171,7 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
         ...basicUserDetails
       }
       proposalBookingCore(filter: {status: $status}) {
-        scheduledEvents(filter: {endsAfter: $endsAfter}) {
+        scheduledEvents(filter: {endsAfter: $endsAfter, status: $status}) {
           id
           startsAt
           endsAt
