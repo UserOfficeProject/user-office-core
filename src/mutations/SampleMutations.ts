@@ -148,7 +148,11 @@ export default class SampleMutations {
   }
 
   @Authorized()
-  async cloneSample(agent: UserWithRole | null, sampleId: number) {
+  async cloneSample(
+    agent: UserWithRole | null,
+    sampleId: number,
+    title?: string
+  ) {
     if (!agent) {
       return rejection(
         'Could not clone sample because user is not authorized',
@@ -166,7 +170,7 @@ export default class SampleMutations {
       let clonedSample = await this.sampleDataSource.cloneSample(sampleId);
       clonedSample = await this.sampleDataSource.updateSample({
         sampleId: clonedSample.id,
-        title: `Copy of ${clonedSample.title}`,
+        title: title ? title : `Copy of ${clonedSample.title}`,
       });
 
       return clonedSample;

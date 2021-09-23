@@ -80,6 +80,12 @@ export class UpdateCallInput {
 
   @Field(() => Int)
   public templateId: number;
+
+  @Field({ nullable: true })
+  public title: string;
+
+  @Field({ nullable: true })
+  public description: string;
 }
 
 @InputType()
