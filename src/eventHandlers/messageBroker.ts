@@ -77,13 +77,13 @@ const rabbitMQ = new RabbitMQMessageBroker();
 
 // don't try to initialize during testing
 // causes infinite loop
-// if (process.env.NODE_ENV !== 'test') {
-rabbitMQ.setup({
-  hostname: process.env.RABBITMQ_HOSTNAME,
-  username: process.env.RABBITMQ_USERNAME,
-  password: process.env.RABBITMQ_PASSWORD,
-});
-// }
+if (process.env.NODE_ENV !== 'test') {
+  rabbitMQ.setup({
+    hostname: process.env.RABBITMQ_HOSTNAME,
+    username: process.env.RABBITMQ_USERNAME,
+    password: process.env.RABBITMQ_PASSWORD,
+  });
+}
 
 const getSecondsPerAllocationTimeUnit = (
   timeAllocation: number,
