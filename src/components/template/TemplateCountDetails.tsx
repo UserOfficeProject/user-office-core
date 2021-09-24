@@ -1,4 +1,4 @@
-import MaterialTable from 'material-table';
+import MaterialTable from '@material-table/core';
 import React, { useMemo } from 'react';
 
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
@@ -28,7 +28,9 @@ function TemplateCountDetails({ question }: TemplateCountDetailsProps) {
         { title: 'Description', field: 'description' },
         { title: 'Is Archived', field: 'isArchived' },
       ]}
-      data={templates}
+      data={templates.map((template) =>
+        Object.assign(template, { id: template.templateId })
+      )}
       title="Templates"
       options={{ paging: false }}
     />

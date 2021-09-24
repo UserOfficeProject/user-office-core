@@ -1,4 +1,4 @@
-import { Column } from 'material-table';
+import { Column } from '@material-table/core';
 import React from 'react';
 
 import { Template, TemplateCategoryId } from 'generated/sdk';

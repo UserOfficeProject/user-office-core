@@ -1,5 +1,5 @@
+import MaterialTable from '@material-table/core';
 import Button from '@material-ui/core/Button';
-import MaterialTable from 'material-table';
 import React, { useContext, useState, useEffect } from 'react';
 import { Redirect, useHistory } from 'react-router';
 

@@ -1,3 +1,4 @@
+import MaterialTable from '@material-table/core';
 import { Typography } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -6,7 +7,6 @@ import Edit from '@material-ui/icons/Edit';
 import FileCopy from '@material-ui/icons/FileCopy';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import Visibility from '@material-ui/icons/Visibility';
-import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { Redirect } from 'react-router';
