@@ -87,6 +87,7 @@ const Routes: React.FC<RouteProps> = () => {
       <div className="App">
         <Switch>
           <Route path="/external-auth/:sessionId" component={ExternalAuth} />
+          <Route path="/external-auth/" component={ExternalAuth} />
           <PrivateRoute path="/" component={DashBoard} />
         </Switch>
       </div>

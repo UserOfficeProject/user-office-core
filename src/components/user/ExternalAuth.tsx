@@ -23,7 +23,7 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
   const unauthorizedApi = useUnauthorizedApi();
   const { search } = useLocation();
   const values = queryString.parse(search);
-  const sessionId: string = !!values.sessionid
+  const sessionId = !!values.sessionid
     ? values.sessionid.toString()
     : match.params.sessionId;
 
@@ -57,7 +57,7 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
       });
   }, [token, handleLogin, sessionId, unauthorizedApi, EXTERNAL_AUTH_LOGIN_URL]);
 
-  return <p>Logging in with external service... </p>;
+  return <p>Logging in with external service...</p>;
 };
 
 ExternalAuth.propTypes = ExternalAuthPropTypes;
