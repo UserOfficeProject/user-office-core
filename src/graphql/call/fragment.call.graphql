@@ -39,4 +39,6 @@ fragment call on Call {
     isArchived
   }
   proposalCount
+  title
+  description
 }

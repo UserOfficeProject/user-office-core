@@ -62,6 +62,17 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
             const daysRemainingNum = daysRemaining(new Date(call.endCall));
             const daysRemainingText = getDaysRemainingText(daysRemainingNum);
 
+            const header =
+              call.title === null || call.title === '' ? (
+                <Typography variant="h6" component="h3">
+                  {call.shortCode}
+                </Typography>
+              ) : (
+                <Typography variant="h6" component="h3">
+                  {call.title} <small> ({call.shortCode}) </small>
+                </Typography>
+              );
+
             return (
               <ListItem
                 button
@@ -70,19 +81,18 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
                 divider={true}
               >
                 <ListItemText
-                  primary={
-                    <Typography variant="h6" component="h3">
-                      {call.shortCode}
-                    </Typography>
-                  }
+                  primary={header}
                   secondary={
                     <Fragment>
-                      <Typography component="span" className={classes.date}>
+                      <Typography component="div" className={classes.date}>
                         {`Application deadline: ${formatDate(
                           call.endCall
                         )} ${daysRemainingText}`}
                       </Typography>
-                      <Typography component="span">
+                      <Typography component="div">
+                        {call.description}
+                      </Typography>
+                      <Typography component="div">
                         {call.cycleComment}
                       </Typography>
                     </Fragment>

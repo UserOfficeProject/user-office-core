@@ -68,6 +68,8 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         proposalWorkflowId: '',
         templateId: '',
         allocationTimeUnit: AllocationTimeUnits.DAY,
+        title: '',
+        description: '',
       };
 
   const closeModal = (error: string | null | undefined, callToReturn: Call) => {

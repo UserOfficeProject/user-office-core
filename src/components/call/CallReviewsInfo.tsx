@@ -85,6 +85,7 @@ const CallReviewAndNotification: React.FC = () => {
         margin="normal"
         fullWidth
         required
+        inputProps={{ maxLength: '100' }}
         data-cy="survey-comment"
       />
     </>
