@@ -31,7 +31,7 @@ test('When getting roles for a user, STFC roles are translated into ESS roles', 
     expect.arrayContaining([
       new Role(1, Roles.USER, 'User'),
       new Role(2, Roles.USER_OFFICER, 'User Officer'),
-      new Role(3, Roles.INSTRUMENT_SCIENTIST, 'ISIS Instrument Scientist'),
+      new Role(3, Roles.INSTRUMENT_SCIENTIST, 'Instrument Scientist'),
     ])
   );
 });
