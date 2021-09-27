@@ -6,6 +6,7 @@ import { Answer } from './Answer';
 import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { GenericTemplate } from './GenericTemplate';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
@@ -319,4 +320,11 @@ export class RiskAssessmentResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => RiskAssessment, { nullable: true })
   public riskAssessment: RiskAssessment;
+}
+
+@ObjectType()
+export class GenericTemplateResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => GenericTemplate, { nullable: true })
+  public genericTemplate: GenericTemplate;
 }

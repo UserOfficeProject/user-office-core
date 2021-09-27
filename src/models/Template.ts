@@ -91,6 +91,7 @@ export enum TemplateCategoryId {
   SHIPMENT_DECLARATION,
   VISIT,
   RISK_ASSESSMENT,
+  GENERIC_TEMPLATE,
 }
 
 export class FieldCondition {

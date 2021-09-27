@@ -6,6 +6,7 @@ import {
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
 import { Feature, FeatureId } from '../../models/Feature';
+import { GenericTemplate } from '../../models/GenericTemplate';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
@@ -521,6 +522,18 @@ export interface RiskAssessmentRecord {
   readonly created_at: Date;
 }
 
+export interface GenericTemplateRecord {
+  readonly genericTemplate_id: number;
+  readonly title: string;
+  readonly creator_id: number;
+  readonly proposal_pk: number;
+  readonly questionary_id: number;
+  readonly question_id: string;
+  readonly safety_status: number;
+  readonly safety_comment: string;
+  readonly created_at: Date;
+}
+
 export const createTopicObject = (record: TopicRecord) => {
   return new Topic(
     record.topic_id,
@@ -883,5 +896,19 @@ export const createRiskAssessmentObject = (
     riskAssessment.questionary_id,
     riskAssessment.status as any as RiskAssessmentStatus,
     riskAssessment.created_at
+  );
+};
+
+export const createGenericTemplateObject = (
+  genericTemplate: GenericTemplateRecord
+) => {
+  return new GenericTemplate(
+    genericTemplate.genericTemplate_id,
+    genericTemplate.title,
+    genericTemplate.creator_id,
+    genericTemplate.proposal_pk,
+    genericTemplate.questionary_id,
+    genericTemplate.question_id,
+    genericTemplate.created_at
   );
 };
