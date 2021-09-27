@@ -1,0 +1,10 @@
+mutation updateGenericTemplate($sampleId: Int!, $title: String) {
+  updateGenericTemplate(sampleId: $genericTemplateId, title: $title) {
+    genericTemplate {
+      ...genericTemplate
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

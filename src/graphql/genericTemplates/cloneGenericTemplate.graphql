@@ -1,0 +1,14 @@
+mutation cloneGenericTemplate($genericTemplateId: Int!) {
+  cloneGenericTemplate(genericTemplateId: $genericTemplateId) {
+    genericTemplate {
+      ...genericTemplate
+      questionary {
+        isCompleted
+        ...questionary
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
