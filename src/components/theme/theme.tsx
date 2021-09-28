@@ -1,8 +1,8 @@
 import {
-  createMuiTheme,
+  createTheme,
   responsiveFontSizes,
   useTheme,
-} from '@material-ui/core';
+} from '@material-ui/core/styles';
 import createPalette from '@material-ui/core/styles/createPalette';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import React, { useCallback, useContext } from 'react';
@@ -61,7 +61,7 @@ const Theme: React.FC = (props) => {
   });
 
   const theme = responsiveFontSizes(
-    createMuiTheme({
+    createTheme({
       palette: palette,
     })
   );

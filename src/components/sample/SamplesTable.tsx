@@ -1,5 +1,8 @@
+import MaterialTable, {
+  MaterialTableProps,
+  Column,
+} from '@material-table/core';
 import { Typography } from '@material-ui/core';
-import MaterialTable, { MaterialTableProps, Column } from 'material-table';
 import React from 'react';
 import { DecodedValueMap, SetQuery, QueryParamConfig } from 'use-query-params';
 

@@ -1,3 +1,7 @@
+import MaterialTable, {
+  Column,
+  MaterialTableProps,
+} from '@material-table/core';
 import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Archive from '@material-ui/icons/Archive';
@@ -5,7 +9,6 @@ import Delete from '@material-ui/icons/Delete';
 import Edit from '@material-ui/icons/Edit';
 import FileCopy from '@material-ui/icons/FileCopy';
 import UnarchiveIcon from '@material-ui/icons/Unarchive';
-import MaterialTable, { Column, MaterialTableProps } from 'material-table';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
@@ -224,7 +227,9 @@ export function TemplatesTable({
         }
         columns={columns}
         isLoading={loadingTemplates}
-        data={templates}
+        data={templates.map((template) =>
+          Object.assign(template, { id: template.templateId })
+        )}
         actions={[
           {
             icon: EditIconComponent,
