@@ -200,7 +200,7 @@ context('PageTable component tests', () => {
 
       for (const email of emails) {
         cy.finishedLoading();
-        cy.get('[data-cy=email]').type(email);
+        cy.get('[data-cy=email]').clear().type(email);
 
         cy.get('[data-cy="findUser"]').click();
         cy.finishedLoading();
@@ -209,7 +209,7 @@ context('PageTable component tests', () => {
       }
 
       cy.finishedLoading();
-      cy.get('[data-cy=email]').type('ben@inbox.com');
+      cy.get('[data-cy=email]').clear().type('ben@inbox.com');
 
       cy.get('[data-cy="findUser"]').click();
 
