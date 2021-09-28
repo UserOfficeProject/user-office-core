@@ -1,5 +1,5 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { Column } from 'material-table';
+import { Column } from '@material-table/core';
 
 import { SortDirectionType } from 'components/common/SuperMaterialTable';
 import { Proposal, ProposalEndStatus, ProposalStatus } from 'generated/sdk';

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import MaterialTable, { Options, Column } from '@material-table/core';
 import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import Email from '@material-ui/icons/Email';
 import makeStyles from '@material-ui/styles/makeStyles';
-import MaterialTable, { Options, Column } from 'material-table';
 import React, { useState, useEffect } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -50,7 +50,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   emailInvite?: boolean;
   showInvitationButtons?: boolean;
   selectedUsers?: number[];
-  mtOptions?: Options;
+  mtOptions?: Options<JSX.Element>;
   columns?: Column<any>[];
   preserveSelf?: boolean;
 };
@@ -342,11 +342,11 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             nRowsSelected: '{0} Users(s) Selected',
           },
         }}
-        onChangePage={(page) =>
+        onPageChange={(page) =>
           setQuery({ ...query, offset: page * (query.first as number) })
         }
         onSearchChange={(search) => setQuery({ ...query, filter: search })}
-        onChangeRowsPerPage={(rowsPerPage) =>
+        onRowsPerPageChange={(rowsPerPage) =>
           setQuery({ ...query, first: rowsPerPage })
         }
       />

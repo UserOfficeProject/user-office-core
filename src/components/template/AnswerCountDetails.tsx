@@ -1,4 +1,4 @@
-import MaterialTable from 'material-table';
+import MaterialTable from '@material-table/core';
 import React, { useMemo } from 'react';
 
 import { TemplateCategoryId } from 'generated/sdk';
@@ -23,7 +23,9 @@ function ProposalList({ question }: { question: QuestionWithUsage }) {
         { title: 'ID', field: 'proposalId' },
         { title: 'Title', field: 'title' },
       ]}
-      data={proposalsData}
+      data={proposalsData.map((proposal) =>
+        Object.assign(proposal, { id: proposal.primaryKey })
+      )}
       title="Proposals"
       options={{ paging: false }}
     />

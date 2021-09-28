@@ -1,10 +1,10 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import MaterialTable, { Column } from '@material-table/core';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Edit from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import Visibility from '@material-ui/icons/Visibility';
-import MaterialTable, { Column } from 'material-table';
 import React, { useContext } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
@@ -280,7 +280,9 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         icons={tableIcons}
         title={'Proposals'}
         columns={columns}
-        data={proposalsData}
+        data={proposalsData.map((proposal) =>
+          Object.assign(proposal, { id: proposal.primaryKey })
+        )}
         isLoading={loading}
         options={{
           search: true,

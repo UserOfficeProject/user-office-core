@@ -1,6 +1,6 @@
+import { Column } from '@material-table/core';
 import { makeStyles } from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
-import { Column } from 'material-table';
 import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';

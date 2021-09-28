@@ -1,6 +1,6 @@
+import MaterialTable from '@material-table/core';
 import { Dialog, DialogContent } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
-import MaterialTable from 'material-table';
 import React, { useState } from 'react';
 import { ReactNode } from 'react';
 

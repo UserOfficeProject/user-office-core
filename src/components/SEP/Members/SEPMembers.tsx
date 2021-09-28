@@ -1,3 +1,4 @@
+import MaterialTable from '@material-table/core';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -7,7 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import Clear from '@material-ui/icons/Clear';
 import Person from '@material-ui/icons/Person';
 import PersonAdd from '@material-ui/icons/PersonAdd';
-import MaterialTable from 'material-table';
 import React, { useState, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -385,7 +385,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                 </Typography>
               }
               columns={columns}
-              data={SEPReviewersData ?? []}
+              data={(SEPReviewersData ?? []).map((sepReviewer) =>
+                Object.assign(sepReviewer, { id: sepReviewer.userId })
+              )}
               editable={
                 hasAccessRights
                   ? {
