@@ -11,6 +11,22 @@ const postgresUserDataSource = new PostgresUserDataSource();
 const client = new UOWSSoapClient(process.env.UOWS_URL);
 const token = process.env.EXTERNAL_AUTH_TOKEN;
 
+type StfcRolesToEssRole = { [key: string]: Roles[] };
+
+/*
+ * Must not contain user role, this is appended at the very last step.
+ */
+const stfcRolesToEssRoleDefinitions: StfcRolesToEssRole = {
+  'User Officer': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'ISIS Instrument Scientist': [Roles.INSTRUMENT_SCIENTIST],
+  'CLF Artemis FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF Artemis Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
+  'CLF HPL FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF HPL Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
+  'CLF LSF FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF LSF Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
+};
+
 type stfcRole = {
   name: string;
 };
@@ -193,38 +209,33 @@ export class StfcUserDataSource implements UserDataSource {
       return [userRole];
     }
 
-    const stfcRolesToEssRoleDefinitions = new Map<string, Roles>([
-      ['User Officer', Roles.USER_OFFICER],
-      ['ISIS Instrument Scientist', Roles.INSTRUMENT_SCIENTIST],
-      ['CLF Artemis FAP Secretary', Roles.USER_OFFICER],
-      ['CLF Artemis Link Scientist', Roles.INSTRUMENT_SCIENTIST],
-      ['CLF HPL FAP Secretary', Roles.USER_OFFICER],
-      ['CLF HPL Link Scientist', Roles.INSTRUMENT_SCIENTIST],
-      ['CLF LSF FAP Secretary', Roles.USER_OFFICER],
-      ['CLF LSF Link Scientist', Roles.INSTRUMENT_SCIENTIST],
-    ]);
+    /*
+     * Convert the STFC roles to the Roles enums which refers to roles
+     * by short code. We will use the short code to filter relevant
+     * roles.
+     */
+    const userRolesAsEnum: Roles[] = stfcRoles
+      .flatMap((stfcRole) => stfcRolesToEssRoleDefinitions[stfcRole.name])
+      .filter((r) => r !== undefined) as Roles[];
 
-    const roles: Role[] = [];
+    /*
+     * Filter relevant roles by short code.
+     */
+    const userRolesAsRole: Role[] = userRolesAsEnum
+      .map((r) => roleDefinitions.find((d) => d.shortCode === r))
+      .filter((r) => r !== undefined) as Role[];
 
-    // The User role must be the first item
-    roles.push(userRole);
+    /*
+     * We can't return non-unique roles.
+     */
+    const uniqueRoles: Role[] = [...new Set(userRolesAsRole)];
 
-    stfcRoles.forEach((stfcRole: stfcRole) => {
-      const essRoleDefinition: Roles | undefined =
-        stfcRolesToEssRoleDefinitions.get(stfcRole.name);
-      if (essRoleDefinition) {
-        const essRole: Role | undefined = roleDefinitions.find(
-          (role) => role.shortCode == essRoleDefinition
-        );
+    uniqueRoles.sort((a, b) => a.id - b.id);
 
-        if (essRole && !roles.includes(essRole)) {
-          essRole.title = stfcRole.name;
-          roles.push(essRole);
-        }
-      }
-    });
-
-    return roles;
+    /*
+     * Prepend the user role as it must be first.
+     */
+    return [userRole, ...uniqueRoles];
   }
 
   async getRoles(): Promise<Role[]> {
