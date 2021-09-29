@@ -4,7 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { UpdateGenericTemplateArgs } from '../../resolvers/mutations/UpdateGenericTemplateMutation';
-import { GenericTemplateArgs } from '../../resolvers/queries/GenericTemplateQuery';
+import { GenericTemplatesArgs } from '../../resolvers/queries/GenericTemplatesQuery';
 import { GenericTemplateDataSource } from '../GenericTemplateDataSource';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
@@ -18,6 +18,7 @@ export default class PostgresGenericTemplateDataSource
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource
   ) {}
+
   async cloneGenericTemplate(
     genericTemplateId: number
   ): Promise<GenericTemplate> {
@@ -46,9 +47,10 @@ export default class PostgresGenericTemplateDataSource
 
     return newGenericTemplate;
   }
+
   delete(genericTemplateId: number): Promise<GenericTemplate> {
-    return database('genericTemplates')
-      .where({ genericTemplate_id: genericTemplateId })
+    return database('generic_templates')
+      .where({ generic_template_id: genericTemplateId })
       .delete('*')
       .then((records: GenericTemplateRecord[]) => {
         if (records.length !== 1) {
@@ -65,17 +67,16 @@ export default class PostgresGenericTemplateDataSource
   updateGenericTemplate(
     args: UpdateGenericTemplateArgs
   ): Promise<GenericTemplate> {
-    return database('genericTemplates')
+    return database('generic_templates')
       .update(
         {
           title: args.title,
           proposal_pk: args.proposalPk,
           questionary_id: args.questionaryId,
-          shipment_id: args.shipmentId,
         },
         '*'
       )
-      .where({ genericTemplate_id: args.genericTemplateId })
+      .where({ generic_template_id: args.genericTemplateId })
       .then((records: GenericTemplateRecord[]) => {
         if (records.length !== 1) {
           logger.logError('Could not update genericTemplate', { args });
@@ -93,7 +94,7 @@ export default class PostgresGenericTemplateDataSource
     questionary_id: number,
     question_id: string
   ): Promise<GenericTemplate> {
-    return database('genericTemplates')
+    return database('generic_templates')
       .insert(
         { title, creator_id, proposal_pk, questionary_id, question_id },
         '*'
@@ -105,20 +106,24 @@ export default class PostgresGenericTemplateDataSource
             creator_id,
             proposal_pk,
             questionary_id,
+            question_id,
           });
           throw new Error('Failed to insert genericTemplate');
         }
 
         return createGenericTemplateObject(records[0]);
+      })
+      .catch((err) => {
+        return err;
       });
   }
 
   getGenericTemplate(
     genericTemplateId: number
   ): Promise<GenericTemplate | null> {
-    return database('genericTemplates')
+    return database('generic_templates')
       .select('*')
-      .where('genericTemplate_id', genericTemplateId)
+      .where('generic_template_id', genericTemplateId)
       .first()
       .then((genericTemplate?: GenericTemplateRecord) => {
         if (!genericTemplate) {
@@ -136,11 +141,11 @@ export default class PostgresGenericTemplateDataSource
   getGenericTemplatesByCallId(callId: number): Promise<GenericTemplate[]> {
     return database('proposals')
       .join(
-        'genericTemplates',
+        'generic_templates',
         'proposals.proposal_pk',
-        'genericTemplates.proposal_pk'
+        'generic_templates.proposal_pk'
       )
-      .select('genericTemplates.*')
+      .select('generic_templates.*')
       .where(' proposals.call_id', callId)
       .then((records: GenericTemplateRecord[]) => {
         return (
@@ -150,11 +155,11 @@ export default class PostgresGenericTemplateDataSource
   }
 
   async getGenericTemplates(
-    args: GenericTemplateArgs
+    args: GenericTemplatesArgs
   ): Promise<GenericTemplate[]> {
     const filter = args.filter;
 
-    return database('genericTemplates')
+    return database('generic_templates')
       .modify((query) => {
         if (filter?.creatorId) {
           query.where('creator_id', filter.creatorId);
@@ -166,7 +171,7 @@ export default class PostgresGenericTemplateDataSource
           query.where('title', 'like', `%${filter.title}%`);
         }
         if (filter?.genericTemplateIds) {
-          query.where('genericTemplate_id', 'in', filter.genericTemplateIds);
+          query.where('generic_template_id', 'in', filter.genericTemplateIds);
         }
         if (filter?.proposalPk) {
           query.where('proposal_pk', filter.proposalPk);
@@ -180,23 +185,5 @@ export default class PostgresGenericTemplateDataSource
       .then((records: GenericTemplateRecord[]) =>
         records.map((record) => createGenericTemplateObject(record))
       );
-  }
-
-  getGenericTemplatesByShipmentId(
-    shipmentId: number
-  ): Promise<GenericTemplate[]> {
-    return database('shipments_has_genericTemplates')
-      .leftJoin(
-        'genericTemplates',
-        'shipments_has_genericTemplates.genericTemplate_id',
-        'genericTemplates.genericTemplate_id'
-      )
-      .select('genericTemplates.*')
-      .where(' shipments_has_genericTemplates.shipment_id', shipmentId)
-      .then((records: GenericTemplateRecord[]) => {
-        return (
-          records.map((record) => createGenericTemplateObject(record)) || []
-        );
-      });
   }
 }

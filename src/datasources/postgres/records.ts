@@ -523,14 +523,12 @@ export interface RiskAssessmentRecord {
 }
 
 export interface GenericTemplateRecord {
-  readonly genericTemplate_id: number;
+  readonly generic_template_id: number;
   readonly title: string;
   readonly creator_id: number;
   readonly proposal_pk: number;
   readonly questionary_id: number;
   readonly question_id: string;
-  readonly safety_status: number;
-  readonly safety_comment: string;
   readonly created_at: Date;
 }
 
@@ -903,7 +901,7 @@ export const createGenericTemplateObject = (
   genericTemplate: GenericTemplateRecord
 ) => {
   return new GenericTemplate(
-    genericTemplate.genericTemplate_id,
+    genericTemplate.generic_template_id,
     genericTemplate.title,
     genericTemplate.creator_id,
     genericTemplate.proposal_pk,

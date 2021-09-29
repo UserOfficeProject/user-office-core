@@ -19,6 +19,12 @@ export class SampleBasisConfig {
 }
 
 @ObjectType()
+export class GenericTemplateBasisConfig {
+  @Field(() => String)
+  titlePlaceholder: string;
+}
+
+@ObjectType()
 export class VisitBasisConfig extends ConfigBase {}
 
 @ObjectType()
@@ -177,5 +183,6 @@ export const FieldConfigType = createUnionType({
     RichTextInputConfig,
     VisitBasisConfig,
     RiskAssessmentBasisConfig,
+    GenericTemplateBasisConfig,
   ], // function that returns array of object types classes
 });

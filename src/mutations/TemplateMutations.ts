@@ -72,6 +72,14 @@ export default class TemplateMutations {
           'sample_basis'
         );
         break;
+      case TemplateCategoryId.GENERIC_TEMPLATE:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New sub Topic',
+          'generic_template_basis'
+        );
+        break;
       case TemplateCategoryId.SHIPMENT_DECLARATION:
         await this.createInitialTopic(
           newTemplate.templateId,

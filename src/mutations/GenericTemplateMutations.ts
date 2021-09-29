@@ -6,13 +6,11 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-//import { Event } from '../events/event.enum';
 import { rejection } from '../models/Rejection';
 import { TemplateCategoryId } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { CreateGenericTemplateInput } from '../resolvers/mutations/CreateGenericTemplateMutations';
+import { CreateGenericTemplateInput } from '../resolvers/mutations/CreateGenericTemplateMutation';
 import { UpdateGenericTemplateArgs } from '../resolvers/mutations/UpdateGenericTemplateMutation';
-//import { UpdateGenericTemplateArgs } from '../resolvers/mutations/UpdateGenericTemplateMutation';
 import { GenericTemplateAuthorization } from '../utils/GenericTemplateAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
@@ -112,8 +110,6 @@ export default class GenericTemplateMutations {
         { agent, args }
       );
     }
-
-    // Thi makes sure administrative fields can be only updated by user with the right role
 
     return this.genericTemplateDataSource
       .updateGenericTemplate(args)

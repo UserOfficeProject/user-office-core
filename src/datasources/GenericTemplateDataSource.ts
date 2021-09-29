@@ -1,6 +1,6 @@
 import { GenericTemplate } from '../models/GenericTemplate';
 import { UpdateGenericTemplateArgs } from '../resolvers/mutations/UpdateGenericTemplateMutation';
-import { GenericTemplateArgs } from '../resolvers/queries/GenericTemplateQuery';
+import { GenericTemplatesArgs } from '../resolvers/queries/GenericTemplatesQuery';
 
 export interface GenericTemplateDataSource {
   delete(genericTemplateId: number): Promise<GenericTemplate>;
@@ -19,8 +19,5 @@ export interface GenericTemplateDataSource {
     genericTemplateId: number
   ): Promise<GenericTemplate | null>;
   getGenericTemplatesByCallId(callId: number): Promise<GenericTemplate[]>;
-  getGenericTemplates(args: GenericTemplateArgs): Promise<GenericTemplate[]>;
-  getGenericTemplatesByShipmentId(
-    shipmentId: number
-  ): Promise<GenericTemplate[]>;
+  getGenericTemplates(args: GenericTemplatesArgs): Promise<GenericTemplate[]>;
 }

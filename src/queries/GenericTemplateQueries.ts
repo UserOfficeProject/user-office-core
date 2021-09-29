@@ -6,9 +6,8 @@ import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSou
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { GenericTemplateArgs } from '../resolvers/queries/GenericTemplateQuery';
+import { GenericTemplatesArgs } from '../resolvers/queries/GenericTemplatesQuery';
 import { GenericTemplateAuthorization } from '../utils/GenericTemplateAuthorization';
-import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 
 @injectable()
 export default class GenericTemplateQueries {
@@ -18,9 +17,6 @@ export default class GenericTemplateQueries {
 
     @inject(Tokens.GenericTemplateAuthorization)
     private genericTemplateAuthorization: GenericTemplateAuthorization,
-
-    @inject(Tokens.ShipmentAuthorization)
-    private shipmentAuthorization: ShipmentAuthorization
   ) {}
 
   async getGenericTemplate(
@@ -46,9 +42,9 @@ export default class GenericTemplateQueries {
 
   async getGenericTemplates(
     agent: UserWithRole | null,
-    args: GenericTemplateArgs
+    args: GenericTemplatesArgs
   ) {
-    let genericTemplates = await this.dataSource.getGenericTemplate(args);
+    let genericTemplates = await this.dataSource.getGenericTemplates(args);
 
     genericTemplates = await Promise.all(
       genericTemplates.map((genericTemplate) =>
@@ -62,8 +58,8 @@ export default class GenericTemplateQueries {
     return genericTemplates;
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
-  async getGenericTemplateByCallId(user: UserWithRole | null, callId: number) {
-    return await this.dataSource.getGenericTemplateByCallId(callId);
+  @Authorized([Roles.USER_OFFICER])
+  async getGenericTemplatesByCallId(user: UserWithRole | null, callId: number) {
+    return await this.dataSource.getGenericTemplatesByCallId(callId);
   }
 }

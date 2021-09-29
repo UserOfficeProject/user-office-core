@@ -4,6 +4,7 @@ import { BasicResolverContext } from './context';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import FileMutations from './mutations/FileMutations';
+import GenericTemplateMutations from './mutations/GenericTemplateMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import ProposalSettingsMutations from './mutations/ProposalSettingsMutations';
@@ -20,6 +21,7 @@ import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
 import FileQueries from './queries/FileQueries';
+import GenericTemplateQueries from './queries/GenericTemplateQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import ProposalSettingsQueries from './queries/ProposalSettingsQueries';
@@ -42,6 +44,7 @@ const context: BasicResolverContext = {
     call: container.resolve(CallQueries),
     eventLogs: container.resolve(EventLogQueries),
     file: container.resolve(FileQueries),
+    genericTemplate: container.resolve(GenericTemplateQueries),
     instrument: container.resolve(InstrumentQueries),
     proposal: container.resolve(ProposalQueries),
     proposalSettings: container.resolve(ProposalSettingsQueries),
@@ -60,6 +63,7 @@ const context: BasicResolverContext = {
     admin: container.resolve(AdminMutations),
     call: container.resolve(CallMutations),
     file: container.resolve(FileMutations),
+    genericTemplate: container.resolve(GenericTemplateMutations),
     instrument: container.resolve(InstrumentMutations),
     proposal: container.resolve(ProposalMutations),
     proposalSettings: container.resolve(ProposalSettingsMutations),
