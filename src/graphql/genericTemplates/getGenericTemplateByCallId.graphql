@@ -1,9 +1,0 @@
-query getGenericTemplateByCallId($callId: Int!) {
-  genericTemplateByCallId(callId: $callId) {
-    ...genericTemplate
-    proposal {
-      primaryKey
-      proposalId
-    }
-  }
-}

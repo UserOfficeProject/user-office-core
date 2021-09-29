@@ -9,6 +9,7 @@ import {
   useReducerWithMiddleWares,
 } from 'utils/useReducerWithMiddleWares';
 
+import { GenericTemplateWithQuestionary } from './genericTemplate/GenericTemplateWithQuestionary';
 import { ProposalSubmissionState } from './proposal/ProposalSubmissionState';
 import { ProposalWithQuestionary } from './proposal/ProposalWithQuestionary';
 import { getFieldById } from './QuestionaryFunctions';
@@ -53,7 +54,28 @@ export type Event =
   | { type: 'RISK_ASSESSMENT_CREATED'; assessment: AssessmentWQ }
   | { type: 'RISK_ASSESSMENT_LOADED'; assessment: AssessmentWQ }
   | { type: 'RISK_ASSESSMENT_MODIFIED'; assessment: Partial<AssessmentWQ> }
-  | { type: 'RISK_ASSESSMENT_SUBMITTED'; assessment: Partial<AssessmentWQ> };
+  | { type: 'RISK_ASSESSMENT_SUBMITTED'; assessment: Partial<AssessmentWQ> }
+  // generic template
+  | {
+      type: 'GENERIC_TEMPLATE_CREATED';
+      genericTemplate: GenericTemplateWithQuestionary;
+    }
+  | {
+      type: 'GENERIC_TEMPLATE_LOADED';
+      genericTemplate: GenericTemplateWithQuestionary;
+    }
+  | {
+      type: 'GENERIC_TEMPLATE_UPDATED';
+      genericTemplate: Partial<GenericTemplateWithQuestionary>;
+    }
+  | {
+      type: 'GENERIC_TEMPLATE_MODIFIED';
+      genericTemplate: Partial<GenericTemplateWithQuestionary>;
+    }
+  | {
+      type: 'GENERIC_TEMPLATE_SUBMITTED';
+      genericTemplate: Partial<GenericTemplateWithQuestionary>;
+    };
 
 export interface WizardStepMetadata {
   title: string;

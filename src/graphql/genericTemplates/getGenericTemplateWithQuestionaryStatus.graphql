@@ -1,8 +1,0 @@
-query getGenericTemplateWithQuestionaryStatus($filter: GenericTemplateFilter) {
-  genericTemplate(filter: $filter) {
-    ...genericTemplate
-    questionary {
-      isCompleted
-    }
-  }
-}

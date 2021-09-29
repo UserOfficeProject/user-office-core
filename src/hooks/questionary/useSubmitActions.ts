@@ -1,3 +1,4 @@
+import { genericTemplateBasisPreSubmit } from 'components/questionary/questionaryComponents/GenericTemplateBasis/QuestionaryComponentGenericTemplateBasis';
 import { proposalBasisPreSubmit } from 'components/questionary/questionaryComponents/ProposalBasis/QuestionaryComponentProposalBasis';
 import { riskAssessmentBasisPreSubmit } from 'components/questionary/questionaryComponents/RiskAssessmentBasis/QuestionaryComponentRiskAssessmentBasis';
 import { sampleBasisPreSubmit } from 'components/questionary/questionaryComponents/SampleBasis/QuestionaryComponentSampleBasis';
@@ -32,6 +33,8 @@ export function usePreSubmitActions() {
           return visitBasisPreSubmit();
         case DataType.RISK_ASSESSMENT_BASIS:
           return riskAssessmentBasisPreSubmit();
+        case DataType.GENERIC_TEMPLATE_BASIS:
+          return genericTemplateBasisPreSubmit();
       }
 
       return [];

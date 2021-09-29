@@ -1,5 +1,5 @@
-mutation updateGenericTemplate($sampleId: Int!, $title: String) {
-  updateGenericTemplate(sampleId: $genericTemplateId, title: $title) {
+mutation updateGenericTemplate($genericTemplateId: Int!, $title: String) {
+  updateGenericTemplate(genericTemplateId: $genericTemplateId, title: $title) {
     genericTemplate {
       ...genericTemplate
     }

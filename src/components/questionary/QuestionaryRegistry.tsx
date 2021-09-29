@@ -2,6 +2,7 @@
 import { TemplateCategoryId } from 'generated/sdk';
 
 import { StepDisplayElementFactory } from './DefaultStepDisplayElementFactory';
+import { genericTemplateQuestionaryDefinition } from './questionaries/genericTemplate/GenericTemplateQuestionaryDefinition';
 import { proposalQuestionaryDefinition } from './questionaries/proposal/ProposalQuestionaryDefinition';
 import { riskAssessmentQuestionaryDefinition } from './questionaries/riskAssessment/RiskAssessmentQuestionaryDefinition';
 import { sampleQuestionaryDefinition } from './questionaries/sample/SampleQuestionaryDefinition';
@@ -32,6 +33,7 @@ const registry = [
   shipmentQuestionaryDefinition,
   visitRegistrationQuestionaryDefinition,
   riskAssessmentQuestionaryDefinition,
+  genericTemplateQuestionaryDefinition,
 ];
 
 Object.freeze(registry);

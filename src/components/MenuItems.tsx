@@ -19,6 +19,7 @@ import InboxIcon from '@material-ui/icons/Inbox';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import NoteAdd from '@material-ui/icons/NoteAdd';
+import NoteAddRoundedIcon from '@material-ui/icons/NoteAddRounded';
 import People from '@material-ui/icons/People';
 import Settings from '@material-ui/icons/Settings';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
@@ -176,6 +177,15 @@ const TemplateMenuListItem = () => {
               <InboxIcon />
             </ListItemIcon>
             <ListItemText primary="Sample declaration" />
+          </ListItem>
+        </Tooltip>
+
+        <Tooltip title="Custom template">
+          <ListItem component={NavLink} to="/GenericTemplates" button>
+            <ListItemIcon>
+              <NoteAddRoundedIcon />
+            </ListItemIcon>
+            <ListItemText primary="Custom template" />
           </ListItem>
         </Tooltip>
 
