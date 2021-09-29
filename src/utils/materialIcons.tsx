@@ -1,4 +1,5 @@
 /* eslint-disable react/display-name */
+import { Icons } from '@material-table/core';
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import Check from '@material-ui/icons/Check';
@@ -14,7 +15,6 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
-import { Icons } from 'material-table';
 import React, { forwardRef } from 'react';
 
 export const tableIcons: Icons = {

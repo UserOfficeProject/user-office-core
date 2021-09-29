@@ -1,4 +1,4 @@
-import { Localization } from 'material-table';
+import { Localization } from '@material-table/core';
 
 export const tableLocalization: Localization = {
   pagination: {

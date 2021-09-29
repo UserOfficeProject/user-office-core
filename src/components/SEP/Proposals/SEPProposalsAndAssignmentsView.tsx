@@ -1,4 +1,4 @@
-import { MTableToolbar, Options } from 'material-table';
+import { MTableToolbar, Options } from '@material-table/core';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
@@ -18,7 +18,7 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   const { loadingCalls, calls } = useCallsData();
   const [selectedCallId, setSelectedCallId] = useState<number>(0);
 
-  const Toolbar = (data: Options): JSX.Element => (
+  const Toolbar = (data: Options<JSX.Element>): JSX.Element => (
     <>
       <MTableToolbar {...data} />
       <CallFilter

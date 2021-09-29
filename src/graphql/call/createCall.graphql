@@ -16,6 +16,8 @@ mutation createCall(
   $referenceNumberFormat: String
   $proposalWorkflowId: Int!
   $templateId: Int!
+  $title: String
+  $description: String
 ) {
   createCall(
     createCallInput: {
@@ -36,6 +38,8 @@ mutation createCall(
       referenceNumberFormat: $referenceNumberFormat
       proposalWorkflowId: $proposalWorkflowId
       templateId: $templateId
+      title: $title
+      description: $description
     }
   ) {
     rejection {

@@ -120,27 +120,6 @@ const CallsTable: React.FC = () => {
     }
   };
 
-  const removeAssignedInstrumentFromCall = (
-    updatedInstruments: InstrumentWithAvailabilityTime[],
-    callToRemoveFromId: number
-  ) => {
-    if (calls) {
-      const callsWithRemovedInstrument = calls.map((callItem) => {
-        if (callItem.id === callToRemoveFromId) {
-          return {
-            ...callItem,
-            instruments: updatedInstruments,
-          };
-        } else {
-          return callItem;
-        }
-      });
-
-      setCalls(callsWithRemovedInstrument);
-      setAssigningInstrumentsCallId(null);
-    }
-  };
-
   const deleteCall = async (id: number | string) => {
     return await api('Call deleted successfully')
       .deleteCall({
@@ -160,33 +139,60 @@ const CallsTable: React.FC = () => {
       });
   };
 
-  const setInstrumentAvailabilityTime = (
-    updatedInstruments: InstrumentWithAvailabilityTime[],
-    updatingCallId: number
-  ) => {
-    if (calls) {
-      const callsWithInstrumentAvailabilityTime = calls.map((callItem) => {
-        if (callItem.id === updatingCallId) {
-          return {
-            ...callItem,
-            instruments: updatedInstruments,
-          };
-        } else {
-          return callItem;
-        }
-      });
-
-      setCalls(callsWithInstrumentAvailabilityTime);
-    }
-  };
   const ScienceIconComponent = (): JSX.Element => <ScienceIcon />;
 
-  const AssignedInstruments = (rowData: Call) => (
-    <AssignedInstrumentsTable
-      call={rowData}
-      removeAssignedInstrumentFromCall={removeAssignedInstrumentFromCall}
-      setInstrumentAvailabilityTime={setInstrumentAvailabilityTime}
-    />
+  const AssignedInstruments = React.useCallback(
+    ({ rowData }: Record<'rowData', Call>) => {
+      const removeAssignedInstrumentFromCall = (
+        updatedInstruments: InstrumentWithAvailabilityTime[],
+        callToRemoveFromId: number
+      ) => {
+        if (calls) {
+          const callsWithRemovedInstrument = calls.map((callItem) => {
+            if (callItem.id === callToRemoveFromId) {
+              return {
+                ...callItem,
+                instruments: updatedInstruments,
+              };
+            } else {
+              return callItem;
+            }
+          });
+
+          setCalls(callsWithRemovedInstrument);
+          setAssigningInstrumentsCallId(null);
+        }
+      };
+
+      const setInstrumentAvailabilityTime = (
+        updatedInstruments: InstrumentWithAvailabilityTime[],
+        updatingCallId: number
+      ) => {
+        if (calls) {
+          const callsWithInstrumentAvailabilityTime = calls.map((callItem) => {
+            if (callItem.id === updatingCallId) {
+              return {
+                ...callItem,
+                instruments: updatedInstruments,
+              };
+            } else {
+              return callItem;
+            }
+          });
+
+          setCalls(callsWithInstrumentAvailabilityTime);
+        }
+      };
+
+      return (
+        <AssignedInstrumentsTable
+          call={rowData}
+          removeAssignedInstrumentFromCall={removeAssignedInstrumentFromCall}
+          setInstrumentAvailabilityTime={setInstrumentAvailabilityTime}
+        />
+      );
+    },
+    [calls, setCalls, setAssigningInstrumentsCallId]
   );
 
   const callAssignments = calls.find(

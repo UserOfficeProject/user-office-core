@@ -1,6 +1,6 @@
+import MaterialTable, { MaterialTableProps } from '@material-table/core';
 import Button from '@material-ui/core/Button';
 import Edit from '@material-ui/icons/Edit';
-import MaterialTable, { MaterialTableProps } from 'material-table';
 import React, { SetStateAction, useState } from 'react';
 import {
   DecodedValueMap,
@@ -150,8 +150,14 @@ export function SuperMaterialTable<Entry extends EntryID>({
 
   const EditIcon = (): JSX.Element => <Edit />;
   let localActions: (
-    | import('material-table').Action<Entry>
-    | ((rowData: Entry) => import('material-table').Action<Entry>)
+    | import('@material-table/core').Action<Entry>
+    | ((rowData: Entry) => import('@material-table/core').Action<Entry>)
+    | {
+        action: (
+          rowData: Entry
+        ) => import('@material-table/core').Action<Entry>;
+        position: string;
+      }
   )[] = [];
   if (actions) {
     localActions = actions;
