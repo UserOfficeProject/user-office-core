@@ -117,9 +117,7 @@ class PostgresRiskAssessmentDataSource implements RiskAssessmentDataSource {
 
           return trx.commit();
         } catch (error) {
-          logger.logError('Can not update risk assessment', {
-            msg: error.message,
-          });
+          logger.logException('Can not update risk assessment', error);
           trx.rollback();
         }
       })

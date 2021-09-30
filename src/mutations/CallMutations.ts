@@ -49,7 +49,7 @@ export default class CallMutations {
       const result = await this.dataSource.delete(callId);
 
       return result;
-    } catch (error) {
+    } catch (error: any) {
       if ('code' in error && error.code === '23503') {
         return rejection(
           'Failed to delete call, it has dependencies which need to be deleted first',

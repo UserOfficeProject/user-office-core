@@ -105,7 +105,7 @@ export class VisitAuthorization {
      * User can modify the visit if he is a participant of a proposal
      * and the visit is not yet accepted
      */
-    if (this.userAuthorization.isMemberOfProposal(agent, proposal)) {
+    if (await this.userAuthorization.isMemberOfProposal(agent, proposal)) {
       if (visit.status === VisitStatus.ACCEPTED) {
         logger.logError('User tried to change accepted visit', {
           agent,

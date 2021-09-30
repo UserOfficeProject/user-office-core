@@ -165,7 +165,7 @@ export const collectProposalPDFData = async (
     out.attachments.push(...sampleAttachments);
   }
 
-  if (userAuthorization.isReviewerOfProposal(user, proposal.primaryKey)) {
+  if (await userAuthorization.isReviewerOfProposal(user, proposal.primaryKey)) {
     const technicalReview =
       await baseContext.queries.review.technicalReviewForProposal(
         user,

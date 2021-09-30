@@ -1,5 +1,5 @@
 import { logger } from '@esss-swap/duo-logger';
-import Knex from 'knex';
+import { Knex } from 'knex';
 
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
 import { DataType, QuestionTemplateRelation } from '../Template';

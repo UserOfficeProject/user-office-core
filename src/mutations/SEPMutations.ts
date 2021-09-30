@@ -278,7 +278,8 @@ export default class SEPMutations {
       const result = await this.dataSource.delete(sepId);
 
       return result;
-    } catch (error) {
+      // NOTE: We are explicitly setting error to 'any' because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
+    } catch (error: any) {
       if ('code' in error && error.code === '23503') {
         return rejection(
           'Failed to delete SEP, because it has dependencies which need to be deleted first',

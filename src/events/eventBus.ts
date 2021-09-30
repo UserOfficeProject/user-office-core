@@ -14,7 +14,10 @@ export class EventBus<T extends { type: string }> {
         await handler(event);
       } catch (err) {
         // Something happened, log it and continue
-        logger.logError(`Error handling ${event.type} with handler ${i}`, err);
+        logger.logException(
+          `Error handling ${event.type} with handler ${i}`,
+          err
+        );
       }
     }
   }
