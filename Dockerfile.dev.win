@@ -1,9 +1,0 @@
-ARG WINDOWS_VERSION
-FROM dmsc/bisapps-node:12-servercore${WINDOWS_VERSION}
-
-# The Git repo should be mounted from the host into this directory
-WORKDIR /app
-
-EXPOSE 4000
-
-CMD ["npm.cmd", "run", "dev:docker"]
