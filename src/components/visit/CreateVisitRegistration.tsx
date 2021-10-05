@@ -54,10 +54,8 @@ function CreateVisit({
 }: CreateVisitProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
-  const [
-    blankRegistration,
-    setBlankRegistration,
-  ] = useState<RegistrationWithQuestionary>();
+  const [blankRegistration, setBlankRegistration] =
+    useState<RegistrationWithQuestionary>();
 
   useEffect(() => {
     api()

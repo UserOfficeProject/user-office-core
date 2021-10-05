@@ -18,10 +18,8 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
   const config = field.config as SelectionFromOptionsConfig;
 
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
-  const [
-    showIsMultipleSelectCheckbox,
-    setShowIsMultipleSelectCheckbox,
-  ] = useState(config.variant === 'dropdown');
+  const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
+    useState(config.variant === 'dropdown');
 
   return (
     <QuestionFormShell

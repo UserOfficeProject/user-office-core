@@ -87,10 +87,8 @@ function QuestionaryComponentSampleDeclaration(
   const { api } = useDataApiWithFeedback();
   const classes = useStyles();
 
-  const [
-    selectedSample,
-    setSelectedSample,
-  ] = useState<SampleWithQuestionary | null>(null);
+  const [selectedSample, setSelectedSample] =
+    useState<SampleWithQuestionary | null>(null);
 
   if (!state) {
     throw new Error(createMissingContextErrorMessage());

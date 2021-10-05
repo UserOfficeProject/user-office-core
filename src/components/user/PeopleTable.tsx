@@ -287,9 +287,11 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           }
 
           setSelectedParticipants((selectedParticipants) =>
-            (selectedItem as BasicUserDetails & {
-              tableData: { checked: boolean };
-            }).tableData.checked
+            (
+              selectedItem as BasicUserDetails & {
+                tableData: { checked: boolean };
+              }
+            ).tableData.checked
               ? ([
                   ...selectedParticipants,
                   {

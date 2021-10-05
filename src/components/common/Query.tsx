@@ -15,7 +15,7 @@ export const Query = <T extends unknown>(props: {
         .then((serviceData) => {
           setData(serviceData);
         })
-        .catch((err) => {
+        .catch(() => {
           setError(true);
         })
         .finally(() => {

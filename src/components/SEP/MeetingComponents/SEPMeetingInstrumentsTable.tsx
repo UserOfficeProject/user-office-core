@@ -27,11 +27,8 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
   Toolbar,
   confirm,
 }) => {
-  const {
-    loadingInstruments,
-    instrumentsData,
-    setInstrumentsData,
-  } = useInstrumentsBySEPData(sepId, selectedCallId);
+  const { loadingInstruments, instrumentsData, setInstrumentsData } =
+    useInstrumentsBySEPData(sepId, selectedCallId);
   const { api } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -78,9 +75,10 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         sepId: sepId,
         callId: selectedCallId,
       });
-      const allProposalsOnInstrumentHaveRankings = response.sepProposalsByInstrument?.every(
-        ({ proposal }) => !!proposal.sepMeetingDecision?.submitted
-      );
+      const allProposalsOnInstrumentHaveRankings =
+        response.sepProposalsByInstrument?.every(
+          ({ proposal }) => !!proposal.sepMeetingDecision?.submitted
+        );
 
       if (allProposalsOnInstrumentHaveRankings) {
         const { submitInstrument } = await api(

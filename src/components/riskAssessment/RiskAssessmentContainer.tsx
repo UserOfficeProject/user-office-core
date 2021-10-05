@@ -136,14 +136,12 @@ export default function RiskAssessmentContainer(
     def.wizardStepFactory.getWizardSteps(props.riskAssessment.questionary.steps)
   );
 
-  const {
-    state,
-    dispatch,
-  } = QuestionarySubmissionModel<RiskAssessmentSubmissionState>(
-    initialState,
-    [handleEvents],
-    riskAssessmentReducer
-  );
+  const { state, dispatch } =
+    QuestionarySubmissionModel<RiskAssessmentSubmissionState>(
+      initialState,
+      [handleEvents],
+      riskAssessmentReducer
+    );
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =

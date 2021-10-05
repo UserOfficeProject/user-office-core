@@ -11,9 +11,8 @@ interface TemplatesFilter {
 export function useTemplates(filter: TemplatesFilter) {
   const [templatesFilter, setTemplatesFilter] = useState(filter);
   const api = useDataApi();
-  const [templates, setTemplates] = useState<GetTemplatesQuery['templates']>(
-    null
-  );
+  const [templates, setTemplates] =
+    useState<GetTemplatesQuery['templates']>(null);
   useEffect(() => {
     api()
       .getTemplates({ filter: templatesFilter })

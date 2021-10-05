@@ -22,9 +22,8 @@ const initialFeatureData: FeatureContextData = {
   features: new Map<FeatureId, Feature>(),
 };
 
-export const FeatureContext = React.createContext<FeatureContextData>(
-  initialFeatureData
-);
+export const FeatureContext =
+  React.createContext<FeatureContextData>(initialFeatureData);
 
 export const FeatureContextProvider: React.FC = (props) => {
   const { features, loadingFeatures } = useFeatures();

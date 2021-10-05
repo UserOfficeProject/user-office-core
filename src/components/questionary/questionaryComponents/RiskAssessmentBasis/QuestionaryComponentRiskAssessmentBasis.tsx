@@ -131,49 +131,47 @@ function QuestionaryComponentRiskAssessmentBasis() {
   );
 }
 
-const riskAssessmentBasisPreSubmit = () => async ({
-  api,
-  dispatch,
-  state,
-}: SubmitActionDependencyContainer) => {
-  const riskAssessment = (state as RiskAssessmentSubmissionState)
-    .riskAssessment;
+const riskAssessmentBasisPreSubmit =
+  () =>
+  async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
+    const riskAssessment = (state as RiskAssessmentSubmissionState)
+      .riskAssessment;
 
-  const riskAssessmentExists = riskAssessment.riskAssessmentId > 0;
+    const riskAssessmentExists = riskAssessment.riskAssessmentId > 0;
 
-  let questionaryId: number;
-  let riskAssessmentId: number;
-  if (riskAssessmentExists) {
-    questionaryId = riskAssessment.questionary.questionaryId;
-    riskAssessmentId = riskAssessment.riskAssessmentId;
-  } else {
-    // create new risk assessment with questionary
-    const result = await api.createRiskAssessment({
-      proposalPk: riskAssessment.proposalPk,
-      scheduledEventId: riskAssessment.scheduledEventId,
-    });
-    const newRiskAssessment = result.createRiskAssessment.riskAssessment;
-
-    if (newRiskAssessment) {
-      dispatch({
-        type: 'RISK_ASSESSMENT_CREATED',
-        assessment: newRiskAssessment,
-      });
-      questionaryId = newRiskAssessment.questionary.questionaryId;
-      riskAssessmentId = newRiskAssessment.riskAssessmentId;
+    let questionaryId: number;
+    let riskAssessmentId: number;
+    if (riskAssessmentExists) {
+      questionaryId = riskAssessment.questionary.questionaryId;
+      riskAssessmentId = riskAssessment.riskAssessmentId;
     } else {
-      return 0; // error
+      // create new risk assessment with questionary
+      const result = await api.createRiskAssessment({
+        proposalPk: riskAssessment.proposalPk,
+        scheduledEventId: riskAssessment.scheduledEventId,
+      });
+      const newRiskAssessment = result.createRiskAssessment.riskAssessment;
+
+      if (newRiskAssessment) {
+        dispatch({
+          type: 'RISK_ASSESSMENT_CREATED',
+          assessment: newRiskAssessment,
+        });
+        questionaryId = newRiskAssessment.questionary.questionaryId;
+        riskAssessmentId = newRiskAssessment.riskAssessmentId;
+      } else {
+        return 0; // error
+      }
     }
-  }
 
-  const sampleIds = riskAssessment.samples.map((sample) => sample.id);
-  await api.updateRiskAssessment({
-    riskAssessmentId: riskAssessmentId,
-    sampleIds: sampleIds,
-  });
+    const sampleIds = riskAssessment.samples.map((sample) => sample.id);
+    await api.updateRiskAssessment({
+      riskAssessmentId: riskAssessmentId,
+      sampleIds: sampleIds,
+    });
 
-  return questionaryId;
-};
+    return questionaryId;
+  };
 
 export {
   QuestionaryComponentRiskAssessmentBasis,

@@ -7,12 +7,10 @@ import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import ExperimentsTable from './ExperimentTimesTable';
 
 export default function UserExperimentTimesTable() {
-  const {
-    loading,
-    proposalScheduledEvents,
-  } = useProposalBookingsScheduledEvents({
-    notDraft: true,
-  });
+  const { loading, proposalScheduledEvents } =
+    useProposalBookingsScheduledEvents({
+      notDraft: true,
+    });
 
   return (
     <ContentContainer>

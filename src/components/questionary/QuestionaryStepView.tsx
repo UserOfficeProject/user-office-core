@@ -54,9 +54,8 @@ export const createFormikConfigObjects = (
       answer.question.dataType
     );
     if (definition.createYupValidationSchema) {
-      validationSchema[
-        answer.question.id
-      ] = definition.createYupValidationSchema(answer, state, api);
+      validationSchema[answer.question.id] =
+        definition.createYupValidationSchema(answer, state, api);
       initialValues[answer.question.id] = definition.getYupInitialValue({
         answer,
         state,

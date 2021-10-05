@@ -94,17 +94,13 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     urlQueryParams.instrument || 0
   );
 
-  const {
-    loading,
-    userData,
-    setUserData,
-    setUserWithReviewsFilter,
-  } = useUserWithReviewsData({
-    callId: selectedCallId,
-    instrumentId: selectedInstrumentId,
-    status: getFilterStatus(urlQueryParams.reviewStatus),
-    reviewer: getFilterReviewer(urlQueryParams.reviewer),
-  });
+  const { loading, userData, setUserData, setUserWithReviewsFilter } =
+    useUserWithReviewsData({
+      callId: selectedCallId,
+      instrumentId: selectedInstrumentId,
+      status: getFilterStatus(urlQueryParams.reviewStatus),
+      reviewer: getFilterReviewer(urlQueryParams.reviewer),
+    });
 
   const handleStatusFilterChange = (reviewStatus: ReviewStatus) => {
     setUrlQueryParams((queries) => ({ ...queries, reviewStatus }));

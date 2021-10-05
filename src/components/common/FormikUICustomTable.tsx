@@ -124,9 +124,8 @@ export const FormikUICustomTable = ({
         onRowUpdate: (newData, oldData) =>
           new Promise<void>((resolve) => {
             const newState = [...state];
-            newState[
-              state.indexOf(oldData as Record<string, unknown>)
-            ] = newData;
+            newState[state.indexOf(oldData as Record<string, unknown>)] =
+              newData;
             handleChange(newState);
             resolve();
           }),

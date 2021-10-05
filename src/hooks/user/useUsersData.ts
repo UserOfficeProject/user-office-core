@@ -9,14 +9,8 @@ import { useDataApi } from 'hooks/common/useDataApi';
 export function useUsersData(
   usersFilter: GetUsersQueryVariables & { refreshData?: boolean }
 ) {
-  const {
-    filter,
-    offset,
-    first,
-    subtractUsers,
-    userRole,
-    refreshData,
-  } = usersFilter;
+  const { filter, offset, first, subtractUsers, userRole, refreshData } =
+    usersFilter;
   const [usersData, setUsersData] = useState<{
     totalCount: number;
     users: Array<BasicUserDetailsFragment>;

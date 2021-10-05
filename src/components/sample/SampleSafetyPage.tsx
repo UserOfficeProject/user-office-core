@@ -160,10 +160,8 @@ function SampleSafetyPage() {
     urlQueryParams.call ? urlQueryParams.call : 0
   );
   const [samples, setSamples] = useState<SampleWithProposalData[]>([]);
-  const [
-    selectedSample,
-    setSelectedSample,
-  ] = useState<SampleWithProposalData | null>(null);
+  const [selectedSample, setSelectedSample] =
+    useState<SampleWithProposalData | null>(null);
 
   useEffect(() => {
     if (selectedCallId === null) {

@@ -17,14 +17,11 @@ import {
 } from 'utils/Time';
 
 export default function UserUpcomingExperimentsTable() {
-  const {
-    loading,
-    proposalScheduledEvents,
-    setProposalScheduledEvents,
-  } = useProposalBookingsScheduledEvents({
-    onlyUpcoming: true,
-    notDraft: true,
-  });
+  const { loading, proposalScheduledEvents, setProposalScheduledEvents } =
+    useProposalBookingsScheduledEvents({
+      onlyUpcoming: true,
+      notDraft: true,
+    });
 
   const [modalContents, setModalContents] = useState<ReactNode>(null);
 

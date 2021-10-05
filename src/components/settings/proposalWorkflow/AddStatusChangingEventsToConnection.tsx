@@ -57,114 +57,116 @@ type AddStatusChangingEventsToConnectionProps = {
   statusName?: string;
 };
 
-const AddStatusChangingEventsToConnection: React.FC<AddStatusChangingEventsToConnectionProps> = ({
-  statusChangingEvents,
-  close,
-  addStatusChangingEventsToConnection,
-  statusName,
-}) => {
-  const classes = useStyles();
+const AddStatusChangingEventsToConnection: React.FC<AddStatusChangingEventsToConnectionProps> =
+  ({
+    statusChangingEvents,
+    close,
+    addStatusChangingEventsToConnection,
+    statusName,
+  }) => {
+    const classes = useStyles();
 
-  const { proposalEvents, loadingProposalEvents } = useProposalEventsData();
+    const { proposalEvents, loadingProposalEvents } = useProposalEventsData();
 
-  const initialValues: {
-    selectedStatusChangingEvents: Event[];
-  } = {
-    selectedStatusChangingEvents: statusChangingEvents || [],
-  };
+    const initialValues: {
+      selectedStatusChangingEvents: Event[];
+    } = {
+      selectedStatusChangingEvents: statusChangingEvents || [],
+    };
 
-  return (
-    <Container component="main">
-      <Formik
-        initialValues={initialValues}
-        onSubmit={async (values): Promise<void> => {
-          addStatusChangingEventsToConnection(
-            values.selectedStatusChangingEvents
-          );
-          close();
-        }}
-        validationSchema={addStatusChangingEventsToConnectionValidationSchema}
-      >
-        {({ isSubmitting, values }): JSX.Element => (
-          <Form>
-            <Typography className={classes.cardHeader}>
-              Events that will trigger the change to{' '}
-              <span className="statusName">{statusName}</span> status
-            </Typography>
+    return (
+      <Container component="main">
+        <Formik
+          initialValues={initialValues}
+          onSubmit={async (values): Promise<void> => {
+            addStatusChangingEventsToConnection(
+              values.selectedStatusChangingEvents
+            );
+            close();
+          }}
+          validationSchema={addStatusChangingEventsToConnectionValidationSchema}
+        >
+          {({ isSubmitting, values }): JSX.Element => (
+            <Form>
+              <Typography className={classes.cardHeader}>
+                Events that will trigger the change to{' '}
+                <span className="statusName">{statusName}</span> status
+              </Typography>
 
-            <Grid container spacing={1} className={classes.container}>
-              {loadingProposalEvents ? (
-                <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
-              ) : (
-                <FieldArray
-                  name="selectedStatusChangingEvents"
-                  render={(arrayHelpers) => (
-                    <>
-                      {proposalEvents.map((proposalEvent, index) => (
-                        <Grid key={index} item sm={6}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                id={proposalEvent.name}
-                                name="selectedStatusChangingEvents"
-                                value={proposalEvent.name}
-                                checked={values.selectedStatusChangingEvents.includes(
-                                  proposalEvent.name
-                                )}
-                                color="primary"
-                                data-cy="status-changing-event"
-                                onChange={(e) => {
-                                  if (e.target.checked)
-                                    arrayHelpers.push(proposalEvent.name);
-                                  else {
-                                    const idx = values.selectedStatusChangingEvents.indexOf(
-                                      proposalEvent.name
-                                    );
-                                    arrayHelpers.remove(idx);
-                                  }
-                                }}
-                                inputProps={{
-                                  'aria-label': 'primary checkbox',
-                                }}
-                              />
-                            }
-                            label={proposalEvent.name}
-                          />
-                          <p className={classes.eventDescription}>
-                            {proposalEvent.description}
-                          </p>
-                        </Grid>
-                      ))}
-                    </>
-                  )}
-                />
-              )}
-            </Grid>
-            <Grid
-              container
-              justify="flex-end"
-              className={classes.submitContainer}
-            >
-              <Grid item>
-                <ErrorMessage name="selectedStatusChangingEvents" />
-
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  disabled={isSubmitting || loadingProposalEvents}
-                  data-cy="submit"
-                >
-                  Add status changing events
-                </Button>
+              <Grid container spacing={1} className={classes.container}>
+                {loadingProposalEvents ? (
+                  <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
+                ) : (
+                  <FieldArray
+                    name="selectedStatusChangingEvents"
+                    render={(arrayHelpers) => (
+                      <>
+                        {proposalEvents.map((proposalEvent, index) => (
+                          <Grid key={index} item sm={6}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  id={proposalEvent.name}
+                                  name="selectedStatusChangingEvents"
+                                  value={proposalEvent.name}
+                                  checked={values.selectedStatusChangingEvents.includes(
+                                    proposalEvent.name
+                                  )}
+                                  color="primary"
+                                  data-cy="status-changing-event"
+                                  onChange={(e) => {
+                                    if (e.target.checked)
+                                      arrayHelpers.push(proposalEvent.name);
+                                    else {
+                                      const idx =
+                                        values.selectedStatusChangingEvents.indexOf(
+                                          proposalEvent.name
+                                        );
+                                      arrayHelpers.remove(idx);
+                                    }
+                                  }}
+                                  inputProps={{
+                                    'aria-label': 'primary checkbox',
+                                  }}
+                                />
+                              }
+                              label={proposalEvent.name}
+                            />
+                            <p className={classes.eventDescription}>
+                              {proposalEvent.description}
+                            </p>
+                          </Grid>
+                        ))}
+                      </>
+                    )}
+                  />
+                )}
               </Grid>
-            </Grid>
-          </Form>
-        )}
-      </Formik>
-    </Container>
-  );
-};
+              <Grid
+                container
+                justify="flex-end"
+                className={classes.submitContainer}
+              >
+                <Grid item>
+                  <ErrorMessage name="selectedStatusChangingEvents" />
+
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    disabled={isSubmitting || loadingProposalEvents}
+                    data-cy="submit"
+                  >
+                    Add status changing events
+                  </Button>
+                </Grid>
+              </Grid>
+            </Form>
+          )}
+        </Formik>
+      </Container>
+    );
+  };
 
 AddStatusChangingEventsToConnection.propTypes = {
   close: PropTypes.func.isRequired,

@@ -50,10 +50,8 @@ function CreateRiskAssessment({
 }: CreateRiskAssessmentProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
-  const [
-    blankRiskAssessment,
-    setBlankRiskAssessment,
-  ] = useState<RiskAssessmentWithQuestionary>();
+  const [blankRiskAssessment, setBlankRiskAssessment] =
+    useState<RiskAssessmentWithQuestionary>();
 
   useEffect(() => {
     api()
