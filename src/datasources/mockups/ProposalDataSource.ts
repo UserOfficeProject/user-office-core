@@ -289,18 +289,18 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async addProposalBookingScheduledEvent(
     eventMessage: ScheduledEventCore
   ): Promise<void> {
-    // Not implemented
+    return;
   }
 
   async removeProposalBookingScheduledEvents(
     eventMessage: ScheduledEventCore[]
   ): Promise<void> {
-    // Not implemented
+    return;
   }
 
   async updateProposalBookingScheduledEvent(
     eventMessage: ScheduledEventCore
   ): Promise<void> {
-    // Not implemented
+    return;
   }
 }
