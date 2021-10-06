@@ -301,6 +301,7 @@ export function createListenToRabbitMQHandler() {
 
       case Event.PROPOSAL_BOOKING_TIME_ACTIVATED:
       case Event.PROPOSAL_BOOKING_TIME_COMPLETED:
+      case Event.PROPOSAL_BOOKING_TIME_UPDATED:
         logger.logDebug(
           `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
           {
@@ -323,7 +324,7 @@ export function createListenToRabbitMQHandler() {
         return;
       default:
         // captured and logged by duo-message-broker
-        // message forwarded to dead-letter queue (DL__PROPOSALS)
+        // message forwarded to dead-letter queue (DL__SCHEDULED_EVENTS)
         throw 'Received unknown event';
     }
   });
