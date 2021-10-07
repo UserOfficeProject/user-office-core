@@ -814,7 +814,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     if (!updatedScheduledEvent) {
       throw new Error(
-        `Failed to add proposal booking scheduled event '${eventToUpdate.id}'`
+        `Failed to update proposal booking scheduled event '${eventToUpdate.id}'`
       );
     }
   }
