@@ -18,6 +18,5 @@ export interface GenericTemplateDataSource {
   getGenericTemplate(
     genericTemplateId: number
   ): Promise<GenericTemplate | null>;
-  getGenericTemplatesByCallId(callId: number): Promise<GenericTemplate[]>;
   getGenericTemplates(args: GenericTemplatesArgs): Promise<GenericTemplate[]>;
 }

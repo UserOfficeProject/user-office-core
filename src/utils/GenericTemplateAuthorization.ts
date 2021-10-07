@@ -34,11 +34,11 @@ export class GenericTemplateAuthorization {
 
   async hasReadRights(
     agent: UserWithRole | null,
-    sample: GenericTemplate
+    genericTemplate: GenericTemplate
   ): Promise<boolean>;
   async hasReadRights(
     agent: UserWithRole | null,
-    sampleId: number
+    genericTemplateId: number
   ): Promise<boolean>;
   async hasReadRights(
     agent: UserWithRole | null,
@@ -80,8 +80,8 @@ export class GenericTemplateAuthorization {
     }
 
     /*
-     * For the sample the authorization follows the business logic for the proposal
-     * authorization that the sample is associated with
+     * For the genericTemplate the authorization follows the business logic for the proposal
+     * authorization that the genericTemplate is associated with
      */
     return this.userAuthorization.hasAccessRights(
       agent,

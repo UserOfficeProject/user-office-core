@@ -32,7 +32,7 @@ BEGIN
             'generic_template_basis',
             'GENERIC_TEMPLATE_BASIS',
             'Template basic information',
-            '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}',
+            '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":"","questionLabel":""}',
             'generic_template_basis',
             6
         );

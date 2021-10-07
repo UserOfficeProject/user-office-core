@@ -40,11 +40,6 @@ export class GenericTemplateDataSourceMock
     return this.genericTemplates;
   }
 
-  async getGenericTemplatesByCallId(
-    _callId: number
-  ): Promise<GenericTemplate[]> {
-    return this.genericTemplates;
-  }
   async create(
     title: string,
     creatorId: number,

@@ -138,22 +138,6 @@ export default class PostgresGenericTemplateDataSource
       });
   }
 
-  getGenericTemplatesByCallId(callId: number): Promise<GenericTemplate[]> {
-    return database('proposals')
-      .join(
-        'generic_templates',
-        'proposals.proposal_pk',
-        'generic_templates.proposal_pk'
-      )
-      .select('generic_templates.*')
-      .where(' proposals.call_id', callId)
-      .then((records: GenericTemplateRecord[]) => {
-        return (
-          records.map((record) => createGenericTemplateObject(record)) || []
-        );
-      });
-  }
-
   async getGenericTemplates(
     args: GenericTemplatesArgs
   ): Promise<GenericTemplate[]> {

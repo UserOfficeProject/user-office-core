@@ -3,8 +3,6 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
-import { Authorized } from '../decorators';
-import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { GenericTemplatesArgs } from '../resolvers/queries/GenericTemplatesQuery';
 import { GenericTemplateAuthorization } from '../utils/GenericTemplateAuthorization';
@@ -16,7 +14,7 @@ export default class GenericTemplateQueries {
     private dataSource: GenericTemplateDataSource,
 
     @inject(Tokens.GenericTemplateAuthorization)
-    private genericTemplateAuthorization: GenericTemplateAuthorization,
+    private genericTemplateAuthorization: GenericTemplateAuthorization
   ) {}
 
   async getGenericTemplate(
@@ -56,10 +54,5 @@ export default class GenericTemplateQueries {
     ).then((results) => genericTemplates.filter((_v, index) => results[index]));
 
     return genericTemplates;
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  async getGenericTemplatesByCallId(user: UserWithRole | null, callId: number) {
-    return await this.dataSource.getGenericTemplatesByCallId(callId);
   }
 }

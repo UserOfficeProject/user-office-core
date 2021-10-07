@@ -10,6 +10,7 @@ import {
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -47,6 +48,8 @@ export default class ProposalMutations {
     private instrumentDataSource: InstrumentDataSource,
     @inject(Tokens.SampleDataSource)
     private sampleDataSource: SampleDataSource,
+    @inject(Tokens.GenericTemplateDataSource)
+    private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
     @inject(Tokens.UserAuthorization)
@@ -558,6 +561,23 @@ export default class ProposalMutations {
           safetyComment: '',
           safetyStatus: SampleStatus.PENDING_EVALUATION,
           shipmentId: null,
+        });
+      }
+
+      const proposalGenericTemplates =
+        await this.genericTemplateDataSource.getGenericTemplates({
+          filter: { proposalPk: sourceProposal.primaryKey },
+        });
+
+      for await (const genericTemplate of proposalGenericTemplates) {
+        const clonedGenericTemplate =
+          await this.genericTemplateDataSource.cloneGenericTemplate(
+            genericTemplate.id
+          );
+        await this.genericTemplateDataSource.updateGenericTemplate({
+          genericTemplateId: clonedGenericTemplate.id,
+          proposalPk: clonedProposal.primaryKey,
+          questionaryId: clonedGenericTemplate.questionaryId,
         });
       }
 

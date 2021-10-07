@@ -2,40 +2,26 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
-import {
-  dummyUserNotOnProposalWithRole,
-  dummyUserOfficerWithRole,
-  dummyUserWithRole,
-} from '../datasources/mockups/UserDataSource';
-import SampleQueries from './SampleQueries';
+import { GenericTemplateDataSourceMock } from '../datasources/mockups/GenericTemplateDataSource';
+import { dummyUserOfficerWithRole } from '../datasources/mockups/UserDataSource';
+import GenericTemplateQueries from './GenericTemplateQueries';
 
-const sampleQueries = container.resolve(SampleQueries);
+const genericTemplateQueries = container.resolve(GenericTemplateQueries);
 
 beforeEach(() => {
-  container.resolve<SampleDataSourceMock>(Tokens.SampleDataSource).init();
+  container
+    .resolve<GenericTemplateDataSourceMock>(Tokens.GenericTemplateDataSource)
+    .init();
 });
 
-test('A userofficer can get samples', () => {
+test('A userofficer can get genericTemplates', () => {
   return expect(
-    sampleQueries.getSamples(dummyUserOfficerWithRole, {})
+    genericTemplateQueries.getGenericTemplates(dummyUserOfficerWithRole, {})
   ).resolves.not.toBe(null);
 });
 
-test('A userofficer can get samples by shipment id', () => {
+test('A userofficer should get', () => {
   return expect(
-    sampleQueries.getSamplesByShipmentId(dummyUserOfficerWithRole, 1)
+    genericTemplateQueries.getGenericTemplates(dummyUserOfficerWithRole, {})
   ).resolves.not.toBe(null);
-});
-
-test('A user of proposal can get samples by shipment id', () => {
-  return expect(
-    sampleQueries.getSamplesByShipmentId(dummyUserWithRole, 1)
-  ).resolves.not.toBe(null);
-});
-
-test('A user not on proposal can not get samples by shipment id', () => {
-  return expect(
-    sampleQueries.getSamplesByShipmentId(dummyUserNotOnProposalWithRole, 1)
-  ).resolves.toBe(null);
 });

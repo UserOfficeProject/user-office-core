@@ -22,6 +22,9 @@ export class SampleBasisConfig {
 export class GenericTemplateBasisConfig {
   @Field(() => String)
   titlePlaceholder: string;
+
+  @Field(() => String)
+  questionLabel: string;
 }
 
 @ObjectType()
