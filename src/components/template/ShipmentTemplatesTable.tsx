@@ -4,7 +4,7 @@ import DoneIcon from '@material-ui/icons/Done';
 import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { ProposalTemplate, Template, TemplateCategoryId } from 'generated/sdk';
+import { ProposalTemplate, Template, TemplateGroupId } from 'generated/sdk';
 import { useActiveTemplateId } from 'hooks/template/useActiveTemplateId';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -32,7 +32,7 @@ type ShipmentTemplatesTableProps = {
 function ShipmentTemplatesTable(props: ShipmentTemplatesTableProps) {
   const { api } = useDataApiWithFeedback();
   const { activeTemplateId, setActiveTemplateId } = useActiveTemplateId(
-    TemplateCategoryId.SHIPMENT_DECLARATION
+    TemplateGroupId.SHIPMENT
   );
   const classes = useStyles();
 
@@ -49,7 +49,7 @@ function ShipmentTemplatesTable(props: ShipmentTemplatesTableProps) {
   return (
     <TemplatesTable
       columns={columns}
-      templateCategory={TemplateCategoryId.SHIPMENT_DECLARATION}
+      templateGroup={TemplateGroupId.SHIPMENT}
       isRowRemovable={() => {
         return true;
       }}
@@ -69,7 +69,7 @@ function ShipmentTemplatesTable(props: ShipmentTemplatesTableProps) {
             const newActiveTemplateId = (data as Pick<Template, 'templateId'>)
               .templateId;
             await api().setActiveTemplate({
-              templateCategoryId: TemplateCategoryId.SHIPMENT_DECLARATION,
+              templateGroupId: TemplateGroupId.SHIPMENT,
               templateId: newActiveTemplateId,
             });
             setActiveTemplateId(newActiveTemplateId);

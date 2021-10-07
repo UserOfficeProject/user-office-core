@@ -20,16 +20,17 @@ const createTopic = (title) => {
     .type(`${title}{enter}`);
 };
 
+const typeToMenuTitle = new Map();
+typeToMenuTitle.set('proposal', 'Proposal');
+typeToMenuTitle.set('sample', 'Sample declaration');
+typeToMenuTitle.set('shipment', 'Shipment declaration templates');
+typeToMenuTitle.set('visit', 'Visit registration');
+typeToMenuTitle.set('proposalEsi', 'Experiment Safety Input (Proposal)');
+typeToMenuTitle.set('sampleEsi', 'Experiment Safety Input (Sample)');
+
 function createTemplate(type, title, description) {
   const templateTitle = title || faker.random.words(2);
   const templateDescription = description || faker.random.words(3);
-
-  const typeToMenuTitle = new Map();
-  typeToMenuTitle.set('proposal', 'Proposal');
-  typeToMenuTitle.set('sample', 'Sample declaration');
-  typeToMenuTitle.set('shipment', 'Shipment declaration templates');
-  typeToMenuTitle.set('visit', 'Visit');
-  typeToMenuTitle.set('riskAssessment', 'Risk assessment');
 
   const menuTitle = typeToMenuTitle.get(type);
   if (!menuTitle) {

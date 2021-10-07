@@ -4,6 +4,10 @@ context('Settings tests', () => {
   describe('Proposal statuses tests', () => {
     before(() => {
       cy.resetDB();
+      cy.viewport(1920, 1080);
+      cy.login('officer');
+      cy.createTemplate('proposalEsi', 'default esi template');
+      cy.logout();
     });
 
     beforeEach(() => {
@@ -171,6 +175,9 @@ context('Settings tests', () => {
         .contains(editableSubmittedWorkflow)
         .click();
 
+      cy.get('[data-cy="call-esi-template"]').click();
+      cy.get('[role="presentation"]').contains('default esi template').click();
+
       cy.get('[data-cy="next-step"]').click();
 
       cy.get('[data-cy="next-step"]').click();
@@ -206,7 +213,10 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains(proposalTitle).parent().contains('submitted');
+      cy.get('[data-cy=proposal-table]')
+        .contains(proposalTitle)
+        .parent()
+        .contains('submitted');
 
       cy.get('[data-cy="proposal-table"] .MuiTable-root tbody tr')
         .first()
@@ -241,6 +251,10 @@ context('Settings tests', () => {
 
     before(() => {
       cy.resetDB();
+      cy.viewport(1920, 1080);
+      cy.login('officer');
+      cy.createTemplate('proposalEsi', 'default esi template');
+      cy.logout();
     });
 
     beforeEach(() => {
@@ -426,6 +440,9 @@ context('Settings tests', () => {
       cy.get('[role="presentation"] [role="listbox"] li')
         .contains(fastTrackWorkflowName)
         .click();
+
+      cy.get('[data-cy="call-esi-template"]').click();
+      cy.get('[role="listbox"]').contains('default esi template').click();
 
       cy.get('[data-cy="next-step"]').click();
 

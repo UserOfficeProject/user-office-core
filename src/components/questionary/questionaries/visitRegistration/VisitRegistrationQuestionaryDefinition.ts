@@ -2,14 +2,14 @@ import { DefaultReviewWizardStep } from 'components/questionary/createDefaultRev
 import { DefaultStepDisplayElementFactory } from 'components/questionary/DefaultStepDisplayElementFactory';
 import { DefaultWizardStepFactory } from 'components/questionary/DefaultWizardStepFactory';
 import VisitRegistrationReview from 'components/visit/VisitRegistrationReview';
-import { TemplateCategoryId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
 import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 import { VisitRegistrationWizardStep } from './VisitRegistrationWizardStep';
 
 export const visitRegistrationQuestionaryDefinition: QuestionaryDefinition = {
-  categoryId: TemplateCategoryId.VISIT,
+  groupId: TemplateGroupId.VISIT_REGISTRATION,
 
   displayElementFactory: new DefaultStepDisplayElementFactory(
     VisitRegistrationReview

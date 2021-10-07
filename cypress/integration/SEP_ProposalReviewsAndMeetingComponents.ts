@@ -715,6 +715,8 @@ context(
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="1"]').click();
 
+      cy.finishedLoading();
+
       cy.get('table tbody [type="checkbox"]').first().check();
 
       cy.get("[title='Assign proposals to SEP']").first().click();
@@ -731,14 +733,12 @@ context(
 
       cy.get("[title='Assign/Remove instrument']").first().click();
 
-      cy.get("#selectedInstrumentId-input").should(
+      cy.get('#selectedInstrumentId-input').should(
         'not.have.class',
         'Mui-disabled'
       );
 
-      cy.get("#selectedInstrumentId-input")
-        .first()
-        .click();
+      cy.get('#selectedInstrumentId-input').first().click();
 
       cy.get("[id='menu-selectedInstrumentId'] li").first().click();
 

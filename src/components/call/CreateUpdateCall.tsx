@@ -4,12 +4,18 @@ import {
 } from '@esss-swap/duo-validation/lib/Call';
 import Typography from '@material-ui/core/Typography';
 import PropTypes from 'prop-types';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
-import { Call, AllocationTimeUnits, UpdateCallInput } from 'generated/sdk';
+import UOLoader from 'components/common/UOLoader';
+import {
+  Call,
+  AllocationTimeUnits,
+  UpdateCallInput,
+  TemplateGroupId,
+} from 'generated/sdk';
+import { useActiveTemplates } from 'hooks/call/useCallTemplates';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
-import { useProposalsTemplates } from 'hooks/template/useProposalTemplates';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import CallGeneralInfo from './CallGeneralInfo';
@@ -23,15 +29,17 @@ type CreateUpdateCallProps = {
 
 const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { api } = useDataApiWithFeedback();
-  const templateIds = useMemo(
-    () =>
-      call?.template?.isArchived && call.templateId ? [call.templateId] : null,
-    [call]
+
+  const { templates: proposalTemplates } = useActiveTemplates(
+    TemplateGroupId.PROPOSAL,
+    call?.templateId
   );
-  const { templates, loadingTemplates } = useProposalsTemplates(
-    false,
-    templateIds
+
+  const { templates: proposalEsiTemplates } = useActiveTemplates(
+    TemplateGroupId.PROPOSAL_ESI,
+    call?.esiTemplateId
   );
+
   const {
     proposalWorkflows,
     loadingProposalWorkflows,
@@ -46,8 +54,9 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const initialValues = call
     ? {
         ...call,
-        templateId: call.templateId || '',
-        proposalWorkflowId: call.proposalWorkflowId || '',
+        templateId: call.templateId || 0,
+        esiTemplateId: call.esiTemplateId || undefined,
+        proposalWorkflowId: call.proposalWorkflowId || 0,
         referenceNumberFormat: call.referenceNumberFormat || '',
       }
     : {
@@ -67,6 +76,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         surveyComment: '',
         proposalWorkflowId: '',
         templateId: '',
+        esiTemplateId: undefined,
         allocationTimeUnit: AllocationTimeUnits.DAY,
         title: '',
         description: '',
@@ -77,6 +87,10 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       close(callToReturn);
     }
   };
+
+  if (!proposalTemplates || !proposalEsiTemplates) {
+    return <UOLoader />;
+  }
 
   return (
     <>
@@ -116,8 +130,9 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
           }
         >
           <CallGeneralInfo
-            templates={templates}
-            loadingTemplates={loadingTemplates}
+            templates={proposalTemplates}
+            esiTemplates={proposalEsiTemplates}
+            loadingTemplates={!proposalTemplates || !proposalEsiTemplates}
             proposalWorkflows={proposalWorkflows}
             loadingProposalWorkflows={loadingProposalWorkflows}
           />

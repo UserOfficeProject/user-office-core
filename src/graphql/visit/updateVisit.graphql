@@ -36,6 +36,10 @@ mutation updateVisit(
       shipments {
         ...shipment
       }
+
+      esi {
+        ...esi
+      }
     }
 
     rejection {

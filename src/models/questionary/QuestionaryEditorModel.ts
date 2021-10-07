@@ -7,6 +7,7 @@ import {
   Question,
   Template,
   TemplateCategoryId,
+  TemplateGroupId,
   TemplateStep,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -57,7 +58,6 @@ export default function QuestionaryEditorModel(
 ) {
   const { templateId } = useParams<{ templateId: string }>();
   const blankInitTemplate: Template = {
-    categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
     steps: [],
     templateId: 0,
     isArchived: false,
@@ -65,6 +65,11 @@ export default function QuestionaryEditorModel(
     complementaryQuestions: [],
     description: '',
     questionaryCount: 0,
+    groupId: TemplateGroupId.PROPOSAL,
+    group: {
+      categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      groupId: TemplateGroupId.PROPOSAL,
+    },
   };
 
   function reducer(state: Template, action: Event): Template {

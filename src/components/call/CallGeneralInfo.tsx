@@ -25,28 +25,35 @@ import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   AllocationTimeUnits,
   CreateCallMutationVariables,
-  GetProposalTemplatesQuery,
+  FeatureId,
+  GetTemplatesQuery,
   ProposalWorkflow,
   UpdateCallMutationVariables,
 } from 'generated/sdk';
+import { ExcludeNull } from 'utils/utilTypes';
 
 const CallGeneralInfo: React.FC<{
-  templates: Exclude<GetProposalTemplatesQuery['proposalTemplates'], null>;
+  templates: ExcludeNull<GetTemplatesQuery['templates']>;
+  esiTemplates: ExcludeNull<GetTemplatesQuery['templates']>;
   loadingTemplates: boolean;
   proposalWorkflows: ProposalWorkflow[];
   loadingProposalWorkflows: boolean;
 }> = ({
   loadingProposalWorkflows,
   proposalWorkflows,
-  loadingTemplates,
   templates,
+  esiTemplates,
+  loadingTemplates,
 }) => {
+  const { features } = useContext(FeatureContext);
+
   const proposalWorkflowOptions = proposalWorkflows.map((proposalWorkflow) => ({
     text: proposalWorkflow.name,
     value: proposalWorkflow.id,
@@ -262,6 +269,21 @@ const CallGeneralInfo: React.FC<{
         InputProps={{ 'data-cy': 'call-template' }}
         required
       />
+      {features.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
+        <FormikDropdown
+          name="esiTemplateId"
+          label="ESI template"
+          loading={loadingTemplates}
+          noOptionsText="No templates"
+          items={esiTemplates.map((template) => ({
+            text: template.name,
+            value: template.templateId,
+          }))}
+          InputProps={{ 'data-cy': 'call-esi-template' }}
+          required
+        />
+      )}
+
       <FormikDropdown
         name="proposalWorkflowId"
         label="Proposal workflow"
@@ -273,6 +295,7 @@ const CallGeneralInfo: React.FC<{
         }}
         required
       />
+
       <FormikDropdown
         name="allocationTimeUnit"
         label="Allocation time unit"

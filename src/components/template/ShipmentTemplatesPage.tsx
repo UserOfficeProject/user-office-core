@@ -2,7 +2,7 @@ import Grid from '@material-ui/core/Grid';
 import React from 'react';
 
 import SimpleTabs from 'components/common/TabPanel';
-import { TemplateCategoryId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { ContentContainer } from 'styles/StyledComponents';
 
@@ -22,7 +22,7 @@ export default function ShipmentTemplatesPage() {
                   .getTemplates({
                     filter: {
                       isArchived: false,
-                      category: TemplateCategoryId.SHIPMENT_DECLARATION,
+                      group: TemplateGroupId.SHIPMENT,
                     },
                   })
                   .then((data) => data.templates || [])
@@ -34,7 +34,7 @@ export default function ShipmentTemplatesPage() {
                   .getTemplates({
                     filter: {
                       isArchived: true,
-                      category: TemplateCategoryId.SAMPLE_DECLARATION,
+                      group: TemplateGroupId.SHIPMENT,
                     },
                   })
                   .then((data) => data.templates || [])

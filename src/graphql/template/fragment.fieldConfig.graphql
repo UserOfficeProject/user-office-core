@@ -48,8 +48,27 @@ fragment fieldConfig on FieldConfig {
     tooltip
   }
 
+  ... on ProposalEsiBasisConfig {
+    tooltip
+  }
+
+  ... on SampleEsiBasisConfig {
+    tooltip
+  }
+
   ... on SampleBasisConfig {
     titlePlaceholder
+  }
+
+  ... on SampleDeclarationConfig {
+    addEntryButtonLabel
+    minEntries
+    maxEntries
+    templateId
+    esiTemplateId
+    templateCategory
+    required
+    small_label
   }
 
   ... on SubTemplateConfig {
@@ -99,12 +118,6 @@ fragment fieldConfig on FieldConfig {
   }
 
   ... on VisitBasisConfig {
-    small_label
-    required
-    tooltip
-  }
-
-  ... on RiskAssessmentBasisConfig {
     small_label
     required
     tooltip

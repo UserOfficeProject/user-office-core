@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 
 import {
+  EsiFragment,
   Instrument,
   Maybe,
   Proposal,
   ProposalBookingStatus,
-  RiskAssessmentFragment,
   ScheduledEventCore,
   Visit,
   VisitFragment,
@@ -34,8 +34,6 @@ export type ProposalScheduledEvent = Pick<
     proposer: BasicUserDetailsFragment | null;
   } & {
     users: BasicUserDetailsFragment[];
-  } & {
-    riskAssessment: Maybe<RiskAssessmentFragment>;
   };
   instrument: Pick<Instrument, 'id' | 'name'> | null;
 } & {
@@ -43,7 +41,7 @@ export type ProposalScheduledEvent = Pick<
     | (VisitFragment & {
         registrations: VisitRegistrationCore[];
         shipments: ShipmentFragment[];
-      } & Pick<Visit, 'teamLead'>)
+      } & Pick<Visit, 'teamLead'> & { esi: Maybe<EsiFragment> })
     | null;
 };
 
@@ -95,7 +93,6 @@ export function useProposalBookingsScheduledEvents({
                     proposalId: proposal.proposalId,
                     proposer: proposal.proposer,
                     users: proposal.users,
-                    riskAssessment: proposal.riskAssessment,
                     finalStatus: proposal.finalStatus,
                     managementDecisionSubmitted:
                       proposal.managementDecisionSubmitted,

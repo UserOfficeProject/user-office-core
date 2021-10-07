@@ -1,0 +1,12 @@
+query getSampleEsi($sampleId: Int!, $esiId: Int!) {
+  sampleEsi(sampleId: $sampleId, esiId: $esiId) {
+    ...sampleEsi
+    questionary {
+      isCompleted
+      ...questionary
+    }
+    sample {
+      ...sample
+    }
+  }
+}

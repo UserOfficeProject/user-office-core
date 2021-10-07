@@ -6,14 +6,14 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 
-import { TemplateCategoryId, TemplateMetadataFragment } from 'generated/sdk';
+import { TemplateGroupId, TemplateMetadataFragment } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 const CreateTemplate = (props: {
   onComplete: (template: TemplateMetadataFragment | null | undefined) => void;
-  categoryId: TemplateCategoryId;
+  groupId: TemplateGroupId;
 }) => {
-  const { onComplete, categoryId } = props;
+  const { onComplete, groupId } = props;
   const { enqueueSnackbar } = useSnackbar();
   const api = useDataApi();
 
@@ -28,7 +28,7 @@ const CreateTemplate = (props: {
           description: '',
         }}
         onSubmit={async (values): Promise<void> => {
-          const result = await api().createTemplate({ ...values, categoryId });
+          const result = await api().createTemplate({ ...values, groupId });
           const {
             createTemplate: { template, rejection },
           } = result;

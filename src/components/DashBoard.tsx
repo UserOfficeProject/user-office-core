@@ -36,6 +36,8 @@ import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
 import InstrSciUpcomingExperimentTimesTable from './proposalBooking/InstrSciUpcomingExperimentTimesTable';
 import UserExperimentTimesTable from './proposalBooking/UserExperimentsTable';
+import CreateProposalEsiPage from './proposalEsi/CreateProposalEsiPage';
+import UpdateProposalEsiPage from './proposalEsi/UpdateProposalEsiPage';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
@@ -45,9 +47,10 @@ import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage
 import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
 import UnitTablePage from './settings/unitList/UnitTablePage';
+import ProposalEsiPage from './template/EsiPage';
 import ProposalTemplates from './template/ProposalTemplates';
 import QuestionsPage from './template/QuestionsPage';
-import RiskAssessmentPage from './template/RiskAssessmentPage';
+import SampleEsiPage from './template/SampleEsiPage';
 import SampleTemplatesPage from './template/SampleTemplates';
 import ShipmentTemplatesPage from './template/ShipmentTemplatesPage';
 import TemplateEditor from './template/TemplateEditor';
@@ -260,10 +263,8 @@ const Dashboard: React.FC = () => {
             component={ShipmentTemplatesPage}
           />
           <Route path="/VisitTemplates" component={VisitTemplatesPage} />
-          <Route
-            path="/RiskAssessmentTemplates"
-            component={RiskAssessmentPage}
-          />
+          <Route path="/EsiTemplates" component={ProposalEsiPage} />
+          <Route path="/SampleEsiTemplates" component={SampleEsiPage} />
           <Route
             path="/ProposalTableReviewer"
             component={ProposalTableReviewer}
@@ -306,6 +307,8 @@ const Dashboard: React.FC = () => {
           {isUserOfficer && (
             <Route path="/Questions" component={QuestionsPage} />
           )}
+          <Route path="/CreateEsi/:visitId" component={CreateProposalEsiPage} />
+          <Route path="/UpdateEsi/:esiId" component={UpdateProposalEsiPage} />
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}
             yes={() => <Route component={ProposalPage} />}

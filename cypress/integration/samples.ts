@@ -2,7 +2,7 @@ import faker from 'faker';
 
 context('Samples tests', () => {
   before(() => {
-    cy.resetDB();
+    cy.resetDB(true);
   });
 
   beforeEach(() => {
@@ -291,7 +291,12 @@ context('Samples tests', () => {
 
     cy.contains('Sample safety').click();
 
-    cy.get('[data-cy="download-sample"]').first().click();
+    cy.get('[data-cy=samples-table]')
+      .contains(sampleTitle)
+      .first()
+      .closest('tr')
+      .find('[data-cy="download-sample"]')
+      .click();
 
     cy.get('[data-cy="preparing-download-dialog"]').should('exist');
     cy.get('[data-cy="preparing-download-dialog-item"]').contains(sampleTitle);

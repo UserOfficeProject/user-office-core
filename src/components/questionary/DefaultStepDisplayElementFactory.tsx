@@ -21,6 +21,7 @@ export class DefaultStepDisplayElementFactory
       case 'VisitReview':
       case 'ShipmentReview':
       case 'ProposalReview':
+      case 'SampleEsiReview':
         return React.createElement(this.reviewStep);
 
       default:

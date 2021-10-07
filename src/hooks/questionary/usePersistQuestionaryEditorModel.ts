@@ -215,7 +215,7 @@ export function usePersistQuestionaryEditorModel() {
         case EventType.CREATE_QUESTION_REQUESTED:
           executeAndMonitorCall(async () => {
             const result = await createQuestion(
-              state.categoryId,
+              state.group.categoryId,
               action.payload.dataType
             );
             if (result.question) {

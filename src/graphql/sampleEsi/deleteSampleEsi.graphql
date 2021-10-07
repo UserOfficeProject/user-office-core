@@ -1,0 +1,10 @@
+mutation deleteSampleEsi($sampleId: Int!, $esiId: Int!) {
+  deleteSampleEsi(sampleId: $sampleId, esiId: $esiId) {
+    esi {
+      ...sampleEsi
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

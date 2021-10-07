@@ -7,7 +7,7 @@ import {
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
 import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
-import { TemplateCategoryId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import { usePersistProposalModel } from 'hooks/proposal/usePersistProposalModel';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
@@ -59,7 +59,7 @@ export default function ProposalContainer(props: {
   const { persistModel: persistProposalModel } = usePersistProposalModel();
   const previousInitialProposal = usePrevious(props.proposal);
 
-  const def = getQuestionaryDefinition(TemplateCategoryId.PROPOSAL_QUESTIONARY);
+  const def = getQuestionaryDefinition(TemplateGroupId.PROPOSAL);
 
   /**
    * Returns true if reset was performed, false otherwise

@@ -3,6 +3,10 @@ import faker from 'faker';
 context('Calls tests', () => {
   before(() => {
     cy.resetDB();
+    cy.viewport(1920, 1080);
+    cy.login('officer');
+    cy.createTemplate('proposalEsi', 'default esi template');
+    cy.logout();
   });
 
   beforeEach(() => {
@@ -14,6 +18,7 @@ context('Calls tests', () => {
     startDate: faker.date.past().toISOString().slice(0, 10),
     endDate: faker.date.future().toISOString().slice(0, 10),
     template: 'default template',
+    esiTemplate: 'default esi template',
   };
 
   const updatedCall = {
@@ -95,6 +100,9 @@ context('Calls tests', () => {
     cy.get('[data-cy="call-template"]').click();
     cy.get('[role="presentation"]').contains('default template').click();
 
+    cy.get('[data-cy="call-esi-template"]').click();
+    cy.get('[role="presentation"]').contains('default esi template').click();
+
     cy.get('[data-cy="call-workflow"]').click();
     cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
@@ -165,7 +173,7 @@ context('Calls tests', () => {
   });
 
   it('A user-officer should be able to create a call', () => {
-    const { shortCode, startDate, endDate, template } = newCall;
+    const { shortCode, startDate, endDate, template, esiTemplate } = newCall;
 
     cy.login('officer');
 
@@ -176,6 +184,7 @@ context('Calls tests', () => {
       startDate,
       endDate,
       template,
+      esiTemplate,
       workflow: proposalWorkflow.name,
     });
 

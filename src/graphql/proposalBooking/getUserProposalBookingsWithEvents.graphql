@@ -36,14 +36,14 @@ query getUserProposalBookingsWithEvents(
                 ...basicUserDetails
               }
             }
+            esi {
+              ...esi
+            }
           }
         }
       }
       visits {
         ...visit
-      }
-      riskAssessment {
-        ...riskAssessment
       }
       instrument {
         id
