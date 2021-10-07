@@ -1,5 +1,5 @@
-mutation cloneGenericTemplate($genericTemplateId: Int!) {
-  cloneGenericTemplate(genericTemplateId: $genericTemplateId) {
+mutation cloneGenericTemplate($genericTemplateId: Int!, $title: String) {
+  cloneGenericTemplate(genericTemplateId: $genericTemplateId, title: $title) {
     genericTemplate {
       ...genericTemplate
       questionary {

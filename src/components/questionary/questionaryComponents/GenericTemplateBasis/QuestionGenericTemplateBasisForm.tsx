@@ -22,6 +22,7 @@ export const QuestionGenericTemplateBasisForm: FC<QuestionFormProps> = (
         question: Yup.string().required('Question is required'),
         config: Yup.object({
           titlePlaceholder: Yup.string(),
+          questionLabel: Yup.string(),
         }),
       })}
     >
@@ -39,7 +40,7 @@ export const QuestionGenericTemplateBasisForm: FC<QuestionFormProps> = (
           />
           <Field
             name="question"
-            label="Question"
+            label="Default Sub template Question"
             id="Question-input"
             type="text"
             component={TextField}

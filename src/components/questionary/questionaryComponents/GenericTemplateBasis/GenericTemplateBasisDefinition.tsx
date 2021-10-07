@@ -1,4 +1,4 @@
-import InboxIcon from '@material-ui/icons/Inbox';
+import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';
@@ -12,14 +12,14 @@ import { QuestionTemplateRelationGenericTemplateBasisForm } from './QuestionTemp
 
 export const genericTemplateBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.GENERIC_TEMPLATE_BASIS,
-  name: 'Generic Template Basis',
+  name: 'Sub Template Basis',
   questionaryComponent: QuestionaryComponentGenericTemplateBasis,
   questionForm: () => QuestionGenericTemplateBasisForm,
   questionTemplateRelationForm: () =>
     QuestionTemplateRelationGenericTemplateBasisForm,
   readonly: true,
   creatable: false,
-  icon: <InboxIcon />,
+  icon: <DynamicFeedIcon />,
   createYupValidationSchema: createGenericTemplateBasisValidationSchema,
   getYupInitialValue: ({ state }) => {
     const genericTemplateState = state as GenericTemplateSubmissionState;

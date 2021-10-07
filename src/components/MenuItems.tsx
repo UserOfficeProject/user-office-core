@@ -7,6 +7,7 @@ import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import DescriptionIcon from '@material-ui/icons/Description';
+import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import EventIcon from '@material-ui/icons/Event';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
@@ -19,7 +20,6 @@ import InboxIcon from '@material-ui/icons/Inbox';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import NoteAdd from '@material-ui/icons/NoteAdd';
-import NoteAddRoundedIcon from '@material-ui/icons/NoteAddRounded';
 import People from '@material-ui/icons/People';
 import Settings from '@material-ui/icons/Settings';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
@@ -180,12 +180,12 @@ const TemplateMenuListItem = () => {
           </ListItem>
         </Tooltip>
 
-        <Tooltip title="Custom template">
+        <Tooltip title="Sub Template">
           <ListItem component={NavLink} to="/GenericTemplates" button>
             <ListItemIcon>
-              <NoteAddRoundedIcon />
+              <DynamicFeedIcon />
             </ListItemIcon>
-            <ListItemText primary="Custom template" />
+            <ListItemText primary="Sub Template" />
           </ListItem>
         </Tooltip>
 

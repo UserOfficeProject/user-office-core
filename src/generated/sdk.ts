@@ -149,11 +149,6 @@ export type BulkUpsertLostTimesInput = {
   lostTimes: Array<SimpleLostTimeInput>;
 };
 
-export type BulkUpsertScheduledEventsInput = {
-  proposalBookingId: Scalars['Int'];
-  scheduledEvents: Array<SimpleScheduledEventInput>;
-};
-
 export type Call = {
   __typename?: 'Call';
   id: Scalars['Int'];
@@ -317,6 +312,12 @@ export type DeleteProposalWorkflowStatusInput = {
   proposalStatusId: Scalars['Int'];
   proposalWorkflowId: Scalars['Int'];
   sortOrder: Scalars['Int'];
+};
+
+export type DeleteScheduledEventsInput = {
+  ids: Array<Scalars['Int']>;
+  proposalBookingId: Scalars['Int'];
+  instrumentId: Scalars['Int'];
 };
 
 export enum DependenciesLogicOperator {
@@ -561,6 +562,7 @@ export type GenericTemplate = {
 export type GenericTemplateBasisConfig = {
   __typename?: 'GenericTemplateBasisConfig';
   titlePlaceholder: Scalars['String'];
+  questionLabel: Scalars['String'];
 };
 
 export type GenericTemplateResponseWrap = {
@@ -684,6 +686,7 @@ export type Mutation = {
   updateCall: CallResponseWrap;
   assignInstrumentsToCall: CallResponseWrap;
   removeAssignedInstrumentFromCall: CallResponseWrap;
+  createGenericTemplate: GenericTemplateResponseWrap;
   changeProposalsStatus: SuccessResponseWrap;
   assignProposalsToInstrument: SuccessResponseWrap;
   removeProposalsFromInstrument: SuccessResponseWrap;
@@ -758,7 +761,6 @@ export type Mutation = {
   cloneGenericTemplate: GenericTemplateResponseWrap;
   cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
-  createGenericTemplate: GenericTemplateResponseWrap;
   createProposal: ProposalResponseWrap;
   createVisitRegistrationQuestionary: VisitRegistrationResponseWrap;
   deleteCall: CallResponseWrap;
@@ -802,7 +804,7 @@ export type Mutation = {
   addEquipmentResponsible: Scalars['Boolean'];
   bulkUpsertLostTimes: LostTimesResponseWrap;
   createScheduledEvent: ScheduledEventResponseWrap;
-  bulkUpsertScheduledEvents: ScheduledEventsResponseWrap;
+  deleteScheduledEvents: ScheduledEventsResponseWrap;
   updateScheduledEvent: ScheduledEventResponseWrap;
   activateScheduledEvent: ScheduledEventResponseWrap;
   finalizeScheduledEvent: ScheduledEventResponseWrap;
@@ -862,6 +864,14 @@ export type MutationAssignInstrumentsToCallArgs = {
 
 export type MutationRemoveAssignedInstrumentFromCallArgs = {
   removeAssignedInstrumentFromCallInput: RemoveAssignedInstrumentFromCallInput;
+};
+
+
+export type MutationCreateGenericTemplateArgs = {
+  title: Scalars['String'];
+  templateId: Scalars['Int'];
+  proposalPk: Scalars['Int'];
+  questionId: Scalars['String'];
 };
 
 
@@ -1380,14 +1390,6 @@ export type MutationCloneTemplateArgs = {
 };
 
 
-export type MutationCreateGenericTemplateArgs = {
-  title: Scalars['String'];
-  templateId: Scalars['Int'];
-  proposalPk: Scalars['Int'];
-  questionId: Scalars['String'];
-};
-
-
 export type MutationCreateProposalArgs = {
   callId: Scalars['Int'];
 };
@@ -1612,8 +1614,8 @@ export type MutationCreateScheduledEventArgs = {
 };
 
 
-export type MutationBulkUpsertScheduledEventsArgs = {
-  bulkUpsertScheduledEvents: BulkUpsertScheduledEventsInput;
+export type MutationDeleteScheduledEventsArgs = {
+  deleteScheduledEventsInput: DeleteScheduledEventsInput;
 };
 
 
@@ -1653,6 +1655,7 @@ export type NewScheduledEventInput = {
   endsAt: Scalars['TzLessDateTime'];
   description?: Maybe<Scalars['String']>;
   instrumentId: Scalars['Int'];
+  proposalBookingId?: Maybe<Scalars['Int']>;
 };
 
 export type NextProposalStatus = {
@@ -2809,7 +2812,7 @@ export type ScheduledEventResponseWrap = {
 export type ScheduledEventsResponseWrap = {
   __typename?: 'ScheduledEventsResponseWrap';
   error: Maybe<Scalars['String']>;
-  scheduledEvent: Maybe<Array<ScheduledEvent>>;
+  scheduledEvents: Maybe<Array<ScheduledEvent>>;
 };
 
 export type SchedulerConfig = {
@@ -2921,13 +2924,6 @@ export type SimpleLostTimeInput = {
   endsAt: Scalars['TzLessDateTime'];
   newlyCreated?: Maybe<Scalars['Boolean']>;
   scheduledEventId?: Maybe<Scalars['Int']>;
-};
-
-export type SimpleScheduledEventInput = {
-  id: Scalars['Int'];
-  startsAt: Scalars['TzLessDateTime'];
-  endsAt: Scalars['TzLessDateTime'];
-  newlyCreated?: Maybe<Scalars['Boolean']>;
 };
 
 export type StatusChangingEvent = {
@@ -4280,6 +4276,7 @@ export type GetEventLogsQuery = (
 
 export type CloneGenericTemplateMutationVariables = Exact<{
   genericTemplateId: Scalars['Int'];
+  title?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -4369,23 +4366,6 @@ export type GetGenericTemplateQuery = (
     ) }
     & GenericTemplateFragment
   )> }
-);
-
-export type GetGenericTemplatesByCallIdQueryVariables = Exact<{
-  callId: Scalars['Int'];
-}>;
-
-
-export type GetGenericTemplatesByCallIdQuery = (
-  { __typename?: 'Query' }
-  & { genericTemplatesByCallId: Maybe<Array<(
-    { __typename?: 'GenericTemplate' }
-    & { proposal: (
-      { __typename?: 'Proposal' }
-      & Pick<Proposal, 'primaryKey' | 'proposalId'>
-    ) }
-    & GenericTemplateFragment
-  )>> }
 );
 
 export type GetGenericTemplatesWithProposalDataQueryVariables = Exact<{
@@ -6521,7 +6501,7 @@ type FieldConfigRiskAssessmentBasisConfigFragment = (
 
 type FieldConfigGenericTemplateBasisConfigFragment = (
   { __typename?: 'GenericTemplateBasisConfig' }
-  & Pick<GenericTemplateBasisConfig, 'titlePlaceholder'>
+  & Pick<GenericTemplateBasisConfig, 'titlePlaceholder' | 'questionLabel'>
 );
 
 export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubTemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment | FieldConfigVisitBasisConfigFragment | FieldConfigRiskAssessmentBasisConfigFragment | FieldConfigGenericTemplateBasisConfigFragment;
@@ -7933,6 +7913,7 @@ export const FieldConfigFragmentDoc = gql`
   }
   ... on GenericTemplateBasisConfig {
     titlePlaceholder
+    questionLabel
   }
 }
     `;
@@ -8875,8 +8856,8 @@ export const GetEventLogsDocument = gql`
 }
     `;
 export const CloneGenericTemplateDocument = gql`
-    mutation cloneGenericTemplate($genericTemplateId: Int!) {
-  cloneGenericTemplate(genericTemplateId: $genericTemplateId) {
+    mutation cloneGenericTemplate($genericTemplateId: Int!, $title: String) {
+  cloneGenericTemplate(genericTemplateId: $genericTemplateId, title: $title) {
     genericTemplate {
       ...genericTemplate
       questionary {
@@ -8940,17 +8921,6 @@ export const GetGenericTemplateDocument = gql`
 }
     ${GenericTemplateFragmentDoc}
 ${QuestionaryFragmentDoc}`;
-export const GetGenericTemplatesByCallIdDocument = gql`
-    query getGenericTemplatesByCallId($callId: Int!) {
-  genericTemplatesByCallId(callId: $callId) {
-    ...genericTemplate
-    proposal {
-      primaryKey
-      proposalId
-    }
-  }
-}
-    ${GenericTemplateFragmentDoc}`;
 export const GetGenericTemplatesWithProposalDataDocument = gql`
     query getGenericTemplatesWithProposalData($filter: GenericTemplatesFilter) {
   genericTemplates(filter: $filter) {
@@ -11382,9 +11352,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getGenericTemplate(variables: GetGenericTemplateQueryVariables): Promise<GetGenericTemplateQuery> {
       return withWrapper(() => client.request<GetGenericTemplateQuery>(print(GetGenericTemplateDocument), variables));
-    },
-    getGenericTemplatesByCallId(variables: GetGenericTemplatesByCallIdQueryVariables): Promise<GetGenericTemplatesByCallIdQuery> {
-      return withWrapper(() => client.request<GetGenericTemplatesByCallIdQuery>(print(GetGenericTemplatesByCallIdDocument), variables));
     },
     getGenericTemplatesWithProposalData(variables?: GetGenericTemplatesWithProposalDataQueryVariables): Promise<GetGenericTemplatesWithProposalDataQuery> {
       return withWrapper(() => client.request<GetGenericTemplatesWithProposalDataQuery>(print(GetGenericTemplatesWithProposalDataDocument), variables));

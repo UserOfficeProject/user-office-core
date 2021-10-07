@@ -20,6 +20,7 @@ import { GenericTemplateCore } from 'models/questionary/genericTemplate/GenericT
 import { GenericTemplateWithQuestionary } from 'models/questionary/genericTemplate/GenericTemplateWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
+import withPrompt, { WithPromptType } from 'utils/withPrompt';
 
 import {
   QuestionnairesList,
@@ -63,8 +64,6 @@ function createGenericTemplateStub(
     },
     questionId: questionId,
     questionaryId: 0,
-    //safetyComment: '',
-    //safetyStatus: GenericTemplateStatus.PENDING_EVALUATION,
     title: '',
     proposalPk: proposalPk,
   };
@@ -74,12 +73,13 @@ type QuestionaryComponentGenericTemplateProps = {
   answer: Answer;
   formikProps: FormikProps<Record<string, unknown>>;
   confirm: WithConfirmType;
+  prompt: WithPromptType;
 };
 
 function QuestionaryComponentGenericTemplate(
   props: QuestionaryComponentGenericTemplateProps
 ) {
-  const { answer, confirm } = props;
+  const { answer, confirm, prompt } = props;
   const answerId = answer.question.id;
   const config = answer.config as SubTemplateConfig;
   const { state } = useContext(QuestionaryContext) as ProposalContextType;
@@ -99,13 +99,12 @@ function QuestionaryComponentGenericTemplate(
   return (
     <Field name={answerId}>
       {({ field, form }: FieldProps<GenericTemplateWithQuestionary[]>) => {
-        const copyGenericTemplate = (id: number) =>
+        const copyGenericTemplate = (id: number, title: string) =>
           api()
-            .cloneGenericTemplate({ genericTemplateId: id })
+            .cloneGenericTemplate({ genericTemplateId: id, title: title })
             .then((response) => {
               const clonedGenericTemplate =
                 response.cloneGenericTemplate.genericTemplate;
-
               if (clonedGenericTemplate) {
                 form.setFieldValue(answerId, [
                   ...field.value,
@@ -152,10 +151,9 @@ function QuestionaryComponentGenericTemplate(
                 })();
               }}
               onCloneClick={(item) => {
-                confirm(() => copyGenericTemplate(item.id), {
-                  title: 'Copy GenericTemplate',
-                  description:
-                    'This action will copy the genericTemplate and all data associated with it',
+                prompt((answer) => copyGenericTemplate(item.id, answer), {
+                  question: 'Title',
+                  prefilledAnswer: `Copy of ${item.label}`,
                 })();
               }}
               onAddNewClick={() => {
@@ -170,15 +168,13 @@ function QuestionaryComponentGenericTemplate(
                 const questionId = props.answer.question.id;
                 if (proposalPk <= 0 || !questionId) {
                   throw new Error(
-                    'GenericTemplate Declaration is missing proposal id and/or question id'
+                    'GenericTemplate is missing proposal id and/or question id'
                   );
                 }
                 const templateId = config.templateId;
 
                 if (!templateId) {
-                  throw new Error(
-                    'GenericTemplate Declaration is missing templateId'
-                  );
+                  throw new Error('GenericTemplate is missing templateId');
                 }
 
                 api()
@@ -239,6 +235,7 @@ function QuestionaryComponentGenericTemplate(
 
                     setSelectedGenericTemplate(null);
                   }}
+                  title={answer.question.question}
                 ></GenericTemplateContainer>
               ) : (
                 <UOLoader />
@@ -251,4 +248,4 @@ function QuestionaryComponentGenericTemplate(
   );
 }
 
-export default withConfirm(QuestionaryComponentGenericTemplate);
+export default withConfirm(withPrompt(QuestionaryComponentGenericTemplate));

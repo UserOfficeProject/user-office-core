@@ -1,4 +1,4 @@
-import NoteAddRoundedIcon from '@material-ui/icons/NoteAddRounded';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 import React from 'react';
 import * as Yup from 'yup';
 
@@ -13,14 +13,14 @@ import { QuestionTemplateRelationGenericTemplateForm } from './QuestionTemplateR
 
 export const genericTemplateDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.GENERIC_TEMPLATE,
-  name: 'Custom Template',
+  name: 'Sub Template',
   questionaryComponent: QuestionaryComponentGenericTemplate,
   questionForm: () => QuestionGenericTemplateForm,
   questionTemplateRelationForm: () =>
     QuestionTemplateRelationGenericTemplateForm,
   readonly: true,
   creatable: true,
-  icon: <NoteAddRoundedIcon />,
+  icon: <ListAltIcon />,
   renderers: {
     answerRenderer: () => null,
     questionRenderer: defaultRenderer.questionRenderer,

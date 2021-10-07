@@ -115,6 +115,21 @@ declare global {
       ) => void;
 
       /**
+       * Creates generic tempale question
+       *
+       * @returns {typeof createSampleQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.creategenericTemplateQuestion('Provide deatails of any grants', 'deafult generic template', 'Add grant' {minEntries:0, maxEntries:5})
+       */
+       creategenericTemplateQuestion: (
+        question: string,
+        template: string,
+        addButtonLabel: string,
+        options?: { minEntries?: number; maxEntries?: number }
+      ) => void;
+
+      /**
        * Creates rich text input question
        *
        * @returns {typeof createRichTextInput}
@@ -146,7 +161,7 @@ declare global {
        *    cy.createTemplate('proposal')
        */
       createTemplate: (
-        type: 'proposal' | 'sample' | 'shipment' | 'visit' | 'riskAssessment',
+        type: 'proposal' | 'sample' | 'shipment' | 'visit' | 'riskAssessment' | 'genericTemplate',
         title?: string,
         description?: string
       ) => void;

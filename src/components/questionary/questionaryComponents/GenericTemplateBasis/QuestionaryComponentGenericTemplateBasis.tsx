@@ -8,6 +8,7 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
+import { GenericTemplateBasisConfig } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { GenericTemplateSubmissionState } from 'models/questionary/genericTemplate/GenericTemplateSubmissionState';
 
@@ -17,10 +18,13 @@ const TextFieldNoSubmit = withPreventSubmit(TextField);
 
 function QuestionaryComponentGenericTemplateBasis(props: BasicComponentProps) {
   const {
+    answer,
     answer: {
       question: { id },
     },
   } = props;
+
+  const config = answer.config as GenericTemplateBasisConfig;
 
   const { dispatch, state } = useContext(
     QuestionaryContext
@@ -37,7 +41,7 @@ function QuestionaryComponentGenericTemplateBasis(props: BasicComponentProps) {
       <Field
         name={id}
         id={`${id}-field`}
-        label={props.answer.question.question}
+        label={config.questionLabel || answer.question.question}
         inputProps={{
           onChange: (event: ChangeEvent<HTMLInputElement>) => {
             setTitle(event.currentTarget.value);

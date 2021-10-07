@@ -112,5 +112,6 @@ fragment fieldConfig on FieldConfig {
 
     ... on GenericTemplateBasisConfig {
     titlePlaceholder
+    questionLabel
   }
 }

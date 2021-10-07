@@ -56,6 +56,7 @@ export function GenericTemplateContainer(props: {
     genericTemplate: GenericTemplateWithQuestionary
   ) => void;
   genericTemplateEditDone?: () => void;
+  title: string;
 }) {
   const { api } = useDataApiWithFeedback();
 
@@ -165,7 +166,7 @@ export function GenericTemplateContainer(props: {
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
       <Questionary
-        title={state.genericTemplate.title}
+        title={state.genericTemplate.title || props.title}
         handleReset={handleReset}
         displayElementFactory={def.displayElementFactory}
       />
