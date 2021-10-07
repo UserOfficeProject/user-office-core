@@ -22,9 +22,6 @@ export class SampleBasisConfig {
 export class VisitBasisConfig extends ConfigBase {}
 
 @ObjectType()
-export class RiskAssessmentBasisConfig extends ConfigBase {}
-
-@ObjectType()
 export class BooleanConfig extends ConfigBase {}
 
 @ObjectType()
@@ -127,6 +124,11 @@ export class SubTemplateConfig {
 }
 
 @ObjectType()
+export class SampleDeclarationConfig extends SubTemplateConfig {
+  @Field(() => Int, { nullable: true })
+  esiTemplateId: number | null;
+}
+@ObjectType()
 export class IntervalConfig extends ConfigBase {
   @Field(() => [String], { nullable: true })
   units: string[] | null;
@@ -154,6 +156,18 @@ export class ProposalBasisConfig {
 }
 
 @ObjectType()
+export class ProposalEsiBasisConfig {
+  @Field(() => String)
+  tooltip: string;
+}
+
+@ObjectType()
+export class SampleEsiBasisConfig {
+  @Field(() => String)
+  tooltip: string;
+}
+
+@ObjectType()
 export class RichTextInputConfig extends ConfigBase {
   @Field(() => Int, { nullable: true })
   max: number | null;
@@ -169,13 +183,15 @@ export const FieldConfigType = createUnionType({
     SelectionFromOptionsConfig,
     TextInputConfig,
     SampleBasisConfig,
+    SampleDeclarationConfig,
+    SampleEsiBasisConfig,
     SubTemplateConfig,
     ProposalBasisConfig,
+    ProposalEsiBasisConfig,
     IntervalConfig,
     NumberInputConfig,
     ShipmentBasisConfig,
     RichTextInputConfig,
     VisitBasisConfig,
-    RiskAssessmentBasisConfig,
   ], // function that returns array of object types classes
 });

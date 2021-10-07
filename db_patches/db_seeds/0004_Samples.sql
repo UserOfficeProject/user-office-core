@@ -3,33 +3,33 @@ $DO$
 BEGIN
 
   INSERT INTO public.templates(
-	name, description, is_archived, category_id)
-	VALUES ('Samples default template', 'The default template for the samples', false, 2);
+	name, description, is_archived, group_id)
+	VALUES ('default sample template', 'default sample template', false, 'SAMPLE');
 	
 INSERT INTO public.topics(
 	 topic_title, is_enabled, sort_order, template_id)
-	VALUES ('New sample', true, 0, 2);
+	VALUES ('New sample', true, 0, 4);
 	
 INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('sample_basis', 2, 2, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}', 'AND');
+	VALUES ('sample_basis', 4, 4, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}', 'AND');
 	
 INSERT INTO public.questions(
 	question_id, data_type, question, default_config, created_at, updated_at, natural_key, category_id)
-	VALUES ('sample_declaration_question', 'SAMPLE_DECLARATION', 'Add samples', '{"addEntryButtonLabel":"Add","minEntries":null,"maxEntries":null,"templateId":2,"templateCategory":"SAMPLE_DECLARATION","required":false,"small_label":""}',
+	VALUES ('sample_declaration_question', 'SAMPLE_DECLARATION', 'Add samples', '{"addEntryButtonLabel":"Add","minEntries":null,"maxEntries":null,"templateId":4,"esiTemplateId":3,"templateCategory":"SAMPLE_DECLARATION","required":false,"small_label":""}',
 			'2021-07-20 13:53:29.246687+00', '2021-07-20 13:53:29.246687+00', 'sample_declaration_question', 1);
 	
 INSERT INTO public.topics(
 	 topic_title, is_enabled, sort_order, template_id)
-	VALUES ('Samples', true, 1, 1);
+	VALUES ('Topic title', true, 1, 1);
 	
 INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('sample_declaration_question', 1, 3, 0, '{"addEntryButtonLabel":"Add","templateCategory":"SAMPLE_DECLARATION","templateId":2,"small_label":"","required":false,"minEntries":null,"maxEntries":null}', 'AND');
+	VALUES ('sample_declaration_question', 1, 5, 0, '{"addEntryButtonLabel":"Add","templateCategory":"SAMPLE_DECLARATION","templateId":4,"esiTemplateId":3,"small_label":"","required":false,"minEntries":null,"maxEntries":null}', 'AND');
 
 INSERT INTO public.questionaries(
 	template_id, created_at, creator_id)
-	VALUES ( 2, '2021-07-20 13:59:08.597908+00', 2);
+	VALUES ( 4, '2021-07-20 13:59:08.597908+00', 2);
 	
 INSERT INTO public.samples(
 	title, creator_id, questionary_id, safety_status, created_at, safety_comment, proposal_pk, question_id, shipment_id)
@@ -37,7 +37,7 @@ INSERT INTO public.samples(
 	
 INSERT INTO public.topic_completenesses(
 	questionary_id, topic_id, is_complete)
-	VALUES (2, 2, true);
+	VALUES (2, 4, true);
 	
 INSERT INTO public.topic_completenesses(
 	questionary_id, topic_id, is_complete)
@@ -45,7 +45,7 @@ INSERT INTO public.topic_completenesses(
 	
 INSERT INTO public.topic_completenesses(
 	questionary_id, topic_id, is_complete)
-	VALUES (1, 3, true);
+	VALUES (1, 5, true);
 
 
 

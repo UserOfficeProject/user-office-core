@@ -5,6 +5,7 @@ import {
   Template,
   TemplateCategory,
   TemplateCategoryId,
+  TemplateGroupId,
   TemplatesHasQuestions,
   TemplateStep,
   Topic,
@@ -17,6 +18,7 @@ import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutatio
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { QuestionsFilter } from '../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
+import { TemplateGroup } from '../resolvers/types/TemplateGroup';
 
 export interface TemplateDataSource {
   getTemplateCategories(): Promise<TemplateCategory[]>;
@@ -81,11 +83,13 @@ export interface TemplateDataSource {
     templateId: number,
     topicToExcludeId?: number
   ): Promise<Topic[] | null>;
-  getActiveTemplateId(categoryId: TemplateCategoryId): Promise<number | null>;
+  getActiveTemplateId(groupId: TemplateGroupId): Promise<number | null>;
   upsertTopics(data: Topic[]): Promise<Template>;
   createTopic(args: CreateTopicArgs): Promise<Topic>;
   updateTopicTitle(topicId: number, title: string): Promise<Topic>;
   deleteTopic(id: number): Promise<Topic>;
 
   isNaturalKeyPresent(naturalKey: string): Promise<boolean>;
+
+  getGroup(groupId: TemplateGroupId): Promise<TemplateGroup>;
 }

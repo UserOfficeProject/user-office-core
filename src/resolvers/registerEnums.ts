@@ -11,12 +11,15 @@ import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
 import { QuestionFilterCompareOperator } from '../models/Questionary';
 import { ReviewerFilter, ReviewStatus } from '../models/Review';
-import { RiskAssessment, RiskAssessmentStatus } from '../models/RiskAssessment';
 import { SampleStatus } from '../models/Sample';
 import { SettingsId } from '../models/Settings';
 import { ShipmentStatus } from '../models/Shipment';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
-import { DataType, TemplateCategoryId } from '../models/Template';
+import {
+  DataType,
+  TemplateCategoryId,
+  TemplateGroupId,
+} from '../models/Template';
 import { UserRole } from '../models/User';
 import { VisitStatus } from '../models/Visit';
 import { NumberValueConstraint } from './types/FieldConfig';
@@ -55,11 +58,8 @@ export const registerEnums = () => {
   registerEnumType(AllocationTimeUnits, {
     name: 'AllocationTimeUnits',
   });
-  registerEnumType(RiskAssessment, {
-    name: 'RiskAssessment',
-  });
-  registerEnumType(RiskAssessmentStatus, {
-    name: 'RiskAssessmentStatus',
+  registerEnumType(TemplateGroupId, {
+    name: 'TemplateGroupId',
   });
   registerEnumType(ScheduledEventBookingType, {
     name: 'ScheduledEventBookingType',

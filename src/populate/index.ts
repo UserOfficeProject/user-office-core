@@ -24,6 +24,7 @@ import {
   TemplatesHasQuestions,
 } from '../models/Template';
 import { UserRole } from '../models/User';
+import { TemplateGroupId } from './../models/Template';
 import * as dummy from './dummy';
 import { execute } from './executor';
 
@@ -74,8 +75,8 @@ const createUsers = async () => {
       faker.internet.userName(),
       '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
       faker.name.firstName(),
-      faker.datatype.uuid(),
-      faker.datatype.uuid(),
+      faker.random.uuid(),
+      faker.random.uuid(),
       dummy.gender(),
       dummy.positiveNumber(20),
       faker.date.past(30).toLocaleDateString(),
@@ -152,7 +153,7 @@ const createCalls = async () => {
       endReview: faker.date.future(1),
       endSEPReview: faker.date.future(1),
       referenceNumberFormat: faker.random.words(8),
-      proposalSequence: faker.datatype.number({
+      proposalSequence: faker.random.number({
         min: 0,
         max: 100,
       }),
@@ -170,7 +171,7 @@ const createCalls = async () => {
 const createTemplates = async () => {
   const templates = await execute(() => {
     return templateDataSource.createTemplate({
-      categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      groupId: TemplateGroupId.PROPOSAL,
       name: faker.random.word(),
       description: faker.random.words(3),
     });
@@ -179,7 +180,7 @@ const createTemplates = async () => {
   for (const template of templates) {
     await execute(() => {
       return templateDataSource.createTopic({
-        sortOrder: faker.datatype.number({
+        sortOrder: faker.random.number({
           min: 0,
           max: 100,
         }),
@@ -211,7 +212,7 @@ const createTemplates = async () => {
         await templateDataSource.upsertQuestionTemplateRelations([
           {
             questionId: question.id,
-            sortOrder: faker.datatype.number({
+            sortOrder: faker.random.number({
               min: 0,
               max: 100,
             }),
@@ -304,7 +305,7 @@ const createReviews = async () => {
             ? TechnicalReviewStatus.FEASIBLE
             : TechnicalReviewStatus.UNFEASIBLE,
         timeAllocation: dummy.positiveNumber(10),
-        submitted: faker.datatype.boolean(),
+        submitted: faker.random.boolean(),
         reviewerId: 1,
       },
       false

@@ -25,7 +25,6 @@ import { ProposalBookingCore, ProposalBookingFilter } from './ProposalBooking';
 import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
-import { RiskAssessment } from './RiskAssessment';
 import { Sample } from './Sample';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
@@ -229,24 +228,6 @@ export class ProposalResolver {
       proposalPk: proposal.primaryKey,
     });
   }
-
-  @FieldResolver(() => RiskAssessment, { nullable: true })
-  async riskAssessment(
-    @Root() proposal: Proposal,
-    @Ctx() context: ResolverContext
-  ): Promise<RiskAssessment | null> {
-    const riskAssessments =
-      await context.queries.riskAssessment.getRiskAssessments(context.user, {
-        proposalPk: proposal.primaryKey,
-      });
-
-    if (riskAssessments.length === 0) {
-      return null;
-    }
-
-    return riskAssessments[0];
-  }
-
   @FieldResolver(() => ProposalBookingCore, { nullable: true })
   proposalBookingCore(
     @Root() proposal: Proposal,

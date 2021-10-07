@@ -10,9 +10,9 @@ import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
-import { RiskAssessment } from '../../models/RiskAssessment';
 import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
+import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { SEP, SEPProposal, SEPAssignment, SEPReviewer } from '../../models/SEP';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
@@ -26,6 +26,8 @@ import {
   QuestionTemplateRelation,
   Template,
   TemplateCategory,
+  TemplateGroup,
+  TemplateGroupId,
   Topic,
 } from '../../models/Template';
 import { BasicUserDetails, User } from '../../models/User';
@@ -35,7 +37,7 @@ import {
   ProposalBookingStatus,
   ScheduledEventBookingType,
 } from '../../resolvers/types/ProposalBooking';
-import { RiskAssessmentStatus } from './../../models/RiskAssessment';
+import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 
 // Interfaces corresponding exactly to database tables
 
@@ -177,7 +179,7 @@ export interface QuestionTemplateRelRecord {
 
 export interface TemplateRecord {
   readonly template_id: number;
-  readonly category_id: number;
+  readonly group_id: string;
   readonly name: string;
   readonly description: string;
   readonly is_archived: boolean;
@@ -269,6 +271,7 @@ export interface CallRecord {
   readonly call_review_ended: boolean;
   readonly call_sep_review_ended: boolean;
   readonly template_id: number;
+  readonly esi_template_id: number;
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly title: string;
   readonly description: string;
@@ -526,14 +529,25 @@ export interface VisitRecord {
   readonly created_at: Date;
 }
 
-export interface RiskAssessmentRecord {
-  readonly risk_assessment_id: number;
-  readonly proposal_pk: number;
-  readonly scheduled_event_id: number;
-  readonly creator_user_id: number;
+export interface EsiRecord {
+  readonly esi_id: number;
+  readonly visit_id: number;
+  readonly creator_id: number;
   readonly questionary_id: number;
-  readonly status: string;
+  readonly is_submitted: boolean;
   readonly created_at: Date;
+}
+
+export interface SampleEsiRecord {
+  readonly esi_id: number;
+  readonly sample_id: number;
+  readonly questionary_id: number;
+  readonly is_submitted: boolean;
+}
+
+export interface TemplateGroupRecord {
+  readonly template_group_id: string;
+  readonly category_id: number;
 }
 
 export const createTopicObject = (record: TopicRecord) => {
@@ -560,7 +574,7 @@ export const createQuestionObject = (question: QuestionRecord) => {
 export const createProposalTemplateObject = (template: TemplateRecord) => {
   return new Template(
     template.template_id,
-    template.category_id,
+    template.group_id as TemplateGroupId,
     template.name,
     template.description,
     template.is_archived
@@ -740,6 +754,7 @@ export const createCallObject = (call: CallRecord) => {
     call.call_review_ended,
     call.call_sep_review_ended,
     call.template_id,
+    call.esi_template_id,
     call.allocation_time_unit,
     call.title,
     call.description
@@ -887,17 +902,30 @@ export const createVisitObject = (visit: VisitRecord) => {
   );
 };
 
-export const createRiskAssessmentObject = (
-  riskAssessment: RiskAssessmentRecord
-) => {
-  return new RiskAssessment(
-    riskAssessment.risk_assessment_id,
-    riskAssessment.proposal_pk,
-    riskAssessment.scheduled_event_id,
-    riskAssessment.creator_user_id,
-    riskAssessment.questionary_id,
-    riskAssessment.status as any as RiskAssessmentStatus,
-    riskAssessment.created_at
+export const createEsiObject = (esi: EsiRecord) => {
+  return new ExperimentSafetyInput(
+    esi.esi_id,
+    esi.visit_id,
+    esi.creator_id,
+    esi.questionary_id,
+    esi.is_submitted,
+    esi.created_at
+  );
+};
+
+export const createSampleEsiObject = (esi: SampleEsiRecord) => {
+  return new SampleExperimentSafetyInput(
+    esi.esi_id,
+    esi.sample_id,
+    esi.questionary_id,
+    esi.is_submitted
+  );
+};
+
+export const createTemplateGroupObject = (group: TemplateGroupRecord) => {
+  return new TemplateGroup(
+    group.template_group_id as TemplateGroupId,
+    group.category_id
   );
 };
 

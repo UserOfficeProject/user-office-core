@@ -1,3 +1,4 @@
+import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Visit } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
 import { GetRegistrationsFilter } from '../../queries/VisitQueries';
@@ -12,6 +13,7 @@ import {
   createVisitObject,
   VisitRecord,
   VisitRegistrationRecord,
+  createEsiObject,
 } from './records';
 
 class PostgresVisitDataSource implements VisitDataSource {
@@ -74,6 +76,14 @@ class PostgresVisitDataSource implements VisitDataSource {
       .where({ scheduled_event_id: eventId })
       .first()
       .then((visit) => (visit ? createVisitObject(visit) : null));
+  }
+
+  getEsiByVisitId(visitId: number): Promise<ExperimentSafetyInput | null> {
+    return database('experiment_safety_inputs')
+      .select('*')
+      .where({ visit_id: visitId })
+      .first()
+      .then((esi) => (esi ? createEsiObject(esi) : null));
   }
 
   createVisit(
@@ -161,6 +171,10 @@ class PostgresVisitDataSource implements VisitDataSource {
       .delete()
       .returning('*')
       .then((result) => {
+        if (result.length !== 1) {
+          throw new Error('Visit not found');
+        }
+
         return createVisitObject(result[0]);
       });
   }
