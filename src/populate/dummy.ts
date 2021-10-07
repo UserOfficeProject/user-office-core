@@ -5,7 +5,7 @@ export function word() {
 }
 
 export function positiveNumber(max: number) {
-  return faker.random.number(max - 1) + 1;
+  return faker.datatype.number(max - 1) + 1;
 }
 
 export function title() {

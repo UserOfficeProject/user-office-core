@@ -14,6 +14,7 @@ import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
 import { Proposal, ProposalEndStatus } from '../models/Proposal';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
+import { ScheduledEventCore } from '../models/ScheduledEventCore';
 
 type ProposalMessageData = {
   proposalPk: number;
@@ -28,6 +29,13 @@ export function createPostToQueueHandler() {
   // return the mapped implementation
   return container.resolve<EventHandler<ApplicationEvent>>(
     Tokens.PostToMessageQueue
+  );
+}
+
+export function createListenToQueueHandler() {
+  // return the mapped implementation
+  return container.resolve<EventHandler<ApplicationEvent>>(
+    Tokens.ListenToMessageQueue
   );
 }
 
@@ -65,6 +73,18 @@ const getProposalMessageData = async (proposal: Proposal) => {
   return JSON.stringify(messageData);
 };
 
+const rabbitMQ = new RabbitMQMessageBroker();
+
+// don't try to initialize during testing
+// causes infinite loop
+if (process.env.NODE_ENV !== 'test') {
+  rabbitMQ.setup({
+    hostname: process.env.RABBITMQ_HOSTNAME,
+    username: process.env.RABBITMQ_USERNAME,
+    password: process.env.RABBITMQ_PASSWORD,
+  });
+}
+
 const getSecondsPerAllocationTimeUnit = (
   timeAllocation: number,
   unit: AllocationTimeUnits
@@ -93,14 +113,6 @@ export function createPostToRabbitMQHandler() {
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
   );
-
-  const rabbitMQ = new RabbitMQMessageBroker();
-
-  rabbitMQ.setup({
-    hostname: process.env.RABBITMQ_HOSTNAME,
-    username: process.env.RABBITMQ_USERNAME,
-    password: process.env.RABBITMQ_PASSWORD,
-  });
 
   return async (event: ApplicationEvent) => {
     // if the original method failed
@@ -230,7 +242,101 @@ export function createPostToRabbitMQHandler() {
   };
 }
 
+export function createListenToRabbitMQHandler() {
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
+  rabbitMQ.listenOn(Queue.SCHEDULED_EVENTS, async (type, message) => {
+    switch (type) {
+      case Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED:
+        logger.logDebug(
+          `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
+          {
+            type,
+            message,
+          }
+        );
+
+        const scheduledEventToAdd = {
+          id: message.id,
+          bookingType: message.bookingType,
+          startsAt: message.startsAt,
+          endsAt: message.endsAt,
+          proposalBookingId: message.proposalBookingId,
+          proposalPk: message.proposalPk,
+          status: message.status,
+        };
+
+        await proposalDataSource.addProposalBookingScheduledEvent(
+          scheduledEventToAdd as ScheduledEventCore
+        );
+
+        return;
+      case Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED:
+        logger.logDebug(
+          `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
+          {
+            type,
+            message,
+          }
+        );
+        const scheduledEventsToRemove = (
+          message.scheduledevents as ScheduledEventCore[]
+        ).map((scheduledEvent) => ({
+          id: scheduledEvent.id,
+          bookingType: scheduledEvent.bookingType,
+          startsAt: scheduledEvent.startsAt,
+          endsAt: scheduledEvent.endsAt,
+          proposalBookingId: scheduledEvent.proposalBookingId,
+          proposalPk: scheduledEvent.proposalPk,
+          status: scheduledEvent.status,
+        }));
+
+        await proposalDataSource.removeProposalBookingScheduledEvents(
+          scheduledEventsToRemove
+        );
+
+        return;
+
+      case Event.PROPOSAL_BOOKING_TIME_ACTIVATED:
+      case Event.PROPOSAL_BOOKING_TIME_COMPLETED:
+      case Event.PROPOSAL_BOOKING_TIME_UPDATED:
+        logger.logDebug(
+          `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
+          {
+            type,
+            message,
+          }
+        );
+        const scheduledEventToUpdate = {
+          id: message.id,
+          proposalBookingId: message.proposalBookingId,
+          startsAt: message.startsAt,
+          endsAt: message.endsAt,
+          status: message.status,
+        };
+
+        await proposalDataSource.updateProposalBookingScheduledEvent(
+          scheduledEventToUpdate as ScheduledEventCore
+        );
+
+        return;
+      default:
+        // captured and logged by duo-message-broker
+        // message forwarded to dead-letter queue (DL__SCHEDULED_EVENTS)
+        throw 'Received unknown event';
+    }
+  });
+}
+
 export function createSkipPostingHandler() {
+  return async (event: ApplicationEvent) => {
+    // no op
+  };
+}
+
+export function createSkipListeningHandler() {
   return async (event: ApplicationEvent) => {
     // no op
   };

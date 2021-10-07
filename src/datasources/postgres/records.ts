@@ -13,6 +13,7 @@ import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import { RiskAssessment } from '../../models/RiskAssessment';
 import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
+import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { SEP, SEPProposal, SEPAssignment, SEPReviewer } from '../../models/SEP';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { Settings, SettingsId } from '../../models/Settings';
@@ -30,6 +31,10 @@ import {
 import { BasicUserDetails, User } from '../../models/User';
 import { Visit, VisitStatus } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
+import {
+  ProposalBookingStatus,
+  ScheduledEventBookingType,
+} from '../../resolvers/types/ProposalBooking';
 import { RiskAssessmentStatus } from './../../models/RiskAssessment';
 
 // Interfaces corresponding exactly to database tables
@@ -44,6 +49,16 @@ export interface QuestionaryRecord {
   readonly template_id: number;
   readonly creator_id: number;
   readonly created_at: Date;
+}
+
+export interface ScheduledEventRecord {
+  readonly scheduled_event_id: number;
+  readonly booking_type: ScheduledEventBookingType;
+  readonly starts_at: Date;
+  readonly ends_at: Date;
+  readonly proposal_booking_id: number;
+  readonly proposal_pk: number;
+  readonly status: ProposalBookingStatus;
 }
 
 export interface ProposalRecord {
@@ -885,3 +900,16 @@ export const createRiskAssessmentObject = (
     riskAssessment.created_at
   );
 };
+
+export const createScheduledEventObject = (
+  scheduledEvent: ScheduledEventRecord
+) =>
+  new ScheduledEventCore(
+    scheduledEvent.scheduled_event_id,
+    scheduledEvent.booking_type,
+    scheduledEvent.starts_at,
+    scheduledEvent.ends_at,
+    scheduledEvent.proposal_pk,
+    scheduledEvent.proposal_booking_id,
+    scheduledEvent.status
+  );

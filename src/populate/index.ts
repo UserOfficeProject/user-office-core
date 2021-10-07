@@ -74,8 +74,8 @@ const createUsers = async () => {
       faker.internet.userName(),
       '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
       faker.name.firstName(),
-      faker.random.uuid(),
-      faker.random.uuid(),
+      faker.datatype.uuid(),
+      faker.datatype.uuid(),
       dummy.gender(),
       dummy.positiveNumber(20),
       faker.date.past(30).toLocaleDateString(),
@@ -152,7 +152,7 @@ const createCalls = async () => {
       endReview: faker.date.future(1),
       endSEPReview: faker.date.future(1),
       referenceNumberFormat: faker.random.words(8),
-      proposalSequence: faker.random.number({
+      proposalSequence: faker.datatype.number({
         min: 0,
         max: 100,
       }),
@@ -179,7 +179,7 @@ const createTemplates = async () => {
   for (const template of templates) {
     await execute(() => {
       return templateDataSource.createTopic({
-        sortOrder: faker.random.number({
+        sortOrder: faker.datatype.number({
           min: 0,
           max: 100,
         }),
@@ -211,7 +211,7 @@ const createTemplates = async () => {
         await templateDataSource.upsertQuestionTemplateRelations([
           {
             questionId: question.id,
-            sortOrder: faker.random.number({
+            sortOrder: faker.datatype.number({
               min: 0,
               max: 100,
             }),
@@ -304,7 +304,7 @@ const createReviews = async () => {
             ? TechnicalReviewStatus.FEASIBLE
             : TechnicalReviewStatus.UNFEASIBLE,
         timeAllocation: dummy.positiveNumber(10),
-        submitted: faker.random.boolean(),
+        submitted: faker.datatype.boolean(),
         reviewerId: 1,
       },
       false

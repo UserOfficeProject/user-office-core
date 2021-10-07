@@ -20,6 +20,11 @@ import { DataType, TemplateCategoryId } from '../models/Template';
 import { UserRole } from '../models/User';
 import { VisitStatus } from '../models/Visit';
 import { NumberValueConstraint } from './types/FieldConfig';
+import {
+  EquipmentAssignmentStatus,
+  ProposalBookingStatus,
+  ScheduledEventBookingType,
+} from './types/ProposalBooking';
 
 export const registerEnums = () => {
   registerEnumType(TemplateCategoryId, { name: 'TemplateCategoryId' });
@@ -55,5 +60,12 @@ export const registerEnums = () => {
   });
   registerEnumType(RiskAssessmentStatus, {
     name: 'RiskAssessmentStatus',
+  });
+  registerEnumType(ScheduledEventBookingType, {
+    name: 'ScheduledEventBookingType',
+  });
+  registerEnumType(ProposalBookingStatus, { name: 'ProposalBookingStatus' });
+  registerEnumType(EquipmentAssignmentStatus, {
+    name: 'EquipmentAssignmentStatus',
   });
 };

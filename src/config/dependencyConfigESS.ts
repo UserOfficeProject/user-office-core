@@ -18,7 +18,10 @@ import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSour
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import { SparkPostMailService } from '../eventHandlers/MailService/SparkPostMailService';
-import { createPostToRabbitMQHandler } from '../eventHandlers/messageBroker';
+import {
+  createListenToRabbitMQHandler,
+  createPostToRabbitMQHandler,
+} from '../eventHandlers/messageBroker';
 import { EAMAssetRegistrar } from '../utils/EAM_service';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import { RiskAssessmentAuthorization } from '../utils/RiskAssessmentAuthorization';
@@ -62,6 +65,7 @@ mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 mapClass(Tokens.MailService, SparkPostMailService);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
+mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
 
 mapValue(
   Tokens.ConfigureEnvironment,

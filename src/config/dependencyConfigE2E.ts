@@ -18,7 +18,10 @@ import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSour
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
-import { createSkipPostingHandler } from '../eventHandlers/messageBroker';
+import {
+  createSkipListeningHandler,
+  createSkipPostingHandler,
+} from '../eventHandlers/messageBroker';
 import { SkipAssetRegistrar } from '../utils/EAM_service';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import { RiskAssessmentAuthorization } from '../utils/RiskAssessmentAuthorization';
@@ -60,5 +63,6 @@ mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 mapClass(Tokens.MailService, SkipSendMailService);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
+mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureESSDevelopmentEnvironment);

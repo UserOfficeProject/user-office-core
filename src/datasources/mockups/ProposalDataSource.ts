@@ -7,8 +7,15 @@ import {
   ProposalPksWithNextStatus,
 } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
+import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
+import {
+  ProposalBookingFilter,
+  ProposalBookingScheduledEventFilterCore,
+  ProposalBookingStatus,
+  ScheduledEventBookingType,
+} from '../../resolvers/types/ProposalBooking';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -59,6 +66,16 @@ export const dummySepMeetingDecision = new SepMeetingDecision(
   'Dummy comment for management',
   true,
   1
+);
+
+const dummyScheduledEventCore = new ScheduledEventCore(
+  1,
+  ScheduledEventBookingType.USER_OPERATIONS,
+  new Date(),
+  new Date(),
+  1,
+  1,
+  ProposalBookingStatus.ACTIVE
 );
 
 export class ProposalDataSourceMock implements ProposalDataSource {
@@ -253,5 +270,37 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     proposalPks: number[]
   ): Promise<ProposalPksWithNextStatus> {
     return { proposalPks: [1] };
+  }
+
+  async getProposalBookingByProposalPk(
+    proposalPk: number,
+    filter?: ProposalBookingFilter
+  ): Promise<{ id: number } | null> {
+    return { id: 1 };
+  }
+
+  async proposalBookingScheduledEvents(
+    proposalBookingId: number,
+    filter?: ProposalBookingScheduledEventFilterCore
+  ): Promise<ScheduledEventCore[] | null> {
+    return [dummyScheduledEventCore];
+  }
+
+  async addProposalBookingScheduledEvent(
+    eventMessage: ScheduledEventCore
+  ): Promise<void> {
+    return;
+  }
+
+  async removeProposalBookingScheduledEvents(
+    eventMessage: ScheduledEventCore[]
+  ): Promise<void> {
+    return;
+  }
+
+  async updateProposalBookingScheduledEvent(
+    eventMessage: ScheduledEventCore
+  ): Promise<void> {
+    return;
   }
 }
