@@ -12,11 +12,11 @@ context('Scheduler tests', () => {
   };
   const ended = {
     startsAt: '2020-01-07 10:00',
-    endsAt: '2020-01-07 10:00',
+    endsAt: '2020-01-07 11:00',
   };
   const completed = {
     startsAt: '2023-02-07 12:00',
-    endsAt: '2023-02-07 12:00',
+    endsAt: '2023-02-07 13:00',
   };
   const scientist = 'Carl';
 
@@ -64,8 +64,6 @@ context('Scheduler tests', () => {
     cy.contains(upcomingDraft.startsAt).should('not.exist');
     cy.contains(upcomingDraft.endsAt).should('not.exist');
 
-    cy.contains(upcoming.startsAt).should('exist');
-    cy.contains(upcoming.endsAt).should('exist');
     cy.logout();
   });
 
