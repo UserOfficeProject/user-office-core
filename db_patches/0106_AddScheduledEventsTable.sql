@@ -29,8 +29,7 @@ BEGIN
           OR proposal_pk = new.proposal_pk
         LOOP
           IF 
-            (new.proposal_booking_id = t_row.proposal_booking_id AND new.proposal_pk = t_row.proposal_pk) OR
-            (new.proposal_booking_id != t_row.proposal_booking_id AND new.proposal_pk != t_row.proposal_pk)
+            (new.proposal_booking_id = t_row.proposal_booking_id AND new.proposal_pk = t_row.proposal_pk)
           THEN
             RETURN NEW;
           ELSE
