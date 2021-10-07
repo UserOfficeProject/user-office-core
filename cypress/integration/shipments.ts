@@ -26,13 +26,7 @@ context('Shipments tests', () => {
       timeToAllocate: 2,
       submitManagementDecision: true,
     });
-    // create and activate booking
-    const eventDate = faker.date.future().toISOString().split('T')[0];
-    cy.createScheduledEvent(1, {
-      startsAt: `${eventDate} 10:00`,
-      endsAt: `${eventDate} 11:00`,
-    });
-    cy.activateBooking(1);
+
     cy.logout();
 
     // Create team

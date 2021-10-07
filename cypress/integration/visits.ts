@@ -25,12 +25,6 @@ context('visits tests', () => {
     cy.get('[data-cy="save-admin-decision"]').click();
     cy.closeModal();
     cy.logout();
-    const eventDate = faker.date.future().toISOString().split('T')[0];
-    cy.createScheduledEvent(1, {
-      startsAt: `${eventDate} 10:00`,
-      endsAt: `${eventDate} 11:00`,
-    });
-    cy.activateBooking(1);
   });
 
   beforeEach(() => {
@@ -84,7 +78,7 @@ context('visits tests', () => {
     cy.testActionButton(declareShipmentTitle, 'inactive');
 
     // create visit
-    cy.get(`[title="${formTeamTitle}"]`).click();
+    cy.get(`[title="${formTeamTitle}"]`).first().click();
 
     // test error messages
     cy.get('[type="submit"]').click();
@@ -94,6 +88,7 @@ context('visits tests', () => {
     // add visitors
     cy.get('[data-cy=add-participant-button]').click();
     cy.get('[name=email]').type('david@teleworm.us{enter}');
+    cy.finishedLoading();
     cy.contains('Beckley').parent().find('[type=checkbox]').click();
     cy.contains('Carlsson').parent().find('[type=checkbox]').click();
     cy.get('[data-cy=assign-selected-users]').click();
@@ -132,7 +127,7 @@ context('visits tests', () => {
     // test if the actions are available after co-proposer defined the team
     cy.testActionButton(registerVisitTitle, 'active');
 
-    cy.get(`[title="${registerVisitTitle}"]`).click();
+    cy.get(`[title="${registerVisitTitle}"]`).first().click();
 
     cy.contains(startDateQuestionTitle).parent().click().type('2021-07-20');
     cy.contains(endDateQuestionTitle).parent().click().type('2021-07-21');
@@ -156,7 +151,7 @@ context('visits tests', () => {
     cy.testActionButton(registerVisitTitle, 'active');
     cy.testActionButton(individualTrainingTitle, 'active');
 
-    cy.get(`[title="${formTeamTitle}"]`).click();
+    cy.get(`[title="${formTeamTitle}"]`).first().click();
 
     cy.contains('Carlsson').parent().find('[title=Delete]').click();
 
@@ -164,7 +159,13 @@ context('visits tests', () => {
 
     cy.get('[data-cy=create-visit-button]').click();
 
-    cy.testActionButton(registerVisitTitle, 'invisible');
-    cy.testActionButton(individualTrainingTitle, 'invisible');
+    cy.contains('2023-01-07 10:00')
+      .parent()
+      .get(`[title="${registerVisitTitle}]`)
+      .should('not.exist');
+    cy.contains('2023-01-07 10:00')
+      .parent()
+      .get(`[title="${individualTrainingTitle}]`)
+      .should('not.exist');
   });
 });

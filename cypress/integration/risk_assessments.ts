@@ -38,12 +38,6 @@ context('visits tests', () => {
     cy.get('[data-cy="save-admin-decision"]').click();
     cy.closeModal();
     cy.logout();
-    const eventDate = faker.date.future().toISOString().split('T')[0];
-    cy.createScheduledEvent(1, {
-      startsAt: `${eventDate} 10:00`,
-      endsAt: `${eventDate} 11:00`,
-    });
-    cy.activateBooking(1);
 
     cy.login('user');
     cy.defineExperimentTeam({
@@ -88,7 +82,7 @@ context('visits tests', () => {
   it('Should be able to do risk assessment', () => {
     cy.login('user');
     // select sample from dropdown
-    cy.get(`[title='${riskAssessmentButtonTitle}']`).click();
+    cy.get(`[title='${riskAssessmentButtonTitle}']`).first().click();
     cy.get('[data-cy=samples-dropdown]').click();
     cy.get('[role=listbox]').contains(sampleTitle).click();
     cy.get('body').type('{esc}');
