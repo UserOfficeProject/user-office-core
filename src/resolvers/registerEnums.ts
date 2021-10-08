@@ -25,7 +25,7 @@ import { VisitStatus } from '../models/Visit';
 import { NumberValueConstraint } from './types/FieldConfig';
 import {
   EquipmentAssignmentStatus,
-  ProposalBookingStatus,
+  ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from './types/ProposalBooking';
 
@@ -64,7 +64,9 @@ export const registerEnums = () => {
   registerEnumType(ScheduledEventBookingType, {
     name: 'ScheduledEventBookingType',
   });
-  registerEnumType(ProposalBookingStatus, { name: 'ProposalBookingStatus' });
+  registerEnumType(ProposalBookingStatusCore, {
+    name: 'ProposalBookingStatusCore',
+  });
   registerEnumType(EquipmentAssignmentStatus, {
     name: 'EquipmentAssignmentStatus',
   });

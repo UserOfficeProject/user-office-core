@@ -33,7 +33,7 @@ export enum ScheduledEventBookingType {
   EQUIPMENT = 'EQUIPMENT',
 }
 
-export enum ProposalBookingStatus {
+export enum ProposalBookingStatusCore {
   DRAFT = 'DRAFT',
   ACTIVE = 'ACTIVE',
   COMPLETED = 'COMPLETED',
@@ -62,14 +62,14 @@ export class ProposalBookingScheduledEventFilterCore {
   @Field(() => TzLessDateTime, { nullable: true })
   endsBefore?: Date;
 
-  @Field(() => [ProposalBookingStatus], { nullable: true })
-  status?: ProposalBookingStatus[] | null;
+  @Field(() => [ProposalBookingStatusCore], { nullable: true })
+  status?: ProposalBookingStatusCore[] | null;
 }
 
 @InputType()
 export class ProposalBookingFilter {
-  @Field(() => [ProposalBookingStatus], { nullable: true })
-  status?: ProposalBookingStatus[] | null;
+  @Field(() => [ProposalBookingStatusCore], { nullable: true })
+  status?: ProposalBookingStatusCore[] | null;
 }
 
 @Resolver(() => ProposalBookingCore)
