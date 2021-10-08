@@ -1766,7 +1766,7 @@ export type ProposalBooking = {
   proposal: Maybe<Proposal>;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  status: ProposalBookingStatus;
+  status: ProposalBookingStatusCore;
   allocatedTime: Scalars['Int'];
   instrument: Maybe<Instrument>;
   scheduledEvents: Array<ScheduledEvent>;
@@ -1789,7 +1789,7 @@ export type ProposalBookingCoreScheduledEventsArgs = {
 };
 
 export type ProposalBookingFilter = {
-  status?: Maybe<Array<ProposalBookingStatus>>;
+  status?: Maybe<Array<ProposalBookingStatusCore>>;
 };
 
 export enum ProposalBookingFinalizeAction {
@@ -1813,10 +1813,10 @@ export type ProposalBookingScheduledEventFilterCore = {
   bookingType?: Maybe<ScheduledEventBookingType>;
   endsAfter?: Maybe<Scalars['TzLessDateTime']>;
   endsBefore?: Maybe<Scalars['TzLessDateTime']>;
-  status?: Maybe<Array<ProposalBookingStatus>>;
+  status?: Maybe<Array<ProposalBookingStatusCore>>;
 };
 
-export enum ProposalBookingStatus {
+export enum ProposalBookingStatusCore {
   DRAFT = 'DRAFT',
   ACTIVE = 'ACTIVE',
   COMPLETED = 'COMPLETED'
@@ -1861,7 +1861,7 @@ export type ProposalPkWithReviewId = {
 };
 
 export type ProposalProposalBookingFilter = {
-  status?: Maybe<Array<ProposalBookingStatus>>;
+  status?: Maybe<Array<ProposalBookingStatusCore>>;
 };
 
 export enum ProposalPublicStatus {
@@ -2788,7 +2788,7 @@ export type ScheduledEvent = {
   description: Maybe<Scalars['String']>;
   instrument: Maybe<Instrument>;
   equipmentId: Maybe<Scalars['Int']>;
-  status: ProposalBookingStatus;
+  status: ProposalBookingStatusCore;
   equipments: Array<EquipmentWithAssignmentStatus>;
   equipmentAssignmentStatus: Maybe<EquipmentAssignmentStatus>;
   proposalBooking: Maybe<ProposalBooking>;
@@ -5057,7 +5057,7 @@ export type UpdateProposalMutation = (
 
 export type GetUserProposalBookingsWithEventsQueryVariables = Exact<{
   endsAfter?: Maybe<Scalars['TzLessDateTime']>;
-  status?: Maybe<Array<ProposalBookingStatus> | ProposalBookingStatus>;
+  status?: Maybe<Array<ProposalBookingStatusCore> | ProposalBookingStatusCore>;
   instrumentId?: Maybe<Scalars['Int']>;
 }>;
 
@@ -9580,7 +9580,7 @@ export const UpdateProposalDocument = gql`
     ${BasicUserDetailsFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const GetUserProposalBookingsWithEventsDocument = gql`
-    query getUserProposalBookingsWithEvents($endsAfter: TzLessDateTime, $status: [ProposalBookingStatus!], $instrumentId: Int) {
+    query getUserProposalBookingsWithEvents($endsAfter: TzLessDateTime, $status: [ProposalBookingStatusCore!], $instrumentId: Int) {
   me {
     proposals(filter: {instrumentId: $instrumentId}) {
       primaryKey

@@ -5,7 +5,7 @@ import {
   Instrument,
   Maybe,
   Proposal,
-  ProposalBookingStatus,
+  ProposalBookingStatusCore,
   ScheduledEventCore,
   Visit,
   VisitFragment,
@@ -69,7 +69,10 @@ export function useProposalBookingsScheduledEvents({
       .getUserProposalBookingsWithEvents({
         ...(onlyUpcoming ? { endsAfter: toTzLessDateTime(new Date()) } : null),
         status: notDraft
-          ? [ProposalBookingStatus.ACTIVE, ProposalBookingStatus.COMPLETED]
+          ? [
+              ProposalBookingStatusCore.ACTIVE,
+              ProposalBookingStatusCore.COMPLETED,
+            ]
           : null,
         instrumentId,
       })
