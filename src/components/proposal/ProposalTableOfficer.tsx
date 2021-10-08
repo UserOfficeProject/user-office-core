@@ -643,6 +643,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           search: true,
           searchText: urlQueryParams.search || undefined,
           selection: true,
+          headerSelectionProps: {
+            inputProps: { 'aria-label': 'Checkbox Select All Rows' },
+          },
           debounceInterval: 400,
           columnsButton: true,
           selectionProps: (rowdata: any) => ({

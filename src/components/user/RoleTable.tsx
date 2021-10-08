@@ -56,6 +56,9 @@ const RoleTable: React.FC<RoleTableProps> = ({ add, activeRoles }) => {
         onSelectionChange={(data) => setSelectedRoles(data)}
         options={{
           search: true,
+          headerSelectionProps: {
+            inputProps: { 'aria-label': 'Checkbox Select All Rows' },
+          },
           selection: true,
           selectionProps: (rowData: Role) => ({
             inputProps: {
