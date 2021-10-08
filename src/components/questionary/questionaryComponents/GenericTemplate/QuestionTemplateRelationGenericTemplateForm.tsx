@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { SubTemplateConfig, TemplateCategoryId } from 'generated/sdk';
+import { SubTemplateConfig, TemplateGroupId } from 'generated/sdk';
 import { useTemplates } from 'hooks/template/useTemplates';
 
 import QuestionDependencyList from '../QuestionDependencyList';
@@ -23,7 +23,7 @@ export const QuestionTemplateRelationGenericTemplateForm: FC<QuestionTemplateRel
     .templateId;
   const { templates } = useTemplates({
     isArchived: false,
-    category: TemplateCategoryId.GENERIC_TEMPLATE,
+    group: TemplateGroupId.GENERIC_TEMPLATE,
     templateIds: templateId ? [templateId] : null,
   });
 

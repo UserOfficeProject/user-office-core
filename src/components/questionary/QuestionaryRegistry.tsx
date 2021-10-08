@@ -2,8 +2,8 @@
 import { TemplateGroupId } from 'generated/sdk';
 
 import { StepDisplayElementFactory } from './DefaultStepDisplayElementFactory';
-import { genericTemplateQuestionaryDefinition } from './questionaries/genericTemplate/GenericTemplateQuestionaryDefinition';
 import { esiQuestionaryDefinition } from './questionaries/esi/EsiQuestionaryDefinition';
+import { genericTemplateQuestionaryDefinition } from './questionaries/genericTemplate/GenericTemplateQuestionaryDefinition';
 import { proposalQuestionaryDefinition } from './questionaries/proposal/ProposalQuestionaryDefinition';
 import { sampleQuestionaryDefinition } from './questionaries/sample/SampleQuestionaryDefinition';
 import { sampleEsiQuestionaryDefinition } from './questionaries/sampleEsi/SampleEsiQuestionaryDefinition';

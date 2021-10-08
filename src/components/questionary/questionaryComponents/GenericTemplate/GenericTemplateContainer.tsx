@@ -7,7 +7,7 @@ import {
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
 import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
-import { TemplateCategoryId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import { GenericTemplateSubmissionState } from 'models/questionary/genericTemplate/GenericTemplateSubmissionState';
 import { GenericTemplateWithQuestionary } from 'models/questionary/genericTemplate/GenericTemplateWithQuestionary';
@@ -60,7 +60,7 @@ export function GenericTemplateContainer(props: {
 }) {
   const { api } = useDataApiWithFeedback();
 
-  const def = getQuestionaryDefinition(TemplateCategoryId.GENERIC_TEMPLATE);
+  const def = getQuestionaryDefinition(TemplateGroupId.GENERIC_TEMPLATE);
 
   const previousInitialGenericTemplate = usePrevious(props.genericTemplate);
 
