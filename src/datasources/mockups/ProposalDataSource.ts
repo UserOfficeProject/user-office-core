@@ -13,7 +13,7 @@ import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/Up
 import {
   ProposalBookingFilter,
   ProposalBookingScheduledEventFilterCore,
-  ProposalBookingStatus,
+  ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from '../../resolvers/types/ProposalBooking';
 import { ProposalEventsRecord } from '../postgres/records';
@@ -75,7 +75,7 @@ const dummyScheduledEventCore = new ScheduledEventCore(
   new Date(),
   1,
   1,
-  ProposalBookingStatus.ACTIVE
+  ProposalBookingStatusCore.ACTIVE
 );
 
 export class ProposalDataSourceMock implements ProposalDataSource {

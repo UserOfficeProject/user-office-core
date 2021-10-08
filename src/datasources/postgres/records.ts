@@ -34,7 +34,7 @@ import { BasicUserDetails, User } from '../../models/User';
 import { Visit, VisitStatus } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
 import {
-  ProposalBookingStatus,
+  ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from '../../resolvers/types/ProposalBooking';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
@@ -60,7 +60,7 @@ export interface ScheduledEventRecord {
   readonly ends_at: Date;
   readonly proposal_booking_id: number;
   readonly proposal_pk: number;
-  readonly status: ProposalBookingStatus;
+  readonly status: ProposalBookingStatusCore;
 }
 
 export interface ProposalRecord {
