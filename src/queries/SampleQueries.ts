@@ -73,4 +73,14 @@ export default class SampleQueries {
 
     return response;
   }
+
+  async getSamplesByEsiId(
+    user: UserWithRole | null,
+    esiId: number
+  ): Promise<Sample[] | null> {
+    // TODO implement authorization
+    const response = await this.dataSource.getSamplesByEsiId(esiId);
+
+    return response;
+  }
 }

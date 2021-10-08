@@ -3,11 +3,12 @@ import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
 import FileMutations from '../mutations/FileMutations';
 import InstrumentMutations from '../mutations/InstrumentMutations';
+import ProposalEsiMutations from '../mutations/ProposalEsiMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
 import ProposalSettingsMutations from '../mutations/ProposalSettingsMutations';
 import QuestionaryMutations from '../mutations/QuestionaryMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
-import RiskAssessmentMutations from '../mutations/RiskAssessmentMutations';
+import SampleEsiMutations from '../mutations/SampleEsiMutations';
 import SampleMutations from '../mutations/SampleMutations';
 import SEPMutations from '../mutations/SEPMutations';
 import ShipmentMutations from '../mutations/ShipmentMutations';
@@ -19,11 +20,12 @@ import CallQueries from '../queries/CallQueries';
 import EventLogQueries from '../queries/EventLogQueries';
 import FileQueries from '../queries/FileQueries';
 import InstrumentQueries from '../queries/InstrumentQueries';
+import ProposalEsiQueries from '../queries/ProposalEsiQueries';
 import ProposalQueries from '../queries/ProposalQueries';
 import ProposalSettingsQueries from '../queries/ProposalSettingsQueries';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import ReviewQueries from '../queries/ReviewQueries';
-import RiskAssessmentQueries from '../queries/RiskAssessmentQueries';
+import SampleEsiQueries from '../queries/SampleEsiQueries';
 import SampleQueries from '../queries/SampleQueries';
 import SEPQueries from '../queries/SEPQueries';
 import ShipmentQueries from '../queries/ShipmentQueries';
@@ -41,7 +43,6 @@ interface ResolverContextQueries {
   file: FileQueries;
   admin: AdminQueries;
   template: TemplateQueries;
-  riskAssessment: RiskAssessmentQueries;
   eventLogs: EventLogQueries;
   sep: SEPQueries;
   instrument: InstrumentQueries;
@@ -51,6 +52,8 @@ interface ResolverContextQueries {
   shipment: ShipmentQueries;
   system: SystemQueries;
   visit: VisitQueries;
+  proposalEsi: ProposalEsiQueries;
+  sampleEsi: SampleEsiQueries;
 }
 
 interface ResolverContextMutations {
@@ -61,14 +64,15 @@ interface ResolverContextMutations {
   file: FileMutations;
   admin: AdminMutations;
   template: TemplateMutations;
-  riskAssessment: RiskAssessmentMutations;
   sep: SEPMutations;
   instrument: InstrumentMutations;
   questionary: QuestionaryMutations;
   sample: SampleMutations;
+  sampleEsi: SampleEsiMutations;
   proposalSettings: ProposalSettingsMutations;
   shipment: ShipmentMutations;
   visit: VisitMutations;
+  proposalEsi: ProposalEsiMutations;
 }
 
 export interface BasicResolverContext {

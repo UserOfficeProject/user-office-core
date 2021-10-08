@@ -50,7 +50,7 @@ export class UserVisitResolver {
     return context.queries.questionary.getQuestionaryOrDefault(
       context.user,
       userVisit.registrationQuestionaryId || 0,
-      TemplateCategoryId.VISIT
+      TemplateCategoryId.VISIT_REGISTRATION
     );
   }
 }

@@ -7,6 +7,7 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { AllocationTimeUnits } from '../models/Call';
+import { CreateCallInput } from '../resolvers/mutations/CreateCallMutation';
 import CallMutations from './CallMutations';
 
 const callMutations = container.resolve(CallMutations);
@@ -104,7 +105,7 @@ describe('Test Call Mutations', () => {
   });
 
   test('A logged in user officer can create a call', () => {
-    const callToCreate = {
+    const callToCreate: CreateCallInput = {
       shortCode: '2019-02-19',
       startCall: new Date('2019-02-19'),
       endCall: new Date('2019-02-19'),
@@ -123,6 +124,7 @@ describe('Test Call Mutations', () => {
       proposalWorkflowId: 1,
       allocationTimeUnit: AllocationTimeUnits.Day,
       templateId: 1,
+      esiTemplateId: 2,
       title: 'Title',
       description: 'Description',
     };

@@ -12,7 +12,9 @@ import { ResolverContext } from '../../context';
 import { Visit as VisitOrigin } from '../../models/Visit';
 import { VisitStatus } from '../../models/Visit';
 import { BasicUserDetails } from './BasicUserDetails';
+import { ExperimentSafetyInput } from './ExperimentSafetyInput';
 import { Proposal } from './Proposal';
+import { Sample } from './Sample';
 import { Shipment } from './Shipment';
 import { VisitRegistration } from './VisitRegistration';
 
@@ -70,5 +72,27 @@ export class VisitResolver {
     return context.queries.shipment.getShipments(context.user, {
       filter: { visitId: visit.id },
     });
+  }
+
+  @FieldResolver(() => [Sample])
+  async samples(
+    @Root() visit: Visit,
+    @Ctx() context: ResolverContext
+  ): Promise<Sample[]> {
+    return context.queries.sample.getSamples(context.user, {
+      filter: { visitId: visit.id },
+    });
+  }
+
+  @FieldResolver(() => ExperimentSafetyInput, { nullable: true })
+  async esi(
+    @Root() visit: Visit,
+    @Ctx() context: ResolverContext
+  ): Promise<ExperimentSafetyInput | null> {
+    const esi = await context.queries.proposalEsi.getEsis(context.user, {
+      visitId: visit.id,
+    });
+
+    return esi ? esi[0] : null;
   }
 }

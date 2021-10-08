@@ -376,6 +376,47 @@ export default class PostgresQuestionaryDataSource
     return steps;
   }
 
+  async copyAnswers(
+    sourceQuestionaryId: number,
+    targetQuestionaryId: number
+  ): Promise<void> {
+    const sourceQuestionary = await this.getQuestionary(sourceQuestionaryId);
+    const targetQuestionary = await this.getQuestionary(targetQuestionaryId);
+
+    const sourceTemplateId = sourceQuestionary?.templateId;
+    const targetTemplateId = targetQuestionary?.templateId;
+
+    if (!sourceTemplateId || !targetTemplateId) {
+      throw new Error(
+        'Can not copy questions, because no template for the questionary was found'
+      );
+    }
+    await database.raw(
+      `
+      INSERT INTO 
+      answers(questionary_id, question_id, answer)
+      SELECT :targetQuestionaryId, question_id, answer FROM answers 
+      WHERE question_id IN (
+        SELECT question_id 
+        FROM templates_has_questions
+        WHERE question_id IN
+          (
+            SELECT question_id from templates_has_questions
+            WHERE template_id=:targetTemplateId
+          )
+        AND template_id=:sourceTemplateId
+      )
+      AND questionary_id = :sourceQuestionaryId
+  `,
+      {
+        targetQuestionaryId,
+        targetTemplateId,
+        sourceTemplateId,
+        sourceQuestionaryId,
+      }
+    );
+  }
+
   async clone(questionaryId: number): Promise<Questionary> {
     const sourceQuestionary = await this.getQuestionary(questionaryId);
     if (!sourceQuestionary) {
