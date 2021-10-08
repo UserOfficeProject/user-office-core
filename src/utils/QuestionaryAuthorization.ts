@@ -5,20 +5,18 @@ import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { ProposalEsiDataSource } from '../datasources/ProposalEsiDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { RiskAssessmentStatus } from '../models/RiskAssessment';
-import { TemplateCategoryId } from '../models/Template';
+import { TemplateGroupId } from '../models/Template';
 import { User, UserWithRole } from '../models/User';
-import { RiskAssessmentDataSource } from './../datasources/RiskAssessmentDataSource';
 import { VisitDataSource } from './../datasources/VisitDataSource';
-import { RiskAssessmentAuthorization } from './RiskAssessmentAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 import { VisitAuthorization } from './VisitAuthorization';
 
-interface QuestionaryAuthorizer {
+export interface QuestionaryAuthorizer {
   hasReadRights(agent: User | null, questionaryId: number): Promise<boolean>;
   hasWriteRights(agent: User | null, questionaryId: number): Promise<boolean>;
 }
@@ -48,6 +46,16 @@ export class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
         questionaryIds: [questionaryId],
       })
     ).proposals[0];
+
+    if (!proposal) {
+      // there is no proposal associated with the questionary
+      logger.logError(
+        'Authorizer failed unexpectedly, because is no proposal is associated with the questionary',
+        { agent, questionaryId }
+      );
+
+      return false;
+    }
 
     const hasActiveCall = await this.callDataSource.checkActiveCall(
       proposal.callId
@@ -260,69 +268,59 @@ class VisitQuestionaryAuthorizer implements QuestionaryAuthorizer {
 }
 
 @injectable()
-class RiskAssessmentQuestionaryAuthorizer implements QuestionaryAuthorizer {
+export class ProposalEsiQuestionaryAuthorizer implements QuestionaryAuthorizer {
   constructor(
-    @inject(Tokens.RiskAssessmentDataSource)
-    private riskAssessmentDataSource: RiskAssessmentDataSource,
-    @inject(Tokens.RiskAssessmentAuthorization)
-    private riskAssessmentAuth: RiskAssessmentAuthorization,
-    @inject(Tokens.UserAuthorization)
-    private userAuthorization: UserAuthorization
+    @inject(Tokens.ProposalEsiDataSource)
+    private proposalEsiDataSource: ProposalEsiDataSource,
+    @inject(Tokens.VisitDataSource)
+    private visitDataSource: VisitDataSource,
+
+    private proposalQuestionaryAuth: ProposalQuestionaryAuthorizer = container.resolve(
+      ProposalQuestionaryAuthorizer
+    )
   ) {}
+
+  async getProposalPk(esiQuestionaryId: number): Promise<number | null> {
+    const esi = await this.proposalEsiDataSource.getEsis({
+      questionaryId: esiQuestionaryId,
+    });
+    if (esi.length !== 1) {
+      return null;
+    }
+    const visit = await this.visitDataSource.getVisit(esi[0].visitId);
+    if (!visit) {
+      return null;
+    }
+
+    return visit.proposalPk;
+  }
   async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
-    if (!agent) {
+    const proposalPk = await this.getProposalPk(questionaryId);
+    if (proposalPk === null) {
       return false;
     }
 
-    if (await this.userAuthorization.isUserOfficer(agent)) {
-      return true;
-    }
-
-    const assessment = (
-      await this.riskAssessmentDataSource.getRiskAssessments({
-        questionaryIds: [questionaryId],
-      })
-    )[0];
-
-    if (!assessment) {
-      return false;
-    }
-
-    return this.riskAssessmentAuth.hasReadRights(agent, assessment);
+    return this.proposalQuestionaryAuth.hasReadRights(agent, proposalPk);
   }
   async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
-    if (!agent) {
+    const proposalPk = await this.getProposalPk(questionaryId);
+    if (proposalPk === null) {
       return false;
     }
 
-    if (await this.userAuthorization.isUserOfficer(agent)) {
-      return true;
-    }
+    return this.proposalQuestionaryAuth.hasWriteRights(agent, proposalPk);
+  }
+}
 
-    const assessment = (
-      await this.riskAssessmentDataSource.getRiskAssessments({
-        questionaryIds: [questionaryId],
-      })
-    )[0];
-
-    if (!assessment) {
-      return false;
-    }
-
-    if (assessment.status === RiskAssessmentStatus.SUBMITTED) {
-      logger.logError(
-        'User tried to update risk assessment that is already submitted',
-        {
-          agent,
-          questionaryId,
-          assessment,
-        }
-      );
-
-      return false;
-    }
-
-    return this.riskAssessmentAuth.hasWriteRights(agent, assessment);
+@injectable()
+export class SampleEsiQuestionaryAuthorizer implements QuestionaryAuthorizer {
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
+    //  TODO implement this
+    return true;
+  }
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
+    //  TODO implement this
+    return true;
   }
 }
 
@@ -385,7 +383,7 @@ class GenericTemplateQuestionaryAuthorizer implements QuestionaryAuthorizer {
 }
 @injectable()
 export class QuestionaryAuthorization {
-  private authorizers = new Map<number, QuestionaryAuthorizer>();
+  private authorizers = new Map<TemplateGroupId, QuestionaryAuthorizer>();
   // TODO obtain authorizer from QuestionaryDefinition
   constructor(
     @inject(Tokens.QuestionaryDataSource)
@@ -395,24 +393,28 @@ export class QuestionaryAuthorization {
     @inject(Tokens.SampleDataSource) private sampleDataSource: SampleDataSource
   ) {
     this.authorizers.set(
-      TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      TemplateGroupId.PROPOSAL,
       container.resolve(ProposalQuestionaryAuthorizer)
     );
     this.authorizers.set(
-      TemplateCategoryId.SAMPLE_DECLARATION,
+      TemplateGroupId.SAMPLE,
       container.resolve(SampleDeclarationQuestionaryAuthorizer)
     );
     this.authorizers.set(
-      TemplateCategoryId.SHIPMENT_DECLARATION,
+      TemplateGroupId.SHIPMENT,
       container.resolve(ShipmentDeclarationQuestionaryAuthorizer)
     );
     this.authorizers.set(
-      TemplateCategoryId.VISIT,
+      TemplateGroupId.VISIT_REGISTRATION,
       container.resolve(VisitQuestionaryAuthorizer)
     );
     this.authorizers.set(
-      TemplateCategoryId.RISK_ASSESSMENT,
-      container.resolve(RiskAssessmentQuestionaryAuthorizer)
+      TemplateGroupId.PROPOSAL_ESI,
+      container.resolve(ProposalEsiQuestionaryAuthorizer)
+    );
+    this.authorizers.set(
+      TemplateGroupId.SAMPLE_ESI,
+      container.resolve(SampleEsiQuestionaryAuthorizer)
     );
     this.authorizers.set(
       TemplateCategoryId.GENERIC_TEMPLATE,
@@ -420,21 +422,21 @@ export class QuestionaryAuthorization {
     );
   }
 
-  private async getTemplateCategoryIdForQuestionary(questionaryId: number) {
+  private async getTemplateGroupIdForQuestionary(questionaryId: number) {
     const templateId = (
       await this.questionaryDataSource.getQuestionary(questionaryId)
     )?.templateId;
     if (!templateId) return null;
 
-    const categoryId = (await this.templateDataSource.getTemplate(templateId))
-      ?.categoryId;
-    if (!categoryId) return null;
+    const groupId = (await this.templateDataSource.getTemplate(templateId))
+      ?.groupId;
+    if (!groupId) return null;
 
-    return categoryId;
+    return groupId;
   }
 
   private async getAuthorizer(questionaryId: number) {
-    const categoryId = await this.getTemplateCategoryIdForQuestionary(
+    const categoryId = await this.getTemplateGroupIdForQuestionary(
       questionaryId
     );
     if (!categoryId) return null;

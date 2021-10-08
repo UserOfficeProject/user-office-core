@@ -4,6 +4,7 @@ import { Proposal, ProposalPksWithNextStatus } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review, ReviewWithNextProposalStatus } from '../models/Review';
 import { Sample } from '../models/Sample';
+import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { SEP } from '../models/SEP';
 import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import { TechnicalReview } from '../models/TechnicalReview';
@@ -258,6 +259,15 @@ interface CallSEPReviewEndedEvent extends GeneralEvent {
   call: Call;
 }
 
+interface ProposalBookingTimeSlotAddedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED;
+  scheduledEvent: ScheduledEventCore;
+}
+interface ProposalBookingTimeSlotsRemovedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED;
+  scheduledEvents: ScheduledEventCore[];
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -304,4 +314,6 @@ export type ApplicationEvent =
   | ProposalSEPMeetingSavedEvent
   | ProposalSEPMeetingRankingOverwrittenEvent
   | ProposalSEPMeetingReorderEvent
-  | ProposalTopicAnsweredEvent;
+  | ProposalTopicAnsweredEvent
+  | ProposalBookingTimeSlotAddedEvent
+  | ProposalBookingTimeSlotsRemovedEvent;

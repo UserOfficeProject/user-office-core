@@ -9,7 +9,7 @@ import { Authorized } from '../decorators';
 import { ProposalEndStatus } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
 import { Rejection } from '../models/Rejection';
-import { TemplateCategoryId } from '../models/Template';
+import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { Visit, VisitStatus } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
@@ -185,7 +185,7 @@ export default class VisitMutations {
     }
 
     const activeTemplate = await this.templateDataSource.getActiveTemplateId(
-      TemplateCategoryId.VISIT
+      TemplateGroupId.VISIT_REGISTRATION
     );
     if (!activeTemplate) {
       return rejection(

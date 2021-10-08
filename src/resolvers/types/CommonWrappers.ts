@@ -6,6 +6,7 @@ import { Answer } from './Answer';
 import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { ExperimentSafetyInput } from './ExperimentSafetyInput';
 import { GenericTemplate } from './GenericTemplate';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
@@ -21,8 +22,8 @@ import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 import { Rejection } from './Rejection';
 import { ReviewWithNextProposalStatus } from './Review';
 import { Review } from './Review';
-import { RiskAssessment } from './RiskAssessment';
 import { Sample } from './Sample';
+import { SampleExperimentSafetyInput } from './SampleExperimentSafetyInput';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
 import { SEPProposal } from './SEPProposal';
@@ -316,10 +317,17 @@ export class VisitRegistrationResponseWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class RiskAssessmentResponseWrap extends ResponseWrapBase {
+export class EsiResponseWrap extends ResponseWrapBase {
   @Response()
-  @Field(() => RiskAssessment, { nullable: true })
-  public riskAssessment: RiskAssessment;
+  @Field(() => ExperimentSafetyInput, { nullable: true })
+  public esi: ExperimentSafetyInput;
+}
+
+@ObjectType()
+export class SampleEsiResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => SampleExperimentSafetyInput, { nullable: true })
+  public esi?: SampleExperimentSafetyInput;
 }
 
 @ObjectType()

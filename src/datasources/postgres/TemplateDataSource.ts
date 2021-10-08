@@ -8,6 +8,7 @@ import {
   Template,
   TemplateCategory,
   TemplateCategoryId,
+  TemplateGroupId,
   TemplatesHasQuestions,
   TemplateStep,
   Topic,
@@ -27,11 +28,13 @@ import {
   createQuestionObject,
   createQuestionTemplateRelationObject,
   createTemplateCategoryObject,
+  createTemplateGroupObject,
   createTopicObject,
   QuestionDependencyRecord,
   QuestionRecord,
   QuestionTemplateRelRecord,
   TemplateCategoryRecord,
+  TemplateGroupRecord,
   TemplateRecord,
   TopicRecord,
 } from './records';
@@ -59,8 +62,11 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
              )
         AND category_id = 
             (SELECT category_id
-              FROM templates 
-              WHERE template_id = ${templateId})
+              FROM template_groups
+              WHERE template_group_id = 
+              ( SELECT group_id FROM templates
+                WHERE template_id = ${templateId})
+            )
         `
       )
     ).rows;
@@ -98,7 +104,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async createTemplate(args: CreateTemplateArgs): Promise<Template> {
     return database('templates')
       .insert({
-        category_id: args.categoryId,
+        group_id: args.groupId,
         name: args.name,
         description: args.description,
       })
@@ -137,11 +143,11 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         if (args.filter?.isArchived !== undefined) {
           query.where({ is_archived: args.filter?.isArchived });
         }
-        if (args.filter?.category) {
-          query.where({ category_id: args.filter?.category || undefined });
+        if (args.filter?.group) {
+          query.where({ group_id: args.filter?.group || undefined });
         }
         if (args.filter?.templateIds) {
-          query.orWhereIn('template_id', args.filter.templateIds);
+          query.where('template_id', 'in', args.filter.templateIds);
         }
       })
       .then((resultSet: TemplateRecord[]) => {
@@ -568,12 +574,10 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async getActiveTemplateId(
-    categoryId: TemplateCategoryId
-  ): Promise<number | null> {
+  async getActiveTemplateId(groupId: TemplateGroupId): Promise<number | null> {
     return database('active_templates')
       .select('template_id')
-      .where('category_id', categoryId)
+      .where('group_id', groupId)
       .first()
       .then((result: { template_id: number }) => {
         if (!result) {
@@ -587,10 +591,10 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async setActiveTemplate(args: SetActiveTemplateArgs): Promise<boolean> {
     await database('active_templates')
       .delete('template_id')
-      .where('category_id', args.templateCategoryId);
+      .where('group_id', args.templateGroupId);
 
     await database('active_templates').insert({
-      category_id: args.templateCategoryId,
+      group_id: args.templateGroupId,
       template_id: args.templateId,
     });
 
@@ -664,7 +668,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       throw new Error('Could not clone template');
     }
     const newTemplate = await this.createTemplate({
-      categoryId: sourceTemplate.categoryId,
+      groupId: sourceTemplate.groupId,
       name: `Copy of ${sourceTemplate.name}`,
       description: sourceTemplate.description,
     });
@@ -743,5 +747,13 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     `);
 
     return newTemplate;
+  }
+
+  async getGroup(groupId: TemplateGroupId) {
+    return database('template_groups')
+      .where({ template_group_id: groupId })
+      .select('*')
+      .first()
+      .then((row: TemplateGroupRecord) => createTemplateGroupObject(row));
   }
 }

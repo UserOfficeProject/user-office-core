@@ -276,4 +276,11 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
       )!.isCompleted = isComplete;
     }
   }
+
+  async copyAnswers(
+    sourceQuestionaryId: number,
+    targetQuestionaryId: number
+  ): Promise<void> {
+    return;
+  }
 }

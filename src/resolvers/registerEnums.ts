@@ -11,15 +11,23 @@ import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
 import { QuestionFilterCompareOperator } from '../models/Questionary';
 import { ReviewerFilter, ReviewStatus } from '../models/Review';
-import { RiskAssessment, RiskAssessmentStatus } from '../models/RiskAssessment';
 import { SampleStatus } from '../models/Sample';
 import { SettingsId } from '../models/Settings';
 import { ShipmentStatus } from '../models/Shipment';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
-import { DataType, TemplateCategoryId } from '../models/Template';
+import {
+  DataType,
+  TemplateCategoryId,
+  TemplateGroupId,
+} from '../models/Template';
 import { UserRole } from '../models/User';
 import { VisitStatus } from '../models/Visit';
 import { NumberValueConstraint } from './types/FieldConfig';
+import {
+  EquipmentAssignmentStatus,
+  ProposalBookingStatus,
+  ScheduledEventBookingType,
+} from './types/ProposalBooking';
 
 export const registerEnums = () => {
   registerEnumType(TemplateCategoryId, { name: 'TemplateCategoryId' });
@@ -50,10 +58,14 @@ export const registerEnums = () => {
   registerEnumType(AllocationTimeUnits, {
     name: 'AllocationTimeUnits',
   });
-  registerEnumType(RiskAssessment, {
-    name: 'RiskAssessment',
+  registerEnumType(TemplateGroupId, {
+    name: 'TemplateGroupId',
   });
-  registerEnumType(RiskAssessmentStatus, {
-    name: 'RiskAssessmentStatus',
+  registerEnumType(ScheduledEventBookingType, {
+    name: 'ScheduledEventBookingType',
+  });
+  registerEnumType(ProposalBookingStatus, { name: 'ProposalBookingStatus' });
+  registerEnumType(EquipmentAssignmentStatus, {
+    name: 'EquipmentAssignmentStatus',
   });
 };

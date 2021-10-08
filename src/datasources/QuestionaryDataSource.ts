@@ -28,4 +28,8 @@ export interface QuestionaryDataSource {
   ): Promise<void>;
   create(creator_id: number, template_id: number): Promise<Questionary>;
   clone(questionaryId: number): Promise<Questionary>;
+  copyAnswers(
+    sourceQuestionaryId: number,
+    targetQuestionaryId: number
+  ): Promise<void>;
 }

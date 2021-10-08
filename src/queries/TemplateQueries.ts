@@ -4,7 +4,7 @@ import { Tokens } from '../config/Tokens';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
-import { Question, TemplateCategoryId, TemplateStep } from '../models/Template';
+import { Question, TemplateGroupId, TemplateStep } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { QuestionsFilter } from '../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
@@ -62,7 +62,7 @@ export default class TemplateQueries {
   @Authorized()
   getActiveTemplateId(
     _user: UserWithRole | null,
-    templateCategoryId: TemplateCategoryId
+    templateCategoryId: TemplateGroupId
   ) {
     return this.dataSource.getActiveTemplateId(templateCategoryId);
   }

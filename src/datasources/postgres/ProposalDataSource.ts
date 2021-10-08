@@ -7,7 +7,12 @@ import { Event } from '../../events/event.enum';
 import { Proposal, ProposalPksWithNextStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
+import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
+import {
+  ProposalBookingFilter,
+  ProposalBookingScheduledEventFilterCore,
+} from '../../resolvers/types/ProposalBooking';
 import { UserProposalsFilter } from '../../resolvers/types/User';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -16,9 +21,11 @@ import {
   CallRecord,
   createProposalObject,
   createProposalViewObject,
+  createScheduledEventObject,
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
+  ScheduledEventRecord,
   StatusChangingEventRecord,
 } from './records';
 
@@ -137,7 +144,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           return await trx.commit(proposalUpdate);
         } catch (error) {
           throw new Error(
-            `Failed to submit proposal with id '${primaryKey}' because: '${error.message}'`
+            `Failed to submit proposal with id '${primaryKey}' because: '${
+              (error as Error).message
+            }'`
           );
         }
       }
@@ -711,5 +720,125 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new ProposalPksWithNextStatus(
       result.map((item) => item.proposal_pk)
     );
+  }
+
+  async getProposalBookingByProposalPk(
+    proposalPk: number,
+    filter?: ProposalBookingFilter
+  ): Promise<{ id: number } | null> {
+    const result: ScheduledEventRecord = await database<ScheduledEventRecord>(
+      'scheduled_events'
+    )
+      .select()
+      .where('proposal_pk', proposalPk)
+      .modify((qb) => {
+        if (filter?.status) {
+          qb.whereIn('status', filter.status);
+        }
+      })
+      .first();
+
+    if (result) {
+      return { id: result.proposal_booking_id };
+    } else {
+      return null;
+    }
+  }
+
+  async proposalBookingScheduledEvents(
+    proposalBookingId: number,
+    filter?: ProposalBookingScheduledEventFilterCore
+  ): Promise<ScheduledEventCore[] | null> {
+    const scheduledEventRecords: ScheduledEventRecord[] =
+      await database<ScheduledEventRecord>('scheduled_events')
+        .select()
+        .where('proposal_booking_id', proposalBookingId)
+        .orderBy('starts_at', 'asc')
+        .modify((qb) => {
+          if (filter?.status) {
+            qb.whereIn('status', filter.status);
+          }
+          if (filter?.bookingType) {
+            qb.where('booking_type', filter.bookingType);
+          }
+
+          if (filter?.endsAfter !== undefined && filter?.endsAfter !== null) {
+            qb.where('ends_at', '>=', filter.endsAfter);
+          }
+
+          if (filter?.endsBefore !== undefined && filter.endsBefore !== null) {
+            qb.where('ends_at', '<=', filter.endsBefore);
+          }
+        });
+
+    return scheduledEventRecords.map(createScheduledEventObject);
+  }
+
+  async addProposalBookingScheduledEvent(
+    eventMessage: ScheduledEventCore
+  ): Promise<void> {
+    const [addedScheduledEvent]: ScheduledEventRecord[] = await database
+      .insert({
+        scheduled_event_id: eventMessage.id,
+        booking_type: eventMessage.bookingType,
+        starts_at: eventMessage.startsAt,
+        ends_at: eventMessage.endsAt,
+        proposal_booking_id: eventMessage.proposalBookingId,
+        proposal_pk: eventMessage.proposalPk,
+        status: eventMessage.status,
+      })
+      .into('scheduled_events')
+      .returning(['*']);
+
+    if (!addedScheduledEvent) {
+      throw new Error(
+        `Failed to add proposal booking scheduled event '${eventMessage.id}'`
+      );
+    }
+  }
+
+  async updateProposalBookingScheduledEvent(
+    eventToUpdate: ScheduledEventCore
+  ): Promise<void> {
+    const [updatedScheduledEvent]: ScheduledEventRecord[] = await database(
+      'scheduled_events'
+    )
+      .update({
+        starts_at: eventToUpdate.startsAt,
+        ends_at: eventToUpdate.endsAt,
+        status: eventToUpdate.status,
+      })
+      .where('scheduled_event_id', eventToUpdate.id)
+      .andWhere('proposal_booking_id', eventToUpdate.proposalBookingId)
+      .returning(['*']);
+
+    if (!updatedScheduledEvent) {
+      throw new Error(
+        `Failed to update proposal booking scheduled event '${eventToUpdate.id}'`
+      );
+    }
+  }
+
+  async removeProposalBookingScheduledEvents(
+    eventMessage: ScheduledEventCore[]
+  ): Promise<void> {
+    const [removedScheduledEvent]: ScheduledEventRecord[] = await database(
+      'scheduled_events'
+    )
+      .whereIn(
+        'scheduled_event_id',
+        eventMessage.map((event) => event.id)
+      )
+      .andWhere('proposal_booking_id', eventMessage[0].proposalBookingId)
+      .del()
+      .returning('*');
+
+    if (!removedScheduledEvent) {
+      throw new Error(
+        `Could not delete scheduled events with ids: ${eventMessage
+          .map((event) => event.id)
+          .join(', ')} `
+      );
+    }
   }
 }

@@ -10,15 +10,15 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { TemplateCategoryId } from '../../models/Template';
+import { TemplateGroupId } from '../../models/Template';
 import { Template } from '../types/Template';
 @InputType()
 class TemplatesFilter {
   @Field({ nullable: true })
   public isArchived?: boolean;
 
-  @Field(() => TemplateCategoryId, { nullable: true })
-  public category?: TemplateCategoryId;
+  @Field(() => TemplateGroupId, { nullable: true })
+  public group?: TemplateGroupId;
 
   @Field(() => [Int], { nullable: true })
   public templateIds?: number[];

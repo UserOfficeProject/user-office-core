@@ -11,6 +11,10 @@ import {
 } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import {
+  ProposalBookingFilter,
+  ProposalBookingScheduledEventFilterCore,
+} from '../resolvers/types/ProposalBooking';
 import { omit } from '../utils/helperFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
@@ -85,7 +89,7 @@ export default class ProposalQueries {
       // and we want to handle it here
       return await this.dataSource.getProposalsFromView(filter);
     } catch (e) {
-      logger.logException('Method getAllView failed', e, { filter });
+      logger.logException('Method getAllView failed', e as Error, { filter });
 
       return [];
     }
@@ -119,5 +123,48 @@ export default class ProposalQueries {
     } else {
       return ProposalPublicStatus.draft;
     }
+  }
+
+  @Authorized()
+  async getProposalBookingByProposalPk(
+    agent: UserWithRole | null,
+    {
+      proposalPk,
+      filter,
+    }: { proposalPk: number; filter?: ProposalBookingFilter }
+  ) {
+    const proposal = await this.get(agent, proposalPk);
+    if (!proposal) {
+      return null;
+    }
+
+    const proposalBooking =
+      await this.dataSource.getProposalBookingByProposalPk(proposalPk, filter);
+
+    if (!proposalBooking) {
+      return null;
+    }
+
+    return proposalBooking;
+  }
+
+  @Authorized()
+  async proposalBookingScheduledEvents(
+    agent: UserWithRole | null,
+    {
+      proposalBookingId,
+      filter,
+    }: {
+      proposalBookingId: number;
+      filter?: ProposalBookingScheduledEventFilterCore;
+    }
+  ) {
+    const proposalBookingScheduledEvents =
+      await this.dataSource.proposalBookingScheduledEvents(
+        proposalBookingId,
+        filter
+      );
+
+    return proposalBookingScheduledEvents;
   }
 }
