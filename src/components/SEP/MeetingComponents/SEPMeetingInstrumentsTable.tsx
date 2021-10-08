@@ -1,5 +1,6 @@
+import MaterialTable, { Options } from '@material-table/core';
+import { Typography } from '@material-ui/core';
 import DoneAll from '@material-ui/icons/DoneAll';
-import MaterialTable, { Options } from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -15,7 +16,7 @@ import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
 
 type SEPMeetingInstrumentsTableProps = {
   sepId: number;
-  Toolbar: (data: Options) => JSX.Element;
+  Toolbar: (data: Options<JSX.Element>) => JSX.Element;
   selectedCallId: number;
   confirm: WithConfirmType;
 };
@@ -45,8 +46,8 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     { title: 'Description', field: 'description' },
     {
       title: 'Availability time',
-      render: (rowData: InstrumentWithAvailabilityTime) =>
-        rowData.availabilityTime ? rowData.availabilityTime : '-',
+      field: 'availabilityTime',
+      emptyValue: '-',
     },
     {
       title: 'Submitted',
@@ -55,14 +56,17 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     },
   ];
 
-  const SEPInstrumentProposalsTableComponent = (
-    instrument: InstrumentWithAvailabilityTime
-  ) => (
-    <SEPInstrumentProposalsTable
-      sepId={sepId}
-      sepInstrument={instrument}
-      selectedCallId={selectedCallId}
-    />
+  const SEPInstrumentProposalsTableComponent = React.useCallback(
+    ({ rowData }) => {
+      return (
+        <SEPInstrumentProposalsTable
+          sepId={sepId}
+          sepInstrument={rowData}
+          selectedCallId={selectedCallId}
+        />
+      );
+    },
+    [sepId, selectedCallId]
   );
 
   const submitInstrument = async (
@@ -75,7 +79,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         callId: selectedCallId,
       });
       const allProposalsOnInstrumentHaveRankings = response.sepProposalsByInstrument?.every(
-        ({ proposal }) => !!proposal.rankOrder
+        ({ proposal }) => !!proposal.sepMeetingDecision?.submitted
       );
 
       if (allProposalsOnInstrumentHaveRankings) {
@@ -86,7 +90,8 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
           instrumentId: instrumentToSubmit.id,
           sepId: sepId,
         });
-        const isError = submitInstrument.error || !submitInstrument.isSuccess;
+        const isError =
+          submitInstrument.rejection || !submitInstrument.isSuccess;
         if (!isError) {
           const newInstrumentsData = instrumentsData.map((instrument) => {
             if (instrument.id === instrumentToSubmit.id) {
@@ -98,7 +103,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
           setInstrumentsData(newInstrumentsData);
         }
       } else {
-        enqueueSnackbar('All proposals must have rankings', {
+        enqueueSnackbar('All proposal SEP meetings should be submitted', {
           variant: 'error',
           className: 'snackbar-error',
         });
@@ -131,10 +136,10 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
             },
             {
               title: 'Submit instrument',
-              description: 'Are you sure you want to submit the instrument?',
+              description:
+                'No further changes to sep meeting decisions and rankings are possible after submission. Are you sure you want to submit the instrument?',
             }
           )(),
-        // setInstrumentToSubmit(rowData as InstrumentWithAvailabilityTime);
         tooltip: 'Submit instrument',
       })
     );
@@ -144,7 +149,11 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     <div data-cy="SEP-meeting-components-table">
       <MaterialTable
         icons={tableIcons}
-        title={'Instruments with proposals'}
+        title={
+          <Typography variant="h6" component="h2">
+            Instruments with proposals
+          </Typography>
+        }
         columns={columns}
         components={{
           Toolbar: Toolbar,

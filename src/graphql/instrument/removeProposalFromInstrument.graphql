@@ -1,9 +1,8 @@
-mutation removeProposalFromInstrument($proposalId: Int!, $instrumentId: Int!) {
-  removeProposalFromInstrument(
-    proposalId: $proposalId
-    instrumentId: $instrumentId
-  ) {
-    error
+mutation removeProposalsFromInstrument($proposalPks: [Int!]!) {
+  removeProposalsFromInstrument(proposalPks: $proposalPks) {
+    rejection {
+      ...rejection
+    }
     isSuccess
   }
 }

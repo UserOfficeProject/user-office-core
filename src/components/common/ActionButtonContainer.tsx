@@ -3,22 +3,25 @@ import React, { PropsWithChildren } from 'react';
 
 import { ButtonContainer } from 'styles/StyledComponents';
 
-export function ActionButtonContainer(
-  props: PropsWithChildren<Record<string, unknown>>
-) {
-  const classes = makeStyles((theme) => ({
-    buttonContainer: {
-      justifyItems: 'flex-end',
-      marginTop: theme.spacing(3),
-      '& button': {
-        marginLeft: theme.spacing(2),
-      },
+const useStyles = makeStyles((theme) => ({
+  buttonContainer: {
+    justifyItems: 'flex-end',
+    marginTop: theme.spacing(3),
+    '& button': {
+      marginLeft: theme.spacing(2),
     },
-  }))();
+  },
+}));
+
+export function ActionButtonContainer({
+  children,
+  ...rest
+}: PropsWithChildren<Record<string, unknown>>) {
+  const classes = useStyles();
 
   return (
-    <ButtonContainer className={classes.buttonContainer}>
-      {props.children}
+    <ButtonContainer className={classes.buttonContainer} {...rest}>
+      {children}
     </ButtonContainer>
   );
 }

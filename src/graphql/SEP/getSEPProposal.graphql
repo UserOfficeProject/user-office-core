@@ -1,6 +1,6 @@
-query getSEPProposal($sepId: Int!, $proposalId: Int!) {
-  sepProposal(sepId: $sepId, proposalId: $proposalId) {
-    proposalId
+query getSEPProposal($sepId: Int!, $proposalPk: Int!) {
+  sepProposal(sepId: $sepId, proposalPk: $proposalPk) {
+    proposalPk
     sepId
     sepTimeAllocation
 
@@ -18,6 +18,9 @@ query getSEPProposal($sepId: Int!, $proposalId: Int!) {
       }
       technicalReview {
         ...coreTechnicalReview
+        reviewer {
+          ...basicUserDetails
+        }
       }
       reviews {
         id
@@ -40,6 +43,7 @@ query getSEPProposal($sepId: Int!, $proposalId: Int!) {
       call {
         id
         shortCode
+        allocationTimeUnit
       }
     }
   }

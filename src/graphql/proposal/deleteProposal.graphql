@@ -1,9 +1,10 @@
-mutation deleteProposal($id: Int!) {
-  deleteProposal(id: $id) {
-    error
-    proposal {
-      id
+mutation deleteProposal($proposalPk: Int!) {
+  deleteProposal(proposalPk: $proposalPk) {
+    rejection {
+      ...rejection
     }
-    error
+    proposal {
+      primaryKey
+    }
   }
 }

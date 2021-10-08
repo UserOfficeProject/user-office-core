@@ -1,12 +1,14 @@
-import { Column } from 'material-table';
+import { Column } from '@material-table/core';
 import React from 'react';
 
-import { Template, TemplateCategoryId } from 'generated/sdk';
+import { Template, TemplateGroupId } from 'generated/sdk';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
-type SampleTemplateRowDataType = TemplateRowDataType & Record<string, unknown>;
+type SampleTemplateRowDataType = TemplateRowDataType & {
+  questionaryCount?: number;
+};
 
 type SampleTemplatesTableProps = {
   dataProvider: () => Promise<
@@ -26,17 +28,17 @@ function SampleTemplatesTable(props: SampleTemplatesTableProps) {
   ];
 
   return (
-    <>
-      <TemplatesTable
-        columns={columns}
-        templateCategory={TemplateCategoryId.SAMPLE_DECLARATION}
-        isRowRemovable={() => {
-          return true;
-        }}
-        dataProvider={props.dataProvider}
-        confirm={props.confirm}
-      />
-    </>
+    <TemplatesTable
+      columns={columns}
+      templateGroup={TemplateGroupId.SAMPLE}
+      isRowRemovable={(rowData) => {
+        const sampleTemplateRowData = rowData as SampleTemplateRowDataType;
+
+        return sampleTemplateRowData.questionaryCount === 0;
+      }}
+      dataProvider={props.dataProvider}
+      confirm={props.confirm}
+    />
   );
 }
 

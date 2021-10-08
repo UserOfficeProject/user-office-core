@@ -6,6 +6,7 @@ context('User tests', () => {
   });
 
   beforeEach(() => {
+    cy.viewport(1920, 1080);
     cy.visit('/SignUp?code=WRMVXa');
   });
 
@@ -30,9 +31,7 @@ context('User tests', () => {
   const telephone = faker.phone.phoneNumber('0##########');
 
   it('A user should be able to create a new account with mandatory fields only', () => {
-    cy.get('[data-cy=email] input')
-      .type(email)
-      .should('have.value', email);
+    cy.get('[data-cy=email] input').type(email).should('have.value', email);
 
     cy.get('[data-cy=password] input')
       .type(password)
@@ -43,7 +42,7 @@ context('User tests', () => {
       .should('have.value', password);
 
     // Personal details
-    cy.get('#mui-component-select-user_title').click();
+    cy.get('#user_title-input').click();
     cy.contains('Prof.').click();
     cy.get('[data-cy=firstname] input')
       .clear()
@@ -55,11 +54,11 @@ context('User tests', () => {
       .type(lastName)
       .should('have.value', lastName);
 
-    cy.get('#mui-component-select-gender').click();
+    cy.get('#gender-input').click();
 
     cy.contains('Male').click();
 
-    cy.get('#mui-component-select-nationality').click();
+    cy.get('#nationality-input').click();
 
     cy.contains('Swedish').click();
 
@@ -68,7 +67,7 @@ context('User tests', () => {
       .should('have.value', birthDate);
 
     //Organization details
-    cy.get('#mui-component-select-organisation').click();
+    cy.get('#organisation-input').click();
 
     cy.contains('Lund University').click();
 
@@ -142,9 +141,7 @@ context('User tests', () => {
     const telephone = faker.phone.phoneNumber('0##########');
     const telephoneAlt = faker.phone.phoneNumber('0##########');
 
-    cy.get('[data-cy=email] input')
-      .type(email)
-      .should('have.value', email);
+    cy.get('[data-cy=email] input').type(email).should('have.value', email);
 
     cy.get('[data-cy=password] input')
       .type(password)
@@ -155,7 +152,7 @@ context('User tests', () => {
       .should('have.value', password);
 
     // Personal details
-    cy.get('#mui-component-select-user_title').click();
+    cy.get('#user_title-input').click();
     cy.contains('Prof.').click();
     cy.get('[data-cy=firstname] input')
       .clear()
@@ -174,11 +171,11 @@ context('User tests', () => {
       .type(preferredName)
       .should('have.value', preferredName);
 
-    cy.get('#mui-component-select-gender').click();
+    cy.get('#gender-input').click();
 
     cy.contains('Male').click();
 
-    cy.get('#mui-component-select-nationality').click();
+    cy.get('#nationality-input').click();
 
     cy.contains('Swedish').click();
 
@@ -187,7 +184,7 @@ context('User tests', () => {
       .should('have.value', birthDate);
 
     //Organization details
-    cy.get('#mui-component-select-organisation').click();
+    cy.get('#organisation-input').click();
 
     cy.contains('Lund University').click();
 

@@ -9,13 +9,14 @@ import { useProposalData } from 'hooks/proposal/useProposalData';
 import ProposalContainer from './ProposalContainer';
 
 export default function ProposalEdit() {
-  const { proposalID } = useParams();
+  const { proposalPk } = useParams<{ proposalPk: string }>();
 
-  const { proposalData } = useProposalData(+proposalID);
+  const { proposalData } = useProposalData(+proposalPk);
 
   if (!proposalData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
+
   if (proposalData.notified) {
     return (
       <SimpleTabs tabNames={['Comment', 'Proposal']}>
@@ -23,7 +24,11 @@ export default function ProposalEdit() {
           <p>
             Decision: {getTranslation(proposalData.finalStatus as ResourceId)}
           </p>
-          <p>Comment: {proposalData.commentForUser}</p>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: proposalData.commentForUser || '-',
+            }}
+          />
         </>
         <ProposalContainer proposal={proposalData} />
       </SimpleTabs>

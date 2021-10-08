@@ -1,5 +1,7 @@
 mutation setUserNotPlaceholder($id: Int!) {
   setUserNotPlaceholder(id: $id) {
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

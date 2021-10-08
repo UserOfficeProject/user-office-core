@@ -9,9 +9,14 @@
 /coverage
 /cypress/videos/
 /cypress/screenshots/
+/cypress/node_modules
 
 # production
 /build
+
+# Env files
+.env*
+!.env.example
 
 # misc
 .DS_Store
@@ -19,6 +24,7 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.vscode/*
 
 react-app-env.d.ts
 

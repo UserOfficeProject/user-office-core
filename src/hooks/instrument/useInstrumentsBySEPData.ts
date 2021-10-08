@@ -21,10 +21,16 @@ export function useInstrumentsBySEPData(
   const api = useDataApi();
 
   useEffect(() => {
+    let unmounted = false;
+
     setLoadingInstruments(true);
     api()
       .getInstrumentsBySEP({ sepId, callId })
       .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         if (data.instrumentsBySep) {
           setInstrumentsData(
             data.instrumentsBySep as InstrumentWithAvailabilityTime[]
@@ -32,6 +38,10 @@ export function useInstrumentsBySEPData(
         }
         setLoadingInstruments(false);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [api, sepId, callId]);
 
   return { loadingInstruments, instrumentsData, setInstrumentsData };

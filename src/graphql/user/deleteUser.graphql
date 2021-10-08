@@ -1,12 +1,10 @@
-mutation deleteUser(
-  $id: Int!
-) {
-  deleteUser(
-    id: $id
-  ) {
+mutation deleteUser($id: Int!) {
+  deleteUser(id: $id) {
     user {
       id
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

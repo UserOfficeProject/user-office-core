@@ -19,7 +19,7 @@ import {
   QuestionTemplateRelation,
   Template,
 } from 'generated/sdk';
-import { getAllFields } from 'models/QuestionaryFunctions';
+import { getAllFields } from 'models/questionary/QuestionaryFunctions';
 
 type QuestionDependencyListProps = {
   template: Template;

@@ -1,8 +1,8 @@
+import { Options, MTableToolbar } from '@material-table/core';
 import IconButton from '@material-ui/core/IconButton';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Tooltip from '@material-ui/core/Tooltip';
 import GridOnIcon from '@material-ui/icons/GridOn';
-import { Options, MTableToolbar } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
@@ -31,7 +31,7 @@ const SEPMeetingComponentsView: React.FC<SEPMeetingComponentsViewProps> = ({
   // NOTE: Default call is with id=1
   const [selectedCallId, setSelectedCallId] = useState<number>(1);
 
-  const Toolbar = (data: Options): JSX.Element => (
+  const Toolbar = (data: Options<JSX.Element>): JSX.Element => (
     <>
       <MTableToolbar {...data} />
       <CallFilter

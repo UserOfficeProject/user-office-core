@@ -7,6 +7,7 @@ const useStyles = makeStyles({
     marginTop: '15px',
     display: 'flex',
     justifyContent: 'flex-end',
+    flexWrap: 'wrap',
     '& > *': {
       margin: '25px 5px 0 10px',
       '&:first-child': {

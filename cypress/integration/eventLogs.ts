@@ -7,8 +7,7 @@ context('Event log tests', () => {
   });
 
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
+    cy.viewport(1920, 1080);
   });
 
   it('If user creates a proposal, officer should be able to see the event logs for that proposal', () => {
@@ -20,9 +19,7 @@ context('Event log tests', () => {
 
     cy.login('officer');
 
-    cy.get("[data-cy='view-proposal']")
-      .first()
-      .click();
+    cy.get("[data-cy='view-proposal']").first().click();
     cy.contains('Logs').click({ force: true });
     cy.contains('PROPOSAL_CREATED');
   });
@@ -34,9 +31,7 @@ context('Event log tests', () => {
 
     cy.get('[data-cy="active-user-profile"]').click();
 
-    cy.get("[name='firstname']")
-      .clear()
-      .type(newFirstName);
+    cy.get("[name='firstname']").clear().type(newFirstName);
 
     cy.contains('Update Profile').click();
 
@@ -51,10 +46,7 @@ context('Event log tests', () => {
 
     cy.get('[aria-label="Search"]').type('Carlsson');
 
-    cy.contains('Carlsson')
-      .parent()
-      .find('button[title="Edit user"]')
-      .click();
+    cy.contains('Carlsson').parent().find('button[title="Edit user"]').click();
 
     cy.get("[name='firstname']").should('have.value', newFirstName);
 

@@ -1,5 +1,5 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { Column } from 'material-table';
+import { Column } from '@material-table/core';
 
 import { SortDirectionType } from 'components/common/SuperMaterialTable';
 import { Proposal, ProposalEndStatus, ProposalStatus } from 'generated/sdk';
@@ -49,15 +49,15 @@ export const getProposalStatus = (
 
 export const fromProposalToProposalView = (proposal: Proposal) => {
   return {
-    id: proposal.id,
+    primaryKey: proposal.primaryKey,
     title: proposal.title,
     status: proposal.status?.name || '',
     statusId: proposal.status?.id || 1,
     statusName: proposal.status?.name || '',
     statusDescription: proposal.status?.description || '',
     submitted: proposal.submitted,
-    shortCode: proposal.shortCode,
-    rankOrder: proposal.rankOrder,
+    proposalId: proposal.proposalId,
+    rankOrder: proposal.sepMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
     timeAllocation: proposal.technicalReview?.timeAllocation || null,
     technicalStatus: getTranslation(
@@ -71,5 +71,9 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,
     callId: proposal.callId,
+    allocationTimeUnit: proposal.call?.allocationTimeUnit,
   } as ProposalViewData;
 };
+
+export const capitalize = (s: string) =>
+  s && s[0].toUpperCase() + s.slice(1).toLocaleLowerCase();

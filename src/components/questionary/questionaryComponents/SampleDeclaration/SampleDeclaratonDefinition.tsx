@@ -3,13 +3,13 @@ import React from 'react';
 import * as Yup from 'yup';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
-import { DataType, SubtemplateConfig } from 'generated/sdk';
+import { DataType, SubTemplateConfig } from 'generated/sdk';
+import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import QuestionaryComponentSampleDeclaration from './QuestionaryComponentSampleDeclaration';
 import { QuestionSampleDeclarationForm } from './QuestionSampleDeclarationForm';
 import { QuestionTemplateRelationSampleDeclarationForm } from './QuestionTemplateRelationSampleDeclarationForm';
-import SamplesAnswerRenderer from './SamplesAnswerRenderer';
 
 export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.SAMPLE_DECLARATION,
@@ -18,18 +18,17 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
   questionForm: () => QuestionSampleDeclarationForm,
   questionTemplateRelationForm: () =>
     QuestionTemplateRelationSampleDeclarationForm,
-  readonly: false,
+  readonly: true,
   creatable: true,
   icon: <AssignmentIcon />,
   renderers: {
-    answerRenderer: function SamplesAnswerRendererComponent({ answer }) {
-      return <SamplesAnswerRenderer answer={answer} />;
-    },
+    answerRenderer: () => null,
     questionRenderer: defaultRenderer.questionRenderer,
   },
   createYupValidationSchema: (answer) => {
-    const config = answer.config as SubtemplateConfig;
-    let schema = Yup.array().of(Yup.number());
+    const config = answer.config as SubTemplateConfig;
+    let schema = Yup.array().of<Yup.AnyObjectSchema>(Yup.object());
+
     if (config.minEntries) {
       schema = schema.min(
         config.minEntries,
@@ -43,7 +42,22 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
       );
     }
 
+    schema = schema.test(
+      'allSamplesCompleted',
+      'All samples must be completed',
+      (value) =>
+        value?.every((sample) => sample?.questionary.isCompleted) ?? false
+    );
+
     return schema;
   },
-  getYupInitialValue: ({ answer }) => answer.value || [],
+  getYupInitialValue: ({ state, answer }) => {
+    const samplesState = state as ProposalSubmissionState;
+
+    return (
+      samplesState.proposal.samples?.filter(
+        (sample) => sample.questionId === answer.question.id
+      ) ?? []
+    );
+  },
 };

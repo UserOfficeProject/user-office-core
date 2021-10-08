@@ -3,22 +3,27 @@ mutation updateInstrument(
   $name: String!
   $shortCode: String!
   $description: String!
+  $managerUserId: Int!
 ) {
   updateInstrument(
     id: $id
     name: $name
     shortCode: $shortCode
     description: $description
+    managerUserId: $managerUserId
   ) {
     instrument {
       id
       name
       shortCode
       description
+      managerUserId
       scientists {
         ...basicUserDetails
       }
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

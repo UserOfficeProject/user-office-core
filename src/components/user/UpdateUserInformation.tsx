@@ -32,16 +32,20 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '25px',
     marginLeft: '10px',
   },
+  orcIdLabel: {
+    marginBottom: theme.spacing(1),
+  },
   orcidIconSmall: {
-    'vertical-align': 'middle',
-    'margin-right': '4px',
+    verticalAlign: 'middle',
+    marginLeft: theme.spacing(0.5),
     width: '16px',
     height: '16px',
     border: '0px',
   },
   orcIdContainer: {
-    'margin-top': '16px',
-    'margin-bottom': '19px',
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+    overflow: 'hidden',
   },
   chipSpace: {
     '& > * + *': {
@@ -107,10 +111,10 @@ export default function UpdateUserInformation(props: { id: number }) {
 
   const handleSetUserEmailVerified = async () => {
     const {
-      setUserEmailVerified: { error },
+      setUserEmailVerified: { rejection },
     } = await api('Email verified').setUserEmailVerified({ id: props.id });
 
-    if (!error) {
+    if (!rejection) {
       setUserData((userData) =>
         userData
           ? {
@@ -124,12 +128,12 @@ export default function UpdateUserInformation(props: { id: number }) {
 
   const handleSetUserNotPlaceholder = async () => {
     const {
-      setUserNotPlaceholder: { error },
+      setUserNotPlaceholder: { rejection },
     } = await api('User is no longer placeholder').setUserNotPlaceholder({
       id: props.id,
     });
 
-    if (!error) {
+    if (!rejection) {
       setUserData((userData) =>
         userData
           ? {
@@ -190,7 +194,7 @@ export default function UpdateUserInformation(props: { id: number }) {
       >
         {({ isSubmitting, values }) => (
           <Form>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" component="h2" gutterBottom>
               User Information
               <Box className={classes.chipSpace}>
                 {!userData.emailVerified && (
@@ -240,6 +244,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                     <Field
                       name="firstname"
                       label="Firstname"
+                      id="firstname-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -249,6 +254,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                     <Field
                       name="middlename"
                       label="Middle name"
+                      id="middlename-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -258,6 +264,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                     <Field
                       name="lastname"
                       label="Lastname"
+                      id="lastname-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -267,6 +274,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                     <Field
                       name="preferredname"
                       label="Preferred name"
+                      id="preferredname-input"
                       type="text"
                       component={TextField}
                       margin="normal"
@@ -287,6 +295,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                       <Field
                         name="othergender"
                         label="Please specify gender"
+                        id="othergender-input"
                         type="text"
                         component={TextField}
                         margin="normal"
@@ -305,6 +314,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                     <Field
                       name="birthdate"
                       label="Birthdate"
+                      id="birthdate-input"
                       format="yyyy-MM-dd"
                       component={KeyboardDatePicker}
                       margin="normal"
@@ -316,23 +326,26 @@ export default function UpdateUserInformation(props: { id: number }) {
               </Grid>
               <Grid item xs={6}>
                 <div className={classes.orcIdContainer}>
-                  <InputLabel shrink>ORCID iD</InputLabel>
-                  <a
-                    href={'https://orcid.org/' + values.orcid}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
+                  <InputLabel shrink className={classes.orcIdLabel}>
+                    ORCID iD{' '}
                     <img
                       className={classes.orcidIconSmall}
                       src={orcid}
                       alt="ORCID iD icon"
                     />
+                  </InputLabel>
+                  <a
+                    href={'https://orcid.org/' + values.orcid}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
                     https://orcid.org/{values.orcid}
                   </a>
                 </div>
                 <Field
                   name="username"
                   label="Username"
+                  id="username-input"
                   type="text"
                   component={TextField}
                   margin="normal"
@@ -350,6 +363,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                 <Field
                   name="department"
                   label="Department"
+                  id="department-input"
                   type="text"
                   component={TextField}
                   margin="normal"
@@ -359,6 +373,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                 <Field
                   name="position"
                   label="Position"
+                  id="position-input"
                   type="text"
                   component={TextField}
                   margin="normal"
@@ -368,6 +383,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                 <Field
                   name="email"
                   label="E-mail"
+                  id="email-input"
                   type="email"
                   component={TextField}
                   margin="normal"
@@ -377,6 +393,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                 <Field
                   name="telephone"
                   label="Telephone"
+                  id="telephone-input"
                   type="text"
                   component={TextField}
                   margin="normal"
@@ -386,6 +403,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                 <Field
                   name="telephone_alt"
                   label="Telephone Alt."
+                  id="telephone-alt-input"
                   type="text"
                   component={TextField}
                   margin="normal"

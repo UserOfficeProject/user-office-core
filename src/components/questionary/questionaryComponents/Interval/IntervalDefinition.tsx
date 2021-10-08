@@ -1,3 +1,4 @@
+import { intervalQuestionValidationSchema } from '@esss-swap/duo-validation';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import React from 'react';
 
@@ -5,7 +6,7 @@ import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
-import { createIntervalValidationSchema } from './createIntervalValidationSchema';
+import { IntervalAnswerRenderer } from './IntervalAnswerRenderer';
 import IntervalSearchCriteriaComponent from './IntervalSearchCriteriaComponent';
 import { QuestionaryComponentInterval } from './QuestionaryComponentInterval';
 import { QuestionIntervalForm } from './QuestionIntervalForm';
@@ -21,25 +22,10 @@ export const intervalDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <ArrowForwardIosIcon />,
   renderers: {
-    answerRenderer: function AnswerRendererComponent({ answer }) {
-      const isAnswered = answer.value.min || answer.value.min; // at least one answer
-      if (isAnswered) {
-        const min = answer.value.min;
-        const max = answer.value.max;
-        const unit = answer.value.unit || '';
-
-        return (
-          <span>
-            {min} - {max} {unit}
-          </span>
-        );
-      }
-
-      return <span>Left blank</span>;
-    },
+    answerRenderer: IntervalAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: createIntervalValidationSchema,
+  createYupValidationSchema: intervalQuestionValidationSchema,
   getYupInitialValue: ({ answer }) =>
     answer.value || { min: '', max: '', unit: null },
   searchCriteriaComponent: IntervalSearchCriteriaComponent,

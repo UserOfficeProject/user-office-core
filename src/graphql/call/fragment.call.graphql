@@ -13,8 +13,11 @@ fragment call on Call {
   endCycle
   cycleComment
   surveyComment
+  referenceNumberFormat
   proposalWorkflowId
   templateId
+  esiTemplateId
+  allocationTimeUnit
   instruments {
     id
     name
@@ -31,5 +34,12 @@ fragment call on Call {
     name
     description
   }
+  template {
+    templateId
+    name
+    isArchived
+  }
   proposalCount
+  title
+  description
 }

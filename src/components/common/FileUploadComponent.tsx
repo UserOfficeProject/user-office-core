@@ -25,7 +25,7 @@ import React, { ChangeEvent, useState } from 'react';
 
 import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
 import { useFileMetadata } from 'hooks/file/useFileMetadata';
-import { FileMetaData } from 'models/FileUpload';
+import { FileMetaData } from 'models/questionary/FileUpload';
 import { FunctionType } from 'utils/utilTypes';
 
 import UOLoader from './UOLoader';
@@ -157,31 +157,33 @@ export function FileEntry(props: {
 
       <Grid item xs={5}>
         <Grid container spacing={1}>
-          <Grid item xs={6}>
-            <TextField
-              label="Figure"
-              data-cy="image-figure"
-              defaultValue={props.figure || ''}
-              className={classes.captionInput}
-              onBlur={(e) =>
-                props.onImageCaptionOrFigureAdded({
-                  id: props.metaData.fileId,
-                  caption: props.caption,
-                  figure: e.target.value,
-                })
-              }
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Tooltip title="Use figure to reference the image inside the rich text editor">
-                      <InfoOutlined className={classes.infoIcon} />
-                    </Tooltip>
-                  </InputAdornment>
-                ),
-              }}
-              fullWidth
-            />
-          </Grid>
+          {props.metaData.mimeType.startsWith('image') && (
+            <Grid item xs={6}>
+              <TextField
+                label="Figure"
+                data-cy="image-figure"
+                defaultValue={props.figure || ''}
+                className={classes.captionInput}
+                onBlur={(e) =>
+                  props.onImageCaptionOrFigureAdded({
+                    id: props.metaData.fileId,
+                    caption: props.caption,
+                    figure: e.target.value,
+                  })
+                }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Tooltip title="Use figure to reference the image inside the rich text editor">
+                        <InfoOutlined className={classes.infoIcon} />
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                }}
+                fullWidth
+              />
+            </Grid>
+          )}
           {(showCaption || props.caption) && (
             <Grid item xs={6}>
               <TextField
@@ -297,6 +299,16 @@ export function NewFileEntry(props: {
   return <div>Unknown state</div>;
 }
 
+const useStyles = makeStyles(() => ({
+  questionnairesList: {
+    listStyle: 'none',
+    padding: 0,
+    marginBottom: 0,
+    '& li': {
+      paddingLeft: 0,
+    },
+  },
+}));
 export function FileUploadComponent(props: {
   maxFiles?: number;
   id?: string;
@@ -307,16 +319,7 @@ export function FileUploadComponent(props: {
   const fileIds = props.value.map((fileItem) => fileItem.id);
   const { files, setFiles } = useFileMetadata(fileIds);
 
-  const classes = makeStyles(() => ({
-    questionnairesList: {
-      listStyle: 'none',
-      padding: 0,
-      marginBottom: 0,
-      '& li': {
-        paddingLeft: 0,
-      },
-    },
-  }))();
+  const classes = useStyles();
 
   const onUploadComplete = (newFile: FileMetaData): void => {
     const newValue = files.concat(newFile);

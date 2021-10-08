@@ -1,0 +1,11 @@
+query getVisits($filter: VisitsFilter) {
+  visits(filter: $filter) {
+    ...visit
+    proposal {
+      ...proposal
+      instrument {
+        name
+      }
+    }
+  }
+}

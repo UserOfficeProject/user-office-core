@@ -2,14 +2,13 @@ import { useState } from 'react';
 
 import {
   DataType,
-  FieldDependencyInput,
-  Question,
   QuestionTemplateRelation,
+  Rejection,
   Template,
   TemplateCategoryId,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { Event, EventType } from 'models/QuestionaryEditorModel';
+import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
 
@@ -37,29 +36,6 @@ export function usePersistQuestionaryEditorModel() {
       });
   };
 
-  // Have this until GQL accepts Union types
-  // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
-  const prepareDependencies = (dependency: FieldDependencyInput) => {
-    return {
-      ...dependency,
-      condition: {
-        ...dependency?.condition,
-        params: JSON.stringify({ value: dependency?.condition.params }),
-      },
-    };
-  };
-
-  const updateQuestion = async (question: Question) => {
-    return api()
-      .updateQuestion({
-        id: question.id,
-        naturalKey: question.naturalKey,
-        question: question.question,
-        config: question.config ? JSON.stringify(question.config) : undefined,
-      })
-      .then((data) => data.updateQuestion);
-  };
-
   const updateQuestionTemplateRelation = async (
     templateId: number,
     field: QuestionTemplateRelation
@@ -73,25 +49,6 @@ export function usePersistQuestionaryEditorModel() {
         config: field.config ? JSON.stringify(field.config) : undefined,
       })
       .then((data) => data.updateQuestionTemplateRelation);
-  };
-
-  const updateQuestionTemplateRelationSettings = async (
-    templateId: number,
-    field: QuestionTemplateRelation
-  ) => {
-    return api()
-      .updateQuestionTemplateRelationSettings({
-        templateId,
-        questionId: field.question.id,
-        config: field.config ? JSON.stringify(field.config) : undefined,
-        dependencies: field.dependencies
-          ? field.dependencies.map((dependency) =>
-              prepareDependencies(dependency)
-            )
-          : [],
-        dependenciesOperator: field.dependenciesOperator,
-      })
-      .then((data) => data.updateQuestionTemplateRelationSettings);
   };
 
   const createQuestion = async (
@@ -109,32 +66,6 @@ export function usePersistQuestionaryEditorModel() {
         setIsLoading(false);
 
         return questionResponse.createQuestion;
-      });
-  };
-
-  const deleteQuestion = async (questionId: string) => {
-    return api()
-      .deleteQuestion({
-        questionId,
-      })
-      .then((data) => data.deleteQuestion);
-  };
-
-  const deleteQuestionTemplateRelation = async (
-    templateId: number,
-    questionId: string
-  ) => {
-    setIsLoading(true);
-
-    return api()
-      .deleteQuestionTemplateRelation({
-        templateId,
-        questionId,
-      })
-      .then((data) => {
-        setIsLoading(false);
-
-        return data.deleteQuestionTemplateRelation;
       });
   };
 
@@ -187,7 +118,7 @@ export function usePersistQuestionaryEditorModel() {
   };
 
   type MonitorableServiceCall = () => Promise<{
-    error?: string | null;
+    rejection?: Rejection | null;
   }>;
 
   const persistModel = ({
@@ -197,10 +128,10 @@ export function usePersistQuestionaryEditorModel() {
     const executeAndMonitorCall = (call: MonitorableServiceCall) => {
       setIsLoading(true);
       call().then((result) => {
-        if (result.error) {
+        if (result.rejection) {
           dispatch({
             type: EventType.SERVICE_ERROR_OCCURRED,
-            payload: result.error,
+            payload: result.rejection.reason,
           });
         }
         setIsLoading(false);
@@ -276,45 +207,15 @@ export function usePersistQuestionaryEditorModel() {
             updateTopic(action.payload.topicId, {
               title: action.payload.title as string,
               templateId: state.templateId,
+              sortOrder: action.payload.sortOrder,
             })
           );
           break;
-        case EventType.UPDATE_QUESTION_REQUESTED:
-          executeAndMonitorCall(async () => {
-            const question = action.payload.field as Question;
-            const result = await updateQuestion(question);
-            dispatch({
-              type: EventType.QUESTION_UPDATED,
-              payload: result.question,
-            });
 
-            return result;
-          });
-          break;
-        case EventType.UPDATE_QUESTION_REL_REQUESTED:
-          executeAndMonitorCall(async () => {
-            const questionRel = action.payload
-              .field as QuestionTemplateRelation;
-            const templateId = action.payload.templateId;
-
-            const result = await updateQuestionTemplateRelationSettings(
-              templateId,
-              questionRel
-            );
-            if (result.template) {
-              dispatch({
-                type: EventType.QUESTION_REL_UPDATED,
-                payload: result.template,
-              });
-            }
-
-            return result;
-          });
-          break;
         case EventType.CREATE_QUESTION_REQUESTED:
           executeAndMonitorCall(async () => {
             const result = await createQuestion(
-              state.categoryId,
+              state.group.categoryId,
               action.payload.dataType
             );
             if (result.question) {
@@ -327,39 +228,9 @@ export function usePersistQuestionaryEditorModel() {
             return result;
           });
           break;
-        case EventType.DELETE_QUESTION_REL_REQUESTED:
-          executeAndMonitorCall(async () => {
-            const result = await deleteQuestionTemplateRelation(
-              state.templateId,
-              action.payload.fieldId
-            );
-            if (result.template) {
-              dispatch({
-                type: EventType.QUESTION_REL_DELETED,
-                payload: result.template,
-              });
-            }
-
-            return result;
-          });
-          break;
         case EventType.DELETE_TOPIC_REQUESTED:
           executeAndMonitorCall(() => deleteTopic(action.payload));
           break;
-        case EventType.DELETE_QUESTION_REQUESTED: {
-          executeAndMonitorCall(async () => {
-            const result = await deleteQuestion(action.payload.questionId);
-            if (result.question) {
-              dispatch({
-                type: EventType.QUESTION_DELETED,
-                payload: result.question.id,
-              });
-            }
-
-            return result;
-          });
-          break;
-        }
         case EventType.CREATE_TOPIC_REQUESTED: {
           const { isFirstStep, topicId } = action.payload;
           let sortOrder = 0;
@@ -371,7 +242,7 @@ export function usePersistQuestionaryEditorModel() {
 
             const previousStep = state.steps[stepIndex];
 
-            sortOrder = previousStep.topic.sortOrder + 1;
+            sortOrder = previousStep ? previousStep.topic.sortOrder + 1 : 0;
           }
 
           executeAndMonitorCall(async () => {

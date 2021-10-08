@@ -1,5 +1,5 @@
-query getProposal($id: Int!) {
-  proposal(id: $id) {
+query getProposal($primaryKey: Int!) {
+  proposal(primaryKey: $primaryKey) {
     ...proposal
     proposer {
       ...basicUserDetails
@@ -9,9 +9,13 @@ query getProposal($id: Int!) {
     }
     questionary {
       ...questionary
+      isCompleted
     }
     technicalReview {
       ...coreTechnicalReview
+      reviewer {
+        ...basicUserDetails
+      }
     }
     reviews {
       id
@@ -34,10 +38,18 @@ query getProposal($id: Int!) {
     call {
       id
       shortCode
+      isActive
+      allocationTimeUnit
     }
     sep {
       id
       code
+    }
+    samples {
+      ...sample
+      questionary {
+        isCompleted
+      }
     }
   }
 }

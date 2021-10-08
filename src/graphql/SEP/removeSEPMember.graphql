@@ -4,7 +4,9 @@ mutation removeMemberFromSep(
   $roleId: UserRole!
 ) {
   removeMemberFromSep(memberId: $memberId, sepId: $sepId, roleId: $roleId) {
-    error
+    rejection {
+      ...rejection
+    }
     sep {
       id
     }

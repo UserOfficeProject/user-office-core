@@ -1,0 +1,49 @@
+mutation updateVisit(
+  $visitId: Int!
+  $proposalPkAndEventId: ProposalPkAndEventId
+  $team: [Int!]
+  $status: VisitStatus
+  $teamLeadUserId: Int
+) {
+  updateVisit(
+    visitId: $visitId
+    proposalPkAndEventId: $proposalPkAndEventId
+    team: $team
+    status: $status
+    teamLeadUserId: $teamLeadUserId
+  ) {
+    visit {
+      ...visit
+
+      teamLead {
+        ...basicUserDetails
+      }
+
+      registrations {
+        ...visitRegistration
+        user {
+          ...basicUserDetails
+        }
+      }
+
+      proposal {
+        ...proposal
+        instrument {
+          name
+        }
+      }
+
+      shipments {
+        ...shipment
+      }
+
+      esi {
+        ...esi
+      }
+    }
+
+    rejection {
+      ...rejection
+    }
+  }
+}

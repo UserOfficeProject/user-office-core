@@ -39,6 +39,7 @@ const CallReviewAndNotification: React.FC = () => {
         <Field
           name="startReview"
           label="Start of review"
+          id="start-review-input"
           format="yyyy-MM-dd"
           component={KeyboardDatePicker}
           margin="normal"
@@ -48,6 +49,7 @@ const CallReviewAndNotification: React.FC = () => {
         <Field
           name="endReview"
           label="End of review"
+          id="end-review-input"
           format="yyyy-MM-dd"
           minDate={startReview}
           component={KeyboardDatePicker}
@@ -57,6 +59,7 @@ const CallReviewAndNotification: React.FC = () => {
         <Field
           name="startSEPReview"
           label="Start of SEP review"
+          id="start-sep-review-input"
           format="yyyy-MM-dd"
           component={KeyboardDatePicker}
           margin="normal"
@@ -65,6 +68,7 @@ const CallReviewAndNotification: React.FC = () => {
         <Field
           name="endSEPReview"
           label="End of SEP review"
+          id="end-sep-review-input"
           format="yyyy-MM-dd"
           minDate={endSEPReview}
           component={KeyboardDatePicker}
@@ -75,11 +79,13 @@ const CallReviewAndNotification: React.FC = () => {
       <Field
         name="surveyComment"
         label="Survey Comment"
+        id="survey-comment-input"
         type="text"
         component={TextField}
         margin="normal"
         fullWidth
         required
+        inputProps={{ maxLength: '100' }}
         data-cy="survey-comment"
       />
     </>

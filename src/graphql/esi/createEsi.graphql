@@ -1,0 +1,34 @@
+mutation createEsi($visitId: Int!) {
+  createEsi(visitId: $visitId) {
+    esi {
+      ...esi
+      questionary {
+        isCompleted
+        ...questionary
+      }
+      sampleEsis {
+        sample {
+          ...sample
+        }
+        ...sampleEsi
+        questionary {
+          isCompleted
+        }
+      }
+      visit {
+        ...visit
+        proposal {
+          proposalId
+          title
+          samples {
+            ...sample
+          }
+        }
+      }
+    }
+
+    rejection {
+      ...rejection
+    }
+  }
+}

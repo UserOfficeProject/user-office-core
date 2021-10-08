@@ -1,8 +1,8 @@
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import InboxIcon from '@material-ui/icons/Inbox';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';
-import { SampleSubmissionState } from 'models/SampleSubmissionState';
+import { SampleSubmissionState } from 'models/questionary/sample/SampleSubmissionState';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createSampleBasisValidationSchema } from './createSampleBasisValidationSchema';
@@ -18,7 +18,7 @@ export const sampleBasisDefinition: QuestionaryComponentDefinition = {
   questionTemplateRelationForm: () => QuestionTemplateRelationSampleBasisForm,
   readonly: true,
   creatable: false,
-  icon: <QuestionAnswerIcon />,
+  icon: <InboxIcon />,
   createYupValidationSchema: createSampleBasisValidationSchema,
   getYupInitialValue: ({ state }) => {
     const sampleState = state as SampleSubmissionState;

@@ -54,11 +54,15 @@ const InstrumentFilter: React.FC<InstrumentFilterProps> = ({
   return (
     <>
       <FormControl className={classes.formControl}>
-        <InputLabel shrink>Instrument</InputLabel>
+        <InputLabel id="instrument-select-label" shrink>
+          Instrument
+        </InputLabel>
         {isLoading ? (
           <div className={classes.loadingText}>Loading...</div>
         ) : (
           <Select
+            id="instrument-select"
+            aria-labelledby="instrument-select-label"
             onChange={(instrument) => {
               setQuery({
                 instrument: instrument.target.value

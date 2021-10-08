@@ -4,7 +4,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Slide from '@material-ui/core/Slide';
-import { Theme } from '@material-ui/core/styles/createMuiTheme';
+import { Theme } from '@material-ui/core/styles';
 import createStyles from '@material-ui/core/styles/createStyles';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -15,10 +15,13 @@ import React, { Ref } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
-import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
-import { TechnicalReview, Review, UserRole } from 'generated/sdk';
+import {
+  TechnicalReview,
+  Review,
+  UserRole,
+  SepMeetingDecision,
+} from 'generated/sdk';
 import { useSEPProposalData } from 'hooks/SEP/useSEPProposalData';
-import { ContentContainer } from 'styles/StyledComponents';
 
 import ExternalReviews from './ExternalReviews';
 import FinalRankingForm from './FinalRankingForm';
@@ -45,15 +48,15 @@ const Transition = React.forwardRef<unknown, TransitionProps>(SlideComponent);
 
 type SEPMeetingProposalViewModalProps = {
   proposalViewModalOpen: boolean;
-  proposalId: number;
+  proposalPk?: number | null;
   sepId: number;
-  meetingSubmitted: (data: AdministrationFormData) => void;
+  meetingSubmitted: (data: SepMeetingDecision) => void;
   setProposalViewModalOpen: (isOpen: boolean) => void;
 };
 
 const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = ({
   proposalViewModalOpen,
-  proposalId,
+  proposalPk,
   sepId,
   meetingSubmitted,
   setProposalViewModalOpen,
@@ -68,7 +71,7 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
 
   const { SEPProposalData, loading, setSEPProposalData } = useSEPProposalData(
     sepId,
-    proposalId
+    proposalPk
   );
 
   const finalHasWriteAccess = SEPProposalData?.instrumentSubmitted
@@ -79,7 +82,6 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
 
   const handleClose = () => {
     setProposalViewModalOpen(false);
-    setSEPProposalData(null);
   };
 
   const sepTimeAllocation = SEPProposalData?.sepTimeAllocation ?? null;
@@ -99,6 +101,7 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
               color="inherit"
               onClick={handleClose}
               aria-label="close"
+              data-cy="close-modal"
             >
               <CloseIcon />
             </IconButton>
@@ -108,57 +111,52 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
           </Toolbar>
         </AppBar>
         <DialogContent>
-          <ContentContainer>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <div data-cy="SEP-meeting-components-proposal-view">
-                  {loading || !SEPProposalData || !proposalData ? (
-                    <UOLoader
-                      style={{ marginLeft: '50%', marginTop: '20px' }}
+          <Grid container>
+            <Grid item xs={12}>
+              <div data-cy="SEP-meeting-components-proposal-view">
+                {loading || !SEPProposalData || !proposalData ? (
+                  <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />
+                ) : (
+                  <>
+                    <FinalRankingForm
+                      closeModal={handleClose}
+                      hasWriteAccess={finalHasWriteAccess}
+                      proposalData={proposalData}
+                      meetingSubmitted={(data) => {
+                        setSEPProposalData({
+                          ...SEPProposalData,
+                          proposal: {
+                            ...proposalData,
+                            sepMeetingDecision: data,
+                          },
+                        });
+                        meetingSubmitted(data);
+                      }}
                     />
-                  ) : (
-                    <>
-                      <FinalRankingForm
-                        closeModal={handleClose}
-                        hasWriteAccess={finalHasWriteAccess}
-                        proposalData={proposalData}
-                        meetingSubmitted={(data) => {
-                          setSEPProposalData({
-                            ...SEPProposalData,
-                            proposal: {
-                              ...proposalData,
-                              ...data,
-                              rankOrder: data.rankOrder as number,
-                            },
-                          });
-                          meetingSubmitted(data);
-                        }}
-                      />
-                      <ProposalDetails proposal={proposalData} />
-                      <TechnicalReviewInfo
-                        hasWriteAccess={finalHasWriteAccess}
-                        technicalReview={
-                          proposalData.technicalReview as TechnicalReview
-                        }
-                        sepTimeAllocation={sepTimeAllocation}
-                        onSepTimeAllocationEdit={(sepTimeAllocation) =>
-                          setSEPProposalData({
-                            ...SEPProposalData,
-                            sepTimeAllocation,
-                          })
-                        }
-                        proposalId={proposalData.id}
-                        sepId={sepId}
-                      />
-                      <ExternalReviews
-                        reviews={proposalData.reviews as Review[]}
-                      />
-                    </>
-                  )}
-                </div>
-              </Grid>
+                    <ProposalDetails proposal={proposalData} />
+                    <TechnicalReviewInfo
+                      hasWriteAccess={finalHasWriteAccess}
+                      technicalReview={
+                        proposalData.technicalReview as TechnicalReview
+                      }
+                      sepTimeAllocation={sepTimeAllocation}
+                      onSepTimeAllocationEdit={(sepTimeAllocation) =>
+                        setSEPProposalData({
+                          ...SEPProposalData,
+                          sepTimeAllocation,
+                        })
+                      }
+                      proposal={proposalData}
+                      sepId={sepId}
+                    />
+                    <ExternalReviews
+                      reviews={proposalData.reviews as Review[]}
+                    />
+                  </>
+                )}
+              </div>
             </Grid>
-          </ContentContainer>
+          </Grid>
         </DialogContent>
       </Dialog>
     </>

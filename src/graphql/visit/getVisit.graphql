@@ -1,0 +1,24 @@
+query getVisit($visitId: Int!) {
+  visit(visitId: $visitId) {
+    ...visit
+    registrations {
+      ...visitRegistration
+      user {
+        ...basicUserDetails
+      }
+    }
+    proposal {
+      ...proposal
+      instrument {
+        name
+      }
+    }
+    esi {
+      ...esi
+      questionary {
+        isCompleted
+        ...questionary
+      }
+    }
+  }
+}

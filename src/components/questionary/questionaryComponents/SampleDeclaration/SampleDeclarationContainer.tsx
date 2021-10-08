@@ -6,17 +6,16 @@ import {
   QuestionaryContext,
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
-import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
-import { QuestionaryStep, Sample } from 'generated/sdk';
+import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
+import { TemplateGroupId } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import {
   Event,
-  EventType,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
-  WizardStep,
-} from 'models/QuestionarySubmissionState';
-import { SampleSubmissionState } from 'models/SampleSubmissionState';
+} from 'models/questionary/QuestionarySubmissionState';
+import { SampleSubmissionState } from 'models/questionary/sample/SampleSubmissionState';
+import { SampleWithQuestionary } from 'models/questionary/sample/SampleWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
@@ -31,95 +30,34 @@ const samplesReducer = (
   action: Event
 ) => {
   switch (action.type) {
-    case EventType.SAMPLE_CREATED:
-    case EventType.SAMPLE_LOADED:
-      const sample: Sample = action.payload.sample;
+    case 'SAMPLE_CREATED':
+    case 'SAMPLE_LOADED':
       draftState.isDirty = false;
-      draftState.questionaryId = sample.questionaryId;
-      draftState.sample = sample;
-      draftState.steps = sample.questionary.steps;
-      draftState.templateId = sample.questionary.templateId;
+      draftState.itemWithQuestionary = action.sample;
       break;
-    case EventType.SAMPLE_MODIFIED:
+    case 'SAMPLE_MODIFIED':
       draftState.sample = {
         ...draftState.sample,
-        ...action.payload,
+        ...action.sample,
       };
       draftState.isDirty = true;
-      break;
-
-    case EventType.QUESTIONARY_STEPS_LOADED: {
-      draftState.sample.questionary.steps = action.payload.questionarySteps;
-      break;
-    }
-    case EventType.QUESTIONARY_STEP_ANSWERED:
-      const updatedStep = action.payload.questionaryStep as QuestionaryStep;
-      const stepIndex = draftState.sample.questionary.steps.findIndex(
-        (step) => step.topic.id === updatedStep.topic.id
-      );
-      draftState.sample.questionary.steps[stepIndex] = updatedStep;
-
       break;
   }
 
   return draftState;
 };
 
-const createQuestionaryWizardStep = (
-  step: QuestionaryStep,
-  index: number
-): WizardStep => ({
-  type: 'QuestionaryStep',
-  payload: { topicId: step.topic.id, questionaryStepIndex: index },
-  getMetadata: (state, payload) => {
-    const questionaryStep = state.steps[payload.questionaryStepIndex];
-
-    return {
-      title: questionaryStep.topic.title,
-      isCompleted: questionaryStep.isCompleted,
-      isReadonly: index > 0 && state.steps[index - 1].isCompleted === false,
-    };
-  },
-});
-
 export function SampleDeclarationContainer(props: {
-  sample: Sample;
-  sampleCreated?: (sample: Sample) => void;
-  sampleUpdated?: (sample: Sample) => void;
+  sample: SampleWithQuestionary;
+  sampleCreated?: (sample: SampleWithQuestionary) => void;
+  sampleUpdated?: (sample: SampleWithQuestionary) => void;
   sampleEditDone?: () => void;
 }) {
   const { api } = useDataApiWithFeedback();
 
+  const def = getQuestionaryDefinition(TemplateGroupId.SAMPLE);
+
   const previousInitialSample = usePrevious(props.sample);
-
-  const createSampleWizardSteps = (): WizardStep[] => {
-    const wizardSteps: WizardStep[] = [];
-    const questionarySteps = props.sample.questionary.steps;
-
-    questionarySteps.forEach((step, index) =>
-      wizardSteps.push(createQuestionaryWizardStep(step, index))
-    );
-
-    return wizardSteps;
-  };
-
-  const isLastStep = (wizardStep: WizardStep) =>
-    state.wizardSteps[state.wizardSteps.length - 1] === wizardStep;
-
-  const displayElementFactory = (
-    wizardStep: WizardStep,
-    isReadonly: boolean
-  ) => {
-    return (
-      <QuestionaryStepView
-        readonly={isReadonly}
-        topicId={wizardStep.payload.topicId}
-        onStepComplete={() =>
-          isLastStep(wizardStep) ? props.sampleEditDone?.() : undefined
-        }
-      />
-    );
-  };
 
   /**
    * Returns true if reset was performed, false otherwise
@@ -129,8 +67,8 @@ export function SampleDeclarationContainer(props: {
     if (sampleState.sample.id === 0) {
       // if sample isn't created yet
       dispatch({
-        type: EventType.SAMPLE_LOADED,
-        payload: { sample: initialState.sample },
+        type: 'SAMPLE_LOADED',
+        sample: initialState.sample,
       });
     } else {
       await api()
@@ -138,15 +76,13 @@ export function SampleDeclarationContainer(props: {
         .then((data) => {
           if (data.sample && data.sample.questionary.steps) {
             dispatch({
-              type: EventType.SAMPLE_LOADED,
-              payload: { sample: data.sample },
+              type: 'SAMPLE_LOADED',
+              sample: data.sample,
             });
             dispatch({
-              type: EventType.QUESTIONARY_STEPS_LOADED,
-              payload: {
-                questionarySteps: data.sample.questionary.steps,
-                stepIndex: state.stepIndex,
-              },
+              type: 'STEPS_LOADED',
+              steps: data.sample.questionary.steps,
+              stepIndex: state.stepIndex,
             });
           }
         });
@@ -163,33 +99,33 @@ export function SampleDeclarationContainer(props: {
       next(action);
       const state = getState() as SampleSubmissionState;
       switch (action.type) {
-        case EventType.SAMPLE_UPDATED:
-          props.sampleUpdated?.(action.payload.sample);
+        case 'SAMPLE_UPDATED':
+          props.sampleUpdated?.({ ...state.sample, ...action.sample });
           break;
-        case EventType.SAMPLE_CREATED:
-          props.sampleCreated?.(action.payload.sample);
+        case 'SAMPLE_CREATED':
+          props.sampleCreated?.(action.sample);
           break;
-        case EventType.BACK_CLICKED:
+        case 'SAMPLE_SUBMITTED':
+          props.sampleEditDone?.();
+          break;
+        case 'BACK_CLICKED':
           if (!state.isDirty || (await handleReset())) {
-            dispatch({ type: EventType.GO_STEP_BACK });
+            dispatch({ type: 'GO_STEP_BACK' });
           }
           break;
-        case EventType.RESET_CLICKED:
+        case 'RESET_CLICKED':
           handleReset();
           break;
       }
     };
   };
 
-  const initialState: SampleSubmissionState = {
-    sample: props.sample,
-    templateId: props.sample.questionary.templateId,
-    isDirty: false,
-    questionaryId: props.sample.questionary.questionaryId,
-    stepIndex: 0,
-    steps: props.sample.questionary.steps,
-    wizardSteps: createSampleWizardSteps(),
-  };
+  const initialState = new SampleSubmissionState(
+    props.sample,
+    0,
+    false,
+    def.wizardStepFactory.getWizardSteps(props.sample.questionary.steps)
+  );
 
   const { state, dispatch } = QuestionarySubmissionModel<SampleSubmissionState>(
     initialState,
@@ -202,12 +138,12 @@ export function SampleDeclarationContainer(props: {
       previousInitialSample === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: EventType.SAMPLE_LOADED,
-        payload: { sample: props.sample },
+        type: 'SAMPLE_LOADED',
+        sample: props.sample,
       });
       dispatch({
-        type: EventType.QUESTIONARY_STEPS_LOADED,
-        payload: { questionarySteps: props.sample.questionary.steps },
+        type: 'STEPS_LOADED',
+        steps: props.sample.questionary.steps,
       });
     }
   }, [previousInitialSample, props.sample, dispatch]);
@@ -217,7 +153,7 @@ export function SampleDeclarationContainer(props: {
       <Questionary
         title={state.sample.title || 'New Sample'}
         handleReset={handleReset}
-        displayElementFactory={displayElementFactory}
+        displayElementFactory={def.displayElementFactory}
       />
     </QuestionaryContext.Provider>
   );

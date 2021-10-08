@@ -1,11 +1,14 @@
-mutation cloneSample($sampleId: Int!) {
-  cloneSample(sampleId: $sampleId) {
+mutation cloneSample($sampleId: Int!, $title: String) {
+  cloneSample(sampleId: $sampleId, title: $title) {
     sample {
       ...sample
       questionary {
+        isCompleted
         ...questionary
       }
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

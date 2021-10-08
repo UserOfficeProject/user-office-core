@@ -1,5 +1,7 @@
 {
   "video": false,
   "baseUrl": "http://proxy:80",
-  "screenshotsFolder": "/tmp/screenshots"
+  "screenshotsFolder": "/tmp/screenshots",
+  "retries": 1,
+  "scrollBehavior": "center"
 }

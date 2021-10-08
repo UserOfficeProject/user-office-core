@@ -5,6 +5,8 @@ mutation deleteProposalWorkflow($id: Int!) {
       name
       description
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

@@ -1,3 +1,4 @@
+import MaterialTable from '@material-table/core';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -7,7 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import Clear from '@material-ui/icons/Clear';
 import Person from '@material-ui/icons/Person';
 import PersonAdd from '@material-ui/icons/PersonAdd';
-import MaterialTable from 'material-table';
 import React, { useState, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -19,12 +19,18 @@ import { useRenewToken } from 'hooks/common/useRenewToken';
 import { useSEPReviewersData } from 'hooks/SEP/useSEPReviewersData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 const useStyles = makeStyles(() => ({
   darkerDisabledTextField: {
     '& .MuiInputBase-root.Mui-disabled': {
       color: 'rgba(0, 0, 0, 0.7) !important',
+    },
+  },
+  defaultTextField: {
+    '& .MuiFormLabel-root': {
+      color: 'black',
     },
   },
 }));
@@ -85,7 +91,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     const [sepChair] = value;
 
     const {
-      assignChairOrSecretary: { error },
+      assignChairOrSecretary: { rejection },
     } = await api('SEP chair assigned successfully!').assignChairOrSecretary({
       assignChairOrSecretaryToSEPInput: {
         sepId: sepId,
@@ -96,7 +102,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
     setOpen(false);
 
-    if (error) {
+    if (rejection) {
       return;
     }
     setSepChairModalOpen(false);
@@ -116,7 +122,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     const [sepSecretary] = value;
 
     const {
-      assignChairOrSecretary: { error },
+      assignChairOrSecretary: { rejection },
     } = await api(
       'SEP secretary assigned successfully!'
     ).assignChairOrSecretary({
@@ -129,7 +135,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
     setOpen(false);
 
-    if (error) {
+    if (rejection) {
       return;
     }
 
@@ -146,7 +152,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
   const addMember = async (users: BasicUserDetails[]): Promise<void> => {
     const {
-      assignReviewersToSEP: { error },
+      assignReviewersToSEP: { rejection },
     } = await api('SEP member assigned successfully!').assignReviewersToSEP({
       memberIds: users.map((user) => user.id),
       sepId,
@@ -154,7 +160,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
     setOpen(false);
 
-    if (error) {
+    if (rejection) {
       return;
     }
 
@@ -168,14 +174,14 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     user: BasicUserDetailsWithRole
   ): Promise<void> => {
     const {
-      removeMemberFromSep: { error },
+      removeMemberFromSep: { rejection },
     } = await api('SEP member removed successfully!').removeMemberFromSep({
       memberId: user.id,
       sepId,
       roleId: user.roleId,
     });
 
-    if (error) {
+    if (rejection) {
       return;
     }
 
@@ -248,29 +254,27 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
         userRole={UserRole.SEP_REVIEWER}
       />
       <>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" component="h2" gutterBottom>
           SEP Members
         </Typography>
         <Grid container spacing={3} alignItems="center">
-          <Grid item xs={6}>
+          <Grid item sm={6} xs={12}>
             <TextField
               name="SEPChair"
               id="SEPChair"
               label="SEP Chair"
               type="text"
-              value={
-                sepData.sepChair
-                  ? `${sepData.sepChair.firstname} ${sepData.sepChair.lastname}`
-                  : ''
-              }
+              value={getFullUserName(sepData.sepChair)}
               margin="none"
               fullWidth
               data-cy="SEPChair"
               required
               disabled
               className={
-                sepData.sepChair ? classes.darkerDisabledTextField : ''
-              }
+                sepData.sepChair
+                  ? classes.darkerDisabledTextField
+                  : classes.defaultTextField
+              } // original behaviour preserved but labels legible by default
               InputProps={{
                 endAdornment: isUserOfficer && (
                   <>
@@ -288,7 +292,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                               },
                               {
                                 title: 'Remove SEP member',
-                                description: `Are you sure you want to remove ${sepData.sepChair?.firstname} ${sepData.sepChair?.lastname} from this SEP?`,
+                                description: `Are you sure you want to remove ${getFullUserName(
+                                  sepData.sepChair
+                                )} from this SEP?`,
                               }
                             )()
                           }
@@ -310,25 +316,23 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               }}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item sm={6} xs={12}>
             <TextField
               name="SEPSecretary"
               id="SEPSecretary"
               label="SEP Secretary"
               type="text"
-              value={
-                sepData.sepSecretary
-                  ? `${sepData.sepSecretary.firstname} ${sepData.sepSecretary.lastname}`
-                  : ''
-              }
+              value={getFullUserName(sepData.sepSecretary)}
               margin="none"
               fullWidth
               data-cy="SEPSecretary"
               required
               disabled
               className={
-                sepData.sepSecretary ? classes.darkerDisabledTextField : ''
-              }
+                sepData.sepSecretary
+                  ? classes.darkerDisabledTextField
+                  : classes.defaultTextField
+              } // original behaviour preserved but labels legible by default
               InputProps={{
                 endAdornment: isUserOfficer && (
                   <>
@@ -346,7 +350,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                               },
                               {
                                 title: 'Remove SEP member',
-                                description: `Are you sure you want to remove ${sepData.sepSecretary?.firstname} ${sepData.sepSecretary?.lastname} from this SEP?`,
+                                description: `Are you sure you want to remove ${getFullUserName(
+                                  sepData.sepSecretary
+                                )} from this SEP?`,
                               }
                             )()
                           }
@@ -373,9 +379,15 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
           <Grid data-cy="sep-reviewers-table" item xs={12}>
             <MaterialTable
               icons={tableIcons}
-              title={'Reviewers'}
+              title={
+                <Typography variant="h6" component="h3" gutterBottom>
+                  Reviewers
+                </Typography>
+              }
               columns={columns}
-              data={SEPReviewersData ?? []}
+              data={(SEPReviewersData ?? []).map((sepReviewer) =>
+                Object.assign(sepReviewer, { id: sepReviewer.userId })
+              )}
               editable={
                 hasAccessRights
                   ? {

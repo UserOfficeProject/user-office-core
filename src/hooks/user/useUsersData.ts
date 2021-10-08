@@ -1,24 +1,57 @@
 import { useEffect, useState } from 'react';
 
-import { GetUsersQuery } from 'generated/sdk';
+import {
+  BasicUserDetailsFragment,
+  GetUsersQueryVariables,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useUsersData(filter: string) {
-  const [usersData, setUsersData] = useState<GetUsersQuery['users'] | null>(
-    null
-  );
-  const [loading, setLoading] = useState(true);
+export function useUsersData(
+  usersFilter: GetUsersQueryVariables & { refreshData?: boolean }
+) {
+  const {
+    filter,
+    offset,
+    first,
+    subtractUsers,
+    userRole,
+    refreshData,
+  } = usersFilter;
+  const [usersData, setUsersData] = useState<{
+    totalCount: number;
+    users: Array<BasicUserDetailsFragment>;
+  }>({
+    totalCount: 0,
+    users: [],
+  });
+  const [loadingUsersData, setLoading] = useState(true);
 
   const api = useDataApi();
   useEffect(() => {
+    let unmounted = false;
+
     setLoading(true);
     api()
-      .getUsers({ filter })
+      .getUsers({
+        filter,
+        offset,
+        subtractUsers,
+        first,
+        userRole,
+      })
       .then((data) => {
-        setUsersData(data.users);
+        if (unmounted) {
+          return;
+        }
+
+        setUsersData(data.users || { totalCount: 0, users: [] });
         setLoading(false);
       });
-  }, [filter, api]);
 
-  return { loading, usersData };
+    return () => {
+      unmounted = true;
+    };
+  }, [filter, offset, subtractUsers, first, userRole, api, refreshData]);
+
+  return { loadingUsersData, usersData, setUsersData };
 }

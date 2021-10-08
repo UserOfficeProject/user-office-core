@@ -9,6 +9,8 @@ mutation deleteQuestionTemplateRelation(
     template {
       ...template
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

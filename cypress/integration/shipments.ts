@@ -1,27 +1,47 @@
 import faker from 'faker';
 
+faker.seed(1);
+
+const declareShipmentTitle = 'Declare shipment(s)';
+
+const proposalTitle = 'Test proposal';
+
+const sampleTitle = /My sample title/i;
+
+const shipmentTitle = faker.lorem.words(2);
+const shipmentTemplateName = faker.lorem.words(2);
+const shipmentTemplateDescription = faker.lorem.words(3);
+
 context('Shipments tests', () => {
   before(() => {
-    cy.resetDB();
+    cy.viewport(1920, 1080);
+
+    cy.resetDB(true);
+    cy.resetSchedulerDB(true);
+
+    // allocate time for the proposal
+    cy.login('officer');
+    cy.allocateProposalTime({
+      proposalTitle: proposalTitle,
+      timeToAllocate: 2,
+      submitManagementDecision: true,
+    });
+
+    cy.logout();
+
+    // Create team
+    cy.login('user');
+    cy.defineExperimentTeam({
+      proposalTitle: proposalTitle,
+      usersEmails: ['Javon4@hotmail.com', 'david@teleworm.us'],
+      teamLead: 'Carlsson',
+    });
+    cy.logout();
   });
 
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
+    cy.viewport(1920, 1080);
   });
-
-  const proposalTitle = faker.lorem.words(2);
-  const shipmentTemplateName = faker.lorem.words(2);
-  const shipmentTemplateDescription = faker.lorem.words(3);
-
-  const sampleTemplateName = faker.lorem.words(2);
-  const sampleTemplateDescription = faker.lorem.words(3);
-
-  const sampleQuestion = faker.lorem.words(2);
-
-  const sampleTitle = faker.lorem.words(2);
-
-  const shipmentTitle = faker.lorem.words(2);
 
   it('Should be able to create shipments template', () => {
     cy.login('officer');
@@ -39,64 +59,27 @@ context('Shipments tests', () => {
     cy.get('[data-cy=submit]').click();
 
     cy.contains('New shipment');
-
-    cy.visit('/');
-
-    cy.navigateToTemplatesSubmenu('Shipment declaration templates');
-
-    cy.get("[title='Mark as active']").click();
   });
 
-  it('Should be able to create proposal template with sample', () => {
-    cy.login('officer');
+  it('Co-proposer should see that he can declare shipment', () => {
+    cy.login('user');
+    cy.testActionButton(declareShipmentTitle, 'neutral');
+  });
 
-    cy.createTemplate('sample', sampleTemplateName, sampleTemplateDescription);
+  it('Visitor should see that he can declare shipment', () => {
+    cy.login({ email: 'david@teleworm.us', password: 'Test1234!' });
+    cy.testActionButton(declareShipmentTitle, 'neutral');
+  });
 
-    cy.visit('/');
+  it('PI should be able to declare shipment', () => {
+    cy.login('user');
 
-    cy.navigateToTemplatesSubmenu('Proposal templates');
+    cy.testActionButton(declareShipmentTitle, 'neutral');
 
-    cy.contains('default template')
+    cy.contains(proposalTitle)
       .parent()
-      .get("[title='Edit']")
-      .first()
+      .find(`[title="${declareShipmentTitle}"]`)
       .click();
-
-    cy.createTopic('New topic');
-
-    cy.createSampleQuestion(sampleQuestion, sampleTemplateName);
-
-    cy.contains(sampleQuestion)
-      .parent()
-      .dragElement([{ direction: 'left', length: 1 }]);
-  });
-
-  it('Should be able to declare sample', () => {
-    cy.login('user');
-
-    cy.createProposal(proposalTitle);
-
-    cy.get('[data-cy=add-button]').click();
-    cy.get('[data-cy=title-input]').type(sampleTitle);
-
-    cy.get(
-      '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
-    ).click();
-
-    cy.get('[data-cy=save-and-continue-button]').click();
-
-    cy.contains('Submit').click();
-
-    cy.contains('OK').click();
-
-  });
-
-  it('Should be able to delete shipment', () => {
-    cy.login('user');
-
-    cy.contains('My shipment').click();
-
-    cy.get('[data-cy=create-new-entry]').click();
 
     cy.get('[data-cy=title-input] input')
       .click()
@@ -106,43 +89,11 @@ context('Shipments tests', () => {
 
     cy.get('[data-cy=select-proposal-dropdown]').click();
 
-    cy.contains(proposalTitle).click();
-
-    cy.get('[data-cy=save-and-continue-button]').click();
-
-    cy.reload();
-
-    cy.contains(shipmentTitle)
-      .parent()
-      .get("[title='Delete shipment']")
-      .first()
-      .click();
-
-    cy.contains('OK').click();
-
-    cy.should('not.contain', shipmentTitle);
-  });
-
-  it('Should be able to declare shipment', () => {
-    cy.login('user');
-
-    cy.contains('My shipment').click();
-
-    cy.get('[data-cy=create-new-entry]').click();
-
-    cy.get('[data-cy=title-input] input')
-      .click()
-      .clear()
-      .type(shipmentTitle)
-      .should('have.value', shipmentTitle);
-
-    cy.get('[data-cy=select-proposal-dropdown]').click();
-
-    cy.contains(proposalTitle).click();
+    cy.get('[role="listbox"]').contains(proposalTitle).click();
 
     cy.get('[data-cy=samples-dropdown]').click();
 
-    cy.contains(sampleTitle).click();
+    cy.get('[role="listbox"]').contains(sampleTitle).click();
 
     cy.get('body').type('{esc}');
 
@@ -152,14 +103,18 @@ context('Shipments tests', () => {
 
     cy.contains('OK').click();
 
-    cy.contains(shipmentTitle);
-    
+    cy.contains(proposalTitle);
+
     cy.contains('SUBMITTED', { matchCase: false });
 
     cy.get('[data-cy=download-shipment-label]').click();
 
     cy.get('[data-cy="preparing-download-dialog"]').should('exist');
 
+    cy.get('body').type('{esc}');
 
+    cy.visit('/');
+
+    cy.testActionButton(declareShipmentTitle, 'completed');
   });
 });

@@ -5,6 +5,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
 import Switch from '@material-ui/core/Switch';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
@@ -20,12 +21,13 @@ import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQu
 import QuestionaryEditorModel, {
   Event,
   EventType,
-} from 'models/QuestionaryEditorModel';
+} from 'models/questionary/QuestionaryEditorModel';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
-} from 'models/QuestionaryFunctions';
-import { StyledPaper } from 'styles/StyledComponents';
+} from 'models/questionary/QuestionaryFunctions';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
 
@@ -35,8 +37,18 @@ import QuestionTemplateRelationEditor from './QuestionTemplateRelationEditor';
 import { TemplateMetadataEditor } from './TemplateMetadataEditor';
 import QuestionaryEditorTopic from './TemplateTopicEditor';
 
+const useStyles = makeStyles(() => ({
+  modalContainer: {
+    backgroundColor: 'white',
+  },
+  centeredButton: {
+    display: 'flex',
+    margin: '10px auto',
+  },
+}));
 export default function TemplateEditor() {
   const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const [
     selectedQuestionTemplateRelation,
     setSelectedQuestionTemplateRelation,
@@ -104,15 +116,8 @@ export default function TemplateEditor() {
   const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
 
   const theme = useTheme();
-  const classes = makeStyles(() => ({
-    modalContainer: {
-      backgroundColor: 'white',
-    },
-    centeredButton: {
-      display: 'flex',
-      margin: '10px auto',
-    },
-  }))();
+  const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
+  const classes = useStyles();
 
   const getTopicListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver
@@ -121,11 +126,13 @@ export default function TemplateEditor() {
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
     display: 'flex',
     overflow: 'auto',
+    maxHeight: isExtraLargeScreen ? '1400px' : '700px',
   });
 
   const onDragEnd = (result: DropResult): void => {
     const dragSource = result.source;
     const dragDestination = result.destination;
+
     if (
       !dragDestination ||
       (dragDestination.droppableId === dragSource.droppableId &&
@@ -149,7 +156,7 @@ export default function TemplateEditor() {
         dragSource.droppableId !== 'questionPicker';
 
       if (isDraggingFromQuestionDrawerToTopic) {
-        const questionId = state.complementaryQuestions[dragSource.index].id;
+        const questionId = result.draggableId;
         const topicId = dragDestination.droppableId
           ? +dragDestination.droppableId
           : undefined;
@@ -174,13 +181,19 @@ export default function TemplateEditor() {
           topicId
         ) as QuestionaryStep;
         const question = step.fields[dragSource.index].question;
-        dispatch({
-          type: EventType.DELETE_QUESTION_REL_REQUESTED,
-          payload: {
-            fieldId: question.id,
+        api()
+          .deleteQuestionTemplateRelation({
             templateId: state.templateId,
-          },
-        });
+            questionId: question.id,
+          })
+          .then((data) => {
+            if (data.deleteQuestionTemplateRelation.template) {
+              dispatch({
+                type: EventType.QUESTION_REL_UPDATED,
+                payload: data.deleteQuestionTemplateRelation.template,
+              });
+            }
+          });
       } else if (isReorderingInsideTopics) {
         dispatch({
           type: EventType.REORDER_QUESTION_REL_REQUESTED,
@@ -248,7 +261,7 @@ export default function TemplateEditor() {
     ) : null;
 
   return (
-    <>
+    <ContentContainer>
       <TemplateMetadataEditor dispatch={dispatch} template={state} />
       <StyledPaper style={getContainerStyle()}>
         {progressJsx}
@@ -260,7 +273,7 @@ export default function TemplateEditor() {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 style={getTopicListStyle(snapshot.isDraggingOver)}
-                className="topicsDroppable"
+                className="tinyScroll"
               >
                 {state.steps.map((step, index) => {
                   const questionPicker =
@@ -310,6 +323,6 @@ export default function TemplateEditor() {
         closeMe={() => setSelectedQuestion(null)}
         template={state}
       />
-    </>
+    </ContentContainer>
   );
 }

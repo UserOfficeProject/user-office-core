@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import Delete from '@material-ui/icons/DeleteOutline';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
@@ -57,7 +58,7 @@ const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
         id: id,
       })
       .then((resp) => {
-        if (!resp.deleteProposalStatus.error) {
+        if (!resp.deleteProposalStatus.rejection) {
           const newObjectsArray = proposalStatuses.filter(
             (objectItem) => objectItem.id !== id
           );
@@ -77,7 +78,11 @@ const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
         }}
         setData={setProposalStatuses}
         icons={tableIcons}
-        title={'Proposal statuses'}
+        title={
+          <Typography variant="h6" component="h2">
+            Proposal statuses
+          </Typography>
+        }
         columns={columns}
         data={proposalStatuses}
         isLoading={loadingProposalStatuses}

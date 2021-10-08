@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -30,7 +31,10 @@ const ApiAccessTokensTable: React.FC = () => {
 
   const createModal = (
     onUpdate: FunctionType<void, [PermissionsWithAccessToken | null]>,
-    onCreate: FunctionType<void, [PermissionsWithAccessToken | null]>,
+    onCreate: (
+      token: PermissionsWithAccessToken | null,
+      shouldCloseAfterCreation?: boolean
+    ) => void,
     editApiAccessToken: PermissionsWithAccessToken | null
   ) => (
     <CreateUpdateApiAccessToken
@@ -38,7 +42,7 @@ const ApiAccessTokensTable: React.FC = () => {
       close={(apiAccessToken: PermissionsWithAccessToken | null) =>
         !!editApiAccessToken
           ? onUpdate(apiAccessToken)
-          : onCreate(apiAccessToken)
+          : onCreate(apiAccessToken, false)
       }
     />
   );
@@ -49,7 +53,7 @@ const ApiAccessTokensTable: React.FC = () => {
         accessTokenId: id as string,
       })
       .then((resp) => {
-        if (resp.deleteApiAccessToken.error) {
+        if (resp.deleteApiAccessToken.rejection) {
           return false;
         } else {
           return true;
@@ -70,7 +74,11 @@ const ApiAccessTokensTable: React.FC = () => {
         }}
         setData={setApiAccessTokens}
         icons={tableIcons}
-        title={'API Access Tokens'}
+        title={
+          <Typography variant="h6" component="h2">
+            API Access Tokens
+          </Typography>
+        }
         columns={columns}
         data={apiAccessTokens}
         isLoading={loadingApiAccessTokens}

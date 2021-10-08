@@ -5,6 +5,8 @@ mutation createInstitution($name: String!, $verified: Boolean!) {
       name
       verified
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

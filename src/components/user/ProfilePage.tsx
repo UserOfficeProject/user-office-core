@@ -1,8 +1,8 @@
-import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import SimpleTabs from 'components/common/TabPanel';
+import { ContentContainer } from 'styles/StyledComponents';
 
 import UpdatePassword from './UpdatePassword';
 import UpdateUserInformation from './UpdateUserInformation';
@@ -19,12 +19,12 @@ type ProfilePageProps = PropTypes.InferProps<typeof ProfilePagePropTypes>;
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ match }) => {
   return (
-    <Container maxWidth="lg">
+    <ContentContainer>
       <SimpleTabs tabNames={['General', 'Settings']}>
         <UpdateUserInformation id={parseInt(match.params.id)} />
         <UpdatePassword id={parseInt(match.params.id)} />
       </SimpleTabs>
-    </Container>
+    </ContentContainer>
   );
 };
 

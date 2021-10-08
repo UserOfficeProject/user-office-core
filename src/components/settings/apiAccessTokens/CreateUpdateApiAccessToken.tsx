@@ -11,18 +11,11 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
-import {
-  ErrorMessage,
-  Field,
-  FieldArray,
-  FieldArrayRenderProps,
-  Form,
-  Formik,
-} from 'formik';
+import { Field, FieldArray, FieldArrayRenderProps, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import PropTypes from 'prop-types';
 import React from 'react';
 
+import ErrorMessage from 'components/common/ErrorMessage';
 import SimpleTabs from 'components/common/TabPanel';
 import UOLoader from 'components/common/UOLoader';
 import { PermissionsWithAccessToken } from 'generated/sdk';
@@ -39,10 +32,6 @@ const useStyles = makeStyles((theme) => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
-  },
-  error: {
-    color: theme.palette.error.main,
-    marginRight: theme.spacing(1),
   },
   submitContainer: {
     margin: theme.spacing(2, 0, 2),
@@ -87,7 +76,10 @@ type FormPermissionsWithAccessToken = {
 };
 
 type CreateUpdateApiAccessTokenProps = {
-  close: (apiAccessTokenAdded: PermissionsWithAccessToken | null) => void;
+  close: (
+    apiAccessTokenAdded: PermissionsWithAccessToken | null,
+    shouldCloseAfterCreation?: boolean
+  ) => void;
   apiAccessToken: PermissionsWithAccessToken | null;
 };
 
@@ -195,7 +187,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
             name: values.name,
             accessPermissions: JSON.stringify(accessPermissions),
           });
-          if (data.updateApiAccessToken.error) {
+          if (data.updateApiAccessToken.rejection) {
             close(null);
           } else if (data.updateApiAccessToken.apiAccessToken) {
             close(data.updateApiAccessToken.apiAccessToken);
@@ -209,13 +201,15 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
           });
 
           if (
-            !data.createApiAccessToken.error &&
+            !data.createApiAccessToken.rejection &&
             data.createApiAccessToken.apiAccessToken
           ) {
             formikHelpers.setFieldValue(
               'accessToken',
               `Bearer ${data.createApiAccessToken.apiAccessToken.accessToken}`
             );
+
+            close(data.createApiAccessToken.apiAccessToken, false);
           }
         }
       }}
@@ -227,7 +221,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
     >
       {({ isSubmitting, values }) => (
         <Form>
-          <Typography variant="h6">
+          <Typography variant="h6" component="h1">
             {apiAccessToken ? 'Update' : 'Create new'} api access token
           </Typography>
           <Field
@@ -302,11 +296,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
             className={classes.submitContainer}
           >
             <Grid item>
-              <ErrorMessage
-                className={classes.error}
-                component="span"
-                name="accessPermissions"
-              />
+              <ErrorMessage name="accessPermissions" />
 
               <Button
                 type="submit"
@@ -318,7 +308,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
                 data-cy="submit"
               >
                 {isExecutingCall && <UOLoader size={14} />}
-                {apiAccessToken ? 'Update' : 'Create'}
+                {values.accessToken ? 'Update' : 'Create'}
               </Button>
             </Grid>
           </Grid>
@@ -326,16 +316,6 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
       )}
     </Formik>
   );
-};
-
-CreateUpdateApiAccessToken.propTypes = {
-  apiAccessToken: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    accessToken: PropTypes.string.isRequired,
-    accessPermissions: PropTypes.string.isRequired,
-  }),
-  close: PropTypes.func.isRequired,
 };
 
 export default CreateUpdateApiAccessToken;

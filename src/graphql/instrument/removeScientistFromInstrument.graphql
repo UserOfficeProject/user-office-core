@@ -1,9 +1,14 @@
-mutation removeScientistFromInstrument($scientistId: Int!, $instrumentId: Int!) {
+mutation removeScientistFromInstrument(
+  $scientistId: Int!
+  $instrumentId: Int!
+) {
   removeScientistFromInstrument(
     scientistId: $scientistId
     instrumentId: $instrumentId
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     isSuccess
   }
 }

@@ -116,6 +116,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
         <Grid item xs={2} className={classes.unitField}>
           <TextField
             label="Value"
+            id={`${id}-value`}
             onChange={(e) =>
               setStateValue({
                 ...stateValue,

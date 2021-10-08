@@ -1,11 +1,11 @@
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';
 import {
   ShipmentBasisFormikData,
   ShipmentSubmissionState,
-} from 'models/ShipmentSubmissionState';
+} from 'models/questionary/shipment/ShipmentSubmissionState';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import { createShipmentBasisValidationSchema } from './createShipmentBasisValidationSchema';
@@ -15,20 +15,20 @@ import { QuestionTemplateRelationShipmentBasisForm } from './QuestionTemplateRel
 
 export const shipmentBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.SHIPMENT_BASIS,
-  name: 'Shpiment Basis',
+  name: 'Shipment Basis',
   questionaryComponent: QuestionaryComponentShipmentBasis,
   questionForm: () => QuestionShipmentBasisForm,
   questionTemplateRelationForm: () => QuestionTemplateRelationShipmentBasisForm,
   readonly: true,
   creatable: false,
-  icon: <QuestionAnswerIcon />,
+  icon: <LocalShippingIcon />,
   createYupValidationSchema: createShipmentBasisValidationSchema,
   getYupInitialValue: ({ state }): ShipmentBasisFormikData => {
     const shipmentState = state as ShipmentSubmissionState;
 
     return {
       title: shipmentState.shipment.title,
-      proposalId: shipmentState.shipment.proposalId || '',
+      proposalPk: shipmentState.shipment.proposalPk,
       samples: shipmentState.shipment.samples,
     };
   },

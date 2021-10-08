@@ -1,5 +1,5 @@
+import MaterialTable from '@material-table/core';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -60,7 +60,7 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
       instrumentId: instrument.id,
     });
 
-    if (!result.removeScientistFromInstrument.error) {
+    if (!result.removeScientistFromInstrument.rejection) {
       removeAssignedScientistFromInstrument(scientistId, instrument.id);
     }
   };

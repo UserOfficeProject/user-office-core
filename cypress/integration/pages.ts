@@ -6,8 +6,7 @@ context('Page tests', () => {
   });
 
   beforeEach(() => {
-    cy.visit('/');
-    cy.viewport(1100, 1000);
+    cy.viewport(1920, 1080);
   });
 
   const faqContents = faker.random.words(2);
@@ -20,20 +19,23 @@ context('Page tests', () => {
     cy.contains('Set user homepage');
     cy.contains('Help').click();
 
-    cy.window().then(win => {
-      cy.wait(5000).then(() => {
-        win.tinyMCE.get('HELPPAGE').setContent(faqContents); // faq page editor
-        cy.contains('Update').click();
-        cy.wait(2000);
-        cy.reload();
-        cy.contains('Proposals').click();
-        cy.contains('FAQ').click();
-        cy.wait(3000).then(() => {
-          cy.contains(faqContents);
-          cy.contains('Close').click();
-          cy.logout();
-        });
-      });
-    });
+    cy.setTinyMceContent('HELPPAGE', faqContents);
+
+    cy.contains('Update').click();
+
+    cy.notification({ text: 'Updated Page', variant: 'success' });
+
+    cy.getTinyMceContent('HELPPAGE').then((content) =>
+      expect(content).to.have.string(faqContents)
+    );
+
+    cy.reload();
+    cy.contains('Proposals').click();
+    cy.contains('FAQ').click();
+
+    cy.get('[role="presentation"]').should('exist');
+
+    cy.contains(faqContents);
+    cy.contains('Close').click();
   });
 });

@@ -1,10 +1,11 @@
 import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
 
+import { Rejection } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 const isMutationResult = (result: Record<string, unknown>) => {
-  return result.hasOwnProperty('error');
+  return result.hasOwnProperty('rejection');
 };
 
 function useDataApiWithFeedback() {
@@ -24,8 +25,9 @@ function useDataApiWithFeedback() {
             const result = serverResponse[prop];
 
             if (result && isMutationResult(result)) {
-              if (result.error) {
-                enqueueSnackbar(result.error, {
+              if (result.rejection) {
+                const { reason } = result.rejection as Rejection;
+                enqueueSnackbar(reason, {
                   variant: 'error',
                   className: 'snackbar-error',
                   autoHideDuration: 10000,

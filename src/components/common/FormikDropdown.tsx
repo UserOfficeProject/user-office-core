@@ -1,5 +1,8 @@
+import { PropTypes } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
 import MenuItem from '@material-ui/core/MenuItem';
 import MuiTextField from '@material-ui/core/TextField';
+import Clear from '@material-ui/icons/Clear';
 import { connect, Field, FormikContextType } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
@@ -15,6 +18,8 @@ type TProps = {
   InputProps?: Record<string, unknown>;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  isClearable?: boolean;
+  margin?: PropTypes.Margin;
 };
 
 const FormikDropdown: React.FC<
@@ -34,6 +39,7 @@ const FormikDropdown: React.FC<
   InputProps,
   formik,
   onChange,
+  isClearable,
 }) => {
   const menuItems =
     items.length > 0 ? (
@@ -80,11 +86,33 @@ const FormikDropdown: React.FC<
     props.value = value;
   }
 
+  const handleClearSelection = () => {
+    formik.setFieldValue(name, '');
+  };
+
+  if (isClearable && formik.values[name]) {
+    InputProps = {
+      ...InputProps,
+      endAdornment: (
+        <IconButton
+          onClick={handleClearSelection}
+          disabled={!formik.values[name]}
+          style={{ marginRight: 20 }}
+          title="Clear selection"
+          data-cy="clear-selection"
+        >
+          <Clear color="disabled" fontSize="small" />
+        </IconButton>
+      ),
+    };
+  }
+
   return (
     <Field
       type="text"
       name={name}
       label={label}
+      id={name + '-input'}
       select
       margin="normal"
       component={TextField}

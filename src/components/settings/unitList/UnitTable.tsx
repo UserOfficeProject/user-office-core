@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -38,7 +39,7 @@ const UnitTable: React.FC = () => {
         id: id as number,
       })
       .then((resp) => {
-        if (!resp.deleteUnit.error) {
+        if (!resp.deleteUnit.rejection) {
           const newObjectsArray = units.filter(
             (objectItem) => objectItem.id !== id
           );
@@ -62,7 +63,11 @@ const UnitTable: React.FC = () => {
         }}
         setData={setUnits}
         icons={tableIcons}
-        title={'Units'}
+        title={
+          <Typography variant="h6" component="h2">
+            Units
+          </Typography>
+        }
         columns={columns}
         data={units}
         isLoading={loadingUnits}

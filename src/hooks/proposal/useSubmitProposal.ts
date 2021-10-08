@@ -7,15 +7,15 @@ export function useSubmitProposal() {
 
   const api = useDataApi();
 
-  const submitProposal = async (id: number) => {
+  const submitProposal = async (proposalPk: number) => {
     setIsLoading(true);
 
     return api()
-      .submitProposal({ id })
+      .submitProposal({ proposalPk })
       .then((data) => {
         setIsLoading(false);
 
-        return !data.submitProposal.error;
+        return !data.submitProposal.rejection;
       });
   };
 

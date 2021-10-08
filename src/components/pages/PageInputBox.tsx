@@ -50,8 +50,8 @@ export default function PageInputBox(props: {
 
   return (
     <>
-      <Typography variant="h6" gutterBottom>
-        {props.heading}
+      <Typography variant="h6" component="h2" gutterBottom>
+        <label htmlFor={props.pageName}>{props.heading}</label>
       </Typography>
       <Divider />
       {loading ? null : (

@@ -2,7 +2,10 @@ mutation createQuestionary($templateId: Int!) {
   createQuestionary(templateId: $templateId) {
     questionary {
       ...questionary
+      isCompleted
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

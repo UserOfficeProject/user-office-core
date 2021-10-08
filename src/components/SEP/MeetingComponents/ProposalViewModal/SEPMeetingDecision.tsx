@@ -6,6 +6,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
 
+import { Maybe, Sep, SepMeetingDecision } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 
 const useStyles = makeStyles((theme) => ({
@@ -17,19 +18,27 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// TODO: This should be populated after https://jira.esss.lu.se/browse/SWAP-1460
-type SEPMeetingDecisionProps = { sepDecision: any };
+type SEPMeetingDecisionProps = {
+  sepMeetingDecision: Maybe<SepMeetingDecision>;
+  sep: Maybe<Pick<Sep, 'id' | 'code'>>;
+};
 
 const SEPMeetingDecision: React.FC<SEPMeetingDecisionProps> = ({
-  sepDecision,
+  sepMeetingDecision,
+  sep,
 }) => {
   const classes = useStyles();
 
   return (
     <div data-cy="SEP-meeting-components-decision">
       <StyledPaper margin={[2, 0]}>
-        <Typography variant="h6" className={classes.heading} gutterBottom>
-          SEP Meeting decision
+        <Typography
+          variant="h6"
+          component="h2"
+          className={classes.heading}
+          gutterBottom
+        >
+          {sep?.code} - SEP Meeting decision
         </Typography>
         <Table>
           <TableBody>
@@ -37,21 +46,33 @@ const SEPMeetingDecision: React.FC<SEPMeetingDecisionProps> = ({
               <TableCell width="25%" className={classes.textBold}>
                 Rank
               </TableCell>
-              <TableCell width="25%">{sepDecision?.rank || '-'}</TableCell>
-              <TableCell width="25%" className={classes.textBold}>
-                Time allocation
+              <TableCell width="25%">
+                {sepMeetingDecision?.rankOrder || '-'}
               </TableCell>
-              <TableCell>{sepDecision?.timeAllocation || '-'}</TableCell>
+              <TableCell width="25%" className={classes.textBold}>
+                SEP meeting recommendation
+              </TableCell>
+              <TableCell width="25%">
+                {sepMeetingDecision?.recommendation || '-'}
+              </TableCell>
             </TableRow>
             <TableRow key="comments">
               <TableCell className={classes.textBold}>
                 Comment for management
               </TableCell>
-              <TableCell>{sepDecision?.commentForManagement || '-'}</TableCell>
+              <TableCell
+                dangerouslySetInnerHTML={{
+                  __html: sepMeetingDecision?.commentForManagement || '-',
+                }}
+              />
               <TableCell className={classes.textBold}>
                 Comment for user
               </TableCell>
-              <TableCell>{sepDecision?.commentForUser || '-'}</TableCell>
+              <TableCell
+                dangerouslySetInnerHTML={{
+                  __html: sepMeetingDecision?.commentForUser || '-',
+                }}
+              />
             </TableRow>
           </TableBody>
         </Table>

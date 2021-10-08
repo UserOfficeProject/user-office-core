@@ -1,23 +1,27 @@
 import React, { useCallback, useState } from 'react';
 
-import { Call, Maybe, ProposalPublicStatus } from 'generated/sdk';
+import {
+  Call,
+  Maybe,
+  ProposalPublicStatus,
+  ProposalStatus,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { getProposalStatus } from 'utils/helperFunctions';
 import { timeAgo } from 'utils/Time';
 
 import ProposalTable from './ProposalTable';
 
 export type PartialProposalsDataType = {
-  id: number;
+  primaryKey: number;
   title: string;
-  status: string | null;
+  status: ProposalStatus | null;
   publicStatus: ProposalPublicStatus;
   finalStatus?: string;
   notified?: boolean;
   submitted: boolean;
-  shortCode: string;
+  proposalId: string;
   created: string | null;
-  call: Maybe<Pick<Call, 'shortCode' | 'id'>>;
+  call?: Maybe<Pick<Call, 'shortCode' | 'id' | 'isActive'>>;
   proposerId?: number;
 };
 
@@ -50,12 +54,12 @@ const ProposalTableUser: React.FC = () => {
             })
             .map((proposal) => {
               return {
-                id: proposal.id,
+                primaryKey: proposal.primaryKey,
                 title: proposal.title,
-                status: getProposalStatus(proposal),
+                status: proposal.status,
                 publicStatus: proposal.publicStatus,
                 submitted: proposal.submitted,
-                shortCode: proposal.shortCode,
+                proposalId: proposal.proposalId,
                 created: timeAgo(proposal.created),
                 notified: proposal.notified,
                 proposerId: proposal.proposer?.id,

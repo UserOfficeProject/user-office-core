@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react';
 import { QuestionaryStep } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useBlankQuestionaryStepsData(templateId: number) {
+export function useBlankQuestionaryStepsData(
+  templateId: number | undefined | null
+) {
   const [questionarySteps, setQuestionarySteps] = useState<
     QuestionaryStep[] | null
   >(null);
@@ -12,6 +14,9 @@ export function useBlankQuestionaryStepsData(templateId: number) {
   const api = useDataApi();
 
   useEffect(() => {
+    if (!templateId) {
+      return;
+    }
     api()
       .getBlankQuestionarySteps({ templateId })
       .then((data) => {

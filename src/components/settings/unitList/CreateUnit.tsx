@@ -38,7 +38,7 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
         const data = await api('Unit created successfully').createUnit({
           name: values.name,
         });
-        if (data.createUnit.error) {
+        if (data.createUnit.rejection) {
           close(null);
         } else if (data.createUnit.unit) {
           close(data.createUnit.unit);
@@ -47,7 +47,9 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
     >
       {() => (
         <Form>
-          <Typography variant="h6">Create new unit</Typography>
+          <Typography variant="h6" component="h1">
+            Create new unit
+          </Typography>
 
           <Field
             name="name"

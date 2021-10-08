@@ -1,6 +1,5 @@
 mutation administrationProposal(
-  $id: Int!
-  $rankOrder: Int
+  $proposalPk: Int!
   $finalStatus: ProposalEndStatus
   $statusId: Int
   $commentForUser: String
@@ -9,8 +8,7 @@ mutation administrationProposal(
   $managementDecisionSubmitted: Boolean
 ) {
   administrationProposal(
-    id: $id
-    rankOrder: $rankOrder
+    proposalPk: $proposalPk
     finalStatus: $finalStatus
     statusId: $statusId
     commentForUser: $commentForUser
@@ -19,8 +17,10 @@ mutation administrationProposal(
     managementDecisionSubmitted: $managementDecisionSubmitted
   ) {
     proposal {
-      id
+      primaryKey
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

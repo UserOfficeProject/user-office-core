@@ -1,6 +1,8 @@
 mutation assignReviewersToSEP($memberIds: [Int!]!, $sepId: Int!) {
   assignReviewersToSEP(memberIds: $memberIds, sepId: $sepId) {
-    error
+    rejection {
+      ...rejection
+    }
     sep {
       id
     }
@@ -13,7 +15,9 @@ mutation assignChairOrSecretary(
   assignChairOrSecretary(
     assignChairOrSecretaryToSEPInput: $assignChairOrSecretaryToSEPInput
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     sep {
       id
     }

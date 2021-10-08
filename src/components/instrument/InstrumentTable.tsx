@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import AssignmentInd from '@material-ui/icons/AssignmentInd';
 import React, { useState } from 'react';
 import { useQueryParams } from 'use-query-params';
@@ -29,8 +30,8 @@ const InstrumentTable: React.FC = () => {
     { title: 'Description', field: 'description' },
     {
       title: 'Scientists',
-      render: (rowData: Instrument) =>
-        rowData.scientists.length > 0 ? rowData.scientists.length : '-',
+      field: 'scientists.length',
+      emptyValue: '-',
     },
   ];
   const { api } = useDataApiWithFeedback();
@@ -49,7 +50,7 @@ const InstrumentTable: React.FC = () => {
         id: instrumentDeletedId as number,
       })
       .then((data) => {
-        if (data.deleteInstrument.error) {
+        if (data.deleteInstrument.rejection) {
           return false;
         } else {
           return true;
@@ -67,7 +68,9 @@ const InstrumentTable: React.FC = () => {
       scientistIds: scientists.map((scientist) => scientist.id),
     });
 
-    if (!assignScientistToInstrumentResult.assignScientistsToInstrument.error) {
+    if (
+      !assignScientistToInstrumentResult.assignScientistsToInstrument.rejection
+    ) {
       scientists = scientists.map((scientist) => {
         if (!scientist.organisation) {
           scientist.organisation = 'Other';
@@ -93,38 +96,43 @@ const InstrumentTable: React.FC = () => {
     setAssigningInstrumentId(null);
   };
 
-  const removeAssignedScientistFromInstrument = (
-    scientistToRemoveId: number,
-    instrumentToRemoveFromId: number
-  ) => {
-    setInstruments((instruments) =>
-      instruments.map((instrumentItem) => {
-        if (instrumentItem.id === instrumentToRemoveFromId) {
-          const newScientists = instrumentItem.scientists.filter(
-            (scientistItem) => scientistItem.id !== scientistToRemoveId
-          );
-
-          return {
-            ...instrumentItem,
-            scientists: newScientists,
-          };
-        } else {
-          return instrumentItem;
-        }
-      })
-    );
-    setAssigningInstrumentId(null);
-  };
-
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
 
-  const AssignedScientists = (rowData: Instrument) => (
-    <AssignedScientistsTable
-      instrument={rowData}
-      removeAssignedScientistFromInstrument={
-        removeAssignedScientistFromInstrument
-      }
-    />
+  const AssignedScientists = React.useCallback(
+    ({ rowData }) => {
+      const removeAssignedScientistFromInstrument = (
+        scientistToRemoveId: number,
+        instrumentToRemoveFromId: number
+      ) => {
+        setInstruments((instruments) =>
+          instruments.map((instrumentItem) => {
+            if (instrumentItem.id === instrumentToRemoveFromId) {
+              const newScientists = instrumentItem.scientists.filter(
+                (scientistItem) => scientistItem.id !== scientistToRemoveId
+              );
+
+              return {
+                ...instrumentItem,
+                scientists: newScientists,
+              };
+            } else {
+              return instrumentItem;
+            }
+          })
+        );
+        setAssigningInstrumentId(null);
+      };
+
+      return (
+        <AssignedScientistsTable
+          instrument={rowData}
+          removeAssignedScientistFromInstrument={
+            removeAssignedScientistFromInstrument
+          }
+        />
+      );
+    },
+    [setInstruments, setAssigningInstrumentId]
   );
 
   const createModal = (
@@ -166,7 +174,11 @@ const InstrumentTable: React.FC = () => {
             update: isUserOfficer,
             remove: isUserOfficer,
           }}
-          title={'Instruments'}
+          title={
+            <Typography variant="h6" component="h2">
+              Instruments
+            </Typography>
+          }
           columns={columns}
           data={instruments}
           isLoading={loadingInstruments}

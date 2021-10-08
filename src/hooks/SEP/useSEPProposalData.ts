@@ -5,14 +5,14 @@ import { useDataApi } from 'hooks/common/useDataApi';
 
 export type SepProposalBasics = Pick<
   SepProposal,
-  'proposalId' | 'sepId' | 'sepTimeAllocation' | 'instrumentSubmitted'
+  'proposalPk' | 'sepId' | 'sepTimeAllocation' | 'instrumentSubmitted'
 > & {
   proposal: Proposal;
 };
 
 export function useSEPProposalData(
   sepId: number,
-  proposalId: number
+  proposalPk?: number | null
 ): {
   loading: boolean;
   SEPProposalData: SepProposalBasics | null;
@@ -25,26 +25,30 @@ export function useSEPProposalData(
   ] = useState<SepProposalBasics | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    let canceled = false;
+    let unmounted = false;
     setLoading(true);
 
-    api()
-      .getSEPProposal({ sepId, proposalId })
-      .then((data) => {
-        if (canceled) {
-          return;
-        }
+    if (proposalPk && sepId) {
+      api()
+        .getSEPProposal({ sepId, proposalPk })
+        .then((data) => {
+          if (unmounted) {
+            return;
+          }
 
-        if (data.sepProposal) {
-          setSEPProposalData(data.sepProposal as SepProposalBasics);
-        }
-        setLoading(false);
-      });
+          if (data.sepProposal) {
+            setSEPProposalData(data.sepProposal as SepProposalBasics);
+          }
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
 
     return () => {
-      canceled = true;
+      unmounted = true;
     };
-  }, [sepId, api, proposalId]);
+  }, [sepId, api, proposalPk]);
 
   return { loading, SEPProposalData, setSEPProposalData };
 }

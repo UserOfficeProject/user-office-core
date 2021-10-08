@@ -1,12 +1,14 @@
 mutation setActiveTemplate(
-  $templateCategoryId: TemplateCategoryId!
+  $templateGroupId: TemplateGroupId!
   $templateId: Int!
 ) {
   setActiveTemplate(
     templateId: $templateId
-    templateCategoryId: $templateCategoryId
+    templateGroupId: $templateGroupId
   ) {
     isSuccess
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

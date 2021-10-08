@@ -1,10 +1,10 @@
+import { Column } from '@material-table/core';
 import { makeStyles } from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
-import { Column } from 'material-table';
 import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { ProposalTemplate, Template, TemplateCategoryId } from 'generated/sdk';
+import { ProposalTemplate, Template, TemplateGroupId } from 'generated/sdk';
 import { useActiveTemplateId } from 'hooks/template/useActiveTemplateId';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -32,7 +32,7 @@ type ShipmentTemplatesTableProps = {
 function ShipmentTemplatesTable(props: ShipmentTemplatesTableProps) {
   const { api } = useDataApiWithFeedback();
   const { activeTemplateId, setActiveTemplateId } = useActiveTemplateId(
-    TemplateCategoryId.SHIPMENT_DECLARATION
+    TemplateGroupId.SHIPMENT
   );
   const classes = useStyles();
 
@@ -47,38 +47,36 @@ function ShipmentTemplatesTable(props: ShipmentTemplatesTableProps) {
   ];
 
   return (
-    <>
-      <TemplatesTable
-        columns={columns}
-        templateCategory={TemplateCategoryId.SHIPMENT_DECLARATION}
-        isRowRemovable={() => {
-          return true;
-        }}
-        dataProvider={props.dataProvider}
-        confirm={props.confirm}
-        actions={[
-          (rowData) => ({
-            icon: function DoneIconComponent() {
-              return rowData.templateId === activeTemplateId ? (
-                <DoneIcon />
-              ) : (
-                <DoneIcon className={classes.inactive} />
-              );
-            },
-            tooltip: 'Mark as active',
-            onClick: async (event, data) => {
-              const newActiveTemplateId = (data as Pick<Template, 'templateId'>)
-                .templateId;
-              await api().setActiveTemplate({
-                templateCategoryId: TemplateCategoryId.SHIPMENT_DECLARATION,
-                templateId: newActiveTemplateId,
-              });
-              setActiveTemplateId(newActiveTemplateId);
-            },
-          }),
-        ]}
-      />
-    </>
+    <TemplatesTable
+      columns={columns}
+      templateGroup={TemplateGroupId.SHIPMENT}
+      isRowRemovable={() => {
+        return true;
+      }}
+      dataProvider={props.dataProvider}
+      confirm={props.confirm}
+      actions={[
+        (rowData) => ({
+          icon: function DoneIconComponent() {
+            return rowData.templateId === activeTemplateId ? (
+              <DoneIcon />
+            ) : (
+              <DoneIcon className={classes.inactive} />
+            );
+          },
+          tooltip: 'Mark as active',
+          onClick: async (event, data) => {
+            const newActiveTemplateId = (data as Pick<Template, 'templateId'>)
+              .templateId;
+            await api().setActiveTemplate({
+              templateGroupId: TemplateGroupId.SHIPMENT,
+              templateId: newActiveTemplateId,
+            });
+            setActiveTemplateId(newActiveTemplateId);
+          },
+        }),
+      ]}
+    />
   );
 }
 

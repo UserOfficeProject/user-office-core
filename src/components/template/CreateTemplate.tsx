@@ -1,4 +1,3 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { createTemplateValidationSchema } from '@esss-swap/duo-validation/lib/Template';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
@@ -7,33 +6,35 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 
-import { TemplateCategoryId, TemplateMetadataFragment } from 'generated/sdk';
+import { TemplateGroupId, TemplateMetadataFragment } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 const CreateTemplate = (props: {
   onComplete: (template: TemplateMetadataFragment | null | undefined) => void;
-  categoryId: TemplateCategoryId;
+  groupId: TemplateGroupId;
 }) => {
-  const { onComplete, categoryId } = props;
+  const { onComplete, groupId } = props;
   const { enqueueSnackbar } = useSnackbar();
   const api = useDataApi();
 
   return (
     <>
-      <Typography variant="h6">Create new template</Typography>
+      <Typography variant="h6" component="h1">
+        Create new template
+      </Typography>
       <Formik
         initialValues={{
           name: '',
           description: '',
         }}
         onSubmit={async (values): Promise<void> => {
-          const result = await api().createTemplate({ ...values, categoryId });
+          const result = await api().createTemplate({ ...values, groupId });
           const {
-            createTemplate: { template, error },
+            createTemplate: { template, rejection },
           } = result;
 
-          if (error) {
-            enqueueSnackbar(getTranslation(error as ResourceId), {
+          if (rejection) {
+            enqueueSnackbar(rejection.reason, {
               variant: 'error',
             });
           }
@@ -44,6 +45,7 @@ const CreateTemplate = (props: {
         {() => (
           <Form>
             <Field
+              id="name-field"
               name="name"
               label="Name"
               component={TextField}
@@ -52,6 +54,7 @@ const CreateTemplate = (props: {
               data-cy="name"
             />
             <Field
+              id="description-field"
               name="description"
               label="Description"
               component={TextField}

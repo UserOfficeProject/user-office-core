@@ -15,15 +15,12 @@ import QuestionaryDetails, {
 import { ShipmentStatus } from 'generated/sdk';
 import { useDownloadPDFShipmentLabel } from 'hooks/proposal/useDownloadPDFShipmentLabel';
 import { useProposalData } from 'hooks/proposal/useProposalData';
-import { EventType } from 'models/QuestionarySubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ShipmentContextType } from './ShipmentContainer';
 
 type ShipmentReviewProps = {
-  onComplete?: FunctionType<void>;
   confirm: WithConfirmType;
 };
 
@@ -43,7 +40,7 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const { proposalData } = useProposalData(state.shipment.proposalId);
+  const { proposalData } = useProposalData(state.shipment.proposalPk);
   const downloadShipmentLabel = useDownloadPDFShipmentLabel();
   const classes = useStyles();
 
@@ -57,11 +54,12 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
     {
       label: 'Proposal',
       value: (
-        <Link href={`/ProposalEdit/${proposalData.id}`}>
+        <Link href={`/ProposalEdit/${proposalData.primaryKey}`}>
           {proposalData.title}
         </Link>
       ),
     },
+    { label: 'Proposal ID', value: state.shipment.proposal.proposalId },
     {
       label: 'Samples',
       value: (
@@ -91,9 +89,16 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
                 const result = await api().submitShipment({
                   shipmentId: state.shipment.id,
                 });
+                if (!result.submitShipment.shipment) {
+                  return;
+                }
                 dispatch({
-                  type: EventType.SHIPMENT_MODIFIED,
-                  payload: { shipment: result.submitShipment.shipment },
+                  type: 'SHIPMENT_MODIFIED',
+                  shipment: result.submitShipment.shipment,
+                });
+                dispatch({
+                  type: 'SHIPMENT_SUBMITTED',
+                  shipment: result.submitShipment.shipment,
                 });
               },
               {

@@ -10,12 +10,14 @@ query sepProposalsByInstrument(
   ) {
     sepTimeAllocation
     proposal {
-      id
+      primaryKey
       title
-      shortCode
-      rankOrder
+      proposalId
       status {
         ...proposalStatus
+      }
+      sepMeetingDecision {
+        ...sepMeetingDecision
       }
       reviews {
         id

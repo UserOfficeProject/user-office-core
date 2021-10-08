@@ -12,7 +12,7 @@ import FormikDropdown from 'components/common/FormikDropdown';
 import { Call } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 
-const callSelectModalOnProposalCloneValidationSchema = yup.object().shape({
+const callSelectModalOnProposalsCloneValidationSchema = yup.object().shape({
   selectedCallId: yup.string().required('You must select active call'),
 });
 
@@ -26,17 +26,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-type CallSelectModalOnProposalCloneProps = {
+type CallSelectModalOnProposalsCloneProps = {
   close: () => void;
-  cloneProposalToCall: (call: Call) => Promise<void>;
+  cloneProposalsToCall: (call: Call) => Promise<void>;
 };
 
-const CallSelectModalOnProposalClone: React.FC<CallSelectModalOnProposalCloneProps> = ({
+const CallSelectModalOnProposalsClone: React.FC<CallSelectModalOnProposalsCloneProps> = ({
   close,
-  cloneProposalToCall,
+  cloneProposalsToCall,
 }) => {
   const classes = useStyles();
-  const { calls } = useCallsData({ isActive: true });
+  const { calls, loadingCalls } = useCallsData({ isActive: true });
 
   return (
     <Container component="main" maxWidth="xs">
@@ -55,15 +55,19 @@ const CallSelectModalOnProposalClone: React.FC<CallSelectModalOnProposalClonePro
             return;
           }
 
-          await cloneProposalToCall(selectedCall);
+          await cloneProposalsToCall(selectedCall);
           close();
         }}
-        validationSchema={callSelectModalOnProposalCloneValidationSchema}
+        validationSchema={callSelectModalOnProposalsCloneValidationSchema}
       >
         {({ isSubmitting }): JSX.Element => (
           <Form>
-            <Typography className={classes.cardHeader}>
-              Clone proposal to call
+            <Typography
+              variant="h6"
+              component="h1"
+              className={classes.cardHeader}
+            >
+              Clone proposal/s to call
             </Typography>
 
             <Grid container spacing={3}>
@@ -75,6 +79,7 @@ const CallSelectModalOnProposalClone: React.FC<CallSelectModalOnProposalClonePro
                     value: call.id.toString(),
                     text: call.shortCode,
                   }))}
+                  loading={loadingCalls}
                   required
                 />
               </Grid>
@@ -97,9 +102,9 @@ const CallSelectModalOnProposalClone: React.FC<CallSelectModalOnProposalClonePro
   );
 };
 
-CallSelectModalOnProposalClone.propTypes = {
+CallSelectModalOnProposalsClone.propTypes = {
   close: PropTypes.func.isRequired,
-  cloneProposalToCall: PropTypes.func.isRequired,
+  cloneProposalsToCall: PropTypes.func.isRequired,
 };
 
-export default CallSelectModalOnProposalClone;
+export default CallSelectModalOnProposalsClone;

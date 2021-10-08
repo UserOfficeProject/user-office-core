@@ -1,0 +1,12 @@
+query getVisitRegistration($visitId: Int!) {
+  visitRegistration(visitId: $visitId) {
+    ...visitRegistration
+    user {
+      ...basicUserDetails
+    }
+    questionary {
+      ...questionary
+      isCompleted
+    }
+  }
+}

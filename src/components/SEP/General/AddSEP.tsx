@@ -37,7 +37,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
       onSubmit={async (values): Promise<void> => {
         const data = await api('SEP created successfully!').createSEP(values);
 
-        if (data.createSEP.error) {
+        if (data.createSEP.rejection) {
           close(null);
         } else {
           close(data.createSEP.sep);
@@ -47,7 +47,9 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
     >
       {(): JSX.Element => (
         <Form>
-          <Typography variant="h6">Create new SEP</Typography>
+          <Typography variant="h6" component="h1">
+            Create new SEP
+          </Typography>
 
           <Field
             name="code"

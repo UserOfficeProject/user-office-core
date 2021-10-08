@@ -17,10 +17,10 @@ query getProposalWorkflow($id: Int!) {
         nextProposalStatusId
         prevProposalStatusId
         droppableGroupId
-        nextStatusEvents {
-          nextStatusEventId
+        statusChangingEvents {
+          statusChangingEventId
           proposalWorkflowConnectionId
-          nextStatusEvent
+          statusChangingEvent
         }
       }
     }

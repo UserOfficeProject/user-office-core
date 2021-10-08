@@ -1,7 +1,11 @@
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
 import React, { useContext, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
+import { SettingsId } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 
 const ExternalAuthPropTypes = {
@@ -17,9 +21,19 @@ type ExternalAuthProps = PropTypes.InferProps<typeof ExternalAuthPropTypes>;
 const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
   const { token, handleLogin } = useContext(UserContext);
   const unauthorizedApi = useUnauthorizedApi();
-  const sessionId: string = match.params.sessionId;
+  const { search } = useLocation();
+  const values = queryString.parse(search);
+  const sessionId = !!values.sessionid
+    ? values.sessionid.toString()
+    : match.params.sessionId;
 
   const isFirstRun = useRef<boolean>(true);
+
+  const settingsContext = useContext(SettingsContext);
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const EXTERNAL_AUTH_LOGIN_URL = settingsContext.settings.get(
+    SettingsId.EXTERNAL_AUTH_LOGIN_URL
+  )?.settingsValue;
 
   useEffect(() => {
     if (!isFirstRun.current) {
@@ -32,17 +46,16 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
         externalToken: sessionId,
       })
       .then((token) => {
-        if (token.checkExternalToken && !token.checkExternalToken.error) {
+        if (token.checkExternalToken && !token.checkExternalToken.rejection) {
           handleLogin(token.checkExternalToken.token);
           window.location.href = '/';
         } else {
-          if (process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL) {
-            window.location.href =
-              process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL;
+          if (EXTERNAL_AUTH_LOGIN_URL) {
+            window.location.href = EXTERNAL_AUTH_LOGIN_URL;
           }
         }
       });
-  }, [token, handleLogin, sessionId, unauthorizedApi]);
+  }, [token, handleLogin, sessionId, unauthorizedApi, EXTERNAL_AUTH_LOGIN_URL]);
 
   return <p>Logging in with external service...</p>;
 };

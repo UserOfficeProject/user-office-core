@@ -9,12 +9,13 @@ import {
 } from 'react-beautiful-dnd';
 
 import {
+  ProposalStatus,
   ProposalWorkflowConnection,
   ProposalWorkflowConnectionGroup,
 } from 'generated/sdk';
 import { usePersistProposalWorkflowEditorModel } from 'hooks/settings/usePersistProposalWorkflowEditorModel';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
-import { StyledPaper } from 'styles/StyledComponents';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import { FunctionType } from 'utils/utilTypes';
 
 import ProposalStatusPicker from './ProposalStatusPicker';
@@ -47,8 +48,6 @@ const ProposalWorkflowEditor: React.FC = () => {
     reducerMiddleware,
   ]);
 
-  // TODO: Cleanup a bit!!!
-
   const proposalWorkflowConnectionsPartOfWorkflow: ProposalWorkflowConnection[] = [];
 
   state.proposalWorkflowConnectionGroups.forEach(
@@ -58,19 +57,7 @@ const ProposalWorkflowEditor: React.FC = () => {
       )
   );
 
-  const proposalStatusesPartOfWorkflow = proposalWorkflowConnectionsPartOfWorkflow.map(
-    (proposalWorkflowConnection) => proposalWorkflowConnection.proposalStatus
-  );
-
-  const proposalStatusesInThePicker = state.id
-    ? proposalStatuses.filter(
-        (proposalStatus) =>
-          !proposalStatusesPartOfWorkflow.find(
-            (proposalStatusPartOfWorkflow) =>
-              proposalStatusPartOfWorkflow.id === proposalStatus.id
-          )
-      )
-    : [];
+  const proposalStatusesInThePicker = state.id ? proposalStatuses : [];
 
   const getPreviousWorkflowStatus = (
     destinationIndex: number,
@@ -88,11 +75,10 @@ const ProposalWorkflowEditor: React.FC = () => {
     const lastWorkflowStatusInParentGroup =
       parentDroppableGroup?.connections[
         parentDroppableGroup?.connections.length - 1
-      ]?.proposalStatus.id;
+      ]?.proposalStatus;
 
     const previousWorkflowStatusInCurrentGroup =
-      currentDroppableGroup.connections[destinationIndex - 1]?.proposalStatus
-        .id;
+      currentDroppableGroup.connections[destinationIndex - 1]?.proposalStatus;
 
     return isFirstInTheGroupAndHasParentGroup
       ? lastWorkflowStatusInParentGroup || null
@@ -100,53 +86,66 @@ const ProposalWorkflowEditor: React.FC = () => {
   };
 
   // TODO: Check this about getting next status in the workflow. It should be similar to getting previous.
-  const getNextWorkflowStatus = (
+  const getNextWorkflowStatuses = (
     destination: DraggableLocation,
     currentDroppableGroup: ProposalWorkflowConnectionGroup
-  ) => {
+  ): ProposalStatus[] => {
     const isLastInTheCurrentGroup =
       destination.index === currentDroppableGroup.connections.length;
-    const childGroup = state.proposalWorkflowConnectionGroups.find(
+    const childGroups = state.proposalWorkflowConnectionGroups.filter(
       (proposalWorkflowConnectionGroup) =>
         proposalWorkflowConnectionGroup.parentGroupId ===
         currentDroppableGroup.groupId
     );
 
     const isLastInTheGroupAndHasChildGroup =
-      isLastInTheCurrentGroup && childGroup;
+      isLastInTheCurrentGroup && childGroups?.length > 0;
 
     return isLastInTheGroupAndHasChildGroup
-      ? childGroup?.connections[0].proposalStatus.id || null
-      : currentDroppableGroup.connections[destination.index]?.proposalStatus
-          .id || null;
+      ? childGroups.flatMap((childGroup) =>
+          childGroup.connections.map((connection) => connection.proposalStatus)
+        ) || []
+      : [
+          currentDroppableGroup.connections[destination.index]?.proposalStatus,
+        ] || [];
   };
 
   const onDragEnd = (result: DropResult): void => {
     const { source, destination } = result;
 
-    if (
-      !destination ||
-      (destination?.droppableId === source?.droppableId &&
-        source.index === destination.index)
-    ) {
+    const isWrongDrop =
+      destination?.droppableId === source?.droppableId &&
+      source.index === destination.index;
+
+    if (!destination || isWrongDrop) {
       return;
     }
 
-    if (
+    const isDragAndDropFromStatusPickerToWorkflowEditor =
       source.droppableId === 'proposalStatusPicker' &&
-      destination?.droppableId.startsWith('proposalWorkflowConnections')
-    ) {
+      destination.droppableId.startsWith('proposalWorkflowConnections');
+
+    const isReorderingConnectionsInsideWorkflowEditor =
+      source.droppableId.startsWith('proposalWorkflowConnections') &&
+      destination?.droppableId.startsWith('proposalWorkflowConnections');
+
+    const isDragAndDropFromWorkflowEditorToStatusPicker =
+      source.droppableId.startsWith('proposalWorkflowConnections') &&
+      destination?.droppableId === 'proposalStatusPicker';
+
+    if (isDragAndDropFromStatusPickerToWorkflowEditor) {
       const currentDroppableGroup = state.proposalWorkflowConnectionGroups.find(
         (proposalWorkflowConnectionGroup) =>
           proposalWorkflowConnectionGroup.groupId === destination.droppableId
       );
 
-      const statusDroppedBeforeDraft =
+      const isDroppedBeforeVeryFirstStatus =
         currentDroppableGroup?.groupId === 'proposalWorkflowConnections_0' &&
-        destination.index === 0;
+        destination.index === 0 &&
+        currentDroppableGroup.connections.length > 0;
 
-      if (statusDroppedBeforeDraft) {
-        enqueueSnackbar('Dropping before DRAFT status not alowed', {
+      if (isDroppedBeforeVeryFirstStatus) {
+        enqueueSnackbar('Adding before first status is not allowed', {
           variant: 'info',
           className: 'snackbar-info',
         });
@@ -155,14 +154,29 @@ const ProposalWorkflowEditor: React.FC = () => {
       }
 
       const proposalStatusId = proposalStatusesInThePicker[source.index].id;
-      const nextProposalStatusId = getNextWorkflowStatus(
+      const nextProposalStatusesId = getNextWorkflowStatuses(
         destination,
         currentDroppableGroup as ProposalWorkflowConnectionGroup
-      );
+      ).map((status) => status?.id);
       const prevProposalStatusId = getPreviousWorkflowStatus(
         destination.index,
         currentDroppableGroup as ProposalWorkflowConnectionGroup
-      );
+      )?.id;
+      const [firstNextProposalStatusId] = nextProposalStatusesId;
+
+      const isRepeatingTheSameStatus =
+        nextProposalStatusesId?.some(
+          (statusId) => statusId === proposalStatusId
+        ) || proposalStatusId === prevProposalStatusId;
+
+      if (isRepeatingTheSameStatus) {
+        enqueueSnackbar('Repeating same status is not allowed', {
+          variant: 'info',
+          className: 'snackbar-info',
+        });
+
+        return;
+      }
 
       dispatch({
         type: EventType.ADD_WORKFLOW_STATUS_REQUESTED,
@@ -175,15 +189,12 @@ const ProposalWorkflowEditor: React.FC = () => {
           proposalStatus: {
             ...proposalStatusesInThePicker[source.index],
           },
-          nextProposalStatusId,
+          nextProposalStatusId: firstNextProposalStatusId,
           prevProposalStatusId,
           proposalWorkflowId: state.id,
         },
       });
-    } else if (
-      source.droppableId.startsWith('proposalWorkflowConnections') &&
-      destination?.droppableId.startsWith('proposalWorkflowConnections')
-    ) {
+    } else if (isReorderingConnectionsInsideWorkflowEditor) {
       // NOTE: For now reordering is disabled!
       // dispatch({
       //   type: EventType.REORDER_WORKFLOW_STATUS_REQUESTED,
@@ -193,10 +204,7 @@ const ProposalWorkflowEditor: React.FC = () => {
       //   },
       // });
       return;
-    } else if (
-      source.droppableId.startsWith('proposalWorkflowConnections') &&
-      destination?.droppableId === 'proposalStatusPicker'
-    ) {
+    } else if (isDragAndDropFromWorkflowEditorToStatusPicker) {
       dispatch({
         type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
         payload: {
@@ -223,7 +231,7 @@ const ProposalWorkflowEditor: React.FC = () => {
   const progressJsx = !dataLoaded ? <LinearProgress /> : null;
 
   return (
-    <>
+    <ContentContainer>
       <ProposalWorkflowMetadataEditor
         dispatch={dispatch}
         proposalWorkflow={state}
@@ -248,7 +256,7 @@ const ProposalWorkflowEditor: React.FC = () => {
           </Grid>
         </DragDropContext>
       </StyledPaper>
-    </>
+    </ContentContainer>
   );
 };
 

@@ -3,6 +3,8 @@ mutation deleteUnit($id: Int!) {
     unit {
       id
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

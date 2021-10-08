@@ -11,6 +11,7 @@ fragment fieldConfig on FieldConfig {
     minDate
     maxDate
     defaultDate
+    includeTime
   }
   ... on EmbellishmentConfig {
     html
@@ -47,11 +48,30 @@ fragment fieldConfig on FieldConfig {
     tooltip
   }
 
+  ... on ProposalEsiBasisConfig {
+    tooltip
+  }
+
+  ... on SampleEsiBasisConfig {
+    tooltip
+  }
+
   ... on SampleBasisConfig {
     titlePlaceholder
   }
 
-  ... on SubtemplateConfig {
+  ... on SampleDeclarationConfig {
+    addEntryButtonLabel
+    minEntries
+    maxEntries
+    templateId
+    esiTemplateId
+    templateCategory
+    required
+    small_label
+  }
+
+  ... on SubTemplateConfig {
     addEntryButtonLabel
     minEntries
     maxEntries
@@ -95,5 +115,11 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     max
+  }
+
+  ... on VisitBasisConfig {
+    small_label
+    required
+    tooltip
   }
 }

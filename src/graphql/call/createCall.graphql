@@ -12,8 +12,13 @@ mutation createCall(
   $endCycle: DateTime!
   $cycleComment: String!
   $surveyComment: String!
-  $proposalWorkflowId: Int
-  $templateId: Int
+  $allocationTimeUnit: AllocationTimeUnits!
+  $referenceNumberFormat: String
+  $proposalWorkflowId: Int!
+  $templateId: Int!
+  $esiTemplateId: Int
+  $title: String
+  $description: String
 ) {
   createCall(
     createCallInput: {
@@ -30,11 +35,18 @@ mutation createCall(
       endCycle: $endCycle
       cycleComment: $cycleComment
       surveyComment: $surveyComment
+      allocationTimeUnit: $allocationTimeUnit
+      referenceNumberFormat: $referenceNumberFormat
       proposalWorkflowId: $proposalWorkflowId
       templateId: $templateId
+      esiTemplateId: $esiTemplateId
+      title: $title
+      description: $description
     }
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     call {
       ...call
     }

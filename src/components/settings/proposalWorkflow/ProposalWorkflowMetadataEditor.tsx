@@ -13,37 +13,38 @@ import { ButtonContainer } from 'styles/StyledComponents';
 
 import { Event, EventType } from './ProposalWorkflowEditorModel';
 
+const useStyles = makeStyles((theme) => ({
+  workflowName: {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    paddingBottom: '5px',
+  },
+  workflowDescription: {
+    fontSize: '16px',
+    whiteSpace: 'pre-wrap',
+  },
+  container: {
+    padding: theme.spacing(3),
+    marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(3),
+  },
+  button: {
+    margin: '25px 10px 0 10px',
+    '&:first-child': {
+      marginLeft: '0',
+    },
+    '&:last-child': {
+      marginRight: '0',
+    },
+  },
+}));
 const ProposalWorkflowMetadataEditor: React.FC<{
   proposalWorkflow: ProposalWorkflow;
   dispatch: React.Dispatch<Event>;
 }> = ({ proposalWorkflow, dispatch }) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const classes = makeStyles((theme) => ({
-    workflowName: {
-      fontSize: '24px',
-      fontWeight: 'bold',
-      paddingBottom: '5px',
-    },
-    workflowDescription: {
-      fontSize: '16px',
-      whiteSpace: 'pre-wrap',
-    },
-    container: {
-      padding: theme.spacing(3),
-      marginTop: theme.spacing(3),
-      marginBottom: theme.spacing(3),
-    },
-    button: {
-      margin: '25px 10px 0 10px',
-      '&:first-child': {
-        marginLeft: '0',
-      },
-      '&:last-child': {
-        marginRight: '0',
-      },
-    },
-  }))();
+  const classes = useStyles();
 
   const staticJSX = (
     <div data-cy="proposal-workflow-metadata-container">

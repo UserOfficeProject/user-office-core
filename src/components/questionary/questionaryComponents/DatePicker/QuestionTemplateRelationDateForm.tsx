@@ -3,35 +3,40 @@ import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import React from 'react';
+import React, { FC } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import TitledContainer from 'components/common/TitledContainer';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionTemplateRelation } from 'generated/sdk';
+import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRelation> = (
+export const QuestionTemplateRelationDateForm: FC<QuestionTemplateRelationFormProps> = (
   props
 ) => {
   return (
     <QuestionTemplateRelationFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      questionRel={props.field}
-      template={props.template}
+      {...props}
       validationSchema={Yup.object().shape({})}
     >
       {(formikProps) => (
         <>
-          <QuestionExcerpt question={props.field.question} />
+          <QuestionExcerpt question={props.questionRel.question} />
+          <Field
+            name="config.includeTime"
+            label="Include time"
+            component={FormikUICustomCheckbox}
+            margin="normal"
+            fullWidth
+            inputProps={{ 'data-cy': 'includeTime' }}
+          />
           <Field
             name="config.tooltip"
             label="Tooltip"
+            id="tooltip-input"
             type="text"
             component={TextField}
             margin="normal"
@@ -52,6 +57,7 @@ export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRel
               <Field
                 name="config.minDate"
                 label="Min"
+                id="Min-input"
                 format="yyyy-MM-dd"
                 component={KeyboardDatePicker}
                 margin="normal"
@@ -61,6 +67,7 @@ export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRel
               <Field
                 name="config.maxDate"
                 label="Max"
+                id="Max-input"
                 format="yyyy-MM-dd"
                 component={KeyboardDatePicker}
                 margin="normal"
@@ -70,6 +77,7 @@ export const QuestionTemplateRelationDateForm: FormComponent<QuestionTemplateRel
               <Field
                 name="config.defaultDate"
                 label="Default"
+                id="Default-input"
                 format="yyyy-MM-dd"
                 component={KeyboardDatePicker}
                 margin="normal"

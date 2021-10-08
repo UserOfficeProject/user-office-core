@@ -1,11 +1,12 @@
 import { proposalBasisPreSubmit } from 'components/questionary/questionaryComponents/ProposalBasis/QuestionaryComponentProposalBasis';
 import { sampleBasisPreSubmit } from 'components/questionary/questionaryComponents/SampleBasis/QuestionaryComponentSampleBasis';
 import { shipmentBasisPreSubmit } from 'components/questionary/questionaryComponents/ShipmentBasis/QuestionaryComponentShipmentBasis';
+import { visitBasisPreSubmit } from 'components/questionary/questionaryComponents/VisitBasis/QuestionaryComponentVisitBasis';
 import { Answer, DataType, Sdk } from 'generated/sdk';
 import {
   Event,
   QuestionarySubmissionState,
-} from 'models/QuestionarySubmissionState';
+} from 'models/questionary/QuestionarySubmissionState';
 
 export type SubmitActionDependencyContainer = {
   state: QuestionarySubmissionState;
@@ -21,11 +22,13 @@ export function usePreSubmitActions() {
     const actions = answers.flatMap((answer) => {
       switch (answer.question.dataType) {
         case DataType.SAMPLE_BASIS:
-          return sampleBasisPreSubmit(answer);
+          return sampleBasisPreSubmit();
         case DataType.PROPOSAL_BASIS:
-          return proposalBasisPreSubmit(answer);
+          return proposalBasisPreSubmit();
         case DataType.SHIPMENT_BASIS:
-          return shipmentBasisPreSubmit(answer);
+          return shipmentBasisPreSubmit();
+        case DataType.VISIT_BASIS:
+          return visitBasisPreSubmit();
       }
 
       return [];

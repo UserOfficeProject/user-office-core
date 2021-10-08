@@ -10,17 +10,27 @@ export function useGetPageContent(pageName: PageName) {
   const api = useDataApi();
 
   useEffect(() => {
+    let unmounted = false;
+
     setLoading(true);
     api()
       .getPageContent({
         id: pageName,
       })
       .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         if (data.getPageContent) {
           setPageContent(data.getPageContent);
         }
         setLoading(false);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [pageName, api]);
 
   return [loading, pageContent] as const;

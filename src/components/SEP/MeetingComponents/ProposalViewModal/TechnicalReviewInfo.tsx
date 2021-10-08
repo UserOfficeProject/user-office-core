@@ -12,6 +12,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import EditIcon from '@material-ui/icons/Edit';
@@ -22,13 +23,14 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { TechnicalReview } from 'generated/sdk';
+import { Proposal, TechnicalReview } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import { getFullUserName } from 'utils/user';
 
 type SEPProposalProps = {
   sepId: number;
-  proposalId: number;
+  proposal: Proposal;
 };
 
 type TechnicalReviewInfoProps = {
@@ -54,6 +56,9 @@ const useStyles = makeStyles((theme) => ({
   spacingLeft: {
     marginLeft: theme.spacing(1),
   },
+  table: {
+    minWidth: 500,
+  },
 }));
 
 const OverwriteTimeAllocationDialog = ({
@@ -68,6 +73,7 @@ const OverwriteTimeAllocationDialog = ({
 
   const initialValues = {
     ...sepProposalArgs,
+    proposalPk: sepProposalArgs.proposal.primaryKey,
     sepTimeAllocation: timeAllocation,
   };
 
@@ -88,7 +94,7 @@ const OverwriteTimeAllocationDialog = ({
         onSubmit={async (values) => {
           const result = await api('Updated').updateSEPTimeAllocation(values);
 
-          if (result.updateSEPTimeAllocation.error) {
+          if (result.updateSEPTimeAllocation.rejection) {
             return;
           }
 
@@ -106,7 +112,7 @@ const OverwriteTimeAllocationDialog = ({
                 id="sepTimeAllocation"
                 type="number"
                 name="sepTimeAllocation"
-                label="Time Allocation(Days)"
+                label={`Time Allocation(${sepProposalArgs.proposal.call?.allocationTimeUnit}s)`}
                 value={values.sepTimeAllocation ?? ''}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue(
@@ -174,56 +180,75 @@ const TechnicalReviewInfo: React.FC<TechnicalReviewInfoProps> = ({
         <Typography variant="h6" className={classes.heading} gutterBottom>
           Technical review info
         </Typography>
-        <Table>
-          <TableBody>
-            <TableRow key="statusAndTime">
-              <TableCell width="25%" className={classes.textBold}>
-                Status
-              </TableCell>
-              <TableCell width="25%">
-                {technicalReview?.status || '-'}
-              </TableCell>
-              <TableCell width="25%" className={classes.textBold}>
-                Time allocation
-                {hasWriteAccess && (
-                  <Tooltip title="Edit" className={classes.spacingLeft}>
-                    <IconButton
-                      size="medium"
-                      onClick={() => setOpen(true)}
-                      data-cy="edit-sep-time-allocation"
-                    >
-                      <EditIcon fontSize="inherit" />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </TableCell>
-              <TableCell>
-                <span
-                  className={clsx({
-                    [classes.disabled]: sepTimeAllocation !== null,
-                  })}
-                >
-                  {technicalReview?.timeAllocation || '-'}
-                </span>
-                {sepTimeAllocation !== null && (
+        <TableContainer>
+          <Table className={classes.table}>
+            <TableBody>
+              <TableRow key="statusAndTime">
+                <TableCell width="25%" className={classes.textBold}>
+                  Status
+                </TableCell>
+                <TableCell width="25%">
+                  {technicalReview?.status || '-'}
+                </TableCell>
+                <TableCell width="25%" className={classes.textBold}>
+                  Time allocation(
+                  {sepProposalArgs.proposal.call?.allocationTimeUnit}s)
+                  {hasWriteAccess && (
+                    <Tooltip title="Edit" className={classes.spacingLeft}>
+                      <IconButton
+                        size="medium"
+                        onClick={() => setOpen(true)}
+                        data-cy="edit-sep-time-allocation"
+                      >
+                        <EditIcon fontSize="inherit" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </TableCell>
+                <TableCell>
                   <span
-                    className={clsx(classes.overwritten, classes.spacingLeft)}
+                    className={clsx({
+                      [classes.disabled]: sepTimeAllocation !== null,
+                    })}
                   >
-                    {sepTimeAllocation} (Overwritten)
+                    {technicalReview?.timeAllocation || '-'}
                   </span>
-                )}
-              </TableCell>
-            </TableRow>
-            <TableRow key="comments">
-              <TableCell className={classes.textBold}>
-                Internal comment
-              </TableCell>
-              <TableCell>{technicalReview?.comment || '-'}</TableCell>
-              <TableCell className={classes.textBold}>Public comment</TableCell>
-              <TableCell>{technicalReview?.publicComment || '-'}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+                  {sepTimeAllocation !== null && (
+                    <span
+                      className={clsx(classes.overwritten, classes.spacingLeft)}
+                    >
+                      {sepTimeAllocation} (Overwritten)
+                    </span>
+                  )}
+                </TableCell>
+              </TableRow>
+              <TableRow key="comments">
+                <TableCell className={classes.textBold}>
+                  Internal comment
+                </TableCell>
+                <TableCell
+                  dangerouslySetInnerHTML={{
+                    __html: technicalReview?.comment || '-',
+                  }}
+                />
+                <TableCell className={classes.textBold}>
+                  Comments for the review panel
+                </TableCell>
+                <TableCell
+                  dangerouslySetInnerHTML={{
+                    __html: technicalReview?.publicComment || '-',
+                  }}
+                />
+              </TableRow>
+              <TableRow key="reviewer">
+                <TableCell className={classes.textBold}>Reviewer</TableCell>
+                <TableCell>
+                  {getFullUserName(technicalReview?.reviewer)}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
       </StyledPaper>
     </div>
   );
@@ -234,7 +259,7 @@ TechnicalReviewInfo.propTypes = {
   sepTimeAllocation: PropTypes.number,
   onSepTimeAllocationEdit: PropTypes.func.isRequired,
   sepId: PropTypes.number.isRequired,
-  proposalId: PropTypes.number.isRequired,
+  proposal: PropTypes.any.isRequired,
   hasWriteAccess: PropTypes.bool.isRequired,
 };
 

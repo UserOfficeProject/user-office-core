@@ -5,10 +5,13 @@ import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import Typography from '@material-ui/core/Typography';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import clsx from 'clsx';
+import parse from 'html-react-parser';
 import PropTypes from 'prop-types';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -31,6 +34,10 @@ import ProposalChooseCall from './proposal/ProposalChooseCall';
 import ProposalCreate from './proposal/ProposalCreate';
 import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
+import InstrSciUpcomingExperimentTimesTable from './proposalBooking/InstrSciUpcomingExperimentTimesTable';
+import UserExperimentTimesTable from './proposalBooking/UserExperimentsTable';
+import CreateProposalEsiPage from './proposalEsi/CreateProposalEsiPage';
+import UpdateProposalEsiPage from './proposalEsi/UpdateProposalEsiPage';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
@@ -40,13 +47,14 @@ import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage
 import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
 import UnitTablePage from './settings/unitList/UnitTablePage';
-import ShipmentCreate from './shipments/CreateUpdateShipment';
-import MyShipments from './shipments/MyShipments';
-import ShipmentsPage from './shipments/ShipmentsPage';
+import ProposalEsiPage from './template/EsiPage';
 import ProposalTemplates from './template/ProposalTemplates';
+import QuestionsPage from './template/QuestionsPage';
+import SampleEsiPage from './template/SampleEsiPage';
 import SampleTemplatesPage from './template/SampleTemplates';
 import ShipmentTemplatesPage from './template/ShipmentTemplatesPage';
 import TemplateEditor from './template/TemplateEditor';
+import VisitTemplatesPage from './template/VisitTemplatesPage';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
@@ -64,7 +72,7 @@ const BottomNavItem: React.FC<BottomNavItemProps> = ({ text, linkText }) => {
       text={text}
       linkText={linkText}
       linkStyle={{
-        fontSize: '10px',
+        fontSize: '12px',
         minWidth: 'auto',
         padding: '10px',
       }}
@@ -86,9 +94,14 @@ const useStyles = makeStyles((theme) => ({
   toolbarIcon: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
+    justifyContent: 'center',
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(1),
     ...theme.mixins.toolbar,
+
+    '& .closeDrawer': {
+      marginLeft: 'auto',
+    },
   },
   drawer: {
     width: drawerWidth,
@@ -114,12 +127,10 @@ const useStyles = makeStyles((theme) => ({
       width: theme.spacing(9),
     },
   },
-  appBarSpacer: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
     height: 'calc(100vh - 64px)',
     marginTop: '64px',
-    padding: `0 ${theme.spacing(2)}px`,
     width: `calc(100% - ${drawerWidth}px)`,
   },
   bottomNavigation: {
@@ -134,9 +145,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Dashboard: React.FC = () => {
+  const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const classes = useStyles();
   const [open, setOpen] = React.useState(
-    localStorage.drawerOpen ? localStorage.drawerOpen === '1' : true
+    localStorage.drawerOpen
+      ? localStorage.drawerOpen === '1'
+      : !isTabletOrMobile
   );
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isSampleSafetyReviewer = useCheckAccess([
@@ -144,11 +158,19 @@ const Dashboard: React.FC = () => {
   ]);
 
   const featureContext = useContext(FeatureContext);
-  const isShipmentEnabled = !!featureContext.features.get(FeatureId.SHIPPING)
+  const isSchedulerEnabled = featureContext.features.get(FeatureId.SCHEDULER)
     ?.isEnabled;
 
   const { currentRole } = useContext(UserContext);
   const { calls } = useCallsData({ isActive: true });
+
+  useEffect(() => {
+    if (isTabletOrMobile) {
+      setOpen(false);
+    } else if (localStorage.getItem('drawerOpen') === '1') {
+      setOpen(true);
+    }
+  }, [isTabletOrMobile]);
 
   const handleDrawerOpen = () => {
     localStorage.setItem('drawerOpen', '1');
@@ -161,14 +183,15 @@ const Dashboard: React.FC = () => {
 
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
+  const [, footerContent] = useGetPageContent(PageName.FOOTERCONTENT);
 
-  // TODO: Check who can see what and modify the access controll here.
+  // TODO: Check who can see what and modify the access control here.
   return (
     <div className={classes.root}>
       <CssBaseline />
       <AppToolbar open={open} handleDrawerOpen={handleDrawerOpen} />
       <Drawer
-        variant="permanent"
+        variant={isTabletOrMobile ? 'temporary' : 'permanent'}
         className={clsx(classes.drawer, {
           [classes.drawerOpen]: open,
           [classes.drawerClose]: !open,
@@ -180,9 +203,19 @@ const Dashboard: React.FC = () => {
           }),
         }}
         open={open}
+        onClose={handleDrawerClose}
       >
         <div className={classes.toolbarIcon}>
-          <IconButton onClick={handleDrawerClose}>
+          {isTabletOrMobile && (
+            <Typography component="h1" variant="h6" color="inherit" noWrap>
+              User Office
+            </Typography>
+          )}
+          <IconButton
+            aria-label="Close drawer"
+            onClick={handleDrawerClose}
+            className="closeDrawer"
+          >
             <ChevronLeftIcon />
           </IconButton>
         </div>
@@ -194,7 +227,7 @@ const Dashboard: React.FC = () => {
       </Drawer>
       <main className={classes.content}>
         <Switch>
-          <Route path="/ProposalEdit/:proposalID" component={ProposalEdit} />
+          <Route path="/ProposalEdit/:proposalPk" component={ProposalEdit} />
           <Route
             path="/ProposalSelectType"
             component={() => <ProposalChooseCall callsData={calls} />}
@@ -203,12 +236,6 @@ const Dashboard: React.FC = () => {
             path="/ProposalCreate/:callId/:templateId"
             component={ProposalCreate}
           />
-          {isShipmentEnabled && (
-            <Route path="/ShipmentCreate" component={ShipmentCreate} />
-          )}
-          {isShipmentEnabled && (
-            <Route path="/MyShipments" component={MyShipments} />
-          )}
           <Route path="/ProfilePage/:id" component={ProfilePage} />
           {isUserOfficer && (
             <Route path="/PeoplePage/:id" component={UserPage} />
@@ -235,6 +262,9 @@ const Dashboard: React.FC = () => {
             path="/ShipmentDeclarationTemplates"
             component={ShipmentTemplatesPage}
           />
+          <Route path="/VisitTemplates" component={VisitTemplatesPage} />
+          <Route path="/EsiTemplates" component={ProposalEsiPage} />
+          <Route path="/SampleEsiTemplates" component={SampleEsiPage} />
           <Route
             path="/ProposalTableReviewer"
             component={ProposalTableReviewer}
@@ -258,12 +288,27 @@ const Dashboard: React.FC = () => {
           {(isSampleSafetyReviewer || isUserOfficer) && (
             <Route path="/SampleSafety" component={SampleSafetyPage} />
           )}
-          {isUserOfficer && (
-            <Route path="/Shipments" component={ShipmentsPage} />
-          )}
+
           {isUserOfficer && (
             <Route path="/ApiAccessTokens" component={ApiAccessTokensPage} />
           )}
+          {isSchedulerEnabled && (
+            <Route
+              path="/ExperimentTimes"
+              component={UserExperimentTimesTable}
+            />
+          )}
+          {isSchedulerEnabled && (
+            <Route
+              path="/UpcomingExperimentTimes"
+              component={InstrSciUpcomingExperimentTimesTable}
+            />
+          )}
+          {isUserOfficer && (
+            <Route path="/Questions" component={QuestionsPage} />
+          )}
+          <Route path="/CreateEsi/:visitId" component={CreateProposalEsiPage} />
+          <Route path="/UpdateEsi/:esiId" component={UpdateProposalEsiPage} />
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}
             yes={() => <Route component={ProposalPage} />}
@@ -301,6 +346,7 @@ const Dashboard: React.FC = () => {
             )}
           />
         </Switch>
+        {parse(footerContent)}
         <BottomNavigation className={classes.bottomNavigation}>
           <BottomNavItem
             text={privacyPageContent}

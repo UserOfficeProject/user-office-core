@@ -42,7 +42,7 @@ export default function UpdatePassword(props: { id: number }) {
       >
         {({ isSubmitting }) => (
           <Form>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" component="h2" gutterBottom>
               Password
             </Typography>
             <Grid container spacing={3}>
@@ -50,6 +50,7 @@ export default function UpdatePassword(props: { id: number }) {
                 <Field
                   name="password"
                   label="New Password"
+                  id="password-input"
                   type="password"
                   component={TextField}
                   margin="normal"
@@ -63,6 +64,7 @@ export default function UpdatePassword(props: { id: number }) {
                 <Field
                   name="confirmPassword"
                   label="Confirm Password"
+                  id="confirm-password-input"
                   type="password"
                   component={TextField}
                   margin="normal"

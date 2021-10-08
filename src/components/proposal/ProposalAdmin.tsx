@@ -1,54 +1,47 @@
 import { administrationProposalValidationSchema } from '@esss-swap/duo-validation/lib/Proposal';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import InputLabel from '@material-ui/core/InputLabel';
 import Typography from '@material-ui/core/Typography';
+import { Editor } from '@tinymce/tinymce-react';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
-import { Proposal, UserRole } from 'generated/sdk';
+import { UserRole } from 'generated/sdk';
 import { ProposalEndStatus } from 'generated/sdk';
-import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { ProposalData } from 'hooks/proposal/useProposalData';
 import { ButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 export type AdministrationFormData = {
-  id: number;
+  proposalPk: number;
   commentForUser: string;
   commentForManagement: string;
   finalStatus: ProposalEndStatus;
   managementTimeAllocation?: number;
   managementDecisionSubmitted?: boolean;
-  rankOrder?: number;
 };
 
 type ProposalAdminProps = {
-  data: Proposal;
+  data: ProposalData;
   setAdministration: (data: AdministrationFormData) => void;
-  confirm: WithConfirmType;
 };
 
 const ProposalAdmin: React.FC<ProposalAdminProps> = ({
   data,
   setAdministration,
-  confirm,
 }) => {
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const {
-    proposalStatuses,
-    loadingProposalStatuses,
-  } = useProposalStatusesData();
 
   const initialValues = {
-    id: data.id,
+    proposalPk: data.primaryKey,
     finalStatus: data.finalStatus || ProposalEndStatus.UNSET,
-    proposalStatus: data.statusId,
     commentForUser: data.commentForUser || '',
     commentForManagement: data.commentForManagement || '',
     managementTimeAllocation: data.managementTimeAllocation || '',
@@ -69,18 +62,18 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
   const handleProposalAdministration = async (
     administrationValues: AdministrationFormData
   ) => {
-    const result = await api('Updated!').administrationProposal(
+    const result = await api('Saved!').administrationProposal(
       administrationValues
     );
 
-    if (!result.administrationProposal.error) {
+    if (!result.administrationProposal.rejection) {
       setAdministration(administrationValues);
     }
   };
 
   return (
     <>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" component="h2" gutterBottom>
         Administration
       </Typography>
       <Formik
@@ -88,41 +81,23 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
         validationSchema={administrationProposalValidationSchema}
         onSubmit={async (values): Promise<void> => {
           const administrationValues = {
-            id: data.id,
+            proposalPk: data.primaryKey,
             finalStatus:
               ProposalEndStatus[values.finalStatus as ProposalEndStatus],
-            statusId: values.proposalStatus,
             commentForUser: values.commentForUser,
             commentForManagement: values.commentForManagement,
             managementTimeAllocation: +values.managementTimeAllocation,
             managementDecisionSubmitted: values.managementDecisionSubmitted,
           };
 
-          const isDraftStatus =
-            proposalStatuses.find((status) => status.shortCode === 'DRAFT')
-              ?.id === values.proposalStatus;
-
-          if (isDraftStatus) {
-            confirm(
-              async () => {
-                await handleProposalAdministration(administrationValues);
-              },
-              {
-                title: 'Are you sure?',
-                description:
-                  'This will re-open proposal for changes and submission. Are you sure you want to change status to DRAFT?',
-              }
-            )();
-          } else {
-            await handleProposalAdministration(administrationValues);
-          }
+          await handleProposalAdministration(administrationValues);
         }}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, setFieldValue }) => (
           <Form>
             <PromptIfDirty />
-            <Grid container spacing={3}>
-              <Grid item xs={4}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
                 <FormikDropdown
                   name="finalStatus"
                   label="Final status"
@@ -137,24 +112,11 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                   disabled={!isUserOfficer || isSubmitting}
                 />
               </Grid>
-              <Grid item xs={4}>
-                <FormikDropdown
-                  name="proposalStatus"
-                  label="Proposal status"
-                  data-cy="proposalStatus"
-                  loading={loadingProposalStatuses}
-                  items={proposalStatuses.map((proposalStatus) => ({
-                    text: proposalStatus.name,
-                    value: proposalStatus.id,
-                  }))}
-                  required
-                  disabled={!isUserOfficer || isSubmitting}
-                />
-              </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <Field
                   name="managementTimeAllocation"
-                  label="Management time allocation(Days)"
+                  label={`Management time allocation(${data.call?.allocationTimeUnit}s)`}
+                  id="time-managemment-input"
                   type="number"
                   component={TextField}
                   margin="normal"
@@ -165,58 +127,105 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                 />
               </Grid>
               <Grid item xs={12}>
-                <Field
-                  name="commentForUser"
-                  label="Comment for user"
-                  type="text"
-                  component={TextField}
-                  margin="normal"
-                  fullWidth
-                  autoComplete="off"
-                  data-cy="commentForUser"
-                  multiline
-                  rowsMax="16"
-                  rows="4"
+                <InputLabel htmlFor="commentForUser" shrink margin="dense">
+                  Comment for user
+                </InputLabel>
+                <Editor
+                  id="commentForUser"
+                  initialValue={initialValues.commentForUser}
+                  init={{
+                    skin: false,
+                    content_css: false,
+                    plugins: [
+                      'link',
+                      'preview',
+                      'code',
+                      'charmap',
+                      'wordcount',
+                    ],
+                    toolbar: 'bold italic',
+                    branding: false,
+                  }}
+                  onEditorChange={(content, editor) => {
+                    const normalizedContent = content.replace(
+                      /(?:\r\n|\r|\n)/g,
+                      ''
+                    );
+
+                    if (
+                      normalizedContent !== editor.startContent ||
+                      editor.isDirty()
+                    ) {
+                      setFieldValue('commentForUser', content);
+                    }
+                  }}
                   disabled={!isUserOfficer || isSubmitting}
                 />
               </Grid>
               <Grid item xs={12}>
-                <Field
-                  name="commentForManagement"
-                  label="Comment for management"
-                  type="text"
-                  component={TextField}
-                  margin="normal"
-                  fullWidth
-                  autoComplete="off"
-                  data-cy="commentForManagement"
-                  multiline
-                  rowsMax="16"
-                  rows="4"
+                <InputLabel
+                  htmlFor="commentForManagement"
+                  shrink
+                  margin="dense"
+                >
+                  Comment for management
+                </InputLabel>
+                <Editor
+                  id="commentForManagement"
+                  initialValue={initialValues.commentForManagement}
+                  init={{
+                    skin: false,
+                    content_css: false,
+                    plugins: [
+                      'link',
+                      'preview',
+                      'code',
+                      'charmap',
+                      'wordcount',
+                    ],
+                    toolbar: 'bold italic',
+                    branding: false,
+                  }}
+                  onEditorChange={(content, editor) => {
+                    const normalizedContent = content.replace(
+                      /(?:\r\n|\r|\n)/g,
+                      ''
+                    );
+
+                    if (
+                      normalizedContent !== editor.startContent ||
+                      editor.isDirty()
+                    ) {
+                      setFieldValue('commentForManagement', content);
+                    }
+                  }}
                   disabled={!isUserOfficer || isSubmitting}
                 />
               </Grid>
+              {isUserOfficer && (
+                <Grid item xs={12}>
+                  <ButtonContainer>
+                    <Field
+                      id="managementDecisionSubmitted"
+                      name="managementDecisionSubmitted"
+                      component={FormikUICustomCheckbox}
+                      label="Submitted"
+                      color="primary"
+                      data-cy="is-management-decision-submitted"
+                    />
+                    <Button
+                      disabled={isSubmitting}
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                      data-cy="save-admin-decision"
+                    >
+                      Save
+                    </Button>
+                  </ButtonContainer>
+                </Grid>
+              )}
             </Grid>
-            {isUserOfficer && (
-              <ButtonContainer>
-                <Field
-                  id="managementDecisionSubmitted"
-                  name="managementDecisionSubmitted"
-                  component={FormikUICustomCheckbox}
-                  label="Submitted"
-                  color="primary"
-                  data-cy="is-management-decision-submitted"
-                />
-                <Button
-                  disabled={isSubmitting}
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                >
-                  Update
-                </Button>
-              </ButtonContainer>
-            )}
           </Form>
         )}
       </Formik>
@@ -224,4 +233,4 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
   );
 };
 
-export default withConfirm(ProposalAdmin);
+export default ProposalAdmin;

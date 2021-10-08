@@ -1,9 +1,10 @@
 import TextFieldsIcon from '@material-ui/icons/TextFields';
 import React from 'react';
 
-import { DataType, EmbellishmentConfig } from 'generated/sdk';
+import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
+import EmbellishmentQuestionRenderer from './EmbellishmentQuestionRenderer';
 import { QuestionaryComponentEmbellishment } from './QuestionaryComponentEmbellishment';
 import { QuestionEmbellishmentForm } from './QuestionEmbellishmentForm';
 import { QuestionTemplateRelationEmbellishmentForm } from './QuestionTemplateRelationEmbellishmentForm';
@@ -17,9 +18,7 @@ export const embellishmentDefinition: QuestionaryComponentDefinition = {
   readonly: true,
   creatable: true,
   renderers: {
-    questionRenderer: function QuestionRendererComponent({ question }) {
-      return <span>{(question.config as EmbellishmentConfig).plain}</span>;
-    },
+    questionRenderer: EmbellishmentQuestionRenderer,
     answerRenderer: () => null,
   },
   icon: <TextFieldsIcon />,

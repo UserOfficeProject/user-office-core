@@ -2,16 +2,19 @@ import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { useShipment } from 'hooks/shipment/useShipment';
-import { ShipmentBasic } from 'models/ShipmentSubmissionState';
+import { ShipmentCore } from 'models/questionary/shipment/ShipmentCore';
 
 import ShipmentContainer from './ShipmentContainer';
 
 interface UpdateShipmentProps {
-  shipment: ShipmentBasic;
-  close: (shipment: ShipmentBasic | null) => void;
+  shipment: ShipmentCore;
+  onShipmentSubmitted: (shipment: ShipmentCore) => void;
 }
 
-function UpdateShipment({ close, shipment: { id } }: UpdateShipmentProps) {
+function UpdateShipment({
+  shipment: { id },
+  onShipmentSubmitted,
+}: UpdateShipmentProps) {
   const { shipment } = useShipment(id);
 
   if (!shipment) {
@@ -21,7 +24,7 @@ function UpdateShipment({ close, shipment: { id } }: UpdateShipmentProps) {
   return (
     <ShipmentContainer
       shipment={shipment}
-      done={(shipment) => close({ ...shipment })}
+      onShipmentSubmitted={onShipmentSubmitted}
     />
   );
 }

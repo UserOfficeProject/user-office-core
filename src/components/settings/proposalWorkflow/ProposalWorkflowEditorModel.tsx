@@ -4,7 +4,7 @@ import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
 
 import {
-  NextStatusEvent,
+  StatusChangingEvent,
   ProposalWorkflow,
   ProposalWorkflowConnection,
   ProposalWorkflowConnectionGroup,
@@ -118,10 +118,10 @@ const ProposalWorkflowEditorModel = (
     return workflowConnectionGroups;
   };
 
-  const addNextStatusEventsToConnection = (
+  const addStatusChangingEventsToConnection = (
     workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
     workflowConnection: ProposalWorkflowConnection,
-    nextStatusEvents: NextStatusEvent[]
+    statusChangingEvents: StatusChangingEvent[]
   ) => {
     const groupIndexWhereConnectionShouldBeUpdated = findGroupIndexByGroupId(
       workflowConnectionGroups,
@@ -133,7 +133,7 @@ const ProposalWorkflowEditorModel = (
     ].connections.find((connection) => connection.id === workflowConnection.id);
 
     if (connectionToUpdate) {
-      connectionToUpdate.nextStatusEvents = nextStatusEvents;
+      connectionToUpdate.statusChangingEvents = statusChangingEvents;
     }
 
     return workflowConnectionGroups;
@@ -215,12 +215,12 @@ const ProposalWorkflowEditorModel = (
         }
         case EventType.NEXT_STATUS_EVENTS_ADDED: {
           const { proposalWorkflowConnectionGroups } = draft;
-          const { workflowConnection, nextStatusEvents } = action.payload;
+          const { workflowConnection, statusChangingEvents } = action.payload;
 
-          draft.proposalWorkflowConnectionGroups = addNextStatusEventsToConnection(
+          draft.proposalWorkflowConnectionGroups = addStatusChangingEventsToConnection(
             proposalWorkflowConnectionGroups,
             workflowConnection,
-            nextStatusEvents
+            statusChangingEvents
           );
 
           return draft;

@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import MaterialTable, { Column } from '@material-table/core';
+import { Typography } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
@@ -10,26 +12,25 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import GridOnIcon from '@material-ui/icons/GridOn';
 import GroupWork from '@material-ui/icons/GroupWork';
 import Visibility from '@material-ui/icons/Visibility';
-import MaterialTable, { Column } from 'material-table';
-import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
-import ScienceIconAdd from 'components/common/icons/ScienceIconAdd';
-import ScienceIconRemove from 'components/common/icons/ScienceIconRemove';
+import ListStatusIcon from 'components/common/icons/ListStatusIcon';
+import ScienceIcon from 'components/common/icons/ScienceIcon';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
 import ProposalReviewContent, {
   TabNames,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
+import AssignProposalsToSEP from 'components/SEP/Proposals/AssignProposalsToSEP';
 import {
   Call,
   Instrument,
   Proposal,
   ProposalsFilter,
-  ProposalsToInstrumentArgs,
+  ProposalStatus,
+  ProposalPkWithCallId,
   Sep,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -47,15 +48,21 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import CallSelectModalOnProposalClone from './CallSelectModalOnProposalClone';
+import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
+import ChangeProposalStatus from './ChangeProposalStatus';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
-import RankInput from './RankInput';
 
 type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
   urlQueryParams: DecodedValueMap<ProposalUrlQueryParamsType>;
   setUrlQueryParams: SetQuery<ProposalUrlQueryParamsType>;
   confirm: WithConfirmType;
+};
+
+type ProposalWithCallInstrumentAndSepId = ProposalPkWithCallId & {
+  instrumentId: number | null;
+  sepId: number | null;
+  statusId: number;
 };
 
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
@@ -68,21 +75,20 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const [openInstrumentAssignment, setOpenInstrumentAssignment] = useState(
     false
   );
+  const [openChangeProposalStatus, setOpenChangeProposalStatus] = useState(
+    false
+  );
   const [selectedProposals, setSelectedProposals] = useState<
-    ProposalsToInstrumentArgs[]
+    ProposalWithCallInstrumentAndSepId[]
   >([]);
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
     ProposalViewData[]
   >([]);
   const [openCallSelection, setOpenCallSelection] = useState(false);
-  const [proposalToCloneId, setProposalToCloneId] = useState<number | null>(
-    null
-  );
 
   const downloadPDFProposal = useDownloadPDFProposal();
   const downloadXLSXProposal = useDownloadXLSXProposal();
   const { api } = useDataApiWithFeedback();
-  const { enqueueSnackbar } = useSnackbar();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
@@ -99,16 +105,22 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       const selection = new Set(urlQueryParams.selection);
 
       setPreselectedProposalsData((preselectedProposalsData) => {
-        const selected: ProposalsToInstrumentArgs[] = [];
+        const selected: ProposalWithCallInstrumentAndSepId[] = [];
         const preselected = preselectedProposalsData.map((proposal) => {
-          if (selection.has(proposal.id.toString())) {
-            selected.push({ id: proposal.id, callId: proposal.callId });
+          if (selection.has(proposal.primaryKey.toString())) {
+            selected.push({
+              primaryKey: proposal.primaryKey,
+              callId: proposal.callId,
+              instrumentId: proposal.instrumentId,
+              sepId: proposal.sepId,
+              statusId: proposal.statusId,
+            });
           }
 
           return {
             ...proposal,
             tableData: {
-              checked: selection.has(proposal.id.toString()),
+              checked: selection.has(proposal.primaryKey.toString()),
             },
           };
         });
@@ -128,52 +140,23 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     }
   }, [proposalsData, urlQueryParams.selection]);
 
-  const setNewRanking = (proposalID: number, ranking: number) => {
-    api().administrationProposal({
-      id: proposalID,
-      rankOrder: ranking,
-    });
-    setProposalsData((proposalsData) =>
-      proposalsData.map((prop) => {
-        if (prop.id === proposalID) prop.rankOrder = ranking;
-
-        return prop;
-      })
-    );
-  };
-
-  const removeProposalFromInstrument = async (
-    proposalId: number,
-    instrumentId: number | null
-  ) => {
-    if (!instrumentId || !proposalId) {
-      return;
+  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
+  const DeleteIcon = (): JSX.Element => <Delete />;
+  const GroupWorkIcon = (): JSX.Element => <GroupWork />;
+  const EmailIcon = (): JSX.Element => <Email />;
+  const ScienceIconComponent = (
+    props: JSX.IntrinsicAttributes & {
+      children?: React.ReactNode;
+      'data-cy'?: string;
     }
-
-    const result = await api(
-      'Proposal removed from the instrument successfully!'
-    ).removeProposalFromInstrument({
-      proposalId,
-      instrumentId,
-    });
-
-    const isError = !!result.removeProposalFromInstrument.error;
-
-    if (!isError) {
-      setProposalsData((proposalsData) =>
-        proposalsData.map((prop) => {
-          if (prop.id === proposalId) {
-            prop.instrumentName = null;
-            prop.instrumentId = null;
-          }
-
-          return prop;
-        })
-      );
+  ): JSX.Element => <ScienceIcon {...props} />;
+  const ChangeProposalStatusIcon = (
+    props: JSX.IntrinsicAttributes & {
+      children?: React.ReactNode;
+      'data-cy'?: string;
     }
-  };
-
-  const RemoveScienceIcon = (): JSX.Element => <ScienceIconRemove />;
+  ): JSX.Element => <ListStatusIcon {...props} />;
+  const ExportIcon = (): JSX.Element => <GridOnIcon />;
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -188,70 +171,27 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           <IconButton
             data-cy="view-proposal"
             onClick={() => {
-              setUrlQueryParams({ reviewModal: rowData.id });
+              setUrlQueryParams({ reviewModal: rowData.primaryKey });
             }}
             style={iconButtonStyle}
           >
             <Visibility />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Clone proposal">
-          <IconButton
-            data-cy="clone-proposal"
-            onClick={() => {
-              setProposalToCloneId(rowData.id);
-              setOpenCallSelection(true);
-            }}
-            style={iconButtonStyle}
-          >
-            <FileCopy />
-          </IconButton>
-        </Tooltip>
         <Tooltip title="Download proposal as pdf">
           <IconButton
             data-cy="download-proposal"
-            onClick={() => downloadPDFProposal([rowData.id], rowData.title)}
+            onClick={() =>
+              downloadPDFProposal([rowData.primaryKey], rowData.title)
+            }
             style={iconButtonStyle}
           >
             <GetAppIcon />
           </IconButton>
         </Tooltip>
-
-        {rowData.instrumentName && (
-          <Tooltip title="Remove assigned instrument">
-            <IconButton
-              style={iconButtonStyle}
-              onClick={() => {
-                confirm(
-                  async () => {
-                    await removeProposalFromInstrument(
-                      rowData.id,
-                      rowData.instrumentId
-                    );
-                  },
-                  {
-                    title: 'Remove assigned instrument',
-                    description:
-                      'This action will remove assigned instrument from proposal.',
-                  }
-                )();
-              }}
-            >
-              <RemoveScienceIcon />
-            </IconButton>
-          </Tooltip>
-        )}
       </>
     );
   };
-
-  const RankComponent = (rowData: ProposalViewData) => (
-    <RankInput
-      proposalID={rowData.id}
-      defaultValue={rowData.rankOrder}
-      onChange={setNewRanking}
-    />
-  );
 
   let columns: Column<ProposalViewData>[] = [
     {
@@ -261,15 +201,18 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       removable: false,
       render: RowActionButtons,
     },
-    { title: 'Proposal ID', field: 'shortCode' },
+    { title: 'Proposal ID', field: 'proposalId' },
     {
       title: 'Title',
       field: 'title',
       ...{ width: 'auto' },
     },
     {
-      title: 'Time(Days)',
-      field: 'timeAllocation',
+      title: 'Time allocation',
+      render: (rowData) =>
+        rowData.timeAllocation
+          ? `${rowData.timeAllocation}(${rowData.allocationTimeUnit}s)`
+          : '',
       hidden: true,
     },
     {
@@ -299,7 +242,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     {
       title: 'Ranking',
       field: 'rankOrder',
-      render: RankComponent,
     },
     { title: 'Notified', field: 'notified' },
     {
@@ -330,19 +272,19 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const emailProposals = (): void => {
     selectedProposals.forEach(async (proposal) => {
       const {
-        notifyProposal: { error },
+        notifyProposal: { rejection },
       } = await api('Notification sent successfully').notifyProposal({
-        id: proposal.id,
+        proposalPk: proposal.primaryKey,
       });
 
-      if (error) {
+      if (rejection) {
         return;
       }
 
       setProposalsData((proposalsData) =>
         proposalsData.map((prop) => ({
           ...prop,
-          notified: prop.id === proposal.id,
+          notified: prop.primaryKey === proposal.primaryKey,
         }))
       );
     });
@@ -351,98 +293,111 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const deleteProposals = (): void => {
     selectedProposals.forEach(async (proposal) => {
       const {
-        deleteProposal: { error },
-      } = await api().deleteProposal({ id: proposal.id });
+        deleteProposal: { rejection },
+      } = await api().deleteProposal({ proposalPk: proposal.primaryKey });
 
-      if (error) {
+      if (rejection) {
         return;
       }
 
       setProposalsData((proposalsData) =>
-        proposalsData.filter(({ id }) => id !== proposal.id)
+        proposalsData.filter(
+          ({ primaryKey }) => primaryKey !== proposal.primaryKey
+        )
       );
     });
   };
 
-  const assignProposalToSEP = async (sep: Sep): Promise<void> => {
-    const responses = await Promise.all(
-      selectedProposals.map(async (selectedProposal) => {
-        const result = await api().assignProposalToSEP({
-          proposalId: selectedProposal.id,
-          sepId: sep.id,
-        });
-
-        return {
-          result: result.assignProposalToSEP,
-          proposalId: selectedProposal.id,
-        };
-      })
-    );
-
-    const errors = responses.map((item) => item.result.error);
-    const isError = !!errors.join('');
-
-    enqueueSnackbar(
-      isError
-        ? 'Proposal/s can not be assigned to SEP'
-        : 'Proposal/s assigned to SEP',
-      {
-        variant: isError ? 'error' : 'success',
-        className: isError ? 'snackbar-error' : 'snackbar-success',
-      }
-    );
-
-    if (!isError) {
-      setProposalsData((proposalsData) =>
-        proposalsData.map((prop) => {
-          if (
-            selectedProposals.find(
-              (selectedProposal) => selectedProposal.id === prop.id
-            )
-          ) {
-            prop.sepCode = sep.code;
-
-            const proposalNextStatusResponse = responses.find(
-              (item) => item.proposalId === prop.id
-            );
-
-            if (proposalNextStatusResponse?.result.nextProposalStatus?.name) {
-              prop.statusName =
-                proposalNextStatusResponse.result.nextProposalStatus.name;
-            }
-          }
-
-          return prop;
-        })
-      );
-    }
-  };
-
-  const assignProposalsToInstrument = async (
-    instrument: Instrument
-  ): Promise<void> => {
-    const selectedProposalsWithInstrument = proposalsData.filter(
-      (proposalDataItem) =>
-        selectedProposals.some(
-          (selectedProposal) => selectedProposal.id === proposalDataItem.id
-        ) && proposalDataItem.instrumentId
-    );
-
-    if (selectedProposalsWithInstrument.length === 0) {
-      const result = await api(
-        'Proposal/s assigned to the selected instrument'
-      ).assignProposalsToInstrument({
-        proposals: selectedProposals,
-        instrumentId: instrument.id,
+  const assignProposalsToSEP = async (sep: Sep | null): Promise<void> => {
+    if (sep) {
+      const response = await api(
+        'Proposal/s assigned to the selected SEP successfully!'
+      ).assignProposalsToSep({
+        proposals: selectedProposals.map((selectedProposal) => ({
+          primaryKey: selectedProposal.primaryKey,
+          callId: selectedProposal.callId,
+        })),
+        sepId: sep.id,
       });
-      const isError = !!result.assignProposalsToInstrument.error;
+
+      const isError = !!response.assignProposalsToSep.rejection;
 
       if (!isError) {
         setProposalsData((proposalsData) =>
           proposalsData.map((prop) => {
             if (
               selectedProposals.find(
-                (selectedProposal) => selectedProposal.id === prop.id
+                (selectedProposal) =>
+                  selectedProposal.primaryKey === prop.primaryKey
+              )
+            ) {
+              prop.sepCode = sep.code;
+              prop.sepId = sep.id;
+
+              if (response.assignProposalsToSep.nextProposalStatus?.name) {
+                prop.statusName =
+                  response.assignProposalsToSep.nextProposalStatus.name;
+              }
+            }
+
+            return prop;
+          })
+        );
+      }
+    } else {
+      const result = await api(
+        'Proposal/s removed from the SEP successfully!'
+      ).removeProposalsFromSep({
+        proposalPks: selectedProposals.map(
+          (selectedProposal) => selectedProposal.primaryKey
+        ),
+        sepId: selectedProposals[0].sepId as number,
+      });
+
+      const isError = !!result.removeProposalsFromSep.rejection;
+
+      if (!isError) {
+        setProposalsData((proposalsData) =>
+          proposalsData.map((prop) => {
+            if (
+              selectedProposals.find(
+                (selectedProposal) =>
+                  selectedProposal.primaryKey === prop.primaryKey
+              )
+            ) {
+              prop.sepCode = null;
+              prop.sepId = null;
+            }
+
+            return prop;
+          })
+        );
+      }
+    }
+  };
+
+  const assignProposalsToInstrument = async (
+    instrument: Instrument | null
+  ): Promise<void> => {
+    if (instrument) {
+      const result = await api(
+        'Proposal/s assigned to the selected instrument successfully!'
+      ).assignProposalsToInstrument({
+        proposals: selectedProposals.map((selectedProposal) => ({
+          primaryKey: selectedProposal.primaryKey,
+          callId: selectedProposal.callId,
+        })),
+        instrumentId: instrument.id,
+      });
+      const isError = !!result.assignProposalsToInstrument.rejection;
+
+      if (!isError) {
+        setProposalsData((proposalsData) =>
+          proposalsData.map((prop) => {
+            if (
+              selectedProposals.find(
+                (selectedProposal) =>
+                  selectedProposal.primaryKey === prop.primaryKey
               )
             ) {
               prop.instrumentName = instrument.name;
@@ -454,51 +409,103 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         );
       }
     } else {
-      enqueueSnackbar(
-        'One or more of your selected proposals already have instrument assigned',
-        {
-          variant: 'error',
-        }
-      );
+      const result = await api(
+        'Proposal/s removed from the instrument successfully!'
+      ).removeProposalsFromInstrument({
+        proposalPks: selectedProposals.map(
+          (selectedProposal) => selectedProposal.primaryKey
+        ),
+      });
+
+      const isError = !!result.removeProposalsFromInstrument.rejection;
+
+      if (!isError) {
+        setProposalsData((proposalsData) =>
+          proposalsData.map((prop) => {
+            if (
+              selectedProposals.find(
+                (selectedProposal) =>
+                  selectedProposal.primaryKey === prop.primaryKey
+              )
+            ) {
+              prop.instrumentName = null;
+              prop.instrumentId = null;
+            }
+
+            return prop;
+          })
+        );
+      }
     }
   };
 
-  const cloneProposalToCall = async (call: Call) => {
-    setProposalToCloneId(null);
-
-    if (!call?.id || !proposalToCloneId) {
+  const cloneProposalsToCall = async (call: Call) => {
+    if (!call?.id || !selectedProposals.length) {
       return;
     }
 
-    const result = await api('Proposal cloned successfully').cloneProposal({
+    const proposalsToClonePk = selectedProposals.map(
+      (selectedProposal) => selectedProposal.primaryKey
+    );
+
+    const result = await api('Proposal/s cloned successfully').cloneProposals({
       callId: call.id,
-      proposalToCloneId,
+      proposalsToClonePk,
     });
+    const resultProposals = result.cloneProposals.proposals;
 
-    const resultProposal = result.cloneProposal.proposal;
-
-    if (!result.cloneProposal.error && proposalsData && resultProposal) {
-      const newClonedProposal = fromProposalToProposalView(
-        resultProposal as Proposal
+    if (!result.cloneProposals.rejection && proposalsData && resultProposals) {
+      const newClonedProposals = resultProposals.map((resultProposal) =>
+        fromProposalToProposalView(resultProposal as Proposal)
       );
 
-      const newProposalsData = [newClonedProposal, ...proposalsData];
+      const newProposalsData = [...newClonedProposals, ...proposalsData];
 
       setProposalsData(newProposalsData);
     }
   };
 
-  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
-  const DeleteIcon = (): JSX.Element => <Delete />;
-  const GroupWorkIcon = (): JSX.Element => <GroupWork />;
-  const EmailIcon = (): JSX.Element => <Email />;
-  const AddScienceIcon = (
-    props: JSX.IntrinsicAttributes & {
-      children?: React.ReactNode;
-      'data-cy'?: string;
+  const changeStatusOnProposals = async (status: ProposalStatus) => {
+    if (status?.id && selectedProposals?.length) {
+      const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
+      const result = await api(
+        `Proposal${shouldAddPluralLetter} status changed successfully!`
+      ).changeProposalsStatus({
+        proposals: selectedProposals.map((selectedProposal) => ({
+          primaryKey: selectedProposal.primaryKey,
+          callId: selectedProposal.callId,
+        })),
+        statusId: status.id,
+      });
+
+      const isError = !!result.changeProposalsStatus.rejection;
+
+      if (!isError) {
+        const shouldChangeSubmittedValue = status.shortCode === 'DRAFT';
+
+        setProposalsData((proposalsData) =>
+          proposalsData.map((prop) => {
+            if (
+              selectedProposals.find(
+                (selectedProposal) =>
+                  selectedProposal.primaryKey === prop.primaryKey
+              )
+            ) {
+              prop.statusId = status.id;
+              prop.statusName = status.name;
+              prop.statusDescription = status.description;
+
+              if (shouldChangeSubmittedValue) {
+                prop.submitted = false;
+              }
+            }
+
+            return prop;
+          })
+        );
+      }
     }
-  ): JSX.Element => <ScienceIconAdd {...props} />;
-  const ExportIcon = (): JSX.Element => <GridOnIcon />;
+  };
 
   columns = setSortDirectionOnSortColumn(
     columns,
@@ -507,7 +514,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   );
 
   const proposalToReview = proposalsData.find(
-    (proposal) => proposal.id === urlQueryParams.reviewModal
+    (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
   );
 
   const userOfficerProposalReviewTabs: TabNames[] = [
@@ -527,9 +534,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         onClose={(): void => setOpenAssignment(false)}
       >
         <DialogContent>
-          <AssignProposalToSEP
-            assignProposalToSEP={assignProposalToSEP}
+          <AssignProposalsToSEP
+            assignProposalsToSEP={assignProposalsToSEP}
             close={(): void => setOpenAssignment(false)}
+            sepIds={selectedProposals.map(
+              (selectedProposal) => selectedProposal.sepId
+            )}
           />
         </DialogContent>
       </Dialog>
@@ -546,6 +556,25 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             callIds={selectedProposals.map(
               (selectedProposal) => selectedProposal.callId
             )}
+            instrumentIds={selectedProposals.map(
+              (selectedProposal) => selectedProposal.instrumentId
+            )}
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openChangeProposalStatus}
+        onClose={(): void => setOpenChangeProposalStatus(false)}
+      >
+        <DialogContent>
+          <ChangeProposalStatus
+            changeStatusOnProposals={changeStatusOnProposals}
+            close={(): void => setOpenChangeProposalStatus(false)}
+            selectedProposalStatuses={selectedProposals.map(
+              (selectedProposal) => selectedProposal.statusId
+            )}
           />
         </DialogContent>
       </Dialog>
@@ -556,19 +585,19 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         onClose={(): void => setOpenCallSelection(false)}
       >
         <DialogContent>
-          <CallSelectModalOnProposalClone
-            cloneProposalToCall={cloneProposalToCall}
+          <CallSelectModalOnProposalsClone
+            cloneProposalsToCall={cloneProposalsToCall}
             close={(): void => setOpenCallSelection(false)}
           />
         </DialogContent>
       </Dialog>
       <ProposalReviewModal
-        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.shortCode})`}
+        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
           setProposalsData(
             proposalsData.map((proposal) => {
-              if (proposal.id === updatedProposal?.id) {
+              if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return fromProposalToProposalView(updatedProposal);
               } else {
                 return proposal;
@@ -577,18 +606,24 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           );
           setUrlQueryParams({ reviewModal: undefined });
         }}
-        reviewItemId={proposalToReview?.id}
+        reviewItemId={proposalToReview?.primaryKey}
       >
         <ProposalReviewContent
-          proposalId={proposalToReview?.id as number}
+          proposalPk={proposalToReview?.primaryKey as number}
           tabNames={userOfficerProposalReviewTabs}
         />
       </ProposalReviewModal>
       <MaterialTable
         icons={tableIcons}
-        title={'Proposals'}
+        title={
+          <Typography variant="h6" component="h2">
+            Proposals
+          </Typography>
+        }
         columns={columns}
-        data={preselectedProposalsData}
+        data={preselectedProposalsData.map((proposal) =>
+          Object.assign(proposal, { id: proposal.primaryKey })
+        )}
         isLoading={loading}
         onSearchChange={(searchText) => {
           setUrlQueryParams({ search: searchText ? searchText : undefined });
@@ -599,7 +634,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             selection:
               selectedItems.length > 0
                 ? selectedItems.map((selectedItem) =>
-                    selectedItem.id.toString()
+                    selectedItem.primaryKey.toString()
                   )
                 : undefined,
           }));
@@ -610,14 +645,27 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           selection: true,
           debounceInterval: 400,
           columnsButton: true,
+          selectionProps: (rowdata: any) => ({
+            inputProps: {
+              'aria-label': `${rowdata.title}-select`,
+            },
+          }),
         }}
         actions={[
+          {
+            icon: FileCopy,
+            tooltip: 'Clone proposals to call',
+            onClick: () => {
+              setOpenCallSelection(true);
+            },
+            position: 'toolbarOnSelect',
+          },
           {
             icon: GetAppIconComponent,
             tooltip: 'Download proposals in PDF',
             onClick: (event, rowData): void => {
               downloadPDFProposal(
-                (rowData as ProposalViewData[]).map((row) => row.id),
+                (rowData as ProposalViewData[]).map((row) => row.primaryKey),
                 (rowData as ProposalViewData[])[0].title
               );
             },
@@ -628,7 +676,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             tooltip: 'Export proposals in Excel',
             onClick: (event, rowData): void => {
               downloadXLSXProposal(
-                (rowData as ProposalViewData[]).map((row) => row.id),
+                (rowData as ProposalViewData[]).map((row) => row.primaryKey),
                 (rowData as ProposalViewData[])[0].title
               );
             },
@@ -660,12 +708,22 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             position: 'toolbarOnSelect',
           },
           {
-            icon: AddScienceIcon.bind(null, {
-              'data-cy': 'assign-proposals-to-instrument',
+            icon: ScienceIconComponent.bind(null, {
+              'data-cy': 'assign-remove-instrument',
             }),
-            tooltip: 'Assign proposals to instrument',
+            tooltip: 'Assign/Remove instrument',
             onClick: () => {
               setOpenInstrumentAssignment(true);
+            },
+            position: 'toolbarOnSelect',
+          },
+          {
+            icon: ChangeProposalStatusIcon.bind(null, {
+              'data-cy': 'change-proposal-status',
+            }),
+            tooltip: 'Change proposal status',
+            onClick: () => {
+              setOpenChangeProposalStatus(true);
             },
             position: 'toolbarOnSelect',
           },

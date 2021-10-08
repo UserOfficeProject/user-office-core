@@ -3,6 +3,8 @@ mutation deleteQuestion($questionId: String!) {
     question {
       ...question
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

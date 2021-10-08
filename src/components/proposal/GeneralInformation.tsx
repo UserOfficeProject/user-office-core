@@ -6,29 +6,25 @@ import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
-import { Proposal, UserRole } from 'generated/sdk';
+import { UserRole } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
 
 import ProposalContainer from './ProposalContainer';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end',
   },
   button: {
     marginTop: '20px',
-    backgroundColor: theme.palette.secondary.main,
-    color: '#ffff',
-    '&:hover': {
-      backgroundColor: theme.palette.secondary.light,
-    },
   },
 }));
 
 type GeneralInformationProps = {
-  data: Proposal;
-  onProposalChanged?: (newProposal: Proposal) => void;
+  data: ProposalWithQuestionary;
+  onProposalChanged?: (newProposal: ProposalWithQuestionary) => void;
 };
 
 const GeneralInformation: React.FC<GeneralInformationProps> = ({
@@ -53,6 +49,7 @@ const GeneralInformation: React.FC<GeneralInformationProps> = ({
           control={
             <Switch
               checked={isEditable}
+              data-cy="toggle-edit-proposal"
               onChange={() => {
                 setIsEditable(!isEditable);
               }}
@@ -63,15 +60,17 @@ const GeneralInformation: React.FC<GeneralInformationProps> = ({
         />
       )}
       {isEditable ? getEditableView() : getReadonlyView()}
-      <div className={classes.buttons}>
-        <Button
-          className={classes.button}
-          onClick={() => downloadPDFProposal([data.id], data.title)}
-          variant="contained"
-        >
-          Download PDF
-        </Button>
-      </div>
+      {!isEditable && (
+        <div className={classes.buttons}>
+          <Button
+            className={classes.button}
+            onClick={() => downloadPDFProposal([data.primaryKey], data.title)}
+            variant="contained"
+          >
+            Download PDF
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

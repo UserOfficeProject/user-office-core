@@ -1,22 +1,26 @@
 mutation addTechnicalReview(
-  $proposalID: Int!
+  $proposalPk: Int!
   $timeAllocation: Int
   $comment: String
   $publicComment: String
   $status: TechnicalReviewStatus
   $submitted: Boolean!
+  $reviewerId: Int!
 ) {
   addTechnicalReview(
     addTechnicalReviewInput: {
-      proposalID: $proposalID
+      proposalPk: $proposalPk
       timeAllocation: $timeAllocation
       comment: $comment
       publicComment: $publicComment
       status: $status
       submitted: $submitted
+      reviewerId: $reviewerId
     }
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     technicalReview {
       id
     }

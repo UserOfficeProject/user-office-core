@@ -3,7 +3,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
 import Slide from '@material-ui/core/Slide';
-import { Theme } from '@material-ui/core/styles/createMuiTheme';
+import { Theme } from '@material-ui/core/styles';
 import createStyles from '@material-ui/core/styles/createStyles';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       marginLeft: theme.spacing(2),
       flex: 1,
+      color: theme.palette.primary.contrastText,
     },
   })
 );
@@ -57,7 +58,7 @@ const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
     }
 
     return api()
-      .getProposal({ id: reviewItemId })
+      .getProposal({ primaryKey: reviewItemId })
       .then((data) => {
         return data.proposal as Proposal;
       });
@@ -91,7 +92,7 @@ const ProposalReviewModal: React.FC<ProposalReviewModalProps> = ({
             >
               <CloseIcon />
             </IconButton>
-            <Typography variant="h6" className={classes.title}>
+            <Typography variant="h6" component="h1" className={classes.title}>
               {title}
             </Typography>
           </Toolbar>

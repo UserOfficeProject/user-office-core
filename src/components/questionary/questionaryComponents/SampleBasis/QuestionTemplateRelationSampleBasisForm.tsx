@@ -1,21 +1,13 @@
-import React from 'react';
-import * as Yup from 'yup';
+import React, { FC } from 'react';
 
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionTemplateRelation } from 'generated/sdk';
+import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationSampleBasisForm: FormComponent<QuestionTemplateRelation> = (
+export const QuestionTemplateRelationSampleBasisForm: FC<QuestionTemplateRelationFormProps> = (
   props
 ) => {
   return (
-    <QuestionTemplateRelationFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      questionRel={props.field}
-      template={props.template}
-      validationSchema={Yup.object().shape({})}
-    />
+    <QuestionTemplateRelationFormShell {...props} validationSchema={null} />
   );
 };

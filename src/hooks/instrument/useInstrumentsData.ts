@@ -40,6 +40,7 @@ export function useInstrumentsData(
         UserRole.SEP_REVIEWER,
         UserRole.SEP_CHAIR,
         UserRole.SEP_SECRETARY,
+        UserRole.USER,
       ].includes(currentRole)
     ) {
       api()

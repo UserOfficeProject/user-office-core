@@ -3,6 +3,8 @@ mutation deleteProposalStatus($id: Int!) {
     proposalStatus {
       ...proposalStatus
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

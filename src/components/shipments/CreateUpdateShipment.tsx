@@ -1,20 +1,35 @@
 import React from 'react';
 
-import { ShipmentBasic } from 'models/ShipmentSubmissionState';
+import { VisitFragment } from 'generated/sdk';
+import { ShipmentCore } from 'models/questionary/shipment/ShipmentCore';
 
 import CreateShipment from './CreateShipment';
 import UpdateShipment from './UpdateShipment';
 
 type CreateUpdateShipmentProps = {
-  close: (shipment: ShipmentBasic | null) => void;
-  shipment: ShipmentBasic | null;
+  onShipmentSubmitted: (shipment: ShipmentCore) => void;
+  visit: VisitFragment & {
+    shipments: ShipmentCore[];
+  };
 };
 
-function CreateUpdateShipment({ shipment, close }: CreateUpdateShipmentProps) {
+function CreateUpdateShipment({
+  visit,
+  onShipmentSubmitted,
+}: CreateUpdateShipmentProps) {
+  if (visit.shipments.length > 1) {
+    return <span>Multiple shipments per visit is not supported yet</span>;
+  }
+
+  const shipment = visit.shipments[0]; // currently only supporting 1 shipment per visit
+
   return shipment ? (
-    <UpdateShipment shipment={shipment} close={close} />
+    <UpdateShipment
+      shipment={shipment}
+      onShipmentSubmitted={onShipmentSubmitted}
+    />
   ) : (
-    <CreateShipment close={close} />
+    <CreateShipment visit={visit} onShipmentSubmitted={onShipmentSubmitted} />
   );
 }
 

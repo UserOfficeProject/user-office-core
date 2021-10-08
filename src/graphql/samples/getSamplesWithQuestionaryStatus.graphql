@@ -1,0 +1,8 @@
+query getSamplesWithQuestionaryStatus($filter: SamplesFilter) {
+  samples(filter: $filter) {
+    ...sample
+    questionary {
+      isCompleted
+    }
+  }
+}

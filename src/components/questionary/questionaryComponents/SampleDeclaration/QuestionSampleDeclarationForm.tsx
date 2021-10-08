@@ -4,36 +4,43 @@ import Link from '@material-ui/core/Link';
 import MenuItem from '@material-ui/core/MenuItem';
 import { Field } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
-import React from 'react';
+import React, { FC, useContext } from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { Question, TemplateCategoryId } from 'generated/sdk';
-import { useTemplates } from 'hooks/template/useTemplates';
+import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import {
+  FeatureId,
+  SampleDeclarationConfig,
+  TemplateGroupId,
+} from 'generated/sdk';
+import { useActiveTemplates } from 'hooks/call/useCallTemplates';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionSampleDeclarationForm: FormComponent<Question> = (
-  props
-) => {
-  const field = props.field;
+export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
+  const field = props.question;
+  const config = field.config as SampleDeclarationConfig;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
-  const { templates } = useTemplates(
-    false,
-    TemplateCategoryId.SAMPLE_DECLARATION
+  const { features } = useContext(FeatureContext);
+  const { templates } = useActiveTemplates(
+    TemplateGroupId.SAMPLE,
+    config.templateId
+  );
+  const { templates: esiTemplates } = useActiveTemplates(
+    TemplateGroupId.SAMPLE_ESI,
+    config.esiTemplateId
   );
 
-  if (!templates) {
+  if (!templates || !esiTemplates) {
     return null;
   }
 
   return (
     <QuestionFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      question={props.field}
+      {...props}
       validationSchema={Yup.object().shape({
         naturalKey: naturalKeySchema,
         question: Yup.string().required('Question is required'),
@@ -48,6 +55,7 @@ export const QuestionSampleDeclarationForm: FormComponent<Question> = (
         <>
           <Field
             name="naturalKey"
+            id="Key-Input"
             label="Key"
             type="text"
             component={TextField}
@@ -58,6 +66,7 @@ export const QuestionSampleDeclarationForm: FormComponent<Question> = (
 
           <Field
             name="question"
+            id="Question-Input"
             label="Question"
             type="text"
             component={TextField}
@@ -71,28 +80,72 @@ export const QuestionSampleDeclarationForm: FormComponent<Question> = (
               <InputLabel htmlFor="config.templateId">Template name</InputLabel>
               <Field
                 name="config.templateId"
+                id="config.templateId"
                 type="text"
                 component={Select}
                 data-cy="template-id"
               >
-                {templates.map((template) => {
-                  return (
-                    <MenuItem
-                      value={template.templateId}
-                      key={template.templateId}
-                    >
-                      {template.name}
-                    </MenuItem>
-                  );
-                })}
+                {templates.length ? (
+                  templates.map((template) => {
+                    return (
+                      <MenuItem
+                        value={template.templateId}
+                        key={template.templateId}
+                      >
+                        {template.name}
+                      </MenuItem>
+                    );
+                  })
+                ) : (
+                  <MenuItem value="noTemplates" key="noTemplates" disabled>
+                    No active templates
+                  </MenuItem>
+                )}
               </Field>
-              <Link href="/SampleDeclarationTemplates/" target="blank">
+              <Link
+                href="/SampleDeclarationTemplates/"
+                target="blank"
+                style={{ textAlign: 'right' }}
+              >
                 View all templates
               </Link>
             </FormControl>
 
+            {features.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
+              <FormControl fullWidth>
+                <InputLabel htmlFor="config.esiTemplateId">
+                  ESI template name
+                </InputLabel>
+                <Field
+                  name="config.esiTemplateId"
+                  id="config.esiTemplateId"
+                  type="text"
+                  component={Select}
+                  data-cy="esi-template-id"
+                >
+                  {esiTemplates.length ? (
+                    esiTemplates.map((template) => {
+                      return (
+                        <MenuItem
+                          value={template.templateId}
+                          key={template.templateId}
+                        >
+                          {template.name}
+                        </MenuItem>
+                      );
+                    })
+                  ) : (
+                    <MenuItem value="noTemplates" key="noTemplates" disabled>
+                      No active templates
+                    </MenuItem>
+                  )}
+                </Field>
+              </FormControl>
+            )}
+
             <Field
               name="config.addEntryButtonLabel"
+              id="Add-button-label-Input"
               label="Add button label"
               placeholder='(e.g. "add new")'
               type="text"
@@ -103,6 +156,7 @@ export const QuestionSampleDeclarationForm: FormComponent<Question> = (
             />
             <Field
               name="config.minEntries"
+              id="Min-Input"
               label="Min entries"
               placeholder="(e.g. 1, leave blank for unlimited)"
               type="text"
@@ -113,6 +167,7 @@ export const QuestionSampleDeclarationForm: FormComponent<Question> = (
             />
             <Field
               name="config.maxEntries"
+              id="Max-Input"
               label="Max entries"
               placeholder="(e.g. 4, leave blank for unlimited)"
               type="text"

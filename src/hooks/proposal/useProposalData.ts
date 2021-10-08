@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { Proposal } from 'generated/sdk';
+import { GetProposalQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useProposalData(id: number | null | undefined) {
-  const [proposalData, setProposalData] = useState<Proposal | null>(null);
+export function useProposalData(primaryKey: number | null | undefined) {
+  const [proposalData, setProposalData] = useState<ProposalData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const api = useDataApi();
@@ -12,16 +12,16 @@ export function useProposalData(id: number | null | undefined) {
   useEffect(() => {
     let unmounted = false;
 
-    if (id) {
+    if (primaryKey) {
       setLoading(true);
       api()
-        .getProposal({ id })
+        .getProposal({ primaryKey })
         .then((data) => {
           if (unmounted) {
             return;
           }
 
-          setProposalData(data.proposal as Proposal);
+          setProposalData(data.proposal);
           setLoading(false);
         });
     }
@@ -29,7 +29,9 @@ export function useProposalData(id: number | null | undefined) {
     return () => {
       unmounted = true;
     };
-  }, [id, api]);
+  }, [primaryKey, api]);
 
   return { loading, proposalData, setProposalData };
 }
+
+export type ProposalData = Exclude<GetProposalQuery['proposal'], null>;

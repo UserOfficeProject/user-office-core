@@ -1,8 +1,10 @@
-mutation submitProposal($id: Int!) {
-  submitProposal(id: $id) {
+mutation submitProposal($proposalPk: Int!) {
+  submitProposal(proposalPk: $proposalPk) {
     proposal {
       ...proposal
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

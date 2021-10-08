@@ -1,14 +1,16 @@
 mutation assignSepReviewersToProposal(
   $memberIds: [Int!]!
   $sepId: Int!
-  $proposalId: Int!
+  $proposalPk: Int!
 ) {
   assignSepReviewersToProposal(
     memberIds: $memberIds
     sepId: $sepId
-    proposalId: $proposalId
+    proposalPk: $proposalPk
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     sep {
       id
     }

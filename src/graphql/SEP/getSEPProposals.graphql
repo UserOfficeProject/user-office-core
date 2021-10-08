@@ -1,13 +1,13 @@
 query getSEPProposals($sepId: Int!, $callId: Int!) {
   sepProposals(sepId: $sepId, callId: $callId) {
-    proposalId
+    proposalPk
     dateAssigned
     sepId
     sepTimeAllocation
     proposal {
       title
-      id
-      shortCode
+      primaryKey
+      proposalId
       status {
         ...proposalStatus
       }

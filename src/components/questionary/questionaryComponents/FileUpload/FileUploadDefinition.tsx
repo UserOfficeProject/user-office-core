@@ -1,6 +1,6 @@
+import { fileUploadQuestionValidationSchema } from '@esss-swap/duo-validation';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import React from 'react';
-import * as Yup from 'yup';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import { DataType } from 'generated/sdk';
@@ -22,12 +22,10 @@ export const fileUploadDefinition: QuestionaryComponentDefinition = {
   creatable: true,
   icon: <AttachFileIcon />,
   renderers: {
-    answerRenderer: function AnswerRendererComponent({ answer }) {
-      return <FilesAnswerRenderer answer={answer} />;
-    },
+    answerRenderer: FilesAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: () => Yup.array().of(Yup.string()),
+  createYupValidationSchema: fileUploadQuestionValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || [],
   searchCriteriaComponent: FileUploadSearchCriteriaInput,
 };

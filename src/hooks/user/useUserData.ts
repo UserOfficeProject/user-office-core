@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { ReviewerFilter } from 'generated/sdk';
 import { UserWithReviewsQuery, ReviewStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
@@ -7,6 +8,7 @@ export function useUserWithReviewsData(filters?: {
   callId?: number;
   instrumentId?: number;
   status?: ReviewStatus;
+  reviewer?: ReviewerFilter;
 }) {
   const api = useDataApi();
   const [userWithReviewsFilter, setUserWithReviewsFilter] = useState(filters);

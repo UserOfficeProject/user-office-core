@@ -1,8 +1,8 @@
+import { StylesProvider } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
-import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import { ProviderContext, SnackbarProvider } from 'notistack';
-import React, { ErrorInfo } from 'react';
+import React, { ErrorInfo, useContext } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import {
   BrowserRouter as Router,
@@ -15,12 +15,16 @@ import { QueryParamProvider } from 'use-query-params';
 
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
+import { SettingsContextProvider } from 'context/SettingsContextProvider';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
+import { FeatureId, SettingsId } from 'generated/sdk';
 import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
-import { getTheme } from '../theme';
 import DashBoard from './DashBoard';
+import Theme from './theme/theme';
 import EmailVerification from './user/EmailVerification';
 import ExternalAuth from './user/ExternalAuth';
 import ResetPassword from './user/ResetPassword';
@@ -36,6 +40,15 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
 
   const Component = component; // JSX Elements have to be uppercase.
 
+  const featureContext = useContext(FeatureContext);
+  const EXTERNAL_AUTH = !!featureContext.features.get(FeatureId.EXTERNAL_AUTH)
+    ?.isEnabled;
+
+  const settingsContext = useContext(SettingsContext);
+  const EXTERNAL_AUTH_LOGIN_URL = settingsContext.settings.get(
+    SettingsId.EXTERNAL_AUTH_LOGIN_URL
+  )?.settingsValue;
+
   return (
     <UserContext.Consumer>
       {({ roles, token, currentRole, handleRole }): JSX.Element => (
@@ -43,12 +56,8 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
-              if (
-                process.env.REACT_APP_AUTH_TYPE === 'external' &&
-                process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL
-              ) {
-                window.location.href =
-                  process.env.REACT_APP_EXTERNAL_AUTH_LOGIN_URL;
+              if (EXTERNAL_AUTH && EXTERNAL_AUTH_LOGIN_URL) {
+                window.location.href = EXTERNAL_AUTH_LOGIN_URL;
 
                 return <p>Redirecting to external sign-in page...</p>;
               }
@@ -66,6 +75,41 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
       )}
     </UserContext.Consumer>
   );
+};
+
+const Routes: React.FC<RouteProps> = () => {
+  const featureContext = useContext(FeatureContext);
+  const EXTERNAL_AUTH = !!featureContext.features.get(FeatureId.EXTERNAL_AUTH)
+    ?.isEnabled;
+
+  if (EXTERNAL_AUTH) {
+    return (
+      <div className="App">
+        <Switch>
+          <Route path="/external-auth/:sessionId" component={ExternalAuth} />
+          <Route path="/external-auth/" component={ExternalAuth} />
+          <PrivateRoute path="/" component={DashBoard} />
+        </Switch>
+      </div>
+    );
+  } else {
+    return (
+      <div className="App">
+        <Switch>
+          <Route path="/SignUp" component={SignUp} />
+          <Route path="/SignIn" component={SignIn} />
+          <Route path="/shared-auth" component={SharedAuth} />
+          <Route path="/ResetPasswordEmail" component={ResetPasswordEmail} />
+          <Route path="/ResetPassword/:token" component={ResetPassword} />
+          <Route
+            path="/EmailVerification/:token"
+            component={EmailVerification}
+          />
+          <PrivateRoute path="/" component={DashBoard} />
+        </Switch>
+      </div>
+    );
+  }
 };
 
 class App extends React.Component {
@@ -91,13 +135,6 @@ class App extends React.Component {
     }
   }
 
-  componentDidMount() {
-    const primaryColor = getTheme().palette.primary.main;
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', primaryColor);
-  }
-
   private notistackRef = React.createRef<ProviderContext>();
 
   onClickDismiss = (key: string | number | undefined) => () => {
@@ -105,33 +142,8 @@ class App extends React.Component {
   };
 
   render(): JSX.Element {
-    let routes;
-    if (process.env.REACT_APP_AUTH_TYPE === 'external') {
-      routes = (
-        <Switch>
-          <Route path="/external-auth/:sessionId" component={ExternalAuth} />
-          <PrivateRoute path="/" component={DashBoard} />
-        </Switch>
-      );
-    } else {
-      routes = (
-        <Switch>
-          <Route path="/SignUp" component={SignUp} />
-          <Route path="/SignIn" component={SignIn} />
-          <Route path="/shared-auth" component={SharedAuth} />
-          <Route path="/ResetPasswordEmail" component={ResetPasswordEmail} />
-          <Route path="/ResetPassword/:token" component={ResetPassword} />
-          <Route
-            path="/EmailVerification/:token"
-            component={EmailVerification}
-          />
-          <PrivateRoute path="/" component={DashBoard} />
-        </Switch>
-      );
-    }
-
     return (
-      <ThemeProvider theme={getTheme()}>
+      <StylesProvider injectFirst>
         <CookiesProvider>
           <UserContextProvider>
             <SnackbarProvider
@@ -144,21 +156,25 @@ class App extends React.Component {
                 </IconButton>
               )}
             >
-              <FeatureContextProvider>
-                <DownloadContextProvider>
-                  <ReviewAndAssignmentContextProvider>
-                    <Router>
-                      <QueryParamProvider ReactRouterRoute={Route}>
-                        <div className="App">{routes}</div>
-                      </QueryParamProvider>
-                    </Router>
-                  </ReviewAndAssignmentContextProvider>
-                </DownloadContextProvider>
-              </FeatureContextProvider>
+              <SettingsContextProvider>
+                <FeatureContextProvider>
+                  <Theme>
+                    <DownloadContextProvider>
+                      <ReviewAndAssignmentContextProvider>
+                        <Router>
+                          <QueryParamProvider ReactRouterRoute={Route}>
+                            <Routes />
+                          </QueryParamProvider>
+                        </Router>
+                      </ReviewAndAssignmentContextProvider>
+                    </DownloadContextProvider>
+                  </Theme>
+                </FeatureContextProvider>
+              </SettingsContextProvider>
             </SnackbarProvider>
           </UserContextProvider>
         </CookiesProvider>
-      </ThemeProvider>
+      </StylesProvider>
     );
   }
 }

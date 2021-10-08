@@ -1,10 +1,10 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import MaterialTable, { Column } from '@material-table/core';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Edit from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import Visibility from '@material-ui/icons/Visibility';
-import MaterialTable, { Column } from 'material-table';
 import React, { useContext } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
@@ -30,7 +30,9 @@ import {
   standardDeviation,
 } from 'utils/mathFunctions';
 
-import ProposalFilterBar from './ProposalFilterBar';
+import ProposalFilterBar, {
+  questionaryFilterFromUrlQuery,
+} from './ProposalFilterBar';
 import { ProposalUrlQueryParamsType } from './ProposalPage';
 
 const ProposalTableInstrumentScientist: React.FC = () => {
@@ -55,6 +57,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
     proposalStatusId: urlQueryParams.proposalStatus || 2,
+    questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
   });
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
@@ -67,6 +70,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     proposalStatusId: proposalFilter.proposalStatusId,
     instrumentId: proposalFilter.instrumentId,
     callId: proposalFilter.callId,
+    questionFilter: proposalFilter.questionFilter,
   });
 
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -80,9 +84,12 @@ const ProposalTableInstrumentScientist: React.FC = () => {
    */
   const RowActionButtons = (rowData: Proposal) => {
     const iconButtonStyle = { padding: '7px' };
+    const isCurrentUserTechnicalReviewAssignee =
+      rowData.technicalReviewAssignee === user.id;
 
     const showView =
-      rowData.technicalReview && rowData.technicalReview.submitted;
+      (rowData.technicalReview && rowData.technicalReview.submitted) ||
+      isCurrentUserTechnicalReviewAssignee === false;
 
     return (
       <>
@@ -96,7 +103,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           <IconButton
             data-cy="view-proposal"
             onClick={() => {
-              setUrlQueryParams({ reviewModal: rowData.id });
+              setUrlQueryParams({ reviewModal: rowData.primaryKey });
             }}
             style={iconButtonStyle}
           >
@@ -107,7 +114,9 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         <Tooltip title="Download proposal as pdf">
           <IconButton
             data-cy="download-proposal"
-            onClick={() => downloadPDFProposal([rowData.id], rowData.title)}
+            onClick={() =>
+              downloadPDFProposal([rowData.primaryKey], rowData.title)
+            }
             style={iconButtonStyle}
           >
             <GetAppIcon />
@@ -125,15 +134,16 @@ const ProposalTableInstrumentScientist: React.FC = () => {
       removable: false,
       render: RowActionButtons,
     },
-    { title: 'Proposal ID', field: 'shortCode' },
+    { title: 'Proposal ID', field: 'proposalId' },
     {
       title: 'Title',
       field: 'title',
       ...{ width: 'auto' },
     },
     {
-      title: 'Time(Days)',
-      field: 'technicalReview.timeAllocation',
+      title: 'Time allocation',
+      render: (rowData) =>
+        `${rowData.technicalReview?.timeAllocation}(${rowData.call?.allocationTimeUnit}s)`,
       hidden: false,
     },
     {
@@ -188,19 +198,19 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     },
     {
       title: 'Instrument',
-      render: (rowData: Proposal): string =>
-        rowData.instrument ? rowData.instrument.name : '-',
+      field: 'instrument.name',
+      emptyValue: '-',
     },
     {
       title: 'Call',
-      render: (rowData: Proposal): string =>
-        rowData.call ? rowData.call.shortCode : '-',
+      field: 'call.shortCode',
+      emptyValue: '-',
       hidden: true,
     },
     {
       title: 'SEP',
-      render: (rowData: Proposal): string =>
-        rowData.sep ? rowData.sep.code : '-',
+      field: 'sep.code',
+      emptyValue: '-',
       hidden: true,
     },
   ];
@@ -224,7 +234,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
 
   const proposalToReview = proposalsData.find(
-    (proposal) => proposal.id === urlQueryParams.reviewModal
+    (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
   );
 
   const instrumentScientistProposalReviewTabs: TabNames[] = [
@@ -235,12 +245,12 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   return (
     <>
       <ProposalReviewModal
-        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.shortCode})`}
+        title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
           setProposalsData(
             proposalsData.map((proposal) => {
-              if (proposal.id === updatedProposal?.id) {
+              if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return updatedProposal;
               } else {
                 return proposal;
@@ -252,7 +262,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         reviewItemId={urlQueryParams.reviewModal}
       >
         <ProposalReviewContent
-          proposalId={urlQueryParams.reviewModal as number}
+          proposalPk={urlQueryParams.reviewModal as number}
           tabNames={instrumentScientistProposalReviewTabs}
         />
       </ProposalReviewModal>
@@ -270,7 +280,9 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         icons={tableIcons}
         title={'Proposals'}
         columns={columns}
-        data={proposalsData}
+        data={proposalsData.map((proposal) =>
+          Object.assign(proposal, { id: proposal.primaryKey })
+        )}
         isLoading={loading}
         options={{
           search: true,
@@ -278,6 +290,11 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           selection: true,
           debounceInterval: 400,
           columnsButton: true,
+          selectionProps: (rowData: Proposal) => ({
+            inputProps: {
+              'aria-label': `${rowData.title}-select`,
+            },
+          }),
         }}
         onSearchChange={(searchText) => {
           setUrlQueryParams({ search: searchText ? searchText : undefined });
@@ -308,7 +325,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
             tooltip: 'Download proposals in PDF',
             onClick: (event, rowData): void => {
               downloadPDFProposal(
-                (rowData as Proposal[]).map((row) => row.id),
+                (rowData as Proposal[]).map((row) => row.primaryKey),
                 (rowData as Proposal[])[0].title
               );
             },

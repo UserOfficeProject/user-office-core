@@ -54,13 +54,24 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
   return (
     <ContentContainer>
       <StyledPaper margin={[0]}>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" component="h2" gutterBottom>
           Select a call
         </Typography>
-        <List>
+        <List data-cy="call-list">
           {callsData.map((call) => {
             const daysRemainingNum = daysRemaining(new Date(call.endCall));
             const daysRemainingText = getDaysRemainingText(daysRemainingNum);
+
+            const header =
+              call.title === null || call.title === '' ? (
+                <Typography variant="h6" component="h3">
+                  {call.shortCode}
+                </Typography>
+              ) : (
+                <Typography variant="h6" component="h3">
+                  {call.title} <small> ({call.shortCode}) </small>
+                </Typography>
+              );
 
             return (
               <ListItem
@@ -70,17 +81,18 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
                 divider={true}
               >
                 <ListItemText
-                  primary={
-                    <Typography variant="h6">{call.shortCode}</Typography>
-                  }
+                  primary={header}
                   secondary={
                     <Fragment>
-                      <Typography component="span" className={classes.date}>
+                      <Typography component="div" className={classes.date}>
                         {`Application deadline: ${formatDate(
                           call.endCall
                         )} ${daysRemainingText}`}
                       </Typography>
-                      <Typography component="span">
+                      <Typography component="div">
+                        {call.description}
+                      </Typography>
+                      <Typography component="div">
                         {call.cycleComment}
                       </Typography>
                     </Fragment>
@@ -89,7 +101,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
                 <ListItemSecondaryAction>
                   <IconButton
                     edge="end"
-                    aria-label="comments"
+                    aria-label={'Select ' + call.shortCode}
                     onClick={() => handleSelect(call.id, call.templateId)}
                   >
                     <NavigateNext />

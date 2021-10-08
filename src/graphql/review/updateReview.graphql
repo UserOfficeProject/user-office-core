@@ -12,7 +12,9 @@ mutation addReview(
     status: $status
     sepID: $sepID
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     review {
       id
       userID

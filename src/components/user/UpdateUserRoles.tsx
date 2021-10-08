@@ -1,5 +1,6 @@
+import MaterialTable from '@material-table/core';
+import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import MaterialTable from 'material-table';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -69,7 +70,7 @@ export default function UpdateUserRoles(props: { id: number }) {
   const columns = [{ title: 'Name', field: 'title' }];
 
   return (
-    <React.Fragment>
+    <div data-cy="user-roles-table">
       <RoleModal
         show={modalOpen}
         close={() => setOpen(false)}
@@ -77,7 +78,11 @@ export default function UpdateUserRoles(props: { id: number }) {
         activeRoles={roles}
       />
       <MaterialTable
-        title="Roles"
+        title={
+          <Typography variant="h6" component="h2" gutterBottom>
+            Roles
+          </Typography>
+        }
         columns={columns}
         icons={tableIcons}
         data={roles.map((role: Role) => {
@@ -109,6 +114,6 @@ export default function UpdateUserRoles(props: { id: number }) {
           Add role
         </Button>
       </ActionButtonContainer>
-    </React.Fragment>
+    </div>
   );
 }

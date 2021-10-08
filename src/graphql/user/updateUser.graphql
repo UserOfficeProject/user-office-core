@@ -35,6 +35,8 @@ mutation updateUser(
     user {
       id
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

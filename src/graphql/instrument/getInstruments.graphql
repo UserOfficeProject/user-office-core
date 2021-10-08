@@ -5,6 +5,7 @@ query getInstruments($callIds: [Int!]) {
       name
       shortCode
       description
+      managerUserId
       scientists {
         ...basicUserDetails
       }

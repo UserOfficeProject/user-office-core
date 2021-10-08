@@ -3,6 +3,8 @@ mutation createTopic($templateId: Int!, $sortOrder: Int!) {
     template {
       ...template
     }
-    error
+    rejection {
+      ...rejection
+    }
   }
 }

@@ -21,6 +21,9 @@
   "settings": {
     "react": {
       "version": "detect"
+    },
+    "jest": {
+      "version": "detect"
     }
   },
   "plugins": [
@@ -97,6 +100,7 @@
     ],
     "@typescript-eslint/ban-ts-comment": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-non-null-assertion": "off", // already checked by typescript, no need to duplicate
     "jest/no-export": "off", // rule not implemented properly, rule should only restrict exporting tests
     "unused-imports/no-unused-imports-ts": 2
   }

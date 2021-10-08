@@ -1,14 +1,21 @@
 import React from 'react';
 
-import { Renderers } from './QuestionaryComponentRegistry';
+import {
+  AnswerRenderer,
+  QuestionRenderer,
+  Renderers,
+} from './QuestionaryComponentRegistry';
+
+const DefaultAnswerRenderer: AnswerRenderer = ({ value }) => (
+  <span>{value}</span>
+);
+const DefaultQuestionRenderer: QuestionRenderer = ({ question }) => (
+  <span>{question}</span>
+);
 
 const defaultRenderer: Renderers = {
-  answerRenderer: function AnswerRendererComponent({ answer }) {
-    return <span>{answer.value}</span>;
-  },
-  questionRenderer: function QuestionRendererComponent({ question }) {
-    return <span>{question.question}</span>;
-  },
+  answerRenderer: DefaultAnswerRenderer,
+  questionRenderer: DefaultQuestionRenderer,
 };
 
 export default defaultRenderer;

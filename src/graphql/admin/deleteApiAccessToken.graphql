@@ -2,7 +2,9 @@ mutation deleteApiAccessToken($accessTokenId: String!) {
   deleteApiAccessToken(
     deleteApiAccessTokenInput: { accessTokenId: $accessTokenId }
   ) {
-    error
+    rejection {
+      ...rejection
+    }
     isSuccess
   }
 }

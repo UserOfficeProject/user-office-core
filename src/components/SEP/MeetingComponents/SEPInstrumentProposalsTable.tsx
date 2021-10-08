@@ -1,25 +1,35 @@
+import MaterialTable, { MTableBodyRow } from '@material-table/core';
+import IconButton from '@material-ui/core/IconButton';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
+import Tooltip from '@material-ui/core/Tooltip';
+import DragHandle from '@material-ui/icons/DragHandle';
 import Visibility from '@material-ui/icons/Visibility';
 import clsx from 'clsx';
-import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
-import React, { useState, useContext } from 'react';
+import React, { useContext, DragEvent, useState, useEffect } from 'react';
+import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
-import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
 import { UserContext } from 'context/UserContextProvider';
 import {
   SepProposal,
   InstrumentWithAvailabilityTime,
   UserRole,
+  SepMeetingDecision,
 } from 'generated/sdk';
 import { useSEPProposalsByInstrument } from 'hooks/SEP/useSEPProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
-import { getGrades, average } from 'utils/mathFunctions';
+import { getGrades, average, standardDeviation } from 'utils/mathFunctions';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';
+
+type SepProposalWithAverageScoreAndAvailabilityZone = SepProposal & {
+  proposalAverageScore: number;
+  isInAvailabilityZone: boolean;
+};
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles((theme) => ({
@@ -30,6 +40,10 @@ const useStyles = makeStyles((theme) => ({
     '& .MuiPaper-root': {
       padding: '0 40px',
       backgroundColor: '#fafafa',
+    },
+
+    '& .draggingRow': {
+      backgroundColor: `${theme.palette.warning.light} !important`,
     },
   },
   disabled: {
@@ -48,6 +62,9 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
   sepId,
   selectedCallId,
 }) => {
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
+    sepMeetingModal: NumberParam,
+  });
   const {
     instrumentProposalsData,
     loadingInstrumentProposals,
@@ -56,65 +73,97 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
   } = useSEPProposalsByInstrument(sepInstrument.id, sepId, selectedCallId);
   const classes = useStyles();
   const theme = useTheme();
-  const [openProposalId, setOpenProposalId] = useState<number | null>(null);
   const isSEPReviewer = useCheckAccess([UserRole.SEP_REVIEWER]);
   const { user } = useContext(UserContext);
+  const { api } = useDataApiWithFeedback();
+  const [savingOrder, setSavingOrder] = useState(false);
+
+  const DragState = {
+    row: -1,
+    dropIndex: -1,
+  };
+
+  useEffect(() => {
+    if (!loadingInstrumentProposals && sepInstrument.submitted) {
+      refreshInstrumentProposalsData();
+    }
+    // NOTE: Should refresh proposals when we submit instrument to update rankings.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sepInstrument.submitted]);
 
   const sortByRankOrder = (a: SepProposal, b: SepProposal) => {
-    if (a.proposal.rankOrder === b.proposal.rankOrder) {
+    if (
+      a.proposal.sepMeetingDecision?.rankOrder ===
+        b.proposal.sepMeetingDecision?.rankOrder ||
+      (!a.proposal.sepMeetingDecision?.rankOrder &&
+        !b.proposal.sepMeetingDecision?.rankOrder)
+    ) {
       return -1;
-    } else if (a.proposal.rankOrder === null) {
+    } else if (!a.proposal.sepMeetingDecision?.rankOrder) {
       return 1;
-    } else if (b.proposal.rankOrder === null) {
+    } else if (!b.proposal.sepMeetingDecision?.rankOrder) {
       return -1;
     } else {
-      return a.proposal.rankOrder > b.proposal.rankOrder ? 1 : -1;
+      return (a.proposal.sepMeetingDecision?.rankOrder as number) >
+        (b.proposal.sepMeetingDecision?.rankOrder as number)
+        ? 1
+        : -1;
     }
   };
 
-  const sortByRankOrAverageScore = (data: SepProposal[]) => {
-    let allocationTimeSum = 0;
+  const [
+    sortedProposalsWithAverageScore,
+    setSortedProposalsWithAverageScore,
+  ] = useState<SepProposalWithAverageScoreAndAvailabilityZone[]>([]);
 
-    return data
-      .map((proposalData) => {
-        const proposalAverageScore =
-          average(getGrades(proposalData.proposal.reviews) as number[]) || 0;
+  useEffect(() => {
+    const sortByRankOrAverageScore = (data: SepProposal[]) => {
+      let allocationTimeSum = 0;
 
-        return {
-          ...proposalData,
-          proposalAverageScore,
-        };
-      })
-      .sort((a, b) =>
-        a.proposalAverageScore > b.proposalAverageScore ? 1 : -1
-      )
-      .sort(sortByRankOrder)
-      .map((proposalData) => {
-        const proposalAllocationTime =
-          proposalData.sepTimeAllocation !== null
-            ? proposalData.sepTimeAllocation
-            : proposalData.proposal.technicalReview?.timeAllocation || 0;
-
-        if (
-          allocationTimeSum + proposalAllocationTime >
-          (sepInstrument.availabilityTime as number)
-        ) {
-          allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+      return data
+        .map((proposalData) => {
+          const proposalAverageScore =
+            average(getGrades(proposalData.proposal.reviews) as number[]) || 0;
 
           return {
-            isInAvailabilityZone: false,
             ...proposalData,
+            proposalAverageScore,
           };
-        } else {
-          allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+        })
+        .sort((a, b) =>
+          a.proposalAverageScore > b.proposalAverageScore ? 1 : -1
+        )
+        .sort(sortByRankOrder)
+        .map((proposalData) => {
+          const proposalAllocationTime =
+            proposalData.sepTimeAllocation !== null
+              ? proposalData.sepTimeAllocation
+              : proposalData.proposal.technicalReview?.timeAllocation || 0;
 
-          return {
-            isInAvailabilityZone: true,
-            ...proposalData,
-          };
-        }
-      });
-  };
+          if (
+            allocationTimeSum + proposalAllocationTime >
+            (sepInstrument.availabilityTime as number)
+          ) {
+            allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+
+            return {
+              ...proposalData,
+              isInAvailabilityZone: false,
+            };
+          } else {
+            allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+
+            return {
+              ...proposalData,
+              isInAvailabilityZone: true,
+            };
+          }
+        });
+    };
+
+    const sortedProposals = sortByRankOrAverageScore(instrumentProposalsData);
+    setSortedProposalsWithAverageScore(sortedProposals);
+  }, [instrumentProposalsData, sepInstrument.availabilityTime]);
 
   const proposalTimeAllocationColumn = (
     rowData: SepProposal & {
@@ -148,53 +197,128 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     );
   };
 
+  const RowActionButtons = (rowData: SepProposal) => {
+    const showViewIcon =
+      !isSEPReviewer ||
+      rowData.assignments?.some(
+        ({ sepMemberUserId }) => sepMemberUserId === user.id
+      );
+
+    return (
+      <>
+        <Tooltip title="Drag proposals to reorder">
+          <IconButton style={{ cursor: 'grab' }} color="inherit">
+            <DragHandle />
+          </IconButton>
+        </Tooltip>
+        {showViewIcon && (
+          <Tooltip title="View proposal details">
+            <IconButton
+              color="inherit"
+              onClick={() =>
+                setUrlQueryParams({
+                  sepMeetingModal: rowData.proposal.primaryKey,
+                })
+              }
+            >
+              <Visibility />
+            </IconButton>
+          </Tooltip>
+        )}
+      </>
+    );
+  };
+
   const assignmentColumns = [
+    {
+      title: 'Actions',
+      cellStyle: { padding: 0, minWidth: 100 },
+      sorting: false,
+      render: RowActionButtons,
+    },
     {
       title: 'Title',
       field: 'proposal.title',
     },
     {
       title: 'ID',
-      field: 'proposal.shortCode',
+      field: 'proposal.proposalId',
     },
     { title: 'Status', field: 'proposal.status.name' },
     {
-      title: 'Initial rank (by average score)',
+      title: 'Average score',
+      field: 'proposalAverageScore',
+      emptyValue: '-',
+    },
+    {
+      title: 'Deviation',
+      field: 'deviation',
       render: (
-        rowData: SepProposal & {
-          proposalAverageScore: number;
-        }
-      ) => (rowData.proposalAverageScore ? rowData.proposalAverageScore : '-'),
+        rowData: SepProposalWithAverageScoreAndAvailabilityZone
+      ): string => {
+        const stdDeviation = standardDeviation(
+          getGrades(rowData.proposal.reviews ?? []) as number[]
+        );
+
+        return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
+      },
+      customSort: (
+        a: SepProposalWithAverageScoreAndAvailabilityZone,
+        b: SepProposalWithAverageScoreAndAvailabilityZone
+      ) =>
+        (standardDeviation(getGrades(a.proposal.reviews ?? []) as number[]) ||
+          0) -
+        (standardDeviation(getGrades(b.proposal.reviews ?? []) as number[]) ||
+          0),
     },
     {
       title: 'Current rank',
-      render: (rowData: SepProposal) =>
-        rowData.proposal.rankOrder ? rowData.proposal.rankOrder : '-',
+      field: 'proposal.sepMeetingDecision.rankOrder',
+      emptyValue: '-',
     },
     {
       title: 'Time allocation',
-      render: (
-        rowData: SepProposal & {
-          proposalAverageScore: number;
+      render: (rowData: SepProposalWithAverageScoreAndAvailabilityZone) =>
+        proposalTimeAllocationColumn(rowData),
+      customSort: (
+        a: SepProposalWithAverageScoreAndAvailabilityZone,
+        b: SepProposalWithAverageScoreAndAvailabilityZone
+      ) => {
+        if (a.sepTimeAllocation && b.sepTimeAllocation) {
+          return a.sepTimeAllocation - b.sepTimeAllocation;
         }
-      ) => proposalTimeAllocationColumn(rowData),
+
+        if (
+          a.proposal.technicalReview?.timeAllocation &&
+          b.proposal.technicalReview?.timeAllocation
+        ) {
+          return (
+            a.proposal.technicalReview.timeAllocation -
+            b.proposal.technicalReview.timeAllocation
+          );
+        } else {
+          return -1;
+        }
+      },
     },
     {
-      title: 'Review meeting',
-      render: (rowData: SepProposal): string =>
-        rowData.proposal.rankOrder ? 'Yes' : 'No',
+      title: 'SEP meeting submitted',
+      render: (
+        rowData: SepProposalWithAverageScoreAndAvailabilityZone
+      ): string =>
+        rowData.proposal.sepMeetingDecision?.submitted ? 'Yes' : 'No',
     },
   ];
 
-  const onMeetingSubmitted = (data: AdministrationFormData) => {
+  const onMeetingSubmitted = (data: SepMeetingDecision) => {
     const newInstrumentProposalsData = instrumentProposalsData.map(
       (proposalData) => {
-        if (proposalData.proposal.id === data.id) {
+        if (proposalData.proposal.primaryKey === data.proposalPk) {
           return {
             ...proposalData,
             proposal: {
               ...proposalData.proposal,
-              ...data,
+              sepMeetingDecision: data,
             },
           };
         } else {
@@ -208,12 +332,6 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     setInstrumentProposalsData(newInstrumentProposalsData as SepProposal[]);
   };
 
-  const sortedProposalsWithAverageScore = sortByRankOrAverageScore(
-    instrumentProposalsData
-  );
-
-  const ViewIcon = (): JSX.Element => <Visibility />;
-
   const redBackgroundWhenOutOfAvailabilityZone = (
     isInsideAvailabilityZone: boolean
   ): CSSProperties =>
@@ -221,15 +339,127 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
       ? {}
       : { backgroundColor: theme.palette.error.light };
 
+  const updateAllProposalRankings = (proposals: SepProposal[]) => {
+    const proposalsWithUpdatedRanking = proposals.map((item, index) => ({
+      ...item,
+      proposal: {
+        ...item.proposal,
+        sepMeetingDecision: {
+          proposalPk: item.proposal.primaryKey,
+          rankOrder: index + 1,
+          commentForManagement:
+            item.proposal.sepMeetingDecision?.commentForManagement || null,
+          commentForUser:
+            item.proposal.sepMeetingDecision?.commentForUser || null,
+          recommendation:
+            item.proposal.sepMeetingDecision?.recommendation || null,
+          submitted: item.proposal.sepMeetingDecision?.submitted || false,
+          submittedBy: item.proposal.sepMeetingDecision?.submittedBy || null,
+        },
+      },
+    }));
+
+    return proposalsWithUpdatedRanking;
+  };
+
+  const reorderArray = (
+    { fromIndex, toIndex }: { fromIndex: number; toIndex: number },
+    originalArray: SepProposal[]
+  ) => {
+    const movedItem = originalArray.find((item, index) => index === fromIndex);
+
+    if (!movedItem) {
+      return originalArray;
+    }
+
+    const remainingItems = originalArray.filter(
+      (item, index) => index !== fromIndex
+    );
+
+    const reorderedItems = [
+      ...remainingItems.slice(0, toIndex),
+      movedItem,
+      ...remainingItems.slice(toIndex),
+    ];
+
+    return reorderedItems;
+  };
+
+  const reOrderRow = async (fromIndex: number, toIndex: number) => {
+    setSavingOrder(true);
+    const newTableData = reorderArray(
+      { fromIndex, toIndex },
+      sortedProposalsWithAverageScore
+    );
+
+    const tableDataWithRankingsUpdated = updateAllProposalRankings(
+      newTableData
+    );
+
+    const reorderSepMeetingDecisionProposalsInput = tableDataWithRankingsUpdated.map(
+      (item) => ({
+        proposalPk: item.proposal.primaryKey,
+        rankOrder: item.proposal.sepMeetingDecision?.rankOrder,
+      })
+    );
+
+    const result = await api(
+      'Reordering of proposals saved successfully!'
+    ).reorderSepMeetingDecisionProposals({
+      reorderSepMeetingDecisionProposalsInput: {
+        proposals: reorderSepMeetingDecisionProposalsInput,
+      },
+    });
+
+    if (!result.reorderSepMeetingDecisionProposals.rejection) {
+      setInstrumentProposalsData(tableDataWithRankingsUpdated);
+    }
+
+    setSavingOrder(false);
+  };
+
+  /**  NOTE: Making this to work on mobile is a bit harder and might need more attention.
+   * Here is some useful article (https://medium.com/@deepakkadarivel/drag-and-drop-dnd-for-mobile-browsers-fc9bcd1ad3c5)
+   * And example https://github.com/deepakkadarivel/DnDWithTouch/blob/master/main.js
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const RowDraggableComponent = (props: any) => (
+    <MTableBodyRow
+      {...props}
+      draggable="true"
+      onDragStart={(e: DragEvent<HTMLDivElement>) => {
+        e.currentTarget.classList.add('draggingRow');
+        DragState.row = props.data.tableData.id;
+      }}
+      onDragEnter={(e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+
+        DragState.dropIndex = props.data.tableData.id;
+      }}
+      onDragEnd={async (e: DragEvent<HTMLDivElement>) => {
+        e.currentTarget.classList.remove('draggingRow');
+
+        if (
+          DragState.dropIndex !== -1 &&
+          DragState.dropIndex !== DragState.row
+        ) {
+          await reOrderRow(DragState.row, DragState.dropIndex);
+        }
+        DragState.row = -1;
+        DragState.dropIndex = -1;
+      }}
+    />
+  );
+
   return (
     <div className={classes.root} data-cy="sep-instrument-proposals-table">
       <SEPMeetingProposalViewModal
-        proposalViewModalOpen={!!openProposalId}
+        proposalViewModalOpen={!!urlQueryParams.sepMeetingModal}
         setProposalViewModalOpen={() => {
-          setOpenProposalId(null);
+          setUrlQueryParams({ sepMeetingModal: undefined });
           refreshInstrumentProposalsData();
         }}
-        proposalId={openProposalId || 0}
+        proposalPk={urlQueryParams.sepMeetingModal}
         meetingSubmitted={onMeetingSubmitted}
         sepId={sepId}
       />
@@ -237,33 +467,19 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         icons={tableIcons}
         columns={assignmentColumns}
         title={'Assigned reviewers'}
-        data={sortedProposalsWithAverageScore}
-        isLoading={loadingInstrumentProposals}
-        actions={[
-          (rowData) => ({
-            icon: ViewIcon,
-            onClick: (event, data) => {
-              setOpenProposalId((data as SepProposal).proposal.id);
-            },
-            tooltip: 'View proposal details',
-            hidden:
-              isSEPReviewer &&
-              !rowData.assignments?.some(
-                ({ sepMemberUserId }) => sepMemberUserId === user.id
-              ),
-          }),
-        ]}
+        data={sortedProposalsWithAverageScore.map((proposal) =>
+          Object.assign(proposal, { id: proposal.proposalPk })
+        )}
+        isLoading={loadingInstrumentProposals || savingOrder}
+        components={{
+          Row: RowDraggableComponent,
+        }}
         options={{
           search: false,
           paging: false,
           toolbar: false,
           headerStyle: { backgroundColor: '#fafafa' },
-          rowStyle: (
-            rowData: SepProposal & {
-              proposalAverageScore: number;
-              isInAvailabilityZone: boolean;
-            }
-          ) =>
+          rowStyle: (rowData: SepProposalWithAverageScoreAndAvailabilityZone) =>
             redBackgroundWhenOutOfAvailabilityZone(
               rowData.isInAvailabilityZone
             ),

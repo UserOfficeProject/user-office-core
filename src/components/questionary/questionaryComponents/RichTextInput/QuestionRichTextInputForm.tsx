@@ -1,25 +1,22 @@
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React from 'react';
+import React, { FC } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import TitledContainer from 'components/common/TitledContainer';
-import { FormComponent } from 'components/questionary/QuestionaryComponentRegistry';
-import { Question } from 'generated/sdk';
+import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-export const QuestionRichTextInputForm: FormComponent<Question> = (props) => {
-  const field = props.field;
+export const QuestionRichTextInputForm: FC<QuestionFormProps> = (props) => {
+  const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
   return (
     <QuestionFormShell
-      closeMe={props.closeMe}
-      dispatch={props.dispatch}
-      question={props.field}
+      {...props}
       validationSchema={Yup.object().shape({
         naturalKey: naturalKeySchema,
         question: Yup.string().required('Question is required'),
@@ -33,6 +30,7 @@ export const QuestionRichTextInputForm: FormComponent<Question> = (props) => {
           <Field
             name="naturalKey"
             label="Key"
+            id="Key-input"
             type="text"
             component={TextField}
             margin="normal"
@@ -42,6 +40,7 @@ export const QuestionRichTextInputForm: FormComponent<Question> = (props) => {
           <Field
             name="question"
             label="Question"
+            id="Question-input"
             type="text"
             component={TextField}
             margin="normal"
@@ -57,6 +56,16 @@ export const QuestionRichTextInputForm: FormComponent<Question> = (props) => {
               margin="normal"
               fullWidth
               data-cy="required"
+            />
+            <Field
+              name="config.max"
+              label="Max"
+              type="text"
+              id="Max-input"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="max"
             />
           </TitledContainer>
         </>
