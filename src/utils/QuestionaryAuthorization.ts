@@ -417,7 +417,7 @@ export class QuestionaryAuthorization {
       container.resolve(SampleEsiQuestionaryAuthorizer)
     );
     this.authorizers.set(
-      TemplateCategoryId.GENERIC_TEMPLATE,
+      TemplateGroupId.GENERIC_TEMPLATE,
       container.resolve(GenericTemplateQuestionaryAuthorizer)
     );
   }

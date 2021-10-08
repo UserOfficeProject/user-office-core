@@ -7,7 +7,7 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { rejection } from '../models/Rejection';
-import { TemplateCategoryId } from '../models/Template';
+import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { CreateGenericTemplateInput } from '../resolvers/mutations/CreateGenericTemplateMutation';
 import { UpdateGenericTemplateArgs } from '../resolvers/mutations/UpdateGenericTemplateMutation';
@@ -47,7 +47,7 @@ export default class GenericTemplateMutations {
     }
 
     const template = await this.templateDataSource.getTemplate(args.templateId);
-    if (template?.categoryId !== TemplateCategoryId.GENERIC_TEMPLATE) {
+    if (template?.groupId !== TemplateGroupId.GENERIC_TEMPLATE) {
       return rejection('Can not create genericTemplate with this template', {
         agent,
         args,
