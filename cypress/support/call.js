@@ -5,6 +5,7 @@ const createCall = ({
   startDate,
   endDate,
   template,
+  esiTemplate,
   workflow,
   surveyComment,
   cycleComment,
@@ -37,6 +38,11 @@ const createCall = ({
   if (template) {
     cy.get('[data-cy="call-template"]').click();
     cy.get('[role="presentation"]').contains(template).click();
+  }
+
+  if (esiTemplate) {
+    cy.get('[data-cy="call-esi-template"]').click();
+    cy.get('[role="presentation"]').contains(esiTemplate).click();
   }
 
   if (workflow) {

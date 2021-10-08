@@ -1,5 +1,3 @@
-import faker from 'faker';
-
 const defineExperimentTeam = ({ proposalTitle, usersEmails, teamLead }) => {
   cy.contains(/Upcoming experiments/i).should('exist');
 

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 
 import {
+  EsiFragment,
   Instrument,
   Maybe,
   Proposal,
-  ProposalBookingStatus,
-  RiskAssessmentFragment,
-  ScheduledEvent,
+  ProposalBookingStatusCore,
+  ScheduledEventCore,
   Visit,
   VisitFragment,
 } from 'generated/sdk';
@@ -20,7 +20,7 @@ import {
 } from './../../generated/sdk';
 
 export type ProposalScheduledEvent = Pick<
-  ScheduledEvent,
+  ScheduledEventCore,
   'startsAt' | 'endsAt' | 'id'
 > & {
   proposal: Pick<
@@ -34,8 +34,6 @@ export type ProposalScheduledEvent = Pick<
     proposer: BasicUserDetailsFragment | null;
   } & {
     users: BasicUserDetailsFragment[];
-  } & {
-    riskAssessment: Maybe<RiskAssessmentFragment>;
   };
   instrument: Pick<Instrument, 'id' | 'name'> | null;
 } & {
@@ -43,7 +41,7 @@ export type ProposalScheduledEvent = Pick<
     | (VisitFragment & {
         registrations: VisitRegistrationCore[];
         shipments: ShipmentFragment[];
-      } & Pick<Visit, 'teamLead'>)
+      } & Pick<Visit, 'teamLead'> & { esi: Maybe<EsiFragment> })
     | null;
 };
 
@@ -71,7 +69,10 @@ export function useProposalBookingsScheduledEvents({
       .getUserProposalBookingsWithEvents({
         ...(onlyUpcoming ? { endsAfter: toTzLessDateTime(new Date()) } : null),
         status: notDraft
-          ? [ProposalBookingStatus.ACTIVE, ProposalBookingStatus.COMPLETED]
+          ? [
+              ProposalBookingStatusCore.ACTIVE,
+              ProposalBookingStatusCore.COMPLETED,
+            ]
           : null,
         instrumentId,
       })
@@ -83,7 +84,7 @@ export function useProposalBookingsScheduledEvents({
         if (data.me?.proposals) {
           const proposalScheduledEvent: ProposalScheduledEvent[] = [];
           data.me?.proposals.forEach((proposal) =>
-            proposal.proposalBooking?.scheduledEvents.forEach(
+            proposal.proposalBookingCore?.scheduledEvents.forEach(
               (scheduledEvent) => {
                 proposalScheduledEvent.push({
                   id: scheduledEvent.id,
@@ -95,7 +96,6 @@ export function useProposalBookingsScheduledEvents({
                     proposalId: proposal.proposalId,
                     proposer: proposal.proposer,
                     users: proposal.users,
-                    riskAssessment: proposal.riskAssessment,
                     finalStatus: proposal.finalStatus,
                     managementDecisionSubmitted:
                       proposal.managementDecisionSubmitted,

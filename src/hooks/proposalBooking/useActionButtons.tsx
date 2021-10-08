@@ -7,21 +7,15 @@ import React, { ReactNode, useContext } from 'react';
 import { useHistory } from 'react-router';
 
 import BoxIcon from 'components/common/icons/BoxIcon';
-import RiskAssessmentIcon from 'components/common/icons/RiskAssessmentIcon';
+import EsiIcon from 'components/common/icons/EsiIcon';
 import ActionButton, {
   ActionButtonState,
 } from 'components/proposalBooking/ActionButton';
 import CreateUpdateVisit from 'components/proposalBooking/CreateUpdateVisit';
-import CreateRiskAssessment from 'components/riskAssessment/CreateRiskAssessment';
-import UpdateRiskAssessment from 'components/riskAssessment/UpdateRiskAssessment';
 import CreateUpdateShipment from 'components/shipments/CreateUpdateShipment';
 import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
 import { UserContext } from 'context/UserContextProvider';
-import {
-  ProposalEndStatus,
-  RiskAssessmentFragment,
-  RiskAssessmentStatus,
-} from 'generated/sdk';
+import { ProposalEndStatus } from 'generated/sdk';
 import { User } from 'models/User';
 import { parseTzLessDateTime } from 'utils/Time';
 
@@ -116,18 +110,16 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     );
   };
 
-  const finishRiskAssessment = (event: ProposalScheduledEvent) => {
+  const finishEsi = (event: ProposalScheduledEvent) => {
     let buttonState: ActionButtonState;
 
     if (isPiOrCoProposer(user, event)) {
       if (
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
-        event.proposal.managementDecisionSubmitted
+        event.proposal.managementDecisionSubmitted &&
+        event.visit // for now visit is required, but once ESI is attached to proposalScheduledEvent, this can be removed
       ) {
-        if (
-          event.proposal.riskAssessment?.status ===
-          RiskAssessmentStatus.SUBMITTED
-        ) {
+        if (event.visit.esi?.isSubmitted) {
           buttonState = 'completed';
         } else {
           buttonState = 'active';
@@ -139,48 +131,15 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       buttonState = 'invisible';
     }
 
-    const createNewEventObject = (
-      oldEvent: ProposalScheduledEvent,
-      riskAssessment: RiskAssessmentFragment
-    ): ProposalScheduledEvent => ({
-      ...oldEvent,
-      proposal: {
-        ...oldEvent.proposal,
-        riskAssessment: riskAssessment,
-      },
-    });
-
     return createActionButton(
-      'Finish risk assessment',
-      <RiskAssessmentIcon />,
+      'Finish safety input form',
+      <EsiIcon />,
       buttonState,
       () => {
-        if (event.proposal.riskAssessment) {
-          openModal(
-            <UpdateRiskAssessment
-              riskAssessment={event.proposal.riskAssessment}
-              onSubmitted={(submittedRiskAssessment) => {
-                const updatedEvent = createNewEventObject(
-                  event,
-                  submittedRiskAssessment
-                );
-                eventUpdated(updatedEvent);
-                closeModal();
-              }}
-            />
-          );
+        if (event.visit?.esi) {
+          history.push(`/UpdateEsi/${event.visit.esi.id}`);
         } else {
-          openModal(
-            <CreateRiskAssessment
-              proposalPk={event.proposal.primaryKey}
-              scheduledEventId={event.id}
-              onSubmitted={(newRiskAssessment) => {
-                const newEvent = createNewEventObject(event, newRiskAssessment);
-                eventUpdated(newEvent);
-                closeModal();
-              }}
-            />
-          );
+          history.push(`/CreateEsi/${event.visit!.id}`);
         }
       }
     );
@@ -308,7 +267,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
 
   return {
     formTeamAction,
-    finishRiskAssessment,
+    finishEsi,
     registerVisitAction,
     individualTrainingAction,
     declareShipmentAction,

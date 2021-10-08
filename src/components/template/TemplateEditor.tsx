@@ -132,6 +132,7 @@ export default function TemplateEditor() {
   const onDragEnd = (result: DropResult): void => {
     const dragSource = result.source;
     const dragDestination = result.destination;
+
     if (
       !dragDestination ||
       (dragDestination.droppableId === dragSource.droppableId &&
@@ -155,7 +156,7 @@ export default function TemplateEditor() {
         dragSource.droppableId !== 'questionPicker';
 
       if (isDraggingFromQuestionDrawerToTopic) {
-        const questionId = state.complementaryQuestions[dragSource.index].id;
+        const questionId = result.draggableId;
         const topicId = dragDestination.droppableId
           ? +dragDestination.droppableId
           : undefined;

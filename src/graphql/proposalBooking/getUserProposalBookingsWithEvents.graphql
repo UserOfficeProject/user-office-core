@@ -1,6 +1,6 @@
 query getUserProposalBookingsWithEvents(
   $endsAfter: TzLessDateTime
-  $status: [ProposalBookingStatus!]
+  $status: [ProposalBookingStatusCore!]
   $instrumentId: Int
 ) {
   me {
@@ -16,8 +16,8 @@ query getUserProposalBookingsWithEvents(
       users {
         ...basicUserDetails
       }
-      proposalBooking(filter: { status: $status }) {
-        scheduledEvents(filter: { endsAfter: $endsAfter }) {
+      proposalBookingCore(filter: { status: $status }) {
+        scheduledEvents(filter: { endsAfter: $endsAfter, status: $status }) {
           id
           startsAt
           endsAt
@@ -36,14 +36,14 @@ query getUserProposalBookingsWithEvents(
                 ...basicUserDetails
               }
             }
+            esi {
+              ...esi
+            }
           }
         }
       }
       visits {
         ...visit
-      }
-      riskAssessment {
-        ...riskAssessment
       }
       instrument {
         id

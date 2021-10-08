@@ -1,20 +1,21 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { TemplateCategoryId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 
 import { StepDisplayElementFactory } from './DefaultStepDisplayElementFactory';
 import { genericTemplateQuestionaryDefinition } from './questionaries/genericTemplate/GenericTemplateQuestionaryDefinition';
+import { esiQuestionaryDefinition } from './questionaries/esi/EsiQuestionaryDefinition';
 import { proposalQuestionaryDefinition } from './questionaries/proposal/ProposalQuestionaryDefinition';
-import { riskAssessmentQuestionaryDefinition } from './questionaries/riskAssessment/RiskAssessmentQuestionaryDefinition';
 import { sampleQuestionaryDefinition } from './questionaries/sample/SampleQuestionaryDefinition';
+import { sampleEsiQuestionaryDefinition } from './questionaries/sampleEsi/SampleEsiQuestionaryDefinition';
 import { shipmentQuestionaryDefinition } from './questionaries/shipment/ShipmentQuestionaryDefinition';
 import { visitRegistrationQuestionaryDefinition } from './questionaries/visitRegistration/VisitRegistrationQuestionaryDefinition';
 import { WizardStepFactory } from './WizardStepFactory';
 
 export interface QuestionaryDefinition {
   /**
-   * The enum value from TemplateCategoryId
+   * The enum value from TemplateGroupId
    */
-  readonly categoryId: TemplateCategoryId;
+  readonly groupId: TemplateGroupId;
 
   /**
    * displayElementFactory
@@ -32,21 +33,22 @@ const registry = [
   sampleQuestionaryDefinition,
   shipmentQuestionaryDefinition,
   visitRegistrationQuestionaryDefinition,
-  riskAssessmentQuestionaryDefinition,
   genericTemplateQuestionaryDefinition,
+  esiQuestionaryDefinition,
+  sampleEsiQuestionaryDefinition,
 ];
 
 Object.freeze(registry);
 
 const questionaryDefinitionMap = new Map<
-  TemplateCategoryId,
+  TemplateGroupId,
   QuestionaryDefinition
 >();
 registry.forEach((definition) =>
-  questionaryDefinitionMap.set(definition.categoryId, definition)
+  questionaryDefinitionMap.set(definition.groupId, definition)
 );
 
-export function getQuestionaryDefinition(id: TemplateCategoryId) {
+export function getQuestionaryDefinition(id: TemplateGroupId) {
   const definition = questionaryDefinitionMap.get(id);
   if (!definition) {
     throw new Error(`Definition for ${id} was not found`);

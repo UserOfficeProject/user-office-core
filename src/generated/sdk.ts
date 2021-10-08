@@ -170,6 +170,7 @@ export type Call = {
   proposalWorkflowId: Maybe<Scalars['Int']>;
   allocationTimeUnit: AllocationTimeUnits;
   templateId: Scalars['Int'];
+  esiTemplateId: Maybe<Scalars['Int']>;
   title: Maybe<Scalars['String']>;
   description: Maybe<Scalars['String']>;
   instruments: Array<InstrumentWithAvailabilityTime>;
@@ -239,6 +240,7 @@ export type CreateCallInput = {
   allocationTimeUnit: AllocationTimeUnits;
   proposalWorkflowId: Scalars['Int'];
   templateId: Scalars['Int'];
+  esiTemplateId?: Maybe<Scalars['Int']>;
   title?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
 };
@@ -276,8 +278,9 @@ export enum DataType {
   SHIPMENT_BASIS = 'SHIPMENT_BASIS',
   RICH_TEXT_INPUT = 'RICH_TEXT_INPUT',
   VISIT_BASIS = 'VISIT_BASIS',
-  RISK_ASSESSMENT_BASIS = 'RISK_ASSESSMENT_BASIS',
-  GENERIC_TEMPLATE_BASIS = 'GENERIC_TEMPLATE_BASIS'
+  GENERIC_TEMPLATE_BASIS = 'GENERIC_TEMPLATE_BASIS',
+  PROPOSAL_ESI_BASIS = 'PROPOSAL_ESI_BASIS',
+  SAMPLE_ESI_BASIS = 'SAMPLE_ESI_BASIS'
 }
 
 export type DateConfig = {
@@ -412,6 +415,12 @@ export type EquipmentWithAssignmentStatusEventsArgs = {
   startsAt: Scalars['TzLessDateTime'];
 };
 
+export type EsiResponseWrap = {
+  __typename?: 'EsiResponseWrap';
+  rejection: Maybe<Rejection>;
+  esi: Maybe<ExperimentSafetyInput>;
+};
+
 export enum EvaluatorOperator {
   EQ = 'eq',
   NEQ = 'neq'
@@ -464,7 +473,12 @@ export enum Event {
   PROPOSAL_CLONED = 'PROPOSAL_CLONED',
   PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
   PROPOSAL_STATUS_CHANGED_BY_USER = 'PROPOSAL_STATUS_CHANGED_BY_USER',
-  TOPIC_ANSWERED = 'TOPIC_ANSWERED'
+  TOPIC_ANSWERED = 'TOPIC_ANSWERED',
+  PROPOSAL_BOOKING_TIME_SLOT_ADDED = 'PROPOSAL_BOOKING_TIME_SLOT_ADDED',
+  PROPOSAL_BOOKING_TIME_SLOTS_REMOVED = 'PROPOSAL_BOOKING_TIME_SLOTS_REMOVED',
+  PROPOSAL_BOOKING_TIME_ACTIVATED = 'PROPOSAL_BOOKING_TIME_ACTIVATED',
+  PROPOSAL_BOOKING_TIME_COMPLETED = 'PROPOSAL_BOOKING_TIME_COMPLETED',
+  PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED'
 }
 
 export type EventLog = {
@@ -475,6 +489,19 @@ export type EventLog = {
   eventTStamp: Scalars['DateTime'];
   changedObjectId: Scalars['String'];
   changedBy: User;
+};
+
+export type ExperimentSafetyInput = {
+  __typename?: 'ExperimentSafetyInput';
+  id: Scalars['Int'];
+  visitId: Scalars['Int'];
+  creatorId: Scalars['Int'];
+  questionaryId: Scalars['Int'];
+  isSubmitted: Scalars['Boolean'];
+  created: Scalars['DateTime'];
+  sampleEsis: Array<SampleExperimentSafetyInput>;
+  visit: Maybe<Visit>;
+  questionary: Questionary;
 };
 
 export type Feature = {
@@ -502,7 +529,7 @@ export type FieldConditionInput = {
   params: Scalars['String'];
 };
 
-export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubTemplateConfig | ProposalBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig | RichTextInputConfig | VisitBasisConfig | RiskAssessmentBasisConfig | GenericTemplateBasisConfig;
+export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | GenericTemplateBasisConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SampleDeclarationConfig | SampleEsiBasisConfig | SubTemplateConfig | ProposalBasisConfig | ProposalEsiBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig | RichTextInputConfig | VisitBasisConfig;
 
 export type FieldDependency = {
   __typename?: 'FieldDependency';
@@ -696,6 +723,8 @@ export type Mutation = {
   updateInstrument: InstrumentResponseWrap;
   setInstrumentAvailabilityTime: SuccessResponseWrap;
   submitInstrument: SuccessResponseWrap;
+  createEsi: EsiResponseWrap;
+  updateEsi: EsiResponseWrap;
   administrationProposal: ProposalResponseWrap;
   cloneProposals: ProposalsResponseWrap;
   updateProposal: ProposalResponseWrap;
@@ -714,8 +743,9 @@ export type Mutation = {
   addUserForReview: ReviewResponseWrap;
   submitProposalsReview: SuccessResponseWrap;
   updateTechnicalReviewAssignee: ProposalsResponseWrap;
-  createRiskAssessment: RiskAssessmentResponseWrap;
-  updateRiskAssessment: RiskAssessmentResponseWrap;
+  createSampleEsi: SampleEsiResponseWrap;
+  deleteSampleEsi: SampleEsiResponseWrap;
+  updateSampleEsi: SampleEsiResponseWrap;
   createSample: SampleResponseWrap;
   updateSample: SampleResponseWrap;
   assignChairOrSecretary: SepResponseWrap;
@@ -769,7 +799,6 @@ export type Mutation = {
   deleteInstrument: InstrumentResponseWrap;
   deleteProposal: ProposalResponseWrap;
   deleteQuestion: QuestionResponseWrap;
-  deleteRiskAssessment: RiskAssessmentResponseWrap;
   deleteSample: SampleResponseWrap;
   deleteSEP: SepResponseWrap;
   deleteShipment: ShipmentResponseWrap;
@@ -934,6 +963,17 @@ export type MutationSubmitInstrumentArgs = {
 };
 
 
+export type MutationCreateEsiArgs = {
+  visitId: Scalars['Int'];
+};
+
+
+export type MutationUpdateEsiArgs = {
+  esiId: Scalars['Int'];
+  isSubmitted?: Maybe<Scalars['Boolean']>;
+};
+
+
 export type MutationAdministrationProposalArgs = {
   proposalPk: Scalars['Int'];
   commentForUser?: Maybe<Scalars['String']>;
@@ -1045,16 +1085,22 @@ export type MutationUpdateTechnicalReviewAssigneeArgs = {
 };
 
 
-export type MutationCreateRiskAssessmentArgs = {
-  proposalPk: Scalars['Int'];
-  scheduledEventId: Scalars['Int'];
+export type MutationCreateSampleEsiArgs = {
+  sampleId: Scalars['Int'];
+  esiId: Scalars['Int'];
 };
 
 
-export type MutationUpdateRiskAssessmentArgs = {
-  riskAssessmentId: Scalars['Int'];
-  status?: Maybe<RiskAssessmentStatus>;
-  sampleIds?: Maybe<Array<Scalars['Int']>>;
+export type MutationDeleteSampleEsiArgs = {
+  sampleId: Scalars['Int'];
+  esiId: Scalars['Int'];
+};
+
+
+export type MutationUpdateSampleEsiArgs = {
+  esiId: Scalars['Int'];
+  sampleId: Scalars['Int'];
+  isSubmitted?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -1183,7 +1229,7 @@ export type MutationCreateQuestionTemplateRelationArgs = {
 
 
 export type MutationCreateTemplateArgs = {
-  categoryId: TemplateCategoryId;
+  groupId: TemplateGroupId;
   name: Scalars['String'];
   description?: Maybe<Scalars['String']>;
 };
@@ -1203,7 +1249,7 @@ export type MutationDeleteQuestionTemplateRelationArgs = {
 
 
 export type MutationSetActiveTemplateArgs = {
-  templateCategoryId: TemplateCategoryId;
+  templateGroupId: TemplateGroupId;
   templateId: Scalars['Int'];
 };
 
@@ -1427,11 +1473,6 @@ export type MutationDeleteProposalArgs = {
 
 export type MutationDeleteQuestionArgs = {
   questionId: Scalars['String'];
-};
-
-
-export type MutationDeleteRiskAssessmentArgs = {
-  riskAssessmentId: Scalars['Int'];
 };
 
 
@@ -1766,8 +1807,13 @@ export type Proposal = {
   samples: Maybe<Array<Sample>>;
   genericTemplates: Maybe<Array<GenericTemplate>>;
   visits: Maybe<Array<Visit>>;
-  riskAssessment: Maybe<RiskAssessment>;
+  proposalBookingCore: Maybe<ProposalBookingCore>;
   proposalBooking: Maybe<ProposalBooking>;
+};
+
+
+export type ProposalProposalBookingCoreArgs = {
+  filter?: Maybe<ProposalBookingFilter>;
 };
 
 
@@ -1787,7 +1833,7 @@ export type ProposalBooking = {
   proposal: Maybe<Proposal>;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
-  status: ProposalBookingStatus;
+  status: ProposalBookingStatusCore;
   allocatedTime: Scalars['Int'];
   instrument: Maybe<Instrument>;
   scheduledEvents: Array<ScheduledEvent>;
@@ -1796,6 +1842,21 @@ export type ProposalBooking = {
 
 export type ProposalBookingScheduledEventsArgs = {
   filter: ProposalBookingScheduledEventFilter;
+};
+
+export type ProposalBookingCore = {
+  __typename?: 'ProposalBookingCore';
+  id: Scalars['Int'];
+  scheduledEvents: Array<ScheduledEventCore>;
+};
+
+
+export type ProposalBookingCoreScheduledEventsArgs = {
+  filter: ProposalBookingScheduledEventFilterCore;
+};
+
+export type ProposalBookingFilter = {
+  status?: Maybe<Array<ProposalBookingStatusCore>>;
 };
 
 export enum ProposalBookingFinalizeAction {
@@ -1815,7 +1876,14 @@ export type ProposalBookingScheduledEventFilter = {
   endsBefore?: Maybe<Scalars['TzLessDateTime']>;
 };
 
-export enum ProposalBookingStatus {
+export type ProposalBookingScheduledEventFilterCore = {
+  bookingType?: Maybe<ScheduledEventBookingType>;
+  endsAfter?: Maybe<Scalars['TzLessDateTime']>;
+  endsBefore?: Maybe<Scalars['TzLessDateTime']>;
+  status?: Maybe<Array<ProposalBookingStatusCore>>;
+};
+
+export enum ProposalBookingStatusCore {
   DRAFT = 'DRAFT',
   ACTIVE = 'ACTIVE',
   COMPLETED = 'COMPLETED'
@@ -1827,6 +1895,11 @@ export enum ProposalEndStatus {
   RESERVED = 'RESERVED',
   REJECTED = 'REJECTED'
 }
+
+export type ProposalEsiBasisConfig = {
+  __typename?: 'ProposalEsiBasisConfig';
+  tooltip: Scalars['String'];
+};
 
 export type ProposalEvent = {
   __typename?: 'ProposalEvent';
@@ -1855,7 +1928,7 @@ export type ProposalPkWithReviewId = {
 };
 
 export type ProposalProposalBookingFilter = {
-  status?: Maybe<Array<ProposalBookingStatus>>;
+  status?: Maybe<Array<ProposalBookingStatusCore>>;
 };
 
 export enum ProposalPublicStatus {
@@ -1897,13 +1970,14 @@ export type ProposalStatusResponseWrap = {
 export type ProposalTemplate = {
   __typename?: 'ProposalTemplate';
   templateId: Scalars['Int'];
-  categoryId: TemplateCategoryId;
+  groupId: TemplateGroupId;
   name: Scalars['String'];
   description: Maybe<Scalars['String']>;
   isArchived: Scalars['Boolean'];
   steps: Array<TemplateStep>;
   complementaryQuestions: Array<Question>;
   questionaryCount: Scalars['Int'];
+  group: TemplateGroup;
   callCount: Scalars['Int'];
 };
 
@@ -2011,6 +2085,7 @@ export type Query = {
   callsByInstrumentScientist: Maybe<Array<Call>>;
   proposals: Maybe<ProposalsQueryResult>;
   instrumentScientistProposals: Maybe<ProposalsQueryResult>;
+  sampleEsi: Maybe<SampleExperimentSafetyInput>;
   shipments: Maybe<Array<Shipment>>;
   questions: Array<QuestionWithUsage>;
   templates: Maybe<Array<Template>>;
@@ -2019,9 +2094,11 @@ export type Query = {
   activeTemplateId: Maybe<Scalars['Int']>;
   basicUserDetails: Maybe<BasicUserDetails>;
   basicUserDetailsByEmail: Maybe<BasicUserDetails>;
+  blankQuestionary: Questionary;
   blankQuestionarySteps: Maybe<Array<QuestionaryStep>>;
   call: Maybe<Call>;
   checkEmailExist: Maybe<Scalars['Boolean']>;
+  esi: Maybe<ExperimentSafetyInput>;
   eventLogs: Maybe<Array<EventLog>>;
   features: Array<Feature>;
   fileMetadata: Maybe<Array<FileMetadata>>;
@@ -2055,7 +2132,6 @@ export type Query = {
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
   proposalReviews: Maybe<Array<Review>>;
-  riskAssessment: RiskAssessment;
   roles: Maybe<Array<Role>>;
   sample: Maybe<Sample>;
   samplesByCallId: Maybe<Array<Sample>>;
@@ -2121,6 +2197,12 @@ export type QueryInstrumentScientistProposalsArgs = {
 };
 
 
+export type QuerySampleEsiArgs = {
+  esiId: Scalars['Int'];
+  sampleId: Scalars['Int'];
+};
+
+
 export type QueryShipmentsArgs = {
   filter?: Maybe<ShipmentsFilter>;
 };
@@ -2142,7 +2224,7 @@ export type QueryVisitsArgs = {
 
 
 export type QueryActiveTemplateIdArgs = {
-  templateCategoryId: TemplateCategoryId;
+  templateGroupId: TemplateGroupId;
 };
 
 
@@ -2154,6 +2236,11 @@ export type QueryBasicUserDetailsArgs = {
 export type QueryBasicUserDetailsByEmailArgs = {
   role?: Maybe<UserRole>;
   email: Scalars['String'];
+};
+
+
+export type QueryBlankQuestionaryArgs = {
+  templateId: Scalars['Int'];
 };
 
 
@@ -2169,6 +2256,11 @@ export type QueryCallArgs = {
 
 export type QueryCheckEmailExistArgs = {
   email: Scalars['String'];
+};
+
+
+export type QueryEsiArgs = {
+  esiId: Scalars['Int'];
 };
 
 
@@ -2293,11 +2385,6 @@ export type QueryReviewArgs = {
 
 export type QueryProposalReviewsArgs = {
   proposalPk: Scalars['Int'];
-};
-
-
-export type QueryRiskAssessmentArgs = {
-  riskAssessmentId: Scalars['Int'];
 };
 
 
@@ -2617,36 +2704,6 @@ export type RichTextInputConfig = {
   max: Maybe<Scalars['Int']>;
 };
 
-export type RiskAssessment = {
-  __typename?: 'RiskAssessment';
-  riskAssessmentId: Scalars['Int'];
-  proposalPk: Scalars['Int'];
-  scheduledEventId: Scalars['Int'];
-  creatorUserId: Scalars['Int'];
-  questionaryId: Scalars['Int'];
-  status: RiskAssessmentStatus;
-  questionary: Questionary;
-  samples: Array<Sample>;
-};
-
-export type RiskAssessmentBasisConfig = {
-  __typename?: 'RiskAssessmentBasisConfig';
-  small_label: Scalars['String'];
-  required: Scalars['Boolean'];
-  tooltip: Scalars['String'];
-};
-
-export type RiskAssessmentResponseWrap = {
-  __typename?: 'RiskAssessmentResponseWrap';
-  rejection: Maybe<Rejection>;
-  riskAssessment: Maybe<RiskAssessment>;
-};
-
-export enum RiskAssessmentStatus {
-  DRAFT = 'DRAFT',
-  SUBMITTED = 'SUBMITTED'
-}
-
 export type Role = {
   __typename?: 'Role';
   id: Scalars['Int'];
@@ -2737,6 +2794,39 @@ export type SampleBasisConfig = {
   titlePlaceholder: Scalars['String'];
 };
 
+export type SampleDeclarationConfig = {
+  __typename?: 'SampleDeclarationConfig';
+  minEntries: Maybe<Scalars['Int']>;
+  maxEntries: Maybe<Scalars['Int']>;
+  templateId: Maybe<Scalars['Int']>;
+  templateCategory: Scalars['String'];
+  addEntryButtonLabel: Scalars['String'];
+  small_label: Scalars['String'];
+  required: Scalars['Boolean'];
+  esiTemplateId: Maybe<Scalars['Int']>;
+};
+
+export type SampleEsiBasisConfig = {
+  __typename?: 'SampleEsiBasisConfig';
+  tooltip: Scalars['String'];
+};
+
+export type SampleEsiResponseWrap = {
+  __typename?: 'SampleEsiResponseWrap';
+  rejection: Maybe<Rejection>;
+  esi: Maybe<SampleExperimentSafetyInput>;
+};
+
+export type SampleExperimentSafetyInput = {
+  __typename?: 'SampleExperimentSafetyInput';
+  esiId: Scalars['Int'];
+  sampleId: Scalars['Int'];
+  questionaryId: Scalars['Int'];
+  isSubmitted: Scalars['Boolean'];
+  questionary: Questionary;
+  sample: Sample;
+};
+
 export type SampleResponseWrap = {
   __typename?: 'SampleResponseWrap';
   rejection: Maybe<Rejection>;
@@ -2758,6 +2848,7 @@ export type SamplesFilter = {
   status?: Maybe<SampleStatus>;
   questionId?: Maybe<Scalars['String']>;
   proposalPk?: Maybe<Scalars['Int']>;
+  visitId?: Maybe<Scalars['Int']>;
 };
 
 export type SaveSepMeetingDecisionInput = {
@@ -2782,11 +2873,10 @@ export type ScheduledEvent = {
   description: Maybe<Scalars['String']>;
   instrument: Maybe<Instrument>;
   equipmentId: Maybe<Scalars['Int']>;
-  status: ProposalBookingStatus;
+  status: ProposalBookingStatusCore;
   equipments: Array<EquipmentWithAssignmentStatus>;
   equipmentAssignmentStatus: Maybe<EquipmentAssignmentStatus>;
   proposalBooking: Maybe<ProposalBooking>;
-  visit: Maybe<Visit>;
 };
 
 export enum ScheduledEventBookingType {
@@ -2796,6 +2886,15 @@ export enum ScheduledEventBookingType {
   COMMISSIONING = 'COMMISSIONING',
   EQUIPMENT = 'EQUIPMENT'
 }
+
+export type ScheduledEventCore = {
+  __typename?: 'ScheduledEventCore';
+  id: Scalars['Int'];
+  bookingType: ScheduledEventBookingType;
+  startsAt: Scalars['TzLessDateTime'];
+  endsAt: Scalars['TzLessDateTime'];
+  visit: Maybe<Visit>;
+};
 
 export type ScheduledEventFilter = {
   startsAt: Scalars['TzLessDateTime'];
@@ -2993,13 +3092,14 @@ export enum TechnicalReviewStatus {
 export type Template = {
   __typename?: 'Template';
   templateId: Scalars['Int'];
-  categoryId: TemplateCategoryId;
+  groupId: TemplateGroupId;
   name: Scalars['String'];
   description: Maybe<Scalars['String']>;
   isArchived: Scalars['Boolean'];
   steps: Array<TemplateStep>;
   complementaryQuestions: Array<Question>;
   questionaryCount: Scalars['Int'];
+  group: TemplateGroup;
 };
 
 export type TemplateCategory = {
@@ -3009,12 +3109,27 @@ export type TemplateCategory = {
 };
 
 export enum TemplateCategoryId {
+  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
   PROPOSAL_QUESTIONARY = 'PROPOSAL_QUESTIONARY',
   SAMPLE_DECLARATION = 'SAMPLE_DECLARATION',
   SHIPMENT_DECLARATION = 'SHIPMENT_DECLARATION',
-  VISIT = 'VISIT',
-  RISK_ASSESSMENT = 'RISK_ASSESSMENT',
-  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE'
+  VISIT_REGISTRATION = 'VISIT_REGISTRATION'
+}
+
+export type TemplateGroup = {
+  __typename?: 'TemplateGroup';
+  groupId: TemplateGroupId;
+  categoryId: TemplateCategoryId;
+};
+
+export enum TemplateGroupId {
+  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
+  PROPOSAL = 'PROPOSAL',
+  PROPOSAL_ESI = 'PROPOSAL_ESI',
+  SAMPLE = 'SAMPLE',
+  SAMPLE_ESI = 'SAMPLE_ESI',
+  SHIPMENT = 'SHIPMENT',
+  VISIT_REGISTRATION = 'VISIT_REGISTRATION'
 }
 
 export type TemplateResponseWrap = {
@@ -3031,7 +3146,7 @@ export type TemplateStep = {
 
 export type TemplatesFilter = {
   isArchived?: Maybe<Scalars['Boolean']>;
-  category?: Maybe<TemplateCategoryId>;
+  group?: Maybe<TemplateGroupId>;
   templateIds?: Maybe<Array<Scalars['Int']>>;
 };
 
@@ -3120,6 +3235,7 @@ export type UpdateCallInput = {
   callReviewEnded?: Maybe<Scalars['Int']>;
   callSEPReviewEnded?: Maybe<Scalars['Int']>;
   templateId: Scalars['Int'];
+  esiTemplateId?: Maybe<Scalars['Int']>;
   title?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
 };
@@ -3227,6 +3343,8 @@ export type Visit = {
   registrations: Array<VisitRegistration>;
   teamLead: BasicUserDetails;
   shipments: Array<Shipment>;
+  samples: Array<Sample>;
+  esi: Maybe<ExperimentSafetyInput>;
 };
 
 export type VisitBasisConfig = {
@@ -4101,6 +4219,7 @@ export type CreateCallMutationVariables = Exact<{
   referenceNumberFormat?: Maybe<Scalars['String']>;
   proposalWorkflowId: Scalars['Int'];
   templateId: Scalars['Int'];
+  esiTemplateId?: Maybe<Scalars['Int']>;
   title?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
 }>;
@@ -4142,7 +4261,7 @@ export type DeleteCallMutation = (
 
 export type CallFragment = (
   { __typename?: 'Call' }
-  & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startSEPReview' | 'endSEPReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'referenceNumberFormat' | 'proposalWorkflowId' | 'templateId' | 'allocationTimeUnit' | 'proposalCount' | 'title' | 'description'>
+  & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startSEPReview' | 'endSEPReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'referenceNumberFormat' | 'proposalWorkflowId' | 'templateId' | 'esiTemplateId' | 'allocationTimeUnit' | 'proposalCount' | 'title' | 'description'>
   & { instruments: Array<(
     { __typename?: 'InstrumentWithAvailabilityTime' }
     & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime' | 'submitted'>
@@ -4237,6 +4356,7 @@ export type UpdateCallMutationVariables = Exact<{
   referenceNumberFormat?: Maybe<Scalars['String']>;
   proposalWorkflowId: Scalars['Int'];
   templateId: Scalars['Int'];
+  esiTemplateId?: Maybe<Scalars['Int']>;
   title?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
 }>;
@@ -4252,6 +4372,130 @@ export type UpdateCallMutation = (
     )>, call: Maybe<(
       { __typename?: 'Call' }
       & CallFragment
+    )> }
+  ) }
+);
+
+export type CreateEsiMutationVariables = Exact<{
+  visitId: Scalars['Int'];
+}>;
+
+
+export type CreateEsiMutation = (
+  { __typename?: 'Mutation' }
+  & { createEsi: (
+    { __typename?: 'EsiResponseWrap' }
+    & { esi: Maybe<(
+      { __typename?: 'ExperimentSafetyInput' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ), sampleEsis: Array<(
+        { __typename?: 'SampleExperimentSafetyInput' }
+        & { sample: (
+          { __typename?: 'Sample' }
+          & SampleFragment
+        ), questionary: (
+          { __typename?: 'Questionary' }
+          & Pick<Questionary, 'isCompleted'>
+        ) }
+        & SampleEsiFragment
+      )>, visit: Maybe<(
+        { __typename?: 'Visit' }
+        & { proposal: (
+          { __typename?: 'Proposal' }
+          & Pick<Proposal, 'proposalId' | 'title'>
+          & { samples: Maybe<Array<(
+            { __typename?: 'Sample' }
+            & SampleFragment
+          )>> }
+        ) }
+        & VisitFragment
+      )> }
+      & EsiFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type EsiFragment = (
+  { __typename?: 'ExperimentSafetyInput' }
+  & Pick<ExperimentSafetyInput, 'id' | 'visitId' | 'creatorId' | 'questionaryId' | 'isSubmitted' | 'created'>
+);
+
+export type GetEsiQueryVariables = Exact<{
+  esiId: Scalars['Int'];
+}>;
+
+
+export type GetEsiQuery = (
+  { __typename?: 'Query' }
+  & { esi: Maybe<(
+    { __typename?: 'ExperimentSafetyInput' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & Pick<Questionary, 'isCompleted'>
+      & QuestionaryFragment
+    ), sampleEsis: Array<(
+      { __typename?: 'SampleExperimentSafetyInput' }
+      & { sample: (
+        { __typename?: 'Sample' }
+        & SampleFragment
+      ), questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+      ) }
+      & SampleEsiFragment
+    )>, visit: Maybe<(
+      { __typename?: 'Visit' }
+      & { proposal: (
+        { __typename?: 'Proposal' }
+        & Pick<Proposal, 'proposalId' | 'title'>
+        & { samples: Maybe<Array<(
+          { __typename?: 'Sample' }
+          & SampleFragment
+        )>> }
+      ) }
+      & VisitFragment
+    )> }
+    & EsiFragment
+  )> }
+);
+
+export type UpdateEsiMutationVariables = Exact<{
+  esiId: Scalars['Int'];
+  isSubmitted?: Maybe<Scalars['Boolean']>;
+}>;
+
+
+export type UpdateEsiMutation = (
+  { __typename?: 'Mutation' }
+  & { updateEsi: (
+    { __typename?: 'EsiResponseWrap' }
+    & { esi: Maybe<(
+      { __typename?: 'ExperimentSafetyInput' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ), sampleEsis: Array<(
+        { __typename?: 'SampleExperimentSafetyInput' }
+        & { sample: (
+          { __typename?: 'Sample' }
+          & SampleFragment
+        ), questionary: (
+          { __typename?: 'Questionary' }
+          & Pick<Questionary, 'isCompleted'>
+        ) }
+        & SampleEsiFragment
+      )> }
+      & EsiFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
     )> }
   ) }
 );
@@ -5062,7 +5306,7 @@ export type UpdateProposalMutation = (
 
 export type GetUserProposalBookingsWithEventsQueryVariables = Exact<{
   endsAfter?: Maybe<Scalars['TzLessDateTime']>;
-  status?: Maybe<Array<ProposalBookingStatus> | ProposalBookingStatus>;
+  status?: Maybe<Array<ProposalBookingStatusCore> | ProposalBookingStatusCore>;
   instrumentId?: Maybe<Scalars['Int']>;
 }>;
 
@@ -5080,11 +5324,11 @@ export type GetUserProposalBookingsWithEventsQuery = (
       )>, users: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
-      )>, proposalBooking: Maybe<(
-        { __typename?: 'ProposalBooking' }
+      )>, proposalBookingCore: Maybe<(
+        { __typename?: 'ProposalBookingCore' }
         & { scheduledEvents: Array<(
-          { __typename?: 'ScheduledEvent' }
-          & Pick<ScheduledEvent, 'id' | 'startsAt' | 'endsAt' | 'bookingType'>
+          { __typename?: 'ScheduledEventCore' }
+          & Pick<ScheduledEventCore, 'id' | 'startsAt' | 'endsAt' | 'bookingType'>
           & { visit: Maybe<(
             { __typename?: 'Visit' }
             & { teamLead: (
@@ -5100,6 +5344,9 @@ export type GetUserProposalBookingsWithEventsQuery = (
                 & BasicUserDetailsFragment
               ) }
               & VisitRegistrationFragment
+            )>, esi: Maybe<(
+              { __typename?: 'ExperimentSafetyInput' }
+              & EsiFragment
             )> }
             & VisitFragment
           )> }
@@ -5107,10 +5354,7 @@ export type GetUserProposalBookingsWithEventsQuery = (
       )>, visits: Maybe<Array<(
         { __typename?: 'Visit' }
         & VisitFragment
-      )>>, riskAssessment: Maybe<(
-        { __typename?: 'RiskAssessment' }
-        & RiskAssessmentFragment
-      )>, instrument: Maybe<(
+      )>>, instrument: Maybe<(
         { __typename?: 'Instrument' }
         & Pick<Instrument, 'id' | 'name'>
       )> }
@@ -5188,11 +5432,20 @@ export type AnswerFragment = (
     { __typename?: 'SampleBasisConfig' }
     & FieldConfigSampleBasisConfigFragment
   ) | (
+    { __typename?: 'SampleDeclarationConfig' }
+    & FieldConfigSampleDeclarationConfigFragment
+  ) | (
+    { __typename?: 'SampleEsiBasisConfig' }
+    & FieldConfigSampleEsiBasisConfigFragment
+  ) | (
     { __typename?: 'SubTemplateConfig' }
     & FieldConfigSubTemplateConfigFragment
   ) | (
     { __typename?: 'ProposalBasisConfig' }
     & FieldConfigProposalBasisConfigFragment
+  ) | (
+    { __typename?: 'ProposalEsiBasisConfig' }
+    & FieldConfigProposalEsiBasisConfigFragment
   ) | (
     { __typename?: 'IntervalConfig' }
     & FieldConfigIntervalConfigFragment
@@ -5208,9 +5461,6 @@ export type AnswerFragment = (
   ) | (
     { __typename?: 'VisitBasisConfig' }
     & FieldConfigVisitBasisConfigFragment
-  ) | (
-    { __typename?: 'RiskAssessmentBasisConfig' }
-    & FieldConfigRiskAssessmentBasisConfigFragment
   ) | (
     { __typename?: 'GenericTemplateBasisConfig' }
     & FieldConfigGenericTemplateBasisConfigFragment
@@ -5243,6 +5493,20 @@ export type QuestionaryStepFragment = (
     { __typename?: 'Answer' }
     & AnswerFragment
   )> }
+);
+
+export type GetBlankQuestionaryQueryVariables = Exact<{
+  templateId: Scalars['Int'];
+}>;
+
+
+export type GetBlankQuestionaryQuery = (
+  { __typename?: 'Query' }
+  & { blankQuestionary: (
+    { __typename?: 'Questionary' }
+    & Pick<Questionary, 'isCompleted'>
+    & QuestionaryFragment
+  ) }
 );
 
 export type GetBlankQuestionaryStepsQueryVariables = Exact<{
@@ -5510,27 +5774,27 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
-export type CreateRiskAssessmentMutationVariables = Exact<{
-  proposalPk: Scalars['Int'];
-  scheduledEventId: Scalars['Int'];
+export type CreateSampleEsiMutationVariables = Exact<{
+  sampleId: Scalars['Int'];
+  esiId: Scalars['Int'];
 }>;
 
 
-export type CreateRiskAssessmentMutation = (
+export type CreateSampleEsiMutation = (
   { __typename?: 'Mutation' }
-  & { createRiskAssessment: (
-    { __typename?: 'RiskAssessmentResponseWrap' }
-    & { riskAssessment: Maybe<(
-      { __typename?: 'RiskAssessment' }
+  & { createSampleEsi: (
+    { __typename?: 'SampleEsiResponseWrap' }
+    & { esi: Maybe<(
+      { __typename?: 'SampleExperimentSafetyInput' }
       & { questionary: (
         { __typename?: 'Questionary' }
         & Pick<Questionary, 'isCompleted'>
         & QuestionaryFragment
-      ), samples: Array<(
+      ), sample: (
         { __typename?: 'Sample' }
         & SampleFragment
-      )> }
-      & RiskAssessmentFragment
+      ) }
+      & SampleEsiFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
       & RejectionFragment
@@ -5538,50 +5802,75 @@ export type CreateRiskAssessmentMutation = (
   ) }
 );
 
-export type RiskAssessmentFragment = (
-  { __typename?: 'RiskAssessment' }
-  & Pick<RiskAssessment, 'riskAssessmentId' | 'proposalPk' | 'scheduledEventId' | 'status'>
-);
-
-export type GetRiskAssessmentQueryVariables = Exact<{
-  riskAssessmentId: Scalars['Int'];
+export type DeleteSampleEsiMutationVariables = Exact<{
+  sampleId: Scalars['Int'];
+  esiId: Scalars['Int'];
 }>;
 
 
-export type GetRiskAssessmentQuery = (
+export type DeleteSampleEsiMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteSampleEsi: (
+    { __typename?: 'SampleEsiResponseWrap' }
+    & { esi: Maybe<(
+      { __typename?: 'SampleExperimentSafetyInput' }
+      & SampleEsiFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type SampleEsiFragment = (
+  { __typename?: 'SampleExperimentSafetyInput' }
+  & Pick<SampleExperimentSafetyInput, 'sampleId' | 'esiId' | 'questionaryId' | 'isSubmitted'>
+);
+
+export type GetSampleEsiQueryVariables = Exact<{
+  sampleId: Scalars['Int'];
+  esiId: Scalars['Int'];
+}>;
+
+
+export type GetSampleEsiQuery = (
   { __typename?: 'Query' }
-  & { riskAssessment: (
-    { __typename?: 'RiskAssessment' }
+  & { sampleEsi: Maybe<(
+    { __typename?: 'SampleExperimentSafetyInput' }
     & { questionary: (
       { __typename?: 'Questionary' }
       & Pick<Questionary, 'isCompleted'>
       & QuestionaryFragment
-    ), samples: Array<(
+    ), sample: (
       { __typename?: 'Sample' }
       & SampleFragment
-    )> }
-    & RiskAssessmentFragment
-  ) }
+    ) }
+    & SampleEsiFragment
+  )> }
 );
 
-export type UpdateRiskAssessmentMutationVariables = Exact<{
-  riskAssessmentId: Scalars['Int'];
-  status?: Maybe<RiskAssessmentStatus>;
-  sampleIds?: Maybe<Array<Scalars['Int']> | Scalars['Int']>;
+export type UpdateSampleEsiMutationVariables = Exact<{
+  esiId: Scalars['Int'];
+  sampleId: Scalars['Int'];
+  isSubmitted?: Maybe<Scalars['Boolean']>;
 }>;
 
 
-export type UpdateRiskAssessmentMutation = (
+export type UpdateSampleEsiMutation = (
   { __typename?: 'Mutation' }
-  & { updateRiskAssessment: (
-    { __typename?: 'RiskAssessmentResponseWrap' }
-    & { riskAssessment: Maybe<(
-      { __typename?: 'RiskAssessment' }
-      & { samples: Array<(
+  & { updateSampleEsi: (
+    { __typename?: 'SampleEsiResponseWrap' }
+    & { esi: Maybe<(
+      { __typename?: 'SampleExperimentSafetyInput' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ), sample: (
         { __typename?: 'Sample' }
         & SampleFragment
-      )> }
-      & RiskAssessmentFragment
+      ) }
+      & SampleEsiFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
       & RejectionFragment
@@ -6180,7 +6469,7 @@ export type GetShipmentsQuery = (
 );
 
 export type SetActiveTemplateMutationVariables = Exact<{
-  templateCategoryId: TemplateCategoryId;
+  templateGroupId: TemplateGroupId;
   templateId: Scalars['Int'];
 }>;
 
@@ -6262,27 +6551,6 @@ export type CloneTemplateMutation = (
   ) }
 );
 
-export type CreateTemplateMutationVariables = Exact<{
-  categoryId: TemplateCategoryId;
-  name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
-}>;
-
-
-export type CreateTemplateMutation = (
-  { __typename?: 'Mutation' }
-  & { createTemplate: (
-    { __typename?: 'TemplateResponseWrap' }
-    & { template: Maybe<(
-      { __typename?: 'Template' }
-      & TemplateMetadataFragment
-    )>, rejection: Maybe<(
-      { __typename?: 'Rejection' }
-      & RejectionFragment
-    )> }
-  ) }
-);
-
 export type CreateQuestionMutationVariables = Exact<{
   categoryId: TemplateCategoryId;
   dataType: DataType;
@@ -6318,6 +6586,27 @@ export type CreateQuestionTemplateRelationMutation = (
     & { template: Maybe<(
       { __typename?: 'Template' }
       & TemplateFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type CreateTemplateMutationVariables = Exact<{
+  groupId: TemplateGroupId;
+  name: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
+}>;
+
+
+export type CreateTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { createTemplate: (
+    { __typename?: 'TemplateResponseWrap' }
+    & { template: Maybe<(
+      { __typename?: 'Template' }
+      & TemplateMetadataFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
       & RejectionFragment
@@ -6459,6 +6748,16 @@ type FieldConfigSampleBasisConfigFragment = (
   & Pick<SampleBasisConfig, 'titlePlaceholder'>
 );
 
+type FieldConfigSampleDeclarationConfigFragment = (
+  { __typename?: 'SampleDeclarationConfig' }
+  & Pick<SampleDeclarationConfig, 'addEntryButtonLabel' | 'minEntries' | 'maxEntries' | 'templateId' | 'esiTemplateId' | 'templateCategory' | 'required' | 'small_label'>
+);
+
+type FieldConfigSampleEsiBasisConfigFragment = (
+  { __typename?: 'SampleEsiBasisConfig' }
+  & Pick<SampleEsiBasisConfig, 'tooltip'>
+);
+
 type FieldConfigSubTemplateConfigFragment = (
   { __typename?: 'SubTemplateConfig' }
   & Pick<SubTemplateConfig, 'addEntryButtonLabel' | 'minEntries' | 'maxEntries' | 'templateId' | 'templateCategory' | 'required' | 'small_label'>
@@ -6467,6 +6766,11 @@ type FieldConfigSubTemplateConfigFragment = (
 type FieldConfigProposalBasisConfigFragment = (
   { __typename?: 'ProposalBasisConfig' }
   & Pick<ProposalBasisConfig, 'tooltip'>
+);
+
+type FieldConfigProposalEsiBasisConfigFragment = (
+  { __typename?: 'ProposalEsiBasisConfig' }
+  & Pick<ProposalEsiBasisConfig, 'tooltip'>
 );
 
 type FieldConfigIntervalConfigFragment = (
@@ -6493,18 +6797,12 @@ type FieldConfigVisitBasisConfigFragment = (
   { __typename?: 'VisitBasisConfig' }
   & Pick<VisitBasisConfig, 'small_label' | 'required' | 'tooltip'>
 );
-
-type FieldConfigRiskAssessmentBasisConfigFragment = (
-  { __typename?: 'RiskAssessmentBasisConfig' }
-  & Pick<RiskAssessmentBasisConfig, 'small_label' | 'required' | 'tooltip'>
-);
-
 type FieldConfigGenericTemplateBasisConfigFragment = (
   { __typename?: 'GenericTemplateBasisConfig' }
   & Pick<GenericTemplateBasisConfig, 'titlePlaceholder' | 'questionLabel'>
 );
 
-export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubTemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment | FieldConfigVisitBasisConfigFragment | FieldConfigRiskAssessmentBasisConfigFragment | FieldConfigGenericTemplateBasisConfigFragment;
+export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSampleDeclarationConfigFragment | FieldConfigSampleEsiBasisConfigFragment | FieldConfigSubTemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigProposalEsiBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment | FieldConfigVisitBasisConfigFragment | FieldConfigGenericTemplateBasisConfigFragment;
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
@@ -6531,11 +6829,20 @@ export type QuestionFragment = (
     { __typename?: 'SampleBasisConfig' }
     & FieldConfigSampleBasisConfigFragment
   ) | (
+    { __typename?: 'SampleDeclarationConfig' }
+    & FieldConfigSampleDeclarationConfigFragment
+  ) | (
+    { __typename?: 'SampleEsiBasisConfig' }
+    & FieldConfigSampleEsiBasisConfigFragment
+  ) | (
     { __typename?: 'SubTemplateConfig' }
     & FieldConfigSubTemplateConfigFragment
   ) | (
     { __typename?: 'ProposalBasisConfig' }
     & FieldConfigProposalBasisConfigFragment
+  ) | (
+    { __typename?: 'ProposalEsiBasisConfig' }
+    & FieldConfigProposalEsiBasisConfigFragment
   ) | (
     { __typename?: 'IntervalConfig' }
     & FieldConfigIntervalConfigFragment
@@ -6551,9 +6858,6 @@ export type QuestionFragment = (
   ) | (
     { __typename?: 'VisitBasisConfig' }
     & FieldConfigVisitBasisConfigFragment
-  ) | (
-    { __typename?: 'RiskAssessmentBasisConfig' }
-    & FieldConfigRiskAssessmentBasisConfigFragment
   ) | (
     { __typename?: 'GenericTemplateBasisConfig' }
     & FieldConfigGenericTemplateBasisConfigFragment
@@ -6588,11 +6892,20 @@ export type QuestionTemplateRelationFragment = (
     { __typename?: 'SampleBasisConfig' }
     & FieldConfigSampleBasisConfigFragment
   ) | (
+    { __typename?: 'SampleDeclarationConfig' }
+    & FieldConfigSampleDeclarationConfigFragment
+  ) | (
+    { __typename?: 'SampleEsiBasisConfig' }
+    & FieldConfigSampleEsiBasisConfigFragment
+  ) | (
     { __typename?: 'SubTemplateConfig' }
     & FieldConfigSubTemplateConfigFragment
   ) | (
     { __typename?: 'ProposalBasisConfig' }
     & FieldConfigProposalBasisConfigFragment
+  ) | (
+    { __typename?: 'ProposalEsiBasisConfig' }
+    & FieldConfigProposalEsiBasisConfigFragment
   ) | (
     { __typename?: 'IntervalConfig' }
     & FieldConfigIntervalConfigFragment
@@ -6609,9 +6922,6 @@ export type QuestionTemplateRelationFragment = (
     { __typename?: 'VisitBasisConfig' }
     & FieldConfigVisitBasisConfigFragment
   ) | (
-    { __typename?: 'RiskAssessmentBasisConfig' }
-    & FieldConfigRiskAssessmentBasisConfigFragment
-  ) | (
     { __typename?: 'GenericTemplateBasisConfig' }
     & FieldConfigGenericTemplateBasisConfigFragment
   ), dependencies: Array<(
@@ -6626,7 +6936,7 @@ export type QuestionTemplateRelationFragment = (
 
 export type TemplateFragment = (
   { __typename?: 'Template' }
-  & Pick<Template, 'isArchived' | 'questionaryCount' | 'templateId' | 'categoryId' | 'name' | 'description'>
+  & Pick<Template, 'isArchived' | 'questionaryCount' | 'templateId' | 'groupId' | 'name' | 'description'>
   & { steps: Array<(
     { __typename?: 'TemplateStep' }
     & { topic: (
@@ -6639,7 +6949,10 @@ export type TemplateFragment = (
   )>, complementaryQuestions: Array<(
     { __typename?: 'Question' }
     & QuestionFragment
-  )> }
+  )>, group: (
+    { __typename?: 'TemplateGroup' }
+    & Pick<TemplateGroup, 'groupId' | 'categoryId'>
+  ) }
 );
 
 export type TemplateMetadataFragment = (
@@ -6664,7 +6977,7 @@ export type TopicFragment = (
 );
 
 export type GetActiveTemplateIdQueryVariables = Exact<{
-  templateCategoryId: TemplateCategoryId;
+  templateGroupId: TemplateGroupId;
 }>;
 
 
@@ -6728,11 +7041,20 @@ export type GetQuestionsQuery = (
       { __typename?: 'SampleBasisConfig' }
       & FieldConfigSampleBasisConfigFragment
     ) | (
+      { __typename?: 'SampleDeclarationConfig' }
+      & FieldConfigSampleDeclarationConfigFragment
+    ) | (
+      { __typename?: 'SampleEsiBasisConfig' }
+      & FieldConfigSampleEsiBasisConfigFragment
+    ) | (
       { __typename?: 'SubTemplateConfig' }
       & FieldConfigSubTemplateConfigFragment
     ) | (
       { __typename?: 'ProposalBasisConfig' }
       & FieldConfigProposalBasisConfigFragment
+    ) | (
+      { __typename?: 'ProposalEsiBasisConfig' }
+      & FieldConfigProposalEsiBasisConfigFragment
     ) | (
       { __typename?: 'IntervalConfig' }
       & FieldConfigIntervalConfigFragment
@@ -6748,9 +7070,6 @@ export type GetQuestionsQuery = (
     ) | (
       { __typename?: 'VisitBasisConfig' }
       & FieldConfigVisitBasisConfigFragment
-    ) | (
-      { __typename?: 'RiskAssessmentBasisConfig' }
-      & FieldConfigRiskAssessmentBasisConfigFragment
     ) | (
       { __typename?: 'GenericTemplateBasisConfig' }
       & FieldConfigGenericTemplateBasisConfigFragment
@@ -7470,35 +7789,11 @@ export type CreateVisitMutation = (
       ), shipments: Array<(
         { __typename?: 'Shipment' }
         & ShipmentFragment
+      )>, esi: Maybe<(
+        { __typename?: 'ExperimentSafetyInput' }
+        & EsiFragment
       )> }
       & VisitFragment
-    )>, rejection: Maybe<(
-      { __typename?: 'Rejection' }
-      & RejectionFragment
-    )> }
-  ) }
-);
-
-export type CreateVisitRegistrationQuestionaryMutationVariables = Exact<{
-  visitId: Scalars['Int'];
-}>;
-
-
-export type CreateVisitRegistrationQuestionaryMutation = (
-  { __typename?: 'Mutation' }
-  & { createVisitRegistrationQuestionary: (
-    { __typename?: 'VisitRegistrationResponseWrap' }
-    & { registration: Maybe<(
-      { __typename?: 'VisitRegistration' }
-      & { user: (
-        { __typename?: 'BasicUserDetails' }
-        & BasicUserDetailsFragment
-      ), questionary: (
-        { __typename?: 'Questionary' }
-        & Pick<Questionary, 'isCompleted'>
-        & QuestionaryFragment
-      ) }
-      & VisitRegistrationFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
       & RejectionFragment
@@ -7530,11 +7825,6 @@ export type VisitFragment = (
   & Pick<Visit, 'id' | 'proposalPk' | 'status' | 'creatorId'>
 );
 
-export type VisitRegistrationFragment = (
-  { __typename?: 'VisitRegistration' }
-  & Pick<VisitRegistration, 'userId' | 'visitId' | 'registrationQuestionaryId' | 'isRegistrationSubmitted' | 'trainingExpiryDate'>
-);
-
 export type GetVisitQueryVariables = Exact<{
   visitId: Scalars['Int'];
 }>;
@@ -7558,29 +7848,16 @@ export type GetVisitQuery = (
         & Pick<Instrument, 'name'>
       )> }
       & ProposalFragment
-    ) }
+    ), esi: Maybe<(
+      { __typename?: 'ExperimentSafetyInput' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ) }
+      & EsiFragment
+    )> }
     & VisitFragment
-  )> }
-);
-
-export type GetVisitRegistrationQueryVariables = Exact<{
-  visitId: Scalars['Int'];
-}>;
-
-
-export type GetVisitRegistrationQuery = (
-  { __typename?: 'Query' }
-  & { visitRegistration: Maybe<(
-    { __typename?: 'VisitRegistration' }
-    & { user: (
-      { __typename?: 'BasicUserDetails' }
-      & BasicUserDetailsFragment
-    ), questionary: (
-      { __typename?: 'Questionary' }
-      & Pick<Questionary, 'isCompleted'>
-      & QuestionaryFragment
-    ) }
-    & VisitRegistrationFragment
   )> }
 );
 
@@ -7640,6 +7917,9 @@ export type UpdateVisitMutation = (
       ), shipments: Array<(
         { __typename?: 'Shipment' }
         & ShipmentFragment
+      )>, esi: Maybe<(
+        { __typename?: 'ExperimentSafetyInput' }
+        & EsiFragment
       )> }
       & VisitFragment
     )>, rejection: Maybe<(
@@ -7647,6 +7927,59 @@ export type UpdateVisitMutation = (
       & RejectionFragment
     )> }
   ) }
+);
+
+export type CreateVisitRegistrationQuestionaryMutationVariables = Exact<{
+  visitId: Scalars['Int'];
+}>;
+
+
+export type CreateVisitRegistrationQuestionaryMutation = (
+  { __typename?: 'Mutation' }
+  & { createVisitRegistrationQuestionary: (
+    { __typename?: 'VisitRegistrationResponseWrap' }
+    & { registration: Maybe<(
+      { __typename?: 'VisitRegistration' }
+      & { user: (
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      ), questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ) }
+      & VisitRegistrationFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type VisitRegistrationFragment = (
+  { __typename?: 'VisitRegistration' }
+  & Pick<VisitRegistration, 'userId' | 'visitId' | 'registrationQuestionaryId' | 'isRegistrationSubmitted' | 'trainingExpiryDate'>
+);
+
+export type GetVisitRegistrationQueryVariables = Exact<{
+  visitId: Scalars['Int'];
+}>;
+
+
+export type GetVisitRegistrationQuery = (
+  { __typename?: 'Query' }
+  & { visitRegistration: Maybe<(
+    { __typename?: 'VisitRegistration' }
+    & { user: (
+      { __typename?: 'BasicUserDetails' }
+      & BasicUserDetailsFragment
+    ), questionary: (
+      { __typename?: 'Questionary' }
+      & Pick<Questionary, 'isCompleted'>
+      & QuestionaryFragment
+    ) }
+    & VisitRegistrationFragment
+  )> }
 );
 
 export type UpdateVisitRegistrationMutationVariables = Exact<{
@@ -7707,6 +8040,7 @@ export const CallFragmentDoc = gql`
   referenceNumberFormat
   proposalWorkflowId
   templateId
+  esiTemplateId
   allocationTimeUnit
   instruments {
     id
@@ -7743,6 +8077,17 @@ export const GenericTemplateFragmentDoc = gql`
   created
   proposalPk
   questionId
+}
+  `;
+
+export const EsiFragmentDoc = gql`
+    fragment esi on ExperimentSafetyInput {
+  id
+  visitId
+  creatorId
+  questionaryId
+  isSubmitted
+  created
 }
     `;
 export const CoreTechnicalReviewFragmentDoc = gql`
@@ -7858,8 +8203,24 @@ export const FieldConfigFragmentDoc = gql`
   ... on ProposalBasisConfig {
     tooltip
   }
+  ... on ProposalEsiBasisConfig {
+    tooltip
+  }
+  ... on SampleEsiBasisConfig {
+    tooltip
+  }
   ... on SampleBasisConfig {
     titlePlaceholder
+  }
+  ... on SampleDeclarationConfig {
+    addEntryButtonLabel
+    minEntries
+    maxEntries
+    templateId
+    esiTemplateId
+    templateCategory
+    required
+    small_label
   }
   ... on SubTemplateConfig {
     addEntryButtonLabel
@@ -7902,11 +8263,6 @@ export const FieldConfigFragmentDoc = gql`
     max
   }
   ... on VisitBasisConfig {
-    small_label
-    required
-    tooltip
-  }
-  ... on RiskAssessmentBasisConfig {
     small_label
     required
     tooltip
@@ -7992,12 +8348,12 @@ export const CoreReviewFragmentDoc = gql`
   sepID
 }
     `;
-export const RiskAssessmentFragmentDoc = gql`
-    fragment riskAssessment on RiskAssessment {
-  riskAssessmentId
-  proposalPk
-  scheduledEventId
-  status
+export const SampleEsiFragmentDoc = gql`
+    fragment sampleEsi on SampleExperimentSafetyInput {
+  sampleId
+  esiId
+  questionaryId
+  isSubmitted
 }
     `;
 export const SampleFragmentDoc = gql`
@@ -8065,11 +8421,15 @@ export const TemplateFragmentDoc = gql`
   isArchived
   questionaryCount
   templateId
-  categoryId
+  groupId
   name
   description
   complementaryQuestions {
     ...question
+  }
+  group {
+    groupId
+    categoryId
   }
 }
     ${TopicFragmentDoc}
@@ -8758,9 +9118,9 @@ export const AssignInstrumentsToCallDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const CreateCallDocument = gql`
-    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $title: String, $description: String) {
+    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $esiTemplateId: Int, $title: String, $description: String) {
   createCall(
-    createCallInput: {shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, title: $title, description: $description}
+    createCallInput: {shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, esiTemplateId: $esiTemplateId, title: $title, description: $description}
   ) {
     rejection {
       ...rejection
@@ -8824,9 +9184,9 @@ export const RemoveAssignedInstrumentFromCallDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const UpdateCallDocument = gql`
-    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $title: String, $description: String) {
+    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $esiTemplateId: Int, $title: String, $description: String) {
   updateCall(
-    updateCallInput: {id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, title: $title, description: $description}
+    updateCallInput: {id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, esiTemplateId: $esiTemplateId, title: $title, description: $description}
   ) {
     rejection {
       ...rejection
@@ -8838,6 +9198,109 @@ export const UpdateCallDocument = gql`
 }
     ${RejectionFragmentDoc}
 ${CallFragmentDoc}`;
+export const CreateEsiDocument = gql`
+    mutation createEsi($visitId: Int!) {
+  createEsi(visitId: $visitId) {
+    esi {
+      ...esi
+      questionary {
+        isCompleted
+        ...questionary
+      }
+      sampleEsis {
+        sample {
+          ...sample
+        }
+        ...sampleEsi
+        questionary {
+          isCompleted
+        }
+      }
+      visit {
+        ...visit
+        proposal {
+          proposalId
+          title
+          samples {
+            ...sample
+          }
+        }
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${EsiFragmentDoc}
+${QuestionaryFragmentDoc}
+${SampleFragmentDoc}
+${SampleEsiFragmentDoc}
+${VisitFragmentDoc}
+${RejectionFragmentDoc}`;
+export const GetEsiDocument = gql`
+    query getEsi($esiId: Int!) {
+  esi(esiId: $esiId) {
+    ...esi
+    questionary {
+      isCompleted
+      ...questionary
+    }
+    sampleEsis {
+      sample {
+        ...sample
+      }
+      ...sampleEsi
+      questionary {
+        isCompleted
+      }
+    }
+    visit {
+      ...visit
+      proposal {
+        proposalId
+        title
+        samples {
+          ...sample
+        }
+      }
+    }
+  }
+}
+    ${EsiFragmentDoc}
+${QuestionaryFragmentDoc}
+${SampleFragmentDoc}
+${SampleEsiFragmentDoc}
+${VisitFragmentDoc}`;
+export const UpdateEsiDocument = gql`
+    mutation updateEsi($esiId: Int!, $isSubmitted: Boolean) {
+  updateEsi(esiId: $esiId, isSubmitted: $isSubmitted) {
+    esi {
+      ...esi
+      questionary {
+        isCompleted
+        ...questionary
+      }
+      sampleEsis {
+        sample {
+          ...sample
+        }
+        ...sampleEsi
+        questionary {
+          isCompleted
+        }
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${EsiFragmentDoc}
+${QuestionaryFragmentDoc}
+${SampleFragmentDoc}
+${SampleEsiFragmentDoc}
+${RejectionFragmentDoc}`;
 export const GetEventLogsDocument = gql`
     query getEventLogs($eventType: String!, $changedObjectId: String!) {
   eventLogs(eventType: $eventType, changedObjectId: $changedObjectId) {
@@ -9512,7 +9975,7 @@ export const UpdateProposalDocument = gql`
     ${BasicUserDetailsFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const GetUserProposalBookingsWithEventsDocument = gql`
-    query getUserProposalBookingsWithEvents($endsAfter: TzLessDateTime, $status: [ProposalBookingStatus!], $instrumentId: Int) {
+    query getUserProposalBookingsWithEvents($endsAfter: TzLessDateTime, $status: [ProposalBookingStatusCore!], $instrumentId: Int) {
   me {
     proposals(filter: {instrumentId: $instrumentId}) {
       primaryKey
@@ -9526,8 +9989,8 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
       users {
         ...basicUserDetails
       }
-      proposalBooking(filter: {status: $status}) {
-        scheduledEvents(filter: {endsAfter: $endsAfter}) {
+      proposalBookingCore(filter: {status: $status}) {
+        scheduledEvents(filter: {endsAfter: $endsAfter, status: $status}) {
           id
           startsAt
           endsAt
@@ -9546,14 +10009,14 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
                 ...basicUserDetails
               }
             }
+            esi {
+              ...esi
+            }
           }
         }
       }
       visits {
         ...visit
-      }
-      riskAssessment {
-        ...riskAssessment
       }
       instrument {
         id
@@ -9566,7 +10029,7 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
 ${VisitFragmentDoc}
 ${ShipmentFragmentDoc}
 ${VisitRegistrationFragmentDoc}
-${RiskAssessmentFragmentDoc}`;
+${EsiFragmentDoc}`;
 export const AnswerTopicDocument = gql`
     mutation answerTopic($questionaryId: Int!, $topicId: Int!, $answers: [AnswerInput!]!, $isPartialSave: Boolean) {
   answerTopic(
@@ -9599,6 +10062,14 @@ export const CreateQuestionaryDocument = gql`
 }
     ${QuestionaryFragmentDoc}
 ${RejectionFragmentDoc}`;
+export const GetBlankQuestionaryDocument = gql`
+    query getBlankQuestionary($templateId: Int!) {
+  blankQuestionary(templateId: $templateId) {
+    isCompleted
+    ...questionary
+  }
+}
+    ${QuestionaryFragmentDoc}`;
 export const GetBlankQuestionaryStepsDocument = gql`
     query getBlankQuestionarySteps($templateId: Int!) {
   blankQuestionarySteps(templateId: $templateId) {
@@ -9788,19 +10259,16 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
-export const CreateRiskAssessmentDocument = gql`
-    mutation createRiskAssessment($proposalPk: Int!, $scheduledEventId: Int!) {
-  createRiskAssessment(
-    proposalPk: $proposalPk
-    scheduledEventId: $scheduledEventId
-  ) {
-    riskAssessment {
-      ...riskAssessment
+export const CreateSampleEsiDocument = gql`
+    mutation createSampleEsi($sampleId: Int!, $esiId: Int!) {
+  createSampleEsi(sampleId: $sampleId, esiId: $esiId) {
+    esi {
+      ...sampleEsi
       questionary {
-        ...questionary
         isCompleted
+        ...questionary
       }
-      samples {
+      sample {
         ...sample
       }
     }
@@ -9809,36 +10277,49 @@ export const CreateRiskAssessmentDocument = gql`
     }
   }
 }
-    ${RiskAssessmentFragmentDoc}
+    ${SampleEsiFragmentDoc}
 ${QuestionaryFragmentDoc}
 ${SampleFragmentDoc}
 ${RejectionFragmentDoc}`;
-export const GetRiskAssessmentDocument = gql`
-    query getRiskAssessment($riskAssessmentId: Int!) {
-  riskAssessment(riskAssessmentId: $riskAssessmentId) {
-    ...riskAssessment
-    questionary {
-      ...questionary
-      isCompleted
+export const DeleteSampleEsiDocument = gql`
+    mutation deleteSampleEsi($sampleId: Int!, $esiId: Int!) {
+  deleteSampleEsi(sampleId: $sampleId, esiId: $esiId) {
+    esi {
+      ...sampleEsi
     }
-    samples {
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${SampleEsiFragmentDoc}
+${RejectionFragmentDoc}`;
+export const GetSampleEsiDocument = gql`
+    query getSampleEsi($sampleId: Int!, $esiId: Int!) {
+  sampleEsi(sampleId: $sampleId, esiId: $esiId) {
+    ...sampleEsi
+    questionary {
+      isCompleted
+      ...questionary
+    }
+    sample {
       ...sample
     }
   }
 }
-    ${RiskAssessmentFragmentDoc}
+    ${SampleEsiFragmentDoc}
 ${QuestionaryFragmentDoc}
 ${SampleFragmentDoc}`;
-export const UpdateRiskAssessmentDocument = gql`
-    mutation updateRiskAssessment($riskAssessmentId: Int!, $status: RiskAssessmentStatus, $sampleIds: [Int!]) {
-  updateRiskAssessment(
-    riskAssessmentId: $riskAssessmentId
-    status: $status
-    sampleIds: $sampleIds
-  ) {
-    riskAssessment {
-      ...riskAssessment
-      samples {
+export const UpdateSampleEsiDocument = gql`
+    mutation updateSampleEsi($esiId: Int!, $sampleId: Int!, $isSubmitted: Boolean) {
+  updateSampleEsi(sampleId: $sampleId, esiId: $esiId, isSubmitted: $isSubmitted) {
+    esi {
+      ...sampleEsi
+      questionary {
+        isCompleted
+        ...questionary
+      }
+      sample {
         ...sample
       }
     }
@@ -9847,7 +10328,8 @@ export const UpdateRiskAssessmentDocument = gql`
     }
   }
 }
-    ${RiskAssessmentFragmentDoc}
+    ${SampleEsiFragmentDoc}
+${QuestionaryFragmentDoc}
 ${SampleFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const CloneSampleDocument = gql`
@@ -10286,11 +10768,8 @@ export const GetShipmentsDocument = gql`
 }
     ${ShipmentFragmentDoc}`;
 export const SetActiveTemplateDocument = gql`
-    mutation setActiveTemplate($templateCategoryId: TemplateCategoryId!, $templateId: Int!) {
-  setActiveTemplate(
-    templateId: $templateId
-    templateCategoryId: $templateCategoryId
-  ) {
+    mutation setActiveTemplate($templateGroupId: TemplateGroupId!, $templateId: Int!) {
+  setActiveTemplate(templateId: $templateId, templateGroupId: $templateGroupId) {
     isSuccess
     rejection {
       ...rejection
@@ -10347,19 +10826,6 @@ export const CloneTemplateDocument = gql`
 }
     ${TemplateMetadataFragmentDoc}
 ${RejectionFragmentDoc}`;
-export const CreateTemplateDocument = gql`
-    mutation createTemplate($categoryId: TemplateCategoryId!, $name: String!, $description: String) {
-  createTemplate(categoryId: $categoryId, name: $name, description: $description) {
-    template {
-      ...templateMetadata
-    }
-    rejection {
-      ...rejection
-    }
-  }
-}
-    ${TemplateMetadataFragmentDoc}
-${RejectionFragmentDoc}`;
 export const CreateQuestionDocument = gql`
     mutation createQuestion($categoryId: TemplateCategoryId!, $dataType: DataType!) {
   createQuestion(categoryId: $categoryId, dataType: $dataType) {
@@ -10390,6 +10856,19 @@ export const CreateQuestionTemplateRelationDocument = gql`
   }
 }
     ${TemplateFragmentDoc}
+${RejectionFragmentDoc}`;
+export const CreateTemplateDocument = gql`
+    mutation createTemplate($groupId: TemplateGroupId!, $name: String!, $description: String) {
+  createTemplate(groupId: $groupId, name: $name, description: $description) {
+    template {
+      ...templateMetadata
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${TemplateMetadataFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const CreateTopicDocument = gql`
     mutation createTopic($templateId: Int!, $sortOrder: Int!) {
@@ -10453,8 +10932,8 @@ export const DeleteTopicDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const GetActiveTemplateIdDocument = gql`
-    query getActiveTemplateId($templateCategoryId: TemplateCategoryId!) {
-  activeTemplateId(templateCategoryId: $templateCategoryId)
+    query getActiveTemplateId($templateGroupId: TemplateGroupId!) {
+  activeTemplateId(templateGroupId: $templateGroupId)
 }
     `;
 export const GetIsNaturalKeyPresentDocument = gql`
@@ -11033,6 +11512,9 @@ export const CreateVisitDocument = gql`
       shipments {
         ...shipment
       }
+      esi {
+        ...esi
+      }
     }
     rejection {
       ...rejection
@@ -11044,28 +11526,7 @@ ${BasicUserDetailsFragmentDoc}
 ${VisitRegistrationFragmentDoc}
 ${ProposalFragmentDoc}
 ${ShipmentFragmentDoc}
-${RejectionFragmentDoc}`;
-export const CreateVisitRegistrationQuestionaryDocument = gql`
-    mutation createVisitRegistrationQuestionary($visitId: Int!) {
-  createVisitRegistrationQuestionary(visitId: $visitId) {
-    registration {
-      ...visitRegistration
-      user {
-        ...basicUserDetails
-      }
-      questionary {
-        ...questionary
-        isCompleted
-      }
-    }
-    rejection {
-      ...rejection
-    }
-  }
-}
-    ${VisitRegistrationFragmentDoc}
-${BasicUserDetailsFragmentDoc}
-${QuestionaryFragmentDoc}
+${EsiFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const DeleteVisitDocument = gql`
     mutation deleteVisit($visitId: Int!) {
@@ -11096,27 +11557,20 @@ export const GetVisitDocument = gql`
         name
       }
     }
+    esi {
+      ...esi
+      questionary {
+        isCompleted
+        ...questionary
+      }
+    }
   }
 }
     ${VisitFragmentDoc}
 ${VisitRegistrationFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
-${ProposalFragmentDoc}`;
-export const GetVisitRegistrationDocument = gql`
-    query getVisitRegistration($visitId: Int!) {
-  visitRegistration(visitId: $visitId) {
-    ...visitRegistration
-    user {
-      ...basicUserDetails
-    }
-    questionary {
-      ...questionary
-      isCompleted
-    }
-  }
-}
-    ${VisitRegistrationFragmentDoc}
-${BasicUserDetailsFragmentDoc}
+${ProposalFragmentDoc}
+${EsiFragmentDoc}
 ${QuestionaryFragmentDoc}`;
 export const GetVisitsDocument = gql`
     query getVisits($filter: VisitsFilter) {
@@ -11161,6 +11615,9 @@ export const UpdateVisitDocument = gql`
       shipments {
         ...shipment
       }
+      esi {
+        ...esi
+      }
     }
     rejection {
       ...rejection
@@ -11172,7 +11629,46 @@ ${BasicUserDetailsFragmentDoc}
 ${VisitRegistrationFragmentDoc}
 ${ProposalFragmentDoc}
 ${ShipmentFragmentDoc}
+${EsiFragmentDoc}
 ${RejectionFragmentDoc}`;
+export const CreateVisitRegistrationQuestionaryDocument = gql`
+    mutation createVisitRegistrationQuestionary($visitId: Int!) {
+  createVisitRegistrationQuestionary(visitId: $visitId) {
+    registration {
+      ...visitRegistration
+      user {
+        ...basicUserDetails
+      }
+      questionary {
+        ...questionary
+        isCompleted
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${VisitRegistrationFragmentDoc}
+${BasicUserDetailsFragmentDoc}
+${QuestionaryFragmentDoc}
+${RejectionFragmentDoc}`;
+export const GetVisitRegistrationDocument = gql`
+    query getVisitRegistration($visitId: Int!) {
+  visitRegistration(visitId: $visitId) {
+    ...visitRegistration
+    user {
+      ...basicUserDetails
+    }
+    questionary {
+      ...questionary
+      isCompleted
+    }
+  }
+}
+    ${VisitRegistrationFragmentDoc}
+${BasicUserDetailsFragmentDoc}
+${QuestionaryFragmentDoc}`;
 export const UpdateVisitRegistrationDocument = gql`
     mutation updateVisitRegistration($visitId: Int!, $trainingExpiryDate: DateTime, $isRegistrationSubmitted: Boolean) {
   updateVisitRegistration(
@@ -11338,6 +11834,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     updateCall(variables: UpdateCallMutationVariables): Promise<UpdateCallMutation> {
       return withWrapper(() => client.request<UpdateCallMutation>(print(UpdateCallDocument), variables));
     },
+    createEsi(variables: CreateEsiMutationVariables): Promise<CreateEsiMutation> {
+      return withWrapper(() => client.request<CreateEsiMutation>(print(CreateEsiDocument), variables));
+    },
+    getEsi(variables: GetEsiQueryVariables): Promise<GetEsiQuery> {
+      return withWrapper(() => client.request<GetEsiQuery>(print(GetEsiDocument), variables));
+    },
+    updateEsi(variables: UpdateEsiMutationVariables): Promise<UpdateEsiMutation> {
+      return withWrapper(() => client.request<UpdateEsiMutation>(print(UpdateEsiDocument), variables));
+    },
     getEventLogs(variables: GetEventLogsQueryVariables): Promise<GetEventLogsQuery> {
       return withWrapper(() => client.request<GetEventLogsQuery>(print(GetEventLogsDocument), variables));
     },
@@ -11443,6 +11948,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     createQuestionary(variables: CreateQuestionaryMutationVariables): Promise<CreateQuestionaryMutation> {
       return withWrapper(() => client.request<CreateQuestionaryMutation>(print(CreateQuestionaryDocument), variables));
     },
+    getBlankQuestionary(variables: GetBlankQuestionaryQueryVariables): Promise<GetBlankQuestionaryQuery> {
+      return withWrapper(() => client.request<GetBlankQuestionaryQuery>(print(GetBlankQuestionaryDocument), variables));
+    },
     getBlankQuestionarySteps(variables: GetBlankQuestionaryStepsQueryVariables): Promise<GetBlankQuestionaryStepsQuery> {
       return withWrapper(() => client.request<GetBlankQuestionaryStepsQuery>(print(GetBlankQuestionaryStepsDocument), variables));
     },
@@ -11482,14 +11990,17 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return withWrapper(() => client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables));
     },
-    createRiskAssessment(variables: CreateRiskAssessmentMutationVariables): Promise<CreateRiskAssessmentMutation> {
-      return withWrapper(() => client.request<CreateRiskAssessmentMutation>(print(CreateRiskAssessmentDocument), variables));
+    createSampleEsi(variables: CreateSampleEsiMutationVariables): Promise<CreateSampleEsiMutation> {
+      return withWrapper(() => client.request<CreateSampleEsiMutation>(print(CreateSampleEsiDocument), variables));
     },
-    getRiskAssessment(variables: GetRiskAssessmentQueryVariables): Promise<GetRiskAssessmentQuery> {
-      return withWrapper(() => client.request<GetRiskAssessmentQuery>(print(GetRiskAssessmentDocument), variables));
+    deleteSampleEsi(variables: DeleteSampleEsiMutationVariables): Promise<DeleteSampleEsiMutation> {
+      return withWrapper(() => client.request<DeleteSampleEsiMutation>(print(DeleteSampleEsiDocument), variables));
     },
-    updateRiskAssessment(variables: UpdateRiskAssessmentMutationVariables): Promise<UpdateRiskAssessmentMutation> {
-      return withWrapper(() => client.request<UpdateRiskAssessmentMutation>(print(UpdateRiskAssessmentDocument), variables));
+    getSampleEsi(variables: GetSampleEsiQueryVariables): Promise<GetSampleEsiQuery> {
+      return withWrapper(() => client.request<GetSampleEsiQuery>(print(GetSampleEsiDocument), variables));
+    },
+    updateSampleEsi(variables: UpdateSampleEsiMutationVariables): Promise<UpdateSampleEsiMutation> {
+      return withWrapper(() => client.request<UpdateSampleEsiMutation>(print(UpdateSampleEsiDocument), variables));
     },
     cloneSample(variables: CloneSampleMutationVariables): Promise<CloneSampleMutation> {
       return withWrapper(() => client.request<CloneSampleMutation>(print(CloneSampleDocument), variables));
@@ -11587,14 +12098,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     cloneTemplate(variables: CloneTemplateMutationVariables): Promise<CloneTemplateMutation> {
       return withWrapper(() => client.request<CloneTemplateMutation>(print(CloneTemplateDocument), variables));
     },
-    createTemplate(variables: CreateTemplateMutationVariables): Promise<CreateTemplateMutation> {
-      return withWrapper(() => client.request<CreateTemplateMutation>(print(CreateTemplateDocument), variables));
-    },
     createQuestion(variables: CreateQuestionMutationVariables): Promise<CreateQuestionMutation> {
       return withWrapper(() => client.request<CreateQuestionMutation>(print(CreateQuestionDocument), variables));
     },
     createQuestionTemplateRelation(variables: CreateQuestionTemplateRelationMutationVariables): Promise<CreateQuestionTemplateRelationMutation> {
       return withWrapper(() => client.request<CreateQuestionTemplateRelationMutation>(print(CreateQuestionTemplateRelationDocument), variables));
+    },
+    createTemplate(variables: CreateTemplateMutationVariables): Promise<CreateTemplateMutation> {
+      return withWrapper(() => client.request<CreateTemplateMutation>(print(CreateTemplateDocument), variables));
     },
     createTopic(variables: CreateTopicMutationVariables): Promise<CreateTopicMutation> {
       return withWrapper(() => client.request<CreateTopicMutation>(print(CreateTopicDocument), variables));
@@ -11737,23 +12248,23 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     createVisit(variables: CreateVisitMutationVariables): Promise<CreateVisitMutation> {
       return withWrapper(() => client.request<CreateVisitMutation>(print(CreateVisitDocument), variables));
     },
-    createVisitRegistrationQuestionary(variables: CreateVisitRegistrationQuestionaryMutationVariables): Promise<CreateVisitRegistrationQuestionaryMutation> {
-      return withWrapper(() => client.request<CreateVisitRegistrationQuestionaryMutation>(print(CreateVisitRegistrationQuestionaryDocument), variables));
-    },
     deleteVisit(variables: DeleteVisitMutationVariables): Promise<DeleteVisitMutation> {
       return withWrapper(() => client.request<DeleteVisitMutation>(print(DeleteVisitDocument), variables));
     },
     getVisit(variables: GetVisitQueryVariables): Promise<GetVisitQuery> {
       return withWrapper(() => client.request<GetVisitQuery>(print(GetVisitDocument), variables));
     },
-    getVisitRegistration(variables: GetVisitRegistrationQueryVariables): Promise<GetVisitRegistrationQuery> {
-      return withWrapper(() => client.request<GetVisitRegistrationQuery>(print(GetVisitRegistrationDocument), variables));
-    },
     getVisits(variables?: GetVisitsQueryVariables): Promise<GetVisitsQuery> {
       return withWrapper(() => client.request<GetVisitsQuery>(print(GetVisitsDocument), variables));
     },
     updateVisit(variables: UpdateVisitMutationVariables): Promise<UpdateVisitMutation> {
       return withWrapper(() => client.request<UpdateVisitMutation>(print(UpdateVisitDocument), variables));
+    },
+    createVisitRegistrationQuestionary(variables: CreateVisitRegistrationQuestionaryMutationVariables): Promise<CreateVisitRegistrationQuestionaryMutation> {
+      return withWrapper(() => client.request<CreateVisitRegistrationQuestionaryMutation>(print(CreateVisitRegistrationQuestionaryDocument), variables));
+    },
+    getVisitRegistration(variables: GetVisitRegistrationQueryVariables): Promise<GetVisitRegistrationQuery> {
+      return withWrapper(() => client.request<GetVisitRegistrationQuery>(print(GetVisitRegistrationDocument), variables));
     },
     updateVisitRegistration(variables: UpdateVisitRegistrationMutationVariables): Promise<UpdateVisitRegistrationMutation> {
       return withWrapper(() => client.request<UpdateVisitRegistrationMutation>(print(UpdateVisitRegistrationDocument), variables));

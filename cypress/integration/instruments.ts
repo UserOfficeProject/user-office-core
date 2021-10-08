@@ -35,6 +35,7 @@ context('Instrument tests', () => {
     startDate: faker.date.past().toISOString().slice(0, 10),
     endDate: faker.date.future().toISOString().slice(0, 10),
     template: 'default template',
+    esiTemplate: 'default esi template',
     workflow: proposalWorkflow.name,
   };
 
@@ -43,6 +44,10 @@ context('Instrument tests', () => {
 
   before(() => {
     cy.resetDB();
+    cy.viewport(1920, 1080);
+    cy.login('officer');
+    cy.createTemplate('proposalEsi', 'default esi template');
+    cy.logout();
   });
 
   beforeEach(() => {

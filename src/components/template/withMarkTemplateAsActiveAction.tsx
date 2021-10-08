@@ -22,7 +22,7 @@ const withMarkTemplateAsActiveAction = (
     const classes = useStyles();
     const { api } = useDataApiWithFeedback();
     const { activeTemplateId, setActiveTemplateId } = useActiveTemplateId(
-      props.templateCategory
+      props.templateGroup
     );
 
     if (activeTemplateId === undefined) {
@@ -46,7 +46,7 @@ const withMarkTemplateAsActiveAction = (
               const newActiveTemplateId = (data as Pick<Template, 'templateId'>)
                 .templateId;
               await api().setActiveTemplate({
-                templateCategoryId: props.templateCategory,
+                templateGroupId: props.templateGroup,
                 templateId: newActiveTemplateId,
               });
               setActiveTemplateId(newActiveTemplateId);

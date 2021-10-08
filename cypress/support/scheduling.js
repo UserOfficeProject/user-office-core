@@ -1,13 +1,15 @@
-import faker from 'faker';
 import { GraphQLClient } from 'graphql-request';
 
 const createScheduledEvent = (proposalBookingId, date) => {
   const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
 
   const createEventQuery = `
-        mutation bulkUpsertScheduledEvents($input: BulkUpsertScheduledEventsInput!) {
-          bulkUpsertScheduledEvents(bulkUpsertScheduledEvents: $input) {
+        mutation createScheduledEvent($input: NewScheduledEventInput!) {
+          createScheduledEvent(newScheduledEvent: $input) {
             error
+            scheduledEvent {
+              id
+            }
           }
         }
         `;
@@ -17,40 +19,37 @@ const createScheduledEvent = (proposalBookingId, date) => {
   }).rawRequest(createEventQuery, {
     input: {
       proposalBookingId: proposalBookingId,
-      scheduledEvents: [
-        {
-          id: 1,
-          newlyCreated: true,
-          startsAt: `${date.startsAt}:00`,
-          endsAt: `${date.endsAt}:00`,
-        },
-      ],
+      startsAt: `${date.startsAt}:00`,
+      endsAt: `${date.endsAt}:00`,
+      bookingType: 'USER_OPERATIONS',
+      instrumentId: 1,
     },
   });
 
   cy.wrap(createEventReq);
 };
 
-const activateBooking = (proposalBookingId) => {
+const activateScheduledEvent = (scheduledEventId) => {
   const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
 
-  const activateBookingQuery = `
-      mutation activateProposalBooking($id: Int!
-        ) {
-          activateProposalBooking(id: $id) {
+  const activateScheduledEventQuery = `
+      mutation activateScheduledEvent($input: ActivateScheduledEventInput!) {
+          activateScheduledEvent(activateScheduledEvent: $input) {
             error
           }
         }
       `;
 
-  const activateBookingReq = new GraphQLClient('/graphql', {
+  const activateScheduledEventReq = new GraphQLClient('/graphql', {
     headers: { authorization: authHeader },
-  }).rawRequest(activateBookingQuery, {
-    id: proposalBookingId,
+  }).rawRequest(activateScheduledEventQuery, {
+    input: {
+      id: scheduledEventId,
+    },
   });
 
-  cy.wrap(activateBookingReq);
+  cy.wrap(activateScheduledEventReq);
 };
 
 Cypress.Commands.add('createScheduledEvent', createScheduledEvent);
-Cypress.Commands.add('activateBooking', activateBooking);
+Cypress.Commands.add('activateScheduledEvent', activateScheduledEvent);

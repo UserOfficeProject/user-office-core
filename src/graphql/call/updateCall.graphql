@@ -17,6 +17,7 @@ mutation updateCall(
   $referenceNumberFormat: String
   $proposalWorkflowId: Int!
   $templateId: Int!
+  $esiTemplateId: Int
   $title: String
   $description: String
 ) {
@@ -40,6 +41,7 @@ mutation updateCall(
       referenceNumberFormat: $referenceNumberFormat
       proposalWorkflowId: $proposalWorkflowId
       templateId: $templateId
+      esiTemplateId: $esiTemplateId
       title: $title
       description: $description
     }

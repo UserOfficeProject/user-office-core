@@ -1,7 +1,7 @@
 import { Column } from '@material-table/core';
 import React from 'react';
 
-import { Template, TemplateCategoryId } from 'generated/sdk';
+import { Template, TemplateGroupId } from 'generated/sdk';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
@@ -30,7 +30,7 @@ function SampleTemplatesTable(props: SampleTemplatesTableProps) {
   return (
     <TemplatesTable
       columns={columns}
-      templateCategory={TemplateCategoryId.SAMPLE_DECLARATION}
+      templateGroup={TemplateGroupId.SAMPLE}
       isRowRemovable={(rowData) => {
         const sampleTemplateRowData = rowData as SampleTemplateRowDataType;
 

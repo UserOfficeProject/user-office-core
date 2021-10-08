@@ -14,7 +14,7 @@ import { useHistory } from 'react-router';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
-import { GetTemplatesQuery, Template, TemplateCategoryId } from 'generated/sdk';
+import { GetTemplatesQuery, Template, TemplateGroupId } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { WithConfirmType } from 'utils/withConfirm';
@@ -28,7 +28,7 @@ export type TemplateRowDataType = Pick<
 
 export interface TemplatesTableProps {
   columns: Column<TemplateRowDataType>[];
-  templateCategory: TemplateCategoryId;
+  templateGroup: TemplateGroupId;
   dataProvider: () => Promise<Exclude<GetTemplatesQuery['templates'], null>>;
   isRowRemovable: (row: TemplateRowDataType) => boolean;
   confirm: WithConfirmType;
@@ -37,7 +37,7 @@ export interface TemplatesTableProps {
 export function TemplatesTable({
   dataProvider,
   columns,
-  templateCategory,
+  templateGroup,
   isRowRemovable,
   confirm,
   actions,
@@ -215,7 +215,7 @@ export function TemplatesTable({
             }
             setShow(false);
           }}
-          categoryId={templateCategory}
+          groupId={templateGroup}
         />
       </InputDialog>
       <MaterialTable

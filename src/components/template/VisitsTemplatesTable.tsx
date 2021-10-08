@@ -1,7 +1,7 @@
 import { Column } from '@material-table/core';
 import React from 'react';
 
-import { Template, TemplateCategoryId } from 'generated/sdk';
+import { Template, TemplateGroupId } from 'generated/sdk';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
@@ -31,7 +31,7 @@ function VisitTemplatesTable(props: VisitTemplatesTableProps) {
   return (
     <Table
       columns={columns}
-      templateCategory={TemplateCategoryId.VISIT}
+      templateGroup={TemplateGroupId.VISIT_REGISTRATION}
       isRowRemovable={() => {
         return true;
       }}

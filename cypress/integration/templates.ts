@@ -2,11 +2,11 @@ import faker from 'faker';
 
 context('Template tests', () => {
   before(() => {
-    cy.resetDB();
+    cy.resetDB(true);
   });
 
   beforeEach(() => {
-    cy.viewport(1920, 1380);
+    cy.viewport(1920, 1680);
   });
 
   let boolId: string;
@@ -36,7 +36,7 @@ context('Template tests', () => {
 
   const dateTooltip = faker.lorem.words(2);
 
-  const topic = faker.lorem.words(2);
+  const topic = 'Topic title';
   const title = faker.lorem.words(3);
   const abstract = faker.lorem.words(8);
   const textAnswer = faker.lorem.words(5);
@@ -97,8 +97,6 @@ context('Template tests', () => {
       .find("[title='Edit']")
       .first()
       .click();
-
-    cy.createTopic(topic);
 
     /* Boolean */
 
@@ -956,6 +954,9 @@ context('Template tests', () => {
     cy.get('[role="presentation"] [role="listbox"] li')
       .contains(proposalWorkflow.name)
       .click();
+
+    cy.get('[data-cy="call-esi-template"]').click();
+    cy.get('[role=listbox]').contains('default esi template').click();
 
     cy.get('[data-cy="next-step"]').click();
     cy.get('[data-cy="next-step"]').click();

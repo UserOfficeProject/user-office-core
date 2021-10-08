@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
-import { Call, ProposalTemplate, TemplateCategoryId } from 'generated/sdk';
+import { Call, ProposalTemplate, TemplateGroupId } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -107,7 +107,7 @@ function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
     <>
       <TemplatesTable
         columns={columns}
-        templateCategory={TemplateCategoryId.PROPOSAL_QUESTIONARY}
+        templateGroup={TemplateGroupId.PROPOSAL}
         isRowRemovable={(rowData) => {
           const proposalTemplateRowData = rowData as ProposalTemplateRowDataType;
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { FormikProps } from 'formik';
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 import * as Yup from 'yup';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -25,10 +25,11 @@ import { intervalDefinition } from './questionaryComponents/Interval/IntervalDef
 import { multipleChoiceDefinition as multiChoiceDefinition } from './questionaryComponents/MultipleChoice/MultipleChoiceDefinition';
 import { numberInputDefinition } from './questionaryComponents/NumberInput/NumberInputDefinition';
 import { proposalBasisDefinition } from './questionaryComponents/ProposalBasis/ProposalBasisDefinition';
+import { proposalEsiBasisDefinition } from './questionaryComponents/ProposalEsiBasis/ProposalEsiBasisDefinition';
 import { richTextInputDefinition } from './questionaryComponents/RichTextInput/RichTextInputDefinition';
-import { riskAssessmentBasisDefinition } from './questionaryComponents/RiskAssessmentBasis/RiskAssessmentBasisDefinition';
 import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/SampleBasisDefinition';
 import { sampleDeclarationDefinition } from './questionaryComponents/SampleDeclaration/SampleDeclaratonDefinition';
+import { sampleEsiBasisDefinition } from './questionaryComponents/SampleEsiBasis/SampleEsiBasisDefinition';
 import { shipmentBasisDefinition } from './questionaryComponents/ShipmentBasis/ShipmentBasisDefinition';
 import { textInputDefinition } from './questionaryComponents/TextInput/TextInputDefinition';
 import { visitBasisDefinition } from './questionaryComponents/VisitBasis/VisitBasisDefinition';
@@ -73,8 +74,6 @@ export type GetYupInitialValue = (props: {
   state: QuestionarySubmissionState;
 }) => Answer['value'];
 
-type QuestionaryComponent = (props: BasicComponentProps) => JSX.Element | null;
-
 export interface QuestionaryComponentDefinition {
   /**
    * The enum value from DataType
@@ -89,7 +88,7 @@ export interface QuestionaryComponentDefinition {
   /**
    * The main component that is rendered in the questionary and visible by user
    */
-  readonly questionaryComponent: QuestionaryComponent;
+  readonly questionaryComponent: FC<BasicComponentProps> | null;
 
   /**
    * A form used in administration panel to define a question (more on this below)
@@ -154,7 +153,9 @@ const registry = [
   textInputDefinition,
   sampleDeclarationDefinition,
   proposalBasisDefinition,
+  proposalEsiBasisDefinition,
   sampleBasisDefinition,
+  sampleEsiBasisDefinition,
   intervalDefinition,
   numberInputDefinition,
   shipmentBasisDefinition,
@@ -162,7 +163,6 @@ const registry = [
   genericTemplateDefinition,
   genericTemplateBasisDefinition,
   visitBasisDefinition,
-  riskAssessmentBasisDefinition,
 ];
 
 Object.freeze(registry);
@@ -202,11 +202,13 @@ export function createQuestionForm(props: QuestionFormProps): JSX.Element {
 
 export function createQuestionaryComponent(
   props: BasicComponentProps
-): JSX.Element {
+): ReactNode {
   const dataType = props.answer.question.dataType;
   const definition = getQuestionaryComponentDefinition(dataType);
 
-  return React.createElement(definition.questionaryComponent, props);
+  return definition.questionaryComponent
+    ? React.createElement(definition.questionaryComponent, props)
+    : null;
 }
 
 export const getTemplateFieldIcon = (dataType: DataType) => {
