@@ -357,7 +357,7 @@ class GenericTemplateQuestionaryAuthorizer implements QuestionaryAuthorizer {
 
     if (queryResult.length !== 1) {
       logger.logError(
-        'Expected to find exactly one sample with questionaryId',
+        'Expected to find exactly one generic template with questionaryId',
         { questionaryId }
       );
 
