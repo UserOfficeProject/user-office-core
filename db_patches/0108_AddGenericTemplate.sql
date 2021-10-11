@@ -4,7 +4,7 @@ BEGIN
 	IF register_patch('AddGenericTemplate.sql', 'vyshnavidoddi', 'Adding Generic template feature', '2021-09-21') THEN
 	BEGIN
 
-    INSERT INTO template_categories(template_category_id, name) VALUES(5, 'Generic template');
+    INSERT INTO template_categories(template_category_id, name) VALUES(7, 'Generic template');
 
     INSERT INTO question_datatypes(question_datatype_id) VALUES('GENERIC_TEMPLATE');
 
@@ -34,12 +34,12 @@ BEGIN
             'Template basic information',
             '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":"","questionLabel":""}',
             'generic_template_basis',
-            5
+            7
         );
 
     INSERT INTO template_groups (template_group_id, category_id)
         VALUES
-            ('GENERIC_TEMPLATE', 5);
+            ('GENERIC_TEMPLATE', 7);
 
     END;
 	END IF;

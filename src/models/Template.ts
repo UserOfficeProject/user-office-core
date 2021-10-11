@@ -99,8 +99,8 @@ export enum TemplateCategoryId {
   PROPOSAL_QUESTIONARY = 1,
   SAMPLE_DECLARATION,
   SHIPMENT_DECLARATION,
-  GENERIC_TEMPLATE,
   VISIT_REGISTRATION,
+  GENERIC_TEMPLATE = 7,
 }
 
 export enum TemplateGroupId {
