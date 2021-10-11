@@ -1,5 +1,5 @@
 import {
-  ProposalBookingStatus,
+  ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from '../resolvers/types/ProposalBooking';
 
@@ -11,6 +11,6 @@ export class ScheduledEventCore {
     public endsAt: Date,
     public proposalPk: number | null,
     public proposalBookingId: number | null,
-    public status: ProposalBookingStatus
+    public status: ProposalBookingStatusCore
   ) {}
 }
