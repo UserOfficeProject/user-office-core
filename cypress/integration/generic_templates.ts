@@ -5,7 +5,7 @@ function twoFakes(numberWords: number) {
 
 context('GenericTemplates tests', () => {
   before(() => {
-    cy.resetDB();
+    cy.resetDB(true);
   });
 
   beforeEach(() => {
@@ -17,7 +17,7 @@ context('GenericTemplates tests', () => {
   const genericTemplateTemplateQuestions = twoFakes(2);
   const genericTemplateTemplateDescription = twoFakes(2);
   const genericTemplateQuestion = twoFakes(4);
-  const proposalTitle = faker.lorem.words(2);
+  const proposalTitle = twoFakes(2);
   const addButtonLabel = twoFakes(1);
   const genericTemplateTitle = faker.lorem.words(2);
   const proposalTitleUpdated = faker.lorem.words(2);
@@ -29,6 +29,8 @@ context('GenericTemplates tests', () => {
 
   it('Should be able to create proposal template with genericTemplate', () => {
     cy.login('officer');
+
+    cy.finishedLoading();
 
     cy.createTemplate(
       'genericTemplate',
@@ -127,7 +129,7 @@ context('GenericTemplates tests', () => {
   it('Should have different Question lables for different tables', () => {
     cy.login('user');
 
-    cy.createProposal(proposalTitle);
+    cy.createProposal(proposalTitle[0]);
 
     cy.contains(addButtonLabel[0]).click();
 
@@ -143,7 +145,7 @@ context('GenericTemplates tests', () => {
   it('Should be able to create proposal with genericTemplate', () => {
     cy.login('user');
 
-    cy.createProposal(proposalTitle);
+    cy.createProposal(proposalTitle[1]);
 
     cy.contains(addButtonLabel[0]).click();
 
@@ -208,7 +210,7 @@ context('GenericTemplates tests', () => {
 
     cy.contains('Proposals').click();
 
-    cy.contains(proposalTitle).parent().find('input[type="checkbox"]').click();
+    cy.contains(proposalTitle[1]).parent().find('input[type="checkbox"]').click();
 
     cy.get('[title="Clone proposals to call"]').click();
 
@@ -222,7 +224,7 @@ context('GenericTemplates tests', () => {
       text: 'Proposal/s cloned successfully',
     });
 
-    cy.contains(`Copy of ${proposalTitle}`)
+    cy.contains(`Copy of ${proposalTitle[1]}`)
       .parent()
       .find('[title="View proposal"]')
       .click();
@@ -240,7 +242,7 @@ context('GenericTemplates tests', () => {
       '[data-cy="genericTemplate-declaration-modal"] [data-cy=questionary-title]'
     ).contains(genericTemplateTitle);
   });
-
+  
   it('User should not be able to submit proposal with unfinished genericTemplate', () => {
     cy.login('user');
 
@@ -295,6 +297,6 @@ context('GenericTemplates tests', () => {
 
     cy.get('[data-cy="confirm-ok"]').click();
 
-    cy.contains(proposalTitle).should('not.exist');
+    cy.contains(proposalTitle[1]).should('not.exist');
   });
 });

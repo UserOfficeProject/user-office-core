@@ -23,6 +23,7 @@ const createTopic = (title) => {
 const typeToMenuTitle = new Map();
 typeToMenuTitle.set('proposal', 'Proposal');
 typeToMenuTitle.set('sample', 'Sample declaration');
+typeToMenuTitle.set('genericTemplate', 'Sub Template');
 typeToMenuTitle.set('shipment', 'Shipment declaration templates');
 typeToMenuTitle.set('visit', 'Visit registration');
 typeToMenuTitle.set('proposalEsi', 'Experiment Safety Input (Proposal)');
