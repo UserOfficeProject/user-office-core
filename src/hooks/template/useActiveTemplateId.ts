@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
 
-import { TemplateCategoryId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useActiveTemplateId(templateCategoryId: TemplateCategoryId) {
+export function useActiveTemplateId(templateGroupId: TemplateGroupId) {
   const api = useDataApi();
   const [activeTemplateId, setActiveTemplateId] = useState<
     number | null | undefined
   >(undefined);
   useEffect(() => {
     api()
-      .getActiveTemplateId({ templateCategoryId })
+      .getActiveTemplateId({ templateGroupId })
       .then((data) => {
         setActiveTemplateId(data.activeTemplateId);
       });
-  }, [api, templateCategoryId]);
+  }, [api, templateGroupId]);
 
   return { activeTemplateId, setActiveTemplateId };
 }

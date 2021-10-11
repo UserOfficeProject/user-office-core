@@ -32,9 +32,9 @@ import { Call, FeatureId, UserRole } from 'generated/sdk';
 
 import BoxIcon from './common/icons/BoxIcon';
 import CommentQuestionIcon from './common/icons/CommentQuestionIcon';
+import EsiIcon from './common/icons/EsiIcon';
 import ProposalSettingsIcon from './common/icons/ProposalSettingsIcon';
 import ProposalWorkflowIcon from './common/icons/ProposalWorkflowIcon';
-import RiskAssessmentIcon from './common/icons/RiskAssessmentIcon';
 import ScienceIcon from './common/icons/ScienceIcon';
 
 type MenuItemsProps = {
@@ -123,6 +123,57 @@ const SettingsMenuListItem = () => {
   );
 };
 
+const EsiTemplatesMenuListItem = () => {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  return (
+    <>
+      <Tooltip title="Experiment Safety Input (ESI)">
+        <ListItem button onClick={() => setIsExpanded(!isExpanded)}>
+          <ListItemIcon>
+            {isExpanded ? (
+              <>
+                <EsiIcon />
+                <ExpandLess fontSize="small" />
+              </>
+            ) : (
+              <>
+                <EsiIcon />
+                <ExpandMore fontSize="small" />
+              </>
+            )}
+          </ListItemIcon>
+          <ListItemText primary="ESI" />
+        </ListItem>
+      </Tooltip>
+
+      <Collapse
+        in={isExpanded}
+        timeout="auto"
+        unmountOnExit
+        style={{ marginLeft: '10px' }}
+      >
+        <Tooltip title="Experiment Safety Input (Proposal)">
+          <ListItem component={NavLink} to="/EsiTemplates" button>
+            <ListItemIcon>
+              <DescriptionIcon />
+            </ListItemIcon>
+            <ListItemText primary="Proposal ESI" title="Proposal ESI" />
+          </ListItem>
+        </Tooltip>
+        <Tooltip title="Experiment Safety Input (Sample)">
+          <ListItem component={NavLink} to="/SampleEsiTemplates" button>
+            <ListItemIcon>
+              <InboxIcon />
+            </ListItemIcon>
+            <ListItemText primary="Sample ESI" title="Sample ESI" />
+          </ListItem>
+        </Tooltip>
+      </Collapse>
+    </>
+  );
+};
+
 const TemplateMenuListItem = () => {
   const history = useHistory();
   const shouldExpand =
@@ -193,27 +244,15 @@ const TemplateMenuListItem = () => {
             </ListItem>
           </Tooltip>
         )}
-        <Tooltip title="Visit">
+        <Tooltip title="Visit registration">
           <ListItem component={NavLink} to="/VisitTemplates" button>
             <ListItemIcon>
               <FlightTakeoffIcon />
             </ListItemIcon>
-            <ListItemText primary="Visit" />
+            <ListItemText primary="Visit registration" />
           </ListItem>
         </Tooltip>
-        {isRiskAssessmentFeatureEnabled && (
-          <Tooltip title="Risk assessment">
-            <ListItem component={NavLink} to="/RiskAssessmentTemplates" button>
-              <ListItemIcon>
-                <RiskAssessmentIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="Risk assessment"
-                title="Risk assessment templates"
-              />
-            </ListItem>
-          </Tooltip>
-        )}
+        {isRiskAssessmentFeatureEnabled && <EsiTemplatesMenuListItem />}
       </Collapse>
     </>
   );

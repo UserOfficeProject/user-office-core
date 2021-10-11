@@ -7,7 +7,7 @@ import {
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
 import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
-import { TemplateCategoryId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import {
   Event,
@@ -55,7 +55,7 @@ export function SampleDeclarationContainer(props: {
 }) {
   const { api } = useDataApiWithFeedback();
 
-  const def = getQuestionaryDefinition(TemplateCategoryId.SAMPLE_DECLARATION);
+  const def = getQuestionaryDefinition(TemplateGroupId.SAMPLE);
 
   const previousInitialSample = usePrevious(props.sample);
 

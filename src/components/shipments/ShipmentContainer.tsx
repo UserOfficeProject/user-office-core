@@ -7,7 +7,7 @@ import {
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
 import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
-import { TemplateCategoryId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import {
   Event,
@@ -57,7 +57,7 @@ export default function ShipmentContainer(props: {
 
   const previousInitialShipment = usePrevious(props.shipment);
 
-  const def = getQuestionaryDefinition(TemplateCategoryId.SHIPMENT_DECLARATION);
+  const def = getQuestionaryDefinition(TemplateGroupId.SHIPMENT);
 
   /**
    * Returns true if reset was performed, false otherwise

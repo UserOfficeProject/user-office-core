@@ -7,7 +7,7 @@ import {
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
 import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
-import { TemplateCategoryId } from 'generated/sdk';
+import { TemplateGroupId } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
 import {
   Event,
@@ -58,7 +58,7 @@ export default function VisitRegistrationContainer(
 ) {
   const { api } = useDataApiWithFeedback();
 
-  const def = getQuestionaryDefinition(TemplateCategoryId.VISIT);
+  const def = getQuestionaryDefinition(TemplateGroupId.VISIT_REGISTRATION);
 
   const previousInitialVisit = usePrevious(props.registration);
 

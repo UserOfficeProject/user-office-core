@@ -1,0 +1,24 @@
+mutation updateEsi($esiId: Int!, $isSubmitted: Boolean) {
+  updateEsi(esiId: $esiId, isSubmitted: $isSubmitted) {
+    esi {
+      ...esi
+      questionary {
+        isCompleted
+        ...questionary
+      }
+      sampleEsis {
+        sample {
+          ...sample
+        }
+        ...sampleEsi
+        questionary {
+          isCompleted
+        }
+      }
+    }
+
+    rejection {
+      ...rejection
+    }
+  }
+}

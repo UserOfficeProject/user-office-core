@@ -1,0 +1,6 @@
+fragment sampleEsi on SampleExperimentSafetyInput {
+  sampleId
+  esiId
+  questionaryId
+  isSubmitted
+}

@@ -81,7 +81,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
             {visit ? 'Update the visit' : 'Create new visit'}
           </Typography>
           <Participants
-            title="Add Visitors"
+            title="Visitors"
             setUsers={(team: BasicUserDetails[]) => {
               setFieldValue('team', team);
             }}
@@ -94,11 +94,12 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
               text: getFullUserName(user),
               value: user.id,
             }))}
-            label="Specify team leader"
+            label="Team lead"
             name="teamLeadUserId"
             InputProps={{
               'data-cy': 'team-lead-user-dropdown',
             }}
+            margin="dense"
           />
 
           <ActionButtonContainer>

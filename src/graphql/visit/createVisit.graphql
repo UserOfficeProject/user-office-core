@@ -33,6 +33,10 @@ mutation createVisit(
       shipments {
         ...shipment
       }
+
+      esi {
+        ...esi
+      }
     }
 
     rejection {

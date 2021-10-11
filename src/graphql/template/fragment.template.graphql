@@ -10,10 +10,14 @@ fragment template on Template {
   isArchived
   questionaryCount
   templateId
-  categoryId
+  groupId
   name
   description
   complementaryQuestions {
     ...question
+  }
+  group {
+    groupId
+    categoryId
   }
 }

@@ -1,0 +1,28 @@
+query getEsi($esiId: Int!) {
+  esi(esiId: $esiId) {
+    ...esi
+    questionary {
+      isCompleted
+      ...questionary
+    }
+    sampleEsis {
+      sample {
+        ...sample
+      }
+      ...sampleEsi
+      questionary {
+        isCompleted
+      }
+    }
+    visit {
+      ...visit
+      proposal {
+        proposalId
+        title
+        samples {
+          ...sample
+        }
+      }
+    }
+  }
+}

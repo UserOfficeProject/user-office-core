@@ -1,3 +1,4 @@
+import { PropTypes } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import MenuItem from '@material-ui/core/MenuItem';
 import MuiTextField from '@material-ui/core/TextField';
@@ -18,6 +19,7 @@ type TProps = {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isClearable?: boolean;
+  margin?: PropTypes.Margin;
 };
 
 const FormikDropdown: React.FC<

@@ -19,14 +19,14 @@ declare global {
       ) => Promise<void>;
 
       /**
-       * Activates booking in scheduler
+       * Activates scheduled event in scheduler
        *
-       * @returns {typeof activateBooking}
+       * @returns {typeof activateScheduledEvent}
        * @memberof Chainable
        * @example
-       *    cy.activateBooking(1)
+       *    cy.activateScheduledEvent(1)
        */
-      activateBooking: (proposalBookingId: number) => Promise<void>;
+      activateScheduledEvent: (scheduledEventId: number) => Promise<void>;
     }
   }
 }

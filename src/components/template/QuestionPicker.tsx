@@ -20,6 +20,7 @@ import React, { useState } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
 import {
+  getQuestionaryComponentDefinition,
   getQuestionaryComponentDefinitions,
   getTemplateFieldIcon,
 } from 'components/questionary/QuestionaryComponentRegistry';
@@ -28,7 +29,7 @@ import {
   DependenciesLogicOperator,
   Question,
   Template,
-  TemplateCategoryId,
+  TemplateGroupId,
   Topic,
 } from 'generated/sdk';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
@@ -154,6 +155,10 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
   const getItems = () =>
     template.complementaryQuestions
       .filter(isQuestionMatchingFilter)
+      .filter(
+        (question) =>
+          getQuestionaryComponentDefinition(question.dataType).creatable
+      )
       .map((question, index) => (
         <TemplateQuestionEditor
           index={index}
@@ -240,8 +245,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
                     }
                     disabled={
                       definition.dataType === DataType.SAMPLE_DECLARATION &&
-                      template.categoryId !==
-                        TemplateCategoryId.PROPOSAL_QUESTIONARY
+                      template.groupId !== TemplateGroupId.PROPOSAL
                     }
                     key={definition.dataType}
                   >

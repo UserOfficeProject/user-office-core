@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
 import React, { useContext, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
@@ -19,7 +21,11 @@ type ExternalAuthProps = PropTypes.InferProps<typeof ExternalAuthPropTypes>;
 const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
   const { token, handleLogin } = useContext(UserContext);
   const unauthorizedApi = useUnauthorizedApi();
-  const sessionId: string = match.params.sessionId;
+  const { search } = useLocation();
+  const values = queryString.parse(search);
+  const sessionId = !!values.sessionid
+    ? values.sessionid.toString()
+    : match.params.sessionId;
 
   const isFirstRun = useRef<boolean>(true);
 

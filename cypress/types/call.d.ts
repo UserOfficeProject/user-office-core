@@ -16,6 +16,7 @@ declare global {
         surveyComment?: string;
         cycleComment?: string;
         template?: string;
+        esiTemplate?: string;
         workflow?: string;
       }) => void;
     }

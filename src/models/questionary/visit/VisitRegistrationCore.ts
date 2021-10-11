@@ -6,7 +6,7 @@ export type VisitRegistrationCore = ExcludeTypeName<
     ExcludeNull<
       ExcludeNull<
         ExcludeNull<GetUserProposalBookingsWithEventsQuery['me']>['proposals']
-      >[0]['proposalBooking']
+      >[0]['proposalBookingCore']
     >['scheduledEvents'][0]['visit']
   >['registrations'][0]
 >;
