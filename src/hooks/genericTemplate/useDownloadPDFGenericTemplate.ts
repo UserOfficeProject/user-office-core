@@ -8,8 +8,12 @@ import {
 export function useDownloadPDFGenericTemplate() {
   const { prepareDownload } = useContext(DownloadContext);
   const downloadGenericTemplatePDF = useCallback(
-    (sampleIds: number[], name: string) => {
-      prepareDownload(PREPARE_DOWNLOAD_TYPE.PDF_SAMPLE, sampleIds, name);
+    (genericTemplateIds: number[], name: string) => {
+      prepareDownload(
+        PREPARE_DOWNLOAD_TYPE.PDF_GENERIC_TEMPLATE,
+        genericTemplateIds,
+        name
+      );
     },
     [prepareDownload]
   );

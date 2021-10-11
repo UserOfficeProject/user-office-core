@@ -2,6 +2,6 @@ import { QuestionaryWizardStep } from 'components/questionary/DefaultWizardStepF
 
 export class GenericTemplateQuestionaryWizardStep extends QuestionaryWizardStep {
   isItemWithQuestionaryEditable(): boolean {
-    return true; // Since view is locked when proposal is submitted, we can simply return true because edit sample will be disabled
+    return true; // Since view is locked when proposal is submitted, we can simply return true because edit genericTemplate will be disabled
   }
 }
