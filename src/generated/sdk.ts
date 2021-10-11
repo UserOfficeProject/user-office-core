@@ -529,7 +529,7 @@ export type FieldConditionInput = {
   params: Scalars['String'];
 };
 
-export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | GenericTemplateBasisConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SampleDeclarationConfig | SampleEsiBasisConfig | SubTemplateConfig | ProposalBasisConfig | ProposalEsiBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig | RichTextInputConfig | VisitBasisConfig;
+export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SampleDeclarationConfig | SampleEsiBasisConfig | SubTemplateConfig | ProposalBasisConfig | ProposalEsiBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig | RichTextInputConfig | VisitBasisConfig | GenericTemplateBasisConfig;
 
 export type FieldDependency = {
   __typename?: 'FieldDependency';
@@ -2103,7 +2103,6 @@ export type Query = {
   features: Array<Feature>;
   fileMetadata: Maybe<Array<FileMetadata>>;
   genericTemplate: Maybe<GenericTemplate>;
-  genericTemplatesByCallId: Maybe<Array<GenericTemplate>>;
   genericTemplates: Maybe<Array<GenericTemplate>>;
   allAccessTokensAndPermissions: Maybe<Array<PermissionsWithAccessToken>>;
   queriesAndMutations: Maybe<QueriesAndMutations>;
@@ -2277,11 +2276,6 @@ export type QueryFileMetadataArgs = {
 
 export type QueryGenericTemplateArgs = {
   genericTemplateId: Scalars['Int'];
-};
-
-
-export type QueryGenericTemplatesByCallIdArgs = {
-  callId: Scalars['Int'];
 };
 
 
@@ -3109,10 +3103,10 @@ export type TemplateCategory = {
 };
 
 export enum TemplateCategoryId {
-  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
   PROPOSAL_QUESTIONARY = 'PROPOSAL_QUESTIONARY',
   SAMPLE_DECLARATION = 'SAMPLE_DECLARATION',
   SHIPMENT_DECLARATION = 'SHIPMENT_DECLARATION',
+  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
   VISIT_REGISTRATION = 'VISIT_REGISTRATION'
 }
 
@@ -3123,13 +3117,13 @@ export type TemplateGroup = {
 };
 
 export enum TemplateGroupId {
-  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
   PROPOSAL = 'PROPOSAL',
   PROPOSAL_ESI = 'PROPOSAL_ESI',
   SAMPLE = 'SAMPLE',
   SAMPLE_ESI = 'SAMPLE_ESI',
   SHIPMENT = 'SHIPMENT',
-  VISIT_REGISTRATION = 'VISIT_REGISTRATION'
+  VISIT_REGISTRATION = 'VISIT_REGISTRATION',
+  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE'
 }
 
 export type TemplateResponseWrap = {
@@ -6797,6 +6791,7 @@ type FieldConfigVisitBasisConfigFragment = (
   { __typename?: 'VisitBasisConfig' }
   & Pick<VisitBasisConfig, 'small_label' | 'required' | 'tooltip'>
 );
+
 type FieldConfigGenericTemplateBasisConfigFragment = (
   { __typename?: 'GenericTemplateBasisConfig' }
   & Pick<GenericTemplateBasisConfig, 'titlePlaceholder' | 'questionLabel'>
@@ -8068,6 +8063,16 @@ export const CallFragmentDoc = gql`
   description
 }
     ${BasicUserDetailsFragmentDoc}`;
+export const EsiFragmentDoc = gql`
+    fragment esi on ExperimentSafetyInput {
+  id
+  visitId
+  creatorId
+  questionaryId
+  isSubmitted
+  created
+}
+    `;
 export const GenericTemplateFragmentDoc = gql`
     fragment genericTemplate on GenericTemplate {
   id
@@ -8077,17 +8082,6 @@ export const GenericTemplateFragmentDoc = gql`
   created
   proposalPk
   questionId
-}
-  `;
-
-export const EsiFragmentDoc = gql`
-    fragment esi on ExperimentSafetyInput {
-  id
-  visitId
-  creatorId
-  questionaryId
-  isSubmitted
-  created
 }
     `;
 export const CoreTechnicalReviewFragmentDoc = gql`
