@@ -97,7 +97,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
 
   if (options?.selection) {
     options.headerSelectionProps = {
-      inputProps: { 'aria-label': 'Checkbox Select All Rows' },
+      inputProps: { 'aria-label': 'Select All Rows' },
     };
   }
 

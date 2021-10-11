@@ -374,7 +374,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
           search: false,
           selection: true,
           headerSelectionProps: {
-            inputProps: { 'aria-label': 'Checkbox Select All Rows' },
+            inputProps: { 'aria-label': 'Select All Rows' },
           },
           selectionProps: (rowData: UserWithReview) => ({
             inputProps: {

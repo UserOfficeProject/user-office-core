@@ -311,7 +311,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           pageSize: query.first as number,
           selection: props.selection,
           headerSelectionProps: {
-            inputProps: { 'aria-label': 'Checkbox Select All Rows' },
+            inputProps: { 'aria-label': 'Select All Rows' },
           },
           ...props.mtOptions,
           selectionProps: (rowdata: any) => ({

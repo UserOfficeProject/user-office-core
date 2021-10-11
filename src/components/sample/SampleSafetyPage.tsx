@@ -252,7 +252,7 @@ function SampleSafetyPage() {
                 options={{
                   selection: true,
                   headerSelectionProps: {
-                    inputProps: { 'aria-label': 'Checkbox Select All Rows' },
+                    inputProps: { 'aria-label': 'Select All Rows' },
                   },
                 }}
                 actions={[

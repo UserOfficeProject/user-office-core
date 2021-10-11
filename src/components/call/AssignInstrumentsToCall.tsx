@@ -81,7 +81,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
           search: true,
           selection: true,
           headerSelectionProps: {
-            inputProps: { 'aria-label': 'Checkbox Select All Rows' },
+            inputProps: { 'aria-label': 'Select All Rows' },
           },
           debounceInterval: 400,
           selectionProps: (rowData: InstrumentWithAvailabilityTime) => ({
