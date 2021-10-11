@@ -91,12 +91,11 @@ BEGIN
         UPDATE templates SET group_id='SAMPLE' where category_id=2;
         UPDATE templates SET group_id='SHIPMENT' where category_id=3;
         UPDATE templates SET group_id='VISIT_REGISTRATION' where category_id=4;
+		UPDATE templates SET group_id='PROPOSAL' where category_id= 5;
+		UPDATE templates SET group_id='SAMPLE' where category_id=6;
 
         UPDATE questions SET category_id=1 WHERE category_id=5; -- move "Proposal ESI" questions to "proposal" category
         UPDATE questions SET category_id=2 WHERE category_id=6; -- move "Proposal ESI" questions to "proposal" category
-
-        DELETE FROM template_categories WHERE template_category_id=5; -- DELETE Experiment ESI
-        DELETE FROM template_categories WHERE template_category_id=6; -- DELETE Sample ESI
 
         ALTER TABLE templates ALTER COLUMN group_id SET NOT NULL;
         ALTER TABLE templates DROP COLUMN category_id;
