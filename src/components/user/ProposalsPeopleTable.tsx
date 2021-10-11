@@ -444,6 +444,9 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                     'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
                   },
                 }),
+                headerSelectionProps: {
+                  inputProps: { 'aria-label': 'Select All Rows' },
+                },
               }}
               actions={actionArray}
               localization={{

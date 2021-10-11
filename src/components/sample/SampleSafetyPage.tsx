@@ -249,7 +249,12 @@ function SampleSafetyPage() {
                 urlQueryParams={urlQueryParams}
                 setUrlQueryParams={setUrlQueryParams}
                 columns={columns}
-                options={{ selection: true }}
+                options={{
+                  selection: true,
+                  headerSelectionProps: {
+                    inputProps: { 'aria-label': 'Select All Rows' },
+                  },
+                }}
                 actions={[
                   {
                     icon: GetAppIcon,

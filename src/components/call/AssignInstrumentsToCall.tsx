@@ -80,6 +80,9 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
         options={{
           search: true,
           selection: true,
+          headerSelectionProps: {
+            inputProps: { 'aria-label': 'Select All Rows' },
+          },
           debounceInterval: 400,
           selectionProps: (rowData: InstrumentWithAvailabilityTime) => ({
             inputProps: {

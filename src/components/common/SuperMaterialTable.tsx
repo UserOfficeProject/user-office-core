@@ -95,6 +95,12 @@ export function SuperMaterialTable<Entry extends EntryID>({
     });
   }
 
+  if (options?.selection) {
+    options.headerSelectionProps = {
+      inputProps: { 'aria-label': 'Select All Rows' },
+    };
+  }
+
   if (options?.search && urlQueryParams) {
     options.searchText = urlQueryParams.search || undefined;
   }
