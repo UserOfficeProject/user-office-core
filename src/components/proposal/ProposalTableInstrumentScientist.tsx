@@ -284,6 +284,9 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           search: true,
           searchText: urlQueryParams.search || undefined,
           selection: true,
+          headerSelectionProps: {
+            inputProps: { 'aria-label': 'Select All Rows' },
+          },
           debounceInterval: 400,
           columnsButton: true,
           selectionProps: (rowData: Proposal) => ({

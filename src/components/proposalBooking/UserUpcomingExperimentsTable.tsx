@@ -90,7 +90,6 @@ export default function UserUpcomingExperimentsTable() {
           data={proposalScheduledEvents}
           options={{
             search: false,
-            selection: false,
             padding: 'dense',
             emptyRowsWhenPaging: false,
             paging: false,
