@@ -15,13 +15,15 @@ export type Scalars = {
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: any;
   IntStringDateBoolArray: any;
-  /** DateTime without timezone in 'yyyy-MM-dd HH:mm:ss' format */
+  /** DateTime without timezone in 'yyyy-MM-DD HH:mm:ss' format */
   TzLessDateTime: string;
+  _Any: any;
 };
 
-export type ActivateScheduledEventInput = {
-  id: Scalars['Int'];
-};
+
+
+
+
 
 export type AddProposalWorkflowStatusInput = {
   proposalWorkflowId: Scalars['Int'];
@@ -97,12 +99,6 @@ export type AssignChairOrSecretaryToSepInput = {
   sepId: Scalars['Int'];
 };
 
-export type AssignEquipmentsToScheduledEventInput = {
-  scheduledEventId: Scalars['Int'];
-  proposalBookingId: Scalars['Int'];
-  equipmentIds: Array<Scalars['Int']>;
-};
-
 export type AssignInstrumentsToCallInput = {
   instrumentIds: Array<Scalars['Int']>;
   callId: Scalars['Int'];
@@ -142,11 +138,6 @@ export type BooleanConfig = {
   small_label: Scalars['String'];
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
-};
-
-export type BulkUpsertLostTimesInput = {
-  proposalBookingId: Scalars['Int'];
-  lostTimes: Array<SimpleLostTimeInput>;
 };
 
 export type Call = {
@@ -208,12 +199,6 @@ export type CheckExternalTokenWrap = {
 export type CloneProposalsInput = {
   callId: Scalars['Int'];
   proposalsToClonePk: Array<Scalars['Int']>;
-};
-
-export type ConfirmEquipmentAssignmentInput = {
-  scheduledEventId: Scalars['Int'];
-  equipmentId: Scalars['Int'];
-  newStatus: EquipmentAssignmentStatus;
 };
 
 export type CreateApiAccessTokenInput = {
@@ -293,32 +278,14 @@ export type DateConfig = {
 };
 
 
-export type DbStat = {
-  __typename?: 'DbStat';
-  total: Scalars['Float'];
-  state: Maybe<Scalars['String']>;
-};
-
 export type DeleteApiAccessTokenInput = {
   accessTokenId: Scalars['String'];
-};
-
-export type DeleteEquipmentAssignmentInput = {
-  scheduledEventId: Scalars['Int'];
-  proposalBookingId: Scalars['Int'];
-  equipmentId: Scalars['Int'];
 };
 
 export type DeleteProposalWorkflowStatusInput = {
   proposalStatusId: Scalars['Int'];
   proposalWorkflowId: Scalars['Int'];
   sortOrder: Scalars['Int'];
-};
-
-export type DeleteScheduledEventsInput = {
-  ids: Array<Scalars['Int']>;
-  proposalBookingId: Scalars['Int'];
-  instrumentId: Scalars['Int'];
 };
 
 export enum DependenciesLogicOperator {
@@ -343,74 +310,6 @@ export type Entry = {
   __typename?: 'Entry';
   id: Scalars['Int'];
   value: Scalars['String'];
-};
-
-export type Equipment = {
-  __typename?: 'Equipment';
-  id: Scalars['Int'];
-  owner: Maybe<User>;
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-  name: Scalars['String'];
-  description: Maybe<Scalars['String']>;
-  maintenanceStartsAt: Maybe<Scalars['TzLessDateTime']>;
-  maintenanceEndsAt: Maybe<Scalars['TzLessDateTime']>;
-  autoAccept: Scalars['Boolean'];
-  events: Array<ScheduledEvent>;
-  equipmentResponsible: Array<User>;
-};
-
-
-export type EquipmentEventsArgs = {
-  endsAt: Scalars['TzLessDateTime'];
-  startsAt: Scalars['TzLessDateTime'];
-};
-
-export enum EquipmentAssignmentStatus {
-  PENDING = 'PENDING',
-  ACCEPTED = 'ACCEPTED',
-  REJECTED = 'REJECTED'
-}
-
-export type EquipmentInput = {
-  name: Scalars['String'];
-  description: Scalars['String'];
-  maintenanceStartsAt?: Maybe<Scalars['TzLessDateTime']>;
-  maintenanceEndsAt?: Maybe<Scalars['TzLessDateTime']>;
-  autoAccept: Scalars['Boolean'];
-};
-
-export type EquipmentResponseWrap = {
-  __typename?: 'EquipmentResponseWrap';
-  error: Maybe<Scalars['String']>;
-  equipment: Maybe<Equipment>;
-};
-
-export type EquipmentResponsibleInput = {
-  equipmentId: Scalars['Int'];
-  userIds: Array<Scalars['Int']>;
-};
-
-export type EquipmentWithAssignmentStatus = {
-  __typename?: 'EquipmentWithAssignmentStatus';
-  id: Scalars['Int'];
-  owner: Maybe<User>;
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-  name: Scalars['String'];
-  description: Maybe<Scalars['String']>;
-  maintenanceStartsAt: Maybe<Scalars['TzLessDateTime']>;
-  maintenanceEndsAt: Maybe<Scalars['TzLessDateTime']>;
-  autoAccept: Scalars['Boolean'];
-  events: Array<ScheduledEvent>;
-  equipmentResponsible: Array<User>;
-  status: EquipmentAssignmentStatus;
-};
-
-
-export type EquipmentWithAssignmentStatusEventsArgs = {
-  endsAt: Scalars['TzLessDateTime'];
-  startsAt: Scalars['TzLessDateTime'];
 };
 
 export type EsiResponseWrap = {
@@ -566,17 +465,6 @@ export type FileUploadConfig = {
   max_files: Scalars['Int'];
 };
 
-export type FinalizeScheduledEventInput = {
-  id: Scalars['Int'];
-  action: ProposalBookingFinalizeAction;
-};
-
-export type HealthStats = {
-  __typename?: 'HealthStats';
-  message: Scalars['String'];
-  dbStats: Array<DbStat>;
-};
-
 export type IndexWithGroupId = {
   index: Scalars['Int'];
   droppableId: Scalars['String'];
@@ -640,23 +528,6 @@ export type IntervalConfig = {
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
   units: Maybe<Array<Scalars['String']>>;
-};
-
-export type LostTime = {
-  __typename?: 'LostTime';
-  id: Scalars['Int'];
-  proposalBookingId: Scalars['Int'];
-  scheduledEventId: Scalars['Int'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-  startsAt: Scalars['TzLessDateTime'];
-  endsAt: Scalars['TzLessDateTime'];
-};
-
-export type LostTimesResponseWrap = {
-  __typename?: 'LostTimesResponseWrap';
-  error: Maybe<Scalars['String']>;
-  lostTime: Maybe<Array<LostTime>>;
 };
 
 export type MoveProposalWorkflowStatusInput = {
@@ -785,21 +656,6 @@ export type Mutation = {
   token: TokenResponseWrap;
   selectRole: TokenResponseWrap;
   updatePassword: BasicUserDetailsResponseWrap;
-  createEquipment: EquipmentResponseWrap;
-  updateEquipment: EquipmentResponseWrap;
-  assignToScheduledEvents: Scalars['Boolean'];
-  deleteEquipmentAssignment: Scalars['Boolean'];
-  confirmEquipmentAssignment: Scalars['Boolean'];
-  addEquipmentResponsible: Scalars['Boolean'];
-  bulkUpsertLostTimes: LostTimesResponseWrap;
-  createScheduledEvent: ScheduledEventResponseWrap;
-  deleteScheduledEvents: ScheduledEventsResponseWrap;
-  updateScheduledEvent: ScheduledEventResponseWrap;
-  activateScheduledEvent: ScheduledEventResponseWrap;
-  finalizeScheduledEvent: ScheduledEventResponseWrap;
-  finalizeProposalBooking: ProposalBookingResponseWrap;
-  activateProposalBooking: ProposalBookingResponseWrap;
-  resetSchedulerDb: Scalars['String'];
 };
 
 
@@ -1547,92 +1403,6 @@ export type MutationUpdatePasswordArgs = {
   password: Scalars['String'];
 };
 
-
-export type MutationCreateEquipmentArgs = {
-  newEquipmentInput: EquipmentInput;
-};
-
-
-export type MutationUpdateEquipmentArgs = {
-  updateEquipmentInput: EquipmentInput;
-  id: Scalars['Int'];
-};
-
-
-export type MutationAssignToScheduledEventsArgs = {
-  assignEquipmentsToScheduledEventInput: AssignEquipmentsToScheduledEventInput;
-};
-
-
-export type MutationDeleteEquipmentAssignmentArgs = {
-  deleteEquipmentAssignmentInput: DeleteEquipmentAssignmentInput;
-};
-
-
-export type MutationConfirmEquipmentAssignmentArgs = {
-  confirmEquipmentAssignmentInput: ConfirmEquipmentAssignmentInput;
-};
-
-
-export type MutationAddEquipmentResponsibleArgs = {
-  equipmentResponsibleInput: EquipmentResponsibleInput;
-};
-
-
-export type MutationBulkUpsertLostTimesArgs = {
-  bulkUpsertLostTimes: BulkUpsertLostTimesInput;
-};
-
-
-export type MutationCreateScheduledEventArgs = {
-  newScheduledEvent: NewScheduledEventInput;
-};
-
-
-export type MutationDeleteScheduledEventsArgs = {
-  deleteScheduledEventsInput: DeleteScheduledEventsInput;
-};
-
-
-export type MutationUpdateScheduledEventArgs = {
-  updateScheduledEvent: UpdateScheduledEventInput;
-};
-
-
-export type MutationActivateScheduledEventArgs = {
-  activateScheduledEvent: ActivateScheduledEventInput;
-};
-
-
-export type MutationFinalizeScheduledEventArgs = {
-  finalizeScheduledEvent: FinalizeScheduledEventInput;
-};
-
-
-export type MutationFinalizeProposalBookingArgs = {
-  id: Scalars['Int'];
-  action: ProposalBookingFinalizeAction;
-};
-
-
-export type MutationActivateProposalBookingArgs = {
-  id: Scalars['Int'];
-};
-
-
-export type MutationResetSchedulerDbArgs = {
-  includeSeeds?: Maybe<Scalars['Boolean']>;
-};
-
-export type NewScheduledEventInput = {
-  bookingType: ScheduledEventBookingType;
-  startsAt: Scalars['TzLessDateTime'];
-  endsAt: Scalars['TzLessDateTime'];
-  description?: Maybe<Scalars['String']>;
-  instrumentId: Scalars['Int'];
-  proposalBookingId?: Maybe<Scalars['Int']>;
-};
-
 export type NextProposalStatus = {
   __typename?: 'NextProposalStatus';
   id: Maybe<Scalars['Int']>;
@@ -1741,7 +1511,6 @@ export type Proposal = {
   samples: Maybe<Array<Sample>>;
   visits: Maybe<Array<Visit>>;
   proposalBookingCore: Maybe<ProposalBookingCore>;
-  proposalBooking: Maybe<ProposalBooking>;
 };
 
 
@@ -1749,32 +1518,9 @@ export type ProposalProposalBookingCoreArgs = {
   filter?: Maybe<ProposalBookingFilter>;
 };
 
-
-export type ProposalProposalBookingArgs = {
-  filter?: Maybe<ProposalProposalBookingFilter>;
-};
-
 export type ProposalBasisConfig = {
   __typename?: 'ProposalBasisConfig';
   tooltip: Scalars['String'];
-};
-
-export type ProposalBooking = {
-  __typename?: 'ProposalBooking';
-  id: Scalars['Int'];
-  call: Maybe<Call>;
-  proposal: Maybe<Proposal>;
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-  status: ProposalBookingStatusCore;
-  allocatedTime: Scalars['Int'];
-  instrument: Maybe<Instrument>;
-  scheduledEvents: Array<ScheduledEvent>;
-};
-
-
-export type ProposalBookingScheduledEventsArgs = {
-  filter: ProposalBookingScheduledEventFilter;
 };
 
 export type ProposalBookingCore = {
@@ -1790,23 +1536,6 @@ export type ProposalBookingCoreScheduledEventsArgs = {
 
 export type ProposalBookingFilter = {
   status?: Maybe<Array<ProposalBookingStatusCore>>;
-};
-
-export enum ProposalBookingFinalizeAction {
-  COMPLETE = 'COMPLETE',
-  RESTART = 'RESTART'
-}
-
-export type ProposalBookingResponseWrap = {
-  __typename?: 'ProposalBookingResponseWrap';
-  error: Maybe<Scalars['String']>;
-  proposalBooking: Maybe<ProposalBooking>;
-};
-
-export type ProposalBookingScheduledEventFilter = {
-  bookingType?: Maybe<ScheduledEventBookingType>;
-  endsAfter?: Maybe<Scalars['TzLessDateTime']>;
-  endsBefore?: Maybe<Scalars['TzLessDateTime']>;
 };
 
 export type ProposalBookingScheduledEventFilterCore = {
@@ -1858,10 +1587,6 @@ export type ProposalPkWithRankOrder = {
 export type ProposalPkWithReviewId = {
   proposalPk: Scalars['Int'];
   reviewId: Scalars['Int'];
-};
-
-export type ProposalProposalBookingFilter = {
-  status?: Maybe<Array<ProposalBookingStatusCore>>;
 };
 
 export enum ProposalPublicStatus {
@@ -2014,6 +1739,8 @@ export type QueriesAndMutations = {
 
 export type Query = {
   __typename?: 'Query';
+  _entities: Array<Maybe<Entity>>;
+  _service: Service;
   calls: Maybe<Array<Call>>;
   callsByInstrumentScientist: Maybe<Array<Call>>;
   proposals: Maybe<ProposalsQueryResult>;
@@ -2087,19 +1814,11 @@ export type Query = {
   previousCollaborators: Maybe<UserQueryResult>;
   visitRegistration: Maybe<VisitRegistration>;
   visit: Maybe<Visit>;
-  scheduledEvents: Array<ScheduledEvent>;
-  scheduledEvent: Maybe<ScheduledEvent>;
-  proposalBookingScheduledEvents: Array<ScheduledEvent>;
-  proposalBookingScheduledEvent: Maybe<ScheduledEvent>;
-  equipments: Array<Equipment>;
-  availableEquipments: Array<Equipment>;
-  equipment: Maybe<Equipment>;
-  proposalBookingLostTimes: Array<LostTime>;
-  instrumentProposalBookings: Array<ProposalBooking>;
-  proposalBooking: Maybe<ProposalBooking>;
-  healthCheck: HealthStats;
-  schedulerConfig: SchedulerConfig;
-  schedulerVersion: Scalars['String'];
+};
+
+
+export type QueryEntitiesArgs = {
+  representations: Array<Scalars['_Any']>;
 };
 
 
@@ -2406,58 +2125,6 @@ export type QueryVisitRegistrationArgs = {
 
 export type QueryVisitArgs = {
   visitId: Scalars['Int'];
-};
-
-
-export type QueryScheduledEventsArgs = {
-  filter: ScheduledEventFilter;
-};
-
-
-export type QueryScheduledEventArgs = {
-  id: Scalars['Int'];
-};
-
-
-export type QueryProposalBookingScheduledEventsArgs = {
-  proposalBookingId: Scalars['Int'];
-};
-
-
-export type QueryProposalBookingScheduledEventArgs = {
-  scheduledEventId: Scalars['Int'];
-  proposalBookingId: Scalars['Int'];
-};
-
-
-export type QueryEquipmentsArgs = {
-  equipmentIds?: Maybe<Array<Scalars['Int']>>;
-};
-
-
-export type QueryAvailableEquipmentsArgs = {
-  scheduledEventId: Scalars['Int'];
-};
-
-
-export type QueryEquipmentArgs = {
-  id: Scalars['Int'];
-};
-
-
-export type QueryProposalBookingLostTimesArgs = {
-  scheduledEventId?: Maybe<Scalars['Int']>;
-  proposalBookingId: Scalars['Int'];
-};
-
-
-export type QueryInstrumentProposalBookingsArgs = {
-  instrumentId: Scalars['Int'];
-};
-
-
-export type QueryProposalBookingArgs = {
-  id: Scalars['Int'];
 };
 
 export type Question = {
@@ -2775,25 +2442,6 @@ export type SaveSepMeetingDecisionInput = {
   submitted?: Maybe<Scalars['Boolean']>;
 };
 
-export type ScheduledEvent = {
-  __typename?: 'ScheduledEvent';
-  id: Scalars['Int'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-  bookingType: ScheduledEventBookingType;
-  startsAt: Scalars['TzLessDateTime'];
-  endsAt: Scalars['TzLessDateTime'];
-  proposalBookingId: Maybe<Scalars['Int']>;
-  scheduledBy: Maybe<User>;
-  description: Maybe<Scalars['String']>;
-  instrument: Maybe<Instrument>;
-  equipmentId: Maybe<Scalars['Int']>;
-  status: ProposalBookingStatusCore;
-  equipments: Array<EquipmentWithAssignmentStatus>;
-  equipmentAssignmentStatus: Maybe<EquipmentAssignmentStatus>;
-  proposalBooking: Maybe<ProposalBooking>;
-};
-
 export enum ScheduledEventBookingType {
   USER_OPERATIONS = 'USER_OPERATIONS',
   MAINTENANCE = 'MAINTENANCE',
@@ -2809,29 +2457,6 @@ export type ScheduledEventCore = {
   startsAt: Scalars['TzLessDateTime'];
   endsAt: Scalars['TzLessDateTime'];
   visit: Maybe<Visit>;
-};
-
-export type ScheduledEventFilter = {
-  startsAt: Scalars['TzLessDateTime'];
-  endsAt: Scalars['TzLessDateTime'];
-  instrumentId?: Maybe<Scalars['Int']>;
-};
-
-export type ScheduledEventResponseWrap = {
-  __typename?: 'ScheduledEventResponseWrap';
-  error: Maybe<Scalars['String']>;
-  scheduledEvent: Maybe<ScheduledEvent>;
-};
-
-export type ScheduledEventsResponseWrap = {
-  __typename?: 'ScheduledEventsResponseWrap';
-  error: Maybe<Scalars['String']>;
-  scheduledEvents: Maybe<Array<ScheduledEvent>>;
-};
-
-export type SchedulerConfig = {
-  __typename?: 'SchedulerConfig';
-  authRedirect: Scalars['String'];
 };
 
 export type SelectionFromOptionsConfig = {
@@ -2930,14 +2555,6 @@ export type ShipmentsFilter = {
   externalRef?: Maybe<Scalars['String']>;
   shipmentIds?: Maybe<Array<Scalars['Int']>>;
   visitId?: Maybe<Scalars['Int']>;
-};
-
-export type SimpleLostTimeInput = {
-  id: Scalars['Int'];
-  startsAt: Scalars['TzLessDateTime'];
-  endsAt: Scalars['TzLessDateTime'];
-  newlyCreated?: Maybe<Scalars['Boolean']>;
-  scheduledEventId?: Maybe<Scalars['Int']>;
 };
 
 export type StatusChangingEvent = {
@@ -3167,12 +2784,6 @@ export type UpdateProposalWorkflowInput = {
   description: Scalars['String'];
 };
 
-export type UpdateScheduledEventInput = {
-  scheduledEventId: Scalars['Int'];
-  startsAt: Scalars['TzLessDateTime'];
-  endsAt: Scalars['TzLessDateTime'];
-};
-
 export type User = {
   __typename?: 'User';
   id: Scalars['Int'];
@@ -3300,6 +2911,15 @@ export type VisitsFilter = {
   creatorId?: Maybe<Scalars['Int']>;
   proposalPk?: Maybe<Scalars['Int']>;
   scheduledEventId?: Maybe<Scalars['Int']>;
+};
+
+
+export type Entity = Call | Proposal | Instrument | User;
+
+export type Service = {
+  __typename?: '_Service';
+  /** The sdl representing the federated service capabilities. Includes federation directives, removes federation types, and includes rest of full schema after schema directives have been applied */
+  sdl: Maybe<Scalars['String']>;
 };
 
 export type AssignProposalsToSepMutationVariables = Exact<{
