@@ -19,6 +19,8 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       currentRole: req.user.currentRole,
     };
 
+    console.log(userWithRole);
+
     const proposalPks: number[] = req.params.proposal_pks
       .split(',')
       .map((n: string) => parseInt(n))
