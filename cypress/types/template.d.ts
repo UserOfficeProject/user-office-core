@@ -115,7 +115,7 @@ declare global {
       ) => void;
 
       /**
-       * Creates generic tempale question
+       * Creates generic template question
        *
        * @returns {typeof createSampleQuestion}
        * @memberof Chainable
