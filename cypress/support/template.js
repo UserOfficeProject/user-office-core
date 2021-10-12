@@ -290,7 +290,7 @@ const createSampleQuestion = (question, templateName, options) => {
   closeQuestionsMenu();
 };
 
-const creategenericTemplateQuestion = (question, templateName, addButtonLabel, options) => {
+const createGenericTemplateQuestion = (question, templateName, addButtonLabel, options) => {
   openQuestionsMenu();
 
   cy.contains('Add Sub Template').click();
@@ -384,4 +384,4 @@ Cypress.Commands.add('createSampleQuestion', createSampleQuestion);
 
 Cypress.Commands.add('createRichTextInput', createRichTextInput);
 
-Cypress.Commands.add('creategenericTemplateQuestion', creategenericTemplateQuestion);
+Cypress.Commands.add('createGenericTemplateQuestion', createGenericTemplateQuestion);

@@ -117,12 +117,12 @@ declare global {
       /**
        * Creates generic template question
        *
-       * @returns {typeof createSampleQuestion}
+       * @returns {typeof createGenericTemplateQuestion}
        * @memberof Chainable
        * @example
-       *    cy.creategenericTemplateQuestion('Provide deatails of any grants', 'deafult generic template', 'Add grant' {minEntries:0, maxEntries:5})
+       *    cy.createGenericTemplateQuestion('Provide deatails of any grants', 'deafult generic template', 'Add grant' {minEntries:0, maxEntries:5})
        */
-       creategenericTemplateQuestion: (
+       createGenericTemplateQuestion: (
         question: string,
         template: string,
         addButtonLabel: string,

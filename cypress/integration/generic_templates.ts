@@ -76,7 +76,7 @@ context('GenericTemplates tests', () => {
 
     cy.createTopic('New topic');
 
-    cy.creategenericTemplateQuestion(
+    cy.createGenericTemplateQuestion(
       genericTemplateQuestion[0],
       genericTemplateTemplateName[0],
       addButtonLabel[0],
@@ -86,7 +86,7 @@ context('GenericTemplates tests', () => {
       }
     );
 
-    cy.creategenericTemplateQuestion(
+    cy.createGenericTemplateQuestion(
       genericTemplateQuestion[1],
       genericTemplateTemplateName[1],
       addButtonLabel[1],
