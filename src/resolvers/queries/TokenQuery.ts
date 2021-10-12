@@ -31,7 +31,7 @@ class AuthJwtPayload implements AuthJwtPayloadBase {
 @ObjectType()
 class AuthJwtApiTokenPayload implements AuthJwtApiTokenPayloadBase {
   @Field(() => String)
-  accessTokenId: string;
+  accessTokenId?: string;
 }
 
 const TokenPayloadUnion = createUnionType({

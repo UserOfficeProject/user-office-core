@@ -464,10 +464,13 @@ export default class UserMutations {
     try {
       const decoded = verifyToken<AuthJwtPayload>(token);
 
-      // TODO: fixme
-      const currentRole = decoded.roles.find(
+      const currentRole = decoded.roles?.find(
         (role: Role) => role.id === selectedRoleId
-      )!;
+      );
+
+      if (!currentRole) {
+        return rejection('User role not found', { selectedRoleId });
+      }
 
       const tokenWithRole = signToken<AuthJwtPayload>({
         user: decoded.user,
