@@ -244,7 +244,8 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
                       onCreateNewQuestionClicked(definition.dataType)
                     }
                     disabled={
-                      definition.dataType === DataType.SAMPLE_DECLARATION &&
+                      (definition.dataType === DataType.SAMPLE_DECLARATION ||
+                        definition.dataType === DataType.GENERIC_TEMPLATE) &&
                       template.groupId !== TemplateGroupId.PROPOSAL
                     }
                     key={definition.dataType}

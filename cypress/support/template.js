@@ -23,6 +23,7 @@ const createTopic = (title) => {
 const typeToMenuTitle = new Map();
 typeToMenuTitle.set('proposal', 'Proposal');
 typeToMenuTitle.set('sample', 'Sample declaration');
+typeToMenuTitle.set('genericTemplate', 'Sub Template');
 typeToMenuTitle.set('shipment', 'Shipment declaration templates');
 typeToMenuTitle.set('visit', 'Visit registration');
 typeToMenuTitle.set('proposalEsi', 'Experiment Safety Input (Proposal)');
@@ -289,6 +290,48 @@ const createSampleQuestion = (question, templateName, options) => {
   closeQuestionsMenu();
 };
 
+const createGenericTemplateQuestion = (question, templateName, addButtonLabel, options) => {
+  openQuestionsMenu();
+
+  cy.contains('Add Sub Template').click();
+
+  cy.get('[data-cy=question]')
+    .clear()
+    .type(question)
+    .should('have.value', question);
+
+  cy.get('[data-cy=template-id]').click();
+
+  cy.contains(templateName).click();
+
+  if (addButtonLabel) {
+    cy.get('[data-cy="addEntryButtonLabel"]').type(addButtonLabel)
+  }
+
+
+  if (options?.minEntries) {
+    cy.get('[data-cy=min-entries] input')
+      .clear()
+      .type(options.minEntries.toString());
+  }
+
+  if (options?.maxEntries) {
+    cy.get('[data-cy=max-entries] input')
+      .clear()
+      .type(options.maxEntries.toString());
+  }
+
+  cy.contains('Save').click();
+
+  cy.contains(question)
+    .parent()
+    .dragElement([{ direction: 'left', length: 1 }]);
+
+  cy.finishedLoading();
+
+  closeQuestionsMenu();
+};
+
 const createRichTextInput = (question, options) => {
   openQuestionsMenu();
 
@@ -340,3 +383,5 @@ Cypress.Commands.add('createIntervalQuestion', createIntervalQuestion);
 Cypress.Commands.add('createSampleQuestion', createSampleQuestion);
 
 Cypress.Commands.add('createRichTextInput', createRichTextInput);
+
+Cypress.Commands.add('createGenericTemplateQuestion', createGenericTemplateQuestion);
