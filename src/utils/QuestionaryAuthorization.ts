@@ -3,6 +3,7 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalEsiDataSource } from '../datasources/ProposalEsiDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -324,6 +325,63 @@ export class SampleEsiQuestionaryAuthorizer implements QuestionaryAuthorizer {
 }
 
 @injectable()
+class GenericTemplateQuestionaryAuthorizer implements QuestionaryAuthorizer {
+  constructor(
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.GenericTemplateDataSource)
+    private genericTemplateDataSource: GenericTemplateDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuthorization: UserAuthorization
+  ) {}
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
+    return this.hasRights(agent, questionaryId);
+  }
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
+    return this.hasRights(agent, questionaryId);
+  }
+
+  private async hasRights(agent: UserWithRole | null, questionaryId: number) {
+    if (!agent) {
+      return false;
+    }
+
+    if (this.userAuthorization.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const queryResult =
+      await this.genericTemplateDataSource.getGenericTemplates({
+        filter: { questionaryIds: [questionaryId] },
+      });
+
+    if (queryResult.length !== 1) {
+      logger.logError(
+        'Expected to find exactly one generic template with questionaryId',
+        { questionaryId }
+      );
+
+      return false;
+    }
+
+    const genericTemplate = queryResult[0];
+
+    const proposal = await this.proposalDataSource.get(
+      genericTemplate.proposalPk
+    );
+
+    if (!proposal) {
+      logger.logError('Could not find proposal for questionary', {
+        questionaryId,
+      });
+
+      return false;
+    }
+
+    return this.userAuthorization.hasAccessRights(agent, proposal);
+  }
+}
+@injectable()
 export class QuestionaryAuthorization {
   private authorizers = new Map<TemplateGroupId, QuestionaryAuthorizer>();
   // TODO obtain authorizer from QuestionaryDefinition
@@ -357,6 +415,10 @@ export class QuestionaryAuthorization {
     this.authorizers.set(
       TemplateGroupId.SAMPLE_ESI,
       container.resolve(SampleEsiQuestionaryAuthorizer)
+    );
+    this.authorizers.set(
+      TemplateGroupId.GENERIC_TEMPLATE,
+      container.resolve(GenericTemplateQuestionaryAuthorizer)
     );
   }
 

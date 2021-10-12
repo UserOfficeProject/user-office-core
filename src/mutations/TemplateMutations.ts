@@ -72,6 +72,14 @@ export default class TemplateMutations {
           'sample_basis'
         );
         break;
+      case TemplateGroupId.GENERIC_TEMPLATE:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New Sub Topic',
+          'generic_template_basis'
+        );
+        break;
       case TemplateGroupId.SHIPMENT:
         await this.createInitialTopic(
           newTemplate.templateId,
@@ -363,7 +371,7 @@ export default class TemplateMutations {
       });
   }
 
-  // @ValidateArgs(updateQuestionTemplateRelationValidationSchema)
+  @ValidateArgs(updateQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateQuestionTemplateRelationSettings(
     agent: UserWithRole | null,

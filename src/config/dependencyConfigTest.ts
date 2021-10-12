@@ -4,6 +4,7 @@ import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import FileDataSourceMock from '../datasources/mockups/FileDataSource';
+import { GenericTemplateDataSourceMock } from '../datasources/mockups/GenericTemplateDataSource';
 import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { ProposalEsiDataSourceMock } from '../datasources/mockups/ProposalEsiDataSource';
@@ -22,6 +23,7 @@ import {
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
 import { SkipAssetRegistrar } from '../utils/EAM_service';
+import { GenericTemplateAuthorization } from '../utils/GenericTemplateAuthorization';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
@@ -32,6 +34,7 @@ import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
+mapClass(Tokens.GenericTemplateAuthorization, GenericTemplateAuthorization);
 mapClass(Tokens.UserAuthorization, UserAuthorization);
 mapClass(Tokens.QuestionaryAuthorization, QuestionaryAuthorization);
 mapClass(Tokens.SampleAuthorization, SampleAuthorization);
@@ -41,6 +44,7 @@ mapClass(Tokens.VisitAuthorization, VisitAuthorization);
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
 mapClass(Tokens.CallDataSource, CallDataSourceMock);
 mapClass(Tokens.EventLogsDataSource, EventLogsDataSourceMock);
+mapClass(Tokens.GenericTemplateDataSource, GenericTemplateDataSourceMock);
 mapClass(Tokens.ProposalEsiDataSource, ProposalEsiDataSourceMock);
 mapClass(Tokens.InstrumentDataSource, InstrumentDataSourceMock);
 mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);

@@ -7,6 +7,7 @@ import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
+import { GenericTemplate } from './GenericTemplate';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
@@ -327,4 +328,11 @@ export class SampleEsiResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => SampleExperimentSafetyInput, { nullable: true })
   public esi?: SampleExperimentSafetyInput;
+}
+
+@ObjectType()
+export class GenericTemplateResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => GenericTemplate, { nullable: true })
+  public genericTemplate: GenericTemplate;
 }

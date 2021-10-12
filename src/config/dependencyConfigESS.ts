@@ -4,6 +4,7 @@ import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
+import PostgresGenericTemplateDataSource from '../datasources/postgres/GenericTemplateDataSource';
 import PostgresInstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
 import PostgresProposalDataSource from '../datasources/postgres/ProposalDataSource';
 import PostgresProposalEsiDataSource from '../datasources/postgres/ProposalEsiDataSource';
@@ -24,6 +25,7 @@ import {
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
 import { EAMAssetRegistrar } from '../utils/EAM_service';
+import { GenericTemplateAuthorization } from '../utils/GenericTemplateAuthorization';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
 import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
@@ -35,6 +37,7 @@ import { mapClass, mapValue } from './utils';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+mapClass(Tokens.GenericTemplateAuthorization, GenericTemplateAuthorization);
 mapClass(Tokens.UserAuthorization, UserAuthorization);
 mapClass(Tokens.QuestionaryAuthorization, QuestionaryAuthorization);
 mapClass(Tokens.SampleAuthorization, SampleAuthorization);
@@ -46,6 +49,7 @@ mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
 mapClass(Tokens.FileDataSource, PostgresFileDataSource);
+mapClass(Tokens.GenericTemplateDataSource, PostgresGenericTemplateDataSource);
 mapClass(Tokens.InstrumentDataSource, PostgresInstrumentDataSource);
 mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
 mapClass(Tokens.ProposalSettingsDataSource, PostgresProposalSettingsDataSource);
