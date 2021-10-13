@@ -5,7 +5,9 @@ import { useDataApi } from 'hooks/common/useDataApi';
 import { GenericTemplateCore } from 'models/questionary/genericTemplate/GenericTemplateCore';
 
 export function useGenericTemplates(filter?: GenericTemplatesFilter) {
-  const [genericTemplates, setGenericTemplates] = useState<GenericTemplateCore[]>([]);
+  const [genericTemplates, setGenericTemplates] = useState<
+    GenericTemplateCore[]
+  >([]);
 
   const [genericTemplatesFilter, setGenericTemplatesFilter] = useState(filter);
   const [loadingGenericTemplates, setLoadingGenericTemplates] = useState(false);
@@ -14,7 +16,9 @@ export function useGenericTemplates(filter?: GenericTemplatesFilter) {
   useEffect(() => {
     setLoadingGenericTemplates(true);
     api()
-      .getGenericTemplatesWithQuestionaryStatus({ filter: genericTemplatesFilter })
+      .getGenericTemplatesWithQuestionaryStatus({
+        filter: genericTemplatesFilter,
+      })
       .then((data) => {
         if (data.genericTemplates) {
           setGenericTemplates(data.genericTemplates);
@@ -23,5 +27,10 @@ export function useGenericTemplates(filter?: GenericTemplatesFilter) {
       });
   }, [api, genericTemplatesFilter]);
 
-  return { genericTemplates, loadingGenericTemplates, setGenericTemplates, setGenericTemplatesFilter };
+  return {
+    genericTemplates,
+    loadingGenericTemplates,
+    setGenericTemplates,
+    setGenericTemplatesFilter,
+  };
 }
