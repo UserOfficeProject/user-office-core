@@ -45,7 +45,7 @@ test('A userofficer can add a reviewer for a proposal', () => {
   return expect(
     reviewMutations.addUserForReview(dummyUserOfficerWithRole, {
       userID: 1,
-      proposalID: 1,
+      proposalPk: 1,
       sepID: 1,
     })
   ).resolves.toBeInstanceOf(Review);
@@ -55,7 +55,7 @@ test('A user can not add a reviewer for a proposal', () => {
   return expect(
     reviewMutations.addUserForReview(dummyUserWithRole, {
       userID: 1,
-      proposalID: 1,
+      proposalPk: 1,
       sepID: 1,
     })
   ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');

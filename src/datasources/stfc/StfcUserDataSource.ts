@@ -8,8 +8,24 @@ import { UserDataSource } from '../UserDataSource';
 import UOWSSoapClient from './UOWSSoapInterface';
 
 const postgresUserDataSource = new PostgresUserDataSource();
-const client = new UOWSSoapClient();
+const client = new UOWSSoapClient(process.env.UOWS_URL);
 const token = process.env.EXTERNAL_AUTH_TOKEN;
+
+type StfcRolesToEssRole = { [key: string]: Roles[] };
+
+/*
+ * Must not contain user role, this is appended at the very last step.
+ */
+const stfcRolesToEssRoleDefinitions: StfcRolesToEssRole = {
+  'User Officer': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'ISIS Instrument Scientist': [Roles.INSTRUMENT_SCIENTIST],
+  'CLF Artemis FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF Artemis Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
+  'CLF HPL FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF HPL Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
+  'CLF LSF FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF LSF Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
+};
 
 type stfcRole = {
   name: string;
@@ -94,9 +110,9 @@ export class StfcUserDataSource implements UserDataSource {
     throw new Error('Method not implemented.');
   }
 
-  async getProposalUsersFull(proposalId: number): Promise<User[]> {
+  async getProposalUsersFull(proposalPk: number): Promise<User[]> {
     const users: User[] = await postgresUserDataSource.getProposalUsersFull(
-      proposalId
+      proposalPk
     );
     const userNumbers: string[] = users.map((user) => String(user.id));
 
@@ -113,6 +129,15 @@ export class StfcUserDataSource implements UserDataSource {
     const stfcUser = (
       await client.getBasicPersonDetailsFromUserNumber(token, id)
     )?.return;
+
+    return stfcUser ? toEssBasicUserDetails(stfcUser) : null;
+  }
+
+  async getBasicUserDetailsByEmail(
+    email: string
+  ): Promise<BasicUserDetails | null> {
+    const stfcUser = (await client.getBasicPersonDetailsFromEmail(token, email))
+      ?.return;
 
     return stfcUser ? toEssBasicUserDetails(stfcUser) : null;
   }
@@ -184,33 +209,33 @@ export class StfcUserDataSource implements UserDataSource {
       return [userRole];
     }
 
-    const stfcRolesToEssRoleDefinitions = new Map<string, Roles>([
-      ['User Officer', Roles.USER_OFFICER],
-      ['ISIS Instrument Scientist', Roles.INSTRUMENT_SCIENTIST],
-    ]);
+    /*
+     * Convert the STFC roles to the Roles enums which refers to roles
+     * by short code. We will use the short code to filter relevant
+     * roles.
+     */
+    const userRolesAsEnum: Roles[] = stfcRoles
+      .flatMap((stfcRole) => stfcRolesToEssRoleDefinitions[stfcRole.name])
+      .filter((r) => r !== undefined) as Roles[];
 
-    const roles: Role[] = [];
+    /*
+     * Filter relevant roles by short code.
+     */
+    const userRolesAsRole: Role[] = userRolesAsEnum
+      .map((r) => roleDefinitions.find((d) => d.shortCode === r))
+      .filter((r) => r !== undefined) as Role[];
 
-    // The User role must be the first item
-    roles.push(userRole);
+    /*
+     * We can't return non-unique roles.
+     */
+    const uniqueRoles: Role[] = [...new Set(userRolesAsRole)];
 
-    stfcRoles.forEach((stfcRole: stfcRole) => {
-      const essRoleDefinition:
-        | Roles
-        | undefined = stfcRolesToEssRoleDefinitions.get(stfcRole.name);
-      if (essRoleDefinition) {
-        const essRole: Role | undefined = roleDefinitions.find(
-          (role) => role.shortCode == essRoleDefinition
-        );
+    uniqueRoles.sort((a, b) => a.id - b.id);
 
-        if (essRole && !roles.includes(essRole)) {
-          essRole.title = stfcRole.name;
-          roles.push(essRole);
-        }
-      }
-    });
-
-    return roles;
+    /*
+     * Prepend the user role as it must be first.
+     */
+    return [userRole, ...uniqueRoles];
   }
 
   async getRoles(): Promise<Role[]> {
@@ -277,10 +302,47 @@ export class StfcUserDataSource implements UserDataSource {
     };
   }
 
-  async getProposalUsers(proposalId: number): Promise<BasicUserDetails[]> {
-    const users: BasicUserDetails[] = await postgresUserDataSource.getProposalUsers(
-      proposalId
-    );
+  async getPreviousCollaborators(
+    userId: number,
+    filter?: string,
+    first?: number,
+    offset?: number,
+    userRole?: number,
+    subtractUsers?: [number]
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
+    const dbUsers: BasicUserDetails[] = (
+      await postgresUserDataSource.getPreviousCollaborators(
+        userId,
+        filter,
+        first,
+        offset,
+        userRole,
+        subtractUsers
+      )
+    ).users;
+
+    let users: BasicUserDetails[] = [];
+
+    if (dbUsers[0]) {
+      const userNumbers: string[] = dbUsers.map((record) => String(record.id));
+      const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
+        await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+      )?.return;
+
+      users = stfcBasicPeople
+        ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
+        : [];
+    }
+
+    return {
+      totalCount: users.length,
+      users,
+    };
+  }
+
+  async getProposalUsers(proposalPk: number): Promise<BasicUserDetails[]> {
+    const users: BasicUserDetails[] =
+      await postgresUserDataSource.getProposalUsers(proposalPk);
     const userNumbers: string[] = users.map((user) => String(user.id));
 
     const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
@@ -294,11 +356,11 @@ export class StfcUserDataSource implements UserDataSource {
 
   async checkScientistToProposal(
     scientistId: number,
-    proposalId: number
+    proposalPk: number
   ): Promise<boolean> {
     return await postgresUserDataSource.checkScientistToProposal(
       scientistId,
-      proposalId
+      proposalPk
     );
   }
 
@@ -322,6 +384,10 @@ export class StfcUserDataSource implements UserDataSource {
     telephone: string,
     telephone_alt: string | undefined
   ): Promise<User> {
+    throw new Error('Method not implemented.');
+  }
+
+  async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
     throw new Error('Method not implemented.');
   }
 }

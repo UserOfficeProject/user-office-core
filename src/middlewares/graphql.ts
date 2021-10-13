@@ -1,6 +1,7 @@
 import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import { Express, Request } from 'express';
+import { applyMiddleware } from 'graphql-middleware';
 
 import 'reflect-metadata';
 import baseContext from '../buildContext';
@@ -10,6 +11,8 @@ import { User, UserWithRole } from '../models/User';
 import federationSources from '../resolvers/federationSources';
 import { registerEnums } from '../resolvers/registerEnums';
 import { buildFederatedSchema } from '../utils/buildFederatedSchema';
+import rejectionLogger from './rejectionLogger';
+import rejectionSanitizer from './rejectionSanitizer';
 
 interface Req extends Request {
   user?: {
@@ -27,7 +30,7 @@ const apolloServer = async (app: Express) => {
 
   const { orphanedTypes, referenceResolvers } = federationSources();
 
-  const schema = await buildFederatedSchema(
+  let schema = await buildFederatedSchema(
     {
       resolvers: [
         __dirname + '/../resolvers/**/*Query.{ts,js}',
@@ -42,21 +45,23 @@ const apolloServer = async (app: Express) => {
     }
   );
 
-  // TODO Find out why applyMiddleware is corrupting the schema
-  // schema = applyMiddleware(schema, rejectionLogger);
-  // if (process.env.NODE_ENV === 'production') {
-  //   // prevent exposing too much information when running in production
-  //   schema = applyMiddleware(schema, rejectionSanitizer);
-  // }
+  schema = applyMiddleware(schema, rejectionLogger);
+
+  const env = process.env.NODE_ENV;
+
+  if (env === 'production') {
+    // prevent exposing too much information when running in production
+    schema = applyMiddleware(schema, rejectionSanitizer);
+  }
 
   const server = new ApolloServer({
     schema: schema,
     tracing: false,
-    playground: {
-      settings: {
-        'schema.polling.enable': false,
-      },
-    },
+    // Explicitly disable playground in prod
+    playground:
+      env !== 'production'
+        ? { settings: { 'schema.polling.enable': false } }
+        : false,
     plugins: [ApolloServerPluginInlineTraceDisabled()],
 
     context: async ({ req }: { req: Req }) => {
@@ -66,11 +71,10 @@ const apolloServer = async (app: Express) => {
 
       if (req.user) {
         if (accessTokenId) {
-          const {
-            accessPermissions,
-          } = await baseContext.queries.admin.getPermissionsByToken(
-            accessTokenId
-          );
+          const { accessPermissions } =
+            await baseContext.queries.admin.getPermissionsByToken(
+              accessTokenId
+            );
 
           user = {
             accessPermissions: accessPermissions

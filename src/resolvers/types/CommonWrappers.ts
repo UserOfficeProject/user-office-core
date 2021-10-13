@@ -6,6 +6,8 @@ import { Answer } from './Answer';
 import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { ExperimentSafetyInput } from './ExperimentSafetyInput';
+import { GenericTemplate } from './GenericTemplate';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
 import { PermissionsWithAccessToken } from './PermissionsWithAccessToken';
@@ -21,6 +23,7 @@ import { Rejection } from './Rejection';
 import { ReviewWithNextProposalStatus } from './Review';
 import { Review } from './Review';
 import { Sample } from './Sample';
+import { SampleExperimentSafetyInput } from './SampleExperimentSafetyInput';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
 import { SEPProposal } from './SEPProposal';
@@ -31,6 +34,8 @@ import { Template } from './Template';
 import { Topic } from './Topic';
 import { Unit } from './Unit';
 import { User } from './User';
+import { Visit } from './Visit';
+import { VisitRegistration } from './VisitRegistration';
 
 @ObjectType()
 export class ResponseWrapBase {
@@ -295,4 +300,39 @@ export class ProposalsResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => [Proposal])
   public proposals: Proposal[];
+}
+
+@ObjectType()
+export class VisitResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => Visit, { nullable: true })
+  public visit: Visit;
+}
+
+@ObjectType()
+export class VisitRegistrationResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => VisitRegistration, { nullable: true })
+  public registration: VisitRegistration;
+}
+
+@ObjectType()
+export class EsiResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => ExperimentSafetyInput, { nullable: true })
+  public esi: ExperimentSafetyInput;
+}
+
+@ObjectType()
+export class SampleEsiResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => SampleExperimentSafetyInput, { nullable: true })
+  public esi?: SampleExperimentSafetyInput;
+}
+
+@ObjectType()
+export class GenericTemplateResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => GenericTemplate, { nullable: true })
+  public genericTemplate: GenericTemplate;
 }

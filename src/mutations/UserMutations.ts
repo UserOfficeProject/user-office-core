@@ -29,6 +29,7 @@ import {
   EmailVerificationJwtPayload,
   AuthJwtPayload,
   PasswordResetJwtPayload,
+  UserRoleShortCodeMap,
 } from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
@@ -109,11 +110,21 @@ export default class UserMutations {
       this.userAuth.isUserOfficer(agent)
     ) {
       userId = await this.dataSource.createInviteUser(args);
-      await this.dataSource.setUserRoles(userId, [UserRole.SEP_REVIEWER]);
+
+      const newUserRole = await this.dataSource.getRoleByShortCode(
+        UserRoleShortCodeMap[role]
+      );
+
+      await this.dataSource.setUserRoles(userId, [newUserRole.id]);
       role = UserRole.SEP_REVIEWER;
     } else if (args.userRole === UserRole.USER) {
       userId = await this.dataSource.createInviteUser(args);
-      await this.dataSource.setUserRoles(userId, [UserRole.USER]);
+
+      const newUserRole = await this.dataSource.getRoleByShortCode(
+        UserRoleShortCodeMap[role]
+      );
+
+      await this.dataSource.setUserRoles(userId, [newUserRole.id]);
       role = UserRole.USER;
     } else if (
       args.userRole === UserRole.SEP_CHAIR &&
@@ -264,10 +275,8 @@ export default class UserMutations {
     agent: UserWithRole | null,
     args: UpdateUserArgs
   ): Promise<User | Rejection> {
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !this.userAuth.isUser(agent, args.id)
-    ) {
+    const isUpdatingOwnUser = agent?.id === args.id;
+    if (!this.userAuth.isUserOfficer(agent) && !isUpdatingOwnUser) {
       return rejection(
         'Can not update user because of insufficient permissions',
         { args, agent }
@@ -406,7 +415,7 @@ export default class UserMutations {
 
   async checkExternalToken(externalToken: string): Promise<string | Rejection> {
     try {
-      const client = new UOWSSoapClient();
+      const client = new UOWSSoapClient(process.env.UOWS_URL);
 
       const rawStfcUser = await client.getPersonDetailsFromSessionId(
         externalToken
@@ -422,6 +431,14 @@ export default class UserMutations {
       const userNumber = parseInt(stfcUser.userNumber);
       const dummyUser = await this.dataSource.ensureDummyUserExists(userNumber);
       const roles = await this.dataSource.getUserRoles(dummyUser.id);
+
+      // With dummyUser created and written (ensureDummyUserExists), info can now
+      // be added to it without persisting it to the database, which is not wanted.
+      // This info is used in the userContext.
+      dummyUser.email = stfcUser.email;
+      dummyUser.firstname = stfcUser.givenName;
+      dummyUser.preferredname = stfcUser.firstNameKnownAs;
+      dummyUser.lastname = stfcUser.familyName;
 
       const proposalsToken = signToken<AuthJwtPayload>({
         user: dummyUser,
@@ -531,10 +548,8 @@ export default class UserMutations {
     agent: UserWithRole | null,
     { id, password }: { id: number; password: string }
   ): Promise<BasicUserDetails | Rejection> {
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !this.userAuth.isUser(agent, id)
-    ) {
+    const isUpdatingOwnUser = agent?.id === id;
+    if (!this.userAuth.isUserOfficer(agent) && !isUpdatingOwnUser) {
       return rejection(
         'Can not update password because of insufficient permissions',
         { id, agent }

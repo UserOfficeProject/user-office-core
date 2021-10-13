@@ -9,12 +9,13 @@ export interface SampleDataSource {
   create(
     title: string,
     creatorId: number,
-    proposalId: number,
+    proposalPk: number,
     questionaryId: number,
     questionId: string
   ): Promise<Sample>;
   getSample(sampleId: number): Promise<Sample | null>;
-  getSamplesByCallId(callId: number): Promise<Sample[]>;
   getSamples(args: SamplesArgs): Promise<Sample[]>;
+  getSamplesByCallId(callId: number): Promise<Sample[]>;
   getSamplesByShipmentId(shipmentId: number): Promise<Sample[]>;
+  getSamplesByEsiId(esiId: number): Promise<Sample[]>;
 }

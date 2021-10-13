@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { AllocationTimeUnits } from '../../models/Call';
 import { CallResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
@@ -62,7 +63,10 @@ export class UpdateCallInput {
   @Field()
   public surveyComment: string;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => AllocationTimeUnits)
+  public allocationTimeUnit: AllocationTimeUnits;
+
+  @Field(() => Int)
   public proposalWorkflowId: number;
 
   @Field(() => Int, { nullable: true })
@@ -74,8 +78,17 @@ export class UpdateCallInput {
   @Field(() => Int, { nullable: true })
   public callSEPReviewEnded?: boolean;
 
+  @Field(() => Int)
+  public templateId: number;
+
   @Field(() => Int, { nullable: true })
-  public templateId?: number;
+  public esiTemplateId?: number;
+
+  @Field({ nullable: true })
+  public title: string;
+
+  @Field({ nullable: true })
+  public description: string;
 }
 
 @InputType()

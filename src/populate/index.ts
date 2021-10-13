@@ -15,6 +15,7 @@ import ReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import SEPDataSource from '../datasources/postgres/SEPDataSource';
 import TemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import UserDataSource from '../datasources/postgres/UserDataSource';
+import { AllocationTimeUnits } from '../models/Call';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import {
@@ -23,6 +24,7 @@ import {
   TemplatesHasQuestions,
 } from '../models/Template';
 import { UserRole } from '../models/User';
+import { TemplateGroupId } from './../models/Template';
 import * as dummy from './dummy';
 import { execute } from './executor';
 
@@ -159,6 +161,9 @@ const createCalls = async () => {
       surveyComment: faker.random.words(5),
       proposalWorkflowId: 1,
       templateId: dummy.positiveNumber(MAX_TEMPLATES),
+      allocationTimeUnit: AllocationTimeUnits.Day,
+      title: faker.random.words(8),
+      description: faker.random.words(10),
     });
   }, MAX_CALLS);
 };
@@ -166,7 +171,7 @@ const createCalls = async () => {
 const createTemplates = async () => {
   const templates = await execute(() => {
     return templateDataSource.createTemplate({
-      categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      groupId: TemplateGroupId.PROPOSAL,
       name: faker.random.word(),
       description: faker.random.words(3),
     });
@@ -260,7 +265,7 @@ const createProposals = async () => {
       abstract: faker.random.words(7),
     });
     await proposalDataSource.setProposalUsers(
-      proposal.id,
+      proposal.primaryKey,
       createUniqueIntArray(3, MAX_USERS)
     );
     const questionarySteps = await questionaryDataSource.getQuestionarySteps(
@@ -282,7 +287,7 @@ const createProposals = async () => {
     }
 
     instrumentDataSource.assignProposalsToInstrument(
-      [proposal.id],
+      [proposal.primaryKey],
       dummy.positiveNumber(MAX_INSTRUMENTS)
     );
   }, MAX_PROPOSALS);
@@ -292,7 +297,7 @@ const createReviews = async () => {
   await execute(() => {
     return reviewDataSource.setTechnicalReview(
       {
-        proposalID: dummy.positiveNumber(MAX_PROPOSALS),
+        proposalPk: dummy.positiveNumber(MAX_PROPOSALS),
         comment: faker.random.words(50),
         publicComment: faker.random.words(25),
         status:
@@ -330,15 +335,18 @@ const createSeps = async () => {
       sepId: sep.id,
       memberIds: [dummy.positiveNumber(MAX_USERS)],
     });
-    const proposalIds = createUniqueIntArray(5, MAX_PROPOSALS);
-    for (const proposalId of proposalIds) {
+    const proposalPks = createUniqueIntArray(5, MAX_PROPOSALS);
+    for (const proposalPk of proposalPks) {
       const tmpUserId = dummy.positiveNumber(MAX_USERS);
-      await sepDataSource.assignProposal(proposalId, sep.id);
-      await sepDataSource.assignMemberToSEPProposal(proposalId, sep.id, [
+      await sepDataSource.assignProposalsToSep({
+        proposals: [{ primaryKey: proposalPk, callId: 1 }],
+        sepId: sep.id,
+      });
+      await sepDataSource.assignMemberToSEPProposal(proposalPk, sep.id, [
         tmpUserId,
       ]);
       await reviewDataSource.addUserForReview({
-        proposalID: proposalId,
+        proposalPk: proposalPk,
         sepID: sep.id,
         userID: tmpUserId,
       });

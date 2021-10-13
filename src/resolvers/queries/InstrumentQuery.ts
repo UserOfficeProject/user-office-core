@@ -70,13 +70,13 @@ export class InstrumentQuery {
   @Query(() => Boolean, { nullable: true })
   async instrumentScientistHasAccess(
     @Arg('instrumentId', () => Int) instrumentId: number,
-    @Arg('proposalId', () => Int) proposalId: number,
+    @Arg('proposalPk', () => Int) proposalPk: number,
     @Ctx() context: ResolverContext
   ): Promise<boolean> {
     return context.queries.instrument.hasInstrumentScientistAccess(
       context.user,
       instrumentId,
-      proposalId
+      proposalPk
     );
   }
 }

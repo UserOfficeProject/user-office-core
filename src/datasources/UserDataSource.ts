@@ -1,4 +1,4 @@
-import { Role } from '../models/Role';
+import { Role, Roles } from '../models/Role';
 import { User, BasicUserDetails, UserRole } from '../models/User';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
@@ -8,6 +8,10 @@ export interface UserDataSource {
   addUserRole(args: AddUserRoleArgs): Promise<boolean>;
   createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
+  getBasicUserDetailsByEmail(
+    email: string,
+    role?: UserRole
+  ): Promise<BasicUserDetails | null>;
   checkEmailExist(email: string): Promise<boolean>;
   checkOrcIDExist(orcID: string): Promise<boolean>;
   // Read
@@ -25,9 +29,17 @@ export interface UserDataSource {
     userRole?: UserRole,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
+  getPreviousCollaborators(
+    user_id: number,
+    filter?: string,
+    first?: number,
+    offset?: number,
+    userRole?: UserRole,
+    subtractUsers?: [number]
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getRoles(): Promise<Role[]>;
-  getProposalUsers(proposalId: number): Promise<BasicUserDetails[]>;
-  getProposalUsersFull(proposalId: number): Promise<User[]>;
+  getProposalUsers(proposalPk: number): Promise<BasicUserDetails[]>;
+  getProposalUsersFull(proposalPk: number): Promise<User[]>;
   // Write
   create(
     user_title: string | undefined,
@@ -59,6 +71,7 @@ export interface UserDataSource {
   setUserNotPlaceholder(id: number): Promise<User | null>;
   checkScientistToProposal(
     userId: number,
-    proposalId: number
+    proposalPk: number
   ): Promise<boolean>;
+  getRoleByShortCode(roleShortCode: Roles): Promise<Role>;
 }

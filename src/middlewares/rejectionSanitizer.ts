@@ -15,7 +15,8 @@ const rejectionSanitizer: IMiddlewareResolver = async (
   info
 ) => {
   const result: ResponseWrapBase = await resolve(root, args, context, info);
-  const rejection = result.rejection;
+  const rejection = result?.rejection;
+
   if (isRejection(rejection)) {
     delete rejection.context;
     delete rejection.exception;

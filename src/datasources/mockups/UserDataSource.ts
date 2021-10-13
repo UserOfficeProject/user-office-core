@@ -1,5 +1,10 @@
-import { Role } from '../../models/Role';
-import { BasicUserDetails, User, UserWithRole } from '../../models/User';
+import { Role, Roles } from '../../models/Role';
+import {
+  BasicUserDetails,
+  User,
+  UserRole,
+  UserWithRole,
+} from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UserDataSource } from '../UserDataSource';
@@ -181,7 +186,7 @@ export class UserDataSourceMock implements UserDataSource {
   async createOrganisation(name: string, verified: boolean): Promise<number> {
     return 1;
   }
-  async getProposalUsersFull(proposalId: number): Promise<User[]> {
+  async getProposalUsersFull(proposalPk: number): Promise<User[]> {
     throw new Error('Method not implemented.');
   }
   async getBasicUserInfo(
@@ -189,6 +194,22 @@ export class UserDataSourceMock implements UserDataSource {
   ): Promise<import('../../models/User').BasicUserDetails | null> {
     throw new Error('Method not implemented.');
   }
+
+  async getBasicUserDetailsByEmail(
+    email: string,
+    role?: UserRole
+  ): Promise<import('../../models/User').BasicUserDetails | null> {
+    return new BasicUserDetails(
+      1,
+      'John',
+      'Smith',
+      'ESS',
+      'Manager',
+      new Date('2019-07-17 08:25:12.23043+00'),
+      false
+    );
+  }
+
   async checkOrcIDExist(orcID: string): Promise<boolean> {
     return false;
   }
@@ -230,7 +251,7 @@ export class UserDataSourceMock implements UserDataSource {
   }
   async addUserForReview(
     userID: number,
-    proposalID: number
+    proposalPk: number
   ): Promise<boolean | null> {
     return true;
   }
@@ -255,7 +276,7 @@ export class UserDataSourceMock implements UserDataSource {
         },
       ];
     } else if (id === 1001) {
-      return [{ id: 2, shortCode: 'SEP_Reviewer', title: 'User' }];
+      return [{ id: 2, shortCode: 'sep_reviewer', title: 'User' }];
     } else {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }
@@ -291,13 +312,25 @@ export class UserDataSourceMock implements UserDataSource {
     };
   }
 
+  async getPreviousCollaborators(
+    user_id: number,
+    filter?: string,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
+    return {
+      totalCount: 2,
+      users: [basicDummyUser, basicDummyUserNotOnProposal],
+    };
+  }
+
   async getProposalUsers(id: number) {
     return [basicDummyUser];
   }
 
   async checkScientistToProposal(
     scientsitId: number,
-    proposalId: number
+    proposalPk: number
   ): Promise<boolean> {
     if (scientsitId === dummyUserNotOnProposalWithRole.id) {
       return false;
@@ -312,5 +345,9 @@ export class UserDataSourceMock implements UserDataSource {
 
   async ensureDummyUserExists(userId: number): Promise<User> {
     return dummyUser;
+  }
+
+  async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
+    return { id: 1, shortCode: 'user_officer', title: 'User Officer' };
   }
 }

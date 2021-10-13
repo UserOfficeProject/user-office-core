@@ -9,4 +9,6 @@ export class Feature {
 export enum FeatureId {
   SHIPPING = 'SHIPPING',
   SCHEDULER = 'SCHEDULER',
+  EXTERNAL_AUTH = 'EXTERNAL_AUTH',
+  RISK_ASSESSMENT = 'RISK_ASSESSMENT',
 }

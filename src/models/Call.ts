@@ -20,6 +20,15 @@ export class Call {
     public callEnded: boolean,
     public callReviewEnded: boolean,
     public callSEPReviewEnded: boolean,
-    public templateId: number
+    public templateId: number,
+    public esiTemplateId: number | undefined,
+    public allocationTimeUnit: AllocationTimeUnits,
+    public title: string,
+    public description: string
   ) {}
+}
+
+export enum AllocationTimeUnits {
+  Day = 'day',
+  Hour = 'hour',
 }

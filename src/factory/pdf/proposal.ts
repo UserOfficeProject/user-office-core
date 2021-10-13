@@ -15,6 +15,10 @@ import {
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
 import { getFileAttachments, Attachment } from '../util';
+import {
+  collectGenericTemplatePDFData,
+  GenericTemplatePDFData,
+} from './genericTemplates';
 import { collectSamplePDFData, SamplePDFData } from './sample';
 
 type ProposalPDFData = {
@@ -25,6 +29,12 @@ type ProposalPDFData = {
   attachments: Attachment[];
   technicalReview?: Omit<TechnicalReview, 'status'> & { status: string };
   samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
+  genericTemplates: Array<
+    Pick<
+      GenericTemplatePDFData,
+      'genericTemplate' | 'genericTemplateQuestionaryFields'
+    >
+  >;
 };
 
 const getTechnicalReviewHumanReadableStatus = (
@@ -56,12 +66,12 @@ const getTopicActiveAnswers = (
 };
 
 export const collectProposalPDFData = async (
-  proposalId: number,
+  proposalPk: number,
   user: UserWithRole,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
   const userAuthorization = baseContext.userAuthorization;
-  const proposal = await baseContext.queries.proposal.get(user, proposalId);
+  const proposal = await baseContext.queries.proposal.get(user, proposalPk);
 
   // Authenticate user
   if (!proposal || !userAuthorization.hasAccessRights(user, proposal)) {
@@ -85,7 +95,7 @@ export const collectProposalPDFData = async (
   );
   const coProposers = await baseContext.queries.user.getProposers(
     user,
-    proposalId
+    proposalPk
   );
 
   if (!principalInvestigator || !coProposers) {
@@ -95,7 +105,7 @@ export const collectProposalPDFData = async (
   const sampleAttachments: Attachment[] = [];
 
   const samples = await baseContext.queries.sample.getSamples(user, {
-    filter: { proposalId },
+    filter: { proposalPk },
   });
 
   const samplePDFData = (
@@ -110,7 +120,34 @@ export const collectProposalPDFData = async (
 
   notify?.(
     `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
-      proposal.shortCode
+      proposal.proposalId
+    }.pdf`
+  );
+
+  const genericTemplateAttachments: Attachment[] = [];
+
+  const genericTemplates =
+    await baseContext.queries.genericTemplate.getGenericTemplates(user, {
+      filter: { proposalPk },
+    });
+
+  const genericTemplatePDFData = (
+    await Promise.all(
+      genericTemplates.map((genericTemplate) =>
+        collectGenericTemplatePDFData(genericTemplate.id, user)
+      )
+    )
+  ).map(
+    ({ genericTemplate, genericTemplateQuestionaryFields, attachments }) => {
+      genericTemplateAttachments.push(...attachments);
+
+      return { genericTemplate, genericTemplateQuestionaryFields };
+    }
+  );
+
+  notify?.(
+    `${proposal.created.getUTCFullYear()}_${principalInvestigator.lastname}_${
+      proposal.proposalId
     }.pdf`
   );
 
@@ -121,6 +158,7 @@ export const collectProposalPDFData = async (
     questionarySteps: [],
     attachments: [],
     samples: samplePDFData,
+    genericTemplates: genericTemplatePDFData,
   };
 
   // Information from each topic in proposal
@@ -154,6 +192,13 @@ export const collectProposalPDFData = async (
         answer.value = samples
           .filter((sample) => sample.questionId === answer.question.id)
           .map((sample) => sample);
+      } else if (answer.question.dataType === DataType.GENERIC_TEMPLATE) {
+        answer.value = genericTemplates
+          .filter(
+            (genericTemplate) =>
+              genericTemplate.questionId === answer.question.id
+          )
+          .map((genericTemplate) => genericTemplate);
       }
     }
 
@@ -163,13 +208,15 @@ export const collectProposalPDFData = async (
     });
     out.attachments.push(...questionaryAttachments);
     out.attachments.push(...sampleAttachments);
+    out.attachments.push(...genericTemplateAttachments);
   }
 
-  if (userAuthorization.isReviewerOfProposal(user, proposal.id)) {
-    const technicalReview = await baseContext.queries.review.technicalReviewForProposal(
-      user,
-      proposal.id
-    );
+  if (await userAuthorization.isReviewerOfProposal(user, proposal.primaryKey)) {
+    const technicalReview =
+      await baseContext.queries.review.technicalReviewForProposal(
+        user,
+        proposal.primaryKey
+      );
     if (technicalReview) {
       out.technicalReview = {
         ...technicalReview,

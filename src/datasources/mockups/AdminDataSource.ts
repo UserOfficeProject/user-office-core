@@ -2,6 +2,7 @@ import { Page } from '../../models/Admin';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
+import { Settings, SettingsId } from '../../models/Settings';
 import { Unit } from '../../models/Unit';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
@@ -19,6 +20,12 @@ export const dummyApiAccessToken = new Permissions(
 export const dummyApiAccessTokens = [dummyApiAccessToken];
 
 export class AdminDataSourceMock implements AdminDataSource {
+  async setFeatures(
+    features: FeatureId[],
+    value: boolean
+  ): Promise<FeatureId[]> {
+    return features;
+  }
   updateUnit(unit: Unit): Promise<Unit | null> {
     throw new Error('Method not implemented.');
   }
@@ -84,7 +91,19 @@ export class AdminDataSourceMock implements AdminDataSource {
     return new Page(id, text);
   }
   async getFeatures(): Promise<Feature[]> {
-    return [{ id: FeatureId.SHIPPING, isEnabled: false, description: '' }];
+    return [
+      { id: FeatureId.SHIPPING, isEnabled: false, description: '' },
+      { id: FeatureId.EXTERNAL_AUTH, isEnabled: true, description: '' },
+    ];
+  }
+  async getSettings(): Promise<Settings[]> {
+    return [
+      {
+        id: SettingsId.EXTERNAL_AUTH_LOGIN_URL,
+        settingsValue: '',
+        description: '',
+      },
+    ];
   }
 
   async getTokenAndPermissionsById(
@@ -127,6 +146,18 @@ export class AdminDataSourceMock implements AdminDataSource {
     apiAccessToken.name = args.name;
 
     return apiAccessToken;
+  }
+
+  async updateSettings(
+    id: SettingsId,
+    value?: string,
+    description?: string
+  ): Promise<Settings> {
+    return {
+      id: id,
+      settingsValue: value || '',
+      description: description || '',
+    };
   }
 
   async deleteApiAccessToken(accessTokenId: string): Promise<boolean> {

@@ -6,15 +6,19 @@ import {
   InputType,
   Field,
   ArgsType,
+  Int,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { TemplateCategoryId } from '../../models/Template';
 import { ProposalTemplate } from '../types/ProposalTemplate';
+import { TemplateGroupId } from './../../models/Template';
 @InputType()
 class ProposalTemplatesFilter {
   @Field({ nullable: true })
   public isArchived?: boolean;
+
+  @Field(() => [Int], { nullable: true })
+  public templateIds?: number[];
 }
 
 @ArgsType()
@@ -33,7 +37,7 @@ export class ProposalTemplatesQuery {
     return context.queries.template.getTemplates(context.user, {
       filter: {
         ...args.filter,
-        category: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+        group: TemplateGroupId.PROPOSAL,
       },
     });
   }

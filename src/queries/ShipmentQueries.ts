@@ -18,10 +18,11 @@ export default class ShipmentQueries {
   ) {}
 
   async getShipment(agent: UserWithRole | null, shipmentId: number) {
-    if (
-      (await this.shipmentAuthorization.hasReadRights(agent, shipmentId)) !==
-      true
-    ) {
+    const hasRights = await this.shipmentAuthorization.hasReadRights(
+      agent,
+      shipmentId
+    );
+    if (hasRights == false) {
       logger.logWarn('Unauthorized getShipment access', { agent, shipmentId });
 
       return null;
@@ -30,12 +31,13 @@ export default class ShipmentQueries {
     return this.dataSource.getShipment(shipmentId);
   }
 
+  @Authorized()
   async getShipments(agent: UserWithRole | null, args: ShipmentsArgs) {
     let shipments = await this.dataSource.getShipments(args);
 
     shipments = await Promise.all(
       shipments.map((shipment) =>
-        this.shipmentAuthorization.hasReadRights(agent, shipment.id)
+        this.shipmentAuthorization.hasReadRights(agent, shipment)
       )
     ).then((results) => shipments.filter((_v, index) => results[index]));
 
@@ -45,5 +47,20 @@ export default class ShipmentQueries {
   @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
   async getShipmentsByCallId(user: UserWithRole | null, callId: number) {
     return await this.dataSource.getShipmentsByCallId(callId);
+  }
+
+  @Authorized()
+  async getMyShipments(agent: UserWithRole | null) {
+    let shipments = await this.dataSource.getShipments({
+      filter: { creatorId: agent!.id },
+    });
+
+    shipments = await Promise.all(
+      shipments.map((shipment) =>
+        this.shipmentAuthorization.hasReadRights(agent, shipment)
+      )
+    ).then((results) => shipments.filter((_v, index) => results[index]));
+
+    return shipments;
   }
 }

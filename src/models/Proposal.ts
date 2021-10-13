@@ -29,14 +29,14 @@ export enum ProposalPublicStatus {
 
 export class Proposal {
   constructor(
-    public id: number,
+    public primaryKey: number,
     public title: string,
     public abstract: string,
     public proposerId: number,
     public statusId: number, // proposal status id while it moving though proposal workflow
     public created: Date,
     public updated: Date,
-    public shortCode: string,
+    public proposalId: string,
     public finalStatus: ProposalEndStatus,
     public callId: number,
     public questionaryId: number,
@@ -51,9 +51,9 @@ export class Proposal {
   ) {}
 }
 
-export class ProposalIdsWithNextStatus {
+export class ProposalPksWithNextStatus {
   constructor(
-    public proposalIds: number[],
+    public proposalPks: number[],
     public id?: number,
     public shortCode?: string,
     public name?: string

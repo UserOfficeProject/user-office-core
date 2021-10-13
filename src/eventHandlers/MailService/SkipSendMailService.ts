@@ -11,9 +11,7 @@ export class SkipSendMailService extends MailService {
     super();
   }
 
-  async sendMail(
-    options: EmailSettings
-  ): Promise<{
+  async sendMail(options: EmailSettings): Promise<{
     results: SendMailResults;
   }> {
     logger.logInfo('Pretending to send an email', { ...options }); // TODO: fix type of the second param in the lib (don't use Record<string, unknown>)

@@ -4,7 +4,8 @@ import database from './database';
 import { EventLogRecord } from './records';
 
 export default class PostgresEventLogsDataSource
-  implements EventLogsDataSource {
+  implements EventLogsDataSource
+{
   private createEventLogObject(eventLog: EventLogRecord) {
     return new EventLog(
       eventLog.id,

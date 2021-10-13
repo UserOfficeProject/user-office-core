@@ -8,19 +8,24 @@ import { Page } from '../../models/Admin';
 import { Feature } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
+import { Settings } from '../../models/Settings';
 import { Unit } from '../../models/Unit';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource, Entry } from '../AdminDataSource';
+import { FeatureId } from './../../models/Feature';
+import { SettingsId } from './../../models/Settings';
 import { InstitutionsFilter } from './../../resolvers/queries/InstitutionsQuery';
 import database from './database';
 import {
   CountryRecord,
   createBasicUserObject,
   createFeatureObject,
+  createSettingsObject,
   createPageObject,
   FeatureRecord,
+  SettingsRecord,
   InstitutionRecord,
   NationalityRecord,
   PageTextRecord,
@@ -154,6 +159,17 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .where('pagetext_id', id)
       .first()
       .then((res) => (res ? res.content : null));
+  }
+
+  async setFeatures(
+    features: FeatureId[],
+    value: boolean
+  ): Promise<FeatureId[]> {
+    await database('features')
+      .update({ is_enabled: value })
+      .whereIn('feature_id', features);
+
+    return features;
   }
 
   async setPageText(id: number, content: string): Promise<Page> {
@@ -365,12 +381,19 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       );
   }
 
+  async getSettings(): Promise<Settings[]> {
+    return database
+      .select()
+      .from('settings')
+      .then((settings: SettingsRecord[]) =>
+        settings.map((settings) => createSettingsObject(settings))
+      );
+  }
+
   async getTokenAndPermissionsById(
     accessTokenId: string
   ): Promise<Permissions> {
-    const [
-      permissionRules,
-    ]: TokensAndPermissionsRecord[] = await database
+    const [permissionRules]: TokensAndPermissionsRecord[] = await database
       .select()
       .from('api_permissions')
       .where('access_token_id', accessTokenId);
@@ -390,9 +413,8 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async getAllTokensAndPermissions(): Promise<Permissions[]> {
-    const accessTokensWithPermissions: TokensAndPermissionsRecord[] = await database
-      .select()
-      .from('api_permissions');
+    const accessTokensWithPermissions: TokensAndPermissionsRecord[] =
+      await database.select().from('api_permissions');
 
     return accessTokensWithPermissions.map(
       (accessTokenWithPermissions) =>
@@ -459,6 +481,18 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       permissionRules.access_token,
       JSON.stringify(permissionRules.access_permissions)
     );
+  }
+
+  async updateSettings(
+    id: SettingsId,
+    value?: string,
+    description?: string
+  ): Promise<Settings> {
+    return database('settings')
+      .update({ settings_value: value, description: description })
+      .where('settings_id', id)
+      .returning('*')
+      .then((records: SettingsRecord[]) => createSettingsObject(records[0]));
   }
 
   async deleteApiAccessToken(accessTokenId: string): Promise<boolean> {

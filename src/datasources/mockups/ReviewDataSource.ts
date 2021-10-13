@@ -6,21 +6,13 @@ import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReview
 import { ReviewDataSource } from '../ReviewDataSource';
 
 export const dummyReview = new Review(4, 10, 1, 'Good proposal', 9, 0, 1);
-export const dummyReviewWithNextProposalStatus = new ReviewWithNextProposalStatus(
-  4,
-  10,
-  1,
-  'Good proposal',
-  9,
-  0,
-  1,
-  null
-);
+export const dummyReviewWithNextProposalStatus =
+  new ReviewWithNextProposalStatus(4, 10, 1, 'Good proposal', 9, 0, 1, null);
 
 export const dummyReviewBad = new Review(1, 9, 1, 'bad proposal', 1, 0, 1);
 
 export class ReviewDataSourceMock implements ReviewDataSource {
-  getTechnicalReview(proposalID: number): Promise<TechnicalReview | null> {
+  getTechnicalReview(proposalPk: number): Promise<TechnicalReview | null> {
     throw new Error('Method not implemented.');
   }
   setTechnicalReview(
@@ -30,9 +22,9 @@ export class ReviewDataSourceMock implements ReviewDataSource {
     throw new Error('Method not implemented.');
   }
   async addUserForReview(args: AddUserForReviewArgs): Promise<Review> {
-    const { proposalID, userID } = args;
+    const { proposalPk, userID } = args;
 
-    return new Review(1, proposalID, userID, ' ', 1, 1, 1);
+    return new Review(1, proposalPk, userID, ' ', 1, 1, 1);
   }
   async removeUserForReview(id: number): Promise<Review> {
     return new Review(1, 1, 1, ' ', 1, 1, 1);
@@ -45,7 +37,7 @@ export class ReviewDataSourceMock implements ReviewDataSource {
     return dummyReview;
   }
 
-  async getAssignmentReview(sepId: number, proposalId: number, userId: number) {
+  async getAssignmentReview(sepId: number, proposalPk: number, userId: number) {
     return dummyReview;
   }
 

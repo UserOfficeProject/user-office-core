@@ -9,7 +9,7 @@ import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { rejection } from '../models/Rejection';
 import { ShipmentStatus } from '../models/Shipment';
-import { TemplateCategoryId } from '../models/Template';
+import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { AddSamplesToShipmentArgs } from '../resolvers/mutations/AddSamplesShipmentMutation';
 import { CreateShipmentInput } from '../resolvers/mutations/CreateShipmentMutation';
@@ -49,7 +49,7 @@ export default class ShipmentMutations {
       );
     }
 
-    const proposal = await this.proposalDataSource.get(args.proposalId);
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
     if (!proposal) {
       return rejection(
         'Can not create shipment because proposal was not found',
@@ -58,7 +58,7 @@ export default class ShipmentMutations {
     }
 
     const templateId = await this.templateDataSource.getActiveTemplateId(
-      TemplateCategoryId.SHIPMENT_DECLARATION
+      TemplateGroupId.SHIPMENT
     );
 
     if (!templateId) {
@@ -69,7 +69,7 @@ export default class ShipmentMutations {
     }
 
     const template = await this.templateDataSource.getTemplate(templateId);
-    if (template?.categoryId !== TemplateCategoryId.SHIPMENT_DECLARATION) {
+    if (template?.groupId !== TemplateGroupId.SHIPMENT) {
       return rejection('Can not create shipment with this template', {
         args,
         agent,
@@ -89,8 +89,9 @@ export default class ShipmentMutations {
         return this.shipmentDataSource.create(
           args.title,
           agent.id,
-          args.proposalId,
-          questionary.questionaryId
+          args.proposalPk,
+          questionary.questionaryId,
+          args.visitId
         );
       })
       .catch((error) => {

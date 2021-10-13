@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
 
@@ -10,9 +11,20 @@ export class SMTPMailService extends MailService {
   constructor() {
     super();
 
+    const attachments = [];
+
+    if (process.env.EMAIL_FOOTER_IMAGE_PATH !== undefined) {
+      attachments.push({
+        filename: 'logo.png',
+        path: process.env.EMAIL_FOOTER_IMAGE_PATH,
+        cid: 'logo1',
+      });
+    }
+
     this._email = new EmailTemplates({
       message: {
         from: process.env.EMAIL_SENDER,
+        attachments,
       },
       send: true,
       transport: nodemailer.createTransport({
@@ -30,9 +42,7 @@ export class SMTPMailService extends MailService {
     });
   }
 
-  sendMail(
-    options: EmailSettings
-  ): Promise<{
+  async sendMail(options: EmailSettings): Promise<{
     results: SendMailResults;
   }> {
     const emailPromises: Promise<SendMailResults>[] = [];
@@ -49,6 +59,20 @@ export class SMTPMailService extends MailService {
 
     options.content.template_id =
       process.env.EMAIL_TEMPLATE_PATH + options.content.template_id;
+
+    if (
+      !(await (this._email as any).templateExists(
+        options.content.template_id + '\\html.pug'
+      )) &&
+      process.env.NODE_ENV !== 'test'
+    ) {
+      console.log('test output');
+      logger.logError('Template does not exist', {
+        templateId: options.content.template_id,
+      });
+
+      return { results: sendMailResults };
+    }
 
     options.recipients.forEach((participant) => {
       emailPromises.push(

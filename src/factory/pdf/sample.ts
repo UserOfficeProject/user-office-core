@@ -54,10 +54,11 @@ export async function collectSamplePDFData(
     );
   }
 
-  const questionarySteps = await baseContext.queries.questionary.getQuestionarySteps(
-    user,
-    sample.questionaryId
-  );
+  const questionarySteps =
+    await baseContext.queries.questionary.getQuestionarySteps(
+      user,
+      sample.questionaryId
+    );
 
   if (!questionarySteps) {
     throw new Error(
@@ -65,10 +66,8 @@ export async function collectSamplePDFData(
     );
   }
 
-  const completedFields = (getAllFields(
-    questionarySteps
-  ) as Answer[]).filter((field) =>
-    areDependenciesSatisfied(questionarySteps, field.question.id)
+  const completedFields = (getAllFields(questionarySteps) as Answer[]).filter(
+    (field) => areDependenciesSatisfied(questionarySteps, field.question.id)
   );
 
   const attachments: Attachment[] = [];

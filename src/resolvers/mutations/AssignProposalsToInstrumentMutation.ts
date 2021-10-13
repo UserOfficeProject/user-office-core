@@ -12,12 +12,12 @@ import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
 import { SuccessResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
-import { ProposalIdWithCallId } from './ChangeProposalsStatusMutation';
+import { ProposalPkWithCallId } from './ChangeProposalsStatusMutation';
 
 @ArgsType()
 export class AssignProposalsToInstrumentArgs {
-  @Field(() => [ProposalIdWithCallId])
-  public proposals: ProposalIdWithCallId[];
+  @Field(() => [ProposalPkWithCallId])
+  public proposals: ProposalPkWithCallId[];
 
   @Field(() => Int)
   public instrumentId: number;
@@ -25,11 +25,8 @@ export class AssignProposalsToInstrumentArgs {
 
 @ArgsType()
 export class RemoveProposalsFromInstrumentArgs {
-  @Field(() => Int)
-  public proposalId: number;
-
-  @Field(() => Int)
-  public instrumentId: number;
+  @Field(() => [Int])
+  public proposalPks: number[];
 }
 
 @Resolver()
@@ -51,12 +48,12 @@ export class AssignProposalsToInstrumentMutation {
   }
 
   @Mutation(() => SuccessResponseWrap)
-  async removeProposalFromInstrument(
+  async removeProposalsFromInstrument(
     @Args() args: RemoveProposalsFromInstrumentArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.instrument.removeProposalFromInstrument(
+      context.mutations.instrument.removeProposalsFromInstrument(
         context.user,
         args
       ),

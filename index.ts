@@ -1,12 +1,14 @@
 import { logger } from '@esss-swap/duo-logger';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-
-import './env-loader.js';
-import './src/config';
 import 'reflect-metadata';
+import { container } from 'tsyringe';
+
+import './src/env-loader.js';
+import './src/config';
 
 import { startAsyncJobs } from './src/asyncJobs/startAsyncJobs';
+import { Tokens } from './src/config/Tokens';
 import authorization from './src/middlewares/authorization';
 import exceptionHandler from './src/middlewares/exceptionHandler';
 import factory from './src/middlewares/factory';
@@ -39,6 +41,7 @@ async function bootstrap() {
   console.info(`Running a GraphQL API server at localhost:${PORT}/graphql`);
 
   startAsyncJobs();
+  container.resolve<() => void>(Tokens.ConfigureEnvironment)();
 }
 
 bootstrap();

@@ -4,4 +4,5 @@ export enum PageName {
   PRIVACYPAGE = 3,
   COOKIEPAGE = 4,
   REVIEWPAGE = 5,
+  FOOTERCONTENT = 6,
 }

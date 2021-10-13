@@ -77,22 +77,21 @@ describe('Test Instrument Mutations', () => {
         dummyUserOfficerWithRole,
         {
           proposals: [
-            { id: 1, callId: 1 },
-            { id: 2, callId: 1 },
+            { primaryKey: 1, callId: 1 },
+            { primaryKey: 2, callId: 1 },
           ],
           instrumentId: 1,
         }
       )
-    ).resolves.toStrictEqual({ proposalIds: [1, 2] });
+    ).resolves.toStrictEqual({ proposalPks: [1, 2] });
   });
 
   test('A logged in user officer can remove assigned proposal from instrument', () => {
     return expect(
-      instrumentMutations.removeProposalFromInstrument(
+      instrumentMutations.removeProposalsFromInstrument(
         dummyUserOfficerWithRole,
         {
-          proposalId: 1,
-          instrumentId: 1,
+          proposalPks: [1],
         }
       )
     ).resolves.toBe(true);

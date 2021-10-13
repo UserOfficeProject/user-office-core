@@ -62,6 +62,28 @@ export default class UserQueries {
     );
   }
 
+  @Authorized()
+  async getBasicUserDetailsByEmail(
+    agent: UserWithRole | null,
+    email: string,
+    role?: UserRole
+  ) {
+    const user = await this.dataSource.getBasicUserDetailsByEmail(email, role);
+    if (!user) {
+      return null;
+    }
+
+    return new BasicUserDetails(
+      user.id,
+      user.firstname,
+      user.lastname,
+      user.organisation,
+      user.position,
+      user.created,
+      user.placeholder
+    );
+  }
+
   async checkEmailExist(agent: UserWithRole | null, email: string) {
     return this.dataSource.checkEmailExist(email);
   }
@@ -174,6 +196,26 @@ export default class UserQueries {
     );
   }
 
+  @Authorized()
+  async getPreviousCollaborators(
+    agent: UserWithRole | null,
+    userId: number,
+    filter?: string,
+    first?: number,
+    offset?: number,
+    userRole?: UserRole,
+    subtractUsers?: [number]
+  ) {
+    return this.dataSource.getPreviousCollaborators(
+      userId,
+      filter,
+      first,
+      offset,
+      userRole,
+      subtractUsers
+    );
+  }
+
   @Authorized([Roles.USER_OFFICER])
   async getRoles(agent: UserWithRole | null) {
     return this.dataSource.getRoles();
@@ -183,13 +225,11 @@ export default class UserQueries {
     return this.dataSource.getUser(id);
   }
 
-  async getProposers(agent: UserWithRole | null, proposalId: number) {
-    return this.dataSource.getProposalUsers(proposalId);
+  async getProposers(agent: UserWithRole | null, proposalPk: number) {
+    return this.dataSource.getProposalUsers(proposalPk);
   }
 
-  async checkToken(
-    token: string
-  ): Promise<{
+  async checkToken(token: string): Promise<{
     isValid: boolean;
     payload: AuthJwtPayload | AuthJwtApiTokenPayload | null;
   }> {

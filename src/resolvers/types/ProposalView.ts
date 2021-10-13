@@ -1,5 +1,6 @@
 import { Field, Float, Int, ObjectType } from 'type-graphql';
 
+import { AllocationTimeUnits } from '../../models/Call';
 import {
   Proposal as ProposalOrigin,
   ProposalEndStatus,
@@ -9,7 +10,7 @@ import { TechnicalReviewStatus } from '../../models/TechnicalReview';
 @ObjectType()
 export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Int)
-  public id: number;
+  public primaryKey: number;
 
   @Field(() => String)
   public title: string;
@@ -24,7 +25,7 @@ export class ProposalView implements Partial<ProposalOrigin> {
   public statusDescription: string;
 
   @Field(() => String)
-  public shortCode: string;
+  public proposalId: string;
 
   @Field(() => Int, { nullable: true })
   public rankOrder: number;
@@ -53,6 +54,9 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => String, { nullable: true })
   public sepCode: string;
 
+  @Field(() => Int, { nullable: true })
+  public sepId: number;
+
   @Field(() => Float, { nullable: true })
   public reviewAverage: number;
 
@@ -64,4 +68,7 @@ export class ProposalView implements Partial<ProposalOrigin> {
 
   @Field(() => Int)
   public callId: number;
+
+  @Field(() => AllocationTimeUnits)
+  public allocationTimeUnit: AllocationTimeUnits;
 }

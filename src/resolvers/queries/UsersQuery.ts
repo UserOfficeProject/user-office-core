@@ -41,6 +41,12 @@ export class UsersArgs {
   subtractUsers?: [number];
 }
 
+@ArgsType()
+export class PreviousCollaboratorsArgs extends UsersArgs {
+  @Field(() => Int, { nullable: false })
+  userId: number;
+}
+
 @Resolver()
 export class UsersQuery {
   @Query(() => UserQueryResult, { nullable: true })
@@ -50,6 +56,30 @@ export class UsersQuery {
   ) {
     return context.queries.user.getAll(
       context.user,
+      filter,
+      first,
+      offset,
+      userRole,
+      subtractUsers
+    );
+  }
+
+  @Query(() => UserQueryResult, { nullable: true })
+  previousCollaborators(
+    @Args()
+    {
+      userId,
+      filter,
+      first,
+      offset,
+      userRole,
+      subtractUsers,
+    }: PreviousCollaboratorsArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.user.getPreviousCollaborators(
+      context.user,
+      userId,
       filter,
       first,
       offset,

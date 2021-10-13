@@ -9,10 +9,11 @@ export class CloneSampleMutation {
   @Mutation(() => SampleResponseWrap)
   cloneSample(
     @Arg('sampleId', () => Int) sampleId: number,
+    @Arg('title', () => String, { nullable: true }) title: string | undefined,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sample.cloneSample(context.user, sampleId),
+      context.mutations.sample.cloneSample(context.user, sampleId, title),
       SampleResponseWrap
     );
   }

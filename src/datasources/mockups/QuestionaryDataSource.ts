@@ -95,6 +95,7 @@ export const dummyTemplateHasQuestionRelationFactory = (
 const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
   return [
     new QuestionaryStep(
+      1,
       new Topic(1, 'General information', 1, 0, true),
       false,
       [
@@ -171,7 +172,8 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   }
 
   public init() {
-    dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
+    dummyQuestionarySteps =
+      create1Topic3FieldWithDependenciesQuestionarySteps();
     dummyQuestionary = createDummyQuestionary();
   }
 
@@ -215,7 +217,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   }
 
   async updateAnswer(
-    _proposalId: number,
+    _proposalPk: number,
     questionId: string,
     answer: string
   ): Promise<string> {
@@ -237,7 +239,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     return questionId;
   }
   async insertFiles(
-    _proposalId: number,
+    _proposalPk: number,
     _questionId: string,
     files: string[]
   ): Promise<string[]> {
@@ -245,7 +247,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   }
 
   async deleteFiles(
-    _proposalId: number,
+    _proposalPk: number,
     _questionId: string
   ): Promise<string[]> {
     return ['file_id_012345'];
@@ -273,5 +275,12 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
         (step) => step.topic.id === topic_id
       )!.isCompleted = isComplete;
     }
+  }
+
+  async copyAnswers(
+    sourceQuestionaryId: number,
+    targetQuestionaryId: number
+  ): Promise<void> {
+    return;
   }
 }

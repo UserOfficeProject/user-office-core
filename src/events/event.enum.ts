@@ -23,6 +23,7 @@ export enum Event {
   PROPOSAL_MANAGEMENT_DECISION_SUBMITTED = 'PROPOSAL_MANAGEMENT_DECISION_SUBMITTED',
   PROPOSAL_INSTRUMENT_SUBMITTED = 'PROPOSAL_INSTRUMENT_SUBMITTED',
   PROPOSAL_ACCEPTED = 'PROPOSAL_ACCEPTED',
+  PROPOSAL_RESERVED = 'PROPOSAL_RESERVED',
   PROPOSAL_REJECTED = 'PROPOSAL_REJECTED',
   PROPOSAL_STATUS_UPDATED = 'PROPOSAL_STATUS_UPDATED',
   CALL_ENDED = 'CALL_ENDED',
@@ -45,6 +46,12 @@ export enum Event {
   PROPOSAL_CLONED = 'PROPOSAL_CLONED',
   PROPOSAL_STATUS_CHANGED_BY_WORKFLOW = 'PROPOSAL_STATUS_CHANGED_BY_WORKFLOW',
   PROPOSAL_STATUS_CHANGED_BY_USER = 'PROPOSAL_STATUS_CHANGED_BY_USER',
+  TOPIC_ANSWERED = 'TOPIC_ANSWERED',
+  PROPOSAL_BOOKING_TIME_SLOT_ADDED = 'PROPOSAL_BOOKING_TIME_SLOT_ADDED',
+  PROPOSAL_BOOKING_TIME_SLOTS_REMOVED = 'PROPOSAL_BOOKING_TIME_SLOTS_REMOVED',
+  PROPOSAL_BOOKING_TIME_ACTIVATED = 'PROPOSAL_BOOKING_TIME_ACTIVATED',
+  PROPOSAL_BOOKING_TIME_COMPLETED = 'PROPOSAL_BOOKING_TIME_COMPLETED',
+  PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -132,6 +139,7 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when proposal management decision is submitted',
   ],
   [Event.PROPOSAL_REJECTED, 'Event occurs when proposal gets rejected'],
+  [Event.PROPOSAL_RESERVED, 'Event occurs when proposal gets reserved'],
   [
     Event.PROPOSAL_STATUS_UPDATED,
     'Event occurs when proposal status gets updated manually',
@@ -185,5 +193,29 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PROPOSAL_STATUS_CHANGED_BY_USER,
     'Event occurs when the proposal status was changed by the user',
+  ],
+  [
+    Event.TOPIC_ANSWERED,
+    'Event occurs when the user clicks save on a topic in any questionary',
+  ],
+  [
+    Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED,
+    'Event occurs when the new time slot is booked in the scheduler',
+  ],
+  [
+    Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED,
+    'Event occurs when the time slots are removed in the scheduler',
+  ],
+  [
+    Event.PROPOSAL_BOOKING_TIME_ACTIVATED,
+    'Event occurs when the time slot booking is activated in the scheduler',
+  ],
+  [
+    Event.PROPOSAL_BOOKING_TIME_COMPLETED,
+    'Event occurs when the time slot booking is completed in the scheduler',
+  ],
+  [
+    Event.PROPOSAL_BOOKING_TIME_UPDATED,
+    'Event occurs when the time slot booking is updated in the scheduler',
   ],
 ]);

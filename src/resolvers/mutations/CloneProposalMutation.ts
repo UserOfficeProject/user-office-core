@@ -9,29 +9,32 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalResponseWrap } from '../types/CommonWrappers';
+import { ProposalsResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @InputType()
-export class CloneProposalInput {
+export class CloneProposalsInput {
   @Field(() => Int)
   public callId: number;
 
-  @Field(() => Int)
-  public proposalToCloneId: number;
+  @Field(() => [Int])
+  public proposalsToClonePk: number[];
 }
 
 @Resolver()
-export class CloneProposalMutation {
-  @Mutation(() => ProposalResponseWrap)
-  cloneProposal(
-    @Arg('cloneProposalInput')
-    cloneProposalInput: CloneProposalInput,
+export class CloneProposalsMutation {
+  @Mutation(() => ProposalsResponseWrap)
+  async cloneProposals(
+    @Arg('cloneProposalsInput')
+    cloneProposalsInput: CloneProposalsInput,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposal.clone(context.user, cloneProposalInput),
-      ProposalResponseWrap
+      context.mutations.proposal.cloneProposals(
+        context.user,
+        cloneProposalsInput
+      ),
+      ProposalsResponseWrap
     );
   }
 }

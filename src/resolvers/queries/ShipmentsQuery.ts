@@ -22,7 +22,7 @@ class ShipmentsFilter {
   public creatorId?: number;
 
   @Field(() => Int, { nullable: true })
-  public proposalId?: number;
+  public proposalPk?: number;
 
   @Field(() => [Int], { nullable: true })
   public questionaryIds?: number[];
@@ -35,6 +35,9 @@ class ShipmentsFilter {
 
   @Field(() => [Int], { nullable: true })
   public shipmentIds?: number[];
+
+  @Field(() => Int, { nullable: true })
+  public visitId?: number;
 }
 
 @ArgsType()

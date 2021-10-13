@@ -1,15 +1,21 @@
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
-import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
+import { Proposal, ProposalPksWithNextStatus } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
+import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
+import {
+  ProposalBookingFilter,
+  ProposalBookingScheduledEventFilterCore,
+} from '../resolvers/types/ProposalBooking';
+import { UserProposalsFilter } from '../resolvers/types/User';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 import { ProposalEventsRecord } from './postgres/records';
 
 export interface ProposalDataSource {
   getProposalsFromView(filter?: ProposalsFilter): Promise<ProposalView[]>;
   // Read
-  get(id: number): Promise<Proposal | null>;
+  get(primaryKey: number): Promise<Proposal | null>;
 
   getProposals(
     filter?: ProposalsFilter,
@@ -24,7 +30,7 @@ export interface ProposalDataSource {
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
   getUserProposals(
     id: number,
-    filter?: { instrumentId?: number | null }
+    filter?: UserProposalsFilter
   ): Promise<Proposal[]>;
 
   // Write
@@ -35,28 +41,45 @@ export interface ProposalDataSource {
   ): Promise<Proposal>;
   update(proposal: Proposal): Promise<Proposal>;
   updateProposalStatus(
-    proposalId: number,
+    proposalPk: number,
     proposalStatusId: number
   ): Promise<Proposal>;
   updateProposalTechnicalReviewer(
     args: UpdateTechnicalReviewAssigneeInput
   ): Promise<Proposal[]>;
-  setProposalUsers(id: number, users: number[]): Promise<void>;
-  submitProposal(id: number): Promise<Proposal>;
-  deleteProposal(id: number): Promise<Proposal>;
+  setProposalUsers(proposalPk: number, users: number[]): Promise<void>;
+  submitProposal(primaryKey: number): Promise<Proposal>;
+  deleteProposal(primaryKey: number): Promise<Proposal>;
   markEventAsDoneOnProposal(
     event: Event,
-    proposalId: number
+    proposalPk: number
   ): Promise<ProposalEventsRecord | null>;
   getCount(callId: number): Promise<number>;
   cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal>;
   resetProposalEvents(
-    proposalId: number,
+    proposalPk: number,
     callId: number,
     statusId: number
   ): Promise<boolean>;
   changeProposalsStatus(
     statusId: number,
-    proposalIds: number[]
-  ): Promise<ProposalIdsWithNextStatus>;
+    proposalPks: number[]
+  ): Promise<ProposalPksWithNextStatus>;
+  getProposalBookingByProposalPk(
+    proposalPk: number,
+    filter?: ProposalBookingFilter
+  ): Promise<{ id: number } | null>;
+  proposalBookingScheduledEvents(
+    proposalBookingId: number,
+    filter?: ProposalBookingScheduledEventFilterCore
+  ): Promise<ScheduledEventCore[] | null>;
+  addProposalBookingScheduledEvent(
+    eventMessage: ScheduledEventCore
+  ): Promise<void>;
+  removeProposalBookingScheduledEvents(
+    eventMessage: ScheduledEventCore[]
+  ): Promise<void>;
+  updateProposalBookingScheduledEvent(
+    eventMessage: ScheduledEventCore
+  ): Promise<void>;
 }

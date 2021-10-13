@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "48a57b02-7eb7-41e5-be7f-1ac653226dbe",
+		"_postman_id": "beeaf58a-15ce-458c-82c4-f43fe2f4cbc1",
 		"name": "Monitoring a collection copy",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
 		{
@@ -11,7 +11,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f790d647-91c6-499c-8291-d0870701128c",
+						"id": "6c06a483-adfc-4872-9718-f1ddf8f8b00c",
 						"exec": [
 							"pm.test(\"Should be able to create user\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -29,7 +29,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "405af2a1-ebc8-42bb-9a66-eb8d8e84572a",
+						"id": "44ff346d-ddf3-49b0-881d-a5dd3aef8233",
 						"exec": [
 							""
 						],
@@ -123,7 +123,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d80874c1-1503-4e24-bcca-d6433bb7dea4",
+						"id": "12d2bc88-9edd-48a2-b647-7d205c0e68d1",
 						"exec": [
 							"pm.test(\"Should be able to fetch users\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -137,13 +137,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -197,17 +193,7 @@
 						"variables": "{\n    \"filter\": \"\",\n    \"offset\": 0,\n    \"first\": 5,\n    \"subtractUsers\":[],\n    \"userRole\":\"USER\"\n  }"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -217,7 +203,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d5b395cb-1acb-4313-bf41-8b2909be7e63",
+						"id": "99e35f25-3441-4b99-92d4-9872556d2bd3",
 						"exec": [
 							"pm.test(\"Should be able to log in\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -283,21 +269,11 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    token\n    error\n  }\n}\n",
+						"query": "mutation ($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    token\n    rejection { reason }\n  }\n}\n",
 						"variables": "{\n    \"email\": \"{{NEW_USER_EMAIL}}\",\n    \"password\":\"{{USER_PASSWORD}}\"\n  }"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -307,11 +283,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7261dc5b-3062-4575-8740-3eb30f2bb866",
+						"id": "364961b0-8c7a-4889-a9f7-c37b5769e8a3",
 						"exec": [
 							"pm.test(\"Should be able to renew token\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.token.error).to.eql(null)",
+							"    pm.expect(jsonData.data.token.rejection).to.eql(null)",
 							"    pm.expect(jsonData.data.token.token).to.not.eql(null)",
 							"});",
 							"",
@@ -325,13 +301,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -383,21 +355,11 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($token: String!) {\n  token(token:$token) {\n    token\n    error\n  }\n}\n\n",
+						"query": "mutation ($token: String!) {\n  token(token:$token) {\n    token\n    rejection { reason }\n  }\n}\n\n",
 						"variables": "{\n\t\"token\": \"{{NEW_USER_TOKEN}}\"\n}"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -407,11 +369,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9ec44847-85a5-4c53-aa22-4f1029adc684",
+						"id": "9c17e5ac-4f65-4d1e-9653-9e2a4bd6d134",
 						"exec": [
 							"pm.test(\"Should be able to renew token\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.token.error).to.eql(null)",
+							"    pm.expect(jsonData.data.token.rejection).to.eql(null)",
 							"    pm.expect(jsonData.data.token.token).to.not.eql(null)",
 							"});",
 							"",
@@ -425,13 +387,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -483,24 +441,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($token: String!) {\n  token(token:$token) {\n    token\n    error\n  }\n}\n\n",
+						"query": "mutation ($token: String!) {\n  token(token:$token) {\n    token\n    rejection { reason }\n  }\n}\n\n",
 						"variables": "{\n\t\"token\": \"{{NEW_USER_TOKEN}}\"\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -510,7 +458,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f057e66f-c817-4ee5-813a-16ba3778b4dd",
+						"id": "84ae6293-93ed-411f-96f2-51d28d4f6d42",
 						"exec": [
 							"pm.test(\"Should be able to update password\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -523,7 +471,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "2006ddfe-b9e5-4c8a-98eb-caf3d22f247b",
+						"id": "c7a68698-15a9-4395-8a7b-5adecee61b23",
 						"exec": [
 							""
 						],
@@ -534,13 +482,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -593,21 +537,11 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($id:Int!, $password:String!) {\n  updatePassword(id:$id, password:$password)\n    {\n      user {\n        id\n      }\n      error\n    }\n}\n\n",
+						"query": "mutation($id:Int!, $password:String!) {\n  updatePassword(id:$id, password:$password)\n    {\n      user {\n        id\n      }\n      rejection { reason }\n    }\n}\n\n",
 						"variables": "{\n\t\"id\":{{NEW_USER_ID}},\n\t\"password\":\"{{$randomPassword}}\"\n}"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -617,11 +551,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "0e9740f8-da36-4252-8a33-3b7c4762a648",
+						"id": "62e4465f-938a-4303-b335-ef797fab11fb",
 						"exec": [
 							"pm.test(\"Can create proposal template\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createSEP.error).to.be.eql(null)",
+							"    pm.expect(jsonData.data.createSEP.rejection).to.be.eql(null)",
 							"    pm.expect(jsonData.data.createSEP.sep.id).to.be.above(0)",
 							"    pm.environment.set(\"NEW_SEP_ID\", jsonData.data.createSEP.sep.id);",
 							"});",
@@ -634,13 +568,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -670,24 +600,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($code: String!, $active: Boolean!, $description: String!) {\n  createSEP(code:$code, active:$active, description:$description) {\n    sep {\n      id\n    }\n    error\n  }\n}",
+						"query": "mutation($code: String!, $active: Boolean!, $description: String!) {\n  createSEP(code:$code, active:$active, description:$description) {\n    sep {\n      id\n    }\n    rejection { reason }\n  }\n}",
 						"variables": "{\n        \"code\": \"{{$randomWord}}\",\n        \"active\": true,\n        \"description\": \"{{$randomWord}}\"\n    }"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -697,11 +617,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f0c3f28e-a979-4aa4-8160-27a1e8f04754",
+						"id": "3d63e731-658c-46e6-b6b3-83076440ac67",
 						"exec": [
 							"pm.test(\"Can create proposal template\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createTemplate.error).to.be.eql(null)",
+							"    pm.expect(jsonData.data.createTemplate.rejection).to.be.eql(null)",
 							"    pm.expect(jsonData.data.createTemplate.template.templateId).to.be.above(0)",
 							"    pm.environment.set(\"NEW_TEMPLATE_ID\", jsonData.data.createTemplate.template.templateId);",
 							"});",
@@ -714,13 +634,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -750,24 +666,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation  ($categoryId: TemplateCategoryId!, $name: String!, $description: String) {\n  createTemplate(categoryId: $categoryId, name:$name, description:$description) {\n    template {\n      templateId\n      name\n    }\n    error\n  }\n}",
+						"query": "mutation  ($categoryId: TemplateCategoryId!, $name: String!, $description: String) {\n  createTemplate(categoryId: $categoryId, name:$name, description:$description) {\n    template {\n      templateId\n      name\n    }\n    rejection { reason }\n  }\n}",
 						"variables": "{\n        \"categoryId\": \"PROPOSAL_QUESTIONARY\",\n        \"name\": \"{{$randomWord}}\",\n        \"description\": \"{{$randomWord}}\"\n    }"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -777,7 +683,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9bb5fd45-c1b9-4f08-886b-155cb7f14a75",
+						"id": "7d0db699-5896-48ba-b375-02b7c7dfc769",
 						"exec": [
 							"pm.test(\"Can create proposal template\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -792,13 +698,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -835,34 +737,21 @@
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
 		{
-			"name": "createCall [Mutation]",
+			"name": "createWorkflow [Mutation]",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "a7cad31b-9421-4bea-afc9-7fc8d1002771",
+						"id": "50a75f02-d7d1-45fb-97e6-42b90a863cb6",
 						"exec": [
 							"pm.test(\"Should create call\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createCall.call.id).to.be.above(0);",
-							"",
-							"    var jsonData = pm.response.json();",
-							"    pm.environment.set(\"NEW_CALL_ID\", jsonData.data.createCall.call.id);",
+							"    pm.expect(jsonData.data.createProposalWorkflow.proposalWorkflow.id).to.be.above(0);",
 							"});",
 							"",
 							"",
@@ -875,13 +764,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -934,24 +819,106 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($shortCode: String!, $startDate: DateTime!, $endDate: DateTime!, $comment: String!, $templateId: Int!) {\n  createCall (createCallInput:{\n    shortCode:$shortCode\n    startCall: $startDate\n    endCall: $endDate\n    startReview: $startDate\n    endReview: $endDate\n    startNotify: $startDate\n    endNotify: $endDate\n    startCycle: $startDate\n    endCycle: $endDate\n    cycleComment: $comment\n    surveyComment: \"Test\"\n    templateId: $templateId\n  }\n  )\n  {\n    call {\n      id\n      shortCode\n      startCall\n    }\n    error\n  }\n}",
+						"query": "mutation {\n  createProposalWorkflow(\n    newProposalWorkflowInput: { name: \"default\", description: \"description\" }\n  ) {\n    proposalWorkflow {\n      id\n    }\n    rejection {\n      reason\n    }\n  }\n}\n",
+						"variables": ""
+					},
+					"options": {
+						"graphql": {}
+					}
+				},
+				"url": "http://localhost:4000/graphql"
+			},
+			"response": []
+		},
+		{
+			"name": "createCall [Mutation]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "97b0dc78-b702-498f-bf5d-021f850a69ab",
+						"exec": [
+							"pm.test(\"Should create call\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.createCall.call.id).to.be.above(0);",
+							"",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"NEW_CALL_ID\", jsonData.data.createCall.call.id);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"type": "text",
+						"value": "cors"
+					},
+					{
+						"key": "Sec-Fetch-Site",
+						"type": "text",
+						"value": "same-origin"
+					},
+					{
+						"key": "Origin",
+						"type": "text",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "Accept-Encoding",
+						"type": "text",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "en-GB,en-US;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "*/*"
+					},
+					{
+						"key": "User-Agent",
+						"type": "text",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "Connection",
+						"type": "text",
+						"value": "keep-alive"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation ($shortCode: String!, $startDate: DateTime!, $endDate: DateTime!, $comment: String!, $templateId: Int!) {\n  createCall (createCallInput:{\n    shortCode:$shortCode\n    startCall: $startDate\n    endCall: $endDate\n    startReview: $startDate\n    endReview: $endDate\n    startNotify: $startDate\n    endNotify: $endDate\n    startCycle: $startDate\n    endCycle: $endDate\n    cycleComment: $comment\n    surveyComment: \"Test\"\n    templateId: $templateId\n    allocationTimeUnit: Hour\n    proposalWorkflowId: 1\n  }\n  )\n  {\n    call {\n      id\n      shortCode\n      startCall\n    }\n    rejection { reason }\n  }\n}",
 						"variables": "{\n\t\"shortCode\":\"{{$randomLoremWord}}\",\n\t\"startDate\":\"2010-01-01\",\n\t\"endDate\":\"2030-01-01\",\n\t\"comment\":\"{{$randomPhrase}}\",\n\t\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -961,11 +928,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "68fd6069-f2ba-4e41-94fc-9b5143ca1fa1",
+						"id": "40737d23-ab68-48f6-8963-52a890288d56",
 						"exec": [
 							"pm.test(\"Can create topic\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createTopic.error).to.be.eql(null)",
+							"    pm.expect(jsonData.data.createTopic.rejection).to.be.eql(null)",
 							"    pm.environment.set(\"NEW_TOPIC_ID\", jsonData.data.createTopic.template.steps[0].topic.id);",
 							"});",
 							""
@@ -977,13 +944,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1013,24 +976,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($templateId: Int!) {\n  createTopic(templateId: $templateId, sortOrder: 0) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($templateId: Int!) {\n  createTopic(templateId: $templateId, sortOrder: 0) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n      }\n    }\n    rejection { reason }\n  }\n}\n",
 						"variables": "{\n\t\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -1040,11 +993,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5046ad0a-4734-429a-9dfd-b9cf03fa717a",
+						"id": "03b17752-ce48-45bd-841f-669a8e03e832",
 						"exec": [
 							"pm.test(\"Should update topic\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.updateTopic.error).to.eql(null)",
+							"    pm.expect(jsonData.data.updateTopic.rejection).to.eql(null)",
 							"});",
 							""
 						],
@@ -1055,13 +1008,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1095,24 +1044,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($topicId: Int!, $title: String, $isEnabled: Boolean, $templateId: Int!) {\n  updateTopic(id: $topicId, title: $title, isEnabled: $isEnabled, templateId:$templateId, sortOrder: 0) {\n    template{\n        steps {\n        topic {\n          title\n          id\n          sortOrder\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($topicId: Int!, $title: String, $isEnabled: Boolean, $templateId: Int!) {\n  updateTopic(id: $topicId, title: $title, isEnabled: $isEnabled, templateId:$templateId, sortOrder: 0) {\n    template{\n        steps {\n        topic {\n          title\n          id\n          sortOrder\n        }\n      }\n    }\n    rejection { reason }\n  }\n}\n",
 						"variables": "{\n        \"title\": \"{{$randomWord}}\",\n        \"topicId\": {{NEW_TOPIC_ID}},\n        \"templateId\": {{NEW_TEMPLATE_ID}}\n    }"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -1122,16 +1061,16 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "eec44748-9ba1-466d-937d-7e6b47c1749c",
+						"id": "41973ef9-b31b-4970-91da-14c6b6c226b0",
 						"exec": [
 							"pm.test(\"Create field should not resut in failure\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createQuestion.error).to.be.eql(null);",
+							"    pm.expect(jsonData.data.createQuestion.rejection).to.be.eql(null);",
 							"});",
 							"",
 							"pm.test(\"Create field should not resut in failure\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createQuestion.question.dataType).to.be.eql(\"FILE_UPLOAD\");",
+							"    pm.expect(jsonData.data.createQuestion.question.dataType).to.be.eql(\"TEXT_INPUT\");",
 							"});",
 							"",
 							"var jsonData = pm.response.json();",
@@ -1145,13 +1084,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1205,24 +1140,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($categoryId: TemplateCategoryId!, $dataType: DataType!) {\n  createQuestion(categoryId: $categoryId, dataType: $dataType) {\n    question {\n          id\n          dataType\n          question\n          config\n          {\n              ... on TextInputConfig {\n                required\n              }\n          }\n          \n\n    }\n    error\n  }\n}",
-						"variables": "{\n        \"categoryId\": \"PROPOSAL_QUESTIONARY\",\n        \"dataType\": \"FILE_UPLOAD\",\n        \"fieldConfigFragment\":\"__typename\"\n    }"
+						"query": "mutation ($categoryId: TemplateCategoryId!, $dataType: DataType!) {\n  createQuestion(categoryId: $categoryId, dataType: $dataType) {\n    question {\n          id\n          dataType\n          question\n          config\n          {\n              ... on TextInputConfig {\n                required\n              }\n          }\n          \n\n    }\n    rejection { reason }\n  }\n}",
+						"variables": "{\n        \"categoryId\": \"PROPOSAL_QUESTIONARY\",\n        \"dataType\": \"TEXT_INPUT\",\n        \"fieldConfigFragment\":\"__typename\"\n    }"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -1232,12 +1157,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e00ee7ed-9ba2-43aa-a0c4-9f42b6bbe24c",
+						"id": "785c91ae-9e4c-4f60-aec5-20355146cd44",
 						"exec": [
 							"pm.test(\"Create field should not resut in failure\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.updateQuestion).to.not.eql(null);",
-							"    pm.expect(jsonData.data.updateQuestion.error).to.eql(null);",
+							"    pm.expect(jsonData.data.updateQuestion.rejection).to.eql(null);",
 							"});",
 							""
 						],
@@ -1248,13 +1173,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1308,24 +1229,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($id:String!, $question:String, $config:String) {\n  updateQuestion(id:$id, question:$question, config:$config) {\n    question {\n        question\n        id\n    }\n    error\n  }\n}\n",
+						"query": "mutation($id:String!, $question:String, $config:String) {\n  updateQuestion(id:$id, question:$question, config:$config) {\n    question {\n        question\n        id\n    }\n    rejection { reason }\n  }\n}\n",
 						"variables": "{\n\t\"id\": \"{{NEW_FIELD_ID}}\",\n\"question\": \"{{$randomWords}}\",\n\"config\": \"{\\\"required\\\":true}\",\n\"isEnabled\": true,\n\"dependencies\": []\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -1335,12 +1246,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5e5b70fb-690d-4bf0-86df-e938cb33c04e",
+						"id": "1b10d135-5155-4cb3-a955-5e4ac19638f7",
 						"exec": [
 							"pm.test(\"Create field should not resut in failure\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.createQuestionTemplateRelation.template).to.not.eql(null);",
-							"    pm.expect(jsonData.data.createQuestionTemplateRelation.error).to.eql(null);",
+							"    pm.expect(jsonData.data.createQuestionTemplateRelation.rejection).to.eql(null);",
 							"});",
 							""
 						],
@@ -1351,13 +1262,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1411,24 +1318,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($templateId: Int!, $questionId: String!, $topicId: Int!) {\n  createQuestionTemplateRelation(templateId:$templateId, questionId:$questionId, sortOrder:0, topicId:$topicId) {\n\ttemplate {\n\t\tname\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($templateId: Int!, $questionId: String!, $topicId: Int!) {\n  createQuestionTemplateRelation(templateId:$templateId, questionId:$questionId, sortOrder:0, topicId:$topicId) {\n\ttemplate {\n\t\tname\n    }\n    rejection { reason }\n  }\n}\n",
 						"variables": "{\n\t\"questionId\": \"{{NEW_FIELD_ID}}\",\n\t\"topicId\": {{NEW_TOPIC_ID}},\n\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -1438,12 +1335,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f15891e3-d37b-4108-9916-281b1a718464",
+						"id": "023a378f-3d9d-4db6-bccd-587385160a1b",
 						"exec": [
 							"pm.test(\"Create field should not resut in failure\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.updateQuestionTemplateRelation.template).to.not.eql(null);",
-							"    pm.expect(jsonData.data.updateQuestionTemplateRelation.error).to.eql(null);",
+							"    pm.expect(jsonData.data.updateQuestionTemplateRelation.rejection).to.eql(null);",
 							"});",
 							""
 						],
@@ -1454,13 +1351,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1514,24 +1407,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($questionId: String!, $templateId: Int!, $topicId: Int!, $sortOrder: Int!) {\n  updateQuestionTemplateRelation(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            id\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n          dependencies {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n              condition\n              params\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($questionId: String!, $templateId: Int!, $topicId: Int!, $sortOrder: Int!) {\n  updateQuestionTemplateRelation(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            id\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n          dependencies {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n              condition\n              params\n            }\n          }\n        }\n      }\n    }\n    rejection { reason }\n  }\n}\n",
 						"variables": "{\n\t\"questionId\": \"{{NEW_FIELD_ID}}\",\n\"question\": \"{{$randomWords}}\",\n\"config\": \"{\\\"required\\\":true}\",\n\"topicId\": {{NEW_TOPIC_ID}},\n\"sortOrder\": 0,\n\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -1541,7 +1424,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "277c41c6-3730-41d1-aa84-d42623565746",
+						"id": "d424c5da-9ca3-4fdc-98aa-56ccc6a9473c",
 						"exec": [
 							"pm.test(\"Should create proposal\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1557,13 +1440,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1624,17 +1503,7 @@
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -1644,12 +1513,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "db72ee3a-69b0-4983-ad7c-8f132db7b470",
+						"id": "331240cf-1c96-4c82-8214-ade9884a3601",
 						"exec": [
 							"pm.test(\"Should create proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createProposal.proposal.id).to.be.above(0)",
-							"    pm.environment.set(\"NEW_PROPOSAL_ID\", jsonData.data.createProposal.proposal.id);",
+							"    pm.expect(jsonData.data.createProposal.proposal.primaryKey).to.be.above(0)",
+							"    pm.environment.set(\"NEW_PROPOSAL_PK\", jsonData.data.createProposal.proposal.primaryKey);",
 							"    pm.environment.set(\"NEW_QUESTIONARY_ID\", jsonData.data.createProposal.proposal.questionaryId);",
 							"});",
 							"",
@@ -1662,13 +1531,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1722,24 +1587,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($callId: Int!) {\n  createProposal(callId: $callId) {\n    proposal {\n      id\n      status\n      {\n        name\n      }\n      questionaryId\n      questionary {\n        steps {\n          topic {\n            title\n            id\n          }\n          fields {\n            question {\n              id\n              dataType\n              question\n            }\n            value\n            dependencies {\n              questionId\n              dependencyId\n              dependencyNaturalKey\n              condition {\n                condition\n                params\n              }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($callId: Int!) {\n  createProposal(callId: $callId) {\n    proposal {\n      primaryKey\n      status\n      {\n        name\n      }\n      questionaryId\n      questionary {\n        steps {\n          topic {\n            title\n            id\n          }\n          fields {\n            question {\n              id\n              dataType\n              question\n            }\n            value\n            dependencies {\n              questionId\n              dependencyId\n              dependencyNaturalKey\n              condition {\n                condition\n                params\n              }\n            }\n          }\n        }\n      }\n    }\n    rejection { reason }\n  }\n}\n",
 						"variables": "{\n\t\"callId\": {{NEW_CALL_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -1749,7 +1604,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "836dde73-34b9-490e-bdc5-d1eac1734317",
+						"id": "9284cf75-3412-4453-8bf6-76e012f8ca84",
 						"exec": [
 							"pm.test(\"Should create proposal\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1766,13 +1621,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1826,24 +1677,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation {\n  createTemplate(\n    categoryId: SAMPLE_DECLARATION\n    name: \"Sample title\"\n    description: \"Sample description\"\n  ) {\n    template {\n      templateId\n    }\n    error\n  }\n}",
+						"query": "mutation {\n  createTemplate(\n    categoryId: SAMPLE_DECLARATION\n    name: \"Sample title\"\n    description: \"Sample description\"\n  ) {\n    template {\n      templateId\n    }\n    rejection { reason }\n  }\n}",
 						"variables": ""
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -1853,11 +1694,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8648825e-aba0-41c6-9c3b-939b4a29daa9",
+						"id": "fc7f8c50-ad5c-4618-994b-a429992329fb",
 						"exec": [
 							"pm.test(\"Can create proposal template\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createTemplate.error).to.be.eql(null)",
+							"    pm.expect(jsonData.data.createTemplate.rejection).to.be.eql(null)",
 							"    pm.expect(jsonData.data.createTemplate.template.templateId).to.be.above(0)",
 							"    pm.environment.set(\"NEW_SHIPMENT_TEMPLATE_ID\", jsonData.data.createTemplate.template.templateId);",
 							"});",
@@ -1870,13 +1711,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1906,24 +1743,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation  ($categoryId: TemplateCategoryId!, $name: String!, $description: String) {\n  createTemplate(categoryId: $categoryId, name:$name, description:$description) {\n    template {\n      templateId\n      name\n    }\n    error\n  }\n}",
+						"query": "mutation  ($categoryId: TemplateCategoryId!, $name: String!, $description: String) {\n  createTemplate(categoryId: $categoryId, name:$name, description:$description) {\n    template {\n      templateId\n      name\n    }\n    rejection { reason }\n  }\n}",
 						"variables": "{\n        \"categoryId\": \"SHIPMENT_DECLARATION\",\n        \"name\": \"{{$randomWord}}\",\n        \"description\": \"{{$randomWord}}\"\n    }"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -1933,7 +1760,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a38433e7-066a-4311-ae3d-29075ec00ec9",
+						"id": "82f16693-8783-4af1-8153-36259ba5d41a",
 						"exec": [
 							"pm.test(\"Can set active template\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -1948,13 +1775,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1984,24 +1807,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($newShipmentTemplateId: Int!) {\n  setActiveTemplate(templateCategoryId:SHIPMENT_DECLARATION, templateId:$newShipmentTemplateId){\n    isSuccess\n    error\n  }\n}\n\n",
+						"query": "mutation($newShipmentTemplateId: Int!) {\n  setActiveTemplate(templateCategoryId:SHIPMENT_DECLARATION, templateId:$newShipmentTemplateId){\n    isSuccess\n    rejection { reason }\n  }\n}\n\n",
 						"variables": "{\n    \"newShipmentTemplateId\": {{NEW_SHIPMENT_TEMPLATE_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -2011,11 +1824,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "6488f6c8-a562-430b-9394-50d6a750227f",
+						"id": "44b3a817-2552-4963-b7e0-102aa070b8d6",
 						"exec": [
 							"pm.test(\"Should create sample\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.createSample.sample.id).to.be.above(0)",
+							"",
+							"    pm.environment.set(\"NEW_SAMPLE_ID\", jsonData.data.createSample.sample.id);",
 							"});",
 							"",
 							""
@@ -2027,13 +1842,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -2087,24 +1898,105 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($sampleTemplateId: Int!, $proposalId: Int!, $questionId: String!) {\n\tcreateSample(title: \"My sample\", templateId: $sampleTemplateId, proposalId: $proposalId, questionId: $questionId) {\n\t\tsample {\n\t\t\tid\n\t\t\ttitle\n\t\t}\n\t\terror\n\t}\n}",
-						"variables": "{\n\t\"sampleTemplateId\": {{NEW_SAMPLE_TEMPLATE_ID}},\n\t\"proposalId\": {{NEW_PROPOSAL_ID}},\n\t\"questionId\": \"{{NEW_FIELD_ID}}\"\n}"
+						"query": "mutation($sampleTemplateId: Int!, $proposalPk: Int!, $questionId: String!) {\n\tcreateSample(title: \"My sample\", templateId: $sampleTemplateId, proposalPk: $proposalPk, questionId: $questionId) {\n\t\tsample {\n\t\t\tid\n\t\t\ttitle\n\t\t}\n\t\trejection { reason }\n\t}\n}",
+						"variables": "{\n\t\"sampleTemplateId\": {{NEW_SAMPLE_TEMPLATE_ID}},\n\t\"proposalPk\": {{NEW_PROPOSAL_PK}},\n\t\"questionId\": \"{{NEW_FIELD_ID}}\"\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
+				"url": "http://localhost:4000/graphql"
+			},
+			"response": []
+		},
+		{
+			"name": "updateSample [Mutation]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "619f709d-2583-44f4-8a63-514d2658a9fd",
+						"exec": [
+							"pm.test(\"Should update sample\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.updateSample.sample.id).to.eql(pm.environment.get(\"NEW_SAMPLE_ID\"))",
+							"    pm.expect(jsonData.data.updateSample.sample.title).to.eql(\"Updated title\")",
+							"    pm.expect(jsonData.data.updateSample.sample.safetyStatus).to.eql(\"ELEVATED_RISK\")",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
 				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Sec-Fetch-Site",
+						"value": "same-origin"
+					},
+					{
+						"key": "Origin",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en-GB,en-US;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQ2FybCIsIm1pZGRsZW5hbWUiOiJDaHJpc3RpYW4iLCJsYXN0bmFtZSI6IkNhcmxzc29uIiwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsInByZWZlcnJlZG5hbWUiOm51bGwsIm9yY2lkIjoiNTgxNDU5NjA0IiwiZ2VuZGVyIjoibWFsZSIsIm5hdGlvbmFsaXR5IjoiTm9yd2VnaWFuIiwiYmlydGhkYXRlIjoiMjAwMC0wNC0wMVQyMjowMDowMC4wMDBaIiwib3JnYW5pc2F0aW9uIjoiUm9iZXJ0cywgUmVpbGx5IGFuZCBHdXRrb3dza2kiLCJkZXBhcnRtZW50IjoiSVQgZGVwYXJtZW50Iiwib3JnYW5pc2F0aW9uX2FkZHJlc3MiOiJFc3RvbmlhLCBOZXcgR2FicmllbGxhLCA0MDU2IENyb25pbiBNb3RvcndheSIsInBvc2l0aW9uIjoiU3RyYXRlZ2lzdCIsImVtYWlsIjoiSmF2b240QGhvdG1haWwuY29tIiwidGVsZXBob25lIjoiKDI4OCkgNDMxLTE0NDMiLCJ0ZWxlcGhvbmVfYWx0IjoiKDM3MCkgMzg2LTg5NzYiLCJjcmVhdGVkIjoiMjAxOS0xMC0wM1QwODoyNDo1Ni41MTdaIiwidXBkYXRlZCI6IjIwMTktMTAtMDNUMDg6MjQ6NTYuNTE3WiJ9LCJyb2xlcyI6W3siaWQiOjEsInNob3J0Q29kZSI6InVzZXIiLCJ0aXRsZSI6IlVzZXIifV0sImlhdCI6MTU3MDA5ODAyNCwiZXhwIjoxNTcwNzAyODI0fQ.tQKzxyg8_i_Z4b2ny6-naoT3JqaFnJN_Z-MvU1ta31s"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "*/*"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "Referer",
+						"value": "http://localhost:3000/ProposalSubmission"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation updateSample(\n  $sampleId: Int!\n  $title: String\n  $safetyStatus: SampleStatus\n) {\n  updateSample(\n    sampleId: $sampleId\n    title: $title\n    safetyStatus: $safetyStatus\n  ) {\n    sample {\n      id\n      title\n      safetyStatus\n    }\n    rejection {\n      reason\n    }\n  }\n}\n",
+						"variables": "{\n\t\"sampleId\": {{NEW_SAMPLE_ID}},\n\t\"title\": \"Updated title\",\n\t\"safetyStatus\": \"ELEVATED_RISK\"\n}\n"
+					},
+					"options": {
+						"graphql": {}
+					}
+				},
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -2114,11 +2006,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f9324e04-5353-4b37-bf62-15b277563946",
+						"id": "a81c30f4-5bfd-4c7f-b6f6-198ab5603f14",
 						"exec": [
 							"pm.test(\"Should get proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.proposal.id).to.eql(pm.environment.get(\"NEW_PROPOSAL_ID\"));",
+							"    pm.expect(jsonData.data.proposal.primaryKey).to.eql(pm.environment.get(\"NEW_PROPOSAL_PK\"));",
 							"});",
 							""
 						],
@@ -2129,13 +2021,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -2183,24 +2071,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query ($id: Int!) {\n  proposal(id: $id) {\n    id\n    title\n    abstract\n    status\n    {\n      name\n    }\n    users {\n      firstname\n      lastname\n      id\n    }\n    questionary {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            id\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n          value\n          dependencies {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n              condition\n              params\n            }\n          }\n        }\n      }\n    }\n    reviews {\n      id\n      comment\n      status\n      reviewer {\n        firstname\n        lastname\n        id\n      }\n    }\n  }\n}\n",
-						"variables": "{\n\t\"id\":{{NEW_PROPOSAL_ID}}\n}"
+						"query": "query ($primaryKey: Int!) {\n  proposal(primaryKey: $primaryKey) {\n    primaryKey\n    title\n    abstract\n    status\n    {\n      name\n    }\n    users {\n      firstname\n      lastname\n      id\n    }\n    questionary {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            id\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n          value\n          dependencies {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n              condition\n              params\n            }\n          }\n        }\n      }\n    }\n    reviews {\n      id\n      comment\n      status\n      reviewer {\n        firstname\n        lastname\n        id\n      }\n    }\n  }\n}\n",
+						"variables": "{\n\t\"primaryKey\":{{NEW_PROPOSAL_PK}}\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -2210,11 +2088,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "33fed752-6cfb-4438-b73c-c76abfde4f24",
+						"id": "04a22611-8159-4926-b1b2-be1f63b69770",
 						"exec": [
 							"pm.test(\"Should update proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.updateProposal.proposal.id).to.eql(pm.environment.get(\"NEW_PROPOSAL_ID\"))",
+							"    pm.expect(jsonData.data.updateProposal.proposal.primaryKey).to.eql(pm.environment.get(\"NEW_PROPOSAL_PK\"))",
 							"    pm.expect(jsonData.data.updateProposal.proposal.title).to.eql(pm.environment.get(\"NEW_PROPOSAL_TITLE\"))",
 							"});"
 						],
@@ -2225,13 +2103,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -2283,24 +2157,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($id: Int!, $title: String, $abstract: String, $users: [Int!]) {\n      updateProposal(id: $id, title: $title, abstract: $abstract, users: $users) {\n    proposal {\n      id\n      title\n      abstract\n    }\n    error\n  }\n}\n",
-						"variables": "{\n        \"id\": {{NEW_PROPOSAL_ID}},\n        \"title\": \"{{NEW_PROPOSAL_TITLE}}\",\n        \"abstract\": \"{{NEW_PROPOSAL_ABSTRACT}}\"\n    }"
+						"query": "mutation ($proposalPk: Int!, $title: String, $abstract: String, $users: [Int!]) {\n      updateProposal(proposalPk: $proposalPk, title: $title, abstract: $abstract, users: $users) {\n    proposal {\n      primaryKey\n      proposalId\n      title\n      abstract\n    }\n    rejection { reason }\n  }\n}\n",
+						"variables": "{\n        \"proposalPk\": {{NEW_PROPOSAL_PK}},\n        \"title\": \"{{NEW_PROPOSAL_TITLE}}\",\n        \"abstract\": \"{{NEW_PROPOSAL_ABSTRACT}}\"\n    }"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -2310,11 +2174,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5fb3668e-217a-459c-84a9-eb269e73fcd4",
+						"id": "1395e55a-3c72-4fa8-ba95-cee4aa1c2439",
 						"exec": [
 							"pm.test(\"Should answer topic\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.answerTopic.error).to.eql(null);",
+							"    pm.expect(jsonData.data.answerTopic.rejection).to.eql(null);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -2324,13 +2188,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -2382,24 +2242,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($questionaryId: Int!, $topicId:Int!, $answers: [AnswerInput!]!) {\n  answerTopic(questionaryId:$questionaryId, topicId: $topicId,  answers:$answers) {\n    questionaryStep{\n         fields {\n          question {\n            question\n          }\n        }\n    }\n    error\n  }\n}",
+						"query": "mutation ($questionaryId: Int!, $topicId:Int!, $answers: [AnswerInput!]!) {\n  answerTopic(questionaryId:$questionaryId, topicId: $topicId,  answers:$answers) {\n    questionaryStep{\n         fields {\n          question {\n            question\n          }\n        }\n    }\n    rejection { reason }\n  }\n}",
 						"variables": "{\n        \"questionaryId\": {{NEW_QUESTIONARY_ID}},\n        \"topicId\": {{NEW_TOPIC_ID}},\n        \"answers\": [{\"questionId\": \"{{NEW_FIELD_ID}}\", \"value\":\"{\\\"value\\\":\\\"val\\\"}\"}]\n    }"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -2409,11 +2259,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "255dd32c-d3ad-4bcc-98a1-1cca70235a19",
+						"id": "4108d6fc-1254-4deb-8ba4-504f196d83f9",
 						"exec": [
 							"pm.test(\"Should update answer\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.updateAnswer.error).to.eql(null);",
+							"    pm.expect(jsonData.data.updateAnswer.rejection).to.eql(null);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -2423,13 +2273,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -2481,24 +2327,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($questionaryId: Int!, $answer: AnswerInput!) {\n    updateAnswer(questionaryId:$questionaryId, answer:$answer) {\n        questionId\n        error\n    }\n}\n",
+						"query": "mutation($questionaryId: Int!, $answer: AnswerInput!) {\n    updateAnswer(questionaryId:$questionaryId, answer:$answer) {\n        questionId\n        rejection { reason }\n    }\n}\n",
 						"variables": "{\n        \"questionaryId\": {{NEW_QUESTIONARY_ID}},\n        \"answer\": {\"questionId\": \"{{NEW_FIELD_ID}}\", \"value\":\"{\\\"value\\\":\\\"val\\\"}\"}\n    }"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -2508,11 +2344,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "395ebfdb-2959-4ee5-9796-5d059f3d8bab",
+						"id": "d2a632b3-804a-4411-9b7c-8e320dfed5a3",
 						"exec": [
 							"pm.test(\"Should submit proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.submitProposal.proposal.id).to.equal(pm.environment.get(\"NEW_PROPOSAL_ID\"));",
+							"    pm.expect(jsonData.data.submitProposal.proposal.primaryKey).to.equal(pm.environment.get(\"NEW_PROPOSAL_PK\"));",
 							"});",
 							"",
 							""
@@ -2524,13 +2360,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -2583,8 +2415,216 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($proposalId: Int!) {\n  submitProposal(id:$proposalId) {\n    proposal {\n      id\n    }\n    error\n  }\n}\n",
-						"variables": "{\n\t\"proposalId\":{{NEW_PROPOSAL_ID}}\n}"
+						"query": "mutation($proposalPk: Int!) {\n  submitProposal(proposalPk:$proposalPk) {\n    proposal {\n      primaryKey\n    }\n    rejection { reason }\n  }\n}\n\n\n",
+						"variables": "{\n\t\"proposalPk\":{{NEW_PROPOSAL_PK}}\n}"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/graphql",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"graphql"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "administerProposal [Mutation]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "457168c4-00c0-4271-98a0-ca0597179e17",
+						"exec": [
+							"pm.test(\"Should create shipment\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.administrationProposal.rejection).to.equal(null);",
+							"    pm.expect(jsonData.data.administrationProposal.proposal.primaryKey).to.equal(pm.environment.get(\"NEW_PROPOSAL_PK\"));",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"type": "text",
+						"value": "cors"
+					},
+					{
+						"key": "Sec-Fetch-Site",
+						"type": "text",
+						"value": "same-origin"
+					},
+					{
+						"key": "Origin",
+						"type": "text",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "Accept-Encoding",
+						"type": "text",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "en-GB,en-US;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "*/*"
+					},
+					{
+						"key": "User-Agent",
+						"type": "text",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "Connection",
+						"type": "text",
+						"value": "keep-alive"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation administrationProposal($proposalPk: Int!, $finalStatus: ProposalEndStatus, $commentForUser: String, $commentForManagement: String, $managementTimeAllocation: Int, $managementDecisionSubmitted: Boolean) {\n  administrationProposal(\n    proposalPk: $proposalPk\n    finalStatus: $finalStatus\n    commentForUser: $commentForUser\n    commentForManagement: $commentForManagement\n    managementTimeAllocation: $managementTimeAllocation\n    managementDecisionSubmitted: $managementDecisionSubmitted\n  ) {\n    proposal {\n      primaryKey\n    }\n    rejection {\n      reason\n    }\n  }\n}\n",
+						"variables": "{\n\t\"proposalPk\":{{NEW_PROPOSAL_PK}},\n\t\"finalStatus\": \"ACCEPTED\",\n\t\"commentForUser\": \"It is good\",\n\t\"commentForManagement\": \"It is not good, don't tell the user\",\n\t\"managementTimeAllocation\": 2,\n\t\"managementDecisionSubmitted\": true\n}"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/graphql",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"graphql"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createVisit [Mutation]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "37f90ae0-6a55-45ec-a91a-6a81a68b5b0d",
+						"exec": [
+							"pm.test(\"Should create shipment\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.createVisit.rejection).to.equal(null);",
+							"",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"NEW_VISIT_ID\", jsonData.data.createVisit.visit.id);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"type": "text",
+						"value": "cors"
+					},
+					{
+						"key": "Sec-Fetch-Site",
+						"type": "text",
+						"value": "same-origin"
+					},
+					{
+						"key": "Origin",
+						"type": "text",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "Accept-Encoding",
+						"type": "text",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "Accept-Language",
+						"type": "text",
+						"value": "en-GB,en-US;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "*/*"
+					},
+					{
+						"key": "User-Agent",
+						"type": "text",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "Connection",
+						"type": "text",
+						"value": "keep-alive"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation($proposalPk: Int!, $userId: Int!) {\n  createVisit(proposalPk:$proposalPk, scheduledEventId:1, teamLeadUserId:$userId, team:[$userId]) {\n    visit {\n      id\n      proposalPk\n    }\n    rejection {\n      reason\n    }\n  }\n}\n",
+						"variables": "{\n\t\"proposalPk\":{{NEW_PROPOSAL_PK}},\n\t\"userId\": {{NEW_USER_ID}}\n}"
 					}
 				},
 				"url": {
@@ -2614,11 +2654,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c5393a21-d0aa-49da-84a6-a4aeddc3b8ad",
+						"id": "855dc236-cc9d-44e3-85cf-1e995a8a29da",
 						"exec": [
 							"pm.test(\"Should create shipment\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createShipment.shipment.proposalId).to.equal(pm.environment.get(\"NEW_PROPOSAL_ID\"));",
+							"    pm.expect(jsonData.data.createShipment.shipment.proposalPk).to.equal(pm.environment.get(\"NEW_PROPOSAL_PK\"));",
 							"",
 							"    var jsonData = pm.response.json();",
 							"    pm.environment.set(\"NEW_SHIPMENT_ID\", jsonData.data.createShipment.shipment.id);",
@@ -2633,13 +2673,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -2692,8 +2728,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($proposalId: Int!) {\n  createShipment(\n    proposalId: $proposalId,\n    title: \"My shipment\"\n    \n  ) {\n    error\n    shipment {\n      id\n      proposalId\n      status\n      externalRef\n      creatorId\n      created\n      questionary{\n        steps {\n          fields {\n            question{\n              question\n            }\n          }\n          topic {\n           title\n            \n          }\n        }\n      }\n    }\n  }\n}\n",
-						"variables": "{\n\t\"proposalId\":{{NEW_PROPOSAL_ID}}\n}"
+						"query": "mutation($proposalPk: Int!, $visitId: Int!) {\n  createShipment(\n    proposalPk: $proposalPk,\n    title: \"My shipment\"\n    visitId: $visitId\n  ) {\n    rejection { reason }\n    shipment {\n      id\n      proposalPk\n      status\n      externalRef\n      creatorId\n      created\n      questionary{\n        steps {\n          fields {\n            question{\n              question\n            }\n          }\n          topic {\n           title\n            \n          }\n        }\n      }\n    }\n  }\n}\n",
+						"variables": "{\n\t\"proposalPk\":{{NEW_PROPOSAL_PK}},\n\t\"visitId\": {{NEW_VISIT_ID}}\n}"
 					}
 				},
 				"url": {
@@ -2723,11 +2759,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "00098aa3-c061-40ba-81ec-f9edc2c82352",
+						"id": "81caa7fa-53e3-4ef1-92ed-6d53ee543700",
 						"exec": [
 							"pm.test(\"Should get shipment\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.shipment.proposalId).to.equal(pm.environment.get(\"NEW_PROPOSAL_ID\"));",
+							"    pm.expect(jsonData.data.shipment.proposalPk).to.equal(pm.environment.get(\"NEW_PROPOSAL_PK\"));",
 							"});",
 							"",
 							""
@@ -2739,13 +2775,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -2798,7 +2830,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query($shipmentId: Int!) {\n  shipment(shipmentId: $shipmentId) {\n    title\n    proposalId\n    questionary {\n      steps {\n        fields {\n          question {\n            question\n          }\n        }\n      }\n    }\n  }\n}\n",
+						"query": "query($shipmentId: Int!) {\n  shipment(shipmentId: $shipmentId) {\n    title\n    proposalPk\n    questionary {\n      steps {\n        fields {\n          question {\n            question\n          }\n        }\n      }\n    }\n  }\n}\n",
 						"variables": "{\n\t\"shipmentId\":{{NEW_SHIPMENT_ID}}\n}"
 					}
 				},
@@ -2829,7 +2861,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "63c5d372-9ae1-40d6-b8d0-2f7246a15102",
+						"id": "aa4bbf6d-2fa1-4eda-b10e-f50df817e6a7",
 						"exec": [
 							"pm.test(\"Should get call\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -2844,13 +2876,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -2888,17 +2916,7 @@
 						"variables": "{\n\t\"callID\":{{NEW_CALL_ID}}\n}"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -2908,12 +2926,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5f4e9ec5-7abc-4754-ad75-217e8f0d203a",
+						"id": "ef5d17a9-3ff7-4b95-9dff-9025e7b58465",
 						"exec": [
 							"pm.test(\"Should add user role\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.addUserRole.success).to.equal(true);",
-							"    pm.expect(jsonData.data.addUserRole.error).to.equal(null);",
+							"    pm.expect(jsonData.data.addUserRole.rejection).to.equal(null);",
 							"});",
 							""
 						],
@@ -2924,13 +2942,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -2983,21 +2997,11 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($newUserId:Int!) {\n  addUserRole(userID: $newUserId, roleID: 2) {\n      success\n      error\n  }\n}\n",
+						"query": "mutation($newUserId:Int!) {\n  addUserRole(userID: $newUserId, roleID: 2) {\n      success\n      rejection { reason }\n  }\n}\n",
 						"variables": "{\n\t\"newUserId\":{{NEW_USER_ID}}\n}"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3007,7 +3011,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "38d993c3-5381-4fb9-8cd6-74b1e057f1ba",
+						"id": "9181edc1-5588-4c3c-98ea-3c0e274d2d09",
 						"exec": [
 							"pm.test(\"Should add user for review\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -3025,13 +3029,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -3084,24 +3084,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($newUserId:Int!, $newProposalId:Int!, $newSepId:Int!) {\n  addUserForReview(userID: $newUserId, sepID: $newSepId, proposalID: $newProposalId) {\n    review {\n      id\n\t}\n    error\n  }\n}\n",
-						"variables": "{\n\t\"newUserId\":{{NEW_USER_ID}},\n\t\"newProposalId\":{{NEW_PROPOSAL_ID}},\n\t\"newSepId\":{{NEW_SEP_ID}}\n}"
+						"query": "mutation($newUserId:Int!, $newProposalPk:Int!, $newSepId:Int!) {\n  addUserForReview(userID: $newUserId, sepID: $newSepId, proposalPk: $newProposalPk) {\n    review {\n      id\n\t}\n    rejection { reason }\n  }\n}\n",
+						"variables": "{\n\t\"newUserId\":{{NEW_USER_ID}},\n\t\"newProposalPk\":{{NEW_PROPOSAL_PK}},\n\t\"newSepId\":{{NEW_SEP_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3111,12 +3101,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "3c610897-53fb-47be-b14a-73a07f2c4ec3",
+						"id": "943966bb-d750-41f1-9c3c-9f29fd263830",
 						"exec": [
 							"pm.test(\"Should add review\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.addReview.review.id).to.equal(pm.environment.get(\"NEW_REVIEW_ID\"));",
-							"    pm.expect(jsonData.data.addReview.error).to.equal(null);",
+							"    pm.expect(jsonData.data.addReview.rejection).to.equal(null);",
 							"    pm.expect(jsonData.data.addReview.review.comment).to.equal(\"Test comment\");",
 							"    pm.expect(jsonData.data.addReview.review.grade).to.equal(9);",
 							"});",
@@ -3129,13 +3119,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -3188,24 +3174,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($reviewID: Int!, $sepID: Int!) {\n  addReview(reviewID: $reviewID, comment:\"Test comment\", grade:9, status:DRAFT, sepID: $sepID) {\n    review {\n        id,\n        comment,\n        grade,\n    }\n    error\n  }\n}\n",
+						"query": "mutation($reviewID: Int!, $sepID: Int!) {\n  addReview(reviewID: $reviewID, comment:\"Test comment\", grade:9, status:DRAFT, sepID: $sepID) {\n    review {\n        id,\n        comment,\n        grade,\n    }\n    rejection { reason }\n  }\n}\n",
 						"variables": "{\n\t\"reviewID\":{{NEW_REVIEW_ID}},\n\t\"sepID\": {{NEW_SEP_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3215,7 +3191,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7b22cd1c-a879-471b-82e5-d3cd884831d5",
+						"id": "17cb2b0e-2bae-469b-af4d-cdc190750f42",
 						"exec": [
 							"pm.test(\"Should get review\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -3230,13 +3206,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -3274,17 +3246,7 @@
 						"variables": "{\n\t\"reviewId\":{{NEW_REVIEW_ID}}\n}"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3294,12 +3256,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "bcf5d54c-a520-4f57-b004-e74bc1ae468e",
+						"id": "93067764-7564-42a6-89d1-8c3834940a5c",
 						"exec": [
 							"pm.test(\"Should remove user from review\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.removeUserForReview.review.id).to.be.above(0);",
-							"    pm.expect(jsonData.data.removeUserForReview.error).to.equal(null);",
+							"    pm.expect(jsonData.data.removeUserForReview.rejection).to.equal(null);",
 							"});",
 							"",
 							"var jsonData = pm.response.json();",
@@ -3313,13 +3275,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -3372,21 +3330,11 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($newReviewID:Int!, $sepId:Int!) {\n  removeUserForReview(reviewId: $newReviewID, sepId: $sepId) {\n      review {\n          id\n      }\n      error\n  }\n}\n",
+						"query": "mutation($newReviewID:Int!, $sepId:Int!) {\n  removeUserForReview(reviewId: $newReviewID, sepId: $sepId) {\n      review {\n          id\n      }\n      rejection { reason }\n  }\n}\n",
 						"variables": "{\n\t\"newReviewID\":{{NEW_REVIEW_ID}},\n\t\"sepId\":{{NEW_SEP_ID}}\n}"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3396,7 +3344,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e02159a4-9960-440d-9dd1-234ab9369b95",
+						"id": "4cb3af57-6e51-48af-9610-79d701064144",
 						"exec": [
 							"pm.test(\"Should get page content\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -3411,13 +3359,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -3455,17 +3399,7 @@
 						"variables": ""
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3475,12 +3409,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a8c32e31-1f3c-4cf0-9bf2-3fea28bfc586",
+						"id": "e68b91d3-96ba-457d-88a4-d360ba86610a",
 						"exec": [
 							"pm.test(\"Should set page content\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.setPageContent.page.content).to.not.be.eql(null)",
-							"    pm.expect(jsonData.data.setPageContent.error).to.be.eql(null)",
+							"    pm.expect(jsonData.data.setPageContent.rejection).to.be.eql(null)",
 							"});",
 							""
 						],
@@ -3491,13 +3425,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -3531,21 +3461,11 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($content: String!) {\n  setPageContent(id:HELPPAGE, text:$content)\n    {\n      page{\n        content\n      }\n      error\n    }\n}\n",
+						"query": "mutation($content: String!) {\n  setPageContent(id:HELPPAGE, text:$content)\n    {\n      page{\n        content\n      }\n      rejection { reason }\n    }\n}\n",
 						"variables": "{\n\t\"content\":\"{{$randomLoremSentences}}\"\n}"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3555,7 +3475,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b6aecf94-e267-458c-a5c6-3de51c7a6f12",
+						"id": "e7fadf77-4760-4265-9572-74a9e693c5c1",
 						"exec": [
 							"pm.test(\"Should get proposals\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -3570,13 +3490,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -3610,24 +3526,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\n  proposals {\n    proposals{\n      id\n      shortCode\n      title\n      status {\n        name\n      }\n      }\n    totalCount\n    }\n  }",
+						"query": "query {\n  proposals {\n    proposals{\n      proposalId\n      title\n      status {\n        name\n      }\n      }\n    totalCount\n    }\n  }",
 						"variables": "{\n    \"filter\": \"\"\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3637,7 +3543,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "22ce3ad5-1692-4c29-9d57-b64891de33fd",
+						"id": "a8580ac2-9b85-48cb-af91-ea13fb5f2e93",
 						"exec": [
 							"pm.test(\"Should get proposals\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -3652,13 +3558,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -3692,24 +3594,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query($questionaryIds: [Int!]) {\n  proposals(filter:{questionaryIds:$questionaryIds}) {\n    proposals{\n      id\n      shortCode\n      title\n      status {\n        name\n      }\n      }\n    totalCount\n    }\n  }",
+						"query": "query($questionaryIds: [Int!]) {\n  proposals(filter:{questionaryIds:$questionaryIds}) {\n    proposals{\n      proposalId\n      title\n      status {\n        name\n      }\n    }\n    totalCount\n  }\n}",
 						"variables": "{\n    \"questionaryIds\": [{{NEW_QUESTIONARY_ID}}]\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3719,7 +3611,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "3fa96f3b-cc0a-4ac9-b1b6-19d29d72d329",
+						"id": "f5bf52fd-4cd6-4690-a7e2-f17bf9e81a43",
 						"exec": [
 							"pm.test(\"Should get basic user details\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -3734,13 +3626,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -3778,17 +3666,7 @@
 						"variables": "{\n\t\"id\":{{NEW_USER_ID}}\n}"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3798,7 +3676,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f702fdd2-791e-40d1-8048-4f83319cc1f0",
+						"id": "57a9b94a-7255-4db6-a24c-b23f17f585db",
 						"exec": [
 							"pm.test(\"Should check email exists\", function () {",
 							"    var jsonData = pm.response.json();",
@@ -3813,13 +3691,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{NEW_USER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -3857,17 +3731,7 @@
 						"variables": "{\n\t\"email\":\"{{NEW_USER_EMAIL}}\"\n}"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3877,12 +3741,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "076ed090-09c1-430b-8374-f505e3e605d5",
+						"id": "e56a104d-8e9c-4d66-b406-f24c588b835a",
 						"exec": [
 							"pm.test(\"Should delete proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.deleteProposal.error).to.equal(null)",
-							"    pm.expect(jsonData.data.deleteProposal.proposal.id).to.be.equal(pm.environment.get(\"NEW_PROPOSAL_ID\"))",
+							"    pm.expect(jsonData.data.deleteProposal.rejection).to.equal(null)",
+							"    pm.expect(jsonData.data.deleteProposal.proposal.primaryKey).to.be.equal(pm.environment.get(\"NEW_PROPOSAL_PK\"))",
 							"});"
 						],
 						"type": "text/javascript"
@@ -3892,13 +3756,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -3952,21 +3812,11 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($id:Int!) {\n  deleteProposal(id:$id){\n    proposal{\n      id\n    }\n    error\n  }\n}",
-						"variables": "{\n\t\"id\":{{NEW_PROPOSAL_ID}}\n}"
+						"query": "mutation($primaryKey:Int!) {\n  deleteProposal(proposalPk:$primaryKey){\n    proposal{\n      primaryKey\n      proposalId\n    }\n    rejection { reason }\n  }\n}",
+						"variables": "{\n\t\"primaryKey\":{{NEW_PROPOSAL_PK}}\n}"
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -3976,11 +3826,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f14350da-2fd5-416e-a691-110b6fb9b8b6",
+						"id": "fc153531-a437-44db-954f-531ec25c6e32",
 						"exec": [
 							"pm.test(\"Update delete template field\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.deleteQuestionTemplateRelation.error).to.be.eql(null);",
+							"    pm.expect(jsonData.data.deleteQuestionTemplateRelation.rejection).to.be.eql(null);",
 							"});",
 							"",
 							""
@@ -3991,7 +3841,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "8273192c-41b6-4331-82a8-ac51dd1f87a5",
+						"id": "e6755419-3dce-4cdb-89bf-d74a92412259",
 						"exec": [
 							"console.log(\"Authorization\")"
 						],
@@ -4002,13 +3852,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -4062,24 +3908,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($questionId: String!, $templateId: Int!) {\n  deleteQuestionTemplateRelation(questionId: $questionId, templateId: $templateId) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            id\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($questionId: String!, $templateId: Int!) {\n  deleteQuestionTemplateRelation(questionId: $questionId, templateId: $templateId) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            id\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n        }\n      }\n    }\n    rejection { reason }\n  }\n}\n",
 						"variables": "{\n        \"questionId\": \"{{NEW_FIELD_ID}}\",\n        \"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -4089,11 +3925,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "04bdd8f6-9247-481c-9505-88a7d8d68cb2",
+						"id": "b07094da-290f-4c83-9633-eae627d7d0da",
 						"exec": [
 							"pm.test(\"Update delete template field\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.deleteQuestion.error).to.be.eql(null);",
+							"    pm.expect(jsonData.data.deleteQuestion.rejection).to.be.eql(null);",
 							"});",
 							"",
 							""
@@ -4104,7 +3940,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "dddc3620-caa6-4280-b106-4006b241f786",
+						"id": "7c5bc9fc-e4ad-4ee4-b2cc-99d6c7a8bd6a",
 						"exec": [
 							"console.log(\"Authorization\")"
 						],
@@ -4115,13 +3951,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -4175,24 +4007,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($id: String!) {\n  deleteQuestion(questionId: $id) {\n    question {\n      question\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($id: String!) {\n  deleteQuestion(questionId: $id) {\n    question {\n      question\n    }\n    rejection { reason }\n  }\n}\n",
 						"variables": "{\n        \"id\": \"{{NEW_FIELD_ID}}\"\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -4202,11 +4024,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "22f89942-56d0-49ad-8aa1-721b62f90e99",
+						"id": "ea85976e-9ac5-4617-bb3e-2920db7b614e",
 						"exec": [
 							"pm.test(\"Should delete topic\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.deleteTopic.error).to.be.eql(null)",
+							"    pm.expect(jsonData.data.deleteTopic.rejection).to.be.eql(null)",
 							"});",
 							""
 						],
@@ -4217,13 +4039,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{Authorization}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{Authorization}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -4257,24 +4075,14 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($id: Int!) {\n    deleteTopic(topicId: $id){\n    error\n  }\n}",
+						"query": "mutation($id: Int!) {\n    deleteTopic(topicId: $id){\n    rejection { reason }\n  }\n}",
 						"variables": "{\n\t\"id\":{{NEW_TOPIC_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:4000/graphql",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"graphql"
-					]
-				}
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		}
@@ -4283,7 +4091,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "d22c4f11-4b94-4db4-ae88-03deae52def0",
+				"id": "72726ee3-030c-4498-b5a3-ba085732ff6a",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -4293,7 +4101,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "b34dd3eb-acbf-4a82-b88f-1679ea903f09",
+				"id": "5055bd13-08ea-440c-a480-2dd7c10a605a",
 				"type": "text/javascript",
 				"exec": [
 					""

@@ -14,36 +14,46 @@ import {
   SEPResponseWrap,
 } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
+import { ProposalPkWithCallId } from './ChangeProposalsStatusMutation';
 
 @ArgsType()
-export class AssignProposalToSEPArgs {
+export class AssignProposalsToSepArgs {
+  @Field(() => [ProposalPkWithCallId])
+  public proposals: ProposalPkWithCallId[];
+
   @Field(() => Int)
-  public proposalId: number;
+  public sepId: number;
+}
+
+@ArgsType()
+export class RemoveProposalsFromSepArgs {
+  @Field(() => [Int])
+  public proposalPks: number[];
 
   @Field(() => Int)
   public sepId: number;
 }
 
 @Resolver()
-export class AssignProposalToSEPMutation {
+export class AssignProposalsToSEPMutation {
   @Mutation(() => NextProposalStatusResponseWrap)
-  async assignProposalToSEP(
-    @Args() args: AssignProposalToSEPArgs,
+  async assignProposalsToSep(
+    @Args() args: AssignProposalsToSepArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sep.assignProposalToSEP(context.user, args),
+      context.mutations.sep.assignProposalsToSep(context.user, args),
       NextProposalStatusResponseWrap
     );
   }
 
   @Mutation(() => SEPResponseWrap)
-  async removeProposalAssignment(
-    @Args() args: AssignProposalToSEPArgs,
+  async removeProposalsFromSep(
+    @Args() args: RemoveProposalsFromSepArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sep.removeProposalAssignment(context.user, args),
+      context.mutations.sep.removeProposalsFromSep(context.user, args),
       SEPResponseWrap
     );
   }

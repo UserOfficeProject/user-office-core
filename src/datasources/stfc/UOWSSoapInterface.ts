@@ -1,4 +1,4 @@
-import * as soap from "soap";
+import * as soap from 'soap';
 
 export default class UOWSSoapClient {
 

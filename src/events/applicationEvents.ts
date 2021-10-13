@@ -1,8 +1,10 @@
 import { Call } from '../models/Call';
 import { InstrumentHasProposals } from '../models/Instrument';
-import { Proposal, ProposalIdsWithNextStatus } from '../models/Proposal';
+import { Proposal, ProposalPksWithNextStatus } from '../models/Proposal';
+import { QuestionaryStep } from '../models/Questionary';
 import { Review, ReviewWithNextProposalStatus } from '../models/Review';
 import { Sample } from '../models/Sample';
+import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { SEP } from '../models/SEP';
 import { SepMeetingDecision } from '../models/SepMeetingDecision';
 import { TechnicalReview } from '../models/TechnicalReview';
@@ -50,6 +52,11 @@ interface ProposalRejectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_REJECTED;
   proposal: Proposal;
   reason: string;
+}
+
+interface ProposalReservedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_RESERVED;
+  proposal: Proposal;
 }
 
 interface ProposalCreatedEvent extends GeneralEvent {
@@ -109,17 +116,17 @@ interface ProposalSampleReviewSubmittedEvent extends GeneralEvent {
 
 interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_INSTRUMENT_SELECTED;
-  proposalidswithnextstatus: ProposalIdsWithNextStatus;
+  proposalpkswithnextstatus: ProposalPksWithNextStatus;
 }
 
 interface ProposalSEPSelectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_SELECTED;
-  proposalidswithnextstatus: ProposalIdsWithNextStatus;
+  proposalpkswithnextstatus: ProposalPksWithNextStatus;
 }
 
 interface ProposalStatusUpdatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_UPDATED;
-  proposalidswithnextstatus: ProposalIdsWithNextStatus;
+  proposalpkswithnextstatus: ProposalPksWithNextStatus;
 }
 
 interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
@@ -155,6 +162,11 @@ interface ProposalSEPMeetingRankingOverwrittenEvent extends GeneralEvent {
 interface ProposalSEPMeetingReorderEvent extends GeneralEvent {
   type: Event.PROPOSAL_SEP_MEETING_REORDER;
   sepmeetingdecision: SepMeetingDecision;
+}
+
+interface ProposalTopicAnsweredEvent extends GeneralEvent {
+  type: Event.TOPIC_ANSWERED;
+  questionarystep: QuestionaryStep;
 }
 
 interface UserResetPasswordEmailEvent extends GeneralEvent {
@@ -247,6 +259,15 @@ interface CallSEPReviewEndedEvent extends GeneralEvent {
   call: Call;
 }
 
+interface ProposalBookingTimeSlotAddedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED;
+  scheduledEvent: ScheduledEventCore;
+}
+interface ProposalBookingTimeSlotsRemovedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED;
+  scheduledEvents: ScheduledEventCore[];
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -255,6 +276,7 @@ export type ApplicationEvent =
   | ProposalUnfeasibleEvent
   | ProposalSampleSafeEvent
   | ProposalRejectedEvent
+  | ProposalReservedEvent
   | ProposalCreatedEvent
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent
@@ -291,4 +313,7 @@ export type ApplicationEvent =
   | ProposalStatusChangedByUserEvent
   | ProposalSEPMeetingSavedEvent
   | ProposalSEPMeetingRankingOverwrittenEvent
-  | ProposalSEPMeetingReorderEvent;
+  | ProposalSEPMeetingReorderEvent
+  | ProposalTopicAnsweredEvent
+  | ProposalBookingTimeSlotAddedEvent
+  | ProposalBookingTimeSlotsRemovedEvent;

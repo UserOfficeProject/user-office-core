@@ -4,11 +4,18 @@ import { Call } from '../../models/Call';
 import {
   Proposal,
   ProposalEndStatus,
-  ProposalIdsWithNextStatus,
+  ProposalPksWithNextStatus,
 } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
+import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssignee';
+import {
+  ProposalBookingFilter,
+  ProposalBookingScheduledEventFilterCore,
+  ProposalBookingStatusCore,
+  ScheduledEventBookingType,
+} from '../../resolvers/types/ProposalBooking';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -29,14 +36,14 @@ export type DeepPartial<T> = {
 
 const dummyProposalFactory = (values?: Partial<Proposal>) => {
   return new Proposal(
-    values?.id || 1,
+    values?.primaryKey || 1,
     values?.title || 'title',
     values?.abstract || 'abstract',
     values?.proposerId || 1,
     values?.statusId || 1,
     values?.created || new Date(),
     values?.updated || new Date(),
-    values?.shortCode || 'shortCode',
+    values?.proposalId || 'shortCode',
     values?.finalStatus || ProposalEndStatus.UNSET,
     values?.callId || 1,
     values?.questionaryId || 1,
@@ -47,7 +54,7 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.referenceNumberSequence || 0,
     values?.managementTimeAllocation || 0,
     values?.managementDecisionSubmitted || false,
-    0
+    values?.technicalReviewAssignee || null
   );
 };
 
@@ -59,6 +66,16 @@ export const dummySepMeetingDecision = new SepMeetingDecision(
   'Dummy comment for management',
   true,
   1
+);
+
+const dummyScheduledEventCore = new ScheduledEventCore(
+  1,
+  ScheduledEventBookingType.USER_OPERATIONS,
+  new Date(),
+  new Date(),
+  1,
+  1,
+  ProposalBookingStatusCore.ACTIVE
 );
 
 export class ProposalDataSourceMock implements ProposalDataSource {
@@ -78,17 +95,18 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return [];
   }
   public init() {
-    dummyProposal = dummyProposalFactory({ id: 1 });
+    dummyProposal = dummyProposalFactory({ primaryKey: 1 });
     dummyProposalSubmitted = dummyProposalFactory({
-      id: 2,
+      primaryKey: 2,
       title: 'Submitted proposal',
       submitted: true,
       finalStatus: ProposalEndStatus.ACCEPTED,
       notified: true,
+      managementDecisionSubmitted: true,
     });
 
     dummyProposalWithNotActiveCall = dummyProposalFactory({
-      id: 3,
+      primaryKey: 3,
       questionaryId: 2,
       callId: 2,
     });
@@ -102,13 +120,13 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async deleteProposal(id: number): Promise<Proposal> {
     const dummyProposalRef = dummyProposalFactory(dummyProposal);
-    dummyProposal.id = -1; // hacky
+    dummyProposal.primaryKey = -1; // hacky
 
     return dummyProposalRef;
   }
 
-  async rejectProposal(proposalId: number): Promise<Proposal> {
-    if (dummyProposal.id !== proposalId) {
+  async rejectProposal(proposalPk: number): Promise<Proposal> {
+    if (dummyProposal.primaryKey !== proposalPk) {
       throw new Error('Wrong ID');
     }
 
@@ -118,7 +136,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async update(proposal: Proposal): Promise<Proposal> {
-    const foundIndex = allProposals.findIndex(({ id }) => proposal.id === id);
+    const foundIndex = allProposals.findIndex(
+      ({ primaryKey: id }) => proposal.primaryKey === id
+    );
 
     if (foundIndex === -1) {
       throw new Error('Proposal does not exist');
@@ -128,22 +148,27 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async updateProposalStatus(
-    proposalId: number,
+    proposalPk: number,
     proposalStatusId: number
   ): Promise<Proposal> {
-    if (proposalId !== dummyProposal.id) {
+    const proposal = await this.get(proposalPk);
+
+    if (!proposal) {
       throw new Error('Proposal does not exist');
     }
+    proposal.statusId = proposalStatusId;
 
-    return dummyProposal;
+    return proposal;
   }
 
-  async setProposalUsers(id: number, users: number[]): Promise<void> {
+  async setProposalUsers(proposalPk: number, users: number[]): Promise<void> {
     throw new Error('Not implemented');
   }
 
-  async submitProposal(id: number): Promise<Proposal> {
-    const found = allProposals.find((proposal) => proposal.id === id);
+  async submitProposal(primaryKey: number): Promise<Proposal> {
+    const found = allProposals.find(
+      (proposal) => proposal.primaryKey === primaryKey
+    );
 
     if (!found) {
       throw new Error('Wrong ID');
@@ -156,7 +181,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async get(id: number) {
-    return allProposals.find((proposal) => proposal.id === id) || null;
+    return allProposals.find((proposal) => proposal.primaryKey === id) || null;
   }
 
   async create(proposerId: number, callId: number, questionaryId: number) {
@@ -183,7 +208,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getInstrumentScientistProposals(
-    scientsitId: number,
+    scientistId: number,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
@@ -193,10 +218,10 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async markEventAsDoneOnProposal(
     event: Event,
-    proposalId: number
+    proposalPk: number
   ): Promise<ProposalEventsRecord | null> {
     return {
-      proposal_id: 1,
+      proposal_pk: 1,
       proposal_created: true,
       proposal_submitted: true,
       proposal_feasible: true,
@@ -218,6 +243,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       proposal_sep_meeting_submitted: false,
       proposal_instrument_submitted: false,
       proposal_accepted: false,
+      proposal_reserved: false,
       proposal_rejected: false,
       proposal_notified: false,
     };
@@ -232,7 +258,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async resetProposalEvents(
-    proposalId: number,
+    proposalPk: number,
     callId: number,
     statusId: number
   ): Promise<boolean> {
@@ -241,8 +267,40 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async changeProposalsStatus(
     statusId: number,
-    proposalIds: number[]
-  ): Promise<ProposalIdsWithNextStatus> {
-    return { proposalIds: [1] };
+    proposalPks: number[]
+  ): Promise<ProposalPksWithNextStatus> {
+    return { proposalPks: [1] };
+  }
+
+  async getProposalBookingByProposalPk(
+    proposalPk: number,
+    filter?: ProposalBookingFilter
+  ): Promise<{ id: number } | null> {
+    return { id: 1 };
+  }
+
+  async proposalBookingScheduledEvents(
+    proposalBookingId: number,
+    filter?: ProposalBookingScheduledEventFilterCore
+  ): Promise<ScheduledEventCore[] | null> {
+    return [dummyScheduledEventCore];
+  }
+
+  async addProposalBookingScheduledEvent(
+    eventMessage: ScheduledEventCore
+  ): Promise<void> {
+    return;
+  }
+
+  async removeProposalBookingScheduledEvents(
+    eventMessage: ScheduledEventCore[]
+  ): Promise<void> {
+    return;
+  }
+
+  async updateProposalBookingScheduledEvent(
+    eventMessage: ScheduledEventCore
+  ): Promise<void> {
+    return;
   }
 }

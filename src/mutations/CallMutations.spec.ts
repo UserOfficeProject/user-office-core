@@ -6,6 +6,8 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { AllocationTimeUnits } from '../models/Call';
+import { CreateCallInput } from '../resolvers/mutations/CreateCallMutation';
 import CallMutations from './CallMutations';
 
 const callMutations = container.resolve(CallMutations);
@@ -30,6 +32,10 @@ describe('Test Call Mutations', () => {
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
         proposalWorkflowId: 1,
+        allocationTimeUnit: AllocationTimeUnits.Day,
+        templateId: 1,
+        title: 'Title',
+        description: 'Description',
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -61,6 +67,10 @@ describe('Test Call Mutations', () => {
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
         proposalWorkflowId: 1,
+        allocationTimeUnit: AllocationTimeUnits.Day,
+        templateId: 1,
+        title: 'Title',
+        description: 'Description',
       })
     ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
   });
@@ -83,6 +93,10 @@ describe('Test Call Mutations', () => {
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
       proposalWorkflowId: 1,
+      allocationTimeUnit: AllocationTimeUnits.Day,
+      templateId: 1,
+      title: 'Title',
+      description: 'Description',
     };
 
     return expect(
@@ -91,7 +105,7 @@ describe('Test Call Mutations', () => {
   });
 
   test('A logged in user officer can create a call', () => {
-    const callToCreate = {
+    const callToCreate: CreateCallInput = {
       shortCode: '2019-02-19',
       startCall: new Date('2019-02-19'),
       endCall: new Date('2019-02-19'),
@@ -108,6 +122,11 @@ describe('Test Call Mutations', () => {
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
       proposalWorkflowId: 1,
+      allocationTimeUnit: AllocationTimeUnits.Day,
+      templateId: 1,
+      esiTemplateId: 2,
+      title: 'Title',
+      description: 'Description',
     };
 
     return expect(
@@ -142,6 +161,10 @@ describe('Test Call Mutations', () => {
         cycleComment: 'Comment review update',
         surveyComment: 'Comment feedback update',
         proposalWorkflowId: 1,
+        allocationTimeUnit: AllocationTimeUnits.Day,
+        templateId: 1,
+        title: 'Title',
+        description: 'Description',
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -165,6 +188,10 @@ describe('Test Call Mutations', () => {
       cycleComment: 'Comment review update',
       surveyComment: 'Comment feedback update',
       proposalWorkflowId: 1,
+      allocationTimeUnit: AllocationTimeUnits.Day,
+      templateId: 1,
+      title: 'Title',
+      description: 'Description',
     };
 
     return expect(

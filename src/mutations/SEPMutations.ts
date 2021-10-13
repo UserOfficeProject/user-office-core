@@ -3,7 +3,6 @@ import {
   updateSEPValidationSchema,
   assignSEPMembersValidationSchema,
   removeSEPMemberValidationSchema,
-  assignProposalToSEPValidationSchema,
   assignSEPChairOrSecretaryValidationSchema,
   assignSEPMemberToProposalValidationSchema,
   updateTimeAllocationValidationSchema,
@@ -19,8 +18,8 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { ProposalIdsWithNextStatus } from '../models/Proposal';
-import { rejection, Rejection, isRejection } from '../models/Rejection';
+import { ProposalPksWithNextStatus } from '../models/Proposal';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
 import { SepMeetingDecision } from '../models/SepMeetingDecision';
@@ -32,7 +31,10 @@ import {
   RemoveSepReviewerFromProposalArgs,
   AssignChairOrSecretaryToSEPArgs,
 } from '../resolvers/mutations/AssignMembersToSEP';
-import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
+import {
+  AssignProposalsToSepArgs,
+  RemoveProposalsFromSepArgs,
+} from '../resolvers/mutations/AssignProposalsToSep';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { ReorderSepMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderSepMeetingDecisionProposalsMutation';
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
@@ -182,10 +184,11 @@ export default class SEPMutations {
       );
     }
 
-    const isMemberChairOrSecretaryOfSEP = await this.userAuth.isChairOrSecretaryOfSEP(
-      { id: args.memberId } as User,
-      args.sepId
-    );
+    const isMemberChairOrSecretaryOfSEP =
+      await this.userAuth.isChairOrSecretaryOfSEP(
+        { id: args.memberId } as User,
+        args.sepId
+      );
 
     // SEP Chair and SEP Secretary can not
     // modify SEP Chair and SEP Secretary members
@@ -210,40 +213,23 @@ export default class SEPMutations {
       });
   }
 
-  @ValidateArgs(assignProposalToSEPValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.PROPOSAL_SEP_SELECTED)
-  async assignProposalToSEP(
+  async assignProposalsToSep(
     agent: UserWithRole | null,
-    args: AssignProposalToSEPArgs
-  ): Promise<ProposalIdsWithNextStatus | Rejection> {
-    const SEP = await this.dataSource.getSEPByProposalId(args.proposalId);
-    if (SEP) {
-      if (
-        isRejection(
-          await this.removeProposalAssignment(agent, {
-            proposalId: args.proposalId,
-            sepId: SEP.id,
-          })
-        )
-      ) {
-        return rejection(
-          'Could not assign proposal to SEP because an error occurred',
-          { args, agent }
-        );
-      }
-    }
-
+    args: AssignProposalsToSepArgs
+  ): Promise<ProposalPksWithNextStatus | Rejection> {
     return this.dataSource
-      .assignProposal(args.proposalId, args.sepId)
+      .assignProposalsToSep(args)
       .then(async (result) => {
-        const nextProposalStatus = await this.proposalSettingsDataSource.getProposalNextStatus(
-          args.proposalId,
-          Event.PROPOSAL_SEP_SELECTED
-        );
+        const nextProposalStatus =
+          await this.proposalSettingsDataSource.getProposalNextStatus(
+            args.proposals[0].primaryKey,
+            Event.PROPOSAL_SEP_SELECTED
+          );
 
-        return new ProposalIdsWithNextStatus(
-          result.proposalIds,
+        return new ProposalPksWithNextStatus(
+          result.proposalPks,
           nextProposalStatus?.id,
           nextProposalStatus?.shortCode,
           nextProposalStatus?.name
@@ -258,15 +244,14 @@ export default class SEPMutations {
       });
   }
 
-  @ValidateArgs(assignProposalToSEPValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.SEP_PROPOSAL_REMOVED)
-  async removeProposalAssignment(
+  async removeProposalsFromSep(
     agent: UserWithRole | null,
-    args: AssignProposalToSEPArgs
+    args: RemoveProposalsFromSepArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
-      .removeProposalAssignment(args.proposalId, args.sepId)
+      .removeProposalsFromSep(args.proposalPks, args.sepId)
       .catch((err) => {
         return rejection(
           'Could not remove assigned proposal from scientific evaluation panel',
@@ -323,7 +308,7 @@ export default class SEPMutations {
     }
 
     return this.dataSource
-      .assignMemberToSEPProposal(args.proposalId, args.sepId, args.memberIds)
+      .assignMemberToSEPProposal(args.proposalPk, args.sepId, args.memberIds)
       .catch((err) => {
         return rejection(
           'Can not assign proposal to scientific evaluation panel',
@@ -351,7 +336,7 @@ export default class SEPMutations {
     }
 
     return this.dataSource
-      .removeMemberFromSepProposal(args.proposalId, args.sepId, args.memberId)
+      .removeMemberFromSepProposal(args.proposalPk, args.sepId, args.memberId)
       .catch((error) => {
         return rejection(
           'Can not remove member from SEP proposal because of an error',
@@ -365,7 +350,7 @@ export default class SEPMutations {
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   async updateTimeAllocation(
     agent: UserWithRole | null,
-    { sepId, proposalId, sepTimeAllocation = null }: UpdateSEPTimeAllocationArgs
+    { sepId, proposalPk, sepTimeAllocation = null }: UpdateSEPTimeAllocationArgs
   ) {
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (
@@ -374,27 +359,26 @@ export default class SEPMutations {
     ) {
       return rejection(
         'Could not update the time allocation because of insufficient permissions',
-        { agent, sepId, proposalId }
+        { agent, sepId, proposalPk }
       );
     }
 
-    const isProposalInstrumentSubmitted = await this.instrumentDataSource.isProposalInstrumentSubmitted(
-      proposalId
-    );
+    const isProposalInstrumentSubmitted =
+      await this.instrumentDataSource.isProposalInstrumentSubmitted(proposalPk);
 
     if (isProposalInstrumentSubmitted && !isUserOfficer) {
       return rejection(
         'Could not update the time allocation because the instrument is submitted',
-        { agent, sepId, proposalId }
+        { agent, sepId, proposalPk }
       );
     }
 
     return this.dataSource
-      .updateTimeAllocation(sepId, proposalId, sepTimeAllocation)
+      .updateTimeAllocation(sepId, proposalPk, sepTimeAllocation)
       .catch((err) => {
         return rejection(
           'Could not update SEP proposal time allocation',
-          { agent, sepId, proposalId, sepTimeAllocation },
+          { agent, sepId, proposalPk, sepTimeAllocation },
           err
         );
       });
@@ -410,10 +394,8 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     args: SaveSEPMeetingDecisionInput
   ): Promise<SepMeetingDecision | Rejection> {
-    const isChairOrSecretaryOfProposal = await this.userAuth.isChairOrSecretaryOfProposal(
-      agent,
-      args.proposalId
-    );
+    const isChairOrSecretaryOfProposal =
+      await this.userAuth.isChairOrSecretaryOfProposal(agent, args.proposalPk);
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
 
     if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
@@ -423,9 +405,9 @@ export default class SEPMutations {
       );
     }
 
-    const proposal = await this.proposalDataSource.get(args.proposalId);
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
 
-    if (!proposal?.id) {
+    if (!proposal?.primaryKey) {
       return rejection(
         'Can not add SEP meeting decision to non existing proposal',
         { args }

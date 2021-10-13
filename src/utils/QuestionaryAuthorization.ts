@@ -3,20 +3,26 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { ProposalEsiDataSource } from '../datasources/ProposalEsiDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { TemplateCategoryId } from '../models/Template';
+import { TemplateGroupId } from '../models/Template';
 import { User, UserWithRole } from '../models/User';
+import { VisitDataSource } from './../datasources/VisitDataSource';
+import { EsiAuthorization } from './EsiAuthorization';
 import { UserAuthorization } from './UserAuthorization';
+import { VisitAuthorization } from './VisitAuthorization';
 
-interface QuestionaryAuthorizer {
+export interface QuestionaryAuthorizer {
   hasReadRights(agent: User | null, questionaryId: number): Promise<boolean>;
   hasWriteRights(agent: User | null, questionaryId: number): Promise<boolean>;
 }
 
+// TODO move QuestionaryAuthorizers to separate files
 @injectable()
 export class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
   constructor(
@@ -41,6 +47,16 @@ export class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
         questionaryIds: [questionaryId],
       })
     ).proposals[0];
+
+    if (!proposal) {
+      // there is no proposal associated with the questionary
+      logger.logError(
+        'Authorizer failed unexpectedly, because is no proposal is associated with the questionary',
+        { agent, questionaryId }
+      );
+
+      return false;
+    }
 
     const hasActiveCall = await this.callDataSource.checkActiveCall(
       proposal.callId
@@ -109,7 +125,7 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
 
     const sample = queryResult[0];
 
-    const proposal = await this.proposalDataSource.get(sample.proposalId);
+    const proposal = await this.proposalDataSource.get(sample.proposalPk);
 
     if (!proposal) {
       logger.logError('Could not find proposal for questionary', {
@@ -125,7 +141,8 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
 
 @injectable()
 class ShipmentDeclarationQuestionaryAuthorizer
-  implements QuestionaryAuthorizer {
+  implements QuestionaryAuthorizer
+{
   constructor(
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
@@ -165,7 +182,7 @@ class ShipmentDeclarationQuestionaryAuthorizer
 
     const shipment = queryResult[0];
 
-    const proposal = await this.proposalDataSource.get(shipment.proposalId);
+    const proposal = await this.proposalDataSource.get(shipment.proposalPk);
 
     if (!proposal) {
       logger.logError('Could not find proposal for questionary', {
@@ -180,8 +197,187 @@ class ShipmentDeclarationQuestionaryAuthorizer
 }
 
 @injectable()
+class VisitQuestionaryAuthorizer implements QuestionaryAuthorizer {
+  constructor(
+    @inject(Tokens.VisitDataSource)
+    private visitDataSource: VisitDataSource,
+    @inject(Tokens.VisitAuthorization)
+    private visitAuth: VisitAuthorization,
+    @inject(Tokens.UserAuthorization)
+    private userAuthorization: UserAuthorization
+  ) {}
+  /**
+   * Visitor has read rights on his and other visitor questionaries
+   * that ar in the same visit
+   * */
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
+    if (!agent) {
+      return false;
+    }
+
+    if (await this.userAuthorization.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const registration = (
+      await this.visitDataSource.getRegistrations({
+        questionaryIds: [questionaryId],
+      })
+    )[0];
+
+    if (!registration) {
+      return false;
+    }
+
+    return this.visitAuth.hasReadRights(agent, registration.visitId);
+  }
+
+  /**
+   * Visitor has write rights only his questionary
+   * */
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
+    if (!agent) {
+      return false;
+    }
+
+    if (await this.userAuthorization.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const registration = (
+      await this.visitDataSource.getRegistrations({
+        questionaryIds: [questionaryId],
+      })
+    )[0];
+
+    if (!registration) {
+      return false;
+    }
+
+    if (registration.isRegistrationSubmitted) {
+      logger.logError('User tried to update visit that is already submitted', {
+        agent,
+        questionaryId,
+        registration,
+      });
+
+      return false;
+    }
+
+    return registration.userId === agent.id;
+  }
+}
+
+@injectable()
+export class ProposalEsiQuestionaryAuthorizer implements QuestionaryAuthorizer {
+  private esiAuth = container.resolve(EsiAuthorization);
+
+  constructor(
+    @inject(Tokens.ProposalEsiDataSource)
+    private proposalEsiDataSource: ProposalEsiDataSource
+  ) {}
+
+  async getEsiId(esiQuestionaryId: number): Promise<number | null> {
+    const esi = await this.proposalEsiDataSource.getEsis({
+      questionaryId: esiQuestionaryId,
+    });
+    if (esi.length !== 1) {
+      return null;
+    }
+
+    return esi[0].id;
+  }
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
+    const esiId = await this.getEsiId(questionaryId);
+    if (esiId === null) {
+      return false;
+    }
+
+    return this.esiAuth.hasReadRights(agent, esiId);
+  }
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
+    const esiId = await this.getEsiId(questionaryId);
+    if (esiId === null) {
+      return false;
+    }
+
+    return this.esiAuth.hasWriteRights(agent, esiId);
+  }
+}
+
+@injectable()
+export class SampleEsiQuestionaryAuthorizer implements QuestionaryAuthorizer {
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
+    //  TODO implement this
+    return true;
+  }
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
+    //  TODO implement this
+    return true;
+  }
+}
+
+@injectable()
+class GenericTemplateQuestionaryAuthorizer implements QuestionaryAuthorizer {
+  constructor(
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.GenericTemplateDataSource)
+    private genericTemplateDataSource: GenericTemplateDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuthorization: UserAuthorization
+  ) {}
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
+    return this.hasRights(agent, questionaryId);
+  }
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
+    return this.hasRights(agent, questionaryId);
+  }
+
+  private async hasRights(agent: UserWithRole | null, questionaryId: number) {
+    if (!agent) {
+      return false;
+    }
+
+    if (this.userAuthorization.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const queryResult =
+      await this.genericTemplateDataSource.getGenericTemplates({
+        filter: { questionaryIds: [questionaryId] },
+      });
+
+    if (queryResult.length !== 1) {
+      logger.logError(
+        'Expected to find exactly one generic template with questionaryId',
+        { questionaryId }
+      );
+
+      return false;
+    }
+
+    const genericTemplate = queryResult[0];
+
+    const proposal = await this.proposalDataSource.get(
+      genericTemplate.proposalPk
+    );
+
+    if (!proposal) {
+      logger.logError('Could not find proposal for questionary', {
+        questionaryId,
+      });
+
+      return false;
+    }
+
+    return this.userAuthorization.hasAccessRights(agent, proposal);
+  }
+}
+@injectable()
 export class QuestionaryAuthorization {
-  private authorizers = new Map<number, QuestionaryAuthorizer>();
+  private authorizers = new Map<TemplateGroupId, QuestionaryAuthorizer>();
+  // TODO obtain authorizer from QuestionaryDefinition
   constructor(
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
@@ -190,34 +386,50 @@ export class QuestionaryAuthorization {
     @inject(Tokens.SampleDataSource) private sampleDataSource: SampleDataSource
   ) {
     this.authorizers.set(
-      TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      TemplateGroupId.PROPOSAL,
       container.resolve(ProposalQuestionaryAuthorizer)
     );
     this.authorizers.set(
-      TemplateCategoryId.SAMPLE_DECLARATION,
+      TemplateGroupId.SAMPLE,
       container.resolve(SampleDeclarationQuestionaryAuthorizer)
     );
     this.authorizers.set(
-      TemplateCategoryId.SHIPMENT_DECLARATION,
+      TemplateGroupId.SHIPMENT,
       container.resolve(ShipmentDeclarationQuestionaryAuthorizer)
+    );
+    this.authorizers.set(
+      TemplateGroupId.VISIT_REGISTRATION,
+      container.resolve(VisitQuestionaryAuthorizer)
+    );
+    this.authorizers.set(
+      TemplateGroupId.PROPOSAL_ESI,
+      container.resolve(ProposalEsiQuestionaryAuthorizer)
+    );
+    this.authorizers.set(
+      TemplateGroupId.SAMPLE_ESI,
+      container.resolve(SampleEsiQuestionaryAuthorizer)
+    );
+    this.authorizers.set(
+      TemplateGroupId.GENERIC_TEMPLATE,
+      container.resolve(GenericTemplateQuestionaryAuthorizer)
     );
   }
 
-  private async getTemplateCategoryIdForQuestionary(questionaryId: number) {
+  private async getTemplateGroupIdForQuestionary(questionaryId: number) {
     const templateId = (
       await this.questionaryDataSource.getQuestionary(questionaryId)
     )?.templateId;
     if (!templateId) return null;
 
-    const categoryId = (await this.templateDataSource.getTemplate(templateId))
-      ?.categoryId;
-    if (!categoryId) return null;
+    const groupId = (await this.templateDataSource.getTemplate(templateId))
+      ?.groupId;
+    if (!groupId) return null;
 
-    return categoryId;
+    return groupId;
   }
 
   private async getAuthorizer(questionaryId: number) {
-    const categoryId = await this.getTemplateCategoryIdForQuestionary(
+    const categoryId = await this.getTemplateGroupIdForQuestionary(
       questionaryId
     );
     if (!categoryId) return null;

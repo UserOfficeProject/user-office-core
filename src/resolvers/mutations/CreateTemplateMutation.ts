@@ -1,14 +1,14 @@
 import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { TemplateCategoryId } from '../../models/Template';
+import { TemplateGroupId } from '../../models/Template';
 import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class CreateTemplateArgs {
-  @Field(() => TemplateCategoryId)
-  categoryId: TemplateCategoryId;
+  @Field(() => TemplateGroupId)
+  groupId: TemplateGroupId;
 
   @Field(() => String)
   name: string;

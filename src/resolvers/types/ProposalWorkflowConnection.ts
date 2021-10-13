@@ -16,7 +16,8 @@ import { StatusChangingEvent } from './StatusChangingEvent';
 
 @ObjectType()
 export class ProposalWorkflowConnection
-  implements Partial<ProposalWorkflowConnectionOrigin> {
+  implements Partial<ProposalWorkflowConnectionOrigin>
+{
   @Field(() => Int)
   public id: number;
 
@@ -56,15 +57,16 @@ export class ProposalWorkflowConnectionGroup {
 
 @Resolver(() => ProposalWorkflowConnection)
 export class ProposalWorkflowConnectionResolver {
-  @FieldResolver(() => [StatusChangingEvent])
+  @FieldResolver(() => [StatusChangingEvent], { nullable: true })
   async statusChangingEvents(
     @Root() proposalWorkflowConnection: ProposalWorkflowConnection,
     @Ctx() context: ResolverContext
   ): Promise<StatusChangingEvent[]> {
-    const statusChangingEvents = await context.queries.proposalSettings.getStatusChangingEventsByConnectionId(
-      context.user,
-      proposalWorkflowConnection.id
-    );
+    const statusChangingEvents =
+      await context.queries.proposalSettings.getStatusChangingEventsByConnectionId(
+        context.user,
+        proposalWorkflowConnection.id
+      );
 
     return isRejection(statusChangingEvents) ? [] : statusChangingEvents;
   }

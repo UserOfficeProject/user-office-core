@@ -25,7 +25,8 @@ import {
 } from './records';
 
 export default class PostgresQuestionaryDataSource
-  implements QuestionaryDataSource {
+  implements QuestionaryDataSource
+{
   async getIsCompleted(questionaryId: number): Promise<boolean> {
     const unFinishedTopics: Topic[] = (
       await database.raw(
@@ -118,16 +119,15 @@ export default class PostgresQuestionaryDataSource
     question_id: string,
     answer: string
   ): Promise<string> {
-    const results:
-      | { count?: string | number | undefined }
-      | undefined = await database
-      .count()
-      .from('answers')
-      .where({
-        questionary_id,
-        question_id,
-      })
-      .first();
+    const results: { count?: string | number | undefined } | undefined =
+      await database
+        .count()
+        .from('answers')
+        .where({
+          questionary_id,
+          question_id,
+        })
+        .first();
 
     const hasEntry = results && results.count !== '0';
     if (hasEntry) {
@@ -152,11 +152,11 @@ export default class PostgresQuestionaryDataSource
   }
 
   async insertFiles(
-    proposal_id: number,
+    proposal_pk: number,
     question_id: string,
     files: string[]
   ): Promise<string[]> {
-    const answerId = await this.getAnswerId(proposal_id, question_id);
+    const answerId = await this.getAnswerId(proposal_pk, question_id);
     if (!answerId) {
       throw new Error(
         `Could not insert files because answer does not exist. AnswerID ${answerId}`
@@ -171,10 +171,10 @@ export default class PostgresQuestionaryDataSource
   }
 
   async deleteFiles(
-    proposal_id: number,
+    proposal_pk: number,
     question_id: string
   ): Promise<string[]> {
-    const answerId = await this.getAnswerId(proposal_id, question_id);
+    const answerId = await this.getAnswerId(proposal_pk, question_id);
     if (!answerId) {
       throw new Error(
         `Could not delete files because answer does not exist. AnswerID ${answerId}`
@@ -188,13 +188,13 @@ export default class PostgresQuestionaryDataSource
   }
 
   private async getAnswerId(
-    proposal_id: number,
+    proposal_pk: number,
     question_id: string
   ): Promise<number | null> {
     const selectResult = await database
       .from('answers')
       .where({
-        proposal_id,
+        proposal_pk,
         question_id,
       })
       .select('answer_id');
@@ -365,6 +365,7 @@ export default class PostgresQuestionaryDataSource
     topicRecords.forEach((topic) => {
       steps.push(
         new QuestionaryStep(
+          questionaryId,
           createTopicObject(topic),
           topic.is_complete || false,
           fields.filter((field) => field.topicId === topic.topic_id)
@@ -373,6 +374,47 @@ export default class PostgresQuestionaryDataSource
     });
 
     return steps;
+  }
+
+  async copyAnswers(
+    sourceQuestionaryId: number,
+    targetQuestionaryId: number
+  ): Promise<void> {
+    const sourceQuestionary = await this.getQuestionary(sourceQuestionaryId);
+    const targetQuestionary = await this.getQuestionary(targetQuestionaryId);
+
+    const sourceTemplateId = sourceQuestionary?.templateId;
+    const targetTemplateId = targetQuestionary?.templateId;
+
+    if (!sourceTemplateId || !targetTemplateId) {
+      throw new Error(
+        'Can not copy questions, because no template for the questionary was found'
+      );
+    }
+    await database.raw(
+      `
+      INSERT INTO 
+      answers(questionary_id, question_id, answer)
+      SELECT :targetQuestionaryId, question_id, answer FROM answers 
+      WHERE question_id IN (
+        SELECT question_id 
+        FROM templates_has_questions
+        WHERE question_id IN
+          (
+            SELECT question_id from templates_has_questions
+            WHERE template_id=:targetTemplateId
+          )
+        AND template_id=:sourceTemplateId
+      )
+      AND questionary_id = :sourceQuestionaryId
+  `,
+      {
+        targetQuestionaryId,
+        targetTemplateId,
+        sourceTemplateId,
+        sourceQuestionaryId,
+      }
+    );
   }
 
   async clone(questionaryId: number): Promise<Questionary> {

@@ -16,7 +16,7 @@ export class SEPReviewer {
 
 export class SEPProposal {
   constructor(
-    public proposalId: number,
+    public proposalPk: number,
     public sepId: number,
     public dateAssigned: Date,
     public sepTimeAllocation: number | null,
@@ -26,7 +26,7 @@ export class SEPProposal {
 
 export class SEPProposalWithReviewGradesAndRanking {
   constructor(
-    public proposalId: number,
+    public proposalPk: number,
     public rankOrder: number | null,
     public reviewGrades: number[]
   ) {}
@@ -34,7 +34,7 @@ export class SEPProposalWithReviewGradesAndRanking {
 
 export class SEPAssignment {
   constructor(
-    public proposalId: number,
+    public proposalPk: number,
     public sepMemberUserId: number | null,
     public sepId: number,
     public dateAssigned: Date,

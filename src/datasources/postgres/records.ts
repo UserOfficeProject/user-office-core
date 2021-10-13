@@ -1,19 +1,23 @@
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
-import { Call } from '../../models/Call';
+import { AllocationTimeUnits, Call } from '../../models/Call';
 import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
 import { Feature, FeatureId } from '../../models/Feature';
+import { GenericTemplate } from '../../models/GenericTemplate';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import { Role } from '../../models/Role';
 import { Sample } from '../../models/Sample';
+import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
+import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { SEP, SEPProposal, SEPAssignment, SEPReviewer } from '../../models/SEP';
 import { SepMeetingDecision } from '../../models/SepMeetingDecision';
+import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import {
   DataType,
@@ -23,14 +27,23 @@ import {
   QuestionTemplateRelation,
   Template,
   TemplateCategory,
+  TemplateGroup,
+  TemplateGroupId,
   Topic,
 } from '../../models/Template';
 import { BasicUserDetails, User } from '../../models/User';
+import { Visit, VisitStatus } from '../../models/Visit';
+import { VisitRegistration } from '../../models/VisitRegistration';
+import {
+  ProposalBookingStatusCore,
+  ScheduledEventBookingType,
+} from '../../resolvers/types/ProposalBooking';
+import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 
 // Interfaces corresponding exactly to database tables
 
 export interface ProposalUserRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly user_id: number;
 }
 
@@ -41,8 +54,18 @@ export interface QuestionaryRecord {
   readonly created_at: Date;
 }
 
+export interface ScheduledEventRecord {
+  readonly scheduled_event_id: number;
+  readonly booking_type: ScheduledEventBookingType;
+  readonly starts_at: Date;
+  readonly ends_at: Date;
+  readonly proposal_booking_id: number;
+  readonly proposal_pk: number;
+  readonly status: ProposalBookingStatusCore;
+}
+
 export interface ProposalRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly title: string;
   readonly abstract: string;
   readonly proposer_id: number;
@@ -50,7 +73,7 @@ export interface ProposalRecord {
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
-  readonly short_code: string;
+  readonly proposal_id: string;
   readonly final_status: number;
   readonly excellence_score: number;
   readonly safety_score: number;
@@ -69,13 +92,13 @@ export interface ProposalRecord {
 }
 
 export interface ProposalViewRecord {
-  readonly id: number;
+  readonly proposal_pk: number;
   readonly title: string;
   readonly proposer_id: number;
   readonly proposal_status_id: number;
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
-  readonly short_code: string;
+  readonly proposal_id: string;
   readonly rank_order: number;
   readonly final_status: number;
   readonly time_allocation: number;
@@ -83,12 +106,14 @@ export interface ProposalViewRecord {
   readonly technical_review_status: number;
   readonly instrument_name: string;
   readonly call_short_code: string;
+  readonly sep_id: number;
   readonly sep_code: string;
   readonly average: number;
   readonly deviation: number;
   readonly instrument_id: number;
   readonly call_id: number;
   readonly submitted: boolean;
+  readonly allocation_time_unit: AllocationTimeUnits;
 }
 
 export interface TopicRecord {
@@ -155,7 +180,7 @@ export interface QuestionTemplateRelRecord {
 
 export interface TemplateRecord {
   readonly template_id: number;
-  readonly category_id: number;
+  readonly group_id: string;
   readonly name: string;
   readonly description: string;
   readonly is_archived: boolean;
@@ -190,6 +215,14 @@ export interface UserRecord {
   readonly orcid_refreshtoken: string;
 }
 
+export interface VisitRegistrationRecord {
+  user_id: number;
+  visit_id: number;
+  registration_questionary_id: number | null;
+  is_registration_submitted: boolean;
+  training_expiry_date: Date | null;
+}
+
 export interface RoleRecord {
   readonly role_id: number;
   readonly short_code: string;
@@ -199,7 +232,7 @@ export interface RoleRecord {
 export interface ReviewRecord {
   readonly review_id: number;
   readonly user_id: number;
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly comment: string;
   readonly grade: number;
   readonly status: number;
@@ -208,7 +241,7 @@ export interface ReviewRecord {
 
 export interface TechnicalReviewRecord {
   readonly technical_review_id: number;
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly comment: string;
   readonly public_comment: string;
   readonly time_allocation: number;
@@ -239,6 +272,10 @@ export interface CallRecord {
   readonly call_review_ended: boolean;
   readonly call_sep_review_ended: boolean;
   readonly template_id: number;
+  readonly esi_template_id: number;
+  readonly allocation_time_unit: AllocationTimeUnits;
+  readonly title: string;
+  readonly description: string;
 }
 
 export interface PageTextRecord {
@@ -297,7 +334,7 @@ export interface SEPRecord {
 }
 
 export interface SEPProposalRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly sep_id: number;
   readonly date_assigned: Date;
   readonly sep_time_allocation: number | null;
@@ -305,7 +342,7 @@ export interface SEPProposalRecord {
 }
 
 export interface SEPAssignmentRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly sep_member_user_id: number;
   readonly sep_id: number;
   readonly date_assigned: Date;
@@ -336,7 +373,7 @@ export interface InstrumentRecord {
 
 export interface InstrumentHasProposalsRecord {
   readonly instrument_id: number;
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly submitted: boolean;
 }
 
@@ -361,7 +398,7 @@ export interface SampleRecord {
   readonly sample_id: number;
   readonly title: string;
   readonly creator_id: number;
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly questionary_id: number;
   readonly question_id: string;
   readonly safety_status: number;
@@ -370,10 +407,11 @@ export interface SampleRecord {
 }
 
 export interface ShipmentRecord {
+  readonly visit_id: number;
   readonly shipment_id: number;
   readonly title: string;
   readonly creator_id: number;
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly questionary_id: number;
   readonly status: string;
   readonly external_ref: string;
@@ -414,7 +452,7 @@ export interface StatusChangingEventRecord {
 }
 
 export interface SepMeetingDecisionRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly comment_for_management: string;
   readonly comment_for_user: string;
   readonly rank_order: number;
@@ -424,13 +462,13 @@ export interface SepMeetingDecisionRecord {
 }
 
 export interface SepProposalWithReviewGradesAndRankingRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly rank_order: number | null;
   readonly review_grades: number[];
 }
 
 export interface ProposalEventsRecord {
-  readonly proposal_id: number;
+  readonly proposal_pk: number;
   readonly proposal_created: boolean;
   readonly proposal_submitted: boolean;
   readonly proposal_feasible: boolean;
@@ -452,6 +490,7 @@ export interface ProposalEventsRecord {
   readonly proposal_sep_meeting_submitted: boolean;
   readonly proposal_instrument_submitted: boolean;
   readonly proposal_accepted: boolean;
+  readonly proposal_reserved: boolean;
   readonly proposal_rejected: boolean;
   readonly proposal_notified: boolean;
 }
@@ -459,6 +498,12 @@ export interface ProposalEventsRecord {
 export interface FeatureRecord {
   readonly feature_id: string;
   readonly is_enabled: boolean;
+  readonly description: string;
+}
+
+export interface SettingsRecord {
+  readonly settings_id: string;
+  readonly settings_value: string;
   readonly description: string;
 }
 
@@ -471,6 +516,49 @@ export interface TokensAndPermissionsRecord {
   readonly name: string;
   readonly access_token: string;
   readonly access_permissions: string;
+}
+
+export interface VisitRecord {
+  readonly visit_id: number;
+  readonly proposal_pk: number;
+  readonly instrument_id: number;
+  readonly status: string;
+  readonly questionary_id: number;
+  readonly creator_id: number;
+  readonly team_lead_user_id: number;
+  readonly scheduled_event_id: number;
+  readonly created_at: Date;
+}
+
+export interface EsiRecord {
+  readonly esi_id: number;
+  readonly visit_id: number;
+  readonly creator_id: number;
+  readonly questionary_id: number;
+  readonly is_submitted: boolean;
+  readonly created_at: Date;
+}
+
+export interface GenericTemplateRecord {
+  readonly generic_template_id: number;
+  readonly title: string;
+  readonly creator_id: number;
+  readonly proposal_pk: number;
+  readonly questionary_id: number;
+  readonly question_id: string;
+  readonly created_at: Date;
+}
+
+export interface SampleEsiRecord {
+  readonly esi_id: number;
+  readonly sample_id: number;
+  readonly questionary_id: number;
+  readonly is_submitted: boolean;
+}
+
+export interface TemplateGroupRecord {
+  readonly template_group_id: string;
+  readonly category_id: number;
 }
 
 export const createTopicObject = (record: TopicRecord) => {
@@ -497,7 +585,7 @@ export const createQuestionObject = (question: QuestionRecord) => {
 export const createProposalTemplateObject = (template: TemplateRecord) => {
   return new Template(
     template.template_id,
-    template.category_id,
+    template.group_id as TemplateGroupId,
     template.name,
     template.description,
     template.is_archived
@@ -506,14 +594,14 @@ export const createProposalTemplateObject = (template: TemplateRecord) => {
 
 export const createProposalObject = (proposal: ProposalRecord) => {
   return new Proposal(
-    proposal.proposal_id,
+    proposal.proposal_pk,
     proposal.title || '',
     proposal.abstract || '',
     proposal.proposer_id,
     proposal.status_id,
     proposal.created_at,
     proposal.updated_at,
-    proposal.short_code,
+    proposal.proposal_id,
     proposal.final_status,
     proposal.call_id,
     proposal.questionary_id,
@@ -530,12 +618,12 @@ export const createProposalObject = (proposal: ProposalRecord) => {
 
 export const createProposalViewObject = (proposal: ProposalViewRecord) => {
   return new ProposalView(
-    proposal.id,
+    proposal.proposal_pk,
     proposal.title || '',
     proposal.proposal_status_id,
     proposal.proposal_status_name,
     proposal.proposal_status_description,
-    proposal.short_code,
+    proposal.proposal_id,
     proposal.rank_order,
     proposal.final_status,
     proposal.time_allocation,
@@ -543,12 +631,14 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.technical_review_status,
     proposal.instrument_name,
     proposal.call_short_code,
+    proposal.sep_id,
     proposal.sep_code,
     proposal.average,
     proposal.deviation,
     proposal.instrument_id,
     proposal.call_id,
-    proposal.submitted
+    proposal.submitted,
+    proposal.allocation_time_unit
   );
 };
 
@@ -640,6 +730,18 @@ export const createBasicUserObject = (user: UserRecord) => {
   );
 };
 
+export const createVisitRegistrationObject = (
+  record: VisitRegistrationRecord
+) => {
+  return new VisitRegistration(
+    record.user_id,
+    record.visit_id,
+    record.registration_questionary_id,
+    record.is_registration_submitted,
+    record.training_expiry_date
+  );
+};
+
 export const createCallObject = (call: CallRecord) => {
   return new Call(
     call.call_id,
@@ -662,7 +764,11 @@ export const createCallObject = (call: CallRecord) => {
     call.call_ended,
     call.call_review_ended,
     call.call_sep_review_ended,
-    call.template_id
+    call.template_id,
+    call.esi_template_id,
+    call.allocation_time_unit,
+    call.title,
+    call.description
   );
 };
 
@@ -689,7 +795,7 @@ export const createSampleObject = (sample: SampleRecord) => {
     sample.sample_id,
     sample.title,
     sample.creator_id,
-    sample.proposal_id,
+    sample.proposal_pk,
     sample.questionary_id,
     sample.question_id,
     sample.safety_status,
@@ -713,8 +819,9 @@ export const createShipmentObject = (shipment: ShipmentRecord) => {
     shipment.shipment_id,
     shipment.title,
     shipment.creator_id,
-    shipment.proposal_id,
+    shipment.proposal_pk,
     shipment.questionary_id,
+    shipment.visit_id,
     shipment.status as ShipmentStatus,
     shipment.external_ref,
     shipment.created_at
@@ -725,6 +832,14 @@ export const createFeatureObject = (record: FeatureRecord) => {
   return new Feature(
     record.feature_id as FeatureId,
     record.is_enabled,
+    record.description
+  );
+};
+
+export const createSettingsObject = (record: SettingsRecord) => {
+  return new Settings(
+    record.settings_id as SettingsId,
+    record.settings_value,
     record.description
   );
 };
@@ -745,7 +860,7 @@ export const createSepMeetingDecisionObject = (
   sepMeetingDecisionRecord: SepMeetingDecisionRecord
 ) => {
   return new SepMeetingDecision(
-    sepMeetingDecisionRecord.proposal_id,
+    sepMeetingDecisionRecord.proposal_pk,
     sepMeetingDecisionRecord.rank_order,
     sepMeetingDecisionRecord.recommendation,
     sepMeetingDecisionRecord.comment_for_user,
@@ -757,7 +872,7 @@ export const createSepMeetingDecisionObject = (
 
 export const createSEPProposalObject = (sepAssignment: SEPProposalRecord) => {
   return new SEPProposal(
-    sepAssignment.proposal_id,
+    sepAssignment.proposal_pk,
     sepAssignment.sep_id,
     sepAssignment.date_assigned,
     sepAssignment.sep_time_allocation,
@@ -768,7 +883,7 @@ export const createSEPAssignmentObject = (
   sepAssignment: SEPAssignmentRecord
 ) => {
   return new SEPAssignment(
-    sepAssignment.proposal_id,
+    sepAssignment.proposal_pk,
     sepAssignment.sep_member_user_id,
     sepAssignment.sep_id,
     sepAssignment.date_assigned,
@@ -785,3 +900,69 @@ export const createSEPReviewerObject = (sepMember: SEPReviewerRecord) => {
 export const createRoleObject = (role: RoleRecord) => {
   return new Role(role.role_id, role.short_code, role.title);
 };
+
+export const createVisitObject = (visit: VisitRecord) => {
+  return new Visit(
+    visit.visit_id,
+    visit.proposal_pk,
+    visit.status as any as VisitStatus,
+    visit.creator_id,
+    visit.team_lead_user_id,
+    visit.scheduled_event_id,
+    visit.created_at
+  );
+};
+
+export const createEsiObject = (esi: EsiRecord) => {
+  return new ExperimentSafetyInput(
+    esi.esi_id,
+    esi.visit_id,
+    esi.creator_id,
+    esi.questionary_id,
+    esi.is_submitted,
+    esi.created_at
+  );
+};
+
+export const createGenericTemplateObject = (
+  genericTemplate: GenericTemplateRecord
+) => {
+  return new GenericTemplate(
+    genericTemplate.generic_template_id,
+    genericTemplate.title,
+    genericTemplate.creator_id,
+    genericTemplate.proposal_pk,
+    genericTemplate.questionary_id,
+    genericTemplate.question_id,
+    genericTemplate.created_at
+  );
+};
+
+export const createSampleEsiObject = (esi: SampleEsiRecord) => {
+  return new SampleExperimentSafetyInput(
+    esi.esi_id,
+    esi.sample_id,
+    esi.questionary_id,
+    esi.is_submitted
+  );
+};
+
+export const createTemplateGroupObject = (group: TemplateGroupRecord) => {
+  return new TemplateGroup(
+    group.template_group_id as TemplateGroupId,
+    group.category_id
+  );
+};
+
+export const createScheduledEventObject = (
+  scheduledEvent: ScheduledEventRecord
+) =>
+  new ScheduledEventCore(
+    scheduledEvent.scheduled_event_id,
+    scheduledEvent.booking_type,
+    scheduledEvent.starts_at,
+    scheduledEvent.ends_at,
+    scheduledEvent.proposal_pk,
+    scheduledEvent.proposal_booking_id,
+    scheduledEvent.status
+  );

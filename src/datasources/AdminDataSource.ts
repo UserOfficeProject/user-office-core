@@ -1,7 +1,8 @@
 import { Page } from '../models/Admin';
-import { Feature } from '../models/Feature';
+import { Feature, FeatureId } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { Permissions } from '../models/Permissions';
+import { Settings, SettingsId } from '../models/Settings';
 import { Unit } from '../models/Unit';
 import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
@@ -22,6 +23,8 @@ export interface AdminDataSource {
   resetDB(includeSeeds: boolean): Promise<string>;
   applyPatches(): Promise<string>;
   getFeatures(): Promise<Feature[]>;
+  setFeatures(features: FeatureId[], value: boolean): Promise<FeatureId[]>;
+  getSettings(): Promise<Settings[]>;
   createUnit(unit: Unit): Promise<Unit | null>;
   deleteUnit(id: number): Promise<Unit>;
   getUnits(): Promise<Unit[]>;
@@ -31,6 +34,11 @@ export interface AdminDataSource {
     accessToken: string
   ): Promise<Permissions>;
   updateApiAccessToken(args: UpdateApiAccessTokenInput): Promise<Permissions>;
+  updateSettings(
+    id: SettingsId,
+    value?: string,
+    description?: string
+  ): Promise<Settings>;
   getTokenAndPermissionsById(accessTokenId: string): Promise<Permissions>;
   getAllTokensAndPermissions(): Promise<Permissions[]>;
   deleteApiAccessToken(accessTokenId: string): Promise<boolean>;

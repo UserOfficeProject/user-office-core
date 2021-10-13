@@ -10,6 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { Sample as SampleOrigin, SampleStatus } from '../../models/Sample';
+import { TemplateCategoryId } from '../../models/Template';
 import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
 
@@ -28,7 +29,7 @@ export class Sample implements Partial<SampleOrigin> {
   public questionaryId: number;
 
   @Field(() => Int)
-  public proposalId: number;
+  public proposalPk: number;
 
   @Field()
   public questionId: string;
@@ -49,10 +50,11 @@ export class SampleResolver {
   async questionary(
     @Root() sample: Sample,
     @Ctx() context: ResolverContext
-  ): Promise<Questionary | null> {
-    return context.queries.questionary.getQuestionary(
+  ): Promise<Questionary> {
+    return context.queries.questionary.getQuestionaryOrDefault(
       context.user,
-      sample.questionaryId
+      sample.questionaryId,
+      TemplateCategoryId.SAMPLE_DECLARATION
     );
   }
 
@@ -61,6 +63,6 @@ export class SampleResolver {
     @Root() sample: Sample,
     @Ctx() context: ResolverContext
   ): Promise<Proposal | null> {
-    return context.queries.proposal.get(context.user, sample.proposalId);
+    return context.queries.proposal.get(context.user, sample.proposalPk);
   }
 }

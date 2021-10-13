@@ -4,7 +4,8 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, EventBus } from '../decorators';
+import { Event } from '../events/event.enum';
 import {
   isMatchingConstraints,
   transformAnswerValueIfNeeded,
@@ -54,13 +55,14 @@ export default class QuestionaryMutations {
   }
 
   @Authorized()
+  @EventBus(Event.TOPIC_ANSWERED)
   async answerTopic(agent: UserWithRole | null, args: AnswerTopicArgs) {
     const { questionaryId, topicId, answers, isPartialSave } = args;
 
     const questionary = await this.dataSource.getQuestionary(questionaryId);
     if (!questionary) {
       return rejection(
-        'Can not answer topic because quesitonary does not exist',
+        'Can not answer topic because questionary does not exist',
         { questionaryId }
       );
     }
@@ -89,10 +91,11 @@ export default class QuestionaryMutations {
 
     for (const answer of answers) {
       if (answer.value !== undefined) {
-        const questionTemplateRelation = await this.templateDataSource.getQuestionTemplateRelation(
-          answer.questionId,
-          questionary.templateId
-        );
+        const questionTemplateRelation =
+          await this.templateDataSource.getQuestionTemplateRelation(
+            answer.questionId,
+            questionary.templateId
+          );
         if (!questionTemplateRelation) {
           return rejection(
             'Can not answer topic because could not find QuestionTemplateRelation',
@@ -108,7 +111,7 @@ export default class QuestionaryMutations {
           !isMatchingConstraints(questionTemplateRelation, value)
         ) {
           return rejection(
-            'Can not answer topic because provided value is not sattisfying constraint',
+            'Can not answer topic because provided value is not satisfying constraint',
             { answer, questionTemplateRelation }
           );
         }

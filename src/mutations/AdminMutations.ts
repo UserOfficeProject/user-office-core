@@ -4,7 +4,7 @@ import {
   createApiAccessTokenValidationSchema,
   updateApiAccessTokenValidationSchema,
 } from '@esss-swap/duo-validation';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
@@ -39,7 +39,10 @@ export default class AdminMutations {
     if (process.env.NODE_ENV === 'development') {
       logger.logWarn('Resetting database', {});
 
-      return this.dataSource.resetDB(includeSeeds);
+      const log = await this.dataSource.resetDB(includeSeeds);
+      container.resolve<() => void>(Tokens.ConfigureEnvironment)();
+
+      return log;
     } else {
       return rejection('Resetting database is not allowed');
     }
@@ -75,7 +78,7 @@ export default class AdminMutations {
   ) {
     const institution = await this.dataSource.getInstitution(args.id);
     if (!institution) {
-      return rejection('Could not retrieve insititutions');
+      return rejection('Could not retrieve institutions');
     }
 
     institution.name = args.name ?? institution.name;

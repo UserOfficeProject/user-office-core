@@ -101,6 +101,10 @@ export default class PostgresCallDataSource implements CallDataSource {
         proposal_sequence: args.proposalSequence,
         proposal_workflow_id: args.proposalWorkflowId,
         template_id: args.templateId,
+        esi_template_id: args.esiTemplateId,
+        allocation_time_unit: args.allocationTimeUnit,
+        title: args.title,
+        description: args.description,
       })
       .into('call')
       .returning('*')
@@ -133,7 +137,7 @@ export default class PostgresCallDataSource implements CallDataSource {
           args.referenceNumberFormat !== preUpdateCall.reference_number_format
         ) {
           const proposals = await database
-            .select('p.proposal_id', 'p.reference_number_sequence')
+            .select('p.proposal_pk', 'p.reference_number_sequence')
             .from('proposals as p')
             .where({ 'p.call_id': preUpdateCall.call_id, 'p.submitted': true })
             .forUpdate()
@@ -144,13 +148,13 @@ export default class PostgresCallDataSource implements CallDataSource {
             async (p) => {
               await database
                 .update({
-                  short_code: await calculateReferenceNumber(
+                  proposal_id: await calculateReferenceNumber(
                     args.referenceNumberFormat,
                     p.reference_number_sequence
                   ),
                 })
                 .from('proposals')
-                .where('proposal_id', p.proposal_id)
+                .where('proposal_pk', p.proposal_pk)
                 .transacting(trx);
             },
             { concurrency: 50 }
@@ -179,6 +183,10 @@ export default class PostgresCallDataSource implements CallDataSource {
               call_review_ended: args.callReviewEnded,
               call_sep_review_ended: args.callSEPReviewEnded,
               template_id: args.templateId,
+              esi_template_id: args.esiTemplateId,
+              allocation_time_unit: args.allocationTimeUnit,
+              title: args.title,
+              description: args.description,
             },
             ['*']
           )

@@ -8,7 +8,7 @@ import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { rejection } from '../models/Rejection';
-import { TemplateCategoryId } from '../models/Template';
+import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { CreateSampleInput } from '../resolvers/mutations/CreateSampleMutations';
 import { UpdateSampleArgs } from '../resolvers/mutations/UpdateSampleMutation';
@@ -41,14 +41,14 @@ export default class SampleMutations {
     }
 
     const template = await this.templateDataSource.getTemplate(args.templateId);
-    if (template?.categoryId !== TemplateCategoryId.SAMPLE_DECLARATION) {
+    if (template?.groupId !== TemplateGroupId.SAMPLE) {
       return rejection('Can not create sample with this template', {
         agent,
         args,
       });
     }
 
-    const proposal = await this.proposalDataSource.get(args.proposalId);
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
     if (!proposal) {
       return rejection('Can not create sample because proposal was not found', {
         agent,
@@ -71,7 +71,7 @@ export default class SampleMutations {
         return this.sampleDataSource.create(
           args.title,
           agent.id,
-          args.proposalId,
+          args.proposalPk,
           questionary.questionaryId,
           args.questionId
         );
@@ -148,7 +148,11 @@ export default class SampleMutations {
   }
 
   @Authorized()
-  async cloneSample(agent: UserWithRole | null, sampleId: number) {
+  async cloneSample(
+    agent: UserWithRole | null,
+    sampleId: number,
+    title?: string
+  ) {
     if (!agent) {
       return rejection(
         'Could not clone sample because user is not authorized',
@@ -166,7 +170,7 @@ export default class SampleMutations {
       let clonedSample = await this.sampleDataSource.cloneSample(sampleId);
       clonedSample = await this.sampleDataSource.updateSample({
         sampleId: clonedSample.id,
-        title: `Copy of ${clonedSample.title}`,
+        title: title ? title : `Copy of ${clonedSample.title}`,
       });
 
       return clonedSample;

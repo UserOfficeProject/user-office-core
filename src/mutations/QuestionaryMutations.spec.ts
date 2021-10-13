@@ -34,11 +34,8 @@ beforeEach(() => {
 });
 
 it('User should answer topic questions', async () => {
-  const {
-    firstAnswer,
-    firstStep,
-    questionaryId,
-  } = await getDummyUsersProposal();
+  const { firstAnswer, firstStep, questionaryId } =
+    await getDummyUsersProposal();
   const result = await mutations.answerTopic(dummyUserWithRole, {
     questionaryId,
     topicId: firstStep.topic.id,
@@ -53,11 +50,8 @@ it('User should answer topic questions', async () => {
 });
 
 it('User should not be able to answer topic questions if proposal has no active call', async () => {
-  const {
-    firstAnswer,
-    firstStep,
-    questionaryId,
-  } = await getDummyUsersProposal();
+  const { firstAnswer, firstStep, questionaryId } =
+    await getDummyUsersProposal();
   const result = await mutations.answerTopic(dummyUserWithRole, {
     questionaryId: questionaryId + 1, // anything other than 1 is considered to have no active call
     topicId: firstStep.topic.id,

@@ -3,8 +3,9 @@ export class Shipment {
     public id: number,
     public title: string,
     public creatorId: number,
-    public proposalId: number,
+    public proposalPk: number,
     public questionaryId: number,
+    public visitId: number,
     public status: ShipmentStatus,
     public externalRef: string,
     public created: Date

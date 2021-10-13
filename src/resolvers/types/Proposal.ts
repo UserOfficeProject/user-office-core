@@ -1,4 +1,5 @@
 import {
+  Arg,
   Ctx,
   Directive,
   Field,
@@ -16,9 +17,12 @@ import {
   ProposalPublicStatus,
 } from '../../models/Proposal';
 import { isRejection } from '../../models/Rejection';
+import { TemplateCategoryId } from '../../models/Template';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { GenericTemplate } from './GenericTemplate';
 import { Instrument } from './Instrument';
+import { ProposalBookingCore, ProposalBookingFilter } from './ProposalBooking';
 import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
@@ -26,12 +30,13 @@ import { Sample } from './Sample';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
 import { TechnicalReview } from './TechnicalReview';
+import { Visit } from './Visit';
 
 @ObjectType()
-@Directive('@key(fields: "id")')
+@Directive('@key(fields: "primaryKey")')
 export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => Int)
-  public id: number;
+  public primaryKey: number;
 
   @Field(() => String)
   public title: string;
@@ -49,7 +54,7 @@ export class Proposal implements Partial<ProposalOrigin> {
   public updated: Date;
 
   @Field(() => String)
-  public shortCode: string;
+  public proposalId: string;
 
   @Field(() => ProposalEndStatus, { nullable: true })
   public finalStatus?: ProposalEndStatus;
@@ -93,7 +98,7 @@ export class ProposalResolver {
   ): Promise<BasicUserDetails[]> {
     const users = await context.queries.user.getProposers(
       context.user,
-      proposal.id
+      proposal.primaryKey
     );
 
     return isRejection(users) ? [] : users;
@@ -126,7 +131,10 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<ProposalPublicStatus> {
-    return context.queries.proposal.getPublicStatus(context.user, proposal.id);
+    return context.queries.proposal.getPublicStatus(
+      context.user,
+      proposal.primaryKey
+    );
   }
 
   @FieldResolver(() => [Review], { nullable: true })
@@ -136,7 +144,7 @@ export class ProposalResolver {
   ): Promise<Review[] | null> {
     return await context.queries.review.reviewsForProposal(
       context.user,
-      proposal.id
+      proposal.primaryKey
     );
   }
 
@@ -147,7 +155,7 @@ export class ProposalResolver {
   ): Promise<TechnicalReview | null> {
     return await context.queries.review.technicalReviewForProposal(
       context.user,
-      proposal.id
+      proposal.primaryKey
     );
   }
 
@@ -156,8 +164,8 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Instrument | null> {
-    return await context.queries.instrument.dataSource.getInstrumentByProposalId(
-      proposal.id
+    return await context.queries.instrument.dataSource.getInstrumentByProposalPk(
+      proposal.primaryKey
     );
   }
 
@@ -166,7 +174,9 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<SEP | null> {
-    return await context.queries.sep.dataSource.getSEPByProposalId(proposal.id);
+    return await context.queries.sep.dataSource.getSEPByProposalPk(
+      proposal.primaryKey
+    );
   }
 
   @FieldResolver(() => Call, { nullable: true })
@@ -177,14 +187,15 @@ export class ProposalResolver {
     return await context.queries.call.dataSource.getCall(proposal.callId);
   }
 
-  @FieldResolver(() => Questionary, { nullable: true })
+  @FieldResolver(() => Questionary)
   async questionary(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Questionary | null> {
-    return context.queries.questionary.getQuestionary(
+  ): Promise<Questionary> {
+    return context.queries.questionary.getQuestionaryOrDefault(
       context.user,
-      proposal.questionaryId
+      proposal.questionaryId,
+      TemplateCategoryId.PROPOSAL_QUESTIONARY
     );
   }
 
@@ -195,7 +206,7 @@ export class ProposalResolver {
   ): Promise<SepMeetingDecision | null> {
     return await context.queries.sep.getProposalSepMeetingDecision(
       context.user,
-      proposal.id
+      proposal.primaryKey
     );
   }
 
@@ -205,7 +216,42 @@ export class ProposalResolver {
     @Ctx() context: ResolverContext
   ): Promise<Sample[] | null> {
     return await context.queries.sample.getSamples(context.user, {
-      filter: { proposalId: proposal.id },
+      filter: { proposalPk: proposal.primaryKey },
+    });
+  }
+
+  @FieldResolver(() => [GenericTemplate], { nullable: true })
+  async genericTemplates(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<GenericTemplate[] | null> {
+    return await context.queries.genericTemplate.getGenericTemplates(
+      context.user,
+      {
+        filter: { proposalPk: proposal.primaryKey },
+      }
+    );
+  }
+
+  @FieldResolver(() => [Visit], { nullable: true })
+  async visits(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Visit[] | null> {
+    return await context.queries.visit.getMyVisits(context.user, {
+      proposalPk: proposal.primaryKey,
+    });
+  }
+  @FieldResolver(() => ProposalBookingCore, { nullable: true })
+  proposalBookingCore(
+    @Root() proposal: Proposal,
+    @Ctx() ctx: ResolverContext,
+    @Arg('filter', () => ProposalBookingFilter, { nullable: true })
+    filter?: ProposalBookingFilter
+  ) {
+    return ctx.queries.proposal.getProposalBookingByProposalPk(ctx.user, {
+      proposalPk: proposal.primaryKey,
+      filter,
     });
   }
 }
@@ -218,11 +264,12 @@ export async function resolveProposalReference(
   // it should be source, args, context, resolveInfo
   // but instead we get source, context and resolveInfo
   // this was the easies way to make the compiler happy and use real types
-  const [reference, ctx]: [Pick<Proposal, 'id'>, ResolverContext] = params;
+  const [reference, ctx]: [Pick<Proposal, 'primaryKey'>, ResolverContext] =
+    params;
 
   // dataSource.get can be null, even with non-null operator the compiler complains
   return (await (ctx.queries.proposal.byRef(
     ctx.user,
-    reference.id
+    reference.primaryKey
   ) as unknown)) as Proposal;
 }

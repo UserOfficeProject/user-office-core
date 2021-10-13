@@ -48,12 +48,12 @@ const shouldMoveToNextStatus = (
 };
 
 const updateProposalStatus = (
-  proposalId: number,
+  proposalPk: number,
   nextProposalStatusId: number
-) => proposalDataSource.updateProposalStatus(proposalId, nextProposalStatusId);
+) => proposalDataSource.updateProposalStatus(proposalPk, nextProposalStatusId);
 
 export type WorkflowEngineProposalType = {
-  id: number;
+  primaryKey: number;
   callId: number;
   statusId: number;
 };
@@ -70,10 +70,11 @@ export const workflowEngine = async (
     return;
   }
 
-  const currentWorkflowConnections = await getProposalWorkflowConnectionByStatusId(
-    proposalWorkflow.id,
-    proposal.statusId
-  );
+  const currentWorkflowConnections =
+    await getProposalWorkflowConnectionByStatusId(
+      proposalWorkflow.id,
+      proposal.statusId
+    );
 
   if (!currentWorkflowConnections.length) {
     return;
@@ -97,28 +98,31 @@ export const workflowEngine = async (
         return;
       }
 
-      const nextWorkflowConnections = await getProposalWorkflowConnectionByStatusId(
-        proposalWorkflow.id,
-        currentWorkflowConnection.nextProposalStatusId,
-        currentWorkflowConnection.proposalStatusId
-      );
+      const nextWorkflowConnections =
+        await getProposalWorkflowConnectionByStatusId(
+          proposalWorkflow.id,
+          currentWorkflowConnection.nextProposalStatusId,
+          currentWorkflowConnection.proposalStatusId
+        );
 
       if (!nextWorkflowConnections?.length) {
         return;
       }
 
-      const statusChangingEvents = await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
-        nextWorkflowConnections.map((connection) => connection.id)
-      );
+      const statusChangingEvents =
+        await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
+          nextWorkflowConnections.map((connection) => connection.id)
+        );
 
       if (!statusChangingEvents) {
         return;
       }
 
-      const eventThatTriggeredStatusChangeIsStatusChangingEvent = statusChangingEvents.find(
-        (statusChangingEvent) =>
-          proposal.currentEvent === statusChangingEvent.statusChangingEvent
-      );
+      const eventThatTriggeredStatusChangeIsStatusChangingEvent =
+        statusChangingEvents.find(
+          (statusChangingEvent) =>
+            proposal.currentEvent === statusChangingEvent.statusChangingEvent
+        );
 
       if (!eventThatTriggeredStatusChangeIsStatusChangingEvent) {
         return;
@@ -128,7 +132,7 @@ export const workflowEngine = async (
         shouldMoveToNextStatus(statusChangingEvents, proposal.proposalEvents)
       ) {
         return updateProposalStatus(
-          proposal.id,
+          proposal.primaryKey,
           currentWorkflowConnection.nextProposalStatusId
         );
       }

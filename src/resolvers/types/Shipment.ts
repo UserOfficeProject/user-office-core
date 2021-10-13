@@ -13,6 +13,7 @@ import {
   Shipment as ShipmentOrigin,
   ShipmentStatus,
 } from '../../models/Shipment';
+import { TemplateCategoryId } from '../../models/Template';
 import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
 import { Sample } from './Sample';
@@ -26,7 +27,7 @@ export class Shipment implements Partial<ShipmentOrigin> {
   public title: string;
 
   @Field(() => Int)
-  public proposalId: number;
+  public proposalPk: number;
 
   @Field(() => ShipmentStatus)
   public status: ShipmentStatus;
@@ -36,6 +37,9 @@ export class Shipment implements Partial<ShipmentOrigin> {
 
   @Field(() => Int)
   public questionaryId: number;
+
+  @Field(() => Int)
+  public visitId: number;
 
   @Field(() => Int)
   public creatorId: number;
@@ -50,10 +54,11 @@ export class ShipmentResolver {
   async questionary(
     @Root() shipment: Shipment,
     @Ctx() context: ResolverContext
-  ): Promise<Questionary | null> {
-    return context.queries.questionary.getQuestionary(
+  ): Promise<Questionary> {
+    return context.queries.questionary.getQuestionaryOrDefault(
       context.user,
-      shipment.questionaryId
+      shipment.questionaryId,
+      TemplateCategoryId.SHIPMENT_DECLARATION
     );
   }
 
@@ -75,7 +80,7 @@ export class ShipmentResolver {
   ): Promise<Proposal | null> {
     const proposal = await context.queries.proposal.get(
       context.user,
-      shipment.proposalId
+      shipment.proposalPk
     );
 
     return proposal;
