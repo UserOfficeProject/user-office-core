@@ -3,7 +3,7 @@ import { logger } from '@esss-swap/duo-logger';
 import { SystemDataSource } from '../SystemDataSource';
 import database from './database';
 
-export default class PostgreSystemDataSource implements SystemDataSource {
+export default class PostgresSystemDataSource implements SystemDataSource {
   async connectivityCheck(): Promise<boolean> {
     try {
       return database
