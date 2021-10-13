@@ -13,6 +13,7 @@ import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateGroupId } from '../models/Template';
 import { User, UserWithRole } from '../models/User';
 import { VisitDataSource } from './../datasources/VisitDataSource';
+import { EsiAuthorization } from './EsiAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 import { VisitAuthorization } from './VisitAuthorization';
 
@@ -269,46 +270,38 @@ class VisitQuestionaryAuthorizer implements QuestionaryAuthorizer {
 
 @injectable()
 export class ProposalEsiQuestionaryAuthorizer implements QuestionaryAuthorizer {
+  private esiAuth = container.resolve(EsiAuthorization);
+
   constructor(
     @inject(Tokens.ProposalEsiDataSource)
-    private proposalEsiDataSource: ProposalEsiDataSource,
-    @inject(Tokens.VisitDataSource)
-    private visitDataSource: VisitDataSource,
-
-    private proposalQuestionaryAuth: ProposalQuestionaryAuthorizer = container.resolve(
-      ProposalQuestionaryAuthorizer
-    )
+    private proposalEsiDataSource: ProposalEsiDataSource
   ) {}
 
-  async getProposalPk(esiQuestionaryId: number): Promise<number | null> {
+  async getEsiId(esiQuestionaryId: number): Promise<number | null> {
     const esi = await this.proposalEsiDataSource.getEsis({
       questionaryId: esiQuestionaryId,
     });
     if (esi.length !== 1) {
       return null;
     }
-    const visit = await this.visitDataSource.getVisit(esi[0].visitId);
-    if (!visit) {
-      return null;
-    }
 
-    return visit.proposalPk;
+    return esi[0].id;
   }
   async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
-    const proposalPk = await this.getProposalPk(questionaryId);
-    if (proposalPk === null) {
+    const esiId = await this.getEsiId(questionaryId);
+    if (esiId === null) {
       return false;
     }
 
-    return this.proposalQuestionaryAuth.hasReadRights(agent, proposalPk);
+    return this.esiAuth.hasReadRights(agent, esiId);
   }
   async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
-    const proposalPk = await this.getProposalPk(questionaryId);
-    if (proposalPk === null) {
+    const esiId = await this.getEsiId(questionaryId);
+    if (esiId === null) {
       return false;
     }
 
-    return this.proposalQuestionaryAuth.hasWriteRights(agent, proposalPk);
+    return this.esiAuth.hasWriteRights(agent, esiId);
   }
 }
 

@@ -30,15 +30,45 @@ export class EsiAuthorization {
 
     return esi;
   }
-  async hasAccessRights(
+
+  async hasReadRights(
     agent: UserWithRole | null,
     esi: ExperimentSafetyInput
   ): Promise<boolean>;
-  async hasAccessRights(
+  async hasReadRights(
     agent: UserWithRole | null,
     esiId: number
   ): Promise<boolean>;
-  async hasAccessRights(
+  async hasReadRights(
+    agent: UserWithRole | null,
+    esiOrEsiId: ExperimentSafetyInput | number
+  ): Promise<boolean> {
+    if (!agent) {
+      return false;
+    }
+
+    const esi = await this.resolveEsi(esiOrEsiId);
+    if (!esi) {
+      return false;
+    }
+    const visit = await this.visitDataSource.getVisit(esi.visitId);
+
+    if (!visit) {
+      return false;
+    }
+
+    return this.userAuth.hasAccessRights(agent, visit.proposalPk);
+  }
+
+  async hasWriteRights(
+    agent: UserWithRole | null,
+    esi: ExperimentSafetyInput
+  ): Promise<boolean>;
+  async hasWriteRights(
+    agent: UserWithRole | null,
+    esiId: number
+  ): Promise<boolean>;
+  async hasWriteRights(
     agent: UserWithRole | null,
     esiOrEsiId: ExperimentSafetyInput | number
   ): Promise<boolean> {
