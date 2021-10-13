@@ -1,0 +1,10 @@
+mutation deleteGenericTemplate($genericTemplateId: Int!) {
+  deleteGenericTemplate(genericTemplateId: $genericTemplateId) {
+    genericTemplate {
+      ...genericTemplate
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
