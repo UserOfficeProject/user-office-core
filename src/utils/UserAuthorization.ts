@@ -62,6 +62,14 @@ export class UserAuthorization {
 
   async isMemberOfProposal(
     agent: User | null,
+    proposalPk: number
+  ): Promise<boolean>;
+  async isMemberOfProposal(
+    agent: User | null,
+    proposal: Proposal | null
+  ): Promise<boolean>;
+  async isMemberOfProposal(
+    agent: User | null,
     proposalOrPk: Proposal | number | null
   ) {
     if (agent == null || proposalOrPk == null) {
