@@ -34,10 +34,7 @@ export default class SampleEsiMutations {
     user: UserWithRole | null,
     args: CreateSampleEsiInput
   ): Promise<SampleExperimentSafetyInput | Rejection> {
-    const hasAccessRights = await this.esiAuth.hasAccessRights(
-      user,
-      args.esiId
-    );
+    const hasAccessRights = await this.esiAuth.hasWriteRights(user, args.esiId);
     if (hasAccessRights === false) {
       return rejection('User does not have permission to create sample ESI', {
         args,
@@ -79,11 +76,8 @@ export default class SampleEsiMutations {
     user: UserWithRole | null,
     args: DeleteSampleEsiInput
   ): Promise<SampleExperimentSafetyInput | Rejection> {
-    const hasAccessRights = await this.esiAuth.hasAccessRights(
-      user,
-      args.esiId
-    );
-    if (hasAccessRights === false) {
+    const hasRights = await this.esiAuth.hasWriteRights(user, args.esiId);
+    if (hasRights === false) {
       return rejection(
         'User does not have permission to delete this sample ESI',
         {
@@ -100,11 +94,8 @@ export default class SampleEsiMutations {
     user: UserWithRole | null,
     args: UpdateSampleEsiArgs
   ): Promise<SampleExperimentSafetyInput | Rejection> {
-    const hasAccessRights = await this.esiAuth.hasAccessRights(
-      user,
-      args.esiId
-    );
-    if (hasAccessRights === false) {
+    const hasRights = await this.esiAuth.hasWriteRights(user, args.esiId);
+    if (hasRights === false) {
       return rejection(
         'User does not have permission to update this sample ESI',
         {
