@@ -23,6 +23,12 @@ mutation createProposal($callId: Int!) {
           isCompleted
         }
       }
+      genericTemplates {
+        ...genericTemplate
+        questionary {
+          isCompleted
+        }
+      }
     }
     rejection {
       ...rejection

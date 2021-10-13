@@ -108,7 +108,7 @@ export const QuestionTemplateRelationFormShell = (
         }}
         className={classes.naturalKey}
       >
-        {props.questionRel.question.naturalKey}
+        Edit {props.questionRel.question.naturalKey}
       </Link>
       <Formik
         initialValues={props.questionRel}

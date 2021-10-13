@@ -48,6 +48,7 @@ import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflow
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
 import UnitTablePage from './settings/unitList/UnitTablePage';
 import ProposalEsiPage from './template/EsiPage';
+import GenericTemplates from './template/GenericTemplates';
 import ProposalTemplates from './template/ProposalTemplates';
 import QuestionsPage from './template/QuestionsPage';
 import SampleEsiPage from './template/SampleEsiPage';
@@ -258,6 +259,7 @@ const Dashboard: React.FC = () => {
             path="/SampleDeclarationTemplates"
             component={SampleTemplatesPage}
           />
+          <Route path="/GenericTemplates" component={GenericTemplates} />
           <Route
             path="/ShipmentDeclarationTemplates"
             component={ShipmentTemplatesPage}

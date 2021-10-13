@@ -267,6 +267,7 @@ export enum DataType {
   DATE = 'DATE',
   EMBELLISHMENT = 'EMBELLISHMENT',
   FILE_UPLOAD = 'FILE_UPLOAD',
+  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
   SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
   TEXT_INPUT = 'TEXT_INPUT',
   SAMPLE_DECLARATION = 'SAMPLE_DECLARATION',
@@ -277,6 +278,7 @@ export enum DataType {
   SHIPMENT_BASIS = 'SHIPMENT_BASIS',
   RICH_TEXT_INPUT = 'RICH_TEXT_INPUT',
   VISIT_BASIS = 'VISIT_BASIS',
+  GENERIC_TEMPLATE_BASIS = 'GENERIC_TEMPLATE_BASIS',
   PROPOSAL_ESI_BASIS = 'PROPOSAL_ESI_BASIS',
   SAMPLE_ESI_BASIS = 'SAMPLE_ESI_BASIS'
 }
@@ -527,7 +529,7 @@ export type FieldConditionInput = {
   params: Scalars['String'];
 };
 
-export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SampleDeclarationConfig | SampleEsiBasisConfig | SubTemplateConfig | ProposalBasisConfig | ProposalEsiBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig | RichTextInputConfig | VisitBasisConfig;
+export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SampleDeclarationConfig | SampleEsiBasisConfig | SubTemplateConfig | ProposalBasisConfig | ProposalEsiBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig | RichTextInputConfig | VisitBasisConfig | GenericTemplateBasisConfig;
 
 export type FieldDependency = {
   __typename?: 'FieldDependency';
@@ -569,6 +571,40 @@ export type FileUploadConfig = {
 export type FinalizeScheduledEventInput = {
   id: Scalars['Int'];
   action: ProposalBookingFinalizeAction;
+};
+
+export type GenericTemplate = {
+  __typename?: 'GenericTemplate';
+  id: Scalars['Int'];
+  title: Scalars['String'];
+  creatorId: Scalars['Int'];
+  questionaryId: Scalars['Int'];
+  proposalPk: Scalars['Int'];
+  questionId: Scalars['String'];
+  created: Scalars['DateTime'];
+  questionary: Questionary;
+  proposal: Proposal;
+};
+
+export type GenericTemplateBasisConfig = {
+  __typename?: 'GenericTemplateBasisConfig';
+  titlePlaceholder: Scalars['String'];
+  questionLabel: Scalars['String'];
+};
+
+export type GenericTemplateResponseWrap = {
+  __typename?: 'GenericTemplateResponseWrap';
+  rejection: Maybe<Rejection>;
+  genericTemplate: Maybe<GenericTemplate>;
+};
+
+export type GenericTemplatesFilter = {
+  title?: Maybe<Scalars['String']>;
+  creatorId?: Maybe<Scalars['Int']>;
+  questionaryIds?: Maybe<Array<Scalars['Int']>>;
+  genericTemplateIds?: Maybe<Array<Scalars['Int']>>;
+  questionId?: Maybe<Scalars['String']>;
+  proposalPk?: Maybe<Scalars['Int']>;
 };
 
 export type HealthStats = {
@@ -677,6 +713,7 @@ export type Mutation = {
   updateCall: CallResponseWrap;
   assignInstrumentsToCall: CallResponseWrap;
   removeAssignedInstrumentFromCall: CallResponseWrap;
+  createGenericTemplate: GenericTemplateResponseWrap;
   changeProposalsStatus: SuccessResponseWrap;
   assignProposalsToInstrument: SuccessResponseWrap;
   removeProposalsFromInstrument: SuccessResponseWrap;
@@ -751,11 +788,13 @@ export type Mutation = {
   addTechnicalReview: TechnicalReviewResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   checkExternalToken: CheckExternalTokenWrap;
+  cloneGenericTemplate: GenericTemplateResponseWrap;
   cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   createProposal: ProposalResponseWrap;
   createVisitRegistrationQuestionary: VisitRegistrationResponseWrap;
   deleteCall: CallResponseWrap;
+  deleteGenericTemplate: GenericTemplateResponseWrap;
   deleteInstitution: InstitutionResponseWrap;
   deleteInstrument: InstrumentResponseWrap;
   deleteProposal: ProposalResponseWrap;
@@ -784,6 +823,7 @@ export type Mutation = {
   submitTechnicalReview: TechnicalReviewResponseWrap;
   token: TokenResponseWrap;
   selectRole: TokenResponseWrap;
+  updateGenericTemplate: GenericTemplateResponseWrap;
   updatePassword: BasicUserDetailsResponseWrap;
   createEquipment: EquipmentResponseWrap;
   updateEquipment: EquipmentResponseWrap;
@@ -853,6 +893,14 @@ export type MutationAssignInstrumentsToCallArgs = {
 
 export type MutationRemoveAssignedInstrumentFromCallArgs = {
   removeAssignedInstrumentFromCallInput: RemoveAssignedInstrumentFromCallInput;
+};
+
+
+export type MutationCreateGenericTemplateArgs = {
+  title: Scalars['String'];
+  templateId: Scalars['Int'];
+  proposalPk: Scalars['Int'];
+  questionId: Scalars['String'];
 };
 
 
@@ -1371,6 +1419,12 @@ export type MutationCheckExternalTokenArgs = {
 };
 
 
+export type MutationCloneGenericTemplateArgs = {
+  title?: Maybe<Scalars['String']>;
+  genericTemplateId: Scalars['Int'];
+};
+
+
 export type MutationCloneSampleArgs = {
   title?: Maybe<Scalars['String']>;
   sampleId: Scalars['Int'];
@@ -1394,6 +1448,11 @@ export type MutationCreateVisitRegistrationQuestionaryArgs = {
 
 export type MutationDeleteCallArgs = {
   id: Scalars['Int'];
+};
+
+
+export type MutationDeleteGenericTemplateArgs = {
+  genericTemplateId: Scalars['Int'];
 };
 
 
@@ -1539,6 +1598,13 @@ export type MutationTokenArgs = {
 export type MutationSelectRoleArgs = {
   token: Scalars['String'];
   selectedRoleId?: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationUpdateGenericTemplateArgs = {
+  genericTemplateId: Scalars['Int'];
+  title?: Maybe<Scalars['String']>;
+  safetyComment?: Maybe<Scalars['String']>;
 };
 
 
@@ -1739,6 +1805,7 @@ export type Proposal = {
   questionary: Questionary;
   sepMeetingDecision: Maybe<SepMeetingDecision>;
   samples: Maybe<Array<Sample>>;
+  genericTemplates: Maybe<Array<GenericTemplate>>;
   visits: Maybe<Array<Visit>>;
   proposalBookingCore: Maybe<ProposalBookingCore>;
   proposalBooking: Maybe<ProposalBooking>;
@@ -2035,6 +2102,8 @@ export type Query = {
   eventLogs: Maybe<Array<EventLog>>;
   features: Array<Feature>;
   fileMetadata: Maybe<Array<FileMetadata>>;
+  genericTemplate: Maybe<GenericTemplate>;
+  genericTemplates: Maybe<Array<GenericTemplate>>;
   allAccessTokensAndPermissions: Maybe<Array<PermissionsWithAccessToken>>;
   queriesAndMutations: Maybe<QueriesAndMutations>;
   accessTokenAndPermissions: Maybe<PermissionsWithAccessToken>;
@@ -2202,6 +2271,16 @@ export type QueryEventLogsArgs = {
 
 export type QueryFileMetadataArgs = {
   fileIds: Array<Scalars['String']>;
+};
+
+
+export type QueryGenericTemplateArgs = {
+  genericTemplateId: Scalars['Int'];
+};
+
+
+export type QueryGenericTemplatesArgs = {
+  filter?: Maybe<GenericTemplatesFilter>;
 };
 
 
@@ -3027,7 +3106,8 @@ export enum TemplateCategoryId {
   PROPOSAL_QUESTIONARY = 'PROPOSAL_QUESTIONARY',
   SAMPLE_DECLARATION = 'SAMPLE_DECLARATION',
   SHIPMENT_DECLARATION = 'SHIPMENT_DECLARATION',
-  VISIT_REGISTRATION = 'VISIT_REGISTRATION'
+  VISIT_REGISTRATION = 'VISIT_REGISTRATION',
+  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE'
 }
 
 export type TemplateGroup = {
@@ -3042,7 +3122,8 @@ export enum TemplateGroupId {
   SAMPLE = 'SAMPLE',
   SAMPLE_ESI = 'SAMPLE_ESI',
   SHIPMENT = 'SHIPMENT',
-  VISIT_REGISTRATION = 'VISIT_REGISTRATION'
+  VISIT_REGISTRATION = 'VISIT_REGISTRATION',
+  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE'
 }
 
 export type TemplateResponseWrap = {
@@ -4431,6 +4512,154 @@ export type GetEventLogsQuery = (
   )>> }
 );
 
+export type CloneGenericTemplateMutationVariables = Exact<{
+  genericTemplateId: Scalars['Int'];
+  title?: Maybe<Scalars['String']>;
+}>;
+
+
+export type CloneGenericTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { cloneGenericTemplate: (
+    { __typename?: 'GenericTemplateResponseWrap' }
+    & { genericTemplate: Maybe<(
+      { __typename?: 'GenericTemplate' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ) }
+      & GenericTemplateFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type CreateGenericTemplateMutationVariables = Exact<{
+  title: Scalars['String'];
+  templateId: Scalars['Int'];
+  proposalPk: Scalars['Int'];
+  questionId: Scalars['String'];
+}>;
+
+
+export type CreateGenericTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { createGenericTemplate: (
+    { __typename?: 'GenericTemplateResponseWrap' }
+    & { genericTemplate: Maybe<(
+      { __typename?: 'GenericTemplate' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ) }
+      & GenericTemplateFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type DeleteGenericTemplateMutationVariables = Exact<{
+  genericTemplateId: Scalars['Int'];
+}>;
+
+
+export type DeleteGenericTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteGenericTemplate: (
+    { __typename?: 'GenericTemplateResponseWrap' }
+    & { genericTemplate: Maybe<(
+      { __typename?: 'GenericTemplate' }
+      & GenericTemplateFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type GenericTemplateFragment = (
+  { __typename?: 'GenericTemplate' }
+  & Pick<GenericTemplate, 'id' | 'title' | 'creatorId' | 'questionaryId' | 'created' | 'proposalPk' | 'questionId'>
+);
+
+export type GetGenericTemplateQueryVariables = Exact<{
+  genericTemplateId: Scalars['Int'];
+}>;
+
+
+export type GetGenericTemplateQuery = (
+  { __typename?: 'Query' }
+  & { genericTemplate: Maybe<(
+    { __typename?: 'GenericTemplate' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & Pick<Questionary, 'isCompleted'>
+      & QuestionaryFragment
+    ) }
+    & GenericTemplateFragment
+  )> }
+);
+
+export type GetGenericTemplatesWithProposalDataQueryVariables = Exact<{
+  filter?: Maybe<GenericTemplatesFilter>;
+}>;
+
+
+export type GetGenericTemplatesWithProposalDataQuery = (
+  { __typename?: 'Query' }
+  & { genericTemplates: Maybe<Array<(
+    { __typename?: 'GenericTemplate' }
+    & { proposal: (
+      { __typename?: 'Proposal' }
+      & Pick<Proposal, 'primaryKey' | 'proposalId'>
+    ) }
+    & GenericTemplateFragment
+  )>> }
+);
+
+export type GetGenericTemplatesWithQuestionaryStatusQueryVariables = Exact<{
+  filter?: Maybe<GenericTemplatesFilter>;
+}>;
+
+
+export type GetGenericTemplatesWithQuestionaryStatusQuery = (
+  { __typename?: 'Query' }
+  & { genericTemplates: Maybe<Array<(
+    { __typename?: 'GenericTemplate' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & Pick<Questionary, 'isCompleted'>
+    ) }
+    & GenericTemplateFragment
+  )>> }
+);
+
+export type UpdateGenericTemplateMutationVariables = Exact<{
+  genericTemplateId: Scalars['Int'];
+  title?: Maybe<Scalars['String']>;
+}>;
+
+
+export type UpdateGenericTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { updateGenericTemplate: (
+    { __typename?: 'GenericTemplateResponseWrap' }
+    & { genericTemplate: Maybe<(
+      { __typename?: 'GenericTemplate' }
+      & GenericTemplateFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
 export type AssignProposalsToInstrumentMutationVariables = Exact<{
   proposals: Array<ProposalPkWithCallId> | ProposalPkWithCallId;
   instrumentId: Scalars['Int'];
@@ -4770,6 +4999,13 @@ export type CreateProposalMutation = (
           & Pick<Questionary, 'isCompleted'>
         ) }
         & SampleFragment
+      )>>, genericTemplates: Maybe<Array<(
+        { __typename?: 'GenericTemplate' }
+        & { questionary: (
+          { __typename?: 'Questionary' }
+          & Pick<Questionary, 'isCompleted'>
+        ) }
+        & GenericTemplateFragment
       )>> }
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
@@ -4922,6 +5158,13 @@ export type GetProposalQuery = (
         & Pick<Questionary, 'isCompleted'>
       ) }
       & SampleFragment
+    )>>, genericTemplates: Maybe<Array<(
+      { __typename?: 'GenericTemplate' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+      ) }
+      & GenericTemplateFragment
     )>> }
     & ProposalFragment
   )> }
@@ -5212,6 +5455,9 @@ export type AnswerFragment = (
   ) | (
     { __typename?: 'VisitBasisConfig' }
     & FieldConfigVisitBasisConfigFragment
+  ) | (
+    { __typename?: 'GenericTemplateBasisConfig' }
+    & FieldConfigGenericTemplateBasisConfigFragment
   ), dependencies: Array<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -6546,7 +6792,12 @@ type FieldConfigVisitBasisConfigFragment = (
   & Pick<VisitBasisConfig, 'small_label' | 'required' | 'tooltip'>
 );
 
-export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSampleDeclarationConfigFragment | FieldConfigSampleEsiBasisConfigFragment | FieldConfigSubTemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigProposalEsiBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment | FieldConfigVisitBasisConfigFragment;
+type FieldConfigGenericTemplateBasisConfigFragment = (
+  { __typename?: 'GenericTemplateBasisConfig' }
+  & Pick<GenericTemplateBasisConfig, 'titlePlaceholder' | 'questionLabel'>
+);
+
+export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSampleDeclarationConfigFragment | FieldConfigSampleEsiBasisConfigFragment | FieldConfigSubTemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigProposalEsiBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment | FieldConfigVisitBasisConfigFragment | FieldConfigGenericTemplateBasisConfigFragment;
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
@@ -6602,6 +6853,9 @@ export type QuestionFragment = (
   ) | (
     { __typename?: 'VisitBasisConfig' }
     & FieldConfigVisitBasisConfigFragment
+  ) | (
+    { __typename?: 'GenericTemplateBasisConfig' }
+    & FieldConfigGenericTemplateBasisConfigFragment
   ) }
 );
 
@@ -6662,6 +6916,9 @@ export type QuestionTemplateRelationFragment = (
   ) | (
     { __typename?: 'VisitBasisConfig' }
     & FieldConfigVisitBasisConfigFragment
+  ) | (
+    { __typename?: 'GenericTemplateBasisConfig' }
+    & FieldConfigGenericTemplateBasisConfigFragment
   ), dependencies: Array<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -6808,6 +7065,9 @@ export type GetQuestionsQuery = (
     ) | (
       { __typename?: 'VisitBasisConfig' }
       & FieldConfigVisitBasisConfigFragment
+    ) | (
+      { __typename?: 'GenericTemplateBasisConfig' }
+      & FieldConfigGenericTemplateBasisConfigFragment
     ), answers: Array<(
       { __typename?: 'AnswerBasic' }
       & Pick<AnswerBasic, 'questionaryId'>
@@ -7813,6 +8073,17 @@ export const EsiFragmentDoc = gql`
   created
 }
     `;
+export const GenericTemplateFragmentDoc = gql`
+    fragment genericTemplate on GenericTemplate {
+  id
+  title
+  creatorId
+  questionaryId
+  created
+  proposalPk
+  questionId
+}
+    `;
 export const CoreTechnicalReviewFragmentDoc = gql`
     fragment coreTechnicalReview on TechnicalReview {
   id
@@ -7989,6 +8260,10 @@ export const FieldConfigFragmentDoc = gql`
     small_label
     required
     tooltip
+  }
+  ... on GenericTemplateBasisConfig {
+    titlePlaceholder
+    questionLabel
   }
 }
     `;
@@ -9037,6 +9312,106 @@ export const GetEventLogsDocument = gql`
   }
 }
     `;
+export const CloneGenericTemplateDocument = gql`
+    mutation cloneGenericTemplate($genericTemplateId: Int!, $title: String) {
+  cloneGenericTemplate(genericTemplateId: $genericTemplateId, title: $title) {
+    genericTemplate {
+      ...genericTemplate
+      questionary {
+        isCompleted
+        ...questionary
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${GenericTemplateFragmentDoc}
+${QuestionaryFragmentDoc}
+${RejectionFragmentDoc}`;
+export const CreateGenericTemplateDocument = gql`
+    mutation createGenericTemplate($title: String!, $templateId: Int!, $proposalPk: Int!, $questionId: String!) {
+  createGenericTemplate(
+    title: $title
+    templateId: $templateId
+    proposalPk: $proposalPk
+    questionId: $questionId
+  ) {
+    genericTemplate {
+      ...genericTemplate
+      questionary {
+        isCompleted
+        ...questionary
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${GenericTemplateFragmentDoc}
+${QuestionaryFragmentDoc}
+${RejectionFragmentDoc}`;
+export const DeleteGenericTemplateDocument = gql`
+    mutation deleteGenericTemplate($genericTemplateId: Int!) {
+  deleteGenericTemplate(genericTemplateId: $genericTemplateId) {
+    genericTemplate {
+      ...genericTemplate
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${GenericTemplateFragmentDoc}
+${RejectionFragmentDoc}`;
+export const GetGenericTemplateDocument = gql`
+    query getGenericTemplate($genericTemplateId: Int!) {
+  genericTemplate(genericTemplateId: $genericTemplateId) {
+    ...genericTemplate
+    questionary {
+      isCompleted
+      ...questionary
+    }
+  }
+}
+    ${GenericTemplateFragmentDoc}
+${QuestionaryFragmentDoc}`;
+export const GetGenericTemplatesWithProposalDataDocument = gql`
+    query getGenericTemplatesWithProposalData($filter: GenericTemplatesFilter) {
+  genericTemplates(filter: $filter) {
+    ...genericTemplate
+    proposal {
+      primaryKey
+      proposalId
+    }
+  }
+}
+    ${GenericTemplateFragmentDoc}`;
+export const GetGenericTemplatesWithQuestionaryStatusDocument = gql`
+    query getGenericTemplatesWithQuestionaryStatus($filter: GenericTemplatesFilter) {
+  genericTemplates(filter: $filter) {
+    ...genericTemplate
+    questionary {
+      isCompleted
+    }
+  }
+}
+    ${GenericTemplateFragmentDoc}`;
+export const UpdateGenericTemplateDocument = gql`
+    mutation updateGenericTemplate($genericTemplateId: Int!, $title: String) {
+  updateGenericTemplate(genericTemplateId: $genericTemplateId, title: $title) {
+    genericTemplate {
+      ...genericTemplate
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${GenericTemplateFragmentDoc}
+${RejectionFragmentDoc}`;
 export const AssignProposalsToInstrumentDocument = gql`
     mutation assignProposalsToInstrument($proposals: [ProposalPkWithCallId!]!, $instrumentId: Int!) {
   assignProposalsToInstrument(proposals: $proposals, instrumentId: $instrumentId) {
@@ -9311,6 +9686,12 @@ export const CreateProposalDocument = gql`
           isCompleted
         }
       }
+      genericTemplates {
+        ...genericTemplate
+        questionary {
+          isCompleted
+        }
+      }
     }
     rejection {
       ...rejection
@@ -9321,6 +9702,7 @@ export const CreateProposalDocument = gql`
 ${QuestionaryFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
 ${SampleFragmentDoc}
+${GenericTemplateFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const DeleteProposalDocument = gql`
     mutation deleteProposal($proposalPk: Int!) {
@@ -9444,13 +9826,20 @@ export const GetProposalDocument = gql`
         isCompleted
       }
     }
+    genericTemplates {
+      ...genericTemplate
+      questionary {
+        isCompleted
+      }
+    }
   }
 }
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
 ${QuestionaryFragmentDoc}
 ${CoreTechnicalReviewFragmentDoc}
-${SampleFragmentDoc}`;
+${SampleFragmentDoc}
+${GenericTemplateFragmentDoc}`;
 export const GetProposalsDocument = gql`
     query getProposals($filter: ProposalsFilter) {
   proposals(filter: $filter) {
@@ -11450,6 +11839,27 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getEventLogs(variables: GetEventLogsQueryVariables): Promise<GetEventLogsQuery> {
       return withWrapper(() => client.request<GetEventLogsQuery>(print(GetEventLogsDocument), variables));
+    },
+    cloneGenericTemplate(variables: CloneGenericTemplateMutationVariables): Promise<CloneGenericTemplateMutation> {
+      return withWrapper(() => client.request<CloneGenericTemplateMutation>(print(CloneGenericTemplateDocument), variables));
+    },
+    createGenericTemplate(variables: CreateGenericTemplateMutationVariables): Promise<CreateGenericTemplateMutation> {
+      return withWrapper(() => client.request<CreateGenericTemplateMutation>(print(CreateGenericTemplateDocument), variables));
+    },
+    deleteGenericTemplate(variables: DeleteGenericTemplateMutationVariables): Promise<DeleteGenericTemplateMutation> {
+      return withWrapper(() => client.request<DeleteGenericTemplateMutation>(print(DeleteGenericTemplateDocument), variables));
+    },
+    getGenericTemplate(variables: GetGenericTemplateQueryVariables): Promise<GetGenericTemplateQuery> {
+      return withWrapper(() => client.request<GetGenericTemplateQuery>(print(GetGenericTemplateDocument), variables));
+    },
+    getGenericTemplatesWithProposalData(variables?: GetGenericTemplatesWithProposalDataQueryVariables): Promise<GetGenericTemplatesWithProposalDataQuery> {
+      return withWrapper(() => client.request<GetGenericTemplatesWithProposalDataQuery>(print(GetGenericTemplatesWithProposalDataDocument), variables));
+    },
+    getGenericTemplatesWithQuestionaryStatus(variables?: GetGenericTemplatesWithQuestionaryStatusQueryVariables): Promise<GetGenericTemplatesWithQuestionaryStatusQuery> {
+      return withWrapper(() => client.request<GetGenericTemplatesWithQuestionaryStatusQuery>(print(GetGenericTemplatesWithQuestionaryStatusDocument), variables));
+    },
+    updateGenericTemplate(variables: UpdateGenericTemplateMutationVariables): Promise<UpdateGenericTemplateMutation> {
+      return withWrapper(() => client.request<UpdateGenericTemplateMutation>(print(UpdateGenericTemplateDocument), variables));
     },
     assignProposalsToInstrument(variables: AssignProposalsToInstrumentMutationVariables): Promise<AssignProposalsToInstrumentMutation> {
       return withWrapper(() => client.request<AssignProposalsToInstrumentMutation>(print(AssignProposalsToInstrumentDocument), variables));
