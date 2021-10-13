@@ -41,7 +41,10 @@ export class GenericTemplatesArgs {
 @Resolver()
 export class GenericTemplatesQuery {
   @Query(() => [GenericTemplate], { nullable: true })
-  async genericTemplates(@Ctx() context: ResolverContext, @Args() args: GenericTemplatesArgs) {
+  async genericTemplates(
+    @Ctx() context: ResolverContext,
+    @Args() args: GenericTemplatesArgs
+  ) {
     const response = await context.queries.genericTemplate.getGenericTemplates(
       context.user,
       args
