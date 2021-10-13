@@ -19,6 +19,8 @@ import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefini
 import { dateDefinition } from './questionaryComponents/DatePicker/DatePickerDefinition';
 import { embellishmentDefinition } from './questionaryComponents/Embellishment/EmbellishmentDefinition';
 import { fileUploadDefinition } from './questionaryComponents/FileUpload/FileUploadDefinition';
+import { genericTemplateDefinition } from './questionaryComponents/GenericTemplate/GenericTemplateDefinition';
+import { genericTemplateBasisDefinition } from './questionaryComponents/GenericTemplateBasis/GenericTemplateBasisDefinition';
 import { intervalDefinition } from './questionaryComponents/Interval/IntervalDefinition';
 import { multipleChoiceDefinition as multiChoiceDefinition } from './questionaryComponents/MultipleChoice/MultipleChoiceDefinition';
 import { numberInputDefinition } from './questionaryComponents/NumberInput/NumberInputDefinition';
@@ -158,6 +160,8 @@ const registry = [
   numberInputDefinition,
   shipmentBasisDefinition,
   richTextInputDefinition,
+  genericTemplateDefinition,
+  genericTemplateBasisDefinition,
   visitBasisDefinition,
 ];
 

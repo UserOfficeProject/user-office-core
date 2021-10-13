@@ -40,6 +40,7 @@ function createProposalStub(
     submitted: false,
     users: [],
     samples: [],
+    genericTemplates: [],
   };
 }
 

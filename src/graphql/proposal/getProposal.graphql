@@ -51,5 +51,11 @@ query getProposal($primaryKey: Int!) {
         isCompleted
       }
     }
+    genericTemplates {
+      ...genericTemplate
+      questionary {
+        isCompleted
+      }
+    }
   }
 }
