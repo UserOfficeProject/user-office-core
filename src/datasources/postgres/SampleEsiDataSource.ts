@@ -56,7 +56,7 @@ class PostgresSampleEsiDataSource implements SampleEsiDataSource {
   }
 
   // Update
-  updateSampleEsi(
+  async updateSampleEsi(
     args: UpdateSampleEsiArgs & { questionaryId?: number }
   ): Promise<SampleExperimentSafetyInput> {
     return database('sample_experiment_safety_inputs')
@@ -73,7 +73,7 @@ class PostgresSampleEsiDataSource implements SampleEsiDataSource {
   }
 
   // Delete
-  deleteSampleEsi(
+  async deleteSampleEsi(
     args: DeleteSampleEsiInput
   ): Promise<SampleExperimentSafetyInput> {
     return database('sample_experiment_safety_inputs')
