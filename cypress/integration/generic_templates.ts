@@ -124,6 +124,8 @@ context('GenericTemplates tests', () => {
     cy.get('[data-cy="next-step"]').click();
 
     cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ text: 'Call updated successfully', variant: 'success' });
   });
 
   it('Should have different Question lables for different tables', () => {
@@ -210,7 +212,10 @@ context('GenericTemplates tests', () => {
 
     cy.contains('Proposals').click();
 
-    cy.contains(proposalTitle[1]).parent().find('input[type="checkbox"]').click();
+    cy.contains(proposalTitle[1])
+      .parent()
+      .find('input[type="checkbox"]')
+      .click();
 
     cy.get('[title="Clone proposals to call"]').click();
 
@@ -242,7 +247,7 @@ context('GenericTemplates tests', () => {
       '[data-cy="genericTemplate-declaration-modal"] [data-cy=questionary-title]'
     ).contains(genericTemplateTitle);
   });
-  
+
   it('User should not be able to submit proposal with unfinished genericTemplate', () => {
     cy.login('user');
 
