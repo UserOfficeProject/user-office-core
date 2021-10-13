@@ -7,6 +7,8 @@ import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
 import { embellishmentDefinition } from './Embellishment';
 import { fileUploadDefinition } from './FileUpload';
+import { genericTemplateDefinition } from './GenericTemplate';
+import { genericTemplateBasisDefinition } from './GenericTemplateBasis';
 import { intervalDefinition } from './Interval';
 import { numberInputDefinition } from './NumberInput';
 import { proposalBasisDefinition } from './ProposalBasis';
@@ -66,6 +68,7 @@ const registry = [
   dateDefinition,
   embellishmentDefinition,
   fileUploadDefinition,
+  genericTemplateDefinition,
   selectionFromOptionsDefinition,
   textInputDefinition,
   sampleDeclarationDefinition,
@@ -78,6 +81,7 @@ const registry = [
   shipmentBasis,
   richTextInputDefinition,
   visitBasisDefinition,
+  genericTemplateBasisDefinition,
 ];
 
 Object.freeze(registry);

@@ -20,6 +20,7 @@ import { isRejection } from '../../models/Rejection';
 import { TemplateCategoryId } from '../../models/Template';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { GenericTemplate } from './GenericTemplate';
 import { Instrument } from './Instrument';
 import { ProposalBookingCore, ProposalBookingFilter } from './ProposalBooking';
 import { ProposalStatus } from './ProposalStatus';
@@ -217,6 +218,19 @@ export class ProposalResolver {
     return await context.queries.sample.getSamples(context.user, {
       filter: { proposalPk: proposal.primaryKey },
     });
+  }
+
+  @FieldResolver(() => [GenericTemplate], { nullable: true })
+  async genericTemplates(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<GenericTemplate[] | null> {
+    return await context.queries.genericTemplate.getGenericTemplates(
+      context.user,
+      {
+        filter: { proposalPk: proposal.primaryKey },
+      }
+    );
   }
 
   @FieldResolver(() => [Visit], { nullable: true })
