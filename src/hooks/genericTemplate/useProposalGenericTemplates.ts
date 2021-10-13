@@ -4,7 +4,9 @@ import { useDataApi } from 'hooks/common/useDataApi';
 import { GenericTemplateCore } from 'models/questionary/genericTemplate/GenericTemplateCore';
 
 export function useProposalGenericTemplates(proposalPk: number | null) {
-  const [genericTemplates, setGenericTemplates] = useState<GenericTemplateCore[]>([]);
+  const [genericTemplates, setGenericTemplates] = useState<
+    GenericTemplateCore[]
+  >([]);
 
   const [loadingGenericTemplates, setLoadingGenericTemplates] = useState(false);
   const api = useDataApi();

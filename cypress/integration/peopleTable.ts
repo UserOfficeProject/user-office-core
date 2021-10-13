@@ -394,10 +394,14 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').find('[title="Next Page"]').click();
 
+      cy.finishedLoading();
+
       cy.get('@modal').find('tr[index="0"] input').check();
       cy.get('@modal').contains('2 user(s) selected');
 
       cy.get('@modal').find('[title="Previous Page"]').click();
+
+      cy.finishedLoading();
 
       cy.get('@modal').find('tr[index="1"] input:checked');
       cy.get('@modal').contains('2 user(s) selected');
@@ -408,6 +412,9 @@ context('PageTable component tests', () => {
       cy.get('@modal').contains('1 user(s) selected');
 
       cy.get('@modal').find('[title="Next Page"]').click();
+
+      cy.finishedLoading();
+
       cy.get('@modal').find('tr[index="0"] input:checked');
       cy.get('@modal').contains('1 user(s) selected');
     });
