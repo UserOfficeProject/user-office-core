@@ -229,7 +229,8 @@ export default class UserMutations {
           args.telephone_alt
         )) as UserWithRole;
       } catch (error) {
-        if ('code' in error && error.code === '23505') {
+        // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
+        if ((error as { code: string }).code === '23503') {
           return rejection(
             'Can not create user because account already exists',
             { args },
@@ -463,10 +464,13 @@ export default class UserMutations {
     try {
       const decoded = verifyToken<AuthJwtPayload>(token);
 
-      // TODO: fixme
-      const currentRole = decoded.roles.find(
+      const currentRole = decoded.roles?.find(
         (role: Role) => role.id === selectedRoleId
-      )!;
+      );
+
+      if (!currentRole) {
+        return rejection('User role not found', { selectedRoleId });
+      }
 
       const tokenWithRole = signToken<AuthJwtPayload>({
         user: decoded.user,

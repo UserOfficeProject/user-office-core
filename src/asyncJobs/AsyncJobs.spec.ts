@@ -74,7 +74,7 @@ describe('Test if predefined async jobs are running correctly', () => {
     expect(mockedFunction).toHaveBeenCalledTimes(1);
   });
 
-  it('Should run callReviewEnded job two times in 48 hours', (done) => {
+  it('Should run callReviewEnded job once in 24 hours', (done) => {
     const functionWithMockedDataSource = async () => {
       const callsWithEndedReview = await checkCallsReviewEndedJob.functionToRun(
         callDataSourceMock
@@ -103,11 +103,11 @@ describe('Test if predefined async jobs are running correctly', () => {
 
     runAsyncJobs(allJobs);
 
-    clock.tick(2 * 24 * 60 * 60 * 1000);
+    clock.tick(24 * 60 * 60 * 1000);
 
     clock.restore();
 
-    expect(mockedFunction).toHaveBeenCalledTimes(2);
+    expect(mockedFunction).toHaveBeenCalledTimes(1);
   });
 
   it('Should run callSEPReviewEnded job once in 24 hours', (done) => {

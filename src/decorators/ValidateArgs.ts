@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import sanitizeHtml from 'sanitize-html';
 import * as Yup from 'yup';
 
@@ -8,7 +9,7 @@ import { UserWithRole } from '../models/User';
 const schemaValidation = async (
   schema: Yup.AnyObjectSchema,
   inputArgs: unknown
-) => {
+): Promise<any> => {
   try {
     await schema.validate(inputArgs, { abortEarly: false });
   } catch (error) {

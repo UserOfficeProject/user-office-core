@@ -139,7 +139,7 @@ export class EAMAssetRegistrar implements AssetRegistrar {
     try {
       return await client.getToken(tokenParams);
     } catch (error) {
-      logger.logError('Access Token Error', error.message);
+      logger.logException('Access Token Error', error);
       throw new Error('Access Token Error');
     }
   }

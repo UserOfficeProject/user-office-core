@@ -2,7 +2,7 @@ export class Rejection {
   constructor(
     public reason: string,
     public context?: Record<string, unknown>,
-    public exception?: Error
+    public exception?: Error | unknown
   ) {}
 
   get contextStr() {
@@ -16,18 +16,8 @@ export class Rejection {
 
 export function rejection(
   reason: string,
-  context?: Record<string, unknown>
-): Rejection;
-export function rejection(
-  reason: string,
   context?: Record<string, unknown>,
-  exception?: Error
-): Rejection;
-
-export function rejection(
-  reason: string,
-  context?: Record<string, unknown>,
-  exception?: Error
+  exception?: Error | unknown
 ): Rejection {
   return new Rejection(reason, context, exception);
 }

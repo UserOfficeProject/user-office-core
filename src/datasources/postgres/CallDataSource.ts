@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import BluePromise from 'bluebird';
 
 import { Call } from '../../models/Call';
@@ -118,7 +119,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async update(args: UpdateCallInput): Promise<Call> {
-    const call: CallRecord[] = await database.transaction(async (trx) => {
+    const call = await database.transaction(async (trx) => {
       try {
         /*
          * Check if the reference number format has been changed,
@@ -196,13 +197,15 @@ export default class PostgresCallDataSource implements CallDataSource {
 
         return await trx.commit(callUpdate);
       } catch (error) {
-        throw new Error(
-          `Could not update call with id '${args.id}' because: '${error.message}'`
+        logger.logException(
+          `Could not update call with id '${args.id}'`,
+          error
         );
+        trx.rollback();
       }
     });
 
-    if (call.length !== 1) {
+    if (call?.length !== 1) {
       throw new Error('Could not update call');
     }
 

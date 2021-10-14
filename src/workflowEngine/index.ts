@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
 import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import { ProposalEventsRecord } from '../datasources/postgres/records';
+import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 
