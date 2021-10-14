@@ -87,10 +87,8 @@ function QuestionaryComponentGenericTemplate(
   const { api } = useDataApiWithFeedback();
   const classes = useStyles();
 
-  const [
-    selectedGenericTemplate,
-    setSelectedGenericTemplate,
-  ] = useState<GenericTemplateWithQuestionary | null>(null);
+  const [selectedGenericTemplate, setSelectedGenericTemplate] =
+    useState<GenericTemplateWithQuestionary | null>(null);
 
   if (!state) {
     throw new Error(createMissingContextErrorMessage());

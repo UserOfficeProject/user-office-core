@@ -48,7 +48,8 @@ const GenericTemplateQuestionaryStepView = ({
 };
 
 export class GenericTemplateStepDisplayElementFactory
-  implements StepDisplayElementFactory {
+  implements StepDisplayElementFactory
+{
   getDisplayElement(wizardStep: WizardStep, isReadonly: boolean) {
     switch (wizardStep.type) {
       case 'QuestionaryStep':

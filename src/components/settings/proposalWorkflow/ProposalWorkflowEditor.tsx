@@ -28,10 +28,8 @@ import ProposalWorkflowMetadataEditor from './ProposalWorkflowMetadataEditor';
 
 const ProposalWorkflowEditor: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const {
-    proposalStatuses,
-    loadingProposalStatuses,
-  } = useProposalStatusesData();
+  const { proposalStatuses, loadingProposalStatuses } =
+    useProposalStatusesData();
   const reducerMiddleware = () => {
     return (next: FunctionType) => (action: Event) => {
       next(action);
@@ -48,7 +46,8 @@ const ProposalWorkflowEditor: React.FC = () => {
     reducerMiddleware,
   ]);
 
-  const proposalWorkflowConnectionsPartOfWorkflow: ProposalWorkflowConnection[] = [];
+  const proposalWorkflowConnectionsPartOfWorkflow: ProposalWorkflowConnection[] =
+    [];
 
   state.proposalWorkflowConnectionGroups.forEach(
     (proposalWorkflowConnectionGroup) =>

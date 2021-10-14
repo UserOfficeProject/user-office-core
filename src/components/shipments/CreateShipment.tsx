@@ -58,10 +58,8 @@ function CreateShipment({ visit, onShipmentSubmitted }: CreateShipmentProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [blankShipment, setBlankShipment] = useState<ShipmentWithQuestionary>();
-  const [
-    noActiveShipmentTemplates,
-    setNoActiveShipmentTemplates,
-  ] = useState<boolean>(false);
+  const [noActiveShipmentTemplates, setNoActiveShipmentTemplates] =
+    useState<boolean>(false);
 
   useEffect(() => {
     api()

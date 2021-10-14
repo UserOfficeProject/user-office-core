@@ -139,14 +139,12 @@ export function GenericTemplateContainer(props: {
     )
   );
 
-  const {
-    state,
-    dispatch,
-  } = QuestionarySubmissionModel<GenericTemplateSubmissionState>(
-    initialState,
-    [handleEvents],
-    genericTemplatesReducer
-  );
+  const { state, dispatch } =
+    QuestionarySubmissionModel<GenericTemplateSubmissionState>(
+      initialState,
+      [handleEvents],
+      genericTemplatesReducer
+    );
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =

@@ -134,14 +134,12 @@ export default function ProposalEsiContainer(props: ProposalEsiContainerProps) {
     def.wizardStepFactory.getWizardSteps(props.esi.questionary.steps)
   );
 
-  const {
-    state,
-    dispatch,
-  } = QuestionarySubmissionModel<ProposalEsiSubmissionState>(
-    initialState,
-    [handleEvents],
-    proposalEsiReducer
-  );
+  const { state, dispatch } =
+    QuestionarySubmissionModel<ProposalEsiSubmissionState>(
+      initialState,
+      [handleEvents],
+      proposalEsiReducer
+    );
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime = previousInitialEsi === undefined;

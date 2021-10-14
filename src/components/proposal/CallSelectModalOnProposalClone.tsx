@@ -31,76 +31,74 @@ type CallSelectModalOnProposalsCloneProps = {
   cloneProposalsToCall: (call: Call) => Promise<void>;
 };
 
-const CallSelectModalOnProposalsClone: React.FC<CallSelectModalOnProposalsCloneProps> = ({
-  close,
-  cloneProposalsToCall,
-}) => {
-  const classes = useStyles();
-  const { calls, loadingCalls } = useCallsData({ isActive: true });
+const CallSelectModalOnProposalsClone: React.FC<CallSelectModalOnProposalsCloneProps> =
+  ({ close, cloneProposalsToCall }) => {
+    const classes = useStyles();
+    const { calls, loadingCalls } = useCallsData({ isActive: true });
 
-  return (
-    <Container component="main" maxWidth="xs">
-      <Formik
-        initialValues={{
-          selectedCallId: '',
-        }}
-        onSubmit={async (values, actions): Promise<void> => {
-          const selectedCall = calls.find(
-            (call) => call.id === +values.selectedCallId
-          );
+    return (
+      <Container component="main" maxWidth="xs">
+        <Formik
+          initialValues={{
+            selectedCallId: '',
+          }}
+          onSubmit={async (values, actions): Promise<void> => {
+            const selectedCall = calls.find(
+              (call) => call.id === +values.selectedCallId
+            );
 
-          if (!selectedCall) {
-            actions.setFieldError('selectedCallId', 'Required');
+            if (!selectedCall) {
+              actions.setFieldError('selectedCallId', 'Required');
 
-            return;
-          }
+              return;
+            }
 
-          await cloneProposalsToCall(selectedCall);
-          close();
-        }}
-        validationSchema={callSelectModalOnProposalsCloneValidationSchema}
-      >
-        {({ isSubmitting }): JSX.Element => (
-          <Form>
-            <Typography
-              variant="h6"
-              component="h1"
-              className={classes.cardHeader}
-            >
-              Clone proposal/s to call
-            </Typography>
+            await cloneProposalsToCall(selectedCall);
+            close();
+          }}
+          validationSchema={callSelectModalOnProposalsCloneValidationSchema}
+        >
+          {({ isSubmitting }): JSX.Element => (
+            <Form>
+              <Typography
+                variant="h6"
+                component="h1"
+                className={classes.cardHeader}
+              >
+                Clone proposal/s to call
+              </Typography>
 
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <FormikDropdown
-                  name="selectedCallId"
-                  label="Select call"
-                  items={calls.map((call) => ({
-                    value: call.id.toString(),
-                    text: call.shortCode,
-                  }))}
-                  loading={loadingCalls}
-                  required
-                />
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <FormikDropdown
+                    name="selectedCallId"
+                    label="Select call"
+                    items={calls.map((call) => ({
+                      value: call.id.toString(),
+                      text: call.shortCode,
+                    }))}
+                    loading={loadingCalls}
+                    required
+                  />
+                </Grid>
               </Grid>
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              disabled={isSubmitting}
-              data-cy="submit"
-            >
-              Clone to call
-            </Button>
-          </Form>
-        )}
-      </Formik>
-    </Container>
-  );
-};
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                disabled={isSubmitting}
+                data-cy="submit"
+              >
+                Clone to call
+              </Button>
+            </Form>
+          )}
+        </Formik>
+      </Container>
+    );
+  };
 
 CallSelectModalOnProposalsClone.propTypes = {
   close: PropTypes.func.isRequired,

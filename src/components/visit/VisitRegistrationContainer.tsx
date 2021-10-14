@@ -139,14 +139,12 @@ export default function VisitRegistrationContainer(
     def.wizardStepFactory.getWizardSteps(props.registration.questionary.steps)
   );
 
-  const {
-    state,
-    dispatch,
-  } = QuestionarySubmissionModel<VisitRegistrationSubmissionState>(
-    initialState,
-    [handleEvents],
-    visitReducer
-  );
+  const { state, dispatch } =
+    QuestionarySubmissionModel<VisitRegistrationSubmissionState>(
+      initialState,
+      [handleEvents],
+      visitReducer
+    );
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =

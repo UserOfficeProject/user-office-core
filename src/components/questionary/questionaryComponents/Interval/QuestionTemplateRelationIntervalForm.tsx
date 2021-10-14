@@ -20,67 +20,66 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export const QuestionTemplateRelationIntervalForm: FC<QuestionTemplateRelationFormProps> = (
-  props
-) => {
-  const classes = useStyles();
-  const { units } = useUnitsData();
+export const QuestionTemplateRelationIntervalForm: FC<QuestionTemplateRelationFormProps> =
+  (props) => {
+    const classes = useStyles();
+    const { units } = useUnitsData();
 
-  return (
-    <QuestionTemplateRelationFormShell
-      {...props}
-      template={props.template}
-      validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            required: Yup.bool(),
-            units: Yup.array().of(Yup.string()),
+    return (
+      <QuestionTemplateRelationFormShell
+        {...props}
+        template={props.template}
+        validationSchema={Yup.object().shape({
+          question: Yup.object({
+            config: Yup.object({
+              required: Yup.bool(),
+              units: Yup.array().of(Yup.string()),
+            }),
           }),
-        }),
-      })}
-    >
-      {(formikProps) => (
-        <>
-          <QuestionExcerpt question={props.questionRel.question} />
-          <Field
-            name="config.small_label"
-            label="Small label"
-            id="small-label-input"
-            type="text"
-            component={TextField}
-            margin="normal"
-            fullWidth
-            inputProps={{ 'data-cy': 'small-label' }}
-          />
-          <TitledContainer label="Constraints">
+        })}
+      >
+        {(formikProps) => (
+          <>
+            <QuestionExcerpt question={props.questionRel.question} />
             <Field
-              name="config.required"
-              component={FormikUICustomCheckbox}
-              label="Check to make this field mandatory"
+              name="config.small_label"
+              label="Small label"
+              id="small-label-input"
+              type="text"
+              component={TextField}
               margin="normal"
               fullWidth
-              InputProps={{ 'data-cy': 'required' }}
+              inputProps={{ 'data-cy': 'small-label' }}
             />
+            <TitledContainer label="Constraints">
+              <Field
+                name="config.required"
+                component={FormikUICustomCheckbox}
+                label="Check to make this field mandatory"
+                margin="normal"
+                fullWidth
+                InputProps={{ 'data-cy': 'required' }}
+              />
 
-            <Field
-              name="config.units"
-              component={FormikUICustomSelect}
-              multiple
-              label="Units"
-              margin="normal"
-              availableOptions={units.map((unit) => unit.name)}
-              className={classes.units}
-            />
-          </TitledContainer>
+              <Field
+                name="config.units"
+                component={FormikUICustomSelect}
+                multiple
+                label="Units"
+                margin="normal"
+                availableOptions={units.map((unit) => unit.name)}
+                className={classes.units}
+              />
+            </TitledContainer>
 
-          <TitledContainer label="Dependencies">
-            <QuestionDependencyList
-              form={formikProps}
-              template={props.template}
-            />
-          </TitledContainer>
-        </>
-      )}
-    </QuestionTemplateRelationFormShell>
-  );
-};
+            <TitledContainer label="Dependencies">
+              <QuestionDependencyList
+                form={formikProps}
+                template={props.template}
+              />
+            </TitledContainer>
+          </>
+        )}
+      </QuestionTemplateRelationFormShell>
+    );
+  };

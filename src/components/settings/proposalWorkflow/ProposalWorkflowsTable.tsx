@@ -24,10 +24,8 @@ const ProposalWorkflowsTable: React.FC = () => {
     proposalWorkflows,
     setProposalWorkflowsWithLoading: setProposalWorkflows,
   } = useProposalWorkflowsData();
-  const [
-    urlQueryParams,
-    setUrlQueryParams,
-  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
+  const [urlQueryParams, setUrlQueryParams] =
+    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
   const columns = [
     { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },

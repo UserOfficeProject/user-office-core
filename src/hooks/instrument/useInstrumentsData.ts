@@ -10,9 +10,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { Instrument, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useInstrumentsData(
-  callIds?: number[]
-): {
+export function useInstrumentsData(callIds?: number[]): {
   loadingInstruments: boolean;
   instruments: Instrument[];
   setInstrumentsWithLoading: Dispatch<SetStateAction<Instrument[]>>;

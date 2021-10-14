@@ -31,9 +31,8 @@ function QuestionaryComponentProposalEsiBasis(props: BasicComponentProps) {
   const { answer } = props;
   const answerId = answer.question.id;
   const { state } = useContext(QuestionaryContext) as ProposalEsiContextType;
-  const [selectedSampleEsi, setSelectedSampleEsi] = useState<
-    GetSampleEsiQuery['sampleEsi']
-  >(null);
+  const [selectedSampleEsi, setSelectedSampleEsi] =
+    useState<GetSampleEsiQuery['sampleEsi']>(null);
   const { api } = useDataApiWithFeedback();
 
   return (

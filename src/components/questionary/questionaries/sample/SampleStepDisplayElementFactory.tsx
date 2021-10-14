@@ -45,7 +45,8 @@ const SampleQuestionaryStepView = ({
 };
 
 export class SampleStepDisplayElementFactory
-  implements StepDisplayElementFactory {
+  implements StepDisplayElementFactory
+{
   getDisplayElement(wizardStep: WizardStep, isReadonly: boolean) {
     switch (wizardStep.type) {
       case 'QuestionaryStep':

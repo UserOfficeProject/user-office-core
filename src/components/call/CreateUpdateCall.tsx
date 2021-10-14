@@ -39,11 +39,8 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
     TemplateGroupId.PROPOSAL_ESI,
     call?.esiTemplateId
   );
-
-  const {
-    proposalWorkflows,
-    loadingProposalWorkflows,
-  } = useProposalWorkflowsData();
+  const { proposalWorkflows, loadingProposalWorkflows } =
+    useProposalWorkflowsData();
 
   const currentDayStart = new Date();
   currentDayStart.setHours(0, 0, 0, 0);

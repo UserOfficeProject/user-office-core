@@ -39,10 +39,8 @@ const InstrumentTable: React.FC = () => {
     number | null
   >(null);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [
-    urlQueryParams,
-    setUrlQueryParams,
-  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
+  const [urlQueryParams, setUrlQueryParams] =
+    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const onInstrumentDelete = async (instrumentDeletedId: number | string) => {
     return await api('Instrument removed successfully!')

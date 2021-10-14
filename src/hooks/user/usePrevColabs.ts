@@ -11,14 +11,8 @@ import { getCurrentUser } from '../../context/UserContextProvider';
 export function usePrevColabs(
   usersFilter: GetUsersQueryVariables & { refreshData?: boolean }
 ) {
-  const {
-    filter,
-    offset,
-    first,
-    subtractUsers,
-    userRole,
-    refreshData,
-  } = usersFilter;
+  const { filter, offset, first, subtractUsers, userRole, refreshData } =
+    usersFilter;
   const userId = getCurrentUser()?.user.id as number;
 
   const [prevColabUsers, setPrevColabUsers] = useState<{

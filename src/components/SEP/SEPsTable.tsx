@@ -28,11 +28,11 @@ const SEPsTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
   const [sepFilter, setSEPFilter] = useState<undefined | boolean>(true);
   const history = useHistory();
-  const { loadingSEPs, SEPs, setSEPsWithLoading: setSEPs } = useSEPsData(
-    '',
-    sepFilter,
-    currentRole as UserRole
-  );
+  const {
+    loadingSEPs,
+    SEPs,
+    setSEPsWithLoading: setSEPs,
+  } = useSEPsData('', sepFilter, currentRole as UserRole);
   const columns = [
     { title: 'Code', field: 'code' },
     { title: 'Description', field: 'description' },

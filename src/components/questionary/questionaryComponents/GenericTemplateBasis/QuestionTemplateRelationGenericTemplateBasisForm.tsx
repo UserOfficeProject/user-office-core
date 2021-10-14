@@ -9,35 +9,34 @@ import { QuestionTemplateRelationFormProps } from 'components/questionary/Questi
 
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationGenericTemplateBasisForm: FC<QuestionTemplateRelationFormProps> = (
-  props
-) => {
-  return (
-    <QuestionTemplateRelationFormShell
-      {...props}
-      validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            titlePlaceholder: Yup.string(),
-            questionLabel: Yup.string(),
+export const QuestionTemplateRelationGenericTemplateBasisForm: FC<QuestionTemplateRelationFormProps> =
+  (props) => {
+    return (
+      <QuestionTemplateRelationFormShell
+        {...props}
+        validationSchema={Yup.object().shape({
+          question: Yup.object({
+            config: Yup.object({
+              titlePlaceholder: Yup.string(),
+              questionLabel: Yup.string(),
+            }),
           }),
-        }),
-      })}
-    >
-      {() => (
-        <>
-          <TitledContainer label="Question">
-            <Field
-              name="config.questionLabel"
-              label="Question"
-              component={TextField}
-              margin="normal"
-              type="text"
-              inputProps={{ 'data-cy': 'question' }}
-            />
-          </TitledContainer>
-        </>
-      )}
-    </QuestionTemplateRelationFormShell>
-  );
-};
+        })}
+      >
+        {() => (
+          <>
+            <TitledContainer label="Question">
+              <Field
+                name="config.questionLabel"
+                label="Question"
+                component={TextField}
+                margin="normal"
+                type="text"
+                inputProps={{ 'data-cy': 'question' }}
+              />
+            </TitledContainer>
+          </>
+        )}
+      </QuestionTemplateRelationFormShell>
+    );
+  };

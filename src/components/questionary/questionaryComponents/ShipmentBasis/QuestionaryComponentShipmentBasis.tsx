@@ -159,51 +159,49 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
   );
 }
 
-const shipmentBasisPreSubmit = () => async ({
-  api,
-  dispatch,
-  state,
-}: SubmitActionDependencyContainer) => {
-  const shipment = (state as ShipmentSubmissionState).shipment;
-  const title = shipment.title;
-  let shipmentId = shipment.id;
-  let returnValue = state.questionary.questionaryId;
-  if (shipmentId > 0) {
-    const result = await api.updateShipment({
-      title: title,
-      shipmentId: shipment.id,
-      proposalPk: shipment.proposalPk,
-    });
-    if (result.updateShipment.shipment) {
-      dispatch({
-        type: 'SHIPMENT_MODIFIED',
-        shipment: result.updateShipment.shipment,
+const shipmentBasisPreSubmit =
+  () =>
+  async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
+    const shipment = (state as ShipmentSubmissionState).shipment;
+    const title = shipment.title;
+    let shipmentId = shipment.id;
+    let returnValue = state.questionary.questionaryId;
+    if (shipmentId > 0) {
+      const result = await api.updateShipment({
+        title: title,
+        shipmentId: shipment.id,
+        proposalPk: shipment.proposalPk,
       });
-    }
-  } else {
-    const result = await api.createShipment({
-      title: title,
-      proposalPk: shipment.proposalPk,
-      visitId: shipment.visitId,
-    });
-    if (result.createShipment.shipment) {
-      dispatch({
-        type: 'SHIPMENT_CREATED',
-        shipment: result.createShipment.shipment,
-      });
-      shipmentId = result.createShipment.shipment.id;
-      returnValue = result.createShipment.shipment.questionaryId;
+      if (result.updateShipment.shipment) {
+        dispatch({
+          type: 'SHIPMENT_MODIFIED',
+          shipment: result.updateShipment.shipment,
+        });
+      }
     } else {
-      return returnValue;
+      const result = await api.createShipment({
+        title: title,
+        proposalPk: shipment.proposalPk,
+        visitId: shipment.visitId,
+      });
+      if (result.createShipment.shipment) {
+        dispatch({
+          type: 'SHIPMENT_CREATED',
+          shipment: result.createShipment.shipment,
+        });
+        shipmentId = result.createShipment.shipment.id;
+        returnValue = result.createShipment.shipment.questionaryId;
+      } else {
+        return returnValue;
+      }
     }
-  }
 
-  await api.addSamplesToShipment({
-    shipmentId: shipmentId,
-    sampleIds: samplesToSampleIds(shipment.samples),
-  });
+    await api.addSamplesToShipment({
+      shipmentId: shipmentId,
+      sampleIds: samplesToSampleIds(shipment.samples),
+    });
 
-  return returnValue;
-};
+    return returnValue;
+  };
 
 export { QuestionaryComponentShipmentBasis, shipmentBasisPreSubmit };

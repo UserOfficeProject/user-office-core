@@ -126,14 +126,12 @@ export default function ProposalContainer(props: {
     def.wizardStepFactory.getWizardSteps(props.proposal.questionary.steps)
   );
 
-  const {
-    state,
-    dispatch,
-  } = QuestionarySubmissionModel<ProposalSubmissionState>(
-    initialState,
-    [handleEvents, persistProposalModel],
-    proposalReducer
-  );
+  const { state, dispatch } =
+    QuestionarySubmissionModel<ProposalSubmissionState>(
+      initialState,
+      [handleEvents, persistProposalModel],
+      proposalReducer
+    );
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =
