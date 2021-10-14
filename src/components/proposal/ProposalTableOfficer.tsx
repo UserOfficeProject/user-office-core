@@ -72,12 +72,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   confirm,
 }) => {
   const [openAssignment, setOpenAssignment] = useState(false);
-  const [openInstrumentAssignment, setOpenInstrumentAssignment] = useState(
-    false
-  );
-  const [openChangeProposalStatus, setOpenChangeProposalStatus] = useState(
-    false
-  );
+  const [openInstrumentAssignment, setOpenInstrumentAssignment] =
+    useState(false);
+  const [openChangeProposalStatus, setOpenChangeProposalStatus] =
+    useState(false);
   const [selectedProposals, setSelectedProposals] = useState<
     ProposalWithCallInstrumentAndSepId[]
   >([]);
@@ -92,9 +90,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
-  const { loading, setProposalsData, proposalsData } = useProposalsCoreData(
-    proposalFilter
-  );
+  const { loading, setProposalsData, proposalsData } =
+    useProposalsCoreData(proposalFilter);
 
   useEffect(() => {
     setPreselectedProposalsData(proposalsData);

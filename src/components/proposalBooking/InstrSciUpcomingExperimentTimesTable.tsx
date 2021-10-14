@@ -20,14 +20,12 @@ export default function InstrSciUpcomingExperimentTimesTable() {
     urlQueryParams.instrument ? urlQueryParams.instrument : 0
   );
 
-  const {
-    loading,
-    proposalScheduledEvents,
-  } = useProposalBookingsScheduledEvents({
-    onlyUpcoming: true,
-    notDraft: true,
-    instrumentId: selectedInstrumentId,
-  });
+  const { loading, proposalScheduledEvents } =
+    useProposalBookingsScheduledEvents({
+      onlyUpcoming: true,
+      notDraft: true,
+      instrumentId: selectedInstrumentId,
+    });
 
   return (
     <ContentContainer>

@@ -5,12 +5,11 @@ import { QuestionTemplateRelationFormProps } from 'components/questionary/Questi
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationProposalBasisForm: FC<QuestionTemplateRelationFormProps> = (
-  props
-) => {
-  return (
-    <QuestionTemplateRelationFormShell {...props} validationSchema={null}>
-      {() => <QuestionExcerpt question={props.questionRel.question} />}
-    </QuestionTemplateRelationFormShell>
-  );
-};
+export const QuestionTemplateRelationProposalBasisForm: FC<QuestionTemplateRelationFormProps> =
+  (props) => {
+    return (
+      <QuestionTemplateRelationFormShell {...props} validationSchema={null}>
+        {() => <QuestionExcerpt question={props.questionRel.question} />}
+      </QuestionTemplateRelationFormShell>
+    );
+  };

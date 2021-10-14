@@ -5,10 +5,8 @@ import { useDataApi } from 'hooks/common/useDataApi';
 import { GenericTemplateFragment } from '../../generated/sdk';
 
 export function useGenericTemplate(genericTemplateId: number) {
-  const [
-    genericTemplate,
-    setGenericTemplate,
-  ] = useState<GenericTemplateFragment | null>(null);
+  const [genericTemplate, setGenericTemplate] =
+    useState<GenericTemplateFragment | null>(null);
 
   const api = useDataApi();
 

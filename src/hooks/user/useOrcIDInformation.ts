@@ -4,9 +4,8 @@ import { GetOrcIdInformationQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useOrcIDInformation(authorizationCode?: string | null) {
-  const [orcData, setOrcData] = useState<
-    GetOrcIdInformationQuery['getOrcIDInformation']
-  >(null);
+  const [orcData, setOrcData] =
+    useState<GetOrcIdInformationQuery['getOrcIDInformation']>(null);
   const [loading, setLoading] = useState(true);
 
   const api = useDataApi();

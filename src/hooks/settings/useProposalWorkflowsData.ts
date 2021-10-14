@@ -11,9 +11,8 @@ export function useProposalWorkflowsData(): {
   const [proposalWorkflows, setProposalWorkflows] = useState<
     ProposalWorkflow[]
   >([]);
-  const [loadingProposalWorkflows, setLoadingProposalWorkflows] = useState(
-    true
-  );
+  const [loadingProposalWorkflows, setLoadingProposalWorkflows] =
+    useState(true);
 
   const api = useDataApi();
 

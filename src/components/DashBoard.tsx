@@ -159,8 +159,9 @@ const Dashboard: React.FC = () => {
   ]);
 
   const featureContext = useContext(FeatureContext);
-  const isSchedulerEnabled = featureContext.features.get(FeatureId.SCHEDULER)
-    ?.isEnabled;
+  const isSchedulerEnabled = featureContext.features.get(
+    FeatureId.SCHEDULER
+  )?.isEnabled;
 
   const { currentRole } = useContext(UserContext);
   const { calls } = useCallsData({ isActive: true });

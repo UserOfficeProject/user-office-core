@@ -33,8 +33,9 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
 
-  const logoFilename = settings.get(SettingsId.HEADER_LOGO_FILENAME)
-    ?.settingsValue;
+  const logoFilename = settings.get(
+    SettingsId.HEADER_LOGO_FILENAME
+  )?.settingsValue;
   let logo;
   if (logoFilename) {
     logo = require('images/' + logoFilename).default;

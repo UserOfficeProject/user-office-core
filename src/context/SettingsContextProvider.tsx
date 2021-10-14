@@ -22,9 +22,8 @@ const initialSettingsData: SettingsContextData = {
   settings: new Map<SettingsId, Settings>(),
 };
 
-export const SettingsContext = React.createContext<SettingsContextData>(
-  initialSettingsData
-);
+export const SettingsContext =
+  React.createContext<SettingsContextData>(initialSettingsData);
 
 export const SettingsContextProvider: React.FC = (props) => {
   const { settings, loadingSettings } = useSettings();

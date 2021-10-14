@@ -22,10 +22,8 @@ const ApiAccessTokensTable: React.FC = () => {
     apiAccessTokens,
     setApiAccessTokensWithLoading: setApiAccessTokens,
   } = useApiAccessTokensData();
-  const [
-    urlQueryParams,
-    setUrlQueryParams,
-  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
+  const [urlQueryParams, setUrlQueryParams] =
+    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
   const columns = [{ title: 'Name', field: 'name' }];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 

@@ -16,12 +16,8 @@ import QuestionsTableFilter from './QuestionsTableFilter';
 import TemplateCountDetails from './TemplateCountDetails';
 
 function QuestionsPage() {
-  const {
-    questions,
-    setQuestions,
-    setQuestionsFilter,
-    loadingQuestions,
-  } = useCreatableQuestions();
+  const { questions, setQuestions, setQuestionsFilter, loadingQuestions } =
+    useCreatableQuestions();
 
   const { api } = useDataApiWithFeedback();
 

@@ -38,10 +38,8 @@ const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
   selectedProposalStatuses,
 }) => {
   const classes = useStyles();
-  const {
-    proposalStatuses,
-    loadingProposalStatuses,
-  } = useProposalStatusesData();
+  const { proposalStatuses, loadingProposalStatuses } =
+    useProposalStatusesData();
 
   const allSelectedProposalsHaveSameStatus = selectedProposalStatuses.every(
     (item) => item === selectedProposalStatuses[0]

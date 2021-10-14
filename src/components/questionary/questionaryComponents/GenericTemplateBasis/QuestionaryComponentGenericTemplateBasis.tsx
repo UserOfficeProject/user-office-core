@@ -63,47 +63,46 @@ function QuestionaryComponentGenericTemplateBasis(props: BasicComponentProps) {
   );
 }
 
-const genericTemplateBasisPreSubmit = () => async ({
-  api,
-  dispatch,
-  state,
-}: SubmitActionDependencyContainer) => {
-  const genericTemplate = (state as GenericTemplateSubmissionState)
-    .genericTemplate;
-  const title = genericTemplate.title;
+const genericTemplateBasisPreSubmit =
+  () =>
+  async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
+    const genericTemplate = (state as GenericTemplateSubmissionState)
+      .genericTemplate;
+    const title = genericTemplate.title;
 
-  let returnValue = state.questionary.questionaryId;
+    let returnValue = state.questionary.questionaryId;
 
-  if (genericTemplate.id > 0) {
-    const result = await api.updateGenericTemplate({
-      title: title,
-      genericTemplateId: genericTemplate.id,
-    });
-    if (result.updateGenericTemplate.genericTemplate) {
-      dispatch({
-        type: 'GENERIC_TEMPLATE_UPDATED',
-        genericTemplate: result.updateGenericTemplate.genericTemplate,
+    if (genericTemplate.id > 0) {
+      const result = await api.updateGenericTemplate({
+        title: title,
+        genericTemplateId: genericTemplate.id,
       });
-    }
-  } else {
-    const result = await api.createGenericTemplate({
-      title: title,
-      templateId: state.questionary.templateId,
-      proposalPk: genericTemplate.proposalPk,
-      questionId: genericTemplate.questionId,
-    });
-
-    if (result.createGenericTemplate.genericTemplate) {
-      dispatch({
-        type: 'GENERIC_TEMPLATE_CREATED',
-        genericTemplate: result.createGenericTemplate.genericTemplate,
+      if (result.updateGenericTemplate.genericTemplate) {
+        dispatch({
+          type: 'GENERIC_TEMPLATE_UPDATED',
+          genericTemplate: result.updateGenericTemplate.genericTemplate,
+        });
+      }
+    } else {
+      const result = await api.createGenericTemplate({
+        title: title,
+        templateId: state.questionary.templateId,
+        proposalPk: genericTemplate.proposalPk,
+        questionId: genericTemplate.questionId,
       });
-      returnValue = result.createGenericTemplate.genericTemplate.questionaryId;
-    }
-  }
 
-  return returnValue;
-};
+      if (result.createGenericTemplate.genericTemplate) {
+        dispatch({
+          type: 'GENERIC_TEMPLATE_CREATED',
+          genericTemplate: result.createGenericTemplate.genericTemplate,
+        });
+        returnValue =
+          result.createGenericTemplate.genericTemplate.questionaryId;
+      }
+    }
+
+    return returnValue;
+  };
 
 export {
   QuestionaryComponentGenericTemplateBasis,

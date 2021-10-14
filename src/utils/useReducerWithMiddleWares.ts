@@ -15,7 +15,11 @@ function compose(
   if (fns.length === 0) return (arg: any): any => arg;
   if (fns.length === 1) return fns[0];
 
-  return fns.reduce((a: any, b: any) => (...args: any): any => a(b(...args)));
+  return fns.reduce(
+    (a: any, b: any) =>
+      (...args: any): any =>
+        a(b(...args))
+  );
 }
 
 export function useReducerWithMiddleWares<R extends Reducer<any, any>>(

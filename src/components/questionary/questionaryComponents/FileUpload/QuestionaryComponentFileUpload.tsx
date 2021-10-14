@@ -24,9 +24,8 @@ export function QuestionaryComponentFileUpload(
   } = answer;
   const isError = errors[id] ? true : false;
   const config = answer.config as FileUploadConfig;
-  const [stateValue, setStateValue] = useState<FileIdWithCaptionAndFigure[]>(
-    value
-  );
+  const [stateValue, setStateValue] =
+    useState<FileIdWithCaptionAndFigure[]>(value);
 
   useEffect(() => {
     setStateValue(answer.value);
