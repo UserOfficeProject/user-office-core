@@ -8,7 +8,7 @@
     "dateformat": "^4.5.1",
     "faker": "^5.5.3",
     "graphql": "^15.6.0",
-    "graphql-request": "^3.4.0",
+    "graphql-request": "^3.5.0",
     "typescript": "^3.9.10"
   },
   "scripts": {
