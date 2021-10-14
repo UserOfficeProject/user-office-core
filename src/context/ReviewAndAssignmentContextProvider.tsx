@@ -50,9 +50,8 @@ const reducer = (
   }
 };
 
-export const ReviewAndAssignmentContext = React.createContext<ReviewAndAssignmentData>(
-  initialState
-);
+export const ReviewAndAssignmentContext =
+  React.createContext<ReviewAndAssignmentData>(initialState);
 
 export const ReviewAndAssignmentContextProvider: React.FC = (
   props

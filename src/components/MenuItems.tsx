@@ -289,8 +289,9 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const isShipmentFeatureEnabled = !!context.features.get(FeatureId.SHIPPING)
     ?.isEnabled;
 
-  const isSchedulerEnabled = context.features.get(FeatureId.SCHEDULER)
-    ?.isEnabled;
+  const isSchedulerEnabled = context.features.get(
+    FeatureId.SCHEDULER
+  )?.isEnabled;
 
   const user = (
     <div data-cy="user-menu-items">

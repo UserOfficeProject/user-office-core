@@ -14,12 +14,8 @@ const CallReviewAndNotification: React.FC = () => {
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
-  const {
-    startReview,
-    endReview,
-    startSEPReview,
-    endSEPReview,
-  } = formik.values;
+  const { startReview, endReview, startSEPReview, endSEPReview } =
+    formik.values;
 
   useEffect(() => {
     if (endReview && endReview < startReview) {

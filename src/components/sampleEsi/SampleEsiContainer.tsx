@@ -132,14 +132,12 @@ export default function SampleEsiContainer(props: SampleEsiContainerProps) {
     def.wizardStepFactory.getWizardSteps(props.esi.questionary.steps)
   );
 
-  const {
-    state,
-    dispatch,
-  } = QuestionarySubmissionModel<SampleEsiSubmissionState>(
-    initialState,
-    [handleEvents],
-    sampleEsiReducer
-  );
+  const { state, dispatch } =
+    QuestionarySubmissionModel<SampleEsiSubmissionState>(
+      initialState,
+      [handleEvents],
+      sampleEsiReducer
+    );
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime = previousInitialEsi === undefined;

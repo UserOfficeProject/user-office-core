@@ -36,83 +36,82 @@ type AddNewWorkflowConnectionsRowProps = {
   parentDroppableIds: string[];
 };
 
-const AddNewWorkflowConnectionsRow: React.FC<AddNewWorkflowConnectionsRowProps> = ({
-  close,
-  addNewWorkflowConnectionsRow,
-  parentDroppableIds,
-}) => {
-  const classes = useStyles();
+const AddNewWorkflowConnectionsRow: React.FC<AddNewWorkflowConnectionsRowProps> =
+  ({ close, addNewWorkflowConnectionsRow, parentDroppableIds }) => {
+    const classes = useStyles();
 
-  const initialValues: {
-    selectedParentDroppableId: string;
-    numberOfColumns: number | '';
-  } = {
-    selectedParentDroppableId: '',
-    numberOfColumns: '',
-  };
+    const initialValues: {
+      selectedParentDroppableId: string;
+      numberOfColumns: number | '';
+    } = {
+      selectedParentDroppableId: '',
+      numberOfColumns: '',
+    };
 
-  return (
-    <Container component="main" maxWidth="xs">
-      <Formik
-        initialValues={initialValues}
-        onSubmit={async (values): Promise<void> => {
-          addNewWorkflowConnectionsRow(
-            values.numberOfColumns as number,
-            values.selectedParentDroppableId
-          );
-          close();
-        }}
-        validationSchema={addNewWorkflowConnectionsRowValidationSchema}
-      >
-        {({ isSubmitting }): JSX.Element => (
-          <Form>
-            <Typography className={classes.cardHeader}>
-              New workflow connection row
-            </Typography>
+    return (
+      <Container component="main" maxWidth="xs">
+        <Formik
+          initialValues={initialValues}
+          onSubmit={async (values): Promise<void> => {
+            addNewWorkflowConnectionsRow(
+              values.numberOfColumns as number,
+              values.selectedParentDroppableId
+            );
+            close();
+          }}
+          validationSchema={addNewWorkflowConnectionsRowValidationSchema}
+        >
+          {({ isSubmitting }): JSX.Element => (
+            <Form>
+              <Typography className={classes.cardHeader}>
+                New workflow connection row
+              </Typography>
 
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <FormikDropdown
-                  name="selectedParentDroppableId"
-                  label="Select parent droppable group"
-                  items={parentDroppableIds.map((parentDroppableId, index) => ({
-                    value: parentDroppableId,
-                    text: index
-                      ? `Workflow droppable group ${
-                          parentDroppableId.split('_')[1]
-                        }`
-                      : 'Default droppable group',
-                  }))}
-                  required
-                />
-                <FormikDropdown
-                  name="numberOfColumns"
-                  label="Select number of columns"
-                  items={[2, 3, 4].map((numberOfColumn) => ({
-                    value: numberOfColumn,
-                    text: numberOfColumn.toString(),
-                  }))}
-                  required
-                />
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <FormikDropdown
+                    name="selectedParentDroppableId"
+                    label="Select parent droppable group"
+                    items={parentDroppableIds.map(
+                      (parentDroppableId, index) => ({
+                        value: parentDroppableId,
+                        text: index
+                          ? `Workflow droppable group ${
+                              parentDroppableId.split('_')[1]
+                            }`
+                          : 'Default droppable group',
+                      })
+                    )}
+                    required
+                  />
+                  <FormikDropdown
+                    name="numberOfColumns"
+                    label="Select number of columns"
+                    items={[2, 3, 4].map((numberOfColumn) => ({
+                      value: numberOfColumn,
+                      text: numberOfColumn.toString(),
+                    }))}
+                    required
+                  />
+                </Grid>
               </Grid>
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              disabled={isSubmitting}
-              data-cy="submit"
-            >
-              Add row
-            </Button>
-          </Form>
-        )}
-      </Formik>
-    </Container>
-  );
-};
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                disabled={isSubmitting}
+                data-cy="submit"
+              >
+                Add row
+              </Button>
+            </Form>
+          )}
+        </Formik>
+      </Container>
+    );
+  };
 
 AddNewWorkflowConnectionsRow.propTypes = {
   close: PropTypes.func.isRequired,

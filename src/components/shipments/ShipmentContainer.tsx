@@ -122,14 +122,12 @@ export default function ShipmentContainer(props: {
     false,
     def.wizardStepFactory.getWizardSteps(props.shipment.questionary.steps)
   );
-  const {
-    state,
-    dispatch,
-  } = QuestionarySubmissionModel<ShipmentSubmissionState>(
-    initialState,
-    [handleEvents],
-    shipmentReducer
-  );
+  const { state, dispatch } =
+    QuestionarySubmissionModel<ShipmentSubmissionState>(
+      initialState,
+      [handleEvents],
+      shipmentReducer
+    );
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =

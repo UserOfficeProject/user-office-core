@@ -42,10 +42,8 @@ function EditProposalSamples({ proposal, onClose }: EditProposalSamplesProps) {
   const sampleAnswers = filterSampleAnswers(proposal.questionary);
 
   const initialState = new ProposalSubmissionState(proposal, 0, false, []);
-  const {
-    state,
-    dispatch,
-  } = QuestionarySubmissionModel<ProposalSubmissionState>(initialState, []);
+  const { state, dispatch } =
+    QuestionarySubmissionModel<ProposalSubmissionState>(initialState, []);
 
   const { initialValues } = createFormikConfigObjects(
     sampleAnswers,
