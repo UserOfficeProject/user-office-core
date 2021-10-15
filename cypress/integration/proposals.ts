@@ -30,7 +30,11 @@ context('Proposal tests', () => {
 
     cy.contains('New Proposal').click();
 
-    cy.contains('Carl');
+    cy.get('[data-cy=principal-investigator] input').should(
+      'contain.value',
+      'Carl'
+    );
+
     cy.get('[data-cy=edit-proposer-button]').click();
 
     cy.finishedLoading();

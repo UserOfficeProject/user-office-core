@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     opacity: 0.7,
   },
   container: {
-    margin: theme.spacing(1, 0),
+    margin: theme.spacing(2, 0),
   },
 }));
 
@@ -73,9 +73,10 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           data-cy="title"
           margin="dense"
           id="title-input"
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
-      </div>
-      <div className={classes.container}>
         <Field
           name={`${id}.abstract`}
           label="Abstract"
@@ -91,13 +92,16 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           }}
           required
           multiline
-          rowsMax="16"
-          rows="4"
+          maxRows="16"
+          minRows="4"
           fullWidth
           component={TextFieldNoSubmit}
           data-cy="abstract"
           margin="dense"
           id="abstract-input"
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
       </div>
       <ProposalParticipant
@@ -115,7 +119,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         userId={proposer?.id}
       />
       <Participants
-        title="Add Co-Proposers"
+        title="Co-Proposers"
         className={classes.container}
         setUsers={(users: BasicUserDetails[]) => {
           formikProps.setFieldValue(
