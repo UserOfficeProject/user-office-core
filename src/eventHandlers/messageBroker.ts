@@ -25,6 +25,27 @@ type ProposalMessageData = {
   proposer?: { firstName: string; lastName: string; email: string };
 };
 
+let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
+
+const getRabbitMQMessageBroker = () => {
+  if (rabbitMQCachedBroker === null) {
+    rabbitMQCachedBroker = createRabbitMQMessageBroker();
+  }
+
+  return rabbitMQCachedBroker;
+};
+
+const createRabbitMQMessageBroker = () => {
+  const messageBroker = new RabbitMQMessageBroker();
+  messageBroker.setup({
+    hostname: process.env.RABBITMQ_HOSTNAME,
+    username: process.env.RABBITMQ_USERNAME,
+    password: process.env.RABBITMQ_PASSWORD,
+  });
+
+  return messageBroker;
+};
+
 export function createPostToQueueHandler() {
   // return the mapped implementation
   return container.resolve<EventHandler<ApplicationEvent>>(
@@ -73,18 +94,6 @@ const getProposalMessageData = async (proposal: Proposal) => {
   return JSON.stringify(messageData);
 };
 
-const rabbitMQ = new RabbitMQMessageBroker();
-
-// don't try to initialize during testing
-// causes infinite loop
-if (process.env.NODE_ENV !== 'test') {
-  rabbitMQ.setup({
-    hostname: process.env.RABBITMQ_HOSTNAME,
-    username: process.env.RABBITMQ_USERNAME,
-    password: process.env.RABBITMQ_PASSWORD,
-  });
-}
-
 const getSecondsPerAllocationTimeUnit = (
   timeAllocation: number,
   unit: AllocationTimeUnits
@@ -99,6 +108,8 @@ const getSecondsPerAllocationTimeUnit = (
 };
 
 export function createPostToRabbitMQHandler() {
+  const rabbitMQ = getRabbitMQMessageBroker();
+
   const proposalSettingsDataSource =
     container.resolve<ProposalSettingsDataSource>(
       Tokens.ProposalSettingsDataSource
@@ -243,6 +254,8 @@ export function createPostToRabbitMQHandler() {
 }
 
 export function createListenToRabbitMQHandler() {
+  const rabbitMQ = getRabbitMQMessageBroker();
+
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
