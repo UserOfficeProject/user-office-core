@@ -12,6 +12,7 @@ export const Tokens = {
   SEPDataSource: Symbol('SEPDataSource'),
   SampleDataSource: Symbol('SampleDataSource'),
   GenericTemplateDataSource: Symbol('GenericTemplateDataSource'),
+  ScheduledEventDataSource: Symbol('ScheduledEventDataSource'),
   ShipmentDataSource: Symbol('ShipmentDataSource'),
   SystemDataSource: Symbol('SystemDataSource'),
   TemplateDataSource: Symbol('TemplateDataSource'),

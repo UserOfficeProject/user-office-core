@@ -1,3 +1,4 @@
+import { container } from 'tsyringe';
 import {
   Ctx,
   Field,
@@ -8,11 +9,13 @@ import {
   Root,
 } from 'type-graphql';
 
+import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
+import ScheduledEventDataSource from '../../datasources/postgres/ScheduledEventDataSource';
 import { ExperimentSafetyInput as ExperimentSafetyInputOrigin } from '../../models/ExperimentSafetyInput';
+import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
 import { SampleExperimentSafetyInput } from './SampleExperimentSafetyInput';
-import { Visit } from './Visit';
 
 @ObjectType()
 export class ExperimentSafetyInput
@@ -22,7 +25,7 @@ export class ExperimentSafetyInput
   public id: number;
 
   @Field(() => Int)
-  public visitId: number;
+  public scheduledEventId: number;
 
   @Field(() => Int)
   public creatorId: number;
@@ -49,14 +52,6 @@ export class ExperimentSafetyInputResolver {
     });
   }
 
-  @FieldResolver(() => Visit, { nullable: true })
-  async visit(
-    @Root() esi: ExperimentSafetyInput,
-    @Ctx() context: ResolverContext
-  ): Promise<Visit | null> {
-    return context.queries.visit.getVisit(context.user, esi.visitId);
-  }
-
   @FieldResolver(() => Questionary)
   async questionary(
     @Root() esi: ExperimentSafetyInput,
@@ -66,5 +61,37 @@ export class ExperimentSafetyInputResolver {
       context.user,
       esi.questionaryId
     );
+  }
+
+  @FieldResolver(() => Proposal)
+  async proposal(
+    @Root() esi: ExperimentSafetyInput,
+    @Ctx() context: ResolverContext
+  ): Promise<Proposal> {
+    const scheduledEventDataSource =
+      container.resolve<ScheduledEventDataSource>(
+        Tokens.ScheduledEventDataSource
+      );
+    const scheduledEvent = await scheduledEventDataSource.getScheduledEvent(
+      esi.scheduledEventId
+    );
+    if (scheduledEvent === null || scheduledEvent.proposalPk === null) {
+      throw new Error(
+        'Unexpected error. Scheduled event must have an associated proposal'
+      );
+    }
+
+    const proposal = await context.queries.proposal.get(
+      context.user,
+      scheduledEvent.proposalPk
+    );
+
+    if (proposal === null) {
+      throw new Error(
+        'Unexpected error. Scheduled event proposal does not exist'
+      );
+    }
+
+    return proposal;
   }
 }

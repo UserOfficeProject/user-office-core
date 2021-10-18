@@ -13,6 +13,7 @@ import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDa
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSource';
+import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledEventDataSource';
 import PostgresSEPDataSource from '../datasources/postgres/SEPDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
@@ -42,6 +43,7 @@ mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
 mapClass(Tokens.SampleDataSource, PostgresSampleDataSource);
 mapClass(Tokens.SampleEsiDataSource, PostgresSampleEsiDataSource);
+mapClass(Tokens.ScheduledEventDataSource, PostgresScheduledEventDataSource);
 mapClass(Tokens.SEPDataSource, PostgresSEPDataSource);
 mapClass(Tokens.ShipmentDataSource, PostgresShipmentDataSource);
 mapClass(Tokens.SystemDataSource, PostgresSystemDataSource);

@@ -1,13 +1,14 @@
 import { ExperimentSafetyInput } from '../models/ExperimentSafetyInput';
 import { Rejection } from '../models/Rejection';
 import { GetProposalEsisFilter } from '../queries/ProposalEsiQueries';
-import { CreateEsiArgs } from '../resolvers/mutations/CreateEsiMutation';
 import { UpdateEsiArgs } from '../resolvers/mutations/UpdateEsiMutation';
 
 export interface ProposalEsiDataSource {
   // Create
   createEsi(
-    args: CreateEsiArgs & { questionaryId: number; creatorId: number }
+    scheduledEventId: number,
+    questionaryId: number,
+    creatorId: number
   ): Promise<ExperimentSafetyInput | Rejection>;
 
   // Read

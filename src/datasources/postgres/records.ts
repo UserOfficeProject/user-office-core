@@ -532,7 +532,7 @@ export interface VisitRecord {
 
 export interface EsiRecord {
   readonly esi_id: number;
-  readonly visit_id: number;
+  readonly scheduled_event_id: number;
   readonly creator_id: number;
   readonly questionary_id: number;
   readonly is_submitted: boolean;
@@ -916,7 +916,7 @@ export const createVisitObject = (visit: VisitRecord) => {
 export const createEsiObject = (esi: EsiRecord) => {
   return new ExperimentSafetyInput(
     esi.esi_id,
-    esi.visit_id,
+    esi.scheduled_event_id,
     esi.creator_id,
     esi.questionary_id,
     esi.is_submitted,

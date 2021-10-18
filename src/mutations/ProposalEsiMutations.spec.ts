@@ -24,13 +24,13 @@ beforeEach(() => {
 
 test('A user on the visit can create ESI', () => {
   return expect(
-    mutations.createEsi(dummyUserWithRole, { visitId: 1 })
+    mutations.createEsi(dummyUserWithRole, 1)
   ).resolves.toBeInstanceOf(ExperimentSafetyInput);
 });
 
 test('A user NOT on the visit can NOT create ESI', () => {
   return expect(
-    mutations.createEsi(dummyUserNotOnProposalWithRole, { visitId: 1 })
+    mutations.createEsi(dummyUserNotOnProposalWithRole, 1)
   ).resolves.toBeInstanceOf(Rejection);
 });
 

@@ -5,12 +5,11 @@ import { CallDataSource } from '../datasources/CallDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalEsiDataSource } from '../datasources/ProposalEsiDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { VisitDataSource } from '../datasources/VisitDataSource';
+import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSource';
 import { Authorized } from '../decorators';
 import { ExperimentSafetyInput } from '../models/ExperimentSafetyInput';
 import { rejection, Rejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
-import { CreateEsiArgs } from '../resolvers/mutations/CreateEsiMutation';
 import { UpdateEsiArgs } from '../resolvers/mutations/UpdateEsiMutation';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
@@ -21,8 +20,8 @@ export default class ProposalEsiMutations {
   constructor(
     @inject(Tokens.ProposalEsiDataSource)
     private dataSource: ProposalEsiDataSource,
-    @inject(Tokens.VisitDataSource)
-    private visitDataSource: VisitDataSource,
+    @inject(Tokens.ScheduledEventDataSource)
+    private scheduledEventDataSource: ScheduledEventDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.QuestionaryDataSource)
@@ -34,16 +33,19 @@ export default class ProposalEsiMutations {
   @Authorized()
   async createEsi(
     user: UserWithRole | null,
-    args: CreateEsiArgs
+    scheduledEventId: number
   ): Promise<ExperimentSafetyInput | Rejection> {
-    const visit = await this.visitDataSource.getVisit(args.visitId);
-    if (!visit) {
+    const scheduledEvent =
+      await this.scheduledEventDataSource.getScheduledEvent(scheduledEventId);
+    if (!scheduledEvent?.proposalPk) {
       return rejection(
-        'Can not create ESI, because visit with provided ID does not exist'
+        'Can not create ESI, because scheduled event does not exist or has no proposal attached to it'
       );
     }
 
-    const proposal = await this.proposalDataSource.get(visit.proposalPk);
+    const proposal = await this.proposalDataSource.get(
+      scheduledEvent.proposalPk
+    );
     if (!proposal) {
       return rejection('Can not create ESI, because proposal does not exist');
     }
@@ -74,11 +76,11 @@ export default class ProposalEsiMutations {
       newQuestionaryId
     );
 
-    return this.dataSource.createEsi({
-      ...args,
-      questionaryId: newQuestionaryId,
-      creatorId: user!.id,
-    });
+    return this.dataSource.createEsi(
+      scheduledEventId,
+      newQuestionaryId,
+      user!.id
+    );
   }
 
   @Authorized()

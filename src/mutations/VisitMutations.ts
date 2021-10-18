@@ -3,6 +3,7 @@ import { container, inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
+import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Authorized } from '../decorators';
@@ -32,7 +33,9 @@ export default class VisitMutations {
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
-    private templateDataSource: TemplateDataSource
+    private templateDataSource: TemplateDataSource,
+    @inject(Tokens.ScheduledEventDataSource)
+    private scheduledEventDataSource: ScheduledEventDataSource
   ) {}
 
   @Authorized()
@@ -40,27 +43,6 @@ export default class VisitMutations {
     user: UserWithRole | null,
     args: CreateVisitArgs
   ): Promise<Visit | Rejection> {
-    const proposal = await this.proposalDataSource.get(args.proposalPk);
-    if (!proposal) {
-      return rejection('Can not create visit, proposal does not exist', {
-        args,
-        agent: user,
-      });
-    }
-
-    if (
-      proposal.finalStatus !== ProposalEndStatus.ACCEPTED ||
-      proposal.managementDecisionSubmitted === false
-    ) {
-      return rejection(
-        'Can not create visit, the proposal is not yet accepted',
-        {
-          args,
-          agent: user,
-        }
-      );
-    }
-
     const visitAlreadyExists =
       (
         await this.dataSource.getVisits({
@@ -68,10 +50,61 @@ export default class VisitMutations {
         })
       ).length > 0;
 
-    if (visitAlreadyExists) {
+    if (visitAlreadyExists === true) {
       return rejection(
         'Can not create visit because visit for the experiment that already exists',
         { args }
+      );
+    }
+
+    const scheduledEvent =
+      await this.scheduledEventDataSource.getScheduledEvent(
+        args.scheduledEventId
+      );
+    if (!scheduledEvent) {
+      return rejection(
+        'Can not create visit because scheduled event does not exist',
+        {
+          args,
+          agent: user,
+        }
+      );
+    }
+
+    if (scheduledEvent.proposalPk === null) {
+      return rejection(
+        'Can not create visit because scheduled event does not have a proposal associated with',
+        {
+          args,
+          agent: user,
+        }
+      );
+    }
+
+    const proposal = await this.proposalDataSource.get(
+      scheduledEvent.proposalPk
+    );
+
+    if (proposal === null) {
+      return rejection(
+        'Can not create visit, proposal for the scheduled does not exist',
+        {
+          args,
+          agent: user,
+        }
+      );
+    }
+
+    if (
+      proposal.finalStatus !== ProposalEndStatus.ACCEPTED ||
+      proposal.managementDecisionSubmitted === false
+    ) {
+      return rejection(
+        'Can not create visit because the proposal is not yet accepted',
+        {
+          args,
+          agent: user,
+        }
       );
     }
 
@@ -83,14 +116,18 @@ export default class VisitMutations {
       );
     }
 
-    // TODO verify that provided scheduledEventId exists
     try {
-      const visit = await this.dataSource.createVisit(args, user!.id);
+      const visit = await this.dataSource.createVisit(
+        args,
+        user!.id,
+        proposal.primaryKey
+      );
 
       if (args.team && args.team.length > 0) {
         await this.dataSource.updateVisit({
           visitId: visit.id,
           team: args.team,
+          teamLeadUserId: args.teamLeadUserId,
         });
       }
 
