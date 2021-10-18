@@ -1,7 +1,6 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { UserWithRole } from '../models/User';
 import { Shipment } from './../resolvers/types/Shipment';
@@ -9,13 +8,10 @@ import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class ShipmentAuthorization {
+  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.ShipmentDataSource)
-    private shipmentDataSource: ShipmentDataSource,
-    @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.UserAuthorization)
-    private userAuthorization: UserAuthorization
+    private shipmentDataSource: ShipmentDataSource
   ) {}
 
   private async resolveShipment(
@@ -69,7 +65,7 @@ export class ShipmentAuthorization {
     shipmentOrShipmentId: Shipment | number
   ) {
     // User officer has read/write rights
-    if (this.userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuth.isUserOfficer(agent)) {
       return true;
     }
 
@@ -82,6 +78,6 @@ export class ShipmentAuthorization {
      * For the shipment the authorization follows the business logic for the proposal
      * authorization that the shipment is associated with
      */
-    return this.userAuthorization.hasAccessRights(agent, shipment.proposalPk);
+    return this.userAuth.hasAccessRights(agent, shipment.proposalPk);
   }
 }

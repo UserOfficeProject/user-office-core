@@ -1,5 +1,5 @@
 import { logger } from '@esss-swap/duo-logger';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
@@ -9,12 +9,11 @@ import { GenericTemplateAuthorization } from '../utils/GenericTemplateAuthorizat
 
 @injectable()
 export default class GenericTemplateQueries {
+  private genericTemplateAuth = container.resolve(GenericTemplateAuthorization);
+
   constructor(
     @inject(Tokens.GenericTemplateDataSource)
-    private dataSource: GenericTemplateDataSource,
-
-    @inject(Tokens.GenericTemplateAuthorization)
-    private genericTemplateAuthorization: GenericTemplateAuthorization
+    private dataSource: GenericTemplateDataSource
   ) {}
 
   async getGenericTemplate(
@@ -22,7 +21,7 @@ export default class GenericTemplateQueries {
     genericTemplateId: number
   ) {
     if (
-      (await this.genericTemplateAuthorization.hasReadRights(
+      (await this.genericTemplateAuth.hasReadRights(
         agent,
         genericTemplateId
       )) !== true
@@ -46,10 +45,7 @@ export default class GenericTemplateQueries {
 
     genericTemplates = await Promise.all(
       genericTemplates.map((genericTemplate) =>
-        this.genericTemplateAuthorization.hasReadRights(
-          agent,
-          genericTemplate.id
-        )
+        this.genericTemplateAuth.hasReadRights(agent, genericTemplate.id)
       )
     ).then((results) => genericTemplates.filter((_v, index) => results[index]));
 

@@ -1,3 +1,4 @@
+import { Event } from '../../events/event.enum';
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import {

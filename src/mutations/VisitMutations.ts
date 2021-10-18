@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -21,6 +21,9 @@ import { VisitAuthorization } from './../utils/VisitAuthorization';
 
 @injectable()
 export default class VisitMutations {
+  private userAuth = container.resolve(UserAuthorization);
+  private visitAuth = container.resolve(VisitAuthorization);
+
   constructor(
     @inject(Tokens.VisitDataSource)
     private dataSource: VisitDataSource,
@@ -29,11 +32,7 @@ export default class VisitMutations {
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
-    private templateDataSource: TemplateDataSource,
-    @inject(Tokens.VisitAuthorization)
-    private visitAuthorization: VisitAuthorization,
-    @inject(Tokens.UserAuthorization)
-    private userAuthorization: UserAuthorization
+    private templateDataSource: TemplateDataSource
   ) {}
 
   @Authorized()
@@ -76,10 +75,7 @@ export default class VisitMutations {
       );
     }
 
-    const isProposalOwner = await this.userAuthorization.hasAccessRights(
-      user,
-      proposal
-    );
+    const isProposalOwner = await this.userAuth.hasAccessRights(user, proposal);
     if (isProposalOwner === false) {
       return rejection(
         'Can not create visit for proposal that does not belong to you',
@@ -128,12 +124,9 @@ export default class VisitMutations {
       );
     }
 
-    const hasRights = await this.visitAuthorization.hasWriteRights(user, visit);
+    const hasRights = await this.visitAuth.hasWriteRights(user, visit);
 
-    if (
-      this.userAuthorization.isUser(user) &&
-      args.status === VisitStatus.ACCEPTED
-    ) {
+    if (this.userAuth.isUser(user) && args.status === VisitStatus.ACCEPTED) {
       return rejection(
         'Can not update visit status because of insufficient permissions'
       );
@@ -154,10 +147,7 @@ export default class VisitMutations {
     user: UserWithRole | null,
     visitId: number
   ): Promise<Visit | Rejection> {
-    const hasRights = await this.visitAuthorization.hasWriteRights(
-      user,
-      visitId
-    );
+    const hasRights = await this.visitAuth.hasWriteRights(user, visitId);
     if (hasRights === false) {
       return rejection(
         'Can not update visit because of insufficient permissions',

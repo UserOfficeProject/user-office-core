@@ -12,12 +12,12 @@ import { rejection, Rejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
 import { CreateEsiArgs } from '../resolvers/mutations/CreateEsiMutation';
 import { UpdateEsiArgs } from '../resolvers/mutations/UpdateEsiMutation';
-import { EsiAuthorization } from '../utils/EsiAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 @injectable()
 export default class ProposalEsiMutations {
-  private esiAuth = container.resolve(EsiAuthorization);
+  private userAuth = container.resolve(UserAuthorization);
+
   constructor(
     @inject(Tokens.ProposalEsiDataSource)
     private dataSource: ProposalEsiDataSource,
@@ -28,9 +28,7 @@ export default class ProposalEsiMutations {
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.CallDataSource)
-    private callDataSource: CallDataSource,
-    @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization
+    private callDataSource: CallDataSource
   ) {}
 
   @Authorized()

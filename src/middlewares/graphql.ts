@@ -1,27 +1,17 @@
 import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
-import { Express, Request } from 'express';
+import { Express } from 'express';
 import { applyMiddleware } from 'graphql-middleware';
 
 import 'reflect-metadata';
 import baseContext from '../buildContext';
 import { ResolverContext } from '../context';
-import { Role } from '../models/Role';
-import { User, UserWithRole } from '../models/User';
+import { UserWithRole } from '../models/User';
 import federationSources from '../resolvers/federationSources';
 import { registerEnums } from '../resolvers/registerEnums';
 import { buildFederatedSchema } from '../utils/buildFederatedSchema';
 import rejectionLogger from './rejectionLogger';
 import rejectionSanitizer from './rejectionSanitizer';
-
-interface Req extends Request {
-  user?: {
-    user?: User;
-    currentRole?: Role;
-    roles?: Role[];
-    accessTokenId?: string;
-  };
-}
 
 const apolloServer = async (app: Express) => {
   const PATH = '/graphql';
@@ -64,7 +54,7 @@ const apolloServer = async (app: Express) => {
         : false,
     plugins: [ApolloServerPluginInlineTraceDisabled()],
 
-    context: async ({ req }: { req: Req }) => {
+    context: async ({ req }) => {
       let user = null;
       const userId = req.user?.user?.id as number;
       const accessTokenId = req.user?.accessTokenId;

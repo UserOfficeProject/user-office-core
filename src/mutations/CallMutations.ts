@@ -50,7 +50,8 @@ export default class CallMutations {
 
       return result;
     } catch (error) {
-      if ('code' in error && error.code === '23503') {
+      // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
+      if ((error as { code: string }).code === '23503') {
         return rejection(
           'Failed to delete call, it has dependencies which need to be deleted first',
           { callId },

@@ -7,7 +7,7 @@ import {
   submitProposalValidationSchema,
   updateProposalValidationSchema,
 } from '@esss-swap/duo-validation';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
@@ -38,6 +38,7 @@ import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDat
 
 @injectable()
 export default class ProposalMutations {
+  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.ProposalDataSource)
     public proposalDataSource: ProposalDataSource,
@@ -52,8 +53,6 @@ export default class ProposalMutations {
     private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
-    @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization,
     @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource
   ) {}
@@ -279,7 +278,8 @@ export default class ProposalMutations {
 
       return result;
     } catch (error) {
-      if ('code' in error && error.code === '23503') {
+      // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
+      if ((error as { code: string }).code === '23503') {
         return rejection(
           'Failed to delete proposal because, it has dependencies which need to be deleted first',
           { proposal },
