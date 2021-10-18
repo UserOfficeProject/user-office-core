@@ -1,5 +1,5 @@
 import { logger } from '@esss-swap/duo-logger';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -12,11 +12,11 @@ import { TemplateCategoryId } from './../models/Template';
 
 @injectable()
 export default class QuestionaryQueries {
+  private questionaryAuth = container.resolve(QuestionaryAuthorization);
+
   constructor(
     @inject(Tokens.QuestionaryDataSource)
-    public dataSource: QuestionaryDataSource,
-    @inject(Tokens.QuestionaryAuthorization)
-    private authorizer: QuestionaryAuthorization
+    public dataSource: QuestionaryDataSource
   ) {}
 
   @Authorized()
@@ -24,7 +24,10 @@ export default class QuestionaryQueries {
     agent: UserWithRole | null,
     questionaryId: number
   ): Promise<Questionary | null> {
-    const hasRights = await this.authorizer.hasReadRights(agent, questionaryId);
+    const hasRights = await this.questionaryAuth.hasReadRights(
+      agent,
+      questionaryId
+    );
     if (!hasRights) {
       logger.logWarn('Permissions violated trying to access questionary', {
         email: agent?.email,
@@ -78,7 +81,10 @@ export default class QuestionaryQueries {
     agent: UserWithRole | null,
     questionaryId: number
   ): Promise<QuestionaryStep[] | null> {
-    const hasRights = await this.authorizer.hasReadRights(agent, questionaryId);
+    const hasRights = await this.questionaryAuth.hasReadRights(
+      agent,
+      questionaryId
+    );
     if (!hasRights) {
       logger.logWarn('Permissions violated trying to access steps', {
         email: agent?.email,
@@ -98,7 +104,10 @@ export default class QuestionaryQueries {
 
   @Authorized()
   async isCompleted(agent: UserWithRole | null, questionaryId: number) {
-    const hasRights = await this.authorizer.hasReadRights(agent, questionaryId);
+    const hasRights = await this.questionaryAuth.hasReadRights(
+      agent,
+      questionaryId
+    );
     if (!hasRights) {
       logger.logWarn('Permissions violated trying to access isComplete', {
         email: agent?.email,

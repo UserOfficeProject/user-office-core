@@ -1,5 +1,5 @@
 import { logger } from '@esss-swap/duo-logger';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -19,13 +19,13 @@ import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 
 @injectable()
 export default class QuestionaryMutations {
+  private questionaryAuth = container.resolve(QuestionaryAuthorization);
+
   constructor(
     @inject(Tokens.QuestionaryDataSource)
     private dataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
-    private templateDataSource: TemplateDataSource,
-    @inject(Tokens.QuestionaryAuthorization)
-    private questionaryAuth: QuestionaryAuthorization
+    private templateDataSource: TemplateDataSource
   ) {}
 
   async deleteOldAnswers(

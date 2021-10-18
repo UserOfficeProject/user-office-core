@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
@@ -8,12 +8,10 @@ import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class GenericTemplateAuthorization {
+  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.GenericTemplateDataSource)
-    private genericTemplateDataSource: GenericTemplateDataSource,
-
-    @inject(Tokens.UserAuthorization)
-    private userAuthorization: UserAuthorization
+    private genericTemplateDataSource: GenericTemplateDataSource
   ) {}
 
   private async resolveGenericTemplate(
@@ -67,7 +65,7 @@ export class GenericTemplateAuthorization {
     genericTemplateOrGenericTemplateId: GenericTemplate | number
   ) {
     // User officer has access
-    if (this.userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuth.isUserOfficer(agent)) {
       return true;
     }
 
@@ -83,9 +81,6 @@ export class GenericTemplateAuthorization {
      * For the genericTemplate the authorization follows the business logic for the proposal
      * authorization that the genericTemplate is associated with
      */
-    return this.userAuthorization.hasAccessRights(
-      agent,
-      genericTemplate.proposalPk
-    );
+    return this.userAuth.hasAccessRights(agent, genericTemplate.proposalPk);
   }
 }

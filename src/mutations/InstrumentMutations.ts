@@ -8,7 +8,7 @@ import {
   setAvailabilityTimeOnInstrumentValidationSchema,
   submitInstrumentValidationSchema,
 } from '@esss-swap/duo-validation';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -39,13 +39,13 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 import { ProposalDataSource } from './../datasources/ProposalDataSource';
 @injectable()
 export default class InstrumentMutations {
+  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.InstrumentDataSource)
     private dataSource: InstrumentDataSource,
     @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    private proposalDataSource: ProposalDataSource
   ) {}
 
   @ValidateArgs(createInstrumentValidationSchema)

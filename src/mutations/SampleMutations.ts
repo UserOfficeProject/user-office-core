@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -13,10 +13,13 @@ import { UserWithRole } from '../models/User';
 import { CreateSampleInput } from '../resolvers/mutations/CreateSampleMutations';
 import { UpdateSampleArgs } from '../resolvers/mutations/UpdateSampleMutation';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { UserAuthorization } from './../utils/UserAuthorization';
 
 @injectable()
 export default class SampleMutations {
+  private userAuth = container.resolve(UserAuthorization);
+  private sampleAuth = container.resolve(SampleAuthorization);
+
   constructor(
     @inject(Tokens.SampleDataSource) private sampleDataSource: SampleDataSource,
     @inject(Tokens.QuestionaryDataSource)
@@ -24,11 +27,7 @@ export default class SampleMutations {
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.SampleAuthorization)
-    private sampleAuthorization: SampleAuthorization,
-    @inject(Tokens.UserAuthorization)
-    private userAuthorization: UserAuthorization
+    private proposalDataSource: ProposalDataSource
   ) {}
 
   @Authorized()
@@ -56,9 +55,7 @@ export default class SampleMutations {
       });
     }
 
-    if (
-      (await this.userAuthorization.hasAccessRights(agent, proposal)) === false
-    ) {
+    if ((await this.userAuth.hasAccessRights(agent, proposal)) === false) {
       return rejection(
         'Can not create sample because of insufficient permissions',
         { agent, args }
@@ -87,7 +84,7 @@ export default class SampleMutations {
 
   @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
   async updateSample(agent: UserWithRole | null, args: UpdateSampleArgs) {
-    const hasWriteRights = await this.sampleAuthorization.hasWriteRights(
+    const hasWriteRights = await this.sampleAuth.hasWriteRights(
       agent,
       args.sampleId
     );
@@ -102,8 +99,8 @@ export default class SampleMutations {
     // Thi makes sure administrative fields can be only updated by user with the right role
     if (args.safetyComment || args.safetyStatus) {
       const canAdministrerSample =
-        this.userAuthorization.isUserOfficer(agent) ||
-        (await this.userAuthorization.isSampleSafetyReviewer(agent));
+        this.userAuth.isUserOfficer(agent) ||
+        (await this.userAuth.isSampleSafetyReviewer(agent));
       if (canAdministrerSample === false) {
         delete args.safetyComment;
         delete args.safetyStatus;
@@ -123,7 +120,7 @@ export default class SampleMutations {
   }
 
   async deleteSample(agent: UserWithRole | null, sampleId: number) {
-    const hasWriteRights = await this.sampleAuthorization.hasWriteRights(
+    const hasWriteRights = await this.sampleAuth.hasWriteRights(
       agent,
       sampleId
     );
@@ -159,7 +156,7 @@ export default class SampleMutations {
         { agent, sampleId }
       );
     }
-    if (!(await this.sampleAuthorization.hasWriteRights(agent, sampleId))) {
+    if (!(await this.sampleAuth.hasWriteRights(agent, sampleId))) {
       return rejection(
         'Could not clone sample because of insufficient permissions',
         { agent, sampleId }

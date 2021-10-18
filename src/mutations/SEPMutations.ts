@@ -8,7 +8,7 @@ import {
   updateTimeAllocationValidationSchema,
   saveSepMeetingDecisionValidationSchema,
 } from '@esss-swap/duo-validation';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -43,13 +43,12 @@ import { UpdateSEPTimeAllocationArgs } from '../resolvers/mutations/UpdateSEPPro
 import { UserAuthorization } from '../utils/UserAuthorization';
 @injectable()
 export default class SEPMutations {
+  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.SEPDataSource)
     private dataSource: SEPDataSource,
     @inject(Tokens.InstrumentDataSource)
     private instrumentDataSource: InstrumentDataSource,
-    @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
     @inject(Tokens.ProposalSettingsDataSource)

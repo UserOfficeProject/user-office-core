@@ -25,24 +25,11 @@ import {
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
 import { EAMAssetRegistrar } from '../utils/EAM_service';
-import { GenericTemplateAuthorization } from '../utils/GenericTemplateAuthorization';
-import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
-import { SampleAuthorization } from '../utils/SampleAuthorization';
-import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
-import { UserAuthorization } from '../utils/UserAuthorization';
-import { VisitAuthorization } from './../utils/VisitAuthorization';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
 const isProduction = process.env.NODE_ENV === 'production';
-
-mapClass(Tokens.GenericTemplateAuthorization, GenericTemplateAuthorization);
-mapClass(Tokens.UserAuthorization, UserAuthorization);
-mapClass(Tokens.QuestionaryAuthorization, QuestionaryAuthorization);
-mapClass(Tokens.SampleAuthorization, SampleAuthorization);
-mapClass(Tokens.ShipmentAuthorization, ShipmentAuthorization);
-mapClass(Tokens.VisitAuthorization, VisitAuthorization);
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
