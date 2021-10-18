@@ -1,13 +1,11 @@
 mutation createVisit(
-  $proposalPk: Int!
-  $team: [Int!]!
   $scheduledEventId: Int!
+  $team: [Int!]!
   $teamLeadUserId: Int!
 ) {
   createVisit(
-    proposalPk: $proposalPk
-    team: $team
     scheduledEventId: $scheduledEventId
+    team: $team
     teamLeadUserId: $teamLeadUserId
   ) {
     visit {
@@ -32,10 +30,6 @@ mutation createVisit(
 
       shipments {
         ...shipment
-      }
-
-      esi {
-        ...esi
       }
     }
 

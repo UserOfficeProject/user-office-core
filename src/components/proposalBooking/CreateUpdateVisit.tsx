@@ -62,7 +62,6 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
         } else {
           api('Visit created')
             .createVisit({
-              proposalPk: event.proposal.primaryKey,
               scheduledEventId: event.id,
               team: values.team?.map((user) => user.id),
               teamLeadUserId: values.teamLeadUserId as number,

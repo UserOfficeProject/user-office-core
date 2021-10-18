@@ -119,7 +119,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         event.proposal.managementDecisionSubmitted &&
         event.visit // for now visit is required, but once ESI is attached to proposalScheduledEvent, this can be removed
       ) {
-        if (event.visit.esi?.isSubmitted) {
+        if (event.esi?.isSubmitted) {
           buttonState = 'completed';
         } else {
           buttonState = 'active';
@@ -136,10 +136,10 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <EsiIcon />,
       buttonState,
       () => {
-        if (event.visit?.esi) {
-          history.push(`/UpdateEsi/${event.visit.esi.id}`);
+        if (event?.esi) {
+          history.push(`/UpdateEsi/${event.esi.id}`);
         } else {
-          history.push(`/CreateEsi/${event.visit!.id}`);
+          history.push(`/CreateEsi/${event.id}`);
         }
       }
     );

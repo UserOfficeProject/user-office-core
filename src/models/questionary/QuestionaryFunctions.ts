@@ -2,6 +2,7 @@ import { getQuestionaryComponentDefinition } from 'components/questionary/Questi
 import {
   Answer,
   AnswerInput,
+  DataType,
   DependenciesLogicOperator,
   FieldDependency,
   QuestionaryStep,
@@ -130,4 +131,13 @@ export function prepareAnswers(answers?: Answer[]): AnswerInput[] {
   } else {
     return [];
   }
+}
+
+export function getQuestionsByType(
+  collection: AbstractCollection,
+  type: DataType
+) {
+  return getAllFields(collection).filter(
+    (field) => field.question.dataType === type
+  );
 }

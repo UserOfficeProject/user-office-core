@@ -69,7 +69,8 @@ context('visits tests', () => {
 
   it('Should be able to complete ESI', () => {
     cy.login('user');
-    cy.contains(proposalTitle)
+    cy.get('[data-cy=upcoming-experiments]')
+      .contains(proposalTitle)
       .closest('TR')
       .find(`[title='${proposalEsiButtonTitle}']`)
       .click();

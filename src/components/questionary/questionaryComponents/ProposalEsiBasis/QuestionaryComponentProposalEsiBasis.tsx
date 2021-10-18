@@ -90,7 +90,7 @@ function QuestionaryComponentProposalEsiBasis(props: BasicComponentProps) {
             });
         };
 
-        const allSamples = state?.esi.visit?.proposal.samples;
+        const allSamples = state?.esi?.proposal.samples;
         const declaredEsis = field.value || [];
 
         return (
@@ -180,9 +180,7 @@ function QuestionaryComponentProposalEsiBasis(props: BasicComponentProps) {
             <Divider style={{ marginBottom: '12px' }} />
             <Typography variant="body1" align={'right'}>
               {`${declaredEsis.length ?? 0} of
-              ${
-                state?.esi.visit?.proposal.samples?.length ?? 0
-              } samples selected`}
+              ${state?.esi?.proposal.samples?.length ?? 0} samples selected`}
             </Typography>
             <StyledModal
               onClose={() => setSelectedSampleEsi(null)}

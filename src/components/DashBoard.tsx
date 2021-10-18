@@ -310,7 +310,10 @@ const Dashboard: React.FC = () => {
           {isUserOfficer && (
             <Route path="/Questions" component={QuestionsPage} />
           )}
-          <Route path="/CreateEsi/:visitId" component={CreateProposalEsiPage} />
+          <Route
+            path="/CreateEsi/:scheduledEventId"
+            component={CreateProposalEsiPage}
+          />
           <Route path="/UpdateEsi/:esiId" component={UpdateProposalEsiPage} />
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}

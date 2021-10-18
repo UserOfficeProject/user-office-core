@@ -73,7 +73,7 @@ export default function UserUpcomingExperimentsTable() {
   }
 
   return (
-    <Grid item xs={12}>
+    <Grid item xs={12} data-cy="upcoming-experiments">
       <StyledPaper margin={[0]}>
         <MaterialTable
           actions={[

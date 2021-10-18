@@ -36,9 +36,9 @@ query getUserProposalBookingsWithEvents(
                 ...basicUserDetails
               }
             }
-            esi {
-              ...esi
-            }
+          }
+          esi {
+            ...esi
           }
         }
       }
