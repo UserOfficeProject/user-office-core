@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { decode } from 'jsonwebtoken';
 import PropTypes from 'prop-types';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 
-import { Role, UserRole } from 'generated/sdk';
+import { FeatureId, Role, UserRole } from 'generated/sdk';
+import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 import { dummyUser, User } from 'models/User';
+
+import { FeatureContext } from './FeatureContextProvider';
 
 interface UserContextData {
   user: User;
@@ -146,6 +149,11 @@ const reducer = (
 export const UserContextProvider: React.FC = (props): JSX.Element => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
   const [, setCookie] = useCookies();
+  const unauthorizedApi = useUnauthorizedApi();
+  const featureContext = useContext(FeatureContext);
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const EXTERNAL_AUTH = !!featureContext.features.get(FeatureId.EXTERNAL_AUTH)
+    ?.isEnabled;
 
   checkLocalStorage(dispatch, state);
   useEffect(() => {
@@ -168,10 +176,14 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
         handleLogin: (data): void =>
           dispatch({ type: ActionType.LOGINUSER, payload: data }),
         // Using useCallback here as these are used in useDataAPI dependency array
-        handleLogout: useCallback(
-          () => dispatch({ type: ActionType.LOGOFFUSER, payload: null }),
-          []
-        ),
+        handleLogout: useCallback(() => {
+          if (EXTERNAL_AUTH) {
+            unauthorizedApi().ExternalLogoutToken({
+              externalToken: localStorage.token,
+            });
+          }
+          dispatch({ type: ActionType.LOGOFFUSER, payload: null });
+        }, [EXTERNAL_AUTH, unauthorizedApi]),
         handleRole: (role: string): void =>
           dispatch({ type: ActionType.SELECTROLE, payload: role }),
         handleNewToken: useCallback(

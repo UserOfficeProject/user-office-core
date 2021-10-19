@@ -504,6 +504,12 @@ export type ExperimentSafetyInput = {
   scheduledEventId: Scalars['Int'];
 };
 
+export type ExternalLogoutTokenWrap = {
+  __typename?: 'ExternalLogoutTokenWrap';
+  rejection: Maybe<Rejection>;
+  token: Maybe<Scalars['String']>;
+};
+
 export type Feature = {
   __typename?: 'Feature';
   description: Scalars['String'];
@@ -703,6 +709,7 @@ export type MoveProposalWorkflowStatusInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  ExternalLogoutToken: ExternalLogoutTokenWrap;
   activateProposalBooking: ProposalBookingResponseWrap;
   activateScheduledEvent: ScheduledEventResponseWrap;
   addClientLog: SuccessResponseWrap;
@@ -840,6 +847,11 @@ export type Mutation = {
   updateUserRoles: UserResponseWrap;
   updateVisit: VisitResponseWrap;
   updateVisitRegistration: VisitRegistrationResponseWrap;
+};
+
+
+export type MutationExternalLogoutTokenArgs = {
+  externalToken: Scalars['String'];
 };
 
 
@@ -2283,7 +2295,7 @@ export type QueryInstrumentArgs = {
 
 
 export type QueryInstrumentProposalBookingsArgs = {
-  instrumentId: Scalars['Int'];
+  instrumentIds: Array<Scalars['Int']>;
 };
 
 
@@ -2886,7 +2898,7 @@ export type ScheduledEventCore = {
 
 export type ScheduledEventFilter = {
   endsAt: Scalars['TzLessDateTime'];
-  instrumentId?: Maybe<Scalars['Int']>;
+  instrumentIds?: Maybe<Array<Scalars['Int']>>;
   startsAt: Scalars['TzLessDateTime'];
 };
 
@@ -7220,6 +7232,23 @@ export type UpdateTopicMutation = (
   ) }
 );
 
+export type ExternalLogoutTokenMutationVariables = Exact<{
+  externalToken: Scalars['String'];
+}>;
+
+
+export type ExternalLogoutTokenMutation = (
+  { __typename?: 'Mutation' }
+  & { ExternalLogoutToken: (
+    { __typename?: 'ExternalLogoutTokenWrap' }
+    & Pick<ExternalLogoutTokenWrap, 'token'>
+    & { rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
 export type CheckExternalTokenMutationVariables = Exact<{
   externalToken: Scalars['String'];
 }>;
@@ -11059,6 +11088,16 @@ export const UpdateTopicDocument = gql`
 }
     ${TemplateFragmentDoc}
 ${RejectionFragmentDoc}`;
+export const ExternalLogoutTokenDocument = gql`
+    mutation ExternalLogoutToken($externalToken: String!) {
+  ExternalLogoutToken(externalToken: $externalToken) {
+    token
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${RejectionFragmentDoc}`;
 export const CheckExternalTokenDocument = gql`
     mutation checkExternalToken($externalToken: String!) {
   checkExternalToken(externalToken: $externalToken) {
@@ -12105,6 +12144,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateTopic(variables: UpdateTopicMutationVariables): Promise<UpdateTopicMutation> {
       return withWrapper(() => client.request<UpdateTopicMutation>(print(UpdateTopicDocument), variables));
+    },
+    ExternalLogoutToken(variables: ExternalLogoutTokenMutationVariables): Promise<ExternalLogoutTokenMutation> {
+      return withWrapper(() => client.request<ExternalLogoutTokenMutation>(print(ExternalLogoutTokenDocument), variables));
     },
     checkExternalToken(variables: CheckExternalTokenMutationVariables): Promise<CheckExternalTokenMutation> {
       return withWrapper(() => client.request<CheckExternalTokenMutation>(print(CheckExternalTokenDocument), variables));
