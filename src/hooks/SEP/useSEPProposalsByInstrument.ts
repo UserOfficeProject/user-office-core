@@ -16,9 +16,8 @@ export function useSEPProposalsByInstrument(
   const [instrumentProposalsData, setInstrumentProposalsData] = useState<
     SepProposal[]
   >([]);
-  const [loadingInstrumentProposals, setLoadingInstrumentProposals] = useState(
-    true
-  );
+  const [loadingInstrumentProposals, setLoadingInstrumentProposals] =
+    useState(true);
   const [refreshCounter, setRefreshCounter] = useState(0);
 
   const api = useDataApi();

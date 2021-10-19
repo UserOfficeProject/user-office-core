@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FormikProps } from 'formik';
 
 import { Answer } from 'generated/sdk';

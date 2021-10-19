@@ -48,6 +48,7 @@ import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflow
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
 import UnitTablePage from './settings/unitList/UnitTablePage';
 import ProposalEsiPage from './template/EsiPage';
+import GenericTemplates from './template/GenericTemplates';
 import ProposalTemplates from './template/ProposalTemplates';
 import QuestionsPage from './template/QuestionsPage';
 import SampleEsiPage from './template/SampleEsiPage';
@@ -158,8 +159,9 @@ const Dashboard: React.FC = () => {
   ]);
 
   const featureContext = useContext(FeatureContext);
-  const isSchedulerEnabled = featureContext.features.get(FeatureId.SCHEDULER)
-    ?.isEnabled;
+  const isSchedulerEnabled = featureContext.features.get(
+    FeatureId.SCHEDULER
+  )?.isEnabled;
 
   const { currentRole } = useContext(UserContext);
   const { calls } = useCallsData({ isActive: true });
@@ -258,6 +260,7 @@ const Dashboard: React.FC = () => {
             path="/SampleDeclarationTemplates"
             component={SampleTemplatesPage}
           />
+          <Route path="/GenericTemplates" component={GenericTemplates} />
           <Route
             path="/ShipmentDeclarationTemplates"
             component={ShipmentTemplatesPage}
@@ -307,7 +310,10 @@ const Dashboard: React.FC = () => {
           {isUserOfficer && (
             <Route path="/Questions" component={QuestionsPage} />
           )}
-          <Route path="/CreateEsi/:visitId" component={CreateProposalEsiPage} />
+          <Route
+            path="/CreateEsi/:scheduledEventId"
+            component={CreateProposalEsiPage}
+          />
           <Route path="/UpdateEsi/:esiId" component={UpdateProposalEsiPage} />
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}

@@ -354,15 +354,15 @@ export default function QuestionaryEditorTopic(props: {
                       className={classes.addQuestionMenuItem}
                       data-cy="delete-topic-menu-item"
                       onClick={() => {
-                        const isAllQuestionsInTopicDeletable = data.fields.every(
-                          (item) => {
-                            const definition = getQuestionaryComponentDefinition(
-                              item.question.dataType
-                            );
+                        const isAllQuestionsInTopicDeletable =
+                          data.fields.every((item) => {
+                            const definition =
+                              getQuestionaryComponentDefinition(
+                                item.question.dataType
+                              );
 
                             return definition.creatable;
-                          }
-                        );
+                          });
                         if (isAllQuestionsInTopicDeletable === false) {
                           enqueueSnackbar(
                             'This topic can not be deleted because it contains protected question(s)',

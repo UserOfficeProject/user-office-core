@@ -5,9 +5,8 @@ import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useQuestionary(questionaryId: number) {
   const [loadingQuestionary, setLoadingQuestionary] = useState<boolean>(true);
-  const [questionary, setQuestionary] = useState<
-    GetQuestionaryQuery['questionary']
-  >(null);
+  const [questionary, setQuestionary] =
+    useState<GetQuestionaryQuery['questionary']>(null);
 
   const api = useDataApi();
 

@@ -33,7 +33,8 @@ export const questionaryFilterFromUrlQuery = (
   ) {
     return {
       questionId: urlQuery.questionId,
-      compareOperator: urlQuery.compareOperator as QuestionFilterCompareOperator,
+      compareOperator:
+        urlQuery.compareOperator as QuestionFilterCompareOperator,
       value: urlQuery.value,
       dataType: urlQuery.dataType as DataType,
     };

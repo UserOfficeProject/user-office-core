@@ -1,16 +1,24 @@
+import { Button, makeStyles, Typography } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import People from '@material-ui/icons/People';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import PeopleTable from 'components/user/PeopleTable';
 import { BasicUserDetails, UserRole } from 'generated/sdk';
 
 import ParticipantModal from './ParticipantModal';
 
+const useStyles = makeStyles((theme) => ({
+  label: {
+    fontSize: '12px',
+    color: 'grey',
+  },
+  buttonContainer: {
+    marginTop: theme.spacing(1),
+  },
+}));
 type ParticipantsProps = {
   /** Basic user details array to be shown in the modal. */
   users: BasicUserDetails[];
@@ -31,6 +39,8 @@ const Participants: React.FC<ParticipantsProps> = ({
   preserveSelf,
 }) => {
   const [modalOpen, setOpen] = useState(false);
+
+  const classes = useStyles();
 
   const addUsers = (addedUsers: BasicUserDetails[]) => {
     setUsers([...users, ...addedUsers]);
@@ -72,22 +82,18 @@ const Participants: React.FC<ParticipantsProps> = ({
         userRole={UserRole.USER}
         participant={true}
       />
-      <FormControl margin="dense" fullWidth>
-        <FormLabel component="div">
-          {title}
-          <Tooltip title={title}>
-            <IconButton onClick={openModal}>
-              <People data-cy="add-participant-button" />
-            </IconButton>
-          </Tooltip>
-        </FormLabel>
 
+      <FormControl margin="dense" fullWidth>
+        <Typography className={classes.label}>{title}</Typography>
         <PeopleTable
           selection={false}
           mtOptions={{
             showTitle: false,
             toolbar: false,
             paging: false,
+            headerStyle: {
+              padding: '4px 10px',
+            },
           }}
           isFreeAction={true}
           data={users}
@@ -97,6 +103,18 @@ const Participants: React.FC<ParticipantsProps> = ({
           onRemove={removeUser}
           preserveSelf={preserveSelf}
         />
+        <ActionButtonContainer className={classes.buttonContainer}>
+          <Button
+            variant="outlined"
+            onClick={openModal}
+            data-cy="add-participant-button"
+            size="small"
+            color="primary"
+            startIcon={<PersonAddIcon />}
+          >
+            Add
+          </Button>
+        </ActionButtonContainer>
       </FormControl>
     </div>
   );

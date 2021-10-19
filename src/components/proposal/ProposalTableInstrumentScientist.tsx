@@ -37,20 +37,18 @@ import { ProposalUrlQueryParamsType } from './ProposalPage';
 
 const ProposalTableInstrumentScientist: React.FC = () => {
   const { user } = useContext(UserContext);
-  const [
-    urlQueryParams,
-    setUrlQueryParams,
-  ] = useQueryParams<ProposalUrlQueryParamsType>({
-    call: NumberParam,
-    instrument: NumberParam,
-    proposalStatus: NumberParam,
-    questionId: StringParam,
-    compareOperator: StringParam,
-    value: StringParam,
-    dataType: StringParam,
-    reviewModal: NumberParam,
-    ...DefaultQueryParams,
-  });
+  const [urlQueryParams, setUrlQueryParams] =
+    useQueryParams<ProposalUrlQueryParamsType>({
+      call: NumberParam,
+      instrument: NumberParam,
+      proposalStatus: NumberParam,
+      questionId: StringParam,
+      compareOperator: StringParam,
+      value: StringParam,
+      dataType: StringParam,
+      reviewModal: NumberParam,
+      ...DefaultQueryParams,
+    });
 
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
@@ -61,10 +59,8 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   });
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
-  const {
-    proposalStatuses,
-    loadingProposalStatuses,
-  } = useProposalStatusesData();
+  const { proposalStatuses, loadingProposalStatuses } =
+    useProposalStatusesData();
 
   const { loading, proposalsData, setProposalsData } = useProposalsData({
     proposalStatusId: proposalFilter.proposalStatusId,

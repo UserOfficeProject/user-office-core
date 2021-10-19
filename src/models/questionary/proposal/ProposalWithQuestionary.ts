@@ -4,6 +4,7 @@ import {
   Call,
   Questionary,
   SampleFragment,
+  GenericTemplateFragment,
 } from 'generated/sdk';
 
 export type ProposalWithQuestionary = Pick<
@@ -22,5 +23,11 @@ export type ProposalWithQuestionary = Pick<
 > & { call?: Maybe<Pick<Call, 'isActive'>> } & {
   samples: Maybe<
     (SampleFragment & { questionary: Pick<Questionary, 'isCompleted'> })[]
+  >;
+} & {
+  genericTemplates: Maybe<
+    (GenericTemplateFragment & {
+      questionary: Pick<Questionary, 'isCompleted'>;
+    })[]
   >;
 };

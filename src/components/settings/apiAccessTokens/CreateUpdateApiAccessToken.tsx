@@ -89,10 +89,8 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
 }) => {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const {
-    queriesAndMutations,
-    loadingQueriesAndMutations,
-  } = useQueriesAndMutationsData();
+  const { queriesAndMutations, loadingQueriesAndMutations } =
+    useQueriesAndMutationsData();
 
   const normalizeAccessPermissions = (data: string | undefined) => {
     const permissionsArray: string[] = [];

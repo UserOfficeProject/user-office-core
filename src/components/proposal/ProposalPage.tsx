@@ -34,20 +34,18 @@ export type ProposalUrlQueryParamsType = {
 } & UrlQueryParamsType;
 
 export default function ProposalPage() {
-  const [
-    urlQueryParams,
-    setUrlQueryParams,
-  ] = useQueryParams<ProposalUrlQueryParamsType>({
-    ...DefaultQueryParams,
-    call: NumberParam,
-    instrument: NumberParam,
-    proposalStatus: NumberParam,
-    reviewModal: NumberParam,
-    questionId: StringParam,
-    compareOperator: StringParam,
-    value: StringParam,
-    dataType: StringParam,
-  });
+  const [urlQueryParams, setUrlQueryParams] =
+    useQueryParams<ProposalUrlQueryParamsType>({
+      ...DefaultQueryParams,
+      call: NumberParam,
+      instrument: NumberParam,
+      proposalStatus: NumberParam,
+      reviewModal: NumberParam,
+      questionId: StringParam,
+      compareOperator: StringParam,
+      value: StringParam,
+      dataType: StringParam,
+    });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
@@ -56,10 +54,8 @@ export default function ProposalPage() {
   });
   const { calls, loadingCalls } = useCallsData();
   const { instruments, loadingInstruments } = useInstrumentsData();
-  const {
-    proposalStatuses,
-    loadingProposalStatuses,
-  } = useProposalStatusesData();
+  const { proposalStatuses, loadingProposalStatuses } =
+    useProposalStatusesData();
 
   return (
     <>

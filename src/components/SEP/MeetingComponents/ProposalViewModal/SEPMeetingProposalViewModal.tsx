@@ -54,113 +54,116 @@ type SEPMeetingProposalViewModalProps = {
   setProposalViewModalOpen: (isOpen: boolean) => void;
 };
 
-const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = ({
-  proposalViewModalOpen,
-  proposalPk,
-  sepId,
-  meetingSubmitted,
-  setProposalViewModalOpen,
-}) => {
-  const classes = useStyles();
-  const hasWriteAccess = useCheckAccess([
-    UserRole.USER_OFFICER,
-    UserRole.SEP_CHAIR,
-    UserRole.SEP_SECRETARY,
-  ]);
-  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-
-  const { SEPProposalData, loading, setSEPProposalData } = useSEPProposalData(
+const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> =
+  ({
+    proposalViewModalOpen,
+    proposalPk,
     sepId,
-    proposalPk
-  );
+    meetingSubmitted,
+    setProposalViewModalOpen,
+  }) => {
+    const classes = useStyles();
+    const hasWriteAccess = useCheckAccess([
+      UserRole.USER_OFFICER,
+      UserRole.SEP_CHAIR,
+      UserRole.SEP_SECRETARY,
+    ]);
+    const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const finalHasWriteAccess = SEPProposalData?.instrumentSubmitted
-    ? isUserOfficer
-    : hasWriteAccess;
+    const { SEPProposalData, loading, setSEPProposalData } = useSEPProposalData(
+      sepId,
+      proposalPk
+    );
 
-  const proposalData = SEPProposalData?.proposal ?? null;
+    const finalHasWriteAccess = SEPProposalData?.instrumentSubmitted
+      ? isUserOfficer
+      : hasWriteAccess;
 
-  const handleClose = () => {
-    setProposalViewModalOpen(false);
-  };
+    const proposalData = SEPProposalData?.proposal ?? null;
 
-  const sepTimeAllocation = SEPProposalData?.sepTimeAllocation ?? null;
+    const handleClose = () => {
+      setProposalViewModalOpen(false);
+    };
 
-  return (
-    <>
-      <Dialog
-        open={proposalViewModalOpen}
-        fullScreen
-        onClose={(): void => handleClose()}
-        TransitionComponent={Transition}
-      >
-        <AppBar className={classes.appBar}>
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={handleClose}
-              aria-label="close"
-              data-cy="close-modal"
-            >
-              <CloseIcon />
-            </IconButton>
-            <Typography variant="h6" className={classes.title}>
-              SEP Meeting Components - Proposal View
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <DialogContent>
-          <Grid container>
-            <Grid item xs={12}>
-              <div data-cy="SEP-meeting-components-proposal-view">
-                {loading || !SEPProposalData || !proposalData ? (
-                  <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />
-                ) : (
-                  <>
-                    <FinalRankingForm
-                      closeModal={handleClose}
-                      hasWriteAccess={finalHasWriteAccess}
-                      proposalData={proposalData}
-                      meetingSubmitted={(data) => {
-                        setSEPProposalData({
-                          ...SEPProposalData,
-                          proposal: {
-                            ...proposalData,
-                            sepMeetingDecision: data,
-                          },
-                        });
-                        meetingSubmitted(data);
-                      }}
+    const sepTimeAllocation = SEPProposalData?.sepTimeAllocation ?? null;
+
+    return (
+      <>
+        <Dialog
+          open={proposalViewModalOpen}
+          fullScreen
+          onClose={(): void => handleClose()}
+          TransitionComponent={Transition}
+        >
+          <AppBar className={classes.appBar}>
+            <Toolbar>
+              <IconButton
+                edge="start"
+                color="inherit"
+                onClick={handleClose}
+                aria-label="close"
+                data-cy="close-modal"
+              >
+                <CloseIcon />
+              </IconButton>
+              <Typography variant="h6" className={classes.title}>
+                SEP Meeting Components - Proposal View
+              </Typography>
+            </Toolbar>
+          </AppBar>
+          <DialogContent>
+            <Grid container>
+              <Grid item xs={12}>
+                <div data-cy="SEP-meeting-components-proposal-view">
+                  {loading || !SEPProposalData || !proposalData ? (
+                    <UOLoader
+                      style={{ marginLeft: '50%', marginTop: '20px' }}
                     />
-                    <ProposalDetails proposal={proposalData} />
-                    <TechnicalReviewInfo
-                      hasWriteAccess={finalHasWriteAccess}
-                      technicalReview={
-                        proposalData.technicalReview as TechnicalReview
-                      }
-                      sepTimeAllocation={sepTimeAllocation}
-                      onSepTimeAllocationEdit={(sepTimeAllocation) =>
-                        setSEPProposalData({
-                          ...SEPProposalData,
-                          sepTimeAllocation,
-                        })
-                      }
-                      proposal={proposalData}
-                      sepId={sepId}
-                    />
-                    <ExternalReviews
-                      reviews={proposalData.reviews as Review[]}
-                    />
-                  </>
-                )}
-              </div>
+                  ) : (
+                    <>
+                      <FinalRankingForm
+                        closeModal={handleClose}
+                        hasWriteAccess={finalHasWriteAccess}
+                        proposalData={proposalData}
+                        meetingSubmitted={(data) => {
+                          setSEPProposalData({
+                            ...SEPProposalData,
+                            proposal: {
+                              ...proposalData,
+                              sepMeetingDecision: data,
+                            },
+                          });
+                          meetingSubmitted(data);
+                        }}
+                      />
+                      <ProposalDetails proposal={proposalData} />
+                      <TechnicalReviewInfo
+                        hasWriteAccess={finalHasWriteAccess}
+                        technicalReview={
+                          proposalData.technicalReview as TechnicalReview
+                        }
+                        sepTimeAllocation={sepTimeAllocation}
+                        onSepTimeAllocationEdit={(sepTimeAllocation) =>
+                          setSEPProposalData({
+                            ...SEPProposalData,
+                            sepTimeAllocation,
+                          })
+                        }
+                        proposal={proposalData}
+                        sepId={sepId}
+                      />
+                      <ExternalReviews
+                        reviews={proposalData.reviews as Review[]}
+                      />
+                    </>
+                  )}
+                </div>
+              </Grid>
             </Grid>
-          </Grid>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-};
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  };
 
 export default SEPMeetingProposalViewModal;

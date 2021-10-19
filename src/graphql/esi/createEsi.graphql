@@ -1,5 +1,5 @@
-mutation createEsi($visitId: Int!) {
-  createEsi(visitId: $visitId) {
+mutation createEsi($scheduledEventId: Int!) {
+  createEsi(scheduledEventId: $scheduledEventId) {
     esi {
       ...esi
       questionary {
@@ -15,14 +15,14 @@ mutation createEsi($visitId: Int!) {
           isCompleted
         }
       }
-      visit {
-        ...visit
-        proposal {
-          proposalId
-          title
-          samples {
-            ...sample
-          }
+      proposal {
+        proposalId
+        title
+        samples {
+          ...sample
+        }
+        questionary {
+          ...questionary
         }
       }
     }

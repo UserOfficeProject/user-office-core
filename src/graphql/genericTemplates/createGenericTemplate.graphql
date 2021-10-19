@@ -1,0 +1,24 @@
+mutation createGenericTemplate(
+  $title: String!
+  $templateId: Int!
+  $proposalPk: Int!
+  $questionId: String!
+) {
+  createGenericTemplate(
+    title: $title
+    templateId: $templateId
+    proposalPk: $proposalPk
+    questionId: $questionId
+  ) {
+    genericTemplate {
+      ...genericTemplate
+      questionary {
+        isCompleted
+        ...questionary
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}

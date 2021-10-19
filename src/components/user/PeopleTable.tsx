@@ -287,9 +287,11 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           }
 
           setSelectedParticipants((selectedParticipants) =>
-            (selectedItem as BasicUserDetails & {
-              tableData: { checked: boolean };
-            }).tableData.checked
+            (
+              selectedItem as BasicUserDetails & {
+                tableData: { checked: boolean };
+              }
+            ).tableData.checked
               ? ([
                   ...selectedParticipants,
                   {
@@ -340,7 +342,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             : {}
         }
         localization={{
-          body: { emptyDataSourceMessage: 'No Users Found' },
+          body: { emptyDataSourceMessage: 'No Users' },
           toolbar: {
             nRowsSelected: '{0} Users(s) Selected',
           },

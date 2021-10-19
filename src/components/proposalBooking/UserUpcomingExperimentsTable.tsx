@@ -17,14 +17,11 @@ import {
 } from 'utils/Time';
 
 export default function UserUpcomingExperimentsTable() {
-  const {
-    loading,
-    proposalScheduledEvents,
-    setProposalScheduledEvents,
-  } = useProposalBookingsScheduledEvents({
-    onlyUpcoming: true,
-    notDraft: true,
-  });
+  const { loading, proposalScheduledEvents, setProposalScheduledEvents } =
+    useProposalBookingsScheduledEvents({
+      onlyUpcoming: true,
+      notDraft: true,
+    });
 
   const [modalContents, setModalContents] = useState<ReactNode>(null);
 
@@ -76,7 +73,7 @@ export default function UserUpcomingExperimentsTable() {
   }
 
   return (
-    <Grid item xs={12}>
+    <Grid item xs={12} data-cy="upcoming-experiments">
       <StyledPaper margin={[0]}>
         <MaterialTable
           actions={[

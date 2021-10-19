@@ -148,10 +148,11 @@ const ProposalWorkflowEditorModel = (
           const { proposalWorkflowConnectionGroups } = draft;
           const newConnectionToAdd = action.payload;
 
-          draft.proposalWorkflowConnectionGroups = findGroupAndAddNewStatusConnection(
-            proposalWorkflowConnectionGroups,
-            newConnectionToAdd
-          );
+          draft.proposalWorkflowConnectionGroups =
+            findGroupAndAddNewStatusConnection(
+              proposalWorkflowConnectionGroups,
+              newConnectionToAdd
+            );
 
           return draft;
         }
@@ -173,11 +174,12 @@ const ProposalWorkflowEditorModel = (
         case EventType.REORDER_WORKFLOW_STATUS_REQUESTED:
           const { source, destination } = action.payload;
 
-          draft.proposalWorkflowConnectionGroups = moveStatusConnectionInsideWorkflow(
-            draft.proposalWorkflowConnectionGroups,
-            source,
-            destination
-          );
+          draft.proposalWorkflowConnectionGroups =
+            moveStatusConnectionInsideWorkflow(
+              draft.proposalWorkflowConnectionGroups,
+              source,
+              destination
+            );
 
           return draft;
         case EventType.REORDER_WORKFLOW_STATUS_FAILED:
@@ -217,11 +219,12 @@ const ProposalWorkflowEditorModel = (
           const { proposalWorkflowConnectionGroups } = draft;
           const { workflowConnection, statusChangingEvents } = action.payload;
 
-          draft.proposalWorkflowConnectionGroups = addStatusChangingEventsToConnection(
-            proposalWorkflowConnectionGroups,
-            workflowConnection,
-            statusChangingEvents
-          );
+          draft.proposalWorkflowConnectionGroups =
+            addStatusChangingEventsToConnection(
+              proposalWorkflowConnectionGroups,
+              workflowConnection,
+              statusChangingEvents
+            );
 
           return draft;
         }

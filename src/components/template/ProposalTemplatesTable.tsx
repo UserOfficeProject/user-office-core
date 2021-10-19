@@ -109,7 +109,8 @@ function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
         columns={columns}
         templateGroup={TemplateGroupId.PROPOSAL}
         isRowRemovable={(rowData) => {
-          const proposalTemplateRowData = rowData as ProposalTemplateRowDataType;
+          const proposalTemplateRowData =
+            rowData as ProposalTemplateRowDataType;
 
           return (
             proposalTemplateRowData.callCount === 0 &&

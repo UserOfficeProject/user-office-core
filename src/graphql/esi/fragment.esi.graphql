@@ -1,6 +1,5 @@
 fragment esi on ExperimentSafetyInput {
   id
-  visitId
   creatorId
   questionaryId
   isSubmitted

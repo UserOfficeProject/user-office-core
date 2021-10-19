@@ -20,10 +20,8 @@ const UnitTable: React.FC = () => {
   const { loadingUnits, units, setUnitsWithLoading: setUnits } = useUnitsData();
   const columns = [{ title: 'Unit', field: 'name' }];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [
-    urlQueryParams,
-    setUrlQueryParams,
-  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
+  const [urlQueryParams, setUrlQueryParams] =
+    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const createModal = (
     onUpdate: FunctionType<void, [Unit | null]>,

@@ -22,10 +22,8 @@ const InstitutionPage: React.FC = () => {
     institutions,
     setInstitutionsWithLoading: setInstitutions,
   } = useInstitutionsData();
-  const [
-    urlQueryParams,
-    setUrlQueryParams,
-  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
+  const [urlQueryParams, setUrlQueryParams] =
+    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const deleteInstitution = async (id: number | string) => {
     return await api('Institution removed successfully!')

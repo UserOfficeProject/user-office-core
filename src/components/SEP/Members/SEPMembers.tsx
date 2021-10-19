@@ -57,14 +57,11 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   const { user } = useContext(UserContext);
   const { setRenewTokenValue } = useRenewToken();
   const classes = useStyles();
-  const {
-    loadingMembers,
-    SEPReviewersData,
-    setSEPReviewersData,
-  } = useSEPReviewersData(
-    sepId,
-    modalOpen || sepChairModalOpen || sepSecretaryModalOpen
-  );
+  const { loadingMembers, SEPReviewersData, setSEPReviewersData } =
+    useSEPReviewersData(
+      sepId,
+      modalOpen || sepChairModalOpen || sepSecretaryModalOpen
+    );
   const { api } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,

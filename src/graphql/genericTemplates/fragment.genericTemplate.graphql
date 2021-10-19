@@ -1,0 +1,9 @@
+fragment genericTemplate on GenericTemplate {
+  id
+  title
+  creatorId
+  questionaryId
+  created
+  proposalPk
+  questionId
+}

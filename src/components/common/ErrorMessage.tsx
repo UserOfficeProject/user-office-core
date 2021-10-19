@@ -4,7 +4,7 @@ import React from 'react';
 
 const useStyles = makeStyles((theme) => ({
   error: {
-    color: theme.palette.primary.main,
+    color: theme.palette.error.main,
     margin: theme.spacing(2),
   },
 }));

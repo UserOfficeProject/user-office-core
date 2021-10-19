@@ -63,9 +63,8 @@ const FormikUICustomSelect = ({
   multiple,
   ...props
 }: FormikUICustomMultipleSelectProps) => {
-  const availableOptionsNormalized: Option[] = normalizeOptions(
-    availableOptions
-  );
+  const availableOptionsNormalized: Option[] =
+    normalizeOptions(availableOptions);
 
   const getOptionByValue = (value: ValueType) =>
     availableOptionsNormalized.find(

@@ -20,35 +20,34 @@ function QuestionaryComponentVisitBasis() {
   return null;
 }
 
-const visitBasisPreSubmit = () => async ({
-  api,
-  dispatch,
-  state,
-}: SubmitActionDependencyContainer) => {
-  const registration = (state as VisitRegistrationSubmissionState).registration;
+const visitBasisPreSubmit =
+  () =>
+  async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
+    const registration = (state as VisitRegistrationSubmissionState)
+      .registration;
 
-  let returnValue = state.questionary.questionaryId;
-  if (registration.registrationQuestionaryId) {
-    // Already has questionary
-    return registration.registrationQuestionaryId;
-  }
+    let returnValue = state.questionary.questionaryId;
+    if (registration.registrationQuestionaryId) {
+      // Already has questionary
+      return registration.registrationQuestionaryId;
+    }
 
-  // create new questionary
-  const result = await api.createVisitRegistrationQuestionary({
-    visitId: registration.visitId,
-  });
-  const newRegistration =
-    result.createVisitRegistrationQuestionary.registration;
-
-  if (newRegistration?.questionary) {
-    dispatch({
-      type: 'REGISTRATION_CREATED',
-      visit: newRegistration,
+    // create new questionary
+    const result = await api.createVisitRegistrationQuestionary({
+      visitId: registration.visitId,
     });
-    returnValue = newRegistration.questionary.questionaryId;
-  }
+    const newRegistration =
+      result.createVisitRegistrationQuestionary.registration;
 
-  return returnValue;
-};
+    if (newRegistration?.questionary) {
+      dispatch({
+        type: 'REGISTRATION_CREATED',
+        visit: newRegistration,
+      });
+      returnValue = newRegistration.questionary.questionaryId;
+    }
+
+    return returnValue;
+  };
 
 export { QuestionaryComponentVisitBasis, visitBasisPreSubmit };
