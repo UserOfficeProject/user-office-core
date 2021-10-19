@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
@@ -16,6 +16,9 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 
 @injectable()
 export default class GenericTemplateMutations {
+  private genericTemplateAuth = container.resolve(GenericTemplateAuthorization);
+  private userAuth = container.resolve(UserAuthorization);
+
   constructor(
     @inject(Tokens.GenericTemplateDataSource)
     private genericTemplateDataSource: GenericTemplateDataSource,
@@ -24,11 +27,7 @@ export default class GenericTemplateMutations {
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.GenericTemplateAuthorization)
-    private genericTemplateAuthorization: GenericTemplateAuthorization,
-    @inject(Tokens.UserAuthorization)
-    private userAuthorization: UserAuthorization
+    private proposalDataSource: ProposalDataSource
   ) {}
 
   @Authorized()
@@ -65,9 +64,7 @@ export default class GenericTemplateMutations {
       );
     }
 
-    if (
-      (await this.userAuthorization.hasAccessRights(agent, proposal)) === false
-    ) {
+    if ((await this.userAuth.hasAccessRights(agent, proposal)) === false) {
       return rejection(
         'Can not create genericTemplate because of insufficient permissions',
         { agent, args }
@@ -98,11 +95,10 @@ export default class GenericTemplateMutations {
     agent: UserWithRole | null,
     args: UpdateGenericTemplateArgs
   ) {
-    const hasWriteRights =
-      await this.genericTemplateAuthorization.hasWriteRights(
-        agent,
-        args.genericTemplateId
-      );
+    const hasWriteRights = await this.genericTemplateAuth.hasWriteRights(
+      agent,
+      args.genericTemplateId
+    );
 
     if (hasWriteRights === false) {
       return rejection(
@@ -127,11 +123,10 @@ export default class GenericTemplateMutations {
     agent: UserWithRole | null,
     genericTemplateId: number
   ) {
-    const hasWriteRights =
-      await this.genericTemplateAuthorization.hasWriteRights(
-        agent,
-        genericTemplateId
-      );
+    const hasWriteRights = await this.genericTemplateAuth.hasWriteRights(
+      agent,
+      genericTemplateId
+    );
 
     if (hasWriteRights === false) {
       return rejection(
@@ -165,10 +160,7 @@ export default class GenericTemplateMutations {
       );
     }
     if (
-      !(await this.genericTemplateAuthorization.hasWriteRights(
-        agent,
-        genericTemplateId
-      ))
+      !(await this.genericTemplateAuth.hasWriteRights(agent, genericTemplateId))
     ) {
       return rejection(
         'Could not clone genericTemplate because of insufficient permissions',

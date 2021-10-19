@@ -1,7 +1,6 @@
 import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Rejection } from '../../models/Rejection';
 import { GetProposalEsisFilter } from '../../queries/ProposalEsiQueries';
-import { CreateEsiArgs } from '../../resolvers/mutations/CreateEsiMutation';
 import { UpdateEsiArgs } from '../../resolvers/mutations/UpdateEsiMutation';
 import { ProposalEsiDataSource } from '../ProposalEsiDataSource';
 import database from './database';
@@ -9,14 +8,16 @@ import { createEsiObject, EsiRecord } from './records';
 
 class PostgresProposalEsiDataSource implements ProposalEsiDataSource {
   // Create
-  async createEsi(
-    args: CreateEsiArgs & { questionaryId: number; creatorId: number }
+  createEsi(
+    scheduledEventId: number,
+    questionaryId: number,
+    creatorId: number
   ): Promise<ExperimentSafetyInput | Rejection> {
     return database
       .insert({
-        visit_id: args.visitId,
-        questionary_id: args.questionaryId,
-        creator_id: args.creatorId,
+        scheduled_event_id: scheduledEventId,
+        questionary_id: questionaryId,
+        creator_id: creatorId,
       })
       .into('experiment_safety_inputs')
       .returning('*')
@@ -41,8 +42,8 @@ class PostgresProposalEsiDataSource implements ProposalEsiDataSource {
       .select('*')
       .from('experiment_safety_inputs')
       .modify((query) => {
-        if (filter.visitId) {
-          query.where('visit_id', filter.visitId);
+        if (filter.scheduledEventId) {
+          query.where('scheduled_event_id', filter.scheduledEventId);
         }
         if (filter.questionaryId) {
           query.where('questionary_id', filter.questionaryId);

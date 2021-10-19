@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { SampleDataSource } from '../datasources/SampleDataSource';
@@ -8,12 +8,11 @@ import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class SampleAuthorization {
+  private userAuth = container.resolve(UserAuthorization);
+
   constructor(
     @inject(Tokens.SampleDataSource)
-    private sampleDataSource: SampleDataSource,
-
-    @inject(Tokens.UserAuthorization)
-    private userAuthorization: UserAuthorization
+    private sampleDataSource: SampleDataSource
   ) {}
 
   private async resolveSample(
@@ -65,7 +64,7 @@ export class SampleAuthorization {
     sampleOrSampleId: Sample | number
   ) {
     // User officer has access
-    if (this.userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuth.isUserOfficer(agent)) {
       return true;
     }
 
@@ -79,6 +78,6 @@ export class SampleAuthorization {
      * For the sample the authorization follows the business logic for the proposal
      * authorization that the sample is associated with
      */
-    return this.userAuthorization.hasAccessRights(agent, sample.proposalPk);
+    return this.userAuth.hasAccessRights(agent, sample.proposalPk);
   }
 }

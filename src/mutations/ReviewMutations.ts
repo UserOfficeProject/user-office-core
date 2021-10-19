@@ -3,7 +3,7 @@ import {
   proposalTechnicalReviewValidationSchema,
   addUserForReviewValidationSchema,
 } from '@esss-swap/duo-validation';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -32,11 +32,12 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 
 @injectable()
 export default class ReviewMutations {
+  private userAuth = container.resolve(UserAuthorization);
+
   constructor(
     @inject(Tokens.ReviewDataSource) private dataSource: ReviewDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource
   ) {}

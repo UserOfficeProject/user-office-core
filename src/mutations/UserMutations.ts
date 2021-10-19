@@ -12,7 +12,7 @@ import {
   userPasswordFieldBEValidationSchema,
 } from '@esss-swap/duo-validation';
 import * as bcrypt from 'bcryptjs';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
@@ -45,9 +45,10 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 
 @injectable()
 export default class UserMutations {
+  private userAuth = container.resolve(UserAuthorization);
+
   constructor(
-    @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserDataSource) private dataSource: UserDataSource
   ) {}
 
   createHash(password: string): string {

@@ -10,6 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { TzLessDateTime } from '../CustomScalars';
+import { ExperimentSafetyInput } from './ExperimentSafetyInput';
 import { ScheduledEventBookingType } from './ProposalBooking';
 import { Visit } from './Visit';
 
@@ -39,5 +40,17 @@ export class ScheduledEventResolver {
       context.user,
       event.id
     );
+  }
+
+  @FieldResolver(() => ExperimentSafetyInput, { nullable: true })
+  async esi(
+    @Root() event: ScheduledEventCore,
+    @Ctx() context: ResolverContext
+  ): Promise<ExperimentSafetyInput | null> {
+    const esi = await context.queries.proposalEsi.getEsis(context.user, {
+      scheduledEventId: event.id,
+    });
+
+    return esi ? esi[0] : null;
   }
 }

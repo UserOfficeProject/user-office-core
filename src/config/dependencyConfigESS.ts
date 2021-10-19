@@ -13,6 +13,7 @@ import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDa
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSource';
+import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledEventDataSource';
 import PostgresSEPDataSource from '../datasources/postgres/SEPDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
@@ -25,24 +26,11 @@ import {
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
 import { EAMAssetRegistrar } from '../utils/EAM_service';
-import { GenericTemplateAuthorization } from '../utils/GenericTemplateAuthorization';
-import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
-import { SampleAuthorization } from '../utils/SampleAuthorization';
-import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
-import { UserAuthorization } from '../utils/UserAuthorization';
-import { VisitAuthorization } from './../utils/VisitAuthorization';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
 const isProduction = process.env.NODE_ENV === 'production';
-
-mapClass(Tokens.GenericTemplateAuthorization, GenericTemplateAuthorization);
-mapClass(Tokens.UserAuthorization, UserAuthorization);
-mapClass(Tokens.QuestionaryAuthorization, QuestionaryAuthorization);
-mapClass(Tokens.SampleAuthorization, SampleAuthorization);
-mapClass(Tokens.ShipmentAuthorization, ShipmentAuthorization);
-mapClass(Tokens.VisitAuthorization, VisitAuthorization);
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
@@ -57,6 +45,7 @@ mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
 mapClass(Tokens.SampleDataSource, PostgresSampleDataSource);
 mapClass(Tokens.SampleEsiDataSource, PostgresSampleEsiDataSource);
+mapClass(Tokens.ScheduledEventDataSource, PostgresScheduledEventDataSource);
 mapClass(Tokens.SEPDataSource, PostgresSEPDataSource);
 mapClass(Tokens.ShipmentDataSource, PostgresShipmentDataSource);
 mapClass(Tokens.SystemDataSource, PostgresSystemDataSource);

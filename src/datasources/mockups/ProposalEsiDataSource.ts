@@ -1,7 +1,6 @@
 import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Rejection } from '../../models/Rejection';
 import { GetProposalEsisFilter } from '../../queries/ProposalEsiQueries';
-import { CreateEsiArgs } from '../../resolvers/mutations/CreateEsiMutation';
 import { UpdateEsiArgs } from '../../resolvers/mutations/UpdateEsiMutation';
 import { ProposalEsiDataSource } from '../ProposalEsiDataSource';
 
@@ -17,13 +16,15 @@ export class ProposalEsiDataSourceMock implements ProposalEsiDataSource {
 
   // Create
   async createEsi(
-    args: CreateEsiArgs & { questionaryId: number; creatorId: number }
+    scheduledEventId: number,
+    questionaryId: number,
+    creatorId: number
   ): Promise<ExperimentSafetyInput | Rejection> {
     const newEsi = new ExperimentSafetyInput(
       2,
-      args.visitId,
-      args.creatorId,
-      args.questionaryId,
+      scheduledEventId,
+      creatorId,
+      questionaryId,
       false,
       new Date()
     );
@@ -40,8 +41,8 @@ export class ProposalEsiDataSourceMock implements ProposalEsiDataSource {
     filter: GetProposalEsisFilter
   ): Promise<ExperimentSafetyInput[]> {
     return this.esis.filter((esi) => {
-      const isVisitMatch = filter.visitId
-        ? esi.visitId === filter.visitId
+      const isVisitMatch = filter.scheduledEventId
+        ? esi.scheduledEventId === filter.scheduledEventId
         : true;
       const isQuestionaryMatch = filter.questionaryId
         ? esi.questionaryId === filter.questionaryId
