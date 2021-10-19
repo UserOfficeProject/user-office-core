@@ -407,6 +407,7 @@ export default class UserMutations {
         user: decoded.user,
         roles,
         currentRole: decoded.currentRole,
+        externalToken: decoded.externalToken,
       });
 
       return freshToken;
@@ -446,6 +447,7 @@ export default class UserMutations {
         user: dummyUser,
         roles,
         currentRole: roles[0], // User role
+        externalToken: externalToken,
       });
 
       return proposalsToken;
@@ -455,6 +457,30 @@ export default class UserMutations {
         {},
         error
       );
+    }
+  }
+
+  async logout(externalToken: string): Promise<string | Rejection> {
+    try {
+      console.log(externalToken);
+
+      const client = new UOWSSoapClient(process.env.UOWS_URL);
+      const proposalsToken = verifyToken<AuthJwtPayload>(externalToken);
+
+      await client.logout(proposalsToken.externalToken);
+
+      //Check logout has worked
+      const rawStfcUser = await client.getPersonDetailsFromSessionId(
+        proposalsToken.externalToken
+      );
+
+      if (rawStfcUser) {
+        return rejection('Logout unsuccessful', { externalToken });
+      }
+
+      return proposalsToken.externalToken || 'No token';
+    } catch (error) {
+      return rejection('Error occurred during external logout', {}, error);
     }
   }
 
