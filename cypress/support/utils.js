@@ -33,8 +33,10 @@ const notification = ({ variant, text }) => {
 
 const closeNotification = () => {
   cy.get('body').then((body) => {
-    if (body.has('[aria-describedby="client-snackbar"]')) {
-      cy.get('.MuiSnackbarContent-action button').click();
+    if (body.has('[aria-describedby="notistack-snackbar"]')) {
+      cy.get(
+        '[aria-describedby="notistack-snackbar"] button.MuiIconButton-root'
+      ).click();
     }
   });
 };
