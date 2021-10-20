@@ -1,4 +1,8 @@
-import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
+import {
+  ApolloServerPluginInlineTraceDisabled,
+  ApolloServerPluginLandingPageDisabled,
+  ApolloServerPluginLandingPageGraphQLPlayground,
+} from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import { Express } from 'express';
 import { applyMiddleware } from 'graphql-middleware';
@@ -46,14 +50,15 @@ const apolloServer = async (app: Express) => {
 
   const server = new ApolloServer({
     schema: schema,
-    tracing: false,
-    // Explicitly disable playground in prod
-    playground:
-      env !== 'production'
-        ? { settings: { 'schema.polling.enable': false } }
-        : false,
-    plugins: [ApolloServerPluginInlineTraceDisabled()],
-
+    plugins: [
+      ApolloServerPluginInlineTraceDisabled(),
+      // Explicitly disable playground in prod
+      process.env.NODE_ENV === 'production'
+        ? ApolloServerPluginLandingPageDisabled()
+        : ApolloServerPluginLandingPageGraphQLPlayground({
+            settings: { 'schema.polling.enable': false },
+          }),
+    ],
     context: async ({ req }) => {
       let user = null;
       const userId = req.user?.user?.id as number;
@@ -87,6 +92,9 @@ const apolloServer = async (app: Express) => {
       return context;
     },
   });
+
+  await server.start();
+
   server.applyMiddleware({ app: app, path: PATH });
 };
 
