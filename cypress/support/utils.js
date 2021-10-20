@@ -13,11 +13,11 @@ const notification = ({ variant, text }) => {
 
   switch (variant) {
     case 'error':
-      notificationQuerySelector = '.snackbar-error [role="alert"]';
+      notificationQuerySelector = '.snackbar-error #notistack-snackbar';
       break;
 
     default:
-      notificationQuerySelector = '.snackbar-success [role="alert"]';
+      notificationQuerySelector = '.snackbar-success #notistack-snackbar';
       break;
   }
   let notification = cy.get(notificationQuerySelector).should('exist');
