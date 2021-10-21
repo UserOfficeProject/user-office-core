@@ -16,3 +16,5 @@ const resetDB = (includeSeeds = false) => {
 
   cy.wrap(request);
 };
+
+Cypress.Commands.add('resetDB', resetDB);
