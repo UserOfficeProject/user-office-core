@@ -26,7 +26,12 @@ async function setEssColourTheme() {
 async function enableDefaultEssFeatures() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
   await db.setFeatures(
-    [FeatureId.SCHEDULER, FeatureId.SHIPPING, FeatureId.RISK_ASSESSMENT],
+    [
+      FeatureId.SCHEDULER,
+      FeatureId.SHIPPING,
+      FeatureId.RISK_ASSESSMENT,
+      FeatureId.EMAIL_INVITE,
+    ],
     true
   );
 }
