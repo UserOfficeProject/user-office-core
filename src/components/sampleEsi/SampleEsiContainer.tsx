@@ -50,7 +50,6 @@ const sampleEsiReducer = (
 
 export interface SampleEsiContainerProps {
   esi: SampleEsiWithQuestionary;
-  onCreate?: (esi: SampleEsiWithQuestionary) => void;
   onUpdate?: (esi: SampleEsiWithQuestionary) => void;
   onSubmitted?: (esi: SampleEsiWithQuestionary) => void;
 }
@@ -156,7 +155,7 @@ export default function SampleEsiContainer(props: SampleEsiContainerProps) {
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
       <Questionary
-        title={'Input for Sample Experiment Safety Form'}
+        title={state.esi.sample.title}
         handleReset={handleReset}
         displayElementFactory={def.displayElementFactory}
       />
