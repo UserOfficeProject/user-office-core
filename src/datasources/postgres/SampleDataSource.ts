@@ -84,11 +84,19 @@ export default class PostgresSampleDataSource implements SampleDataSource {
     creator_id: number,
     proposal_pk: number,
     questionary_id: number,
-    question_id: string
+    question_id: string,
+    is_post_proposal_submission?: boolean
   ): Promise<Sample> {
     return database('samples')
       .insert(
-        { title, creator_id, proposal_pk, questionary_id, question_id },
+        {
+          title,
+          creator_id,
+          proposal_pk,
+          questionary_id,
+          question_id,
+          is_post_proposal_submission,
+        },
         '*'
       )
       .then((records: SampleRecord[]) => {
