@@ -318,10 +318,6 @@ jobs:
 
           export CYPRES_SPEC_PATTERN=${{ matrix.pattern }}
 
-          ls
-          ls cypress
-          ls cypress/integration
-
           docker-compose \
             -f user-office-backend/docker-compose.e2e.yml \
             -f docker-compose.all.yml \
