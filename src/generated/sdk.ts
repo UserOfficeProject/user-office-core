@@ -512,6 +512,7 @@ export type Feature = {
 };
 
 export enum FeatureId {
+  EMAIL_INVITE = 'EMAIL_INVITE',
   EXTERNAL_AUTH = 'EXTERNAL_AUTH',
   RISK_ASSESSMENT = 'RISK_ASSESSMENT',
   SCHEDULER = 'SCHEDULER',
@@ -2283,7 +2284,7 @@ export type QueryInstrumentArgs = {
 
 
 export type QueryInstrumentProposalBookingsArgs = {
-  instrumentId: Scalars['Int'];
+  instrumentIds: Array<Scalars['Int']>;
 };
 
 
@@ -2886,7 +2887,7 @@ export type ScheduledEventCore = {
 
 export type ScheduledEventFilter = {
   endsAt: Scalars['TzLessDateTime'];
-  instrumentId?: Maybe<Scalars['Int']>;
+  instrumentIds?: Maybe<Array<Scalars['Int']>>;
   startsAt: Scalars['TzLessDateTime'];
 };
 
