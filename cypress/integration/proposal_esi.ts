@@ -7,6 +7,8 @@ const visitorEmail = 'david@teleworm.us';
 const proposalTitle = 'Test proposal';
 const proposalEsiButtonTitle = 'Finish safety input form';
 
+const newSampleTitle = faker.lorem.words(2);
+
 context('visits tests', () => {
   before(() => {
     cy.viewport(1920, 1080);
@@ -67,14 +69,14 @@ context('visits tests', () => {
     cy.testActionButton(proposalEsiButtonTitle, 'invisible');
   });
 
-  it('Should be able to complete ESI', () => {
+  it('Should be able to add complete ESI', () => {
     cy.login('user');
     cy.get('[data-cy=upcoming-experiments]')
       .contains(proposalTitle)
       .closest('TR')
       .find(`[title='${proposalEsiButtonTitle}']`)
       .click();
-    cy.get('[data-cy=add-sample-btn]').click();
+    cy.get('[data-cy=add-esi-btn]').click();
     cy.get(
       '[data-cy=sample-esi-modal] [data-cy=save-and-continue-button]'
     ).click();
@@ -83,6 +85,27 @@ context('visits tests', () => {
     cy.get('[data-cy=submit-esi-button]').should('not.be.disabled');
     cy.get('[data-cy=sample-esi-modal] [data-cy=submit-esi-button]').click();
 
+    // Add new sample
+    cy.get('[data-cy=add-sample-btn]').click();
+
+    cy.get('[data-cy=prompt-input]').type(newSampleTitle);
+    cy.get('[data-cy=prompt-ok]').click();
+    cy.get(
+      '[data-cy=sample-esi-modal] [data-cy=save-and-continue-button]'
+    ).click();
+    cy.get('[data-cy=confirm-sample-correct-cb]').click();
+    cy.get('[data-cy=sample-esi-modal] [data-cy=submit-esi-button]').click();
+
+    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle);
+
+    // Delete new sample
+    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle).closest('li').find('[data-cy=delete-esi-btn]').click();
+    cy.get('[data-cy=confirm-ok]').click();
+    
+    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle).closest('li').find('[data-cy=delete-sample-btn]').click();
+    cy.get('[data-cy=confirm-ok]').click();
+
+    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle).should('not.exist');
     cy.get('[data-cy=save-and-continue-button]').click();
 
     cy.get('[data-cy=submit-proposal-esi-button]').click();

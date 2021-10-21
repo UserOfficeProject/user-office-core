@@ -94,7 +94,9 @@ const withConfirm = <T extends Record<string, unknown>>(
             </DialogContent>
           )}
           <DialogActions>
-            <Button onClick={handleCancel}>{cancellationText}</Button>
+            <Button onClick={handleCancel} data-cy="confirm-cancel">
+              {cancellationText}
+            </Button>
             <Button
               onClick={handleConfirm}
               color="primary"
