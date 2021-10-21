@@ -1,8 +1,0 @@
-mutation ExternalLogoutToken($externalToken: String!) {
-  ExternalLogoutToken(externalToken: $externalToken) {
-    token
-    rejection {
-      ...rejection
-    }
-  }
-}

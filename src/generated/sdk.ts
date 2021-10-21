@@ -709,7 +709,6 @@ export type MoveProposalWorkflowStatusInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  ExternalLogoutToken: ExternalLogoutTokenWrap;
   activateProposalBooking: ProposalBookingResponseWrap;
   activateScheduledEvent: ScheduledEventResponseWrap;
   addClientLog: SuccessResponseWrap;
@@ -788,6 +787,7 @@ export type Mutation = {
   deleteUser: UserResponseWrap;
   deleteVisit: VisitResponseWrap;
   emailVerification: EmailVerificationResponseWrap;
+  externalLogoutToken: ExternalLogoutTokenWrap;
   finalizeProposalBooking: ProposalBookingResponseWrap;
   finalizeScheduledEvent: ScheduledEventResponseWrap;
   getTokenForUser: TokenResponseWrap;
@@ -847,11 +847,6 @@ export type Mutation = {
   updateUserRoles: UserResponseWrap;
   updateVisit: VisitResponseWrap;
   updateVisitRegistration: VisitRegistrationResponseWrap;
-};
-
-
-export type MutationExternalLogoutTokenArgs = {
-  externalToken: Scalars['String'];
 };
 
 
@@ -1311,6 +1306,11 @@ export type MutationDeleteVisitArgs = {
 
 export type MutationEmailVerificationArgs = {
   token: Scalars['String'];
+};
+
+
+export type MutationExternalLogoutTokenArgs = {
+  externalToken: Scalars['String'];
 };
 
 
@@ -7232,23 +7232,6 @@ export type UpdateTopicMutation = (
   ) }
 );
 
-export type ExternalLogoutTokenMutationVariables = Exact<{
-  externalToken: Scalars['String'];
-}>;
-
-
-export type ExternalLogoutTokenMutation = (
-  { __typename?: 'Mutation' }
-  & { ExternalLogoutToken: (
-    { __typename?: 'ExternalLogoutTokenWrap' }
-    & Pick<ExternalLogoutTokenWrap, 'token'>
-    & { rejection: Maybe<(
-      { __typename?: 'Rejection' }
-      & RejectionFragment
-    )> }
-  ) }
-);
-
 export type CheckExternalTokenMutationVariables = Exact<{
   externalToken: Scalars['String'];
 }>;
@@ -7349,6 +7332,23 @@ export type DeleteUserMutation = (
       { __typename?: 'User' }
       & Pick<User, 'id'>
     )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type ExternalLogoutTokenMutationVariables = Exact<{
+  externalToken: Scalars['String'];
+}>;
+
+
+export type ExternalLogoutTokenMutation = (
+  { __typename?: 'Mutation' }
+  & { externalLogoutToken: (
+    { __typename?: 'ExternalLogoutTokenWrap' }
+    & Pick<ExternalLogoutTokenWrap, 'token'>
+    & { rejection: Maybe<(
       { __typename?: 'Rejection' }
       & RejectionFragment
     )> }
@@ -11088,16 +11088,6 @@ export const UpdateTopicDocument = gql`
 }
     ${TemplateFragmentDoc}
 ${RejectionFragmentDoc}`;
-export const ExternalLogoutTokenDocument = gql`
-    mutation ExternalLogoutToken($externalToken: String!) {
-  ExternalLogoutToken(externalToken: $externalToken) {
-    token
-    rejection {
-      ...rejection
-    }
-  }
-}
-    ${RejectionFragmentDoc}`;
 export const CheckExternalTokenDocument = gql`
     mutation checkExternalToken($externalToken: String!) {
   checkExternalToken(externalToken: $externalToken) {
@@ -11168,6 +11158,16 @@ export const DeleteUserDocument = gql`
     user {
       id
     }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${RejectionFragmentDoc}`;
+export const ExternalLogoutTokenDocument = gql`
+    mutation externalLogoutToken($externalToken: String!) {
+  externalLogoutToken(externalToken: $externalToken) {
+    token
     rejection {
       ...rejection
     }
@@ -12145,9 +12145,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     updateTopic(variables: UpdateTopicMutationVariables): Promise<UpdateTopicMutation> {
       return withWrapper(() => client.request<UpdateTopicMutation>(print(UpdateTopicDocument), variables));
     },
-    ExternalLogoutToken(variables: ExternalLogoutTokenMutationVariables): Promise<ExternalLogoutTokenMutation> {
-      return withWrapper(() => client.request<ExternalLogoutTokenMutation>(print(ExternalLogoutTokenDocument), variables));
-    },
     checkExternalToken(variables: CheckExternalTokenMutationVariables): Promise<CheckExternalTokenMutation> {
       return withWrapper(() => client.request<CheckExternalTokenMutation>(print(CheckExternalTokenDocument), variables));
     },
@@ -12162,6 +12159,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     deleteUser(variables: DeleteUserMutationVariables): Promise<DeleteUserMutation> {
       return withWrapper(() => client.request<DeleteUserMutation>(print(DeleteUserDocument), variables));
+    },
+    externalLogoutToken(variables: ExternalLogoutTokenMutationVariables): Promise<ExternalLogoutTokenMutation> {
+      return withWrapper(() => client.request<ExternalLogoutTokenMutation>(print(ExternalLogoutTokenDocument), variables));
     },
     getBasicUserDetails(variables: GetBasicUserDetailsQueryVariables): Promise<GetBasicUserDetailsQuery> {
       return withWrapper(() => client.request<GetBasicUserDetailsQuery>(print(GetBasicUserDetailsDocument), variables));
