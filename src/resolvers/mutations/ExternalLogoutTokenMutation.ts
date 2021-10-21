@@ -7,7 +7,7 @@ import { wrapResponse } from '../wrapResponse';
 @Resolver()
 export class ExternalLogoutTokenMutation {
   @Mutation(() => ExternalLogoutTokenWrap)
-  ExternalLogoutToken(
+  externalLogoutToken(
     @Arg('externalToken') externalToken: string,
     @Ctx() context: ResolverContext
   ) {
