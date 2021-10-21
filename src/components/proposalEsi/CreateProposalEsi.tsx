@@ -8,13 +8,11 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import ProposalEsiContainer from './ProposalEsiContainer';
 
 interface CreateProposalEsiProps {
-  onCreate?: (esi: ProposalEsiWithQuestionary) => void;
   onUpdate?: (esi: ProposalEsiWithQuestionary) => void;
   onSubmitted?: (esi: ProposalEsiWithQuestionary) => void;
   scheduledEventId: number;
 }
 function CreateProposalEsi({
-  onCreate,
   onUpdate,
   onSubmitted,
   scheduledEventId,
@@ -39,7 +37,6 @@ function CreateProposalEsi({
   return (
     <ProposalEsiContainer
       esi={esi}
-      onCreate={onCreate}
       onUpdate={onUpdate}
       onSubmitted={onSubmitted}
     />
