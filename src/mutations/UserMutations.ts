@@ -15,7 +15,6 @@ import * as bcrypt from 'bcryptjs';
 import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -418,30 +417,13 @@ export default class UserMutations {
 
   async checkExternalToken(externalToken: string): Promise<string | Rejection> {
     try {
-      const client = new UOWSSoapClient(process.env.UOWS_URL);
+      const dummyUser = await this.dataSource.checkExternalToken(externalToken);
 
-      const rawStfcUser = await client.getPersonDetailsFromSessionId(
-        externalToken
-      );
-      if (!rawStfcUser) {
+      if (!dummyUser) {
         return rejection('User not found', { externalToken });
       }
-      const stfcUser = rawStfcUser.return;
 
-      // Create dummy user if one does not exist in the proposals DB.
-      // This is needed to satisfy the FOREIGN_KEY constraints
-      // in tables that link to a user (such as proposals)
-      const userNumber = parseInt(stfcUser.userNumber);
-      const dummyUser = await this.dataSource.ensureDummyUserExists(userNumber);
-      const roles = await this.dataSource.getUserRoles(dummyUser.id);
-
-      // With dummyUser created and written (ensureDummyUserExists), info can now
-      // be added to it without persisting it to the database, which is not wanted.
-      // This info is used in the userContext.
-      dummyUser.email = stfcUser.email;
-      dummyUser.firstname = stfcUser.givenName;
-      dummyUser.preferredname = stfcUser.firstNameKnownAs;
-      dummyUser.lastname = stfcUser.familyName;
+      const roles = await this.dataSource.getUserRoles(dummyUser?.id);
 
       const proposalsToken = signToken<AuthJwtPayload>({
         user: dummyUser,
@@ -460,25 +442,13 @@ export default class UserMutations {
     }
   }
 
-  async logout(externalToken: string): Promise<string | Rejection> {
+  async externalLogout(token: string): Promise<void | Rejection> {
     try {
-      console.log(externalToken);
+      const decodedToken = verifyToken<AuthJwtPayload>(token);
 
-      const client = new UOWSSoapClient(process.env.UOWS_URL);
-      const proposalsToken = verifyToken<AuthJwtPayload>(externalToken);
+      this.dataSource.externalLogout(decodedToken.externalToken ?? 'no-token');
 
-      await client.logout(proposalsToken.externalToken);
-
-      //Check logout has worked
-      const rawStfcUser = await client.getPersonDetailsFromSessionId(
-        proposalsToken.externalToken
-      );
-
-      if (rawStfcUser) {
-        return rejection('Logout unsuccessful', { externalToken });
-      }
-
-      return proposalsToken.externalToken || 'No token';
+      return;
     } catch (error) {
       return rejection('Error occurred during external logout', {}, error);
     }

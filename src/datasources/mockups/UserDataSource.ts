@@ -350,4 +350,12 @@ export class UserDataSourceMock implements UserDataSource {
   async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
     return { id: 1, shortCode: 'user_officer', title: 'User Officer' };
   }
+
+  async checkExternalToken(token: string): Promise<User> {
+    return dummyUser;
+  }
+
+  async externalLogout(token: string) {
+    return;
+  }
 }

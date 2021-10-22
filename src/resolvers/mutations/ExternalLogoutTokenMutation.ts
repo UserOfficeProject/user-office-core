@@ -12,7 +12,7 @@ export class ExternalLogoutTokenMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.user.logout(externalToken),
+      context.mutations.user.externalLogout(externalToken),
       ExternalLogoutTokenWrap
     );
   }
