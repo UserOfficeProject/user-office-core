@@ -41,11 +41,12 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   const Component = component; // JSX Elements have to be uppercase.
 
   const featureContext = useContext(FeatureContext);
-  const EXTERNAL_AUTH = !!featureContext.features.get(FeatureId.EXTERNAL_AUTH)
-    ?.isEnabled;
+  const isExternalAuthEnabled = !!featureContext.features.get(
+    FeatureId.EXTERNAL_AUTH
+  )?.isEnabled;
 
   const settingsContext = useContext(SettingsContext);
-  const EXTERNAL_AUTH_LOGIN_URL = settingsContext.settings.get(
+  const externalAuthLoginUrl = settingsContext.settings.get(
     SettingsId.EXTERNAL_AUTH_LOGIN_URL
   )?.settingsValue;
 
@@ -56,8 +57,8 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
-              if (EXTERNAL_AUTH && EXTERNAL_AUTH_LOGIN_URL) {
-                window.location.href = EXTERNAL_AUTH_LOGIN_URL;
+              if (isExternalAuthEnabled && externalAuthLoginUrl) {
+                window.location.href = externalAuthLoginUrl;
 
                 return <p>Redirecting to external sign-in page...</p>;
               }

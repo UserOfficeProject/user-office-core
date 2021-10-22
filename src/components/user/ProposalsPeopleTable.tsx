@@ -192,8 +192,9 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
   });
 
   const featureContext = useContext(FeatureContext);
-  const EMAIL_INVITE = !!featureContext.features.get(FeatureId.EMAIL_INVITE)
-    ?.isEnabled;
+  const isEmailInviteEnabled = !!featureContext.features.get(
+    FeatureId.EMAIL_INVITE
+  )?.isEnabled;
   const { prevColabUsers, loadingUsersData } = usePrevColabs(query);
 
   const sendRequest = useDataApi();
@@ -273,7 +274,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
     });
 
   props.emailInvite &&
-    EMAIL_INVITE &&
+    isEmailInviteEnabled &&
     actionArray.push({
       icon: EmailIcon,
       isFreeAction: true,

@@ -114,8 +114,9 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     refreshData: false,
   });
   const featureContext = useContext(FeatureContext);
-  const EMAIL_INVITE = !!featureContext.features.get(FeatureId.EMAIL_INVITE)
-    ?.isEnabled;
+  const isEmailInviteEnabled = !!featureContext.features.get(
+    FeatureId.EMAIL_INVITE
+  )?.isEnabled;
 
   const { isLoading } = props;
   const { usersData, loadingUsersData } = useUsersData(query);
@@ -182,7 +183,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
       ) => action.fn(rowData),
     });
   props.emailInvite &&
-    EMAIL_INVITE &&
+    isEmailInviteEnabled &&
     actionArray.push({
       icon: EmailIcon,
       isFreeAction: true,
