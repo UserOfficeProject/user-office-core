@@ -34,6 +34,9 @@ export class Sample implements Partial<SampleOrigin> {
   @Field()
   public questionId: string;
 
+  @Field()
+  public isPostProposalSubmission: boolean;
+
   @Field(() => SampleStatus)
   public safetyStatus: SampleStatus;
 

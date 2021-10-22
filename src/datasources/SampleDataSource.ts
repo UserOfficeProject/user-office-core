@@ -11,7 +11,8 @@ export interface SampleDataSource {
     creatorId: number,
     proposalPk: number,
     questionaryId: number,
-    questionId: string
+    questionId: string,
+    isPostProposalSubmission?: boolean
   ): Promise<Sample>;
   getSample(sampleId: number): Promise<Sample | null>;
   getSamples(args: SamplesArgs): Promise<Sample[]>;

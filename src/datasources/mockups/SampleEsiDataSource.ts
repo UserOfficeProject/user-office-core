@@ -60,7 +60,6 @@ export class SampleEsiDataSourceMock implements SampleEsiDataSource {
     args: UpdateSampleEsiArgs & { questionaryId?: number }
   ): Promise<SampleExperimentSafetyInput> {
     const esiToUpdate = (await this.getSampleEsi(args))!;
-    console.log('is it', esiToUpdate.isSubmitted);
     if (args.isSubmitted !== undefined) {
       esiToUpdate.isSubmitted = args.isSubmitted;
     }
