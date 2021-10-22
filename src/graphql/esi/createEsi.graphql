@@ -16,6 +16,7 @@ mutation createEsi($scheduledEventId: Int!) {
         }
       }
       proposal {
+        primaryKey
         proposalId
         title
         samples {

@@ -62,6 +62,7 @@ function createSampleStub(
     },
     questionId: questionId,
     questionaryId: 0,
+    isPostProposalSubmission: false,
     safetyComment: '',
     safetyStatus: SampleStatus.PENDING_EVALUATION,
     title: '',
