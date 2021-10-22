@@ -13,11 +13,11 @@ const notification = ({ variant, text }) => {
 
   switch (variant) {
     case 'error':
-      notificationQuerySelector = '.snackbar-error [role="alert"]';
+      notificationQuerySelector = '.snackbar-error #notistack-snackbar';
       break;
 
     default:
-      notificationQuerySelector = '.snackbar-success [role="alert"]';
+      notificationQuerySelector = '.snackbar-success #notistack-snackbar';
       break;
   }
   let notification = cy.get(notificationQuerySelector).should('exist');
@@ -33,8 +33,10 @@ const notification = ({ variant, text }) => {
 
 const closeNotification = () => {
   cy.get('body').then((body) => {
-    if (body.has('[aria-describedby="client-snackbar"]')) {
-      cy.get('.MuiSnackbarContent-action button').click();
+    if (body.has('[aria-describedby="notistack-snackbar"]')) {
+      cy.get(
+        '[aria-describedby="notistack-snackbar"] button.MuiIconButton-root'
+      ).click();
     }
   });
 };

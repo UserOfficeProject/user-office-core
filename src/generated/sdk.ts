@@ -2284,7 +2284,7 @@ export type QueryInstrumentArgs = {
 
 
 export type QueryInstrumentProposalBookingsArgs = {
-  instrumentId: Scalars['Int'];
+  instrumentIds: Array<Scalars['Int']>;
 };
 
 
@@ -2888,7 +2888,7 @@ export type ScheduledEventCore = {
 
 export type ScheduledEventFilter = {
   endsAt: Scalars['TzLessDateTime'];
-  instrumentId?: Maybe<Scalars['Int']>;
+  instrumentIds?: Maybe<Array<Scalars['Int']>>;
   startsAt: Scalars['TzLessDateTime'];
 };
 
