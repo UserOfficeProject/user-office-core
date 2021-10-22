@@ -48,7 +48,7 @@
     "apollo-server-core": "^3.4.0",
     "apollo-server-express": "^3.4.0",
     "await-to-js": "^2.1.1",
-    "axios": "^0.21.4",
+    "axios": "^0.22.0",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
     "cache-pug-templates": "^2.0.3",
