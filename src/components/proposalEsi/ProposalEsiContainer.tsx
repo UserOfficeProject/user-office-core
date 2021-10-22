@@ -43,6 +43,17 @@ const proposalEsiReducer = (
       };
       draftState.isDirty = true;
       break;
+    case 'ESI_SAMPLE_CREATED':
+      if (!draftState.esi.proposal.samples) {
+        draftState.esi.proposal.samples = [];
+      }
+      draftState.esi.proposal.samples.push(action.sample);
+      break;
+    case 'ESI_SAMPLE_DELETED':
+      draftState.esi.proposal.samples = draftState.esi.proposal.samples!.filter(
+        (sample) => sample.id !== action.sampleId
+      );
+      break;
   }
 
   return draftState;
@@ -50,7 +61,6 @@ const proposalEsiReducer = (
 
 export interface ProposalEsiContainerProps {
   esi: ProposalEsiWithQuestionary;
-  onCreate?: (esi: ProposalEsiWithQuestionary) => void;
   onUpdate?: (esi: ProposalEsiWithQuestionary) => void;
   onSubmitted?: (esi: ProposalEsiWithQuestionary) => void;
 }
@@ -112,9 +122,6 @@ export default function ProposalEsiContainer(props: ProposalEsiContainerProps) {
 
         case 'RESET_CLICKED':
           handleReset();
-          break;
-
-        case 'ESI_CREATED':
           break;
 
         case 'ESI_MODIFIED':

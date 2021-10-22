@@ -1105,6 +1105,7 @@ export type MutationCreateSepArgs = {
 
 
 export type MutationCreateSampleArgs = {
+  isPostProposalSubmission?: Maybe<Scalars['Boolean']>;
   proposalPk: Scalars['Int'];
   questionId: Scalars['String'];
   templateId: Scalars['Int'];
@@ -2778,6 +2779,7 @@ export type Sample = {
   created: Scalars['DateTime'];
   creatorId: Scalars['Int'];
   id: Scalars['Int'];
+  isPostProposalSubmission: Scalars['Boolean'];
   proposal: Proposal;
   proposalPk: Scalars['Int'];
   questionId: Scalars['String'];
@@ -4403,7 +4405,7 @@ export type CreateEsiMutation = (
         & SampleEsiFragment
       )>, proposal: (
         { __typename?: 'Proposal' }
-        & Pick<Proposal, 'proposalId' | 'title'>
+        & Pick<Proposal, 'primaryKey' | 'proposalId' | 'title'>
         & { samples: Maybe<Array<(
           { __typename?: 'Sample' }
           & SampleFragment
@@ -4450,7 +4452,7 @@ export type GetEsiQuery = (
       & SampleEsiFragment
     )>, proposal: (
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'proposalId' | 'title'>
+      & Pick<Proposal, 'primaryKey' | 'proposalId' | 'title'>
       & { samples: Maybe<Array<(
         { __typename?: 'Sample' }
         & SampleFragment
@@ -5906,6 +5908,7 @@ export type CreateSampleMutationVariables = Exact<{
   templateId: Scalars['Int'];
   proposalPk: Scalars['Int'];
   questionId: Scalars['String'];
+  isPostProposalSubmission?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -5949,7 +5952,7 @@ export type DeleteSampleMutation = (
 
 export type SampleFragment = (
   { __typename?: 'Sample' }
-  & Pick<Sample, 'id' | 'title' | 'creatorId' | 'questionaryId' | 'safetyStatus' | 'safetyComment' | 'created' | 'proposalPk' | 'questionId'>
+  & Pick<Sample, 'id' | 'title' | 'creatorId' | 'questionaryId' | 'safetyStatus' | 'safetyComment' | 'isPostProposalSubmission' | 'created' | 'proposalPk' | 'questionId'>
 );
 
 export type GetSampleQueryVariables = Exact<{
@@ -8362,6 +8365,7 @@ export const SampleFragmentDoc = gql`
   questionaryId
   safetyStatus
   safetyComment
+  isPostProposalSubmission
   created
   proposalPk
   questionId
@@ -9215,6 +9219,7 @@ export const CreateEsiDocument = gql`
         }
       }
       proposal {
+        primaryKey
         proposalId
         title
         samples {
@@ -9253,6 +9258,7 @@ export const GetEsiDocument = gql`
       }
     }
     proposal {
+      primaryKey
       proposalId
       title
       samples {
@@ -10347,12 +10353,13 @@ export const CloneSampleDocument = gql`
 ${QuestionaryFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const CreateSampleDocument = gql`
-    mutation createSample($title: String!, $templateId: Int!, $proposalPk: Int!, $questionId: String!) {
+    mutation createSample($title: String!, $templateId: Int!, $proposalPk: Int!, $questionId: String!, $isPostProposalSubmission: Boolean) {
   createSample(
     title: $title
     templateId: $templateId
     proposalPk: $proposalPk
     questionId: $questionId
+    isPostProposalSubmission: $isPostProposalSubmission
   ) {
     sample {
       ...sample
