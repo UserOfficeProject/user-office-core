@@ -34,10 +34,6 @@ const AccountActionButton: React.FC = () => {
     handleLogout();
   };
 
-  const closeRoleSelect = () => {
-    setShow(false);
-  };
-
   return (
     <>
       <Dialog
@@ -48,7 +44,7 @@ const AccountActionButton: React.FC = () => {
         style={{ backdropFilter: 'blur(6px)' }}
       >
         <DialogContent>
-          <RoleSelection closeRoleSelect={closeRoleSelect} />
+          <RoleSelection />
         </DialogContent>
       </Dialog>
       <>

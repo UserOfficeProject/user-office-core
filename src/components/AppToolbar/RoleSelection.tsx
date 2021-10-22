@@ -9,9 +9,7 @@ import { getUniqueArrayBy } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const RoleSelection: React.FC<{ closeRoleSelect: () => void }> = ({
-  closeRoleSelect,
-}) => {
+const RoleSelection: React.FC = ({}) => {
   const { currentRole, token, handleNewToken } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const { api } = useDataApiWithFeedback();
@@ -60,8 +58,6 @@ const RoleSelection: React.FC<{ closeRoleSelect: () => void }> = ({
 
       setTimeout(() => {
         handleNewToken(result.selectRole.token);
-        setLoading(false);
-        closeRoleSelect();
       }, 500);
     }
   };

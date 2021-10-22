@@ -155,9 +155,9 @@ class App extends React.Component {
               </IconButton>
             )}
           >
-            <SettingsContextProvider>
-              <FeatureContextProvider>
-                <UserContextProvider>
+            <UserContextProvider>
+              <SettingsContextProvider>
+                <FeatureContextProvider>
                   <Theme>
                     <DownloadContextProvider>
                       <ReviewAndAssignmentContextProvider>
@@ -169,9 +169,9 @@ class App extends React.Component {
                       </ReviewAndAssignmentContextProvider>
                     </DownloadContextProvider>
                   </Theme>
-                </UserContextProvider>
-              </FeatureContextProvider>
-            </SettingsContextProvider>
+                </FeatureContextProvider>
+              </SettingsContextProvider>
+            </UserContextProvider>
           </SnackbarProvider>
         </CookiesProvider>
       </StylesProvider>
