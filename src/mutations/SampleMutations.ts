@@ -62,6 +62,13 @@ export default class SampleMutations {
       );
     }
 
+    if (proposal.submitted && args.isPostProposalSubmission !== true) {
+      return rejection(
+        'Can not create sample because proposal is already submitted',
+        { agent, args }
+      );
+    }
+
     return this.questionaryDataSource
       .create(agent.id, args.templateId)
       .then((questionary) => {
@@ -70,7 +77,8 @@ export default class SampleMutations {
           agent.id,
           args.proposalPk,
           questionary.questionaryId,
-          args.questionId
+          args.questionId,
+          args.isPostProposalSubmission
         );
       })
       .catch((error) => {
@@ -120,14 +128,26 @@ export default class SampleMutations {
   }
 
   async deleteSample(agent: UserWithRole | null, sampleId: number) {
-    const hasWriteRights = await this.sampleAuth.hasWriteRights(
-      agent,
-      sampleId
-    );
+    const sample = await this.sampleDataSource.getSample(sampleId);
+    if (sample === null) {
+      return rejection(
+        'Could not delete sample because sample with specified ID does not exist',
+        { agent, sampleId }
+      );
+    }
+    const hasWriteRights = await this.sampleAuth.hasWriteRights(agent, sample);
 
     if (hasWriteRights === false) {
       return rejection(
         'Can not delete sample because of insufficient permissions',
+        { agent, sampleId }
+      );
+    }
+
+    const proposal = await this.proposalDataSource.get(sample.proposalPk);
+    if (proposal!.submitted && sample.isPostProposalSubmission === false) {
+      return rejection(
+        'Could not delete sample because associated proposal is already submitted',
         { agent, sampleId }
       );
     }
