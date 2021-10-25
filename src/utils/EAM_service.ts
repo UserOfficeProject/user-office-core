@@ -89,7 +89,7 @@ export class EAMAssetRegistrar implements AssetRegistrar {
       data: request,
       headers: {
         'Content-Type': 'text/xml',
-        'Content-Length': this.addAssetSoapRequest.length,
+        'Content-Length': `${this.addAssetSoapRequest.length}`,
         Authorization: `Bearer ${accessToken?.token.access_token}`,
       },
     });
