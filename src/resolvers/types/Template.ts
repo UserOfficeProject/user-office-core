@@ -1,3 +1,4 @@
+import { container } from 'tsyringe';
 import {
   Ctx,
   Field,
@@ -9,11 +10,13 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import {
   Template as TemplateOrigin,
-  TemplateCategoryId,
+  TemplateGroupId,
 } from '../../models/Template';
 import { Question } from './Question';
+import { TemplateGroup } from './TemplateGroup';
 import { TemplateStep } from './TemplateStep';
 
 @ObjectType()
@@ -21,8 +24,8 @@ export class Template implements Partial<TemplateOrigin> {
   @Field(() => Int)
   public templateId: number;
 
-  @Field(() => TemplateCategoryId)
-  public categoryId: TemplateCategoryId;
+  @Field(() => TemplateGroupId)
+  public groupId: TemplateGroupId;
 
   @Field()
   public name: string;
@@ -67,5 +70,15 @@ export class TemplateResolver {
       context.user,
       template.templateId
     );
+  }
+
+  @FieldResolver(() => TemplateGroup)
+  async group(
+    @Root() template: Template,
+    @Ctx() context: ResolverContext
+  ): Promise<TemplateGroup> {
+    const templateDataSource = container.resolve(TemplateDataSource);
+
+    return templateDataSource.getGroup(template.groupId);
   }
 }

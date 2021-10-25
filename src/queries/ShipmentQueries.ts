@@ -1,5 +1,5 @@
 import { logger } from '@esss-swap/duo-logger';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
@@ -11,17 +11,14 @@ import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 
 @injectable()
 export default class ShipmentQueries {
+  private shipmentAuth = container.resolve(ShipmentAuthorization);
+
   constructor(
-    @inject(Tokens.ShipmentDataSource) private dataSource: ShipmentDataSource,
-    @inject(Tokens.ShipmentAuthorization)
-    private shipmentAuthorization: ShipmentAuthorization
+    @inject(Tokens.ShipmentDataSource) private dataSource: ShipmentDataSource
   ) {}
 
   async getShipment(agent: UserWithRole | null, shipmentId: number) {
-    const hasRights = await this.shipmentAuthorization.hasReadRights(
-      agent,
-      shipmentId
-    );
+    const hasRights = await this.shipmentAuth.hasReadRights(agent, shipmentId);
     if (hasRights == false) {
       logger.logWarn('Unauthorized getShipment access', { agent, shipmentId });
 
@@ -37,7 +34,7 @@ export default class ShipmentQueries {
 
     shipments = await Promise.all(
       shipments.map((shipment) =>
-        this.shipmentAuthorization.hasReadRights(agent, shipment)
+        this.shipmentAuth.hasReadRights(agent, shipment)
       )
     ).then((results) => shipments.filter((_v, index) => results[index]));
 
@@ -57,7 +54,7 @@ export default class ShipmentQueries {
 
     shipments = await Promise.all(
       shipments.map((shipment) =>
-        this.shipmentAuthorization.hasReadRights(agent, shipment)
+        this.shipmentAuth.hasReadRights(agent, shipment)
       )
     ).then((results) => shipments.filter((_v, index) => results[index]));
 

@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
@@ -11,9 +11,10 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 
 @injectable()
 export default class ReviewQueries {
+  private userAuth = container.resolve(UserAuthorization);
+
   constructor(
-    @inject(Tokens.ReviewDataSource) public dataSource: ReviewDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.ReviewDataSource) public dataSource: ReviewDataSource
   ) {}
 
   @Authorized()

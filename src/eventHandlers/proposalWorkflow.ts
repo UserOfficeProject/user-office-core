@@ -70,7 +70,7 @@ export default function createHandler() {
             event.proposal.primaryKey
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.primaryKey}: `,
             error
           );
@@ -107,7 +107,7 @@ export default function createHandler() {
             )
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposalpkswithnextstatus.proposalPks}: `,
             error
           );
@@ -130,7 +130,7 @@ export default function createHandler() {
             event.proposal
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.primaryKey}: `,
             error
           );
@@ -154,7 +154,7 @@ export default function createHandler() {
             event.proposal
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.primaryKey}: `,
             error
           );
@@ -201,7 +201,7 @@ export default function createHandler() {
             event.proposal
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.proposal.primaryKey}: `,
             error
           );
@@ -234,7 +234,7 @@ export default function createHandler() {
             proposal
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.technicalreview.proposalPk}: `,
             error
           );
@@ -281,7 +281,7 @@ export default function createHandler() {
             proposal
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.technicalreview.proposalPk}: `,
             error
           );
@@ -319,7 +319,7 @@ export default function createHandler() {
             proposal
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sample.proposalPk}: `,
             error
           );
@@ -343,7 +343,7 @@ export default function createHandler() {
             proposal
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sepmeetingdecision.proposalPk}: `,
             error
           );
@@ -376,7 +376,7 @@ export default function createHandler() {
             proposal
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.sepmeetingdecision.proposalPk}: `,
             error
           );
@@ -411,7 +411,7 @@ export default function createHandler() {
             proposal
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.reviewwithnextproposalstatus.proposalPk}: `,
             error
           );
@@ -453,7 +453,7 @@ export default function createHandler() {
             proposal
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.review.proposalPk}: `,
             error
           );
@@ -480,7 +480,7 @@ export default function createHandler() {
             );
           }
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine on proposals with callId = ${event.call.id}: `,
             error
           );
@@ -503,7 +503,7 @@ export default function createHandler() {
             })
           );
         } catch (error) {
-          logger.logError(
+          logger.logException(
             `Error while trying to mark ${event.type} event as done and calling workflow engine with ${event.instrumenthasproposals.proposalPks}: `,
             error
           );

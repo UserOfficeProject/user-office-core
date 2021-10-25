@@ -19,6 +19,7 @@ export enum DataType {
   DATE = 'DATE',
   EMBELLISHMENT = 'EMBELLISHMENT',
   FILE_UPLOAD = 'FILE_UPLOAD',
+  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
   SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
   TEXT_INPUT = 'TEXT_INPUT',
   SAMPLE_DECLARATION = 'SAMPLE_DECLARATION',
@@ -29,7 +30,9 @@ export enum DataType {
   SHIPMENT_BASIS = 'SHIPMENT_BASIS',
   RICH_TEXT_INPUT = 'RICH_TEXT_INPUT',
   VISIT_BASIS = 'VISIT_BASIS',
-  RISK_ASSESSMENT_BASIS = 'RISK_ASSESSMENT_BASIS',
+  GENERIC_TEMPLATE_BASIS = 'GENERIC_TEMPLATE_BASIS',
+  PROPOSAL_ESI_BASIS = 'PROPOSAL_ESI_BASIS',
+  SAMPLE_ESI_BASIS = 'SAMPLE_ESI_BASIS',
 }
 
 export class Topic {
@@ -77,6 +80,13 @@ export class QuestionTemplateRelation {
   ) {}
 }
 
+export class TemplateGroup {
+  constructor(
+    public groupId: TemplateGroupId,
+    public categoryId: TemplateCategoryId
+  ) {}
+}
+
 export class TemplateStep {
   constructor(public topic: Topic, public fields: QuestionTemplateRelation[]) {}
 }
@@ -89,8 +99,18 @@ export enum TemplateCategoryId {
   PROPOSAL_QUESTIONARY = 1,
   SAMPLE_DECLARATION,
   SHIPMENT_DECLARATION,
-  VISIT,
-  RISK_ASSESSMENT,
+  VISIT_REGISTRATION,
+  GENERIC_TEMPLATE = 7,
+}
+
+export enum TemplateGroupId {
+  PROPOSAL = 'PROPOSAL',
+  PROPOSAL_ESI = 'PROPOSAL_ESI',
+  SAMPLE = 'SAMPLE',
+  SAMPLE_ESI = 'SAMPLE_ESI',
+  SHIPMENT = 'SHIPMENT',
+  VISIT_REGISTRATION = 'VISIT_REGISTRATION',
+  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
 }
 
 export class FieldCondition {
@@ -100,7 +120,7 @@ export class FieldCondition {
 export class Template {
   constructor(
     public templateId: number,
-    public categoryId: number,
+    public groupId: TemplateGroupId,
     public name: string,
     public description: string,
     public isArchived: boolean

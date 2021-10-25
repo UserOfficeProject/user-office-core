@@ -101,9 +101,24 @@
 			"key": "NEW_SHIPMENT_ID",
 			"value": "",
 			"enabled": true
+		},
+		{
+			"key": "NEW_PROPOSAL_PK",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "NEW_VISIT_ID",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "NEW_SAMPLE_ID",
+			"value": "",
+			"enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
-	"_postman_exported_at": "2020-12-11T08:28:48.012Z",
+	"_postman_exported_at": "2021-09-17T13:56:57.411Z",
 	"_postman_exported_using": "Postman/7.28.0"
 }

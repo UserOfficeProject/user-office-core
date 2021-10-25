@@ -1,3 +1,4 @@
+import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Visit } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
 import { GetRegistrationsFilter } from '../../queries/VisitQueries';
@@ -12,6 +13,7 @@ import {
   createVisitObject,
   VisitRecord,
   VisitRegistrationRecord,
+  createEsiObject,
 } from './records';
 
 class PostgresVisitDataSource implements VisitDataSource {
@@ -76,9 +78,18 @@ class PostgresVisitDataSource implements VisitDataSource {
       .then((visit) => (visit ? createVisitObject(visit) : null));
   }
 
+  getEsiByVisitId(visitId: number): Promise<ExperimentSafetyInput | null> {
+    return database('experiment_safety_inputs')
+      .select('*')
+      .where({ visit_id: visitId })
+      .first()
+      .then((esi) => (esi ? createEsiObject(esi) : null));
+  }
+
   createVisit(
-    { proposalPk, scheduledEventId, teamLeadUserId }: CreateVisitArgs,
-    creatorId: number
+    { scheduledEventId: scheduledEventId, teamLeadUserId }: CreateVisitArgs,
+    creatorId: number,
+    proposalPk: number
   ): Promise<Visit> {
     return database('visits')
       .insert({
@@ -112,13 +123,11 @@ class PostgresVisitDataSource implements VisitDataSource {
             .ignore()
             .transacting(trx);
         }
-        if (args.status || args.proposalPkAndEventId || args.teamLeadUserId) {
+        if (args.status || args.teamLeadUserId) {
           await database('visits')
             .update({
               status: args.status,
-              proposal_pk: args.proposalPkAndEventId?.proposalPK,
-              scheduled_event_id: args.proposalPkAndEventId?.scheduledEventId,
-              team_lead_user_id: args?.teamLeadUserId,
+              team_lead_user_id: args.teamLeadUserId,
             })
             .where({ visit_id: args.visitId })
             .transacting(trx);
@@ -161,6 +170,10 @@ class PostgresVisitDataSource implements VisitDataSource {
       .delete()
       .returning('*')
       .then((result) => {
+        if (result.length !== 1) {
+          throw new Error('Visit not found');
+        }
+
         return createVisitObject(result[0]);
       });
   }

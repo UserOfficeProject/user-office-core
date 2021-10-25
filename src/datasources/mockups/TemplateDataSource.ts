@@ -8,6 +8,8 @@ import {
   Template,
   TemplateCategory,
   TemplateCategoryId,
+  TemplateGroup,
+  TemplateGroupId,
   TemplatesHasQuestions,
   TemplateStep,
   Topic,
@@ -19,6 +21,7 @@ import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/muta
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
+import { SampleDeclarationConfig } from '../../resolvers/types/FieldConfig';
 import { TemplateDataSource } from '../TemplateDataSource';
 import {
   dummyQuestionFactory,
@@ -33,7 +36,7 @@ export let dummyComplementarySteps: Question[];
 const dummyProposalTemplateFactory = (values?: Partial<Template>) => {
   return new Template(
     values?.templateId || 1,
-    values?.categoryId || 1,
+    values?.groupId || TemplateGroupId.PROPOSAL,
     values?.name || 'Industrial template',
     values?.description || 'Industrial template description',
     values?.isArchived || false
@@ -76,7 +79,7 @@ const dummyTemplateStepsFactory = () => {
     question: dummyQuestionFactory({
       id: 'enable_crystallization',
       dataType: DataType.BOOLEAN,
-      question: 'Is crystallization aplicable',
+      question: 'Is crystallization applicable',
       naturalKey: 'enable_crystallization',
     }),
   });
@@ -98,6 +101,15 @@ const dummyTemplateStepsFactory = () => {
     }),
   });
 
+  const samplesField = dummyQuestionTemplateRelationFactory({
+    question: dummyQuestionFactory({
+      id: 'experiment_samples',
+      naturalKey: 'experiment_samples',
+      dataType: DataType.SAMPLE_DECLARATION,
+      config: { esiTemplateId: 1 } as SampleDeclarationConfig,
+    }),
+  });
+
   return [
     new TemplateStep(new Topic(1, 'General information', 1, 1, true), [
       hasLinksToField,
@@ -105,6 +117,7 @@ const dummyTemplateStepsFactory = () => {
       hasLinksWithIndustry,
       enableCrystallization,
       proposalBasis,
+      samplesField,
     ]),
   ];
 };
@@ -112,6 +125,9 @@ const dummyTemplateStepsFactory = () => {
 export class TemplateDataSourceMock implements TemplateDataSource {
   constructor() {
     this.init();
+  }
+  async getGroup(groupId: TemplateGroupId): Promise<TemplateGroup> {
+    return new TemplateGroup(groupId, TemplateCategoryId.PROPOSAL_QUESTIONARY);
   }
   public init() {
     dummyProposalTemplate = dummyProposalTemplateFactory();
@@ -194,7 +210,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return [
       new Template(
         1,
-        1,
+        TemplateGroupId.PROPOSAL,
         'Industrial',
         'Industrial proposal template',
         args?.filter?.isArchived || false
@@ -337,9 +353,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return true;
   }
 
-  async getActiveTemplateId(
-    _categoryId: TemplateCategoryId
-  ): Promise<number | null> {
+  async getActiveTemplateId(_groupId: TemplateGroupId): Promise<number | null> {
     return 1;
   }
 

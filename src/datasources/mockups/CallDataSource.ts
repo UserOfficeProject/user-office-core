@@ -31,6 +31,7 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.callReviewEnded || false,
     values?.callSEPReviewEnded || false,
     values?.templateId || 1,
+    values?.esiTemplateId || 2,
     values?.allocationTimeUnit || AllocationTimeUnits.Day,
     values?.title || 'Title',
     values?.description || 'Description'
@@ -59,6 +60,7 @@ export const dummyCall = new Call(
   false,
   false,
   1,
+  2,
   AllocationTimeUnits.Day,
   '',
   ''
@@ -86,6 +88,7 @@ export const anotherDummyCall = new Call(
   false,
   false,
   1,
+  2,
   AllocationTimeUnits.Day,
   '',
   ''

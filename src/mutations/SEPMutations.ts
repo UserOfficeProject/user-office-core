@@ -8,7 +8,7 @@ import {
   updateTimeAllocationValidationSchema,
   saveSepMeetingDecisionValidationSchema,
 } from '@esss-swap/duo-validation';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -43,13 +43,12 @@ import { UpdateSEPTimeAllocationArgs } from '../resolvers/mutations/UpdateSEPPro
 import { UserAuthorization } from '../utils/UserAuthorization';
 @injectable()
 export default class SEPMutations {
+  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.SEPDataSource)
     private dataSource: SEPDataSource,
     @inject(Tokens.InstrumentDataSource)
     private instrumentDataSource: InstrumentDataSource,
-    @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
     @inject(Tokens.ProposalSettingsDataSource)
@@ -279,7 +278,8 @@ export default class SEPMutations {
 
       return result;
     } catch (error) {
-      if ('code' in error && error.code === '23503') {
+      // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
+      if ((error as { code: string }).code === '23503') {
         return rejection(
           'Failed to delete SEP, because it has dependencies which need to be deleted first',
           { sepId },

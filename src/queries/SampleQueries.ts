@@ -1,5 +1,5 @@
 import { logger } from '@esss-swap/duo-logger';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { SampleDataSource } from '../datasources/SampleDataSource';
@@ -13,21 +13,16 @@ import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 
 @injectable()
 export default class SampleQueries {
+  private sampleAuth = container.resolve(SampleAuthorization);
+  private shipmentAuth = container.resolve(ShipmentAuthorization);
+
   constructor(
     @inject(Tokens.SampleDataSource)
-    private dataSource: SampleDataSource,
-
-    @inject(Tokens.SampleAuthorization)
-    private sampleAuthorization: SampleAuthorization,
-
-    @inject(Tokens.ShipmentAuthorization)
-    private shipmentAuthorization: ShipmentAuthorization
+    private dataSource: SampleDataSource
   ) {}
 
   async getSample(agent: UserWithRole | null, sampleId: number) {
-    if (
-      (await this.sampleAuthorization.hasReadRights(agent, sampleId)) !== true
-    ) {
+    if ((await this.sampleAuth.hasReadRights(agent, sampleId)) !== true) {
       logger.logWarn('Unauthorized getSample access', { agent, sampleId });
 
       return null;
@@ -40,9 +35,7 @@ export default class SampleQueries {
     let samples = await this.dataSource.getSamples(args);
 
     samples = await Promise.all(
-      samples.map((sample) =>
-        this.sampleAuthorization.hasReadRights(agent, sample.id)
-      )
+      samples.map((sample) => this.sampleAuth.hasReadRights(agent, sample.id))
     ).then((results) => samples.filter((_v, index) => results[index]));
 
     return samples;
@@ -57,10 +50,7 @@ export default class SampleQueries {
     user: UserWithRole | null,
     shipmentId: number
   ): Promise<Sample[] | null> {
-    const hasRights = await this.shipmentAuthorization.hasReadRights(
-      user,
-      shipmentId
-    );
+    const hasRights = await this.shipmentAuth.hasReadRights(user, shipmentId);
     if (hasRights === false) {
       logger.logWarn('Unauthorized getSamplesByShipmentId access', {
         user,

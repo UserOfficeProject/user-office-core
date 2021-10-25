@@ -15,9 +15,6 @@ import { wrapResponse } from '../wrapResponse';
 @ArgsType()
 export class CreateVisitArgs {
   @Field(() => Int)
-  proposalPk: number;
-
-  @Field(() => Int)
   scheduledEventId: number;
 
   @Field(() => [Int!])
