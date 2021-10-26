@@ -58,7 +58,6 @@ export class Question {
 
 export class TemplatesHasQuestions {
   constructor(
-    public id: number,
     public questionId: string,
     public templateId: number,
     public topicId: number,
