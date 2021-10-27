@@ -315,6 +315,7 @@ export function createListenToRabbitMQHandler() {
       case Event.PROPOSAL_BOOKING_TIME_ACTIVATED:
       case Event.PROPOSAL_BOOKING_TIME_COMPLETED:
       case Event.PROPOSAL_BOOKING_TIME_UPDATED:
+      case Event.PROPOSAL_BOOKING_TIME_REOPENED:
         logger.logDebug(
           `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
           {

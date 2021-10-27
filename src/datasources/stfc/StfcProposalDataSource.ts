@@ -1,14 +1,11 @@
 import { injectable } from 'tsyringe';
 
-import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 import { Proposal } from '../../models/Proposal';
-import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import database from '../postgres/database';
-import {
-  createProposalObject,
-  ProposalRecord,
-} from '../postgres/records';
+import { createProposalObject, ProposalRecord } from '../postgres/records';
+import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
+import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 
 @injectable()
 export default class StfcProposalDataSource extends PostgresProposalDataSource {
@@ -19,11 +16,8 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
     return database
-      .select([
-        '*',
-        database.raw('count(*) OVER() AS full_count')
-      ])
-      .from('proposals') 
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('proposals')
       .modify((query) => {
         if (filter?.text) {
           query
