@@ -3,6 +3,7 @@ import { injectable } from 'tsyringe';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 import { Proposal } from '../../models/Proposal';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
+import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import database from '../postgres/database';
 import {
   createProposalObject,
