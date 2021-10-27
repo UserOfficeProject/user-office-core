@@ -7,7 +7,7 @@
     "cypress-file-upload": "^3.5.3",
     "dateformat": "^4.6.3",
     "faker": "^5.5.3",
-    "graphql": "^15.6.0",
+    "graphql": "^15.6.1",
     "graphql-request": "^3.5.0",
     "typescript": "^3.9.10"
   },
