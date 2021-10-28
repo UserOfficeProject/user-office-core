@@ -2,7 +2,6 @@ import MaterialTable, { MTableBodyRow } from '@material-table/core';
 import IconButton from '@material-ui/core/IconButton';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
-// import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import Tooltip from '@material-ui/core/Tooltip';
 import DragHandle from '@material-ui/icons/DragHandle';
 import Visibility from '@material-ui/icons/Visibility';
