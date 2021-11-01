@@ -44,3 +44,9 @@ test('When getting roles for a user, no roles are granted if role definitions do
 
   return expect(roles).toHaveLength(0);
 });
+
+test('When an invalid external token is supplied, no user is found', async () => {
+  return expect(
+    userdataSource.checkExternalToken('invalid')
+  ).rejects.toThrowError();
+});
