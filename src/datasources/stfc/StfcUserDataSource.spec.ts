@@ -21,9 +21,9 @@ beforeAll(() => {
     userdataSource,
     'ensureDummyUserExists'
   );
-  mockEnsureDummyUserExists.mockImplementation(() => {
+  mockEnsureDummyUserExists.mockImplementation((userId: number) => {
     const user = dummyUser;
-    user.id = 1;
+    user.id = userId;
 
     return Promise.resolve(user);
   });
