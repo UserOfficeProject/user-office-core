@@ -29,7 +29,7 @@
     "@types/tinymce": "^4.6.4",
     "@types/yup": "~0.29.13",
     "clsx": "^1.1.1",
-    "date-fns": "^2.24.0",
+    "date-fns": "^2.25.0",
     "dateformat": "^4.6.3",
     "express": "^4.17.1",
     "express-favicon": "^2.0.1",
