@@ -23,6 +23,11 @@ export type ActivateScheduledEventInput = {
   id: Scalars['Int'];
 };
 
+export type AddLostTimeInput = {
+  lostTime: SimpleLostTimeInput;
+  proposalBookingId: Scalars['Int'];
+};
+
 export type AddProposalWorkflowStatusInput = {
   droppableGroupId: Scalars['String'];
   nextProposalStatusId?: Maybe<Scalars['Int']>;
@@ -142,11 +147,6 @@ export type BooleanConfig = {
   required: Scalars['Boolean'];
   small_label: Scalars['String'];
   tooltip: Scalars['String'];
-};
-
-export type BulkUpsertLostTimesInput = {
-  lostTimes: Array<SimpleLostTimeInput>;
-  proposalBookingId: Scalars['Int'];
 };
 
 export type Call = {
@@ -311,6 +311,10 @@ export type DeleteEquipmentAssignmentInput = {
   scheduledEventId: Scalars['Int'];
 };
 
+export type DeleteLostTimeInput = {
+  id: Scalars['Int'];
+};
+
 export type DeleteProposalWorkflowStatusInput = {
   proposalStatusId: Scalars['Int'];
   proposalWorkflowId: Scalars['Int'];
@@ -436,6 +440,7 @@ export enum Event {
   PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED = 'PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED',
   PROPOSAL_BOOKING_TIME_ACTIVATED = 'PROPOSAL_BOOKING_TIME_ACTIVATED',
   PROPOSAL_BOOKING_TIME_COMPLETED = 'PROPOSAL_BOOKING_TIME_COMPLETED',
+  PROPOSAL_BOOKING_TIME_REOPENED = 'PROPOSAL_BOOKING_TIME_REOPENED',
   PROPOSAL_BOOKING_TIME_SLOTS_REMOVED = 'PROPOSAL_BOOKING_TIME_SLOTS_REMOVED',
   PROPOSAL_BOOKING_TIME_SLOT_ADDED = 'PROPOSAL_BOOKING_TIME_SLOT_ADDED',
   PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED',
@@ -695,10 +700,10 @@ export type LostTime = {
   updatedAt: Scalars['DateTime'];
 };
 
-export type LostTimesResponseWrap = {
-  __typename?: 'LostTimesResponseWrap';
+export type LostTimeResponseWrap = {
+  __typename?: 'LostTimeResponseWrap';
   error: Maybe<Scalars['String']>;
-  lostTime: Maybe<Array<LostTime>>;
+  lostTime: Maybe<LostTime>;
 };
 
 export type MoveProposalWorkflowStatusInput = {
@@ -713,6 +718,7 @@ export type Mutation = {
   activateScheduledEvent: ScheduledEventResponseWrap;
   addClientLog: SuccessResponseWrap;
   addEquipmentResponsible: Scalars['Boolean'];
+  addLostTime: LostTimeResponseWrap;
   addProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
   addReview: ReviewWithNextStatusResponseWrap;
   addSamplesToShipment: ShipmentResponseWrap;
@@ -731,12 +737,12 @@ export type Mutation = {
   assignScientistsToInstrument: SuccessResponseWrap;
   assignSepReviewersToProposal: SepResponseWrap;
   assignToScheduledEvents: Scalars['Boolean'];
-  bulkUpsertLostTimes: LostTimesResponseWrap;
   changeProposalsStatus: SuccessResponseWrap;
   checkExternalToken: CheckExternalTokenWrap;
   cloneGenericTemplate: GenericTemplateResponseWrap;
   cloneProposals: ProposalsResponseWrap;
   cloneSample: SampleResponseWrap;
+  cloneSampleEsi: SampleEsiResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   confirmEquipmentAssignment: Scalars['Boolean'];
   createApiAccessToken: ApiAccessTokenResponseWrap;
@@ -770,6 +776,7 @@ export type Mutation = {
   deleteGenericTemplate: GenericTemplateResponseWrap;
   deleteInstitution: InstitutionResponseWrap;
   deleteInstrument: InstrumentResponseWrap;
+  deleteLostTime: LostTimeResponseWrap;
   deleteProposal: ProposalResponseWrap;
   deleteProposalStatus: ProposalStatusResponseWrap;
   deleteProposalWorkflow: ProposalWorkflowResponseWrap;
@@ -802,6 +809,8 @@ export type Mutation = {
   removeProposalsFromSep: SepResponseWrap;
   removeScientistFromInstrument: SuccessResponseWrap;
   removeUserForReview: ReviewResponseWrap;
+  reopenProposalBooking: ProposalBookingResponseWrap;
+  reopenScheduledEvent: ScheduledEventResponseWrap;
   reorderSepMeetingDecisionProposals: SepMeetingDecisionResponseWrap;
   resetPassword: BasicUserDetailsResponseWrap;
   resetPasswordEmail: SuccessResponseWrap;
@@ -827,6 +836,7 @@ export type Mutation = {
   updateGenericTemplate: GenericTemplateResponseWrap;
   updateInstitution: InstitutionResponseWrap;
   updateInstrument: InstrumentResponseWrap;
+  updateLostTime: LostTimeResponseWrap;
   updatePassword: BasicUserDetailsResponseWrap;
   updateProposal: ProposalResponseWrap;
   updateProposalStatus: ProposalStatusResponseWrap;
@@ -867,6 +877,11 @@ export type MutationAddClientLogArgs = {
 
 export type MutationAddEquipmentResponsibleArgs = {
   equipmentResponsibleInput: EquipmentResponsibleInput;
+};
+
+
+export type MutationAddLostTimeArgs = {
+  addLostTimeInput: AddLostTimeInput;
 };
 
 
@@ -978,11 +993,6 @@ export type MutationAssignToScheduledEventsArgs = {
 };
 
 
-export type MutationBulkUpsertLostTimesArgs = {
-  bulkUpsertLostTimes: BulkUpsertLostTimesInput;
-};
-
-
 export type MutationChangeProposalsStatusArgs = {
   changeProposalsStatusInput: ChangeProposalsStatusInput;
 };
@@ -1005,8 +1015,16 @@ export type MutationCloneProposalsArgs = {
 
 
 export type MutationCloneSampleArgs = {
+  isPostProposalSubmission?: Maybe<Scalars['Boolean']>;
   sampleId: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationCloneSampleEsiArgs = {
+  esiId: Scalars['Int'];
+  newSampleTitle?: Maybe<Scalars['String']>;
+  sampleId: Scalars['Int'];
 };
 
 
@@ -1223,6 +1241,11 @@ export type MutationDeleteInstrumentArgs = {
 };
 
 
+export type MutationDeleteLostTimeArgs = {
+  deleteLostTimeInput: DeleteLostTimeInput;
+};
+
+
 export type MutationDeleteProposalArgs = {
   proposalPk: Scalars['Int'];
 };
@@ -1394,6 +1417,16 @@ export type MutationRemoveUserForReviewArgs = {
 };
 
 
+export type MutationReopenProposalBookingArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationReopenScheduledEventArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationReorderSepMeetingDecisionProposalsArgs = {
   reorderSepMeetingDecisionProposalsInput: ReorderSepMeetingDecisionProposalsInput;
 };
@@ -1535,6 +1568,11 @@ export type MutationUpdateInstrumentArgs = {
   managerUserId: Scalars['Int'];
   name: Scalars['String'];
   shortCode: Scalars['String'];
+};
+
+
+export type MutationUpdateLostTimeArgs = {
+  updateLostTimeInput: UpdateLostTimeInput;
 };
 
 
@@ -3021,7 +3059,6 @@ export type ShipmentsFilter = {
 
 export type SimpleLostTimeInput = {
   endsAt: Scalars['TzLessDateTime'];
-  id: Scalars['Int'];
   newlyCreated?: Maybe<Scalars['Boolean']>;
   scheduledEventId?: Maybe<Scalars['Int']>;
   startsAt: Scalars['TzLessDateTime'];
@@ -3240,6 +3277,12 @@ export type UpdateCallInput = {
   surveyComment: Scalars['String'];
   templateId: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
+};
+
+export type UpdateLostTimeInput = {
+  endsAt: Scalars['TzLessDateTime'];
+  id: Scalars['Int'];
+  startsAt: Scalars['TzLessDateTime'];
 };
 
 export type UpdateProposalStatusInput = {
@@ -5774,6 +5817,35 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
+export type CloneSampleEsiMutationVariables = Exact<{
+  esiId: Scalars['Int'];
+  sampleId: Scalars['Int'];
+  newSampleTitle?: Maybe<Scalars['String']>;
+}>;
+
+
+export type CloneSampleEsiMutation = (
+  { __typename?: 'Mutation' }
+  & { cloneSampleEsi: (
+    { __typename?: 'SampleEsiResponseWrap' }
+    & { esi: Maybe<(
+      { __typename?: 'SampleExperimentSafetyInput' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ), sample: (
+        { __typename?: 'Sample' }
+        & SampleFragment
+      ) }
+      & SampleEsiFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
 export type CreateSampleEsiMutationVariables = Exact<{
   sampleId: Scalars['Int'];
   esiId: Scalars['Int'];
@@ -5881,6 +5953,7 @@ export type UpdateSampleEsiMutation = (
 export type CloneSampleMutationVariables = Exact<{
   sampleId: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
+  isPostProposalSubmission?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -10261,6 +10334,32 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
+export const CloneSampleEsiDocument = gql`
+    mutation cloneSampleEsi($esiId: Int!, $sampleId: Int!, $newSampleTitle: String) {
+  cloneSampleEsi(
+    esiId: $esiId
+    sampleId: $sampleId
+    newSampleTitle: $newSampleTitle
+  ) {
+    esi {
+      ...sampleEsi
+      questionary {
+        isCompleted
+        ...questionary
+      }
+      sample {
+        ...sample
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${SampleEsiFragmentDoc}
+${QuestionaryFragmentDoc}
+${SampleFragmentDoc}
+${RejectionFragmentDoc}`;
 export const CreateSampleEsiDocument = gql`
     mutation createSampleEsi($sampleId: Int!, $esiId: Int!) {
   createSampleEsi(sampleId: $sampleId, esiId: $esiId) {
@@ -10335,8 +10434,12 @@ ${QuestionaryFragmentDoc}
 ${SampleFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const CloneSampleDocument = gql`
-    mutation cloneSample($sampleId: Int!, $title: String) {
-  cloneSample(sampleId: $sampleId, title: $title) {
+    mutation cloneSample($sampleId: Int!, $title: String, $isPostProposalSubmission: Boolean) {
+  cloneSample(
+    sampleId: $sampleId
+    title: $title
+    isPostProposalSubmission: $isPostProposalSubmission
+  ) {
     sample {
       ...sample
       questionary {
@@ -11983,6 +12086,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return withWrapper(() => client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables));
+    },
+    cloneSampleEsi(variables: CloneSampleEsiMutationVariables): Promise<CloneSampleEsiMutation> {
+      return withWrapper(() => client.request<CloneSampleEsiMutation>(print(CloneSampleEsiDocument), variables));
     },
     createSampleEsi(variables: CreateSampleEsiMutationVariables): Promise<CreateSampleEsiMutation> {
       return withWrapper(() => client.request<CreateSampleEsiMutation>(print(CreateSampleEsiDocument), variables));

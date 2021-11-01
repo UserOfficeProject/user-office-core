@@ -10,12 +10,12 @@ const createCall = ({
   surveyComment,
   cycleComment,
 }) => {
-  const callShortCode = shortCode || faker.random.word().split(' ')[0]; // faker random word is buggy, it ofter returns phrases
+  const callShortCode = shortCode || faker.lorem.word();
   const callStartDate =
     startDate || faker.date.past().toISOString().slice(0, 10);
   const callEndDate = endDate || faker.date.future().toISOString().slice(0, 10);
-  const callSurveyComment = surveyComment || faker.random.word().split(' ')[0];
-  const callCycleComment = cycleComment || faker.random.word().split(' ')[0];
+  const callSurveyComment = surveyComment || faker.lorem.word();
+  const callCycleComment = cycleComment || faker.lorem.word();
 
   cy.contains('Calls').click();
 

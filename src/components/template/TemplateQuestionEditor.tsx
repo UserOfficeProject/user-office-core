@@ -117,7 +117,7 @@ export default function TemplateQuestionEditor(props: {
   const dependencyJsx = dependencies.length ? (
     <div>
       <LockIcon className={classes.lockIcon} />
-      <ul>
+      <ul data-cy="dependency-list">
         {dependencies.map((dependency, i) => {
           dependencyComparator =
             i < dependencies.length - 1 ? dependencyComparator : '';

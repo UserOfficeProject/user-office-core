@@ -49,7 +49,7 @@ function ProposalEsiReview({ confirm }: ProposalEsiReviewProps) {
       value: (
         <ul className={classes.sampleList}>
           {state.esi.sampleEsis.map((esi) => (
-            <li key={esi.esiId}>{esi.sample.title}</li>
+            <li key={esi.sampleId}>{esi.sample.title}</li>
           ))}
         </ul>
       ),
