@@ -7,18 +7,23 @@ import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
+import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 import { rejection } from '../models/Rejection';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { CreateSampleInput } from '../resolvers/mutations/CreateSampleMutations';
 import { UpdateSampleArgs } from '../resolvers/mutations/UpdateSampleMutation';
+import { CloneUtils } from '../utils/CloneUtils';
 import { SampleAuthorization } from '../utils/SampleAuthorization';
+import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
+import { CloneSampleInput } from './../resolvers/mutations/CloneSampleMutation';
 import { UserAuthorization } from './../utils/UserAuthorization';
 
 @injectable()
 export default class SampleMutations {
   private userAuth = container.resolve(UserAuthorization);
   private sampleAuth = container.resolve(SampleAuthorization);
+  private cloneUtils = container.resolve(CloneUtils);
 
   constructor(
     @inject(Tokens.SampleDataSource) private sampleDataSource: SampleDataSource,
@@ -27,7 +32,9 @@ export default class SampleMutations {
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.ProposalSettingsDataSource)
+    private proposalSettingsDataSource: ProposalSettingsDataSource
   ) {}
 
   @Authorized()
@@ -69,25 +76,26 @@ export default class SampleMutations {
       );
     }
 
-    return this.questionaryDataSource
-      .create(agent.id, args.templateId)
-      .then((questionary) => {
-        return this.sampleDataSource.create(
-          args.title,
-          agent.id,
-          args.proposalPk,
-          questionary.questionaryId,
-          args.questionId,
-          args.isPostProposalSubmission
-        );
-      })
-      .catch((error) => {
-        return rejection(
-          'Can not create sample because an error occurred',
-          { agent, args },
-          error
-        );
+    const sampleQuestionary = await this.questionaryDataSource.create(
+      agent.id,
+      args.templateId
+    );
+
+    let newSample = await this.sampleDataSource.create(
+      args.title,
+      agent.id,
+      args.proposalPk,
+      sampleQuestionary.questionaryId,
+      args.questionId
+    );
+    if (args.isPostProposalSubmission) {
+      newSample = await this.sampleDataSource.updateSample({
+        sampleId: newSample.id,
+        isPostProposalSubmission: args.isPostProposalSubmission,
       });
+    }
+
+    return newSample;
   }
 
   @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
@@ -104,7 +112,7 @@ export default class SampleMutations {
       );
     }
 
-    // Thi makes sure administrative fields can be only updated by user with the right role
+    // This makes sure administrative fields can be only updated by user with the right role
     if (args.safetyComment || args.safetyStatus) {
       const canAdministrerSample =
         this.userAuth.isUserOfficer(agent) ||
@@ -165,32 +173,59 @@ export default class SampleMutations {
   }
 
   @Authorized()
-  async cloneSample(
-    agent: UserWithRole | null,
-    sampleId: number,
-    title?: string
-  ) {
+  async cloneSample(agent: UserWithRole | null, args: CloneSampleInput) {
+    const { sampleId, title, isPostProposalSubmission } = args;
     if (!agent) {
       return rejection(
         'Could not clone sample because user is not authorized',
-        { agent, sampleId }
+        { agent, args }
       );
     }
-    if (!(await this.sampleAuth.hasWriteRights(agent, sampleId))) {
+
+    const sourceSample = await this.sampleDataSource.getSample(sampleId);
+    if (!sourceSample) {
       return rejection(
-        'Could not clone sample because of insufficient permissions',
-        { agent, sampleId }
+        'Could not clone sample, because source sample does not exist',
+        { agent, args }
       );
+    }
+
+    if (!(await this.sampleAuth.hasWriteRights(agent, sourceSample))) {
+      return rejection(
+        'Could not clone sample, because of insufficient permissions',
+        { agent, args }
+      );
+    }
+
+    const proposal = await this.proposalDataSource.get(sourceSample.proposalPk);
+    if (!proposal) {
+      return rejection(
+        'Could not clone sample, because proposal does not exist',
+        { agent, args }
+      );
+    }
+
+    // TODO Move this logic into commonly shared place ProposalAuthorizer SWAP-1944
+    const proposalStatus =
+      await this.proposalSettingsDataSource.getProposalStatus(
+        proposal.statusId
+      );
+
+    if (
+      proposalStatus?.shortCode !==
+      ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED
+    ) {
+      if (
+        proposal.submitted &&
+        isPostProposalSubmission !== true &&
+        !this.userAuth.isUserOfficer(agent)
+      ) {
+        return rejection('Can not update proposal after submission');
+      }
     }
 
     try {
-      let clonedSample = await this.sampleDataSource.cloneSample(sampleId);
-      clonedSample = await this.sampleDataSource.updateSample({
-        sampleId: clonedSample.id,
-        title: title ? title : `Copy of ${clonedSample.title}`,
-      });
-
-      return clonedSample;
+      return this.cloneUtils.cloneSample(sourceSample, { title });
     } catch (error) {
       return rejection(
         'Could not clone sample because an error occurred',
