@@ -1,0 +1,17 @@
+mutation cloneSampleEsi($esiId: Int!, $sampleId: Int!, $newSampleTitle: String) {
+  cloneSampleEsi(esiId: $esiId, sampleId: $sampleId, newSampleTitle: $newSampleTitle) {
+    esi {
+      ...sampleEsi
+      questionary {
+        isCompleted
+        ...questionary
+      }
+      sample {
+        ...sample
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
