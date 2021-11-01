@@ -1,46 +1,15 @@
 import { logger } from '@esss-swap/duo-logger';
-import { inject, injectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
 import { Sample } from '../../models/Sample';
 import { UpdateSampleArgs } from '../../resolvers/mutations/UpdateSampleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
-import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import { SampleDataSource } from '../SampleDataSource';
 import database from './database';
 import { createSampleObject, SampleRecord } from './records';
 
 @injectable()
 export default class PostgresSampleDataSource implements SampleDataSource {
-  constructor(
-    @inject(Tokens.QuestionaryDataSource)
-    private questionaryDataSource: QuestionaryDataSource
-  ) {}
-
-  async cloneSample(sampleId: number): Promise<Sample> {
-    const sourceSample = await this.getSample(sampleId);
-    if (!sourceSample) {
-      logger.logError(
-        'Could not clone sample because source sample does not exist',
-        { sampleId }
-      );
-      throw new Error('Could not clone sample');
-    }
-
-    const newQuestionary = await this.questionaryDataSource.clone(
-      sourceSample.questionaryId
-    );
-
-    const newSample = await this.create(
-      sourceSample.title,
-      sourceSample.creatorId,
-      sourceSample.proposalPk,
-      newQuestionary.questionaryId,
-      sourceSample.questionId
-    );
-
-    return newSample;
-  }
   delete(sampleId: number): Promise<Sample> {
     return database('samples')
       .where({ sample_id: sampleId })
@@ -65,6 +34,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
           proposal_pk: args.proposalPk,
           questionary_id: args.questionaryId,
           shipment_id: args.shipmentId,
+          is_post_proposal_submission: args.isPostProposalSubmission,
         },
         '*'
       )
@@ -84,8 +54,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
     creator_id: number,
     proposal_pk: number,
     questionary_id: number,
-    question_id: string,
-    is_post_proposal_submission?: boolean
+    question_id: string
   ): Promise<Sample> {
     return database('samples')
       .insert(
@@ -95,7 +64,6 @@ export default class PostgresSampleDataSource implements SampleDataSource {
           proposal_pk,
           questionary_id,
           question_id,
-          is_post_proposal_submission,
         },
         '*'
       )

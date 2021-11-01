@@ -394,16 +394,17 @@ export interface TemplateCategoryRecord {
 }
 
 export interface SampleRecord {
-  readonly sample_id: number;
-  readonly title: string;
-  readonly creator_id: number;
-  readonly proposal_pk: number;
-  readonly questionary_id: number;
-  readonly question_id: string;
-  readonly safety_status: number;
-  readonly is_post_proposal_submission: boolean;
-  readonly safety_comment: string;
   readonly created_at: Date;
+  readonly creator_id: number;
+  readonly is_post_proposal_submission: boolean;
+  readonly proposal_pk: number;
+  readonly question_id: string;
+  readonly questionary_id: number;
+  readonly safety_comment: string;
+  readonly safety_status: number;
+  readonly sample_id: number;
+  readonly shipment_id: number;
+  readonly title: string;
 }
 
 export interface ShipmentRecord {
@@ -801,7 +802,8 @@ export const createSampleObject = (sample: SampleRecord) => {
     sample.is_post_proposal_submission,
     sample.safety_status,
     sample.safety_comment,
-    sample.created_at
+    sample.created_at,
+    sample.shipment_id
   );
 };
 

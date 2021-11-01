@@ -12,12 +12,15 @@ import { UpdateSampleEsiArgs } from '../resolvers/mutations/UpdateSampleEsiMutat
 import { SampleDataSource } from './../datasources/SampleDataSource';
 import { TemplateDataSource } from './../datasources/TemplateDataSource';
 import { SampleExperimentSafetyInput } from './../models/SampleExperimentSafetyInput';
+import { CloneSampleEsiInput } from './../resolvers/mutations/CloneSampleEsiMutation';
 import { SampleDeclarationConfig } from './../resolvers/types/FieldConfig';
+import { CloneUtils } from './../utils/CloneUtils';
 import { EsiAuthorization } from './../utils/EsiAuthorization';
 
 @injectable()
 export default class SampleEsiMutations {
   private esiAuth = container.resolve(EsiAuthorization);
+  private cloneUtils = container.resolve(CloneUtils);
   constructor(
     @inject(Tokens.SampleEsiDataSource)
     private sampleEsiDataSource: SampleEsiDataSource,
@@ -105,5 +108,38 @@ export default class SampleEsiMutations {
     }
 
     return this.sampleEsiDataSource.updateSampleEsi(args);
+  }
+
+  @Authorized()
+  async cloneSampleEsi(
+    user: UserWithRole | null,
+    args: CloneSampleEsiInput
+  ): Promise<SampleExperimentSafetyInput | Rejection> {
+    const { esiId, newSampleTitle } = args;
+    const sourceSampleEsi = await this.sampleEsiDataSource.getSampleEsi(args);
+    if (!sourceSampleEsi) {
+      return rejection(
+        'Can not clone sample ESI, because source sample ESI does not exist',
+        { user, args }
+      );
+    }
+
+    const hasRights = await this.esiAuth.hasWriteRights(user, esiId);
+    if (hasRights === false) {
+      return rejection(
+        'Can not clone sample ESI, because user does not have permissions to this sample ESI',
+        { user, args }
+      );
+    }
+
+    return this.cloneUtils.cloneSampleEsi(sourceSampleEsi, {
+      esi: {
+        isSubmitted: false,
+      },
+      sample: {
+        isPostProposalSubmission: true,
+        title: newSampleTitle,
+      },
+    });
   }
 }

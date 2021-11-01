@@ -61,3 +61,21 @@ test('A user not on the visit can NOT update the Sample ESI', () => {
     })
   ).resolves.toBeInstanceOf(Rejection);
 });
+
+test('A useron the visit can clone the Sample ESI', () => {
+  return expect(
+    mutations.cloneSampleEsi(dummyUserWithRole, {
+      esiId: 1,
+      sampleId: 1,
+    })
+  ).resolves.toBeInstanceOf(SampleExperimentSafetyInput);
+});
+
+test('A user not on the visit can NOT clone the Sample ESI', () => {
+  return expect(
+    mutations.cloneSampleEsi(dummyUserNotOnProposalWithRole, {
+      esiId: 1,
+      sampleId: 1,
+    })
+  ).resolves.toBeInstanceOf(Rejection);
+});

@@ -35,10 +35,12 @@ import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutatio
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
+import { CloneUtils } from './../utils/CloneUtils';
 
 @injectable()
 export default class ProposalMutations {
   private userAuth = container.resolve(UserAuthorization);
+  private cloneUtils = container.resolve(CloneUtils);
   constructor(
     @inject(Tokens.ProposalDataSource)
     public proposalDataSource: ProposalDataSource,
@@ -553,13 +555,10 @@ export default class ProposalMutations {
       });
 
       for await (const sample of proposalSamples) {
-        const clonedSample = await this.sampleDataSource.cloneSample(sample.id);
-        await this.sampleDataSource.updateSample({
-          sampleId: clonedSample.id,
+        await this.cloneUtils.cloneSample(sample, {
           proposalPk: clonedProposal.primaryKey,
-          questionaryId: clonedSample.questionaryId,
-          safetyComment: '',
           safetyStatus: SampleStatus.PENDING_EVALUATION,
+          safetyComment: '',
           shipmentId: null,
         });
       }
