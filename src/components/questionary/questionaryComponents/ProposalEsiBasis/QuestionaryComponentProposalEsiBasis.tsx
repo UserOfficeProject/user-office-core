@@ -1,24 +1,21 @@
 import {
-  Avatar,
   Button,
+  Checkbox,
   Divider,
   IconButton,
   List,
   ListItem,
-  ListItemAvatar,
   ListItemText,
   Typography,
 } from '@material-ui/core';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import AddBox from '@material-ui/icons/AddBox';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import CheckIcon from '@material-ui/icons/Check';
-import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { Field, FieldProps } from 'formik';
 import React, { MouseEvent, useContext, useState } from 'react';
 
+import ErrorMessage from 'components/common/ErrorMessage';
 import BoxIcon from 'components/common/icons/BoxIcon';
 import StyledModal from 'components/common/StyledModal';
 import UOLoader from 'components/common/UOLoader';
@@ -69,47 +66,35 @@ function QuestionaryComponentProposalEsiBasis(
               sampleId: sampleId,
             })
             .then((response) => {
-              if (response.createSampleEsi?.esi) {
-                form.setFieldValue(answerId, [
-                  ...field.value,
-                  response.createSampleEsi.esi,
-                ]);
+              const sampleEsi = response.createSampleEsi?.esi;
+              if (sampleEsi) {
+                form.setFieldValue(answerId, [...field.value, sampleEsi]);
+                dispatch({
+                  type: 'ESI_SAMPLE_ESI_CREATED',
+                  sampleEsi: sampleEsi,
+                });
                 setSelectedSampleEsi(response.createSampleEsi.esi);
               }
             });
         };
 
-        const revokeEsi = (id: number) => {
+        const revokeEsi = (sampleId: number) => {
           api()
             .deleteSampleEsi({
               esiId: state!.esi.id,
-              sampleId: id,
+              sampleId: sampleId,
             })
             .then((response) => {
-              if (!response.deleteSampleEsi.rejection) {
+              const deletedEsi = response.deleteSampleEsi?.esi;
+              if (deletedEsi) {
                 const newValue = field.value.filter(
-                  (esi) => esi.sample.id !== id
+                  (esi) => esi.sampleId !== deletedEsi.sampleId
                 );
                 form.setFieldValue(answerId, newValue);
-              }
-            });
-        };
-
-        const openEsi = async (id: number) => {
-          await api()
-            .updateSampleEsi({
-              esiId: state!.esi.id,
-              sampleId: id,
-              isSubmitted: false,
-            })
-            .then((response) => {
-              const updatedEsi = response.updateSampleEsi.esi;
-              if (updatedEsi) {
-                setSelectedSampleEsi(updatedEsi);
-                const newValue = field.value.map((esi) =>
-                  esi.sampleId === updatedEsi.sampleId ? updatedEsi : esi
-                );
-                form.setFieldValue(answerId, newValue);
+                dispatch({
+                  type: 'ESI_SAMPLE_ESI_DELETED',
+                  sampleId: deletedEsi.sampleId,
+                });
               }
             });
         };
@@ -155,6 +140,42 @@ function QuestionaryComponentProposalEsiBasis(
             });
         };
 
+        const handleRevokeEsiClick = async (sampleId: number) => {
+          confirm(
+            () => {
+              revokeEsi(sampleId);
+            },
+            {
+              title: 'Are you sure?',
+              description:
+                'Are you sure you want to deselect the sample? The information entered for the ESI will be lost!',
+            }
+          )();
+        };
+
+        const handleEditEsiClick = async (id: number) => {
+          await api()
+            .updateSampleEsi({
+              esiId: state!.esi.id,
+              sampleId: id,
+              isSubmitted: false,
+            })
+            .then((response) => {
+              const updatedEsi = response.updateSampleEsi.esi;
+              if (updatedEsi) {
+                setSelectedSampleEsi(updatedEsi);
+                const newValue = field.value.map((esi) =>
+                  esi.sampleId === updatedEsi.sampleId ? updatedEsi : esi
+                );
+                dispatch({
+                  type: 'ESI_SAMPLE_ESI_UPDATED',
+                  sampleEsi: updatedEsi,
+                });
+                form.setFieldValue(answerId, newValue);
+              }
+            });
+        };
+
         const allSamples = state?.esi?.proposal.samples;
         const declaredEsis = field.value || [];
 
@@ -171,19 +192,29 @@ function QuestionaryComponentProposalEsiBasis(
 
                 return (
                   <ListItem key={sample.id}>
-                    <ListItemAvatar>
-                      <Avatar>
-                        <BoxIcon
-                          htmlColor={
-                            isDeclarationComplete
-                              ? 'green'
-                              : hasDeclaredEsi
-                              ? 'red'
-                              : 'inherit'
-                          }
-                        />
-                      </Avatar>
-                    </ListItemAvatar>
+                    <ListItemIcon>
+                      <Checkbox
+                        edge="start"
+                        checked={hasDeclaredEsi}
+                        onChange={(e) =>
+                          e.target.checked
+                            ? declareEsi(sample.id)
+                            : handleRevokeEsiClick(sample.id)
+                        }
+                        data-cy="select-sample-chk"
+                      />
+                    </ListItemIcon>
+                    <ListItemIcon>
+                      <BoxIcon
+                        htmlColor={
+                          isDeclarationComplete
+                            ? 'green'
+                            : hasDeclaredEsi
+                            ? 'red'
+                            : 'inherit'
+                        }
+                      />
+                    </ListItemIcon>
                     <ListItemText
                       primary={sample.title}
                       secondary={
@@ -194,45 +225,6 @@ function QuestionaryComponentProposalEsiBasis(
                           : ''
                       }
                     />
-                    {!hasDeclaredEsi && (
-                      <ListItemIcon>
-                        <IconButton
-                          edge="end"
-                          title="Add"
-                          data-cy="add-esi-btn"
-                          onClick={(e: MouseEvent) => {
-                            e.stopPropagation();
-                            declareEsi(sample.id);
-                          }}
-                        >
-                          <AddBox />
-                        </IconButton>
-                      </ListItemIcon>
-                    )}
-
-                    {hasDeclaredEsi && (
-                      <ListItemIcon>
-                        <IconButton
-                          edge="end"
-                          title="Remove ESI"
-                          data-cy="delete-esi-btn"
-                          onClick={(e: MouseEvent) => {
-                            e.stopPropagation();
-                            confirm(
-                              async () => {
-                                revokeEsi(sample.id);
-                              },
-                              {
-                                title: 'Are you sure',
-                                description: `Are you sure you want to delete ESI for "${sample.title}"`,
-                              }
-                            )();
-                          }}
-                        >
-                          <CloseIcon />
-                        </IconButton>
-                      </ListItemIcon>
-                    )}
 
                     {hasDeclaredEsi && (
                       <ListItemIcon>
@@ -241,15 +233,16 @@ function QuestionaryComponentProposalEsiBasis(
                           title="Edit"
                           onClick={(e: MouseEvent) => {
                             e.stopPropagation();
-                            openEsi(sample.id);
+                            handleEditEsiClick(sample.id);
                           }}
+                          data-cy="edit-esi-btn"
                         >
-                          {isDeclarationComplete ? <CheckIcon /> : <EditIcon />}
+                          <EditIcon />
                         </IconButton>
                       </ListItemIcon>
                     )}
 
-                    {!hasDeclaredEsi && sample.isPostProposalSubmission && (
+                    {sample.isPostProposalSubmission && (
                       <ListItemIcon>
                         <IconButton
                           edge="end"
@@ -276,6 +269,7 @@ function QuestionaryComponentProposalEsiBasis(
                 );
               })}
             </List>
+            <ErrorMessage name={answerId} />
             <ButtonContainer>
               <Button
                 onClick={() =>
@@ -314,7 +308,10 @@ function QuestionaryComponentProposalEsiBasis(
                         ? updatedSampleEsi
                         : sampleEsi
                     );
-
+                    dispatch({
+                      type: 'ESI_SAMPLE_ESI_UPDATED',
+                      sampleEsi: updatedSampleEsi,
+                    });
                     form.setFieldValue(answerId, newValue);
                   }}
                   onSubmitted={() => {

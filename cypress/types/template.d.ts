@@ -58,7 +58,9 @@ declare global {
           option1?: string;
           option2?: string;
           option3?: string;
-        }
+          isMultipleSelect?: boolean
+          type?: 'radio' | 'dropdown'
+        },
       ) => void;
 
       /**

@@ -23,6 +23,11 @@ export type ActivateScheduledEventInput = {
   id: Scalars['Int'];
 };
 
+export type AddLostTimeInput = {
+  lostTime: SimpleLostTimeInput;
+  proposalBookingId: Scalars['Int'];
+};
+
 export type AddProposalWorkflowStatusInput = {
   droppableGroupId: Scalars['String'];
   nextProposalStatusId?: Maybe<Scalars['Int']>;
@@ -142,11 +147,6 @@ export type BooleanConfig = {
   required: Scalars['Boolean'];
   small_label: Scalars['String'];
   tooltip: Scalars['String'];
-};
-
-export type BulkUpsertLostTimesInput = {
-  lostTimes: Array<SimpleLostTimeInput>;
-  proposalBookingId: Scalars['Int'];
 };
 
 export type Call = {
@@ -311,6 +311,10 @@ export type DeleteEquipmentAssignmentInput = {
   scheduledEventId: Scalars['Int'];
 };
 
+export type DeleteLostTimeInput = {
+  id: Scalars['Int'];
+};
+
 export type DeleteProposalWorkflowStatusInput = {
   proposalStatusId: Scalars['Int'];
   proposalWorkflowId: Scalars['Int'];
@@ -436,6 +440,7 @@ export enum Event {
   PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED = 'PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED',
   PROPOSAL_BOOKING_TIME_ACTIVATED = 'PROPOSAL_BOOKING_TIME_ACTIVATED',
   PROPOSAL_BOOKING_TIME_COMPLETED = 'PROPOSAL_BOOKING_TIME_COMPLETED',
+  PROPOSAL_BOOKING_TIME_REOPENED = 'PROPOSAL_BOOKING_TIME_REOPENED',
   PROPOSAL_BOOKING_TIME_SLOTS_REMOVED = 'PROPOSAL_BOOKING_TIME_SLOTS_REMOVED',
   PROPOSAL_BOOKING_TIME_SLOT_ADDED = 'PROPOSAL_BOOKING_TIME_SLOT_ADDED',
   PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED',
@@ -690,10 +695,10 @@ export type LostTime = {
   updatedAt: Scalars['DateTime'];
 };
 
-export type LostTimesResponseWrap = {
-  __typename?: 'LostTimesResponseWrap';
+export type LostTimeResponseWrap = {
+  __typename?: 'LostTimeResponseWrap';
   error: Maybe<Scalars['String']>;
-  lostTime: Maybe<Array<LostTime>>;
+  lostTime: Maybe<LostTime>;
 };
 
 export type MoveProposalWorkflowStatusInput = {
@@ -708,6 +713,7 @@ export type Mutation = {
   activateScheduledEvent: ScheduledEventResponseWrap;
   addClientLog: SuccessResponseWrap;
   addEquipmentResponsible: Scalars['Boolean'];
+  addLostTime: LostTimeResponseWrap;
   addProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
   addReview: ReviewWithNextStatusResponseWrap;
   addSamplesToShipment: ShipmentResponseWrap;
@@ -726,7 +732,6 @@ export type Mutation = {
   assignScientistsToInstrument: SuccessResponseWrap;
   assignSepReviewersToProposal: SepResponseWrap;
   assignToScheduledEvents: Scalars['Boolean'];
-  bulkUpsertLostTimes: LostTimesResponseWrap;
   changeProposalsStatus: SuccessResponseWrap;
   checkExternalToken: CheckExternalTokenWrap;
   cloneGenericTemplate: GenericTemplateResponseWrap;
@@ -765,6 +770,7 @@ export type Mutation = {
   deleteGenericTemplate: GenericTemplateResponseWrap;
   deleteInstitution: InstitutionResponseWrap;
   deleteInstrument: InstrumentResponseWrap;
+  deleteLostTime: LostTimeResponseWrap;
   deleteProposal: ProposalResponseWrap;
   deleteProposalStatus: ProposalStatusResponseWrap;
   deleteProposalWorkflow: ProposalWorkflowResponseWrap;
@@ -821,6 +827,7 @@ export type Mutation = {
   updateGenericTemplate: GenericTemplateResponseWrap;
   updateInstitution: InstitutionResponseWrap;
   updateInstrument: InstrumentResponseWrap;
+  updateLostTime: LostTimeResponseWrap;
   updatePassword: BasicUserDetailsResponseWrap;
   updateProposal: ProposalResponseWrap;
   updateProposalStatus: ProposalStatusResponseWrap;
@@ -861,6 +868,11 @@ export type MutationAddClientLogArgs = {
 
 export type MutationAddEquipmentResponsibleArgs = {
   equipmentResponsibleInput: EquipmentResponsibleInput;
+};
+
+
+export type MutationAddLostTimeArgs = {
+  addLostTimeInput: AddLostTimeInput;
 };
 
 
@@ -969,11 +981,6 @@ export type MutationAssignSepReviewersToProposalArgs = {
 
 export type MutationAssignToScheduledEventsArgs = {
   assignEquipmentsToScheduledEventInput: AssignEquipmentsToScheduledEventInput;
-};
-
-
-export type MutationBulkUpsertLostTimesArgs = {
-  bulkUpsertLostTimes: BulkUpsertLostTimesInput;
 };
 
 
@@ -1214,6 +1221,11 @@ export type MutationDeleteInstitutionArgs = {
 
 export type MutationDeleteInstrumentArgs = {
   id: Scalars['Int'];
+};
+
+
+export type MutationDeleteLostTimeArgs = {
+  deleteLostTimeInput: DeleteLostTimeInput;
 };
 
 
@@ -1524,6 +1536,11 @@ export type MutationUpdateInstrumentArgs = {
   managerUserId: Scalars['Int'];
   name: Scalars['String'];
   shortCode: Scalars['String'];
+};
+
+
+export type MutationUpdateLostTimeArgs = {
+  updateLostTimeInput: UpdateLostTimeInput;
 };
 
 
@@ -3010,7 +3027,6 @@ export type ShipmentsFilter = {
 
 export type SimpleLostTimeInput = {
   endsAt: Scalars['TzLessDateTime'];
-  id: Scalars['Int'];
   newlyCreated?: Maybe<Scalars['Boolean']>;
   scheduledEventId?: Maybe<Scalars['Int']>;
   startsAt: Scalars['TzLessDateTime'];
@@ -3229,6 +3245,12 @@ export type UpdateCallInput = {
   surveyComment: Scalars['String'];
   templateId: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
+};
+
+export type UpdateLostTimeInput = {
+  endsAt: Scalars['TzLessDateTime'];
+  id: Scalars['Int'];
+  startsAt: Scalars['TzLessDateTime'];
 };
 
 export type UpdateProposalStatusInput = {
