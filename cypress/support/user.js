@@ -1,3 +1,6 @@
+import { GraphQLClient } from 'graphql-request';
+import { decode } from 'jsonwebtoken';
+
 function addScientistRoleToUser(name) {
   cy.get('[aria-label="Search"]').type(name);
 
@@ -66,17 +69,35 @@ const login = (roleOrCredentials) => {
       ? testCredentialStore[roleOrCredentials]
       : roleOrCredentials;
 
+  const query = `mutation {
+    login(
+      email: "${credentials.email}",
+      password: "${credentials.password}"
+    ) {
+      rejection {
+        reason
+      }
+      token
+    }
+  }`;
+
+  const request = new GraphQLClient('/gateway')
+    .rawRequest(query, null)
+    .then((resp) => {
+      const { currentRole, user, exp } = decode(resp.data.login.token);
+
+      window.localStorage.setItem('token', resp.data.login.token);
+      window.localStorage.setItem(
+        'currentRole',
+        currentRole.shortCode.toUpperCase()
+      );
+      window.localStorage.setItem('expToken', exp);
+      window.localStorage.setItem('user', JSON.stringify(user));
+    });
+
+  cy.wrap(request);
+
   cy.visit('/');
-
-  cy.get('[data-cy=input-email] input')
-    .type(credentials.email)
-    .should('have.value', credentials.email);
-
-  cy.get('[data-cy=input-password] input')
-    .type(credentials.password)
-    .should('have.value', credentials.password);
-
-  cy.get('[data-cy=submit]').click();
 };
 
 const logout = () => {

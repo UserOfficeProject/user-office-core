@@ -1,23 +1,15 @@
 import faker from 'faker';
 
 context('Calls tests', () => {
-  before(() => {
-    cy.resetDB();
-    cy.viewport(1920, 1080);
-    cy.login('officer');
-    cy.createTemplate('proposalEsi', 'default esi template');
-    cy.logout();
-  });
-
-  beforeEach(() => {
-    cy.viewport(1920, 1080);
-  });
+  let esiTemplateId: number;
+  let workflowId: number;
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
     startDate: faker.date.past().toISOString().slice(0, 10),
     endDate: faker.date.future().toISOString().slice(0, 10),
     template: 'default template',
+    templateId: 1,
     esiTemplate: 'default esi template',
   };
 
@@ -40,6 +32,21 @@ context('Calls tests', () => {
 
   const scientist = 'Carl';
 
+  beforeEach(() => {
+    cy.viewport(1920, 1080);
+    cy.resetDB();
+    cy.createTemplate('PROPOSAL_ESI', 'default esi template').then((result) => {
+      esiTemplateId = result.data.createTemplate.template.templateId;
+    });
+
+    cy.createProposalWorkflow(
+      proposalWorkflow.name,
+      proposalWorkflow.description
+    ).then((result) => {
+      workflowId = result.data.createProposalWorkflow.proposalWorkflow.id;
+    });
+  });
+
   it('A user should not be able to see/visit calls', () => {
     cy.login('user');
 
@@ -61,11 +68,6 @@ context('Calls tests', () => {
     const endDate = faker.date.future().toISOString().slice(0, 10);
 
     cy.login('officer');
-
-    cy.createProposalWorkflow(
-      proposalWorkflow.name,
-      proposalWorkflow.description
-    );
 
     cy.contains('Proposals');
 
@@ -174,19 +176,59 @@ context('Calls tests', () => {
 
   it('A user-officer should be able to create a call', () => {
     const { shortCode, startDate, endDate, template, esiTemplate } = newCall;
+    const callShortCode = shortCode || faker.lorem.word();
+    const callStartDate =
+      startDate || faker.date.past().toISOString().slice(0, 10);
+    const callEndDate =
+      endDate || faker.date.future().toISOString().slice(0, 10);
+    const callSurveyComment = faker.lorem.word();
+    const callCycleComment = faker.lorem.word();
 
     cy.login('officer');
 
-    cy.contains('Proposals');
+    cy.contains('Calls').click();
 
-    cy.createCall({
-      shortCode,
-      startDate,
-      endDate,
-      template,
-      esiTemplate,
-      workflow: proposalWorkflow.name,
-    });
+    cy.contains('Create').click();
+
+    cy.get('[data-cy=short-code] input')
+      .type(callShortCode)
+      .should('have.value', callShortCode);
+
+    cy.get('[data-cy=start-date] input')
+      .clear()
+      .type(callStartDate)
+      .should('have.value', callStartDate);
+
+    cy.get('[data-cy=end-date] input')
+      .clear()
+      .type(callEndDate)
+      .should('have.value', callEndDate);
+
+    cy.get('[data-cy="call-template"]').click();
+    cy.get('[role="presentation"]').contains(template).click();
+
+    cy.get('[data-cy="call-esi-template"]').click();
+    cy.get('[role="presentation"]').contains(esiTemplate).click();
+
+    cy.get('#proposalWorkflowId-input').click();
+
+    cy.contains('Loading...').should('not.exist');
+
+    cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
+
+    cy.get('[data-cy="next-step"]').click();
+
+    cy.get('[data-cy=survey-comment] input').clear().type(callSurveyComment);
+
+    cy.get('[data-cy="next-step"]').click();
+
+    cy.get('[data-cy=cycle-comment] input').clear().type(callCycleComment);
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ variant: 'success', text: 'successfully' });
+
+    cy.contains(callShortCode);
 
     cy.contains(shortCode)
       .parent()
@@ -197,9 +239,19 @@ context('Calls tests', () => {
 
   it('A user-officer should be able to edit a call', () => {
     const { shortCode, startDate, endDate } = updatedCall;
+
     const refNumFormat = '211{digits:5}';
 
     cy.login('officer');
+
+    cy.createCall({
+      shortCode: newCall.shortCode,
+      startDate: newCall.startDate,
+      endDate: newCall.endDate,
+      templateId: newCall.templateId,
+      esiTemplateId: esiTemplateId,
+      workflowId: workflowId,
+    });
 
     cy.contains('Proposals');
 
@@ -247,6 +299,14 @@ context('Calls tests', () => {
 
   it('A user-officer should be able to assign instrument/s to a call', () => {
     cy.login('officer');
+    cy.createCall({
+      shortCode: newCall.shortCode,
+      startDate: newCall.startDate,
+      endDate: newCall.endDate,
+      templateId: newCall.templateId,
+      esiTemplateId: esiTemplateId,
+      workflowId: workflowId,
+    });
 
     cy.contains('People').click();
     cy.addScientistRoleToUser(scientist);

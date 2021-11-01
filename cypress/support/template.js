@@ -1,4 +1,5 @@
 import faker from 'faker';
+import { GraphQLClient } from 'graphql-request';
 
 const navigateToTemplatesSubmenu = (submenuName) => {
   cy.contains('Templates').click();
@@ -33,23 +34,26 @@ function createTemplate(type, title, description) {
   const templateTitle = title || faker.random.words(2);
   const templateDescription = description || faker.random.words(3);
 
-  const menuTitle = typeToMenuTitle.get(type);
-  if (!menuTitle) {
-    throw new Error(`Type ${type} not supported`);
-  }
+  const query = `mutation {
+    createTemplate(
+      groupId: ${type},
+      name: "${templateTitle}",
+      description: "${templateDescription}"
+    ) {
+      rejection {
+        reason
+      }
+      template {
+        templateId
+      }
+    }
+  }`;
+  const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
+  const request = new GraphQLClient('/gateway', {
+    headers: { authorization: authHeader },
+  }).rawRequest(query, null);
 
-  cy.log(`${menuTitle}`);
-  cy.navigateToTemplatesSubmenu(menuTitle);
-
-  cy.get('[data-cy=create-new-button]').click();
-
-  cy.get('[data-cy=name] input')
-    .type(templateTitle)
-    .should('have.value', templateTitle);
-
-  cy.get('[data-cy=description]').type(templateDescription);
-
-  cy.get('[data-cy=submit]').click();
+  cy.wrap(request);
 }
 
 function openQuestionsMenu() {
@@ -146,13 +150,13 @@ function createMultipleChoiceQuestion(question, options) {
 
   cy.get('[data-cy=question]').clear().type(question);
 
-  if(options.type === undefined || options.type === 'dropdown') {
+  if (options.type === undefined || options.type === 'dropdown') {
     cy.contains('Radio').click();
-  
+
     cy.contains('Dropdown').click();
   }
 
-  if(options.isMultipleSelect === true) {
+  if (options.isMultipleSelect === true) {
     cy.contains('Is multiple select').click();
   }
 
@@ -294,7 +298,12 @@ const createSampleQuestion = (question, templateName, options) => {
   closeQuestionsMenu();
 };
 
-const createGenericTemplateQuestion = (question, templateName, addButtonLabel, options) => {
+const createGenericTemplateQuestion = (
+  question,
+  templateName,
+  addButtonLabel,
+  options
+) => {
   openQuestionsMenu();
 
   cy.contains('Add Sub Template').click();
@@ -309,9 +318,8 @@ const createGenericTemplateQuestion = (question, templateName, addButtonLabel, o
   cy.contains(templateName).click();
 
   if (addButtonLabel) {
-    cy.get('[data-cy="addEntryButtonLabel"]').type(addButtonLabel)
+    cy.get('[data-cy="addEntryButtonLabel"]').type(addButtonLabel);
   }
-
 
   if (options?.minEntries) {
     cy.get('[data-cy=min-entries] input')
@@ -388,4 +396,7 @@ Cypress.Commands.add('createSampleQuestion', createSampleQuestion);
 
 Cypress.Commands.add('createRichTextInput', createRichTextInput);
 
-Cypress.Commands.add('createGenericTemplateQuestion', createGenericTemplateQuestion);
+Cypress.Commands.add(
+  'createGenericTemplateQuestion',
+  createGenericTemplateQuestion
+);

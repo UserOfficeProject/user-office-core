@@ -164,16 +164,16 @@ declare global {
        */
       createTemplate: (
         type:
-          | 'proposal'
-          | 'sample'
-          | 'shipment'
-          | 'visit'
-          | 'proposalEsi'
-          | 'sampleEsi'
-          | 'genericTemplate',
+          | 'PROPOSAL'
+          | 'SAMPLE'
+          | 'SHIPMENT'
+          | 'VISIT_REGISTRATION'
+          | 'PROPOSAL_ESI'
+          | 'SAMPLE_ESI'
+          | 'GENERIC_TEMPLATE',
         title?: string,
         description?: string
-      ) => void;
+      ) => Promise<any>;
 
       /**
        * Creates topic in template

@@ -12,7 +12,7 @@ declare global {
       createProposalWorkflow: (
         workflowName: string,
         workflowDescription: string
-      ) => void;
+      ) => Promise<any>;
 
       /**
        * Adds status changing event/s to status. When those event/s are fired the the status will be changed to statusCode you pass.

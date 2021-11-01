@@ -1,13 +1,25 @@
+import { GraphQLClient } from 'graphql-request';
+
 const createProposalWorkflow = (workflowName, workflowDescription) => {
-  cy.contains('Settings').click();
-  cy.contains('Proposal workflows').click();
-  cy.contains('Create').click();
+  const query = `mutation {
+    createProposalWorkflow(newProposalWorkflowInput: {
+      name: "${workflowName}",
+      description: "${workflowDescription}"
+    }) {
+      rejection {
+        reason
+      }
+      proposalWorkflow {
+        id
+      }
+    }
+  }`;
+  const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
+  const request = new GraphQLClient('/gateway', {
+    headers: { authorization: authHeader },
+  }).rawRequest(query, null);
 
-  cy.get('#name').type(workflowName);
-  cy.get('#description').type(workflowDescription);
-  cy.get('[data-cy="submit"]').click();
-
-  cy.notification({ variant: 'success', text: 'created successfully' });
+  cy.wrap(request);
 };
 
 const addProposalStatusChangingEventToStatus = (

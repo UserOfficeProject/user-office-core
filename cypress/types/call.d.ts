@@ -11,13 +11,15 @@ declare global {
        */
       createCall: (values: {
         shortCode?: string;
+        title?: string;
+        description?: string;
         startDate?: string;
         endDate?: string;
         surveyComment?: string;
         cycleComment?: string;
-        template?: string;
-        esiTemplate?: string;
-        workflow?: string;
+        templateId?: number;
+        esiTemplateId: number;
+        workflowId?: number;
       }) => void;
     }
   }
