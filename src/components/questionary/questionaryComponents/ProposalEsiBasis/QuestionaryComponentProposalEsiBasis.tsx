@@ -12,6 +12,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import FileCopy from '@material-ui/icons/FileCopy';
 import { Field, FieldProps } from 'formik';
 import React, { MouseEvent, useContext, useState } from 'react';
 
@@ -30,6 +31,7 @@ import {
   DataType,
   GetSampleEsiQuery,
   SampleDeclarationConfig,
+  SampleFragment,
 } from 'generated/sdk';
 import { getQuestionsByType } from 'models/questionary/QuestionaryFunctions';
 import { SampleEsiWithQuestionary } from 'models/questionary/sampleEsi/SampleEsiWithQuestionary';
@@ -68,12 +70,12 @@ function QuestionaryComponentProposalEsiBasis(
             .then((response) => {
               const sampleEsi = response.createSampleEsi?.esi;
               if (sampleEsi) {
-                form.setFieldValue(answerId, [...field.value, sampleEsi]);
                 dispatch({
                   type: 'ESI_SAMPLE_ESI_CREATED',
                   sampleEsi: sampleEsi,
                 });
                 setSelectedSampleEsi(response.createSampleEsi.esi);
+                form.setFieldValue(answerId, [...field.value, sampleEsi]);
               }
             });
         };
@@ -87,14 +89,17 @@ function QuestionaryComponentProposalEsiBasis(
             .then((response) => {
               const deletedEsi = response.deleteSampleEsi?.esi;
               if (deletedEsi) {
-                const newValue = field.value.filter(
-                  (esi) => esi.sampleId !== deletedEsi.sampleId
-                );
-                form.setFieldValue(answerId, newValue);
                 dispatch({
                   type: 'ESI_SAMPLE_ESI_DELETED',
                   sampleId: deletedEsi.sampleId,
                 });
+
+                // Refresh ESI list
+                api()
+                  .getEsi({ esiId: state!.esi.id })
+                  .then((result) => {
+                    form.setFieldValue(answerId, result.esi?.sampleEsis);
+                  });
               }
             });
         };
@@ -132,10 +137,18 @@ function QuestionaryComponentProposalEsiBasis(
             .then((response) => {
               const deletedSample = response.deleteSample.sample;
               if (deletedSample) {
+                const newValue = field.value.filter(
+                  (esi) => esi.sampleId !== deletedSample.id
+                );
                 dispatch({
                   type: 'ESI_SAMPLE_DELETED',
                   sampleId: deletedSample.id,
                 });
+                dispatch({
+                  type: 'ESI_SAMPLE_ESI_DELETED',
+                  sampleId: deletedSample.id,
+                });
+                form.setFieldValue(answerId, newValue);
               }
             });
         };
@@ -174,6 +187,67 @@ function QuestionaryComponentProposalEsiBasis(
                 form.setFieldValue(answerId, newValue);
               }
             });
+        };
+
+        const handleCloneSampleClick = async (
+          sampleToClone: SampleFragment
+        ) => {
+          prompt(
+            async (newTitle) => {
+              await api()
+                .cloneSample({
+                  sampleId: sampleToClone.id,
+                  title: newTitle,
+                  isPostProposalSubmission: true,
+                })
+                .then((response) => {
+                  const newSample = response.cloneSample.sample;
+                  if (newSample !== null) {
+                    dispatch({ type: 'ESI_SAMPLE_CREATED', sample: newSample });
+                  }
+                });
+            },
+            {
+              question: 'Sample title',
+              prefilledAnswer: `Copy of ${sampleToClone.title}`,
+            }
+          )();
+        };
+
+        const handleCloneSampleEsiClick = async (
+          sampleToClone: SampleFragment
+        ) => {
+          prompt(
+            async (newTitle) => {
+              await api()
+                .cloneSampleEsi({
+                  esiId: state.esi.id,
+                  sampleId: sampleToClone.id,
+                  newSampleTitle: newTitle,
+                })
+                .then((response) => {
+                  const newSampleEsi = response.cloneSampleEsi.esi;
+                  if (newSampleEsi !== null) {
+                    dispatch({
+                      type: 'ESI_SAMPLE_CREATED',
+                      sample: newSampleEsi.sample,
+                    });
+                    dispatch({
+                      type: 'ESI_SAMPLE_ESI_CREATED',
+                      sampleEsi: newSampleEsi,
+                    });
+                    form.setFieldValue(answerId, [
+                      ...field.value,
+                      newSampleEsi,
+                    ]);
+                  }
+                });
+            },
+            {
+              question: 'Sample title',
+              prefilledAnswer: `Copy of ${sampleToClone.title}`,
+            }
+          )();
         };
 
         const allSamples = state?.esi?.proposal.samples;
@@ -242,6 +316,24 @@ function QuestionaryComponentProposalEsiBasis(
                       </ListItemIcon>
                     )}
 
+                    {
+                      <ListItemIcon>
+                        <IconButton
+                          edge="end"
+                          title="Clone sample"
+                          onClick={(e: MouseEvent) => {
+                            e.stopPropagation();
+                            hasDeclaredEsi
+                              ? handleCloneSampleEsiClick(sample)
+                              : handleCloneSampleClick(sample);
+                          }}
+                          data-cy="clone-sample-btn"
+                        >
+                          <FileCopy />
+                        </IconButton>
+                      </ListItemIcon>
+                    }
+
                     {sample.isPostProposalSubmission && (
                       <ListItemIcon>
                         <IconButton
@@ -286,7 +378,7 @@ function QuestionaryComponentProposalEsiBasis(
                 color="primary"
                 startIcon={<AddCircleOutlineIcon />}
               >
-                Add sample
+                Create new sample
               </Button>
             </ButtonContainer>
             <Divider style={{ margin: '12px 0' }} />
