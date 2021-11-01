@@ -169,7 +169,6 @@ export interface QuestionDependencyRecord {
 }
 
 export interface QuestionTemplateRelRecord {
-  readonly id: number;
   readonly question_id: string;
   readonly template_id: number;
   readonly topic_id: number;

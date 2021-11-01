@@ -421,7 +421,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       }
 
       dataToUpsert.push({
-        id: item.id,
         question_id: item.questionId,
         template_id: item.templateId,
         topic_id: item.topicId,
@@ -562,7 +561,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         }
 
         return resultSet.map((resultItem) => ({
-          id: resultItem.id,
           questionId: resultItem.question_id,
           templateId: resultItem.template_id,
           topicId: resultItem.topic_id,
