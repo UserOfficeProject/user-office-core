@@ -643,8 +643,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       );
   }
 
-  async checkExternalToken(token: string): Promise<User> {
-    throw new Error('No Op');
+  async checkExternalToken(token: string): Promise<null> {
+    return null;
   }
 
   async externalLogout(token: string): Promise<void> {
