@@ -171,7 +171,7 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
           dispatch({ type: ActionType.LOGINUSER, payload: data }),
         // Using useCallback here as these are used in useDataAPI dependency array
         handleLogout: useCallback(() => {
-          unauthorizedApi().externalLogoutToken({
+          unauthorizedApi().logout({
             externalToken: localStorage.token,
           });
 
