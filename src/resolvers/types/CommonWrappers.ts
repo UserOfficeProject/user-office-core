@@ -219,7 +219,7 @@ export class CheckExternalTokenWrap extends ResponseWrapBase {
 }
 
 @ObjectType()
-export class ExternalLogoutTokenWrap extends ResponseWrapBase {
+export class LogoutTokenWrap extends ResponseWrapBase {
   @Response()
   @Field(() => String, { nullable: true })
   public token: string;

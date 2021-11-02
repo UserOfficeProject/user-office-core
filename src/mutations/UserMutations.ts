@@ -15,10 +15,12 @@ import * as bcrypt from 'bcryptjs';
 import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { AdminDataSource } from '../datasources/AdminDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
+import { FeatureId } from '../models/Feature';
 import { isRejection, rejection, Rejection } from '../models/Rejection';
 import { Roles, Role } from '../models/Role';
 import {
@@ -45,10 +47,20 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 @injectable()
 export default class UserMutations {
   private userAuth = container.resolve(UserAuthorization);
+  //Set as a class variable to avoid excessive calls to database
+  private externalAuth: boolean;
 
   constructor(
-    @inject(Tokens.UserDataSource) private dataSource: UserDataSource
-  ) {}
+    @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
+    @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource
+  ) {
+    adminDataSource.getFeatures().then((features) => {
+      this.externalAuth = features.filter(
+        (feature) => feature.id == FeatureId.EXTERNAL_AUTH
+      )[0].isEnabled;
+      console.log(this.externalAuth);
+    });
+  }
 
   createHash(password: string): string {
     //Check that password follows rules
@@ -442,11 +454,17 @@ export default class UserMutations {
     }
   }
 
-  async externalLogout(token: string): Promise<void | Rejection> {
+  async logout(token: string): Promise<void | Rejection> {
     try {
       const decodedToken = verifyToken<AuthJwtPayload>(token);
 
-      this.dataSource.externalLogout(decodedToken.externalToken ?? 'no-token');
+      if (this.externalAuth) {
+        if (decodedToken.externalToken) {
+          this.dataSource.externalLogout(decodedToken.externalToken);
+        } else {
+          return rejection('No external token found in JWT', { token });
+        }
+      }
 
       return;
     } catch (error) {

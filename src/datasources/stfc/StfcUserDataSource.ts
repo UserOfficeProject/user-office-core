@@ -1,3 +1,5 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { Role } from '../../models/Role';
 import { Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
@@ -418,9 +420,10 @@ export class StfcUserDataSource implements UserDataSource {
   async externalLogout(token: string): Promise<void> {
     await client.logout(token);
     const rawStfcUser = await client.getPersonDetailsFromSessionId(token);
-    console.log(rawStfcUser);
     if (rawStfcUser) {
-      throw new Error(`User found ${token}`);
+      const userNumber = rawStfcUser.return.userNumber;
+      logger.logWarn('Failed to log out user', { userNumber, token });
+      throw new Error(`Failed to logout ${token}`);
     }
 
     return;
