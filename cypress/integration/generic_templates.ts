@@ -12,18 +12,18 @@ context('GenericTemplates tests', () => {
     cy.viewport(1920, 1080);
   });
 
-  const proposalTemplateName = faker.lorem.words(2);
-  const genericTemplateTemplateName = twoFakes(2);
-  const genericTemplateTemplateQuestions = twoFakes(2);
-  const genericTemplateTemplateDescription = twoFakes(2);
+  const proposalTemplateName = faker.lorem.words(3);
+  const genericTemplateTemplateName = twoFakes(3);
+  const genericTemplateTemplateQuestions = twoFakes(3);
+  const genericTemplateTemplateDescription = twoFakes(3);
   const genericTemplateQuestion = twoFakes(4);
-  const proposalTitle = twoFakes(2);
-  const addButtonLabel = twoFakes(1);
-  const genericTemplateTitle = faker.lorem.words(2);
-  const proposalTitleUpdated = faker.lorem.words(2);
-  const genericTemplateQuestionaryQuestion = twoFakes(2);
+  const proposalTitle = twoFakes(3);
+  const addButtonLabel = twoFakes(2);
+  const genericTemplateTitle = faker.lorem.words(3);
+  const proposalTitleUpdated = faker.lorem.words(3);
+  const genericTemplateQuestionaryQuestion = twoFakes(3);
   const proposalWorkflow = {
-    name: faker.random.words(2),
+    name: faker.random.words(3),
     description: faker.random.words(5),
   };
 
