@@ -1,12 +1,15 @@
-import faker from 'faker';
-import { GraphQLClient } from 'graphql-request';
+import {
+  CreateTemplateMutationVariables,
+  getSdk,
+} from '../../src/generated/sdk';
+import { getE2EApi } from './utils';
 
-const navigateToTemplatesSubmenu = (submenuName) => {
+const navigateToTemplatesSubmenu = (submenuName: string) => {
   cy.contains('Templates').click();
   cy.get(`[title='${submenuName}']`).first().click();
 };
 
-const createTopic = (title) => {
+const createTopic = (title: string) => {
   cy.get('[data-cy=show-more-button]').last().click();
 
   cy.get('[data-cy=add-topic-menu-item]').last().click();
@@ -30,28 +33,9 @@ typeToMenuTitle.set('visit', 'Visit registration');
 typeToMenuTitle.set('proposalEsi', 'Experiment Safety Input (Proposal)');
 typeToMenuTitle.set('sampleEsi', 'Experiment Safety Input (Sample)');
 
-function createTemplate(type, title, description) {
-  const templateTitle = title || faker.random.words(2);
-  const templateDescription = description || faker.random.words(3);
-
-  const query = `mutation {
-    createTemplate(
-      groupId: ${type},
-      name: "${templateTitle}",
-      description: "${templateDescription}"
-    ) {
-      rejection {
-        reason
-      }
-      template {
-        templateId
-      }
-    }
-  }`;
-  const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
-  const request = new GraphQLClient('/gateway', {
-    headers: { authorization: authHeader },
-  }).rawRequest(query, null);
+function createTemplate(createTemplateInput: CreateTemplateMutationVariables) {
+  const api = getE2EApi();
+  const request = api.createTemplate(createTemplateInput);
 
   cy.wrap(request);
 }
@@ -68,7 +52,7 @@ function closeQuestionsMenu() {
   cy.get('[data-cy=questionPicker] [data-cy=close-button]').click();
 }
 
-function createBooleanQuestion(question) {
+function createBooleanQuestion(question: any) {
   openQuestionsMenu();
 
   cy.contains('Add Boolean').click();
@@ -86,7 +70,7 @@ function createBooleanQuestion(question) {
   closeQuestionsMenu();
 }
 
-function createTextQuestion(question, options) {
+function createTextQuestion(question: any, options: any) {
   openQuestionsMenu();
 
   cy.contains('Add Text Input').click();
@@ -117,7 +101,7 @@ function createTextQuestion(question, options) {
   closeQuestionsMenu();
 }
 
-function createDateQuestion(question, options) {
+function createDateQuestion(question: any, options: any) {
   openQuestionsMenu();
 
   cy.contains('Add Date').click();
@@ -143,7 +127,7 @@ function createDateQuestion(question, options) {
   closeQuestionsMenu();
 }
 
-function createMultipleChoiceQuestion(question, options) {
+function createMultipleChoiceQuestion(question: any, options: any) {
   openQuestionsMenu();
 
   cy.contains('Add Multiple choice').click();
@@ -191,7 +175,7 @@ function createMultipleChoiceQuestion(question, options) {
   closeQuestionsMenu();
 }
 
-function createFileUploadQuestion(question) {
+function createFileUploadQuestion(question: any) {
   openQuestionsMenu();
 
   cy.contains('Add File Upload').click();
@@ -209,7 +193,7 @@ function createFileUploadQuestion(question) {
   closeQuestionsMenu();
 }
 
-function createNumberInputQuestion(question, options) {
+function createNumberInputQuestion(question: any, options: any) {
   openQuestionsMenu();
 
   cy.contains('Add Number').click();
@@ -235,7 +219,7 @@ function createNumberInputQuestion(question, options) {
   closeQuestionsMenu();
 }
 
-function createIntervalQuestion(question, options) {
+function createIntervalQuestion(question: any, options: any) {
   openQuestionsMenu();
 
   cy.contains('Add Interval').click();
@@ -261,7 +245,11 @@ function createIntervalQuestion(question, options) {
   closeQuestionsMenu();
 }
 
-const createSampleQuestion = (question, templateName, options) => {
+const createSampleQuestion = (
+  question: any,
+  templateName: any,
+  options: any
+) => {
   openQuestionsMenu();
 
   cy.contains('Add Sample Declaration').click();
@@ -299,10 +287,10 @@ const createSampleQuestion = (question, templateName, options) => {
 };
 
 const createGenericTemplateQuestion = (
-  question,
-  templateName,
-  addButtonLabel,
-  options
+  question: any,
+  templateName: any,
+  addButtonLabel: any,
+  options: any
 ) => {
   openQuestionsMenu();
 
@@ -344,7 +332,7 @@ const createGenericTemplateQuestion = (
   closeQuestionsMenu();
 };
 
-const createRichTextInput = (question, options) => {
+const createRichTextInput = (question: any, options: any) => {
   openQuestionsMenu();
 
   cy.contains('Add Rich Text Input').click();

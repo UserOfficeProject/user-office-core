@@ -1,3 +1,8 @@
+import {
+  CreateTemplateMutationVariables,
+  CreateTemplateMutation,
+} from '../../src/generated/sdk';
+
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -58,9 +63,9 @@ declare global {
           option1?: string;
           option2?: string;
           option3?: string;
-          isMultipleSelect?: boolean
-          type?: 'radio' | 'dropdown'
-        },
+          isMultipleSelect?: boolean;
+          type?: 'radio' | 'dropdown';
+        }
       ) => void;
 
       /**
@@ -124,7 +129,7 @@ declare global {
        * @example
        *    cy.createGenericTemplateQuestion('Provide deatails of any grants', 'deafult generic template', 'Add grant' {minEntries:0, maxEntries:5})
        */
-       createGenericTemplateQuestion: (
+      createGenericTemplateQuestion: (
         question: string,
         template: string,
         addButtonLabel: string,
@@ -163,17 +168,8 @@ declare global {
        *    cy.createTemplate('proposal')
        */
       createTemplate: (
-        type:
-          | 'PROPOSAL'
-          | 'SAMPLE'
-          | 'SHIPMENT'
-          | 'VISIT_REGISTRATION'
-          | 'PROPOSAL_ESI'
-          | 'SAMPLE_ESI'
-          | 'GENERIC_TEMPLATE',
-        title?: string,
-        description?: string
-      ) => Promise<any>;
+        createTemplateInput: CreateTemplateMutationVariables
+      ) => Promise<CreateTemplateMutation>;
 
       /**
        * Creates topic in template

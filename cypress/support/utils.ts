@@ -1,4 +1,6 @@
 import 'cypress-file-upload';
+import { GraphQLClient } from 'graphql-request';
+import { getSdk } from '../../src/generated/sdk';
 
 const KEY_CODES = {
   space: 32,
@@ -8,7 +10,17 @@ const KEY_CODES = {
   down: 40,
 };
 
-const notification = ({ variant, text }) => {
+export const getE2EApi = () => {
+  const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
+
+  return getSdk(
+    new GraphQLClient('/graphql', {
+      headers: { authorization: authHeader },
+    })
+  );
+};
+
+const notification = ({ variant, text }: any) => {
   let notificationQuerySelector = '';
 
   switch (variant) {
@@ -84,26 +96,34 @@ function presentationMode() {
   }
 }
 
-const dragElement = (element, moveArgs) => {
+const dragElement = (element: any, moveArgs: any) => {
   const focusedElement = cy.get(element);
 
   focusedElement.trigger('keydown', { keyCode: KEY_CODES.space });
 
-  moveArgs.forEach(({ direction, length }) => {
-    for (let i = 1; i <= length; i++) {
-      focusedElement.trigger('keydown', {
-        keyCode: KEY_CODES[direction],
-        force: true,
-      });
+  moveArgs.forEach(
+    ({
+      direction,
+      length,
+    }: {
+      direction: 'left' | 'up' | 'right' | 'down';
+      length: number;
+    }) => {
+      for (let i = 1; i <= length; i++) {
+        focusedElement.trigger('keydown', {
+          keyCode: KEY_CODES[direction] as any,
+          force: true,
+        });
+      }
     }
-  });
+  );
 
   focusedElement.trigger('keydown', { keyCode: KEY_CODES.space, force: true });
 
   return element;
 };
 
-const setTinyMceContent = (tinyMceId, content) => {
+const setTinyMceContent = (tinyMceId: any, content: any) => {
   cy.get(`#${tinyMceId}`).should('exist');
 
   cy.window().then((win) => {
@@ -112,7 +132,7 @@ const setTinyMceContent = (tinyMceId, content) => {
   });
 };
 
-const getTinyMceContent = (tinyMceId) => {
+const getTinyMceContent = (tinyMceId: any) => {
   cy.get(`#${tinyMceId}`).should('exist');
 
   cy.window().then((win) => {
@@ -122,7 +142,7 @@ const getTinyMceContent = (tinyMceId) => {
   });
 };
 
-const testActionButton = (title, state) => {
+const testActionButton = (title: any, state: any) => {
   switch (state) {
     case 'completed':
       cy.get(`[title="${title}"]`).should('not.be.disabled');

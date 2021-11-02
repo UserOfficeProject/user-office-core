@@ -1,16 +1,33 @@
 import faker from 'faker';
+import { AllocationTimeUnits, TemplateGroupId } from '../../src/generated/sdk';
 
 context('Calls tests', () => {
-  let esiTemplateId: number;
+  let esiTemplateId: number | undefined;
   let workflowId: number;
+
+  const currentDayStart = new Date();
+  currentDayStart.setHours(0, 0, 0, 0);
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startDate: faker.date.past().toISOString().slice(0, 10),
-    endDate: faker.date.future().toISOString().slice(0, 10),
-    template: 'default template',
+    startCall: faker.date.past().toISOString().slice(0, 10),
+    endCall: faker.date.future().toISOString().slice(0, 10),
+    startReview: currentDayStart,
+    endReview: currentDayStart,
+    startSEPReview: currentDayStart,
+    endSEPReview: currentDayStart,
+    startNotify: currentDayStart,
+    endNotify: currentDayStart,
+    startCycle: currentDayStart,
+    endCycle: currentDayStart,
+    templateName: 'default template',
     templateId: 1,
-    esiTemplate: 'default esi template',
+    allocationTimeUnit: AllocationTimeUnits.DAY,
+    cycleComment: faker.lorem.word(),
+    surveyComment: faker.lorem.word(),
+    description: '',
+    title: '',
+    esiTemplateName: 'default esi template',
   };
 
   const updatedCall = {
@@ -35,8 +52,12 @@ context('Calls tests', () => {
   beforeEach(() => {
     cy.viewport(1920, 1080);
     cy.resetDB();
-    cy.createTemplate('PROPOSAL_ESI', 'default esi template').then((result) => {
-      esiTemplateId = result.data.createTemplate.template.templateId;
+    cy.createTemplate({
+      groupId: TemplateGroupId.PROPOSAL_ESI,
+      name: 'default esi template',
+    }).then((result) => {
+      console.log(result);
+      esiTemplateId = result.createTemplate.template?.templateId;
     });
 
     cy.createProposalWorkflow(
@@ -175,12 +196,13 @@ context('Calls tests', () => {
   });
 
   it('A user-officer should be able to create a call', () => {
-    const { shortCode, startDate, endDate, template, esiTemplate } = newCall;
+    const { shortCode, startCall, endCall, templateName, esiTemplateName } =
+      newCall;
     const callShortCode = shortCode || faker.lorem.word();
     const callStartDate =
-      startDate || faker.date.past().toISOString().slice(0, 10);
+      startCall || faker.date.past().toISOString().slice(0, 10);
     const callEndDate =
-      endDate || faker.date.future().toISOString().slice(0, 10);
+      endCall || faker.date.future().toISOString().slice(0, 10);
     const callSurveyComment = faker.lorem.word();
     const callCycleComment = faker.lorem.word();
 
@@ -205,10 +227,10 @@ context('Calls tests', () => {
       .should('have.value', callEndDate);
 
     cy.get('[data-cy="call-template"]').click();
-    cy.get('[role="presentation"]').contains(template).click();
+    cy.get('[role="presentation"]').contains(templateName).click();
 
     cy.get('[data-cy="call-esi-template"]').click();
-    cy.get('[role="presentation"]').contains(esiTemplate).click();
+    cy.get('[role="presentation"]').contains(esiTemplateName).click();
 
     cy.get('#proposalWorkflowId-input').click();
 
@@ -245,12 +267,9 @@ context('Calls tests', () => {
     cy.login('officer');
 
     cy.createCall({
-      shortCode: newCall.shortCode,
-      startDate: newCall.startDate,
-      endDate: newCall.endDate,
-      templateId: newCall.templateId,
+      ...newCall,
       esiTemplateId: esiTemplateId,
-      workflowId: workflowId,
+      proposalWorkflowId: workflowId,
     });
 
     cy.contains('Proposals');
@@ -300,12 +319,9 @@ context('Calls tests', () => {
   it('A user-officer should be able to assign instrument/s to a call', () => {
     cy.login('officer');
     cy.createCall({
-      shortCode: newCall.shortCode,
-      startDate: newCall.startDate,
-      endDate: newCall.endDate,
-      templateId: newCall.templateId,
+      ...newCall,
       esiTemplateId: esiTemplateId,
-      workflowId: workflowId,
+      proposalWorkflowId: workflowId,
     });
 
     cy.contains('People').click();
