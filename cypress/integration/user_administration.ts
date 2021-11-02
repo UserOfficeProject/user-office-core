@@ -213,8 +213,6 @@ context('User administration tests', () => {
     cy.get("[data-cy=co-proposers] [title='Save']").click();
 
     cy.notification({ variant: 'success', text: 'User removed successfully' });
-
-    cy.logout();
   });
 
   it('Should be able to send email for password reset', () => {
