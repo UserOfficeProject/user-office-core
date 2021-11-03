@@ -1357,7 +1357,7 @@ export type MutationLoginArgs = {
 
 
 export type MutationLogoutArgs = {
-  externalToken: Scalars['String'];
+  token: Scalars['String'];
 };
 
 
@@ -7661,7 +7661,7 @@ export type LoginMutation = (
 );
 
 export type LogoutMutationVariables = Exact<{
-  externalToken: Scalars['String'];
+  token: Scalars['String'];
 }>;
 
 
@@ -11486,8 +11486,8 @@ export const LoginDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const LogoutDocument = gql`
-    mutation logout($externalToken: String!) {
-  logout(externalToken: $externalToken) {
+    mutation logout($token: String!) {
+  logout(token: $token) {
     token
     rejection {
       ...rejection
