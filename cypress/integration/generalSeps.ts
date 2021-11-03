@@ -401,7 +401,7 @@ context('General scientific evaluation panel tests', () => {
 
     cy.contains('Members').click();
 
-    cy.get('[title="Add Member"]').click();
+    cy.get('[data-cy="add-participant-button"]').click();
 
     cy.finishedLoading();
 
