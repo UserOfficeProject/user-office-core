@@ -1,6 +1,5 @@
 import {
   Ctx,
-  Directive,
   Field,
   FieldResolver,
   Int,
@@ -10,27 +9,48 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { TzLessDateTime } from '../CustomScalars';
+import { ExperimentSafetyInput } from './ExperimentSafetyInput';
+import { ScheduledEventBookingType } from './ProposalBooking';
 import { Visit } from './Visit';
 
 @ObjectType()
-@Directive('@extends')
-@Directive('@key(fields: "id")')
-export class ScheduledEvent {
+export class ScheduledEventCore {
   @Field(() => Int)
-  @Directive('@external')
   id: number;
+
+  @Field(() => ScheduledEventBookingType)
+  bookingType: ScheduledEventBookingType;
+
+  @Field(() => TzLessDateTime)
+  startsAt: Date;
+
+  @Field(() => TzLessDateTime)
+  endsAt: Date;
 }
 
-@Resolver((of) => ScheduledEvent)
+@Resolver(() => ScheduledEventCore)
 export class ScheduledEventResolver {
   @FieldResolver(() => Visit, { nullable: true })
   async visit(
-    @Root() event: ScheduledEvent,
+    @Root() event: ScheduledEventCore,
     @Ctx() context: ResolverContext
   ): Promise<Visit | null> {
     return context.queries.visit.getVisitByScheduledEventId(
       context.user,
       event.id
     );
+  }
+
+  @FieldResolver(() => ExperimentSafetyInput, { nullable: true })
+  async esi(
+    @Root() event: ScheduledEventCore,
+    @Ctx() context: ResolverContext
+  ): Promise<ExperimentSafetyInput | null> {
+    const esi = await context.queries.proposalEsi.getEsis(context.user, {
+      scheduledEventId: event.id,
+    });
+
+    return esi ? esi[0] : null;
   }
 }

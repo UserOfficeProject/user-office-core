@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { SEPDataSource } from '../datasources/SEPDataSource';
@@ -9,10 +9,9 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 
 @injectable()
 export default class SEPQueries {
-  constructor(
-    @inject(Tokens.SEPDataSource) public dataSource: SEPDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
-  ) {}
+  private userAuth = container.resolve(UserAuthorization);
+
+  constructor(@inject(Tokens.SEPDataSource) public dataSource: SEPDataSource) {}
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async get(agent: UserWithRole | null, id: number) {

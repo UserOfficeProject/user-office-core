@@ -1,5 +1,5 @@
 import { logger } from '@esss-swap/duo-logger';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { VisitDataSource } from '../datasources/VisitDataSource';
@@ -11,13 +11,13 @@ import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class VisitAuthorization {
+  private userAuth = container.resolve(UserAuthorization);
+
   constructor(
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.VisitDataSource)
-    private visitDataSource: VisitDataSource,
-    @inject(Tokens.UserAuthorization)
-    private userAuthorization: UserAuthorization
+    private visitDataSource: VisitDataSource
   ) {}
 
   private async resolveVisit(
@@ -51,7 +51,7 @@ export class VisitAuthorization {
     }
 
     // User officer has access
-    if (this.userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuth.isUserOfficer(agent)) {
       return true;
     }
 
@@ -67,7 +67,7 @@ export class VisitAuthorization {
      */
     return (
       visit.creatorId === agent.id ||
-      this.userAuthorization.isMemberOfProposal(agent, visit.proposalPk) ||
+      this.userAuth.isMemberOfProposal(agent, visit.proposalPk) ||
       this.visitDataSource.isVisitorOfVisit(agent.id, visit.id)
     );
   }
@@ -89,7 +89,7 @@ export class VisitAuthorization {
     }
 
     // User officer has access
-    if (this.userAuthorization.isUserOfficer(agent)) {
+    if (this.userAuth.isUserOfficer(agent)) {
       return true;
     }
 
@@ -105,7 +105,7 @@ export class VisitAuthorization {
      * User can modify the visit if he is a participant of a proposal
      * and the visit is not yet accepted
      */
-    if (this.userAuthorization.isMemberOfProposal(agent, proposal)) {
+    if (await this.userAuth.isMemberOfProposal(agent, proposal)) {
       if (visit.status === VisitStatus.ACCEPTED) {
         logger.logError('User tried to change accepted visit', {
           agent,

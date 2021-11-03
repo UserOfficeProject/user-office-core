@@ -1,27 +1,21 @@
-import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
+import {
+  ApolloServerPluginInlineTraceDisabled,
+  ApolloServerPluginLandingPageDisabled,
+  ApolloServerPluginLandingPageGraphQLPlayground,
+} from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
-import { Express, Request } from 'express';
+import { Express } from 'express';
 import { applyMiddleware } from 'graphql-middleware';
 
 import 'reflect-metadata';
 import baseContext from '../buildContext';
 import { ResolverContext } from '../context';
-import { Role } from '../models/Role';
-import { User, UserWithRole } from '../models/User';
+import { UserWithRole } from '../models/User';
 import federationSources from '../resolvers/federationSources';
 import { registerEnums } from '../resolvers/registerEnums';
 import { buildFederatedSchema } from '../utils/buildFederatedSchema';
 import rejectionLogger from './rejectionLogger';
 import rejectionSanitizer from './rejectionSanitizer';
-
-interface Req extends Request {
-  user?: {
-    user?: User;
-    currentRole?: Role;
-    roles?: Role[];
-    accessTokenId?: string;
-  };
-}
 
 const apolloServer = async (app: Express) => {
   const PATH = '/graphql';
@@ -46,21 +40,26 @@ const apolloServer = async (app: Express) => {
   );
 
   schema = applyMiddleware(schema, rejectionLogger);
-  if (process.env.NODE_ENV === 'production') {
+
+  const env = process.env.NODE_ENV;
+
+  if (env === 'production') {
     // prevent exposing too much information when running in production
     schema = applyMiddleware(schema, rejectionSanitizer);
   }
 
   const server = new ApolloServer({
     schema: schema,
-    tracing: false,
-    // Explicitly disable playground in prod
-    playground: process.env.NODE_ENV !== 'production'
-      ? {settings: {'schema.polling.enable': false}}
-      : false,
-    plugins: [ApolloServerPluginInlineTraceDisabled()],
-
-    context: async ({ req }: { req: Req }) => {
+    plugins: [
+      ApolloServerPluginInlineTraceDisabled(),
+      // Explicitly disable playground in prod
+      process.env.NODE_ENV === 'production'
+        ? ApolloServerPluginLandingPageDisabled()
+        : ApolloServerPluginLandingPageGraphQLPlayground({
+            settings: { 'schema.polling.enable': false },
+          }),
+    ],
+    context: async ({ req }) => {
       let user = null;
       const userId = req.user?.user?.id as number;
       const accessTokenId = req.user?.accessTokenId;
@@ -93,6 +92,9 @@ const apolloServer = async (app: Express) => {
       return context;
     },
   });
+
+  await server.start();
+
   server.applyMiddleware({ app: app, path: PATH });
 };
 

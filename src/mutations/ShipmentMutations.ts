@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -9,7 +9,7 @@ import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { rejection } from '../models/Rejection';
 import { ShipmentStatus } from '../models/Shipment';
-import { TemplateCategoryId } from '../models/Template';
+import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { AddSamplesToShipmentArgs } from '../resolvers/mutations/AddSamplesShipmentMutation';
 import { CreateShipmentInput } from '../resolvers/mutations/CreateShipmentMutation';
@@ -21,6 +21,10 @@ import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 import { UserAuthorization } from '../utils/UserAuthorization';
 @injectable()
 export default class ShipmentMutations {
+  private userAuth = container.resolve(UserAuthorization);
+  private sampleAuth = container.resolve(SampleAuthorization);
+  private shipmentAuth = container.resolve(ShipmentAuthorization);
+
   constructor(
     @inject(Tokens.ShipmentDataSource)
     private shipmentDataSource: ShipmentDataSource,
@@ -30,12 +34,6 @@ export default class ShipmentMutations {
     private templateDataSource: TemplateDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.SampleAuthorization)
-    private sampleAuth: SampleAuthorization,
-    @inject(Tokens.ShipmentAuthorization)
-    private shipmentAuth: ShipmentAuthorization,
-    @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization,
     @inject(Tokens.AssetRegistrar)
     private assetRegistrarService: AssetRegistrar
   ) {}
@@ -58,7 +56,7 @@ export default class ShipmentMutations {
     }
 
     const templateId = await this.templateDataSource.getActiveTemplateId(
-      TemplateCategoryId.SHIPMENT_DECLARATION
+      TemplateGroupId.SHIPMENT
     );
 
     if (!templateId) {
@@ -69,7 +67,7 @@ export default class ShipmentMutations {
     }
 
     const template = await this.templateDataSource.getTemplate(templateId);
-    if (template?.categoryId !== TemplateCategoryId.SHIPMENT_DECLARATION) {
+    if (template?.groupId !== TemplateGroupId.SHIPMENT) {
       return rejection('Can not create shipment with this template', {
         args,
         agent,

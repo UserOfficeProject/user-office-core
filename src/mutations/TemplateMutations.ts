@@ -25,9 +25,9 @@ import {
   DataType,
   Question,
   Template,
-  TemplateCategoryId,
   TemplatesHasQuestions,
   Topic,
+  TemplateGroupId,
 } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
@@ -55,8 +55,8 @@ export default class TemplateMutations {
   ): Promise<Template | Rejection> {
     const newTemplate = await this.dataSource.createTemplate(args);
 
-    switch (args.categoryId) {
-      case TemplateCategoryId.PROPOSAL_QUESTIONARY:
+    switch (args.groupId) {
+      case TemplateGroupId.PROPOSAL:
         await this.createInitialTopic(
           newTemplate.templateId,
           0,
@@ -64,7 +64,7 @@ export default class TemplateMutations {
           'proposal_basis'
         );
         break;
-      case TemplateCategoryId.SAMPLE_DECLARATION:
+      case TemplateGroupId.SAMPLE:
         await this.createInitialTopic(
           newTemplate.templateId,
           0,
@@ -72,7 +72,15 @@ export default class TemplateMutations {
           'sample_basis'
         );
         break;
-      case TemplateCategoryId.SHIPMENT_DECLARATION:
+      case TemplateGroupId.GENERIC_TEMPLATE:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New Sub Topic',
+          'generic_template_basis'
+        );
+        break;
+      case TemplateGroupId.SHIPMENT:
         await this.createInitialTopic(
           newTemplate.templateId,
           0,
@@ -80,7 +88,7 @@ export default class TemplateMutations {
           'shipment_basis'
         );
         break;
-      case TemplateCategoryId.VISIT:
+      case TemplateGroupId.VISIT_REGISTRATION:
         await this.createInitialTopic(
           newTemplate.templateId,
           0,
@@ -88,23 +96,31 @@ export default class TemplateMutations {
           'visit_basis'
         );
         break;
-      case TemplateCategoryId.RISK_ASSESSMENT:
+      case TemplateGroupId.PROPOSAL_ESI:
         await this.createInitialTopic(
           newTemplate.templateId,
           0,
-          'New risk assessment',
-          'risk_assessment_basis'
+          'New experiment safety input',
+          'proposal_esi_basis'
+        );
+        break;
+      case TemplateGroupId.SAMPLE_ESI:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New experiment safety input',
+          'sample_esi_basis'
         );
         break;
     }
 
     const currentActiveTemplateId = await this.dataSource.getActiveTemplateId(
-      args.categoryId
+      args.groupId
     );
     if (!currentActiveTemplateId) {
       // if there is no active template, then mark newly created template as active
       await this.dataSource.setActiveTemplate({
-        templateCategoryId: args.categoryId,
+        templateGroupId: args.groupId,
         templateId: newTemplate.templateId,
       });
     }
@@ -355,7 +371,7 @@ export default class TemplateMutations {
       });
   }
 
-  // @ValidateArgs(updateQuestionTemplateRelationValidationSchema)
+  @ValidateArgs(updateQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateQuestionTemplateRelationSettings(
     agent: UserWithRole | null,
@@ -404,8 +420,8 @@ export default class TemplateMutations {
   ) {
     const template = await this.dataSource.getTemplate(args.templateId);
 
-    if (template?.categoryId !== args.templateCategoryId) {
-      return rejection('TemplateId and TemplateCategoryId mismatch');
+    if (template?.groupId !== args.templateGroupId) {
+      return rejection('TemplateId and TemplateGroupId mismatch');
     }
 
     return this.dataSource.setActiveTemplate(args).catch((err: Error) => {

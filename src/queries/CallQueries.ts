@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
@@ -10,10 +10,10 @@ import { CallsFilter } from './../resolvers/queries/CallsQuery';
 
 @injectable()
 export default class CallQueries {
+  private userAuth = container.resolve(UserAuthorization);
+
   constructor(
-    @inject(Tokens.CallDataSource) public dataSource: CallDataSource,
-    @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization
+    @inject(Tokens.CallDataSource) public dataSource: CallDataSource
   ) {}
 
   @Authorized()

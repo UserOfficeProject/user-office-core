@@ -14,6 +14,7 @@ import {
   TemplateCategoryId,
   DataType,
   Question,
+  TemplateGroupId,
 } from '../models/Template';
 import TemplateMutations from './TemplateMutations';
 
@@ -46,9 +47,9 @@ test('An userofficer can update topic', async () => {
 test('An userofficer can create template', async () => {
   const name = 'The name';
   const description = 'The description';
-  const categoryId = TemplateCategoryId.PROPOSAL_QUESTIONARY;
+  const groupId = TemplateGroupId.PROPOSAL;
   const template = await mutations.createTemplate(dummyUserOfficerWithRole, {
-    categoryId,
+    groupId,
     name,
     description,
   });
@@ -59,9 +60,9 @@ test('An userofficer can create template', async () => {
 test('An user cannot create template', async () => {
   const name = 'The name';
   const description = 'The description';
-  const categoryId = TemplateCategoryId.PROPOSAL_QUESTIONARY;
+  const groupId = TemplateGroupId.PROPOSAL;
   const template = await mutations.createTemplate(dummyUserWithRole, {
-    categoryId,
+    groupId,
     name,
     description,
   });

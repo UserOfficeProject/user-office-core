@@ -7,9 +7,10 @@ import {
   submitProposalValidationSchema,
   updateProposalValidationSchema,
 } from '@esss-swap/duo-validation';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -36,9 +37,12 @@ import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutatio
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
+import { CloneUtils } from './../utils/CloneUtils';
 
 @injectable()
 export default class ProposalMutations {
+  private userAuth = container.resolve(UserAuthorization);
+  private cloneUtils = container.resolve(CloneUtils);
   constructor(
     @inject(Tokens.ProposalDataSource)
     public proposalDataSource: ProposalDataSource,
@@ -49,10 +53,10 @@ export default class ProposalMutations {
     private instrumentDataSource: InstrumentDataSource,
     @inject(Tokens.SampleDataSource)
     private sampleDataSource: SampleDataSource,
+    @inject(Tokens.GenericTemplateDataSource)
+    private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
-    @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization,
     @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource
   ) {}
@@ -301,8 +305,9 @@ export default class ProposalMutations {
       const result = await this.proposalDataSource.deleteProposal(proposalPk);
 
       return result;
-    } catch(error : any) {
-      if ('code' in error && error.code === '23503') {
+    } catch (error) {
+      // NOTE: We are explicitly casting error to { code: string } type because it is the easiest solution for now and because it's type is a bit difficult to determine because of knexjs not returning typed error message.
+      if ((error as { code: string }).code === '23503') {
         return rejection(
           'Failed to delete proposal because, it has dependencies which need to be deleted first',
           { proposal },
@@ -576,14 +581,28 @@ export default class ProposalMutations {
       });
 
       for await (const sample of proposalSamples) {
-        const clonedSample = await this.sampleDataSource.cloneSample(sample.id);
-        await this.sampleDataSource.updateSample({
-          sampleId: clonedSample.id,
+        await this.cloneUtils.cloneSample(sample, {
           proposalPk: clonedProposal.primaryKey,
-          questionaryId: clonedSample.questionaryId,
-          safetyComment: '',
           safetyStatus: SampleStatus.PENDING_EVALUATION,
+          safetyComment: '',
           shipmentId: null,
+        });
+      }
+
+      const proposalGenericTemplates =
+        await this.genericTemplateDataSource.getGenericTemplates({
+          filter: { proposalPk: sourceProposal.primaryKey },
+        });
+
+      for await (const genericTemplate of proposalGenericTemplates) {
+        const clonedGenericTemplate =
+          await this.genericTemplateDataSource.cloneGenericTemplate(
+            genericTemplate.id
+          );
+        await this.genericTemplateDataSource.updateGenericTemplate({
+          genericTemplateId: clonedGenericTemplate.id,
+          proposalPk: clonedProposal.primaryKey,
+          questionaryId: clonedGenericTemplate.questionaryId,
         });
       }
 

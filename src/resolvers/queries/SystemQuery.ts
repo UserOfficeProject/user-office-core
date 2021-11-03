@@ -19,7 +19,7 @@ export class SystemQuery {
       cachedVersion = content.toString().trim();
 
       return cachedVersion;
-    } catch (err) {
+    } catch (err: any) {
       if (err.code !== 'ENOENT') {
         logger.logException(
           'Unknown error while reading build-version.txt',

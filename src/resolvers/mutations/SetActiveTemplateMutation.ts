@@ -9,14 +9,14 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { TemplateCategoryId } from '../../models/Template';
+import { TemplateGroupId } from '../../models/Template';
 import { SuccessResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class SetActiveTemplateArgs {
-  @Field(() => TemplateCategoryId)
-  public templateCategoryId: TemplateCategoryId;
+  @Field(() => TemplateGroupId)
+  public templateGroupId: TemplateGroupId;
 
   @Field(() => Int)
   public templateId: number;

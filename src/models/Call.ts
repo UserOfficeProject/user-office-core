@@ -21,7 +21,10 @@ export class Call {
     public callReviewEnded: boolean,
     public callSEPReviewEnded: boolean,
     public templateId: number,
-    public allocationTimeUnit: AllocationTimeUnits
+    public esiTemplateId: number | undefined,
+    public allocationTimeUnit: AllocationTimeUnits,
+    public title: string,
+    public description: string
   ) {}
 }
 

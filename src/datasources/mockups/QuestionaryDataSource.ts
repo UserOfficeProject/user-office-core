@@ -82,7 +82,6 @@ export const dummyTemplateHasQuestionRelationFactory = (
   templateId: number
 ): TemplatesHasQuestions => {
   return new TemplatesHasQuestions(
-    Math.round(Math.random() * 100),
     dummyQuestionFactory().id,
     templateId || Math.round(Math.random() * 100),
     Math.round(Math.random() * 10),
@@ -275,5 +274,12 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
         (step) => step.topic.id === topic_id
       )!.isCompleted = isComplete;
     }
+  }
+
+  async copyAnswers(
+    sourceQuestionaryId: number,
+    targetQuestionaryId: number
+  ): Promise<void> {
+    return;
   }
 }

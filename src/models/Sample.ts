@@ -6,9 +6,11 @@ export class Sample {
     public proposalPk: number,
     public questionaryId: number,
     public questionId: string,
+    public isPostProposalSubmission: boolean,
     public safetyStatus: SampleStatus,
     public safetyComment: string,
-    public created: Date
+    public created: Date,
+    public shipmentId: number | null
   ) {}
 }
 

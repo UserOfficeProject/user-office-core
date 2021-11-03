@@ -25,6 +25,9 @@ export class CreateSampleInput {
 
   @Field(() => String)
   questionId: string;
+
+  @Field(() => Boolean, { nullable: true })
+  isPostProposalSubmission?: boolean;
 }
 
 @Resolver()

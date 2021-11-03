@@ -24,6 +24,7 @@ import {
   TemplatesHasQuestions,
 } from '../models/Template';
 import { UserRole } from '../models/User';
+import { TemplateGroupId } from './../models/Template';
 import * as dummy from './dummy';
 import { execute } from './executor';
 
@@ -161,6 +162,8 @@ const createCalls = async () => {
       proposalWorkflowId: 1,
       templateId: dummy.positiveNumber(MAX_TEMPLATES),
       allocationTimeUnit: AllocationTimeUnits.Day,
+      title: faker.random.words(8),
+      description: faker.random.words(10),
     });
   }, MAX_CALLS);
 };
@@ -168,7 +171,7 @@ const createCalls = async () => {
 const createTemplates = async () => {
   const templates = await execute(() => {
     return templateDataSource.createTemplate({
-      categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      groupId: TemplateGroupId.PROPOSAL,
       name: faker.random.word(),
       description: faker.random.words(3),
     });
