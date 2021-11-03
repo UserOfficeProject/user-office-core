@@ -417,7 +417,7 @@ export class StfcUserDataSource implements UserDataSource {
     return dummyUser;
   }
 
-  async externalLogout(token: string): Promise<void> {
+  async logout(token: string): Promise<void> {
     await client.logout(token);
     const rawStfcUser = await client.getPersonDetailsFromSessionId(token);
     if (rawStfcUser) {

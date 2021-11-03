@@ -74,6 +74,6 @@ export interface UserDataSource {
     proposalPk: number
   ): Promise<boolean>;
   getRoleByShortCode(roleShortCode: Roles): Promise<Role>;
-  externalLogout(token: string): void;
+  logout(token: string): void;
   checkExternalToken(token: string): Promise<User | null>;
 }

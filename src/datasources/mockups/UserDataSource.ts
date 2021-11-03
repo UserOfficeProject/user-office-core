@@ -355,7 +355,7 @@ export class UserDataSourceMock implements UserDataSource {
     return dummyUser;
   }
 
-  async externalLogout(token: string) {
+  async logout(token: string) {
     return;
   }
 }

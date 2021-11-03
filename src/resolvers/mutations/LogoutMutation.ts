@@ -7,13 +7,7 @@ import { wrapResponse } from '../wrapResponse';
 @Resolver()
 export class LogoutMutation {
   @Mutation(() => LogoutTokenWrap)
-  logout(
-    @Arg('externalToken') externalToken: string,
-    @Ctx() context: ResolverContext
-  ) {
-    return wrapResponse(
-      context.mutations.user.logout(externalToken),
-      LogoutTokenWrap
-    );
+  logout(@Arg('token') token: string, @Ctx() context: ResolverContext) {
+    return wrapResponse(context.mutations.user.logout(token), LogoutTokenWrap);
   }
 }

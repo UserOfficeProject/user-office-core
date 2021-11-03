@@ -460,7 +460,7 @@ export default class UserMutations {
 
       if (this.externalAuth) {
         if (decodedToken.externalToken) {
-          this.dataSource.externalLogout(decodedToken.externalToken);
+          this.dataSource.logout(decodedToken.externalToken);
         } else {
           return rejection('No external token found in JWT', { token });
         }
