@@ -43,7 +43,7 @@ export interface ProposalDataSource {
     args: UpdateTechnicalReviewAssigneeInput
   ): Promise<Proposal[]>;
   setProposalUsers(proposalPk: number, users: number[]): Promise<void>;
-  submitProposal(primaryKey: number): Promise<Proposal>;
+  submitProposal(primaryKey: number, legacyReferenceNumber?: string): Promise<Proposal>;
   deleteProposal(primaryKey: number): Promise<Proposal>;
   markEventAsDoneOnProposal(
     event: Event,

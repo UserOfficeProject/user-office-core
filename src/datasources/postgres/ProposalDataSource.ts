@@ -71,7 +71,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     return response;
   }
-  async submitProposal(primaryKey: number): Promise<Proposal> {
+  async submitProposal(primaryKey: number, legacyReferenceNumber?: string): Promise<Proposal> {
     const proposal: ProposalRecord[] = await database.transaction(
       async (trx) => {
         try {
@@ -89,7 +89,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .transacting(trx);
 
           let referenceNumber: string | null;
-          if (call.reference_number_format) {
+
+          if (legacyReferenceNumber !== undefined) {
+            referenceNumber = legacyReferenceNumber;
+          } else if (call.reference_number_format) {
             referenceNumber = await calculateReferenceNumber(
               call.reference_number_format,
               call.proposal_sequence
@@ -712,4 +715,24 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       result.map((item) => item.proposal_pk)
     );
   }
+  
+//   async importLegacyProposal(
+//     title:string,
+//     referenceNumber:number,
+//     abstract:string,
+//     objectives:string,
+//     pi:number,
+//     coinvestigators:string,
+//     submittedDate:Date,
+//     submitter:number
+//   ): Promise<Proposal> {
+//     return database
+//       .insert({ title, referenceNumber, abstract, objectives, pi, coinvestigators, submittedDate, submitter, status_id: 1 }, ['*'])
+//       .from('proposals')
+//       .then((resultSet: ProposalRecord[]) => {
+//         return createProposalObject(resultSet[0]);
+//       });
+//   }     
 }
+  
+

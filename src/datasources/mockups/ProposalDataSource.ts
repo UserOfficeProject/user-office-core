@@ -1,3 +1,4 @@
+import { checkForResolveTypeResolver } from 'graphql-tools';
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
@@ -62,6 +63,7 @@ export const dummySepMeetingDecision = new SepMeetingDecision(
 );
 
 export class ProposalDataSourceMock implements ProposalDataSource {
+  proposalsUpdated: Proposal[];
   constructor() {
     this.init();
   }
@@ -99,6 +101,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       dummyProposalSubmitted,
       dummyProposalWithNotActiveCall,
     ];
+
+    this.proposalsUpdated = [];
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
@@ -124,8 +128,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     );
 
     if (foundIndex === -1) {
+      console.log("Proposal not found")
       throw new Error('Proposal does not exist');
     }
+
+    this.proposalsUpdated.push(proposal);
 
     return proposal;
   }
@@ -148,7 +155,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     throw new Error('Not implemented');
   }
 
-  async submitProposal(primaryKey: number): Promise<Proposal> {
+  async submitProposal(primaryKey: number, legacyReferenceNumber?: string): Promise<Proposal> {
     const found = allProposals.find(
       (proposal) => proposal.primaryKey === primaryKey
     );
@@ -158,6 +165,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     }
 
     const newObj = { ...found, submitted: true };
+
+    if (legacyReferenceNumber !== undefined) {
+      newObj.proposalId = legacyReferenceNumber;
+    }
+
     Object.setPrototypeOf(newObj, Proposal.prototype);
 
     return newObj;
@@ -254,4 +266,5 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   ): Promise<ProposalPksWithNextStatus> {
     return { proposalPks: [1] };
   }
+
 }
