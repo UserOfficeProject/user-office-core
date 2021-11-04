@@ -61,7 +61,11 @@ export class UserAuthorization {
   }
 
   async isInstrumentScientist(agent: UserWithRole) {
-    return await this.hasRole(agent, "instrument_scientist");
+    if(agent == null) {
+      return false;
+    }
+
+    return agent?.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST;
   }
 
   async isMemberOfProposal(
