@@ -1,0 +1,8 @@
+mutation externalTokenLogin($externalToken: String!) {
+  externalTokenLogin(externalToken: $externalToken) {
+    token
+    rejection {
+      ...rejection
+    }
+  }
+}
