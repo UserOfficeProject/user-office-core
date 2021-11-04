@@ -320,8 +320,8 @@ test('A user officer can must be able to delete another user', async () => {
   ).resolves.toBe(dummyUser);
 });
 
-test('checkExternalToken supplies a new JWT', async () => {
-  const result = await userMutations.checkExternalToken('valid');
+test('externalTokenLogin supplies a new JWT', async () => {
+  const result = await userMutations.externalTokenLogin('valid');
 
   expect(typeof result).toBe('string');
 

@@ -58,12 +58,12 @@ test('When getting roles for a user, no roles are granted if role definitions do
 
 test('When an invalid external token is supplied, no user is found', async () => {
   return expect(
-    userdataSource.checkExternalToken('invalid')
+    userdataSource.externalTokenLogin('invalid')
   ).rejects.toThrowError();
 });
 
 test('When a valid external token is supplied, valid user is returned', async () => {
-  const result = await userdataSource.checkExternalToken('valid');
+  const result = await userdataSource.externalTokenLogin('valid');
 
   expect(result.id).toBe(1);
   expect(result.email).toBe(dummyUser.email);
