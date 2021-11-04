@@ -393,7 +393,7 @@ export class StfcUserDataSource implements UserDataSource {
     throw new Error('Method not implemented.');
   }
 
-  async checkExternalToken(token: string): Promise<User> {
+  async externalTokenLogin(token: string): Promise<User> {
     const rawStfcUser = await client.getPersonDetailsFromSessionId(token);
     if (!rawStfcUser) {
       throw new Error(`User not found ${token}`);

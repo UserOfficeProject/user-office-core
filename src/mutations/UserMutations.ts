@@ -427,9 +427,9 @@ export default class UserMutations {
     }
   }
 
-  async checkExternalToken(externalToken: string): Promise<string | Rejection> {
+  async externalTokenLogin(externalToken: string): Promise<string | Rejection> {
     try {
-      const dummyUser = await this.dataSource.checkExternalToken(externalToken);
+      const dummyUser = await this.dataSource.externalTokenLogin(externalToken);
 
       if (!dummyUser) {
         return rejection('User not found', { externalToken });

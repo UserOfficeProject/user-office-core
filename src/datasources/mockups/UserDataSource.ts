@@ -351,7 +351,7 @@ export class UserDataSourceMock implements UserDataSource {
     return { id: 1, shortCode: 'user_officer', title: 'User Officer' };
   }
 
-  async checkExternalToken(token: string): Promise<User> {
+  async externalTokenLogin(token: string): Promise<User> {
     return dummyUser;
   }
 
