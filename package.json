@@ -79,7 +79,7 @@
     "tsyringe": "^4.6.0",
     "type-graphql": "^1.1.1",
     "typedi": "^0.10.0",
-    "yup": "^0.32.10"
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@stfc-user-programme/uows_client_generator": "^1.0.15",
