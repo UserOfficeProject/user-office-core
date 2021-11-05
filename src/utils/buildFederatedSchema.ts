@@ -1,8 +1,6 @@
-import {
-  printSchema,
-  buildFederatedSchema as buildApolloFederationSchema,
-} from '@apollo/federation';
-import federationDirectives from '@apollo/federation/dist/directives';
+import { buildSubgraphSchema } from '@apollo/federation';
+import { printSubgraphSchema } from '@apollo/subgraph';
+import { federationDirectives } from '@apollo/subgraph/dist/directives';
 import { addResolversToSchema, GraphQLResolverMap } from 'apollo-graphql';
 import { specifiedDirectives } from 'graphql';
 import gql from 'graphql-tag';
@@ -12,9 +10,11 @@ import {
   createResolversMap,
 } from 'type-graphql';
 
+import { ResolverContext } from '../context';
+
 export async function buildFederatedSchema(
   options: Omit<BuildSchemaOptions, 'skipCheck'>,
-  referenceResolvers?: GraphQLResolverMap<any>
+  referenceResolvers?: GraphQLResolverMap<ResolverContext>
 ) {
   const schema = await buildSchema({
     ...options,
@@ -26,9 +26,11 @@ export async function buildFederatedSchema(
     skipCheck: true,
   });
 
-  const federatedSchema = buildApolloFederationSchema({
-    typeDefs: gql(printSchema(schema)),
-    resolvers: createResolversMap(schema) as any,
+  const federatedSchema = buildSubgraphSchema({
+    typeDefs: gql(printSubgraphSchema(schema)),
+    resolvers: createResolversMap(
+      schema
+    ) as GraphQLResolverMap<ResolverContext>,
   });
 
   if (referenceResolvers) {
