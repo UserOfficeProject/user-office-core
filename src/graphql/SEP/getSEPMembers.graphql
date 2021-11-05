@@ -8,13 +8,7 @@ query getSEPMembers($sepId: Int!) {
       title
     }
     user {
-      id
-      firstname
-      lastname
-      organisation
-      position
-      placeholder
-      created
+      ...basicUserDetails
     }
   }
 }
