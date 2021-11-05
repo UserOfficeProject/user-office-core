@@ -55,6 +55,7 @@ function toEssBasicUserDetails(
     Number(stfcUser.userNumber),
     stfcUser.givenName ?? '',
     stfcUser.familyName ?? '',
+    stfcUser.displayName ?? '',
     stfcUser.orgName ?? '',
     '',
     new Date(),
