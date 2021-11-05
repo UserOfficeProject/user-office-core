@@ -87,7 +87,7 @@ async function setup() {
   await database('templates').insert({
     template_id: -999,
     name: '[IT] template',
-    category_id: 1,
+    group_id: 'PROPOSAL',
   });
 
   await database('questionaries').insert({
@@ -217,15 +217,15 @@ describe('Call update', () => {
     expect(getProposalsInCall(call.id)).resolves.toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          id: p1.primaryKey,
+          primaryKey: p1.primaryKey,
           referenceNumberSequence: 123,
         }),
         expect.objectContaining({
-          id: p2.primaryKey,
+          primaryKey: p2.primaryKey,
           referenceNumberSequence: 456,
         }),
         expect.objectContaining({
-          id: p3.primaryKey,
+          primaryKey: p3.primaryKey,
           referenceNumberSequence: 789,
         }),
       ])
