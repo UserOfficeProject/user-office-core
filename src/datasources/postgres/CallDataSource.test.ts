@@ -86,8 +86,14 @@ async function createSubmittedProposal(
 async function setup() {
   await database('templates').insert({
     template_id: -999,
-    name: '[IT] template',
+    name: '[IT] proposal template',
     group_id: 'PROPOSAL',
+  });
+
+  await database('templates').insert({
+    template_id: -998,
+    name: '[IT] proposal ESI template',
+    group_id: 'PROPOSAL_ESI',
   });
 
   await database('questionaries').insert({
@@ -110,6 +116,8 @@ async function teardown() {
   await database('call').where('call_id', -999).del();
 
   await database('templates').where('template_id', -999).del();
+
+  await database('templates').where('template_id', -998).del();
 
   await database('proposal_workflows')
     .where('proposal_workflow_id', -999)
@@ -146,6 +154,7 @@ describe('Call update', () => {
         id: call.id,
         referenceNumberFormat: '211{digits:4}',
         proposalWorkflowId: -999,
+        esiTemplateId: -998,
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
@@ -168,6 +177,7 @@ describe('Call update', () => {
         id: call.id,
         referenceNumberFormat: '211{digits:5}',
         proposalWorkflowId: -999,
+        esiTemplateId: -998,
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
@@ -191,6 +201,7 @@ describe('Call update', () => {
         id: call.id,
         referenceNumberFormat: '',
         proposalWorkflowId: -999,
+        esiTemplateId: -998,
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
@@ -211,6 +222,7 @@ describe('Call update', () => {
         id: call.id,
         referenceNumberFormat: '',
         proposalWorkflowId: -999,
+        esiTemplateId: -998,
       })
     );
 
@@ -246,6 +258,7 @@ describe('Call update', () => {
         id: call.id,
         referenceNumberFormat: '221{digits:5}',
         proposalWorkflowId: -999,
+        esiTemplateId: -998,
       })
     );
 
