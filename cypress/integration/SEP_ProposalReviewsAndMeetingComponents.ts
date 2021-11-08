@@ -165,7 +165,7 @@ context(
         text: 'SEP secretary assigned successfully',
       });
 
-      cy.get('[title="Add Member"]').click();
+      cy.get('[data-cy="add-participant-button"]').click();
 
       cy.finishedLoading();
 

@@ -134,6 +134,7 @@ export type BasicUserDetails = {
   organisation: Scalars['String'];
   placeholder: Maybe<Scalars['Boolean']>;
   position: Scalars['String'];
+  preferredname: Maybe<Scalars['String']>;
 };
 
 export type BasicUserDetailsResponseWrap = {
@@ -3642,7 +3643,7 @@ export type GetSepMembersQuery = (
       & Pick<Role, 'id' | 'shortCode' | 'title'>
     )>, user: (
       { __typename?: 'BasicUserDetails' }
-      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position' | 'placeholder' | 'created'>
+      & BasicUserDetailsFragment
     ) }
   )>> }
 );
@@ -3780,7 +3781,7 @@ export type GetSepReviewersQuery = (
       & Pick<Role, 'id' | 'shortCode' | 'title'>
     )>, user: (
       { __typename?: 'BasicUserDetails' }
-      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position' | 'placeholder' | 'created'>
+      & BasicUserDetailsFragment
     ) }
   )>> }
 );
@@ -7417,7 +7418,7 @@ export type ExternalTokenLoginMutation = (
 
 export type BasicUserDetailsFragment = (
   { __typename?: 'BasicUserDetails' }
-  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position' | 'created' | 'placeholder'>
+  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'preferredname' | 'organisation' | 'position' | 'created' | 'placeholder'>
 );
 
 export type GetBasicUserDetailsQueryVariables = Exact<{
@@ -8092,6 +8093,7 @@ export const BasicUserDetailsFragmentDoc = gql`
   id
   firstname
   lastname
+  preferredname
   organisation
   position
   created
@@ -8707,17 +8709,11 @@ export const GetSepMembersDocument = gql`
       title
     }
     user {
-      id
-      firstname
-      lastname
-      organisation
-      position
-      placeholder
-      created
+      ...basicUserDetails
     }
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const GetSepProposalDocument = gql`
     query getSEPProposal($sepId: Int!, $proposalPk: Int!) {
   sepProposal(sepId: $sepId, proposalPk: $proposalPk) {
@@ -8858,17 +8854,11 @@ export const GetSepReviewersDocument = gql`
       title
     }
     user {
-      id
-      firstname
-      lastname
-      organisation
-      position
-      placeholder
-      created
+      ...basicUserDetails
     }
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const GetSePsDocument = gql`
     query getSEPs($filter: String!, $active: Boolean) {
   seps(filter: $filter, active: $active) {
