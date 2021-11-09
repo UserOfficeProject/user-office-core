@@ -62,11 +62,10 @@ export class SMTPMailService extends MailService {
 
     if (
       !(await (this._email as any).templateExists(
-        options.content.template_id + '\\html.pug'
+        options.content.template_id + '/html.pug'
       )) &&
       process.env.NODE_ENV !== 'test'
     ) {
-      console.log('test output');
       logger.logError('Template does not exist', {
         templateId: options.content.template_id,
       });
