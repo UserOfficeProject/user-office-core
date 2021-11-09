@@ -61,7 +61,7 @@ export class UserAuthorization {
   }
 
   async isInstrumentScientist(agent: UserWithRole) {
-    if(agent == null) {
+    if (agent == null) {
       return false;
     }
 
@@ -186,7 +186,7 @@ export class UserAuthorization {
     }
 
     return (
-      this.isUserOfficer(agent) ||      
+      this.isUserOfficer(agent) ||
       this.hasGetAccessByToken(agent) ||
       (await this.isInstrumentScientist(agent)) ||
       (await this.isMemberOfProposal(agent, proposal)) ||
