@@ -722,8 +722,9 @@ export const createUserObject = (user: UserRecord) => {
 export const createBasicUserObject = (user: UserRecord) => {
   return new BasicUserDetails(
     user.user_id,
-    user.preferredname || user.firstname,
+    user.firstname,
     user.lastname,
+    user.preferredname,
     user.institution,
     user.position,
     user.created_at,

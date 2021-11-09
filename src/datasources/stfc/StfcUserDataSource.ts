@@ -55,6 +55,7 @@ function toEssBasicUserDetails(
     Number(stfcUser.userNumber),
     stfcUser.givenName ?? '',
     stfcUser.familyName ?? '',
+    stfcUser.displayName ?? '',
     stfcUser.orgName ?? '',
     '',
     new Date(),
@@ -129,6 +130,9 @@ export class StfcUserDataSource implements UserDataSource {
     const stfcUser = (
       await client.getBasicPersonDetailsFromUserNumber(token, id)
     )?.return;
+    if (stfcUser != null) {
+      this.ensureDummyUserExists(stfcUser.userNumber);
+    }
 
     return stfcUser ? toEssBasicUserDetails(stfcUser) : null;
   }
@@ -138,6 +142,9 @@ export class StfcUserDataSource implements UserDataSource {
   ): Promise<BasicUserDetails | null> {
     const stfcUser = (await client.getBasicPersonDetailsFromEmail(token, email))
       ?.return;
+    if (stfcUser != null) {
+      this.ensureDummyUserExists(stfcUser.userNumber);
+    }
 
     return stfcUser ? toEssBasicUserDetails(stfcUser) : null;
   }
@@ -172,6 +179,9 @@ export class StfcUserDataSource implements UserDataSource {
   async getByEmail(email: string): Promise<User | null> {
     const stfcUser = (await client.getBasicPersonDetailsFromEmail(token, email))
       ?.return;
+    if (stfcUser != null) {
+      this.ensureDummyUserExists(stfcUser.userNumber);
+    }
 
     return stfcUser ? toEssUser(stfcUser) : null;
   }
@@ -180,6 +190,9 @@ export class StfcUserDataSource implements UserDataSource {
     const stfcUser = (
       await client.getBasicPersonDetailsFromUserNumber(token, username)
     )?.return;
+    if (stfcUser != null) {
+      this.ensureDummyUserExists(stfcUser.userNumber);
+    }
 
     return stfcUser ? toEssUser(stfcUser) : null;
   }
@@ -258,6 +271,9 @@ export class StfcUserDataSource implements UserDataSource {
     const stfcUser = (
       await client.getBasicPersonDetailsFromUserNumber(token, id)
     )?.return;
+    if (stfcUser != null) {
+      this.ensureDummyUserExists(stfcUser.userNumber);
+    }
 
     return stfcUser ? toEssUser(stfcUser) : null;
   }

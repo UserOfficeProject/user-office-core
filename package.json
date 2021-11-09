@@ -49,7 +49,7 @@
     "apollo-server-core": "^3.4.0",
     "apollo-server-express": "^3.4.0",
     "await-to-js": "^2.1.1",
-    "axios": "^0.22.0",
+    "axios": "^0.23.0",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
     "cache-pug-templates": "^2.0.3",
@@ -73,14 +73,14 @@
     "reflect-metadata": "^0.1.13",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
-    "sanitize-html": "^2.5.1",
+    "sanitize-html": "^2.5.2",
     "simple-oauth2": "^4.2.0",
     "soap": "^0.40.0",
     "sparkpost": "^2.1.4",
     "tsyringe": "^4.6.0",
     "type-graphql": "^1.1.1",
     "typedi": "^0.10.0",
-    "yup": "^0.32.10"
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@stfc-user-programme/uows_client_generator": "^1.0.15",
