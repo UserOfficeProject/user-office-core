@@ -58,7 +58,6 @@ export default class UserMutations {
       this.externalAuth = features.filter(
         (feature) => feature.id == FeatureId.EXTERNAL_AUTH
       )[0].isEnabled;
-      console.log(this.externalAuth);
     });
   }
 
