@@ -79,6 +79,7 @@ export class BasicUserDetails {
     public id: number,
     public firstname: string,
     public lastname: string,
+    public preferredname: string,
     public organisation: string,
     public position: string,
     public created: Date,
