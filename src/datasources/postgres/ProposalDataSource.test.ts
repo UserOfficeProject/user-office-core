@@ -274,4 +274,36 @@ describe('Submit proposal', () => {
       })
     );
   });
+
+  test('In a call with an invalid reference number format, the proposal fails to submit', async () => {
+    const call = await createCall('*invalid*');
+    const proposal = await createProposal(call.id);
+
+    expect(async () => {
+      await proposalDataSource.submitProposal(proposal.primaryKey);
+    }).rejects.toThrowError('Failed to submit');
+    expect(getProposal(proposal.primaryKey)).resolves.toEqual(
+      expect.objectContaining({
+        proposalId: proposal.proposalId,
+        submitted: false,
+        referenceNumberSequence: null,
+      })
+    );
+  });
+
+  test('In a call with a valid reference number format that would make a reference number too long, the proposal fails to submit', async () => {
+    const call = await createCall('211{digits:14}');
+    const proposal = await createProposal(call.id);
+
+    expect(async () => {
+      await proposalDataSource.submitProposal(proposal.primaryKey);
+    }).rejects.toThrowError('Failed to submit');
+    expect(getProposal(proposal.primaryKey)).resolves.toEqual(
+      expect.objectContaining({
+        proposalId: proposal.proposalId,
+        submitted: false,
+        referenceNumberSequence: null,
+      })
+    );
+  });
 });
