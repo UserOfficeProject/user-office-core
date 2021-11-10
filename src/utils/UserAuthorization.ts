@@ -60,6 +60,14 @@ export class UserAuthorization {
     }
   }
 
+  async isInstrumentScientist(agent: UserWithRole) {
+    if (agent == null) {
+      return false;
+    }
+
+    return agent?.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST;
+  }
+
   async isMemberOfProposal(
     agent: User | null,
     proposalPk: number
@@ -180,6 +188,7 @@ export class UserAuthorization {
     return (
       this.isUserOfficer(agent) ||
       this.hasGetAccessByToken(agent) ||
+      (await this.isInstrumentScientist(agent)) ||
       (await this.isMemberOfProposal(agent, proposal)) ||
       (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
       (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
