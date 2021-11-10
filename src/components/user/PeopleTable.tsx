@@ -70,8 +70,9 @@ const useStyles = makeStyles({
 });
 
 const columns = [
-  { title: 'Name', field: 'firstname' },
-  { title: 'Surname', field: 'lastname' },
+  { title: 'Firstname', field: 'firstname' },
+  { title: 'Lastname', field: 'lastname' },
+  { title: 'Preferred name', field: 'preferredname' },
   { title: 'Organisation', field: 'organisation' },
 ];
 
