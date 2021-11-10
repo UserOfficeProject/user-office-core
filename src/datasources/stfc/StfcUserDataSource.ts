@@ -142,8 +142,9 @@ export class StfcUserDataSource implements UserDataSource {
   async getBasicUserDetailsByEmail(
     email: string
   ): Promise<BasicUserDetails | null> {
-    const stfcUser = (await client.getBasicPersonDetailsFromEmail(token, email))
-      ?.return;
+    const stfcUser = (
+      await client.getSearchableBasicPersonDetailsFromEmail(token, email)
+    )?.return;
     if (stfcUser != null) {
       this.ensureDummyUserExists(stfcUser.userNumber);
     }
@@ -334,7 +335,7 @@ export class StfcUserDataSource implements UserDataSource {
         filter,
         first,
         offset,
-        userRole,
+        undefined,
         subtractUsers
       )
     ).users;
@@ -344,7 +345,10 @@ export class StfcUserDataSource implements UserDataSource {
     if (dbUsers[0]) {
       const userNumbers: string[] = dbUsers.map((record) => String(record.id));
       const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
-        await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+        await client.getSearchableBasicPeopleDetailsFromUserNumbers(
+          token,
+          userNumbers
+        )
       )?.return;
 
       users = stfcBasicPeople
