@@ -145,7 +145,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           `Failed to submit proposal with id '${primaryKey}'`,
           error
         );
-        trx.rollback();
       }
     });
 
