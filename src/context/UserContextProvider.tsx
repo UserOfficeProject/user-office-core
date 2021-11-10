@@ -170,13 +170,13 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
         handleLogin: (data): void =>
           dispatch({ type: ActionType.LOGINUSER, payload: data }),
         // Using useCallback here as these are used in useDataAPI dependency array
-        handleLogout: useCallback(() => {
+        handleLogout: () => {
           unauthorizedApi().logout({
             token: localStorage.token,
           });
 
           dispatch({ type: ActionType.LOGOFFUSER, payload: null });
-        }, [unauthorizedApi]),
+        },
         handleRole: (role: string): void =>
           dispatch({ type: ActionType.SELECTROLE, payload: role }),
         handleNewToken: useCallback(
