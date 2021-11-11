@@ -448,4 +448,10 @@ export class StfcUserDataSource implements UserDataSource {
 
     return;
   }
+
+  async isExternalTokenValid(token: string): Promise<boolean> {
+    const result = await client.isTokenValid(token);
+
+    return result.return;
+  }
 }

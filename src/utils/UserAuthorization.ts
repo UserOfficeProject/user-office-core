@@ -245,4 +245,8 @@ export class UserAuthorization {
 
     return sep !== null;
   }
+
+  async isExternalTokenValid(externalToken: string): Promise<boolean> {
+    return await this.userDataSource.isExternalTokenValid(externalToken);
+  }
 }
