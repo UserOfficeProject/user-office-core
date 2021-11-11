@@ -28,23 +28,15 @@ export const sanitizerConfig: IOptions = {
     'ul',
     'ol',
     'li',
+    'div',
+    'br',
   ],
   disallowedTagsMode: 'discard',
   allowedAttributes: {
     a: ['href', 'title'],
     span: ['style'],
     p: ['style'],
-  },
-  allowedStyles: {
-    '*': {
-      color: [
-        /^#(0x)?[0-9a-f]+$/i, // hex
-        /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i, // rgb
-      ],
-      'text-align': [/^left$/i, /^right$/i, /^center$/i, /^justify$/i],
-      'font-size': [/^\d+(?:px|em|%)$/i],
-      'text-decoration': [/^underline$/i, /^line-through$/i],
-    },
+    div: ['style'],
   },
   selfClosing: [],
   allowedSchemes: [],
