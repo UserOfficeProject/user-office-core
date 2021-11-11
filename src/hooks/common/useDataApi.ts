@@ -5,8 +5,9 @@ import { decode } from 'jsonwebtoken';
 import { useSnackbar, WithSnackbarProps } from 'notistack';
 import { useCallback, useContext } from 'react';
 
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { getSdk } from 'generated/sdk';
+import { getSdk, SettingsId } from 'generated/sdk';
 
 const endpoint = '/graphql';
 
@@ -50,13 +51,16 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
         throw error;
       }
 
-      if (error.response.error.includes('ECONNREFUSED')) {
+      if (
+        error.response.error &&
+        error.response.error.includes('ECONNREFUSED')
+      ) {
         notificationWithClientLog(this.enqueueSnackbar, 'Connection problem!');
       } else {
         notificationWithClientLog(
           this.enqueueSnackbar,
           'Something went wrong!',
-          error.response.errors[0].message
+          `Message: ${error.response.errors[0].message}`
         );
       }
 
@@ -67,17 +71,20 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
 
 class AuthorizedGraphQLClient extends GraphQLClient {
   private renewalDate: number;
+  private externalToken: string;
 
   constructor(
     private endpoint: string,
     private token: string,
     private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
     private error?: (reason: string) => void,
-    private tokenRenewed?: (newToken: string) => void
+    private tokenRenewed?: (newToken: string) => void,
+    private externalAuthLoginUrl?: string
   ) {
     super(endpoint);
     token && this.setHeader('authorization', `Bearer ${token}`);
     this.renewalDate = this.getRenewalDate(token);
+    this.externalToken = this.getExternalToken(token);
   }
 
   async request<T extends any>(
@@ -104,6 +111,20 @@ class AuthorizedGraphQLClient extends GraphQLClient {
         error.response.error.includes('ECONNREFUSED')
       ) {
         notificationWithClientLog(this.enqueueSnackbar, 'Connection problem!');
+      } else if (
+        error.response.errors &&
+        error.response.errors[0].message == 'EXTERNAL_TOKEN_INVALID' &&
+        // error.response.errors[0].extensions.code === 'UNAUTHENTICATED' &&
+        this.externalAuthLoginUrl
+      ) {
+        notificationWithClientLog(
+          this.enqueueSnackbar,
+          'You have been logged out redirecting to external homepage'
+        );
+
+        this.error && this.error(error);
+
+        return { data: null };
       } else {
         notificationWithClientLog(
           this.enqueueSnackbar,
@@ -123,9 +144,17 @@ class AuthorizedGraphQLClient extends GraphQLClient {
 
     return (decode(token) as any).iat + oneHour;
   }
+
+  private getExternalToken(token: string): string {
+    return (decode(token) as any).externalToken;
+  }
 }
 
 export function useDataApi() {
+  const settingsContext = useContext(SettingsContext);
+  const externalAuthLoginUrl = settingsContext.settings.get(
+    SettingsId.EXTERNAL_AUTH_LOGIN_URL
+  )?.settingsValue;
   const { token, handleNewToken, handleLogout } = useContext(UserContext);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -141,11 +170,12 @@ export function useDataApi() {
                 console.log(reason);
                 handleLogout();
               },
-              handleNewToken
+              handleNewToken,
+              externalAuthLoginUrl ? externalAuthLoginUrl : undefined
             )
           : new GraphQLClient(endpoint)
       ),
-    [token, handleNewToken, handleLogout, enqueueSnackbar]
+    [token, enqueueSnackbar, handleNewToken, externalAuthLoginUrl, handleLogout]
   );
 }
 
