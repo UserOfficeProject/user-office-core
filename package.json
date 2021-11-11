@@ -43,7 +43,7 @@
     "@apollo/subgraph": "^0.1.4",
     "@esss-swap/duo-localisation": "^1.1.15",
     "@esss-swap/duo-logger": "^1.1.1",
-    "@esss-swap/duo-message-broker": "^1.0.7",
+    "@esss-swap/duo-message-broker": "^1.0.8",
     "@esss-swap/duo-validation": "^2.1.0",
     "apollo-server": "^3.4.0",
     "apollo-server-core": "^3.4.0",
