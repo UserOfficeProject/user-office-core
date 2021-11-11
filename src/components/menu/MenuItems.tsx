@@ -6,18 +6,13 @@ import Tooltip from '@material-ui/core/Tooltip';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import DescriptionIcon from '@material-ui/icons/Description';
-import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import EventIcon from '@material-ui/icons/Event';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
 import FolderOpen from '@material-ui/icons/FolderOpen';
 import FunctionsIcon from '@material-ui/icons/Functions';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import Help from '@material-ui/icons/Help';
-import InboxIcon from '@material-ui/icons/Inbox';
-import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import NoteAdd from '@material-ui/icons/NoteAdd';
 import People from '@material-ui/icons/People';
@@ -31,12 +26,12 @@ import { NavLink } from 'react-router-dom';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { Call, FeatureId, UserRole } from 'generated/sdk';
 
-import BoxIcon from './common/icons/BoxIcon';
-import CommentQuestionIcon from './common/icons/CommentQuestionIcon';
-import EsiIcon from './common/icons/EsiIcon';
-import ProposalSettingsIcon from './common/icons/ProposalSettingsIcon';
-import ProposalWorkflowIcon from './common/icons/ProposalWorkflowIcon';
-import ScienceIcon from './common/icons/ScienceIcon';
+import BoxIcon from '../common/icons/BoxIcon';
+import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
+import ProposalSettingsIcon from '../common/icons/ProposalSettingsIcon';
+import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
+import ScienceIcon from '../common/icons/ScienceIcon';
+import { TemplateMenuListItem } from './TemplateMenuListItem';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
@@ -119,150 +114,6 @@ const SettingsMenuListItem = () => {
             <ListItemText primary="API access tokens" />
           </ListItem>
         </Tooltip>
-      </Collapse>
-    </>
-  );
-};
-
-const EsiTemplatesMenuListItem = () => {
-  const [isExpanded, setIsExpanded] = useState(true);
-
-  return (
-    <>
-      <Tooltip title="Experiment Safety Input (ESI)">
-        <ListItem button onClick={() => setIsExpanded(!isExpanded)}>
-          <ListItemIcon>
-            {isExpanded ? (
-              <>
-                <EsiIcon />
-                <ExpandLess fontSize="small" />
-              </>
-            ) : (
-              <>
-                <EsiIcon />
-                <ExpandMore fontSize="small" />
-              </>
-            )}
-          </ListItemIcon>
-          <ListItemText primary="ESI" />
-        </ListItem>
-      </Tooltip>
-
-      <Collapse
-        in={isExpanded}
-        timeout="auto"
-        unmountOnExit
-        style={{ marginLeft: '10px' }}
-      >
-        <Tooltip title="Experiment Safety Input (Proposal)">
-          <ListItem component={NavLink} to="/EsiTemplates" button>
-            <ListItemIcon>
-              <DescriptionIcon />
-            </ListItemIcon>
-            <ListItemText primary="Proposal ESI" title="Proposal ESI" />
-          </ListItem>
-        </Tooltip>
-        <Tooltip title="Experiment Safety Input (Sample)">
-          <ListItem component={NavLink} to="/SampleEsiTemplates" button>
-            <ListItemIcon>
-              <InboxIcon />
-            </ListItemIcon>
-            <ListItemText primary="Sample ESI" title="Sample ESI" />
-          </ListItem>
-        </Tooltip>
-      </Collapse>
-    </>
-  );
-};
-
-const TemplateMenuListItem = () => {
-  const history = useHistory();
-  const shouldExpand =
-    history.location.pathname === '/ProposalTemplates' ||
-    history.location.pathname === '/SampleDeclarationTemplates';
-  const [isExpanded, setIsExpanded] = useState(shouldExpand);
-  const context = useContext(FeatureContext);
-  const isShipmentFeatureEnabled = !!context.features.get(FeatureId.SHIPPING)
-    ?.isEnabled;
-  const isRiskAssessmentFeatureEnabled = !!context.features.get(
-    FeatureId.RISK_ASSESSMENT
-  )?.isEnabled;
-  function toggleExpand() {
-    setIsExpanded(!isExpanded);
-  }
-
-  return (
-    <>
-      <Tooltip title="Templates">
-        <ListItem button onClick={toggleExpand}>
-          <ListItemIcon>
-            {isExpanded ? (
-              <>
-                <LibraryBooksIcon />
-                <ExpandLess fontSize="small" />
-              </>
-            ) : (
-              <>
-                <LibraryBooksIcon />
-                <ExpandMore fontSize="small" />
-              </>
-            )}
-          </ListItemIcon>
-          <ListItemText primary="Templates" />
-        </ListItem>
-      </Tooltip>
-
-      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-        <Tooltip title="Proposal">
-          <ListItem component={NavLink} to="/ProposalTemplates" button>
-            <ListItemIcon>
-              <DescriptionIcon />
-            </ListItemIcon>
-            <ListItemText primary="Proposal" />
-          </ListItem>
-        </Tooltip>
-
-        <Tooltip title="Sample declaration">
-          <ListItem component={NavLink} to="/SampleDeclarationTemplates" button>
-            <ListItemIcon>
-              <InboxIcon />
-            </ListItemIcon>
-            <ListItemText primary="Sample declaration" />
-          </ListItem>
-        </Tooltip>
-
-        <Tooltip title="Sub Template">
-          <ListItem component={NavLink} to="/GenericTemplates" button>
-            <ListItemIcon>
-              <DynamicFeedIcon />
-            </ListItemIcon>
-            <ListItemText primary="Sub Template" />
-          </ListItem>
-        </Tooltip>
-
-        {isShipmentFeatureEnabled && (
-          <Tooltip title="Shipment declaration templates">
-            <ListItem
-              component={NavLink}
-              to="/ShipmentDeclarationTemplates"
-              button
-            >
-              <ListItemIcon>
-                <LocalShippingIcon />
-              </ListItemIcon>
-              <ListItemText primary="Shipment declaration" />
-            </ListItem>
-          </Tooltip>
-        )}
-        <Tooltip title="Visit registration">
-          <ListItem component={NavLink} to="/VisitTemplates" button>
-            <ListItemIcon>
-              <FlightTakeoffIcon />
-            </ListItemIcon>
-            <ListItemText primary="Visit registration" />
-          </ListItem>
-        </Tooltip>
-        {isRiskAssessmentFeatureEnabled && <EsiTemplatesMenuListItem />}
       </Collapse>
     </>
   );
