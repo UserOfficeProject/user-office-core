@@ -86,8 +86,14 @@ async function createSubmittedProposal(
 async function setup() {
   await database('templates').insert({
     template_id: -999,
-    name: '[IT] template',
-    category_id: 1,
+    name: '[IT] proposal template',
+    group_id: 'PROPOSAL',
+  });
+
+  await database('templates').insert({
+    template_id: -998,
+    name: '[IT] proposal ESI template',
+    group_id: 'PROPOSAL_ESI',
   });
 
   await database('questionaries').insert({
@@ -110,6 +116,8 @@ async function teardown() {
   await database('call').where('call_id', -999).del();
 
   await database('templates').where('template_id', -999).del();
+
+  await database('templates').where('template_id', -998).del();
 
   await database('proposal_workflows')
     .where('proposal_workflow_id', -999)
@@ -146,6 +154,7 @@ describe('Call update', () => {
         id: call.id,
         referenceNumberFormat: '211{digits:4}',
         proposalWorkflowId: -999,
+        esiTemplateId: -998,
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
@@ -168,6 +177,7 @@ describe('Call update', () => {
         id: call.id,
         referenceNumberFormat: '211{digits:5}',
         proposalWorkflowId: -999,
+        esiTemplateId: -998,
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
@@ -191,6 +201,7 @@ describe('Call update', () => {
         id: call.id,
         referenceNumberFormat: '',
         proposalWorkflowId: -999,
+        esiTemplateId: -998,
       })
     );
     const invalidUpdates = (await getProposalsInCall(call.id)).filter(
@@ -211,21 +222,22 @@ describe('Call update', () => {
         id: call.id,
         referenceNumberFormat: '',
         proposalWorkflowId: -999,
+        esiTemplateId: -998,
       })
     );
 
     expect(getProposalsInCall(call.id)).resolves.toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          id: p1.primaryKey,
+          primaryKey: p1.primaryKey,
           referenceNumberSequence: 123,
         }),
         expect.objectContaining({
-          id: p2.primaryKey,
+          primaryKey: p2.primaryKey,
           referenceNumberSequence: 456,
         }),
         expect.objectContaining({
-          id: p3.primaryKey,
+          primaryKey: p3.primaryKey,
           referenceNumberSequence: 789,
         }),
       ])
@@ -246,6 +258,7 @@ describe('Call update', () => {
         id: call.id,
         referenceNumberFormat: '221{digits:5}',
         proposalWorkflowId: -999,
+        esiTemplateId: -998,
       })
     );
 
