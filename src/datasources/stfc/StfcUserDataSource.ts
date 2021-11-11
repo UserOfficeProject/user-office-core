@@ -1,3 +1,5 @@
+import { logger } from '@esss-swap/duo-logger';
+
 import { Role } from '../../models/Role';
 import { Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
@@ -409,5 +411,41 @@ export class StfcUserDataSource implements UserDataSource {
 
   async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
     throw new Error('Method not implemented.');
+  }
+
+  async externalTokenLogin(token: string): Promise<User> {
+    const rawStfcUser = await client.getPersonDetailsFromSessionId(token);
+    if (!rawStfcUser) {
+      throw new Error(`User not found ${token}`);
+    }
+    const stfcUser = rawStfcUser.return;
+
+    // Create dummy user if one does not exist in the proposals DB.
+    // This is needed to satisfy the FOREIGN_KEY constraints
+    // in tables that link to a user (such as proposals)
+    const userNumber = parseInt(stfcUser.userNumber);
+    const dummyUser = await this.ensureDummyUserExists(userNumber);
+
+    // With dummyUser created and written (ensureDummyUserExists), info can now
+    // be added to it without persisting it to the database, which is not wanted.
+    // This info is used in the userContext.
+    dummyUser.email = stfcUser.email;
+    dummyUser.firstname = stfcUser.givenName;
+    dummyUser.preferredname = stfcUser.firstNameKnownAs;
+    dummyUser.lastname = stfcUser.familyName;
+
+    return dummyUser;
+  }
+
+  async logout(token: string): Promise<void> {
+    await client.logout(token);
+    const rawStfcUser = await client.getPersonDetailsFromSessionId(token);
+    if (rawStfcUser) {
+      const userNumber = rawStfcUser.return.userNumber;
+      logger.logWarn('Failed to log out user', { userNumber, token });
+      throw new Error(`Failed to logout ${token}`);
+    }
+
+    return;
   }
 }

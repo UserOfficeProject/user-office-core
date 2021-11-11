@@ -15,11 +15,12 @@ import * as bcrypt from 'bcryptjs';
 import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
+import { AdminDataSource } from '../datasources/AdminDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
+import { FeatureId } from '../models/Feature';
 import { isRejection, rejection, Rejection } from '../models/Rejection';
 import { Roles, Role } from '../models/Role';
 import {
@@ -46,10 +47,19 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 @injectable()
 export default class UserMutations {
   private userAuth = container.resolve(UserAuthorization);
+  //Set as a class variable to avoid excessive calls to database
+  private externalAuth: boolean;
 
   constructor(
-    @inject(Tokens.UserDataSource) private dataSource: UserDataSource
-  ) {}
+    @inject(Tokens.UserDataSource) private dataSource: UserDataSource,
+    @inject(Tokens.AdminDataSource) private adminDataSource: AdminDataSource
+  ) {
+    adminDataSource.getFeatures().then((features) => {
+      this.externalAuth = features.filter(
+        (feature) => feature.id == FeatureId.EXTERNAL_AUTH
+      )[0].isEnabled;
+    });
+  }
 
   createHash(password: string): string {
     //Check that password follows rules
@@ -407,6 +417,7 @@ export default class UserMutations {
         user: decoded.user,
         roles,
         currentRole: decoded.currentRole,
+        externalToken: decoded.externalToken,
       });
 
       return freshToken;
@@ -415,37 +426,21 @@ export default class UserMutations {
     }
   }
 
-  async checkExternalToken(externalToken: string): Promise<string | Rejection> {
+  async externalTokenLogin(externalToken: string): Promise<string | Rejection> {
     try {
-      const client = new UOWSSoapClient(process.env.UOWS_URL);
+      const dummyUser = await this.dataSource.externalTokenLogin(externalToken);
 
-      const rawStfcUser = await client.getPersonDetailsFromSessionId(
-        externalToken
-      );
-      if (!rawStfcUser) {
+      if (!dummyUser) {
         return rejection('User not found', { externalToken });
       }
-      const stfcUser = rawStfcUser.return;
 
-      // Create dummy user if one does not exist in the proposals DB.
-      // This is needed to satisfy the FOREIGN_KEY constraints
-      // in tables that link to a user (such as proposals)
-      const userNumber = parseInt(stfcUser.userNumber);
-      const dummyUser = await this.dataSource.ensureDummyUserExists(userNumber);
-      const roles = await this.dataSource.getUserRoles(dummyUser.id);
-
-      // With dummyUser created and written (ensureDummyUserExists), info can now
-      // be added to it without persisting it to the database, which is not wanted.
-      // This info is used in the userContext.
-      dummyUser.email = stfcUser.email;
-      dummyUser.firstname = stfcUser.givenName;
-      dummyUser.preferredname = stfcUser.firstNameKnownAs;
-      dummyUser.lastname = stfcUser.familyName;
+      const roles = await this.dataSource.getUserRoles(dummyUser?.id);
 
       const proposalsToken = signToken<AuthJwtPayload>({
         user: dummyUser,
         roles,
         currentRole: roles[0], // User role
+        externalToken: externalToken,
       });
 
       return proposalsToken;
@@ -455,6 +450,24 @@ export default class UserMutations {
         {},
         error
       );
+    }
+  }
+
+  async logout(token: string): Promise<void | Rejection> {
+    try {
+      const decodedToken = verifyToken<AuthJwtPayload>(token);
+
+      if (this.externalAuth) {
+        if (decodedToken.externalToken) {
+          this.dataSource.logout(decodedToken.externalToken);
+        } else {
+          return rejection('No external token found in JWT', { token });
+        }
+      }
+
+      return;
+    } catch (error) {
+      return rejection('Error occurred during external logout', {}, error);
     }
   }
 
