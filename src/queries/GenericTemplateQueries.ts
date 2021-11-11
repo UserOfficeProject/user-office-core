@@ -3,6 +3,7 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
+import { Authorized } from '../decorators';
 import { UserWithRole } from '../models/User';
 import { GenericTemplatesArgs } from '../resolvers/queries/GenericTemplatesQuery';
 import { GenericTemplateAuthorization } from '../utils/GenericTemplateAuthorization';
@@ -16,6 +17,7 @@ export default class GenericTemplateQueries {
     private dataSource: GenericTemplateDataSource
   ) {}
 
+  @Authorized()
   async getGenericTemplate(
     agent: UserWithRole | null,
     genericTemplateId: number
@@ -37,6 +39,7 @@ export default class GenericTemplateQueries {
     return this.dataSource.getGenericTemplate(genericTemplateId);
   }
 
+  @Authorized()
   async getGenericTemplates(
     agent: UserWithRole | null,
     args: GenericTemplatesArgs
