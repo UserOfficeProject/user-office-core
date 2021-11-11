@@ -1,0 +1,8 @@
+query getGenericTemplatesWithQuestionaryStatus($filter: GenericTemplatesFilter) {
+  genericTemplates(filter: $filter) {
+    ...genericTemplate
+    questionary {
+      isCompleted
+    }
+  }
+}

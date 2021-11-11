@@ -9,6 +9,8 @@ import {
   useReducerWithMiddleWares,
 } from 'utils/useReducerWithMiddleWares';
 
+import { SampleFragment } from './../../generated/sdk';
+import { GenericTemplateWithQuestionary } from './genericTemplate/GenericTemplateWithQuestionary';
 import { ProposalSubmissionState } from './proposal/ProposalSubmissionState';
 import { ProposalWithQuestionary } from './proposal/ProposalWithQuestionary';
 import { ProposalEsiWithQuestionary } from './proposalEsi/ProposalEsiWithQuestionary';
@@ -50,11 +52,37 @@ export type Event =
   | { type: 'REGISTRATION_LOADED'; visit: RegistrationWQ }
   | { type: 'REGISTRATION_MODIFIED'; visit: Partial<RegistrationWQ> }
   | { type: 'REGISTRATION_SUBMITTED'; visit: Partial<RegistrationWQ> }
+  // generic template
+  | {
+      type: 'GENERIC_TEMPLATE_CREATED';
+      genericTemplate: GenericTemplateWithQuestionary;
+    }
+  | {
+      type: 'GENERIC_TEMPLATE_LOADED';
+      genericTemplate: GenericTemplateWithQuestionary;
+    }
+  | {
+      type: 'GENERIC_TEMPLATE_UPDATED';
+      genericTemplate: Partial<GenericTemplateWithQuestionary>;
+    }
+  | {
+      type: 'GENERIC_TEMPLATE_MODIFIED';
+      genericTemplate: Partial<GenericTemplateWithQuestionary>;
+    }
+  | {
+      type: 'GENERIC_TEMPLATE_SUBMITTED';
+      genericTemplate: Partial<GenericTemplateWithQuestionary>;
+    }
   // esi
   | { type: 'ESI_CREATED'; esi: ProposalEsiWithQuestionary }
   | { type: 'ESI_LOADED'; esi: ProposalEsiWithQuestionary }
   | { type: 'ESI_MODIFIED'; esi: Partial<ProposalEsiWithQuestionary> }
   | { type: 'ESI_SUBMITTED'; esi: Partial<ProposalEsiWithQuestionary> }
+  | { type: 'ESI_SAMPLE_CREATED'; sample: SampleFragment }
+  | { type: 'ESI_SAMPLE_DELETED'; sampleId: number }
+  | { type: 'ESI_SAMPLE_ESI_CREATED'; sampleEsi: SampleEsiWithQuestionary }
+  | { type: 'ESI_SAMPLE_ESI_UPDATED'; sampleEsi: SampleEsiWithQuestionary }
+  | { type: 'ESI_SAMPLE_ESI_DELETED'; sampleId: number }
   // sample esi
   | { type: 'SAMPLE_ESI_CREATED'; esi: SampleEsiWithQuestionary }
   | { type: 'SAMPLE_ESI_LOADED'; esi: SampleEsiWithQuestionary }

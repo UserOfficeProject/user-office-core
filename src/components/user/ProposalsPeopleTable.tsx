@@ -8,14 +8,16 @@ import { Alert, AlertTitle } from '@material-ui/lab';
 import makeStyles from '@material-ui/styles/makeStyles';
 import { Formik, Field, Form } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   BasicUserDetails,
   UserRole,
   GetBasicUserDetailsByEmailQuery,
   GetUsersQueryVariables,
+  FeatureId,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { usePrevColabs } from 'hooks/user/usePrevColabs';
@@ -131,8 +133,9 @@ const useStyles = makeStyles({
 });
 
 const columns = [
-  { title: 'Name', field: 'firstname' },
+  { title: 'Fristname', field: 'firstname' },
   { title: 'Surname', field: 'lastname' },
+  { title: 'Preferred name', field: 'preferredname' },
   { title: 'Organisation', field: 'organisation' },
 ];
 
@@ -188,11 +191,16 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
     userRole: props.userRole ? props.userRole : null,
     refreshData: false,
   });
+
+  const featureContext = useContext(FeatureContext);
+  const isEmailInviteEnabled = !!featureContext.features.get(
+    FeatureId.EMAIL_INVITE
+  )?.isEnabled;
   const { prevColabUsers, loadingUsersData } = usePrevColabs(query);
 
   const sendRequest = useDataApi();
   const [loading, setLoading] = useState(false);
-  const [pageSize] = useState(5);
+  const [pageSize] = useState(10);
   const [sendUserEmail, setSendUserEmail] = useState(false);
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]
@@ -267,6 +275,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
     });
 
   props.emailInvite &&
+    isEmailInviteEnabled &&
     actionArray.push({
       icon: EmailIcon,
       isFreeAction: true,
@@ -444,15 +453,17 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                     'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
                   },
                 }),
+                headerSelectionProps: {
+                  inputProps: { 'aria-label': 'Select All Rows' },
+                },
               }}
               actions={actionArray}
               localization={{
                 body: { emptyDataSourceMessage: 'No Previous Collaborators' },
                 toolbar: {
-                  searchPlaceholder: 'Filter',
-                  searchTooltip: 'Filter Users',
+                  searchPlaceholder: 'Filter found users',
+                  searchTooltip: 'Filter found users',
                   nRowsSelected: '{0} Users(s) Selected',
-                  showColumnsAriaLabel: 'testtest',
                 },
               }}
               onPageChange={(page) =>

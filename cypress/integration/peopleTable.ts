@@ -20,7 +20,7 @@ context('PageTable component tests', () => {
 
       cy.contains('New Proposal').click();
 
-      cy.get('[title="Add Co-Proposers"]').click();
+      cy.get('[data-cy=add-participant-button]').click();
 
       cy.get('[role="presentation"]').as('modal');
 
@@ -73,7 +73,7 @@ context('PageTable component tests', () => {
 
       cy.contains('New Proposal').click();
 
-      cy.get('[title="Add Co-Proposers"]').click();
+      cy.get('[data-cy=add-participant-button]').click();
 
       cy.get('[role="presentation"]')
         .find('tr[index="0"]')
@@ -85,7 +85,7 @@ context('PageTable component tests', () => {
 
       cy.contains('New Proposal').click();
 
-      cy.get('[title="Add Co-Proposers"]').click();
+      cy.get('[data-cy=add-participant-button]').click();
 
       cy.get('[role="presentation"]').as('modal');
 
@@ -195,11 +195,14 @@ context('PageTable component tests', () => {
 
       cy.contains('New Proposal').click();
 
-      cy.get('[title="Add Co-Proposers"]').click();
+      cy.get('[data-cy=add-participant-button]').click();
 
       cy.get('[role="presentation"]').as('modal');
 
       cy.finishedLoading();
+
+      cy.contains('10 rows').click();
+      cy.get('[data-value=5]').click();
 
       for (const email of emails) {
         cy.finishedLoading();
@@ -272,7 +275,7 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=questionary-stepper]').contains('New proposal').click();
 
-      cy.get('[title="Add Co-Proposers"]').click();
+      cy.get('[data-cy=add-participant-button]').click();
 
       cy.get('[role="presentation"]').as('modal');
 
@@ -290,7 +293,7 @@ context('PageTable component tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('@modal').contains('No Users Found');
+      cy.get('@modal').contains('No Users');
 
       cy.get('@modal').contains('1 user(s) selected');
 
@@ -381,9 +384,12 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=questionary-stepper]').contains('New proposal').click();
 
-      cy.get('[title="Add Co-Proposers"]').click();
+      cy.get('[data-cy=add-participant-button]').click();
 
       cy.get('[role="presentation"]').as('modal');
+
+      cy.contains('10 rows').click();
+      cy.get('[data-value=5]').click();
 
       cy.get('@modal').contains('0 user(s) selected');
       cy.get('@modal').contains(/1-5 of [0-9]+/);
@@ -394,10 +400,14 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').find('[title="Next Page"]').click();
 
+      cy.finishedLoading();
+
       cy.get('@modal').find('tr[index="0"] input').check();
       cy.get('@modal').contains('2 user(s) selected');
 
       cy.get('@modal').find('[title="Previous Page"]').click();
+
+      cy.finishedLoading();
 
       cy.get('@modal').find('tr[index="1"] input:checked');
       cy.get('@modal').contains('2 user(s) selected');
@@ -408,6 +418,9 @@ context('PageTable component tests', () => {
       cy.get('@modal').contains('1 user(s) selected');
 
       cy.get('@modal').find('[title="Next Page"]').click();
+
+      cy.finishedLoading();
+
       cy.get('@modal').find('tr[index="0"] input:checked');
       cy.get('@modal').contains('1 user(s) selected');
     });

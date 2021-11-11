@@ -5,6 +5,7 @@ fragment sample on Sample {
   questionaryId
   safetyStatus
   safetyComment
+  isPostProposalSubmission
   created
   proposalPk
   questionId

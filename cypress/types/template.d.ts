@@ -58,7 +58,9 @@ declare global {
           option1?: string;
           option2?: string;
           option3?: string;
-        }
+          isMultipleSelect?: boolean
+          type?: 'radio' | 'dropdown'
+        },
       ) => void;
 
       /**
@@ -115,6 +117,21 @@ declare global {
       ) => void;
 
       /**
+       * Creates generic template question
+       *
+       * @returns {typeof createGenericTemplateQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createGenericTemplateQuestion('Provide deatails of any grants', 'deafult generic template', 'Add grant' {minEntries:0, maxEntries:5})
+       */
+       createGenericTemplateQuestion: (
+        question: string,
+        template: string,
+        addButtonLabel: string,
+        options?: { minEntries?: number; maxEntries?: number }
+      ) => void;
+
+      /**
        * Creates rich text input question
        *
        * @returns {typeof createRichTextInput}
@@ -152,7 +169,8 @@ declare global {
           | 'shipment'
           | 'visit'
           | 'proposalEsi'
-          | 'sampleEsi',
+          | 'sampleEsi'
+          | 'genericTemplate',
         title?: string,
         description?: string
       ) => void;

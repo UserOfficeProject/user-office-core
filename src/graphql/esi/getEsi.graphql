@@ -14,14 +14,16 @@ query getEsi($esiId: Int!) {
         isCompleted
       }
     }
-    visit {
-      ...visit
-      proposal {
-        proposalId
-        title
-        samples {
-          ...sample
-        }
+
+    proposal {
+      primaryKey
+      proposalId
+      title
+      samples {
+        ...sample
+      }
+      questionary {
+        ...questionary
       }
     }
   }

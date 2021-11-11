@@ -1,4 +1,5 @@
 import MaterialTable from '@material-table/core';
+import { Button } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -10,6 +11,7 @@ import Person from '@material-ui/icons/Person';
 import PersonAdd from '@material-ui/icons/PersonAdd';
 import React, { useState, useContext } from 'react';
 
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
 import ParticipantModal from 'components/proposal/ParticipantModal';
@@ -57,14 +59,11 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   const { user } = useContext(UserContext);
   const { setRenewTokenValue } = useRenewToken();
   const classes = useStyles();
-  const {
-    loadingMembers,
-    SEPReviewersData,
-    setSEPReviewersData,
-  } = useSEPReviewersData(
-    sepId,
-    modalOpen || sepChairModalOpen || sepSecretaryModalOpen
-  );
+  const { loadingMembers, SEPReviewersData, setSEPReviewersData } =
+    useSEPReviewersData(
+      sepId,
+      modalOpen || sepChairModalOpen || sepSecretaryModalOpen
+    );
   const { api } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -204,17 +203,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
   }
 
   const AddPersonIcon = (): JSX.Element => <PersonAdd data-cy="add-member" />;
-
-  const tableActions = hasAccessRights
-    ? [
-        {
-          icon: AddPersonIcon,
-          isFreeAction: true,
-          tooltip: 'Add Member',
-          onClick: (): void => setOpen(true),
-        },
-      ]
-    : [];
 
   const alreadySelectedMembers = (SEPReviewersData ?? []).map(
     ({ userId }) => userId
@@ -407,8 +395,20 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
               options={{
                 search: false,
               }}
-              actions={tableActions}
             />
+            {hasAccessRights && (
+              <ActionButtonContainer>
+                <Button
+                  variant="contained"
+                  onClick={() => setOpen(true)}
+                  data-cy="add-participant-button"
+                  color="primary"
+                  startIcon={<AddPersonIcon />}
+                >
+                  Add reviewers
+                </Button>
+              </ActionButtonContainer>
+            )}
           </Grid>
         </Grid>
       </>

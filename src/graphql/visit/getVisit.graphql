@@ -13,12 +13,5 @@ query getVisit($visitId: Int!) {
         name
       }
     }
-    esi {
-      ...esi
-      questionary {
-        isCompleted
-        ...questionary
-      }
-    }
   }
 }

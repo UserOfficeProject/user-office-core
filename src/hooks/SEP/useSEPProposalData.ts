@@ -19,10 +19,8 @@ export function useSEPProposalData(
   setSEPProposalData: Dispatch<SetStateAction<SepProposalBasics | null>>;
 } {
   const api = useDataApi();
-  const [
-    SEPProposalData,
-    setSEPProposalData,
-  ] = useState<SepProposalBasics | null>(null);
+  const [SEPProposalData, setSEPProposalData] =
+    useState<SepProposalBasics | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     let unmounted = false;

@@ -63,7 +63,8 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
 
     return (
       (!definition.readonly ||
-        field.question.dataType === DataType.SAMPLE_DECLARATION) &&
+        field.question.dataType === DataType.SAMPLE_DECLARATION ||
+        field.question.dataType === DataType.GENERIC_TEMPLATE) &&
       areDependenciesSatisfied(questionary.steps, field.question.id)
     );
   });

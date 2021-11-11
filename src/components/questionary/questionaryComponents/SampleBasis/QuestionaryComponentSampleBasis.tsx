@@ -59,45 +59,43 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
   );
 }
 
-const sampleBasisPreSubmit = () => async ({
-  api,
-  dispatch,
-  state,
-}: SubmitActionDependencyContainer) => {
-  const sample = (state as SampleSubmissionState).sample;
-  const title = sample.title;
+const sampleBasisPreSubmit =
+  () =>
+  async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
+    const sample = (state as SampleSubmissionState).sample;
+    const title = sample.title;
 
-  let returnValue = state.questionary.questionaryId;
+    let returnValue = state.questionary.questionaryId;
 
-  if (sample.id > 0) {
-    const result = await api.updateSample({
-      title: title,
-      sampleId: sample.id,
-    });
-    if (result.updateSample.sample) {
-      dispatch({
-        type: 'SAMPLE_UPDATED',
-        sample: result.updateSample.sample,
+    if (sample.id > 0) {
+      const result = await api.updateSample({
+        title: title,
+        sampleId: sample.id,
       });
-    }
-  } else {
-    const result = await api.createSample({
-      title: title,
-      templateId: state.questionary.templateId,
-      proposalPk: sample.proposalPk,
-      questionId: sample.questionId,
-    });
-
-    if (result.createSample.sample) {
-      dispatch({
-        type: 'SAMPLE_CREATED',
-        sample: result.createSample.sample,
+      if (result.updateSample.sample) {
+        dispatch({
+          type: 'SAMPLE_UPDATED',
+          sample: result.updateSample.sample,
+        });
+      }
+    } else {
+      const result = await api.createSample({
+        title: title,
+        templateId: state.questionary.templateId,
+        proposalPk: sample.proposalPk,
+        questionId: sample.questionId,
       });
-      returnValue = result.createSample.sample.questionaryId;
-    }
-  }
 
-  return returnValue;
-};
+      if (result.createSample.sample) {
+        dispatch({
+          type: 'SAMPLE_CREATED',
+          sample: result.createSample.sample,
+        });
+        returnValue = result.createSample.sample.questionaryId;
+      }
+    }
+
+    return returnValue;
+  };
 
 export { QuestionaryComponentSampleBasis, sampleBasisPreSubmit };

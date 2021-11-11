@@ -32,10 +32,8 @@ const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
     { title: 'Description', field: 'description' },
   ];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [
-    urlQueryParams,
-    setUrlQueryParams,
-  ] = useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
+  const [urlQueryParams, setUrlQueryParams] =
+    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const createModal = (
     onUpdate: FunctionType<void, [ProposalStatus | null]>,

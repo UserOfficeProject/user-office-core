@@ -7,9 +7,8 @@ import { ProposalFragment, UserProposalsFilter } from './../../generated/sdk';
 export function useMyProposals(filter: UserProposalsFilter) {
   const [loadingProposals, setLoadingProposals] = useState(true);
   const [proposals, setProposals] = useState<ProposalFragment[]>([]);
-  const [proposalFilter, setProposalFilter] = useState<UserProposalsFilter>(
-    filter
-  );
+  const [proposalFilter, setProposalFilter] =
+    useState<UserProposalsFilter>(filter);
 
   const api = useDataApi();
 

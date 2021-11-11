@@ -160,10 +160,8 @@ function SampleSafetyPage() {
     urlQueryParams.call ? urlQueryParams.call : 0
   );
   const [samples, setSamples] = useState<SampleWithProposalData[]>([]);
-  const [
-    selectedSample,
-    setSelectedSample,
-  ] = useState<SampleWithProposalData | null>(null);
+  const [selectedSample, setSelectedSample] =
+    useState<SampleWithProposalData | null>(null);
 
   useEffect(() => {
     if (selectedCallId === null) {
@@ -249,7 +247,12 @@ function SampleSafetyPage() {
                 urlQueryParams={urlQueryParams}
                 setUrlQueryParams={setUrlQueryParams}
                 columns={columns}
-                options={{ selection: true }}
+                options={{
+                  selection: true,
+                  headerSelectionProps: {
+                    inputProps: { 'aria-label': 'Select All Rows' },
+                  },
+                }}
                 actions={[
                   {
                     icon: GetAppIcon,

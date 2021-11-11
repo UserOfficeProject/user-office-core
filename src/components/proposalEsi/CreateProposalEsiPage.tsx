@@ -7,9 +7,9 @@ import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import CreateProposalEsi from './CreateProposalEsi';
 
 function CreateProposalEsiPage() {
-  const { visitId } = useParams<{ visitId: string }>();
+  const { scheduledEventId } = useParams<{ scheduledEventId: string }>();
 
-  if (!visitId) {
+  if (!scheduledEventId) {
     return <span>Missing query params</span>;
   }
 
@@ -18,7 +18,7 @@ function CreateProposalEsiPage() {
       <Grid container>
         <Grid item xs={12} data-cy="create-proposal-esi-table">
           <StyledPaper>
-            <CreateProposalEsi visitId={+visitId} />
+            <CreateProposalEsi scheduledEventId={+scheduledEventId} />
           </StyledPaper>
         </Grid>
       </Grid>

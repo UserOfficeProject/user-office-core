@@ -108,7 +108,7 @@ export const QuestionTemplateRelationFormShell = (
         }}
         className={classes.naturalKey}
       >
-        {props.questionRel.question.naturalKey}
+        Edit {props.questionRel.question.naturalKey}
       </Link>
       <Formik
         initialValues={props.questionRel}
@@ -123,7 +123,7 @@ export const QuestionTemplateRelationFormShell = (
                 type="button"
                 variant="outlined"
                 color="primary"
-                data-cy="delete"
+                data-cy="remove-from-template"
                 onClick={deleteHandler}
                 disabled={definition.creatable === false}
               >

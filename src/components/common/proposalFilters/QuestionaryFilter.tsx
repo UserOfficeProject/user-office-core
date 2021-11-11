@@ -64,23 +64,20 @@ const extractSearchableQuestionsFromTemplate = (
 function QuestionaryFilter({ templateId, onSubmit }: QuestionaryFilterProps) {
   const { template, isLoadingTemplate } = useTemplate(templateId);
 
-  const {
-    questionFilterQuery,
-    setQuestionFilterQuery,
-  } = useQuestionFilterQueryParams();
+  const { questionFilterQuery, setQuestionFilterQuery } =
+    useQuestionFilterQueryParams();
 
   const initialSearchCriteria =
     questionFilterQuery.compareOperator && questionFilterQuery.value
       ? {
-          compareOperator: questionFilterQuery.compareOperator as QuestionFilterCompareOperator,
+          compareOperator:
+            questionFilterQuery.compareOperator as QuestionFilterCompareOperator,
           value: questionFilterQuery.value,
         }
       : null;
 
-  const [
-    selectedQuestion,
-    setSelectedQuestion,
-  ] = useState<QuestionTemplateRelationFragment | null>(null);
+  const [selectedQuestion, setSelectedQuestion] =
+    useState<QuestionTemplateRelationFragment | null>(null);
 
   const [searchCriteria, setSearchCriteria] = useState<SearchCriteria | null>(
     initialSearchCriteria

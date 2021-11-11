@@ -7,6 +7,7 @@ import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import DescriptionIcon from '@material-ui/icons/Description';
+import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import EventIcon from '@material-ui/icons/Event';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
@@ -230,6 +231,15 @@ const TemplateMenuListItem = () => {
           </ListItem>
         </Tooltip>
 
+        <Tooltip title="Sub Template">
+          <ListItem component={NavLink} to="/GenericTemplates" button>
+            <ListItemIcon>
+              <DynamicFeedIcon />
+            </ListItemIcon>
+            <ListItemText primary="Sub Template" />
+          </ListItem>
+        </Tooltip>
+
         {isShipmentFeatureEnabled && (
           <Tooltip title="Shipment declaration templates">
             <ListItem
@@ -279,8 +289,9 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const isShipmentFeatureEnabled = !!context.features.get(FeatureId.SHIPPING)
     ?.isEnabled;
 
-  const isSchedulerEnabled = context.features.get(FeatureId.SCHEDULER)
-    ?.isEnabled;
+  const isSchedulerEnabled = context.features.get(
+    FeatureId.SCHEDULER
+  )?.isEnabled;
 
   const user = (
     <div data-cy="user-menu-items">

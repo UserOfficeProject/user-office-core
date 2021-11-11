@@ -42,14 +42,14 @@ function ProposalEsiReview({ confirm }: ProposalEsiReviewProps) {
   const isSubmitted = state.esi.isSubmitted;
 
   const additionalDetails: TableRowData[] = [
-    { label: 'Proposal ID', value: state.esi.visit?.proposal.proposalId || '' },
-    { label: 'Proposal Title', value: state.esi.visit?.proposal.title || '' },
+    { label: 'Proposal ID', value: state.esi?.proposal.proposalId || '' },
+    { label: 'Proposal Title', value: state.esi?.proposal.title || '' },
     {
       label: 'Samples for the experiment',
       value: (
         <ul className={classes.sampleList}>
           {state.esi.sampleEsis.map((esi) => (
-            <li key={esi.esiId}>{esi.sample.title}</li>
+            <li key={esi.sampleId}>{esi.sample.title}</li>
           ))}
         </ul>
       ),

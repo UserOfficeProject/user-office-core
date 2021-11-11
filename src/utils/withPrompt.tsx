@@ -25,9 +25,8 @@ const TextFieldWithHandleEnter = withHandleEnter(TextField);
  * })()
  * @param WrappedComponent
  */
-const withPrompt = <T extends Record<string, unknown>>(
-  WrappedComponent: React.ComponentType<T>
-) => {
+// eslint-disable-next-line @typescript-eslint/ban-types
+const withPrompt = <T extends {}>(WrappedComponent: React.ComponentType<T>) => {
   return function WithPromptComponent(props: Omit<T, 'prompt'>): JSX.Element {
     const [onPrompt, setOnPrompt] = useState<((answer: string) => void) | null>(
       null
@@ -62,6 +61,7 @@ const withPrompt = <T extends Record<string, unknown>>(
           <DialogContent>
             <TextFieldWithHandleEnter
               id="prompt-input"
+              data-cy="prompt-input"
               label={question}
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}

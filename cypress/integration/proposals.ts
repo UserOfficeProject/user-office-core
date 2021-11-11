@@ -30,7 +30,11 @@ context('Proposal tests', () => {
 
     cy.contains('New Proposal').click();
 
-    cy.contains('Carl');
+    cy.get('[data-cy=principal-investigator] input').should(
+      'contain.value',
+      'Carl'
+    );
+
     cy.get('[data-cy=edit-proposer-button]').click();
 
     cy.finishedLoading();
@@ -65,6 +69,27 @@ context('Proposal tests', () => {
     cy.contains('submitted');
 
     cy.get('[title="View proposal"]').should('exist');
+  });
+
+  it('User officer should be able to save proposal column selection', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.get("[title='Show Columns']").first().click();
+    cy.get('.MuiPopover-paper').contains('Call').click();
+    cy.get('.MuiPopover-paper').contains('SEP').click();
+
+    cy.get('body').click();
+
+    cy.contains('Calls').click();
+
+    cy.finishedLoading();
+
+    cy.contains('Proposals').click();
+
+    cy.contains('Call');
+    cy.contains('SEP');
   });
 
   it('Should be able to see proposal allocation time unit on the proposal', () => {

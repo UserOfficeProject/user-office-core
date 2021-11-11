@@ -48,9 +48,8 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isCallActive = state.proposal?.call?.isActive ?? true;
 
-  const [loadingSubmitMessage, setLoadingSubmitMessage] = useState<boolean>(
-    true
-  );
+  const [loadingSubmitMessage, setLoadingSubmitMessage] =
+    useState<boolean>(true);
   const [submitButtonMessage, setSubmitButtonMessage] = useState<string>(
     'I am aware that no further edits can be done after proposal submission.'
   );

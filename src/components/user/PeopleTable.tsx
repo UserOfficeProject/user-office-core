@@ -6,12 +6,14 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import Email from '@material-ui/icons/Email';
 import makeStyles from '@material-ui/styles/makeStyles';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import { getCurrentUser } from 'context/UserContextProvider';
 import {
   BasicUserDetails,
+  FeatureId,
   GetUsersQueryVariables,
   UserRole,
 } from 'generated/sdk';
@@ -68,8 +70,9 @@ const useStyles = makeStyles({
 });
 
 const columns = [
-  { title: 'Name', field: 'firstname' },
-  { title: 'Surname', field: 'lastname' },
+  { title: 'Firstname', field: 'firstname' },
+  { title: 'Lastname', field: 'lastname' },
+  { title: 'Preferred name', field: 'preferredname' },
   { title: 'Organisation', field: 'organisation' },
 ];
 
@@ -105,12 +108,17 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     GetUsersQueryVariables & { refreshData: boolean }
   >({
     offset: 0,
-    first: 5,
+    first: 10,
     filter: '',
     subtractUsers: props.selectedUsers ? props.selectedUsers : [],
     userRole: props.userRole ? props.userRole : null,
     refreshData: false,
   });
+  const featureContext = useContext(FeatureContext);
+  const isEmailInviteEnabled = !!featureContext.features.get(
+    FeatureId.EMAIL_INVITE
+  )?.isEnabled;
+
   const { isLoading } = props;
   const { usersData, loadingUsersData } = useUsersData(query);
   const [loading, setLoading] = useState(props.isLoading ?? false);
@@ -176,6 +184,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
       ) => action.fn(rowData),
     });
   props.emailInvite &&
+    isEmailInviteEnabled &&
     actionArray.push({
       icon: EmailIcon,
       isFreeAction: true,
@@ -287,9 +296,11 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           }
 
           setSelectedParticipants((selectedParticipants) =>
-            (selectedItem as BasicUserDetails & {
-              tableData: { checked: boolean };
-            }).tableData.checked
+            (
+              selectedItem as BasicUserDetails & {
+                tableData: { checked: boolean };
+              }
+            ).tableData.checked
               ? ([
                   ...selectedParticipants,
                   {
@@ -310,6 +321,9 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           debounceInterval: 400,
           pageSize: query.first as number,
           selection: props.selection,
+          headerSelectionProps: {
+            inputProps: { 'aria-label': 'Select All Rows' },
+          },
           ...props.mtOptions,
           selectionProps: (rowdata: any) => ({
             inputProps: {
@@ -337,9 +351,11 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             : {}
         }
         localization={{
-          body: { emptyDataSourceMessage: 'No Users Found' },
+          body: { emptyDataSourceMessage: 'No Users' },
           toolbar: {
             nRowsSelected: '{0} Users(s) Selected',
+            searchPlaceholder: 'Filter found users',
+            searchTooltip: 'Filter found users',
           },
         }}
         onPageChange={(page) =>

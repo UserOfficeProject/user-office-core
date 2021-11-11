@@ -5,7 +5,7 @@ import {
   Instrument,
   Maybe,
   Proposal,
-  ProposalBookingStatus,
+  ProposalBookingStatusCore,
   ScheduledEventCore,
   Visit,
   VisitFragment,
@@ -41,9 +41,9 @@ export type ProposalScheduledEvent = Pick<
     | (VisitFragment & {
         registrations: VisitRegistrationCore[];
         shipments: ShipmentFragment[];
-      } & Pick<Visit, 'teamLead'> & { esi: Maybe<EsiFragment> })
+      } & Pick<Visit, 'teamLead'>)
     | null;
-};
+} & { esi: Maybe<EsiFragment> };
 
 export function useProposalBookingsScheduledEvents({
   onlyUpcoming,
@@ -69,7 +69,10 @@ export function useProposalBookingsScheduledEvents({
       .getUserProposalBookingsWithEvents({
         ...(onlyUpcoming ? { endsAfter: toTzLessDateTime(new Date()) } : null),
         status: notDraft
-          ? [ProposalBookingStatus.ACTIVE, ProposalBookingStatus.COMPLETED]
+          ? [
+              ProposalBookingStatusCore.ACTIVE,
+              ProposalBookingStatusCore.COMPLETED,
+            ]
           : null,
         instrumentId,
       })
@@ -99,6 +102,7 @@ export function useProposalBookingsScheduledEvents({
                   },
                   instrument: proposal.instrument,
                   visit: scheduledEvent.visit,
+                  esi: scheduledEvent.esi,
                 });
               }
             )
