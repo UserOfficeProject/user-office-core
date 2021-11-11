@@ -110,7 +110,7 @@ export default function createHandler() {
           break;
       }
     } catch (error) {
-      logger.logError(error.message, error);
+      logger.logException(`Error handling logs for event ${event.type}`, error);
     }
   };
 }

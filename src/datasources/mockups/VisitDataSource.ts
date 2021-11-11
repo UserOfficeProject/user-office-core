@@ -52,6 +52,13 @@ export class VisitDataSourceMock implements VisitDataSource {
         matchingVisits.push(currentVisit);
       }
 
+      if (
+        filter?.scheduledEventId &&
+        currentVisit.scheduledEventId === filter.scheduledEventId
+      ) {
+        matchingVisits.push(currentVisit);
+      }
+
       return matchingVisits;
     }, new Array<Visit>());
   }
@@ -78,8 +85,9 @@ export class VisitDataSourceMock implements VisitDataSource {
   }
 
   async createVisit(
-    { proposalPk, teamLeadUserId, scheduledEventId }: CreateVisitArgs,
-    creatorId: number
+    { teamLeadUserId, scheduledEventId: scheduledEventId }: CreateVisitArgs,
+    creatorId: number,
+    proposalPk: number
   ): Promise<Visit> {
     const newVisit = new Visit(
       this.visits.length,

@@ -3,12 +3,10 @@ import express, { Request, Response, NextFunction } from 'express';
 
 import baseContext from '../buildContext';
 import { DownloadType } from '../factory/service';
-import { AuthJwtPayload, UserWithRole } from '../models/User';
+import { AuthJwtPayload } from '../models/User';
 import { verifyToken } from '../utils/jwt';
 import pdfDownload from './factory/pdf';
 import xlsxDownload from './factory/xlsx';
-
-export type RequestWithUser = Request & { user: UserWithRole };
 
 const defaultErrorMessage = 'Failed to generate the requested file(s)';
 
@@ -37,8 +35,8 @@ router.use(
     const ctx = {
       originalUrl: req.originalUrl,
       user: {
-        id: (req as RequestWithUser).user.id,
-        currentRole: (req as RequestWithUser).user.currentRole,
+        id: req.user.user.id,
+        currentRole: req.user.currentRole,
       },
     };
 
@@ -63,9 +61,10 @@ export default function factory() {
             return res.status(401).send('Unauthorized');
           }
 
-          (req as RequestWithUser).user = {
-            ...user,
+          req.user = {
+            user,
             currentRole: decoded.currentRole,
+            roles: [],
           };
           next();
         })

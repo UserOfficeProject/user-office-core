@@ -15,13 +15,16 @@ import {
   collectSEPlXLSXData,
   defaultSEPDataColumns,
 } from '../../factory/xlsx/sep';
-import { RequestWithUser } from '../factory';
 
 const router = express.Router();
 
 router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
   try {
-    const userWithRole = (req as RequestWithUser).user;
+    const userWithRole = {
+      ...req.user.user,
+      currentRole: req.user.currentRole,
+    };
+
     const proposalPks: number[] = req.params.proposal_pks
       .split(',')
       .map((n: string) => parseInt(n))
@@ -65,7 +68,10 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
 
 router.get(`/${XLSXType.SEP}/:sep_id/call/:call_id`, async (req, res, next) => {
   try {
-    const userWithRole = (req as RequestWithUser).user;
+    const userWithRole = {
+      ...req.user.user,
+      currentRole: req.user.currentRole,
+    };
 
     const sepId = parseInt(req.params.sep_id);
     const callId = parseInt(req.params.call_id);

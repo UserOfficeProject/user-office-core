@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { QueryBuilder } from 'knex';
+import { Knex } from 'knex';
 
 import { Role, Roles } from '../../models/Role';
 import {
@@ -488,7 +488,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async getMostRecentCollaborators(id: number): Promise<number[]> {
-    const fullProposalUserTable = (query: QueryBuilder) =>
+    const fullProposalUserTable = (query: Knex.QueryBuilder) =>
       query
         .select('*')
         .from('proposal_user')
@@ -520,7 +520,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async getFrequentCollaborators(id: number): Promise<number[]> {
-    const fullProposalUser = (query: QueryBuilder) =>
+    const fullProposalUser = (query: Knex.QueryBuilder) =>
       query
         .select('*')
         .from('proposal_user')

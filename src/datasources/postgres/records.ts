@@ -169,7 +169,6 @@ export interface QuestionDependencyRecord {
 }
 
 export interface QuestionTemplateRelRecord {
-  readonly id: number;
   readonly question_id: string;
   readonly template_id: number;
   readonly topic_id: number;
@@ -395,15 +394,17 @@ export interface TemplateCategoryRecord {
 }
 
 export interface SampleRecord {
-  readonly sample_id: number;
-  readonly title: string;
-  readonly creator_id: number;
-  readonly proposal_pk: number;
-  readonly questionary_id: number;
-  readonly question_id: string;
-  readonly safety_status: number;
-  readonly safety_comment: string;
   readonly created_at: Date;
+  readonly creator_id: number;
+  readonly is_post_proposal_submission: boolean;
+  readonly proposal_pk: number;
+  readonly question_id: string;
+  readonly questionary_id: number;
+  readonly safety_comment: string;
+  readonly safety_status: number;
+  readonly sample_id: number;
+  readonly shipment_id: number;
+  readonly title: string;
 }
 
 export interface ShipmentRecord {
@@ -532,7 +533,7 @@ export interface VisitRecord {
 
 export interface EsiRecord {
   readonly esi_id: number;
-  readonly visit_id: number;
+  readonly scheduled_event_id: number;
   readonly creator_id: number;
   readonly questionary_id: number;
   readonly is_submitted: boolean;
@@ -721,8 +722,9 @@ export const createUserObject = (user: UserRecord) => {
 export const createBasicUserObject = (user: UserRecord) => {
   return new BasicUserDetails(
     user.user_id,
-    user.preferredname || user.firstname,
+    user.firstname,
     user.lastname,
+    user.preferredname,
     user.institution,
     user.position,
     user.created_at,
@@ -798,9 +800,11 @@ export const createSampleObject = (sample: SampleRecord) => {
     sample.proposal_pk,
     sample.questionary_id,
     sample.question_id,
+    sample.is_post_proposal_submission,
     sample.safety_status,
     sample.safety_comment,
-    sample.created_at
+    sample.created_at,
+    sample.shipment_id
   );
 };
 
@@ -916,7 +920,7 @@ export const createVisitObject = (visit: VisitRecord) => {
 export const createEsiObject = (esi: EsiRecord) => {
   return new ExperimentSafetyInput(
     esi.esi_id,
-    esi.visit_id,
+    esi.scheduled_event_id,
     esi.creator_id,
     esi.questionary_id,
     esi.is_submitted,

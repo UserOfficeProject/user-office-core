@@ -12,6 +12,7 @@ import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalS
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
+import ScheduledEventDataSourceMock from '../datasources/mockups/ScheduledEventDataSource';
 import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
@@ -23,23 +24,10 @@ import {
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
 import { SkipAssetRegistrar } from '../utils/EAM_service';
-import { GenericTemplateAuthorization } from '../utils/GenericTemplateAuthorization';
-import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
-import { SampleAuthorization } from '../utils/SampleAuthorization';
-import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
-import { UserAuthorization } from '../utils/UserAuthorization';
-import { VisitAuthorization } from '../utils/VisitAuthorization';
 import { SampleEsiDataSourceMock } from './../datasources/mockups/SampleEsiDataSource';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
-
-mapClass(Tokens.GenericTemplateAuthorization, GenericTemplateAuthorization);
-mapClass(Tokens.UserAuthorization, UserAuthorization);
-mapClass(Tokens.QuestionaryAuthorization, QuestionaryAuthorization);
-mapClass(Tokens.SampleAuthorization, SampleAuthorization);
-mapClass(Tokens.ShipmentAuthorization, ShipmentAuthorization);
-mapClass(Tokens.VisitAuthorization, VisitAuthorization);
 
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
 mapClass(Tokens.CallDataSource, CallDataSourceMock);
@@ -53,6 +41,7 @@ mapClass(Tokens.QuestionaryDataSource, QuestionaryDataSourceMock);
 mapClass(Tokens.ReviewDataSource, ReviewDataSourceMock);
 mapClass(Tokens.SampleDataSource, SampleDataSourceMock);
 mapClass(Tokens.SampleEsiDataSource, SampleEsiDataSourceMock);
+mapClass(Tokens.ScheduledEventDataSource, ScheduledEventDataSourceMock);
 mapClass(Tokens.SEPDataSource, SEPDataSourceMock);
 mapClass(Tokens.ShipmentDataSource, ShipmentDataSourceMock);
 mapClass(Tokens.SystemDataSource, SystemDataSourceMock);

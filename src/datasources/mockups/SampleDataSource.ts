@@ -18,9 +18,11 @@ export class SampleDataSourceMock implements SampleDataSource {
         1,
         1,
         'experiment_samples',
+        false,
         SampleStatus.LOW_RISK,
         'safety comment',
-        new Date()
+        new Date(),
+        1
       ),
     ];
   }
@@ -49,9 +51,11 @@ export class SampleDataSourceMock implements SampleDataSource {
       proposalPk,
       questionaryId,
       questionId,
+      false,
       SampleStatus.PENDING_EVALUATION,
       '',
-      new Date()
+      new Date(),
+      null
     );
   }
 
@@ -70,15 +74,6 @@ export class SampleDataSourceMock implements SampleDataSource {
     sample.title = args.title || sample.title;
     sample.safetyComment = args.safetyComment || sample.safetyComment;
     sample.safetyStatus = args.safetyStatus || sample.safetyStatus;
-
-    return sample;
-  }
-
-  async cloneSample(sampleId: number): Promise<Sample> {
-    const sample = await this.getSample(sampleId);
-    if (!sample) {
-      throw new Error('Sample not found');
-    }
 
     return sample;
   }

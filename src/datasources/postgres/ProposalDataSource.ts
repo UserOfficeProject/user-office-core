@@ -1,6 +1,5 @@
 import { logger } from '@esss-swap/duo-logger';
 import BluePromise from 'bluebird';
-import { Transaction } from 'knex';
 import { injectable } from 'tsyringe';
 
 import { Event } from '../../events/event.enum';
@@ -79,80 +78,78 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return response;
   }
   async submitProposal(primaryKey: number): Promise<Proposal> {
-    const proposal: ProposalRecord[] = await database.transaction(
-      async (trx) => {
-        try {
-          const call = await database
-            .select(
-              'c.call_id',
-              'c.reference_number_format',
-              'c.proposal_sequence'
-            )
-            .from('call as c')
-            .join('proposals as p', { 'p.call_id': 'c.call_id' })
-            .where('p.proposal_pk', primaryKey)
-            .first()
-            .forUpdate()
-            .transacting(trx);
+    const proposal = await database.transaction(async (trx) => {
+      try {
+        const call = await database
+          .select(
+            'c.call_id',
+            'c.reference_number_format',
+            'c.proposal_sequence'
+          )
+          .from('call as c')
+          .join('proposals as p', { 'p.call_id': 'c.call_id' })
+          .where('p.proposal_pk', primaryKey)
+          .first()
+          .forUpdate()
+          .transacting(trx);
 
-          let referenceNumber: string | null;
-          if (call.reference_number_format) {
-            referenceNumber = await calculateReferenceNumber(
-              call.reference_number_format,
-              call.proposal_sequence
-            );
-
-            if (!referenceNumber) {
-              throw new Error(
-                `Failed to calculate reference number for proposal with id '${primaryKey}' using format '${call.reference_number_format}'`
-              );
-            } else if (referenceNumber.length > 16) {
-              throw new Error(
-                `The reference number calculated is too long ('${referenceNumber.length} characters)`
-              );
-            }
-          }
-
-          await database
-            .update({
-              proposal_sequence: (call.proposal_sequence ?? 0) + 1,
-            })
-            .from('call as c')
-            .where('c.call_id', call.call_id)
-            .transacting(trx);
-
-          const proposalUpdate = await database
-            .from('proposals')
-            .returning('*')
-            .where('proposal_pk', primaryKey)
-            .modify((query) => {
-              if (referenceNumber) {
-                query.update({
-                  proposal_id: referenceNumber,
-                  reference_number_sequence: call.proposal_sequence ?? 0,
-                  submitted: true,
-                });
-              } else {
-                query.update({
-                  reference_number_sequence: call.proposal_sequence ?? 0,
-                  submitted: true,
-                });
-              }
-            })
-            .transacting(trx);
-
-          return await trx.commit(proposalUpdate);
-        } catch (error) {
-          throw new Error(
-            `Failed to submit proposal with id '${primaryKey}' because: '${
-              (error as Error).message
-            }'`
+        let referenceNumber: string | null;
+        if (call.reference_number_format) {
+          referenceNumber = await calculateReferenceNumber(
+            call.reference_number_format,
+            call.proposal_sequence
           );
-        }
-      }
-    );
 
-    if (proposal === undefined || proposal.length !== 1) {
+          if (!referenceNumber) {
+            throw new Error(
+              `Failed to calculate reference number for proposal with id '${primaryKey}' using format '${call.reference_number_format}'`
+            );
+          } else if (referenceNumber.length > 16) {
+            throw new Error(
+              `The reference number calculated is too long ('${referenceNumber.length} characters)`
+            );
+          }
+        }
+
+        await database
+          .update({
+            proposal_sequence: (call.proposal_sequence ?? 0) + 1,
+          })
+          .from('call as c')
+          .where('c.call_id', call.call_id)
+          .transacting(trx);
+
+        const proposalUpdate = await database
+          .from('proposals')
+          .returning('*')
+          .where('proposal_pk', primaryKey)
+          .modify((query) => {
+            if (referenceNumber) {
+              query.update({
+                proposal_id: referenceNumber,
+                reference_number_sequence: call.proposal_sequence ?? 0,
+                submitted: true,
+              });
+            } else {
+              query.update({
+                reference_number_sequence: call.proposal_sequence ?? 0,
+                submitted: true,
+              });
+            }
+          })
+          .transacting(trx);
+
+        return await trx.commit(proposalUpdate);
+      } catch (error) {
+        logger.logException(
+          `Failed to submit proposal with id '${primaryKey}'`,
+          error
+        );
+        trx.rollback();
+      }
+    });
+
+    if (proposal?.length !== 1) {
       throw new Error(`Failed to submit proposal with id '${primaryKey}'`);
     }
 
@@ -175,7 +172,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async setProposalUsers(proposalPk: number, users: number[]): Promise<void> {
-    return database.transaction(function (trx: Transaction) {
+    return database.transaction(async (trx) => {
       return database
         .from('proposal_user')
         .where('proposal_pk', proposalPk)

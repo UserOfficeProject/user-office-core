@@ -9,7 +9,7 @@ import { UserWithRole } from '../models/User';
 import { QuestionaryDataSource } from './../datasources/QuestionaryDataSource';
 
 export interface GetProposalEsisFilter {
-  visitId?: number;
+  scheduledEventId?: number;
   questionaryId?: number;
 }
 

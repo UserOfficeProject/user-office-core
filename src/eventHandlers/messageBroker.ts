@@ -192,7 +192,10 @@ export function createPostToRabbitMQHandler() {
 
         const json = JSON.stringify(message);
 
+        // NOTE: This message is consumed by scichat
         await rabbitMQ.sendMessage(Queue.PROPOSAL, event.type, json);
+        // NOTE: Send message for scheduler in a separate queue
+        await rabbitMQ.sendMessage(Queue.SCHEDULING_PROPOSAL, event.type, json);
 
         logger.logDebug(
           'Proposal event successfully sent to the message broker',
@@ -315,6 +318,7 @@ export function createListenToRabbitMQHandler() {
       case Event.PROPOSAL_BOOKING_TIME_ACTIVATED:
       case Event.PROPOSAL_BOOKING_TIME_COMPLETED:
       case Event.PROPOSAL_BOOKING_TIME_UPDATED:
+      case Event.PROPOSAL_BOOKING_TIME_REOPENED:
         logger.logDebug(
           `Listener on ${Queue.SCHEDULED_EVENTS}: Received event`,
           {

@@ -1,3 +1,5 @@
+import { injectable } from 'tsyringe';
+
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
 import { GetSampleEsisFilter } from '../../queries/SampleEsiQueries';
 import { CreateSampleEsiInput } from '../../resolvers/mutations/CreateSampleEsiMutation';
@@ -8,6 +10,7 @@ import { SampleEsiDataSource } from '../SampleEsiDataSource';
 import database from './database';
 import { createSampleEsiObject, SampleEsiRecord } from './records';
 
+@injectable()
 class PostgresSampleEsiDataSource implements SampleEsiDataSource {
   // Create
   async createSampleEsi(

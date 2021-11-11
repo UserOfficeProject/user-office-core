@@ -10,6 +10,9 @@ export class GenericTemplateQuery {
     @Ctx() context: ResolverContext,
     @Arg('genericTemplateId', () => Int) genericTemplateId: number
   ) {
-    return context.queries.genericTemplate.getGenericTemplate(context.user, genericTemplateId);
+    return context.queries.genericTemplate.getGenericTemplate(
+      context.user,
+      genericTemplateId
+    );
   }
 }

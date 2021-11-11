@@ -31,6 +31,7 @@ export class UpdateSampleArgs {
   proposalPk?: number;
   questionaryId?: number;
   shipmentId?: number | null;
+  isPostProposalSubmission?: boolean | null;
 }
 
 @Resolver()

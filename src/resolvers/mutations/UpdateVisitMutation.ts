@@ -3,7 +3,6 @@ import {
   ArgsType,
   Ctx,
   Field,
-  InputType,
   Int,
   Mutation,
   Resolver,
@@ -14,15 +13,6 @@ import { VisitStatus } from '../../models/Visit';
 import { VisitResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
-@InputType()
-class ProposalPkAndEventId {
-  @Field(() => Int)
-  proposalPK: number;
-
-  @Field(() => Int)
-  scheduledEventId: number;
-}
-
 @ArgsType()
 export class UpdateVisitArgs {
   @Field(() => Int)
@@ -30,9 +20,6 @@ export class UpdateVisitArgs {
 
   @Field(() => VisitStatus, { nullable: true })
   status?: VisitStatus;
-
-  @Field(() => ProposalPkAndEventId, { nullable: true })
-  proposalPkAndEventId?: ProposalPkAndEventId;
 
   @Field(() => [Int!], { nullable: true })
   team?: number[];

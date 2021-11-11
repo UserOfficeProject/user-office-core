@@ -1,5 +1,5 @@
 import { logger } from '@esss-swap/duo-logger';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -26,9 +26,10 @@ statusMap.set(ProposalEndStatus.RESERVED, ProposalPublicStatus.reserved);
 
 @injectable()
 export default class ProposalQueries {
+  private userAuth = container.resolve(UserAuthorization);
+
   constructor(
-    @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource
   ) {}
 
   @Authorized()

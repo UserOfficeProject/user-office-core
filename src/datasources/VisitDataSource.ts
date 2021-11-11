@@ -21,7 +21,11 @@ export interface VisitDataSource {
   getVisitByScheduledEventId(eventId: number): Promise<Visit | null>;
   getEsiByVisitId(visitId: any): Promise<ExperimentSafetyInput | null>;
   // Write
-  createVisit(args: CreateVisitArgs, creatorId: number): Promise<Visit>;
+  createVisit(
+    args: CreateVisitArgs,
+    creatorId: number,
+    proposalPk: number
+  ): Promise<Visit>;
   updateVisit(args: UpdateVisitArgs): Promise<Visit>;
   updateRegistration(
     userId: number,

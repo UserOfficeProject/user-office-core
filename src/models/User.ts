@@ -1,8 +1,12 @@
 import 'reflect-metadata';
 import { Role, Roles } from './Role';
 
-export type AuthJwtPayload = { user: User; roles: Role[]; currentRole: Role };
-export type AuthJwtApiTokenPayload = { accessTokenId: string };
+export type AuthJwtPayload = {
+  user: User;
+  roles: Role[];
+  currentRole: Role;
+};
+export type AuthJwtApiTokenPayload = { accessTokenId?: string };
 
 type SpecialActionJwtPayload = {
   id: number;
@@ -75,6 +79,7 @@ export class BasicUserDetails {
     public id: number,
     public firstname: string,
     public lastname: string,
+    public preferredname: string,
     public organisation: string,
     public position: string,
     public created: Date,

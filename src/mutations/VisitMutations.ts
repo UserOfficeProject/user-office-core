@@ -1,8 +1,9 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
+import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Authorized } from '../decorators';
@@ -21,6 +22,9 @@ import { VisitAuthorization } from './../utils/VisitAuthorization';
 
 @injectable()
 export default class VisitMutations {
+  private userAuth = container.resolve(UserAuthorization);
+  private visitAuth = container.resolve(VisitAuthorization);
+
   constructor(
     @inject(Tokens.VisitDataSource)
     private dataSource: VisitDataSource,
@@ -30,10 +34,8 @@ export default class VisitMutations {
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
-    @inject(Tokens.VisitAuthorization)
-    private visitAuthorization: VisitAuthorization,
-    @inject(Tokens.UserAuthorization)
-    private userAuthorization: UserAuthorization
+    @inject(Tokens.ScheduledEventDataSource)
+    private scheduledEventDataSource: ScheduledEventDataSource
   ) {}
 
   @Authorized()
@@ -41,27 +43,6 @@ export default class VisitMutations {
     user: UserWithRole | null,
     args: CreateVisitArgs
   ): Promise<Visit | Rejection> {
-    const proposal = await this.proposalDataSource.get(args.proposalPk);
-    if (!proposal) {
-      return rejection('Can not create visit, proposal does not exist', {
-        args,
-        agent: user,
-      });
-    }
-
-    if (
-      proposal.finalStatus !== ProposalEndStatus.ACCEPTED ||
-      proposal.managementDecisionSubmitted === false
-    ) {
-      return rejection(
-        'Can not create visit, the proposal is not yet accepted',
-        {
-          args,
-          agent: user,
-        }
-      );
-    }
-
     const visitAlreadyExists =
       (
         await this.dataSource.getVisits({
@@ -69,17 +50,65 @@ export default class VisitMutations {
         })
       ).length > 0;
 
-    if (visitAlreadyExists) {
+    if (visitAlreadyExists === true) {
       return rejection(
         'Can not create visit because visit for the experiment that already exists',
         { args }
       );
     }
 
-    const isProposalOwner = await this.userAuthorization.hasAccessRights(
-      user,
-      proposal
+    const scheduledEvent =
+      await this.scheduledEventDataSource.getScheduledEvent(
+        args.scheduledEventId
+      );
+    if (!scheduledEvent) {
+      return rejection(
+        'Can not create visit because scheduled event does not exist',
+        {
+          args,
+          agent: user,
+        }
+      );
+    }
+
+    if (scheduledEvent.proposalPk === null) {
+      return rejection(
+        'Can not create visit because scheduled event does not have a proposal associated with',
+        {
+          args,
+          agent: user,
+        }
+      );
+    }
+
+    const proposal = await this.proposalDataSource.get(
+      scheduledEvent.proposalPk
     );
+
+    if (proposal === null) {
+      return rejection(
+        'Can not create visit, proposal for the scheduled does not exist',
+        {
+          args,
+          agent: user,
+        }
+      );
+    }
+
+    if (
+      proposal.finalStatus !== ProposalEndStatus.ACCEPTED ||
+      proposal.managementDecisionSubmitted === false
+    ) {
+      return rejection(
+        'Can not create visit because the proposal is not yet accepted',
+        {
+          args,
+          agent: user,
+        }
+      );
+    }
+
+    const isProposalOwner = await this.userAuth.hasAccessRights(user, proposal);
     if (isProposalOwner === false) {
       return rejection(
         'Can not create visit for proposal that does not belong to you',
@@ -87,14 +116,18 @@ export default class VisitMutations {
       );
     }
 
-    // TODO verify that provided scheduledEventId exists
     try {
-      const visit = await this.dataSource.createVisit(args, user!.id);
+      const visit = await this.dataSource.createVisit(
+        args,
+        user!.id,
+        proposal.primaryKey
+      );
 
       if (args.team && args.team.length > 0) {
         await this.dataSource.updateVisit({
           visitId: visit.id,
           team: args.team,
+          teamLeadUserId: args.teamLeadUserId,
         });
       }
 
@@ -128,12 +161,9 @@ export default class VisitMutations {
       );
     }
 
-    const hasRights = await this.visitAuthorization.hasWriteRights(user, visit);
+    const hasRights = await this.visitAuth.hasWriteRights(user, visit);
 
-    if (
-      this.userAuthorization.isUser(user) &&
-      args.status === VisitStatus.ACCEPTED
-    ) {
+    if (this.userAuth.isUser(user) && args.status === VisitStatus.ACCEPTED) {
       return rejection(
         'Can not update visit status because of insufficient permissions'
       );
@@ -154,10 +184,7 @@ export default class VisitMutations {
     user: UserWithRole | null,
     visitId: number
   ): Promise<Visit | Rejection> {
-    const hasRights = await this.visitAuthorization.hasWriteRights(
-      user,
-      visitId
-    );
+    const hasRights = await this.visitAuth.hasWriteRights(user, visitId);
     if (hasRights === false) {
       return rejection(
         'Can not update visit because of insufficient permissions',

@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -17,15 +17,15 @@ export interface GetRegistrationsFilter {
 
 @injectable()
 export default class VisitQueries {
+  private visitAuth = container.resolve(VisitAuthorization);
+
   constructor(
     @inject(Tokens.VisitDataSource)
     public dataSource: VisitDataSource,
     @inject(Tokens.QuestionaryDataSource)
     public questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
-    public templateDataSource: TemplateDataSource,
-    @inject(Tokens.VisitAuthorization)
-    public visitAuth: VisitAuthorization
+    public templateDataSource: TemplateDataSource
   ) {}
 
   @Authorized()

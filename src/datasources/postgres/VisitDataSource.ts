@@ -87,8 +87,9 @@ class PostgresVisitDataSource implements VisitDataSource {
   }
 
   createVisit(
-    { proposalPk, scheduledEventId, teamLeadUserId }: CreateVisitArgs,
-    creatorId: number
+    { scheduledEventId: scheduledEventId, teamLeadUserId }: CreateVisitArgs,
+    creatorId: number,
+    proposalPk: number
   ): Promise<Visit> {
     return database('visits')
       .insert({
@@ -122,13 +123,11 @@ class PostgresVisitDataSource implements VisitDataSource {
             .ignore()
             .transacting(trx);
         }
-        if (args.status || args.proposalPkAndEventId || args.teamLeadUserId) {
+        if (args.status || args.teamLeadUserId) {
           await database('visits')
             .update({
               status: args.status,
-              proposal_pk: args.proposalPkAndEventId?.proposalPK,
-              scheduled_event_id: args.proposalPkAndEventId?.scheduledEventId,
-              team_lead_user_id: args?.teamLeadUserId,
+              team_lead_user_id: args.teamLeadUserId,
             })
             .where({ visit_id: args.visitId })
             .transacting(trx);

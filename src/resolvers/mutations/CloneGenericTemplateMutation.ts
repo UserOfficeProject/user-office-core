@@ -13,7 +13,11 @@ export class CloneGenericTemplateMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.genericTemplate.cloneGenericTemplate(context.user, genericTemplateId, title),
+      context.mutations.genericTemplate.cloneGenericTemplate(
+        context.user,
+        genericTemplateId,
+        title
+      ),
       GenericTemplateResponseWrap
     );
   }

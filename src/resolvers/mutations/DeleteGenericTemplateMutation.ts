@@ -12,7 +12,10 @@ export class DeleteGenericTemplateMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.genericTemplate.deleteGenericTemplate(context.user, genericTemplateId),
+      context.mutations.genericTemplate.deleteGenericTemplate(
+        context.user,
+        genericTemplateId
+      ),
       GenericTemplateResponseWrap
     );
   }
