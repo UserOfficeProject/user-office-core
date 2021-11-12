@@ -38,6 +38,7 @@ import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
+import UserMutations from './UserMutations';
 
 @injectable()
 export default class ProposalMutations {
@@ -606,7 +607,29 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: ImportProposalArgs
   ): Promise<Proposal | Rejection> {
-    const { callId, submitterId, referenceNumber } = args;
+    const { callId, submitterId, referenceNumber, users } = args;
+
+    const pi = await this.userDataSource.getUser(submitterId);
+
+    if (pi === null) {
+      return rejection('PI user not exist', { submitterId })
+    }
+
+    if (users != null) {
+      // Batch up getting CoI details to check user existance.
+      const coIs = await Promise.all(
+        users.map(async (user) => ({
+          id: user,
+          user: await this.userDataSource.getUser(user)
+        })
+      ));
+      if (coIs.some(c => c.user === null)) {
+        const missing = coIs
+          .filter(c => c.user === null)
+          .map(c => c.id);
+        return rejection('One or more CoI users did not exist', { missing });
+      }
+    }
 
     const call = await this.callDataSource.getCall(callId);
 
@@ -641,6 +664,7 @@ export default class ProposalMutations {
     const submitted = await this.submitProposal(agent, updatedProposal, referenceNumber);
 
     return submitted;
+
 
   }
 
