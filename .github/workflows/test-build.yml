@@ -256,6 +256,7 @@ jobs:
           echo MANIFEST_STATUS $MANIFEST_STATUS
 
           if [[ $MANIFEST_STATUS != "200" ]]; then
+            ls
             docker build -t $TAG --file Dockerfile.e2e .
             docker push $TAG
           fi
