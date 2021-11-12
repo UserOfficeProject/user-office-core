@@ -834,6 +834,7 @@ export type Mutation = {
   updateApiAccessToken: ApiAccessTokenResponseWrap;
   updateCall: CallResponseWrap;
   updateEquipment: EquipmentResponseWrap;
+  updateEquipmentOwner: Scalars['Boolean'];
   updateEsi: EsiResponseWrap;
   updateGenericTemplate: GenericTemplateResponseWrap;
   updateInstitution: InstitutionResponseWrap;
@@ -1541,6 +1542,11 @@ export type MutationUpdateCallArgs = {
 export type MutationUpdateEquipmentArgs = {
   id: Scalars['Int'];
   updateEquipmentInput: EquipmentInput;
+};
+
+
+export type MutationUpdateEquipmentOwnerArgs = {
+  updateEquipmentOwnerInput: UpdateEquipmentOwnerInput;
 };
 
 
@@ -3280,6 +3286,11 @@ export type UpdateCallInput = {
   surveyComment: Scalars['String'];
   templateId: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
+};
+
+export type UpdateEquipmentOwnerInput = {
+  equipmentId: Scalars['Int'];
+  userId: Scalars['Int'];
 };
 
 export type UpdateLostTimeInput = {
