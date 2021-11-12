@@ -9,6 +9,7 @@ import {
 } from '@esss-swap/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -23,7 +24,6 @@ import {
   ProposalEndStatus,
   ProposalPksWithNextStatus,
 } from '../models/Proposal';
-import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SampleStatus } from '../models/Sample';
@@ -32,7 +32,7 @@ import { AdministrationProposalArgs } from '../resolvers/mutations/Administratio
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
@@ -40,6 +40,7 @@ import { CloneUtils } from './../utils/CloneUtils';
 @injectable()
 export default class ProposalMutations {
   private userAuth = container.resolve(UserAuthorization);
+  private proposalAuth = container.resolve(ProposalAuthorization);
   private cloneUtils = container.resolve(CloneUtils);
   constructor(
     @inject(Tokens.ProposalDataSource)
@@ -109,33 +110,10 @@ export default class ProposalMutations {
       return rejection('Proposal not found', { args });
     }
 
-    // Check if the call is open
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.callDataSource.checkActiveCall(proposal.callId))
-    ) {
-      return rejection('Call is not active', { args });
-    }
-
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isMemberOfProposal(agent, proposal))
-    ) {
-      return rejection('Unauthorized proposal update', { args });
-    }
-
-    const proposalStatus =
-      await this.proposalSettingsDataSource.getProposalStatus(
-        proposal.statusId
-      );
-
-    if (
-      proposalStatus?.shortCode !==
-      ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED
-    ) {
-      if (proposal.submitted && !this.userAuth.isUserOfficer(agent)) {
-        return rejection('Can not update proposal after submission');
-      }
+    if ((await this.proposalAuth.hasWriteRights(agent, proposal)) === false) {
+      return rejection('You do not have rights to update this proposal', {
+        args,
+      });
     }
 
     if (title !== undefined) {
@@ -204,7 +182,7 @@ export default class ProposalMutations {
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
     if (
       !isUserOfficer &&
-      !(await this.userAuth.isMemberOfProposal(agent, proposal))
+      !(await this.proposalAuth.isMemberOfProposal(agent, proposal))
     ) {
       return rejection('Unauthorized submission of the proposal', {
         agent,
@@ -267,7 +245,7 @@ export default class ProposalMutations {
     if (!this.userAuth.isUserOfficer(agent)) {
       if (
         proposal.submitted ||
-        !this.userAuth.isPrincipalInvestigatorOfProposal(agent, proposal)
+        !this.proposalAuth.isPrincipalInvestigatorOfProposal(agent, proposal)
       )
         return rejection(
           'Can not delete proposal because proposal is submitted',
@@ -335,7 +313,7 @@ export default class ProposalMutations {
       managementDecisionSubmitted,
     } = args;
     const isChairOrSecretaryOfProposal =
-      await this.userAuth.isChairOrSecretaryOfProposal(agent, primaryKey);
+      await this.proposalAuth.isChairOrSecretaryOfProposal(agent, primaryKey);
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
 
     if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
@@ -469,7 +447,12 @@ export default class ProposalMutations {
       );
     }
 
-    if (!(await this.userAuth.hasAccessRights(agent, sourceProposal))) {
+    const canReadProposal = await this.proposalAuth.hasReadRights(
+      agent,
+      sourceProposal
+    );
+
+    if (canReadProposal === false) {
       return rejection(
         'Can not clone proposal because of insufficient permissions',
         { sourceProposal, agent }

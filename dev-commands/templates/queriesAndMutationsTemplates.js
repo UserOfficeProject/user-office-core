@@ -34,7 +34,7 @@ import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { Create${name.capitalize()}Args } from '../resolvers/mutations/Create${name.capitalize()}Mutation';
 import { Update${name.capitalize()}Args } from '../resolvers/mutations/Update${name.capitalize()}Mutation';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 
 export default class ${name.capitalize()}Mutations {
   constructor(

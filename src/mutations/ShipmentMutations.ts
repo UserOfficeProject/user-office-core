@@ -1,5 +1,8 @@
 import { container, inject, injectable } from 'tsyringe';
 
+import { SampleAuthorization } from '../auth/SampleAuthorization';
+import { ShipmentAuthorization } from '../auth/ShipmentAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -16,12 +19,11 @@ import { CreateShipmentInput } from '../resolvers/mutations/CreateShipmentMutati
 import { SubmitShipmentArgs } from '../resolvers/mutations/SubmitShipmentMutation';
 import { UpdateShipmentArgs } from '../resolvers/mutations/UpdateShipmentMutation';
 import { AssetRegistrar } from '../utils/EAM_service';
-import { SampleAuthorization } from '../utils/SampleAuthorization';
-import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 @injectable()
 export default class ShipmentMutations {
   private userAuth = container.resolve(UserAuthorization);
+  private proposalAuth = container.resolve(ProposalAuthorization);
   private sampleAuth = container.resolve(SampleAuthorization);
   private shipmentAuth = container.resolve(ShipmentAuthorization);
 
@@ -74,7 +76,12 @@ export default class ShipmentMutations {
       });
     }
 
-    if ((await this.userAuth.hasAccessRights(agent, proposal)) === false) {
+    const canReadProposal = await this.proposalAuth.hasReadRights(
+      agent,
+      proposal
+    );
+
+    if (canReadProposal === false) {
       return rejection(
         'Can not create shipment because of insufficient permissions',
         { args, agent }
