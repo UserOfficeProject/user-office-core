@@ -14,6 +14,7 @@ import {
 import * as bcrypt from 'bcryptjs';
 import { container, inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -42,7 +43,6 @@ import {
   UpdateUserRolesArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
 import { signToken, verifyToken } from '../utils/jwt';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 @injectable()
 export default class UserMutations {

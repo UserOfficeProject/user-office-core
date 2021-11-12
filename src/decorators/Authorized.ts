@@ -2,10 +2,10 @@ import { logger } from '@esss-swap/duo-logger';
 import { AuthenticationError } from 'apollo-server-core';
 import { container } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 const Authorized = (roles: Roles[] = []) => {
   return (

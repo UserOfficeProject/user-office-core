@@ -5,11 +5,13 @@ import { ProposalEsiDataSource } from '../datasources/ProposalEsiDataSource';
 import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSource';
 import { UserWithRole } from '../models/User';
 import { ExperimentSafetyInput } from './../resolvers/types/ExperimentSafetyInput';
+import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class EsiAuthorization {
   private userAuth = container.resolve(UserAuthorization);
+  private proposalAuth = container.resolve(ProposalAuthorization);
   constructor(
     @inject(Tokens.ScheduledEventDataSource)
     private scheduledEventDataSource: ScheduledEventDataSource,
@@ -34,6 +36,17 @@ export class EsiAuthorization {
     return esi;
   }
 
+  async canReadProposal(
+    agent: UserWithRole | null,
+    proposalPk: number
+  ): Promise<boolean> {
+    if (!agent) {
+      return false;
+    }
+
+    return this.proposalAuth.hasReadRights(agent, proposalPk);
+  }
+
   async hasReadRights(
     agent: UserWithRole | null,
     esi: ExperimentSafetyInput
@@ -56,11 +69,11 @@ export class EsiAuthorization {
     }
     const scheduledEvent = await this.getScheduledEvent(esi.scheduledEventId);
 
-    if (scheduledEvent === null) {
+    if (scheduledEvent === null || scheduledEvent.proposalPk === null) {
       return false;
     }
 
-    return this.userAuth.hasAccessRights(agent, scheduledEvent.proposalPk!);
+    return this.canReadProposal(agent, scheduledEvent.proposalPk);
   }
 
   async hasWriteRights(
@@ -85,7 +98,7 @@ export class EsiAuthorization {
     }
     const scheduledEvent = await this.getScheduledEvent(esi.scheduledEventId);
 
-    if (scheduledEvent === null) {
+    if (scheduledEvent === null || scheduledEvent.proposalPk === null) {
       return false;
     }
 
@@ -96,6 +109,6 @@ export class EsiAuthorization {
       return false;
     }
 
-    return this.userAuth.hasAccessRights(agent, scheduledEvent.proposalPk!);
+    return this.canReadProposal(agent, scheduledEvent.proposalPk);
   }
 }
