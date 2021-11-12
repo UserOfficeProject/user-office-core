@@ -238,8 +238,4 @@ export class ProposalAuthorization {
 
     return false;
   }
-
-  async isExternalTokenValid(externalToken: string): Promise<boolean> {
-    return await this.userDataSource.isExternalTokenValid(externalToken);
-  }
 }
