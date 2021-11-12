@@ -1,8 +1,0 @@
-mutation checkExternalToken($externalToken: String!) {
-  checkExternalToken(externalToken: $externalToken) {
-    token
-    rejection {
-      ...rejection
-    }
-  }
-}

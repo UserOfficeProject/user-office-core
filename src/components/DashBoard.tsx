@@ -25,7 +25,7 @@ import CallPage from './call/CallPage';
 import Can, { useCheckAccess } from './common/Can';
 import InstitutionPage from './institution/InstitutionPage';
 import InstrumentsPage from './instrument/InstrumentsPage';
-import MenuItems from './MenuItems';
+import MenuItems from './menu/MenuItems';
 import HelpPage from './pages/HelpPage';
 import InformationModal from './pages/InformationModal';
 import OverviewPage from './pages/OverviewPage';

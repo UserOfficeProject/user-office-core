@@ -42,12 +42,12 @@ const ExternalAuth: React.FC<ExternalAuthProps> = ({ match }) => {
     isFirstRun.current = false;
 
     unauthorizedApi()
-      .checkExternalToken({
+      .externalTokenLogin({
         externalToken: sessionId,
       })
       .then((token) => {
-        if (token.checkExternalToken && !token.checkExternalToken.rejection) {
-          handleLogin(token.checkExternalToken.token);
+        if (token.externalTokenLogin && !token.externalTokenLogin.rejection) {
+          handleLogin(token.externalTokenLogin.token);
           window.location.href = '/';
         } else {
           if (EXTERNAL_AUTH_LOGIN_URL) {
