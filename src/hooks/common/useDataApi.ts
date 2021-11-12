@@ -22,7 +22,6 @@ const notificationWithClientLog = async (
   });
 
   if (error) {
-    //
     await getSdk(
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       new UnauthorizedGraphQLClient(endpoint, enqueueSnackbar, true)
@@ -60,7 +59,7 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
         notificationWithClientLog(
           this.enqueueSnackbar,
           'Something went wrong!',
-          `Message: ${error.response.errors[0].message}`
+          error.response.errors[0].message
         );
       }
 
@@ -114,7 +113,6 @@ class AuthorizedGraphQLClient extends GraphQLClient {
       } else if (
         error.response.errors &&
         error.response.errors[0].message == 'EXTERNAL_TOKEN_INVALID' &&
-        // error.response.errors[0].extensions.code === 'UNAUTHENTICATED' &&
         this.externalAuthLoginUrl
       ) {
         notificationWithClientLog(
