@@ -10,6 +10,8 @@ COPY tsconfig.json .
 RUN npm ci --silent
 
 COPY . ./cypress
+COPY ../src/generated ./src/generated
+
 COPY wait-for-frontend.sh /
 
 RUN chmod +x /wait-for-frontend.sh
