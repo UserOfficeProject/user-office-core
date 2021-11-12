@@ -2,9 +2,9 @@ FROM cypress/included:8.7.0
 
 WORKDIR /e2e
 
-COPY cypress/cypress.json .
-COPY cypress/package* .
-COPY cypress/tsconfig.json .
+COPY ./cypress/cypress.json .
+COPY ./cypress/package* .
+COPY ./cypress/tsconfig.json .
 
 # force re-build 4
 RUN npm ci --silent
