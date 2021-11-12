@@ -10,6 +10,7 @@ import {
 } from '@esss-swap/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
@@ -35,7 +36,6 @@ import {
   InstrumentSubmitArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
 import { sortByRankOrAverageScore } from '../utils/mathFunctions';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import { ProposalDataSource } from './../datasources/ProposalDataSource';
 @injectable()
 export default class InstrumentMutations {

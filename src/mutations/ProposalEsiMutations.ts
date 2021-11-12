@@ -1,5 +1,6 @@
 import { container, inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -11,10 +12,11 @@ import { ExperimentSafetyInput } from '../models/ExperimentSafetyInput';
 import { rejection, Rejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
 import { UpdateEsiArgs } from '../resolvers/mutations/UpdateEsiMutation';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 
 @injectable()
 export default class ProposalEsiMutations {
+  private proposalAuth = container.resolve(ProposalAuthorization);
   private userAuth = container.resolve(UserAuthorization);
 
   constructor(
@@ -50,8 +52,11 @@ export default class ProposalEsiMutations {
       return rejection('Can not create ESI, because proposal does not exist');
     }
 
-    const hasAccessRights = await this.userAuth.hasAccessRights(user, proposal);
-    if (!hasAccessRights) {
+    const canReadProposal = await this.proposalAuth.hasReadRights(
+      user,
+      proposal
+    );
+    if (canReadProposal === false) {
       return rejection(
         'User is not authorized to create ESI for this proposal'
       );

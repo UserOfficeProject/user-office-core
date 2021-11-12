@@ -9,13 +9,13 @@ import { UserWithRole } from '../models/User';
 import { CreateSampleEsiInput } from '../resolvers/mutations/CreateSampleEsiMutation';
 import { DeleteSampleEsiInput } from '../resolvers/mutations/DeleteSampleEsiMutation';
 import { UpdateSampleEsiArgs } from '../resolvers/mutations/UpdateSampleEsiMutation';
+import { EsiAuthorization } from './../auth/EsiAuthorization';
 import { SampleDataSource } from './../datasources/SampleDataSource';
 import { TemplateDataSource } from './../datasources/TemplateDataSource';
 import { SampleExperimentSafetyInput } from './../models/SampleExperimentSafetyInput';
 import { CloneSampleEsiInput } from './../resolvers/mutations/CloneSampleEsiMutation';
 import { SampleDeclarationConfig } from './../resolvers/types/FieldConfig';
 import { CloneUtils } from './../utils/CloneUtils';
-import { EsiAuthorization } from './../utils/EsiAuthorization';
 
 @injectable()
 export default class SampleEsiMutations {

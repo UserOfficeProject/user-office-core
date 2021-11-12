@@ -1,5 +1,6 @@
 import { container, inject, injectable } from 'tsyringe';
 
+import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
@@ -9,7 +10,6 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { VisitRegistration } from '../models/VisitRegistration';
 import { VisitsFilter } from '../resolvers/queries/VisitsQuery';
-import { VisitAuthorization } from './../utils/VisitAuthorization';
 export interface GetRegistrationsFilter {
   questionaryIds?: number[];
   visitId?: number;
