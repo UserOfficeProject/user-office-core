@@ -16,7 +16,7 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
-import { isRejection } from '../models/Rejection';
+import { isRejection, Rejection } from '../models/Rejection';
 import ProposalMutations from './ProposalMutations';
 
 const proposalMutations = container.resolve(ProposalMutations);
@@ -42,10 +42,7 @@ test('A user on the proposal can not update its title if it is not in edit mode'
       proposalPk: dummyProposalSubmitted.primaryKey,
       title: '',
     })
-  ).resolves.toHaveProperty(
-    'reason',
-    'Can not update proposal after submission'
-  );
+  ).resolves.toBeInstanceOf(Rejection);
 });
 
 test('A user-officer can update a proposal', async () => {
@@ -110,10 +107,7 @@ test('A user can not update a proposals score mode', async () => {
       proposalPk: dummyProposalSubmitted.primaryKey,
       proposerId: newProposerId,
     })
-  ).resolves.toHaveProperty(
-    'reason',
-    'Can not update proposal after submission'
-  );
+  ).resolves.toBeInstanceOf(Rejection);
 });
 
 test('A user not on a proposal can not update it', () => {
@@ -122,7 +116,7 @@ test('A user not on a proposal can not update it', () => {
       proposalPk: 1,
       proposerId: dummyUserNotOnProposal.id,
     })
-  ).resolves.toHaveProperty('reason', 'Unauthorized proposal update');
+  ).resolves.toBeInstanceOf(Rejection);
 });
 
 //Submit

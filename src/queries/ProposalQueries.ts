@@ -1,6 +1,7 @@
 import { logger } from '@esss-swap/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
@@ -16,7 +17,7 @@ import {
   ProposalBookingScheduledEventFilterCore,
 } from '../resolvers/types/ProposalBooking';
 import { omit } from '../utils/helperFunctions';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 const statusMap = new Map<ProposalEndStatus, ProposalPublicStatus>();
@@ -27,6 +28,7 @@ statusMap.set(ProposalEndStatus.RESERVED, ProposalPublicStatus.reserved);
 @injectable()
 export default class ProposalQueries {
   private userAuth = container.resolve(UserAuthorization);
+  private proposalAuth = container.resolve(ProposalAuthorization);
 
   constructor(
     @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource
@@ -50,7 +52,7 @@ export default class ProposalQueries {
       proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
     }
 
-    if ((await this.hasAccessRights(agent, proposal)) === true) {
+    if ((await this.hasReadRights(agent, proposal)) === true) {
       return proposal;
     } else {
       return null;
@@ -62,7 +64,7 @@ export default class ProposalQueries {
     return this.dataSource.get(id);
   }
 
-  private async hasAccessRights(
+  private async hasReadRights(
     agent: UserWithRole | null,
     proposal: Proposal | null
   ): Promise<boolean> {
@@ -70,7 +72,7 @@ export default class ProposalQueries {
       return true;
     }
 
-    return this.userAuth.hasAccessRights(agent, proposal);
+    return this.proposalAuth.hasReadRights(agent, proposal);
   }
 
   @Authorized([Roles.USER_OFFICER])

@@ -1,12 +1,12 @@
 import { container, inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { Authorized } from '../decorators';
 import { Instrument } from '../models/Instrument';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 @injectable()
 export default class InstrumentQueries {
