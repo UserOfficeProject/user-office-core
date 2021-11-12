@@ -10,7 +10,8 @@ export class ProposalView {
     public proposalId: string,
     public rankOrder: number,
     public finalStatus: number, // Should use ProposalEndStatus enum here
-    public timeAllocation: number,
+    public technicalTimeAllocation: number,
+    public managementTimeAllocation: number,
     public notified: boolean,
     public technicalStatus: TechnicalReviewStatus,
     public instrumentName: string,
