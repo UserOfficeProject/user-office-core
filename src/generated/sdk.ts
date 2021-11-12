@@ -834,6 +834,7 @@ export type Mutation = {
   updateApiAccessToken: ApiAccessTokenResponseWrap;
   updateCall: CallResponseWrap;
   updateEquipment: EquipmentResponseWrap;
+  updateEquipmentOwner: Scalars['Boolean'];
   updateEsi: EsiResponseWrap;
   updateGenericTemplate: GenericTemplateResponseWrap;
   updateInstitution: InstitutionResponseWrap;
@@ -1544,6 +1545,11 @@ export type MutationUpdateEquipmentArgs = {
 };
 
 
+export type MutationUpdateEquipmentOwnerArgs = {
+  updateEquipmentOwnerInput: UpdateEquipmentOwnerInput;
+};
+
+
 export type MutationUpdateEsiArgs = {
   esiId: Scalars['Int'];
   isSubmitted?: Maybe<Scalars['Boolean']>;
@@ -2040,6 +2046,7 @@ export type ProposalView = {
   finalStatus: Maybe<ProposalEndStatus>;
   instrumentId: Maybe<Scalars['Int']>;
   instrumentName: Maybe<Scalars['String']>;
+  managementTimeAllocation: Maybe<Scalars['Int']>;
   notified: Scalars['Boolean'];
   primaryKey: Scalars['Int'];
   proposalId: Scalars['String'];
@@ -2053,7 +2060,7 @@ export type ProposalView = {
   statusName: Scalars['String'];
   submitted: Scalars['Boolean'];
   technicalStatus: Maybe<TechnicalReviewStatus>;
-  timeAllocation: Maybe<Scalars['Int']>;
+  technicalTimeAllocation: Maybe<Scalars['Int']>;
   title: Scalars['String'];
 };
 
@@ -3279,6 +3286,11 @@ export type UpdateCallInput = {
   surveyComment: Scalars['String'];
   templateId: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
+};
+
+export type UpdateEquipmentOwnerInput = {
+  equipmentId: Scalars['Int'];
+  userId: Scalars['Int'];
 };
 
 export type UpdateLostTimeInput = {
@@ -5277,7 +5289,7 @@ export type GetProposalsCoreQuery = (
   { __typename?: 'Query' }
   & { proposalsView: Maybe<Array<(
     { __typename?: 'ProposalView' }
-    & Pick<ProposalView, 'primaryKey' | 'title' | 'statusId' | 'statusName' | 'statusDescription' | 'proposalId' | 'rankOrder' | 'finalStatus' | 'notified' | 'timeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepCode' | 'sepId' | 'reviewAverage' | 'reviewDeviation' | 'instrumentId' | 'callId' | 'submitted' | 'allocationTimeUnit'>
+    & Pick<ProposalView, 'primaryKey' | 'title' | 'statusId' | 'statusName' | 'statusDescription' | 'proposalId' | 'rankOrder' | 'finalStatus' | 'notified' | 'managementTimeAllocation' | 'technicalTimeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepCode' | 'sepId' | 'reviewAverage' | 'reviewDeviation' | 'instrumentId' | 'callId' | 'submitted' | 'allocationTimeUnit'>
   )>> }
 );
 
@@ -9973,7 +9985,8 @@ export const GetProposalsCoreDocument = gql`
     rankOrder
     finalStatus
     notified
-    timeAllocation
+    managementTimeAllocation
+    technicalTimeAllocation
     technicalStatus
     instrumentName
     callShortCode

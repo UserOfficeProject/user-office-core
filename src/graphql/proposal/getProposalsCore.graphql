@@ -9,7 +9,8 @@ query getProposalsCore($filter: ProposalsFilter) {
     rankOrder
     finalStatus
     notified
-    timeAllocation
+    managementTimeAllocation
+    technicalTimeAllocation
     technicalStatus
     instrumentName
     callShortCode

@@ -102,7 +102,8 @@ context('Proposal tests', () => {
     cy.contains('Proposals').click();
 
     cy.get("[title='Show Columns']").first().click();
-    cy.get('.MuiPopover-paper').contains('Time allocation').click();
+    cy.get('.MuiPopover-paper').contains('Technical time allocation').click();
+    cy.get('.MuiPopover-paper').contains('Final time allocation').click();
 
     cy.get('body').click();
 
