@@ -1,3 +1,4 @@
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
@@ -35,7 +36,6 @@ import SystemQueries from '../queries/SystemQueries';
 import TemplateQueries from '../queries/TemplateQueries';
 import UserQueries from '../queries/UserQueries';
 import VisitQueries from '../queries/VisitQueries';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 interface ResolverContextQueries {
   proposal: ProposalQueries;

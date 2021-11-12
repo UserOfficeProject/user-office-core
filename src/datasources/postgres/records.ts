@@ -101,7 +101,8 @@ export interface ProposalViewRecord {
   readonly proposal_id: string;
   readonly rank_order: number;
   readonly final_status: number;
-  readonly time_allocation: number;
+  readonly technical_time_allocation: number;
+  readonly management_time_allocation: number;
   readonly notified: boolean;
   readonly technical_review_status: number;
   readonly instrument_name: string;
@@ -627,7 +628,8 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.proposal_id,
     proposal.rank_order,
     proposal.final_status,
-    proposal.time_allocation,
+    proposal.technical_time_allocation,
+    proposal.management_time_allocation,
     proposal.notified,
     proposal.technical_review_status,
     proposal.instrument_name,
@@ -722,8 +724,9 @@ export const createUserObject = (user: UserRecord) => {
 export const createBasicUserObject = (user: UserRecord) => {
   return new BasicUserDetails(
     user.user_id,
-    user.preferredname || user.firstname,
+    user.firstname,
     user.lastname,
+    user.preferredname,
     user.institution,
     user.position,
     user.created_at,

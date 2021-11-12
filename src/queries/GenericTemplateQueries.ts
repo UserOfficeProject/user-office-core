@@ -1,11 +1,11 @@
 import { logger } from '@esss-swap/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
+import { GenericTemplateAuthorization } from '../auth/GenericTemplateAuthorization';
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { UserWithRole } from '../models/User';
 import { GenericTemplatesArgs } from '../resolvers/queries/GenericTemplatesQuery';
-import { GenericTemplateAuthorization } from '../utils/GenericTemplateAuthorization';
 
 @injectable()
 export default class GenericTemplateQueries {

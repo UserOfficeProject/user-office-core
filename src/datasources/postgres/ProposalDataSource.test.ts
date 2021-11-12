@@ -90,7 +90,7 @@ async function setup() {
   await database('templates').insert({
     template_id: -999,
     name: '[IT] template',
-    category_id: 1,
+    group_id: 'PROPOSAL',
   });
 
   await database('questionaries').insert({
@@ -143,7 +143,7 @@ describe('Submit proposal', () => {
     const submission = proposalDataSource.submitProposal(proposal.primaryKey);
 
     return expect(submission).resolves.toMatchObject({
-      shortCode: proposal.proposalId,
+      proposalId: proposal.proposalId,
       submitted: true,
     });
   });
@@ -182,7 +182,7 @@ describe('Submit proposal', () => {
 
     return expect(submission).resolves.toEqual(
       expect.objectContaining({
-        shortCode: '2110000',
+        proposalId: '2110000',
       })
     );
   });
@@ -214,32 +214,6 @@ describe('Submit proposal', () => {
     );
   });
 
-  test('In a call with a reference number format that has no prefix, the proposal and call remain unmodified', async () => {
-    const preSubmitCall = await createCall('{digits:4}');
-    const preSubmitProposal = await createProposal(preSubmitCall.id);
-
-    expect(async () => {
-      await proposalDataSource.submitProposal(preSubmitProposal.primaryKey);
-    }).rejects.toThrowError('Failed to submit');
-    expect(await getCall(preSubmitCall.id)).toMatchObject(preSubmitCall);
-    expect(await getProposal(preSubmitProposal.primaryKey)).toMatchObject(
-      preSubmitProposal
-    );
-  });
-
-  test('In a call with a reference number format that has a prefix but no parameters, the proposal and call remain unmodified', async () => {
-    const preSubmitCall = await createCall('211');
-    const preSubmitProposal = await createProposal(preSubmitCall.id);
-
-    expect(async () => {
-      await proposalDataSource.submitProposal(preSubmitProposal.primaryKey);
-    }).rejects.toThrowError('Failed to submit');
-    expect(await getCall(preSubmitCall.id)).toMatchObject(preSubmitCall);
-    expect(await getProposal(preSubmitProposal.primaryKey)).toMatchObject(
-      preSubmitProposal
-    );
-  });
-
   test('In a call with a reference number format has a prefix, digits parameter and other parameters, the proposal is given a valid reference number', async () => {
     const call = await createCall('211{digits:4}{other:param}text');
     const proposal = await createProposal(call.id);
@@ -248,7 +222,7 @@ describe('Submit proposal', () => {
 
     return expect(submission).resolves.toEqual(
       expect.objectContaining({
-        shortCode: '2110000',
+        proposalId: '2110000',
         submitted: true,
       })
     );
@@ -294,9 +268,41 @@ describe('Submit proposal', () => {
 
     return expect(submission).resolves.toEqual(
       expect.objectContaining({
-        shortCode: '2110001',
+        proposalId: '2110001',
         submitted: true,
         referenceNumberSequence: 1,
+      })
+    );
+  });
+
+  test('In a call with an invalid reference number format, the proposal fails to submit', async () => {
+    const call = await createCall('*invalid*');
+    const proposal = await createProposal(call.id);
+
+    expect(async () => {
+      await proposalDataSource.submitProposal(proposal.primaryKey);
+    }).rejects.toThrowError('Failed to submit');
+    expect(getProposal(proposal.primaryKey)).resolves.toEqual(
+      expect.objectContaining({
+        proposalId: proposal.proposalId,
+        submitted: false,
+        referenceNumberSequence: null,
+      })
+    );
+  });
+
+  test('In a call with a valid reference number format that would make a reference number too long, the proposal fails to submit', async () => {
+    const call = await createCall('211{digits:14}');
+    const proposal = await createProposal(call.id);
+
+    expect(async () => {
+      await proposalDataSource.submitProposal(proposal.primaryKey);
+    }).rejects.toThrowError('Failed to submit');
+    expect(getProposal(proposal.primaryKey)).resolves.toEqual(
+      expect.objectContaining({
+        proposalId: proposal.proposalId,
+        submitted: false,
+        referenceNumberSequence: null,
       })
     );
   });

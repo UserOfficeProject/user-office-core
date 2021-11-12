@@ -5,7 +5,9 @@ export type AuthJwtPayload = {
   user: User;
   roles: Role[];
   currentRole: Role;
+  externalToken?: string;
 };
+
 export type AuthJwtApiTokenPayload = { accessTokenId?: string };
 
 type SpecialActionJwtPayload = {
@@ -79,6 +81,7 @@ export class BasicUserDetails {
     public id: number,
     public firstname: string,
     public lastname: string,
+    public preferredname: string,
     public organisation: string,
     public position: string,
     public created: Date,

@@ -1,5 +1,6 @@
 import { container } from 'tsyringe';
 
+import { UserAuthorization } from './auth/UserAuthorization';
 import { BasicResolverContext } from './context';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
@@ -37,7 +38,6 @@ import SystemQueries from './queries/SystemQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
 import VisitQueries from './queries/VisitQueries';
-import { UserAuthorization } from './utils/UserAuthorization';
 
 const context: BasicResolverContext = {
   userAuthorization: container.resolve(UserAuthorization),

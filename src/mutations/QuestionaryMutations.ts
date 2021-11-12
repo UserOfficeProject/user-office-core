@@ -1,6 +1,7 @@
 import { logger } from '@esss-swap/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
+import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
@@ -15,7 +16,6 @@ import { User, UserWithRole } from '../models/User';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
 import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
-import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 
 @injectable()
 export default class QuestionaryMutations {
