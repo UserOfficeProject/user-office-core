@@ -9,6 +9,7 @@
     "faker": "^5.5.3",
     "graphql": "^15.6.1",
     "graphql-request": "^3.6.0",
+    "graphql-tag": "2.12.6",
     "typescript": "^4.4.3"
   },
   "scripts": {
