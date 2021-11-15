@@ -1,5 +1,6 @@
 import 'cypress-file-upload';
 import { GraphQLClient } from 'graphql-request';
+
 import { getSdk } from '../../src/generated/sdk';
 
 const KEY_CODES = {
@@ -38,13 +39,15 @@ const notification = ({
       notificationQuerySelector = '.snackbar-success #notistack-snackbar';
       break;
   }
-  let notification = cy.get(notificationQuerySelector).should('exist');
+  cy.get(notificationQuerySelector).should('exist');
 
   if (text) {
     if (text instanceof RegExp) {
-      notification.and(($el) => expect($el.text()).to.match(text));
+      cy.get(notificationQuerySelector).should(($el) =>
+        expect($el.text()).to.match(text)
+      );
     } else {
-      notification.and('contains.text', text);
+      cy.get(notificationQuerySelector).should('contains.text', text);
     }
   }
 };
@@ -62,7 +65,7 @@ const closeNotification = () => {
 const closeModal = () => {
   cy.get('[role="dialog"] [data-cy="close-modal"]').click();
   // NOTE: Need to wait for modal to close with animation.
-  cy.wait(100);
+  // cy.wait(100);
 
   cy.get('[role="dialog"]').should('not.exist');
 };

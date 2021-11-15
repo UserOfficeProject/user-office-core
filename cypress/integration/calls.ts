@@ -1,8 +1,13 @@
 import faker from 'faker';
-import { AllocationTimeUnits, TemplateGroupId } from '../../src/generated/sdk';
+
+import {
+  AllocationTimeUnits,
+  CreateInstrumentMutationVariables,
+  TemplateGroupId,
+} from '../../src/generated/sdk';
 
 context('Calls tests', () => {
-  let esiTemplateId: number | undefined;
+  let esiTemplateId: number;
   let workflowId: number;
 
   const currentDayStart = new Date();
@@ -41,13 +46,17 @@ context('Calls tests', () => {
     description: faker.random.words(5),
   };
 
-  const instrumentAssignedToCall = {
+  const scientist = {
+    id: 1,
+    name: 'Carl',
+  };
+
+  const instrumentAssignedToCall: CreateInstrumentMutationVariables = {
     name: faker.random.words(2),
     shortCode: faker.random.alphaNumeric(15),
     description: faker.random.words(8),
+    managerUserId: scientist.id,
   };
-
-  const scientist = 'Carl';
 
   beforeEach(() => {
     cy.viewport(1920, 1080);
@@ -56,15 +65,19 @@ context('Calls tests', () => {
       groupId: TemplateGroupId.PROPOSAL_ESI,
       name: 'default esi template',
     }).then((result) => {
-      console.log(result);
-      esiTemplateId = result.createTemplate.template?.templateId;
+      if (result.createTemplate.template) {
+        esiTemplateId = result.createTemplate.template?.templateId;
+      } else {
+        throw new Error('ESI templete creation failed');
+      }
     });
 
-    cy.createProposalWorkflow(
-      proposalWorkflow.name,
-      proposalWorkflow.description
-    ).then((result) => {
-      workflowId = result.data.createProposalWorkflow.proposalWorkflow.id;
+    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+      if (result.createProposalWorkflow.proposalWorkflow) {
+        workflowId = result.createProposalWorkflow.proposalWorkflow?.id;
+      } else {
+        throw new Error('Workflow creation failed');
+      }
     });
   });
 
@@ -316,219 +329,247 @@ context('Calls tests', () => {
     cy.contains(shortCode);
   });
 
-  it('A user-officer should be able to assign instrument/s to a call', () => {
-    cy.login('officer');
-    cy.createCall({
-      ...newCall,
-      esiTemplateId: esiTemplateId,
-      proposalWorkflowId: workflowId,
+  describe('Test', () => {
+    let createdCallId: number;
+    let createdInstrumentId: number;
+
+    beforeEach(() => {
+      cy.login('officer');
+      cy.createCall({
+        ...newCall,
+        esiTemplateId: esiTemplateId,
+        proposalWorkflowId: workflowId,
+      }).then((response) => {
+        if (response.createCall.call) {
+          createdCallId = response.createCall.call.id;
+        }
+      });
+      // TODO: This should't be hardcoded. We should get roles and pick the scientist role id.
+      cy.updateUserRoles({ id: scientist.id, roles: [1, 7] });
+      cy.createInstrument(instrumentAssignedToCall).then((response) => {
+        if (response.createInstrument.instrument) {
+          createdInstrumentId = response.createInstrument.instrument.id;
+        }
+      });
     });
 
-    cy.contains('People').click();
-    cy.addScientistRoleToUser(scientist);
+    it('A user-officer should be able to assign instrument/s to a call', () => {
+      cy.contains('Calls').click();
 
-    cy.createInstrument(instrumentAssignedToCall, scientist);
-    cy.contains('Calls').click();
+      cy.contains(newCall.shortCode)
+        .parent()
+        .find('[title="Assign Instrument"]')
+        .click();
 
-    cy.contains(updatedCall.shortCode)
-      .parent()
-      .find('[title="Assign Instrument"]')
-      .click();
+      cy.contains(instrumentAssignedToCall.shortCode)
+        .parent()
+        .find('[type="checkbox"]')
+        .check();
 
-    cy.contains(instrumentAssignedToCall.shortCode)
-      .parent()
-      .find('[type="checkbox"]')
-      .check();
+      cy.contains('Assign instrument').click();
 
-    cy.contains('Assign instrument').click();
+      cy.notification({ variant: 'success', text: 'successfully' });
 
-    cy.notification({ variant: 'success', text: 'successfully' });
+      cy.contains(newCall.shortCode)
+        .parent()
+        .find('[title="Show Instruments"]')
+        .click();
 
-    cy.contains(updatedCall.shortCode)
-      .parent()
-      .find('[title="Show Instruments"]')
-      .click();
+      cy.get('[data-cy="call-instrument-assignments-table"]').contains(
+        instrumentAssignedToCall.shortCode
+      );
+    });
 
-    cy.get('[data-cy="call-instrument-assignments-table"]').contains(
-      instrumentAssignedToCall.shortCode
-    );
-  });
-
-  it('A user-officer should not be able to set negative availability time on instrument per call', () => {
-    cy.login('officer');
-
-    cy.contains('Calls').click();
-
-    cy.contains(updatedCall.shortCode)
-      .parent()
-      .find('[title="Show Instruments"]')
-      .click();
-
-    cy.get('[data-cy="call-instrument-assignments-table"]')
-      .contains(instrumentAssignedToCall.shortCode)
-      .parent()
-      .find('[title="Edit"]')
-      .click();
-
-    cy.get('[data-cy="availability-time"]').type('-10');
-
-    cy.contains(instrumentAssignedToCall.shortCode)
-      .parent()
-      .find('[title="Save"]')
-      .click();
-
-    cy.notification({ variant: 'error', text: 'must be positive number' });
-  });
-
-  it('A user-officer should be able to set availability time on instrument per call', () => {
-    cy.login('officer');
-
-    cy.contains('Calls').click();
-
-    cy.contains(updatedCall.shortCode)
-      .parent()
-      .find('[title="Show Instruments"]')
-      .click();
-
-    cy.get('[data-cy="call-instrument-assignments-table"]')
-      .contains(instrumentAssignedToCall.shortCode)
-      .parent()
-      .find('[title="Edit"]')
-      .click();
-
-    cy.get('[data-cy="availability-time"]').type('10');
-
-    cy.contains(instrumentAssignedToCall.shortCode)
-      .parent()
-      .find('[title="Save"]')
-      .click();
-
-    cy.notification({ variant: 'success', text: 'successfully' });
-
-    cy.get('[data-cy="call-instrument-assignments-table"]')
-      .find('tbody td')
-      .last()
-      .then((element) => {
-        expect(element.text()).to.be.equal('10');
+    it('A user-officer should not be able to set negative availability time on instrument per call', () => {
+      cy.assignInstrumentToCall({
+        callId: createdCallId,
+        instrumentIds: [createdInstrumentId],
       });
-  });
 
-  it('A user-officer should be able to remove instrument from a call', () => {
-    cy.login('officer');
+      cy.contains('Calls').click();
 
-    cy.contains('Calls').click();
+      cy.contains(newCall.shortCode)
+        .parent()
+        .find('[title="Show Instruments"]')
+        .click();
 
-    cy.contains(updatedCall.shortCode)
-      .parent()
-      .find('[title="Show Instruments"]')
-      .click();
+      cy.get('[data-cy="call-instrument-assignments-table"]')
+        .contains(instrumentAssignedToCall.shortCode)
+        .parent()
+        .find('[title="Edit"]')
+        .click();
 
-    cy.get('[data-cy="call-instrument-assignments-table"]')
-      .contains(instrumentAssignedToCall.shortCode)
-      .parent()
-      .find('[title="Delete"]')
-      .click();
+      cy.get('[data-cy="availability-time"]').type('-10');
 
-    cy.get('[data-cy="call-instrument-assignments-table"] [title="Save"]')
-      .first()
-      .click();
+      cy.contains(instrumentAssignedToCall.shortCode)
+        .parent()
+        .find('[title="Save"]')
+        .click();
 
-    cy.notification({ variant: 'success', text: 'successfully' });
+      cy.notification({ variant: 'error', text: 'must be positive number' });
+    });
 
-    cy.get('[data-cy="call-instrument-assignments-table"]')
-      .find('tbody td')
-      .should('have.length', 1);
-
-    cy.get('[data-cy="call-instrument-assignments-table"]')
-      .find('tbody td')
-      .last()
-      .then((element) => {
-        expect(element.text()).to.be.equal('No records to display');
+    it('A user-officer should be able to set availability time on instrument per call', () => {
+      cy.assignInstrumentToCall({
+        callId: createdCallId,
+        instrumentIds: [createdInstrumentId],
       });
-  });
 
-  it('A user-officer should be able to add proposal workflow to a call', () => {
-    cy.login('officer');
+      cy.contains('Calls').click();
 
-    cy.contains('Settings').click();
+      cy.contains(newCall.shortCode)
+        .parent()
+        .find('[title="Show Instruments"]')
+        .click();
 
-    cy.contains('Calls').click();
+      cy.get('[data-cy="call-instrument-assignments-table"]')
+        .contains(instrumentAssignedToCall.shortCode)
+        .parent()
+        .find('[title="Edit"]')
+        .click();
 
-    cy.contains(updatedCall.shortCode).parent().find('[title="Edit"]').click();
+      cy.get('[data-cy="availability-time"]').type('10');
 
-    cy.get('#proposalWorkflowId-input').click();
+      cy.contains(instrumentAssignedToCall.shortCode)
+        .parent()
+        .find('[title="Save"]')
+        .click();
 
-    cy.contains('Loading...').should('not.exist');
+      cy.notification({ variant: 'success', text: 'successfully' });
 
-    cy.get('[role="presentation"] [role="listbox"] li')
-      .contains(proposalWorkflow.name)
-      .click();
+      cy.get('[data-cy="call-instrument-assignments-table"]')
+        .find('tbody td')
+        .last()
+        .then((element) => {
+          expect(element.text()).to.be.equal('10');
+        });
+    });
 
-    cy.get('[data-cy="next-step"]').click();
+    it('A user-officer should be able to remove instrument from a call', () => {
+      cy.assignInstrumentToCall({
+        callId: createdCallId,
+        instrumentIds: [createdInstrumentId],
+      });
+      cy.contains('Calls').click();
 
-    cy.get('[data-cy="next-step"]').click();
+      cy.contains(newCall.shortCode)
+        .parent()
+        .find('[title="Show Instruments"]')
+        .click();
 
-    cy.get('[data-cy="submit"]').click();
+      cy.get('[data-cy="call-instrument-assignments-table"]')
+        .contains(instrumentAssignedToCall.shortCode)
+        .parent()
+        .find('[title="Delete"]')
+        .click();
 
-    cy.notification({ variant: 'success', text: 'Call updated successfully!' });
+      cy.get('[data-cy="call-instrument-assignments-table"] [title="Save"]')
+        .first()
+        .click();
 
-    cy.contains(updatedCall.shortCode).parent().contains(proposalWorkflow.name);
-  });
+      cy.notification({ variant: 'success', text: 'successfully' });
 
-  it('User officer can filter calls by their status', () => {
-    cy.login('officer');
-    cy.contains('Calls').click();
+      cy.get('[data-cy="call-instrument-assignments-table"]')
+        .find('tbody td')
+        .should('have.length', 1);
 
-    cy.get('[data-cy="call-status-filter"]').click();
-    cy.get('[role="listbox"]').contains('Active').click();
+      cy.get('[data-cy="call-instrument-assignments-table"]')
+        .find('tbody td')
+        .last()
+        .then((element) => {
+          expect(element.text()).to.be.equal('No records to display');
+        });
+    });
 
-    cy.finishedLoading();
+    // TODO: Check if this test is really needed because we set proposal workflow in the call creation already. Maybe we can test changing that on existing call.
+    // it('A user-officer should be able to add proposal workflow to a call', () => {
+    //   cy.login('officer');
 
-    cy.get('[data-cy="calls-table"] [title="Show Instruments"]').should(
-      'have.length',
-      2
-    );
-    cy.contains(updatedCall.shortCode);
+    //   cy.contains('Settings').click();
 
-    cy.get('[data-cy="call-status-filter"]').click();
-    cy.get('[role="listbox"]').contains('Inactive').click();
+    //   cy.contains('Calls').click();
 
-    cy.finishedLoading();
+    //   cy.contains(newCall.shortCode).parent().find('[title="Edit"]').click();
 
-    cy.contains('No records to display');
-    cy.get('[data-cy="calls-table"] [title="Show Instruments"]').should(
-      'have.length',
-      0
-    );
-    cy.contains(updatedCall.shortCode).should('not.exist');
+    //   cy.get('#proposalWorkflowId-input').click();
 
-    cy.get('[data-cy="call-status-filter"]').click();
-    cy.get('[role="listbox"]').contains('All').click();
+    //   cy.contains('Loading...').should('not.exist');
 
-    cy.finishedLoading();
+    //   cy.get('[role="presentation"] [role="listbox"] li')
+    //     .contains(proposalWorkflow.name)
+    //     .click();
 
-    cy.get('[data-cy="calls-table"] [title="Show Instruments"]').should(
-      'have.length',
-      2
-    );
-    cy.contains(updatedCall.shortCode);
-  });
+    //   cy.get('[data-cy="next-step"]').click();
 
-  it('A user-officer should be able to remove a call', () => {
-    cy.login('officer');
+    //   cy.get('[data-cy="next-step"]').click();
 
-    cy.contains('Calls').click();
+    //   cy.get('[data-cy="submit"]').click();
 
-    cy.get('[data-cy="call-status-filter"]').click();
-    cy.get('[role="listbox"]').contains('Active').click();
+    //   cy.notification({
+    //     variant: 'success',
+    //     text: 'Call updated successfully!',
+    //   });
 
-    cy.contains(updatedCall.shortCode)
-      .parent()
-      .find('[title="Delete"]')
-      .click();
+    //   cy.contains(updatedCall.shortCode)
+    //     .parent()
+    //     .contains(proposalWorkflow.name);
+    // });
 
-    cy.get('[title="Save"]').click();
+    it('User officer can filter calls by their status', () => {
+      cy.login('officer');
+      cy.contains('Calls').click();
 
-    cy.notification({ variant: 'success', text: 'Call deleted successfully' });
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Active').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="calls-table"] [title="Show Instruments"]').should(
+        'have.length',
+        2
+      );
+      cy.contains(newCall.shortCode);
+
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Inactive').click();
+
+      cy.finishedLoading();
+
+      cy.contains('No records to display');
+      cy.get('[data-cy="calls-table"] [title="Show Instruments"]').should(
+        'have.length',
+        0
+      );
+      cy.contains(newCall.shortCode).should('not.exist');
+
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="calls-table"] [title="Show Instruments"]').should(
+        'have.length',
+        2
+      );
+      cy.contains(newCall.shortCode);
+    });
+
+    it('A user-officer should be able to remove a call', () => {
+      cy.login('officer');
+
+      cy.contains('Calls').click();
+
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Active').click();
+
+      cy.contains(newCall.shortCode).parent().find('[title="Delete"]').click();
+
+      cy.get('[title="Save"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Call deleted successfully',
+      });
+    });
   });
 });

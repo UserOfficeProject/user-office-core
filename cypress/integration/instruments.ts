@@ -1,6 +1,6 @@
-context('Instrument tests', () => {
-  const faker = require('faker');
+import faker from 'faker';
 
+context('Instrument tests', () => {
   const questionText = faker.lorem.words(3);
 
   const instrument1 = {
@@ -59,9 +59,7 @@ context('Instrument tests', () => {
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
 
-    let userMenuItems = cy.get('[data-cy="user-menu-items"]');
-
-    userMenuItems.should('not.contain', 'Instruments');
+    cy.get('[data-cy="user-menu-items"]').should('not.contain', 'Instruments');
   });
 
   it('User Officer should be able to create Instrument', () => {
@@ -74,7 +72,7 @@ context('Instrument tests', () => {
     cy.addScientistRoleToUser(scientist2);
 
     cy.createInstrument(instrument1, scientist1);
-    cy.wait(100);
+    // cy.wait(100);
     cy.createInstrument(instrument2, scientist2);
   });
 
@@ -97,11 +95,11 @@ context('Instrument tests', () => {
 
     cy.notification({ variant: 'success', text: 'updated successfully' });
 
-    const instrumentsTable = cy.get('[data-cy="instruments-table"]');
+    cy.get('[data-cy="instruments-table"]').as('@instrumentsTable');
 
-    instrumentsTable.should('contain', instrument1.name);
-    instrumentsTable.should('contain', instrument1.shortCode);
-    instrumentsTable.should('contain', instrument1.description);
+    cy.get('@instrumentsTable').should('contain', instrument1.name);
+    cy.get('@instrumentsTable').should('contain', instrument1.shortCode);
+    cy.get('@instrumentsTable').should('contain', instrument1.description);
   });
 
   it('User Officer should be able to assign proposal to existing instrument', () => {
@@ -145,14 +143,14 @@ context('Instrument tests', () => {
 
     cy.assignInstrumentToCall('call 1', instrument1.shortCode);
 
-    cy.wait(100);
+    // cy.wait(100);
 
     cy.assignInstrumentToCall(call2.shortCode, instrument2.shortCode);
 
     cy.contains('Proposals').click();
 
     cy.assignInstrumentToProposal(proposal1.title, instrument1.name);
-    cy.wait(100);
+    // cy.wait(100);
     cy.assignInstrumentToProposal(proposal2.title, instrument2.name);
   });
 
@@ -210,7 +208,7 @@ context('Instrument tests', () => {
     cy.contains('Instruments').click();
 
     cy.assignScientistsToInstrument(instrument1.shortCode);
-    cy.wait(100);
+    // cy.wait(100);
     cy.assignScientistsToInstrument(instrument2.shortCode);
 
     cy.logout();

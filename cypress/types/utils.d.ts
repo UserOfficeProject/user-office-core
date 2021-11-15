@@ -107,7 +107,16 @@ declare global {
   }
 
   interface Window {
-    tinyMCE: any;
+    tinyMCE: {
+      editors: Record<
+        string,
+        {
+          setContent: (content: string) => void;
+          fire: (event: string) => void;
+          getContent: () => string;
+        }
+      >;
+    };
   }
 }
 

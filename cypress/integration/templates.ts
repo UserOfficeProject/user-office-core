@@ -1,9 +1,8 @@
 import faker, { lorem } from 'faker';
 
 context('Template tests', () => {
-
   before(() => {
-   cy.resetDB(true);
+    cy.resetDB(true);
   });
 
   beforeEach(() => {
@@ -22,19 +21,19 @@ context('Template tests', () => {
   const template = {
     title: 'default template', // value pre-configured in DB
     topic: {
-      title: 'Topic title' // // value pre-configured in DB
-    }
-  }
+      title: 'Topic title', // // value pre-configured in DB
+    },
+  };
 
   const proposal = {
     title: faker.lorem.words(3),
-    abstract: faker.lorem.words(8)
-  }
+    abstract: faker.lorem.words(8),
+  };
 
   const booleanQuestion = faker.lorem.words(3);
   const dateQuestion = {
     title: faker.lorem.words(3),
-    tooltip: faker.lorem.words(3)
+    tooltip: faker.lorem.words(3),
   };
   const timeQuestion = faker.lorem.words(3);
   const fileQuestion = faker.lorem.words(3);
@@ -43,35 +42,31 @@ context('Template tests', () => {
   const textQuestion = {
     title: faker.lorem.words(3),
     minChars: 1000,
-    answer:faker.lorem.words(5),
-    newId: faker.lorem.word()
-  }
+    answer: faker.lorem.words(5),
+    newId: faker.lorem.word(),
+  };
   const richTextInputQuestion = {
     title: faker.lorem.words(3),
     maxChars: 200,
-    answer: faker.lorem.words(3)
+    answer: faker.lorem.words(3),
   };
   const multipleChoiceQuestion = {
-    title:lorem.words(2),
-    answers:  [
-      faker.lorem.words(3),
-      faker.lorem.words(3),
-      faker.lorem.words(3),
-    ]
+    title: lorem.words(2),
+    answers: [faker.lorem.words(3), faker.lorem.words(3), faker.lorem.words(3)],
   };
 
-  const numberQuestion2 = {title: faker.lorem.words(3)}
-  const numberQuestion3 = {title: faker.lorem.words(3)}
+  const numberQuestion2 = { title: faker.lorem.words(3) };
+  const numberQuestion3 = { title: faker.lorem.words(3) };
 
   const templateSearch = {
     title: faker.lorem.words(3),
-    description: faker.lorem.words(3)
-  }
+    description: faker.lorem.words(3),
+  };
 
   const templateCircDep = {
     title: faker.lorem.words(3),
-    description: faker.lorem.words(3)
-  }
+    description: faker.lorem.words(3),
+  };
 
   const templateDependencies = {
     title: faker.lorem.words(3),
@@ -83,30 +78,25 @@ context('Template tests', () => {
         answer2: faker.lorem.words(3),
       },
       booleanQuestion: {
-        title: faker.lorem.words(3)
+        title: faker.lorem.words(3),
       },
       textQuestion: {
-        title: faker.lorem.words(3)
-      }
-    }
-  }
+        title: faker.lorem.words(3),
+      },
+    },
+  };
 
   const proposalWorkflow = {
     name: faker.random.words(3),
     description: faker.random.words(5),
   };
 
-
   it('User officer can modify proposal template', () => {
     cy.login('officer');
 
     cy.navigateToTemplatesSubmenu('Proposal');
 
-    cy.contains(template.title)
-      .parent()
-      .find("[title='Edit']")
-      .first()
-      .click();
+    cy.contains(template.title).parent().find("[title='Edit']").first().click();
 
     /* Boolean */
 
@@ -178,7 +168,7 @@ context('Template tests', () => {
 
     cy.contains('Save').click();
 
-    cy.wait(500);
+    // cy.wait(500);
 
     cy.contains(textQuestion.newId);
     /* --- */
@@ -202,8 +192,7 @@ context('Template tests', () => {
     // Check reordering
     cy.contains(textQuestion.title)
       .parent()
-      .dragElement([{ direction: 'up', length: 1 }])
-      .wait(500); // Move item to top, in case it isn't
+      .dragElement([{ direction: 'up', length: 1 }]); // Move item to top, in case it isn't
 
     cy.contains(template.topic.title)
       .closest('[data-rbd-draggable-context-id]') // new topic column
@@ -213,8 +202,7 @@ context('Template tests', () => {
 
     cy.contains(textQuestion.title)
       .parent()
-      .dragElement([{ direction: 'down', length: 1 }])
-      .wait(500);
+      .dragElement([{ direction: 'down', length: 1 }]);
 
     cy.contains(template.topic.title)
       .closest('[data-rbd-draggable-context-id]') // new topic column
@@ -227,7 +215,7 @@ context('Template tests', () => {
       option1: multipleChoiceQuestion.answers[0],
       option2: multipleChoiceQuestion.answers[1],
       option3: multipleChoiceQuestion.answers[2],
-      isMultipleSelect: true
+      isMultipleSelect: true,
     });
 
     cy.contains(multipleChoiceQuestion.title)
@@ -244,13 +232,22 @@ context('Template tests', () => {
 
     cy.get('[data-cy=natural-key]').click();
 
-    cy.get('[index=0]').should('not.contain', multipleChoiceQuestion.answers[1]);
+    cy.get('[index=0]').should(
+      'not.contain',
+      multipleChoiceQuestion.answers[1]
+    );
 
-    cy.contains(multipleChoiceQuestion.answers[1]).parent().find('[title=Up]').click();
+    cy.contains(multipleChoiceQuestion.answers[1])
+      .parent()
+      .find('[title=Up]')
+      .click();
 
     cy.get('[index=0]').contains(multipleChoiceQuestion.answers[1]);
 
-    cy.contains(multipleChoiceQuestion.answers[1]).parent().find('[title=Down]').click();
+    cy.contains(multipleChoiceQuestion.answers[1])
+      .parent()
+      .find('[title=Down]')
+      .click();
 
     cy.contains('Save').click();
 
@@ -318,7 +315,10 @@ context('Template tests', () => {
     cy.reload();
 
     cy.contains(dateQuestion.title).click();
-    cy.get("[data-cy='tooltip'] input").should('have.value', dateQuestion.tooltip);
+    cy.get("[data-cy='tooltip'] input").should(
+      'have.value',
+      dateQuestion.tooltip
+    );
     cy.get('body').type('{esc}');
     /* --- */
 
@@ -379,7 +379,9 @@ context('Template tests', () => {
     // Date
     cy.get('[data-cy=data-type]').click();
     cy.get('[role=listbox]').contains('Date').click();
-    cy.get('[data-cy=question-list]').contains(dateQuestion.title).should('exist');
+    cy.get('[data-cy=question-list]')
+      .contains(dateQuestion.title)
+      .should('exist');
     cy.get('[data-cy=question-list]')
       .contains(textQuestion.title)
       .should('not.exist');
@@ -387,11 +389,17 @@ context('Template tests', () => {
     // All question types
     cy.get('[data-cy=data-type]').click();
     cy.get('[role=listbox]').contains('All').click();
-    cy.get('[data-cy=question-list]').contains(dateQuestion.title).should('exist');
-    cy.get('[data-cy=question-list]').contains(textQuestion.title).should('exist');
+    cy.get('[data-cy=question-list]')
+      .contains(dateQuestion.title)
+      .should('exist');
+    cy.get('[data-cy=question-list]')
+      .contains(textQuestion.title)
+      .should('exist');
 
     // filter with no results
-    cy.get('[data-cy=search-text] input').clear().type('string match no results');
+    cy.get('[data-cy=search-text] input')
+      .clear()
+      .type('string match no results');
     cy.get('[data-cy=question-list] div').should('have.length', 0);
 
     // closing resets the filter
@@ -495,11 +503,11 @@ context('Template tests', () => {
     cy.contains(multipleChoiceQuestion.answers[2]).click();
     cy.get('body').type('{esc}');
 
-
-
     cy.window().then((win) => {
       return new Cypress.Promise((resolve) => {
-        win.tinyMCE.editors[richTextInputId].setContent(richTextInputQuestion.answer);
+        win.tinyMCE.editors[richTextInputId].setContent(
+          richTextInputQuestion.answer
+        );
         win.tinyMCE.editors[richTextInputId].fire('blur');
 
         resolve();
@@ -543,17 +551,13 @@ context('Template tests', () => {
   });
 
   it('should render the Date field with default value and min max values when set', () => {
-    let dateFieldId: any;
+    let dateFieldId: string;
 
     cy.login('officer');
 
     cy.navigateToTemplatesSubmenu('Proposal');
 
-    cy.contains(template.title)
-      .parent()
-      .find("[title='Edit']")
-      .first()
-      .click();
+    cy.contains(template.title).parent().find("[title='Edit']").first().click();
 
     cy.get('[data-cy=show-more-button]').first().click();
 
@@ -573,7 +577,7 @@ context('Template tests', () => {
 
     cy.contains('Save').click();
 
-    cy.wait(1000);
+    // cy.wait(1000);
 
     cy.contains(dateQuestion.title)
       .closest('[data-cy=question-container]')
@@ -628,19 +632,14 @@ context('Template tests', () => {
   });
 
   it('should render the Number field accepting only positive, negative numbers if set', () => {
-    let numberField1Id: any;
-    let numberField2Id: any;
-
+    let numberField1Id: string;
+    let numberField2Id: string;
 
     cy.login('officer');
 
     cy.navigateToTemplatesSubmenu('Proposal');
 
-    cy.contains(template.title)
-      .parent()
-      .find("[title='Edit']")
-      .first()
-      .click();
+    cy.contains(template.title).parent().find("[title='Edit']").first().click();
 
     cy.get('[data-cy=show-more-button]').first().click();
 
@@ -762,11 +761,7 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal');
 
-    cy.contains(template.title)
-      .parent()
-      .find("[title='Edit']")
-      .first()
-      .click();
+    cy.contains(template.title).parent().find("[title='Edit']").first().click();
 
     cy.contains(fileQuestion).click();
 
@@ -808,8 +803,6 @@ context('Template tests', () => {
     });
   });
 
-
-
   it('Officer can delete proposal', () => {
     cy.login('officer');
 
@@ -824,11 +817,7 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal');
 
-    cy.contains(template.title)
-      .parent()
-      .find("[title='Edit']")
-      .first()
-      .click();
+    cy.contains(template.title).parent().find("[title='Edit']").first().click();
 
     cy.contains(textQuestion.title).click();
     cy.get("[data-cy='remove-from-template']").click();
@@ -851,12 +840,23 @@ context('Template tests', () => {
       proposalWorkflow.description
     );
 
-    cy.createTemplate('proposal', templateDependencies.title, templateDependencies.description);
+    cy.createTemplate(
+      'proposal',
+      templateDependencies.title,
+      templateDependencies.description
+    );
 
-    cy.createMultipleChoiceQuestion(templateDependencies.questions.selectQuestion.title, 
-    {option1:templateDependencies.questions.selectQuestion.answer1, option2:templateDependencies.questions.selectQuestion.answer2});
+    cy.createMultipleChoiceQuestion(
+      templateDependencies.questions.selectQuestion.title,
+      {
+        option1: templateDependencies.questions.selectQuestion.answer1,
+        option2: templateDependencies.questions.selectQuestion.answer2,
+      }
+    );
 
-    cy.createBooleanQuestion(templateDependencies.questions.booleanQuestion.title)
+    cy.createBooleanQuestion(
+      templateDependencies.questions.booleanQuestion.title
+    );
 
     cy.contains(templateDependencies.questions.booleanQuestion.title).click();
 
@@ -864,14 +864,15 @@ context('Template tests', () => {
 
     cy.get('[id="dependency-id"]').click();
 
-    cy.get('[role="presentation"]').contains(templateDependencies.questions.selectQuestion.title).click();
+    cy.get('[role="presentation"]')
+      .contains(templateDependencies.questions.selectQuestion.title)
+      .click();
 
     cy.get('[id="dependencyValue"]').click();
 
     cy.contains(templateDependencies.questions.selectQuestion.answer1).click();
 
     cy.get('[data-cy="submit"]').click();
-
 
     cy.contains('Calls').click();
     cy.get('[title="Edit"]').first().click();
@@ -901,20 +902,32 @@ context('Template tests', () => {
     cy.contains('New Proposal').click();
 
     // Dependee is NOT visible
-    cy.get('main form').should('not.contain.text', templateDependencies.questions.booleanQuestion.title);
+    cy.get('main form').should(
+      'not.contain.text',
+      templateDependencies.questions.booleanQuestion.title
+    );
 
-    cy.contains(templateDependencies.questions.selectQuestion.title).parent().click();
+    cy.contains(templateDependencies.questions.selectQuestion.title)
+      .parent()
+      .click();
     cy.contains(templateDependencies.questions.selectQuestion.answer1).click();
-    
-    // Dependee is visible
-    cy.get('main form').should('contain.text', templateDependencies.questions.booleanQuestion.title);
 
-    cy.contains(templateDependencies.questions.selectQuestion.title).parent().click();
+    // Dependee is visible
+    cy.get('main form').should(
+      'contain.text',
+      templateDependencies.questions.booleanQuestion.title
+    );
+
+    cy.contains(templateDependencies.questions.selectQuestion.title)
+      .parent()
+      .click();
     cy.contains(templateDependencies.questions.selectQuestion.answer2).click();
 
     // Dependee is NOT visible again
-    cy.get('main form').should('not.contain.text', templateDependencies.questions.booleanQuestion.title);
-
+    cy.get('main form').should(
+      'not.contain.text',
+      templateDependencies.questions.booleanQuestion.title
+    );
   });
 
   it('User officer can add multiple dependencies on a question', () => {
@@ -923,11 +936,11 @@ context('Template tests', () => {
     cy.navigateToTemplatesSubmenu('Proposal');
 
     cy.contains(templateDependencies.title)
-    .parent()
-    .find("[title='Edit']")
-    .click();
+      .parent()
+      .find("[title='Edit']")
+      .click();
 
-    cy.createTextQuestion(templateDependencies.questions.textQuestion.title)
+    cy.createTextQuestion(templateDependencies.questions.textQuestion.title);
 
     cy.contains(templateDependencies.questions.textQuestion.title).click();
 
@@ -935,7 +948,9 @@ context('Template tests', () => {
 
     cy.get('[id="dependency-id"]').click();
 
-    cy.get('[role="presentation"]').contains(templateDependencies.questions.selectQuestion.title).click();
+    cy.get('[role="presentation"]')
+      .contains(templateDependencies.questions.selectQuestion.title)
+      .click();
 
     cy.get('[id="dependencyValue"]').click();
 
@@ -945,7 +960,9 @@ context('Template tests', () => {
 
     cy.get('[id="dependency-id"]').last().click();
 
-    cy.get('[role="presentation"]').contains(templateDependencies.questions.booleanQuestion.title).click();
+    cy.get('[role="presentation"]')
+      .contains(templateDependencies.questions.booleanQuestion.title)
+      .click();
 
     cy.get('[id="dependencyValue"]').last().click();
 
@@ -960,17 +977,25 @@ context('Template tests', () => {
     cy.contains('New Proposal').click();
 
     // Both questions hidden
-    cy.get('main form').should('not.contain.text', templateDependencies.questions.booleanQuestion.title);
+    cy.get('main form').should(
+      'not.contain.text',
+      templateDependencies.questions.booleanQuestion.title
+    );
     cy.get('main form').should(
       'not.contain.text',
       templateDependencies.questions.textQuestion.title
     );
 
-    cy.contains(templateDependencies.questions.selectQuestion.title).parent().click();
+    cy.contains(templateDependencies.questions.selectQuestion.title)
+      .parent()
+      .click();
     cy.contains(templateDependencies.questions.selectQuestion.answer1).click();
 
     // One question visible, other is not
-    cy.get('main form').should('contain.text', templateDependencies.questions.booleanQuestion.title);
+    cy.get('main form').should(
+      'contain.text',
+      templateDependencies.questions.booleanQuestion.title
+    );
     cy.get('main form').should(
       'not.contain.text',
       templateDependencies.questions.textQuestion.title
@@ -984,11 +1009,16 @@ context('Template tests', () => {
       templateDependencies.questions.textQuestion.title
     );
 
-    cy.contains(templateDependencies.questions.selectQuestion.title).parent().click();
+    cy.contains(templateDependencies.questions.selectQuestion.title)
+      .parent()
+      .click();
     cy.contains(templateDependencies.questions.selectQuestion.answer2).click();
 
     // No question is visible if answer 2 is selected
-    cy.get('main form').should('not.contain.text', templateDependencies.questions.booleanQuestion.title);
+    cy.get('main form').should(
+      'not.contain.text',
+      templateDependencies.questions.booleanQuestion.title
+    );
     cy.get('main form').should(
       'not.contain.text',
       templateDependencies.questions.textQuestion.title
@@ -1022,13 +1052,18 @@ context('Template tests', () => {
 
     cy.contains(templateDependencies.questions.selectQuestion.title);
 
-    cy.get('main form').should('not.contain.text', templateDependencies.questions.booleanQuestion.title);
+    cy.get('main form').should(
+      'not.contain.text',
+      templateDependencies.questions.booleanQuestion.title
+    );
     cy.get('main form').should(
       'not.contain.text',
       templateDependencies.questions.textQuestion.title
     );
 
-    cy.contains(templateDependencies.questions.selectQuestion.title).parent().click();
+    cy.contains(templateDependencies.questions.selectQuestion.title)
+      .parent()
+      .click();
     cy.contains(templateDependencies.questions.selectQuestion.answer1).click();
     cy.contains(templateDependencies.questions.booleanQuestion.title);
     cy.get('main form').should(
@@ -1045,9 +1080,14 @@ context('Template tests', () => {
       'not.contain.text',
       templateDependencies.questions.textQuestion.title
     );
-    cy.contains(templateDependencies.questions.selectQuestion.title).parent().click();
+    cy.contains(templateDependencies.questions.selectQuestion.title)
+      .parent()
+      .click();
     cy.contains(templateDependencies.questions.selectQuestion.answer2).click();
-    cy.get('main form').should('not.contain.text', templateDependencies.questions.booleanQuestion.title);
+    cy.get('main form').should(
+      'not.contain.text',
+      templateDependencies.questions.booleanQuestion.title
+    );
     cy.get('main form').should(
       'contain.text',
       templateDependencies.questions.textQuestion.title
@@ -1064,12 +1104,18 @@ context('Template tests', () => {
       .find("[title='Edit']")
       .first()
       .click();
-    
-      cy.contains(templateDependencies.questions.booleanQuestion.title).closest('[data-cy=question-container]').find('[data-cy=dependency-list]').should('exist');
-      cy.contains(templateDependencies.questions.selectQuestion.title).click();
-      cy.get('[data-cy=remove-from-template]').click()
-      cy.contains(templateDependencies.questions.booleanQuestion.title).closest('[data-cy=question-container]').find('[data-cy=dependency-list]').should('not.exist');
-  })
+
+    cy.contains(templateDependencies.questions.booleanQuestion.title)
+      .closest('[data-cy=question-container]')
+      .find('[data-cy=dependency-list]')
+      .should('exist');
+    cy.contains(templateDependencies.questions.selectQuestion.title).click();
+    cy.get('[data-cy=remove-from-template]').click();
+    cy.contains(templateDependencies.questions.booleanQuestion.title)
+      .closest('[data-cy=question-container]')
+      .find('[data-cy=dependency-list]')
+      .should('not.exist');
+  });
 
   it('User can add captions after uploading image/* file', () => {
     cy.login('officer');
@@ -1151,7 +1197,6 @@ context('Template tests', () => {
     cy.login('officer');
 
     cy.navigateToTemplatesSubmenu('Proposal');
-
 
     cy.get('[data-cy="create-new-button"]').click();
     cy.get('[data-cy="name"]').type(templateCircDep.title);

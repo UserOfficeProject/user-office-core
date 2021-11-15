@@ -1,6 +1,7 @@
 import {
   AddStatusChangingEventsToConnectionMutationVariables,
   CreateProposalWorkflowMutationVariables,
+  CreateProposalWorkflowMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -16,7 +17,7 @@ declare global {
        */
       createProposalWorkflow: (
         createProposalWorkflowInput: CreateProposalWorkflowMutationVariables
-      ) => Promise<any>;
+      ) => Promise<CreateProposalWorkflowMutation>;
 
       /**
        * Adds status changing event/s to status. When those event/s are fired the the status will be changed to statusCode you pass.

@@ -64,7 +64,7 @@ function createQuestion(createQuestionInput: CreateQuestionMutationVariables) {
   cy.wrap(request);
 }
 
-function createBooleanQuestion(question: any) {
+function createBooleanQuestion(question: string) {
   openQuestionsMenu();
 
   cy.contains('Add Boolean').click();
@@ -82,7 +82,14 @@ function createBooleanQuestion(question: any) {
   closeQuestionsMenu();
 }
 
-function createTextQuestion(question: any, options: any) {
+function createTextQuestion(
+  question: string,
+  options: {
+    isRequired?: boolean;
+    isMultipleLines?: boolean;
+    minimumCharacters?: number;
+  }
+) {
   openQuestionsMenu();
 
   cy.contains('Add Text Input').click();
@@ -105,15 +112,20 @@ function createTextQuestion(question: any, options: any) {
 
   cy.contains(question)
     .parent()
-    .dragElement([{ direction: 'left', length: 1 }])
-    .wait(500);
+    .dragElement([{ direction: 'left', length: 1 }]);
 
   cy.finishedLoading();
 
   closeQuestionsMenu();
 }
 
-function createDateQuestion(question: any, options: any) {
+function createDateQuestion(
+  question: string,
+  options: {
+    includeTime?: boolean;
+    isRequired?: boolean;
+  }
+) {
   openQuestionsMenu();
 
   cy.contains('Add Date').click();
@@ -139,7 +151,16 @@ function createDateQuestion(question: any, options: any) {
   closeQuestionsMenu();
 }
 
-function createMultipleChoiceQuestion(question: any, options: any) {
+function createMultipleChoiceQuestion(
+  question: string,
+  options: {
+    option1?: string;
+    option2?: string;
+    option3?: string;
+    isMultipleSelect?: boolean;
+    type?: 'radio' | 'dropdown';
+  }
+) {
   openQuestionsMenu();
 
   cy.contains('Add Multiple choice').click();
@@ -187,7 +208,7 @@ function createMultipleChoiceQuestion(question: any, options: any) {
   closeQuestionsMenu();
 }
 
-function createFileUploadQuestion(question: any) {
+function createFileUploadQuestion(question: string) {
   openQuestionsMenu();
 
   cy.contains('Add File Upload').click();
@@ -205,16 +226,19 @@ function createFileUploadQuestion(question: any) {
   closeQuestionsMenu();
 }
 
-function createNumberInputQuestion(question: any, options: any) {
+function createNumberInputQuestion(
+  question: string,
+  options?: { units?: string[] }
+) {
   openQuestionsMenu();
 
   cy.contains('Add Number').click();
 
   cy.get('[data-cy=question]').clear().type(question);
 
-  if (options?.units?.length > 0) {
+  if (options?.units && options.units.length > 0) {
     cy.get('[data-cy=units]>[role=button]').click({ force: true });
-    for (let unit of options.units) {
+    for (const unit of options.units) {
       cy.contains(unit).click();
     }
     cy.get('body').type('{esc}');
@@ -231,16 +255,19 @@ function createNumberInputQuestion(question: any, options: any) {
   closeQuestionsMenu();
 }
 
-function createIntervalQuestion(question: any, options: any) {
+function createIntervalQuestion(
+  question: string,
+  options?: { units?: string[] }
+) {
   openQuestionsMenu();
 
   cy.contains('Add Interval').click();
 
   cy.get('[data-cy=question]').clear().type(question);
 
-  if (options?.units?.length > 0) {
+  if (options?.units && options.units.length > 0) {
     cy.get('[data-cy=units]>[role=button]').click({ force: true });
-    for (let unit of options.units) {
+    for (const unit of options.units) {
       cy.contains(unit).click();
     }
     cy.get('body').type('{esc}');
@@ -258,9 +285,9 @@ function createIntervalQuestion(question: any, options: any) {
 }
 
 const createSampleQuestion = (
-  question: any,
-  templateName: any,
-  options: any
+  question: string,
+  templateName: string,
+  options?: { minEntries?: number; maxEntries?: number }
 ) => {
   openQuestionsMenu();
 
@@ -299,10 +326,10 @@ const createSampleQuestion = (
 };
 
 const createGenericTemplateQuestion = (
-  question: any,
-  templateName: any,
-  addButtonLabel: any,
-  options: any
+  question: string,
+  templateName: string,
+  addButtonLabel: string,
+  options?: { minEntries?: number; maxEntries?: number }
 ) => {
   openQuestionsMenu();
 
@@ -344,7 +371,10 @@ const createGenericTemplateQuestion = (
   closeQuestionsMenu();
 };
 
-const createRichTextInput = (question: any, options: any) => {
+const createRichTextInput = (
+  question: string,
+  options?: { maxChars?: number }
+) => {
   openQuestionsMenu();
 
   cy.contains('Add Rich Text Input').click();

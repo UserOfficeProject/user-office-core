@@ -1,4 +1,3 @@
-import { GraphQLClient } from 'graphql-request';
 import { getE2EApi } from './utils';
 
 const resetDB = (includeSeeds = false) => {

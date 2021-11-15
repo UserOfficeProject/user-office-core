@@ -4,6 +4,7 @@ import {
   AssignProposalsToInstrumentMutationVariables,
   AssignInstrumentsToCallMutationVariables,
   UpdateTechnicalReviewAssigneeMutationVariables,
+  CreateInstrumentMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -24,7 +25,7 @@ declare global {
        */
       createInstrument: (
         createInstrumentInput: CreateInstrumentMutationVariables
-      ) => void;
+      ) => Promise<CreateInstrumentMutation>;
 
       /**
        * Assigns available scientist/s to an instrument

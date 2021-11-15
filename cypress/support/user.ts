@@ -1,4 +1,5 @@
 import { decode } from 'jsonwebtoken';
+
 import {
   Role,
   SelectRoleMutationVariables,
