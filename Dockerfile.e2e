@@ -9,8 +9,8 @@ COPY cypress/tsconfig.json .
 # force re-build 4
 RUN npm ci --silent
 
-COPY cypress ./cypress
-COPY src/generated ./src/generated
+COPY cypress ./cypress/
+COPY src/generated ./src/generated/
 
 COPY cypress/wait-for-frontend.sh /
 
