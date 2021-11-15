@@ -32,7 +32,7 @@ function useDataApiWithFeedback() {
                 if (reason === 'EXTERNAL_TOKEN_INVALID') {
                   handleLogout();
                   reason =
-                    'You have been logged out redirecting to external homepage';
+                    'Your session has expired, you will need to log in again through the external homepage';
                 }
                 enqueueSnackbar(reason, {
                   variant: 'error',

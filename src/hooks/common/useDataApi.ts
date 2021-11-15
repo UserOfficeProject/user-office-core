@@ -117,7 +117,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
       ) {
         notificationWithClientLog(
           this.enqueueSnackbar,
-          'You have been logged out redirecting to external homepage'
+          'Your session has expired, you will need to log in again through the external homepage'
         );
 
         this.error && this.error(error);
