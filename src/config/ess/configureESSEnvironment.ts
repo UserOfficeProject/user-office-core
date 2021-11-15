@@ -7,14 +7,14 @@ import { Tokens } from '../Tokens';
 
 async function setEssColourTheme() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_DARK, '#B33739');
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_MAIN, '#FF4E50');
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_ACCENT, '#0000008A');
-  await db.updateSettings(SettingsId.PALETTE_PRIMARY_LIGHT, '#FC913A');
+  await db.updateSettings(SettingsId.PALETTE_PRIMARY_DARK, '#519548');
+  await db.updateSettings(SettingsId.PALETTE_PRIMARY_MAIN, '#519548');
+  await db.updateSettings(SettingsId.PALETTE_PRIMARY_LIGHT, '#BEF202');
+  await db.updateSettings(SettingsId.PALETTE_PRIMARY_ACCENT, '#000000');
   await db.updateSettings(SettingsId.PALETTE_PRIMARY_CONTRAST, '#ffffff');
-  await db.updateSettings(SettingsId.PALETTE_SECONDARY_DARK, '#B33739');
-  await db.updateSettings(SettingsId.PALETTE_SECONDARY_MAIN, '#FF4E50');
-  await db.updateSettings(SettingsId.PALETTE_SECONDARY_LIGHT, '#E1F5C4');
+  await db.updateSettings(SettingsId.PALETTE_SECONDARY_DARK, '#1B676B');
+  await db.updateSettings(SettingsId.PALETTE_SECONDARY_MAIN, '#1B676B');
+  await db.updateSettings(SettingsId.PALETTE_SECONDARY_LIGHT, '#1B676B');
   await db.updateSettings(SettingsId.PALETTE_SECONDARY_CONTRAST, '#ffffff');
   await db.updateSettings(SettingsId.PALETTE_ERROR_MAIN, '#f44336');
   await db.updateSettings(SettingsId.PALETTE_SUCCESS_MAIN, '#4caf50');
