@@ -1,11 +1,25 @@
 import {
   CreateTemplateMutationVariables,
   CreateTemplateMutation,
+  CreateTopicMutationVariables,
+  CreateQuestionMutationVariables,
 } from '../../src/generated/sdk';
 
 declare global {
   namespace Cypress {
     interface Chainable {
+      /**
+       * Creates question
+       *
+       * @returns {typeof createQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createQuestion(createQuestionInput: CreateQuestionMutationVariables)
+       */
+      createQuestion: (
+        createQuestionInput: CreateQuestionMutationVariables
+      ) => void;
+
       /**
        * Creates boolean question. You have to be in edit template view to call this method
        *
@@ -177,9 +191,9 @@ declare global {
        * @returns {typeof createTopic}
        * @memberof Chainable
        * @example
-       *    cy.createTopic('New topic')
+       *    cy.createTopic(createTopicInput: CreateTopicMutationVariables)
        */
-      createTopic: (topic: string) => void;
+      createTopic: (createTopicInput: CreateTopicMutationVariables) => void;
     }
   }
 }

@@ -1,3 +1,8 @@
+import {
+  AddStatusChangingEventsToConnectionMutationVariables,
+  CreateProposalWorkflowMutationVariables,
+} from '../../src/generated/sdk';
+
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -10,21 +15,19 @@ declare global {
        *    cy.createProposalWorkflow('Workflow name', 'Workflow description')
        */
       createProposalWorkflow: (
-        workflowName: string,
-        workflowDescription: string
+        createProposalWorkflowInput: CreateProposalWorkflowMutationVariables
       ) => Promise<any>;
 
       /**
        * Adds status changing event/s to status. When those event/s are fired the the status will be changed to statusCode you pass.
        *
-       * @returns {typeof addProposalStatusChangingEventToStatus}
+       * @returns {typeof addStatusChangingEventsToConnection}
        * @memberof Chainable
        * @example
-       *    cy.addProposalStatusChangingEventToStatus('FEASIBILITY_REVIEW', ['PROPOSAL_SUBMITTED'])
+       *    cy.addStatusChangingEventsToConnection('FEASIBILITY_REVIEW', ['PROPOSAL_SUBMITTED'])
        */
-      addProposalStatusChangingEventToStatus: (
-        statusCode: string,
-        statusChangingEvents: string[]
+      addStatusChangingEventsToConnection: (
+        addStatusChangingEventsToConnectionInput: AddStatusChangingEventsToConnectionMutationVariables
       ) => void;
     }
   }

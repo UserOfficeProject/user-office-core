@@ -4173,6 +4173,33 @@ export type GetUnitsQuery = (
   )>> }
 );
 
+export type PrepareDbMutationVariables = Exact<{
+  includeSeeds: Scalars['Boolean'];
+}>;
+
+
+export type PrepareDbMutation = (
+  { __typename?: 'Mutation' }
+  & { prepareDB: (
+    { __typename?: 'PrepareDBResponseWrap' }
+    & Pick<PrepareDbResponseWrap, 'log'>
+    & { rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type PrepareSchedulerDbMutationVariables = Exact<{
+  includeSeeds: Scalars['Boolean'];
+}>;
+
+
+export type PrepareSchedulerDbMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'resetSchedulerDb'>
+);
+
 export type RejectionFragment = (
   { __typename?: 'Rejection' }
   & Pick<Rejection, 'reason' | 'context' | 'exception'>
@@ -9137,6 +9164,21 @@ export const GetUnitsDocument = gql`
   }
 }
     `;
+export const PrepareDbDocument = gql`
+    mutation prepareDB($includeSeeds: Boolean!) {
+  prepareDB(includeSeeds: $includeSeeds) {
+    log
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${RejectionFragmentDoc}`;
+export const PrepareSchedulerDbDocument = gql`
+    mutation prepareSchedulerDB($includeSeeds: Boolean!) {
+  resetSchedulerDb(includeSeeds: $includeSeeds)
+}
+    `;
 export const SetPageContentDocument = gql`
     mutation setPageContent($id: PageName!, $text: String!) {
   setPageContent(id: $id, text: $text) {
@@ -11901,6 +11943,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getUnits(variables?: GetUnitsQueryVariables): Promise<GetUnitsQuery> {
       return withWrapper(() => client.request<GetUnitsQuery>(print(GetUnitsDocument), variables));
+    },
+    prepareDB(variables: PrepareDbMutationVariables): Promise<PrepareDbMutation> {
+      return withWrapper(() => client.request<PrepareDbMutation>(print(PrepareDbDocument), variables));
+    },
+    prepareSchedulerDB(variables: PrepareSchedulerDbMutationVariables): Promise<PrepareSchedulerDbMutation> {
+      return withWrapper(() => client.request<PrepareSchedulerDbMutation>(print(PrepareSchedulerDbDocument), variables));
     },
     setPageContent(variables: SetPageContentMutationVariables): Promise<SetPageContentMutation> {
       return withWrapper(() => client.request<SetPageContentMutation>(print(SetPageContentDocument), variables));

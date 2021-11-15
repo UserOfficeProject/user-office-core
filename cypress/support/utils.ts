@@ -20,7 +20,13 @@ export const getE2EApi = () => {
   );
 };
 
-const notification = ({ variant, text }: any) => {
+const notification = ({
+  variant,
+  text,
+}: {
+  variant: 'success' | 'error' | 'info';
+  text: string | RegExp;
+}) => {
   let notificationQuerySelector = '';
 
   switch (variant) {
@@ -96,34 +102,31 @@ function presentationMode() {
   }
 }
 
-const dragElement = (element: any, moveArgs: any) => {
-  const focusedElement = cy.get(element);
-
+const dragElement = (
+  element: JQuery<HTMLElement>,
+  moveArgs: {
+    direction: 'left' | 'up' | 'right' | 'down';
+    length: number;
+  }[]
+) => {
+  const focusedElement = element;
   focusedElement.trigger('keydown', { keyCode: KEY_CODES.space });
 
-  moveArgs.forEach(
-    ({
-      direction,
-      length,
-    }: {
-      direction: 'left' | 'up' | 'right' | 'down';
-      length: number;
-    }) => {
-      for (let i = 1; i <= length; i++) {
-        focusedElement.trigger('keydown', {
-          keyCode: KEY_CODES[direction] as any,
-          force: true,
-        });
-      }
+  moveArgs.forEach(({ direction, length }) => {
+    for (let i = 1; i <= length; i++) {
+      focusedElement.trigger('keydown', {
+        keyCode: KEY_CODES[direction],
+        force: true,
+      });
     }
-  );
+  });
 
   focusedElement.trigger('keydown', { keyCode: KEY_CODES.space, force: true });
 
   return element;
 };
 
-const setTinyMceContent = (tinyMceId: any, content: any) => {
+const setTinyMceContent = (tinyMceId: string, content: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
 
   cy.window().then((win) => {
@@ -132,7 +135,7 @@ const setTinyMceContent = (tinyMceId: any, content: any) => {
   });
 };
 
-const getTinyMceContent = (tinyMceId: any) => {
+const getTinyMceContent = (tinyMceId: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
 
   cy.window().then((win) => {
@@ -142,7 +145,10 @@ const getTinyMceContent = (tinyMceId: any) => {
   });
 };
 
-const testActionButton = (title: any, state: any) => {
+const testActionButton = (
+  title: string,
+  state: 'completed' | 'active' | 'inactive' | 'neutral' | 'invisible'
+) => {
   switch (state) {
     case 'completed':
       cy.get(`[title="${title}"]`).should('not.be.disabled');

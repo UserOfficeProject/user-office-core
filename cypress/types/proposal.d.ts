@@ -1,3 +1,10 @@
+import {
+  CreateProposalMutationVariables,
+  UpdateProposalMutationVariables,
+  ChangeProposalsStatusInput,
+  AdministrationProposalMutationVariables,
+} from '../../src/generated/sdk';
+
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -7,13 +14,22 @@ declare global {
        * @returns {typeof createProposal}
        * @memberof Chainable
        * @example
-       *    cy.createProposal('Proposal title', 'Proposal abstract')
+       *    cy.createProposal(createProposalInput: CreateProposalMutationVariables)
        */
       createProposal: (
-        proposalTitle?: string,
-        proposalAbstract?: string,
-        call?: string,
-        proposer?: string
+        createProposalInput: CreateProposalMutationVariables
+      ) => void;
+
+      /**
+       * Updates proposal
+       *
+       * @returns {typeof updateProposal}
+       * @memberof Chainable
+       * @example
+       *    cy.updateProposal(updateProposalInput: UpdateProposalMutationVariables)
+       */
+      updateProposal: (
+        updateProposalInput: UpdateProposalMutationVariables
       ) => void;
 
       /**
@@ -23,27 +39,24 @@ declare global {
        * @returns {typeof changeProposalStatus}
        * @memberof Chainable
        * @example
-       *    cy.changeProposalStatus('DRAFT', 'Proposal title')
+       *    cy.changeProposalStatus(changeProposalStatusInput: ChangeProposalsStatusInput)
        */
       changeProposalStatus: (
-        statusName?: string,
-        proposalTitle?: string
+        changeProposalStatusInput: ChangeProposalsStatusInput
       ) => void;
 
       /**
        * Allocates time for the proposal and optionally submits
        * management decision
        *
-       * @returns {typeof changeProposalStatus}
+       * @returns {typeof updateProposalManagementDecision}
        * @memberof Chainable
        * @example
-       *        cy.allocateProposalTime({proposalTitle:proposalTitle, timeToAllocate:2, submitManagementDecision:true});
+       *        cy.updateProposalManagementDecision(administrationProposalInput: AdministrationProposalMutationVariables);
        */
-      allocateProposalTime: (params: {
-        proposalTitle: string;
-        timeToAllocate: number;
-        submitManagementDecision?: boolean;
-      }) => void;
+      updateProposalManagementDecision: (
+        administrationProposalInput: AdministrationProposalMutationVariables
+      ) => void;
     }
   }
 }

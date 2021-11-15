@@ -1,6 +1,7 @@
 import {
+  CreateQuestionMutationVariables,
   CreateTemplateMutationVariables,
-  getSdk,
+  CreateTopicMutationVariables,
 } from '../../src/generated/sdk';
 import { getE2EApi } from './utils';
 
@@ -9,19 +10,23 @@ const navigateToTemplatesSubmenu = (submenuName: string) => {
   cy.get(`[title='${submenuName}']`).first().click();
 };
 
-const createTopic = (title: string) => {
-  cy.get('[data-cy=show-more-button]').last().click();
+const createTopic = (createTopicInput: CreateTopicMutationVariables) => {
+  const api = getE2EApi();
+  const request = api.createTopic(createTopicInput);
 
-  cy.get('[data-cy=add-topic-menu-item]').last().click();
+  cy.wrap(request);
+  // cy.get('[data-cy=show-more-button]').last().click();
 
-  cy.wait(500);
+  // cy.get('[data-cy=add-topic-menu-item]').last().click();
 
-  cy.get('[data-cy="topic-title-edit"]').last().click();
+  // cy.wait(500);
 
-  cy.get('[data-cy=topic-title-input] input')
-    .last()
-    .clear()
-    .type(`${title}{enter}`);
+  // cy.get('[data-cy="topic-title-edit"]').last().click();
+
+  // cy.get('[data-cy=topic-title-input] input')
+  //   .last()
+  //   .clear()
+  //   .type(`${title}{enter}`);
 };
 
 const typeToMenuTitle = new Map();
@@ -50,6 +55,13 @@ function openQuestionsMenu() {
 
 function closeQuestionsMenu() {
   cy.get('[data-cy=questionPicker] [data-cy=close-button]').click();
+}
+
+function createQuestion(createQuestionInput: CreateQuestionMutationVariables) {
+  const api = getE2EApi();
+  const request = api.createQuestion(createQuestionInput);
+
+  cy.wrap(request);
 }
 
 function createBooleanQuestion(question: any) {
@@ -362,6 +374,8 @@ Cypress.Commands.add('createTemplate', createTemplate);
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
 
 Cypress.Commands.add('createTopic', createTopic);
+
+Cypress.Commands.add('createQuestion', createQuestion);
 
 Cypress.Commands.add('createBooleanQuestion', createBooleanQuestion);
 
