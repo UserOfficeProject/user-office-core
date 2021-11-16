@@ -1,6 +1,6 @@
 import { logger } from '@esss-swap/duo-logger';
 import * as bcrypt from 'bcryptjs';
-// TODO: Try to replace request-promise with axios. request-promise depends on reqest which is deprecated.
+// TODO: Try to replace request-promise with axios. request-promise depends on request which is deprecated.
 import { CoreOptions, UriOptions } from 'request';
 import rp from 'request-promise';
 import { inject, injectable } from 'tsyringe';
