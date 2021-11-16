@@ -5,6 +5,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 
 import { Role, UserRole } from 'generated/sdk';
+import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 import { dummyUser, User } from 'models/User';
 
 interface UserContextData {
@@ -146,6 +147,7 @@ const reducer = (
 export const UserContextProvider: React.FC = (props): JSX.Element => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
   const [, setCookie] = useCookies();
+  const unauthorizedApi = useUnauthorizedApi();
 
   checkLocalStorage(dispatch, state);
   useEffect(() => {
@@ -168,10 +170,13 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
         handleLogin: (data): void =>
           dispatch({ type: ActionType.LOGINUSER, payload: data }),
         // Using useCallback here as these are used in useDataAPI dependency array
-        handleLogout: useCallback(
-          () => dispatch({ type: ActionType.LOGOFFUSER, payload: null }),
-          []
-        ),
+        handleLogout: () => {
+          unauthorizedApi().logout({
+            token: localStorage.token,
+          });
+
+          dispatch({ type: ActionType.LOGOFFUSER, payload: null });
+        },
         handleRole: (role: string): void =>
           dispatch({ type: ActionType.SELECTROLE, payload: role }),
         handleNewToken: useCallback(
