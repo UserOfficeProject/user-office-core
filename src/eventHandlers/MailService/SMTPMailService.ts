@@ -106,6 +106,9 @@ export class SMTPMailService extends MailService {
     return Promise.allSettled(emailPromises).then((results) => {
       results.forEach((result) => {
         if (result.status === 'rejected') {
+          logger.logWarn('Unable to send email to user', {
+            error: result.reason,
+          });
           sendMailResults.total_rejected_recipients++;
         } else {
           sendMailResults.total_accepted_recipients++;
