@@ -4,9 +4,12 @@ import { UserContext } from 'context/UserContextProvider';
 import { Proposal, ProposalsFilter, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useProposalsData(filter: ProposalsFilter) {
+export function useProposalsData(
+  filter: ProposalsFilter & { offset?: number; first?: number }
+) {
   const api = useDataApi();
   const [proposalsData, setProposalsData] = useState<Proposal[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const { currentRole } = useContext(UserContext);
 
@@ -17,6 +20,8 @@ export function useProposalsData(filter: ProposalsFilter) {
     questionaryIds,
     questionFilter,
     text,
+    offset,
+    first,
   } = filter;
 
   useEffect(() => {
@@ -39,6 +44,8 @@ export function useProposalsData(filter: ProposalsFilter) {
             },
             text,
           },
+          offset,
+          first,
         })
         .then((data) => {
           if (unmounted) {
@@ -49,6 +56,7 @@ export function useProposalsData(filter: ProposalsFilter) {
             setProposalsData(
               data.instrumentScientistProposals.proposals as Proposal[]
             );
+            setTotalCount(data.instrumentScientistProposals.totalCount);
           }
           setLoading(false);
         });
@@ -88,7 +96,9 @@ export function useProposalsData(filter: ProposalsFilter) {
     text,
     api,
     currentRole,
+    offset,
+    first,
   ]);
 
-  return { loading, proposalsData, setProposalsData };
+  return { loading, proposalsData, totalCount, setProposalsData };
 }

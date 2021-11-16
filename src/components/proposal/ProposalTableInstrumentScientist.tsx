@@ -5,7 +5,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Edit from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import Visibility from '@material-ui/icons/Visibility';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
@@ -49,7 +49,10 @@ const ProposalTableInstrumentScientist: React.FC = () => {
       reviewModal: NumberParam,
       ...DefaultQueryParams,
     });
-
+  const [query, setQuery] = useState<{ offset: number; first: number }>({
+    offset: 0,
+    first: 10,
+  });
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
@@ -62,12 +65,15 @@ const ProposalTableInstrumentScientist: React.FC = () => {
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
 
-  const { loading, proposalsData, setProposalsData } = useProposalsData({
-    proposalStatusId: proposalFilter.proposalStatusId,
-    instrumentId: proposalFilter.instrumentId,
-    callId: proposalFilter.callId,
-    questionFilter: proposalFilter.questionFilter,
-  });
+  const { loading, proposalsData, totalCount, setProposalsData } =
+    useProposalsData({
+      proposalStatusId: proposalFilter.proposalStatusId,
+      instrumentId: proposalFilter.instrumentId,
+      callId: proposalFilter.callId,
+      questionFilter: proposalFilter.questionFilter,
+      offset: query.offset,
+      first: query.first,
+    });
 
   const downloadPDFProposal = useDownloadPDFProposal();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
@@ -121,6 +127,8 @@ const ProposalTableInstrumentScientist: React.FC = () => {
       </>
     );
   };
+
+  const currentPage = query.offset / query.first;
 
   let columns: Column<Proposal>[] = [
     {
@@ -276,6 +284,8 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         icons={tableIcons}
         title={'Proposals'}
         columns={columns}
+        totalCount={totalCount}
+        page={currentPage}
         data={proposalsData.map((proposal) =>
           Object.assign(proposal, { id: proposal.primaryKey })
         )}
@@ -311,6 +321,12 @@ const ProposalTableInstrumentScientist: React.FC = () => {
 
           setLocalStorageValue(proposalColumns);
         }}
+        onPageChange={(page) =>
+          setQuery({ ...query, offset: page * (query.first as number) })
+        }
+        onRowsPerPageChange={(rowsPerPage) =>
+          setQuery({ ...query, first: rowsPerPage })
+        }
         onOrderChange={(orderedColumnId, orderDirection) => {
           setUrlQueryParams &&
             setUrlQueryParams({

@@ -5115,6 +5115,8 @@ export type ProposalFragment = (
 
 export type GetInstrumentScientistProposalsQueryVariables = Exact<{
   filter?: Maybe<ProposalsFilter>;
+  offset?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Int']>;
 }>;
 
 
@@ -9801,8 +9803,8 @@ export const DeleteProposalDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const GetInstrumentScientistProposalsDocument = gql`
-    query getInstrumentScientistProposals($filter: ProposalsFilter) {
-  instrumentScientistProposals(filter: $filter) {
+    query getInstrumentScientistProposals($filter: ProposalsFilter, $offset: Int, $first: Int) {
+  instrumentScientistProposals(filter: $filter, offset: $offset, first: $first) {
     proposals {
       ...proposal
       proposer {

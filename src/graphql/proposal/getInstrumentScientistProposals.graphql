@@ -1,5 +1,13 @@
-query getInstrumentScientistProposals($filter: ProposalsFilter) {
-  instrumentScientistProposals(filter: $filter) {
+query getInstrumentScientistProposals(
+  $filter: ProposalsFilter
+  $offset: Int
+  $first: Int
+) {
+  instrumentScientistProposals(
+    filter: $filter
+    offset: $offset
+    first: $first
+  ) {
     proposals {
       ...proposal
       proposer {
