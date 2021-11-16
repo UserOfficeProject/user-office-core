@@ -320,14 +320,8 @@ test('A user officer can must be able to delete another user', async () => {
   ).resolves.toBe(dummyUser);
 });
 
-test('When an invalid external token is supplied, no user is found', async () => {
-  return expect(
-    userMutations.checkExternalToken('invalid')
-  ).resolves.toHaveProperty('reason', 'User not found');
-});
-
-test('When a valid external token is supplied, a new JWT is returned', async () => {
-  const result = await userMutations.checkExternalToken('valid');
+test('externalTokenLogin supplies a new JWT', async () => {
+  const result = await userMutations.externalTokenLogin('valid');
 
   expect(typeof result).toBe('string');
 

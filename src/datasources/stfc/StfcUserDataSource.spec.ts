@@ -1,4 +1,5 @@
 import { Role, Roles } from '../../models/Role';
+import { dummyUser } from '../mockups/UserDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
 jest.mock('./UOWSSoapInterface');
@@ -16,6 +17,16 @@ beforeAll(() => {
       new Role(3, Roles.INSTRUMENT_SCIENTIST, 'Instrument Scientist'),
     ])
   );
+  const mockEnsureDummyUserExists = jest.spyOn(
+    userdataSource,
+    'ensureDummyUserExists'
+  );
+  mockEnsureDummyUserExists.mockImplementation((userId: number) => {
+    const user = dummyUser;
+    user.id = userId;
+
+    return Promise.resolve(user);
+  });
 });
 
 test('When getting roles for a user, the User role is the first role in the list', async () => {
@@ -43,4 +54,17 @@ test('When getting roles for a user, no roles are granted if role definitions do
   const roles = await userdataSource.getUserRoles(dummyUserNumber);
 
   return expect(roles).toHaveLength(0);
+});
+
+test('When an invalid external token is supplied, no user is found', async () => {
+  return expect(
+    userdataSource.externalTokenLogin('invalid')
+  ).rejects.toThrowError();
+});
+
+test('When a valid external token is supplied, valid user is returned', async () => {
+  const result = await userdataSource.externalTokenLogin('valid');
+
+  expect(result.id).toBe(1);
+  expect(result.email).toBe(dummyUser.email);
 });

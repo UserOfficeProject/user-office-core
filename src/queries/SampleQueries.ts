@@ -1,6 +1,8 @@
 import { logger } from '@esss-swap/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
+import { SampleAuthorization } from '../auth/SampleAuthorization';
+import { ShipmentAuthorization } from '../auth/ShipmentAuthorization';
 import { Tokens } from '../config/Tokens';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { Authorized } from '../decorators';
@@ -8,8 +10,6 @@ import { Roles } from '../models/Role';
 import { Sample } from '../models/Sample';
 import { UserWithRole } from '../models/User';
 import { SamplesArgs } from '../resolvers/queries/SamplesQuery';
-import { SampleAuthorization } from '../utils/SampleAuthorization';
-import { ShipmentAuthorization } from '../utils/ShipmentAuthorization';
 
 @injectable()
 export default class SampleQueries {

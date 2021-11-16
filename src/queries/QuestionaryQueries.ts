@@ -1,13 +1,13 @@
 import { logger } from '@esss-swap/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
+import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized } from '../decorators';
 import { Questionary, QuestionaryStep } from '../models/Questionary';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import { TemplateCategoryId } from './../models/Template';
 
 @injectable()

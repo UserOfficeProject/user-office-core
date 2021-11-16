@@ -13,6 +13,7 @@ export const basicDummyUser = new BasicUserDetails(
   2,
   'john',
   'doe',
+  'john',
   'org',
   'boss',
   new Date('2019-07-17 08:25:12.23043+00'),
@@ -23,6 +24,7 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   3,
   'john',
   'doe',
+  'john',
   'org',
   'boss',
   new Date('2019-07-17 08:25:12.23043+00'),
@@ -203,6 +205,7 @@ export class UserDataSourceMock implements UserDataSource {
       1,
       'John',
       'Smith',
+      'John',
       'ESS',
       'Manager',
       new Date('2019-07-17 08:25:12.23043+00'),
@@ -234,6 +237,7 @@ export class UserDataSourceMock implements UserDataSource {
       id,
       'John',
       'Smith',
+      'John',
       'ESS',
       'Manager',
       new Date('2019-07-17 08:25:12.23043+00'),
@@ -349,5 +353,13 @@ export class UserDataSourceMock implements UserDataSource {
 
   async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
     return { id: 1, shortCode: 'user_officer', title: 'User Officer' };
+  }
+
+  async externalTokenLogin(token: string): Promise<User> {
+    return dummyUser;
+  }
+
+  async logout(token: string) {
+    return;
   }
 }
