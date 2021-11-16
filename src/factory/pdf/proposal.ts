@@ -90,11 +90,14 @@ export const collectProposalPDFData = async (
   if (isRejection(questionarySteps) || questionarySteps == null) {
     throw new Error('Could not fetch questionary');
   }
+  const isCallingProposer = true;
 
-  const principalInvestigator = await baseContext.queries.user.getBasic(
-    user,
-    proposal.proposerId
-  );
+  const principalInvestigator =
+    await baseContext.queries.user.getProposerBasicDetails(
+      user,
+      proposal.proposerId,
+      isCallingProposer
+    );
   const coProposers = await baseContext.queries.user.getProposers(
     user,
     proposalPk

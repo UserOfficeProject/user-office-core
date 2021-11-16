@@ -109,9 +109,12 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<BasicUserDetails | null> {
-    return await context.queries.user.getBasic(
+    const isCallingProposer = true;
+
+    return await context.queries.user.getProposerBasicDetails(
       context.user,
-      proposal.proposerId
+      proposal.proposerId,
+      isCallingProposer
     );
   }
 

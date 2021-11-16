@@ -44,7 +44,7 @@ export default class UserQueries {
     return this.dataSource.me((agent as UserWithRole).id);
   }
 
-  @Authorized()
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getBasic(agent: UserWithRole | null, id: number) {
     const user = await this.dataSource.getBasicUserInfo(id);
     if (!user) {
@@ -62,7 +62,28 @@ export default class UserQueries {
       user.placeholder
     );
   }
+  @Authorized()
+  async getProposerBasicDetails(
+    agent: UserWithRole | null,
+    id: number,
+    isCallingProposer: boolean
+  ) {
+    const user = await this.dataSource.getBasicUserInfo(id);
+    if (!user || !isCallingProposer) {
+      return null;
+    }
 
+    return new BasicUserDetails(
+      user.id,
+      user.firstname,
+      user.lastname,
+      user.preferredname,
+      user.organisation,
+      user.position,
+      user.created,
+      user.placeholder
+    );
+  }
   @Authorized()
   async getBasicUserDetailsByEmail(
     agent: UserWithRole | null,
@@ -223,10 +244,12 @@ export default class UserQueries {
     return this.dataSource.getRoles();
   }
 
-  async getUser(id: number) {
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async getUser(agent: UserWithRole | null, id: number) {
     return this.dataSource.getUser(id);
   }
 
+  @Authorized()
   async getProposers(agent: UserWithRole | null, proposalPk: number) {
     return this.dataSource.getProposalUsers(proposalPk);
   }
