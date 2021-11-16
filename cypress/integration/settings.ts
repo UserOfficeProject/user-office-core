@@ -19,9 +19,9 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="profile-page-btn"]').should('exist');
 
-      let userMenuItems = cy.get('[data-cy="user-menu-items"]');
+      cy.get('[data-cy="user-menu-items"]').as('userMenuItems');
 
-      userMenuItems.should('not.contain', 'Settings');
+      cy.get('@userMenuItems').should('not.contain', 'Settings');
     });
 
     it('User Officer should be able to create Proposal status', () => {
@@ -41,24 +41,27 @@ context('Settings tests', () => {
 
       cy.notification({ variant: 'success', text: 'created successfully' });
 
-      let proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
+      cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
 
-      const lastPageButtonElement = proposalStatusesTable.find(
-        'span[title="Last Page"] > button'
+      cy.get('@proposalStatusesTable')
+        .find('span[title="Last Page"] > button')
+        .as('lastPageButtonElement');
+
+      cy.get('@lastPageButtonElement').click({ force: true });
+
+      cy.get('[data-cy="proposal-statuses-table"]').as(
+        'proposalStatusesTableNew'
       );
-
-      lastPageButtonElement.click({ force: true });
-
-      proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
-      const proposalStatusesTableLastRow = proposalStatusesTable
+      cy.get('@proposalStatusesTableNew')
         .find('tr[level="0"]')
-        .last();
+        .last()
+        .as('proposalStatusesTableLastRow');
 
-      const lastRowText = proposalStatusesTableLastRow.invoke('text');
+      cy.get('@proposalStatusesTableLastRow').invoke('text').as('lastRowText');
 
-      lastRowText.should('contain', shortCode);
-      lastRowText.should('contain', name);
-      lastRowText.should('contain', description);
+      cy.get('@lastRowText').should('contain', shortCode);
+      cy.get('@lastRowText').should('contain', name);
+      cy.get('@lastRowText').should('contain', description);
     });
 
     it('User Officer should be able to update Proposal status', () => {
@@ -70,13 +73,13 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
 
-      let proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
+      cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
 
-      const lastPageButtonElement = proposalStatusesTable.find(
-        'span[title="Last Page"] > button'
-      );
+      cy.get('@proposalStatusesTable')
+        .find('span[title="Last Page"] > button')
+        .as('lastPageButtonElement');
 
-      lastPageButtonElement.click({ force: true });
+      cy.get('@lastPageButtonElement').click({ force: true });
 
       cy.get('[title="Edit"]').last().click();
 
@@ -89,15 +92,18 @@ context('Settings tests', () => {
 
       cy.notification({ variant: 'success', text: 'updated successfully' });
 
-      proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
-      const proposalStatusesTableLastRow = proposalStatusesTable
+      cy.get('[data-cy="proposal-statuses-table"]').as(
+        'proposalStatusesTableNew'
+      );
+      cy.get('@proposalStatusesTableNew')
         .find('tr[level="0"]')
-        .last();
+        .last()
+        .as('proposalStatusesTableLastRow');
 
-      const lastRowText = proposalStatusesTableLastRow.invoke('text');
+      cy.get('@proposalStatusesTableLastRow').invoke('text').as('lastRowText');
 
-      lastRowText.should('contain', newName);
-      lastRowText.should('contain', newDescription);
+      cy.get('@lastRowText').should('contain', newName);
+      cy.get('@lastRowText').should('contain', newDescription);
     });
 
     it('User Officer should be able to delete Proposal status', () => {
@@ -108,13 +114,13 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      let proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
+      cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
 
-      const lastPageButtonElement = proposalStatusesTable.find(
-        'span[title="Last Page"] > button'
-      );
+      cy.get('@proposalStatusesTable')
+        .find('span[title="Last Page"] > button')
+        .as('lastPageButtonElement');
 
-      lastPageButtonElement.click({ force: true });
+      cy.get('@lastPageButtonElement').click({ force: true });
 
       cy.get('[title="Delete"]').last().click();
 
@@ -622,7 +628,7 @@ context('Settings tests', () => {
       cy.get('[aria-label="close"]').click();
 
       cy.get('[role="dialog"]').should('not.exist');
-      cy.wait(100);
+      // cy.wait(100);
       cy.contains('SEP Meeting');
     });
 

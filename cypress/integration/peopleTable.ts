@@ -27,10 +27,10 @@ context('PageTable component tests', () => {
       cy.get('@modal').contains('No Previous Collaborators');
 
       cy.finishedLoading();
-      cy.wait(500);
+      // cy.wait(500);
 
       cy.get('[data-cy=email]').type('ben@inbox.com');
-      cy.wait(500);
+      // cy.wait(500);
 
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
@@ -124,7 +124,7 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').find('[aria-label="Search"] ~ * > button').click();
 
-      cy.wait(500);
+      // cy.wait(500);
 
       cy.get('@modal').contains('1 user(s) selected');
 
@@ -135,7 +135,7 @@ context('PageTable component tests', () => {
       cy.get('@modal').find('[aria-label="Search"]').type('Unverified email');
 
       //How long before the search fires
-      cy.wait(500);
+      // cy.wait(500);
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal').find('tr[index="0"]').contains('Unverified email');
@@ -143,7 +143,7 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').find('[aria-label="Search"]').clear().type('Benjamin');
 
-      cy.wait(500);
+      // cy.wait(500);
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
@@ -153,7 +153,7 @@ context('PageTable component tests', () => {
     });
 
     it('should preserve the selected users after pagination', () => {
-      cy.wait(1000);
+      // cy.wait(1000);
 
       cy.request({
         url: '/graphql',
@@ -292,7 +292,7 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').find('[aria-label="Search"]').type('foo bar');
 
-      cy.wait(500);
+      // cy.wait(500);
 
       cy.finishedLoading();
 
@@ -314,7 +314,7 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').find('[aria-label="Search"]').type(username2);
 
-      cy.wait(500);
+      // cy.wait(500);
 
       cy.finishedLoading();
 
@@ -327,7 +327,7 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').find('[aria-label="Search"]').clear().type(username1);
 
-      cy.wait(500);
+      // cy.wait(500);
 
       cy.finishedLoading();
 
@@ -342,7 +342,7 @@ context('PageTable component tests', () => {
     });
 
     it('should preserve the selected users after pagination', () => {
-      cy.wait(1000);
+      // cy.wait(1000);
 
       cy.request({
         url: '/graphql',

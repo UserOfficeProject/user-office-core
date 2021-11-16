@@ -29,7 +29,7 @@ function readWriteReview() {
   cy.closeModal();
 
   cy.get('@dialog').should('not.exist');
-  cy.wait(100);
+  // cy.wait(100);
 }
 
 function editFinalRankingForm() {
@@ -189,7 +189,7 @@ context(
 
     it('Officer should be able to assign proposal to existing SEP', () => {
       cy.login('user');
-      cy.createProposal(proposal1.proposalTitle);
+      cy.createProposal({ callId: 1 });
       cy.contains('Submit').click();
       cy.contains('OK').click();
       cy.logout();
@@ -561,8 +561,7 @@ context(
 
       cy.notification({
         variant: 'error',
-        text:
-          'Failed to delete proposal because, it has dependencies which need to be deleted first',
+        text: 'Failed to delete proposal because, it has dependencies which need to be deleted first',
       });
     });
 
@@ -1098,7 +1097,7 @@ context(
 
       cy.finishedLoading();
 
-      cy.wait(500);
+      // cy.wait(500);
 
       cy.get('[data-cy="download-sep-xlsx"]').click();
 

@@ -78,7 +78,11 @@ context('visits tests', () => {
       .closest('TR')
       .find(`[title='${proposalEsiButtonTitle}']`)
       .click();
-    cy.get('[data-cy=sample-esi-list]').contains(sampleTitle).closest('li').find('[data-cy=select-sample-chk]').click();
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(sampleTitle)
+      .closest('li')
+      .find('[data-cy=select-sample-chk]')
+      .click();
     cy.get(
       '[data-cy=sample-esi-modal] [data-cy=save-and-continue-button]'
     ).click();
@@ -95,13 +99,20 @@ context('visits tests', () => {
 
     // Abort new sample esi declaration
     cy.get('[data-cy=sample-esi-modal]'); // wait until modal is visible
-    cy.get('body').type('{esc}')
-    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle).closest('li').contains('Unfinished declaration'); // ESI not finished
+    cy.get('body').type('{esc}');
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(newSampleTitle)
+      .closest('li')
+      .contains('Unfinished declaration'); // ESI not finished
     cy.get('[data-cy=save-and-continue-button]').click();
     cy.contains('All experiment safety inputs must be completed');
 
     // Resume new sample esi declaration
-    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle).closest('li').find('[data-cy=edit-esi-btn]').click()
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(newSampleTitle)
+      .closest('li')
+      .find('[data-cy=edit-esi-btn]')
+      .click();
 
     cy.get(
       '[data-cy=sample-esi-modal] [data-cy=save-and-continue-button]'
@@ -109,31 +120,58 @@ context('visits tests', () => {
     cy.get('[data-cy=confirm-sample-correct-cb]').click();
     cy.get('[data-cy=sample-esi-modal] [data-cy=submit-esi-button]').click();
 
-    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle).closest('li').contains('Ready'); // ESI finished
-
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(newSampleTitle)
+      .closest('li')
+      .contains('Ready'); // ESI finished
 
     // Clone sample esi declaration and then delete it
-    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle).closest('li').find('[data-cy=clone-sample-btn]').click()
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(newSampleTitle)
+      .closest('li')
+      .find('[data-cy=clone-sample-btn]')
+      .click();
 
     cy.get('[data-cy=prompt-input]').clear().type(clonedSampleTitle);
     cy.get('[data-cy=prompt-ok]').click();
 
-    cy.get('[data-cy=sample-esi-list]').contains(clonedSampleTitle).closest('li').contains('Unfinished declaration');
-    cy.get('[data-cy=sample-esi-list]').contains(clonedSampleTitle).closest('li').find('[data-cy=delete-sample-btn]').click();
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(clonedSampleTitle)
+      .closest('li')
+      .contains('Unfinished declaration');
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(clonedSampleTitle)
+      .closest('li')
+      .find('[data-cy=delete-sample-btn]')
+      .click();
     cy.get('[data-cy=confirm-ok]').click();
-    cy.get('[data-cy=sample-esi-list]').contains(clonedSampleTitle).should('not.exist');
-
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(clonedSampleTitle)
+      .should('not.exist');
 
     // Revoke ESI
-    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle).closest('li').find('[data-cy=select-sample-chk]').click();
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(newSampleTitle)
+      .closest('li')
+      .find('[data-cy=select-sample-chk]')
+      .click();
     cy.get('[data-cy=confirm-ok]').click();
-    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle).closest('li').should('not.contain', 'Ready'); // ESI not finished
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(newSampleTitle)
+      .closest('li')
+      .should('not.contain', 'Ready'); // ESI not finished
 
     // Delete new sample
-    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle).closest('li').find('[data-cy=delete-sample-btn]').click();
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(newSampleTitle)
+      .closest('li')
+      .find('[data-cy=delete-sample-btn]')
+      .click();
     cy.get('[data-cy=confirm-ok]').click();
 
-    cy.get('[data-cy=sample-esi-list]').contains(newSampleTitle).should('not.exist');
+    cy.get('[data-cy=sample-esi-list]')
+      .contains(newSampleTitle)
+      .should('not.exist');
     cy.get('[data-cy=save-and-continue-button]').click();
 
     cy.contains(sampleTitle).should('exist'); // sample should ve visible in the review page

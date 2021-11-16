@@ -318,7 +318,7 @@ context('Proposal administration tests', () => {
       option1: 'One',
       option2: 'Two',
       option3: 'Three',
-      isMultipleSelect: true
+      isMultipleSelect: true,
     });
     cy.contains(multipleChoiceQuestion)
       .closest('[data-cy=question-container]')

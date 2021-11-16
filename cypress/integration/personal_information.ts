@@ -67,8 +67,8 @@ context('Personal information tests', () => {
 
     cy.contains('Andersson').parent().find('button[title="Edit user"]').click();
 
-    const mainContentElement = cy.get('main');
-    mainContentElement.contains('Settings').click();
+    cy.get('main').as('mainContentElement');
+    cy.get('@mainContentElement').contains('Settings').click();
 
     cy.finishedLoading();
 
@@ -89,7 +89,7 @@ context('Personal information tests', () => {
     // wait before trying to get profile button otherwise page
     // might re-render and you could be trying to access element
     // that is not attached to the DOM
-    cy.wait(2000);
+    // cy.wait(2000);
 
     cy.changeActiveRole('SEP Chair');
 

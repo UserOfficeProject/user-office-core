@@ -12,6 +12,8 @@ context('Calls tests', () => {
 
   const currentDayStart = new Date();
   currentDayStart.setHours(0, 0, 0, 0);
+  const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
+  const twoDaysAgo = new Date(new Date().setDate(new Date().getDate() - 2));
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
@@ -37,8 +39,8 @@ context('Calls tests', () => {
 
   const newInactiveCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startCall: faker.date.past(2).toISOString().slice(0, 10),
-    endCall: faker.date.past(1).toISOString().slice(0, 10),
+    startCall: twoDaysAgo.toISOString().slice(0, 10),
+    endCall: yesterday.toISOString().slice(0, 10),
     startReview: currentDayStart,
     endReview: currentDayStart,
     startSEPReview: currentDayStart,

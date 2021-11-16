@@ -49,9 +49,9 @@ context('General scientific evaluation panel tests', () => {
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
 
-    let userMenuItems = cy.get('[data-cy="user-menu-items"]');
+    cy.get('[data-cy="user-menu-items"]').as('userMenuItems');
 
-    userMenuItems.should('not.contain', 'SEPs');
+    cy.get('@userMenuItems').should('not.contain', 'SEPs');
   });
 
   it('SEP REviewer should not able to see SEPs page', () => {
@@ -59,9 +59,9 @@ context('General scientific evaluation panel tests', () => {
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
 
-    let userMenuItems = cy.get('[data-cy="SEPReviewer-menu-items"]');
+    cy.get('[data-cy="SEPReviewer-menu-items"]').as('userMenuItems');
 
-    userMenuItems.should('not.contain', 'SEPs');
+    cy.get('@userMenuItems').should('not.contain', 'SEPs');
   });
 
   it('Officer should be able to assign SEP Reviewer role', () => {
@@ -161,10 +161,10 @@ context('General scientific evaluation panel tests', () => {
 
     cy.contains('SEPs').click();
 
-    let SEPsTable = cy.get('[data-cy="SEPs-table"]');
+    cy.get('[data-cy="SEPs-table"]').as('SEPsTable');
 
-    SEPsTable.should('contain', newCode);
-    SEPsTable.should('contain', newDescription);
+    cy.get('@SEPsTable').should('contain', newCode);
+    cy.get('@SEPsTable').should('contain', newDescription);
   });
 
   it('Officer should be able to assign SEP Chair to existing SEP', () => {
@@ -275,8 +275,14 @@ context('General scientific evaluation panel tests', () => {
 
   it('SEP Chair should not be able to modify SEP Chair and SEP Secretary', () => {
     cy.login(sepMembers.chair);
+    const token = window.localStorage.getItem('token');
 
-    cy.changeActiveRole('SEP Chair');
+    if (!token) {
+      throw new Error('No logged in user');
+    }
+
+    // TODO: This shouldn't be hardcoded to id: 4 get all roles and find sep_chair role.
+    cy.changeActiveRole({ selectedRoleId: 4, token: token });
 
     cy.finishedLoading();
 
@@ -336,7 +342,14 @@ context('General scientific evaluation panel tests', () => {
   it('SEP Secretary should not be able to modify SEP Chair and SEP Secretary', () => {
     cy.login(sepMembers.secretary);
 
-    cy.changeActiveRole('SEP Secretary');
+    const token = window.localStorage.getItem('token');
+
+    if (!token) {
+      throw new Error('No logged in user');
+    }
+
+    // TODO: This shouldn't be hardcoded to id: 5 get all roles and find sep_secretary role.
+    cy.changeActiveRole({ selectedRoleId: 5, token: token });
 
     cy.finishedLoading();
 
@@ -426,7 +439,14 @@ context('General scientific evaluation panel tests', () => {
   it('SEP Chair should only see SEPs where they have SEP Chair role', () => {
     cy.login(sepMembers.chair);
 
-    cy.changeActiveRole('SEP Chair');
+    const token = window.localStorage.getItem('token');
+
+    if (!token) {
+      throw new Error('No logged in user');
+    }
+
+    // TODO: This shouldn't be hardcoded to id: 4 get all roles and find sep_chair role.
+    cy.changeActiveRole({ selectedRoleId: 4, token: token });
 
     cy.finishedLoading();
 
@@ -439,7 +459,14 @@ context('General scientific evaluation panel tests', () => {
   it('SEP Secretary should only see SEPs where they have SEP Secretary role', () => {
     cy.login(sepMembers.secretary);
 
-    cy.changeActiveRole('SEP Secretary');
+    const token = window.localStorage.getItem('token');
+
+    if (!token) {
+      throw new Error('No logged in user');
+    }
+
+    // TODO: This shouldn't be hardcoded to id: 5 get all roles and find sep_secretary role.
+    cy.changeActiveRole({ selectedRoleId: 5, token: token });
 
     cy.finishedLoading();
 

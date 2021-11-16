@@ -269,7 +269,7 @@ context('Samples tests', () => {
 
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(500);
+    cy.notification({ variant: 'success', text: 'success' });
 
     cy.reload();
 
