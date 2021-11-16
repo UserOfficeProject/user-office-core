@@ -1,16 +1,14 @@
 import faker from 'faker';
 
 context('Institution tests', () => {
-  before(() => {
-    cy.resetDB();
-  });
-
   beforeEach(() => {
+    cy.resetDB();
     cy.viewport(1920, 1080);
   });
 
   it('User should not be able to see Institutions page', () => {
     cy.login('user');
+    cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
 
@@ -23,6 +21,7 @@ context('Institution tests', () => {
     const name = faker.random.words(2);
 
     cy.login('officer');
+    cy.visit('/');
 
     cy.contains('Institutions').click();
     cy.contains('Create').click();
@@ -55,6 +54,7 @@ context('Institution tests', () => {
     const name = faker.random.words(2);
 
     cy.login('officer');
+    cy.visit('/');
 
     cy.contains('Institutions').click();
     cy.get('[title="Edit"]').first().click();
@@ -71,16 +71,9 @@ context('Institution tests', () => {
 
   it('User Officer should be able to delete Institution', () => {
     cy.login('officer');
+    cy.visit('/');
 
     cy.contains('Institutions').click();
-
-    cy.get('[data-cy="institutions-table"]').as('institutionsTable');
-
-    cy.get('@institutionsTable')
-      .find('span[title="Last Page"] > button')
-      .as('lastPageButtonElement');
-
-    cy.get('@lastPageButtonElement').click({ force: true });
 
     cy.get('[title="Delete"]').last().click();
 
