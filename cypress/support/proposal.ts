@@ -1,14 +1,18 @@
 import {
+  AdministrationProposalMutation,
   AdministrationProposalMutationVariables,
-  ChangeProposalsStatusInput,
+  ChangeProposalsStatusMutation,
+  ChangeProposalsStatusMutationVariables,
+  CreateProposalMutation,
   CreateProposalMutationVariables,
+  UpdateProposalMutation,
   UpdateProposalMutationVariables,
 } from '../../src/generated/sdk';
 import { getE2EApi } from './utils';
 
 const createProposal = (
   createProposalInput: CreateProposalMutationVariables
-) => {
+): Cypress.Chainable<CreateProposalMutation> => {
   const api = getE2EApi();
   const request = api.createProposal(createProposalInput);
   // const title = proposalTitle || faker.random.words(3);
@@ -44,21 +48,21 @@ const createProposal = (
   // cy.finishedLoading();
 
   // cy.notification({ variant: 'success', text: 'Saved' });
-  cy.wrap(request);
+  return cy.wrap(request);
 };
 
 const updateProposal = (
   updateProposalInput: UpdateProposalMutationVariables
-) => {
+): Cypress.Chainable<UpdateProposalMutation> => {
   const api = getE2EApi();
   const request = api.updateProposal(updateProposalInput);
 
-  cy.wrap(request);
+  return cy.wrap(request);
 };
 
 const changeProposalsStatus = (
-  changeProposalStatusInput: ChangeProposalsStatusInput
-) => {
+  changeProposalStatusInput: ChangeProposalsStatusMutationVariables
+): Cypress.Chainable<ChangeProposalsStatusMutation> => {
   const api = getE2EApi();
   const request = api.changeProposalsStatus(changeProposalStatusInput);
   // cy.contains('Proposals').click();
@@ -95,12 +99,12 @@ const changeProposalsStatus = (
   //   text: 'status changed successfully',
   // });
 
-  cy.wrap(request);
+  return cy.wrap(request);
 };
 
 const updateProposalManagementDecision = (
   administrationProposalInput: AdministrationProposalMutationVariables
-) => {
+): Cypress.Chainable<AdministrationProposalMutation> => {
   const api = getE2EApi();
   const request = api.administrationProposal(administrationProposalInput);
   // cy.contains(proposalTitle).parent().find('[title="View proposal"]').click();
@@ -116,7 +120,7 @@ const updateProposalManagementDecision = (
   // }
   // cy.closeModal();
 
-  cy.wrap(request);
+  return cy.wrap(request);
 };
 
 Cypress.Commands.add('createProposal', createProposal);

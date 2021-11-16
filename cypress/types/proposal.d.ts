@@ -1,8 +1,12 @@
 import {
   CreateProposalMutationVariables,
   UpdateProposalMutationVariables,
-  ChangeProposalsStatusInput,
   AdministrationProposalMutationVariables,
+  ChangeProposalsStatusMutation,
+  UpdateProposalMutation,
+  AdministrationProposalMutation,
+  CreateProposalMutation,
+  ChangeProposalsStatusMutationVariables,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -18,7 +22,7 @@ declare global {
        */
       createProposal: (
         createProposalInput: CreateProposalMutationVariables
-      ) => void;
+      ) => Cypress.Chainable<CreateProposalMutation>;
 
       /**
        * Updates proposal
@@ -30,7 +34,7 @@ declare global {
        */
       updateProposal: (
         updateProposalInput: UpdateProposalMutationVariables
-      ) => void;
+      ) => Cypress.Chainable<UpdateProposalMutation>;
 
       /**
        * Change of the proposal status by name with status name passed as second parameter.
@@ -41,9 +45,9 @@ declare global {
        * @example
        *    cy.changeProposalStatus(changeProposalStatusInput: ChangeProposalsStatusInput)
        */
-      changeProposalStatus: (
-        changeProposalStatusInput: ChangeProposalsStatusInput
-      ) => void;
+      changeProposalsStatus: (
+        changeProposalStatusInput: ChangeProposalsStatusMutationVariables
+      ) => Cypress.Chainable<ChangeProposalsStatusMutation>;
 
       /**
        * Allocates time for the proposal and optionally submits
@@ -56,7 +60,7 @@ declare global {
        */
       updateProposalManagementDecision: (
         administrationProposalInput: AdministrationProposalMutationVariables
-      ) => void;
+      ) => Cypress.Chainable<AdministrationProposalMutation>;
     }
   }
 }

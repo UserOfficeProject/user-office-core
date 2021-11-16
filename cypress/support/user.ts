@@ -1,8 +1,11 @@
 import { decode } from 'jsonwebtoken';
 
 import {
+  LoginMutation,
   Role,
   SelectRoleMutationVariables,
+  UpdateUserMutation,
+  UpdateUserMutationVariables,
   UpdateUserRolesMutationVariables,
   User,
 } from '../../src/generated/sdk';
@@ -40,7 +43,7 @@ const login = (
     | 'user2'
     | 'placeholderUser'
     | { email: string; password: string }
-) => {
+): Cypress.Chainable<LoginMutation> => {
   const credentials =
     typeof roleOrCredentials === 'string'
       ? testCredentialStore[roleOrCredentials]
@@ -49,7 +52,7 @@ const login = (
   const api = getE2EApi();
   const request = api.login(credentials).then((resp) => {
     if (!resp.login.token) {
-      return;
+      return resp;
     }
 
     const { currentRole, user, exp } = decode(
@@ -63,11 +66,11 @@ const login = (
     );
     window.localStorage.setItem('expToken', `${exp}`);
     window.localStorage.setItem('user', JSON.stringify(user));
+
+    return resp;
   });
 
-  cy.wrap(request);
-
-  cy.visit('/');
+  return cy.wrap(request);
 };
 
 const logout = () => {
@@ -75,6 +78,15 @@ const logout = () => {
 
   cy.get('[data-cy=logout]').click();
 };
+
+function updateUserDetails(
+  updateUserInput: UpdateUserMutationVariables
+): Cypress.Chainable<UpdateUserMutation> {
+  const api = getE2EApi();
+  const request = api.updateUser(updateUserInput);
+
+  return cy.wrap(request);
+}
 
 function updateUserRoles(
   updateUserRolesInput: UpdateUserRolesMutationVariables
@@ -145,10 +157,11 @@ function changeActiveRole(selectRoleInput: SelectRoleMutationVariables) {
   // cy.notification({ variant: 'success', text: 'User role changed' });
 }
 
-Cypress.Commands.add('updateUserRoles', updateUserRoles);
-
-Cypress.Commands.add('changeActiveRole', changeActiveRole);
-
 Cypress.Commands.add('login', login);
 
 Cypress.Commands.add('logout', logout);
+
+Cypress.Commands.add('updateUserRoles', updateUserRoles);
+Cypress.Commands.add('updateUserDetails', updateUserDetails);
+
+Cypress.Commands.add('changeActiveRole', changeActiveRole);

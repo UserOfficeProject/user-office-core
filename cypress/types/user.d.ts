@@ -1,6 +1,9 @@
 import {
+  LoginMutation,
   SelectRoleMutationVariables,
   UpdateUserRolesMutationVariables,
+  UpdateUserMutationVariables,
+  UpdateUserMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -14,7 +17,14 @@ declare global {
        * @example
        *    cy.login('user')
        */
-      login: (role: string | { email: string; password: string }) => void;
+      login: (
+        roleOrCredentials:
+          | 'user'
+          | 'officer'
+          | 'user2'
+          | 'placeholderUser'
+          | { email: string; password: string }
+      ) => Cypress.Chainable<LoginMutation>;
 
       /**
        * Logs user out
@@ -37,6 +47,18 @@ declare global {
       updateUserRoles: (
         updateUserRolesInput: UpdateUserRolesMutationVariables
       ) => void;
+
+      /**
+       * Update user details
+       *
+       * @returns {typeof updateUserDetails}
+       * @memberof Chainable
+       * @example
+       *    cy.updateUserDetails(updateUserInput: UpdateUserMutationVariables)
+       */
+      updateUserDetails: (
+        updateUserInput: UpdateUserMutationVariables
+      ) => Cypress.Chainable<UpdateUserMutation>;
 
       /**
        * Lets you change the logged in user's active role
