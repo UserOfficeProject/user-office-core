@@ -1,10 +1,17 @@
 import {
   CreateInstrumentMutationVariables,
+  CreateInstrumentMutation,
+  AssignInstrumentsToCallMutation,
   AssignScientistsToInstrumentMutationVariables,
+  AssignScientistsToInstrumentMutation,
   AssignProposalsToInstrumentMutationVariables,
+  AssignProposalsToInstrumentMutation,
   AssignInstrumentsToCallMutationVariables,
+  UpdateTechnicalReviewAssigneeMutation,
   UpdateTechnicalReviewAssigneeMutationVariables,
   CreateInstrumentMutation,
+  AddTechnicalReviewMutationVariables,
+  AddTechnicalReviewMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -25,7 +32,7 @@ declare global {
        */
       createInstrument: (
         createInstrumentInput: CreateInstrumentMutationVariables
-      ) => Promise<CreateInstrumentMutation>;
+      ) => Cypress.Chainable<CreateInstrumentMutation>;
 
       /**
        * Assigns available scientist/s to an instrument
@@ -40,7 +47,7 @@ declare global {
        */
       assignScientistsToInstrument: (
         assignScientistsToInstrumentInput: AssignScientistsToInstrumentMutationVariables
-      ) => void;
+      ) => Cypress.Chainable<AssignScientistsToInstrumentMutation>;
 
       /**
        * Assigns selected proposal/s to an instrument
@@ -58,7 +65,7 @@ declare global {
        */
       assignProposalsToInstrument: (
         assignProposalsToInstrumentInput: AssignProposalsToInstrumentMutationVariables
-      ) => void;
+      ) => Cypress.Chainable<AssignProposalsToInstrumentMutation>;
 
       /**
        * Assigns an instrument/s to a selected call
@@ -73,7 +80,7 @@ declare global {
        */
       assignInstrumentToCall: (
         assignInstrumentsToCall: AssignInstrumentsToCallMutationVariables
-      ) => void;
+      ) => Cypress.Chainable<AssignInstrumentsToCallMutation>;
 
       /**
        * Assign technical reviewer assignee to proposal
@@ -88,7 +95,19 @@ declare global {
        */
       updateTechnicalReviewAssignee: (
         updateTechnicalReviewAssigneeInput: UpdateTechnicalReviewAssigneeMutationVariables
-      ) => void;
+      ) => Cypress.Chainable<UpdateTechnicalReviewAssigneeMutation>;
+
+      /**
+       * Add technical review to proposal
+       *
+       * @returns {typeof addProposalTechnicalReview}
+       * @memberof Chainable
+       * @example
+       *    cy.addProposalTechnicalReview();
+       */
+      addProposalTechnicalReview: (
+        addTechnicalReviewInput: AddTechnicalReviewMutationVariables
+      ) => Cypress.Chainable<AddTechnicalReviewMutation>;
     }
   }
 }

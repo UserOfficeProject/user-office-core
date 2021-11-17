@@ -70,6 +70,9 @@ context('Calls tests', () => {
     description: faker.random.words(5),
   };
 
+  const userRoleId = 1;
+  const scientistRoleId = 7;
+
   const scientist = {
     id: 1,
     name: 'Carl',
@@ -376,7 +379,10 @@ context('Calls tests', () => {
         }
       });
       // TODO: This should't be hardcoded. We should get roles and pick the scientist role id.
-      cy.updateUserRoles({ id: scientist.id, roles: [1, 7] });
+      cy.updateUserRoles({
+        id: scientist.id,
+        roles: [userRoleId, scientistRoleId],
+      });
       cy.createInstrument(instrumentAssignedToCall).then((response) => {
         if (response.createInstrument.instrument) {
           createdInstrumentId = response.createInstrument.instrument.id;

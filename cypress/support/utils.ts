@@ -11,8 +11,9 @@ const KEY_CODES = {
   down: 40,
 };
 
-export const getE2EApi = () => {
-  const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
+export const getE2EApi = (token?: string | null) => {
+  // NOTE: Token is used when we want to do some action as a specific logged in user.
+  const authHeader = `Bearer ${token ? token : Cypress.env('SVC_ACC_TOKEN')}`;
 
   return getSdk(
     new GraphQLClient('/graphql', {
