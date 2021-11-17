@@ -198,7 +198,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
   )?.isEnabled;
   const { prevColabUsers, loadingUsersData } = usePrevColabs(query);
 
-  const sendRequest = useDataApi();
+  const api = useDataApi();
   const [loading, setLoading] = useState(false);
   const [pageSize] = useState(10);
   const [sendUserEmail, setSendUserEmail] = useState(false);
@@ -358,7 +358,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
         // If there is an email and it has not already been searched
         if (values.email && !tableEmails.includes(values.email)) {
           setLoading(true);
-          const userDetails = await getUserByEmail(values.email, sendRequest);
+          const userDetails = await getUserByEmail(values.email, api);
 
           if (!userDetails) {
             setDisplayError(true);

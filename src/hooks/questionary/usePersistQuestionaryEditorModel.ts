@@ -7,15 +7,15 @@ import {
   Template,
   TemplateCategoryId,
 } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
 
 export function usePersistQuestionaryEditorModel() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
 
   const updateTopic = async (
     topicId: number,
