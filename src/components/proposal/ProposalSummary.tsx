@@ -105,6 +105,9 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
           }
         }
       }
+      if (call?.submissionMessage != null) {
+        setSubmitButtonMessage(call.submissionMessage);
+      }
       setLoadingSubmitMessage(false);
     }
     checkUpcomingEditableStatus();
