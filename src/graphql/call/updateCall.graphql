@@ -12,7 +12,7 @@ mutation updateCall(
   $startCycle: DateTime!
   $endCycle: DateTime!
   $cycleComment: String!
-  $submissionMessage: String!
+  $submissionMessage: String
   $surveyComment: String!
   $allocationTimeUnit: AllocationTimeUnits!
   $referenceNumberFormat: String
