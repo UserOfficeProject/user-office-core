@@ -1,7 +1,14 @@
 import {
+  CreateQuestionMutation,
   CreateQuestionMutationVariables,
+  CreateQuestionTemplateRelationMutation,
+  CreateQuestionTemplateRelationMutationVariables,
+  CreateTemplateMutation,
   CreateTemplateMutationVariables,
+  CreateTopicMutation,
   CreateTopicMutationVariables,
+  UpdateQuestionMutation,
+  UpdateQuestionMutationVariables,
 } from '../../src/generated/sdk';
 import { getE2EApi } from './utils';
 
@@ -10,11 +17,13 @@ const navigateToTemplatesSubmenu = (submenuName: string) => {
   cy.get(`[title='${submenuName}']`).first().click();
 };
 
-const createTopic = (createTopicInput: CreateTopicMutationVariables) => {
+const createTopic = (
+  createTopicInput: CreateTopicMutationVariables
+): Cypress.Chainable<CreateTopicMutation> => {
   const api = getE2EApi();
   const request = api.createTopic(createTopicInput);
 
-  cy.wrap(request);
+  return cy.wrap(request);
   // cy.get('[data-cy=show-more-button]').last().click();
 
   // cy.get('[data-cy=add-topic-menu-item]').last().click();
@@ -38,11 +47,13 @@ typeToMenuTitle.set('visit', 'Visit registration');
 typeToMenuTitle.set('proposalEsi', 'Experiment Safety Input (Proposal)');
 typeToMenuTitle.set('sampleEsi', 'Experiment Safety Input (Sample)');
 
-function createTemplate(createTemplateInput: CreateTemplateMutationVariables) {
+function createTemplate(
+  createTemplateInput: CreateTemplateMutationVariables
+): Cypress.Chainable<CreateTemplateMutation> {
   const api = getE2EApi();
   const request = api.createTemplate(createTemplateInput);
 
-  cy.wrap(request);
+  return cy.wrap(request);
 }
 
 function openQuestionsMenu() {
@@ -57,11 +68,33 @@ function closeQuestionsMenu() {
   cy.get('[data-cy=questionPicker] [data-cy=close-button]').click();
 }
 
-function createQuestion(createQuestionInput: CreateQuestionMutationVariables) {
+function createQuestion(
+  createQuestionInput: CreateQuestionMutationVariables
+): Cypress.Chainable<CreateQuestionMutation> {
   const api = getE2EApi();
   const request = api.createQuestion(createQuestionInput);
 
-  cy.wrap(request);
+  return cy.wrap(request);
+}
+
+function updateQuestion(
+  updateQuestionInput: UpdateQuestionMutationVariables
+): Cypress.Chainable<UpdateQuestionMutation> {
+  const api = getE2EApi();
+  const request = api.updateQuestion(updateQuestionInput);
+
+  return cy.wrap(request);
+}
+
+function createQuestionTemplateRelation(
+  createQuestionTemplateRelationInput: CreateQuestionTemplateRelationMutationVariables
+): Cypress.Chainable<CreateQuestionTemplateRelationMutation> {
+  const api = getE2EApi();
+  const request = api.createQuestionTemplateRelation(
+    createQuestionTemplateRelationInput
+  );
+
+  return cy.wrap(request);
 }
 
 function createBooleanQuestion(question: string) {
@@ -406,6 +439,11 @@ Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
 Cypress.Commands.add('createTopic', createTopic);
 
 Cypress.Commands.add('createQuestion', createQuestion);
+Cypress.Commands.add('updateQuestion', updateQuestion);
+Cypress.Commands.add(
+  'createQuestionTemplateRelation',
+  createQuestionTemplateRelation
+);
 
 Cypress.Commands.add('createBooleanQuestion', createBooleanQuestion);
 

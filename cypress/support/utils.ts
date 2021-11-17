@@ -94,15 +94,18 @@ function presentationMode() {
     'reload',
     'contains',
   ]) {
-    Cypress.Commands.overwrite(command, (originalFn, ...args) => {
-      const origVal = originalFn(...args);
+    Cypress.Commands.overwrite(
+      command as keyof Cypress.Chainable<any>,
+      (originalFn: any, ...args: any[]) => {
+        const origVal = originalFn(...args);
 
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(origVal);
-        }, COMMAND_DELAY);
-      });
-    });
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(origVal);
+          }, COMMAND_DELAY);
+        });
+      }
+    );
   }
 }
 
@@ -113,21 +116,26 @@ const dragElement = (
     length: number;
   }[]
 ) => {
-  const focusedElement = element;
-  focusedElement.trigger('keydown', { keyCode: KEY_CODES.space });
+  // @ts-expect-error FIXME: This should be fixed maybe using something like cy.find(element.attr('class')!);
+  cy.get(element).as('focusedElement');
+
+  cy.get('@focusedElement').trigger('keydown', { keyCode: KEY_CODES.space });
 
   moveArgs.forEach(({ direction, length }) => {
     for (let i = 1; i <= length; i++) {
-      focusedElement.trigger('keydown', {
+      cy.get('@focusedElement').trigger('keydown', {
         keyCode: KEY_CODES[direction],
         force: true,
       });
     }
   });
 
-  focusedElement.trigger('keydown', { keyCode: KEY_CODES.space, force: true });
+  cy.get('@focusedElement').trigger('keydown', {
+    keyCode: KEY_CODES.space,
+    force: true,
+  });
 
-  return element;
+  return cy.get('@focusedElement');
 };
 
 const setTinyMceContent = (tinyMceId: string, content: string) => {
@@ -142,7 +150,7 @@ const setTinyMceContent = (tinyMceId: string, content: string) => {
 const getTinyMceContent = (tinyMceId: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
 
-  cy.window().then((win) => {
+  return cy.window().then((win) => {
     const editor = win.tinyMCE.editors[tinyMceId];
 
     return editor.getContent();
@@ -195,8 +203,9 @@ Cypress.Commands.add('finishedLoading', finishedLoading);
 Cypress.Commands.add(
   'dragElement',
   { prevSubject: 'element' },
+  // @ts-expect-error FIXME: this should be solved
   (element, args) => {
-    dragElement(element, args);
+    return dragElement(element, args);
   }
 );
 

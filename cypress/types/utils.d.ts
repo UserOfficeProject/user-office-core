@@ -89,7 +89,7 @@ declare global {
        * @example
        *    cy.getTinyMceContent('editorId')
        */
-      getTinyMceContent: (tinyMceId: string) => Promise<string>;
+      getTinyMceContent: (tinyMceId: string) => Cypress.Chainable<string>;
 
       /**
        * Tests if action button in experiments table has the right state
@@ -102,7 +102,7 @@ declare global {
       testActionButton: (
         title: string,
         state: 'completed' | 'active' | 'inactive' | 'neutral' | 'invisible'
-      ) => Promise<void>;
+      ) => void;
     }
   }
 

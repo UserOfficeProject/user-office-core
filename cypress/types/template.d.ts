@@ -3,6 +3,12 @@ import {
   CreateTemplateMutation,
   CreateTopicMutationVariables,
   CreateQuestionMutationVariables,
+  CreateQuestionMutation,
+  UpdateQuestionMutationVariables,
+  UpdateQuestionMutation,
+  CreateQuestionTemplateRelationMutation,
+  CreateQuestionTemplateRelationMutationVariables,
+  CreateTopicMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -18,7 +24,29 @@ declare global {
        */
       createQuestion: (
         createQuestionInput: CreateQuestionMutationVariables
-      ) => void;
+      ) => Cypress.Chainable<CreateQuestionMutation>;
+      /**
+       * Updates question
+       *
+       * @returns {typeof updateQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.updateQuestion(updateQuestionInput: UpdateQuestionMutationVariables)
+       */
+      updateQuestion: (
+        updateQuestionInput: UpdateQuestionMutationVariables
+      ) => Cypress.Chainable<UpdateQuestionMutation>;
+      /**
+       * Adds question to topic
+       *
+       * @returns {typeof createQuestionTemplateRelation}
+       * @memberof Chainable
+       * @example
+       *    cy.createQuestionTemplateRelation(createQuestionTemplateRelationInput: CreateQuestionTemplateRelationMutationVariables)
+       */
+      createQuestionTemplateRelation: (
+        createQuestionTemplateRelationInput: CreateQuestionTemplateRelationMutationVariables
+      ) => Cypress.Chainable<CreateQuestionTemplateRelationMutation>;
 
       /**
        * Creates boolean question. You have to be in edit template view to call this method
@@ -183,7 +211,7 @@ declare global {
        */
       createTemplate: (
         createTemplateInput: CreateTemplateMutationVariables
-      ) => Promise<CreateTemplateMutation>;
+      ) => Cypress.Chainable<CreateTemplateMutation>;
 
       /**
        * Creates topic in template
@@ -193,7 +221,9 @@ declare global {
        * @example
        *    cy.createTopic(createTopicInput: CreateTopicMutationVariables)
        */
-      createTopic: (createTopicInput: CreateTopicMutationVariables) => void;
+      createTopic: (
+        createTopicInput: CreateTopicMutationVariables
+      ) => Cypress.Chainable<CreateTopicMutation>;
     }
   }
 }

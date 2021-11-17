@@ -7074,6 +7074,13 @@ export type TemplateFragment = (
 export type TemplateMetadataFragment = (
   { __typename?: 'Template' }
   & Pick<Template, 'templateId' | 'name' | 'description' | 'isArchived'>
+  & { steps: Array<(
+    { __typename?: 'TemplateStep' }
+    & { topic: (
+      { __typename?: 'Topic' }
+      & TopicFragment
+    ) }
+  )> }
 );
 
 export type TemplateStepFragment = (
@@ -8558,8 +8565,13 @@ export const TemplateMetadataFragmentDoc = gql`
   name
   description
   isArchived
+  steps {
+    topic {
+      ...topic
+    }
+  }
 }
-    `;
+    ${TopicFragmentDoc}`;
 export const TemplateStepFragmentDoc = gql`
     fragment templateStep on TemplateStep {
   topic {
