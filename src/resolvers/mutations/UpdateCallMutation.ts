@@ -60,8 +60,8 @@ export class UpdateCallInput {
   @Field()
   public cycleComment: string;
 
-  @Field()
-  public submissionMessage: string;
+  @Field({ nullable: true })
+  public submissionMessage: string | null;
 
   @Field()
   public surveyComment: string;
