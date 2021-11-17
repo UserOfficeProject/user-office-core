@@ -168,7 +168,7 @@ export type Call = {
   proposalSequence: Maybe<Scalars['Int']>;
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
-  submissionMessage: Scalars['String'];
+  submissionMessage: Maybe<Scalars['String']>;
   proposalWorkflowId: Maybe<Scalars['Int']>;
   allocationTimeUnit: AllocationTimeUnits;
   templateId: Scalars['Int'];
