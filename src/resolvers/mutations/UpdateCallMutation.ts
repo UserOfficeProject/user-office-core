@@ -61,6 +61,9 @@ export class UpdateCallInput {
   public cycleComment: string;
 
   @Field()
+  public submissionMessage: string;
+
+  @Field()
   public surveyComment: string;
 
   @Field(() => AllocationTimeUnits)
