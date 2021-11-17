@@ -5146,7 +5146,7 @@ export type GetInstrumentScientistProposalsQuery = (
         & Pick<Instrument, 'id' | 'name'>
       )>, call: Maybe<(
         { __typename?: 'Call' }
-        & Pick<Call, 'shortCode'>
+        & Pick<Call, 'shortCode' | 'allocationTimeUnit'>
       )>, sep: Maybe<(
         { __typename?: 'SEP' }
         & Pick<Sep, 'code'>
@@ -9832,6 +9832,7 @@ export const GetInstrumentScientistProposalsDocument = gql`
       }
       call {
         shortCode
+        allocationTimeUnit
       }
       sep {
         code
