@@ -1,6 +1,7 @@
 import { useSnackbar } from 'notistack';
-import { useCallback, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 
+import { UserContext } from 'context/UserContextProvider';
 import { Rejection } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
@@ -12,6 +13,7 @@ function useDataApiWithFeedback() {
   const dataApi = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const [isExecutingCall, setIsExecutingCall] = useState(false);
+  const { handleLogout } = useContext(UserContext);
 
   const api = useCallback(
     (successToastMessage?: string) =>
@@ -26,7 +28,12 @@ function useDataApiWithFeedback() {
 
             if (result && isMutationResult(result)) {
               if (result.rejection) {
-                const { reason } = result.rejection as Rejection;
+                let { reason } = result.rejection as Rejection;
+                if (reason === 'EXTERNAL_TOKEN_INVALID') {
+                  handleLogout();
+                  reason =
+                    'Your session has expired, you will need to log in again through the external homepage';
+                }
                 enqueueSnackbar(reason, {
                   variant: 'error',
                   className: 'snackbar-error',
@@ -47,7 +54,7 @@ function useDataApiWithFeedback() {
           };
         },
       }),
-    [setIsExecutingCall, dataApi, enqueueSnackbar]
+    [setIsExecutingCall, dataApi, enqueueSnackbar, handleLogout]
   );
 
   return { api, isExecutingCall };
