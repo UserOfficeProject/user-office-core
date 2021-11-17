@@ -650,4 +650,8 @@ export default class PostgresUserDataSource implements UserDataSource {
   async logout(token: string): Promise<void> {
     return;
   }
+
+  async isExternalTokenValid(token: string): Promise<boolean> {
+    return true;
+  }
 }

@@ -105,6 +105,7 @@ export default class SampleMutations {
   }
 
   @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
+  @Authorized()
   async updateSample(agent: UserWithRole | null, args: UpdateSampleArgs) {
     const sample = await this.sampleDataSource.getSample(args.sampleId);
     if (sample === null) {
@@ -143,6 +144,7 @@ export default class SampleMutations {
       });
   }
 
+  @Authorized()
   async deleteSample(agent: UserWithRole | null, sampleId: number) {
     const sample = await this.sampleDataSource.getSample(sampleId);
     if (sample === null) {

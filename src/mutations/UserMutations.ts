@@ -490,6 +490,7 @@ export default class UserMutations {
         user: decoded.user,
         roles: decoded.roles,
         currentRole,
+        externalToken: decoded.externalToken,
       });
 
       return tokenWithRole;

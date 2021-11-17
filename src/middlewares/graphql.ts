@@ -83,6 +83,7 @@ const apolloServer = async (app: Express) => {
             currentRole:
               req.user.currentRole ||
               (req.user.roles ? req.user.roles[0] : null),
+            externalToken: req.user.externalToken,
           } as UserWithRole;
         }
       }
