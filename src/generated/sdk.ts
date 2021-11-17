@@ -5127,7 +5127,6 @@ export type GetInstrumentScientistProposalsQuery = (
     & Pick<ProposalsQueryResult, 'totalCount'>
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'proposalId' | 'title' | 'submitted' | 'finalStatus'>
       & { status: Maybe<(
         { __typename?: 'ProposalStatus' }
         & Pick<ProposalStatus, 'name'>
@@ -5151,6 +5150,7 @@ export type GetInstrumentScientistProposalsQuery = (
         { __typename?: 'SEP' }
         & Pick<Sep, 'code'>
       )> }
+      & ProposalFragment
     )> }
   )> }
 );
@@ -9803,10 +9803,7 @@ export const GetInstrumentScientistProposalsDocument = gql`
     query getInstrumentScientistProposals($filter: ProposalsFilter, $offset: Int, $first: Int) {
   instrumentScientistProposals(filter: $filter, offset: $offset, first: $first) {
     proposals {
-      proposalId
-      title
-      submitted
-      finalStatus
+      ...proposal
       status {
         name
       }
@@ -9841,7 +9838,7 @@ export const GetInstrumentScientistProposalsDocument = gql`
     totalCount
   }
 }
-    `;
+    ${ProposalFragmentDoc}`;
 export const GetMyProposalsDocument = gql`
     query getMyProposals($filter: UserProposalsFilter) {
   me {

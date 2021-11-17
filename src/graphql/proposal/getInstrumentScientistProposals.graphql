@@ -9,10 +9,7 @@ query getInstrumentScientistProposals(
     first: $first
   ) {
     proposals {
-      proposalId
-      title
-      submitted
-      finalStatus
+      ...proposal
       status {
         name
       }
