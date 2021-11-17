@@ -9,7 +9,12 @@ query getInstrumentScientistProposals(
     first: $first
   ) {
     proposals {
-      ...proposal
+      primaryKey
+      proposalId
+      title
+      submitted
+      finalStatus
+      technicalReviewAssignee
       status {
         name
       }
@@ -28,6 +33,7 @@ query getInstrumentScientistProposals(
       }
       technicalReview {
         status
+        submitted
       }
       instrument {
         id
