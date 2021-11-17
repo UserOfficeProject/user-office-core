@@ -58,7 +58,7 @@ export class CreateCallInput {
   public cycleComment: string;
 
   @Field({ nullable: true })
-  public submissionMessage: string | null;
+  public submissionMessage: string;
 
   @Field()
   public surveyComment: string;

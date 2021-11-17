@@ -68,8 +68,8 @@ export class Call implements Partial<CallOrigin> {
   @Field()
   public surveyComment: string;
 
-  @Field({ nullable: true})
-  public submissionMessage: string | null;
+  @Field({ nullable: true })
+  public submissionMessage: string;
 
   @Field(() => Int, { nullable: true })
   public proposalWorkflowId: number;
