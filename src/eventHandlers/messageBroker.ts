@@ -192,7 +192,10 @@ export function createPostToRabbitMQHandler() {
 
         const json = JSON.stringify(message);
 
+        // NOTE: This message is consumed by scichat
         await rabbitMQ.sendMessage(Queue.PROPOSAL, event.type, json);
+        // NOTE: Send message for scheduler in a separate queue
+        await rabbitMQ.sendMessage(Queue.SCHEDULING_PROPOSAL, event.type, json);
 
         logger.logDebug(
           'Proposal event successfully sent to the message broker',

@@ -1,5 +1,7 @@
 import { logger } from '@esss-swap/duo-logger';
+import { container } from 'tsyringe';
 
+import { ProposalAuthorization } from '../../auth/ProposalAuthorization';
 import baseContext from '../../buildContext';
 import { Proposal } from '../../models/Proposal';
 import {
@@ -70,11 +72,11 @@ export const collectProposalPDFData = async (
   user: UserWithRole,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
-  const userAuthorization = baseContext.userAuthorization;
+  const proposalAuth = container.resolve(ProposalAuthorization);
   const proposal = await baseContext.queries.proposal.get(user, proposalPk);
 
   // Authenticate user
-  if (!proposal || !userAuthorization.hasAccessRights(user, proposal)) {
+  if (!proposal || !proposalAuth.hasReadRights(user, proposal)) {
     throw new Error('User was not allowed to download PDF');
   }
 
@@ -211,7 +213,7 @@ export const collectProposalPDFData = async (
     out.attachments.push(...genericTemplateAttachments);
   }
 
-  if (await userAuthorization.isReviewerOfProposal(user, proposal.primaryKey)) {
+  if (await proposalAuth.isReviewerOfProposal(user, proposal.primaryKey)) {
     const technicalReview =
       await baseContext.queries.review.technicalReviewForProposal(
         user,

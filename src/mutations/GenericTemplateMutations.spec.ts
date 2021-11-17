@@ -9,7 +9,7 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { GenericTemplate } from '../models/GenericTemplate';
-import { isRejection } from '../models/Rejection';
+import { isRejection, Rejection } from '../models/Rejection';
 import GenericTemplateMutations from './GenericTemplateMutations';
 
 const genericTemplateMutations = container.resolve(GenericTemplateMutations);
@@ -35,10 +35,7 @@ test('User officer should be able to clone genericTemplate', () => {
 test('User should not be able to clone genericTemplate that does not exist', () => {
   return expect(
     genericTemplateMutations.cloneGenericTemplate(dummyUserOfficerWithRole, 100)
-  ).resolves.toHaveProperty(
-    'reason',
-    'Could not clone genericTemplate because an error occurred'
-  );
+  ).resolves.toBeInstanceOf(Rejection);
 });
 
 test('User should be able to update title of the genericTemplate', () => {

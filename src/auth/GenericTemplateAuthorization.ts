@@ -4,11 +4,11 @@ import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { UserWithRole } from '../models/User';
 import { GenericTemplate } from './../resolvers/types/GenericTemplate';
-import { UserAuthorization } from './UserAuthorization';
+import { ProposalAuthorization } from './ProposalAuthorization';
 
 @injectable()
 export class GenericTemplateAuthorization {
-  private userAuth = container.resolve(UserAuthorization);
+  private proposalAuth = container.resolve(ProposalAuthorization);
   constructor(
     @inject(Tokens.GenericTemplateDataSource)
     private genericTemplateDataSource: GenericTemplateDataSource
@@ -42,7 +42,19 @@ export class GenericTemplateAuthorization {
     agent: UserWithRole | null,
     genericTemplateOrGenericTemplateId: GenericTemplate | number
   ): Promise<boolean> {
-    return this.hasAccessRights(agent, genericTemplateOrGenericTemplateId);
+    const genericTemplate = await this.resolveGenericTemplate(
+      genericTemplateOrGenericTemplateId
+    );
+
+    if (!genericTemplate) {
+      return false;
+    }
+
+    /*
+     * For the genericTemplate the authorization follows the business logic for the proposal
+     * authorization that the genericTemplate is associated with
+     */
+    return this.proposalAuth.hasReadRights(agent, genericTemplate.proposalPk);
   }
 
   async hasWriteRights(
@@ -57,18 +69,6 @@ export class GenericTemplateAuthorization {
     agent: UserWithRole | null,
     genericTemplateOrGenericTemplateId: GenericTemplate | number
   ): Promise<boolean> {
-    return this.hasAccessRights(agent, genericTemplateOrGenericTemplateId);
-  }
-
-  private async hasAccessRights(
-    agent: UserWithRole | null,
-    genericTemplateOrGenericTemplateId: GenericTemplate | number
-  ) {
-    // User officer has access
-    if (this.userAuth.isUserOfficer(agent)) {
-      return true;
-    }
-
     const genericTemplate = await this.resolveGenericTemplate(
       genericTemplateOrGenericTemplateId
     );
@@ -81,6 +81,6 @@ export class GenericTemplateAuthorization {
      * For the genericTemplate the authorization follows the business logic for the proposal
      * authorization that the genericTemplate is associated with
      */
-    return this.userAuth.hasAccessRights(agent, genericTemplate.proposalPk);
+    return this.proposalAuth.hasWriteRights(agent, genericTemplate.proposalPk);
   }
 }

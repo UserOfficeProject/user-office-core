@@ -10,6 +10,8 @@ import {
 } from '@esss-swap/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -40,10 +42,10 @@ import { ReorderSepMeetingDecisionProposalsInput } from '../resolvers/mutations/
 import { SaveSEPMeetingDecisionInput } from '../resolvers/mutations/SEPMeetingDecisionMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { UpdateSEPTimeAllocationArgs } from '../resolvers/mutations/UpdateSEPProposalMutation';
-import { UserAuthorization } from '../utils/UserAuthorization';
 @injectable()
 export default class SEPMutations {
   private userAuth = container.resolve(UserAuthorization);
+  private proposalAuth = container.resolve(ProposalAuthorization);
   constructor(
     @inject(Tokens.SEPDataSource)
     private dataSource: SEPDataSource,
@@ -395,7 +397,10 @@ export default class SEPMutations {
     args: SaveSEPMeetingDecisionInput
   ): Promise<SepMeetingDecision | Rejection> {
     const isChairOrSecretaryOfProposal =
-      await this.userAuth.isChairOrSecretaryOfProposal(agent, args.proposalPk);
+      await this.proposalAuth.isChairOrSecretaryOfProposal(
+        agent,
+        args.proposalPk
+      );
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
 
     if (!isChairOrSecretaryOfProposal && !isUserOfficer) {

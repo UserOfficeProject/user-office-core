@@ -2,16 +2,18 @@ import { logger } from '@esss-swap/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { UserWithRole } from '../models/User';
 import { VisitStatus } from '../models/Visit';
-import { ProposalDataSource } from './../datasources/ProposalDataSource';
-import { Visit } from './../models/Visit';
+import { Visit } from '../models/Visit';
+import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class VisitAuthorization {
   private userAuth = container.resolve(UserAuthorization);
+  private proposalAuth = container.resolve(ProposalAuthorization);
 
   constructor(
     @inject(Tokens.ProposalDataSource)
@@ -67,7 +69,7 @@ export class VisitAuthorization {
      */
     return (
       visit.creatorId === agent.id ||
-      this.userAuth.isMemberOfProposal(agent, visit.proposalPk) ||
+      this.proposalAuth.isMemberOfProposal(agent, visit.proposalPk) ||
       this.visitDataSource.isVisitorOfVisit(agent.id, visit.id)
     );
   }
@@ -105,7 +107,7 @@ export class VisitAuthorization {
      * User can modify the visit if he is a participant of a proposal
      * and the visit is not yet accepted
      */
-    if (await this.userAuth.isMemberOfProposal(agent, proposal)) {
+    if (await this.proposalAuth.isMemberOfProposal(agent, proposal)) {
       if (visit.status === VisitStatus.ACCEPTED) {
         logger.logError('User tried to change accepted visit', {
           agent,
