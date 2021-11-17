@@ -9,9 +9,12 @@ query getInstrumentScientistProposals(
     first: $first
   ) {
     proposals {
-      ...proposal
-      proposer {
-        ...basicUserDetails
+      proposalId
+      title
+      submitted
+      finalStatus
+      status {
+        name
       }
       reviews {
         id
@@ -26,23 +29,18 @@ query getInstrumentScientistProposals(
           id
         }
       }
-      users {
-        ...basicUserDetails
-      }
       technicalReview {
-        ...coreTechnicalReview
+        status
       }
       instrument {
         id
         name
       }
       call {
-        id
         shortCode
         allocationTimeUnit
       }
       sep {
-        id
         code
       }
     }

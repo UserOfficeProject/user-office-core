@@ -5127,9 +5127,10 @@ export type GetInstrumentScientistProposalsQuery = (
     & Pick<ProposalsQueryResult, 'totalCount'>
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & { proposer: Maybe<(
-        { __typename?: 'BasicUserDetails' }
-        & BasicUserDetailsFragment
+      & Pick<Proposal, 'proposalId' | 'title' | 'submitted' | 'finalStatus'>
+      & { status: Maybe<(
+        { __typename?: 'ProposalStatus' }
+        & Pick<ProposalStatus, 'name'>
       )>, reviews: Maybe<Array<(
         { __typename?: 'Review' }
         & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
@@ -5137,23 +5138,19 @@ export type GetInstrumentScientistProposalsQuery = (
           { __typename?: 'BasicUserDetails' }
           & Pick<BasicUserDetails, 'firstname' | 'lastname' | 'id'>
         )> }
-      )>>, users: Array<(
-        { __typename?: 'BasicUserDetails' }
-        & BasicUserDetailsFragment
-      )>, technicalReview: Maybe<(
+      )>>, technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
-        & CoreTechnicalReviewFragment
+        & Pick<TechnicalReview, 'status'>
       )>, instrument: Maybe<(
         { __typename?: 'Instrument' }
         & Pick<Instrument, 'id' | 'name'>
       )>, call: Maybe<(
         { __typename?: 'Call' }
-        & Pick<Call, 'id' | 'shortCode' | 'allocationTimeUnit'>
+        & Pick<Call, 'shortCode'>
       )>, sep: Maybe<(
         { __typename?: 'SEP' }
-        & Pick<Sep, 'id' | 'code'>
+        & Pick<Sep, 'code'>
       )> }
-      & ProposalFragment
     )> }
   )> }
 );
@@ -9806,9 +9803,12 @@ export const GetInstrumentScientistProposalsDocument = gql`
     query getInstrumentScientistProposals($filter: ProposalsFilter, $offset: Int, $first: Int) {
   instrumentScientistProposals(filter: $filter, offset: $offset, first: $first) {
     proposals {
-      ...proposal
-      proposer {
-        ...basicUserDetails
+      proposalId
+      title
+      submitted
+      finalStatus
+      status {
+        name
       }
       reviews {
         id
@@ -9823,32 +9823,24 @@ export const GetInstrumentScientistProposalsDocument = gql`
           id
         }
       }
-      users {
-        ...basicUserDetails
-      }
       technicalReview {
-        ...coreTechnicalReview
+        status
       }
       instrument {
         id
         name
       }
       call {
-        id
         shortCode
-        allocationTimeUnit
       }
       sep {
-        id
         code
       }
     }
     totalCount
   }
 }
-    ${ProposalFragmentDoc}
-${BasicUserDetailsFragmentDoc}
-${CoreTechnicalReviewFragmentDoc}`;
+    `;
 export const GetMyProposalsDocument = gql`
     query getMyProposals($filter: UserProposalsFilter) {
   me {
