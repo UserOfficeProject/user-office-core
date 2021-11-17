@@ -642,4 +642,12 @@ export default class PostgresUserDataSource implements UserDataSource {
           new Role(role.role_id, role.short_code, role.title)
       );
   }
+
+  async externalTokenLogin(token: string): Promise<null> {
+    return null;
+  }
+
+  async logout(token: string): Promise<void> {
+    return;
+  }
 }

@@ -5,6 +5,8 @@ import {
 } from '@esss-swap/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
@@ -28,11 +30,11 @@ import { ProposalPkWithReviewId } from '../resolvers/mutations/SubmitProposalsRe
 import { SubmitTechnicalReviewInput } from '../resolvers/mutations/SubmitTechnicalReviewMutation';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 @injectable()
 export default class ReviewMutations {
   private userAuth = container.resolve(UserAuthorization);
+  private proposalAuth = container.resolve(ProposalAuthorization);
 
   constructor(
     @inject(Tokens.ReviewDataSource) private dataSource: ReviewDataSource,
@@ -60,7 +62,10 @@ export default class ReviewMutations {
 
     if (
       !(
-        (await this.userAuth.isReviewerOfProposal(agent, review.proposalPk)) ||
+        (await this.proposalAuth.isReviewerOfProposal(
+          agent,
+          review.proposalPk
+        )) ||
         (await this.userAuth.isChairOrSecretaryOfSEP(agent, review.sepID)) ||
         this.userAuth.isUserOfficer(agent)
       )
@@ -150,7 +155,10 @@ export default class ReviewMutations {
 
     if (
       !(
-        (await this.userAuth.isReviewerOfProposal(agent, review.proposalPk)) ||
+        (await this.proposalAuth.isReviewerOfProposal(
+          agent,
+          review.proposalPk
+        )) ||
         (await this.userAuth.isChairOrSecretaryOfSEP(agent, review.sepID)) ||
         this.userAuth.isUserOfficer(agent)
       )
@@ -199,7 +207,7 @@ export default class ReviewMutations {
     if (
       !(
         this.userAuth.isUserOfficer(agent) ||
-        (await this.userAuth.isScientistToProposal(agent, args.proposalPk))
+        (await this.proposalAuth.isScientistToProposal(agent, args.proposalPk))
       )
     ) {
       return rejection(

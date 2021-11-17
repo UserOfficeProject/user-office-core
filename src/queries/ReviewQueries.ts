@@ -1,5 +1,7 @@
 import { container, inject, injectable } from 'tsyringe';
 
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
@@ -7,11 +9,11 @@ import { Review } from '../models/Review';
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 @injectable()
 export default class ReviewQueries {
   private userAuth = container.resolve(UserAuthorization);
+  private proposalAuth = container.resolve(ProposalAuthorization);
 
   constructor(
     @inject(Tokens.ReviewDataSource) public dataSource: ReviewDataSource
@@ -31,7 +33,7 @@ export default class ReviewQueries {
       review.userID === agent!.id ||
       this.userAuth.isUserOfficer(agent) ||
       (sepId && (await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId))) ||
-      (await this.userAuth.isReviewerOfProposal(agent, review.proposalPk))
+      (await this.proposalAuth.isReviewerOfProposal(agent, review.proposalPk))
     ) {
       return review;
     } else {
@@ -46,7 +48,7 @@ export default class ReviewQueries {
   ): Promise<Review[] | null> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfProposal(agent, proposalPk))
+      !(await this.proposalAuth.isChairOrSecretaryOfProposal(agent, proposalPk))
     ) {
       return null;
     }
@@ -61,11 +63,13 @@ export default class ReviewQueries {
   ): Promise<TechnicalReview | null> {
     if (
       this.userAuth.isUserOfficer(agent) ||
-      (await this.userAuth.isScientistToProposal(agent, proposalPk)) ||
-      (await this.userAuth.isChairOrSecretaryOfProposal(agent, proposalPk))
+      (await this.proposalAuth.isScientistToProposal(agent, proposalPk)) ||
+      (await this.proposalAuth.isChairOrSecretaryOfProposal(agent, proposalPk))
     ) {
       return this.dataSource.getTechnicalReview(proposalPk);
-    } else if (await this.userAuth.isReviewerOfProposal(agent, proposalPk)) {
+    } else if (
+      await this.proposalAuth.isReviewerOfProposal(agent, proposalPk)
+    ) {
       const review = await this.dataSource.getTechnicalReview(proposalPk);
       if (review) {
         review.comment = '';
