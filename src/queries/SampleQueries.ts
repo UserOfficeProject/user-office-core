@@ -21,6 +21,7 @@ export default class SampleQueries {
     private dataSource: SampleDataSource
   ) {}
 
+  @Authorized()
   async getSample(agent: UserWithRole | null, sampleId: number) {
     if ((await this.sampleAuth.hasReadRights(agent, sampleId)) !== true) {
       logger.logWarn('Unauthorized getSample access', { agent, sampleId });
@@ -31,6 +32,7 @@ export default class SampleQueries {
     return this.dataSource.getSample(sampleId);
   }
 
+  @Authorized()
   async getSamples(agent: UserWithRole | null, args: SamplesArgs) {
     let samples = await this.dataSource.getSamples(args);
 

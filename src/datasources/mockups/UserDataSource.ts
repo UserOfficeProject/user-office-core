@@ -359,7 +359,11 @@ export class UserDataSourceMock implements UserDataSource {
     return dummyUser;
   }
 
-  async logout(token: string) {
+  async logout(token: string): Promise<void> {
     return;
+  }
+
+  async isExternalTokenValid(token: string): Promise<boolean> {
+    return true;
   }
 }
