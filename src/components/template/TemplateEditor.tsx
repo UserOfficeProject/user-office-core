@@ -7,7 +7,6 @@ import useTheme from '@material-ui/core/styles/useTheme';
 import Switch from '@material-ui/core/Switch';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
-import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 
@@ -47,7 +46,6 @@ const useStyles = makeStyles(() => ({
   },
 }));
 export default function TemplateEditor() {
-  const { enqueueSnackbar } = useSnackbar();
   const { api } = useDataApiWithFeedback();
   const [
     selectedQuestionTemplateRelation,
@@ -69,7 +67,6 @@ export default function TemplateEditor() {
       next(action);
       switch (action.type) {
         case EventType.SERVICE_ERROR_OCCURRED:
-          enqueueSnackbar(action.payload, { variant: 'error' });
           break;
 
         case EventType.QUESTION_CREATED:
