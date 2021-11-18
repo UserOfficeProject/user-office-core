@@ -1,6 +1,8 @@
 import { decode } from 'jsonwebtoken';
 
 import {
+  CreateUserMutation,
+  CreateUserMutationVariables,
   LoginMutation,
   Role,
   SelectRoleMutationVariables,
@@ -77,6 +79,15 @@ const logout = () => {
   cy.get('[data-cy=profile-page-btn]').click();
 
   cy.get('[data-cy=logout]').click();
+};
+
+const createUser = (
+  createUserInput: CreateUserMutationVariables
+): Cypress.Chainable<CreateUserMutation> => {
+  const api = getE2EApi();
+  const request = api.createUser(createUserInput);
+
+  return cy.wrap(request);
 };
 
 function updateUserDetails(
@@ -160,6 +171,7 @@ function changeActiveRole(selectRoleInput: SelectRoleMutationVariables) {
 Cypress.Commands.add('login', login);
 
 Cypress.Commands.add('logout', logout);
+Cypress.Commands.add('createUser', createUser);
 
 Cypress.Commands.add('updateUserRoles', updateUserRoles);
 Cypress.Commands.add('updateUserDetails', updateUserDetails);

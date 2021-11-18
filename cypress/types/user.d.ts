@@ -4,6 +4,8 @@ import {
   UpdateUserRolesMutationVariables,
   UpdateUserMutationVariables,
   UpdateUserMutation,
+  CreateUserMutationVariables,
+  CreateUserMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -36,6 +38,17 @@ declare global {
        */
       logout: () => void;
 
+      /**
+       * Crete user
+       *
+       * @returns {typeof createUser}
+       * @memberof Chainable
+       * @example
+       *    cy.createUser(createUserInput: CreateUserMutationVariables)
+       */
+      createUser: (
+        createUserInput: CreateUserMutationVariables
+      ) => Cypress.Chainable<CreateUserMutation>;
       /**
        * Update user roles
        *
