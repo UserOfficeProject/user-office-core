@@ -96,6 +96,7 @@ context('User tests', () => {
 
   it('A user should be able to login and out', () => {
     cy.createUser({
+      user_title: faker.name.prefix(),
       firstname: firstName,
       lastname: lastName,
       password: password,
