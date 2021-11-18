@@ -9,6 +9,10 @@ import {
   ChangeProposalsStatusMutationVariables,
   SubmitProposalMutationVariables,
   SubmitProposalMutation,
+  UpdateEsiMutationVariables,
+  UpdateEsiMutation,
+  CreateEsiMutationVariables,
+  CreateEsiMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -75,6 +79,30 @@ declare global {
       updateProposalManagementDecision: (
         administrationProposalInput: AdministrationProposalMutationVariables
       ) => Cypress.Chainable<AdministrationProposalMutation>;
+
+      /**
+       * Update proposal ESI.
+       *
+       * @returns {typeof updateEsi}
+       * @memberof Chainable
+       * @example
+       *        cy.updateEsi(updateEsiInput: UpdateEsiMutationVariables);
+       */
+      updateEsi: (
+        updateEsiInput: UpdateEsiMutationVariables
+      ) => Cypress.Chainable<UpdateEsiMutation>;
+
+      /**
+       * Create proposal ESI.
+       *
+       * @returns {typeof createEsi}
+       * @memberof Chainable
+       * @example
+       *        cy.createEsi(createEsiInput: CreateEsiMutationVariables);
+       */
+      createEsi: (
+        createEsiInput: CreateEsiMutationVariables
+      ) => Cypress.Chainable<CreateEsiMutation>;
     }
   }
 }

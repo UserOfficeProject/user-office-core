@@ -3,10 +3,14 @@ import {
   AdministrationProposalMutationVariables,
   ChangeProposalsStatusMutation,
   ChangeProposalsStatusMutationVariables,
+  CreateEsiMutation,
+  CreateEsiMutationVariables,
   CreateProposalMutation,
   CreateProposalMutationVariables,
   SubmitProposalMutation,
   SubmitProposalMutationVariables,
+  UpdateEsiMutation,
+  UpdateEsiMutationVariables,
   UpdateProposalMutation,
   UpdateProposalMutationVariables,
 } from '../../src/generated/sdk';
@@ -101,6 +105,24 @@ const updateProposalManagementDecision = (
   return cy.wrap(request);
 };
 
+const createEsi = (
+  createEsiInput: CreateEsiMutationVariables
+): Cypress.Chainable<CreateEsiMutation> => {
+  const api = getE2EApi();
+  const request = api.createEsi(createEsiInput);
+
+  return cy.wrap(request);
+};
+
+const updateEsi = (
+  updateEsiInput: UpdateEsiMutationVariables
+): Cypress.Chainable<UpdateEsiMutation> => {
+  const api = getE2EApi();
+  const request = api.updateEsi(updateEsiInput);
+
+  return cy.wrap(request);
+};
+
 Cypress.Commands.add('createProposal', createProposal);
 Cypress.Commands.add('updateProposal', updateProposal);
 Cypress.Commands.add('submitProposal', submitProposal);
@@ -109,3 +131,6 @@ Cypress.Commands.add(
   'updateProposalManagementDecision',
   updateProposalManagementDecision
 );
+
+Cypress.Commands.add('createEsi', createEsi);
+Cypress.Commands.add('updateEsi', updateEsi);
