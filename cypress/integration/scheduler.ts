@@ -1,5 +1,3 @@
-import faker from 'faker';
-
 context('Scheduler tests', () => {
   // NOTE: We use fixed dates because we populate the database with a seeder. This is because message broker is not running in test environment.
   const upcoming = {
@@ -18,47 +16,44 @@ context('Scheduler tests', () => {
     startsAt: '2023-02-07 12:00',
     endsAt: '2023-02-07 13:00',
   };
-  const scientist = 'Carl';
-
-  const proposalTitle = faker.random.words(2);
-
-  before(() => {
-    cy.resetDB(true);
-    cy.resetSchedulerDB(true);
-    cy.viewport(1920, 1080);
-
-    cy.login('user');
-    cy.createProposal(proposalTitle);
-    cy.logout();
-
-    cy.login('officer');
-
-    cy.contains('People').click();
-    cy.addScientistRoleToUser(scientist);
-
-    cy.contains('Instruments').click();
-    cy.assignScientistsToInstrument('Instrument 2');
-
-    cy.contains('Calls').click();
-    cy.assignInstrumentToCall('call 1', 'Instrument 2');
-
-    cy.contains('Proposals').click();
-    cy.assignInstrumentToProposal(proposalTitle, 'Instrument 2');
-
-    cy.logout();
-  });
+  const scientist = { firstname: 'Carl', id: 1 };
+  const scientistRoleId = 7;
+  const userRoleId = 1;
+  const existingSeededInstrumentId = 2;
+  const existingSeededCallId = 1;
+  const existingSeedeProposalId = 1;
 
   beforeEach(() => {
-    cy.viewport(1920, 1080);
-  });
+    cy.resetDB(true);
+    cy.resetSchedulerDB(true);
+    cy.updateUserRoles({
+      id: scientist.id,
+      roles: [userRoleId, scientistRoleId],
+    });
+    cy.assignScientistsToInstrument({
+      instrumentId: existingSeededInstrumentId,
+      scientistIds: [scientist.id],
+    });
 
-  after(() => {
-    cy.resetSchedulerDB();
+    cy.assignInstrumentToCall({
+      callId: existingSeededCallId,
+      instrumentIds: [existingSeededInstrumentId],
+    });
+    cy.assignProposalsToInstrument({
+      instrumentId: existingSeededInstrumentId,
+      proposals: [
+        {
+          callId: existingSeededCallId,
+          primaryKey: existingSeedeProposalId,
+        },
+      ],
+    });
+    cy.viewport(1920, 1080);
+    cy.login('user');
+    cy.visit('/');
   });
 
   it('User should not be able to see upcoming experiments in DRAFT state', () => {
-    cy.login('user');
-
     cy.contains('Upcoming experiments');
 
     cy.contains(upcomingDraft.startsAt).should('not.exist');
@@ -68,19 +63,16 @@ context('Scheduler tests', () => {
   });
 
   it('Instrument scientist should not be able to see upcoming experiments in DRAFT state', () => {
-    cy.login('user');
-    cy.changeActiveRole('Instrument Scientist');
+    cy.changeActiveRole(scientistRoleId);
+    cy.visit('/');
     cy.finishedLoading();
 
-    cy.finishedLoading();
     cy.contains('Upcoming experiments').click();
 
     cy.contains('No records to display');
   });
 
   it('User should be able to see upcoming experiments in ACTIVE', () => {
-    cy.login('user');
-
     cy.contains('Upcoming experiments').should('exist');
 
     cy.contains(upcoming.startsAt);
@@ -92,8 +84,8 @@ context('Scheduler tests', () => {
   });
 
   it('Instrument scientist should be able to see upcoming experiments in ACTIVE', () => {
-    cy.login('user');
-    cy.changeActiveRole('Instrument Scientist');
+    cy.changeActiveRole(scientistRoleId);
+    cy.visit('/');
 
     cy.finishedLoading();
     cy.contains('Upcoming experiments').click();
@@ -107,8 +99,6 @@ context('Scheduler tests', () => {
   });
 
   it('User should be able to see upcoming experiments in COMPLETED', () => {
-    cy.login('user');
-
     cy.contains('Upcoming experiments').should('exist');
 
     cy.contains(completed.startsAt);
@@ -120,8 +110,8 @@ context('Scheduler tests', () => {
   });
 
   it('Instrument scientist should be able to see upcoming experiments in COMPLETED', () => {
-    cy.login('user');
-    cy.changeActiveRole('Instrument Scientist');
+    cy.changeActiveRole(scientistRoleId);
+    cy.visit('/');
 
     cy.finishedLoading();
     cy.contains('Upcoming experiments').click();
@@ -135,8 +125,6 @@ context('Scheduler tests', () => {
   });
 
   it('User should be able to see past and upcoming experiments', () => {
-    cy.login('user');
-
     cy.contains('Experiment Times').click();
     cy.finishedLoading();
 
