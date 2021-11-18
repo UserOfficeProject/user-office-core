@@ -181,6 +181,10 @@ context('GenericTemplates tests', () => {
 
   describe('Generic templates basic tests', () => {
     it('Should be able to create proposal template with genericTemplate', () => {
+      cy.createTemplate({
+        name: proposalTemplateName,
+        groupId: TemplateGroupId.PROPOSAL,
+      });
       cy.login('officer');
       cy.visit('/');
 
@@ -517,6 +521,8 @@ context('GenericTemplates tests', () => {
       cy.get(
         '[data-cy="genericTemplate-declaration-modal"] [data-cy="save-and-continue-button"]'
       ).click();
+
+      cy.finishedLoading();
 
       cy.get('.Mui-error').should('not.exist');
 
