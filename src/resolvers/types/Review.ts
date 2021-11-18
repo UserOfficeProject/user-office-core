@@ -10,6 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { Review as ReviewOrigin, ReviewStatus } from '../../models/Review';
+import { UserQueryContext } from '../../queries/UserQueries';
 import { Proposal } from '../types/Proposal';
 import { BasicUserDetails } from './BasicUserDetails';
 import { NextProposalStatus } from './ProposalStatus';
@@ -50,7 +51,11 @@ export class ReviewResolver {
     @Root() review: Review,
     @Ctx() context: ResolverContext
   ): Promise<BasicUserDetails | null> {
-    return context.queries.user.getBasic(context.user, review.userID);
+    return context.queries.user.getBasic(
+      context.user,
+      review.userID,
+      UserQueryContext.ANY
+    );
   }
 
   @FieldResolver(() => Proposal, { nullable: true })

@@ -39,7 +39,7 @@ export class UserAuthorization {
     });
   }
 
-  isInstrumentScientist(agent: UserWithRole) {
+  isInstrumentScientist(agent: UserWithRole | null) {
     if (agent == null) {
       return false;
     }

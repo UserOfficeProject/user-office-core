@@ -10,6 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { SEP as SEPBase } from '../../models/SEP';
+import { UserQueryContext } from '../../queries/UserQueries';
 import { BasicUserDetails } from './BasicUserDetails';
 
 @ObjectType()
@@ -42,7 +43,11 @@ export class SEPResolvers {
       return null;
     }
 
-    return context.queries.user.getBasic(context.user, sep.sepChairUserId);
+    return context.queries.user.getBasic(
+      context.user,
+      sep.sepChairUserId,
+      UserQueryContext.ANY
+    );
   }
 
   @FieldResolver(() => BasicUserDetails, { nullable: true })
@@ -51,6 +56,10 @@ export class SEPResolvers {
       return null;
     }
 
-    return context.queries.user.getBasic(context.user, sep.sepSecretaryUserId);
+    return context.queries.user.getBasic(
+      context.user,
+      sep.sepSecretaryUserId,
+      UserQueryContext.ANY
+    );
   }
 }

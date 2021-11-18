@@ -16,13 +16,13 @@ import {
 } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
+import { UserQueryContext } from '../../queries/UserQueries';
 import { getFileAttachments, Attachment } from '../util';
 import {
   collectGenericTemplatePDFData,
   GenericTemplatePDFData,
 } from './genericTemplates';
 import { collectSamplePDFData, SamplePDFData } from './sample';
-
 type ProposalPDFData = {
   proposal: Proposal;
   principalInvestigator: BasicUserDetails;
@@ -95,14 +95,12 @@ export const collectProposalPDFData = async (
   if (isRejection(questionarySteps) || questionarySteps == null) {
     throw new Error('Could not fetch questionary');
   }
-  const isCallingProposer = true;
 
-  const principalInvestigator =
-    await baseContext.queries.user.getProposerBasicDetails(
-      user,
-      proposal.proposerId,
-      isCallingProposer
-    );
+  const principalInvestigator = await baseContext.queries.user.getBasic(
+    user,
+    proposal.proposerId,
+    UserQueryContext.PROPOSER
+  );
   const coProposers = await baseContext.queries.user.getProposers(
     user,
     proposalPk

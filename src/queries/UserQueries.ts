@@ -3,8 +3,9 @@ import * as bcrypt from 'bcryptjs';
 // TODO: Try to replace request-promise with axios. request-promise depends on request which is deprecated.
 import { CoreOptions, UriOptions } from 'request';
 import rp from 'request-promise';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
@@ -21,6 +22,7 @@ import { signToken, verifyToken } from '../utils/jwt';
 
 @injectable()
 export default class UserQueries {
+  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.UserDataSource) public dataSource: UserDataSource
   ) {}
@@ -44,46 +46,35 @@ export default class UserQueries {
     return this.dataSource.me((agent as UserWithRole).id);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
-  async getBasic(agent: UserWithRole | null, id: number) {
-    const user = await this.dataSource.getBasicUserInfo(id);
-    if (!user) {
-      return null;
-    }
-
-    return new BasicUserDetails(
-      user.id,
-      user.firstname,
-      user.lastname,
-      user.preferredname,
-      user.organisation,
-      user.position,
-      user.created,
-      user.placeholder
-    );
-  }
   @Authorized()
-  async getProposerBasicDetails(
+  async getBasic(
     agent: UserWithRole | null,
     id: number,
-    isCallingProposer: boolean
+    proposer: UserQueryContext
   ) {
     const user = await this.dataSource.getBasicUserInfo(id);
-    if (!user || !isCallingProposer) {
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    const isInstrumentScientist = this.userAuth.isInstrumentScientist(agent);
+    if (
+      ((proposer == 'ANY' && (isUserOfficer || isInstrumentScientist)) ||
+        proposer == 'PROPOSER') &&
+      user
+    ) {
+      return new BasicUserDetails(
+        user.id,
+        user.firstname,
+        user.lastname,
+        user.preferredname,
+        user.organisation,
+        user.position,
+        user.created,
+        user.placeholder
+      );
+    } else {
       return null;
     }
-
-    return new BasicUserDetails(
-      user.id,
-      user.firstname,
-      user.lastname,
-      user.preferredname,
-      user.organisation,
-      user.position,
-      user.created,
-      user.placeholder
-    );
   }
+
   @Authorized()
   async getBasicUserDetailsByEmail(
     agent: UserWithRole | null,
@@ -280,4 +271,8 @@ export default class UserQueries {
       };
     }
   }
+}
+export enum UserQueryContext {
+  PROPOSER = 'PROPOSER',
+  ANY = 'ANY',
 }

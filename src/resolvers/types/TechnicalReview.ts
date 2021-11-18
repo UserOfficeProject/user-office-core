@@ -13,6 +13,7 @@ import {
   TechnicalReview as TechnicalReviewOrigin,
   TechnicalReviewStatus,
 } from '../../models/TechnicalReview';
+import { UserQueryContext } from '../../queries/UserQueries';
 import { Proposal } from '../types/Proposal';
 import { BasicUserDetails } from './BasicUserDetails';
 
@@ -63,7 +64,8 @@ export class TechnicalReviewResolver {
   ): Promise<BasicUserDetails | null> {
     return context.queries.user.getBasic(
       context.user,
-      technicalReview.reviewerId
+      technicalReview.reviewerId,
+      UserQueryContext.ANY
     );
   }
 }
