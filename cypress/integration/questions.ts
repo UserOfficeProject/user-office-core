@@ -1,11 +1,8 @@
 import faker from 'faker';
 
 context('Questions tests', () => {
-  before(() => {
-    cy.resetDB();
-  });
-
   beforeEach(() => {
+    cy.resetDB();
     cy.viewport(1920, 1080);
   });
 
@@ -13,6 +10,7 @@ context('Questions tests', () => {
 
   it('User officer search questions', () => {
     cy.login('officer');
+    cy.visit('/');
 
     cy.navigateToTemplatesSubmenu('Proposal');
 
