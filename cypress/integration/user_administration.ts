@@ -1,14 +1,6 @@
 import faker from 'faker';
 
 context('User administration tests', () => {
-  before(() => {
-    cy.resetDB();
-  });
-
-  beforeEach(() => {
-    cy.viewport(1920, 1080);
-  });
-
   const newFirstName = faker.name.firstName();
   const newMiddleName = faker.name.firstName();
   const newLastName = faker.name.lastName();
@@ -18,10 +10,16 @@ context('User administration tests', () => {
   const newTelephone = faker.phone.phoneNumber('0##########');
   const newTelephoneAlt = faker.phone.phoneNumber('0##########');
   const unverifiedEmailUserName = 'Unverified email';
+  const placeholderUserId = 5;
+
+  beforeEach(() => {
+    cy.resetDB();
+    cy.viewport(1920, 1080);
+    cy.login('officer');
+    cy.visit('/');
+  });
 
   it('should be able to verify email manually', () => {
-    cy.login('officer');
-
     cy.contains('People').click();
 
     cy.contains(unverifiedEmailUserName)
@@ -40,6 +38,7 @@ context('User administration tests', () => {
     cy.logout();
 
     cy.login('placeholderUser');
+    cy.visit('/');
 
     cy.get('[data-cy="active-user-profile"]').click();
 
@@ -48,8 +47,7 @@ context('User administration tests', () => {
   });
 
   it('should be able to remove the placeholder flag', () => {
-    cy.login('officer');
-
+    cy.setUserEmailVerified({ id: placeholderUserId });
     cy.contains('People').click();
 
     cy.get('input[aria-label=Search]').type('placeholder');
@@ -73,6 +71,7 @@ context('User administration tests', () => {
     cy.logout();
 
     cy.login('placeholderUser');
+    cy.visit('/');
 
     cy.get('[data-cy="active-user-profile"]').click();
 
@@ -81,8 +80,6 @@ context('User administration tests', () => {
   });
 
   it('Should be able administer user information', () => {
-    cy.login('officer');
-
     cy.contains('People').click();
 
     cy.get("[title='Edit user']").first().click();
@@ -133,7 +130,6 @@ context('User administration tests', () => {
     const reviewerFirstName = faker.name.firstName();
     const reviewerLastName = faker.name.lastName();
     const reviewerEmail = faker.internet.email();
-
     cy.contains('People').click();
 
     cy.get('[data-cy="invite-user-button"]').click();
@@ -216,6 +212,7 @@ context('User administration tests', () => {
   });
 
   it('Should be able to send email for password reset', () => {
+    cy.logout();
     cy.visit('/SignIn');
     cy.contains('Forgot password?').click();
 

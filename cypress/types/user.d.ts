@@ -5,6 +5,8 @@ import {
   UpdateUserMutation,
   CreateUserMutationVariables,
   CreateUserMutation,
+  SetUserEmailVerifiedMutationVariables,
+  SetUserEmailVerifiedMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -71,6 +73,18 @@ declare global {
       updateUserDetails: (
         updateUserInput: UpdateUserMutationVariables
       ) => Cypress.Chainable<UpdateUserMutation>;
+
+      /**
+       * Set user email verified
+       *
+       * @returns {typeof setUserEmailVerified}
+       * @memberof Chainable
+       * @example
+       *    cy.setUserEmailVerified(setUserEmailVerifiedInput: SetUserEmailVerifiedMutationVariables)
+       */
+      setUserEmailVerified: (
+        setUserEmailVerifiedInput: SetUserEmailVerifiedMutationVariables
+      ) => Cypress.Chainable<SetUserEmailVerifiedMutation>;
 
       /**
        * Lets you change the logged in user's active role

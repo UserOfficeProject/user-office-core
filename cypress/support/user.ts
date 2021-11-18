@@ -5,6 +5,8 @@ import {
   CreateUserMutationVariables,
   LoginMutation,
   Role,
+  SetUserEmailVerifiedMutation,
+  SetUserEmailVerifiedMutationVariables,
   UpdateUserMutation,
   UpdateUserMutationVariables,
   UpdateUserRolesMutationVariables,
@@ -98,6 +100,15 @@ function updateUserDetails(
   return cy.wrap(request);
 }
 
+function setUserEmailVerified(
+  setUserEmailVerifiedInput: SetUserEmailVerifiedMutationVariables
+): Cypress.Chainable<SetUserEmailVerifiedMutation> {
+  const api = getE2EApi();
+  const request = api.setUserEmailVerified(setUserEmailVerifiedInput);
+
+  return cy.wrap(request);
+}
+
 function updateUserRoles(
   updateUserRolesInput: UpdateUserRolesMutationVariables
 ) {
@@ -180,5 +191,6 @@ Cypress.Commands.add('createUser', createUser);
 
 Cypress.Commands.add('updateUserRoles', updateUserRoles);
 Cypress.Commands.add('updateUserDetails', updateUserDetails);
+Cypress.Commands.add('setUserEmailVerified', setUserEmailVerified);
 
 Cypress.Commands.add('changeActiveRole', changeActiveRole);
