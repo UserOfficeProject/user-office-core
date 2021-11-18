@@ -41,15 +41,15 @@ export function useUserWithReviewsData(filters?: {
 }
 
 export function useBasicUserData() {
-  const sendRequest = useDataApi();
+  const api = useDataApi();
 
   const loadBasicUserData = useCallback(
     async (id: number) => {
-      return sendRequest()
+      return api()
         .getBasicUserDetails({ id })
         .then((data) => data.basicUserDetails);
     },
-    [sendRequest]
+    [api]
   );
 
   return { loadBasicUserData };

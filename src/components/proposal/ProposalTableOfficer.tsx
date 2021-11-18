@@ -205,16 +205,28 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       ...{ width: 'auto' },
     },
     {
-      title: 'Time allocation',
+      title: 'Technical time allocation',
       render: (rowData) =>
-        rowData.timeAllocation
-          ? `${rowData.timeAllocation}(${rowData.allocationTimeUnit}s)`
+        rowData.technicalTimeAllocation
+          ? `${rowData.technicalTimeAllocation}(${rowData.allocationTimeUnit}s)`
           : '',
       hidden: true,
     },
     {
       title: 'Technical status',
       field: 'technicalStatus',
+    },
+    {
+      title: 'Final time allocation',
+      render: (rowData) =>
+        rowData.managementTimeAllocation
+          ? `${rowData.managementTimeAllocation}(${rowData.allocationTimeUnit}s)`
+          : '',
+      hidden: true,
+    },
+    {
+      title: 'Final Status',
+      field: 'finalStatus',
     },
     {
       title: 'Submitted',
@@ -233,14 +245,13 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       field: 'reviewAverage',
     },
     {
-      title: 'Final Status',
-      field: 'finalStatus',
-    },
-    {
       title: 'Ranking',
       field: 'rankOrder',
     },
-    { title: 'Notified', field: 'notified' },
+    {
+      title: 'Notified',
+      render: (rowData) => (rowData.notified ? 'Yes' : 'No'),
+    },
     {
       title: 'Instrument',
       field: 'instrumentName',

@@ -1,12 +1,11 @@
 import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
-import { useSnackbar } from 'notistack';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router';
 
 import { UserContext } from 'context/UserContextProvider';
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles({
   buttons: {
@@ -16,9 +15,8 @@ const useStyles = makeStyles({
 });
 
 export function Impersonate(props: { id: number }) {
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const { handleLogin } = useContext(UserContext);
-  const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
   const classes = useStyles();
 
@@ -36,9 +34,7 @@ export function Impersonate(props: { id: number }) {
               .getTokenForUser({ userId: props.id })
               .then((data) => {
                 const { token, rejection } = data.getTokenForUser;
-                if (rejection) {
-                  enqueueSnackbar(rejection, { variant: 'error' });
-                } else {
+                if (!rejection) {
                   handleLogin(token);
                   history.push('/home');
                 }
