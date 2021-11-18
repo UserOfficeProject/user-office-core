@@ -7,6 +7,8 @@ import {
   AdministrationProposalMutation,
   CreateProposalMutation,
   ChangeProposalsStatusMutationVariables,
+  SubmitProposalMutationVariables,
+  SubmitProposalMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -35,6 +37,18 @@ declare global {
       updateProposal: (
         updateProposalInput: UpdateProposalMutationVariables
       ) => Cypress.Chainable<UpdateProposalMutation>;
+
+      /**
+       * Submit proposal
+       *
+       * @returns {typeof submitProposal}
+       * @memberof Chainable
+       * @example
+       *    cy.submitProposal(submitProposalInput: SubmitProposalMutationVariables)
+       */
+      submitProposal: (
+        submitProposalInput: SubmitProposalMutationVariables
+      ) => Cypress.Chainable<SubmitProposalMutation>;
 
       /**
        * Change of the proposal status by name with status name passed as second parameter.

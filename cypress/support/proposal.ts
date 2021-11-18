@@ -5,6 +5,8 @@ import {
   ChangeProposalsStatusMutationVariables,
   CreateProposalMutation,
   CreateProposalMutationVariables,
+  SubmitProposalMutation,
+  SubmitProposalMutationVariables,
   UpdateProposalMutation,
   UpdateProposalMutationVariables,
 } from '../../src/generated/sdk';
@@ -60,44 +62,20 @@ const updateProposal = (
   return cy.wrap(request);
 };
 
+const submitProposal = (
+  submitProposalInput: SubmitProposalMutationVariables
+): Cypress.Chainable<SubmitProposalMutation> => {
+  const api = getE2EApi();
+  const request = api.submitProposal(submitProposalInput);
+
+  return cy.wrap(request);
+};
+
 const changeProposalsStatus = (
   changeProposalStatusInput: ChangeProposalsStatusMutationVariables
 ): Cypress.Chainable<ChangeProposalsStatusMutation> => {
   const api = getE2EApi();
   const request = api.changeProposalsStatus(changeProposalStatusInput);
-  // cy.contains('Proposals').click();
-
-  // if (proposalTitle) {
-  //   cy.contains(proposalTitle).parent().find('[type="checkbox"]').check();
-  // } else {
-  //   cy.get('[type="checkbox"]').first().check();
-  // }
-
-  // cy.get('[data-cy="change-proposal-status"]').click();
-
-  // cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
-  // cy.get('@dialog').contains('Change proposal/s status');
-
-  // cy.get('@dialog')
-  //   .find('#selectedStatusId-input')
-  //   .should('not.have.class', 'Mui-disabled');
-
-  // cy.get('@dialog').find('#selectedStatusId-input').click();
-
-  // cy.get('[role="listbox"]').contains(statusName).click();
-
-  // if (statusName === 'DRAFT') {
-  //   cy.get('[role="alert"] .MuiAlert-message').contains(
-  //     'Be aware that changing status to "DRAFT" will reopen proposal for changes and submission.'
-  //   );
-  // }
-
-  // cy.get('[data-cy="submit-proposal-status-change"]').click();
-
-  // cy.notification({
-  //   variant: 'success',
-  //   text: 'status changed successfully',
-  // });
 
   return cy.wrap(request);
 };
@@ -125,6 +103,7 @@ const updateProposalManagementDecision = (
 
 Cypress.Commands.add('createProposal', createProposal);
 Cypress.Commands.add('updateProposal', updateProposal);
+Cypress.Commands.add('submitProposal', submitProposal);
 Cypress.Commands.add('changeProposalsStatus', changeProposalsStatus);
 Cypress.Commands.add(
   'updateProposalManagementDecision',

@@ -11,6 +11,8 @@ import {
   CreateTopicMutation,
   CreateGenericTemplateMutationVariables,
   CreateGenericTemplateMutation,
+  AnswerTopicMutationVariables,
+  AnswerTopicMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -237,6 +239,18 @@ declare global {
       createTopic: (
         createTopicInput: CreateTopicMutationVariables
       ) => Cypress.Chainable<CreateTopicMutation>;
+
+      /**
+       * Answers topic in proposal template
+       *
+       * @returns {typeof answerTopic}
+       * @memberof Chainable
+       * @example
+       *    cy.answerTopic(answerTopicInput: AnswerTopicMutationVariables)
+       */
+      answerTopic: (
+        answerTopicInput: AnswerTopicMutationVariables
+      ) => Cypress.Chainable<AnswerTopicMutation>;
     }
   }
 }

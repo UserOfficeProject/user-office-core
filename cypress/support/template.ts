@@ -1,4 +1,6 @@
 import {
+  AnswerTopicMutation,
+  AnswerTopicMutationVariables,
   CreateGenericTemplateMutation,
   CreateGenericTemplateMutationVariables,
   CreateQuestionMutation,
@@ -24,6 +26,15 @@ const createTopic = (
 ): Cypress.Chainable<CreateTopicMutation> => {
   const api = getE2EApi();
   const request = api.createTopic(createTopicInput);
+
+  return cy.wrap(request);
+};
+
+const answerTopic = (
+  answerTopicInput: AnswerTopicMutationVariables
+): Cypress.Chainable<AnswerTopicMutation> => {
+  const api = getE2EApi();
+  const request = api.answerTopic(answerTopicInput);
 
   return cy.wrap(request);
   // cy.get('[data-cy=show-more-button]').last().click();
@@ -449,6 +460,7 @@ Cypress.Commands.add('createGenericTemplate', createGenericTemplate);
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
 
 Cypress.Commands.add('createTopic', createTopic);
+Cypress.Commands.add('answerTopic', answerTopic);
 
 Cypress.Commands.add('createQuestion', createQuestion);
 Cypress.Commands.add('updateQuestion', updateQuestion);
