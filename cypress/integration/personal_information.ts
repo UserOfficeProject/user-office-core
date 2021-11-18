@@ -89,7 +89,12 @@ context('Personal information tests', () => {
 
     cy.notification({ variant: 'success', text: 'successfully' });
 
-    cy.contains('Proposals').click();
+    // wait before trying to get profile button otherwise page
+    // might re-render and you could be trying to access element
+    // that is not attached to the DOM
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2000);
+
     cy.finishedLoading();
 
     cy.get("[data-cy='profile-page-btn']").click();

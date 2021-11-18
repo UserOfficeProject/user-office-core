@@ -494,11 +494,11 @@ context('Proposal administration tests', () => {
 
       cy.get('table tbody tr').eq(0).contains(proposalFixedName);
       cy.contains('Title').dblclick();
-      cy.get('table tbody tr').eq(2).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(1).contains(proposalFixedName);
 
       cy.get('table tbody tr input[type="checkbox"]').first().click();
 
-      cy.get('table tbody tr').eq(2).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(1).contains(proposalFixedName);
     });
 
     it('User officer should see Reviews tab before doing the Admin(management decision)', () => {
