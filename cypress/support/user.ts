@@ -5,7 +5,6 @@ import {
   CreateUserMutationVariables,
   LoginMutation,
   Role,
-  SelectRoleMutationVariables,
   UpdateUserMutation,
   UpdateUserMutationVariables,
   UpdateUserRolesMutationVariables,
@@ -133,9 +132,15 @@ function updateUserRoles(
   // cy.notification({ variant: 'success', text: 'successfully' });
 }
 
-function changeActiveRole(selectRoleInput: SelectRoleMutationVariables) {
+function changeActiveRole(selectedRoleId: number) {
+  const token = window.localStorage.getItem('token');
+
+  if (!token) {
+    throw new Error('No logged in user');
+  }
+
   const api = getE2EApi();
-  const request = api.selectRole(selectRoleInput).then((resp) => {
+  const request = api.selectRole({ selectedRoleId, token }).then((resp) => {
     if (!resp.selectRole.token) {
       return;
     }

@@ -1,6 +1,5 @@
 import {
   LoginMutation,
-  SelectRoleMutationVariables,
   UpdateUserRolesMutationVariables,
   UpdateUserMutationVariables,
   UpdateUserMutation,
@@ -79,9 +78,9 @@ declare global {
        * @returns {typeof changeActiveRole}
        * @memberof Chainable
        * @example
-       *    cy.changeActiveRole(selectRoleInput: SelectRoleMutationVariables)
+       *    cy.changeActiveRole(selectedRoleId: number)
        */
-      changeActiveRole: (selectRoleInput: SelectRoleMutationVariables) => void;
+      changeActiveRole: (selectedRoleId: number) => void;
     }
   }
 }

@@ -445,13 +445,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('SEP Chair should not be able to modify SEP Chair and SEP Secretary', () => {
-      const token = window.localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('No logged in user');
-      }
-
-      cy.changeActiveRole({ selectedRoleId: sepChairRoleId, token: token });
+      cy.changeActiveRole(sepChairRoleId);
 
       cy.visit('/');
 
@@ -473,13 +467,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('SEP Chair should be able to modify SEP Reviewers', () => {
-      const token = window.localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('No logged in user');
-      }
-
-      cy.changeActiveRole({ selectedRoleId: sepChairRoleId, token: token });
+      cy.changeActiveRole(sepChairRoleId);
 
       cy.visit('/');
 
@@ -528,13 +516,7 @@ context('General scientific evaluation panel tests', () => {
         active: true,
       });
 
-      const token = window.localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('No logged in user');
-      }
-
-      cy.changeActiveRole({ selectedRoleId: sepChairRoleId, token: token });
+      cy.changeActiveRole(sepChairRoleId);
 
       cy.visit('/');
 
@@ -575,13 +557,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('SEP Secretary should not be able to modify SEP Chair and SEP Secretary', () => {
-      const token = window.localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('No logged in user');
-      }
-
-      cy.changeActiveRole({ selectedRoleId: sepSecretaryRoleId, token: token });
+      cy.changeActiveRole(sepSecretaryRoleId);
 
       cy.visit('/');
 
@@ -603,13 +579,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('SEP Secretary should be able to modify SEP Reviewers', () => {
-      const token = window.localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('No logged in user');
-      }
-
-      cy.changeActiveRole({ selectedRoleId: sepSecretaryRoleId, token: token });
+      cy.changeActiveRole(sepSecretaryRoleId);
 
       cy.visit('/');
 
@@ -651,13 +621,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('SEP Secretary should only see SEPs where they have SEP Secretary role', () => {
-      const token = window.localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('No logged in user');
-      }
-
-      cy.changeActiveRole({ selectedRoleId: sepSecretaryRoleId, token: token });
+      cy.changeActiveRole(sepSecretaryRoleId);
 
       cy.visit('/');
 
