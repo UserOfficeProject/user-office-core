@@ -1,4 +1,6 @@
 import {
+  CreateGenericTemplateMutation,
+  CreateGenericTemplateMutationVariables,
   CreateQuestionMutation,
   CreateQuestionMutationVariables,
   CreateQuestionTemplateRelationMutation,
@@ -52,6 +54,15 @@ function createTemplate(
 ): Cypress.Chainable<CreateTemplateMutation> {
   const api = getE2EApi();
   const request = api.createTemplate(createTemplateInput);
+
+  return cy.wrap(request);
+}
+
+function createGenericTemplate(
+  createGenericTemplateInput: CreateGenericTemplateMutationVariables
+): Cypress.Chainable<CreateGenericTemplateMutation> {
+  const api = getE2EApi();
+  const request = api.createGenericTemplate(createGenericTemplateInput);
 
   return cy.wrap(request);
 }
@@ -433,6 +444,7 @@ const createRichTextInput = (
 };
 
 Cypress.Commands.add('createTemplate', createTemplate);
+Cypress.Commands.add('createGenericTemplate', createGenericTemplate);
 
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
 
