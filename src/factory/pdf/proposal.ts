@@ -75,8 +75,13 @@ export const collectProposalPDFData = async (
   const proposalAuth = container.resolve(ProposalAuthorization);
   const proposal = await baseContext.queries.proposal.get(user, proposalPk);
 
+  if (proposal === null) {
+    throw new Error('Proposal not found');
+  }
+
   // Authenticate user
-  if (!proposal || !proposalAuth.hasReadRights(user, proposal)) {
+  const hasReadRights = await proposalAuth.hasReadRights(user, proposal);
+  if (hasReadRights === false) {
     throw new Error('User was not allowed to download PDF');
   }
 
