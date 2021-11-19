@@ -117,6 +117,7 @@ export class UserAuthorization {
     const availableUsers = [
       ...self,
       ...ids.filter((id) => relatedProposalUsers.includes(id)),
+      ...ids.filter((id) => relatedVisitorUsers.includes(id)),
     ];
 
     return availableUsers;
