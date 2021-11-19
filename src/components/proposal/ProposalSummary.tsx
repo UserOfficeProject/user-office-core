@@ -106,7 +106,9 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
         }
       }
       if (call?.submissionMessage != null) {
-        setSubmitButtonMessage(call.submissionMessage);
+        const defaultMessage =
+          'I am aware that no further edits can be done after proposal submission. \n';
+        setSubmitButtonMessage(defaultMessage + call.submissionMessage);
       }
       setLoadingSubmitMessage(false);
     }
