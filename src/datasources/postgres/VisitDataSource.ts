@@ -206,8 +206,8 @@ class PostgresVisitDataSource implements VisitDataSource {
       .leftJoin('visits_has_users as u', function () {
         this.on('u.visit_id', 'v.visit_id');
         this.andOn(function () {
-          this.on('u.user_id', id.toString()); // where the user is part of the visit
-          this.orOn('p.creator_id', id.toString()); // where the user is a creator of the visit
+          this.onVal('u.user_id', id); // where the user is part of the visit
+          this.orOnVal('v.creator_id', id); // where the user is a creator of the visit
         });
       }) // this gives a list of proposals that a user is related to
       .join('visits_has_users as ou', { 'ou.visit_id': 'u.visit_id' }); // this gives us all of the associated coIs
@@ -217,7 +217,7 @@ class PostgresVisitDataSource implements VisitDataSource {
       .distinct()
       .from('visits as v')
       .leftJoin('visits_has_users as u', {
-        'u.visit_id': 'p.visit_id',
+        'u.visit_id': 'v.visit_id',
         'u.user_id': id,
       }); // this gives a list of proposals that a user is related to
 
