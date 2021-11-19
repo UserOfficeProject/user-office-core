@@ -78,7 +78,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return response;
   }
   async submitProposal(primaryKey: number, legacyReferenceNumber?: string): Promise<Proposal> {
-    const proposal: ProposalRecord[] = await database.transaction(
+    const proposal: ProposalRecord[] | undefined = await database.transaction(
       async (trx) => {
         try {
           const call = await database
@@ -618,7 +618,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         submitted,
         management_decision_submitted,
         management_time_allocation
-      FROM 
+      FROM
         proposals
       WHERE
         proposal_pk = ${sourceProposal.primaryKey}
@@ -650,9 +650,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     const proposalEventsToReset: StatusChangingEventRecord[] = (
       await database.raw(`
-        SELECT 
+        SELECT
           *
-        FROM 
+        FROM
           proposal_workflow_connections AS pwc
         JOIN
           status_changing_events
@@ -843,5 +843,5 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
   }
 }
-  
+
 
