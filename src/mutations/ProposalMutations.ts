@@ -19,6 +19,7 @@ import { SampleDataSource } from '../datasources/SampleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
+import { Call } from '../models/Call';
 import {
   Proposal,
   ProposalEndStatus,
@@ -31,6 +32,7 @@ import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
+import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
@@ -81,16 +83,33 @@ export default class ProposalMutations {
       );
     }
 
+    return await this.createProposal({
+      submitterId: (agent as UserWithRole).id,
+      call,
+    });
+  }
+
+  private async createProposal({
+    submitterId,
+    call,
+  }: {
+    submitterId: number;
+    call: Call;
+  }): Promise<Proposal | Rejection> {
     const questionary = await this.questionaryDataSource.create(
-      (agent as UserWithRole).id,
+      submitterId,
       call.templateId
     );
 
     return this.proposalDataSource
-      .create((agent as UserWithRole).id, callId, questionary.questionaryId)
+      .create(submitterId, call.id, questionary.questionaryId)
       .then((proposal) => proposal)
       .catch((err) => {
-        return rejection('Could not create proposal', { agent, call }, err);
+        return rejection(
+          'Could not create proposal',
+          { submitterId, call },
+          err
+        );
       });
   }
 
@@ -115,6 +134,15 @@ export default class ProposalMutations {
         args,
       });
     }
+
+    return await this.updateProposal(agent, { proposal, args });
+  }
+
+  private async updateProposal(
+    agent: UserWithRole | null,
+    { proposal, args }: { proposal: Proposal; args: UpdateProposalArgs }
+  ): Promise<Proposal | Rejection> {
+    const { proposalPk, title, abstract, users, proposerId } = args;
 
     if (title !== undefined) {
       proposal.title = title;
@@ -149,7 +177,7 @@ export default class ProposalMutations {
       });
 
       return updatedProposal;
-    } catch (err) {
+    } catch (err: any) {
       return rejection(
         'Could not update proposal',
         {
@@ -201,9 +229,21 @@ export default class ProposalMutations {
       });
     }
 
+    return this.submitProposal(agent, proposal);
+  }
+
+  private async submitProposal(
+    agent: UserWithRole | null,
+    proposal: Proposal,
+    legacyReferenceNumber?: string
+  ): Promise<Proposal | Rejection> {
+    //Added this because the rejection doesnt like proposal.primaryKey
+    const proposalPk = proposal.primaryKey;
+
     try {
       const submitProposal = await this.proposalDataSource.submitProposal(
-        proposalPk
+        proposalPk,
+        legacyReferenceNumber
       );
       logger.logInfo('User Submitted a Proposal:', {
         proposalId: proposal.proposalId,
@@ -212,7 +252,7 @@ export default class ProposalMutations {
       });
 
       return submitProposal;
-    } catch (err) {
+    } catch (err: any) {
       return rejection(
         'Could not submit proposal',
         {
@@ -564,12 +604,104 @@ export default class ProposalMutations {
       }
 
       return clonedProposal;
-    } catch (error) {
+    } catch (error: any) {
       return rejection(
         'Could not clone the proposal',
         { proposalToClonePk },
         error
       );
     }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async import(
+    agent: UserWithRole | null,
+    args: ImportProposalArgs
+  ): Promise<Proposal | Rejection> {
+    const {
+      callId,
+      submitterId,
+      proposerId,
+      referenceNumber,
+      users: coiIds,
+    } = args;
+
+    const submitter = await this.userDataSource.getUser(submitterId);
+
+    if (submitter === null) {
+      await this.userDataSource.ensureDummyUserExists(submitterId);
+      logger.logInfo('Created dummy user for non-existent PI', { submitterId });
+    }
+
+    if (proposerId !== undefined) {
+      const proposer = await this.userDataSource.getUser(proposerId);
+
+      if (proposer === null) {
+        await this.userDataSource.ensureDummyUserExists(proposerId);
+        logger.logInfo('Created dummy user for non-existent PI', {
+          proposerId,
+        });
+      }
+    }
+
+    if (coiIds != null) {
+      // Batch up getting CoI details to check user existance.
+      const coIs = await Promise.all(
+        coiIds.map(async (user) => await this.userDataSource.getUser(user))
+      );
+
+      const missing = coiIds.filter(
+        (u) => coIs.find((c) => c?.id === u) === undefined
+      );
+
+      if (missing.length > 0) {
+        await Promise.all(
+          missing.map(
+            async (m) => await this.userDataSource.ensureDummyUserExists(m)
+          )
+        );
+
+        logger.logInfo('Created dummy user for non-existent Co-Is', {
+          missing,
+        });
+      }
+    }
+
+    const call = await this.callDataSource.getCall(callId);
+
+    if (!call || !call.templateId) {
+      return rejection(
+        'Can not create proposal because there is problem with the call',
+        { call }
+      );
+    }
+
+    const proposal = await this.createProposal({ submitterId, call });
+
+    if (proposal instanceof Rejection) {
+      return rejection('Proposal creation rejected', {});
+    }
+
+    const updatedProposal = await this.updateProposal(agent, {
+      proposal: proposal as Proposal,
+      args: {
+        proposalPk: proposal.primaryKey,
+        ...args,
+      },
+    });
+
+    if (updatedProposal instanceof Rejection) {
+      return rejection('Unable to update proposal', {
+        reason: updatedProposal,
+      });
+    }
+
+    const submitted = await this.submitProposal(
+      agent,
+      updatedProposal,
+      referenceNumber
+    );
+
+    return submitted;
   }
 }
