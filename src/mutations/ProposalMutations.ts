@@ -655,9 +655,12 @@ export default class ProposalMutations {
       );
 
       if (missing.length > 0) {
-        for (const coI of missing) {
-          await this.userDataSource.ensureDummyUserExists(coI);
-        }
+        await Promise.all(
+          missing.map(
+            async (m) => await this.userDataSource.ensureDummyUserExists(m)
+          )
+        );
+
         logger.logInfo('Created dummy user for non-existent Co-Is', {
           missing,
         });
