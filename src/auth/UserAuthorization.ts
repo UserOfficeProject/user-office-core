@@ -1,10 +1,10 @@
-import { read } from 'fs';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
+import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Roles } from '../models/Role';
 import { User, UserWithRole } from '../models/User';
 
@@ -14,6 +14,7 @@ export class UserAuthorization {
     @inject(Tokens.UserDataSource) private userDataSource: UserDataSource,
     @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
     @inject(Tokens.ProposalDataSource) private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.VisitDataSource) private visitDataSource: VisitDataSource
   ) {}
 
   isUserOfficer(agent: UserWithRole | null) {
@@ -109,6 +110,9 @@ export class UserAuthorization {
 
     const relatedProposalUsers =
       await this.proposalDataSource.getRelatedUsersOnProposals(agent.id);
+
+    const relatedVisitorUsers =
+      await this.visitDataSource.getRelatedUsersOnVisits(agent.id);
 
     const availableUsers = [
       ...self,

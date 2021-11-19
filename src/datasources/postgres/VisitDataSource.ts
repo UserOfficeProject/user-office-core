@@ -197,6 +197,35 @@ class PostgresVisitDataSource implements VisitDataSource {
       .andWhere('visits_has_users.user_id', visitorId)
       .then((results) => results.length > 0);
   }
+
+  async getRelatedUsersOnVisits(id: number): Promise<number[]> {
+    const relatedVisitors = await database
+      .select('ou.user_id')
+      .distinct()
+      .from('visits as v')
+      .leftJoin('visits_has_users as u', {
+        'u.visit_id': 'v.visit_id',
+        'u.user_id': id,
+        'p.creator_id': id,
+      }) // this gives a list of proposals that a user is related to
+      .join('visits_has_users as ou', { 'ou.visit_id': 'u.visit_id' }); // this gives us all of the associated coIs
+
+    const relatedVisitCreators = await database
+      .select('v.creator_id')
+      .distinct()
+      .from('visits as v')
+      .leftJoin('visits_has_users as u', {
+        'u.visit_id': 'p.visit_id',
+        'u.user_id': id,
+      }); // this gives a list of proposals that a user is related to
+
+    const relatedUsers = [
+      ...relatedVisitors.map((r) => r.user_id),
+      ...relatedVisitCreators.map((r) => r.creator_id),
+    ];
+
+    return relatedUsers;
+  }
 }
 
 export default PostgresVisitDataSource;
