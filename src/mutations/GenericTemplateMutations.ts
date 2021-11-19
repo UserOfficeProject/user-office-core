@@ -95,6 +95,7 @@ export default class GenericTemplateMutations {
       });
   }
 
+  @Authorized()
   async updateGenericTemplate(
     agent: UserWithRole | null,
     args: UpdateGenericTemplateArgs
@@ -123,6 +124,7 @@ export default class GenericTemplateMutations {
       });
   }
 
+  @Authorized()
   async deleteGenericTemplate(
     agent: UserWithRole | null,
     genericTemplateId: number
