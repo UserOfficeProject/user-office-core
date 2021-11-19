@@ -3,17 +3,19 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 
 import { TemplateGroupId, TemplateMetadataFragment } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const CreateTemplate = (props: {
-  onComplete: (template: TemplateMetadataFragment | null | undefined) => void;
+  onComplete: (template: TemplateMetadataFragment) => void;
   groupId: TemplateGroupId;
 }) => {
   const { onComplete, groupId } = props;
   const { api } = useDataApiWithFeedback();
+  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <>
@@ -28,9 +30,15 @@ const CreateTemplate = (props: {
         onSubmit={async (values): Promise<void> => {
           const result = await api().createTemplate({ ...values, groupId });
           const {
-            createTemplate: { template },
+            createTemplate: { template, rejection },
           } = result;
-          onComplete(template);
+          if (!template) {
+            enqueueSnackbar(rejection?.reason ?? 'Unknown error', {
+              variant: 'error',
+            });
+          } else {
+            onComplete(template);
+          }
         }}
         validationSchema={createTemplateValidationSchema}
       >
