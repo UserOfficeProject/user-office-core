@@ -847,7 +847,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getRelatedUsersOnProposals(id: number): Promise<number[]> {
-    return await database
+    const relatedCoIs = await database
       .select('ou.user_id')
       .distinct()
       .from('proposals as p')
@@ -855,8 +855,23 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         'u.proposal_pk': 'p.proposal_pk',
         'u.user_id': id,
         'p.proposer_id': id,
-      }) // this should give a list of proposals that a user is related to
-      .join('proposal_user as ou', { 'ou.proposal_pk': 'u.proposal_pk' }) // this should give us the associated users
-      .returning('*');
+      }) // this gives a list of proposals that a user is related to
+      .join('proposal_user as ou', { 'ou.proposal_pk': 'u.proposal_pk' }); // this gives us all of the associated coIs
+
+    const relatedPis = await database
+      .select('p.proposer_id')
+      .distinct()
+      .from('proposals as p')
+      .leftJoin('proposal_user as u', {
+        'u.proposal_pk': 'p.proposal_pk',
+        'u.user_id': id,
+      }); // this gives a list of proposals that a user is related to
+
+    const relatedUsers = [
+      ...relatedCoIs.map((r) => r.user_id),
+      ...relatedPis.map((r) => r.proposer_id),
+    ];
+
+    return relatedUsers;
   }
 }

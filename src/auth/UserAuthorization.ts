@@ -110,7 +110,12 @@ export class UserAuthorization {
     const relatedProposalUsers =
       await this.proposalDataSource.getRelatedUsersOnProposals(agent.id);
 
-    return [...self, ...ids.filter((id) => relatedProposalUsers.includes(id))];
+    const availableUsers = [
+      ...self,
+      ...ids.filter((id) => relatedProposalUsers.includes(id)),
+    ];
+
+    return availableUsers;
   }
 
   async canReadUser(agent: UserWithRole | null, id: number): Promise<boolean> {
