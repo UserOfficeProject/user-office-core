@@ -13,6 +13,8 @@ import {
   UpdateEsiMutation,
   CreateEsiMutationVariables,
   CreateEsiMutation,
+  CloneProposalsMutationVariables,
+  CloneProposalsMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -53,6 +55,18 @@ declare global {
       submitProposal: (
         submitProposalInput: SubmitProposalMutationVariables
       ) => Cypress.Chainable<SubmitProposalMutation>;
+
+      /**
+       * Clone proposals
+       *
+       * @returns {typeof cloneProposals}
+       * @memberof Chainable
+       * @example
+       *    cy.cloneProposals(cloneProposalsInput: CloneProposalsMutationVariables)
+       */
+      cloneProposals: (
+        cloneProposalsInput: CloneProposalsMutationVariables
+      ) => Cypress.Chainable<CloneProposalsMutation>;
 
       /**
        * Change of the proposal status by name with status name passed as second parameter.

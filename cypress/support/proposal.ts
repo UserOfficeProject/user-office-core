@@ -3,6 +3,8 @@ import {
   AdministrationProposalMutationVariables,
   ChangeProposalsStatusMutation,
   ChangeProposalsStatusMutationVariables,
+  CloneProposalsMutation,
+  CloneProposalsMutationVariables,
   CreateEsiMutation,
   CreateEsiMutationVariables,
   CreateProposalMutation,
@@ -21,39 +23,7 @@ const createProposal = (
 ): Cypress.Chainable<CreateProposalMutation> => {
   const api = getE2EApi();
   const request = api.createProposal(createProposalInput);
-  // const title = proposalTitle || faker.random.words(3);
-  // const abstract = proposalAbstract || faker.random.words(8);
 
-  // cy.contains('New Proposal').click();
-
-  // if (call) {
-  //   cy.get('body').click(0, 0); // fix for flaky test where item can't be clicked if tooltip is visible
-  //   cy.get('[data-cy=call-list]').contains(call).click();
-  // }
-
-  // cy.get('[data-cy=title] input').type(title).should('have.value', title);
-
-  // cy.get('[data-cy=abstract] textarea')
-  //   .first()
-  //   .type(abstract)
-  //   .should('have.value', abstract);
-
-  // if (proposer) {
-  //   cy.get('[data-cy=edit-proposer-button]').click();
-  //   cy.get('[role="presentation"]').as('modal');
-
-  //   cy.get('@modal')
-  //     .contains(proposer)
-  //     .parent()
-  //     .find("[title='Select user']")
-  //     .click();
-  // }
-
-  // cy.contains('Save and continue').click();
-
-  // cy.finishedLoading();
-
-  // cy.notification({ variant: 'success', text: 'Saved' });
   return cy.wrap(request);
 };
 
@@ -71,6 +41,15 @@ const submitProposal = (
 ): Cypress.Chainable<SubmitProposalMutation> => {
   const api = getE2EApi();
   const request = api.submitProposal(submitProposalInput);
+
+  return cy.wrap(request);
+};
+
+const cloneProposals = (
+  cloneProposalInput: CloneProposalsMutationVariables
+): Cypress.Chainable<CloneProposalsMutation> => {
+  const api = getE2EApi();
+  const request = api.cloneProposals(cloneProposalInput);
 
   return cy.wrap(request);
 };
@@ -126,6 +105,7 @@ const updateEsi = (
 Cypress.Commands.add('createProposal', createProposal);
 Cypress.Commands.add('updateProposal', updateProposal);
 Cypress.Commands.add('submitProposal', submitProposal);
+Cypress.Commands.add('cloneProposals', cloneProposals);
 Cypress.Commands.add('changeProposalsStatus', changeProposalsStatus);
 Cypress.Commands.add(
   'updateProposalManagementDecision',
