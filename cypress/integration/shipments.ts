@@ -1,50 +1,49 @@
 import faker from 'faker';
 
+import { TemplateGroupId } from '../../src/generated/sdk';
+
 faker.seed(1);
 
 const declareShipmentTitle = 'Declare shipment(s)';
 
-const proposalTitle = 'Test proposal';
+const existingProposal = { id: 1, title: 'Test proposal' };
 
 const sampleTitle = /My sample title/i;
+const visitor = { id: 6, email: 'david@teleworm.us', password: 'Test1234!' };
+const PI = { id: 1, email: 'Javon4@hotmail.com', password: 'Test1234!' };
+const coProposer = {
+  id: 4,
+  name: 'Benjamin',
+  email: 'ben@inbox.com',
+  password: 'Test1234!',
+};
+const existingScheduledEventId = 996;
 
 const shipmentTitle = faker.lorem.words(2);
 const shipmentTemplateName = faker.lorem.words(2);
 const shipmentTemplateDescription = faker.lorem.words(3);
 
 context('Shipments tests', () => {
-  before(() => {
-    cy.viewport(1920, 1080);
-
+  beforeEach(() => {
     cy.resetDB(true);
     cy.resetSchedulerDB(true);
 
-    // allocate time for the proposal
-    cy.login('officer');
-    cy.allocateProposalTime({
-      proposalTitle: proposalTitle,
-      timeToAllocate: 2,
-      submitManagementDecision: true,
+    cy.updateProposalManagementDecision({
+      proposalPk: existingProposal.id,
+      managementDecisionSubmitted: true,
+      managementTimeAllocation: 2,
     });
-
-    cy.logout();
-
-    // Create team
-    cy.login('user');
-    cy.defineExperimentTeam({
-      proposalTitle: proposalTitle,
-      usersEmails: ['Javon4@hotmail.com', 'david@teleworm.us'],
-      teamLead: 'Carlsson',
+    cy.createVisit({
+      team: [coProposer.id, visitor.id],
+      teamLeadUserId: PI.id,
+      scheduledEventId: existingScheduledEventId,
     });
-    cy.logout();
-  });
-
-  beforeEach(() => {
     cy.viewport(1920, 1080);
   });
 
   it('Should be able to create shipments template', () => {
     cy.login('officer');
+    cy.visit('/');
 
     cy.navigateToTemplatesSubmenu('Shipment declaration templates');
 
@@ -63,6 +62,8 @@ context('Shipments tests', () => {
 
   it('Co-proposer should see that he can declare shipment', () => {
     cy.login('user');
+    cy.visit('/');
+
     cy.testActionButton(declareShipmentTitle, 'neutral');
   });
 
@@ -72,11 +73,17 @@ context('Shipments tests', () => {
   });
 
   it('PI should be able to declare shipment', () => {
+    cy.createTemplate({
+      groupId: TemplateGroupId.SHIPMENT,
+      name: shipmentTemplateName,
+      description: shipmentTemplateDescription,
+    });
     cy.login('user');
+    cy.visit('/');
 
     cy.testActionButton(declareShipmentTitle, 'neutral');
 
-    cy.contains(proposalTitle)
+    cy.contains(existingProposal.title)
       .parent()
       .find(`[title="${declareShipmentTitle}"]`)
       .click();
@@ -89,7 +96,7 @@ context('Shipments tests', () => {
 
     cy.get('[data-cy=select-proposal-dropdown]').click();
 
-    cy.get('[role="listbox"]').contains(proposalTitle).click();
+    cy.get('[role="listbox"]').contains(existingProposal.title).click();
 
     cy.get('[data-cy=samples-dropdown]').click();
 
@@ -103,7 +110,7 @@ context('Shipments tests', () => {
 
     cy.contains('OK').click();
 
-    cy.contains(proposalTitle);
+    cy.contains(existingProposal.title);
 
     cy.contains('SUBMITTED', { matchCase: false });
 
