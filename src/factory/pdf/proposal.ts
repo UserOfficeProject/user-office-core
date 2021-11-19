@@ -16,7 +16,7 @@ import {
 } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
-import { UserQueryContext } from '../../queries/UserQueries';
+import UserQueryContext from '../../queries/UserQueryContext';
 import { getFileAttachments, Attachment } from '../util';
 import {
   collectGenericTemplatePDFData,

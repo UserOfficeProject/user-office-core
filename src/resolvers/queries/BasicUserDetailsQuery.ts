@@ -2,7 +2,6 @@ import { Query, Arg, Ctx, Resolver, Int } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { UserRole } from '../../models/User';
-import { UserQueryContext } from '../../queries/UserQueries';
 import { BasicUserDetails } from '../types/BasicUserDetails';
 
 @Resolver()
@@ -12,11 +11,7 @@ export class BasicUserDetailsQuery {
     @Arg('id', () => Int) id: number,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.user.getBasic(
-      context.user,
-      id,
-      UserQueryContext.ANY
-    );
+    return context.queries.user.getBasic(context.user, id);
   }
 
   @Query(() => BasicUserDetails, { nullable: true })

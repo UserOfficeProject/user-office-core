@@ -11,7 +11,6 @@ import {
 import { ResolverContext } from '../../context';
 import { Visit as VisitOrigin } from '../../models/Visit';
 import { VisitStatus } from '../../models/Visit';
-import { UserQueryContext } from '../../queries/UserQueries';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Proposal } from './Proposal';
 import { Sample } from './Sample';
@@ -64,11 +63,7 @@ export class VisitResolver {
     @Root() visit: Visit,
     @Ctx() context: ResolverContext
   ): Promise<BasicUserDetails | null> {
-    return context.queries.user.getBasic(
-      context.user,
-      visit.teamLeadUserId,
-      UserQueryContext.ANY
-    );
+    return context.queries.user.getBasic(context.user, visit.teamLeadUserId);
   }
 
   @FieldResolver(() => [Shipment])

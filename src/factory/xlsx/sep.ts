@@ -1,6 +1,5 @@
 import baseContext from '../../buildContext';
 import { UserWithRole } from '../../models/User';
-import { UserQueryContext } from '../../queries/UserQueries';
 import { average, getGrades } from '../../utils/mathFunctions';
 
 type SEPXLSXData = Array<{
@@ -171,11 +170,7 @@ export const collectSEPlXLSXData = async (
       return Promise.all(
         proposals.map((proposal) =>
           proposal
-            ? baseContext.queries.user.getBasic(
-                user,
-                proposal.proposerId,
-                UserQueryContext.ANY
-              )
+            ? baseContext.queries.user.getBasic(user, proposal.proposerId)
             : null
         )
       );

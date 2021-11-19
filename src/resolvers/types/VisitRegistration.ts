@@ -11,7 +11,6 @@ import {
 import { ResolverContext } from '../../context';
 import { TemplateCategoryId } from '../../models/Template';
 import { VisitRegistration as VisitRegistrationOrig } from '../../models/VisitRegistration';
-import { UserQueryContext } from '../../queries/UserQueries';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Questionary } from './Questionary';
 
@@ -40,11 +39,7 @@ export class UserVisitResolver {
     @Root() userVisit: VisitRegistration,
     @Ctx() context: ResolverContext
   ): Promise<BasicUserDetails | null> {
-    return context.queries.user.getBasic(
-      context.user,
-      userVisit.userId,
-      UserQueryContext.ANY
-    );
+    return context.queries.user.getBasic(context.user, userVisit.userId);
   }
 
   @FieldResolver(() => Questionary)
