@@ -172,7 +172,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async submitProposal(
     primaryKey: number,
-    legacyReferenceNumber?: string
+    referenceNumber?: string
   ): Promise<Proposal> {
     const found = allProposals.find(
       (proposal) => proposal.primaryKey === primaryKey
@@ -184,8 +184,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
     const newObj = { ...found, submitted: true };
 
-    if (legacyReferenceNumber !== undefined) {
-      newObj.proposalId = legacyReferenceNumber;
+    if (referenceNumber !== undefined) {
+      newObj.proposalId = referenceNumber;
     }
 
     Object.setPrototypeOf(newObj, Proposal.prototype);
