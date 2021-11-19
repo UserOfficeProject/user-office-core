@@ -851,10 +851,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .select('ou.user_id')
       .distinct()
       .from('proposals as p')
-      .leftJoin('proposal_user as u', {
-        'u.proposal_pk': 'p.proposal_pk',
-        'u.user_id': id,
-        'p.proposer_id': id,
+      .leftJoin('proposal_user as u', function () {
+        this.on('u.proposal_pk', 'p.proposal_pk');
+        this.andOn(function () {
+          this.on('u.user_id', id.toString()); // user is on the proposal
+          this.orOn('p.proposer_id', id.toString()); // user is the proposal PI
+        });
       }) // this gives a list of proposals that a user is related to
       .join('proposal_user as ou', { 'ou.proposal_pk': 'u.proposal_pk' }); // this gives us all of the associated coIs
 
