@@ -77,7 +77,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     return response;
   }
-  async submitProposal(primaryKey: number, legacyReferenceNumber?: string): Promise<Proposal> {
+  async submitProposal(
+    primaryKey: number,
+    referenceNumber?: string
+  ): Promise<Proposal> {
     const proposal: ProposalRecord[] | undefined = await database.transaction(
       async (trx) => {
         try {
@@ -94,23 +97,23 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .forUpdate()
             .transacting(trx);
 
-          let referenceNumber: string | null;
+          let ref: string | null;
 
-          if (legacyReferenceNumber !== undefined) {
-            referenceNumber = legacyReferenceNumber;
+          if (referenceNumber !== undefined) {
+            ref = referenceNumber;
           } else if (call.reference_number_format) {
-            referenceNumber = await calculateReferenceNumber(
+            ref = await calculateReferenceNumber(
               call.reference_number_format,
               call.proposal_sequence
             );
 
-            if (!referenceNumber) {
+            if (!ref) {
               throw new Error(
                 `Failed to calculate reference number for proposal with id '${primaryKey}' using format '${call.reference_number_format}'`
               );
-            } else if (referenceNumber.length > 16) {
+            } else if (ref.length > 16) {
               throw new Error(
-                `The reference number calculated is too long ('${referenceNumber.length} characters)`
+                `The reference number calculated is too long ('${ref.length} characters)`
               );
             }
           }
@@ -128,9 +131,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .returning('*')
             .where('proposal_pk', primaryKey)
             .modify((query) => {
-              if (referenceNumber) {
+              if (ref) {
                 query.update({
-                  proposal_id: referenceNumber,
+                  proposal_id: ref,
                   reference_number_sequence: call.proposal_sequence ?? 0,
                   submitted: true,
                 });

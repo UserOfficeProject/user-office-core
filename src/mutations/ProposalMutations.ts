@@ -19,6 +19,7 @@ import { SampleDataSource } from '../datasources/SampleDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
+import { Call } from '../models/Call';
 import {
   Proposal,
   ProposalEndStatus,
@@ -28,17 +29,15 @@ import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { SampleStatus } from '../models/Sample';
 import { UserWithRole } from '../models/User';
-import { Call } from '../models/Call';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
-import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
+import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
-import UserMutations from './UserMutations';
 
 @injectable()
 export default class ProposalMutations {
@@ -68,7 +67,7 @@ export default class ProposalMutations {
   @EventBus(Event.PROPOSAL_CREATED)
   async create(
     agent: UserWithRole | null,
-    { callId}: { callId: number }
+    { callId }: { callId: number }
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
     if (!(await this.callDataSource.checkActiveCall(callId))) {
@@ -77,7 +76,6 @@ export default class ProposalMutations {
 
     const call = await this.callDataSource.getCall(callId);
 
-
     if (!call || !call.templateId) {
       return rejection(
         'Can not create proposal because there is problem with the call',
@@ -85,11 +83,19 @@ export default class ProposalMutations {
       );
     }
 
-    return await this.createProposal({ submitterId: (agent as UserWithRole).id, call });
+    return await this.createProposal({
+      submitterId: (agent as UserWithRole).id,
+      call,
+    });
   }
 
-  private async createProposal({ submitterId, call }: { submitterId: number, call: Call}): Promise<Proposal | Rejection> {
-
+  private async createProposal({
+    submitterId,
+    call,
+  }: {
+    submitterId: number;
+    call: Call;
+  }): Promise<Proposal | Rejection> {
     const questionary = await this.questionaryDataSource.create(
       submitterId,
       call.templateId
@@ -99,7 +105,11 @@ export default class ProposalMutations {
       .create(submitterId, call.id, questionary.questionaryId)
       .then((proposal) => proposal)
       .catch((err) => {
-        return rejection('Could not create proposal', { submitterId , call }, err);
+        return rejection(
+          'Could not create proposal',
+          { submitterId, call },
+          err
+        );
       });
   }
 
@@ -128,10 +138,12 @@ export default class ProposalMutations {
     return await this.updateProposal(agent, { proposal, args });
   }
 
-  private async updateProposal(agent: UserWithRole | null, { proposal, args } : { proposal: Proposal, args: UpdateProposalArgs }): Promise<Proposal | Rejection> {
-
+  private async updateProposal(
+    agent: UserWithRole | null,
+    { proposal, args }: { proposal: Proposal; args: UpdateProposalArgs }
+  ): Promise<Proposal | Rejection> {
     const { proposalPk, title, abstract, users, proposerId } = args;
-    
+
     if (title !== undefined) {
       proposal.title = title;
     }
@@ -152,7 +164,6 @@ export default class ProposalMutations {
         });
     }
 
-
     if (proposerId !== undefined) {
       proposal.proposerId = proposerId;
     }
@@ -166,7 +177,7 @@ export default class ProposalMutations {
       });
 
       return updatedProposal;
-    } catch (err : any) {
+    } catch (err: any) {
       return rejection(
         'Could not update proposal',
         {
@@ -188,7 +199,6 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     { proposalPk }: { proposalPk: number }
   ): Promise<Proposal | Rejection> {
-
     const proposal = await this.proposalDataSource.get(proposalPk);
 
     if (!proposal) {
@@ -222,11 +232,14 @@ export default class ProposalMutations {
     return this.submitProposal(agent, proposal);
   }
 
-  private async submitProposal(agent: UserWithRole | null, proposal: Proposal, legacyReferenceNumber?: string): Promise<Proposal | Rejection> {
-
+  private async submitProposal(
+    agent: UserWithRole | null,
+    proposal: Proposal,
+    legacyReferenceNumber?: string
+  ): Promise<Proposal | Rejection> {
     //Added this because the rejection doesnt like proposal.primaryKey
     const proposalPk = proposal.primaryKey;
-    
+
     try {
       const submitProposal = await this.proposalDataSource.submitProposal(
         proposalPk,
@@ -239,7 +252,7 @@ export default class ProposalMutations {
       });
 
       return submitProposal;
-    } catch (err : any) {
+    } catch (err: any) {
       return rejection(
         'Could not submit proposal',
         {
@@ -591,7 +604,7 @@ export default class ProposalMutations {
       }
 
       return clonedProposal;
-    } catch (error : any) {
+    } catch (error: any) {
       return rejection(
         'Could not clone the proposal',
         { proposalToClonePk },
@@ -600,14 +613,18 @@ export default class ProposalMutations {
     }
   }
 
-  //@ValidateArgs(createProposalValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  //@EventBus(Event.PROPOSAL_SUBMITTED)
   async import(
     agent: UserWithRole | null,
     args: ImportProposalArgs
   ): Promise<Proposal | Rejection> {
-    const { callId, submitterId, proposerId, referenceNumber, users } = args;
+    const {
+      callId,
+      submitterId,
+      proposerId,
+      referenceNumber,
+      users: coiIds,
+    } = args;
 
     const submitter = await this.userDataSource.getUser(submitterId);
 
@@ -621,23 +638,29 @@ export default class ProposalMutations {
 
       if (proposer === null) {
         await this.userDataSource.ensureDummyUserExists(proposerId);
-        logger.logInfo('Created dummy user for non-existent PI', { proposerId });
+        logger.logInfo('Created dummy user for non-existent PI', {
+          proposerId,
+        });
       }
     }
 
-    if (users != null) {
+    if (coiIds != null) {
       // Batch up getting CoI details to check user existance.
       const coIs = await Promise.all(
-        users.map(async (user) => await this.userDataSource.getUser(user)
-      ));
+        coiIds.map(async (user) => await this.userDataSource.getUser(user))
+      );
 
-      const missing = users.filter(u => coIs.find(c => c?.id === u) === undefined);
+      const missing = coiIds.filter(
+        (u) => coIs.find((c) => c?.id === u) === undefined
+      );
 
       if (missing.length > 0) {
         for (const coI of missing) {
           await this.userDataSource.ensureDummyUserExists(coI);
         }
-        logger.logInfo('Created dummy user for non-existent Co-Is', { missing });
+        logger.logInfo('Created dummy user for non-existent Co-Is', {
+          missing,
+        });
       }
     }
 
@@ -650,32 +673,32 @@ export default class ProposalMutations {
       );
     }
 
-    const proposal = await this.createProposal(
-      { submitterId, call }
-    );
+    const proposal = await this.createProposal({ submitterId, call });
 
     if (proposal instanceof Rejection) {
-      return rejection("Proposal creation rejected", {});
+      return rejection('Proposal creation rejected', {});
     }
 
-    const updatedProposal = await this.updateProposal(agent,
-      {
-        proposal:(proposal as Proposal), 
-        args: {
-          proposalPk: proposal.primaryKey,
-          ...args
-        }
-      });
+    const updatedProposal = await this.updateProposal(agent, {
+      proposal: proposal as Proposal,
+      args: {
+        proposalPk: proposal.primaryKey,
+        ...args,
+      },
+    });
 
     if (updatedProposal instanceof Rejection) {
-      return rejection("...", {});
+      return rejection('Unable to update proposal', {
+        reason: updatedProposal,
+      });
     }
 
-    const submitted = await this.submitProposal(agent, updatedProposal, referenceNumber);
+    const submitted = await this.submitProposal(
+      agent,
+      updatedProposal,
+      referenceNumber
+    );
 
     return submitted;
-
-
   }
-
 }

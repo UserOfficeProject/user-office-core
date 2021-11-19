@@ -14,7 +14,6 @@ import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class ImportProposalArgs {
-
   @Field(() => String, { nullable: true })
   public title?: string;
 
@@ -26,7 +25,7 @@ export class ImportProposalArgs {
 
   @Field(() => Int, { nullable: true })
   public proposerId?: number;
-  
+
   @Field(() => Int)
   public submitterId: number;
 
@@ -35,7 +34,6 @@ export class ImportProposalArgs {
 
   @Field(() => Int)
   public callId: number;
-
 }
 
 @Resolver()

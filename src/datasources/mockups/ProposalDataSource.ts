@@ -1,4 +1,3 @@
-import { checkForResolveTypeResolver } from 'graphql-tools';
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
@@ -145,7 +144,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     );
 
     if (foundIndex === -1) {
-      console.log("Proposal not found")
       throw new Error('Proposal does not exist');
     }
 
@@ -172,7 +170,10 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     throw new Error('Not implemented');
   }
 
-  async submitProposal(primaryKey: number, legacyReferenceNumber?: string): Promise<Proposal> {
+  async submitProposal(
+    primaryKey: number,
+    legacyReferenceNumber?: string
+  ): Promise<Proposal> {
     const found = allProposals.find(
       (proposal) => proposal.primaryKey === primaryKey
     );
