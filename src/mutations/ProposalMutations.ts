@@ -607,27 +607,37 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: ImportProposalArgs
   ): Promise<Proposal | Rejection> {
-    const { callId, submitterId, referenceNumber, users } = args;
+    const { callId, submitterId, proposerId, referenceNumber, users } = args;
 
-    const pi = await this.userDataSource.getUser(submitterId);
+    const submitter = await this.userDataSource.getUser(submitterId);
 
-    if (pi === null) {
-      return rejection('PI user not exist', { submitterId })
+    if (submitter === null) {
+      await this.userDataSource.ensureDummyUserExists(submitterId);
+      logger.logInfo('Created dummy user for non-existent PI', { submitterId });
+    }
+
+    if (proposerId !== undefined) {
+      const proposer = await this.userDataSource.getUser(proposerId);
+
+      if (proposer === null) {
+        await this.userDataSource.ensureDummyUserExists(proposerId);
+        logger.logInfo('Created dummy user for non-existent PI', { proposerId });
+      }
     }
 
     if (users != null) {
       // Batch up getting CoI details to check user existance.
       const coIs = await Promise.all(
-        users.map(async (user) => ({
-          id: user,
-          user: await this.userDataSource.getUser(user)
-        })
+        users.map(async (user) => await this.userDataSource.getUser(user)
       ));
-      if (coIs.some(c => c.user === null)) {
-        const missing = coIs
-          .filter(c => c.user === null)
-          .map(c => c.id);
-        return rejection('One or more CoI users did not exist', { missing });
+
+      const missing = users.filter(u => coIs.find(c => c?.id === u) === undefined);
+
+      if (missing.length > 0) {
+        for (const coI of missing) {
+          await this.userDataSource.ensureDummyUserExists(coI);
+        }
+        logger.logInfo('Created dummy user for non-existent Co-Is', { missing });
       }
     }
 
