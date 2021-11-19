@@ -1,7 +1,12 @@
 import {
   AddStatusChangingEventsToConnectionMutationVariables,
+  AddStatusChangingEventsToConnectionMutation,
   CreateProposalWorkflowMutationVariables,
   CreateProposalWorkflowMutation,
+  CreateProposalStatusMutationVariables,
+  CreateProposalStatusMutation,
+  AddProposalWorkflowStatusMutationVariables,
+  AddProposalWorkflowStatusMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -17,7 +22,19 @@ declare global {
        */
       createProposalWorkflow: (
         createProposalWorkflowInput: CreateProposalWorkflowMutationVariables
-      ) => Promise<CreateProposalWorkflowMutation>;
+      ) => Cypress.Chainable<CreateProposalWorkflowMutation>;
+
+      /**
+       * Creates new proposal status.
+       *
+       * @returns {typeof createProposalStatus}
+       * @memberof Chainable
+       * @example
+       *    cy.createProposalStatus(createProposalStatusInput: CreateProposalStatusMutationVariables)
+       */
+      createProposalStatus: (
+        createProposalStatusInput: CreateProposalStatusMutationVariables
+      ) => Cypress.Chainable<CreateProposalStatusMutation>;
 
       /**
        * Adds status changing event/s to status. When those event/s are fired the the status will be changed to statusCode you pass.
@@ -29,7 +46,19 @@ declare global {
        */
       addStatusChangingEventsToConnection: (
         addStatusChangingEventsToConnectionInput: AddStatusChangingEventsToConnectionMutationVariables
-      ) => void;
+      ) => Cypress.Chainable<AddStatusChangingEventsToConnectionMutation>;
+
+      /**
+       * Add proposal status to workflow.
+       *
+       * @returns {typeof addProposalWorkflowStatus}
+       * @memberof Chainable
+       * @example
+       *    cy.addProposalWorkflowStatus(addProposalWorkflowStatusInput: AddProposalWorkflowStatusMutationVariables)
+       */
+      addProposalWorkflowStatus: (
+        addProposalWorkflowStatusInput: AddProposalWorkflowStatusMutationVariables
+      ) => Cypress.Chainable<AddProposalWorkflowStatusMutation>;
     }
   }
 }

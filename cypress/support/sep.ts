@@ -1,6 +1,8 @@
 import {
   AssignChairOrSecretaryMutation,
   AssignChairOrSecretaryMutationVariables,
+  AssignProposalsToSepMutation,
+  AssignProposalsToSepMutationVariables,
   AssignReviewersToSepMutation,
   AssignReviewersToSepMutationVariables,
   CreateSepMutation,
@@ -13,6 +15,15 @@ const createSep = (
 ): Cypress.Chainable<CreateSepMutation> => {
   const api = getE2EApi();
   const request = api.createSEP(newSepInput);
+
+  return cy.wrap(request);
+};
+
+const assignProposalsToSep = (
+  assignProposalsToSepInput: AssignProposalsToSepMutationVariables
+): Cypress.Chainable<AssignProposalsToSepMutation> => {
+  const api = getE2EApi();
+  const request = api.assignProposalsToSep(assignProposalsToSepInput);
 
   return cy.wrap(request);
 };
@@ -38,3 +49,4 @@ const assignReviewersToSep = (
 Cypress.Commands.add('createSep', createSep);
 Cypress.Commands.add('assignChairOrSecretary', assignChairOrSecretary);
 Cypress.Commands.add('assignReviewersToSep', assignReviewersToSep);
+Cypress.Commands.add('assignProposalsToSep', assignProposalsToSep);

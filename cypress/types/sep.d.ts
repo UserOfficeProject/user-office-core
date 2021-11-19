@@ -5,6 +5,8 @@ import {
   CreateSepMutationVariables,
   AssignReviewersToSepMutationVariables,
   AssignReviewersToSepMutation,
+  AssignProposalsToSepMutation,
+  AssignProposalsToSepMutationVariables,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -45,6 +47,18 @@ declare global {
       assignReviewersToSep: (
         assignReviewersToSepInput: AssignReviewersToSepMutationVariables
       ) => Cypress.Chainable<AssignReviewersToSepMutation>;
+
+      /**
+       * Assign proposals to existing sep.
+       *
+       * @returns {typeof assignProposalsToSep}
+       * @memberof Chainable
+       * @example
+       *    cy.assignProposalsToSep(assignProposalsToSepInput: AssignProposalsToSepMutationVariables)
+       */
+      assignProposalsToSep: (
+        assignProposalsToSepInput: AssignProposalsToSepMutationVariables
+      ) => Cypress.Chainable<AssignProposalsToSepMutation>;
     }
   }
 }

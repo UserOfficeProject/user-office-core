@@ -1,3 +1,8 @@
+import {
+  CreateApiAccessTokenMutation,
+  CreateApiAccessTokenMutationVariables,
+} from '../../src/generated/sdk';
+
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -103,6 +108,18 @@ declare global {
         title: string,
         state: 'completed' | 'active' | 'inactive' | 'neutral' | 'invisible'
       ) => void;
+
+      /**
+       * Creates new api access token.
+       *
+       * @returns {typeof createApiAccessToken}
+       * @memberof Chainable
+       * @example
+       *    cy.createApiAccessToken(createApiAccessTokenInput: CreateApiAccessTokenMutationVariables)
+       */
+      createApiAccessToken: (
+        createApiAccessTokenInput: CreateApiAccessTokenMutationVariables
+      ) => Cypress.Chainable<CreateApiAccessTokenMutation>;
     }
   }
 

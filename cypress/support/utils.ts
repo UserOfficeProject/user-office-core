@@ -1,7 +1,11 @@
 import 'cypress-file-upload';
 import { GraphQLClient } from 'graphql-request';
 
-import { getSdk } from '../../src/generated/sdk';
+import {
+  CreateApiAccessTokenMutation,
+  CreateApiAccessTokenMutationVariables,
+  getSdk,
+} from '../../src/generated/sdk';
 
 const KEY_CODES = {
   space: 32,
@@ -20,6 +24,15 @@ export const getE2EApi = (token?: string | null) => {
       headers: { authorization: authHeader },
     })
   );
+};
+
+const createApiAccessToken = (
+  createApiAccessTokenInput: CreateApiAccessTokenMutationVariables
+): Cypress.Chainable<CreateApiAccessTokenMutation> => {
+  const api = getE2EApi();
+  const request = api.createApiAccessToken(createApiAccessTokenInput);
+
+  return cy.wrap(request);
 };
 
 const notification = ({
@@ -214,3 +227,4 @@ Cypress.Commands.add('presentationMode', presentationMode);
 Cypress.Commands.add('setTinyMceContent', setTinyMceContent);
 Cypress.Commands.add('getTinyMceContent', getTinyMceContent);
 Cypress.Commands.add('testActionButton', testActionButton);
+Cypress.Commands.add('createApiAccessToken', createApiAccessToken);
