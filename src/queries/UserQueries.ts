@@ -19,7 +19,6 @@ import {
   AuthJwtApiTokenPayload,
 } from '../models/User';
 import { signToken, verifyToken } from '../utils/jwt';
-import UserQueryContext from './UserQueryContext';
 
 @injectable()
 export default class UserQueries {
@@ -47,29 +46,11 @@ export default class UserQueries {
     return this.dataSource.me((agent as UserWithRole).id);
   }
 
-  /**
-   *
-   *
-   * @param proposer - instance of UserQueryContext that states whether or not
-   * the calling function is setting the PI of the proposal/PDF (UserQueryContext.PROPOSER).
-   * If not set then the user must be a User Officer or Instrument Scientist to run it.
-   *
-   */
   @Authorized()
-  async getBasic(
-    agent: UserWithRole | null,
-    id: number,
-    proposer?: UserQueryContext
-  ) {
+  async getBasic(agent: UserWithRole | null, id: number) {
     const user = await this.dataSource.getBasicUserInfo(id);
-    const isUserOfficer = this.userAuth.isUserOfficer(agent);
-    const isInstrumentScientist = this.userAuth.isInstrumentScientist(agent);
-    if (
-      (((proposer === undefined || proposer === UserQueryContext.ANY) &&
-        (isUserOfficer || isInstrumentScientist)) ||
-        proposer === UserQueryContext.PROPOSER) &&
-      user
-    ) {
+    const hasPermissions = await this.userAuth.canReadUser(agent, id);
+    if (hasPermissions && user) {
       return new BasicUserDetails(
         user.id,
         user.firstname,
@@ -211,13 +192,27 @@ export default class UserQueries {
     userRole?: UserRole,
     subtractUsers?: [number]
   ) {
-    return this.dataSource.getUsers(
+    const userData = await this.dataSource.getUsers(
       filter,
       first,
       offset,
       userRole,
       subtractUsers
     );
+
+    const returnableUserIds = await this.userAuth.listReadableUsers(
+      agent,
+      userData.users.map((u) => u.id)
+    );
+
+    const returnableUsers = userData.users.filter((u) =>
+      returnableUserIds.includes(u.id)
+    );
+
+    return {
+      totalCount: returnableUsers.length,
+      users: returnableUsers,
+    };
   }
 
   @Authorized()

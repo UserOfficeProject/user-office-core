@@ -18,7 +18,6 @@ import {
 } from '../../models/Proposal';
 import { isRejection } from '../../models/Rejection';
 import { TemplateCategoryId } from '../../models/Template';
-import UserQueryContext from '../../queries/UserQueryContext';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { GenericTemplate } from './GenericTemplate';
@@ -112,8 +111,7 @@ export class ProposalResolver {
   ): Promise<BasicUserDetails | null> {
     return await context.queries.user.getBasic(
       context.user,
-      proposal.proposerId,
-      UserQueryContext.PROPOSER
+      proposal.proposerId
     );
   }
 

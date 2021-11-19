@@ -16,7 +16,6 @@ import {
 } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
-import UserQueryContext from '../../queries/UserQueryContext';
 import { getFileAttachments, Attachment } from '../util';
 import {
   collectGenericTemplatePDFData,
@@ -98,8 +97,7 @@ export const collectProposalPDFData = async (
 
   const principalInvestigator = await baseContext.queries.user.getBasic(
     user,
-    proposal.proposerId,
-    UserQueryContext.PROPOSER
+    proposal.proposerId
   );
   const coProposers = await baseContext.queries.user.getProposers(
     user,
