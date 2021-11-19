@@ -7,6 +7,8 @@ import {
   CreateQuestionMutationVariables,
   CreateQuestionTemplateRelationMutation,
   CreateQuestionTemplateRelationMutationVariables,
+  CreateSampleMutation,
+  CreateSampleMutationVariables,
   CreateTemplateMutation,
   CreateTemplateMutationVariables,
   CreateTopicMutation,
@@ -104,6 +106,15 @@ function updateQuestion(
 ): Cypress.Chainable<UpdateQuestionMutation> {
   const api = getE2EApi();
   const request = api.updateQuestion(updateQuestionInput);
+
+  return cy.wrap(request);
+}
+
+function createSample(
+  createSampleInput: CreateSampleMutationVariables
+): Cypress.Chainable<CreateSampleMutation> {
+  const api = getE2EApi();
+  const request = api.createSample(createSampleInput);
 
   return cy.wrap(request);
 }
@@ -464,6 +475,7 @@ Cypress.Commands.add('answerTopic', answerTopic);
 
 Cypress.Commands.add('createQuestion', createQuestion);
 Cypress.Commands.add('updateQuestion', updateQuestion);
+Cypress.Commands.add('createSample', createSample);
 Cypress.Commands.add(
   'createQuestionTemplateRelation',
   createQuestionTemplateRelation

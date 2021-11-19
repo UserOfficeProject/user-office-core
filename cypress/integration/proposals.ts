@@ -12,6 +12,7 @@ context('Proposal tests', () => {
   const abstract = faker.lorem.words(3);
   const newProposalTitle = faker.lorem.words(2);
   const newProposalAbstract = faker.lorem.words(3);
+  const proposalTitleUpdated = faker.lorem.words(2);
   const clonedProposalTitle = `Copy of ${newProposalTitle}`;
   const proposer = { id: 1, name: 'Carl' };
   const existingCallId = 1;
@@ -180,6 +181,33 @@ context('Proposal tests', () => {
     cy.contains('submitted');
 
     cy.get('[title="View proposal"]').should('exist');
+  });
+
+  it('Officer should be able to edit proposal', () => {
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.contains('Proposals').click();
+
+    cy.contains(newProposalTitle)
+      .parent()
+      .find('[title="View proposal"]')
+      .click();
+
+    cy.contains('Edit proposal').click();
+
+    cy.contains('New proposal').click();
+
+    cy.get('[data-cy=title] input')
+      .clear()
+      .type(proposalTitleUpdated)
+      .should('have.value', proposalTitleUpdated);
+
+    cy.get('[data-cy=save-and-continue-button]').click();
+
+    cy.contains('Close').click();
+
+    cy.contains(proposalTitleUpdated);
   });
 
   it('User officer should be able to save proposal column selection', () => {

@@ -13,6 +13,8 @@ import {
   CreateGenericTemplateMutation,
   AnswerTopicMutationVariables,
   AnswerTopicMutation,
+  CreateSampleMutationVariables,
+  CreateSampleMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -251,6 +253,18 @@ declare global {
       answerTopic: (
         answerTopicInput: AnswerTopicMutationVariables
       ) => Cypress.Chainable<AnswerTopicMutation>;
+
+      /**
+       * Creates sample
+       *
+       * @returns {typeof createSample}
+       * @memberof Chainable
+       * @example
+       *    cy.createSample(createSampleInput: CreateSampleMutationVariables)
+       */
+      createSample: (
+        createSampleInput: CreateSampleMutationVariables
+      ) => Cypress.Chainable<CreateSampleMutation>;
     }
   }
 }
