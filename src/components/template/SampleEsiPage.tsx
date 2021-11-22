@@ -1,41 +1,27 @@
-import Container from '@material-ui/core/Container';
+import { Container } from '@material-ui/core';
 import React from 'react';
 
 import SimpleTabs from 'components/common/TabPanel';
 import { TemplateGroupId } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 
-import SampleEsiTemplatesTable from './SampleEsiTemplatesTable';
+import DefaultTemplatesTable from './DefaultTemplatesTable';
 
-export default function EsiPage() {
-  const api = useDataApi();
+export default function SampleEsiPage() {
+  const templateGroup = TemplateGroupId.SAMPLE_ESI;
+  const itemCountLabel = '# Sample ESIs';
 
   return (
     <Container>
       <SimpleTabs tabNames={['Current', 'Archived']}>
-        <SampleEsiTemplatesTable
-          dataProvider={() =>
-            api()
-              .getTemplates({
-                filter: {
-                  isArchived: false,
-                  group: TemplateGroupId.SAMPLE_ESI,
-                },
-              })
-              .then((data) => data.templates || [])
-          }
+        <DefaultTemplatesTable
+          templateGroup={templateGroup}
+          itemCountLabel={itemCountLabel}
+          isArchived={false}
         />
-        <SampleEsiTemplatesTable
-          dataProvider={() =>
-            api()
-              .getTemplates({
-                filter: {
-                  isArchived: true,
-                  group: TemplateGroupId.SAMPLE_ESI,
-                },
-              })
-              .then((data) => data.templates || [])
-          }
+        <DefaultTemplatesTable
+          templateGroup={templateGroup}
+          itemCountLabel={itemCountLabel}
+          isArchived={true}
         />
       </SimpleTabs>
     </Container>

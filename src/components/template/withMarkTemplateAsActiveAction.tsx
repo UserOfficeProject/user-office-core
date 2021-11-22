@@ -1,13 +1,14 @@
+import { MaterialTableProps } from '@material-table/core';
 import { makeStyles } from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
 import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { Template } from 'generated/sdk';
+import { Template, TemplateGroupId } from 'generated/sdk';
 import { useActiveTemplateId } from 'hooks/template/useActiveTemplateId';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import { TemplatesTableProps } from './TemplatesTable';
+import { TemplateRowDataType } from './TemplatesTable';
 
 const useStyles = makeStyles((theme) => ({
   inactive: {
@@ -15,10 +16,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const withMarkTemplateAsActiveAction = (
-  Component: React.FC<TemplatesTableProps>
-) => {
-  const WrappedComponent = (props: TemplatesTableProps) => {
+type InputComponentType<T> = T & {
+  actions?: MaterialTableProps<TemplateRowDataType>['actions'];
+  templateGroup: TemplateGroupId;
+};
+
+/**
+ * Adds a clickable checkmark to the table indicating which template is active
+ * @param Component Input component
+ * @returns Wrapped component, what has the checkmark
+ */
+function withMarkTemplateAsActiveAction<T extends unknown>(
+  Component: React.ComponentType<InputComponentType<T>>
+) {
+  const WrappedComponent = (props: InputComponentType<T>) => {
     const classes = useStyles();
     const { api } = useDataApiWithFeedback();
     const { activeTemplateId, setActiveTemplateId } = useActiveTemplateId(
@@ -58,6 +69,6 @@ const withMarkTemplateAsActiveAction = (
   };
 
   return WrappedComponent;
-};
+}
 
 export default withMarkTemplateAsActiveAction;
