@@ -5,26 +5,28 @@ import SimpleTabs from 'components/common/TabPanel';
 import { TemplateGroupId } from 'generated/sdk';
 
 import DefaultTemplatesTable from './DefaultTemplatesTable';
-import withMarkTemplateAsActiveAction from './withMarkTemplateAsActiveAction';
+import { TemplateRowDataType } from './TemplatesTable';
 
-export default function SampleEsiPage() {
-  const templateGroup = TemplateGroupId.VISIT_REGISTRATION;
-  const itemCountLabel = '# visits';
-
-  const TableComponent = withMarkTemplateAsActiveAction(DefaultTemplatesTable);
+export default function GenericTemplatesPage() {
+  const templateGroup = TemplateGroupId.GENERIC_TEMPLATE;
+  const itemCountLabel = '# templates';
+  const isRowRemovable = (rowData: TemplateRowDataType) =>
+    rowData.questionaryCount === 0;
 
   return (
     <Container>
       <SimpleTabs tabNames={['Current', 'Archived']}>
-        <TableComponent
+        <DefaultTemplatesTable
           templateGroup={templateGroup}
           itemCountLabel={itemCountLabel}
           isArchived={false}
+          isRowRemovable={isRowRemovable}
         />
-        <TableComponent
+        <DefaultTemplatesTable
           templateGroup={templateGroup}
           itemCountLabel={itemCountLabel}
           isArchived={true}
+          isRowRemovable={isRowRemovable}
         />
       </SimpleTabs>
     </Container>

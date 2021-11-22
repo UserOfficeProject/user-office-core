@@ -17,31 +17,32 @@ import InputDialog from 'components/common/InputDialog';
 import { GetTemplatesQuery, Template, TemplateGroupId } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { WithConfirmType } from 'utils/withConfirm';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CreateTemplate from './CreateTemplate';
 
 export type TemplateRowDataType = Pick<
   Template,
-  'templateId' | 'name' | 'description' | 'isArchived'
->;
+  'templateId' | 'name' | 'description' | 'isArchived' | 'questionaryCount'
+> &
+  Record<string, unknown>;
 
 export interface TemplatesTableProps {
   columns: Column<TemplateRowDataType>[];
   templateGroup: TemplateGroupId;
   dataProvider: () => Promise<Exclude<GetTemplatesQuery['templates'], null>>;
   isRowRemovable: (row: TemplateRowDataType) => boolean;
-  confirm: WithConfirmType;
   actions?: MaterialTableProps<TemplateRowDataType>['actions'];
 }
-export function TemplatesTable({
+
+const TemplatesTable = ({
   dataProvider,
   columns,
   templateGroup,
   isRowRemovable,
   confirm,
   actions,
-}: TemplatesTableProps) {
+}: TemplatesTableProps & { confirm: WithConfirmType }) => {
   const [templates, setTemplates] = useState<TemplateRowDataType[]>([]);
   const { api } = useDataApiWithFeedback();
   const history = useHistory();
@@ -207,7 +208,10 @@ export function TemplatesTable({
         <CreateTemplate
           onComplete={(template) => {
             if (template) {
-              setTemplates([...templates, template]);
+              setTemplates([
+                ...templates,
+                { ...template, questionaryCount: 0 },
+              ]);
 
               setTimeout(() => {
                 editTemplate(template.templateId);
@@ -231,6 +235,7 @@ export function TemplatesTable({
           Object.assign(template, { id: template.templateId })
         )}
         actions={[
+          ...customActions,
           {
             icon: EditIconComponent,
             tooltip: 'Edit',
@@ -270,7 +275,6 @@ export function TemplatesTable({
             },
           },
           (rowData) => getMaintenanceButton(rowData),
-          ...customActions,
         ]}
       />
       <ActionButtonContainer>
@@ -286,4 +290,6 @@ export function TemplatesTable({
       </ActionButtonContainer>
     </>
   );
-}
+};
+
+export default withConfirm(TemplatesTable);
