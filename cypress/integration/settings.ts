@@ -744,7 +744,6 @@ context('Settings tests', () => {
       cy.get('[aria-label="close"]').click();
 
       cy.get('[role="dialog"]').should('not.exist');
-      // cy.wait(100);
       cy.contains('SEP Meeting');
     });
 

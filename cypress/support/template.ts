@@ -43,18 +43,6 @@ const answerTopic = (
   const request = api.answerTopic(answerTopicInput);
 
   return cy.wrap(request);
-  // cy.get('[data-cy=show-more-button]').last().click();
-
-  // cy.get('[data-cy=add-topic-menu-item]').last().click();
-
-  // cy.wait(500);
-
-  // cy.get('[data-cy="topic-title-edit"]').last().click();
-
-  // cy.get('[data-cy=topic-title-input] input')
-  //   .last()
-  //   .clear()
-  //   .type(`${title}{enter}`);
 };
 
 const typeToMenuTitle = new Map();

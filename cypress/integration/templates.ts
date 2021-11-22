@@ -405,8 +405,6 @@ context('Template tests', () => {
 
       cy.contains('Save').click();
 
-      // cy.wait(500);
-
       cy.contains(textQuestion.newId);
       /* --- */
 

@@ -52,7 +52,6 @@ function readWriteReview() {
   cy.closeModal();
 
   cy.get('@dialog').should('not.exist');
-  // cy.wait(100);
 }
 
 function editFinalRankingForm() {

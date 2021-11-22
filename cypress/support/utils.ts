@@ -78,8 +78,6 @@ const closeNotification = () => {
 
 const closeModal = () => {
   cy.get('[role="dialog"] [data-cy="close-modal"]').click();
-  // NOTE: Need to wait for modal to close with animation.
-  // cy.wait(100);
 
   cy.get('[role="dialog"]').should('not.exist');
 };
