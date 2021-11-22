@@ -7,7 +7,7 @@ import { ContentContainer } from 'styles/StyledComponents';
 
 import ProposalTemplatesTable from './ProposalTemplatesTable';
 
-export default function ProposalTemplates() {
+export default function ProposalTemplatesPage() {
   const api = useDataApi();
 
   return (
