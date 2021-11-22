@@ -128,10 +128,6 @@ context('Settings tests', () => {
     const proposalAbstract = faker.lorem.words(5);
     const updatedWorkflowName = faker.lorem.words(2);
     const updatedWorkflowDescription = faker.lorem.words(5);
-    const fastTrackWorkflowName = 'Fast track';
-    const fastTrackWorkflowDescription = 'Faster than the fastest workflow';
-    const multiColumnWorkflowName = faker.lorem.words(2);
-    const multiColumnWorkflowDescription = faker.lorem.words(5);
     let workflowDroppableGroupId: string;
     let createdWorkflowId: number;
     let prevProposalStatusId: number;
@@ -298,20 +294,21 @@ context('Settings tests', () => {
           workflowDroppableGroupId =
             workflow.proposalWorkflowConnectionGroups[0].groupId;
 
-          cy.updateCall({
-            id: existingCallId,
-            ...updatedCall,
-            proposalWorkflowId: workflow.id,
-            esiTemplateId: createdEsiTemplateId,
+          cy.createTemplate({
+            name: 'default esi template',
+            groupId: TemplateGroupId.PROPOSAL_ESI,
+          }).then((result) => {
+            if (result.createTemplate.template) {
+              createdEsiTemplateId = result.createTemplate.template.templateId;
+
+              cy.updateCall({
+                id: existingCallId,
+                ...updatedCall,
+                proposalWorkflowId: workflow.id,
+                esiTemplateId: createdEsiTemplateId,
+              });
+            }
           });
-        }
-      });
-      cy.createTemplate({
-        name: 'default esi template',
-        groupId: TemplateGroupId.PROPOSAL_ESI,
-      }).then((result) => {
-        if (result.createTemplate.template) {
-          createdEsiTemplateId = result.createTemplate.template.templateId;
         }
       });
     });
