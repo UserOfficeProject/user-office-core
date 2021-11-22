@@ -103,7 +103,6 @@ export class UserAuthorization {
     }
 
     const self = [];
-
     if (ids.includes(agent.id)) {
       self.push(agent.id);
     }
@@ -114,10 +113,15 @@ export class UserAuthorization {
     const relatedVisitorUsers =
       await this.visitDataSource.getRelatedUsersOnVisits(agent.id);
 
+    const relatedSepUsers = await this.sepDataSource.getRelatedUsersOnSep(
+      agent.id
+    );
+
     const availableUsers = [
       ...self,
       ...ids.filter((id) => relatedProposalUsers.includes(id)),
       ...ids.filter((id) => relatedVisitorUsers.includes(id)),
+      ...ids.filter((id) => relatedSepUsers.includes(id)),
     ];
 
     return availableUsers;
