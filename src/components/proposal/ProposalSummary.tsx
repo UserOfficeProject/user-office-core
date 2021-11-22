@@ -102,13 +102,12 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
             setSubmitButtonMessage(
               'Submit proposal? The proposal can be edited after submission.'
             );
+          } else {
+            'I am aware that no further edits can be done after proposal submission.'.concat(
+              call?.submissionMessage ? '\n' + call.submissionMessage : ''
+            )
           }
         }
-      }
-      if (call?.submissionMessage != null) {
-        const defaultMessage =
-          'I am aware that no further edits can be done after proposal submission. \n';
-        setSubmitButtonMessage(defaultMessage + call.submissionMessage);
       }
       setLoadingSubmitMessage(false);
     }
