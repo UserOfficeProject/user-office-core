@@ -12,6 +12,8 @@ import {
   CreateInstrumentMutation,
   AddTechnicalReviewMutationVariables,
   AddTechnicalReviewMutation,
+  SetInstrumentAvailabilityTimeMutationVariables,
+  SetInstrumentAvailabilityTimeMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -108,6 +110,17 @@ declare global {
       addProposalTechnicalReview: (
         addTechnicalReviewInput: AddTechnicalReviewMutationVariables
       ) => Cypress.Chainable<AddTechnicalReviewMutation>;
+      /**
+       * Set instrument availability time on call
+       *
+       * @returns {typeof setInstrumentAvailabilityTime}
+       * @memberof Chainable
+       * @example
+       *    cy.setInstrumentAvailabilityTime();
+       */
+      setInstrumentAvailabilityTime: (
+        setInstrumentAvailabilityTimeInput: SetInstrumentAvailabilityTimeMutationVariables
+      ) => Cypress.Chainable<SetInstrumentAvailabilityTimeMutation>;
     }
   }
 }
