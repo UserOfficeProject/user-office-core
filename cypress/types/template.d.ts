@@ -15,6 +15,10 @@ import {
   AnswerTopicMutation,
   CreateSampleMutationVariables,
   CreateSampleMutation,
+  CloneTemplateMutationVariables,
+  CloneTemplateMutation,
+  UpdateQuestionTemplateRelationSettingsMutationVariables,
+  UpdateQuestionTemplateRelationSettingsMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -53,6 +57,17 @@ declare global {
       createQuestionTemplateRelation: (
         createQuestionTemplateRelationInput: CreateQuestionTemplateRelationMutationVariables
       ) => Cypress.Chainable<CreateQuestionTemplateRelationMutation>;
+      /**
+       * Updates question topic relation settings
+       *
+       * @returns {typeof updateQuestionTemplateRelationSettings}
+       * @memberof Chainable
+       * @example
+       *    cy.updateQuestionTemplateRelationSettings(updateQuestionTemplateRelationSettingsInput: UpdateQuestionTemplateRelationSettingsMutationVariables)
+       */
+      updateQuestionTemplateRelationSettings: (
+        updateQuestionTemplateRelationSettingsInput: UpdateQuestionTemplateRelationSettingsMutationVariables
+      ) => Cypress.Chainable<UpdateQuestionTemplateRelationSettingsMutation>;
 
       /**
        * Creates boolean question. You have to be in edit template view to call this method
@@ -77,7 +92,7 @@ declare global {
         options?: {
           isRequired?: boolean;
           isMultipleLines?: boolean;
-          minimumCharacters?: number;
+          maxCharacters?: number;
         }
       ) => void;
 
@@ -218,6 +233,17 @@ declare global {
       createTemplate: (
         createTemplateInput: CreateTemplateMutationVariables
       ) => Cypress.Chainable<CreateTemplateMutation>;
+      /**
+       * Clone template
+       *
+       * @returns {typeof cloneTemplate}
+       * @memberof Chainable
+       * @example
+       *    cy.createTemplate('proposal')
+       */
+      cloneTemplate: (
+        cloneTemplateInput: CloneTemplateMutationVariables
+      ) => Cypress.Chainable<CloneTemplateMutation>;
       /**
        * Creates generic template
        *

@@ -1,6 +1,8 @@
 import {
   AnswerTopicMutation,
   AnswerTopicMutationVariables,
+  CloneTemplateMutation,
+  CloneTemplateMutationVariables,
   CreateGenericTemplateMutation,
   CreateGenericTemplateMutationVariables,
   CreateQuestionMutation,
@@ -15,6 +17,8 @@ import {
   CreateTopicMutationVariables,
   UpdateQuestionMutation,
   UpdateQuestionMutationVariables,
+  UpdateQuestionTemplateRelationSettingsMutation,
+  UpdateQuestionTemplateRelationSettingsMutationVariables,
 } from '../../src/generated/sdk';
 import { getE2EApi } from './utils';
 
@@ -67,6 +71,15 @@ function createTemplate(
 ): Cypress.Chainable<CreateTemplateMutation> {
   const api = getE2EApi();
   const request = api.createTemplate(createTemplateInput);
+
+  return cy.wrap(request);
+}
+
+function cloneTemplate(
+  cloneTemplateInput: CloneTemplateMutationVariables
+): Cypress.Chainable<CloneTemplateMutation> {
+  const api = getE2EApi();
+  const request = api.cloneTemplate(cloneTemplateInput);
 
   return cy.wrap(request);
 }
@@ -130,6 +143,17 @@ function createQuestionTemplateRelation(
   return cy.wrap(request);
 }
 
+function updateQuestionTemplateRelationSettings(
+  updateQuestionTemplateRelationSettingsInput: UpdateQuestionTemplateRelationSettingsMutationVariables
+): Cypress.Chainable<UpdateQuestionTemplateRelationSettingsMutation> {
+  const api = getE2EApi();
+  const request = api.updateQuestionTemplateRelationSettings(
+    updateQuestionTemplateRelationSettingsInput
+  );
+
+  return cy.wrap(request);
+}
+
 function createBooleanQuestion(question: string) {
   openQuestionsMenu();
 
@@ -150,10 +174,10 @@ function createBooleanQuestion(question: string) {
 
 function createTextQuestion(
   question: string,
-  options: {
+  options?: {
     isRequired?: boolean;
     isMultipleLines?: boolean;
-    minimumCharacters?: number;
+    maxCharacters?: number;
   }
 ) {
   openQuestionsMenu();
@@ -170,8 +194,8 @@ function createTextQuestion(
     cy.contains('Multiple lines').click();
   }
 
-  if (options?.minimumCharacters !== undefined) {
-    cy.get('[data-cy=max]').type(options.minimumCharacters.toString());
+  if (options?.maxCharacters !== undefined) {
+    cy.get('[data-cy=max]').type(options.maxCharacters.toString());
   }
 
   cy.contains('Save').click();
@@ -187,7 +211,7 @@ function createTextQuestion(
 
 function createDateQuestion(
   question: string,
-  options: {
+  options?: {
     includeTime?: boolean;
     isRequired?: boolean;
   }
@@ -219,7 +243,7 @@ function createDateQuestion(
 
 function createMultipleChoiceQuestion(
   question: string,
-  options: {
+  options?: {
     option1?: string;
     option2?: string;
     option3?: string;
@@ -233,31 +257,31 @@ function createMultipleChoiceQuestion(
 
   cy.get('[data-cy=question]').clear().type(question);
 
-  if (options.type === undefined || options.type === 'dropdown') {
+  if (options?.type === undefined || options.type === 'dropdown') {
     cy.contains('Radio').click();
 
     cy.contains('Dropdown').click();
   }
 
-  if (options.isMultipleSelect === true) {
+  if (options?.isMultipleSelect === true) {
     cy.contains('Is multiple select').click();
   }
 
   cy.contains('Items').click();
 
-  if (options.option1) {
+  if (options?.option1) {
     cy.get('[data-cy=add-answer-button]').closest('button').click();
-    cy.get('[placeholder=Answer]').type(options.option1);
+    cy.get('[placeholder=Answer]').type(options?.option1);
     cy.get('[title="Save"]').click();
   }
 
-  if (options.option2) {
+  if (options?.option2) {
     cy.get('[data-cy=add-answer-button]').closest('button').click();
     cy.get('[placeholder=Answer]').type(options.option2);
     cy.get('[title="Save"]').click();
   }
 
-  if (options.option3) {
+  if (options?.option3) {
     cy.get('[data-cy=add-answer-button]').closest('button').click();
     cy.get('[placeholder=Answer]').type(options.option3);
     cy.get('[title="Save"]').click();
@@ -466,6 +490,7 @@ const createRichTextInput = (
 };
 
 Cypress.Commands.add('createTemplate', createTemplate);
+Cypress.Commands.add('cloneTemplate', cloneTemplate);
 Cypress.Commands.add('createGenericTemplate', createGenericTemplate);
 
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
@@ -479,6 +504,10 @@ Cypress.Commands.add('createSample', createSample);
 Cypress.Commands.add(
   'createQuestionTemplateRelation',
   createQuestionTemplateRelation
+);
+Cypress.Commands.add(
+  'updateQuestionTemplateRelationSettings',
+  updateQuestionTemplateRelationSettings
 );
 
 Cypress.Commands.add('createBooleanQuestion', createBooleanQuestion);
