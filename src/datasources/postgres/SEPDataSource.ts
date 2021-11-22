@@ -833,7 +833,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .join('SEP_Reviewers as sr', { 'sr.sep_id': 's.sep_id' }); // this gives us all of the associated reviewers
 
     const relatedSepChairsAndSecs = await database
-      .select('sr.sep_chair_user_id, s.sep_secretary_user_id')
+      .select('s.sep_chair_user_id', 's.sep_secretary_user_id')
       .distinct()
       .from('SEPs as s')
       .leftJoin('SEP_Reviewers as r', function () {
