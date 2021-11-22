@@ -28,7 +28,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const withConfirm = <T extends Record<string, unknown>>(
+const withConfirm = <T extends unknown>(
   WrappedComponent: React.ComponentType<T>
 ) => {
   return function WithConfirmComponent(props: Omit<T, 'confirm'>): JSX.Element {
