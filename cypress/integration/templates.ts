@@ -1180,6 +1180,8 @@ context('Template tests', () => {
     });
 
     it('File Upload field could be set as required', () => {
+      const fileName = 'file_upload_test.png';
+
       cy.login('officer');
       cy.visit('/');
 
@@ -1209,27 +1211,30 @@ context('Template tests', () => {
       cy.contains('New Proposal').click();
 
       cy.contains(fileQuestion);
-      cy.get('body').then(() => {
-        cy.contains('Save and continue').click();
-        cy.contains(fileQuestion)
-          .parent()
-          .contains('field must have at least 1 items');
+      cy.contains('Save and continue').click();
+      cy.contains(fileQuestion)
+        .parent()
+        .contains('field must have at least 1 items');
 
-        cy.fixture('file_upload_test.png').then((fileContent) => {
-          // NOTE: Using "cypress-file-upload" version "^3.5.3" because this(https://github.com/abramenal/cypress-file-upload/issues/179) should be fixed before upgrading to the latest
-          cy.get('input[type="file"]').upload({
-            fileContent: fileContent.toString(),
-            fileName: 'file_upload_test.png',
-            mimeType: 'image/png',
-          });
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
 
-          cy.contains('file_upload_test');
-
-          cy.contains(fileQuestion)
-            .parent()
-            .should('not.contain.text', 'field must have at least 1 items');
-        });
+      cy.get('input[type="file"]').attachFixture({
+        filePath: fileName,
+        fileName: fileName,
+        mimeType: 'image/png',
       });
+
+      // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
+      cy.wait('@upload', { requestTimeout: 30000 });
+
+      cy.contains(fileName);
+
+      cy.contains(fileQuestion)
+        .parent()
+        .should('not.contain.text', 'field must have at least 1 items');
     });
 
     it('Officer can delete proposal questions', () => {
@@ -1451,6 +1456,7 @@ context('Template tests', () => {
     });
 
     it('User can add captions after uploading image/* file', () => {
+      const fileName = 'file_upload_test.png';
       cy.createProposal({ callId: existingCallId }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
@@ -1476,48 +1482,43 @@ context('Template tests', () => {
 
       cy.contains(fileQuestion);
 
-      cy.fixture('file_upload_test.png').then((fileContent) => {
-        // NOTE: Using "cypress-file-upload" version "^3.5.3" because this(https://github.com/abramenal/cypress-file-upload/issues/179) should be fixed before upgrading to the latest
-        cy.get('input[type="file"]').upload({
-          fileContent: fileContent.toString(),
-          fileName: 'file_upload_test.png',
-          mimeType: 'image/png',
-        });
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
 
-        cy.finishedLoading();
-
-        cy.contains('Uploading...').should('not.exist');
-
-        // NOTE: Check if wait fixes the failing test in the pipeline
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(1000);
-
-        cy.contains('file_upload_test');
-        cy.get('[title="Add image caption"]').click();
-
-        cy.get('[data-cy="image-figure"] input').type('Fig_test');
-        cy.get('[data-cy="image-caption"] input').type('Test caption');
-
-        cy.get('[data-cy="save-button"]').click();
-
-        cy.finishedLoading();
-
-        cy.get('.MuiStep-root').contains('Review').click();
-
-        cy.contains('file_upload_test');
-
-        cy.contains(template.topic.title).click();
-
-        cy.contains('file_upload_test');
-        cy.get('[data-cy="image-caption"] input').should(
-          'have.value',
-          'Test caption'
-        );
-        cy.get('[data-cy="image-figure"] input').should(
-          'have.value',
-          'Fig_test'
-        );
+      cy.get('input[type="file"]').attachFixture({
+        filePath: fileName,
+        fileName: fileName,
+        mimeType: 'image/png',
       });
+
+      // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
+      cy.wait('@upload', { requestTimeout: 30000 });
+
+      cy.contains(fileName);
+
+      cy.get('[title="Add image caption"]').click();
+
+      cy.get('[data-cy="image-figure"] input').type('Fig_test');
+      cy.get('[data-cy="image-caption"] input').type('Test caption');
+
+      cy.get('[data-cy="save-button"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('.MuiStep-root').contains('Review').click();
+
+      cy.contains(fileName);
+
+      cy.contains(template.topic.title).click();
+
+      cy.contains(fileName);
+      cy.get('[data-cy="image-caption"] input').should(
+        'have.value',
+        'Test caption'
+      );
+      cy.get('[data-cy="image-figure"] input').should('have.value', 'Fig_test');
     });
   });
 });
