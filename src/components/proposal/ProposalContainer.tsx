@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
+import { Typography } from '@material-ui/core';
 import { default as React, useEffect } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
@@ -150,17 +151,37 @@ export default function ProposalContainer(props: {
     }
   }, [previousInitialProposal, props.proposal, dispatch]);
 
+  const hasReferenceNumberFormat = state.proposal.call?.referenceNumberFormat
+    ? true
+    : false;
+
+  const isSubmitted = state.proposal.submitted;
+
+  const proposalId = state.proposal.proposalId;
+
+  let info: JSX.Element | string = 'DRAFT';
+
+  if (proposalId) {
+    if (!isSubmitted && hasReferenceNumberFormat) {
+      info = (
+        <Typography>
+          {proposalId}
+          <br />
+          <small>Pre-submission-reference-number</small>
+        </Typography>
+      );
+    } else {
+      info = proposalId;
+    }
+  }
+
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
       <ContentContainer maxWidth="md">
         <StyledPaper>
           <Questionary
             title={state.proposal.title || 'New Proposal'}
-            info={
-              state.proposal.proposalId
-                ? `Proposal ID: ${state.proposal.proposalId}`
-                : 'DRAFT'
-            }
+            info={info}
             handleReset={handleReset}
             displayElementFactory={def.displayElementFactory}
           />
