@@ -1488,6 +1488,10 @@ context('Template tests', () => {
 
         cy.contains('Uploading...').should('not.exist');
 
+        // NOTE: Check if wait fixes the failing test in the pipeline
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(1000);
+
         cy.contains('file_upload_test');
         cy.get('[title="Add image caption"]').click();
 
