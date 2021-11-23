@@ -9,6 +9,8 @@ import {
   AssignSepReviewersToProposalMutationVariables,
   CreateSepMutation,
   CreateSepMutationVariables,
+  SaveSepMeetingDecisionMutation,
+  SaveSepMeetingDecisionMutationVariables,
 } from '../../src/generated/sdk';
 import { getE2EApi } from './utils';
 
@@ -59,6 +61,15 @@ const assignSepReviewersToProposal = (
   return cy.wrap(request);
 };
 
+const saveSepMeetingDecision = (
+  saveSepMeetingDecisionInput: SaveSepMeetingDecisionMutationVariables
+): Cypress.Chainable<SaveSepMeetingDecisionMutation> => {
+  const api = getE2EApi();
+  const request = api.saveSepMeetingDecision(saveSepMeetingDecisionInput);
+
+  return cy.wrap(request);
+};
+
 Cypress.Commands.add('createSep', createSep);
 Cypress.Commands.add('assignChairOrSecretary', assignChairOrSecretary);
 Cypress.Commands.add('assignReviewersToSep', assignReviewersToSep);
@@ -67,3 +78,4 @@ Cypress.Commands.add(
   'assignSepReviewersToProposal',
   assignSepReviewersToProposal
 );
+Cypress.Commands.add('saveSepMeetingDecision', saveSepMeetingDecision);

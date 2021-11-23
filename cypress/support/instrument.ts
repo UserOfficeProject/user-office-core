@@ -11,6 +11,8 @@ import {
   CreateInstrumentMutationVariables,
   SetInstrumentAvailabilityTimeMutation,
   SetInstrumentAvailabilityTimeMutationVariables,
+  SubmitInstrumentMutation,
+  SubmitInstrumentMutationVariables,
   UpdateTechnicalReviewAssigneeMutation,
   UpdateTechnicalReviewAssigneeMutationVariables,
 } from '../../src/generated/sdk';
@@ -89,6 +91,15 @@ const setInstrumentAvailabilityTime = (
   return cy.wrap(request);
 };
 
+const submitInstrument = (
+  submitInstrumentInput: SubmitInstrumentMutationVariables
+): Cypress.Chainable<SubmitInstrumentMutation> => {
+  const api = getE2EApi();
+  const request = api.submitInstrument(submitInstrumentInput);
+
+  return cy.wrap(request);
+};
+
 Cypress.Commands.add('createInstrument', createInstrument);
 Cypress.Commands.add(
   'assignScientistsToInstrument',
@@ -110,3 +121,4 @@ Cypress.Commands.add(
   'setInstrumentAvailabilityTime',
   setInstrumentAvailabilityTime
 );
+Cypress.Commands.add('submitInstrument', submitInstrument);

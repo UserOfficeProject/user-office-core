@@ -14,6 +14,8 @@ import {
   AddTechnicalReviewMutation,
   SetInstrumentAvailabilityTimeMutationVariables,
   SetInstrumentAvailabilityTimeMutation,
+  SubmitInstrumentMutationVariables,
+  SubmitInstrumentMutation,
 } from '../../src/generated/sdk';
 
 declare global {
@@ -121,6 +123,18 @@ declare global {
       setInstrumentAvailabilityTime: (
         setInstrumentAvailabilityTimeInput: SetInstrumentAvailabilityTimeMutationVariables
       ) => Cypress.Chainable<SetInstrumentAvailabilityTimeMutation>;
+
+      /**
+       * Submit instrument in SEP meeting components
+       *
+       * @returns {typeof submitInstrument}
+       * @memberof Chainable
+       * @example
+       *    cy.submitInstrument(submitInstrumentInput: SubmitInstrumentMutationVariables);
+       */
+      submitInstrument: (
+        submitInstrumentInput: SubmitInstrumentMutationVariables
+      ) => Cypress.Chainable<SubmitInstrumentMutation>;
     }
   }
 }
