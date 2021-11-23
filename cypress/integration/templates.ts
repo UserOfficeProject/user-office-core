@@ -1235,6 +1235,8 @@ context('Template tests', () => {
       cy.contains(fileQuestion)
         .parent()
         .should('not.contain.text', 'field must have at least 1 items');
+
+      cy.logout();
     });
 
     it('Officer can delete proposal questions', () => {
@@ -1469,6 +1471,23 @@ context('Template tests', () => {
         }
       });
 
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.contains(template.title)
+        .parent()
+        .find("[title='Edit']")
+        .first()
+        .click();
+
+      cy.contains(fileQuestion)
+        .parent()
+        .dragElement([{ direction: 'left', length: 1 }]);
+
+      cy.logout();
+
       cy.login('user');
       cy.visit('/');
 
@@ -1476,8 +1495,6 @@ context('Template tests', () => {
         .parent()
         .find('[title="Edit proposal"]')
         .click();
-
-      cy.contains('save and continue', { matchCase: false }).click();
       cy.finishedLoading();
 
       cy.contains(fileQuestion);
@@ -1505,20 +1522,35 @@ context('Template tests', () => {
 
       cy.get('[data-cy="save-button"]').click();
 
+      cy.notification({ variant: 'success', text: 'Saved' });
+
       cy.finishedLoading();
 
       cy.get('.MuiStep-root').contains('Review').click();
 
+      cy.finishedLoading();
+
+      cy.contains('proposal information', { matchCase: false });
+
       cy.contains(fileName);
 
-      cy.contains(template.topic.title).click();
+      cy.get('[data-cy="questionary-stepper"]')
+        .contains('New proposal')
+        .click();
 
-      cy.contains(fileName);
-      cy.get('[data-cy="image-caption"] input').should(
-        'have.value',
-        'Test caption'
-      );
-      cy.get('[data-cy="image-figure"] input').should('have.value', 'Fig_test');
+      cy.get('[data-cy="co-proposers"]').should('exist');
+
+      cy.finishedLoading();
+
+      cy.contains(fileQuestion)
+        .parent()
+        .should('contain.text', fileName)
+        .find('[data-cy="image-caption"] input')
+        .should('have.value', 'Test caption');
+      cy.contains(fileQuestion)
+        .parent()
+        .find('[data-cy="image-figure"] input')
+        .should('have.value', 'Fig_test');
     });
   });
 });
