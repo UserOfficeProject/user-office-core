@@ -1,48 +1,32 @@
-import Grid from '@material-ui/core/Grid';
+import { Container } from '@material-ui/core';
 import React from 'react';
 
 import SimpleTabs from 'components/common/TabPanel';
 import { TemplateGroupId } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
-import { ContentContainer } from 'styles/StyledComponents';
 
-import ShipmentTemplatesTable from './ShipmentTemplatesTable';
+import DefaultTemplatesTable from './DefaultTemplatesTable';
+import withMarkTemplateAsActiveAction from './withMarkTemplateAsActiveAction';
 
-export default function ShipmentTemplatesPage() {
-  const api = useDataApi();
+export default function SampleEsiPage() {
+  const templateGroup = TemplateGroupId.SHIPMENT;
+  const itemCountLabel = '# shipments';
+
+  const TableComponent = withMarkTemplateAsActiveAction(DefaultTemplatesTable);
 
   return (
-    <ContentContainer>
-      <Grid container>
-        <Grid item xs={12}>
-          <SimpleTabs tabNames={['Current', 'Archived']}>
-            <ShipmentTemplatesTable
-              dataProvider={() =>
-                api()
-                  .getTemplates({
-                    filter: {
-                      isArchived: false,
-                      group: TemplateGroupId.SHIPMENT,
-                    },
-                  })
-                  .then((data) => data.templates || [])
-              }
-            />
-            <ShipmentTemplatesTable
-              dataProvider={() =>
-                api()
-                  .getTemplates({
-                    filter: {
-                      isArchived: true,
-                      group: TemplateGroupId.SHIPMENT,
-                    },
-                  })
-                  .then((data) => data.templates || [])
-              }
-            />
-          </SimpleTabs>
-        </Grid>
-      </Grid>
-    </ContentContainer>
+    <Container>
+      <SimpleTabs tabNames={['Current', 'Archived']}>
+        <TableComponent
+          templateGroup={templateGroup}
+          itemCountLabel={itemCountLabel}
+          isArchived={false}
+        />
+        <TableComponent
+          templateGroup={templateGroup}
+          itemCountLabel={itemCountLabel}
+          isArchived={true}
+        />
+      </SimpleTabs>
+    </Container>
   );
 }

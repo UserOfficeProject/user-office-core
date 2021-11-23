@@ -6642,6 +6642,7 @@ export type CloneTemplateMutation = (
     { __typename?: 'TemplateResponseWrap' }
     & { template: Maybe<(
       { __typename?: 'Template' }
+      & Pick<Template, 'questionaryCount'>
       & TemplateMetadataFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
@@ -6705,6 +6706,7 @@ export type CreateTemplateMutation = (
     { __typename?: 'TemplateResponseWrap' }
     & { template: Maybe<(
       { __typename?: 'Template' }
+      & Pick<Template, 'questionaryCount'>
       & TemplateMetadataFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
@@ -10938,6 +10940,7 @@ export const CloneTemplateDocument = gql`
   cloneTemplate(templateId: $templateId) {
     template {
       ...templateMetadata
+      questionaryCount
     }
     rejection {
       ...rejection
@@ -10982,6 +10985,7 @@ export const CreateTemplateDocument = gql`
   createTemplate(groupId: $groupId, name: $name, description: $description) {
     template {
       ...templateMetadata
+      questionaryCount
     }
     rejection {
       ...rejection

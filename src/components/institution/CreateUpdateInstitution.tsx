@@ -107,7 +107,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
                 name="verified"
                 type="checkbox"
                 component={Checkbox}
-                value={values.verified}
+                checked={values.verified}
                 color="primary"
                 onChange={(): void =>
                   setFieldValue('verified', !values.verified)
