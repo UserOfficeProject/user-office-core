@@ -1046,6 +1046,7 @@ context('Template tests', () => {
       // Boolean
       cy.get('[data-cy=data-type]').click();
       cy.get('[role=listbox]').contains('Boolean').click();
+      // NOTE: There is no indicator that something is changed in filtering so sometimes first test attempt fails here. Check for possible solutions.
       cy.get('[data-cy=question-list]')
         .contains(booleanQuestion)
         .should('exist');
