@@ -53,7 +53,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
   const [submitButtonMessage, setSubmitButtonMessage] = useState<string>(
     'I am aware that no further edits can be done after proposal submission.'
   );
-
+  
   const proposal = state.proposal;
 
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -72,7 +72,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
   // Show a different submit confirmation if
   // EDITABLE_SUBMITTED is an upcoming status
   useEffect(() => {
-    async function checkUpcomingEditableStatus() {
+    async function initialiseSubmissionMessage() {
       if (!proposal.callId || submitDisabled) {
         setLoadingSubmitMessage(false);
 
@@ -100,18 +100,22 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
           if (proposal.status != null && hasUpcomingEditableStatus) {
             setSubmitButtonMessage(
-              'Submit proposal? The proposal can be edited after submission.'
+              'Submit proposal? The proposal can be edited after submission.'.concat(
+                call?.submissionMessage ? '\n' + call.submissionMessage : ''
+              )
             );
           } else {
-            'I am aware that no further edits can be done after proposal submission.'.concat(
-              call?.submissionMessage ? '\n' + call.submissionMessage : ''
-            )
+            setSubmitButtonMessage(
+              'I am aware that no further edits can be done after proposal submission.'.concat(
+                call?.submissionMessage ? '\n' + call.submissionMessage : ''
+              )
+            );
           }
         }
       }
       setLoadingSubmitMessage(false);
     }
-    checkUpcomingEditableStatus();
+    initialiseSubmissionMessage();
   }, [api, proposal.callId, proposal.status, submitDisabled]);
 
   if (loadingSubmitMessage) {
