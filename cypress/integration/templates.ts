@@ -1484,6 +1484,10 @@ context('Template tests', () => {
           mimeType: 'image/png',
         });
 
+        cy.finishedLoading();
+
+        cy.contains('Uploading...').should('not.exist');
+
         cy.contains('file_upload_test');
         cy.get('[title="Add image caption"]').click();
 
