@@ -167,7 +167,7 @@ export default function ProposalContainer(props: {
         <Typography>
           {proposalId}
           <br />
-          <small>Pre-submission-reference-number</small>
+          <small>Pre-submission reference</small>
         </Typography>
       );
     } else {

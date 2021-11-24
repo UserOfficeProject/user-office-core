@@ -88,7 +88,7 @@ const ProposalTableUser: React.FC = () => {
         searchQuery={sendUserProposalRequest}
         isLoading={loading}
       />
-      <br />* Pre-submission reference number, ID will change upon submission
+      <br />* Pre-submission reference. Reference will change upon submission.
     </div>
   );
 };
