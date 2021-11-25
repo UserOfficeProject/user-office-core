@@ -11,6 +11,7 @@ mutation createCall(
   $startCycle: DateTime!
   $endCycle: DateTime!
   $cycleComment: String!
+  $submissionMessage: String
   $surveyComment: String!
   $allocationTimeUnit: AllocationTimeUnits!
   $referenceNumberFormat: String
@@ -34,6 +35,7 @@ mutation createCall(
       startCycle: $startCycle
       endCycle: $endCycle
       cycleComment: $cycleComment
+      submissionMessage: $submissionMessage
       surveyComment: $surveyComment
       allocationTimeUnit: $allocationTimeUnit
       referenceNumberFormat: $referenceNumberFormat
