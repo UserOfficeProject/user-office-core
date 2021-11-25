@@ -55,10 +55,8 @@ const ProposalTableUser: React.FC = () => {
               );
             })
             .map((proposal) => {
-              const hasReferenceNumberFormat = proposal.call
-                ?.referenceNumberFormat
-                ? true
-                : false;
+              const hasReferenceNumberFormat =
+                !!proposal.call?.referenceNumberFormat;
 
               return {
                 primaryKey: proposal.primaryKey,

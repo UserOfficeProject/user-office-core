@@ -151,28 +151,18 @@ export default function ProposalContainer(props: {
     }
   }, [previousInitialProposal, props.proposal, dispatch]);
 
-  const hasReferenceNumberFormat = state.proposal.call?.referenceNumberFormat
-    ? true
-    : false;
+  const hasReferenceNumberFormat = !!state.proposal.call?.referenceNumberFormat;
 
-  const isSubmitted = state.proposal.submitted;
+  const { submitted, proposalId } = state.proposal;
 
-  const proposalId = state.proposal.proposalId;
+  let info: JSX.Element | string = proposalId || 'DRAFT';
 
-  let info: JSX.Element | string = 'DRAFT';
-
-  if (proposalId) {
-    if (!isSubmitted && hasReferenceNumberFormat) {
-      info = (
-        <Typography>
-          {proposalId}
-          <br />
-          <small>Pre-submission reference</small>
-        </Typography>
-      );
-    } else {
-      info = proposalId;
-    }
+  if (!submitted && hasReferenceNumberFormat && proposalId) {
+    info = (
+      <Typography>
+        {proposalId} <br /> <small>Pre-submission reference</small>
+      </Typography>
+    );
   }
 
   return (
