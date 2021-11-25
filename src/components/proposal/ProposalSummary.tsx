@@ -51,7 +51,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
   const [loadingSubmitMessage, setLoadingSubmitMessage] =
     useState<boolean>(true);
   const [submitButtonMessage, setSubmitButtonMessage] = useState<string>(
-    'I am aware that no further edits can be done after proposal submission.'
+    'I am aware that no further edits can be made after proposal submission.'
   );
 
   const proposal = state.proposal;
@@ -106,7 +106,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
             );
           } else {
             setSubmitButtonMessage(
-              'I am aware that no further edits can be done after proposal submission.'.concat(
+              'I am aware that no further edits can be made after proposal submission.'.concat(
                 call?.submissionMessage ? '\n' + call.submissionMessage : ''
               )
             );
