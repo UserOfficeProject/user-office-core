@@ -5037,7 +5037,7 @@ export type CloneProposalsMutation = (
         & Pick<Instrument, 'id' | 'name' | 'shortCode'>
       )>, call: Maybe<(
         { __typename?: 'Call' }
-        & Pick<Call, 'id' | 'shortCode' | 'isActive'>
+        & Pick<Call, 'id' | 'shortCode' | 'isActive' | 'referenceNumberFormat'>
       )> }
       & ProposalFragment
     )>, rejection: Maybe<(
@@ -5227,7 +5227,7 @@ export type GetProposalQuery = (
       & Pick<Instrument, 'id' | 'name' | 'shortCode'>
     )>, call: Maybe<(
       { __typename?: 'Call' }
-      & Pick<Call, 'id' | 'shortCode' | 'isActive' | 'allocationTimeUnit'>
+      & Pick<Call, 'id' | 'shortCode' | 'isActive' | 'allocationTimeUnit' | 'referenceNumberFormat'>
     )>, sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id' | 'code'>
@@ -7630,7 +7630,7 @@ export type GetUserProposalsQuery = (
         & Pick<BasicUserDetails, 'id'>
       )>, call: Maybe<(
         { __typename?: 'Call' }
-        & Pick<Call, 'id' | 'shortCode' | 'isActive'>
+        & Pick<Call, 'id' | 'shortCode' | 'isActive' | 'referenceNumberFormat'>
       )> }
     )> }
   )> }
@@ -9752,6 +9752,7 @@ export const CloneProposalsDocument = gql`
         id
         shortCode
         isActive
+        referenceNumberFormat
       }
     }
     rejection {
@@ -9919,6 +9920,7 @@ export const GetProposalDocument = gql`
       shortCode
       isActive
       allocationTimeUnit
+      referenceNumberFormat
     }
     sep {
       id
@@ -11466,6 +11468,7 @@ export const GetUserProposalsDocument = gql`
         id
         shortCode
         isActive
+        referenceNumberFormat
       }
     }
   }
