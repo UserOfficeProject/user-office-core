@@ -84,6 +84,16 @@ const CallCycleInfo: React.FC = () => {
         data-cy="cycle-comment"
         inputProps={{ maxLength: '100' }}
       />
+      <Field
+        name="submissionMessage"
+        label="Submission Message"
+        id="submission-message-input"
+        type="text"
+        component={TextField}
+        margin="normal"
+        fullWidth
+        data-cy="submission-message"
+      />
     </>
   );
 };
