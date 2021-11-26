@@ -159,6 +159,7 @@ const createCalls = async () => {
       }),
       shortCode: `${dummy.word().substr(0, 15)}${dummy.positiveNumber(100)}`,
       surveyComment: faker.random.words(5),
+      submissionMessage: faker.random.words(5),
       proposalWorkflowId: 1,
       templateId: dummy.positiveNumber(MAX_TEMPLATES),
       allocationTimeUnit: AllocationTimeUnits.Day,

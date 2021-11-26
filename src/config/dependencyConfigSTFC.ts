@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
-import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
 import PostgresGenericTemplateDataSource from '../datasources/postgres/GenericTemplateDataSource';
@@ -18,6 +17,7 @@ import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSour
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
+import { StfcCallDataSource } from '../datasources/stfc/StfcCallDataSource';
 import StfcProposalDataSource from '../datasources/stfc/StfcProposalDataSource';
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
@@ -31,7 +31,7 @@ import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
-mapClass(Tokens.CallDataSource, PostgresCallDataSource);
+mapClass(Tokens.CallDataSource, StfcCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
 mapClass(Tokens.FileDataSource, PostgresFileDataSource);
