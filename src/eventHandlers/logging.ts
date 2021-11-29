@@ -11,11 +11,10 @@ export default function createHandler() {
     Tokens.EventLogsDataSource
   );
 
-  // Handler that logs every mutation wrapped with the event bus event to stdout and event_logs table.
+  // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
     const json = JSON.stringify(event);
-    const timestamp = new Date().toLocaleString();
-    console.log(`${timestamp} -- ${json}`);
+    logger.logInfo('An event was triggered', { json });
 
     // NOTE: If the event is rejection than log that in the database as well. Later we will be able to see all errors that happened.
     if (event.isRejection) {

@@ -71,6 +71,7 @@
       "error",
       { "blankLine": "always", "prev": "*", "next": "return" }
     ],
-    "unused-imports/no-unused-imports-ts": 2
+    "unused-imports/no-unused-imports-ts": 2,
+    "no-console": "error" // We should use `duo-logger` rather than `console` to log messages
   }
 }
