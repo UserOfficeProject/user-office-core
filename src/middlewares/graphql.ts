@@ -2,9 +2,11 @@ import {
   ApolloServerPluginInlineTraceDisabled,
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
+  ApolloServerPluginUsageReporting,
 } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import { Express } from 'express';
+import { GraphQLError } from 'graphql';
 import { applyMiddleware } from 'graphql-middleware';
 
 import 'reflect-metadata';
@@ -48,17 +50,36 @@ const apolloServer = async (app: Express) => {
     schema = applyMiddleware(schema, rejectionSanitizer);
   }
 
+  const plugins = [
+    ApolloServerPluginInlineTraceDisabled(),
+    // Explicitly disable playground in prod
+    process.env.NODE_ENV === 'production'
+      ? ApolloServerPluginLandingPageDisabled()
+      : ApolloServerPluginLandingPageGraphQLPlayground({
+          settings: { 'schema.polling.enable': false },
+        }),
+  ];
+  /*
+  Only use the usage reporting plugin if apollo studio connection settings are
+  present. If used without them, it will prevent the app starting.
+  When used, this will clear error messages being sent to Apollo Studio,
+  ensuring any personal data and API keys aren't sent to an external service.
+  */
+  if (process.env.APOLLO_KEY) {
+    plugins.push(
+      ApolloServerPluginUsageReporting({
+        rewriteError: (err: GraphQLError) => {
+          err.message = 'Error Redacted';
+
+          return err;
+        },
+      })
+    );
+  }
+
   const server = new ApolloServer({
     schema: schema,
-    plugins: [
-      ApolloServerPluginInlineTraceDisabled(),
-      // Explicitly disable playground in prod
-      process.env.NODE_ENV === 'production'
-        ? ApolloServerPluginLandingPageDisabled()
-        : ApolloServerPluginLandingPageGraphQLPlayground({
-            settings: { 'schema.polling.enable': false },
-          }),
-    ],
+    plugins: plugins,
     context: async ({ req }) => {
       let user = null;
       const userId = req.user?.user?.id as number;
