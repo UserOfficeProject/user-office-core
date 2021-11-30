@@ -79,6 +79,7 @@ const dummyScheduledEventCore = new ScheduledEventCore(
 );
 
 export class ProposalDataSourceMock implements ProposalDataSource {
+  proposalsUpdated: Proposal[];
   constructor() {
     this.init();
   }
@@ -116,6 +117,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       dummyProposalSubmitted,
       dummyProposalWithNotActiveCall,
     ];
+
+    this.proposalsUpdated = [];
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
@@ -144,6 +147,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       throw new Error('Proposal does not exist');
     }
 
+    this.proposalsUpdated.push(proposal);
+
     return proposal;
   }
 
@@ -165,7 +170,10 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     throw new Error('Not implemented');
   }
 
-  async submitProposal(primaryKey: number): Promise<Proposal> {
+  async submitProposal(
+    primaryKey: number,
+    referenceNumber?: string
+  ): Promise<Proposal> {
     const found = allProposals.find(
       (proposal) => proposal.primaryKey === primaryKey
     );
@@ -175,6 +183,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     }
 
     const newObj = { ...found, submitted: true };
+
+    if (referenceNumber !== undefined) {
+      newObj.proposalId = referenceNumber;
+    }
+
     Object.setPrototypeOf(newObj, Proposal.prototype);
 
     return newObj;
