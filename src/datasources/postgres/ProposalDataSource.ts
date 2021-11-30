@@ -406,25 +406,26 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
-  ): Promise<{ totalCount: number; proposals: Proposal[] }> {
+  ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     return database
       .select([
-        'proposals.*',
+        'proposal_table_view.*',
         'instrument_has_scientists.*',
         'instrument_has_proposals.instrument_id',
         'instrument_has_proposals.proposal_pk',
         database.raw('count(*) OVER() AS full_count'),
       ])
-      .from('proposals')
+      .from('proposal_table_view')
       .join('instrument_has_scientists', {
         'instrument_has_scientists.user_id': scientistId,
       })
       .join('instrument_has_proposals', {
-        'instrument_has_proposals.proposal_pk': 'proposals.proposal_pk',
+        'instrument_has_proposals.proposal_pk':
+          'proposal_table_view.proposal_pk',
         'instrument_has_proposals.instrument_id':
           'instrument_has_scientists.instrument_id',
       })
-      .orderBy('proposals.proposal_pk', 'desc')
+      .orderBy('proposal_table_view.proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.text) {
           query
@@ -432,7 +433,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .orWhere('abstract', 'ilike', `%${filter.text}%`);
         }
         if (filter?.callId) {
-          query.where('proposals.call_id', filter.callId);
+          query.where('proposal_table_view.call_id', filter.callId);
         }
         if (filter?.instrumentId) {
           query.where(
@@ -442,7 +443,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (filter?.proposalStatusId) {
-          query.where('proposals.status_id', filter?.proposalStatusId);
+          query.where(
+            'proposal_table_view.proposal_status_id',
+            filter?.proposalStatusId
+          );
         }
 
         if (filter?.shortCodes) {
@@ -451,7 +455,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .join('|');
 
           query.whereRaw(
-            `proposals.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+            `proposal_table_view.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
 
@@ -482,9 +486,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.offset(offset);
         }
       })
-      .then((proposals: ProposalRecord[]) => {
+      .then((proposals: ProposalViewRecord[]) => {
         const props = proposals.map((proposal) =>
-          createProposalObject(proposal)
+          createProposalViewObject(proposal)
         );
 
         return {

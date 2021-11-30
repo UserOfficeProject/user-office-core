@@ -213,7 +213,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     first?: number,
     offset?: number
   ) {
-    return { totalCount: 1, proposals: [dummyProposal] };
+    return { totalCount: 1, proposals: [] };
   }
 
   async markEventAsDoneOnProposal(

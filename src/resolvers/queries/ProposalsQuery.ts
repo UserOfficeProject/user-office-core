@@ -89,17 +89,4 @@ export class ProposalsQuery {
       args.offset
     );
   }
-
-  @Query(() => ProposalsQueryResult, { nullable: true })
-  async instrumentScientistProposals(
-    @Args() args: ProposalsArgs,
-    @Ctx() context: ResolverContext
-  ): Promise<ProposalsQueryResult | null> {
-    return context.queries.proposal.getInstrumentScientistProposals(
-      context.user,
-      args.filter,
-      args.first,
-      args.offset
-    );
-  }
 }

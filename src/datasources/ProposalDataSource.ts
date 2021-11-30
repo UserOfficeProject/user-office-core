@@ -27,7 +27,7 @@ export interface ProposalDataSource {
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
-  ): Promise<{ totalCount: number; proposals: Proposal[] }>;
+  ): Promise<{ totalCount: number; proposals: ProposalView[] }>;
   getUserProposals(
     id: number,
     filter?: UserProposalsFilter

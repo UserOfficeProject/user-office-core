@@ -45,8 +45,14 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Int, { nullable: true })
   public managementTimeAllocation: number;
 
+  @Field(() => Int, { nullable: true })
+  public technicalReviewAssignee: number;
+
   @Field(() => TechnicalReviewStatus, { nullable: true })
   public technicalStatus: TechnicalReviewStatus;
+
+  @Field(() => Int, { nullable: true })
+  public technicalReviewSubmitted: boolean;
 
   @Field(() => String, { nullable: true })
   public instrumentName: string;
