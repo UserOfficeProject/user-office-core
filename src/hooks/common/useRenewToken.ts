@@ -1,13 +1,13 @@
 import { useState, useContext } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export function useRenewToken() {
   const [renewToken, setRenewToken] = useState<string | null | undefined>(null);
   const { token, handleNewToken } = useContext(UserContext);
 
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
 
   const setRenewTokenValue = async () => {
     try {

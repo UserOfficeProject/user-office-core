@@ -24,6 +24,7 @@ function createRegistrationStub(
     user: {
       firstname: '',
       lastname: '',
+      preferredname: '',
       id: userId,
       created: new Date(),
       organisation: '',

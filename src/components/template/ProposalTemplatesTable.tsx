@@ -9,9 +9,8 @@ import InputDialog from 'components/common/InputDialog';
 import { Call, ProposalTemplate, TemplateGroupId } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
-import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
+import TemplatesTable, { TemplateRowDataType } from './TemplatesTable';
 
 function CallsList(props: { filterTemplateId: number }) {
   const { calls } = useCallsData({ templateIds: [props.filterTemplateId] });
@@ -74,7 +73,6 @@ type ProposalTemplatesTableProps = {
       | 'questionaryCount'
     >[]
   >;
-  confirm: WithConfirmType;
 };
 
 function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
@@ -118,7 +116,6 @@ function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
           );
         }}
         dataProvider={props.dataProvider}
-        confirm={props.confirm}
       />
       <CallsModal
         templateId={selectedTemplateId}
@@ -128,4 +125,4 @@ function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
   );
 }
 
-export default withConfirm(ProposalTemplatesTable);
+export default ProposalTemplatesTable;

@@ -14,7 +14,7 @@ import { QuestionaryStepButton } from './QuestionaryStepButton';
 
 interface QuestionaryProps {
   title: string;
-  info?: string;
+  info?: JSX.Element | string;
   displayElementFactory: StepDisplayElementFactory;
   handleReset: () => Promise<boolean>;
 }

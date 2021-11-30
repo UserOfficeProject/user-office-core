@@ -7,15 +7,15 @@ import { useSnackbar } from 'notistack';
 import React from 'react';
 
 import { TemplateGroupId, TemplateMetadataFragment } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const CreateTemplate = (props: {
-  onComplete: (template: TemplateMetadataFragment | null | undefined) => void;
+  onComplete: (template: TemplateMetadataFragment) => void;
   groupId: TemplateGroupId;
 }) => {
   const { onComplete, groupId } = props;
+  const { api } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();
-  const api = useDataApi();
 
   return (
     <>
@@ -32,13 +32,13 @@ const CreateTemplate = (props: {
           const {
             createTemplate: { template, rejection },
           } = result;
-
-          if (rejection) {
-            enqueueSnackbar(rejection.reason, {
+          if (!template) {
+            enqueueSnackbar(rejection?.reason ?? 'Unknown error', {
               variant: 'error',
             });
+          } else {
+            onComplete(template);
           }
-          onComplete(template);
         }}
         validationSchema={createTemplateValidationSchema}
       >

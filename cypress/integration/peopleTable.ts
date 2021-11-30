@@ -201,6 +201,9 @@ context('PageTable component tests', () => {
 
       cy.finishedLoading();
 
+      cy.contains('10 rows').click();
+      cy.get('[data-value=5]').click();
+
       for (const email of emails) {
         cy.finishedLoading();
         cy.get('[data-cy=email]').clear().type(email);
@@ -243,6 +246,9 @@ context('PageTable component tests', () => {
       cy.get('@modal').find('[title="Next Page"]').click();
       cy.get('@modal').find('tr[index="0"] input:checked');
       cy.get('@modal').contains('1 user(s) selected');
+      cy.get('[data-cy="assign-selected-users"]').click();
+
+      cy.logout();
     });
   });
 
@@ -384,6 +390,9 @@ context('PageTable component tests', () => {
       cy.get('[data-cy=add-participant-button]').click();
 
       cy.get('[role="presentation"]').as('modal');
+
+      cy.contains('10 rows').click();
+      cy.get('[data-value=5]').click();
 
       cy.get('@modal').contains('0 user(s) selected');
       cy.get('@modal').contains(/1-5 of [0-9]+/);

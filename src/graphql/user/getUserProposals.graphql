@@ -20,6 +20,7 @@ query getUserProposals {
         id
         shortCode
         isActive
+        referenceNumberFormat
       }
     }
   }

@@ -59,7 +59,8 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
     proposalId: proposal.proposalId,
     rankOrder: proposal.sepMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-    timeAllocation: proposal.technicalReview?.timeAllocation || null,
+    technicalTimeAllocation: proposal.technicalReview?.timeAllocation || null,
+    managementTimeAllocation: proposal.managementTimeAllocation || null,
     technicalStatus: getTranslation(
       proposal.technicalReview?.status as ResourceId
     ),

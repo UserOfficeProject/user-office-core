@@ -121,6 +121,7 @@ export type BasicUserDetails = {
   id: Scalars['Int'];
   firstname: Scalars['String'];
   lastname: Scalars['String'];
+  preferredname: Maybe<Scalars['String']>;
   organisation: Scalars['String'];
   position: Scalars['String'];
   placeholder: Maybe<Scalars['Boolean']>;
@@ -158,6 +159,7 @@ export type Call = {
   proposalSequence: Maybe<Scalars['Int']>;
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
+  submissionMessage: Maybe<Scalars['String']>;
   proposalWorkflowId: Maybe<Scalars['Int']>;
   allocationTimeUnit: AllocationTimeUnits;
   templateId: Scalars['Int'];
@@ -190,12 +192,6 @@ export type ChangeProposalsStatusInput = {
   proposals: Array<ProposalPkWithCallId>;
 };
 
-export type CheckExternalTokenWrap = {
-  __typename?: 'CheckExternalTokenWrap';
-  rejection: Maybe<Rejection>;
-  token: Maybe<Scalars['String']>;
-};
-
 export type CloneProposalsInput = {
   callId: Scalars['Int'];
   proposalsToClonePk: Array<Scalars['Int']>;
@@ -221,6 +217,7 @@ export type CreateCallInput = {
   referenceNumberFormat?: Maybe<Scalars['String']>;
   proposalSequence?: Maybe<Scalars['Int']>;
   cycleComment: Scalars['String'];
+  submissionMessage?: Maybe<Scalars['String']>;
   surveyComment: Scalars['String'];
   allocationTimeUnit: AllocationTimeUnits;
   proposalWorkflowId: Scalars['Int'];
@@ -377,7 +374,8 @@ export enum Event {
   PROPOSAL_BOOKING_TIME_SLOTS_REMOVED = 'PROPOSAL_BOOKING_TIME_SLOTS_REMOVED',
   PROPOSAL_BOOKING_TIME_ACTIVATED = 'PROPOSAL_BOOKING_TIME_ACTIVATED',
   PROPOSAL_BOOKING_TIME_COMPLETED = 'PROPOSAL_BOOKING_TIME_COMPLETED',
-  PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED'
+  PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED',
+  PROPOSAL_BOOKING_TIME_REOPENED = 'PROPOSAL_BOOKING_TIME_REOPENED'
 }
 
 export type EventLog = {
@@ -403,6 +401,12 @@ export type ExperimentSafetyInput = {
   proposal: Proposal;
 };
 
+export type ExternalTokenLoginWrap = {
+  __typename?: 'ExternalTokenLoginWrap';
+  rejection: Maybe<Rejection>;
+  token: Maybe<Scalars['String']>;
+};
+
 export type Feature = {
   __typename?: 'Feature';
   id: FeatureId;
@@ -414,7 +418,8 @@ export enum FeatureId {
   SHIPPING = 'SHIPPING',
   SCHEDULER = 'SCHEDULER',
   EXTERNAL_AUTH = 'EXTERNAL_AUTH',
-  RISK_ASSESSMENT = 'RISK_ASSESSMENT'
+  RISK_ASSESSMENT = 'RISK_ASSESSMENT',
+  EMAIL_INVITE = 'EMAIL_INVITE'
 }
 
 export type FieldCondition = {
@@ -566,6 +571,12 @@ export type IntervalConfig = {
   units: Maybe<Array<Scalars['String']>>;
 };
 
+export type LogoutTokenWrap = {
+  __typename?: 'LogoutTokenWrap';
+  rejection: Maybe<Rejection>;
+  token: Maybe<Scalars['String']>;
+};
+
 export type MoveProposalWorkflowStatusInput = {
   from: IndexWithGroupId;
   to: IndexWithGroupId;
@@ -585,6 +596,7 @@ export type Mutation = {
   assignInstrumentsToCall: CallResponseWrap;
   removeAssignedInstrumentFromCall: CallResponseWrap;
   createGenericTemplate: GenericTemplateResponseWrap;
+  updateGenericTemplate: GenericTemplateResponseWrap;
   changeProposalsStatus: SuccessResponseWrap;
   assignProposalsToInstrument: SuccessResponseWrap;
   removeProposalsFromInstrument: SuccessResponseWrap;
@@ -597,6 +609,7 @@ export type Mutation = {
   updateEsi: EsiResponseWrap;
   administrationProposal: ProposalResponseWrap;
   cloneProposals: ProposalsResponseWrap;
+  importProposal: ProposalResponseWrap;
   updateProposal: ProposalResponseWrap;
   addProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
   addStatusChangingEventsToConnection: ProposalStatusChangingEventResponseWrap;
@@ -616,8 +629,10 @@ export type Mutation = {
   createSampleEsi: SampleEsiResponseWrap;
   deleteSampleEsi: SampleEsiResponseWrap;
   updateSampleEsi: SampleEsiResponseWrap;
+  cloneSampleEsi: SampleEsiResponseWrap;
   createSample: SampleResponseWrap;
   updateSample: SampleResponseWrap;
+  cloneSample: SampleResponseWrap;
   assignChairOrSecretary: SepResponseWrap;
   assignReviewersToSEP: SepResponseWrap;
   removeMemberFromSep: SepResponseWrap;
@@ -657,9 +672,8 @@ export type Mutation = {
   addSamplesToShipment: ShipmentResponseWrap;
   addTechnicalReview: TechnicalReviewResponseWrap;
   applyPatches: PrepareDbResponseWrap;
-  checkExternalToken: CheckExternalTokenWrap;
+  externalTokenLogin: ExternalTokenLoginWrap;
   cloneGenericTemplate: GenericTemplateResponseWrap;
-  cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   createEsi: EsiResponseWrap;
   createProposal: ProposalResponseWrap;
@@ -681,6 +695,7 @@ export type Mutation = {
   emailVerification: EmailVerificationResponseWrap;
   getTokenForUser: TokenResponseWrap;
   login: TokenResponseWrap;
+  logout: LogoutTokenWrap;
   notifyProposal: ProposalResponseWrap;
   prepareDB: PrepareDbResponseWrap;
   removeUserForReview: ReviewResponseWrap;
@@ -694,7 +709,6 @@ export type Mutation = {
   submitTechnicalReview: TechnicalReviewResponseWrap;
   token: TokenResponseWrap;
   selectRole: TokenResponseWrap;
-  updateGenericTemplate: GenericTemplateResponseWrap;
   updatePassword: BasicUserDetailsResponseWrap;
 };
 
@@ -757,6 +771,13 @@ export type MutationCreateGenericTemplateArgs = {
   templateId: Scalars['Int'];
   proposalPk: Scalars['Int'];
   questionId: Scalars['String'];
+};
+
+
+export type MutationUpdateGenericTemplateArgs = {
+  genericTemplateId: Scalars['Int'];
+  title?: Maybe<Scalars['String']>;
+  safetyComment?: Maybe<Scalars['String']>;
 };
 
 
@@ -838,6 +859,17 @@ export type MutationAdministrationProposalArgs = {
 
 export type MutationCloneProposalsArgs = {
   cloneProposalsInput: CloneProposalsInput;
+};
+
+
+export type MutationImportProposalArgs = {
+  title?: Maybe<Scalars['String']>;
+  abstract?: Maybe<Scalars['String']>;
+  users?: Maybe<Array<Scalars['Int']>>;
+  proposerId?: Maybe<Scalars['Int']>;
+  submitterId: Scalars['Int'];
+  referenceNumber: Scalars['Int'];
+  callId: Scalars['Int'];
 };
 
 
@@ -955,6 +987,13 @@ export type MutationUpdateSampleEsiArgs = {
 };
 
 
+export type MutationCloneSampleEsiArgs = {
+  esiId: Scalars['Int'];
+  sampleId: Scalars['Int'];
+  newSampleTitle?: Maybe<Scalars['String']>;
+};
+
+
 export type MutationCreateSampleArgs = {
   title: Scalars['String'];
   templateId: Scalars['Int'];
@@ -969,6 +1008,13 @@ export type MutationUpdateSampleArgs = {
   title?: Maybe<Scalars['String']>;
   safetyComment?: Maybe<Scalars['String']>;
   safetyStatus?: Maybe<SampleStatus>;
+};
+
+
+export type MutationCloneSampleArgs = {
+  sampleId: Scalars['Int'];
+  title?: Maybe<Scalars['String']>;
+  isPostProposalSubmission?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -1264,7 +1310,7 @@ export type MutationAddTechnicalReviewArgs = {
 };
 
 
-export type MutationCheckExternalTokenArgs = {
+export type MutationExternalTokenLoginArgs = {
   externalToken: Scalars['String'];
 };
 
@@ -1272,12 +1318,6 @@ export type MutationCheckExternalTokenArgs = {
 export type MutationCloneGenericTemplateArgs = {
   title?: Maybe<Scalars['String']>;
   genericTemplateId: Scalars['Int'];
-};
-
-
-export type MutationCloneSampleArgs = {
-  title?: Maybe<Scalars['String']>;
-  sampleId: Scalars['Int'];
 };
 
 
@@ -1387,6 +1427,11 @@ export type MutationLoginArgs = {
 };
 
 
+export type MutationLogoutArgs = {
+  token: Scalars['String'];
+};
+
+
 export type MutationNotifyProposalArgs = {
   proposalPk: Scalars['Int'];
 };
@@ -1453,13 +1498,6 @@ export type MutationTokenArgs = {
 export type MutationSelectRoleArgs = {
   token: Scalars['String'];
   selectedRoleId?: Maybe<Scalars['Int']>;
-};
-
-
-export type MutationUpdateGenericTemplateArgs = {
-  genericTemplateId: Scalars['Int'];
-  title?: Maybe<Scalars['String']>;
-  safetyComment?: Maybe<Scalars['String']>;
 };
 
 
@@ -1717,7 +1755,8 @@ export type ProposalView = {
   finalStatus: Maybe<ProposalEndStatus>;
   notified: Scalars['Boolean'];
   submitted: Scalars['Boolean'];
-  timeAllocation: Maybe<Scalars['Int']>;
+  technicalTimeAllocation: Maybe<Scalars['Int']>;
+  managementTimeAllocation: Maybe<Scalars['Int']>;
   technicalStatus: Maybe<TechnicalReviewStatus>;
   instrumentName: Maybe<Scalars['String']>;
   callShortCode: Maybe<Scalars['String']>;
@@ -1804,9 +1843,11 @@ export type Query = {
   _service: Service;
   calls: Maybe<Array<Call>>;
   callsByInstrumentScientist: Maybe<Array<Call>>;
+  genericTemplates: Maybe<Array<GenericTemplate>>;
   proposals: Maybe<ProposalsQueryResult>;
   instrumentScientistProposals: Maybe<ProposalsQueryResult>;
   sampleEsi: Maybe<SampleExperimentSafetyInput>;
+  samples: Maybe<Array<Sample>>;
   shipments: Maybe<Array<Shipment>>;
   questions: Array<QuestionWithUsage>;
   templates: Maybe<Array<Template>>;
@@ -1824,7 +1865,6 @@ export type Query = {
   features: Array<Feature>;
   fileMetadata: Maybe<Array<FileMetadata>>;
   genericTemplate: Maybe<GenericTemplate>;
-  genericTemplates: Maybe<Array<GenericTemplate>>;
   allAccessTokensAndPermissions: Maybe<Array<PermissionsWithAccessToken>>;
   queriesAndMutations: Maybe<QueriesAndMutations>;
   accessTokenAndPermissions: Maybe<PermissionsWithAccessToken>;
@@ -1855,7 +1895,6 @@ export type Query = {
   roles: Maybe<Array<Role>>;
   sample: Maybe<Sample>;
   samplesByCallId: Maybe<Array<Sample>>;
-  samples: Maybe<Array<Sample>>;
   sep: Maybe<Sep>;
   sepMembers: Maybe<Array<SepReviewer>>;
   sepReviewers: Maybe<Array<SepReviewer>>;
@@ -1895,6 +1934,11 @@ export type QueryCallsByInstrumentScientistArgs = {
 };
 
 
+export type QueryGenericTemplatesArgs = {
+  filter?: Maybe<GenericTemplatesFilter>;
+};
+
+
 export type QueryProposalsArgs = {
   filter?: Maybe<ProposalsFilter>;
   first?: Maybe<Scalars['Int']>;
@@ -1912,6 +1956,11 @@ export type QueryInstrumentScientistProposalsArgs = {
 export type QuerySampleEsiArgs = {
   esiId: Scalars['Int'];
   sampleId: Scalars['Int'];
+};
+
+
+export type QuerySamplesArgs = {
+  filter?: Maybe<SamplesFilter>;
 };
 
 
@@ -1989,11 +2038,6 @@ export type QueryFileMetadataArgs = {
 
 export type QueryGenericTemplateArgs = {
   genericTemplateId: Scalars['Int'];
-};
-
-
-export type QueryGenericTemplatesArgs = {
-  filter?: Maybe<GenericTemplatesFilter>;
 };
 
 
@@ -2102,11 +2146,6 @@ export type QuerySampleArgs = {
 
 export type QuerySamplesByCallIdArgs = {
   callId: Scalars['Int'];
-};
-
-
-export type QuerySamplesArgs = {
-  filter?: Maybe<SamplesFilter>;
 };
 
 
@@ -2835,6 +2874,7 @@ export type UpdateCallInput = {
   referenceNumberFormat?: Maybe<Scalars['String']>;
   proposalSequence?: Maybe<Scalars['Int']>;
   cycleComment: Scalars['String'];
+  submissionMessage?: Maybe<Scalars['String']>;
   surveyComment: Scalars['String'];
   allocationTimeUnit: AllocationTimeUnits;
   proposalWorkflowId: Scalars['Int'];
@@ -3206,7 +3246,7 @@ export type GetSepMembersQuery = (
       & Pick<Role, 'id' | 'shortCode' | 'title'>
     )>, user: (
       { __typename?: 'BasicUserDetails' }
-      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position' | 'placeholder' | 'created'>
+      & BasicUserDetailsFragment
     ) }
   )>> }
 );
@@ -3344,7 +3384,7 @@ export type GetSepReviewersQuery = (
       & Pick<Role, 'id' | 'shortCode' | 'title'>
     )>, user: (
       { __typename?: 'BasicUserDetails' }
-      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position' | 'placeholder' | 'created'>
+      & BasicUserDetailsFragment
     ) }
   )>> }
 );
@@ -3824,6 +3864,7 @@ export type CreateCallMutationVariables = Exact<{
   startCycle: Scalars['DateTime'];
   endCycle: Scalars['DateTime'];
   cycleComment: Scalars['String'];
+  submissionMessage?: Maybe<Scalars['String']>;
   surveyComment: Scalars['String'];
   allocationTimeUnit: AllocationTimeUnits;
   referenceNumberFormat?: Maybe<Scalars['String']>;
@@ -3871,7 +3912,7 @@ export type DeleteCallMutation = (
 
 export type CallFragment = (
   { __typename?: 'Call' }
-  & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startSEPReview' | 'endSEPReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'referenceNumberFormat' | 'proposalWorkflowId' | 'templateId' | 'esiTemplateId' | 'allocationTimeUnit' | 'proposalCount' | 'title' | 'description'>
+  & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startSEPReview' | 'endSEPReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'referenceNumberFormat' | 'proposalWorkflowId' | 'templateId' | 'esiTemplateId' | 'allocationTimeUnit' | 'proposalCount' | 'title' | 'description' | 'submissionMessage'>
   & { instruments: Array<(
     { __typename?: 'InstrumentWithAvailabilityTime' }
     & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime' | 'submitted'>
@@ -3961,6 +4002,7 @@ export type UpdateCallMutationVariables = Exact<{
   startCycle: Scalars['DateTime'];
   endCycle: Scalars['DateTime'];
   cycleComment: Scalars['String'];
+  submissionMessage?: Maybe<Scalars['String']>;
   surveyComment: Scalars['String'];
   allocationTimeUnit: AllocationTimeUnits;
   referenceNumberFormat?: Maybe<Scalars['String']>;
@@ -4571,7 +4613,7 @@ export type CloneProposalsMutation = (
         & Pick<Instrument, 'id' | 'name' | 'shortCode'>
       )>, call: Maybe<(
         { __typename?: 'Call' }
-        & Pick<Call, 'id' | 'shortCode' | 'isActive'>
+        & Pick<Call, 'id' | 'shortCode' | 'isActive' | 'referenceNumberFormat'>
       )> }
       & ProposalFragment
     )>, rejection: Maybe<(
@@ -4761,7 +4803,7 @@ export type GetProposalQuery = (
       & Pick<Instrument, 'id' | 'name' | 'shortCode'>
     )>, call: Maybe<(
       { __typename?: 'Call' }
-      & Pick<Call, 'id' | 'shortCode' | 'isActive' | 'allocationTimeUnit'>
+      & Pick<Call, 'id' | 'shortCode' | 'isActive' | 'allocationTimeUnit' | 'referenceNumberFormat'>
     )>, sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id' | 'code'>
@@ -4840,7 +4882,7 @@ export type GetProposalsCoreQuery = (
   { __typename?: 'Query' }
   & { proposalsView: Maybe<Array<(
     { __typename?: 'ProposalView' }
-    & Pick<ProposalView, 'primaryKey' | 'title' | 'statusId' | 'statusName' | 'statusDescription' | 'proposalId' | 'rankOrder' | 'finalStatus' | 'notified' | 'timeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepCode' | 'sepId' | 'reviewAverage' | 'reviewDeviation' | 'instrumentId' | 'callId' | 'submitted' | 'allocationTimeUnit'>
+    & Pick<ProposalView, 'primaryKey' | 'title' | 'statusId' | 'statusName' | 'statusDescription' | 'proposalId' | 'rankOrder' | 'finalStatus' | 'notified' | 'managementTimeAllocation' | 'technicalTimeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepCode' | 'sepId' | 'reviewAverage' | 'reviewDeviation' | 'instrumentId' | 'callId' | 'submitted' | 'allocationTimeUnit'>
   )>> }
 );
 
@@ -5382,6 +5424,35 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
+export type CloneSampleEsiMutationVariables = Exact<{
+  esiId: Scalars['Int'];
+  sampleId: Scalars['Int'];
+  newSampleTitle?: Maybe<Scalars['String']>;
+}>;
+
+
+export type CloneSampleEsiMutation = (
+  { __typename?: 'Mutation' }
+  & { cloneSampleEsi: (
+    { __typename?: 'SampleEsiResponseWrap' }
+    & { esi: Maybe<(
+      { __typename?: 'SampleExperimentSafetyInput' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ), sample: (
+        { __typename?: 'Sample' }
+        & SampleFragment
+      ) }
+      & SampleEsiFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
 export type CreateSampleEsiMutationVariables = Exact<{
   sampleId: Scalars['Int'];
   esiId: Scalars['Int'];
@@ -5489,6 +5560,7 @@ export type UpdateSampleEsiMutation = (
 export type CloneSampleMutationVariables = Exact<{
   sampleId: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
+  isPostProposalSubmission?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -6152,6 +6224,7 @@ export type CloneTemplateMutation = (
     { __typename?: 'TemplateResponseWrap' }
     & { template: Maybe<(
       { __typename?: 'Template' }
+      & Pick<Template, 'questionaryCount'>
       & TemplateMetadataFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
@@ -6215,6 +6288,7 @@ export type CreateTemplateMutation = (
     { __typename?: 'TemplateResponseWrap' }
     & { template: Maybe<(
       { __typename?: 'Template' }
+      & Pick<Template, 'questionaryCount'>
       & TemplateMetadataFragment
     )>, rejection: Maybe<(
       { __typename?: 'Rejection' }
@@ -6843,23 +6917,6 @@ export type UpdateTopicMutation = (
   ) }
 );
 
-export type CheckExternalTokenMutationVariables = Exact<{
-  externalToken: Scalars['String'];
-}>;
-
-
-export type CheckExternalTokenMutation = (
-  { __typename?: 'Mutation' }
-  & { checkExternalToken: (
-    { __typename?: 'CheckExternalTokenWrap' }
-    & Pick<CheckExternalTokenWrap, 'token'>
-    & { rejection: Maybe<(
-      { __typename?: 'Rejection' }
-      & RejectionFragment
-    )> }
-  ) }
-);
-
 export type CheckTokenQueryVariables = Exact<{
   token: Scalars['String'];
 }>;
@@ -6949,9 +7006,26 @@ export type DeleteUserMutation = (
   ) }
 );
 
+export type ExternalTokenLoginMutationVariables = Exact<{
+  externalToken: Scalars['String'];
+}>;
+
+
+export type ExternalTokenLoginMutation = (
+  { __typename?: 'Mutation' }
+  & { externalTokenLogin: (
+    { __typename?: 'ExternalTokenLoginWrap' }
+    & Pick<ExternalTokenLoginWrap, 'token'>
+    & { rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
 export type BasicUserDetailsFragment = (
   { __typename?: 'BasicUserDetails' }
-  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position' | 'created' | 'placeholder'>
+  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'preferredname' | 'organisation' | 'position' | 'created' | 'placeholder'>
 );
 
 export type GetBasicUserDetailsQueryVariables = Exact<{
@@ -7132,7 +7206,7 @@ export type GetUserProposalsQuery = (
         & Pick<BasicUserDetails, 'id'>
       )>, call: Maybe<(
         { __typename?: 'Call' }
-        & Pick<Call, 'id' | 'shortCode' | 'isActive'>
+        & Pick<Call, 'id' | 'shortCode' | 'isActive' | 'referenceNumberFormat'>
       )> }
     )> }
   )> }
@@ -7187,6 +7261,23 @@ export type LoginMutation = (
   & { login: (
     { __typename?: 'TokenResponseWrap' }
     & Pick<TokenResponseWrap, 'token'>
+    & { rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type LogoutMutationVariables = Exact<{
+  token: Scalars['String'];
+}>;
+
+
+export type LogoutMutation = (
+  { __typename?: 'Mutation' }
+  & { logout: (
+    { __typename?: 'LogoutTokenWrap' }
+    & Pick<LogoutTokenWrap, 'token'>
     & { rejection: Maybe<(
       { __typename?: 'Rejection' }
       & RejectionFragment
@@ -7609,6 +7700,7 @@ export const BasicUserDetailsFragmentDoc = gql`
   id
   firstname
   lastname
+  preferredname
   organisation
   position
   created
@@ -7660,6 +7752,7 @@ export const CallFragmentDoc = gql`
   proposalCount
   title
   description
+  submissionMessage
 }
     ${BasicUserDetailsFragmentDoc}`;
 export const EsiFragmentDoc = gql`
@@ -8224,17 +8317,11 @@ export const GetSepMembersDocument = gql`
       title
     }
     user {
-      id
-      firstname
-      lastname
-      organisation
-      position
-      placeholder
-      created
+      ...basicUserDetails
     }
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const GetSepProposalDocument = gql`
     query getSEPProposal($sepId: Int!, $proposalPk: Int!) {
   sepProposal(sepId: $sepId, proposalPk: $proposalPk) {
@@ -8375,17 +8462,11 @@ export const GetSepReviewersDocument = gql`
       title
     }
     user {
-      id
-      firstname
-      lastname
-      organisation
-      position
-      placeholder
-      created
+      ...basicUserDetails
     }
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const GetSePsDocument = gql`
     query getSEPs($filter: String!, $active: Boolean) {
   seps(filter: $filter, active: $active) {
@@ -8711,9 +8792,9 @@ export const AssignInstrumentsToCallDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const CreateCallDocument = gql`
-    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $esiTemplateId: Int, $title: String, $description: String) {
+    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $submissionMessage: String, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $esiTemplateId: Int, $title: String, $description: String) {
   createCall(
-    createCallInput: {shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, esiTemplateId: $esiTemplateId, title: $title, description: $description}
+    createCallInput: {shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, submissionMessage: $submissionMessage, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, esiTemplateId: $esiTemplateId, title: $title, description: $description}
   ) {
     rejection {
       ...rejection
@@ -8777,9 +8858,9 @@ export const RemoveAssignedInstrumentFromCallDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const UpdateCallDocument = gql`
-    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $esiTemplateId: Int, $title: String, $description: String) {
+    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startSEPReview: DateTime, $endSEPReview: DateTime, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $submissionMessage: String, $surveyComment: String!, $allocationTimeUnit: AllocationTimeUnits!, $referenceNumberFormat: String, $proposalWorkflowId: Int!, $templateId: Int!, $esiTemplateId: Int, $title: String, $description: String) {
   updateCall(
-    updateCallInput: {id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, esiTemplateId: $esiTemplateId, title: $title, description: $description}
+    updateCallInput: {id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startSEPReview: $startSEPReview, endSEPReview: $endSEPReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, submissionMessage: $submissionMessage, surveyComment: $surveyComment, allocationTimeUnit: $allocationTimeUnit, referenceNumberFormat: $referenceNumberFormat, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId, esiTemplateId: $esiTemplateId, title: $title, description: $description}
   ) {
     rejection {
       ...rejection
@@ -9247,6 +9328,7 @@ export const CloneProposalsDocument = gql`
         id
         shortCode
         isActive
+        referenceNumberFormat
       }
     }
     rejection {
@@ -9414,6 +9496,7 @@ export const GetProposalDocument = gql`
       shortCode
       isActive
       allocationTimeUnit
+      referenceNumberFormat
     }
     sep {
       id
@@ -9500,7 +9583,8 @@ export const GetProposalsCoreDocument = gql`
     rankOrder
     finalStatus
     notified
-    timeAllocation
+    managementTimeAllocation
+    technicalTimeAllocation
     technicalStatus
     instrumentName
     callShortCode
@@ -9852,6 +9936,32 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
+export const CloneSampleEsiDocument = gql`
+    mutation cloneSampleEsi($esiId: Int!, $sampleId: Int!, $newSampleTitle: String) {
+  cloneSampleEsi(
+    esiId: $esiId
+    sampleId: $sampleId
+    newSampleTitle: $newSampleTitle
+  ) {
+    esi {
+      ...sampleEsi
+      questionary {
+        isCompleted
+        ...questionary
+      }
+      sample {
+        ...sample
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${SampleEsiFragmentDoc}
+${QuestionaryFragmentDoc}
+${SampleFragmentDoc}
+${RejectionFragmentDoc}`;
 export const CreateSampleEsiDocument = gql`
     mutation createSampleEsi($sampleId: Int!, $esiId: Int!) {
   createSampleEsi(sampleId: $sampleId, esiId: $esiId) {
@@ -9926,8 +10036,12 @@ ${QuestionaryFragmentDoc}
 ${SampleFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const CloneSampleDocument = gql`
-    mutation cloneSample($sampleId: Int!, $title: String) {
-  cloneSample(sampleId: $sampleId, title: $title) {
+    mutation cloneSample($sampleId: Int!, $title: String, $isPostProposalSubmission: Boolean) {
+  cloneSample(
+    sampleId: $sampleId
+    title: $title
+    isPostProposalSubmission: $isPostProposalSubmission
+  ) {
     sample {
       ...sample
       questionary {
@@ -10412,6 +10526,7 @@ export const CloneTemplateDocument = gql`
   cloneTemplate(templateId: $templateId) {
     template {
       ...templateMetadata
+      questionaryCount
     }
     rejection {
       ...rejection
@@ -10456,6 +10571,7 @@ export const CreateTemplateDocument = gql`
   createTemplate(groupId: $groupId, name: $name, description: $description) {
     template {
       ...templateMetadata
+      questionaryCount
     }
     rejection {
       ...rejection
@@ -10686,16 +10802,6 @@ export const UpdateTopicDocument = gql`
 }
     ${TemplateFragmentDoc}
 ${RejectionFragmentDoc}`;
-export const CheckExternalTokenDocument = gql`
-    mutation checkExternalToken($externalToken: String!) {
-  checkExternalToken(externalToken: $externalToken) {
-    token
-    rejection {
-      ...rejection
-    }
-  }
-}
-    ${RejectionFragmentDoc}`;
 export const CheckTokenDocument = gql`
     query checkToken($token: String!) {
   checkToken(token: $token) {
@@ -10756,6 +10862,16 @@ export const DeleteUserDocument = gql`
     user {
       id
     }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${RejectionFragmentDoc}`;
+export const ExternalTokenLoginDocument = gql`
+    mutation externalTokenLogin($externalToken: String!) {
+  externalTokenLogin(externalToken: $externalToken) {
+    token
     rejection {
       ...rejection
     }
@@ -10928,6 +11044,7 @@ export const GetUserProposalsDocument = gql`
         id
         shortCode
         isActive
+        referenceNumberFormat
       }
     }
   }
@@ -10965,6 +11082,16 @@ export const GetUsersDocument = gql`
 export const LoginDocument = gql`
     mutation login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
+    token
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${RejectionFragmentDoc}`;
+export const LogoutDocument = gql`
+    mutation logout($token: String!) {
+  logout(token: $token) {
     token
     rejection {
       ...rejection
@@ -11565,6 +11692,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return withWrapper(() => client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables));
     },
+    cloneSampleEsi(variables: CloneSampleEsiMutationVariables): Promise<CloneSampleEsiMutation> {
+      return withWrapper(() => client.request<CloneSampleEsiMutation>(print(CloneSampleEsiDocument), variables));
+    },
     createSampleEsi(variables: CreateSampleEsiMutationVariables): Promise<CreateSampleEsiMutation> {
       return withWrapper(() => client.request<CreateSampleEsiMutation>(print(CreateSampleEsiDocument), variables));
     },
@@ -11733,9 +11863,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     updateTopic(variables: UpdateTopicMutationVariables): Promise<UpdateTopicMutation> {
       return withWrapper(() => client.request<UpdateTopicMutation>(print(UpdateTopicDocument), variables));
     },
-    checkExternalToken(variables: CheckExternalTokenMutationVariables): Promise<CheckExternalTokenMutation> {
-      return withWrapper(() => client.request<CheckExternalTokenMutation>(print(CheckExternalTokenDocument), variables));
-    },
     checkToken(variables: CheckTokenQueryVariables): Promise<CheckTokenQuery> {
       return withWrapper(() => client.request<CheckTokenQuery>(print(CheckTokenDocument), variables));
     },
@@ -11747,6 +11874,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     deleteUser(variables: DeleteUserMutationVariables): Promise<DeleteUserMutation> {
       return withWrapper(() => client.request<DeleteUserMutation>(print(DeleteUserDocument), variables));
+    },
+    externalTokenLogin(variables: ExternalTokenLoginMutationVariables): Promise<ExternalTokenLoginMutation> {
+      return withWrapper(() => client.request<ExternalTokenLoginMutation>(print(ExternalTokenLoginDocument), variables));
     },
     getBasicUserDetails(variables: GetBasicUserDetailsQueryVariables): Promise<GetBasicUserDetailsQuery> {
       return withWrapper(() => client.request<GetBasicUserDetailsQuery>(print(GetBasicUserDetailsDocument), variables));
@@ -11792,6 +11922,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     login(variables: LoginMutationVariables): Promise<LoginMutation> {
       return withWrapper(() => client.request<LoginMutation>(print(LoginDocument), variables));
+    },
+    logout(variables: LogoutMutationVariables): Promise<LogoutMutation> {
+      return withWrapper(() => client.request<LogoutMutation>(print(LogoutDocument), variables));
     },
     resetPassword(variables: ResetPasswordMutationVariables): Promise<ResetPasswordMutation> {
       return withWrapper(() => client.request<ResetPasswordMutation>(print(ResetPasswordDocument), variables));

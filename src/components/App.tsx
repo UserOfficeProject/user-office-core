@@ -1,7 +1,7 @@
 import { StylesProvider } from '@material-ui/core';
 import IconButton from '@material-ui/core/IconButton';
 import Close from '@material-ui/icons/Close';
-import { ProviderContext, SnackbarProvider } from 'notistack';
+import { SnackbarProvider } from 'notistack';
 import React, { ErrorInfo, useContext } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import {
@@ -41,11 +41,12 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
   const Component = component; // JSX Elements have to be uppercase.
 
   const featureContext = useContext(FeatureContext);
-  const EXTERNAL_AUTH = !!featureContext.features.get(FeatureId.EXTERNAL_AUTH)
-    ?.isEnabled;
+  const isExternalAuthEnabled = !!featureContext.features.get(
+    FeatureId.EXTERNAL_AUTH
+  )?.isEnabled;
 
   const settingsContext = useContext(SettingsContext);
-  const EXTERNAL_AUTH_LOGIN_URL = settingsContext.settings.get(
+  const externalAuthLoginUrl = settingsContext.settings.get(
     SettingsId.EXTERNAL_AUTH_LOGIN_URL
   )?.settingsValue;
 
@@ -56,8 +57,8 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
-              if (EXTERNAL_AUTH && EXTERNAL_AUTH_LOGIN_URL) {
-                window.location.href = EXTERNAL_AUTH_LOGIN_URL;
+              if (isExternalAuthEnabled && externalAuthLoginUrl) {
+                window.location.href = externalAuthLoginUrl;
 
                 return <p>Redirecting to external sign-in page...</p>;
               }
@@ -135,7 +136,7 @@ class App extends React.Component {
     }
   }
 
-  private notistackRef = React.createRef<ProviderContext>();
+  private notistackRef = React.createRef<SnackbarProvider>();
 
   onClickDismiss = (key: string | number | undefined) => () => {
     this.notistackRef.current?.closeSnackbar(key);
@@ -145,17 +146,17 @@ class App extends React.Component {
     return (
       <StylesProvider injectFirst>
         <CookiesProvider>
-          <UserContextProvider>
-            <SnackbarProvider
-              ref={this.notistackRef}
-              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-              maxSnack={1}
-              action={(key) => (
-                <IconButton onClick={this.onClickDismiss(key)}>
-                  <Close htmlColor="white" />
-                </IconButton>
-              )}
-            >
+          <SnackbarProvider
+            ref={this.notistackRef}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            maxSnack={1}
+            action={(key) => (
+              <IconButton onClick={this.onClickDismiss(key)}>
+                <Close htmlColor="white" />
+              </IconButton>
+            )}
+          >
+            <UserContextProvider>
               <SettingsContextProvider>
                 <FeatureContextProvider>
                   <Theme>
@@ -171,8 +172,8 @@ class App extends React.Component {
                   </Theme>
                 </FeatureContextProvider>
               </SettingsContextProvider>
-            </SnackbarProvider>
-          </UserContextProvider>
+            </UserContextProvider>
+          </SnackbarProvider>
         </CookiesProvider>
       </StylesProvider>
     );

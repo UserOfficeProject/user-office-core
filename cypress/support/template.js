@@ -146,11 +146,15 @@ function createMultipleChoiceQuestion(question, options) {
 
   cy.get('[data-cy=question]').clear().type(question);
 
-  cy.contains('Radio').click();
+  if(options.type === undefined || options.type === 'dropdown') {
+    cy.contains('Radio').click();
+  
+    cy.contains('Dropdown').click();
+  }
 
-  cy.contains('Dropdown').click();
-
-  cy.contains('Is multiple select').click();
+  if(options.isMultipleSelect === true) {
+    cy.contains('Is multiple select').click();
+  }
 
   cy.contains('Items').click();
 
