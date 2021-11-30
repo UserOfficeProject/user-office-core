@@ -801,6 +801,7 @@ export type Mutation = {
   finalizeProposalBooking: ProposalBookingResponseWrap;
   finalizeScheduledEvent: ScheduledEventResponseWrap;
   getTokenForUser: TokenResponseWrap;
+  importProposal: ProposalResponseWrap;
   login: TokenResponseWrap;
   logout: LogoutTokenWrap;
   moveProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
@@ -1351,6 +1352,17 @@ export type MutationFinalizeScheduledEventArgs = {
 
 export type MutationGetTokenForUserArgs = {
   userId: Scalars['Int'];
+};
+
+
+export type MutationImportProposalArgs = {
+  abstract?: Maybe<Scalars['String']>;
+  callId: Scalars['Int'];
+  proposerId?: Maybe<Scalars['Int']>;
+  referenceNumber: Scalars['Int'];
+  submitterId: Scalars['Int'];
+  title?: Maybe<Scalars['String']>;
+  users?: Maybe<Array<Scalars['Int']>>;
 };
 
 
