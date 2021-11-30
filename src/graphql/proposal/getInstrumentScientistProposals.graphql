@@ -15,37 +15,15 @@ query getInstrumentScientistProposals(
       submitted
       finalStatus
       technicalReviewAssignee
-      status {
-        name
-      }
-      reviews {
-        id
-        grade
-        comment
-        status
-        userID
-        sepID
-        reviewer {
-          firstname
-          lastname
-          id
-        }
-      }
-      technicalReview {
-        status
-        submitted
-      }
-      instrument {
-        id
-        name
-      }
-      call {
-        shortCode
-        allocationTimeUnit
-      }
-      sep {
-        code
-      }
+      technicalStatus
+      statusName
+      technicalReviewSubmitted
+      instrumentId
+      instrumentName
+      allocationTimeUnit
+      callShortCode
+      statusName
+      sepCode
     }
     totalCount
   }

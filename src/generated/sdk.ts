@@ -799,7 +799,6 @@ export type Mutation = {
   finalizeProposalBooking: ProposalBookingResponseWrap;
   finalizeScheduledEvent: ScheduledEventResponseWrap;
   getTokenForUser: TokenResponseWrap;
-  importProposal: ProposalResponseWrap;
   login: TokenResponseWrap;
   logout: LogoutTokenWrap;
   moveProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
@@ -1350,17 +1349,6 @@ export type MutationFinalizeScheduledEventArgs = {
 
 export type MutationGetTokenForUserArgs = {
   userId: Scalars['Int'];
-};
-
-
-export type MutationImportProposalArgs = {
-  abstract?: Maybe<Scalars['String']>;
-  callId: Scalars['Int'];
-  proposerId?: Maybe<Scalars['Int']>;
-  referenceNumber: Scalars['Int'];
-  submitterId: Scalars['Int'];
-  title?: Maybe<Scalars['String']>;
-  users?: Maybe<Array<Scalars['Int']>>;
 };
 
 
@@ -2071,6 +2059,8 @@ export type ProposalView = {
   statusId: Scalars['Int'];
   statusName: Scalars['String'];
   submitted: Scalars['Boolean'];
+  technicalReviewAssignee: Maybe<Scalars['Int']>;
+  technicalReviewSubmitted: Maybe<Scalars['Int']>;
   technicalStatus: Maybe<TechnicalReviewStatus>;
   technicalTimeAllocation: Maybe<Scalars['Int']>;
   title: Scalars['String'];
@@ -2138,6 +2128,12 @@ export type ProposalsResponseWrap = {
   rejection: Maybe<Rejection>;
 };
 
+export type ProposalsViewResult = {
+  __typename?: 'ProposalsViewResult';
+  proposals: Array<ProposalView>;
+  totalCount: Scalars['Int'];
+};
+
 export type QueriesAndMutations = {
   __typename?: 'QueriesAndMutations';
   mutations: Array<Scalars['String']>;
@@ -2177,7 +2173,7 @@ export type Query = {
   instrumentProposalBookings: Array<ProposalBooking>;
   instrumentScientistHasAccess: Maybe<Scalars['Boolean']>;
   instrumentScientistHasInstrument: Maybe<Scalars['Boolean']>;
-  instrumentScientistProposals: Maybe<ProposalsQueryResult>;
+  instrumentScientistProposals: Maybe<ProposalsViewResult>;
   instruments: Maybe<InstrumentsQueryResult>;
   instrumentsBySep: Maybe<Array<InstrumentWithAvailabilityTime>>;
   isNaturalKeyPresent: Maybe<Scalars['Boolean']>;
@@ -2459,6 +2455,8 @@ export type QueryProposalsArgs = {
 
 export type QueryProposalsViewArgs = {
   filter?: Maybe<ProposalsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -5135,34 +5133,11 @@ export type GetInstrumentScientistProposalsQueryVariables = Exact<{
 export type GetInstrumentScientistProposalsQuery = (
   { __typename?: 'Query' }
   & { instrumentScientistProposals: Maybe<(
-    { __typename?: 'ProposalsQueryResult' }
-    & Pick<ProposalsQueryResult, 'totalCount'>
+    { __typename?: 'ProposalsViewResult' }
+    & Pick<ProposalsViewResult, 'totalCount'>
     & { proposals: Array<(
-      { __typename?: 'Proposal' }
-      & Pick<Proposal, 'primaryKey' | 'proposalId' | 'title' | 'submitted' | 'finalStatus' | 'technicalReviewAssignee'>
-      & { status: Maybe<(
-        { __typename?: 'ProposalStatus' }
-        & Pick<ProposalStatus, 'name'>
-      )>, reviews: Maybe<Array<(
-        { __typename?: 'Review' }
-        & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
-        & { reviewer: Maybe<(
-          { __typename?: 'BasicUserDetails' }
-          & Pick<BasicUserDetails, 'firstname' | 'lastname' | 'id'>
-        )> }
-      )>>, technicalReview: Maybe<(
-        { __typename?: 'TechnicalReview' }
-        & Pick<TechnicalReview, 'status' | 'submitted'>
-      )>, instrument: Maybe<(
-        { __typename?: 'Instrument' }
-        & Pick<Instrument, 'id' | 'name'>
-      )>, call: Maybe<(
-        { __typename?: 'Call' }
-        & Pick<Call, 'shortCode' | 'allocationTimeUnit'>
-      )>, sep: Maybe<(
-        { __typename?: 'SEP' }
-        & Pick<Sep, 'code'>
-      )> }
+      { __typename?: 'ProposalView' }
+      & Pick<ProposalView, 'primaryKey' | 'proposalId' | 'title' | 'submitted' | 'finalStatus' | 'technicalReviewAssignee' | 'technicalStatus' | 'statusName' | 'technicalReviewSubmitted' | 'instrumentId' | 'instrumentName' | 'allocationTimeUnit' | 'callShortCode' | 'sepCode'>
     )> }
   )> }
 );
@@ -9823,37 +9798,15 @@ export const GetInstrumentScientistProposalsDocument = gql`
       submitted
       finalStatus
       technicalReviewAssignee
-      status {
-        name
-      }
-      reviews {
-        id
-        grade
-        comment
-        status
-        userID
-        sepID
-        reviewer {
-          firstname
-          lastname
-          id
-        }
-      }
-      technicalReview {
-        status
-        submitted
-      }
-      instrument {
-        id
-        name
-      }
-      call {
-        shortCode
-        allocationTimeUnit
-      }
-      sep {
-        code
-      }
+      technicalStatus
+      statusName
+      technicalReviewSubmitted
+      instrumentId
+      instrumentName
+      allocationTimeUnit
+      callShortCode
+      statusName
+      sepCode
     }
     totalCount
   }
