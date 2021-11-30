@@ -4,9 +4,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { Proposal, ProposalsFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useProposalsData(
-  filter: ProposalsFilter & { offset?: number; first?: number }
-) {
+export function useProposalsData(filter: ProposalsFilter) {
   const api = useDataApi();
   const [proposalsData, setProposalsData] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,8 +17,6 @@ export function useProposalsData(
     questionaryIds,
     questionFilter,
     text,
-    offset,
-    first,
   } = filter;
 
   useEffect(() => {
@@ -62,8 +58,6 @@ export function useProposalsData(
     text,
     api,
     currentRole,
-    offset,
-    first,
   ]);
 
   return { loading, proposalsData, setProposalsData };
