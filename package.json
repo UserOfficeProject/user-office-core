@@ -65,7 +65,7 @@
     "graphql-middleware": "4.0.2",
     "graphql-tools": "^4.0.8",
     "jsonwebtoken": "^8.5.1",
-    "knex": "^0.95.13",
+    "knex": "^0.95.14",
     "moment": "^2.29.1",
     "multer": "^1.4.3",
     "pg": "^7.18.2",
