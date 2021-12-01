@@ -14,7 +14,6 @@ context('Proposal tests', () => {
 
   before(() => {
     cy.resetDB();
-    cy.resetSchedulerDB();
     cy.viewport(1920, 1080);
     cy.login('officer');
     cy.createTemplate('proposalEsi', 'default esi template');

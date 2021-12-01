@@ -16,7 +16,6 @@ context('visits tests', () => {
     cy.viewport(1920, 1080);
     // reset data and add seeds with test proposal
     cy.resetDB(true);
-    cy.resetSchedulerDB(true);
 
     // Add co-proposer
     cy.login('officer');
