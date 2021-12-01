@@ -25,7 +25,6 @@ context('Scheduler tests', () => {
 
   beforeEach(() => {
     cy.resetDB(true);
-    cy.resetSchedulerDB(true);
     cy.updateUserRoles({
       id: scientist.id,
       roles: [userRoleId, scientistRoleId],

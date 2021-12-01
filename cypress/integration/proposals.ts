@@ -84,7 +84,6 @@ context('Proposal tests', () => {
 
   beforeEach(() => {
     cy.resetDB();
-    cy.resetSchedulerDB();
     cy.createTemplate({
       name: 'default esi template',
       groupId: TemplateGroupId.PROPOSAL_ESI,

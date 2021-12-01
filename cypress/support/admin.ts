@@ -7,12 +7,4 @@ const resetDB = (includeSeeds = false) => {
   cy.wrap(request);
 };
 
-const resetSchedulerDB = (includeSeeds = false) => {
-  const api = getE2EApi();
-  const request = api.prepareSchedulerDB({ includeSeeds });
-
-  cy.wrap(request);
-};
-
 Cypress.Commands.add('resetDB', resetDB);
-Cypress.Commands.add('resetSchedulerDB', resetSchedulerDB);

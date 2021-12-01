@@ -1,3 +1,0 @@
-mutation prepareSchedulerDB($includeSeeds: Boolean!) {
-  resetSchedulerDb(includeSeeds: $includeSeeds)
-}

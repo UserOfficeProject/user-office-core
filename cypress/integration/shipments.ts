@@ -26,7 +26,6 @@ const shipmentTemplateDescription = faker.lorem.words(3);
 context('Shipments tests', () => {
   beforeEach(() => {
     cy.resetDB(true);
-    cy.resetSchedulerDB(true);
 
     cy.updateProposalManagementDecision({
       proposalPk: existingProposal.id,

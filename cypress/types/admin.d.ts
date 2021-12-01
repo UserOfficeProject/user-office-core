@@ -10,16 +10,6 @@ declare global {
        *    cy.resetDB()
        */
       resetDB: (includeSeeds?: boolean) => void;
-
-      /**
-       * Resets the scheduler database
-       *
-       * @returns {typeof resetSchedulerDB}
-       * @memberof Chainable
-       * @example
-       *    cy.resetSchedulerDB()
-       */
-      resetSchedulerDB: (includeSeeds?: boolean) => void;
     }
   }
 }

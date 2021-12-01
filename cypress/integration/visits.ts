@@ -23,7 +23,6 @@ context('visits tests', () => {
 
   beforeEach(() => {
     cy.resetDB(true);
-    cy.resetSchedulerDB(true);
     cy.updateProposal({
       proposalPk: existingProposalId,
       proposerId: PI.id,
