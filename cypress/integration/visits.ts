@@ -6,7 +6,6 @@ context('visits tests', () => {
   before(() => {
     // reset data and add seeds with test proposal
     cy.resetDB(true);
-    cy.resetSchedulerDB(true);
     // Add co-proposer
     cy.login('officer');
     cy.contains('999999').parent().find('[title="View proposal"]').click();
