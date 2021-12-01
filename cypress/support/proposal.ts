@@ -68,18 +68,6 @@ const updateProposalManagementDecision = (
 ): Cypress.Chainable<AdministrationProposalMutation> => {
   const api = getE2EApi();
   const request = api.administrationProposal(administrationProposalInput);
-  // cy.contains(proposalTitle).parent().find('[title="View proposal"]').click();
-  // cy.get('[role="dialog"]').contains('Admin').click();
-  // cy.get('#finalStatus-input').click();
-  // cy.get('[role="listbox"]').contains('Accepted').click();
-  // cy.get('[data-cy="managementTimeAllocation"] input').type(
-  //   timeToAllocate.toString()
-  // );
-  // cy.get('[data-cy="is-management-decision-submitted"]').click();
-  // if (submitManagementDecision) {
-  //   cy.get('[data-cy="save-admin-decision"]').click();
-  // }
-  // cy.closeModal();
 
   return cy.wrap(request);
 };

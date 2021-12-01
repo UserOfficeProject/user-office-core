@@ -116,31 +116,6 @@ function updateUserRoles(
   const request = api.updateUserRoles(updateUserRolesInput);
 
   cy.wrap(request);
-  // cy.get('[aria-label="Search"]').type(name);
-
-  // cy.finishedLoading();
-
-  // cy.contains(name).parent().find('button[title="Edit user"]').click();
-
-  // cy.get('main').contains('Settings').click();
-
-  // cy.get('[data-cy="add-role-button"]').should('not.be.disabled').click();
-
-  // cy.finishedLoading();
-
-  // cy.get('[data-cy="role-modal"] [aria-label="Search"]').type(
-  //   'Instrument Scientist'
-  // );
-
-  // cy.get('[data-cy="role-modal"]')
-  //   .contains('Instrument Scientist')
-  //   .parent()
-  //   .find('input[type="checkbox"]')
-  //   .click();
-
-  // cy.get('[data-cy="role-modal"]').contains('Update').click();
-
-  // cy.notification({ variant: 'success', text: 'successfully' });
 }
 
 function changeActiveRole(selectedRoleId: number) {
@@ -170,18 +145,6 @@ function changeActiveRole(selectedRoleId: number) {
   });
 
   cy.wrap(request);
-  // cy.get('[data-cy="profile-page-btn"]').click();
-  // cy.get('[role="presentation"]').contains('Roles').click();
-
-  // cy.finishedLoading();
-
-  // cy.get("[data-cy='role-selection-table'] table tbody")
-  //   .contains(role)
-  //   .parent()
-  //   .contains('Use')
-  //   .click();
-
-  // cy.notification({ variant: 'success', text: 'User role changed' });
 }
 
 Cypress.Commands.add('login', login);
