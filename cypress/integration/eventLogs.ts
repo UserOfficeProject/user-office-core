@@ -2,6 +2,7 @@ import dateformat from 'dateformat';
 import faker from 'faker';
 
 import { UpdateUserMutationVariables, User } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 context('Event log tests', () => {
   before(() => {
@@ -18,7 +19,7 @@ context('Event log tests', () => {
 
     beforeEach(() => {
       cy.login('user');
-      cy.createProposal({ callId: 1 }).then((response) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((response) => {
         if (response.createProposal.proposal) {
           createdProposalPk = response.createProposal.proposal.primaryKey;
         }

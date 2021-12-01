@@ -1,6 +1,7 @@
 import faker from 'faker';
 
 import { UserRole } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 function searchMuiTableAsync(search: string) {
   cy.get('[aria-label="Search"]').type(search);
@@ -10,31 +11,10 @@ function searchMuiTableAsync(search: string) {
 }
 
 const sepMembers = {
-  chair: {
-    id: 4,
-    email: 'ben@inbox.com',
-    password: 'Test1234!',
-    surname: 'Beckley',
-  },
-  secretary: {
-    id: 1,
-    email: 'Javon4@hotmail.com',
-    password: 'Test1234!',
-    surname: 'Carlsson',
-  },
-  reviewer: {
-    id: 3,
-    email: 'nils@ess.se',
-    password: 'Test1234!',
-    surname: 'Nilsson',
-  },
+  chair: initialDBData.users.user2,
+  secretary: initialDBData.users.user1,
+  reviewer: initialDBData.users.reviewer,
 };
-
-// TODO: This should't be hardcoded. We should get roles and pick the needed role id.
-const userRoleId = 1;
-const reviewerRoleId = 6;
-const sepChairRoleId = 4;
-const sepSecretaryRoleId = 5;
 
 const sep1 = {
   code: faker.random.words(3),
@@ -82,7 +62,7 @@ context('General scientific evaluation panel tests', () => {
 
     it('Officer should be able to assign SEP Reviewer role', () => {
       cy.contains('People').click();
-      searchMuiTableAsync(sepMembers.chair.surname);
+      searchMuiTableAsync(sepMembers.chair.lastName);
       cy.get('[title="Edit user"]').click();
       cy.get('[cy-data="user-page"]').contains('Settings').click();
       cy.contains('Add role').click();
@@ -97,7 +77,7 @@ context('General scientific evaluation panel tests', () => {
       });
       cy.contains('People').click();
 
-      searchMuiTableAsync(sepMembers.secretary.surname);
+      searchMuiTableAsync(sepMembers.secretary.lastName);
       cy.get('[title="Edit user"]').click();
       cy.get('[cy-data="user-page"]').contains('Settings').click();
       cy.contains('Add role').click();
@@ -201,11 +181,11 @@ context('General scientific evaluation panel tests', () => {
     it('Officer should be able to assign SEP Chair and SEP Secretary to existing SEP', () => {
       cy.updateUserRoles({
         id: sepMembers.chair.id,
-        roles: [userRoleId, reviewerRoleId],
+        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
       });
       cy.updateUserRoles({
         id: sepMembers.secretary.id,
-        roles: [userRoleId, reviewerRoleId],
+        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
       });
       let selectedChairUserFirstName = '';
       let selectedChairUserLastName = '';
@@ -221,7 +201,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.finishedLoading();
 
-      searchMuiTableAsync(sepMembers.chair.surname);
+      searchMuiTableAsync(sepMembers.chair.lastName);
 
       cy.get('[role="dialog"] table tbody tr')
         .first()
@@ -260,7 +240,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.finishedLoading();
 
-      searchMuiTableAsync(sepMembers.secretary.surname);
+      searchMuiTableAsync(sepMembers.secretary.lastName);
 
       cy.get('[role="dialog"] table tbody tr')
         .first()
@@ -301,11 +281,11 @@ context('General scientific evaluation panel tests', () => {
     it('Officer should be able to remove assigned SEP Chair and SEP Secretary from existing SEP', () => {
       cy.updateUserRoles({
         id: sepMembers.chair.id,
-        roles: [userRoleId, reviewerRoleId],
+        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
       });
       cy.updateUserRoles({
         id: sepMembers.secretary.id,
-        roles: [userRoleId, reviewerRoleId],
+        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
       });
       cy.assignChairOrSecretary({
         assignChairOrSecretaryToSEPInput: {
@@ -357,7 +337,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.finishedLoading();
 
-      searchMuiTableAsync(sepMembers.reviewer.surname);
+      searchMuiTableAsync(sepMembers.reviewer.lastName);
 
       cy.get('input[type="checkbox"]').eq(1).click();
 
@@ -368,7 +348,7 @@ context('General scientific evaluation panel tests', () => {
         text: 'SEP member assigned successfully',
       });
 
-      cy.contains(sepMembers.reviewer.surname);
+      cy.contains(sepMembers.reviewer.lastName);
 
       cy.contains('Logs').click();
 
@@ -421,7 +401,7 @@ context('General scientific evaluation panel tests', () => {
     beforeEach(() => {
       cy.updateUserRoles({
         id: sepMembers.chair.id,
-        roles: [userRoleId, reviewerRoleId],
+        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
       });
       cy.createSep({
         code: sep1.code,
@@ -445,7 +425,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('SEP Chair should not be able to modify SEP Chair and SEP Secretary', () => {
-      cy.changeActiveRole(sepChairRoleId);
+      cy.changeActiveRole(initialDBData.roles.sepChair);
 
       cy.visit('/');
 
@@ -467,7 +447,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('SEP Chair should be able to modify SEP Reviewers', () => {
-      cy.changeActiveRole(sepChairRoleId);
+      cy.changeActiveRole(initialDBData.roles.sepChair);
 
       cy.visit('/');
 
@@ -481,7 +461,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.finishedLoading();
 
-      searchMuiTableAsync(sepMembers.reviewer.surname);
+      searchMuiTableAsync(sepMembers.reviewer.lastName);
 
       cy.get('input[type="checkbox"]').eq(1).click();
 
@@ -492,7 +472,7 @@ context('General scientific evaluation panel tests', () => {
         text: 'SEP member assigned successfully',
       });
 
-      cy.contains(sepMembers.reviewer.surname);
+      cy.contains(sepMembers.reviewer.lastName);
 
       cy.closeNotification();
 
@@ -504,7 +484,7 @@ context('General scientific evaluation panel tests', () => {
         text: 'SEP member removed successfully',
       });
 
-      cy.get('body').should('not.contain', sepMembers.reviewer.surname);
+      cy.get('body').should('not.contain', sepMembers.reviewer.lastName);
       cy.contains('No records to display');
     });
 
@@ -516,7 +496,7 @@ context('General scientific evaluation panel tests', () => {
         active: true,
       });
 
-      cy.changeActiveRole(sepChairRoleId);
+      cy.changeActiveRole(initialDBData.roles.sepChair);
 
       cy.visit('/');
 
@@ -533,7 +513,7 @@ context('General scientific evaluation panel tests', () => {
     beforeEach(() => {
       cy.updateUserRoles({
         id: sepMembers.secretary.id,
-        roles: [userRoleId, reviewerRoleId],
+        roles: [initialDBData.roles.user, initialDBData.roles.sepReviewer],
       });
       cy.createSep({
         code: sep1.code,
@@ -557,7 +537,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('SEP Secretary should not be able to modify SEP Chair and SEP Secretary', () => {
-      cy.changeActiveRole(sepSecretaryRoleId);
+      cy.changeActiveRole(initialDBData.roles.sepSecretary);
 
       cy.visit('/');
 
@@ -579,7 +559,7 @@ context('General scientific evaluation panel tests', () => {
     });
 
     it('SEP Secretary should be able to modify SEP Reviewers', () => {
-      cy.changeActiveRole(sepSecretaryRoleId);
+      cy.changeActiveRole(initialDBData.roles.sepSecretary);
 
       cy.visit('/');
 
@@ -593,7 +573,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.finishedLoading();
 
-      searchMuiTableAsync(sepMembers.reviewer.surname);
+      searchMuiTableAsync(sepMembers.reviewer.lastName);
 
       cy.get('input[type="checkbox"]').eq(1).click();
 
@@ -604,7 +584,7 @@ context('General scientific evaluation panel tests', () => {
         text: 'SEP member assigned successfully',
       });
 
-      cy.contains(sepMembers.reviewer.surname);
+      cy.contains(sepMembers.reviewer.lastName);
 
       cy.closeNotification();
 
@@ -616,12 +596,12 @@ context('General scientific evaluation panel tests', () => {
         text: 'SEP member removed successfully',
       });
 
-      cy.get('body').should('not.contain', sepMembers.reviewer.surname);
+      cy.get('body').should('not.contain', sepMembers.reviewer.lastName);
       cy.contains('No records to display');
     });
 
     it('SEP Secretary should only see SEPs where they have SEP Secretary role', () => {
-      cy.changeActiveRole(sepSecretaryRoleId);
+      cy.changeActiveRole(initialDBData.roles.sepSecretary);
 
       cy.visit('/');
 

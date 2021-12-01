@@ -5,9 +5,11 @@ import {
   CreateInstrumentMutationVariables,
   TemplateGroupId,
 } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 context('Calls tests', () => {
   let esiTemplateId: number;
+  const esiTemplateName = faker.lorem.words(2);
   let workflowId: number;
 
   const currentDayStart = new Date();
@@ -27,14 +29,12 @@ context('Calls tests', () => {
     endNotify: currentDayStart,
     startCycle: currentDayStart,
     endCycle: currentDayStart,
-    templateName: 'default template',
-    templateId: 1,
+    templateName: initialDBData.template.name,
+    templateId: initialDBData.template.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(),
     surveyComment: faker.lorem.word(),
-    description: '',
-    title: '',
-    esiTemplateName: 'default esi template',
+    esiTemplateName: esiTemplateName,
   };
 
   const newInactiveCall = {
@@ -49,14 +49,10 @@ context('Calls tests', () => {
     endNotify: currentDayStart,
     startCycle: currentDayStart,
     endCycle: currentDayStart,
-    templateName: 'default template',
-    templateId: 1,
+    templateId: initialDBData.template.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(),
     surveyComment: faker.lorem.word(),
-    description: '',
-    title: '',
-    esiTemplateName: 'default esi template',
   };
 
   const updatedCall = {
@@ -70,19 +66,11 @@ context('Calls tests', () => {
     description: faker.random.words(5),
   };
 
-  const userRoleId = 1;
-  const scientistRoleId = 7;
-
-  const scientist = {
-    id: 1,
-    name: 'Carl',
-  };
-
   const instrumentAssignedToCall: CreateInstrumentMutationVariables = {
     name: faker.random.words(2),
     shortCode: faker.random.alphaNumeric(15),
     description: faker.random.words(8),
-    managerUserId: scientist.id,
+    managerUserId: initialDBData.users.user1.id,
   };
 
   beforeEach(() => {
@@ -90,7 +78,7 @@ context('Calls tests', () => {
     cy.resetDB();
     cy.createTemplate({
       groupId: TemplateGroupId.PROPOSAL_ESI,
-      name: 'default esi template',
+      name: esiTemplateName,
     }).then((result) => {
       if (result.createTemplate.template) {
         esiTemplateId = result.createTemplate.template?.templateId;
@@ -378,10 +366,12 @@ context('Calls tests', () => {
           createdCallId = response.createCall.call.id;
         }
       });
-      // TODO: This should't be hardcoded. We should get roles and pick the scientist role id.
       cy.updateUserRoles({
-        id: scientist.id,
-        roles: [userRoleId, scientistRoleId],
+        id: initialDBData.users.user1.id,
+        roles: [
+          initialDBData.roles.user,
+          initialDBData.roles.instrumentScientist,
+        ],
       });
       cy.createInstrument(instrumentAssignedToCall).then((response) => {
         if (response.createInstrument.instrument) {

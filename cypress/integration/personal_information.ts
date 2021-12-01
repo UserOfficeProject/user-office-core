@@ -1,5 +1,7 @@
 import faker from 'faker';
 
+import initialDBData from '../support/initialDBData';
+
 context('Personal information tests', () => {
   beforeEach(() => {
     cy.resetDB();
@@ -13,9 +15,6 @@ context('Personal information tests', () => {
   const newPreferredName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.phoneNumber('0##########');
-  const sepChairRoleId = 4;
-  const userOfficerRoleId = 2;
-  const userOfficerUserId = 2;
 
   it('Should be able update personal information', () => {
     cy.login('user');
@@ -121,8 +120,8 @@ context('Personal information tests', () => {
 
   it('Should be able to see user officer role in use', () => {
     cy.updateUserRoles({
-      id: userOfficerUserId,
-      roles: [userOfficerRoleId, sepChairRoleId],
+      id: initialDBData.users.userOfficer.id,
+      roles: [initialDBData.roles.user, initialDBData.roles.sepChair],
     });
     cy.login('officer');
     cy.visit('/');
@@ -146,8 +145,8 @@ context('Personal information tests', () => {
 
   it('Should be able to change role even in the view where next role is not allowed to be', () => {
     cy.updateUserRoles({
-      id: userOfficerUserId,
-      roles: [userOfficerRoleId, sepChairRoleId],
+      id: initialDBData.users.userOfficer.id,
+      roles: [initialDBData.roles.user, initialDBData.roles.sepChair],
     });
     const workflowName = faker.lorem.words(2);
     const workflowDescription = faker.lorem.words(5);

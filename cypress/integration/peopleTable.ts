@@ -1,9 +1,9 @@
 import faker from 'faker';
 
+import initialDBData from '../support/initialDBData';
+
 context('PageTable component tests', () => {
   const emails = new Array(10).fill(0).map(() => faker.internet.email());
-  const username1 = 'Benjamin';
-  const username2 = 'Unverified';
   const title = faker.random.words(3);
   const abstract = faker.random.words(8);
 
@@ -27,16 +27,18 @@ context('PageTable component tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy=email]').type('ben@inbox.com');
+      cy.get('[data-cy=email]').type(initialDBData.users.user2.email);
 
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
 
-      cy.get('@modal').find('tr[index="0"]').contains(username1);
+      cy.get('@modal')
+        .find('tr[index="0"]')
+        .contains(initialDBData.users.user2.firstName);
 
       cy.get('@modal').contains('1 user(s) selected');
 
-      cy.get('[data-cy="email"]').type('Aaron_Harris49@gmail.com');
+      cy.get('[data-cy="email"]').type(initialDBData.users.userOfficer.email);
 
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
@@ -74,7 +76,9 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"]').find('tr[index="0"]').contains(username1);
+      cy.get('[role="presentation"]')
+        .find('tr[index="0"]')
+        .contains(initialDBData.users.user2.firstName);
     });
 
     it('Should preserve the selected users', () => {
@@ -89,7 +93,7 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').contains('0 user(s) selected');
 
-      cy.get('[data-cy=email]').type('unverified-user@example.com');
+      cy.get('[data-cy=email]').type(initialDBData.users.placeholder.email);
 
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
@@ -103,7 +107,9 @@ context('PageTable component tests', () => {
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
 
-      cy.get('@modal').find('tr[index="0"]').contains(username1);
+      cy.get('@modal')
+        .find('tr[index="0"]')
+        .contains(initialDBData.users.user2.firstName);
 
       cy.get('@modal').contains('1 user(s) selected');
 
@@ -119,31 +125,36 @@ context('PageTable component tests', () => {
       cy.get('@modal').contains('1 user(s) selected');
 
       cy.get('@modal')
-        .contains(username1)
+        .contains(initialDBData.users.user2.firstName)
         .parent()
         .find('input')
         .should('be.checked');
 
       cy.finishedLoading();
 
-      cy.get('@modal').find('[aria-label="Search"]').type(username2);
+      cy.get('@modal')
+        .find('[aria-label="Search"]')
+        .type(initialDBData.users.placeholder.firstName);
 
       cy.finishedLoading();
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal')
-        .contains(username2)
+        .contains(initialDBData.users.placeholder.firstName)
         .parent()
         .find('input[type="checkbox"]')
         .should('not.be.checked');
 
-      cy.get('@modal').find('[aria-label="Search"]').clear().type(username1);
+      cy.get('@modal')
+        .find('[aria-label="Search"]')
+        .clear()
+        .type(initialDBData.users.user2.firstName);
 
       cy.finishedLoading();
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal')
-        .contains(username1)
+        .contains(initialDBData.users.user2.firstName)
         .parent()
         .find('input')
         .should('be.checked');
@@ -237,7 +248,7 @@ context('PageTable component tests', () => {
 
   describe('PeopleTable component preserves selected users', () => {
     beforeEach(() => {
-      cy.createProposal({ callId: 1 });
+      cy.createProposal({ callId: initialDBData.call.id });
     });
 
     it('Should preserve the selected users', () => {
@@ -256,7 +267,11 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').contains('0 user(s) selected');
 
-      cy.get('@modal').contains(username1).parent().find('input').check();
+      cy.get('@modal')
+        .contains(initialDBData.users.user2.firstName)
+        .parent()
+        .find('input')
+        .check();
 
       cy.get('@modal').contains('1 user(s) selected');
 
@@ -275,31 +290,36 @@ context('PageTable component tests', () => {
       cy.get('@modal').contains('1 user(s) selected');
 
       cy.get('@modal')
-        .contains(username1)
+        .contains(initialDBData.users.user2.firstName)
         .parent()
         .find('input')
         .should('be.checked');
 
       cy.finishedLoading();
 
-      cy.get('@modal').find('[aria-label="Search"]').type(username2);
+      cy.get('@modal')
+        .find('[aria-label="Search"]')
+        .type(initialDBData.users.placeholder.firstName);
 
       cy.finishedLoading();
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal')
-        .contains(username2)
+        .contains(initialDBData.users.placeholder.firstName)
         .parent()
         .find('input')
         .should('not.be.checked');
 
-      cy.get('@modal').find('[aria-label="Search"]').clear().type(username1);
+      cy.get('@modal')
+        .find('[aria-label="Search"]')
+        .clear()
+        .type(initialDBData.users.user2.firstName);
 
       cy.finishedLoading();
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal')
-        .contains(username1)
+        .contains(initialDBData.users.user2.firstName)
         .parent()
         .find('input')
         .should('be.checked');

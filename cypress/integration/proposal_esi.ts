@@ -1,18 +1,15 @@
 import faker from 'faker';
 
-const coProposer = {
-  id: 4,
-  name: 'Benjamin',
-  email: 'ben@inbox.com',
-  password: 'Test1234!',
-};
-const visitor = { id: 6, email: 'david@teleworm.us', password: 'Test1234!' };
-const PI = { id: 1, email: 'Javon4@hotmail.com', password: 'Test1234!' };
-const existingProposalId = 1;
-const acceptedStatusId = 1;
-const existingScheduledEventId = 996;
+import initialDBData from '../support/initialDBData';
 
-const proposalTitle = 'Test proposal';
+const coProposer = initialDBData.users.user2;
+const visitor = initialDBData.users.user3;
+const PI = initialDBData.users.user1;
+const existingProposalId = initialDBData.proposal.id;
+const acceptedStatusId = 1;
+const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
+
+const proposalTitle = initialDBData.proposal.title;
 const proposalEsiButtonTitle = 'Finish safety input form';
 
 const sampleTitle = /My sample title/i;

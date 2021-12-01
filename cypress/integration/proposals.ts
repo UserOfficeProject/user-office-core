@@ -6,6 +6,7 @@ import {
   TemplateCategoryId,
   TemplateGroupId,
 } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 context('Proposal tests', () => {
   const title = faker.lorem.words(2);
@@ -14,16 +15,13 @@ context('Proposal tests', () => {
   const newProposalAbstract = faker.lorem.words(3);
   const proposalTitleUpdated = faker.lorem.words(2);
   const clonedProposalTitle = `Copy of ${newProposalTitle}`;
-  const proposer = { id: 1, name: 'Carl' };
-  const existingCallId = 1;
+  const proposer = initialDBData.users.user1;
   const proposalWorkflow = {
     name: faker.random.words(2),
     description: faker.random.words(5),
   };
   let createdWorkflowId: number;
   let createdProposalPk: number;
-  const sepReviewStatusId = 5;
-  const existingTemplateId = 1;
   const textQuestion = faker.random.words(2);
 
   const currentDayStart = new Date();
@@ -44,7 +42,7 @@ context('Proposal tests', () => {
     startCycle: currentDayStart,
     endCycle: currentDayStart,
     templateName: 'default template',
-    templateId: existingTemplateId,
+    templateId: initialDBData.template.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(),
     surveyComment: faker.lorem.word(),
@@ -52,34 +50,35 @@ context('Proposal tests', () => {
   };
 
   const createTopicAndQuestionToExistingTemplate = () => {
-    cy.createTopic({ templateId: existingTemplateId, sortOrder: 1 }).then(
-      (topicResult) => {
-        if (topicResult.createTopic.template) {
-          const topicId =
-            topicResult.createTopic.template.steps[
-              topicResult.createTopic.template.steps.length - 1
-            ].topic.id;
-          cy.createQuestion({
-            categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-            dataType: DataType.TEXT_INPUT,
-          }).then((result) => {
-            if (result.createQuestion.question) {
-              cy.updateQuestion({
-                id: result.createQuestion.question.id,
-                question: textQuestion,
-              });
+    cy.createTopic({
+      templateId: initialDBData.template.id,
+      sortOrder: 1,
+    }).then((topicResult) => {
+      if (topicResult.createTopic.template) {
+        const topicId =
+          topicResult.createTopic.template.steps[
+            topicResult.createTopic.template.steps.length - 1
+          ].topic.id;
+        cy.createQuestion({
+          categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+          dataType: DataType.TEXT_INPUT,
+        }).then((result) => {
+          if (result.createQuestion.question) {
+            cy.updateQuestion({
+              id: result.createQuestion.question.id,
+              question: textQuestion,
+            });
 
-              cy.createQuestionTemplateRelation({
-                templateId: existingTemplateId,
-                sortOrder: 0,
-                topicId: topicId,
-                questionId: result.createQuestion.question.id,
-              });
-            }
-          });
-        }
+            cy.createQuestionTemplateRelation({
+              templateId: initialDBData.template.id,
+              sortOrder: 0,
+              topicId: topicId,
+              questionId: result.createQuestion.question.id,
+            });
+          }
+        });
       }
-    );
+    });
   };
 
   beforeEach(() => {
@@ -96,7 +95,7 @@ context('Proposal tests', () => {
         createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
       }
     });
-    cy.createProposal({ callId: existingCallId }).then((result) => {
+    cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
       if (result.createProposal.proposal) {
         createdProposalPk = result.createProposal.proposal.primaryKey;
 
@@ -150,7 +149,7 @@ context('Proposal tests', () => {
     cy.get('[role="presentation"]').as('modal');
 
     cy.get('@modal')
-      .contains(proposer.name)
+      .contains(proposer.firstName)
       .parent()
       .find("[title='Select user']")
       .click();
@@ -320,7 +319,7 @@ context('Proposal tests', () => {
 
   it('User officer should be able to change status to one or multiple proposals', () => {
     cy.cloneProposals({
-      callId: existingCallId,
+      callId: initialDBData.call.id,
       proposalsToClonePk: [createdProposalPk],
     });
     cy.login('officer');
@@ -381,16 +380,15 @@ context('Proposal tests', () => {
   });
 
   it('User officer should be able to see proposal status when opening change status modal', () => {
-    const draftStatusId = 1;
-    const sepMeetingStatusId = 12;
-
     cy.cloneProposals({
-      callId: existingCallId,
+      callId: initialDBData.call.id,
       proposalsToClonePk: [createdProposalPk],
     });
     cy.changeProposalsStatus({
-      statusId: sepMeetingStatusId,
-      proposals: [{ primaryKey: createdProposalPk, callId: existingCallId }],
+      statusId: initialDBData.proposalStatuses.sepMeeting.id,
+      proposals: [
+        { primaryKey: createdProposalPk, callId: initialDBData.call.id },
+      ],
     });
     cy.login('officer');
     cy.visit('/');
@@ -403,7 +401,7 @@ context('Proposal tests', () => {
 
     cy.get('[role="presentation"]')
       .find('input[name="selectedStatusId"]')
-      .should('have.value', `${draftStatusId}`);
+      .should('have.value', `${initialDBData.proposalStatuses.draft.id}`);
 
     cy.get('#selectedStatusId-input').should('have.text', 'DRAFT');
 
@@ -423,7 +421,7 @@ context('Proposal tests', () => {
 
     cy.get('[role="presentation"]')
       .find('input[name="selectedStatusId"]')
-      .should('have.value', `${sepMeetingStatusId}`);
+      .should('have.value', `${initialDBData.proposalStatuses.sepMeeting.id}`);
 
     cy.get('#selectedStatusId-input').should('have.text', 'SEP Meeting');
 
@@ -431,8 +429,10 @@ context('Proposal tests', () => {
     cy.get('body').trigger('keydown', { keyCode: 27 });
 
     cy.changeProposalsStatus({
-      statusId: sepReviewStatusId,
-      proposals: [{ primaryKey: createdProposalPk, callId: existingCallId }],
+      statusId: initialDBData.proposalStatuses.sepReview.id,
+      proposals: [
+        { primaryKey: createdProposalPk, callId: initialDBData.call.id },
+      ],
     });
 
     cy.contains(newProposalTitle).parent().find('[type="checkbox"]').check();
@@ -484,7 +484,7 @@ context('Proposal tests', () => {
     cy.notification({ text: 'Saved', variant: 'success' });
 
     cy.updateCall({
-      id: existingCallId,
+      id: initialDBData.call.id,
       ...newCall,
       startCall: twoDaysAgo,
       endCall: yesterday,

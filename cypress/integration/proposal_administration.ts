@@ -1,6 +1,7 @@
 import faker from 'faker';
 
 import { DataType, TemplateCategoryId } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 context('Proposal administration tests', () => {
   const proposalName1 = faker.lorem.words(3);
@@ -203,7 +204,7 @@ context('Proposal administration tests', () => {
 
   describe('Proposal administration advanced search filter tests', () => {
     beforeEach(() => {
-      cy.createProposal({ callId: 1 }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           cy.updateProposal({
             proposalPk: result.createProposal.proposal.primaryKey,
@@ -420,7 +421,7 @@ context('Proposal administration tests', () => {
     });
 
     it('Should be able to save table sort state in url', () => {
-      cy.createProposal({ callId: 1 }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           cy.updateProposal({
             proposalPk: result.createProposal.proposal.primaryKey,
@@ -478,7 +479,7 @@ context('Proposal administration tests', () => {
     });
 
     it('Should preserve the ordering when row is selected', () => {
-      cy.createProposal({ callId: 1 }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           cy.updateProposal({
             proposalPk: result.createProposal.proposal.primaryKey,
@@ -524,7 +525,7 @@ context('Proposal administration tests', () => {
 
     it('Should be able to search by question', () => {
       // Create a test proposal
-      cy.createProposal({ callId: 1 }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           cy.updateProposal({
             proposalPk: result.createProposal.proposal.primaryKey,

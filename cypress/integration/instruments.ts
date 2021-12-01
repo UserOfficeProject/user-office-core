@@ -1,6 +1,7 @@
 import faker from 'faker';
 
 import { TechnicalReviewStatus } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 context('Instrument tests', () => {
   const proposal1 = {
@@ -12,18 +13,9 @@ context('Instrument tests', () => {
     title: faker.random.words(2),
     abstract: faker.random.words(5),
   };
-  const existingCallId = 1;
 
-  const scientistRoleId = 7;
-
-  const scientist1 = { id: 1, lastname: 'Carlsson' };
-  const scientist2 = {
-    id: 4,
-    firstname: 'Benjamin',
-    lastname: 'Beckley',
-    email: 'ben@inbox.com',
-    password: 'Test1234!',
-  };
+  const scientist1 = initialDBData.users.user1;
+  const scientist2 = initialDBData.users.user2;
 
   const instrument1 = {
     name: faker.random.words(2),
@@ -61,7 +53,7 @@ context('Instrument tests', () => {
 
       cy.updateUserRoles({
         id: scientist1.id,
-        roles: [scientistRoleId],
+        roles: [initialDBData.roles.instrumentScientist],
       });
     });
 
@@ -73,7 +65,7 @@ context('Instrument tests', () => {
       cy.get('#description').type(instrument1.description);
 
       cy.get('[data-cy=beamline-manager]').click();
-      cy.get('[role=presentation]').contains(scientist1.lastname).click();
+      cy.get('[role=presentation]').contains(scientist1.lastName).click();
 
       cy.get('[data-cy="submit"]').click();
 
@@ -82,7 +74,7 @@ context('Instrument tests', () => {
       cy.contains(instrument1.name);
       cy.contains(instrument1.shortCode);
       cy.contains(instrument1.description);
-      cy.contains(scientist1.lastname);
+      cy.contains(scientist1.lastName);
     });
 
     it('User Officer should be able to update Instrument', () => {
@@ -153,7 +145,7 @@ context('Instrument tests', () => {
     beforeEach(() => {
       cy.updateUserRoles({
         id: scientist2.id,
-        roles: [scientistRoleId],
+        roles: [initialDBData.roles.instrumentScientist],
       });
 
       cy.createInstrument(instrument1).then((result) => {
@@ -161,12 +153,12 @@ context('Instrument tests', () => {
           createdInstrumentId = result.createInstrument.instrument.id;
 
           cy.assignInstrumentToCall({
-            callId: existingCallId,
+            callId: initialDBData.call.id,
             instrumentIds: [createdInstrumentId],
           });
         }
       });
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           createdProposalId = result.createProposal.proposal.primaryKey;
 
@@ -250,7 +242,7 @@ context('Instrument tests', () => {
         .click();
 
       cy.get('[data-cy="co-proposers"]')
-        .contains(scientist2.lastname)
+        .contains(scientist2.lastName)
         .parent()
         .find('input[type="checkbox"]')
         .check();
@@ -269,7 +261,9 @@ context('Instrument tests', () => {
         scientistIds: [scientist2.id],
       });
       cy.assignProposalsToInstrument({
-        proposals: [{ callId: existingCallId, primaryKey: createdProposalId }],
+        proposals: [
+          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+        ],
         instrumentId: createdInstrumentId,
       });
 
@@ -301,7 +295,7 @@ context('Instrument tests', () => {
         .invoke('attr', 'title')
         .should(
           'eq',
-          `Reviewed by ${scientist2.firstname} ${scientist2.lastname}`
+          `Reviewed by ${scientist2.firstName} ${scientist2.lastName}`
         );
     });
 
@@ -311,7 +305,9 @@ context('Instrument tests', () => {
         scientistIds: [scientist2.id],
       });
       cy.assignProposalsToInstrument({
-        proposals: [{ callId: existingCallId, primaryKey: createdProposalId }],
+        proposals: [
+          { callId: initialDBData.call.id, primaryKey: createdProposalId },
+        ],
         instrumentId: createdInstrumentId,
       });
 
@@ -390,9 +386,9 @@ context('Instrument tests', () => {
         .find('[title="Show Scientists"]')
         .click();
 
-      cy.contains(scientist2.lastname);
+      cy.contains(scientist2.lastName);
 
-      cy.contains(scientist2.lastname)
+      cy.contains(scientist2.lastName)
         .parent()
         .find('[title="Delete"]')
         .click();
@@ -404,7 +400,7 @@ context('Instrument tests', () => {
         text: 'Scientist removed from instrument',
       });
 
-      cy.contains(scientist2.lastname).should('not.exist');
+      cy.contains(scientist2.lastName).should('not.exist');
 
       cy.contains(instrument1.name)
         .parent()
@@ -420,7 +416,7 @@ context('Instrument tests', () => {
 
       cy.get('[data-cy=beamline-manager]').click();
 
-      cy.get('[role=presentation]').contains(scientist2.lastname).click();
+      cy.get('[role=presentation]').contains(scientist2.lastName).click();
 
       cy.get('[role=presentation] [data-cy=submit]').click();
 
@@ -437,7 +433,7 @@ context('Instrument tests', () => {
     beforeEach(() => {
       cy.updateUserRoles({
         id: scientist2.id,
-        roles: [scientistRoleId],
+        roles: [initialDBData.roles.instrumentScientist],
       });
 
       cy.createInstrument(instrument1).then((result) => {
@@ -445,7 +441,7 @@ context('Instrument tests', () => {
           createdInstrumentId = result.createInstrument.instrument.id;
 
           cy.assignInstrumentToCall({
-            callId: existingCallId,
+            callId: initialDBData.call.id,
             instrumentIds: [createdInstrumentId],
           });
 
@@ -460,7 +456,7 @@ context('Instrument tests', () => {
           const createdInstrument2Id = result.createInstrument.instrument.id;
 
           cy.assignInstrumentToCall({
-            callId: existingCallId,
+            callId: initialDBData.call.id,
             instrumentIds: [createdInstrument2Id],
           });
 
@@ -470,7 +466,7 @@ context('Instrument tests', () => {
           });
         }
       });
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           createdProposalId = result.createProposal.proposal.primaryKey;
 
@@ -482,7 +478,7 @@ context('Instrument tests', () => {
 
           cy.assignProposalsToInstrument({
             proposals: [
-              { callId: existingCallId, primaryKey: createdProposalId },
+              { callId: initialDBData.call.id, primaryKey: createdProposalId },
             ],
             instrumentId: createdInstrumentId,
           });
@@ -504,7 +500,7 @@ context('Instrument tests', () => {
 
       cy.get('[title="Show Scientists"]').first().should('exist').click();
 
-      cy.contains(scientist2.lastname);
+      cy.contains(scientist2.lastName);
     });
 
     it('Instrument scientist should be able to see proposals assigned to instrument where he is instrument scientist', () => {
@@ -555,7 +551,7 @@ context('Instrument tests', () => {
     });
 
     it('Instrument scientist should be able to download multiple proposals as PDF', () => {
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           createdProposalId = result.createProposal.proposal.primaryKey;
 
@@ -567,7 +563,7 @@ context('Instrument tests', () => {
 
           cy.assignProposalsToInstrument({
             proposals: [
-              { callId: existingCallId, primaryKey: createdProposalId },
+              { callId: initialDBData.call.id, primaryKey: createdProposalId },
             ],
             instrumentId: createdInstrumentId,
           });

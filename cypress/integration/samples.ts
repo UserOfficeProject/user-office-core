@@ -6,10 +6,10 @@ import {
   TemplateCategoryId,
   TemplateGroupId,
 } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 context('Samples tests', () => {
-  const existingCallId = 1;
-  const existingUser = { id: 1, name: 'Carl' };
+  const existingUser = initialDBData.users.user1;
   const proposalTemplateName = faker.lorem.words(2);
   const sampleTemplateName = faker.lorem.words(2);
   const sampleTemplateDescription = faker.lorem.words(4);
@@ -27,6 +27,7 @@ context('Samples tests', () => {
   currentDayStart.setHours(0, 0, 0, 0);
 
   const updatedCall = {
+    id: initialDBData.call.id,
     shortCode: faker.random.alphaNumeric(15),
     startCall: faker.date.past().toISOString().slice(0, 10),
     endCall: faker.date.future().toISOString().slice(0, 10),
@@ -122,7 +123,6 @@ context('Samples tests', () => {
             });
 
             cy.updateCall({
-              id: existingCallId,
               ...updatedCall,
               proposalWorkflowId: createdWorkflowId,
               templateId: templateId,
@@ -299,7 +299,7 @@ context('Samples tests', () => {
 
     beforeEach(() => {
       createProposalTemplateWithSampleQuestionAndUseTemplateInCall();
-      cy.createProposal({ callId: 1 }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           createdProposalPk = result.createProposal.proposal.primaryKey;
           createdProposalId = result.createProposal.proposal.proposalId;

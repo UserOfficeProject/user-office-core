@@ -1,49 +1,37 @@
+import initialDBData from '../support/initialDBData';
+
 context('Scheduler tests', () => {
   // NOTE: We use fixed dates because we populate the database with a seeder. This is because message broker is not running in test environment.
-  const upcoming = {
-    startsAt: '2023-01-07 10:00',
-    endsAt: '2023-01-07 11:00',
-  };
-  const upcomingDraft = {
-    startsAt: '2023-01-07 12:00',
-    endsAt: '2023-01-07 13:00',
-  };
-  const ended = {
-    startsAt: '2020-01-07 10:00',
-    endsAt: '2020-01-07 11:00',
-  };
-  const completed = {
-    startsAt: '2023-02-07 12:00',
-    endsAt: '2023-02-07 13:00',
-  };
-  const scientist = { firstname: 'Carl', id: 1 };
-  const scientistRoleId = 7;
-  const userRoleId = 1;
-  const existingSeededInstrumentId = 2;
-  const existingSeededCallId = 1;
-  const existingSeedeProposalId = 1;
+  const upcoming = initialDBData.scheduledEvents.upcoming;
+  const upcomingDraft = initialDBData.scheduledEvents.upcomingDraft;
+  const ended = initialDBData.scheduledEvents.ended;
+  const completed = initialDBData.scheduledEvents.completed;
+  const scientist = initialDBData.users.user1;
 
   beforeEach(() => {
     cy.resetDB(true);
     cy.updateUserRoles({
       id: scientist.id,
-      roles: [userRoleId, scientistRoleId],
+      roles: [
+        initialDBData.roles.user,
+        initialDBData.roles.instrumentScientist,
+      ],
     });
     cy.assignScientistsToInstrument({
-      instrumentId: existingSeededInstrumentId,
+      instrumentId: initialDBData.instrument2.id,
       scientistIds: [scientist.id],
     });
 
     cy.assignInstrumentToCall({
-      callId: existingSeededCallId,
-      instrumentIds: [existingSeededInstrumentId],
+      callId: initialDBData.call.id,
+      instrumentIds: [initialDBData.instrument2.id],
     });
     cy.assignProposalsToInstrument({
-      instrumentId: existingSeededInstrumentId,
+      instrumentId: initialDBData.instrument2.id,
       proposals: [
         {
-          callId: existingSeededCallId,
-          primaryKey: existingSeedeProposalId,
+          callId: initialDBData.call.id,
+          primaryKey: initialDBData.proposal.id,
         },
       ],
     });
@@ -62,7 +50,7 @@ context('Scheduler tests', () => {
   });
 
   it('Instrument scientist should not be able to see upcoming experiments in DRAFT state', () => {
-    cy.changeActiveRole(scientistRoleId);
+    cy.changeActiveRole(initialDBData.roles.instrumentScientist);
     cy.visit('/');
     cy.finishedLoading();
 
@@ -83,7 +71,7 @@ context('Scheduler tests', () => {
   });
 
   it('Instrument scientist should be able to see upcoming experiments in ACTIVE', () => {
-    cy.changeActiveRole(scientistRoleId);
+    cy.changeActiveRole(initialDBData.roles.instrumentScientist);
     cy.visit('/');
 
     cy.finishedLoading();
@@ -109,7 +97,7 @@ context('Scheduler tests', () => {
   });
 
   it('Instrument scientist should be able to see upcoming experiments in COMPLETED', () => {
-    cy.changeActiveRole(scientistRoleId);
+    cy.changeActiveRole(initialDBData.roles.instrumentScientist);
     cy.visit('/');
 
     cy.finishedLoading();
