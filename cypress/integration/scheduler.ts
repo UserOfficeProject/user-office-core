@@ -24,7 +24,6 @@ context('Scheduler tests', () => {
 
   before(() => {
     cy.resetDB(true);
-    cy.resetSchedulerDB(true);
     cy.viewport(1920, 1080);
 
     cy.login('user');
@@ -50,10 +49,6 @@ context('Scheduler tests', () => {
 
   beforeEach(() => {
     cy.viewport(1920, 1080);
-  });
-
-  after(() => {
-    cy.resetSchedulerDB();
   });
 
   it('User should not be able to see upcoming experiments in DRAFT state', () => {

@@ -17,7 +17,6 @@ context('Shipments tests', () => {
     cy.viewport(1920, 1080);
 
     cy.resetDB(true);
-    cy.resetSchedulerDB(true);
 
     // allocate time for the proposal
     cy.login('officer');
