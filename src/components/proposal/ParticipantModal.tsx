@@ -61,9 +61,7 @@ function ParticipantModal(props: {
       fullWidth
     >
       <DialogContent>
-        {props.participant && !isUserOfficer
-          ? proposalPeopleTable
-          : peopleTable}
+        {props.participant ? proposalPeopleTable : peopleTable}
       </DialogContent>
     </Dialog>
   );
