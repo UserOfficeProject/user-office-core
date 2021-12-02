@@ -1,5 +1,7 @@
 import faker from 'faker';
 
+import initialDBData from '../support/initialDBData';
+
 context('User administration tests', () => {
   const newFirstName = faker.name.firstName();
   const newMiddleName = faker.name.firstName();
@@ -9,8 +11,7 @@ context('User administration tests', () => {
   const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.phoneNumber('0##########');
   const newTelephoneAlt = faker.phone.phoneNumber('0##########');
-  const unverifiedEmailUserName = 'Unverified email';
-  const placeholderUserId = 5;
+  const placeholderUser = initialDBData.users.placeholder;
 
   beforeEach(() => {
     cy.resetDB();
@@ -22,7 +23,7 @@ context('User administration tests', () => {
   it('should be able to verify email manually', () => {
     cy.contains('People').click();
 
-    cy.contains(unverifiedEmailUserName)
+    cy.contains(placeholderUser.firstName)
       .parent()
       .find("[title='Edit user']")
       .click();
@@ -47,12 +48,12 @@ context('User administration tests', () => {
   });
 
   it('should be able to remove the placeholder flag', () => {
-    cy.setUserEmailVerified({ id: placeholderUserId });
+    cy.setUserEmailVerified({ id: placeholderUser.id });
     cy.contains('People').click();
 
     cy.get('input[aria-label=Search]').type('placeholder');
 
-    cy.contains(unverifiedEmailUserName)
+    cy.contains(placeholderUser.firstName)
       .parent()
       .find("[title='Edit user']")
       .click();
@@ -201,7 +202,7 @@ context('User administration tests', () => {
 
   it('Should be able to delete user information', () => {
     cy.contains('People').click();
-    cy.contains(unverifiedEmailUserName)
+    cy.contains(placeholderUser.firstName)
       .parent()
       .find("[title='Delete']")
       .click();

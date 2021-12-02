@@ -121,7 +121,7 @@ context('Personal information tests', () => {
   it('Should be able to see user officer role in use', () => {
     cy.updateUserRoles({
       id: initialDBData.users.userOfficer.id,
-      roles: [initialDBData.roles.user, initialDBData.roles.sepChair],
+      roles: [initialDBData.roles.userOfficer, initialDBData.roles.sepChair],
     });
     cy.login('officer');
     cy.visit('/');
@@ -146,7 +146,7 @@ context('Personal information tests', () => {
   it('Should be able to change role even in the view where next role is not allowed to be', () => {
     cy.updateUserRoles({
       id: initialDBData.users.userOfficer.id,
-      roles: [initialDBData.roles.user, initialDBData.roles.sepChair],
+      roles: [initialDBData.roles.userOfficer, initialDBData.roles.sepChair],
     });
     const workflowName = faker.lorem.words(2);
     const workflowDescription = faker.lorem.words(5);

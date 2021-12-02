@@ -5,21 +5,17 @@ import {
   TemplateCategoryId,
   TemplateGroupId,
 } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 faker.seed(1);
 
 context('visits tests', () => {
-  const coProposer = {
-    id: 4,
-    name: 'Benjamin',
-    email: 'ben@inbox.com',
-    password: 'Test1234!',
-  };
-  const visitor = { id: 6, email: 'david@teleworm.us', password: 'Test1234!' };
-  const PI = { id: 1, email: 'Javon4@hotmail.com', password: 'Test1234!' };
-  const existingProposalId = 1;
+  const coProposer = initialDBData.users.user2;
+  const visitor = initialDBData.users.user3;
+  const PI = initialDBData.users.user1;
   const acceptedStatusId = 1;
-  const existingScheduledEventId = 996;
+  const existingProposalId = initialDBData.proposal.id;
+  const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 
   beforeEach(() => {
     cy.resetDB(true);

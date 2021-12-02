@@ -41,12 +41,11 @@ context('Proposal tests', () => {
     endNotify: currentDayStart,
     startCycle: currentDayStart,
     endCycle: currentDayStart,
-    templateName: 'default template',
+    templateName: initialDBData.template.name,
     templateId: initialDBData.template.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(),
     surveyComment: faker.lorem.word(),
-    esiTemplateName: 'default esi template',
   };
 
   const createTopicAndQuestionToExistingTemplate = () => {

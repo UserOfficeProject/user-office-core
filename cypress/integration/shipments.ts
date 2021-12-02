@@ -1,23 +1,19 @@
 import faker from 'faker';
 
 import { TemplateGroupId } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 faker.seed(1);
 
 const declareShipmentTitle = 'Declare shipment(s)';
 
-const existingProposal = { id: 1, title: 'Test proposal' };
+const existingProposal = initialDBData.proposal;
 
 const sampleTitle = /My sample title/i;
-const visitor = { id: 6, email: 'david@teleworm.us', password: 'Test1234!' };
-const PI = { id: 1, email: 'Javon4@hotmail.com', password: 'Test1234!' };
-const coProposer = {
-  id: 4,
-  name: 'Benjamin',
-  email: 'ben@inbox.com',
-  password: 'Test1234!',
-};
-const existingScheduledEventId = 996;
+const visitor = initialDBData.users.user3;
+const PI = initialDBData.users.user1;
+const coProposer = initialDBData.users.user2;
+const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 
 const shipmentTitle = faker.lorem.words(2);
 const shipmentTemplateName = faker.lorem.words(2);

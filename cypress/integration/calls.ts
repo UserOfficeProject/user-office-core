@@ -155,10 +155,12 @@ context('Calls tests', () => {
         .should('have.value', endDate);
 
       cy.get('[data-cy="call-template"]').click();
-      cy.get('[role="presentation"]').contains('default template').click();
+      cy.get('[role="presentation"]')
+        .contains(initialDBData.template.name)
+        .click();
 
       cy.get('[data-cy="call-esi-template"]').click();
-      cy.get('[role="presentation"]').contains('default esi template').click();
+      cy.get('[role="presentation"]').contains(esiTemplateName).click();
 
       cy.get('[data-cy="call-workflow"]').click();
       cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();

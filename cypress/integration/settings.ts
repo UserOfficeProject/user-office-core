@@ -5,6 +5,7 @@ import {
   TechnicalReviewStatus,
   TemplateGroupId,
 } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 context('Settings tests', () => {
   beforeEach(() => {
@@ -121,7 +122,6 @@ context('Settings tests', () => {
   });
 
   describe('Proposal workflows tests', () => {
-    const existingUser = { id: 1, name: 'Carl' };
     const workflowName = faker.lorem.words(2);
     const workflowDescription = faker.lorem.words(5);
     const proposalTitle = faker.lorem.words(2);
@@ -131,16 +131,7 @@ context('Settings tests', () => {
     let workflowDroppableGroupId: string;
     let createdWorkflowId: number;
     let prevProposalStatusId: number;
-    const editableSubmittedStatusId = 14;
-    const feasibilityReviewStatusId = 2;
-    const sepSelectionStatusId = 4;
-    const sepReviewStatusId = 5;
-    const sepMeetingStatusId = 12;
-    const notFeasibleStatusId = 3;
-    const existingCallId = 1;
-    const existingTemplateId = 1;
     let createdEsiTemplateId: number;
-    const existingSepId = 1;
 
     const currentDayStart = new Date();
     currentDayStart.setHours(0, 0, 0, 0);
@@ -160,13 +151,13 @@ context('Settings tests', () => {
       allocationTimeUnit: AllocationTimeUnits.DAY,
       cycleComment: faker.lorem.word(),
       surveyComment: faker.lorem.word(),
-      templateId: existingTemplateId,
+      templateId: initialDBData.template.id,
     };
 
     const addMultipleStatusesToProposalWorkflowWithChangingEvents = () => {
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: feasibilityReviewStatusId,
+        proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 1,
         prevProposalStatusId: prevProposalStatusId,
@@ -182,10 +173,11 @@ context('Settings tests', () => {
       });
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: sepSelectionStatusId,
+        proposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 2,
-        prevProposalStatusId: feasibilityReviewStatusId,
+        prevProposalStatusId:
+          initialDBData.proposalStatuses.feasibilityReview.id,
       }).then((result) => {
         if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
           cy.addStatusChangingEventsToConnection({
@@ -197,10 +189,10 @@ context('Settings tests', () => {
       });
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: sepReviewStatusId,
+        proposalStatusId: initialDBData.proposalStatuses.sepReview.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 3,
-        prevProposalStatusId: sepSelectionStatusId,
+        prevProposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
       }).then((result) => {
         if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
           cy.addStatusChangingEventsToConnection({
@@ -212,10 +204,10 @@ context('Settings tests', () => {
       });
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: sepMeetingStatusId,
+        proposalStatusId: initialDBData.proposalStatuses.sepMeeting.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 4,
-        prevProposalStatusId: sepReviewStatusId,
+        prevProposalStatusId: initialDBData.proposalStatuses.sepReview.id,
       }).then((result) => {
         if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
           cy.addStatusChangingEventsToConnection({
@@ -231,7 +223,7 @@ context('Settings tests', () => {
       () => {
         cy.addProposalWorkflowStatus({
           droppableGroupId: 'proposalWorkflowConnections_0',
-          proposalStatusId: feasibilityReviewStatusId,
+          proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
           proposalWorkflowId: createdWorkflowId,
           sortOrder: 1,
           prevProposalStatusId: prevProposalStatusId,
@@ -247,10 +239,11 @@ context('Settings tests', () => {
         });
         cy.addProposalWorkflowStatus({
           droppableGroupId: 'proposalWorkflowConnections_1',
-          proposalStatusId: sepSelectionStatusId,
+          proposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
           proposalWorkflowId: createdWorkflowId,
           sortOrder: 0,
-          prevProposalStatusId: feasibilityReviewStatusId,
+          prevProposalStatusId:
+            initialDBData.proposalStatuses.feasibilityReview.id,
           parentDroppableGroupId: 'proposalWorkflowConnections_0',
         }).then((result) => {
           if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
@@ -263,10 +256,11 @@ context('Settings tests', () => {
         });
         cy.addProposalWorkflowStatus({
           droppableGroupId: 'proposalWorkflowConnections_2',
-          proposalStatusId: notFeasibleStatusId,
+          proposalStatusId: initialDBData.proposalStatuses.notFeasible.id,
           proposalWorkflowId: createdWorkflowId,
           sortOrder: 0,
-          prevProposalStatusId: feasibilityReviewStatusId,
+          prevProposalStatusId:
+            initialDBData.proposalStatuses.feasibilityReview.id,
           parentDroppableGroupId: 'proposalWorkflowConnections_0',
         }).then((result) => {
           if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
@@ -302,7 +296,7 @@ context('Settings tests', () => {
               createdEsiTemplateId = result.createTemplate.template.templateId;
 
               cy.updateCall({
-                id: existingCallId,
+                id: initialDBData.call.id,
                 ...updatedCall,
                 proposalWorkflowId: workflow.id,
                 esiTemplateId: createdEsiTemplateId,
@@ -318,7 +312,7 @@ context('Settings tests', () => {
       const editedProposalTitle = faker.random.words(3);
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: editableSubmittedStatusId,
+        proposalStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 1,
         prevProposalStatusId: prevProposalStatusId,
@@ -331,13 +325,13 @@ context('Settings tests', () => {
           });
         }
       });
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal.proposal) {
           cy.updateProposal({
             proposalPk: result.createProposal.proposal.primaryKey,
             title: proposalTitle,
             abstract: proposalTitle,
-            proposerId: existingUser.id,
+            proposerId: initialDBData.users.user1.id,
           });
         }
       });
@@ -469,7 +463,7 @@ context('Settings tests', () => {
     it('User Officer should be able to select events that are triggering change to workflow status', () => {
       cy.addProposalWorkflowStatus({
         droppableGroupId: workflowDroppableGroupId,
-        proposalStatusId: feasibilityReviewStatusId,
+        proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 1,
         prevProposalStatusId: prevProposalStatusId,
@@ -515,14 +509,14 @@ context('Settings tests', () => {
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal.proposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,
             title: proposalTitle,
             abstract: proposalAbstract,
-            proposerId: existingUser.id,
+            proposerId: initialDBData.users.user1.id,
           });
         }
       });
@@ -604,14 +598,14 @@ context('Settings tests', () => {
 
     it('Proposal status should update immediately after assigning it to a SEP', () => {
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal.proposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,
             title: proposalTitle,
             abstract: proposalAbstract,
-            proposerId: existingUser.id,
+            proposerId: initialDBData.users.user1.id,
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
@@ -652,14 +646,14 @@ context('Settings tests', () => {
 
     it('Proposal status should update immediately after all SEP reviews submitted', () => {
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal.proposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,
             title: proposalTitle,
             abstract: proposalAbstract,
-            proposerId: existingUser.id,
+            proposerId: initialDBData.users.user1.id,
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
@@ -673,10 +667,10 @@ context('Settings tests', () => {
 
           cy.assignProposalsToSep({
             proposals: {
-              callId: existingCallId,
+              callId: initialDBData.call.id,
               primaryKey: proposal.primaryKey,
             },
-            sepId: existingSepId,
+            sepId: initialDBData.sep.id,
           });
         }
       });
@@ -749,15 +743,15 @@ context('Settings tests', () => {
 
     it('User Officer should be able to filter proposals based on statuses', () => {
       addMultipleStatusesToProposalWorkflowWithChangingEvents();
-      cy.createProposal({ callId: existingCallId });
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id });
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal.proposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,
             title: proposalTitle,
             abstract: proposalAbstract,
-            proposerId: existingUser.id,
+            proposerId: initialDBData.users.user1.id,
           });
 
           cy.submitProposal({ proposalPk: proposal.primaryKey });
@@ -771,10 +765,10 @@ context('Settings tests', () => {
 
           cy.assignProposalsToSep({
             proposals: {
-              callId: existingCallId,
+              callId: initialDBData.call.id,
               primaryKey: proposal.primaryKey,
             },
-            sepId: existingSepId,
+            sepId: initialDBData.sep.id,
           });
         }
       });
@@ -898,26 +892,26 @@ context('Settings tests', () => {
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
       addMultipleStatusesToMultiColumnProposalWorkflowWithChangingEvents();
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal.proposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,
             title: firstProposalTitle,
             abstract: firstProposalAbstract,
-            proposerId: existingUser.id,
+            proposerId: initialDBData.users.user1.id,
           });
           cy.submitProposal({ proposalPk: proposal.primaryKey });
         }
       });
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal.proposal;
         if (proposal) {
           cy.updateProposal({
             proposalPk: proposal.primaryKey,
             title: secondProposalTitle,
             abstract: secondProposalAbstract,
-            proposerId: existingUser.id,
+            proposerId: initialDBData.users.user1.id,
           });
           cy.submitProposal({ proposalPk: proposal.primaryKey });
         }

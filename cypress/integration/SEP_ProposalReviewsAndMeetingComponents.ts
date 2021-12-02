@@ -5,32 +5,13 @@ import {
   TechnicalReviewStatus,
   UserRole,
 } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 const sepMembers = {
-  chair: {
-    id: 4,
-    email: 'ben@inbox.com',
-    password: 'Test1234!',
-    surname: 'Beckley',
-  },
-  secretary: {
-    id: 1,
-    email: 'Javon4@hotmail.com',
-    password: 'Test1234!',
-    surname: 'Carlsson',
-  },
-  reviewer: {
-    id: 3,
-    email: 'nils@ess.se',
-    password: 'Test1234!',
-    surname: 'Nilsson',
-  },
-  reviewer2: {
-    id: 6,
-    email: 'david@teleworm.us',
-    password: 'Test1234!',
-    surname: 'Dawson',
-  },
+  chair: initialDBData.users.user2,
+  secretary: initialDBData.users.user1,
+  reviewer: initialDBData.users.reviewer,
+  reviewer2: initialDBData.users.user3,
 };
 
 function readWriteReview() {
@@ -65,7 +46,7 @@ function editFinalRankingForm() {
 
   cy.contains('External reviews').parent().find('table').as('reviewsTable');
 
-  cy.get('@reviewsTable').contains(sepMembers.reviewer.surname);
+  cy.get('@reviewsTable').contains(sepMembers.reviewer.lastName);
 
   cy.get('[data-cy="save"]').click();
 
@@ -94,10 +75,7 @@ const proposal2 = {
   proposalTitle: faker.random.words(3),
 };
 
-const scientist = {
-  id: 1,
-  name: 'Carl',
-};
+const scientist = initialDBData.users.user1;
 
 const instrument = {
   name: faker.random.words(2),
@@ -106,13 +84,6 @@ const instrument = {
   managerUserId: scientist.id,
 };
 
-const existingCallId = 1;
-const existingUserId = 1;
-const sepReviewStatusId = 5;
-const sepChairRoleId = 4;
-const sepSecretaryRoleId = 5;
-const reviewerRoleId = 6;
-const scientistRoleId = 7;
 let createdSepId: number;
 let createdProposalId: number;
 
@@ -123,15 +94,15 @@ context(
       cy.resetDB();
       cy.updateUserRoles({
         id: sepMembers.chair.id,
-        roles: [reviewerRoleId],
+        roles: [initialDBData.roles.sepReviewer],
       });
       cy.updateUserRoles({
         id: sepMembers.secretary.id,
-        roles: [reviewerRoleId],
+        roles: [initialDBData.roles.sepReviewer],
       });
       cy.updateUserRoles({
         id: sepMembers.reviewer.id,
-        roles: [reviewerRoleId],
+        roles: [initialDBData.roles.sepReviewer],
       });
 
       cy.createSep({
@@ -144,7 +115,7 @@ context(
           createdSepId = result.createSEP.sep.id;
         }
       });
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
           createdProposalId = createdProposal.primaryKey;
@@ -153,14 +124,14 @@ context(
             proposalPk: createdProposal.primaryKey,
             title: proposal1.proposalTitle,
             abstract: proposal1.proposalAbstract,
-            proposerId: existingUserId,
+            proposerId: initialDBData.users.user1.id,
           });
 
           // Manually changing the proposal status to be shown in the SEPs. -------->
           cy.changeProposalsStatus({
-            statusId: sepReviewStatusId,
+            statusId: initialDBData.proposalStatuses.sepReview.id,
             proposals: [
-              { callId: existingCallId, primaryKey: createdProposalId },
+              { callId: initialDBData.call.id, primaryKey: createdProposalId },
             ],
           });
         }
@@ -221,7 +192,7 @@ context(
         cy.assignProposalsToSep({
           sepId: createdSepId,
           proposals: [
-            { callId: existingCallId, primaryKey: createdProposalId },
+            { callId: initialDBData.call.id, primaryKey: createdProposalId },
           ],
         });
         cy.login('officer');
@@ -254,7 +225,7 @@ context(
         cy.assignProposalsToSep({
           sepId: createdSepId,
           proposals: [
-            { callId: existingCallId, primaryKey: createdProposalId },
+            { callId: initialDBData.call.id, primaryKey: createdProposalId },
           ],
         });
         cy.login('officer');
@@ -274,7 +245,7 @@ context(
         cy.assignProposalsToSep({
           sepId: createdSepId,
           proposals: [
-            { callId: existingCallId, primaryKey: createdProposalId },
+            { callId: initialDBData.call.id, primaryKey: createdProposalId },
           ],
         });
         cy.assignReviewersToSep({
@@ -296,7 +267,7 @@ context(
         cy.finishedLoading();
 
         cy.get('[role="dialog"]')
-          .contains(sepMembers.reviewer.surname)
+          .contains(sepMembers.reviewer.lastName)
           .parent()
           .find('input[type="checkbox"]')
           .click();
@@ -310,7 +281,7 @@ context(
 
         cy.get('[role="dialog"]').should('not.exist');
         cy.get("[title='Show Reviewers']").first().click();
-        cy.contains(sepMembers.reviewer.surname);
+        cy.contains(sepMembers.reviewer.lastName);
 
         cy.contains('Logs').click();
 
@@ -323,7 +294,7 @@ context(
         cy.assignProposalsToSep({
           sepId: createdSepId,
           proposals: [
-            { callId: existingCallId, primaryKey: createdProposalId },
+            { callId: initialDBData.call.id, primaryKey: createdProposalId },
           ],
         });
         cy.assignReviewersToSep({
@@ -346,7 +317,7 @@ context(
 
         cy.get('[title="Show Reviewers"]').click();
 
-        cy.contains(sepMembers.reviewer.surname)
+        cy.contains(sepMembers.reviewer.lastName)
           .parent()
           .find('[title="Review proposal"]')
           .click();
@@ -357,7 +328,7 @@ context(
         cy.assignProposalsToSep({
           sepId: createdSepId,
           proposals: [
-            { callId: existingCallId, primaryKey: createdProposalId },
+            { callId: initialDBData.call.id, primaryKey: createdProposalId },
           ],
         });
         cy.assignReviewersToSep({
@@ -398,7 +369,7 @@ context(
         cy.assignProposalsToSep({
           sepId: createdSepId,
           proposals: [
-            { callId: existingCallId, primaryKey: createdProposalId },
+            { callId: initialDBData.call.id, primaryKey: createdProposalId },
           ],
         });
         cy.assignReviewersToSep({
@@ -407,7 +378,7 @@ context(
         });
 
         cy.login(sepMembers.chair);
-        cy.changeActiveRole(sepChairRoleId);
+        cy.changeActiveRole(initialDBData.roles.sepChair);
         cy.visit('/');
       });
 
@@ -424,7 +395,7 @@ context(
         cy.finishedLoading();
 
         cy.get('[role="dialog"]')
-          .contains(sepMembers.chair.surname)
+          .contains(sepMembers.chair.lastName)
           .parent()
           .find('input[type="checkbox"]')
           .click();
@@ -439,7 +410,7 @@ context(
         cy.get('[role="dialog"]').should('not.exist');
         cy.get("[title='Show Reviewers']").first().click();
 
-        cy.contains(sepMembers.chair.surname);
+        cy.contains(sepMembers.chair.lastName);
       });
 
       it('SEP Chair should be able to see proposal details in modal inside proposals and assignments', () => {
@@ -478,7 +449,7 @@ context(
 
         cy.get('[title="Show Reviewers"]').click();
 
-        cy.contains(sepMembers.reviewer.surname)
+        cy.contains(sepMembers.reviewer.lastName)
           .parent()
           .find('[title="Review proposal"]')
           .click();
@@ -498,7 +469,7 @@ context(
         cy.assignProposalsToSep({
           sepId: createdSepId,
           proposals: [
-            { callId: existingCallId, primaryKey: createdProposalId },
+            { callId: initialDBData.call.id, primaryKey: createdProposalId },
           ],
         });
         cy.assignReviewersToSep({
@@ -506,7 +477,7 @@ context(
           memberIds: [sepMembers.reviewer.id],
         });
         cy.login(sepMembers.secretary);
-        cy.changeActiveRole(sepSecretaryRoleId);
+        cy.changeActiveRole(initialDBData.roles.sepSecretary);
         cy.visit('/');
       });
 
@@ -523,7 +494,7 @@ context(
         cy.finishedLoading();
 
         cy.get('[role="dialog"]')
-          .contains(sepMembers.secretary.surname)
+          .contains(sepMembers.secretary.lastName)
           .parent()
           .find('input[type="checkbox"]')
           .click();
@@ -538,7 +509,7 @@ context(
         cy.get('[role="dialog"]').should('not.exist');
         cy.get("[title='Show Reviewers']").first().click();
 
-        cy.contains(sepMembers.secretary.surname);
+        cy.contains(sepMembers.secretary.lastName);
       });
 
       it('SEP Secretary should be able to read/write reviews', () => {
@@ -556,7 +527,7 @@ context(
 
         cy.get('[title="Show Reviewers"]').click();
 
-        cy.contains(sepMembers.reviewer.surname)
+        cy.contains(sepMembers.reviewer.lastName)
           .parent()
           .find('[title="Review proposal"]')
           .click();
@@ -578,7 +549,7 @@ context(
 
         cy.get('[title="Show Reviewers"]').click();
 
-        cy.contains(sepMembers.reviewer.surname)
+        cy.contains(sepMembers.reviewer.lastName)
           .parent()
           .find('[title="Review proposal"]')
           .click();
@@ -591,7 +562,7 @@ context(
         cy.assignProposalsToSep({
           sepId: createdSepId,
           proposals: [
-            { callId: existingCallId, primaryKey: createdProposalId },
+            { callId: initialDBData.call.id, primaryKey: createdProposalId },
           ],
         });
         cy.assignReviewersToSep({
@@ -655,7 +626,7 @@ context(
         cy.assignProposalsToSep({
           sepId: createdSepId,
           proposals: [
-            { callId: existingCallId, primaryKey: createdProposalId },
+            { callId: initialDBData.call.id, primaryKey: createdProposalId },
           ],
         });
         cy.assignReviewersToSep({
@@ -669,7 +640,7 @@ context(
         });
         cy.updateUserRoles({
           id: scientist.id,
-          roles: [scientistRoleId],
+          roles: [initialDBData.roles.instrumentScientist],
         });
         cy.addProposalTechnicalReview({
           proposalPk: createdProposalId,
@@ -684,18 +655,21 @@ context(
             createdInstrumentId = createdInstrument.id;
 
             cy.assignInstrumentToCall({
-              callId: existingCallId,
+              callId: initialDBData.call.id,
               instrumentIds: [createdInstrumentId],
             });
             cy.assignProposalsToInstrument({
               instrumentId: createdInstrumentId,
               proposals: [
-                { callId: existingCallId, primaryKey: createdProposalId },
+                {
+                  callId: initialDBData.call.id,
+                  primaryKey: createdProposalId,
+                },
               ],
             });
 
             cy.setInstrumentAvailabilityTime({
-              callId: existingCallId,
+              callId: initialDBData.call.id,
               instrumentId: createdInstrumentId,
               availabilityTime: 20,
             });
@@ -809,11 +783,11 @@ context(
 
         it('Officer should be able to see calculated availability time on instrument per SEP inside meeting components', () => {
           cy.setInstrumentAvailabilityTime({
-            callId: existingCallId,
+            callId: initialDBData.call.id,
             instrumentId: createdInstrumentId,
             availabilityTime: 50,
           });
-          cy.createProposal({ callId: existingCallId }).then(
+          cy.createProposal({ callId: initialDBData.call.id }).then(
             (proposalResult) => {
               const createdProposal = proposalResult.createProposal.proposal;
               if (createdProposal) {
@@ -832,7 +806,7 @@ context(
                       sepId: sepResult.createSEP.sep.id,
                       proposals: [
                         {
-                          callId: existingCallId,
+                          callId: initialDBData.call.id,
                           primaryKey: createdProposal.primaryKey,
                         },
                       ],
@@ -844,7 +818,7 @@ context(
                   instrumentId: createdInstrumentId,
                   proposals: [
                     {
-                      callId: existingCallId,
+                      callId: initialDBData.call.id,
                       primaryKey: createdProposal.primaryKey,
                     },
                   ],
@@ -1031,7 +1005,7 @@ context(
             },
           });
           cy.submitInstrument({
-            callId: existingCallId,
+            callId: initialDBData.call.id,
             instrumentId: createdInstrumentId,
             sepId: createdSepId,
           });
@@ -1110,7 +1084,7 @@ context(
 
           cy.get('@rows').should(
             'not.contain.text',
-            sepMembers.reviewer.surname
+            sepMembers.reviewer.lastName
           );
 
           cy.contains('Logs').click();
@@ -1172,7 +1146,7 @@ context(
           });
 
           cy.login(sepMembers.chair);
-          cy.changeActiveRole(sepChairRoleId);
+          cy.changeActiveRole(initialDBData.roles.sepChair);
           cy.visit('/');
         });
         it('SEP Chair should be able to edit SEP Meeting form', () => {
@@ -1200,7 +1174,7 @@ context(
             },
           });
           cy.submitInstrument({
-            callId: existingCallId,
+            callId: initialDBData.call.id,
             instrumentId: createdInstrumentId,
             sepId: createdSepId,
           });
@@ -1247,7 +1221,7 @@ context(
         beforeEach(() => {
           cy.updateUserRoles({
             id: sepMembers.secretary.id,
-            roles: [reviewerRoleId],
+            roles: [initialDBData.roles.sepReviewer],
           });
           cy.assignChairOrSecretary({
             assignChairOrSecretaryToSEPInput: {
@@ -1258,7 +1232,7 @@ context(
           });
 
           cy.login(sepMembers.secretary);
-          cy.changeActiveRole(sepSecretaryRoleId);
+          cy.changeActiveRole(initialDBData.roles.sepSecretary);
           cy.visit('/');
         });
 
@@ -1287,7 +1261,7 @@ context(
             },
           });
           cy.submitInstrument({
-            callId: existingCallId,
+            callId: initialDBData.call.id,
             instrumentId: createdInstrumentId,
             sepId: createdSepId,
           });
@@ -1334,7 +1308,7 @@ context(
         beforeEach(() => {
           cy.updateUserRoles({
             id: sepMembers.reviewer2.id,
-            roles: [reviewerRoleId],
+            roles: [initialDBData.roles.sepReviewer],
           });
           cy.assignReviewersToSep({
             sepId: createdSepId,

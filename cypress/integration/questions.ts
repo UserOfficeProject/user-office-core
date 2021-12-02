@@ -1,5 +1,7 @@
 import faker from 'faker';
 
+import initialDBData from '../support/initialDBData';
+
 context('Questions tests', () => {
   beforeEach(() => {
     cy.resetDB();
@@ -14,7 +16,10 @@ context('Questions tests', () => {
 
     cy.navigateToTemplatesSubmenu('Proposal');
 
-    cy.contains('default template').parent().get("[title='Edit']").click();
+    cy.contains(initialDBData.template.name)
+      .parent()
+      .get("[title='Edit']")
+      .click();
 
     cy.createTextQuestion(textQuestion, {
       isRequired: true,

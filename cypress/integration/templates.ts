@@ -6,6 +6,7 @@ import {
   EvaluatorOperator,
   TemplateCategoryId,
 } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
 context('Template tests', () => {
   let boolId: string;
@@ -16,15 +17,6 @@ context('Template tests', () => {
   let intervalId: string;
   let numberId: string;
   let richTextInputId: string;
-
-  const template = {
-    id: 1,
-    title: 'default template', // value pre-configured in DB
-    topic: {
-      id: 5,
-      title: 'Topic title', // // value pre-configured in DB
-    },
-  };
 
   const proposal = {
     title: faker.lorem.words(3),
@@ -82,9 +74,6 @@ context('Template tests', () => {
     },
   };
 
-  const existingCallId = 1;
-  const existingUserId = 1;
-
   const createTopicWithQuestionsAndRelations = (
     shouldAddQuestionsToTemplate = false
   ) => {
@@ -104,9 +93,9 @@ context('Template tests', () => {
         if (shouldAddQuestionsToTemplate) {
           cy.createQuestionTemplateRelation({
             questionId: createdQuestion.id,
-            templateId: template.id,
+            templateId: initialDBData.template.id,
             sortOrder: 0,
-            topicId: template.topic.id,
+            topicId: initialDBData.template.topic.id,
           });
         }
 
@@ -127,14 +116,14 @@ context('Template tests', () => {
             if (shouldAddQuestionsToTemplate) {
               cy.createQuestionTemplateRelation({
                 questionId: createdQuestion.id,
-                templateId: template.id,
+                templateId: initialDBData.template.id,
                 sortOrder: 3,
-                topicId: template.topic.id,
+                topicId: initialDBData.template.topic.id,
               });
 
               cy.updateQuestionTemplateRelationSettings({
                 questionId: createdQuestion.id,
-                templateId: template.id,
+                templateId: initialDBData.template.id,
                 dependenciesOperator: DependenciesLogicOperator.AND,
                 dependencies: {
                   condition: {
@@ -166,9 +155,9 @@ context('Template tests', () => {
         if (shouldAddQuestionsToTemplate) {
           cy.createQuestionTemplateRelation({
             questionId: createdQuestion.id,
-            templateId: template.id,
+            templateId: initialDBData.template.id,
             sortOrder: 1,
-            topicId: template.topic.id,
+            topicId: initialDBData.template.topic.id,
           });
         }
       }
@@ -190,9 +179,9 @@ context('Template tests', () => {
         if (shouldAddQuestionsToTemplate) {
           cy.createQuestionTemplateRelation({
             questionId: createdQuestion.id,
-            templateId: template.id,
+            templateId: initialDBData.template.id,
             sortOrder: 2,
-            topicId: template.topic.id,
+            topicId: initialDBData.template.topic.id,
           });
         }
       }
@@ -215,9 +204,9 @@ context('Template tests', () => {
         if (shouldAddQuestionsToTemplate) {
           cy.createQuestionTemplateRelation({
             questionId: createdQuestion.id,
-            templateId: template.id,
+            templateId: initialDBData.template.id,
             sortOrder: 3,
-            topicId: template.topic.id,
+            topicId: initialDBData.template.topic.id,
           });
         }
       }
@@ -239,9 +228,9 @@ context('Template tests', () => {
         if (shouldAddQuestionsToTemplate) {
           cy.createQuestionTemplateRelation({
             questionId: createdQuestion.id,
-            templateId: template.id,
+            templateId: initialDBData.template.id,
             sortOrder: 4,
-            topicId: template.topic.id,
+            topicId: initialDBData.template.topic.id,
           });
         }
       }
@@ -263,9 +252,9 @@ context('Template tests', () => {
         if (shouldAddQuestionsToTemplate) {
           cy.createQuestionTemplateRelation({
             questionId: createdQuestion.id,
-            templateId: template.id,
+            templateId: initialDBData.template.id,
             sortOrder: 5,
-            topicId: template.topic.id,
+            topicId: initialDBData.template.topic.id,
           });
         }
       }
@@ -284,9 +273,9 @@ context('Template tests', () => {
         if (shouldAddQuestionsToTemplate) {
           cy.createQuestionTemplateRelation({
             questionId: createdQuestion.id,
-            templateId: template.id,
+            templateId: initialDBData.template.id,
             sortOrder: 6,
-            topicId: template.topic.id,
+            topicId: initialDBData.template.topic.id,
           });
         }
       }
@@ -308,9 +297,9 @@ context('Template tests', () => {
         if (shouldAddQuestionsToTemplate) {
           cy.createQuestionTemplateRelation({
             questionId: createdQuestion.id,
-            templateId: template.id,
+            templateId: initialDBData.template.id,
             sortOrder: 7,
-            topicId: template.topic.id,
+            topicId: initialDBData.template.topic.id,
           });
         }
       }
@@ -329,7 +318,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Edit']")
         .first()
@@ -429,7 +418,7 @@ context('Template tests', () => {
         .parent()
         .dragElement([{ direction: 'up', length: 1 }]); // Move item to top, in case it isn't
 
-      cy.contains(template.topic.title)
+      cy.contains(initialDBData.template.topic.title)
         .closest('[data-rbd-draggable-context-id]') // new topic column
         .find('[data-rbd-drag-handle-draggable-id]') // all questions
         .first() // first question
@@ -439,7 +428,7 @@ context('Template tests', () => {
         .parent()
         .dragElement([{ direction: 'down', length: 1 }]);
 
-      cy.contains(template.topic.title)
+      cy.contains(initialDBData.template.topic.title)
         .closest('[data-rbd-draggable-context-id]') // new topic column
         .find('[data-rbd-drag-handle-draggable-id]') // all questions
         .first() // first question
@@ -569,7 +558,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Clone']")
         .first()
@@ -577,17 +566,17 @@ context('Template tests', () => {
 
       cy.contains('Yes').click();
 
-      cy.contains('Copy of default template');
+      cy.contains(`Copy of ${initialDBData.template.name}`);
     });
 
     it('User officer can delete template', () => {
-      cy.cloneTemplate({ templateId: template.id });
+      cy.cloneTemplate({ templateId: initialDBData.template.id });
       cy.login('officer');
       cy.visit('/');
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(`Copy of ${template.title}`)
+      cy.contains(`Copy of ${initialDBData.template.name}`)
         .parent()
         .find("[title='Delete']")
         .first()
@@ -595,7 +584,7 @@ context('Template tests', () => {
 
       cy.contains('Yes').click();
 
-      cy.contains('Copy of default template').should('not.exist');
+      cy.contains(`Copy of ${initialDBData.template.name}`).should('not.exist');
     });
 
     it('User officer archive and unarchive template', () => {
@@ -604,7 +593,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Archive']")
         .first()
@@ -614,13 +603,13 @@ context('Template tests', () => {
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
-      cy.contains(template.title).should('not.exist');
+      cy.contains(initialDBData.template.name).should('not.exist');
 
       cy.contains('Archived').click();
 
-      cy.contains(template.title);
+      cy.contains(initialDBData.template.name);
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Unarchive']")
         .first()
@@ -637,7 +626,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Edit']")
         .first()
@@ -726,7 +715,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Edit']")
         .first()
@@ -849,14 +838,14 @@ context('Template tests', () => {
     });
 
     it('User officer can add multiple choice question as a dependency', () => {
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
             title: proposal.title,
             abstract: proposal.abstract,
-            proposerId: existingUserId,
+            proposerId: initialDBData.users.user1.id,
           });
         }
       });
@@ -866,7 +855,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Edit']")
         .first()
@@ -957,7 +946,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Edit']")
         .first()
@@ -1092,14 +1081,14 @@ context('Template tests', () => {
     });
 
     it('User can create proposal with template', () => {
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
             title: proposal.title,
             abstract: proposal.abstract,
-            proposerId: existingUserId,
+            proposerId: initialDBData.users.user1.id,
           });
         }
       });
@@ -1188,7 +1177,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Edit']")
         .first()
@@ -1246,7 +1235,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Edit']")
         .first()
@@ -1266,14 +1255,14 @@ context('Template tests', () => {
     });
 
     it('User officer can add multiple dependencies on a question', () => {
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
             title: proposal.title,
             abstract: proposal.abstract,
-            proposerId: existingUserId,
+            proposerId: initialDBData.users.user1.id,
           });
         }
       });
@@ -1282,7 +1271,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Edit']")
         .first()
@@ -1363,14 +1352,14 @@ context('Template tests', () => {
     });
 
     it('User officer can change dependency logic operator', () => {
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
             title: proposal.title,
             abstract: proposal.abstract,
-            proposerId: existingUserId,
+            proposerId: initialDBData.users.user1.id,
           });
         }
       });
@@ -1440,7 +1429,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Edit']")
         .first()
@@ -1460,14 +1449,14 @@ context('Template tests', () => {
 
     it('User can add captions after uploading image/* file', () => {
       const fileName = 'file_upload_test.png';
-      cy.createProposal({ callId: existingCallId }).then((result) => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
           cy.updateProposal({
             proposalPk: createdProposal.primaryKey,
             title: proposal.title,
             abstract: proposal.abstract,
-            proposerId: existingUserId,
+            proposerId: initialDBData.users.user1.id,
           });
         }
       });
@@ -1477,7 +1466,7 @@ context('Template tests', () => {
 
       cy.navigateToTemplatesSubmenu('Proposal');
 
-      cy.contains(template.title)
+      cy.contains(initialDBData.template.name)
         .parent()
         .find("[title='Edit']")
         .first()

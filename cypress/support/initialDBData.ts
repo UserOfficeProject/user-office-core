@@ -7,6 +7,10 @@ export default {
   template: {
     id: 1,
     name: 'default template',
+    topic: {
+      id: 5,
+      title: 'Topic title',
+    },
   },
   proposal: {
     id: 1,
@@ -17,6 +21,10 @@ export default {
   },
   instrument2: {
     id: 2,
+  },
+  sep: {
+    id: 1,
+    code: 'DEMAX',
   },
   roles: {
     user: 1,
@@ -73,11 +81,19 @@ export default {
     draft: {
       id: 1,
     },
+    feasibilityReview: {
+      id: 2,
+    },
+    notFeasible: { id: 3 },
+    sepSelection: { id: 4 },
     sepReview: {
       id: 5,
     },
     sepMeeting: {
       id: 12,
+    },
+    editableSubmitted: {
+      id: 14,
     },
   },
   scheduledEvents: {
