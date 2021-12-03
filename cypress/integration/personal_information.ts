@@ -1,10 +1,10 @@
 import faker from 'faker';
 
+import initialDBData from '../support/initialDBData';
+
 context('Personal information tests', () => {
-  before(() => {
-    cy.resetDB();
-  });
   beforeEach(() => {
+    cy.resetDB();
     cy.viewport(1920, 1080);
   });
 
@@ -18,6 +18,7 @@ context('Personal information tests', () => {
 
   it('Should be able update personal information', () => {
     cy.login('user');
+    cy.visit('/');
 
     cy.get('[data-cy="active-user-profile"]').click();
 
@@ -60,6 +61,7 @@ context('Personal information tests', () => {
 
   it('User Officer should be able to see all and change roles if there are multiple', () => {
     cy.login('officer');
+    cy.visit('/');
 
     cy.contains('People').click();
 
@@ -67,8 +69,8 @@ context('Personal information tests', () => {
 
     cy.contains('Andersson').parent().find('button[title="Edit user"]').click();
 
-    const mainContentElement = cy.get('main');
-    mainContentElement.contains('Settings').click();
+    cy.get('main').as('mainContentElement');
+    cy.get('@mainContentElement').contains('Settings').click();
 
     cy.finishedLoading();
 
@@ -89,9 +91,25 @@ context('Personal information tests', () => {
     // wait before trying to get profile button otherwise page
     // might re-render and you could be trying to access element
     // that is not attached to the DOM
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(2000);
 
-    cy.changeActiveRole('SEP Chair');
+    cy.finishedLoading();
+
+    cy.get("[data-cy='profile-page-btn']").click();
+
+    cy.get('[role="menu"]').contains('Roles').click();
+
+    cy.finishedLoading();
+
+    cy.contains('User roles');
+
+    cy.contains('SEP Chair', { matchCase: false })
+      .parent()
+      .find('button')
+      .click();
+
+    cy.finishedLoading();
 
     cy.contains('Proposals to review');
 
@@ -101,7 +119,12 @@ context('Personal information tests', () => {
   });
 
   it('Should be able to see user officer role in use', () => {
+    cy.updateUserRoles({
+      id: initialDBData.users.userOfficer.id,
+      roles: [initialDBData.roles.userOfficer, initialDBData.roles.sepChair],
+    });
     cy.login('officer');
+    cy.visit('/');
 
     cy.get("[data-cy='profile-page-btn']").click();
 
@@ -121,9 +144,14 @@ context('Personal information tests', () => {
   });
 
   it('Should be able to change role even in the view where next role is not allowed to be', () => {
+    cy.updateUserRoles({
+      id: initialDBData.users.userOfficer.id,
+      roles: [initialDBData.roles.userOfficer, initialDBData.roles.sepChair],
+    });
     const workflowName = faker.lorem.words(2);
     const workflowDescription = faker.lorem.words(5);
     cy.login('officer');
+    cy.visit('/');
 
     cy.contains('Settings').click();
     cy.contains('Proposal workflows').click();
@@ -137,7 +165,20 @@ context('Personal information tests', () => {
 
     cy.get('[data-cy^="connection_DRAFT_1"]').should('contain.text', 'DRAFT');
 
-    cy.changeActiveRole('SEP Chair');
+    cy.get("[data-cy='profile-page-btn']").click();
+
+    cy.contains('Roles').click();
+
+    cy.finishedLoading();
+
+    cy.contains('User roles');
+
+    cy.contains('SEP Chair', { matchCase: false })
+      .parent()
+      .find('button')
+      .click();
+
+    cy.finishedLoading();
 
     cy.get('[data-cy="SEPRoles-menu-items"]').should('exist');
   });

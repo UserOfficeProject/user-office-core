@@ -4217,6 +4217,23 @@ export type MergeInstitutionsMutation = (
   ) }
 );
 
+export type PrepareDbMutationVariables = Exact<{
+  includeSeeds: Scalars['Boolean'];
+}>;
+
+
+export type PrepareDbMutation = (
+  { __typename?: 'Mutation' }
+  & { prepareDB: (
+    { __typename?: 'PrepareDBResponseWrap' }
+    & Pick<PrepareDbResponseWrap, 'log'>
+    & { rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
 export type RejectionFragment = (
   { __typename?: 'Rejection' }
   & Pick<Rejection, 'reason' | 'context' | 'exception'>
@@ -7095,6 +7112,13 @@ export type TemplateFragment = (
 export type TemplateMetadataFragment = (
   { __typename?: 'Template' }
   & Pick<Template, 'templateId' | 'name' | 'description' | 'isArchived'>
+  & { steps: Array<(
+    { __typename?: 'TemplateStep' }
+    & { topic: (
+      { __typename?: 'Topic' }
+      & TopicFragment
+    ) }
+  )> }
 );
 
 export type TemplateStepFragment = (
@@ -8580,8 +8604,13 @@ export const TemplateMetadataFragmentDoc = gql`
   name
   description
   isArchived
+  steps {
+    topic {
+      ...topic
+    }
+  }
 }
-    `;
+    ${TopicFragmentDoc}`;
 export const TemplateStepFragmentDoc = gql`
     fragment templateStep on TemplateStep {
   topic {
@@ -9198,6 +9227,16 @@ export const MergeInstitutionsDocument = gql`
       verified
       name
     }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${RejectionFragmentDoc}`;
+export const PrepareDbDocument = gql`
+    mutation prepareDB($includeSeeds: Boolean!) {
+  prepareDB(includeSeeds: $includeSeeds) {
+    log
     rejection {
       ...rejection
     }
@@ -11976,6 +12015,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     mergeInstitutions(variables: MergeInstitutionsMutationVariables): Promise<MergeInstitutionsMutation> {
       return withWrapper(() => client.request<MergeInstitutionsMutation>(print(MergeInstitutionsDocument), variables));
+    },
+    prepareDB(variables: PrepareDbMutationVariables): Promise<PrepareDbMutation> {
+      return withWrapper(() => client.request<PrepareDbMutation>(print(PrepareDbDocument), variables));
     },
     setPageContent(variables: SetPageContentMutationVariables): Promise<SetPageContentMutation> {
       return withWrapper(() => client.request<SetPageContentMutation>(print(SetPageContentDocument), variables));

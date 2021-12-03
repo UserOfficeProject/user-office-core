@@ -1,23 +1,21 @@
+import { CreateVisitMutationVariables } from '../../src/generated/sdk';
+
 declare global {
   namespace Cypress {
     interface Chainable {
       /**
        * Defines experiment team
        *
-       * @returns {typeof defineExperimentTeam}
+       * @returns {typeof createVisit}
        * @memberof Chainable
        * @example
-       * cy.defineExperimentTeam({
+       * cy.createVisit({
        *    proposalTitle: proposalTitle,
        *    usersEmails: ['ben@inbox.com'],
        *    teamLead: 'Carlsson',
        * });
        */
-      defineExperimentTeam: (params: {
-        proposalTitle: string;
-        usersEmails: string[];
-        teamLead: string;
-      }) => void;
+      createVisit: (createVisitInput: CreateVisitMutationVariables) => void;
     }
   }
 }

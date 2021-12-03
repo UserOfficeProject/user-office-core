@@ -1,34 +1,36 @@
 import faker from 'faker';
 
+import {
+  DataType,
+  TemplateCategoryId,
+  TemplateGroupId,
+} from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
+
 faker.seed(1);
 
 context('visits tests', () => {
-  before(() => {
-    // reset data and add seeds with test proposal
-    cy.resetDB(true);
-    // Add co-proposer
-    cy.login('officer');
-    cy.contains('999999').parent().find('[title="View proposal"]').click();
-    cy.get('[data-cy=toggle-edit-proposal]').click();
-    cy.get('[data-cy=questionary-stepper]').contains('New proposal').click();
-    cy.get('[data-cy=add-participant-button]').click();
-    cy.contains('Benjamin').parent().find('[type=checkbox]').click();
-    cy.get('[data-cy=assign-selected-users]').click();
-    cy.get('[data-cy=co-proposers]').contains('Benjamin'); // make sure Benjamin was added
-    cy.get('[data-cy=save-and-continue-button]').click();
-    // allocate time for the test proposal
-    cy.get('[role="dialog"]').contains('Admin').click();
-    cy.get('#finalStatus-input').click();
-    cy.get('[role="listbox"]').contains('Accepted').click();
-    cy.get('[data-cy="is-management-decision-submitted"]').click();
-    cy.get('[data-cy="save-admin-decision"]').click();
-    cy.closeModal();
-    cy.logout();
-  });
+  const coProposer = initialDBData.users.user2;
+  const visitor = initialDBData.users.user3;
+  const PI = initialDBData.users.user1;
+  const acceptedStatusId = 1;
+  const existingProposalId = initialDBData.proposal.id;
+  const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 
   beforeEach(() => {
+    cy.resetDB(true);
+    cy.updateProposal({
+      proposalPk: existingProposalId,
+      proposerId: PI.id,
+      users: [coProposer.id],
+    });
+    cy.updateProposalManagementDecision({
+      proposalPk: existingProposalId,
+      statusId: acceptedStatusId,
+      managementTimeAllocation: 5,
+      managementDecisionSubmitted: true,
+    });
     cy.viewport(1920, 1080);
-    cy.visit('/');
   });
 
   const startDateQuestionTitle = 'Visit start';
@@ -38,18 +40,32 @@ context('visits tests', () => {
   const registerVisitTitle = 'Define your own visit';
   const individualTrainingTitle = 'Finish individual training';
   const declareShipmentTitle = 'Declare shipment(s)';
+  const visitTemplate = {
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(3),
+  };
 
   it('Should be able to create visits template', () => {
     cy.login('officer');
+    cy.visit('/');
 
-    cy.createTemplate('visit');
+    cy.navigateToTemplatesSubmenu('Visit registration');
+    cy.get('[data-cy=create-new-button]').click();
+
+    cy.get('[data-cy=name] input')
+      .type(visitTemplate.name)
+      .should('have.value', visitTemplate.name);
+    cy.get('[data-cy=description]').type(visitTemplate.description);
+
+    cy.get('[data-cy=submit]').click();
 
     cy.createDateQuestion(startDateQuestionTitle);
     cy.createDateQuestion(endDateQuestionTitle);
   });
 
   it('PI should see that he is able to form team', () => {
-    cy.login({ email: 'Javon4@hotmail.com', password: 'Test1234!' });
+    cy.login(PI);
+    cy.visit('/');
 
     cy.contains(/Upcoming experiments/i).should('exist');
 
@@ -60,13 +76,15 @@ context('visits tests', () => {
   });
 
   it('Non-visitor should not see upcoming events', () => {
-    cy.login({ email: 'david@teleworm.us', password: 'Test1234!' });
+    cy.login(visitor);
+    cy.visit('/');
 
     cy.contains(/Upcoming experiments/i).should('not.exist');
   });
 
   it('Co-proposer should be able to form team', () => {
-    cy.login({ email: 'ben@inbox.com', password: 'Test1234!' });
+    cy.login(coProposer);
+    cy.visit('/');
 
     cy.contains(/Upcoming experiments/i).should('exist');
 
@@ -89,7 +107,6 @@ context('visits tests', () => {
     cy.get('[name=email]').type('david@teleworm.us{enter}');
     cy.finishedLoading();
     cy.contains('Beckley').parent().find('[type=checkbox]').click();
-    cy.contains('Carlsson').parent().find('[type=checkbox]').click();
     cy.get('[data-cy=assign-selected-users]').click();
 
     // specify team lead
@@ -110,7 +127,13 @@ context('visits tests', () => {
   });
 
   it('Visitor should only see permitted actions', () => {
-    cy.login({ email: 'david@teleworm.us', password: 'Test1234!' });
+    cy.createVisit({
+      team: [coProposer.id, visitor.id],
+      teamLeadUserId: coProposer.id,
+      scheduledEventId: existingScheduledEventId,
+    });
+    cy.login(visitor);
+    cy.visit('/');
 
     cy.contains(/Upcoming experiments/i).should('exist');
 
@@ -121,7 +144,60 @@ context('visits tests', () => {
   });
 
   it('Visitor should be able to register for a visit', () => {
-    cy.login({ email: 'david@teleworm.us', password: 'Test1234!' });
+    cy.createTemplate({
+      groupId: TemplateGroupId.VISIT_REGISTRATION,
+      name: visitTemplate.name,
+      description: visitTemplate.description,
+    }).then((result) => {
+      const template = result.createTemplate.template;
+      if (template) {
+        const topicId = template.steps[0].topic.id;
+        cy.createQuestion({
+          categoryId: TemplateCategoryId.VISIT_REGISTRATION,
+          dataType: DataType.DATE,
+        }).then((questionResult) => {
+          const question = questionResult.createQuestion.question;
+          if (question) {
+            cy.updateQuestion({
+              id: question.id,
+              question: startDateQuestionTitle,
+            });
+            cy.createQuestionTemplateRelation({
+              questionId: question.id,
+              templateId: template.templateId,
+              sortOrder: 1,
+              topicId: topicId,
+            });
+          }
+        });
+        cy.createQuestion({
+          categoryId: TemplateCategoryId.VISIT_REGISTRATION,
+          dataType: DataType.DATE,
+        }).then((questionResult) => {
+          const question = questionResult.createQuestion.question;
+          if (question) {
+            cy.updateQuestion({
+              id: question.id,
+              question: endDateQuestionTitle,
+            });
+            cy.createQuestionTemplateRelation({
+              questionId: question.id,
+              templateId: template.templateId,
+              sortOrder: 1,
+              topicId: topicId,
+            });
+          }
+        });
+      }
+    });
+    cy.createVisit({
+      team: [coProposer.id, visitor.id],
+      teamLeadUserId: coProposer.id,
+      scheduledEventId: existingScheduledEventId,
+    });
+
+    cy.login(visitor);
+    cy.visit('/');
 
     // test if the actions are available after co-proposer defined the team
     cy.testActionButton(registerVisitTitle, 'active');
@@ -143,7 +219,13 @@ context('visits tests', () => {
   });
 
   it('User should not see register for visit or training button if he is not a visitor', () => {
-    cy.login({ email: 'Javon4@hotmail.com', password: 'Test1234!' });
+    cy.createVisit({
+      team: [PI.id, visitor.id],
+      teamLeadUserId: coProposer.id,
+      scheduledEventId: existingScheduledEventId,
+    });
+    cy.login(PI);
+    cy.visit('/');
 
     cy.contains(/Upcoming experiments/i).should('exist');
 

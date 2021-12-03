@@ -3,4 +3,9 @@ fragment templateMetadata on Template {
   name
   description
   isArchived
+  steps {
+    topic {
+      ...topic
+    }
+  }
 }

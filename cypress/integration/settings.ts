@@ -1,35 +1,37 @@
 import faker from 'faker';
 
-context('Settings tests', () => {
-  describe('Proposal statuses tests', () => {
-    before(() => {
-      cy.resetDB();
-      cy.viewport(1920, 1080);
-      cy.login('officer');
-      cy.createTemplate('proposalEsi', 'default esi template');
-      cy.logout();
-    });
+import {
+  AllocationTimeUnits,
+  TechnicalReviewStatus,
+  TemplateGroupId,
+} from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
 
-    beforeEach(() => {
-      cy.viewport(1920, 1080);
-    });
+context('Settings tests', () => {
+  beforeEach(() => {
+    cy.resetDB();
+    cy.viewport(1920, 1080);
+  });
+
+  describe('Proposal statuses tests', () => {
+    const name = faker.lorem.words(2);
+    const description = faker.lorem.words(5);
+    const shortCode = name.toUpperCase().replace(/\s/g, '_');
 
     it('User should not be able to see Settings page', () => {
       cy.login('user');
+      cy.visit('/');
 
       cy.get('[data-cy="profile-page-btn"]').should('exist');
 
-      let userMenuItems = cy.get('[data-cy="user-menu-items"]');
+      cy.get('[data-cy="user-menu-items"]').as('userMenuItems');
 
-      userMenuItems.should('not.contain', 'Settings');
+      cy.get('@userMenuItems').should('not.contain', 'Settings');
     });
 
     it('User Officer should be able to create Proposal status', () => {
-      const name = faker.lorem.words(2);
-      const description = faker.lorem.words(5);
-      const shortCode = name.toUpperCase().replace(/\s/g, '_');
-
       cy.login('officer');
+      cy.visit('/');
 
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
@@ -41,24 +43,27 @@ context('Settings tests', () => {
 
       cy.notification({ variant: 'success', text: 'created successfully' });
 
-      let proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
+      cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
 
-      const lastPageButtonElement = proposalStatusesTable.find(
-        'span[title="Last Page"] > button'
+      cy.get('@proposalStatusesTable')
+        .find('span[title="Last Page"] > button')
+        .as('lastPageButtonElement');
+
+      cy.get('@lastPageButtonElement').click({ force: true });
+
+      cy.get('[data-cy="proposal-statuses-table"]').as(
+        'proposalStatusesTableNew'
       );
-
-      lastPageButtonElement.click({ force: true });
-
-      proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
-      const proposalStatusesTableLastRow = proposalStatusesTable
+      cy.get('@proposalStatusesTableNew')
         .find('tr[level="0"]')
-        .last();
+        .last()
+        .as('proposalStatusesTableLastRow');
 
-      const lastRowText = proposalStatusesTableLastRow.invoke('text');
+      cy.get('@proposalStatusesTableLastRow').invoke('text').as('lastRowText');
 
-      lastRowText.should('contain', shortCode);
-      lastRowText.should('contain', name);
-      lastRowText.should('contain', description);
+      cy.get('@lastRowText').should('contain', shortCode);
+      cy.get('@lastRowText').should('contain', name);
+      cy.get('@lastRowText').should('contain', description);
     });
 
     it('User Officer should be able to update Proposal status', () => {
@@ -66,19 +71,12 @@ context('Settings tests', () => {
       const newDescription = faker.lorem.words(5);
 
       cy.login('officer');
+      cy.visit('/');
 
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
 
-      let proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
-
-      const lastPageButtonElement = proposalStatusesTable.find(
-        'span[title="Last Page"] > button'
-      );
-
-      lastPageButtonElement.click({ force: true });
-
-      cy.get('[title="Edit"]').last().click();
+      cy.contains('DRAFT').parent().find('[title="Edit"]').click();
 
       cy.get('#shortCode').should('be.disabled');
 
@@ -89,111 +87,264 @@ context('Settings tests', () => {
 
       cy.notification({ variant: 'success', text: 'updated successfully' });
 
-      proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
-      const proposalStatusesTableLastRow = proposalStatusesTable
-        .find('tr[level="0"]')
-        .last();
-
-      const lastRowText = proposalStatusesTableLastRow.invoke('text');
-
-      lastRowText.should('contain', newName);
-      lastRowText.should('contain', newDescription);
+      cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
+      cy.get('@proposalStatusesTable')
+        .should('contain.text', newName)
+        .should('contain.text', newDescription);
     });
 
     it('User Officer should be able to delete Proposal status', () => {
+      cy.createProposalStatus({ name, description, shortCode });
       cy.login('officer');
+      cy.visit('/');
 
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
 
       cy.finishedLoading();
 
-      let proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
+      cy.get('[data-cy="proposal-statuses-table"]').as('proposalStatusesTable');
 
-      const lastPageButtonElement = proposalStatusesTable.find(
-        'span[title="Last Page"] > button'
-      );
+      cy.get('@proposalStatusesTable')
+        .find('span[title="Last Page"] > button')
+        .as('lastPageButtonElement');
 
-      lastPageButtonElement.click({ force: true });
+      cy.get('@lastPageButtonElement').click({ force: true });
 
-      cy.get('[title="Delete"]').last().click();
+      cy.contains(name).parent().find('[title="Delete"]').click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({ variant: 'success', text: 'deleted successfully' });
+
+      cy.get('@proposalStatusesTable').should('not.contain.text', name);
+    });
+  });
+
+  describe('Proposal workflows tests', () => {
+    const workflowName = faker.lorem.words(2);
+    const workflowDescription = faker.lorem.words(5);
+    const proposalTitle = faker.lorem.words(2);
+    const proposalAbstract = faker.lorem.words(5);
+    const updatedWorkflowName = faker.lorem.words(2);
+    const updatedWorkflowDescription = faker.lorem.words(5);
+    let workflowDroppableGroupId: string;
+    let createdWorkflowId: number;
+    let prevProposalStatusId: number;
+    let createdEsiTemplateId: number;
+
+    const currentDayStart = new Date();
+    currentDayStart.setHours(0, 0, 0, 0);
+
+    const updatedCall = {
+      shortCode: faker.random.alphaNumeric(15),
+      startCall: faker.date.past().toISOString().slice(0, 10),
+      endCall: faker.date.future().toISOString().slice(0, 10),
+      startReview: currentDayStart,
+      endReview: currentDayStart,
+      startSEPReview: currentDayStart,
+      endSEPReview: currentDayStart,
+      startNotify: currentDayStart,
+      endNotify: currentDayStart,
+      startCycle: currentDayStart,
+      endCycle: currentDayStart,
+      allocationTimeUnit: AllocationTimeUnits.DAY,
+      cycleComment: faker.lorem.word(),
+      surveyComment: faker.lorem.word(),
+      templateId: initialDBData.template.id,
+    };
+
+    const addMultipleStatusesToProposalWorkflowWithChangingEvents = () => {
+      cy.addProposalWorkflowStatus({
+        droppableGroupId: workflowDroppableGroupId,
+        proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        proposalWorkflowId: createdWorkflowId,
+        sortOrder: 1,
+        prevProposalStatusId: prevProposalStatusId,
+      }).then((result) => {
+        const connection =
+          result.addProposalWorkflowStatus.proposalWorkflowConnection;
+        if (connection) {
+          cy.addStatusChangingEventsToConnection({
+            proposalWorkflowConnectionId: connection.id,
+            statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+          });
+        }
+      });
+      cy.addProposalWorkflowStatus({
+        droppableGroupId: workflowDroppableGroupId,
+        proposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
+        proposalWorkflowId: createdWorkflowId,
+        sortOrder: 2,
+        prevProposalStatusId:
+          initialDBData.proposalStatuses.feasibilityReview.id,
+      }).then((result) => {
+        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+          cy.addStatusChangingEventsToConnection({
+            proposalWorkflowConnectionId:
+              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+            statusChangingEvents: ['PROPOSAL_FEASIBLE'],
+          });
+        }
+      });
+      cy.addProposalWorkflowStatus({
+        droppableGroupId: workflowDroppableGroupId,
+        proposalStatusId: initialDBData.proposalStatuses.sepReview.id,
+        proposalWorkflowId: createdWorkflowId,
+        sortOrder: 3,
+        prevProposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
+      }).then((result) => {
+        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+          cy.addStatusChangingEventsToConnection({
+            proposalWorkflowConnectionId:
+              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+            statusChangingEvents: ['PROPOSAL_SEP_SELECTED'],
+          });
+        }
+      });
+      cy.addProposalWorkflowStatus({
+        droppableGroupId: workflowDroppableGroupId,
+        proposalStatusId: initialDBData.proposalStatuses.sepMeeting.id,
+        proposalWorkflowId: createdWorkflowId,
+        sortOrder: 4,
+        prevProposalStatusId: initialDBData.proposalStatuses.sepReview.id,
+      }).then((result) => {
+        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+          cy.addStatusChangingEventsToConnection({
+            proposalWorkflowConnectionId:
+              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+            statusChangingEvents: ['PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED'],
+          });
+        }
+      });
+    };
+
+    const addMultipleStatusesToMultiColumnProposalWorkflowWithChangingEvents =
+      () => {
+        cy.addProposalWorkflowStatus({
+          droppableGroupId: 'proposalWorkflowConnections_0',
+          proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+          proposalWorkflowId: createdWorkflowId,
+          sortOrder: 1,
+          prevProposalStatusId: prevProposalStatusId,
+        }).then((result) => {
+          const connection =
+            result.addProposalWorkflowStatus.proposalWorkflowConnection;
+          if (connection) {
+            cy.addStatusChangingEventsToConnection({
+              proposalWorkflowConnectionId: connection.id,
+              statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+            });
+          }
+        });
+        cy.addProposalWorkflowStatus({
+          droppableGroupId: 'proposalWorkflowConnections_1',
+          proposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
+          proposalWorkflowId: createdWorkflowId,
+          sortOrder: 0,
+          prevProposalStatusId:
+            initialDBData.proposalStatuses.feasibilityReview.id,
+          parentDroppableGroupId: 'proposalWorkflowConnections_0',
+        }).then((result) => {
+          if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+            cy.addStatusChangingEventsToConnection({
+              proposalWorkflowConnectionId:
+                result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+              statusChangingEvents: ['PROPOSAL_FEASIBLE'],
+            });
+          }
+        });
+        cy.addProposalWorkflowStatus({
+          droppableGroupId: 'proposalWorkflowConnections_2',
+          proposalStatusId: initialDBData.proposalStatuses.notFeasible.id,
+          proposalWorkflowId: createdWorkflowId,
+          sortOrder: 0,
+          prevProposalStatusId:
+            initialDBData.proposalStatuses.feasibilityReview.id,
+          parentDroppableGroupId: 'proposalWorkflowConnections_0',
+        }).then((result) => {
+          if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+            cy.addStatusChangingEventsToConnection({
+              proposalWorkflowConnectionId:
+                result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+              statusChangingEvents: ['PROPOSAL_UNFEASIBLE'],
+            });
+          }
+        });
+      };
+
+    beforeEach(() => {
+      // NOTE: Cypress scrolls automatically to the status position and dragging element is problematic when the droppable area is out of the view. For now this solution to extend the height of the view is the fastest
+      cy.viewport(1920, 2000);
+      cy.createProposalWorkflow({
+        name: workflowName,
+        description: workflowDescription,
+      }).then((result) => {
+        const workflow = result.createProposalWorkflow.proposalWorkflow;
+        if (workflow) {
+          createdWorkflowId = workflow.id;
+          prevProposalStatusId =
+            workflow.proposalWorkflowConnectionGroups[0].connections[0].id;
+          workflowDroppableGroupId =
+            workflow.proposalWorkflowConnectionGroups[0].groupId;
+
+          cy.createTemplate({
+            name: 'default esi template',
+            groupId: TemplateGroupId.PROPOSAL_ESI,
+          }).then((result) => {
+            if (result.createTemplate.template) {
+              createdEsiTemplateId = result.createTemplate.template.templateId;
+
+              cy.updateCall({
+                id: initialDBData.call.id,
+                ...updatedCall,
+                proposalWorkflowId: workflow.id,
+                esiTemplateId: createdEsiTemplateId,
+              });
+            }
+          });
+        }
+      });
     });
 
     it('User should be able to edit a submitted proposal in EDITABLE_SUBMITTED status', () => {
-      cy.viewport(1920, 2000);
       const proposalTitle = faker.random.words(3);
       const editedProposalTitle = faker.random.words(3);
-      const editableSubmittedWorkflow = 'Editable submitted workflow';
-
-      cy.login('officer');
-
-      cy.createProposalWorkflow('Editable submitted workflow', 'Description');
-
-      cy.notification({
-        variant: 'success',
-        text: 'Proposal workflow created successfully',
+      cy.addProposalWorkflowStatus({
+        droppableGroupId: workflowDroppableGroupId,
+        proposalStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
+        proposalWorkflowId: createdWorkflowId,
+        sortOrder: 1,
+        prevProposalStatusId: prevProposalStatusId,
+      }).then((result) => {
+        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+          cy.addStatusChangingEventsToConnection({
+            proposalWorkflowConnectionId:
+              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+            statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+          });
+        }
       });
-
-      cy.get('[data-cy^="status_EDITABLE_SUBMITTED"]').dragElement([
-        { direction: 'up', length: 13 },
-        { direction: 'left', length: 2 },
-        { direction: 'down', length: 1 },
-      ]);
-
-      cy.notification({
-        variant: 'success',
-        text: 'Workflow status added successfully',
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal.proposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.proposal.primaryKey,
+            title: proposalTitle,
+            abstract: proposalTitle,
+            proposerId: initialDBData.users.user1.id,
+          });
+        }
       });
-
-      cy.get('[data-cy^="connection_EDITABLE_SUBMITTED"]').should(
-        'contain.text',
-        'EDITABLE_SUBMITTED'
-      );
-
-      cy.notification({
-        variant: 'success',
-        text: 'Workflow status added successfully',
-      });
-
-      cy.addProposalStatusChangingEventToStatus('EDITABLE_SUBMITTED', [
-        'PROPOSAL_SUBMITTED',
-      ]);
-
-      cy.contains('Calls').click();
-
-      cy.get('[title="Edit"]').first().click();
-
-      cy.get('#proposalWorkflowId-input').click();
-
-      cy.contains('Loading...').should('not.exist');
-
-      cy.get('[role="presentation"] [role="listbox"] li')
-        .contains(editableSubmittedWorkflow)
-        .click();
-
-      cy.get('[data-cy="call-esi-template"]').click();
-      cy.get('[role="presentation"]').contains('default esi template').click();
-
-      cy.get('[data-cy="next-step"]').click();
-
-      cy.get('[data-cy="next-step"]').click();
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Call updated successfully!',
-      });
-
-      cy.logout();
 
       cy.login('user');
+      cy.visit('/');
 
-      cy.createProposal(proposalTitle);
+      cy.contains(proposalTitle)
+        .parent()
+        .find('[title="Edit proposal"]')
+        .click();
+
+      cy.contains('Save and continue').click();
 
       cy.contains('Submit').click();
 
@@ -237,36 +388,20 @@ context('Settings tests', () => {
 
       cy.contains(editedProposalTitle);
     });
-  });
-
-  describe('Proposal workflows tests', () => {
-    const workflowName = faker.lorem.words(2);
-    const workflowDescription = faker.lorem.words(5);
-    const updatedWorkflowName = faker.lorem.words(2);
-    const updatedWorkflowDescription = faker.lorem.words(5);
-    const fastTrackWorkflowName = 'Fast track';
-    const fastTrackWorkflowDescription = 'Faster than the fastest workflow';
-    const multiColumnWorkflowName = faker.lorem.words(2);
-    const multiColumnWorkflowDescription = faker.lorem.words(5);
-
-    before(() => {
-      cy.resetDB();
-      cy.viewport(1920, 1080);
-      cy.login('officer');
-      cy.createTemplate('proposalEsi', 'default esi template');
-      cy.logout();
-    });
-
-    beforeEach(() => {
-      cy.visit('/');
-      // NOTE: Cypress scrolls automatically to the status position and dragging element is problematic when the droppable area is out of the view. For now this solution to extend the height of the view is the fastest
-      cy.viewport(1920, 2000);
-    });
 
     it('User Officer should be able to create proposal workflow and it should contain default DRAFT status', () => {
       cy.login('officer');
+      cy.visit('/ProposalWorkflows');
 
-      cy.createProposalWorkflow(workflowName, workflowDescription);
+      cy.contains('Create').click();
+
+      cy.get('#name').type(workflowName);
+      cy.get('#description').type(workflowDescription);
+      cy.get('[data-cy="submit"]').click();
+
+      cy.notification({ variant: 'success', text: 'created successfully' });
+
+      cy.finishedLoading();
 
       cy.get('[data-cy^="connection_DRAFT"]').should('contain.text', 'DRAFT');
       cy.get('[data-cy^="status_DRAFT"]').should('exist');
@@ -276,6 +411,7 @@ context('Settings tests', () => {
 
     it('User Officer should be able to update proposal workflow', () => {
       cy.login('officer');
+      cy.visit('/');
 
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
@@ -297,11 +433,14 @@ context('Settings tests', () => {
 
     it('User Officer should be able to add more statuses in proposal workflow', () => {
       cy.login('officer');
+      cy.visit('/');
 
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.contains(updatedWorkflowName).parent().find('[title="Edit"]').click();
+      cy.contains(workflowName).parent().find('[title="Edit"]').click();
+
+      cy.finishedLoading();
 
       cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').dragElement([
         { direction: 'left', length: 1 },
@@ -322,20 +461,46 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to select events that are triggering change to workflow status', () => {
+      cy.addProposalWorkflowStatus({
+        droppableGroupId: workflowDroppableGroupId,
+        proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        proposalWorkflowId: createdWorkflowId,
+        sortOrder: 1,
+        prevProposalStatusId: prevProposalStatusId,
+      });
       cy.login('officer');
+      cy.visit('/');
 
       cy.contains('Settings').click();
       cy.contains('Proposal workflows').click();
 
-      cy.contains(updatedWorkflowName).parent().find('[title="Edit"]').click();
+      cy.contains(workflowName).parent().find('[title="Edit"]').click();
 
-      cy.addProposalStatusChangingEventToStatus('FEASIBILITY_REVIEW', [
-        'PROPOSAL_SUBMITTED',
-      ]);
+      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
 
-      cy.addProposalStatusChangingEventToStatus('FEASIBILITY_REVIEW', [
-        'PROPOSAL_FEASIBLE',
-      ]);
+      cy.get('[data-cy="status-changing-events-modal"]').should('exist');
+
+      cy.contains('PROPOSAL_SUBMITTED').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Status changing events added successfully!',
+      });
+
+      cy.get(`[data-cy^="connection_FEASIBILITY_REVIEW"]`).click();
+
+      cy.get('[data-cy="status-changing-events-modal"]').should('exist');
+
+      cy.contains('PROPOSAL_FEASIBLE').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Status changing events added successfully!',
+      });
 
       cy.contains('PROPOSAL_SUBMITTED & PROPOSAL_FEASIBLE');
     });
@@ -343,125 +508,21 @@ context('Settings tests', () => {
     it('Proposal should follow the selected workflow', () => {
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
-      cy.login('officer');
-
-      cy.createProposalWorkflow(
-        fastTrackWorkflowName,
-        fastTrackWorkflowDescription
-      );
-
-      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').dragElement([
-        { direction: 'left', length: 1 },
-        { direction: 'down', length: 1 },
-      ]);
-
-      cy.notification({
-        variant: 'success',
-        text: 'Workflow status added successfully',
+      addMultipleStatusesToProposalWorkflowWithChangingEvents();
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposal = result.createProposal.proposal;
+        if (proposal) {
+          cy.updateProposal({
+            proposalPk: proposal.primaryKey,
+            title: proposalTitle,
+            abstract: proposalAbstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+        }
       });
-
-      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').should('exist');
-
-      cy.get('[data-cy^="status_SEP_SELECTION"]').dragElement([
-        { direction: 'left', length: 1 },
-        { direction: 'down', length: 2 },
-      ]);
-
-      cy.get('[data-cy^="connection_SEP_SELECTION"]').should(
-        'contain.text',
-        'SEP_SELECTION'
-      );
-
-      cy.notification({
-        variant: 'success',
-        text: 'Workflow status added successfully',
-      });
-
-      cy.get('[data-cy^="status_SEP_SELECTION"]').should('exist');
-
-      cy.get('[data-cy^="status_SEP_REVIEW"]').dragElement([
-        { direction: 'left', length: 1 },
-        { direction: 'down', length: 3 },
-      ]);
-
-      cy.get('[data-cy^="connection_SEP_REVIEW"]').should(
-        'contain.text',
-        'SEP_REVIEW'
-      );
-
-      cy.notification({
-        variant: 'success',
-        text: 'Workflow status added successfully',
-      });
-
-      cy.get('[data-cy^="status_SEP_REVIEW"]').should('exist');
-
-      cy.get('[data-cy^="status_SEP_MEETING"]').dragElement([
-        { direction: 'left', length: 1 },
-        { direction: 'down', length: 4 },
-      ]);
-
-      cy.get('[data-cy^="connection_SEP_MEETING"]').should(
-        'contain.text',
-        'SEP Meeting'
-      );
-
-      cy.notification({
-        variant: 'success',
-        text: 'Workflow status added successfully',
-      });
-
-      cy.get('[data-cy^="status_SEP_MEETING"]').should('exist');
-
-      cy.addProposalStatusChangingEventToStatus('FEASIBILITY_REVIEW', [
-        'PROPOSAL_SUBMITTED',
-      ]);
-
-      cy.addProposalStatusChangingEventToStatus('SEP_SELECTION', [
-        'PROPOSAL_FEASIBLE',
-      ]);
-
-      cy.addProposalStatusChangingEventToStatus('SEP_REVIEW', [
-        'PROPOSAL_SEP_SELECTED',
-      ]);
-
-      cy.addProposalStatusChangingEventToStatus('SEP_MEETING', [
-        'PROPOSAL_ALL_SEP_REVIEWS_SUBMITTED',
-      ]);
-
-      cy.contains('Calls').click();
-
-      cy.get('[title="Edit"]').first().click();
-
-      cy.get('#proposalWorkflowId-input').click();
-
-      cy.contains('Loading...').should('not.exist');
-
-      cy.get('[role="presentation"] [role="listbox"] li')
-        .contains(fastTrackWorkflowName)
-        .click();
-
-      cy.get('[data-cy="call-esi-template"]').click();
-      cy.get('[role="listbox"]').contains('default esi template').click();
-
-      cy.get('[data-cy="next-step"]').click();
-
-      cy.get('[data-cy="next-step"]').click();
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Call updated successfully!',
-      });
-
-      cy.logout();
 
       cy.login('user');
-
-      cy.createProposal();
-
-      cy.contains('Dashboard').click();
+      cy.visit('/');
 
       cy.finishedLoading();
 
@@ -473,6 +534,8 @@ context('Settings tests', () => {
         .first()
         .find('[title="Edit proposal"]')
         .click();
+
+      cy.contains('Save and continue').click();
 
       cy.contains('Submit').click();
 
@@ -488,6 +551,7 @@ context('Settings tests', () => {
 
       cy.logout();
       cy.login('officer');
+      cy.visit('/');
 
       cy.finishedLoading();
 
@@ -533,7 +597,29 @@ context('Settings tests', () => {
     });
 
     it('Proposal status should update immediately after assigning it to a SEP', () => {
+      addMultipleStatusesToProposalWorkflowWithChangingEvents();
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposal = result.createProposal.proposal;
+        if (proposal) {
+          cy.updateProposal({
+            proposalPk: proposal.primaryKey,
+            title: proposalTitle,
+            abstract: proposalAbstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.addProposalTechnicalReview({
+            proposalPk: proposal.primaryKey,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            submitted: true,
+            reviewerId: 0,
+          });
+        }
+      });
       cy.login('officer');
+      cy.visit('/');
 
       cy.finishedLoading();
 
@@ -559,7 +645,37 @@ context('Settings tests', () => {
     });
 
     it('Proposal status should update immediately after all SEP reviews submitted', () => {
+      addMultipleStatusesToProposalWorkflowWithChangingEvents();
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposal = result.createProposal.proposal;
+        if (proposal) {
+          cy.updateProposal({
+            proposalPk: proposal.primaryKey,
+            title: proposalTitle,
+            abstract: proposalAbstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.addProposalTechnicalReview({
+            proposalPk: proposal.primaryKey,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            submitted: true,
+            reviewerId: 0,
+          });
+
+          cy.assignProposalsToSep({
+            proposals: {
+              callId: initialDBData.call.id,
+              primaryKey: proposal.primaryKey,
+            },
+            sepId: initialDBData.sep.id,
+          });
+        }
+      });
       cy.login('officer');
+      cy.visit('/');
 
       cy.finishedLoading();
 
@@ -622,18 +738,42 @@ context('Settings tests', () => {
       cy.get('[aria-label="close"]').click();
 
       cy.get('[role="dialog"]').should('not.exist');
-      cy.wait(100);
       cy.contains('SEP Meeting');
     });
 
     it('User Officer should be able to filter proposals based on statuses', () => {
-      cy.login('user');
+      addMultipleStatusesToProposalWorkflowWithChangingEvents();
+      cy.createProposal({ callId: initialDBData.call.id });
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposal = result.createProposal.proposal;
+        if (proposal) {
+          cy.updateProposal({
+            proposalPk: proposal.primaryKey,
+            title: proposalTitle,
+            abstract: proposalAbstract,
+            proposerId: initialDBData.users.user1.id,
+          });
 
-      cy.createProposal();
+          cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.addProposalTechnicalReview({
+            proposalPk: proposal.primaryKey,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            submitted: true,
+            reviewerId: 0,
+          });
 
-      cy.logout();
-
+          cy.assignProposalsToSep({
+            proposals: {
+              callId: initialDBData.call.id,
+              primaryKey: proposal.primaryKey,
+            },
+            sepId: initialDBData.sep.id,
+          });
+        }
+      });
       cy.login('officer');
+      cy.visit('/');
 
       cy.finishedLoading();
 
@@ -643,16 +783,16 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody')
         .first()
-        .then((element) => expect(element.text()).to.contain('SEP Meeting'));
+        .then((element) => expect(element.text()).to.contain('SEP_REVIEW'));
 
       cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="12"]').click();
+      cy.get('[role="listbox"] [data-value="5"]').click();
 
       cy.finishedLoading();
 
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then((element) => expect(element.text()).to.contain('SEP Meeting'));
+        .then((element) => expect(element.text()).to.contain('SEP_REVIEW'));
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="1"]').click();
@@ -664,13 +804,34 @@ context('Settings tests', () => {
         .then((element) => expect(element.text()).to.contain('DRAFT'));
     });
 
+    it('User Officer should be able to remove statuses from proposal workflow using trash icon', () => {
+      addMultipleStatusesToProposalWorkflowWithChangingEvents();
+      cy.login('officer');
+      cy.visit('');
+
+      cy.contains('Settings').click();
+      cy.contains('Proposal workflows').click();
+
+      cy.contains(workflowName).parent().find('[title="Edit"]').click();
+
+      cy.get('[data-cy="remove-workflow-status-button"]').first().click();
+
+      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').should(
+        'contain.text',
+        'FEASIBILITY_REVIEW'
+      );
+
+      cy.notification({
+        variant: 'success',
+        text: 'Workflow status removed successfully',
+      });
+
+      cy.get('[data-cy^="connection_FEASIBILITY_REVIEW"]').should('not.exist');
+    });
+
     it('User Officer should be able to create multi-column proposal workflow', () => {
       cy.login('officer');
-
-      cy.createProposalWorkflow(
-        multiColumnWorkflowName,
-        multiColumnWorkflowDescription
-      );
+      cy.visit(`/ProposalWorkflowEditor/${createdWorkflowId}`);
 
       cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').dragElement([
         { direction: 'left', length: 1 },
@@ -730,85 +891,41 @@ context('Settings tests', () => {
       const secondProposalAbstract = faker.random.words(5);
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
-      cy.login('officer');
-
-      cy.contains('Settings').click();
-
-      cy.contains('Proposal workflows').click();
-
-      cy.contains(multiColumnWorkflowName)
-        .parent()
-        .find('[title="Edit"]')
-        .click();
-
-      cy.addProposalStatusChangingEventToStatus('FEASIBILITY_REVIEW', [
-        'PROPOSAL_SUBMITTED',
-      ]);
-
-      cy.addProposalStatusChangingEventToStatus('SEP_SELECTION', [
-        'PROPOSAL_FEASIBLE',
-      ]);
-
-      cy.addProposalStatusChangingEventToStatus('NOT_FEASIBLE', [
-        'PROPOSAL_UNFEASIBLE',
-      ]);
-
-      cy.contains('Calls').click();
-
-      cy.get('[title="Edit"]').first().click();
-
-      cy.get('#proposalWorkflowId-input').click();
-
-      cy.contains('Loading...').should('not.exist');
-
-      cy.get('[role="presentation"] [role="listbox"] li')
-        .contains(multiColumnWorkflowName)
-        .click();
-
-      cy.get('[data-cy="next-step"]').click();
-
-      cy.get('[data-cy="next-step"]').click();
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.notification({
-        variant: 'success',
-        text: 'Call updated successfully!',
+      addMultipleStatusesToMultiColumnProposalWorkflowWithChangingEvents();
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposal = result.createProposal.proposal;
+        if (proposal) {
+          cy.updateProposal({
+            proposalPk: proposal.primaryKey,
+            title: firstProposalTitle,
+            abstract: firstProposalAbstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+          cy.submitProposal({ proposalPk: proposal.primaryKey });
+        }
+      });
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposal = result.createProposal.proposal;
+        if (proposal) {
+          cy.updateProposal({
+            proposalPk: proposal.primaryKey,
+            title: secondProposalTitle,
+            abstract: secondProposalAbstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+          cy.submitProposal({ proposalPk: proposal.primaryKey });
+        }
       });
 
-      cy.logout();
-
       cy.login('user');
+      cy.visit('/');
 
-      cy.createProposal(firstProposalTitle, firstProposalAbstract);
-
-      cy.contains('Submit').click();
-
-      cy.contains('OK').click();
-
-      cy.contains('Dashboard').click();
-
-      cy.createProposal(secondProposalTitle, secondProposalAbstract);
-
-      cy.contains('Submit').click();
-
-      cy.contains('OK').click();
-
-      cy.contains('Dashboard').click();
-
-      cy.finishedLoading();
-
-      cy.get('.MuiTable-root tbody tr')
-        .contains(firstProposalTitle)
-        .parent()
-        .contains('submitted');
-      cy.get('.MuiTable-root tbody tr')
-        .contains(secondProposalTitle)
-        .parent()
-        .contains('submitted');
+      cy.contains(firstProposalTitle).parent().contains('submitted');
+      cy.contains(secondProposalTitle).parent().contains('submitted');
 
       cy.logout();
       cy.login('officer');
+      cy.visit('/');
 
       cy.finishedLoading();
 
@@ -873,50 +990,17 @@ context('Settings tests', () => {
       cy.contains(firstProposalTitle).parent().contains('SEP_SELECTION');
       cy.contains(secondProposalTitle).parent().contains('NOT_FEASIBLE');
     });
-
-    it('User Officer should be able to remove statuses from proposal workflow using trash icon', () => {
-      cy.login('officer');
-
-      cy.contains('Settings').click();
-      cy.contains('Proposal workflows').click();
-
-      cy.contains(fastTrackWorkflowName)
-        .parent()
-        .find('[title="Edit"]')
-        .click();
-
-      cy.get('[data-cy="remove-workflow-status-button"]').first().click();
-
-      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').should(
-        'contain.text',
-        'FEASIBILITY_REVIEW'
-      );
-
-      cy.notification({
-        variant: 'success',
-        text: 'Workflow status removed successfully',
-      });
-
-      cy.get('[data-cy^="connection_FEASIBILITY_REVIEW"]').should('not.exist');
-    });
   });
 
   describe('API access tokens tests', () => {
-    before(() => {
-      cy.resetDB();
-    });
-
-    beforeEach(() => {
-      cy.visit('/');
-      cy.viewport(1920, 1080);
-    });
+    const accessTokenName = faker.lorem.words(2);
+    beforeEach(() => {});
 
     let removedAccessToken: string;
 
     it('User Officer should be able to create api access token', () => {
-      const name = faker.lorem.words(2);
-
       cy.login('officer');
+      cy.visit('/');
 
       cy.contains('Settings').click();
       cy.contains('API access tokens').click();
@@ -927,7 +1011,7 @@ context('Settings tests', () => {
 
       cy.get('#accessToken').should('be.empty');
 
-      cy.get('#name').type(name);
+      cy.get('#name').type(accessTokenName);
 
       cy.contains('ProposalQueries.getAll').click();
       cy.contains('ProposalQueries.getAllView').click();
@@ -969,12 +1053,18 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to update api access token', () => {
+      cy.createApiAccessToken({
+        name: accessTokenName,
+        accessPermissions:
+          '{"ProposalQueries.getAll":true,"ProposalQueries.getAllView":true}',
+      });
       cy.login('officer');
+      cy.visit('/');
 
       cy.contains('Settings').click();
       cy.contains('API access tokens').click();
 
-      cy.get('[title="Edit"]').click();
+      cy.contains(accessTokenName).parent().find('[title="Edit"]').click();
 
       cy.finishedLoading();
 
@@ -1016,12 +1106,18 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to delete api access token', () => {
+      cy.createApiAccessToken({
+        name: accessTokenName,
+        accessPermissions:
+          '{"ProposalQueries.getAll":true,"ProposalQueries.getAllView":true}',
+      });
       cy.login('officer');
+      cy.visit('/');
 
       cy.contains('Settings').click();
       cy.contains('API access tokens').click();
 
-      cy.get('[title="Delete"]').click();
+      cy.contains(accessTokenName).parent().find('[title="Delete"]').click();
       cy.get('[title="Save"]').click();
 
       cy.notification({

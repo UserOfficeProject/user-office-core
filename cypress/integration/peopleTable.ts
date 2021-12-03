@@ -1,56 +1,57 @@
 import faker from 'faker';
+
+import initialDBData from '../support/initialDBData';
+
 context('PageTable component tests', () => {
-  const emails = new Array(5).fill(0).map(() => faker.internet.email());
-  const username1 = 'Benjamin';
-  const username2 = 'Unverified';
+  const emails = new Array(10).fill(0).map(() => faker.internet.email());
   const title = faker.random.words(3);
   const abstract = faker.random.words(8);
 
-  before(() => {
+  beforeEach(() => {
     cy.resetDB();
+    cy.viewport(1920, 1080);
   });
 
   describe('ProposalPeopleTable component Preserve selected users', () => {
-    beforeEach(() => {
-      cy.viewport(1920, 1080);
-    });
-
-    it('should add a new collaborator', () => {
+    it('Should add a new collaborator and that collaborator should stay as suggestion in the collaborators list', () => {
       cy.login('user');
+      cy.visit('/');
 
       cy.contains('New Proposal').click();
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"]').as('modal');
+      cy.get('[role="presentation"] [data-cy="co-proposers"]').as('modal');
 
       cy.get('@modal').contains('No Previous Collaborators');
 
       cy.finishedLoading();
-      cy.wait(500);
 
-      cy.get('[data-cy=email]').type('ben@inbox.com');
-      cy.wait(500);
+      cy.get('[data-cy=email]').type(initialDBData.users.user2.email);
 
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
 
-      cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
+      cy.get('@modal')
+        .find('tr[index="0"]')
+        .contains(initialDBData.users.user2.firstName);
 
       cy.get('@modal').contains('1 user(s) selected');
 
-      cy.get('[data-cy="email"]').type('Aaron_Harris49@gmail.com');
+      cy.get('[data-cy="email"]').type(initialDBData.users.userOfficer.email);
 
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
 
-      cy.get('@modal').contains('We cannot find that email');
+      cy.get('[role="presentation"] .MuiAlert-message').contains(
+        'We cannot find that email'
+      );
 
       cy.get('@modal').contains('1 Users(s) Selected');
 
       cy.get('[data-cy="assign-selected-users"]').click();
 
-      cy.get('@modal').contains('Benjamin');
+      cy.get('@modal').should('not.exist');
 
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
 
@@ -77,23 +78,22 @@ context('PageTable component tests', () => {
 
       cy.get('[role="presentation"]')
         .find('tr[index="0"]')
-        .contains('Benjamin');
+        .contains(initialDBData.users.user2.firstName);
     });
 
-    it('should preserve the selected users', () => {
+    it('Should preserve the selected users', () => {
       cy.login('user');
+      cy.visit('/');
 
       cy.contains('New Proposal').click();
 
       cy.get('[data-cy=add-participant-button]').click();
 
-      cy.get('[role="presentation"]').as('modal');
+      cy.get('[role="presentation"] [data-cy="co-proposers"]').as('modal');
 
       cy.get('@modal').contains('0 user(s) selected');
 
-      cy.finishedLoading();
-
-      cy.get('[data-cy=email]').type('unverified-user@example.com');
+      cy.get('[data-cy=email]').type(initialDBData.users.placeholder.email);
 
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
@@ -107,11 +107,11 @@ context('PageTable component tests', () => {
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
 
-      cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
+      cy.get('@modal')
+        .find('tr[index="0"]')
+        .contains(initialDBData.users.user2.firstName);
 
       cy.get('@modal').contains('1 user(s) selected');
-
-      cy.finishedLoading();
 
       cy.get('@modal').find('[aria-label="Search"]').type('foo bar');
 
@@ -120,78 +120,72 @@ context('PageTable component tests', () => {
       cy.get('@modal').contains('No Previous Collaborators');
       cy.get('@modal').contains('1 user(s) selected');
 
-      cy.finishedLoading();
-
       cy.get('@modal').find('[aria-label="Search"] ~ * > button').click();
 
-      cy.wait(500);
-
       cy.get('@modal').contains('1 user(s) selected');
 
-      cy.get('@modal').find('tr[index="0"] input:checked');
+      cy.get('@modal')
+        .contains(initialDBData.users.user2.firstName)
+        .parent()
+        .find('input')
+        .should('be.checked');
 
       cy.finishedLoading();
 
-      cy.get('@modal').find('[aria-label="Search"]').type('Unverified email');
+      cy.get('@modal')
+        .find('[aria-label="Search"]')
+        .type(initialDBData.users.placeholder.firstName);
 
-      //How long before the search fires
-      cy.wait(500);
-
-      cy.get('@modal').contains('1 user(s) selected');
-      cy.get('@modal').find('tr[index="0"]').contains('Unverified email');
-      cy.get('@modal').find('tr[index="0"] input:not(:checked)');
-
-      cy.get('@modal').find('[aria-label="Search"]').clear().type('Benjamin');
-
-      cy.wait(500);
+      cy.finishedLoading();
 
       cy.get('@modal').contains('1 user(s) selected');
-      cy.get('@modal').find('tr[index="0"]').contains('Benjamin');
-      cy.get('@modal').find('tr[index="0"] input:checked');
+      cy.get('@modal')
+        .contains(initialDBData.users.placeholder.firstName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .should('not.be.checked');
+
+      cy.get('@modal')
+        .find('[aria-label="Search"]')
+        .clear()
+        .type(initialDBData.users.user2.firstName);
+
+      cy.finishedLoading();
+
+      cy.get('@modal').contains('1 user(s) selected');
+      cy.get('@modal')
+        .contains(initialDBData.users.user2.firstName)
+        .parent()
+        .find('input')
+        .should('be.checked');
 
       cy.get('[data-cy="assign-selected-users"]').click();
     });
 
     it('should preserve the selected users after pagination', () => {
-      cy.wait(1000);
-
-      cy.request({
-        url: '/graphql',
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`,
-        },
-        body: new Array(5).fill(0).map((elem, index) => {
-          return {
-            query: ` mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $orcid: String!, $orcidHash: String!, $refreshToken: String!, $gender: String!, $nationality: Int!, $birthdate: String!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
-              createUser(user_title: $user_title, firstname: $firstname, middlename: $middlename, lastname: $lastname, password: $password, preferredname: $preferredname, orcid: $orcid, orcidHash: $orcidHash, refreshToken: $refreshToken, gender: $gender, nationality: $nationality, birthdate: $birthdate, organisation: $organisation, department: $department, position: $position, email: $email, telephone: $telephone, telephone_alt: $telephone_alt, otherOrganisation: $otherOrganisation) {
-                user {
-                  id
-                }
-              }
-            }`,
-            variables: {
-              user_title: faker.name.prefix(),
-              firstname: faker.name.firstName(),
-              lastname: faker.name.lastName(),
-              password: 'Test1234!',
-              orcid: '0000-0000-0000-0000',
-              orcidHash: 'WRMVXa',
-              refreshToken: '-',
-              gender: '-',
-              nationality: 1,
-              birthdate: faker.date.between('1950', '1990'),
-              organisation: 1,
-              department: faker.commerce.department(),
-              position: faker.name.jobTitle(),
-              email: emails[index],
-              telephone: faker.phone.phoneNumber('0##########'),
-            },
-          };
-        }),
+      // NOTE: Create 5 users
+      new Array(5).fill(0).map((elem, index) => {
+        cy.createUser({
+          user_title: faker.name.prefix(),
+          firstname: faker.name.firstName(),
+          lastname: faker.name.lastName(),
+          password: 'Test1234!',
+          orcid: '0000-0000-0000-0000',
+          orcidHash: 'WRMVXa',
+          refreshToken: '-',
+          gender: '-',
+          nationality: 1,
+          birthdate: faker.date.between('1950', '1990').toISOString(),
+          organisation: 1,
+          department: faker.commerce.department(),
+          position: faker.name.jobTitle(),
+          email: emails[index],
+          telephone: faker.phone.phoneNumber('0##########'),
+        });
       });
 
       cy.login('user');
+      cy.visit('/');
 
       cy.contains('New Proposal').click();
 
@@ -253,24 +247,13 @@ context('PageTable component tests', () => {
   });
 
   describe('PeopleTable component preserves selected users', () => {
-    before(() => {
-      cy.resetDB();
-    });
-
     beforeEach(() => {
-      cy.viewport(1920, 1080);
+      cy.createProposal({ callId: initialDBData.call.id });
     });
 
-    it('should preserve the selected users', () => {
-      cy.login('user');
-
-      cy.contains('New Proposal').click();
-
-      cy.createProposal();
-
-      cy.logout();
-
+    it('Should preserve the selected users', () => {
       cy.login('officer');
+      cy.visit('/');
 
       cy.get('[data-cy=view-proposal]').click();
 
@@ -284,15 +267,17 @@ context('PageTable component tests', () => {
 
       cy.get('@modal').contains('0 user(s) selected');
 
-      cy.get('@modal').contains(username1).parent().find('input').check();
+      cy.get('@modal')
+        .contains(initialDBData.users.user2.firstName)
+        .parent()
+        .find('input')
+        .check();
 
       cy.get('@modal').contains('1 user(s) selected');
 
       cy.finishedLoading();
 
       cy.get('@modal').find('[aria-label="Search"]').type('foo bar');
-
-      cy.wait(500);
 
       cy.finishedLoading();
 
@@ -305,35 +290,36 @@ context('PageTable component tests', () => {
       cy.get('@modal').contains('1 user(s) selected');
 
       cy.get('@modal')
-        .contains(username1)
+        .contains(initialDBData.users.user2.firstName)
         .parent()
         .find('input')
         .should('be.checked');
 
       cy.finishedLoading();
 
-      cy.get('@modal').find('[aria-label="Search"]').type(username2);
-
-      cy.wait(500);
+      cy.get('@modal')
+        .find('[aria-label="Search"]')
+        .type(initialDBData.users.placeholder.firstName);
 
       cy.finishedLoading();
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal')
-        .contains(username2)
+        .contains(initialDBData.users.placeholder.firstName)
         .parent()
         .find('input')
         .should('not.be.checked');
 
-      cy.get('@modal').find('[aria-label="Search"]').clear().type(username1);
-
-      cy.wait(500);
+      cy.get('@modal')
+        .find('[aria-label="Search"]')
+        .clear()
+        .type(initialDBData.users.user2.firstName);
 
       cy.finishedLoading();
 
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('@modal')
-        .contains(username1)
+        .contains(initialDBData.users.user2.firstName)
         .parent()
         .find('input')
         .should('be.checked');
@@ -341,45 +327,29 @@ context('PageTable component tests', () => {
       cy.get('[data-cy="assign-selected-users"]').click();
     });
 
-    it('should preserve the selected users after pagination', () => {
-      cy.wait(1000);
-
-      cy.request({
-        url: '/graphql',
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`,
-        },
-        body: new Array(5).fill(0).map(() => {
-          return {
-            query: ` mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $orcid: String!, $orcidHash: String!, $refreshToken: String!, $gender: String!, $nationality: Int!, $birthdate: String!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
-              createUser(user_title: $user_title, firstname: $firstname, middlename: $middlename, lastname: $lastname, password: $password, preferredname: $preferredname, orcid: $orcid, orcidHash: $orcidHash, refreshToken: $refreshToken, gender: $gender, nationality: $nationality, birthdate: $birthdate, organisation: $organisation, department: $department, position: $position, email: $email, telephone: $telephone, telephone_alt: $telephone_alt, otherOrganisation: $otherOrganisation) {
-                user {
-                  id
-                }
-              }
-            }`,
-            variables: {
-              user_title: faker.name.prefix(),
-              firstname: faker.name.firstName(),
-              lastname: faker.name.lastName(),
-              password: 'Test1234!',
-              orcid: '0000-0000-0000-0000',
-              orcidHash: 'WRMVXa',
-              refreshToken: '-',
-              gender: '-',
-              nationality: 1,
-              birthdate: faker.date.between('1950', '1990'),
-              organisation: 1,
-              department: faker.commerce.department(),
-              position: faker.name.jobTitle(),
-              email: faker.internet.email(),
-              telephone: faker.phone.phoneNumber('0##########'),
-            },
-          };
-        }),
+    it('Should preserve the selected users after pagination', () => {
+      // NOTE: Create 10 users
+      new Array(10).fill(0).map((elem, index) => {
+        cy.createUser({
+          user_title: faker.name.prefix(),
+          firstname: faker.name.firstName(),
+          lastname: faker.name.lastName(),
+          password: 'Test1234!',
+          orcid: '0000-0000-0000-0000',
+          orcidHash: 'WRMVXa',
+          refreshToken: '-',
+          gender: '-',
+          nationality: 1,
+          birthdate: faker.date.between('1950', '1990').toISOString(),
+          organisation: 1,
+          department: faker.commerce.department(),
+          position: faker.name.jobTitle(),
+          email: emails[index],
+          telephone: faker.phone.phoneNumber('0##########'),
+        });
       });
       cy.login('officer');
+      cy.visit('/');
 
       cy.get('[data-cy=view-proposal]').click();
 

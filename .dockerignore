@@ -4,6 +4,7 @@
 !src
 !public
 !package*
+!cypress
 !tsconfig.json
 !iis.conf
 !nginx.conf

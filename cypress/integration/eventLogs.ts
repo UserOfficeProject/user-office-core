@@ -1,6 +1,9 @@
 import dateformat from 'dateformat';
 import faker from 'faker';
 
+import { UpdateUserMutationVariables, User } from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
+
 context('Event log tests', () => {
   before(() => {
     cy.resetDB();
@@ -8,65 +11,91 @@ context('Event log tests', () => {
 
   beforeEach(() => {
     cy.viewport(1920, 1080);
+    cy.resetDB();
   });
 
-  it('If user creates a proposal, officer should be able to see the event logs for that proposal', () => {
-    cy.login('user');
+  describe('Proposal event logs', () => {
+    let createdProposalPk: number;
 
-    cy.createProposal();
+    beforeEach(() => {
+      cy.login('user');
+      cy.createProposal({ callId: initialDBData.call.id }).then((response) => {
+        if (response.createProposal.proposal) {
+          createdProposalPk = response.createProposal.proposal.primaryKey;
+        }
+      });
+    });
 
-    cy.logout();
+    it('If user creates a proposal, officer should be able to see the event logs for that proposal', () => {
+      cy.login('officer');
+      cy.visit('/');
 
-    cy.login('officer');
+      cy.get("[data-cy='view-proposal']").first().click();
+      cy.contains('Logs').click({ force: true });
+      cy.contains('PROPOSAL_CREATED');
 
-    cy.get("[data-cy='view-proposal']").first().click();
-    cy.contains('Logs').click({ force: true });
-    cy.contains('PROPOSAL_CREATED');
+      cy.closeModal();
+
+      cy.updateProposal({
+        title: faker.random.words(2),
+        abstract: faker.random.words(5),
+        proposalPk: createdProposalPk,
+      });
+
+      cy.get("[data-cy='view-proposal']").first().click();
+      cy.contains('Logs').click({ force: true });
+      cy.contains('PROPOSAL_UPDATED');
+    });
   });
 
-  it('If user uptates his info, officer should be able to see the event logs for that update', () => {
-    const newFirstName = faker.name.firstName();
+  describe('User event logs', () => {
+    beforeEach(() => {
+      cy.login('user');
+    });
 
-    cy.login('user');
+    it('If user uptates his info, officer should be able to see the event logs for that update', () => {
+      const newFirstName = faker.name.firstName();
+      // NOTE: Hour date format is enough because we don't know the exact time in seconds and minutes when update will happen in the database.
+      const updateProfileDate = dateformat(new Date(), 'dd-mmm-yyyy HH');
+      const loggedInUser = window.localStorage.getItem('user');
 
-    cy.get('[data-cy="active-user-profile"]').click();
+      if (!loggedInUser) {
+        throw new Error('No logged in user');
+      }
 
-    cy.get("[name='firstname']").clear().type(newFirstName);
+      const loggedInUserParsed = JSON.parse(loggedInUser) as User;
 
-    cy.contains('Update Profile').click();
+      cy.updateUserDetails({
+        ...loggedInUserParsed,
+        firstname: newFirstName,
+      } as UpdateUserMutationVariables);
 
-    // NOTE: Hour date format is enough because we don't know the exact time in seconds and minutes when update will happen in the database.
-    const updateProfileDate = dateformat(new Date(), 'dd-mmm-yyyy HH');
+      cy.login('officer');
+      cy.visit('/');
 
-    cy.logout();
+      cy.contains('People').click();
 
-    cy.login('officer');
+      cy.get('[aria-label="Search"]').type(loggedInUserParsed.lastname);
 
-    cy.contains('People').click();
+      cy.contains(loggedInUserParsed.lastname)
+        .parent()
+        .find('button[title="Edit user"]')
+        .click();
 
-    cy.get('[aria-label="Search"]').type('Carlsson');
+      cy.get("[name='firstname']").should('have.value', newFirstName);
 
-    cy.contains('Carlsson').parent().find('button[title="Edit user"]').click();
+      cy.contains('Logs').click();
 
-    cy.get("[name='firstname']").should('have.value', newFirstName);
+      cy.get('[data-cy="event-logs-table"]').as('eventLogsTable');
+      cy.get('@eventLogsTable')
+        .find('tr[level="0"]')
+        .last()
+        .as('eventLogsTableLastRow');
 
-    cy.contains('Logs').click();
+      cy.get('@eventLogsTableLastRow').invoke('text').as('lastRowText');
 
-    let eventLogsTable = cy.get('[data-cy="event-logs-table"]');
-
-    const lastPageButtonElement = eventLogsTable.find(
-      'span[title="Last Page"] > button'
-    );
-
-    lastPageButtonElement.click({ force: true });
-
-    // NOTE: Need to re-query for the element because it gets detached from the DOM. This is because of how MaterialTable pagination works.
-    eventLogsTable = cy.get('[data-cy="event-logs-table"]');
-    const eventLogsTableLastRow = eventLogsTable.find('tr[level="0"]').last();
-
-    const lastRowText = eventLogsTableLastRow.invoke('text');
-
-    lastRowText.should('contain', 'USER_UPDATED');
-    lastRowText.should('contain', updateProfileDate);
+      cy.get('@lastRowText').should('contain', 'USER_UPDATED');
+      cy.get('@lastRowText').should('contain', updateProfileDate);
+    });
   });
 });
