@@ -850,5 +850,3 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
   }
 }
-
-

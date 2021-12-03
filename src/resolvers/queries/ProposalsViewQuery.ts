@@ -1,4 +1,5 @@
 import {
+  Arg,
   Args,
   ArgsType,
   Ctx,
@@ -17,12 +18,6 @@ import { ProposalsFilter } from './ProposalsQuery';
 class ProposalsViewArgs {
   @Field(() => ProposalsFilter, { nullable: true })
   public filter?: ProposalsFilter;
-
-  @Field(() => Int, { nullable: true })
-  public first?: number;
-
-  @Field(() => Int, { nullable: true })
-  public offset?: number;
 }
 
 @ObjectType()
@@ -46,14 +41,17 @@ export class ProposalsViewQuery {
 
   @Query(() => ProposalsViewResult, { nullable: true })
   async instrumentScientistProposals(
-    @Args() args: ProposalsViewArgs,
-    @Ctx() context: ResolverContext
+    @Ctx() context: ResolverContext,
+    @Arg('filter', () => ProposalsFilter, { nullable: true })
+    filter?: ProposalsFilter,
+    @Arg('first', () => Int, { nullable: true }) first?: number,
+    @Arg('offset', () => Int, { nullable: true }) offset?: number
   ): Promise<ProposalsViewResult | null> {
     return context.queries.proposal.getInstrumentScientistProposals(
       context.user,
-      args.filter,
-      args.first,
-      args.offset
+      filter,
+      first,
+      offset
     );
   }
 }
