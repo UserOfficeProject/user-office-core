@@ -142,6 +142,11 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
                 type="button"
                 variant="contained"
                 color="primary"
+                disabled={
+                  institutionFrom === null ||
+                  institutionInto === null ||
+                  mergedInstitutionName === ''
+                }
                 onClick={() => {
                   if (
                     !institutionFrom ||
