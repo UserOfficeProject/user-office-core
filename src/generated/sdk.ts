@@ -2111,15 +2111,13 @@ export type QueryProposalStatusArgs = {
 
 export type QueryProposalsViewArgs = {
   filter?: Maybe<ProposalsFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
 };
 
 
 export type QueryInstrumentScientistProposalsArgs = {
-  filter?: Maybe<ProposalsFilter>;
-  first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Int']>;
+  filter?: Maybe<ProposalsFilter>;
 };
 
 
