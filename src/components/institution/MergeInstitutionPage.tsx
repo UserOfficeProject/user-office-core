@@ -1,7 +1,6 @@
-import { Button, TextField } from '@material-ui/core';
+import { Button, makeStyles, TextField } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import MergeType from '@material-ui/icons/MergeType';
-import { Autocomplete, AutocompleteProps } from '@material-ui/lab';
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router';
 
@@ -13,41 +12,31 @@ import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-interface InstitutionSelectProps
-  extends Omit<
-    AutocompleteProps<Institution, undefined, undefined, undefined>,
-    'options' | 'renderInput'
-  > {
-  institutions: Institution[];
-  onInstitutionSelected: (institution: Institution | null) => void;
-  label: string;
-}
-const InstitutionSelect = (props: InstitutionSelectProps) => {
-  const { institutions, onInstitutionSelected, label, ...selectProps } = props;
-
-  return (
-    <Autocomplete
-      {...selectProps}
-      options={institutions}
-      getOptionLabel={(option) => option.name}
-      renderInput={(params) => <TextField {...params} label={label} />}
-      onChange={(_event, newValue) => {
-        onInstitutionSelected(newValue);
-      }}
-      value={props.value}
-      style={{ marginTop: '16px' }}
-    ></Autocomplete>
-  );
-};
+import InstitutionSelect from './InstitutionSelect';
 
 type MergeInstitutionPageProps = {
   confirm: WithConfirmType;
 };
+const useStyles = makeStyles(() => ({
+  mergeIcon: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -30%)  rotate(90deg)',
+    fontSize: '5em',
+    color: '#999999',
+  },
+  mergeGridIcon: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+}));
+
 function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
   const { institutionId: institutionIdQueryParam } = useParams<{
     institutionId: string;
   }>();
-  const institutionId = parseInt(institutionIdQueryParam);
+  const institutionId = parseInt(institutionIdQueryParam); // param is string
 
   const { institutions, loadingInstitutions, setInstitutions } =
     useInstitutionsData();
@@ -59,6 +48,7 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
   const [mergedInstitutionName, setMergedInstitutionName] = React.useState('');
 
   const { api } = useDataApiWithFeedback();
+  const classes = useStyles();
 
   useEffect(() => {
     if (institutionFrom === null && institutionId) {
@@ -110,25 +100,9 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
             />
           </Grid>
           <Grid item xs={1} style={{ position: 'relative' }}>
-            <MergeType
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -30%)  rotate(90deg)',
-                fontSize: '5em',
-                color: '#999999',
-              }}
-            />
+            <MergeType className={classes.mergeIcon} />
           </Grid>
-          <Grid
-            item
-            xs={6}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
+          <Grid item xs={6} className={classes.mergeGridIcon}>
             <TextField
               fullWidth
               label="Merged Institution Name"

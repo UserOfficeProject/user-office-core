@@ -131,7 +131,9 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
             {institution && (
               <Tooltip title="Merge with existing institution">
                 <Button
-                  startIcon={<MergeType />}
+                  startIcon={
+                    <MergeType style={{ transform: 'rotate(90deg)' }} />
+                  }
                   type="button"
                   variant="outlined"
                   color="primary"
