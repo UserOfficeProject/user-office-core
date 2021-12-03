@@ -74,6 +74,7 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
           <Grid item xs={5}>
             <InstitutionSelect
               id="select-from-institution"
+              data-cy="select-from-institution"
               label="Institution A"
               institutions={institutions}
               onInstitutionSelected={(institution) => {
@@ -86,6 +87,7 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
             />
             <InstitutionSelect
               id="select-to-institution"
+              data-cy="select-to-institution"
               label="Institution B"
               institutions={institutions.filter(
                 (institution) => institution.id !== institutionFrom?.id
@@ -106,6 +108,7 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
             <TextField
               fullWidth
               label="Merged Institution Name"
+              id="merged-institution-name"
               value={mergedInstitutionName}
               onChange={(e) => setMergedInstitutionName(e.target.value)}
             />
