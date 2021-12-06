@@ -11,7 +11,11 @@ import {
 import { ResolverContext } from '../../context';
 import { TzLessDateTime } from '../CustomScalars';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
-import { ScheduledEventBookingType } from './ProposalBooking';
+import { Feedback } from './Feedback';
+import {
+  ProposalBookingStatusCore,
+  ScheduledEventBookingType,
+} from './ProposalBooking';
 import { Visit } from './Visit';
 
 @ObjectType()
@@ -27,6 +31,9 @@ export class ScheduledEventCore {
 
   @Field(() => TzLessDateTime)
   endsAt: Date;
+
+  @Field(() => ProposalBookingStatusCore)
+  status: ProposalBookingStatusCore;
 }
 
 @Resolver(() => ScheduledEventCore)
@@ -37,6 +44,17 @@ export class ScheduledEventResolver {
     @Ctx() context: ResolverContext
   ): Promise<Visit | null> {
     return context.queries.visit.getVisitByScheduledEventId(
+      context.user,
+      event.id
+    );
+  }
+
+  @FieldResolver(() => Feedback, { nullable: true })
+  async feedback(
+    @Root() event: ScheduledEventCore,
+    @Ctx() context: ResolverContext
+  ): Promise<Feedback | null> {
+    return context.queries.feedback.getFeedbackByScheduledEventId(
       context.user,
       event.id
     );

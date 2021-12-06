@@ -109,6 +109,9 @@ export class TextInputConfig extends ConfigBase {
 export class ShipmentBasisConfig extends ConfigBase {}
 
 @ObjectType()
+export class FeedbackBasisConfig extends ConfigBase {}
+
+@ObjectType()
 export class SubTemplateConfig {
   @Field(() => Int, { nullable: true })
   minEntries: number | null;
@@ -203,5 +206,6 @@ export const FieldConfigType = createUnionType({
     RichTextInputConfig,
     VisitBasisConfig,
     GenericTemplateBasisConfig,
+    FeedbackBasisConfig,
   ], // function that returns array of object types classes
 });

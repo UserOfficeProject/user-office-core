@@ -7,6 +7,7 @@ import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
+import { Feedback } from './Feedback';
 import { GenericTemplate } from './GenericTemplate';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
@@ -342,4 +343,11 @@ export class GenericTemplateResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => GenericTemplate, { nullable: true })
   public genericTemplate: GenericTemplate;
+}
+
+@ObjectType()
+export class FeedbackResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => Feedback, { nullable: true })
+  public feedback: Feedback;
 }
