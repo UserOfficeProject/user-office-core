@@ -1,3 +1,22 @@
+import {
+  CreateProposalMutationVariables,
+  UpdateProposalMutationVariables,
+  AdministrationProposalMutationVariables,
+  ChangeProposalsStatusMutation,
+  UpdateProposalMutation,
+  AdministrationProposalMutation,
+  CreateProposalMutation,
+  ChangeProposalsStatusMutationVariables,
+  SubmitProposalMutationVariables,
+  SubmitProposalMutation,
+  UpdateEsiMutationVariables,
+  UpdateEsiMutation,
+  CreateEsiMutationVariables,
+  CreateEsiMutation,
+  CloneProposalsMutationVariables,
+  CloneProposalsMutation,
+} from '../../src/generated/sdk';
+
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -7,14 +26,47 @@ declare global {
        * @returns {typeof createProposal}
        * @memberof Chainable
        * @example
-       *    cy.createProposal('Proposal title', 'Proposal abstract')
+       *    cy.createProposal(createProposalInput: CreateProposalMutationVariables)
        */
       createProposal: (
-        proposalTitle?: string,
-        proposalAbstract?: string,
-        call?: string,
-        proposer?: string
-      ) => void;
+        createProposalInput: CreateProposalMutationVariables
+      ) => Cypress.Chainable<CreateProposalMutation>;
+
+      /**
+       * Updates proposal
+       *
+       * @returns {typeof updateProposal}
+       * @memberof Chainable
+       * @example
+       *    cy.updateProposal(updateProposalInput: UpdateProposalMutationVariables)
+       */
+      updateProposal: (
+        updateProposalInput: UpdateProposalMutationVariables
+      ) => Cypress.Chainable<UpdateProposalMutation>;
+
+      /**
+       * Submit proposal
+       *
+       * @returns {typeof submitProposal}
+       * @memberof Chainable
+       * @example
+       *    cy.submitProposal(submitProposalInput: SubmitProposalMutationVariables)
+       */
+      submitProposal: (
+        submitProposalInput: SubmitProposalMutationVariables
+      ) => Cypress.Chainable<SubmitProposalMutation>;
+
+      /**
+       * Clone proposals
+       *
+       * @returns {typeof cloneProposals}
+       * @memberof Chainable
+       * @example
+       *    cy.cloneProposals(cloneProposalsInput: CloneProposalsMutationVariables)
+       */
+      cloneProposals: (
+        cloneProposalsInput: CloneProposalsMutationVariables
+      ) => Cypress.Chainable<CloneProposalsMutation>;
 
       /**
        * Change of the proposal status by name with status name passed as second parameter.
@@ -23,27 +75,48 @@ declare global {
        * @returns {typeof changeProposalStatus}
        * @memberof Chainable
        * @example
-       *    cy.changeProposalStatus('DRAFT', 'Proposal title')
+       *    cy.changeProposalStatus(changeProposalStatusInput: ChangeProposalsStatusInput)
        */
-      changeProposalStatus: (
-        statusName?: string,
-        proposalTitle?: string
-      ) => void;
+      changeProposalsStatus: (
+        changeProposalStatusInput: ChangeProposalsStatusMutationVariables
+      ) => Cypress.Chainable<ChangeProposalsStatusMutation>;
 
       /**
        * Allocates time for the proposal and optionally submits
        * management decision
        *
-       * @returns {typeof changeProposalStatus}
+       * @returns {typeof updateProposalManagementDecision}
        * @memberof Chainable
        * @example
-       *        cy.allocateProposalTime({proposalTitle:proposalTitle, timeToAllocate:2, submitManagementDecision:true});
+       *        cy.updateProposalManagementDecision(administrationProposalInput: AdministrationProposalMutationVariables);
        */
-      allocateProposalTime: (params: {
-        proposalTitle: string;
-        timeToAllocate: number;
-        submitManagementDecision?: boolean;
-      }) => void;
+      updateProposalManagementDecision: (
+        administrationProposalInput: AdministrationProposalMutationVariables
+      ) => Cypress.Chainable<AdministrationProposalMutation>;
+
+      /**
+       * Update proposal ESI.
+       *
+       * @returns {typeof updateEsi}
+       * @memberof Chainable
+       * @example
+       *        cy.updateEsi(updateEsiInput: UpdateEsiMutationVariables);
+       */
+      updateEsi: (
+        updateEsiInput: UpdateEsiMutationVariables
+      ) => Cypress.Chainable<UpdateEsiMutation>;
+
+      /**
+       * Create proposal ESI.
+       *
+       * @returns {typeof createEsi}
+       * @memberof Chainable
+       * @example
+       *        cy.createEsi(createEsiInput: CreateEsiMutationVariables);
+       */
+      createEsi: (
+        createEsiInput: CreateEsiMutationVariables
+      ) => Cypress.Chainable<CreateEsiMutation>;
     }
   }
 }

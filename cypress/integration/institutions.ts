@@ -1,28 +1,27 @@
 import faker from 'faker';
 
 context('Institution tests', () => {
-  before(() => {
-    cy.resetDB();
-  });
-
   beforeEach(() => {
+    cy.resetDB();
     cy.viewport(1920, 1080);
   });
 
   it('User should not be able to see Institutions page', () => {
     cy.login('user');
+    cy.visit('/');
 
     cy.get('[data-cy="profile-page-btn"]').should('exist');
 
-    let userMenuItems = cy.get('[data-cy="user-menu-items"]');
+    cy.get('[data-cy="user-menu-items"]').as('userMenuItems');
 
-    userMenuItems.should('not.contain', 'Institutions');
+    cy.get('@userMenuItems').should('not.contain', 'Institutions');
   });
 
   it('User Officer should be able to create Institution', () => {
     const name = faker.random.words(2);
 
     cy.login('officer');
+    cy.visit('/');
 
     cy.contains('Institutions').click();
     cy.contains('Create').click();
@@ -31,29 +30,31 @@ context('Institution tests', () => {
 
     cy.notification({ variant: 'success', text: 'successfully' });
 
-    let institutionsTable = cy.get('[data-cy="institutions-table"]');
+    cy.get('[data-cy="institutions-table"]').as('institutionsTable');
 
-    const lastPageButtonElement = institutionsTable.find(
-      'span[title="Last Page"] > button'
-    );
+    cy.get('@institutionsTable')
+      .find('span[title="Last Page"] > button')
+      .as('lastPageButtonElement');
 
-    lastPageButtonElement.click({ force: true });
+    cy.get('@lastPageButtonElement').click({ force: true });
 
     // NOTE: Need to re-query for the element because it gets detached from the DOM. This is because of how MaterialTable pagination works.
-    institutionsTable = cy.get('[data-cy="institutions-table"]');
-    const institutionsTableLastRow = institutionsTable
+    cy.get('[data-cy="institutions-table"]').as('newInstitutionsTable');
+    cy.get('@newInstitutionsTable')
       .find('tr[level="0"]')
-      .last();
+      .last()
+      .as('institutionsTableLastRow');
 
-    const lastRowText = institutionsTableLastRow.invoke('text');
+    cy.get('@institutionsTableLastRow').invoke('text').as('lastRowText');
 
-    lastRowText.should('contain', name);
+    cy.get('@lastRowText').should('contain', name);
   });
 
   it('User Officer should be able to update Institution', () => {
     const name = faker.random.words(2);
 
     cy.login('officer');
+    cy.visit('/');
 
     cy.contains('Institutions').click();
     cy.get('[title="Edit"]').first().click();
@@ -63,23 +64,16 @@ context('Institution tests', () => {
 
     cy.notification({ variant: 'success', text: 'successfully' });
 
-    const institutionsTable = cy.get('[data-cy="institutions-table"]');
+    cy.get('[data-cy="institutions-table"]').as('institutionsTable');
 
-    institutionsTable.should('contain', name);
+    cy.get('@institutionsTable').should('contain', name);
   });
 
   it('User Officer should be able to delete Institution', () => {
     cy.login('officer');
+    cy.visit('/');
 
     cy.contains('Institutions').click();
-
-    let institutionsTable = cy.get('[data-cy="institutions-table"]');
-
-    const lastPageButtonElement = institutionsTable.find(
-      'span[title="Last Page"] > button'
-    );
-
-    lastPageButtonElement.click({ force: true });
 
     cy.get('[title="Delete"]').last().click();
 

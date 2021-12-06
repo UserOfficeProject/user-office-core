@@ -258,7 +258,7 @@ const TemplatesTable = ({
                       const clonedTemplate = result.cloneTemplate.template;
                       if (clonedTemplate) {
                         const newTemplates = [...templates];
-                        newTemplates.push(clonedTemplate);
+                        newTemplates.push({ ...clonedTemplate, callCount: 0 });
                         setTemplates(newTemplates);
                       }
                     });
