@@ -31,6 +31,7 @@ export default function UserUpcomingExperimentsTable() {
     registerVisitAction,
     individualTrainingAction,
     declareShipmentAction,
+    giveFeedback,
   } = useActionButtons({
     openModal: (contents) => setModalContents(contents),
     closeModal: () => {
@@ -82,6 +83,7 @@ export default function UserUpcomingExperimentsTable() {
             registerVisitAction,
             individualTrainingAction,
             declareShipmentAction,
+            giveFeedback,
           ]}
           icons={tableIcons}
           title="Upcoming experiments"

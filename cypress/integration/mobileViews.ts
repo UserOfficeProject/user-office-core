@@ -1,14 +1,12 @@
 context('Mobile views tests', () => {
-  before(() => {
-    cy.resetDB();
-  });
-
   beforeEach(() => {
+    cy.resetDB();
     cy.viewport('iphone-x');
   });
 
   it('A user officer should not see sidebar menu by default on mobile if not opened but be able to open it', () => {
     cy.login('officer');
+    cy.visit('/');
 
     cy.finishedLoading();
 
