@@ -41,8 +41,6 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
             },
             text,
           },
-          // offset,
-          // first,
         })
         .then((data) => {
           if (unmounted) {
