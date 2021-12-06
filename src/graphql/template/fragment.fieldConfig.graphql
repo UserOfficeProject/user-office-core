@@ -127,4 +127,10 @@ fragment fieldConfig on FieldConfig {
     titlePlaceholder
     questionLabel
   }
+
+    ... on FeedbackBasisConfig {
+    small_label
+    required
+    tooltip
+  }
 }
