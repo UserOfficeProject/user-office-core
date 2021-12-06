@@ -4,6 +4,7 @@ import { UserAuthorization } from './auth/UserAuthorization';
 import { BasicResolverContext } from './context';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
+import FeedbackMutations from './mutations/FeedbackMutations';
 import FileMutations from './mutations/FileMutations';
 import GenericTemplateMutations from './mutations/GenericTemplateMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
@@ -22,6 +23,7 @@ import VisitMutations from './mutations/VisitMutations';
 import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
+import FeedbackQueries from './queries/FeedbackQueries';
 import FileQueries from './queries/FileQueries';
 import GenericTemplateQueries from './queries/GenericTemplateQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
@@ -44,32 +46,34 @@ const context: BasicResolverContext = {
   queries: {
     admin: container.resolve(AdminQueries),
     call: container.resolve(CallQueries),
-    proposalEsi: container.resolve(ProposalEsiQueries),
     eventLogs: container.resolve(EventLogQueries),
+    feedback: container.resolve(FeedbackQueries),
     file: container.resolve(FileQueries),
     genericTemplate: container.resolve(GenericTemplateQueries),
     instrument: container.resolve(InstrumentQueries),
     proposal: container.resolve(ProposalQueries),
+    proposalEsi: container.resolve(ProposalEsiQueries),
     proposalSettings: container.resolve(ProposalSettingsQueries),
     questionary: container.resolve(QuestionaryQueries),
     review: container.resolve(ReviewQueries),
     sample: container.resolve(SampleQueries),
+    sampleEsi: container.resolve(SampleEsiQueries),
     sep: container.resolve(SEPQueries),
     shipment: container.resolve(ShipmentQueries),
     system: container.resolve(SystemQueries),
     template: container.resolve(TemplateQueries),
     user: container.resolve(UserQueries),
     visit: container.resolve(VisitQueries),
-    sampleEsi: container.resolve(SampleEsiQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
     call: container.resolve(CallMutations),
-    proposalEsi: container.resolve(ProposalEsiMutations),
+    feedback: container.resolve(FeedbackMutations),
     file: container.resolve(FileMutations),
     genericTemplate: container.resolve(GenericTemplateMutations),
     instrument: container.resolve(InstrumentMutations),
     proposal: container.resolve(ProposalMutations),
+    proposalEsi: container.resolve(ProposalEsiMutations),
     proposalSettings: container.resolve(ProposalSettingsMutations),
     questionary: container.resolve(QuestionaryMutations),
     review: container.resolve(ReviewMutations),

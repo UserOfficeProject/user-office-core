@@ -112,6 +112,14 @@ export default class TemplateMutations {
           'sample_esi_basis'
         );
         break;
+      case TemplateGroupId.FEEDBACK:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New feedback',
+          'feedback_basis'
+        );
+        break;
     }
 
     const currentActiveTemplateId = await this.dataSource.getActiveTemplateId(
@@ -186,7 +194,7 @@ export default class TemplateMutations {
     { templateId }: { templateId: number }
   ): Promise<Template | Rejection> {
     return this.dataSource.deleteTemplate(templateId).catch((err) => {
-      return rejection('Could not delete proposal', { templateId, user }, err);
+      return rejection('Could not delete template', { templateId, user }, err);
     });
   }
 
