@@ -262,7 +262,8 @@ export enum DataType {
   VISIT_BASIS = 'VISIT_BASIS',
   GENERIC_TEMPLATE_BASIS = 'GENERIC_TEMPLATE_BASIS',
   PROPOSAL_ESI_BASIS = 'PROPOSAL_ESI_BASIS',
-  SAMPLE_ESI_BASIS = 'SAMPLE_ESI_BASIS'
+  SAMPLE_ESI_BASIS = 'SAMPLE_ESI_BASIS',
+  FEEDBACK_BASIS = 'FEEDBACK_BASIS'
 }
 
 export type DateConfig = {
@@ -422,6 +423,41 @@ export enum FeatureId {
   EMAIL_INVITE = 'EMAIL_INVITE'
 }
 
+export type Feedback = {
+  __typename?: 'Feedback';
+  id: Scalars['Int'];
+  scheduledEventId: Scalars['Int'];
+  status: FeedbackStatus;
+  questionaryId: Scalars['Int'];
+  creatorId: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  submittedAt: Maybe<Scalars['DateTime']>;
+  questionary: Questionary;
+};
+
+export type FeedbackBasisConfig = {
+  __typename?: 'FeedbackBasisConfig';
+  small_label: Scalars['String'];
+  required: Scalars['Boolean'];
+  tooltip: Scalars['String'];
+};
+
+export type FeedbackResponseWrap = {
+  __typename?: 'FeedbackResponseWrap';
+  rejection: Maybe<Rejection>;
+  feedback: Maybe<Feedback>;
+};
+
+export enum FeedbackStatus {
+  DRAFT = 'DRAFT',
+  SUBMITTED = 'SUBMITTED'
+}
+
+export type FeedbacksFilter = {
+  creatorId?: Maybe<Scalars['Int']>;
+  scheduledEventId?: Maybe<Scalars['Int']>;
+};
+
 export type FieldCondition = {
   __typename?: 'FieldCondition';
   condition: EvaluatorOperator;
@@ -433,7 +469,7 @@ export type FieldConditionInput = {
   params: Scalars['String'];
 };
 
-export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SampleDeclarationConfig | SampleEsiBasisConfig | SubTemplateConfig | ProposalBasisConfig | ProposalEsiBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig | RichTextInputConfig | VisitBasisConfig | GenericTemplateBasisConfig;
+export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SampleDeclarationConfig | SampleEsiBasisConfig | SubTemplateConfig | ProposalBasisConfig | ProposalEsiBasisConfig | IntervalConfig | NumberInputConfig | ShipmentBasisConfig | RichTextInputConfig | VisitBasisConfig | GenericTemplateBasisConfig | FeedbackBasisConfig;
 
 export type FieldDependency = {
   __typename?: 'FieldDependency';
@@ -595,6 +631,8 @@ export type Mutation = {
   updateCall: CallResponseWrap;
   assignInstrumentsToCall: CallResponseWrap;
   removeAssignedInstrumentFromCall: CallResponseWrap;
+  createFeedback: FeedbackResponseWrap;
+  updateFeedback: FeedbackResponseWrap;
   createGenericTemplate: GenericTemplateResponseWrap;
   updateGenericTemplate: GenericTemplateResponseWrap;
   changeProposalsStatus: SuccessResponseWrap;
@@ -679,6 +717,7 @@ export type Mutation = {
   createProposal: ProposalResponseWrap;
   createVisitRegistrationQuestionary: VisitRegistrationResponseWrap;
   deleteCall: CallResponseWrap;
+  deleteFeedback: FeedbackResponseWrap;
   deleteGenericTemplate: GenericTemplateResponseWrap;
   deleteInstitution: InstitutionResponseWrap;
   deleteInstrument: InstrumentResponseWrap;
@@ -763,6 +802,17 @@ export type MutationAssignInstrumentsToCallArgs = {
 
 export type MutationRemoveAssignedInstrumentFromCallArgs = {
   removeAssignedInstrumentFromCallInput: RemoveAssignedInstrumentFromCallInput;
+};
+
+
+export type MutationCreateFeedbackArgs = {
+  scheduledEventId: Scalars['Int'];
+};
+
+
+export type MutationUpdateFeedbackArgs = {
+  feedbackId: Scalars['Int'];
+  status?: Maybe<FeedbackStatus>;
 };
 
 
@@ -1346,6 +1396,11 @@ export type MutationDeleteCallArgs = {
 };
 
 
+export type MutationDeleteFeedbackArgs = {
+  feedbackId: Scalars['Int'];
+};
+
+
 export type MutationDeleteGenericTemplateArgs = {
   genericTemplateId: Scalars['Int'];
 };
@@ -1843,6 +1898,7 @@ export type Query = {
   _service: Service;
   calls: Maybe<Array<Call>>;
   callsByInstrumentScientist: Maybe<Array<Call>>;
+  feedbacks: Array<Feedback>;
   genericTemplates: Maybe<Array<GenericTemplate>>;
   proposals: Maybe<ProposalsQueryResult>;
   instrumentScientistProposals: Maybe<ProposalsQueryResult>;
@@ -1863,6 +1919,7 @@ export type Query = {
   esi: Maybe<ExperimentSafetyInput>;
   eventLogs: Maybe<Array<EventLog>>;
   features: Array<Feature>;
+  feedback: Maybe<Feedback>;
   fileMetadata: Maybe<Array<FileMetadata>>;
   genericTemplate: Maybe<GenericTemplate>;
   allAccessTokensAndPermissions: Maybe<Array<PermissionsWithAccessToken>>;
@@ -1931,6 +1988,11 @@ export type QueryCallsArgs = {
 
 export type QueryCallsByInstrumentScientistArgs = {
   scientistId: Scalars['Int'];
+};
+
+
+export type QueryFeedbacksArgs = {
+  filter?: Maybe<FeedbacksFilter>;
 };
 
 
@@ -2028,6 +2090,11 @@ export type QueryEsiArgs = {
 export type QueryEventLogsArgs = {
   changedObjectId: Scalars['String'];
   eventType: Scalars['String'];
+};
+
+
+export type QueryFeedbackArgs = {
+  feedbackId: Scalars['Int'];
 };
 
 
@@ -2569,7 +2636,9 @@ export type ScheduledEventCore = {
   bookingType: ScheduledEventBookingType;
   startsAt: Scalars['TzLessDateTime'];
   endsAt: Scalars['TzLessDateTime'];
+  status: ProposalBookingStatusCore;
   visit: Maybe<Visit>;
+  feedback: Maybe<Feedback>;
   esi: Maybe<ExperimentSafetyInput>;
 };
 
@@ -2759,7 +2828,8 @@ export enum TemplateCategoryId {
   SAMPLE_DECLARATION = 'SAMPLE_DECLARATION',
   SHIPMENT_DECLARATION = 'SHIPMENT_DECLARATION',
   VISIT_REGISTRATION = 'VISIT_REGISTRATION',
-  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE'
+  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
+  FEEDBACK = 'FEEDBACK'
 }
 
 export type TemplateGroup = {
@@ -2775,7 +2845,8 @@ export enum TemplateGroupId {
   SAMPLE_ESI = 'SAMPLE_ESI',
   SHIPMENT = 'SHIPMENT',
   VISIT_REGISTRATION = 'VISIT_REGISTRATION',
-  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE'
+  GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
+  FEEDBACK = 'FEEDBACK'
 }
 
 export type TemplateResponseWrap = {
@@ -4185,6 +4256,78 @@ export type GetEventLogsQuery = (
   )>> }
 );
 
+export type CreateFeedbackMutationVariables = Exact<{
+  scheduledEventId: Scalars['Int'];
+}>;
+
+
+export type CreateFeedbackMutation = (
+  { __typename?: 'Mutation' }
+  & { createFeedback: (
+    { __typename?: 'FeedbackResponseWrap' }
+    & { feedback: Maybe<(
+      { __typename?: 'Feedback' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ) }
+      & FeedbackFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
+export type FeedbackFragment = (
+  { __typename?: 'Feedback' }
+  & Pick<Feedback, 'id' | 'scheduledEventId' | 'status' | 'questionaryId' | 'creatorId'>
+);
+
+export type GetFeedbackQueryVariables = Exact<{
+  feedbackId: Scalars['Int'];
+}>;
+
+
+export type GetFeedbackQuery = (
+  { __typename?: 'Query' }
+  & { feedback: Maybe<(
+    { __typename?: 'Feedback' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & Pick<Questionary, 'isCompleted'>
+      & QuestionaryFragment
+    ) }
+    & FeedbackFragment
+  )> }
+);
+
+export type UpdateFeedbackMutationVariables = Exact<{
+  feedbackId: Scalars['Int'];
+  status?: Maybe<FeedbackStatus>;
+}>;
+
+
+export type UpdateFeedbackMutation = (
+  { __typename?: 'Mutation' }
+  & { updateFeedback: (
+    { __typename?: 'FeedbackResponseWrap' }
+    & { feedback: Maybe<(
+      { __typename?: 'Feedback' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & Pick<Questionary, 'isCompleted'>
+        & QuestionaryFragment
+      ) }
+      & FeedbackFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
+
 export type CloneGenericTemplateMutationVariables = Exact<{
   genericTemplateId: Scalars['Int'];
   title?: Maybe<Scalars['String']>;
@@ -4995,7 +5138,7 @@ export type GetUserProposalBookingsWithEventsQuery = (
         { __typename?: 'ProposalBookingCore' }
         & { scheduledEvents: Array<(
           { __typename?: 'ScheduledEventCore' }
-          & Pick<ScheduledEventCore, 'id' | 'startsAt' | 'endsAt' | 'bookingType'>
+          & Pick<ScheduledEventCore, 'id' | 'startsAt' | 'endsAt' | 'bookingType' | 'status'>
           & { visit: Maybe<(
             { __typename?: 'Visit' }
             & { teamLead: (
@@ -5016,6 +5159,9 @@ export type GetUserProposalBookingsWithEventsQuery = (
           )>, esi: Maybe<(
             { __typename?: 'ExperimentSafetyInput' }
             & EsiFragment
+          )>, feedback: Maybe<(
+            { __typename?: 'Feedback' }
+            & FeedbackFragment
           )> }
         )> }
       )>, visits: Maybe<Array<(
@@ -5131,6 +5277,9 @@ export type AnswerFragment = (
   ) | (
     { __typename?: 'GenericTemplateBasisConfig' }
     & FieldConfigGenericTemplateBasisConfigFragment
+  ) | (
+    { __typename?: 'FeedbackBasisConfig' }
+    & FieldConfigFeedbackBasisConfigFragment
   ), dependencies: Array<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -6503,7 +6652,12 @@ type FieldConfigGenericTemplateBasisConfigFragment = (
   & Pick<GenericTemplateBasisConfig, 'titlePlaceholder' | 'questionLabel'>
 );
 
-export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSampleDeclarationConfigFragment | FieldConfigSampleEsiBasisConfigFragment | FieldConfigSubTemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigProposalEsiBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment | FieldConfigVisitBasisConfigFragment | FieldConfigGenericTemplateBasisConfigFragment;
+type FieldConfigFeedbackBasisConfigFragment = (
+  { __typename?: 'FeedbackBasisConfig' }
+  & Pick<FeedbackBasisConfig, 'small_label' | 'required' | 'tooltip'>
+);
+
+export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSampleDeclarationConfigFragment | FieldConfigSampleEsiBasisConfigFragment | FieldConfigSubTemplateConfigFragment | FieldConfigProposalBasisConfigFragment | FieldConfigProposalEsiBasisConfigFragment | FieldConfigIntervalConfigFragment | FieldConfigNumberInputConfigFragment | FieldConfigShipmentBasisConfigFragment | FieldConfigRichTextInputConfigFragment | FieldConfigVisitBasisConfigFragment | FieldConfigGenericTemplateBasisConfigFragment | FieldConfigFeedbackBasisConfigFragment;
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
@@ -6562,6 +6716,9 @@ export type QuestionFragment = (
   ) | (
     { __typename?: 'GenericTemplateBasisConfig' }
     & FieldConfigGenericTemplateBasisConfigFragment
+  ) | (
+    { __typename?: 'FeedbackBasisConfig' }
+    & FieldConfigFeedbackBasisConfigFragment
   ) }
 );
 
@@ -6625,6 +6782,9 @@ export type QuestionTemplateRelationFragment = (
   ) | (
     { __typename?: 'GenericTemplateBasisConfig' }
     & FieldConfigGenericTemplateBasisConfigFragment
+  ) | (
+    { __typename?: 'FeedbackBasisConfig' }
+    & FieldConfigFeedbackBasisConfigFragment
   ), dependencies: Array<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -6781,6 +6941,9 @@ export type GetQuestionsQuery = (
     ) | (
       { __typename?: 'GenericTemplateBasisConfig' }
       & FieldConfigGenericTemplateBasisConfigFragment
+    ) | (
+      { __typename?: 'FeedbackBasisConfig' }
+      & FieldConfigFeedbackBasisConfigFragment
     ), answers: Array<(
       { __typename?: 'AnswerBasic' }
       & Pick<AnswerBasic, 'questionaryId'>
@@ -7788,6 +7951,15 @@ export const EsiFragmentDoc = gql`
   created
 }
     `;
+export const FeedbackFragmentDoc = gql`
+    fragment feedback on Feedback {
+  id
+  scheduledEventId
+  status
+  questionaryId
+  creatorId
+}
+    `;
 export const GenericTemplateFragmentDoc = gql`
     fragment genericTemplate on GenericTemplate {
   id
@@ -7979,6 +8151,11 @@ export const FieldConfigFragmentDoc = gql`
   ... on GenericTemplateBasisConfig {
     titlePlaceholder
     questionLabel
+  }
+  ... on FeedbackBasisConfig {
+    small_label
+    required
+    tooltip
   }
 }
     `;
@@ -9031,6 +9208,54 @@ export const GetEventLogsDocument = gql`
   }
 }
     `;
+export const CreateFeedbackDocument = gql`
+    mutation createFeedback($scheduledEventId: Int!) {
+  createFeedback(scheduledEventId: $scheduledEventId) {
+    feedback {
+      ...feedback
+      questionary {
+        ...questionary
+        isCompleted
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${FeedbackFragmentDoc}
+${QuestionaryFragmentDoc}
+${RejectionFragmentDoc}`;
+export const GetFeedbackDocument = gql`
+    query getFeedback($feedbackId: Int!) {
+  feedback(feedbackId: $feedbackId) {
+    ...feedback
+    questionary {
+      ...questionary
+      isCompleted
+    }
+  }
+}
+    ${FeedbackFragmentDoc}
+${QuestionaryFragmentDoc}`;
+export const UpdateFeedbackDocument = gql`
+    mutation updateFeedback($feedbackId: Int!, $status: FeedbackStatus) {
+  updateFeedback(feedbackId: $feedbackId, status: $status) {
+    feedback {
+      ...feedback
+      questionary {
+        ...questionary
+        isCompleted
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${FeedbackFragmentDoc}
+${QuestionaryFragmentDoc}
+${RejectionFragmentDoc}`;
 export const CloneGenericTemplateDocument = gql`
     mutation cloneGenericTemplate($genericTemplateId: Int!, $title: String) {
   cloneGenericTemplate(genericTemplateId: $genericTemplateId, title: $title) {
@@ -9711,6 +9936,7 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
           startsAt
           endsAt
           bookingType
+          status
           visit {
             ...visit
             teamLead {
@@ -9729,6 +9955,9 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
           esi {
             ...esi
           }
+          feedback {
+            ...feedback
+          }
         }
       }
       visits {
@@ -9745,7 +9974,8 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
 ${VisitFragmentDoc}
 ${ShipmentFragmentDoc}
 ${VisitRegistrationFragmentDoc}
-${EsiFragmentDoc}`;
+${EsiFragmentDoc}
+${FeedbackFragmentDoc}`;
 export const AnswerTopicDocument = gql`
     mutation answerTopic($questionaryId: Int!, $topicId: Int!, $answers: [AnswerInput!]!, $isPartialSave: Boolean) {
   answerTopic(
@@ -11589,6 +11819,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getEventLogs(variables: GetEventLogsQueryVariables): Promise<GetEventLogsQuery> {
       return withWrapper(() => client.request<GetEventLogsQuery>(print(GetEventLogsDocument), variables));
+    },
+    createFeedback(variables: CreateFeedbackMutationVariables): Promise<CreateFeedbackMutation> {
+      return withWrapper(() => client.request<CreateFeedbackMutation>(print(CreateFeedbackDocument), variables));
+    },
+    getFeedback(variables: GetFeedbackQueryVariables): Promise<GetFeedbackQuery> {
+      return withWrapper(() => client.request<GetFeedbackQuery>(print(GetFeedbackDocument), variables));
+    },
+    updateFeedback(variables: UpdateFeedbackMutationVariables): Promise<UpdateFeedbackMutation> {
+      return withWrapper(() => client.request<UpdateFeedbackMutation>(print(UpdateFeedbackDocument), variables));
     },
     cloneGenericTemplate(variables: CloneGenericTemplateMutationVariables): Promise<CloneGenericTemplateMutation> {
       return withWrapper(() => client.request<CloneGenericTemplateMutation>(print(CloneGenericTemplateDocument), variables));

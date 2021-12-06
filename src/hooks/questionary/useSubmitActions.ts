@@ -1,3 +1,4 @@
+import { feedbackBasisPreSubmit } from 'components/questionary/questionaryComponents/FeedbackBasis/QuestionaryComponentFeedbackBasis';
 import { genericTemplateBasisPreSubmit } from 'components/questionary/questionaryComponents/GenericTemplateBasis/QuestionaryComponentGenericTemplateBasis';
 import { proposalBasisPreSubmit } from 'components/questionary/questionaryComponents/ProposalBasis/QuestionaryComponentProposalBasis';
 import { sampleBasisPreSubmit } from 'components/questionary/questionaryComponents/SampleBasis/QuestionaryComponentSampleBasis';
@@ -32,6 +33,8 @@ export function usePreSubmitActions() {
           return visitBasisPreSubmit();
         case DataType.GENERIC_TEMPLATE_BASIS:
           return genericTemplateBasisPreSubmit();
+        case DataType.FEEDBACK_BASIS:
+          return feedbackBasisPreSubmit();
       }
 
       return [];

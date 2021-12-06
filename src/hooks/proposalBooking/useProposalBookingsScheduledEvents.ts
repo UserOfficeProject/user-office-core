@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import {
   EsiFragment,
+  FeedbackFragment,
   Instrument,
   Maybe,
   Proposal,
@@ -21,7 +22,7 @@ import {
 
 export type ProposalScheduledEvent = Pick<
   ScheduledEventCore,
-  'startsAt' | 'endsAt' | 'id'
+  'startsAt' | 'endsAt' | 'id' | 'status'
 > & {
   proposal: Pick<
     Proposal,
@@ -43,7 +44,7 @@ export type ProposalScheduledEvent = Pick<
         shipments: ShipmentFragment[];
       } & Pick<Visit, 'teamLead'>)
     | null;
-} & { esi: Maybe<EsiFragment> };
+} & { esi: Maybe<EsiFragment> } & { feedback: Maybe<FeedbackFragment> };
 
 export function useProposalBookingsScheduledEvents({
   onlyUpcoming,
@@ -90,6 +91,7 @@ export function useProposalBookingsScheduledEvents({
                   id: scheduledEvent.id,
                   startsAt: scheduledEvent.startsAt,
                   endsAt: scheduledEvent.endsAt,
+                  status: scheduledEvent.status,
                   proposal: {
                     primaryKey: proposal.primaryKey,
                     title: proposal.title,
@@ -103,6 +105,7 @@ export function useProposalBookingsScheduledEvents({
                   instrument: proposal.instrument,
                   visit: scheduledEvent.visit,
                   esi: scheduledEvent.esi,
+                  feedback: scheduledEvent.feedback,
                 });
               }
             )

@@ -1,0 +1,7 @@
+fragment feedback on Feedback {
+    id,
+    scheduledEventId,
+    status,
+    questionaryId,
+    creatorId
+}
