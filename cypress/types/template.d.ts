@@ -1,6 +1,74 @@
+import {
+  CreateTemplateMutationVariables,
+  CreateTemplateMutation,
+  CreateTopicMutationVariables,
+  CreateQuestionMutationVariables,
+  CreateQuestionMutation,
+  UpdateQuestionMutationVariables,
+  UpdateQuestionMutation,
+  CreateQuestionTemplateRelationMutation,
+  CreateQuestionTemplateRelationMutationVariables,
+  CreateTopicMutation,
+  CreateGenericTemplateMutationVariables,
+  CreateGenericTemplateMutation,
+  AnswerTopicMutationVariables,
+  AnswerTopicMutation,
+  CreateSampleMutationVariables,
+  CreateSampleMutation,
+  CloneTemplateMutationVariables,
+  CloneTemplateMutation,
+  UpdateQuestionTemplateRelationSettingsMutationVariables,
+  UpdateQuestionTemplateRelationSettingsMutation,
+} from '../../src/generated/sdk';
+
 declare global {
   namespace Cypress {
     interface Chainable {
+      /**
+       * Creates question
+       *
+       * @returns {typeof createQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createQuestion(createQuestionInput: CreateQuestionMutationVariables)
+       */
+      createQuestion: (
+        createQuestionInput: CreateQuestionMutationVariables
+      ) => Cypress.Chainable<CreateQuestionMutation>;
+      /**
+       * Updates question
+       *
+       * @returns {typeof updateQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.updateQuestion(updateQuestionInput: UpdateQuestionMutationVariables)
+       */
+      updateQuestion: (
+        updateQuestionInput: UpdateQuestionMutationVariables
+      ) => Cypress.Chainable<UpdateQuestionMutation>;
+      /**
+       * Adds question to topic
+       *
+       * @returns {typeof createQuestionTemplateRelation}
+       * @memberof Chainable
+       * @example
+       *    cy.createQuestionTemplateRelation(createQuestionTemplateRelationInput: CreateQuestionTemplateRelationMutationVariables)
+       */
+      createQuestionTemplateRelation: (
+        createQuestionTemplateRelationInput: CreateQuestionTemplateRelationMutationVariables
+      ) => Cypress.Chainable<CreateQuestionTemplateRelationMutation>;
+      /**
+       * Updates question topic relation settings
+       *
+       * @returns {typeof updateQuestionTemplateRelationSettings}
+       * @memberof Chainable
+       * @example
+       *    cy.updateQuestionTemplateRelationSettings(updateQuestionTemplateRelationSettingsInput: UpdateQuestionTemplateRelationSettingsMutationVariables)
+       */
+      updateQuestionTemplateRelationSettings: (
+        updateQuestionTemplateRelationSettingsInput: UpdateQuestionTemplateRelationSettingsMutationVariables
+      ) => Cypress.Chainable<UpdateQuestionTemplateRelationSettingsMutation>;
+
       /**
        * Creates boolean question. You have to be in edit template view to call this method
        *
@@ -24,7 +92,7 @@ declare global {
         options?: {
           isRequired?: boolean;
           isMultipleLines?: boolean;
-          minimumCharacters?: number;
+          maxCharacters?: number;
         }
       ) => void;
 
@@ -58,9 +126,9 @@ declare global {
           option1?: string;
           option2?: string;
           option3?: string;
-          isMultipleSelect?: boolean
-          type?: 'radio' | 'dropdown'
-        },
+          isMultipleSelect?: boolean;
+          type?: 'radio' | 'dropdown';
+        }
       ) => void;
 
       /**
@@ -124,7 +192,7 @@ declare global {
        * @example
        *    cy.createGenericTemplateQuestion('Provide deatails of any grants', 'deafult generic template', 'Add grant' {minEntries:0, maxEntries:5})
        */
-       createGenericTemplateQuestion: (
+      createGenericTemplateQuestion: (
         question: string,
         template: string,
         addButtonLabel: string,
@@ -163,17 +231,30 @@ declare global {
        *    cy.createTemplate('proposal')
        */
       createTemplate: (
-        type:
-          | 'proposal'
-          | 'sample'
-          | 'shipment'
-          | 'visit'
-          | 'proposalEsi'
-          | 'sampleEsi'
-          | 'genericTemplate',
-        title?: string,
-        description?: string
-      ) => void;
+        createTemplateInput: CreateTemplateMutationVariables
+      ) => Cypress.Chainable<CreateTemplateMutation>;
+      /**
+       * Clone template
+       *
+       * @returns {typeof cloneTemplate}
+       * @memberof Chainable
+       * @example
+       *    cy.createTemplate('proposal')
+       */
+      cloneTemplate: (
+        cloneTemplateInput: CloneTemplateMutationVariables
+      ) => Cypress.Chainable<CloneTemplateMutation>;
+      /**
+       * Creates generic template
+       *
+       * @returns {typeof createGenericTemplate}
+       * @memberof Chainable
+       * @example
+       *    cy.createGenericTemplate('proposal')
+       */
+      createGenericTemplate: (
+        createGenericTemplateInput: CreateGenericTemplateMutationVariables
+      ) => Cypress.Chainable<CreateGenericTemplateMutation>;
 
       /**
        * Creates topic in template
@@ -181,9 +262,35 @@ declare global {
        * @returns {typeof createTopic}
        * @memberof Chainable
        * @example
-       *    cy.createTopic('New topic')
+       *    cy.createTopic(createTopicInput: CreateTopicMutationVariables)
        */
-      createTopic: (topic: string) => void;
+      createTopic: (
+        createTopicInput: CreateTopicMutationVariables
+      ) => Cypress.Chainable<CreateTopicMutation>;
+
+      /**
+       * Answers topic in proposal template
+       *
+       * @returns {typeof answerTopic}
+       * @memberof Chainable
+       * @example
+       *    cy.answerTopic(answerTopicInput: AnswerTopicMutationVariables)
+       */
+      answerTopic: (
+        answerTopicInput: AnswerTopicMutationVariables
+      ) => Cypress.Chainable<AnswerTopicMutation>;
+
+      /**
+       * Creates sample
+       *
+       * @returns {typeof createSample}
+       * @memberof Chainable
+       * @example
+       *    cy.createSample(createSampleInput: CreateSampleMutationVariables)
+       */
+      createSample: (
+        createSampleInput: CreateSampleMutationVariables
+      ) => Cypress.Chainable<CreateSampleMutation>;
     }
   }
 }

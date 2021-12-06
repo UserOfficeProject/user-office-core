@@ -103,24 +103,28 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
     }
   };
 
-  const updateInstrument = async (
-    oldData: InstrumentWithAvailabilityTime,
-    newData: InstrumentWithAvailabilityTime
-  ) => {
+  const updateInstrument = async (instrumentUpdatedData: {
+    id: number;
+    availabilityTime: number | string;
+  }) => {
     const result = await api(
       'Availability time set successfully!'
     ).setInstrumentAvailabilityTime({
       callId: call.id,
-      instrumentId: newData.id,
-      availabilityTime: +(newData.availabilityTime as number),
+      instrumentId: instrumentUpdatedData.id,
+      availabilityTime: +instrumentUpdatedData.availabilityTime,
     });
 
     if (!result.setInstrumentAvailabilityTime.rejection) {
-      const dataUpdate = [...call.instruments];
-      const index = dataUpdate.indexOf(oldData);
-      dataUpdate[index] = newData;
+      const newUpdatedData = call.instruments.map((instrument) => ({
+        ...instrument,
+        availabilityTime:
+          instrument.id === instrumentUpdatedData.id
+            ? +instrumentUpdatedData.availabilityTime
+            : instrument.availabilityTime,
+      }));
 
-      setInstrumentAvailabilityTime(dataUpdate, call.id);
+      setInstrumentAvailabilityTime(newUpdatedData, call.id);
     }
   };
 
@@ -135,17 +139,17 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
           onRowDelete: (
             rowAssignmentsData: InstrumentWithAvailabilityTime
           ): Promise<void> => removeAssignedInstrument(rowAssignmentsData.id),
-          onRowUpdate: (newData, oldData) =>
+          onRowUpdate: (instrumentUpdatedData) =>
             new Promise<void>(async (resolve, reject) => {
               if (
-                newData &&
-                newData.availabilityTime &&
-                +newData.availabilityTime > 0
+                instrumentUpdatedData &&
+                instrumentUpdatedData.availabilityTime &&
+                +instrumentUpdatedData.availabilityTime > 0
               ) {
-                await updateInstrument(
-                  oldData as InstrumentWithAvailabilityTime,
-                  newData
-                );
+                await updateInstrument({
+                  id: instrumentUpdatedData.id,
+                  availabilityTime: instrumentUpdatedData.availabilityTime,
+                });
                 resolve();
               } else {
                 enqueueSnackbar('Availability time must be positive number', {
