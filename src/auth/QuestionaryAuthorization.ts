@@ -6,6 +6,7 @@ import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateGroupId } from '../models/Template';
 import { User } from '../models/User';
+import { FeedbackQuestionaryAuthorizer } from './questionary/FeedbackQuestionaryAuthorizer';
 import { GenericTemplateQuestionaryAuthorizer } from './questionary/GenericTemplateQuestionaryAuthorizer';
 import { ProposalEsiQuestionaryAuthorizer } from './questionary/ProposalEsiQuestionaryAuthorizer';
 import { ProposalQuestionaryAuthorizer } from './questionary/ProposalQuestionaryAuthorizer';
@@ -57,6 +58,10 @@ export class QuestionaryAuthorization {
     this.authorizers.set(
       TemplateGroupId.GENERIC_TEMPLATE,
       container.resolve(GenericTemplateQuestionaryAuthorizer)
+    );
+    this.authorizers.set(
+      TemplateGroupId.FEEDBACK,
+      container.resolve(FeedbackQuestionaryAuthorizer)
     );
   }
 

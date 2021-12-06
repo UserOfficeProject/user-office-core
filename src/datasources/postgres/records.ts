@@ -6,6 +6,7 @@ import {
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
 import { Feature, FeatureId } from '../../models/Feature';
+import { Feedback } from '../../models/Feedback';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
@@ -39,6 +40,7 @@ import {
   ScheduledEventBookingType,
 } from '../../resolvers/types/ProposalBooking';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
+import { FeedbackStatus } from './../../models/Feedback';
 
 // Interfaces corresponding exactly to database tables
 
@@ -564,6 +566,16 @@ export interface TemplateGroupRecord {
   readonly category_id: number;
 }
 
+export interface FeedbackRecord {
+  readonly feedback_id: number;
+  readonly scheduled_event_id: number;
+  readonly status: FeedbackStatus;
+  readonly questionary_id: number;
+  readonly creator_id: number;
+  readonly created_at: Date;
+  readonly submitted_at: Date;
+}
+
 export const createTopicObject = (record: TopicRecord) => {
   return new Topic(
     record.topic_id,
@@ -973,4 +985,15 @@ export const createScheduledEventObject = (
     scheduledEvent.proposal_pk,
     scheduledEvent.proposal_booking_id,
     scheduledEvent.status
+  );
+
+export const createFeedbackObject = (scheduledEvent: FeedbackRecord) =>
+  new Feedback(
+    scheduledEvent.feedback_id,
+    scheduledEvent.scheduled_event_id,
+    scheduledEvent.status,
+    scheduledEvent.questionary_id,
+    scheduledEvent.creator_id,
+    scheduledEvent.created_at,
+    scheduledEvent.submitted_at
   );
