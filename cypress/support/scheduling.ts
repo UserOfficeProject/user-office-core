@@ -1,6 +1,7 @@
+// TODO: Check if this is used somewhere because commands are not found in the test files.
 import { GraphQLClient } from 'graphql-request';
 
-const createScheduledEvent = (proposalBookingId, date) => {
+const createScheduledEvent = (proposalBookingId: any, date: any) => {
   const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
 
   const createEventQuery = `
@@ -29,7 +30,7 @@ const createScheduledEvent = (proposalBookingId, date) => {
   cy.wrap(createEventReq);
 };
 
-const activateScheduledEvent = (scheduledEventId) => {
+const activateScheduledEvent = (scheduledEventId: any) => {
   const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
 
   const activateScheduledEventQuery = `

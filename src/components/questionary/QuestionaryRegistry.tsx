@@ -3,6 +3,7 @@ import { TemplateGroupId } from 'generated/sdk';
 
 import { StepDisplayElementFactory } from './DefaultStepDisplayElementFactory';
 import { esiQuestionaryDefinition } from './questionaries/esi/EsiQuestionaryDefinition';
+import { feedbackQuestionaryDefinition } from './questionaries/feedback/FeedbackQuestionaryDefinition';
 import { genericTemplateQuestionaryDefinition } from './questionaries/genericTemplate/GenericTemplateQuestionaryDefinition';
 import { proposalQuestionaryDefinition } from './questionaries/proposal/ProposalQuestionaryDefinition';
 import { sampleQuestionaryDefinition } from './questionaries/sample/SampleQuestionaryDefinition';
@@ -29,13 +30,14 @@ export interface QuestionaryDefinition {
 }
 
 const registry = [
+  esiQuestionaryDefinition,
+  feedbackQuestionaryDefinition,
+  genericTemplateQuestionaryDefinition,
   proposalQuestionaryDefinition,
+  sampleEsiQuestionaryDefinition,
   sampleQuestionaryDefinition,
   shipmentQuestionaryDefinition,
   visitRegistrationQuestionaryDefinition,
-  genericTemplateQuestionaryDefinition,
-  esiQuestionaryDefinition,
-  sampleEsiQuestionaryDefinition,
 ];
 
 Object.freeze(registry);

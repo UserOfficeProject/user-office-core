@@ -1,11 +1,8 @@
 import faker from 'faker';
 
 context('Page tests', () => {
-  before(() => {
-    cy.resetDB();
-  });
-
   beforeEach(() => {
+    cy.resetDB();
     cy.viewport(1920, 1080);
   });
 
@@ -13,6 +10,7 @@ context('Page tests', () => {
 
   it('Should be able update FAQ', () => {
     cy.login('officer');
+    cy.visit('/');
 
     cy.contains('Pages').click();
 

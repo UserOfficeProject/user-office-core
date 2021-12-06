@@ -1,3 +1,23 @@
+import {
+  CreateInstrumentMutationVariables,
+  CreateInstrumentMutation,
+  AssignInstrumentsToCallMutation,
+  AssignScientistsToInstrumentMutationVariables,
+  AssignScientistsToInstrumentMutation,
+  AssignProposalsToInstrumentMutationVariables,
+  AssignProposalsToInstrumentMutation,
+  AssignInstrumentsToCallMutationVariables,
+  UpdateTechnicalReviewAssigneeMutation,
+  UpdateTechnicalReviewAssigneeMutationVariables,
+  CreateInstrumentMutation,
+  AddTechnicalReviewMutationVariables,
+  AddTechnicalReviewMutation,
+  SetInstrumentAvailabilityTimeMutationVariables,
+  SetInstrumentAvailabilityTimeMutation,
+  SubmitInstrumentMutationVariables,
+  SubmitInstrumentMutation,
+} from '../../src/generated/sdk';
+
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -11,59 +31,110 @@ declare global {
        *      name: faker.random.words(2),
        *      shortCode: faker.random.alphaNumeric(15),
        *      description: faker.random.words(5),
-       *    })
+       *      managerUserId: 1
+       *    });
        */
       createInstrument: (
-        instrument: {
-          name: string;
-          shortCode: string;
-          description: string;
-        },
-        scientist: string
-      ) => void;
+        createInstrumentInput: CreateInstrumentMutationVariables
+      ) => Cypress.Chainable<CreateInstrumentMutation>;
 
       /**
-       * Assigns all available scientist to an instrument
+       * Assigns available scientist/s to an instrument
        *
        * @returns {typeof assignScientistsToInstrument}
        * @memberof Chainable
        * @example
-       *    cy.assignScientistsToInstrument('instrument name / code');
+       *    cy.assignScientistsToInstrument({
+       *      scientistIds: [1],
+       *      instrumentId: 1
+       *    });
        */
-      assignScientistsToInstrument: (instrument) => void;
+      assignScientistsToInstrument: (
+        assignScientistsToInstrumentInput: AssignScientistsToInstrumentMutationVariables
+      ) => Cypress.Chainable<AssignScientistsToInstrumentMutation>;
 
       /**
-       * Assigns an instrument to a selected proposal
+       * Assigns selected proposal/s to an instrument
        *
-       * @returns {typeof assignInstrumentToProposal}
+       * @returns {typeof assignProposalsToInstrument}
        * @memberof Chainable
        * @example
-       *    cy.assignInstrumentToProposal('proposal name or code', 'instrument name')
+       *    cy.assignProposalsToInstrument({
+       *      proposals: {
+       *        callId: 1,
+       *        primaryKey: 1
+       *      },
+       *      instrumentId: 1
+       *    });
        */
-      assignInstrumentToProposal: (
-        proposal: string,
-        instrument: string
-      ) => void;
+      assignProposalsToInstrument: (
+        assignProposalsToInstrumentInput: AssignProposalsToInstrumentMutationVariables
+      ) => Cypress.Chainable<AssignProposalsToInstrumentMutation>;
 
       /**
-       * Assigns an instrument to a selected call
+       * Assigns an instrument/s to a selected call
        *
        * @returns {typeof assignInstrumentToCall}
        * @memberof Chainable
        * @example
-       *    cy.assignInstrumentToCall('call name or code', 'instrument code or short code')
+       *    cy.assignInstrumentToCall({
+       *      instrumentIds: 1,
+       *      callId: 1
+       *    });
        */
-      assignInstrumentToCall: (call: string, instrument: string) => void;
+      assignInstrumentToCall: (
+        assignInstrumentsToCall: AssignInstrumentsToCallMutationVariables
+      ) => Cypress.Chainable<AssignInstrumentsToCallMutation>;
 
       /**
-       * Assign technical reviewer assignee
+       * Assign technical reviewer assignee to proposal
        *
-       * @returns {typeof assignReviewer}
+       * @returns {typeof updateTechnicalReviewAssignee}
        * @memberof Chainable
        * @example
-       *    cy.assignReviewer('New proposal', 'Carl')
+       *    cy.updateTechnicalReviewAssignee({
+       *      proposalPks: 1,
+       *      userId: 1
+       *    });
        */
-      assignReviewer: (proposalTitle: string, reviewerName: string) => void;
+      updateTechnicalReviewAssignee: (
+        updateTechnicalReviewAssigneeInput: UpdateTechnicalReviewAssigneeMutationVariables
+      ) => Cypress.Chainable<UpdateTechnicalReviewAssigneeMutation>;
+
+      /**
+       * Add technical review to proposal
+       *
+       * @returns {typeof addProposalTechnicalReview}
+       * @memberof Chainable
+       * @example
+       *    cy.addProposalTechnicalReview();
+       */
+      addProposalTechnicalReview: (
+        addTechnicalReviewInput: AddTechnicalReviewMutationVariables
+      ) => Cypress.Chainable<AddTechnicalReviewMutation>;
+      /**
+       * Set instrument availability time on call
+       *
+       * @returns {typeof setInstrumentAvailabilityTime}
+       * @memberof Chainable
+       * @example
+       *    cy.setInstrumentAvailabilityTime();
+       */
+      setInstrumentAvailabilityTime: (
+        setInstrumentAvailabilityTimeInput: SetInstrumentAvailabilityTimeMutationVariables
+      ) => Cypress.Chainable<SetInstrumentAvailabilityTimeMutation>;
+
+      /**
+       * Submit instrument in SEP meeting components
+       *
+       * @returns {typeof submitInstrument}
+       * @memberof Chainable
+       * @example
+       *    cy.submitInstrument(submitInstrumentInput: SubmitInstrumentMutationVariables);
+       */
+      submitInstrument: (
+        submitInstrumentInput: SubmitInstrumentMutationVariables
+      ) => Cypress.Chainable<SubmitInstrumentMutation>;
     }
   }
 }

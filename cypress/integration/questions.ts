@@ -1,11 +1,10 @@
 import faker from 'faker';
 
-context('Questions tests', () => {
-  before(() => {
-    cy.resetDB();
-  });
+import initialDBData from '../support/initialDBData';
 
+context('Questions tests', () => {
   beforeEach(() => {
+    cy.resetDB();
     cy.viewport(1920, 1080);
   });
 
@@ -13,10 +12,14 @@ context('Questions tests', () => {
 
   it('User officer search questions', () => {
     cy.login('officer');
+    cy.visit('/');
 
     cy.navigateToTemplatesSubmenu('Proposal');
 
-    cy.contains('default template').parent().get("[title='Edit']").click();
+    cy.contains(initialDBData.template.name)
+      .parent()
+      .get("[title='Edit']")
+      .click();
 
     cy.createTextQuestion(textQuestion, {
       isRequired: true,

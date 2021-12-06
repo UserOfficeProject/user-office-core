@@ -18,6 +18,7 @@ import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmis
 import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefinition';
 import { dateDefinition } from './questionaryComponents/DatePicker/DatePickerDefinition';
 import { embellishmentDefinition } from './questionaryComponents/Embellishment/EmbellishmentDefinition';
+import { feedbackBasisDefinition } from './questionaryComponents/FeedbackBasis/FeedbackBasisDefinition';
 import { fileUploadDefinition } from './questionaryComponents/FileUpload/FileUploadDefinition';
 import { genericTemplateDefinition } from './questionaryComponents/GenericTemplate/GenericTemplateDefinition';
 import { genericTemplateBasisDefinition } from './questionaryComponents/GenericTemplateBasis/GenericTemplateBasisDefinition';
@@ -148,20 +149,21 @@ const registry = [
   booleanDefinition,
   dateDefinition,
   embellishmentDefinition,
+  feedbackBasisDefinition,
   fileUploadDefinition,
+  genericTemplateBasisDefinition,
+  genericTemplateDefinition,
+  intervalDefinition,
   multiChoiceDefinition,
-  textInputDefinition,
-  sampleDeclarationDefinition,
+  numberInputDefinition,
   proposalBasisDefinition,
   proposalEsiBasisDefinition,
-  sampleBasisDefinition,
-  sampleEsiBasisDefinition,
-  intervalDefinition,
-  numberInputDefinition,
-  shipmentBasisDefinition,
   richTextInputDefinition,
-  genericTemplateDefinition,
-  genericTemplateBasisDefinition,
+  sampleBasisDefinition,
+  sampleDeclarationDefinition,
+  sampleEsiBasisDefinition,
+  shipmentBasisDefinition,
+  textInputDefinition,
   visitBasisDefinition,
 ];
 

@@ -1,15 +1,6 @@
 import faker from 'faker';
 
 context('User tests', () => {
-  before(() => {
-    cy.resetDB();
-  });
-
-  beforeEach(() => {
-    cy.viewport(1920, 1080);
-    cy.visit('/SignUp?code=WRMVXa');
-  });
-
   // Login details
   const password = 'aslaksjdajsl9#ASdADSlk!';
 
@@ -29,6 +20,12 @@ context('User tests', () => {
   //Contact details
   const email = faker.internet.email();
   const telephone = faker.phone.phoneNumber('0##########');
+
+  beforeEach(() => {
+    cy.resetDB();
+    cy.viewport(1920, 1080);
+    cy.visit('/SignUp?code=WRMVXa');
+  });
 
   it('A user should be able to create a new account with mandatory fields only', () => {
     cy.get('[data-cy=email] input').type(email).should('have.value', email);
@@ -98,6 +95,23 @@ context('User tests', () => {
   });
 
   it('A user should be able to login and out', () => {
+    cy.createUser({
+      user_title: faker.name.prefix(),
+      firstname: firstName,
+      lastname: lastName,
+      password: password,
+      orcid: '0000-0000-0000-0000',
+      orcidHash: 'WRMVXa',
+      refreshToken: '-',
+      gender: '-',
+      nationality: 1,
+      birthdate: birthDate,
+      organisation: 1,
+      department: department,
+      position: position,
+      email: email,
+      telephone: telephone,
+    });
     cy.contains('Have an account? Sign In').click();
 
     cy.get('[data-cy=input-email] input')

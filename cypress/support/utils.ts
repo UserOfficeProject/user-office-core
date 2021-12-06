@@ -1,4 +1,11 @@
 import 'cypress-file-upload';
+import { GraphQLClient } from 'graphql-request';
+
+import {
+  CreateApiAccessTokenMutation,
+  CreateApiAccessTokenMutationVariables,
+  getSdk,
+} from '../../src/generated/sdk';
 
 const KEY_CODES = {
   space: 32,
@@ -8,7 +15,33 @@ const KEY_CODES = {
   down: 40,
 };
 
-const notification = ({ variant, text }) => {
+export const getE2EApi = (token?: string | null) => {
+  // NOTE: Token is used when we want to do some action as a specific logged in user.
+  const authHeader = `Bearer ${token ? token : Cypress.env('SVC_ACC_TOKEN')}`;
+
+  return getSdk(
+    new GraphQLClient('/graphql', {
+      headers: { authorization: authHeader },
+    })
+  );
+};
+
+const createApiAccessToken = (
+  createApiAccessTokenInput: CreateApiAccessTokenMutationVariables
+): Cypress.Chainable<CreateApiAccessTokenMutation> => {
+  const api = getE2EApi();
+  const request = api.createApiAccessToken(createApiAccessTokenInput);
+
+  return cy.wrap(request);
+};
+
+const notification = ({
+  variant,
+  text,
+}: {
+  variant: 'success' | 'error' | 'info';
+  text: string | RegExp;
+}) => {
   let notificationQuerySelector = '';
 
   switch (variant) {
@@ -20,13 +53,15 @@ const notification = ({ variant, text }) => {
       notificationQuerySelector = '.snackbar-success #notistack-snackbar';
       break;
   }
-  let notification = cy.get(notificationQuerySelector).should('exist');
+  cy.get(notificationQuerySelector).should('exist');
 
   if (text) {
     if (text instanceof RegExp) {
-      notification.and(($el) => expect($el.text()).to.match(text));
+      cy.get(notificationQuerySelector).should(($el) =>
+        expect($el.text()).to.match(text)
+      );
     } else {
-      notification.and('contains.text', text);
+      cy.get(notificationQuerySelector).should('contains.text', text);
     }
   }
 };
@@ -43,8 +78,6 @@ const closeNotification = () => {
 
 const closeModal = () => {
   cy.get('[role="dialog"] [data-cy="close-modal"]').click();
-  // NOTE: Need to wait for modal to close with animation.
-  cy.wait(100);
 
   cy.get('[role="dialog"]').should('not.exist');
 };
@@ -72,38 +105,51 @@ function presentationMode() {
     'reload',
     'contains',
   ]) {
-    Cypress.Commands.overwrite(command, (originalFn, ...args) => {
-      const origVal = originalFn(...args);
+    Cypress.Commands.overwrite(
+      command as keyof Cypress.Chainable<any>,
+      (originalFn: any, ...args: any[]) => {
+        const origVal = originalFn(...args);
 
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(origVal);
-        }, COMMAND_DELAY);
-      });
-    });
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(origVal);
+          }, COMMAND_DELAY);
+        });
+      }
+    );
   }
 }
 
-const dragElement = (element, moveArgs) => {
-  const focusedElement = cy.get(element);
+const dragElement = (
+  element: JQuery<HTMLElement>,
+  moveArgs: {
+    direction: 'left' | 'up' | 'right' | 'down';
+    length: number;
+  }[]
+) => {
+  // @ts-expect-error FIXME: This should be fixed maybe using something like cy.find(element.attr('class')!);
+  cy.get(element).as('focusedElement');
 
-  focusedElement.trigger('keydown', { keyCode: KEY_CODES.space });
+  cy.get('@focusedElement').trigger('keydown', { keyCode: KEY_CODES.space });
 
   moveArgs.forEach(({ direction, length }) => {
     for (let i = 1; i <= length; i++) {
-      focusedElement.trigger('keydown', {
+      cy.get('@focusedElement').trigger('keydown', {
         keyCode: KEY_CODES[direction],
         force: true,
       });
     }
   });
 
-  focusedElement.trigger('keydown', { keyCode: KEY_CODES.space, force: true });
+  cy.get('@focusedElement').trigger('keydown', {
+    keyCode: KEY_CODES.space,
+    force: true,
+  });
 
-  return element;
+  return cy.get('@focusedElement');
 };
 
-const setTinyMceContent = (tinyMceId, content) => {
+const setTinyMceContent = (tinyMceId: string, content: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
 
   cy.window().then((win) => {
@@ -112,17 +158,20 @@ const setTinyMceContent = (tinyMceId, content) => {
   });
 };
 
-const getTinyMceContent = (tinyMceId) => {
+const getTinyMceContent = (tinyMceId: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
 
-  cy.window().then((win) => {
+  return cy.window().then((win) => {
     const editor = win.tinyMCE.editors[tinyMceId];
 
     return editor.getContent();
   });
 };
 
-const testActionButton = (title, state) => {
+const testActionButton = (
+  title: string,
+  state: 'completed' | 'active' | 'inactive' | 'neutral' | 'invisible'
+) => {
   switch (state) {
     case 'completed':
       cy.get(`[title="${title}"]`).should('not.be.disabled');
@@ -165,8 +214,9 @@ Cypress.Commands.add('finishedLoading', finishedLoading);
 Cypress.Commands.add(
   'dragElement',
   { prevSubject: 'element' },
+  // @ts-expect-error FIXME: this should be solved
   (element, args) => {
-    dragElement(element, args);
+    return dragElement(element, args);
   }
 );
 
@@ -175,3 +225,4 @@ Cypress.Commands.add('presentationMode', presentationMode);
 Cypress.Commands.add('setTinyMceContent', setTinyMceContent);
 Cypress.Commands.add('getTinyMceContent', getTinyMceContent);
 Cypress.Commands.add('testActionButton', testActionButton);
+Cypress.Commands.add('createApiAccessToken', createApiAccessToken);
