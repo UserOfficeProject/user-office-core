@@ -46,7 +46,6 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
           if (unmounted) {
             return;
           }
-          console.log(data);
           if (data.instrumentScientistProposals) {
             setProposalsData(
               data.instrumentScientistProposals.proposals.map((proposal) => {
