@@ -7,6 +7,7 @@ import {
   EvaluatorOperator,
 } from '../models/ConditionEvaluator';
 import { FeatureId } from '../models/Feature';
+import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
 import { QuestionFilterCompareOperator } from '../models/Questionary';
@@ -69,5 +70,8 @@ export const registerEnums = () => {
   });
   registerEnumType(EquipmentAssignmentStatus, {
     name: 'EquipmentAssignmentStatus',
+  });
+  registerEnumType(FeedbackStatus, {
+    name: 'FeedbackStatus',
   });
 };
