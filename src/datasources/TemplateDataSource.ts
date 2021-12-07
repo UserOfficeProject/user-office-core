@@ -25,6 +25,7 @@ export interface TemplateDataSource {
   // Template
   createTemplate(args: CreateTemplateArgs): Promise<Template>;
   getTemplate(templateId: number): Promise<Template | null>;
+  getTemplateAsJson(templateId: number): Promise<string>;
   getTemplates(args?: TemplatesArgs): Promise<Template[]>;
   updateTemplate(values: UpdateTemplateArgs): Promise<Template | null>;
   deleteTemplate(id: number): Promise<Template>;
@@ -54,6 +55,7 @@ export interface TemplateDataSource {
   deleteQuestion(questionId: string): Promise<Question>;
   getComplementaryQuestions(templateId: number): Promise<Question[] | null>;
   getQuestions(filter?: QuestionsFilter): Promise<Question[]>;
+  getQuestionsInTemplate(templateId: number): Promise<Question[]>;
 
   // TemplateField rel
   getQuestionTemplateRelation(

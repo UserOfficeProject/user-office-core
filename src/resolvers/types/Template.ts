@@ -73,12 +73,20 @@ export class TemplateResolver {
   }
 
   @FieldResolver(() => TemplateGroup)
-  async group(
-    @Root() template: Template,
-    @Ctx() context: ResolverContext
-  ): Promise<TemplateGroup> {
+  async group(@Root() template: Template): Promise<TemplateGroup> {
     const templateDataSource = container.resolve(TemplateDataSource);
 
     return templateDataSource.getGroup(template.groupId);
+  }
+
+  @FieldResolver(() => String)
+  async json(
+    @Root() template: Template,
+    @Ctx() context: ResolverContext
+  ): Promise<string> {
+    return context.queries.template.getTemplateAsJson(
+      context.user,
+      template.templateId
+    );
   }
 }
