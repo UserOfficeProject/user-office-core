@@ -157,7 +157,10 @@ export default function createHandler() {
           await userDataSource.setUserEmailVerified(
             event.userlinkresponse.user.id
           );
-          console.log('verify user without email in development');
+          logger.logInfo('Set user as verified without sending email', {
+            userId: event.userlinkresponse.user.id,
+            event,
+          });
         } else {
           mailService
             .sendMail({

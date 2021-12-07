@@ -38,7 +38,10 @@ async function bootstrap() {
     logger.logException('Unhandled NODE exception', error);
   });
 
-  console.info(`Running a GraphQL API server at localhost:${PORT}/graphql`);
+  logger.logInfo(
+    `Running a GraphQL API server at localhost:${PORT}/graphql`,
+    {}
+  );
 
   startAsyncJobs();
   container.resolve<() => void>(Tokens.ConfigureEnvironment)();

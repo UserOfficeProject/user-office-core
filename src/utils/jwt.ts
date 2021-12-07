@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import jsonwebtoken, {
   Algorithm,
   SignOptions,
@@ -8,12 +9,18 @@ const secret = process.env.secret as string;
 const expiresIn = process.env.tokenLife as string;
 
 if (!secret) {
-  console.error('jwt secret missing');
+  logger.logError(
+    'Could not start application: the `secret` environment variable is missing. Exiting.',
+    {}
+  );
   process.exit(1);
 }
 
 if (!expiresIn) {
-  console.error('tokenLife missing');
+  logger.logError(
+    'Could not start application: the `tokenLike` environment variable is missing. Exiting.',
+    {}
+  );
   process.exit(1);
 }
 
