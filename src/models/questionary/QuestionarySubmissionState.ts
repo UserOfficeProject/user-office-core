@@ -10,6 +10,7 @@ import {
 } from 'utils/useReducerWithMiddleWares';
 
 import { SampleFragment } from './../../generated/sdk';
+import { FeedbackWithQuestionary } from './feedback/FeedbackWithQuestionary';
 import { GenericTemplateWithQuestionary } from './genericTemplate/GenericTemplateWithQuestionary';
 import { ProposalSubmissionState } from './proposal/ProposalSubmissionState';
 import { ProposalWithQuestionary } from './proposal/ProposalWithQuestionary';
@@ -87,7 +88,12 @@ export type Event =
   | { type: 'SAMPLE_ESI_CREATED'; esi: SampleEsiWithQuestionary }
   | { type: 'SAMPLE_ESI_LOADED'; esi: SampleEsiWithQuestionary }
   | { type: 'SAMPLE_ESI_MODIFIED'; esi: Partial<SampleEsiWithQuestionary> }
-  | { type: 'SAMPLE_ESI_SUBMITTED'; esi: Partial<SampleEsiWithQuestionary> };
+  | { type: 'SAMPLE_ESI_SUBMITTED'; esi: Partial<SampleEsiWithQuestionary> }
+  // feedback
+  | { type: 'FEEDBACK_CREATED'; feedback: FeedbackWithQuestionary }
+  | { type: 'FEEDBACK_LOADED'; feedback: FeedbackWithQuestionary }
+  | { type: 'FEEDBACK_MODIFIED'; feedback: Partial<FeedbackWithQuestionary> }
+  | { type: 'FEEDBACK_SUBMITTED'; feedback: Partial<FeedbackWithQuestionary> };
 
 export interface WizardStepMetadata {
   title: string;

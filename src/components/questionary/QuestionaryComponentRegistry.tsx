@@ -11,6 +11,7 @@ import {
   QuestionTemplateRelation,
   Sdk,
   Template,
+  TemplateFragment,
 } from 'generated/sdk';
 import { Question } from 'models/questionary/Question';
 import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
@@ -18,6 +19,7 @@ import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmis
 import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefinition';
 import { dateDefinition } from './questionaryComponents/DatePicker/DatePickerDefinition';
 import { embellishmentDefinition } from './questionaryComponents/Embellishment/EmbellishmentDefinition';
+import { feedbackBasisDefinition } from './questionaryComponents/FeedbackBasis/FeedbackBasisDefinition';
 import { fileUploadDefinition } from './questionaryComponents/FileUpload/FileUploadDefinition';
 import { genericTemplateDefinition } from './questionaryComponents/GenericTemplate/GenericTemplateDefinition';
 import { genericTemplateBasisDefinition } from './questionaryComponents/GenericTemplateBasis/GenericTemplateBasisDefinition';
@@ -49,8 +51,8 @@ export interface QuestionTemplateRelationFormProps {
   questionRel: QuestionTemplateRelation;
   template: Template;
   closeMe?: () => unknown;
-  onUpdated?: (template: Template) => unknown;
-  onDeleted?: (template: Template) => unknown;
+  onUpdated?: (template: TemplateFragment) => unknown;
+  onDeleted?: (template: TemplateFragment) => unknown;
   onOpenQuestionClicked?: (question: Question) => unknown;
   children?: FormChildren<QuestionTemplateRelation>;
 }
@@ -148,20 +150,21 @@ const registry = [
   booleanDefinition,
   dateDefinition,
   embellishmentDefinition,
+  feedbackBasisDefinition,
   fileUploadDefinition,
+  genericTemplateBasisDefinition,
+  genericTemplateDefinition,
+  intervalDefinition,
   multiChoiceDefinition,
-  textInputDefinition,
-  sampleDeclarationDefinition,
+  numberInputDefinition,
   proposalBasisDefinition,
   proposalEsiBasisDefinition,
-  sampleBasisDefinition,
-  sampleEsiBasisDefinition,
-  intervalDefinition,
-  numberInputDefinition,
-  shipmentBasisDefinition,
   richTextInputDefinition,
-  genericTemplateDefinition,
-  genericTemplateBasisDefinition,
+  sampleBasisDefinition,
+  sampleDeclarationDefinition,
+  sampleEsiBasisDefinition,
+  shipmentBasisDefinition,
+  textInputDefinition,
   visitBasisDefinition,
 ];
 

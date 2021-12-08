@@ -7,6 +7,7 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+import FeedbackIcon from '@material-ui/icons/Feedback';
 import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
 import InboxIcon from '@material-ui/icons/Inbox';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
@@ -149,6 +150,15 @@ export function TemplateMenuListItem() {
         </Tooltip>
 
         {isRiskAssessmentFeatureEnabled && <EsiTemplatesMenuListItem />}
+
+        <Tooltip title="Feedback">
+          <ListItem component={NavLink} to="/FeedbackTemplates" button>
+            <ListItemIcon>
+              <FeedbackIcon />
+            </ListItemIcon>
+            <ListItemText primary="Feedback" />
+          </ListItem>
+        </Tooltip>
       </Collapse>
     </>
   );
