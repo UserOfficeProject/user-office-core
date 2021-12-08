@@ -1,32 +1,117 @@
 import faker from 'faker';
 
+import {
+  AllocationTimeUnits,
+  DataType,
+  TemplateCategoryId,
+  TemplateGroupId,
+} from '../../src/generated/sdk';
+import initialDBData from '../support/initialDBData';
+
 context('Proposal tests', () => {
   const title = faker.lorem.words(2);
   const abstract = faker.lorem.words(3);
-  const proposalToCloneTitle = faker.lorem.words(2);
-  const proposalToCloneAbstract = faker.lorem.words(3);
-  const clonedProposalTitle = `Copy of ${proposalToCloneTitle}`;
-
+  const newProposalTitle = faker.lorem.words(2);
+  const newProposalAbstract = faker.lorem.words(3);
+  const proposalTitleUpdated = faker.lorem.words(2);
+  const clonedProposalTitle = `Copy of ${newProposalTitle}`;
+  const proposer = initialDBData.users.user1;
   const proposalWorkflow = {
     name: faker.random.words(2),
     description: faker.random.words(5),
   };
+  let createdWorkflowId: number;
+  let createdProposalPk: number;
+  const textQuestion = faker.random.words(2);
 
-  before(() => {
-    cy.resetDB();
-    cy.resetSchedulerDB();
-    cy.viewport(1920, 1080);
-    cy.login('officer');
-    cy.createTemplate('proposalEsi', 'default esi template');
-    cy.logout();
-  });
+  const currentDayStart = new Date();
+  currentDayStart.setHours(0, 0, 0, 0);
+  const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
+  const twoDaysAgo = new Date(new Date().setDate(new Date().getDate() - 2));
+
+  const newCall = {
+    shortCode: faker.random.alphaNumeric(15),
+    startCall: faker.date.past().toISOString().slice(0, 10),
+    endCall: faker.date.future().toISOString().slice(0, 10),
+    startReview: currentDayStart,
+    endReview: currentDayStart,
+    startSEPReview: currentDayStart,
+    endSEPReview: currentDayStart,
+    startNotify: currentDayStart,
+    endNotify: currentDayStart,
+    startCycle: currentDayStart,
+    endCycle: currentDayStart,
+    templateName: initialDBData.template.name,
+    templateId: initialDBData.template.id,
+    allocationTimeUnit: AllocationTimeUnits.DAY,
+    cycleComment: faker.lorem.word(),
+    surveyComment: faker.lorem.word(),
+  };
+
+  const createTopicAndQuestionToExistingTemplate = () => {
+    cy.createTopic({
+      templateId: initialDBData.template.id,
+      sortOrder: 1,
+    }).then((topicResult) => {
+      if (topicResult.createTopic.template) {
+        const topicId =
+          topicResult.createTopic.template.steps[
+            topicResult.createTopic.template.steps.length - 1
+          ].topic.id;
+        cy.createQuestion({
+          categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+          dataType: DataType.TEXT_INPUT,
+        }).then((result) => {
+          if (result.createQuestion.question) {
+            cy.updateQuestion({
+              id: result.createQuestion.question.id,
+              question: textQuestion,
+            });
+
+            cy.createQuestionTemplateRelation({
+              templateId: initialDBData.template.id,
+              sortOrder: 0,
+              topicId: topicId,
+              questionId: result.createQuestion.question.id,
+            });
+          }
+        });
+      }
+    });
+  };
 
   beforeEach(() => {
+    cy.resetDB();
+    cy.createTemplate({
+      name: 'default esi template',
+      groupId: TemplateGroupId.PROPOSAL_ESI,
+    });
+    cy.createProposalWorkflow({
+      name: proposalWorkflow.name,
+      description: proposalWorkflow.description,
+    }).then((result) => {
+      if (result.createProposalWorkflow.proposalWorkflow) {
+        createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
+      }
+    });
+    cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+      if (result.createProposal.proposal) {
+        createdProposalPk = result.createProposal.proposal.primaryKey;
+
+        cy.updateProposal({
+          proposalPk: result.createProposal.proposal.primaryKey,
+          title: newProposalTitle,
+          abstract: newProposalAbstract,
+          proposerId: proposer.id,
+        });
+      }
+    });
     cy.viewport(1920, 1080);
   });
 
   it('Should be able create proposal', () => {
     cy.login('user');
+    cy.visit('/');
 
     cy.contains('New Proposal').click();
 
@@ -50,15 +135,39 @@ context('Proposal tests', () => {
     cy.contains('Title is required');
     cy.contains('Abstract is required');
 
-    const proposer = 'Carl';
+    cy.contains('New Proposal').click();
 
-    cy.createProposal(title, abstract, '', proposer);
+    cy.get('[data-cy=title] input').type(title).should('have.value', title);
+
+    cy.get('[data-cy=abstract] textarea')
+      .first()
+      .type(abstract)
+      .should('have.value', abstract);
+
+    cy.get('[data-cy=edit-proposer-button]').click();
+    cy.get('[role="presentation"]').as('modal');
+
+    cy.get('@modal')
+      .contains(proposer.firstName)
+      .parent()
+      .find("[title='Select user']")
+      .click();
+
+    cy.contains('Save and continue').click();
+
+    cy.finishedLoading();
+
+    cy.notification({ variant: 'success', text: 'Saved' });
 
     cy.contains('Dashboard').click();
 
     cy.contains(title).parent().contains('draft');
 
-    cy.get('[title="Edit proposal"]').should('exist').click();
+    cy.contains(title)
+      .parent()
+      .find('[title="Edit proposal"]')
+      .should('exist')
+      .click();
 
     cy.contains('Submit').click();
 
@@ -71,8 +180,36 @@ context('Proposal tests', () => {
     cy.get('[title="View proposal"]').should('exist');
   });
 
+  it('Officer should be able to edit proposal', () => {
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.contains('Proposals').click();
+
+    cy.contains(newProposalTitle)
+      .parent()
+      .find('[title="View proposal"]')
+      .click();
+
+    cy.contains('Edit proposal').click();
+
+    cy.contains('New proposal').click();
+
+    cy.get('[data-cy=title] input')
+      .clear()
+      .type(proposalTitleUpdated)
+      .should('have.value', proposalTitleUpdated);
+
+    cy.get('[data-cy=save-and-continue-button]').click();
+
+    cy.contains('Close').click();
+
+    cy.contains(proposalTitleUpdated);
+  });
+
   it('User officer should be able to save proposal column selection', () => {
     cy.login('officer');
+    cy.visit('/');
 
     cy.contains('Proposals').click();
 
@@ -94,10 +231,7 @@ context('Proposal tests', () => {
 
   it('Should be able to see proposal allocation time unit on the proposal', () => {
     cy.login('officer');
-    cy.createProposalWorkflow(
-      proposalWorkflow.name,
-      proposalWorkflow.description
-    );
+    cy.visit('/');
 
     cy.contains('Proposals').click();
 
@@ -107,7 +241,10 @@ context('Proposal tests', () => {
 
     cy.get('body').click();
 
-    cy.contains(title).parent().find('[title="View proposal"]').click();
+    cy.contains(newProposalTitle)
+      .parent()
+      .find('[title="View proposal"]')
+      .click();
 
     cy.contains('Technical review').click();
 
@@ -120,7 +257,7 @@ context('Proposal tests', () => {
 
     cy.closeModal();
 
-    cy.contains(title).parent().contains('10(Days)');
+    cy.contains(newProposalTitle).parent().contains('10(Days)');
 
     cy.contains('Calls').click();
 
@@ -144,42 +281,20 @@ context('Proposal tests', () => {
     cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.contains('Proposals').click();
-    cy.contains(title).parent().contains('10(Hours)');
+    cy.contains(newProposalTitle).parent().contains('10(Hours)');
   });
 
   it('Should be able clone proposal to another call', () => {
-    const shortCode = faker.lorem.word();
-    const surveyComment = faker.lorem.word();
-    const cycleComment = faker.lorem.word();
-    const startDate = faker.date.past().toISOString().slice(0, 10);
-    const endDate = faker.date.future().toISOString().slice(0, 10);
-    const template = 'default template';
-    const esiTemplate = 'default esi template';
-
-    cy.login('officer');
-
-    cy.contains('Proposals');
-
     cy.createCall({
-      shortCode,
-      startDate,
-      endDate,
-      template,
-      esiTemplate,
-      surveyComment,
-      cycleComment,
-      workflow: proposalWorkflow.name,
+      ...newCall,
+      proposalWorkflowId: createdWorkflowId,
     });
-
-    cy.logout();
+    cy.submitProposal({ proposalPk: createdProposalPk });
 
     cy.login('user');
+    cy.visit('/');
 
-    cy.createProposal(proposalToCloneTitle, proposalToCloneAbstract, 'call 1');
-
-    cy.contains('Dashboard').click();
-
-    cy.contains(proposalToCloneTitle);
+    cy.contains(newProposalTitle);
     cy.contains('submitted');
 
     cy.get('[title="View proposal"]').should('exist');
@@ -187,7 +302,7 @@ context('Proposal tests', () => {
     cy.get('[title="Clone proposal"]').first().click();
 
     cy.get('#selectedCallId-input').click();
-    cy.get('#menu-selectedCallId').contains(shortCode).click();
+    cy.get('#menu-selectedCallId').contains(newCall.shortCode).click();
 
     cy.get('[data-cy="submit"]').click();
 
@@ -196,17 +311,66 @@ context('Proposal tests', () => {
       text: 'Proposal cloned successfully',
     });
 
-    cy.contains(clonedProposalTitle).parent().should('contain.text', shortCode);
+    cy.contains(clonedProposalTitle)
+      .parent()
+      .should('contain.text', newCall.shortCode);
   });
 
   it('User officer should be able to change status to one or multiple proposals', () => {
+    cy.cloneProposals({
+      callId: initialDBData.call.id,
+      proposalsToClonePk: [createdProposalPk],
+    });
     cy.login('officer');
+    cy.visit('/');
 
-    cy.changeProposalStatus('DRAFT');
+    cy.get('[type="checkbox"]').first().check();
 
-    cy.changeProposalStatus('SEP Meeting');
+    cy.get('[data-cy="change-proposal-status"]').click();
 
-    cy.contains(proposalToCloneTitle)
+    cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
+    cy.get('@dialog').contains('Change proposal/s status');
+
+    cy.get('@dialog')
+      .find('#selectedStatusId-input')
+      .should('not.have.class', 'Mui-disabled');
+
+    cy.get('@dialog').find('#selectedStatusId-input').click();
+
+    cy.get('[role="listbox"]').contains('DRAFT').click();
+
+    cy.get('[role="alert"] .MuiAlert-message').contains(
+      'Be aware that changing status to "DRAFT" will reopen proposal for changes and submission.'
+    );
+
+    cy.get('[data-cy="submit-proposal-status-change"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'status changed successfully',
+    });
+
+    cy.get('[data-cy="change-proposal-status"]').click();
+
+    cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
+    cy.get('@dialog').contains('Change proposal/s status');
+
+    cy.get('@dialog')
+      .find('#selectedStatusId-input')
+      .should('not.have.class', 'Mui-disabled');
+
+    cy.get('@dialog').find('#selectedStatusId-input').click();
+
+    cy.get('[role="listbox"]').contains('SEP Meeting').click();
+
+    cy.get('[data-cy="submit-proposal-status-change"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'status changed successfully',
+    });
+
+    cy.contains(newProposalTitle)
       .parent()
       .should('contain.text', 'SEP Meeting');
     cy.contains(clonedProposalTitle)
@@ -215,7 +379,18 @@ context('Proposal tests', () => {
   });
 
   it('User officer should be able to see proposal status when opening change status modal', () => {
+    cy.cloneProposals({
+      callId: initialDBData.call.id,
+      proposalsToClonePk: [createdProposalPk],
+    });
+    cy.changeProposalsStatus({
+      statusId: initialDBData.proposalStatuses.sepMeeting.id,
+      proposals: [
+        { primaryKey: createdProposalPk, callId: initialDBData.call.id },
+      ],
+    });
     cy.login('officer');
+    cy.visit('/');
 
     cy.contains(clonedProposalTitle).parent().find('[type="checkbox"]').check();
 
@@ -225,17 +400,19 @@ context('Proposal tests', () => {
 
     cy.get('[role="presentation"]')
       .find('input[name="selectedStatusId"]')
-      .should('have.value', '12');
+      .should('have.value', `${initialDBData.proposalStatuses.draft.id}`);
 
-    cy.get('#selectedStatusId-input').should('have.text', 'SEP Meeting');
+    cy.get('#selectedStatusId-input').should('have.text', 'DRAFT');
 
     // Close the modal
     cy.get('body').trigger('keydown', { keyCode: 27 });
 
-    cy.contains(proposalToCloneTitle)
+    cy.contains(clonedProposalTitle)
       .parent()
       .find('[type="checkbox"]')
-      .check();
+      .uncheck();
+
+    cy.contains('SEP Meeting').parent().find('[type="checkbox"]').check();
 
     cy.get('[data-cy="change-proposal-status"]').click();
 
@@ -243,19 +420,21 @@ context('Proposal tests', () => {
 
     cy.get('[role="presentation"]')
       .find('input[name="selectedStatusId"]')
-      .should('have.value', '12');
+      .should('have.value', `${initialDBData.proposalStatuses.sepMeeting.id}`);
 
     cy.get('#selectedStatusId-input').should('have.text', 'SEP Meeting');
 
     // Close the modal
     cy.get('body').trigger('keydown', { keyCode: 27 });
 
-    cy.changeProposalStatus('SEP_REVIEW', clonedProposalTitle);
+    cy.changeProposalsStatus({
+      statusId: initialDBData.proposalStatuses.sepReview.id,
+      proposals: [
+        { primaryKey: createdProposalPk, callId: initialDBData.call.id },
+      ],
+    });
 
-    cy.contains(proposalToCloneTitle)
-      .parent()
-      .find('[type="checkbox"]')
-      .check();
+    cy.contains(newProposalTitle).parent().find('[type="checkbox"]').check();
 
     cy.get('[data-cy="change-proposal-status"]').click();
 
@@ -273,72 +452,54 @@ context('Proposal tests', () => {
 
   it('Should be able to delete proposal', () => {
     cy.login('user');
+    cy.visit('/');
 
-    cy.contains(`Copy of ${proposalToCloneTitle}`)
+    cy.contains(newProposalTitle)
       .parent()
       .find('[title="Delete proposal"]')
       .click();
 
     cy.contains('OK').click();
 
-    cy.contains(`Copy of ${proposalToCloneTitle}`).should('not.exist');
+    cy.contains(newProposalTitle).should('not.exist');
   });
 
   it('User should not be able to edit and submit proposal with inactive call', () => {
-    cy.login('officer');
-    const pastDate = faker.date.past().toISOString().slice(0, 10);
-    const topic = faker.random.words(2);
-    const textQuestion = faker.random.words(2);
-    const proposalName = faker.random.words(3);
-
-    cy.navigateToTemplatesSubmenu('Proposal');
-
-    cy.get('[title="Edit"]').first().click();
-
-    cy.createTopic(topic);
-    cy.createTextQuestion(textQuestion);
-
-    cy.logout();
-
+    createTopicAndQuestionToExistingTemplate();
     cy.login('user');
-    cy.createProposal(proposalName, '-', 'call 1');
+    cy.visit('/');
+
+    cy.contains(newProposalTitle)
+      .parent()
+      .find('[title="Edit proposal"]')
+      .click();
+
+    cy.contains('Save and continue').click();
+
     cy.contains(textQuestion).then(($elem: any) => {
       cy.get(`#${$elem.attr('for')}`).type(faker.random.word());
     });
     cy.contains('Save and continue').click();
     cy.notification({ text: 'Saved', variant: 'success' });
 
-    cy.logout();
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      startCall: twoDaysAgo,
+      endCall: yesterday,
+      proposalWorkflowId: createdWorkflowId,
+    });
 
-    cy.login('officer');
+    cy.visit('/');
 
-    cy.contains('Calls').click();
-    cy.contains('call 1').parent().find('[title="Edit"]').click();
-
-    cy.get('[data-cy=start-date] input')
-      .clear()
-      .type(pastDate)
-      .should('have.value', pastDate);
-
-    cy.get('[data-cy=end-date] input')
-      .clear()
-      .type(pastDate)
-      .should('have.value', pastDate);
-
-    cy.get('[data-cy="next-step"]').click();
-    cy.get('[data-cy="next-step"]').click();
-    cy.get('[data-cy="submit"]').click();
-    cy.notification({ variant: 'success', text: 'successfully' });
-
-    cy.logout();
-
-    cy.login('user');
-
-    cy.contains(proposalName).parent().find('[title="View proposal"]').click();
+    cy.contains(newProposalTitle)
+      .parent()
+      .find('[title="View proposal"]')
+      .click();
 
     cy.contains('Submit').should('be.disabled');
 
-    cy.contains(topic).click();
+    cy.contains('New topic', { matchCase: false }).click();
 
     cy.contains('label', textQuestion).then(($elem: any) => {
       cy.get(`#${$elem.attr('for')}`).then(($inputElem) => {

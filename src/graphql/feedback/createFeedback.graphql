@@ -1,0 +1,19 @@
+mutation createFeedback(
+  $scheduledEventId: Int!
+) {
+  createFeedback(
+    scheduledEventId: $scheduledEventId
+  ) {
+    feedback {
+      ...feedback
+      questionary {
+        ...questionary
+        isCompleted
+      }
+    }
+
+    rejection {
+      ...rejection
+    }
+  }
+}

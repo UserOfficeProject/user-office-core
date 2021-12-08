@@ -13,8 +13,6 @@ jobs:
     outputs:
       BE_TAG: ${{ steps.resolve_rep.outputs.BE_TAG }}
       FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}
-      SCHEDULER_BE_TAG: ${{ steps.resolve_rep.outputs.SCHEDULER_BE_TAG }}
-      GATEWAY_TAG: ${{ steps.resolve_rep.outputs.GATEWAY_TAG }}
 
     steps:
       - name: Resolve required repositories
@@ -47,16 +45,6 @@ jobs:
             https://api.github.com/repos/UserOfficeProject/user-office-factory/branches
           )
 
-          SCHEDULER_BE_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v1/repositories/dmsc/duo-scheduler-backend/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-scheduler-backend/branches
-          )
-
-          GATEWAY_TAGS=$(check_feature ${{ github.head_ref }} \
-            https://registry.hub.docker.com/v1/repositories/dmsc/duo-gateway/tags \
-            https://api.github.com/repos/UserOfficeProject/user-office-gateway/branches
-          )
-
           BE_TAG=develop
           if [[ $BE_TAGS == "2" ]]; then
             BE_TAG="${{ github.head_ref }}"
@@ -67,27 +55,13 @@ jobs:
             FACTORY_TAG="${{ github.head_ref }}"
           fi
 
-          SCHEDULER_BE_TAG=develop
-          if [[ $SCHEDULER_BE_TAGS == "2" ]]; then
-            SCHEDULER_BE_TAG="${{ github.head_ref }}"
-          fi
-
-          GATEWAY_TAG=develop
-          if [[ $GATEWAY_TAGS == "2" ]]; then
-            GATEWAY_TAG="${{ github.head_ref }}"
-          fi
-
           echo ::set-output name=BE_TAG::${BE_TAG}
           echo ::set-output name=FACTORY_TAG::${FACTORY_TAG}
-          echo ::set-output name=SCHEDULER_BE_TAG::${SCHEDULER_BE_TAG}
-          echo ::set-output name=GATEWAY_TAG::${GATEWAY_TAG}
 
       - name: Resolved
         run: |
           echo "BE_TAG: ${{ steps.resolve_rep.outputs.BE_TAG }}"
           echo "FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}"
-          echo "SCHEDULER_BE_TAG: ${{ steps.resolve_rep.outputs.SCHEDULER_BE_TAG }}"
-          echo "GATEWAY_TAG: ${{ steps.resolve_rep.outputs.GATEWAY_TAG }}"
 
   build:
     # The type of runner that the job will run on
@@ -117,8 +91,6 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/.."
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.BE_TAG }}" https://github.com/UserOfficeProject/user-office-backend.git
-          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.SCHEDULER_BE_TAG }}" https://github.com/UserOfficeProject/user-office-scheduler-backend.git
-          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.GATEWAY_TAG }}" https://github.com/UserOfficeProject/user-office-gateway.git
 
       - name: Setup base docker-compose
         run: |
@@ -133,6 +105,9 @@ jobs:
                 - "80:80" # The HTTP port
               volumes:
                 - /var/run/docker.sock:/var/run/docker.sock:ro
+            backend:
+              labels:
+                - "traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads, /gateway, /graphql"
           EOF
 
       - name: Run docker-compose, generate and compare SDK
@@ -148,16 +123,9 @@ jobs:
 
           export USER_OFFICE_FACTORY_ENDPOINT=noop
 
-          export USER_OFFICE_SCHEDULER_BACKEND_TAG=${{ needs.resolve_dep.outputs.SCHEDULER_BE_TAG }}
-          export USER_OFFICE_SCHEDULER_BACKEND_DIR=user-office-scheduler-backend
-          export USER_OFFICE_SCHEDULER_BACKEND=http://scheduler-backend:4000/graphql
-
-          export USER_OFFICE_GATEWAY_TAG=${{ needs.resolve_dep.outputs.GATEWAY_TAG }}
-
-          docker-compose -f docker-compose.all.yml \
+          docker-compose --project-directory $PWD \
             -f user-office-backend/docker-compose.e2e.yml \
-            -f user-office-scheduler-backend/docker-compose.e2e.yml \
-            -f user-office-gateway/docker-compose.e2e.yml \
+            -f docker-compose.all.yml \
             up -d
 
           export SCHEMA_URL=http://localhost:80/graphql
@@ -170,11 +138,12 @@ jobs:
               "$SCHEMA_URL?query=query%7Bversion%7D") # ?query=query{version}, without this we would get an error saying GET query missing
 
             if [[ "$STATUS" == "200" ]]; then
-              echo "gateway is ready"
+              echo "backend is ready"
               break
             fi
 
-            >&2 echo " - gateway is unavailable - sleeping for 10 sec... ($STATUS)"
+            >&2 echo " - backend is unavailable - sleeping for 10 sec... ($STATUS). Last 20 lines of logs:"
+            docker-compose -f docker-compose.all.yml -f user-office-backend/docker-compose.e2e.yml logs --tail 20 backend
             sleep 10
           done;
 
@@ -248,7 +217,7 @@ jobs:
 
       - name: Build new e2e test image if changed
         run: |
-          DOCKERFILE_VERSION=${{ hashFiles('cypress/Dockerfile', 'cypress/*.json') }}
+          DOCKERFILE_VERSION=${{ hashFiles('Dockerfile.e2e', 'cypress/*.json') }}
           MANIFEST_URL="https://docker.pkg.github.com/v2/userofficeproject/user-office-frontend/e2e-cypress-core/manifests/$DOCKERFILE_VERSION"
           MANIFEST_STATUS=$(curl -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' -o /dev/null --silent --get --write-out '%{http_code}' $MANIFEST_URL)
           TAG="docker.pkg.github.com/userofficeproject/user-office-frontend/e2e-cypress-core:$DOCKERFILE_VERSION"
@@ -256,7 +225,7 @@ jobs:
           echo MANIFEST_STATUS $MANIFEST_STATUS
 
           if [[ $MANIFEST_STATUS != "200" ]]; then
-            docker build -t $TAG ./cypress
+            docker build -t $TAG --file Dockerfile.e2e .
             docker push $TAG
           fi
   e2e:
@@ -288,7 +257,7 @@ jobs:
 
       - name: Pull cypress image
         run: |
-          DOCKERFILE_VERSION=${{ hashFiles('cypress/Dockerfile', 'cypress/*.json') }}
+          DOCKERFILE_VERSION=${{ hashFiles('Dockerfile.e2e', 'cypress/*.json') }}
           TAG="docker.pkg.github.com/userofficeproject/user-office-frontend/e2e-cypress-core:$DOCKERFILE_VERSION"
           docker pull $TAG 
           docker tag $TAG e2e-cypress:latest
@@ -317,14 +286,16 @@ jobs:
           cd "$GITHUB_WORKSPACE/.."
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.BE_TAG }}" https://github.com/UserOfficeProject/user-office-backend.git
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
-          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.SCHEDULER_BE_TAG }}" https://github.com/UserOfficeProject/user-office-scheduler-backend.git
-          git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.GATEWAY_TAG }}" https://github.com/UserOfficeProject/user-office-gateway.git
 
       - name: Setup base docker-compose
         run: |
           cd "$GITHUB_WORKSPACE/.."
           cat > docker-compose.all.yml << EOF
           version: "3.1"
+          services:
+            backend:
+              labels:
+                - "traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads, /gateway, /graphql"
           EOF
 
       - name: Run docker-compose
@@ -343,23 +314,16 @@ jobs:
           export USER_OFFICE_FACTORY_TAG=${{ needs.resolve_dep.outputs.FACTORY_TAG }}
           export USER_OFFICE_FACTORY_ENDPOINT=http://factory:4500/generate
 
-          export USER_OFFICE_SCHEDULER_BACKEND_TAG=${{ needs.resolve_dep.outputs.SCHEDULER_BE_TAG }}
-          export USER_OFFICE_SCHEDULER_BACKEND_DIR=user-office-scheduler-backend
-          export USER_OFFICE_SCHEDULER_BACKEND=http://scheduler-backend:4000/graphql
-
-          export USER_OFFICE_GATEWAY_TAG=${{ needs.resolve_dep.outputs.GATEWAY_TAG }}
-
           export USER_OFFICE_FRONTEND_DIR=$REPO_DIR_NAME
           export BUILD_TAG=${{ github.sha }}
 
           export CYPRES_SPEC_PATTERN=${{ matrix.pattern }}
 
-          docker-compose -f docker-compose.all.yml \
+          docker-compose --project-directory $PWD \
             -f user-office-backend/docker-compose.e2e.yml \
             -f user-office-factory/docker-compose.e2e.yml \
-            -f user-office-scheduler-backend/docker-compose.e2e.yml \
-            -f user-office-gateway/docker-compose.e2e.yml \
             -f "$REPO_DIR_NAME/docker-compose.e2e.yml" \
+            -f docker-compose.all.yml \
             up --exit-code-from cypress
 
       - name: Upload cypres screenshots
