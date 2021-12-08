@@ -1790,6 +1790,7 @@ export type ProposalTemplate = {
   complementaryQuestions: Array<Question>;
   questionaryCount: Scalars['Int'];
   group: TemplateGroup;
+  json: Scalars['String'];
   callCount: Scalars['Int'];
 };
 
@@ -2823,6 +2824,7 @@ export type Template = {
   complementaryQuestions: Array<Question>;
   questionaryCount: Scalars['Int'];
   group: TemplateGroup;
+  json: Scalars['String'];
 };
 
 export type TemplateCategory = {
@@ -6962,6 +6964,19 @@ export type GetTemplateCategoriesQuery = (
   )>> }
 );
 
+export type GetTemplateExportQueryVariables = Exact<{
+  templateId: Scalars['Int'];
+}>;
+
+
+export type GetTemplateExportQuery = (
+  { __typename?: 'Query' }
+  & { template: Maybe<(
+    { __typename?: 'Template' }
+    & Pick<Template, 'json'>
+  )> }
+);
+
 export type GetTemplatesQueryVariables = Exact<{
   filter?: Maybe<TemplatesFilter>;
 }>;
@@ -10928,6 +10943,13 @@ export const GetTemplateCategoriesDocument = gql`
   }
 }
     `;
+export const GetTemplateExportDocument = gql`
+    query getTemplateExport($templateId: Int!) {
+  template(templateId: $templateId) {
+    json
+  }
+}
+    `;
 export const GetTemplatesDocument = gql`
     query getTemplates($filter: TemplatesFilter) {
   templates(filter: $filter) {
@@ -12086,6 +12108,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getTemplateCategories(variables?: GetTemplateCategoriesQueryVariables): Promise<GetTemplateCategoriesQuery> {
       return withWrapper(() => client.request<GetTemplateCategoriesQuery>(print(GetTemplateCategoriesDocument), variables));
+    },
+    getTemplateExport(variables: GetTemplateExportQueryVariables): Promise<GetTemplateExportQuery> {
+      return withWrapper(() => client.request<GetTemplateExportQuery>(print(GetTemplateExportDocument), variables));
     },
     getTemplates(variables?: GetTemplatesQueryVariables): Promise<GetTemplatesQuery> {
       return withWrapper(() => client.request<GetTemplatesQuery>(print(GetTemplatesDocument), variables));

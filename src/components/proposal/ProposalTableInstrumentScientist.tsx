@@ -103,7 +103,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Download proposal as pdf">
+        <Tooltip title="Download proposal as PDF">
           <IconButton
             data-cy="download-proposal"
             onClick={() =>
@@ -288,7 +288,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
         actions={[
           {
             icon: GetAppIconComponent,
-            tooltip: 'Download proposals in PDF',
+            tooltip: 'Download proposals',
             onClick: (event, rowData): void => {
               downloadPDFProposal(
                 (rowData as ProposalViewData[]).map((row) => row.primaryKey),

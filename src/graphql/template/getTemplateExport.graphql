@@ -1,0 +1,5 @@
+query getTemplateExport($templateId: Int!) {
+  template(templateId: $templateId) {
+      json
+  }
+}
