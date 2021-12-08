@@ -14,8 +14,8 @@ const CreateTemplate = (props: {
   groupId: TemplateGroupId;
 }) => {
   const { onComplete, groupId } = props;
-  const { api } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
 
   return (
     <>
