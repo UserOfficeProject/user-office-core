@@ -62,7 +62,8 @@ export class InstrumentResolver {
     @Root() instrument: Instrument,
     @Ctx() context: ResolverContext
   ): Promise<BasicUserDetails | null> {
-    return context.queries.user.dataSource.getBasicUserInfo(
+    return context.queries.user.getBasic(
+      context.user,
       instrument.managerUserId
     );
   }
