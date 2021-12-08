@@ -2541,9 +2541,11 @@ export type ScheduledEventCore = {
   startsAt: Scalars['TzLessDateTime'];
   endsAt: Scalars['TzLessDateTime'];
   status: ProposalBookingStatusCore;
+  localContactId: Maybe<Scalars['Int']>;
   visit: Maybe<Visit>;
   feedback: Maybe<Feedback>;
   esi: Maybe<ExperimentSafetyInput>;
+  localContact: Maybe<BasicUserDetails>;
 };
 
 export type SelectionFromOptionsConfig = {
@@ -3953,7 +3955,7 @@ export type GetUserProposalBookingsWithEventsQuery = { me: Maybe<{ proposals: Ar
               & VisitRegistrationFragment
             )> }
             & VisitFragment
-          )>, esi: Maybe<EsiFragment>, feedback: Maybe<FeedbackFragment> }
+          )>, esi: Maybe<EsiFragment>, feedback: Maybe<FeedbackFragment>, localContact: Maybe<BasicUserDetailsFragment> }
         )> }>, visits: Maybe<Array<VisitFragment>>, instrument: Maybe<Pick<Instrument, 'id' | 'name'>> }
     )> }> };
 
@@ -4739,13 +4741,7 @@ export type GetTemplateExportQueryVariables = Exact<{
 }>;
 
 
-export type GetTemplateExportQuery = (
-  { __typename?: 'Query' }
-  & { template: Maybe<(
-    { __typename?: 'Template' }
-    & Pick<Template, 'json'>
-  )> }
-);
+export type GetTemplateExportQuery = { template: Maybe<Pick<Template, 'json'>> };
 
 export type GetTemplatesQueryVariables = Exact<{
   filter?: Maybe<TemplatesFilter>;
@@ -7280,6 +7276,9 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
           }
           feedback {
             ...feedback
+          }
+          localContact {
+            ...basicUserDetails
           }
         }
       }

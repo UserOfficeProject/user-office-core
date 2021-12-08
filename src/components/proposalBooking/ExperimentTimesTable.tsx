@@ -7,6 +7,7 @@ import {
   parseTzLessDateTime,
   TZ_LESS_DATE_TIME_LOW_PREC_FORMAT,
 } from 'utils/Time';
+import { getFullUserName } from 'utils/user';
 
 type ExperimentTimesTableProps = {
   title: string;
@@ -30,6 +31,10 @@ export default function ExperimentsTable({
         { title: 'Proposal title', field: 'proposal.title' },
         { title: 'Proposal ID', field: 'proposal.proposalId' },
         { title: 'Instrument', field: 'instrument.name' },
+        {
+          title: 'Local contact',
+          render: (rowData) => getFullUserName(rowData.localContact),
+        },
         {
           title: 'Starts at',
           field: 'startsAt',
