@@ -8,11 +8,11 @@ import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInpu
 import {
   Answer,
   DataType,
+  Question,
   QuestionTemplateRelation,
   Sdk,
   Template,
 } from 'generated/sdk';
-import { Question } from 'models/questionary/Question';
 import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
 
 import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefinition';

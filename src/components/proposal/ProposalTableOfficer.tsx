@@ -26,12 +26,12 @@ import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import AssignProposalsToSEP from 'components/SEP/Proposals/AssignProposalsToSEP';
 import {
   Call,
-  Instrument,
   Proposal,
   ProposalsFilter,
   ProposalStatus,
   ProposalPkWithCallId,
   Sep,
+  InstrumentFragment,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -385,7 +385,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   };
 
   const assignProposalsToInstrument = async (
-    instrument: Instrument | null
+    instrument: InstrumentFragment | null
   ): Promise<void> => {
     if (instrument) {
       const result = await api(
