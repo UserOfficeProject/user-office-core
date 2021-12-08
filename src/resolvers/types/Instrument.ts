@@ -56,6 +56,16 @@ export class InstrumentResolver {
 
     return isRejection(scientists) ? [] : scientists;
   }
+
+  @FieldResolver(() => BasicUserDetails)
+  async beamlineManager(
+    @Root() instrument: Instrument,
+    @Ctx() context: ResolverContext
+  ): Promise<BasicUserDetails | null> {
+    return context.queries.user.dataSource.getBasicUserInfo(
+      instrument.managerUserId
+    );
+  }
 }
 
 export async function resolveInstrumentReference(
