@@ -1,9 +1,12 @@
 import { injectable } from 'tsyringe';
 
-import { Proposal } from '../../models/Proposal';
+import { ProposalView } from '../../models/ProposalView';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import database from '../postgres/database';
-import { createProposalObject, ProposalRecord } from '../postgres/records';
+import {
+  createProposalViewObject,
+  ProposalViewRecord,
+} from '../postgres/records';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 
@@ -14,10 +17,10 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
-  ): Promise<{ totalCount: number; proposals: Proposal[] }> {
-    return database
+  ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
+    const result = database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .from('proposals')
+      .from('proposal_table_view')
       .modify((query) => {
         if (filter?.text) {
           query
@@ -25,17 +28,17 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             .orWhere('abstract', 'ilike', `%${filter.text}%`);
         }
         if (filter?.callId) {
-          query.where('proposals.call_id', filter.callId);
+          query.where('proposal_table_view.call_id', filter.callId);
         }
         if (filter?.instrumentId) {
-          query.where(
-            'instrument_has_proposals.instrument_id',
-            filter.instrumentId
-          );
+          query.where('proposal_table_view.instrument_id', filter.instrumentId);
         }
 
         if (filter?.proposalStatusId) {
-          query.where('proposals.status_id', filter?.proposalStatusId);
+          query.where(
+            'proposal_table_view.proposal_status_id',
+            filter?.proposalStatusId
+          );
         }
 
         if (filter?.shortCodes) {
@@ -44,7 +47,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             .join('|');
 
           query.whereRaw(
-            `proposals.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+            `proposal_table_view.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
 
@@ -75,9 +78,9 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           query.offset(offset);
         }
       })
-      .then((proposals: ProposalRecord[]) => {
+      .then((proposals: ProposalViewRecord[]) => {
         const props = proposals.map((proposal) =>
-          createProposalObject(proposal)
+          createProposalViewObject(proposal)
         );
 
         return {
@@ -85,5 +88,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           proposals: props,
         };
       });
+
+    return result;
   }
 }
