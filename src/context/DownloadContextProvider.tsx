@@ -14,6 +14,8 @@ import crossFetch from 'cross-fetch';
 import { useSnackbar } from 'notistack';
 import React, { useState, useContext, useRef } from 'react';
 
+import { downloadBlob } from 'utils/downloadBlob';
+
 import { UserContext } from './UserContextProvider';
 
 const useStyles = makeStyles((theme) => ({
@@ -182,22 +184,9 @@ export const DownloadContextProvider: React.FC = ({ children }) => {
 
   const promptDownload = async (response: Response) => {
     const filename = response.headers.get('x-download-filename') || 'unknown';
-
     const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
 
-    const element = document.createElement('a');
-    element.setAttribute('href', url);
-    element.setAttribute('download', decodeURIComponent(filename));
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
-
-    setTimeout(() => URL.revokeObjectURL(url), 150);
+    downloadBlob(blob, filename);
   };
 
   const prepareDownload = (
