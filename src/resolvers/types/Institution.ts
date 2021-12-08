@@ -10,6 +10,9 @@ export class Institution implements Partial<InstitutionOrigin> {
   @Field()
   name: string;
 
+  @Field(() => Int, { nullable: true })
+  country: number;
+
   @Field()
   verified: boolean;
 }

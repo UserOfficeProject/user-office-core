@@ -93,7 +93,12 @@ export default class AdminMutations {
     agent: UserWithRole | null,
     args: CreateInstitutionsArgs
   ) {
-    const institution = new Institution(0, args.name, args.verified);
+    const institution = new Institution(
+      0,
+      args.name,
+      args.country,
+      args.verified
+    );
 
     return await this.dataSource.createInstitution(institution);
   }

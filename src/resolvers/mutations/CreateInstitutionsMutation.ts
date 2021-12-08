@@ -1,4 +1,12 @@
-import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
+import {
+  Args,
+  ArgsType,
+  Ctx,
+  Field,
+  Int,
+  Mutation,
+  Resolver,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { InstitutionResponseWrap } from '../types/CommonWrappers';
@@ -8,6 +16,9 @@ import { wrapResponse } from '../wrapResponse';
 export class CreateInstitutionsArgs {
   @Field(() => String)
   name: string;
+
+  @Field(() => Int)
+  country: number;
 
   @Field(() => Boolean)
   verified: boolean;

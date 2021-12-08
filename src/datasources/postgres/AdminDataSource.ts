@@ -108,6 +108,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return {
       id: institutionRecord.institution_id,
       name: institutionRecord.institution,
+      country: institutionRecord.country_id,
       verified: institutionRecord.verified,
     };
   }
@@ -118,6 +119,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     const [institutionRecord]: InstitutionRecord[] = await database
       .insert({
         institution: institution.name,
+        country_id: institution.country,
         verified: institution.verified,
       })
       .into('institutions')
@@ -130,6 +132,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return {
       id: institutionRecord.institution_id,
       name: institutionRecord.institution,
+      country: institutionRecord.country_id,
       verified: institutionRecord.verified,
     };
   }
@@ -150,6 +153,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return {
       id: institutionRecord.institution_id,
       name: institutionRecord.institution,
+      country: institutionRecord.country_id,
       verified: institutionRecord.verified,
     };
   }
@@ -217,6 +221,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
           return {
             id: int.institution_id,
             name: int.institution,
+            country: int.country_id,
             verified: int.verified,
           };
         })
@@ -231,7 +236,12 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .first()
       .then(
         (int: InstitutionRecord) =>
-          new Institution(int.institution_id, int.institution, int.verified)
+          new Institution(
+            int.institution_id,
+            int.institution,
+            int.country_id,
+            int.verified
+          )
       );
   }
 

@@ -10,6 +10,9 @@ import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 @injectable()
 export default class AdminQueries {
+  getCountry(id: number) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @inject(Tokens.AdminDataSource) private dataSource: AdminDataSource
   ) {}
