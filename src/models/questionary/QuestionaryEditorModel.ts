@@ -70,6 +70,7 @@ export default function QuestionaryEditorModel(
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
       groupId: TemplateGroupId.PROPOSAL,
     },
+    json: '',
   };
 
   function reducer(state: Template, action: Event): Template {

@@ -588,7 +588,7 @@ context('Instrument tests', () => {
         .find('input[type="checkbox"]')
         .check();
 
-      cy.get('[title="Download proposals in PDF"]').click();
+      cy.get('[title="Download proposals"]').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
