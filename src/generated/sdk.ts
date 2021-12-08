@@ -1755,7 +1755,9 @@ export type ProposalView = {
   submitted: Scalars['Boolean'];
   technicalTimeAllocation: Maybe<Scalars['Int']>;
   managementTimeAllocation: Maybe<Scalars['Int']>;
+  technicalReviewAssignee: Maybe<Scalars['Int']>;
   technicalStatus: Maybe<TechnicalReviewStatus>;
+  technicalReviewSubmitted: Maybe<Scalars['Int']>;
   instrumentName: Maybe<Scalars['String']>;
   callShortCode: Maybe<Scalars['String']>;
   sepCode: Maybe<Scalars['String']>;
@@ -1822,6 +1824,11 @@ export type ProposalsResponseWrap = {
   proposals: Array<Proposal>;
 };
 
+export type ProposalsViewResult = {
+  totalCount: Scalars['Int'];
+  proposals: Array<ProposalView>;
+};
+
 export type QueriesAndMutations = {
   queries: Array<Scalars['String']>;
   mutations: Array<Scalars['String']>;
@@ -1835,7 +1842,6 @@ export type Query = {
   feedbacks: Array<Feedback>;
   genericTemplates: Maybe<Array<GenericTemplate>>;
   proposals: Maybe<ProposalsQueryResult>;
-  instrumentScientistProposals: Maybe<ProposalsQueryResult>;
   sampleEsi: Maybe<SampleExperimentSafetyInput>;
   samples: Maybe<Array<Sample>>;
   shipments: Maybe<Array<Shipment>>;
@@ -1876,6 +1882,7 @@ export type Query = {
   proposalStatus: Maybe<ProposalStatus>;
   proposalStatuses: Maybe<Array<ProposalStatus>>;
   proposalsView: Maybe<Array<ProposalView>>;
+  instrumentScientistProposals: Maybe<ProposalsViewResult>;
   proposalTemplates: Maybe<Array<ProposalTemplate>>;
   proposalWorkflow: Maybe<ProposalWorkflow>;
   proposalWorkflows: Maybe<Array<ProposalWorkflow>>;
@@ -1936,13 +1943,6 @@ export type QueryGenericTemplatesArgs = {
 
 
 export type QueryProposalsArgs = {
-  filter?: Maybe<ProposalsFilter>;
-  first?: Maybe<Scalars['Int']>;
-  offset?: Maybe<Scalars['Int']>;
-};
-
-
-export type QueryInstrumentScientistProposalsArgs = {
   filter?: Maybe<ProposalsFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
@@ -2110,6 +2110,13 @@ export type QueryProposalStatusArgs = {
 
 
 export type QueryProposalsViewArgs = {
+  filter?: Maybe<ProposalsFilter>;
+};
+
+
+export type QueryInstrumentScientistProposalsArgs = {
+  offset?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Int']>;
   filter?: Maybe<ProposalsFilter>;
 };
 
@@ -3838,18 +3845,14 @@ export type ProposalFragment = (
 
 export type GetInstrumentScientistProposalsQueryVariables = Exact<{
   filter?: Maybe<ProposalsFilter>;
+  offset?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Int']>;
 }>;
 
 
 export type GetInstrumentScientistProposalsQuery = { instrumentScientistProposals: Maybe<(
-    Pick<ProposalsQueryResult, 'totalCount'>
-    & { proposals: Array<(
-      { proposer: Maybe<BasicUserDetailsFragment>, reviews: Maybe<Array<(
-        Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
-        & { reviewer: Maybe<Pick<BasicUserDetails, 'firstname' | 'lastname' | 'id'>> }
-      )>>, users: Array<BasicUserDetailsFragment>, technicalReview: Maybe<CoreTechnicalReviewFragment>, instrument: Maybe<Pick<Instrument, 'id' | 'name'>>, call: Maybe<Pick<Call, 'id' | 'shortCode' | 'allocationTimeUnit'>>, sep: Maybe<Pick<Sep, 'id' | 'code'>> }
-      & ProposalFragment
-    )> }
+    Pick<ProposalsViewResult, 'totalCount'>
+    & { proposals: Array<Pick<ProposalView, 'primaryKey' | 'proposalId' | 'title' | 'submitted' | 'finalStatus' | 'technicalReviewAssignee' | 'technicalStatus' | 'statusName' | 'technicalReviewSubmitted' | 'instrumentId' | 'instrumentName' | 'allocationTimeUnit' | 'callShortCode' | 'sepCode'>> }
   )> };
 
 export type GetMyProposalsQueryVariables = Exact<{
@@ -6981,52 +6984,29 @@ export const DeleteProposalDocument = gql`
 }
     ${RejectionFragmentDoc}`;
 export const GetInstrumentScientistProposalsDocument = gql`
-    query getInstrumentScientistProposals($filter: ProposalsFilter) {
-  instrumentScientistProposals(filter: $filter) {
+    query getInstrumentScientistProposals($filter: ProposalsFilter, $offset: Int, $first: Int) {
+  instrumentScientistProposals(filter: $filter, offset: $offset, first: $first) {
     proposals {
-      ...proposal
-      proposer {
-        ...basicUserDetails
-      }
-      reviews {
-        id
-        grade
-        comment
-        status
-        userID
-        sepID
-        reviewer {
-          firstname
-          lastname
-          id
-        }
-      }
-      users {
-        ...basicUserDetails
-      }
-      technicalReview {
-        ...coreTechnicalReview
-      }
-      instrument {
-        id
-        name
-      }
-      call {
-        id
-        shortCode
-        allocationTimeUnit
-      }
-      sep {
-        id
-        code
-      }
+      primaryKey
+      proposalId
+      title
+      submitted
+      finalStatus
+      technicalReviewAssignee
+      technicalStatus
+      statusName
+      technicalReviewSubmitted
+      instrumentId
+      instrumentName
+      allocationTimeUnit
+      callShortCode
+      statusName
+      sepCode
     }
     totalCount
   }
 }
-    ${ProposalFragmentDoc}
-${BasicUserDetailsFragmentDoc}
-${CoreTechnicalReviewFragmentDoc}`;
+    `;
 export const GetMyProposalsDocument = gql`
     query getMyProposals($filter: UserProposalsFilter) {
   me {
