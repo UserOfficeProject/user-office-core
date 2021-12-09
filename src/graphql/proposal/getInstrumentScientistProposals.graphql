@@ -1,42 +1,29 @@
-query getInstrumentScientistProposals($filter: ProposalsFilter) {
-  instrumentScientistProposals(filter: $filter) {
+query getInstrumentScientistProposals(
+  $filter: ProposalsFilter
+  $offset: Int
+  $first: Int
+) {
+  instrumentScientistProposals(
+    filter: $filter
+    offset: $offset
+    first: $first
+  ) {
     proposals {
-      ...proposal
-      proposer {
-        ...basicUserDetails
-      }
-      reviews {
-        id
-        grade
-        comment
-        status
-        userID
-        sepID
-        reviewer {
-          firstname
-          lastname
-          id
-        }
-      }
-      users {
-        ...basicUserDetails
-      }
-      technicalReview {
-        ...coreTechnicalReview
-      }
-      instrument {
-        id
-        name
-      }
-      call {
-        id
-        shortCode
-        allocationTimeUnit
-      }
-      sep {
-        id
-        code
-      }
+      primaryKey
+      proposalId
+      title
+      submitted
+      finalStatus
+      technicalReviewAssignee
+      technicalStatus
+      statusName
+      technicalReviewSubmitted
+      instrumentId
+      instrumentName
+      allocationTimeUnit
+      callShortCode
+      statusName
+      sepCode
     }
     totalCount
   }
