@@ -11,7 +11,6 @@ import { FieldDependency, Template, Topic } from '../../models/Template';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
-  AnswerRecord,
   createAnswerBasic,
   createProposalTemplateObject,
   createQuestionaryObject,
@@ -69,13 +68,36 @@ export default class PostgresQuestionaryDataSource
         return parseInt(result?.count || '0');
       });
   }
-  async getAnswer(answer_id: number): Promise<AnswerBasic> {
-    const answerRecord: AnswerRecord = await database('answers')
-      .select('*')
-      .where('answer_id', answer_id)
-      .first();
+  async getAnswer(
+    questionaryId: number,
+    naturalKey: string
+  ): Promise<AnswerBasic>;
+  async getAnswer(answerId: number): Promise<AnswerBasic>;
+  async getAnswer(answerIdOrQuestionaryId: number, naturalKey?: string) {
+    if (naturalKey) {
+      const questionaryId = answerIdOrQuestionaryId;
 
-    return createAnswerBasic(answerRecord);
+      return database
+        .select('*')
+        .from('answers')
+        .leftJoin('questions', 'answers.question_id', 'questions.question_id')
+        .where({
+          questionary_id: questionaryId,
+          natural_key: naturalKey,
+        })
+        .first()
+        .then((record) => {
+          return record ? createAnswerBasic(record) : null;
+        });
+    } else {
+      const answerId = answerIdOrQuestionaryId;
+
+      return database('answers')
+        .select('*')
+        .where('answer_id', answerId)
+        .first()
+        .then((record) => createAnswerBasic(record));
+    }
   }
 
   async getAnswers(questionId: string): Promise<AnswerBasic[]> {
