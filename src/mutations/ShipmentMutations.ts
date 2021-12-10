@@ -1,3 +1,4 @@
+import { logger } from '@esss-swap/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
 import { SampleAuthorization } from '../auth/SampleAuthorization';
@@ -18,8 +19,9 @@ import { AddSamplesToShipmentArgs } from '../resolvers/mutations/AddSamplesShipm
 import { CreateShipmentInput } from '../resolvers/mutations/CreateShipmentMutation';
 import { SubmitShipmentArgs } from '../resolvers/mutations/SubmitShipmentMutation';
 import { UpdateShipmentArgs } from '../resolvers/mutations/UpdateShipmentMutation';
-import { AssetRegistrar } from '../utils/EAM_service';
+import { AssetRegistrar } from '../services/eam';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
+
 @injectable()
 export default class ShipmentMutations {
   private userAuth = container.resolve(UserAuthorization);
@@ -117,7 +119,9 @@ export default class ShipmentMutations {
     }
 
     try {
-      const assetId = await this.assetRegistrarService.register();
+      const assetId = await this.assetRegistrarService.register(
+        args.shipmentId
+      );
 
       return this.shipmentDataSource
         .update({
@@ -127,6 +131,12 @@ export default class ShipmentMutations {
         })
         .then((shipment) => shipment);
     } catch (error) {
+      logger.logException(
+        'Error occurred while registering asset into EAM',
+        error as Error,
+        { agent, args }
+      );
+
       return rejection(
         'Could not submit shipment because an error occurred',
         { args },

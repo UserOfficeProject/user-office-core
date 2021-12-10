@@ -26,7 +26,7 @@ import {
   createListenToRabbitMQHandler,
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
-import { EAMAssetRegistrar } from '../utils/EAM_service';
+import { EAMAssetRegistrar } from '../services/eam';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
