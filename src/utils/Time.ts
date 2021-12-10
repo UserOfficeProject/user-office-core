@@ -97,6 +97,22 @@ export function daysRemaining(date: Date) {
   );
 }
 
+export function timeRemaining(date: Date): string {
+  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+  const firstDate = new Date();
+  const secondDate = date;
+
+  const days = Math.abs((firstDate.getTime() - secondDate.getTime()) / oneDay);
+  const hours = Math.round((days % 1) * 24);
+  const minutes = Math.round((((days % 1) * 24) % 1) * 60);
+
+  if (hours < 1) {
+    return `${minutes} minutes remaining`;
+  }
+
+  return `${hours} hours remaining`;
+}
+
 export const TZ_LESS_DATE_TIME_FORMAT = 'yyyy-MM-DD HH:mm:ss';
 
 export const TZ_LESS_DATE_TIME_LOW_PREC_FORMAT = 'yyyy-MM-DD HH:mm';

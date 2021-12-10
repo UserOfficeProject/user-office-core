@@ -66,13 +66,13 @@ const CallsTable: React.FC = () => {
       title: 'Start Date',
       field: 'startCall',
       render: (rowData: Call): string =>
-        dateformat(new Date(rowData.startCall), 'dd-mmm-yyyy'),
+        dateformat(new Date(rowData.startCall), 'dd-mmm-yyyy HH:MM'),
     },
     {
       title: 'End Date',
       field: 'endCall',
       render: (rowData: Call): string =>
-        dateformat(new Date(rowData.endCall), 'dd-mmm-yyyy'),
+        dateformat(new Date(rowData.endCall), 'dd-mmm-yyyy HH:MM'),
     },
     {
       title: 'Reference number format',

@@ -13,7 +13,7 @@ import { useHistory } from 'react-router';
 
 import { Call } from 'generated/sdk';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
-import { daysRemaining } from 'utils/Time';
+import { daysRemaining, timeRemaining } from 'utils/Time';
 
 const useStyles = makeStyles(() => ({
   date: {
@@ -27,9 +27,7 @@ type ProposalChooseCallProps = {
 };
 
 const getDaysRemainingText = (daysRemaining: number) => {
-  if (daysRemaining <= 1) {
-    return '(last day remaining)';
-  } else if (daysRemaining > 1 && daysRemaining < 30) {
+  if (daysRemaining > 1 && daysRemaining < 30) {
     return `(${daysRemaining} days remaining)`;
   } else {
     return '';
@@ -60,7 +58,11 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
         <List data-cy="call-list">
           {callsData.map((call) => {
             const daysRemainingNum = daysRemaining(new Date(call.endCall));
-            const daysRemainingText = getDaysRemainingText(daysRemainingNum);
+            let daysRemainingText = getDaysRemainingText(daysRemainingNum);
+            const getTimeRemaining = timeRemaining(new Date(call.endCall));
+            if (daysRemainingNum <= 1) {
+              daysRemainingText = `(${getTimeRemaining})`;
+            }
 
             const header =
               call.title === null || call.title === '' ? (
