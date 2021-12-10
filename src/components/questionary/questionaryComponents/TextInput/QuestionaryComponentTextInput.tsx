@@ -15,7 +15,7 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { id },
+    question: { id, naturalKey },
     question,
     value,
   } = answer;
@@ -71,6 +71,8 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
         rowsMax={config.multiline ? 16 : undefined}
         maxLen={config.max || undefined}
         margin="dense"
+        data-cy={id}
+        data-natural-key={naturalKey}
       />
     </div>
   );

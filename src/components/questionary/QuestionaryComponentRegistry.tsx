@@ -11,6 +11,7 @@ import {
   QuestionTemplateRelation,
   Sdk,
   Template,
+  TemplateFragment,
 } from 'generated/sdk';
 import { Question } from 'models/questionary/Question';
 import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
@@ -50,8 +51,8 @@ export interface QuestionTemplateRelationFormProps {
   questionRel: QuestionTemplateRelation;
   template: Template;
   closeMe?: () => unknown;
-  onUpdated?: (template: Template) => unknown;
-  onDeleted?: (template: Template) => unknown;
+  onUpdated?: (template: TemplateFragment) => unknown;
+  onDeleted?: (template: TemplateFragment) => unknown;
   onOpenQuestionClicked?: (question: Question) => unknown;
   children?: FormChildren<QuestionTemplateRelation>;
 }
