@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 export async function execute<T>(f: () => Promise<T>, count: number) {
   const results: Array<T> = [];
   for (let index = 0; index < count; index++) {

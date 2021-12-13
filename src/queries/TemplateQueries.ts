@@ -25,6 +25,11 @@ export default class TemplateQueries {
     return this.dataSource.getTemplates(args);
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  getTemplateAsJson(user: UserWithRole | null, templateId: number) {
+    return this.dataSource.getTemplateAsJson(templateId);
+  }
+
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getComplementaryQuestions(
     agent: UserWithRole | null,

@@ -92,11 +92,9 @@ export interface ProposalRecord {
   readonly management_decision_submitted: boolean;
   readonly technical_review_assignee: number;
 }
-
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
   readonly title: string;
-  readonly proposer_id: number;
   readonly proposal_status_id: number;
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
@@ -107,6 +105,8 @@ export interface ProposalViewRecord {
   readonly management_time_allocation: number;
   readonly notified: boolean;
   readonly technical_review_status: number;
+  readonly technical_review_submitted: boolean;
+  readonly technical_review_assignee: number;
   readonly instrument_name: string;
   readonly call_short_code: string;
   readonly sep_id: number;
@@ -117,6 +117,7 @@ export interface ProposalViewRecord {
   readonly call_id: number;
   readonly submitted: boolean;
   readonly allocation_time_unit: AllocationTimeUnits;
+  readonly full_count: number;
 }
 
 export interface TopicRecord {
@@ -641,20 +642,22 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.proposal_id,
     proposal.rank_order,
     proposal.final_status,
+    proposal.notified,
     proposal.technical_time_allocation,
     proposal.management_time_allocation,
-    proposal.notified,
+    proposal.technical_time_allocation,
     proposal.technical_review_status,
+    proposal.technical_review_submitted,
     proposal.instrument_name,
     proposal.call_short_code,
-    proposal.sep_id,
     proposal.sep_code,
+    proposal.sep_id,
     proposal.average,
     proposal.deviation,
     proposal.instrument_id,
+    proposal.allocation_time_unit,
     proposal.call_id,
-    proposal.submitted,
-    proposal.allocation_time_unit
+    proposal.submitted
   );
 };
 

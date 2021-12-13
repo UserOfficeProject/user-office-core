@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Knex } from 'knex';
-
 import { logger } from '@esss-swap/duo-logger';
+import { Knex } from 'knex';
 
 import { Role, Roles } from '../../models/Role';
 import {
@@ -376,7 +375,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         .returning(['*'])
         .into('users');
 
-      logger.logInfo("Creating dummy user", {userId});
+      logger.logInfo('Creating dummy user', { userId });
     }
 
     if (!user || user.length == 0) {

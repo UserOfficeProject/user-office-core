@@ -13,7 +13,8 @@ export class UserAuthorization {
   constructor(
     @inject(Tokens.UserDataSource) private userDataSource: UserDataSource,
     @inject(Tokens.SEPDataSource) private sepDataSource: SEPDataSource,
-    @inject(Tokens.ProposalDataSource) private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource,
     @inject(Tokens.VisitDataSource) private visitDataSource: VisitDataSource
   ) {}
 
