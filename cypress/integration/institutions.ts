@@ -26,6 +26,8 @@ context('Institution tests', () => {
     cy.contains('Institutions').click();
     cy.contains('Create').click();
     cy.get('#name').type(name);
+    cy.get('#country-input').click();
+    cy.contains('Sweden').click();
     cy.get('[data-cy="submit"]').click();
 
     cy.notification({ variant: 'success', text: 'successfully' });
@@ -60,6 +62,8 @@ context('Institution tests', () => {
     cy.get('[title="Edit"]').first().click();
     cy.get('#name').clear();
     cy.get('#name').type(name);
+    cy.get('#country-input').click();
+    cy.contains('Great Britain').click();
     cy.get('[data-cy="submit"]').click();
 
     cy.notification({ variant: 'success', text: 'successfully' });
