@@ -17,6 +17,9 @@ export class QuestionsFilter {
 
   @Field(() => [DataType], { nullable: true })
   public excludeDataType?: DataType[];
+
+  @Field(() => [String], { nullable: true })
+  public questionIds?: string[];
 }
 
 @Resolver()

@@ -6,6 +6,7 @@ import {
   TemplateCategory,
   TemplateCategoryId,
   TemplateGroupId,
+  TemplateImportWithValidation,
   TemplatesHasQuestions,
   TemplateStep,
   Topic,
@@ -13,6 +14,7 @@ import {
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
+import { ConflictResolution } from '../resolvers/mutations/ImportTemplateMutation';
 import { SetActiveTemplateArgs } from '../resolvers/mutations/SetActiveTemplateMutation';
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
@@ -32,6 +34,10 @@ export interface TemplateDataSource {
   cloneTemplate(templateId: number): Promise<Template>;
   getTemplateSteps(templateId: number): Promise<TemplateStep[]>;
   setActiveTemplate(args: SetActiveTemplateArgs): Promise<boolean>;
+  importTemplate(
+    templateAsJson: string,
+    conflictResolutions: ConflictResolution[]
+  ): Promise<Template>;
   // TemplateField
   createQuestion(
     categoryId: TemplateCategoryId,
@@ -90,8 +96,7 @@ export interface TemplateDataSource {
   createTopic(args: CreateTopicArgs): Promise<Topic>;
   updateTopicTitle(topicId: number, title: string): Promise<Topic>;
   deleteTopic(id: number): Promise<Topic>;
-
   isNaturalKeyPresent(naturalKey: string): Promise<boolean>;
-
   getGroup(groupId: TemplateGroupId): Promise<TemplateGroup>;
+  validateTemplateImport(json: string): Promise<TemplateImportWithValidation>;
 }
