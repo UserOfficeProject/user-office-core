@@ -35,7 +35,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { id, question },
+    question: { id, question, naturalKey },
   } = answer;
   const config = answer.config as NumberInputConfig;
   const fieldError = getIn(errors, id);
@@ -126,6 +126,7 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
             onBlur={() => onComplete(stateValue)}
             value={stateValue.value}
             data-cy={valueFieldId}
+            data-natural-key={naturalKey}
             type="number"
             name={valueFieldId}
             margin="dense"

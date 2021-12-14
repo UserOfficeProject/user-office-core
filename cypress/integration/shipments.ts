@@ -1,6 +1,5 @@
 import faker from 'faker';
 
-import { TemplateGroupId } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 faker.seed(1);
@@ -36,7 +35,24 @@ context('Shipments tests', () => {
     cy.viewport(1920, 1080);
   });
 
-  it('Should be able to create shipments template', () => {
+  it('Co-proposer should see that he can declare shipment', () => {
+    cy.login('user');
+    cy.visit('/');
+
+    cy.testActionButton(declareShipmentTitle, 'neutral');
+  });
+
+  it('Visitor should see that he can declare shipment', () => {
+    cy.login({ email: 'david@teleworm.us', password: 'Test1234!' });
+    cy.testActionButton(declareShipmentTitle, 'neutral');
+  });
+
+  it('Should be able to create and use shipments template', () => {
+    const WIDTH_KEY = 'parcel_width';
+    const HEIGHT_KEY = 'parcel_height';
+    const LENGTH_KEY = 'parcel_length';
+    const WEIGHT_KEY = 'parcel_weight';
+
     cy.login('officer');
     cy.visit('/');
 
@@ -52,27 +68,14 @@ context('Shipments tests', () => {
 
     cy.get('[data-cy=submit]').click();
 
+    cy.createNumberInputQuestion('width', { key: WIDTH_KEY });
+    cy.createNumberInputQuestion('height', { key: HEIGHT_KEY });
+    cy.createNumberInputQuestion('length', { key: LENGTH_KEY });
+    cy.createNumberInputQuestion('weight', { key: WEIGHT_KEY });
+
     cy.contains('New shipment');
-  });
 
-  it('Co-proposer should see that he can declare shipment', () => {
-    cy.login('user');
-    cy.visit('/');
-
-    cy.testActionButton(declareShipmentTitle, 'neutral');
-  });
-
-  it('Visitor should see that he can declare shipment', () => {
-    cy.login({ email: 'david@teleworm.us', password: 'Test1234!' });
-    cy.testActionButton(declareShipmentTitle, 'neutral');
-  });
-
-  it('PI should be able to declare shipment', () => {
-    cy.createTemplate({
-      groupId: TemplateGroupId.SHIPMENT,
-      name: shipmentTemplateName,
-      description: shipmentTemplateDescription,
-    });
+    cy.logout();
     cy.login('user');
     cy.visit('/');
 
@@ -98,6 +101,11 @@ context('Shipments tests', () => {
     cy.get('[role="listbox"]').contains(sampleTitle).click();
 
     cy.get('body').type('{esc}');
+
+    cy.get(`[data-natural-key=${WIDTH_KEY}]`).clear().type('1').click();
+    cy.get(`[data-natural-key=${HEIGHT_KEY}]`).clear().type('1').click();
+    cy.get(`[data-natural-key=${LENGTH_KEY}]`).clear().type('1').click();
+    cy.get(`[data-natural-key=${WEIGHT_KEY}]`).clear().type('1').click();
 
     cy.get('[data-cy=save-and-continue-button]').click();
 

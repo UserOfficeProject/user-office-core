@@ -20,6 +20,7 @@ import {
   FeedbackStatus,
   ProposalBookingStatusCore,
   ProposalEndStatus,
+  ShipmentStatus,
 } from 'generated/sdk';
 import { User } from 'models/User';
 import { parseTzLessDateTime } from 'utils/Time';
@@ -240,7 +241,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let buttonState: ActionButtonState;
 
     if (event.visit !== null) {
-      if (event.visit.shipments.length > 0) {
+      const isAtLeastOneShipmentSubmitted = event.visit.shipments.some(
+        (shipment) => shipment.status === ShipmentStatus.SUBMITTED
+      );
+
+      if (isAtLeastOneShipmentSubmitted) {
         buttonState = 'completed';
       } else {
         buttonState = 'neutral';

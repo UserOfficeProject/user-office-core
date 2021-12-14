@@ -53,6 +53,7 @@ import UnitTablePage from './settings/unitList/UnitTablePage';
 import ProposalEsiPage from './template/EsiPage';
 import FeedbackTemplatesPage from './template/FeedbackTemplatesPage';
 import GenericTemplatesPage from './template/GenericTemplatesPage';
+import ImportTemplatePage from './template/import/ImportTemplatePage';
 import ProposalTemplatesPage from './template/ProposalTemplatesPage';
 import QuestionsPage from './template/QuestionsPage';
 import SampleEsiPage from './template/SampleEsiPage';
@@ -318,6 +319,9 @@ const Dashboard: React.FC = () => {
           )}
           {isUserOfficer && (
             <Route path="/Questions" component={QuestionsPage} />
+          )}
+          {isUserOfficer && (
+            <Route path="/ImportTemplate" component={ImportTemplatePage} />
           )}
           <Route
             path="/CreateEsi/:scheduledEventId"
