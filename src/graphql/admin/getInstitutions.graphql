@@ -2,6 +2,10 @@ query getInstitutions($filter: InstitutionsFilter) {
     institutions(filter: $filter) {
       id
       name
+      country{
+        id
+        value
+      }
       verified
     }
 }

@@ -41,6 +41,7 @@ const InstitutionPage: React.FC = () => {
 
   const columns = [
     { title: 'Name', field: 'name' },
+    { title: 'Country', field: 'country.value' },
     {
       title: 'Verified',
       field: 'verified',
