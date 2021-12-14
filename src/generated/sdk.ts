@@ -206,26 +206,23 @@ export type CloneProposalsInput = {
   proposalsToClonePk: Array<Scalars['Int']>;
 };
 
-<<<<<<< HEAD
 export type ConfirmEquipmentAssignmentInput = {
   equipmentId: Scalars['Int'];
   newStatus: EquipmentAssignmentStatus;
   scheduledEventId: Scalars['Int'];
 };
 
-=======
 export type ConflictResolution = {
   questionId: Scalars['String'];
   strategy: ConflictResolutionStrategy;
 };
 
 export enum ConflictResolutionStrategy {
-  USE_NEW = 'USE_NEW',
+  UNRESOLVED = 'UNRESOLVED',
   USE_EXISTING = 'USE_EXISTING',
-  UNRESOLVED = 'UNRESOLVED'
+  USE_NEW = 'USE_NEW'
 }
 
->>>>>>> 0df8d2513b6f2bca6252fbf91801bf2d962cfa11
 export type CreateApiAccessTokenInput = {
   accessPermissions: Scalars['String'];
   name: Scalars['String'];
@@ -854,11 +851,8 @@ export type Mutation = {
   finalizeProposalBooking: ProposalBookingResponseWrap;
   finalizeScheduledEvent: ScheduledEventResponseWrap;
   getTokenForUser: TokenResponseWrap;
-<<<<<<< HEAD
   importProposal: ProposalResponseWrap;
-=======
   importTemplate: TemplateResponseWrap;
->>>>>>> 0df8d2513b6f2bca6252fbf91801bf2d962cfa11
   login: TokenResponseWrap;
   logout: LogoutTokenWrap;
   mergeInstitutions: InstitutionResponseWrap;
@@ -903,7 +897,6 @@ export type Mutation = {
   updateInstrument: InstrumentResponseWrap;
   updateLostTime: LostTimeResponseWrap;
   updatePassword: BasicUserDetailsResponseWrap;
-<<<<<<< HEAD
   updateProposal: ProposalResponseWrap;
   updateProposalStatus: ProposalStatusResponseWrap;
   updateProposalWorkflow: ProposalWorkflowResponseWrap;
@@ -923,9 +916,7 @@ export type Mutation = {
   updateUserRoles: UserResponseWrap;
   updateVisit: VisitResponseWrap;
   updateVisitRegistration: VisitRegistrationResponseWrap;
-=======
   validateTemplateImport: TemplateImportWithValidationWrap;
->>>>>>> 0df8d2513b6f2bca6252fbf91801bf2d962cfa11
 };
 
 
@@ -1440,6 +1431,12 @@ export type MutationImportProposalArgs = {
 };
 
 
+export type MutationImportTemplateArgs = {
+  conflictResolutions: Array<ConflictResolution>;
+  templateAsJson: Scalars['String'];
+};
+
+
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -1728,24 +1725,12 @@ export type MutationUpdateQuestionTemplateRelationArgs = {
 };
 
 
-<<<<<<< HEAD
 export type MutationUpdateQuestionTemplateRelationSettingsArgs = {
   config?: Maybe<Scalars['String']>;
   dependencies: Array<FieldDependencyInput>;
   dependenciesOperator?: Maybe<DependenciesLogicOperator>;
   questionId: Scalars['String'];
   templateId: Scalars['Int'];
-=======
-export type MutationImportTemplateArgs = {
-  conflictResolutions: Array<ConflictResolution>;
-  templateAsJson: Scalars['String'];
-};
-
-
-export type MutationLoginArgs = {
-  email: Scalars['String'];
-  password: Scalars['String'];
->>>>>>> 0df8d2513b6f2bca6252fbf91801bf2d962cfa11
 };
 
 
@@ -1861,6 +1846,11 @@ export type MutationUpdateVisitRegistrationArgs = {
   visitId: Scalars['Int'];
 };
 
+
+export type MutationValidateTemplateImportArgs = {
+  templateAsJson: Scalars['String'];
+};
+
 export type NewScheduledEventInput = {
   bookingType: ScheduledEventBookingType;
   description?: Maybe<Scalars['String']>;
@@ -1868,11 +1858,6 @@ export type NewScheduledEventInput = {
   instrumentId: Scalars['Int'];
   proposalBookingId?: Maybe<Scalars['Int']>;
   startsAt: Scalars['TzLessDateTime'];
-};
-
-
-export type MutationValidateTemplateImportArgs = {
-  templateAsJson: Scalars['String'];
 };
 
 export type NextProposalStatus = {
@@ -2744,15 +2729,15 @@ export type Question = {
 
 export type QuestionComparison = {
   __typename?: 'QuestionComparison';
+  conflictResolutionStrategy: ConflictResolutionStrategy;
   existingQuestion: Maybe<Question>;
   newQuestion: Question;
   status: QuestionComparisonStatus;
-  conflictResolutionStrategy: ConflictResolutionStrategy;
 };
 
 export enum QuestionComparisonStatus {
-  NEW = 'NEW',
   DIFFERENT = 'DIFFERENT',
+  NEW = 'NEW',
   SAME = 'SAME'
 }
 
@@ -2831,11 +2816,8 @@ export type QuestionsFilter = {
   category?: Maybe<TemplateCategoryId>;
   dataType?: Maybe<Array<DataType>>;
   excludeDataType?: Maybe<Array<DataType>>;
-<<<<<<< HEAD
-  text?: Maybe<Scalars['String']>;
-=======
   questionIds?: Maybe<Array<Scalars['String']>>;
->>>>>>> 0df8d2513b6f2bca6252fbf91801bf2d962cfa11
+  text?: Maybe<Scalars['String']>;
 };
 
 export type Rejection = {
@@ -3345,12 +3327,12 @@ export enum TemplateGroupId {
 
 export type TemplateImportWithValidation = {
   __typename?: 'TemplateImportWithValidation';
-  json: Scalars['String'];
-  version: Scalars['String'];
+  errors: Array<Scalars['String']>;
   exportDate: Scalars['DateTime'];
   isValid: Scalars['Boolean'];
-  errors: Array<Scalars['String']>;
+  json: Scalars['String'];
   questionComparisons: Array<QuestionComparison>;
+  version: Scalars['String'];
 };
 
 export type TemplateImportWithValidationWrap = {
