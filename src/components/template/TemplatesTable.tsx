@@ -8,6 +8,8 @@ import Archive from '@material-ui/icons/Archive';
 import Delete from '@material-ui/icons/Delete';
 import Edit from '@material-ui/icons/Edit';
 import FileCopy from '@material-ui/icons/FileCopy';
+import PostAddIcon from '@material-ui/icons/PostAdd';
+import PublishIcon from '@material-ui/icons/Publish';
 import ShareIcon from '@material-ui/icons/Share';
 import UnarchiveIcon from '@material-ui/icons/Unarchive';
 import React, { useEffect, useState } from 'react';
@@ -304,6 +306,19 @@ const TemplatesTable = ({
       />
       <ActionButtonContainer>
         <Button
+          startIcon={<PublishIcon />}
+          type="button"
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            history.push('/ImportTemplate');
+          }}
+          data-cy="import-template-button"
+        >
+          Import
+        </Button>
+        <Button
+          startIcon={<PostAddIcon />}
           type="button"
           variant="contained"
           color="primary"

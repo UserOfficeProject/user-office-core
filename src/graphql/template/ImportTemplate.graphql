@@ -1,0 +1,12 @@
+mutation importTemplate($templateAsJson: String!, $conflictResolutions: [ConflictResolution!]!) {
+  importTemplate(templateAsJson: $templateAsJson, conflictResolutions: $conflictResolutions) {
+    template {
+      ...template
+    }
+    rejection {
+      reason
+      context
+      exception
+    }
+  }
+}

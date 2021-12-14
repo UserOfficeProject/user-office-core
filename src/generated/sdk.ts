@@ -186,6 +186,17 @@ export type CloneProposalsInput = {
   proposalsToClonePk: Array<Scalars['Int']>;
 };
 
+export type ConflictResolution = {
+  questionId: Scalars['String'];
+  strategy: ConflictResolutionStrategy;
+};
+
+export enum ConflictResolutionStrategy {
+  USE_NEW = 'USE_NEW',
+  USE_EXISTING = 'USE_EXISTING',
+  UNRESOLVED = 'UNRESOLVED'
+}
+
 export type CreateApiAccessTokenInput = {
   name: Scalars['String'];
   accessPermissions: Scalars['String'];
@@ -694,6 +705,7 @@ export type Mutation = {
   deleteVisit: VisitResponseWrap;
   emailVerification: EmailVerificationResponseWrap;
   getTokenForUser: TokenResponseWrap;
+  importTemplate: TemplateResponseWrap;
   login: TokenResponseWrap;
   logout: LogoutTokenWrap;
   notifyProposal: ProposalResponseWrap;
@@ -710,6 +722,7 @@ export type Mutation = {
   token: TokenResponseWrap;
   selectRole: TokenResponseWrap;
   updatePassword: BasicUserDetailsResponseWrap;
+  validateTemplateImport: TemplateImportWithValidationWrap;
 };
 
 
@@ -1437,6 +1450,12 @@ export type MutationGetTokenForUserArgs = {
 };
 
 
+export type MutationImportTemplateArgs = {
+  conflictResolutions: Array<ConflictResolution>;
+  templateAsJson: Scalars['String'];
+};
+
+
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -1520,6 +1539,11 @@ export type MutationSelectRoleArgs = {
 export type MutationUpdatePasswordArgs = {
   id: Scalars['Int'];
   password: Scalars['String'];
+};
+
+
+export type MutationValidateTemplateImportArgs = {
+  templateAsJson: Scalars['String'];
 };
 
 export type NextProposalStatus = {
@@ -2256,6 +2280,20 @@ export type Question = {
   config: FieldConfig;
 };
 
+export type QuestionComparison = {
+  __typename?: 'QuestionComparison';
+  existingQuestion: Maybe<Question>;
+  newQuestion: Question;
+  status: QuestionComparisonStatus;
+  conflictResolutionStrategy: ConflictResolutionStrategy;
+};
+
+export enum QuestionComparisonStatus {
+  NEW = 'NEW',
+  DIFFERENT = 'DIFFERENT',
+  SAME = 'SAME'
+}
+
 export enum QuestionFilterCompareOperator {
   GREATER_THAN = 'GREATER_THAN',
   LESS_THAN = 'LESS_THAN',
@@ -2325,6 +2363,7 @@ export type QuestionsFilter = {
   category?: Maybe<TemplateCategoryId>;
   dataType?: Maybe<Array<DataType>>;
   excludeDataType?: Maybe<Array<DataType>>;
+  questionIds?: Maybe<Array<Scalars['String']>>;
 };
 
 export type Rejection = {
@@ -2747,6 +2786,22 @@ export enum TemplateGroupId {
   GENERIC_TEMPLATE = 'GENERIC_TEMPLATE',
   FEEDBACK = 'FEEDBACK'
 }
+
+export type TemplateImportWithValidation = {
+  __typename?: 'TemplateImportWithValidation';
+  json: Scalars['String'];
+  version: Scalars['String'];
+  exportDate: Scalars['DateTime'];
+  isValid: Scalars['Boolean'];
+  errors: Array<Scalars['String']>;
+  questionComparisons: Array<QuestionComparison>;
+};
+
+export type TemplateImportWithValidationWrap = {
+  __typename?: 'TemplateImportWithValidationWrap';
+  rejection: Maybe<Rejection>;
+  validationResult: Maybe<TemplateImportWithValidation>;
+};
 
 export type TemplateResponseWrap = {
   rejection: Maybe<Rejection>;
@@ -4550,6 +4605,26 @@ export type UpdateShipmentMutation = { updateShipment: { rejection: Maybe<Reject
       & ShipmentFragment
     )> } };
 
+export type ImportTemplateMutationVariables = Exact<{
+  templateAsJson: Scalars['String'];
+  conflictResolutions: Array<ConflictResolution> | ConflictResolution;
+}>;
+
+
+export type ImportTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { importTemplate: (
+    { __typename?: 'TemplateResponseWrap' }
+    & { template: Maybe<(
+      { __typename?: 'Template' }
+      & TemplateFragment
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & Pick<Rejection, 'reason' | 'context' | 'exception'>
+    )> }
+  ) }
+);
+
 export type CloneTemplateMutationVariables = Exact<{
   templateId: Scalars['Int'];
 }>;
@@ -4805,6 +4880,36 @@ export type UpdateTopicMutationVariables = Exact<{
 
 
 export type UpdateTopicMutation = { updateTopic: { template: Maybe<TemplateFragment>, rejection: Maybe<RejectionFragment> } };
+
+export type ValidateTemplateImportMutationVariables = Exact<{
+  templateAsJson: Scalars['String'];
+}>;
+
+
+export type ValidateTemplateImportMutation = (
+  { __typename?: 'Mutation' }
+  & { validateTemplateImport: (
+    { __typename?: 'TemplateImportWithValidationWrap' }
+    & { validationResult: Maybe<(
+      { __typename?: 'TemplateImportWithValidation' }
+      & Pick<TemplateImportWithValidation, 'json' | 'version' | 'exportDate' | 'isValid' | 'errors'>
+      & { questionComparisons: Array<(
+        { __typename?: 'QuestionComparison' }
+        & Pick<QuestionComparison, 'status' | 'conflictResolutionStrategy'>
+        & { existingQuestion: Maybe<(
+          { __typename?: 'Question' }
+          & QuestionFragment
+        )>, newQuestion: (
+          { __typename?: 'Question' }
+          & QuestionFragment
+        ) }
+      )> }
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
 
 export type CheckTokenQueryVariables = Exact<{
   token: Scalars['String'];
@@ -8092,6 +8197,23 @@ export const UpdateShipmentDocument = gql`
     ${RejectionFragmentDoc}
 ${ShipmentFragmentDoc}
 ${QuestionaryFragmentDoc}`;
+export const ImportTemplateDocument = gql`
+    mutation importTemplate($templateAsJson: String!, $conflictResolutions: [ConflictResolution!]!) {
+  importTemplate(
+    templateAsJson: $templateAsJson
+    conflictResolutions: $conflictResolutions
+  ) {
+    template {
+      ...template
+    }
+    rejection {
+      reason
+      context
+      exception
+    }
+  }
+}
+    ${TemplateFragmentDoc}`;
 export const CloneTemplateDocument = gql`
     mutation cloneTemplate($templateId: Int!) {
   cloneTemplate(templateId: $templateId) {
@@ -8379,6 +8501,33 @@ export const UpdateTopicDocument = gql`
   }
 }
     ${TemplateFragmentDoc}
+${RejectionFragmentDoc}`;
+export const ValidateTemplateImportDocument = gql`
+    mutation validateTemplateImport($templateAsJson: String!) {
+  validateTemplateImport(templateAsJson: $templateAsJson) {
+    validationResult {
+      json
+      version
+      exportDate
+      isValid
+      errors
+      questionComparisons {
+        existingQuestion {
+          ...question
+        }
+        newQuestion {
+          ...question
+        }
+        status
+        conflictResolutionStrategy
+      }
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${QuestionFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const CheckTokenDocument = gql`
     query checkToken($token: String!) {
@@ -9390,6 +9539,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     updateShipment(variables: UpdateShipmentMutationVariables): Promise<UpdateShipmentMutation> {
       return withWrapper(() => client.request<UpdateShipmentMutation>(print(UpdateShipmentDocument), variables));
     },
+    importTemplate(variables: ImportTemplateMutationVariables): Promise<ImportTemplateMutation> {
+      return withWrapper(() => client.request<ImportTemplateMutation>(print(ImportTemplateDocument), variables));
+    },
     cloneTemplate(variables: CloneTemplateMutationVariables): Promise<CloneTemplateMutation> {
       return withWrapper(() => client.request<CloneTemplateMutation>(print(CloneTemplateDocument), variables));
     },
@@ -9455,6 +9607,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateTopic(variables: UpdateTopicMutationVariables): Promise<UpdateTopicMutation> {
       return withWrapper(() => client.request<UpdateTopicMutation>(print(UpdateTopicDocument), variables));
+    },
+    validateTemplateImport(variables: ValidateTemplateImportMutationVariables): Promise<ValidateTemplateImportMutation> {
+      return withWrapper(() => client.request<ValidateTemplateImportMutation>(print(ValidateTemplateImportDocument), variables));
     },
     checkToken(variables: CheckTokenQueryVariables): Promise<CheckTokenQuery> {
       return withWrapper(() => client.request<CheckTokenQuery>(print(CheckTokenDocument), variables));
