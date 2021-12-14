@@ -1,4 +1,5 @@
 import { Page } from '../../models/Admin';
+import { Entry } from '../../models/Entry';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
@@ -7,10 +8,10 @@ import { Unit } from '../../models/Unit';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
-import { AdminDataSource, Entry } from '../AdminDataSource';
+import { AdminDataSource } from '../AdminDataSource';
 export const dummyUnit = new Unit(1, 'Second');
 
-export const dummyInstitution = new Institution(1, 'ESS', true);
+export const dummyInstitution = new Institution(1, 'ESS', 1, true);
 export const dummyApiAccessToken = new Permissions(
   'kkmgdyzpj26uxubxoyl',
   'ESS access token',
@@ -21,6 +22,9 @@ export const dummyApiAccessToken = new Permissions(
 export const dummyApiAccessTokens = [dummyApiAccessToken];
 
 export class AdminDataSourceMock implements AdminDataSource {
+  getCountry(id: number): Promise<Entry> {
+    throw new Error('Method not implemented.');
+  }
   async setFeatures(
     features: FeatureId[],
     value: boolean

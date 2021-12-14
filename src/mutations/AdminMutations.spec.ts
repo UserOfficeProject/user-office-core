@@ -54,6 +54,7 @@ describe('Test Admin Mutations', () => {
       adminMutations.updateInstitutions(dummyUserWithRole, {
         id: 1,
         name: 'something',
+        country: 1,
         verified: true,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
