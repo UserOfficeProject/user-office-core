@@ -14,7 +14,8 @@ import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
-import { AdminDataSource, Entry } from '../AdminDataSource';
+import { AdminDataSource } from '../AdminDataSource';
+import { Entry } from './../../models/Entry';
 import { FeatureId } from './../../models/Feature';
 import { SettingsId } from './../../models/Settings';
 import { InstitutionsFilter } from './../../resolvers/queries/InstitutionsQuery';
@@ -41,6 +42,16 @@ const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
 
 @injectable()
 export default class PostgresAdminDataSource implements AdminDataSource {
+  async getCountry(id: number): Promise<Entry> {
+    return database
+      .select('*')
+      .from('countries')
+      .where('country_id', id)
+      .first()
+      .then(
+        (count: CountryRecord) => new Entry(count.country_id, count.country)
+      );
+  }
   async createUnit(unit: Unit): Promise<Unit | null> {
     const [unitRecord]: UnitRecord[] = await database
       .insert({
@@ -96,6 +107,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .update({
         institution: institution.name,
         verified: institution.verified,
+        country_id: institution.country,
       })
       .from('institutions')
       .where('institution_id', institution.id)

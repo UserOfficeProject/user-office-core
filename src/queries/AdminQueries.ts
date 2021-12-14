@@ -10,9 +10,6 @@ import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 @injectable()
 export default class AdminQueries {
-  getCountry(id: number) {
-    throw new Error('Method not implemented.');
-  }
   constructor(
     @inject(Tokens.AdminDataSource) private dataSource: AdminDataSource
   ) {}
@@ -32,6 +29,11 @@ export default class AdminQueries {
   async getCountries() {
     return await this.dataSource.getCountries();
   }
+
+  async getCountry(id: number) {
+    return await this.dataSource.getCountry(id);
+  }
+
   async getInstitutions(filter?: InstitutionsFilter) {
     return await this.dataSource.getInstitutions(filter);
   }

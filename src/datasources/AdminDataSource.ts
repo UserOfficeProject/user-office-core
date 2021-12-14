@@ -1,4 +1,5 @@
 import { Page } from '../models/Admin';
+import { Entry } from '../models/Entry';
 import { Feature, FeatureId } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { Permissions } from '../models/Permissions';
@@ -11,6 +12,7 @@ import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAcces
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 export interface AdminDataSource {
+  getCountry(id: number): Promise<Entry>;
   getInstitution(id: number): Promise<Institution | null>;
   createInstitution(institution: Institution): Promise<Institution | null>;
   updateInstitution(institution: Institution): Promise<Institution | null>;
@@ -44,7 +46,4 @@ export interface AdminDataSource {
   getTokenAndPermissionsById(accessTokenId: string): Promise<Permissions>;
   getAllTokensAndPermissions(): Promise<Permissions[]>;
   deleteApiAccessToken(accessTokenId: string): Promise<boolean>;
-}
-export class Entry {
-  constructor(public id: number, public value: string) {}
 }

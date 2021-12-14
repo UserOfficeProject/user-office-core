@@ -79,11 +79,12 @@ export default class AdminMutations {
   ) {
     const institution = await this.dataSource.getInstitution(args.id);
     if (!institution) {
-      return rejection('Could not retrieve institutions');
+      return rejection('Could not retrieve institutions', { agent });
     }
 
     institution.name = args.name ?? institution.name;
     institution.verified = args.verified ?? institution.verified;
+    institution.country = args.country ?? institution.country;
 
     return await this.dataSource.updateInstitution(institution);
   }
