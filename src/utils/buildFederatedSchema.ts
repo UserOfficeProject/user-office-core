@@ -1,6 +1,5 @@
-import { buildSubgraphSchema } from '@apollo/federation';
-import { printSubgraphSchema } from '@apollo/subgraph';
-import { federationDirectives } from '@apollo/subgraph/dist/directives';
+import { printSubgraphSchema, buildSubgraphSchema } from '@apollo/subgraph';
+import { knownSubgraphDirectives } from '@apollo/subgraph/dist/directives';
 import { addResolversToSchema, GraphQLResolverMap } from 'apollo-graphql';
 import { specifiedDirectives } from 'graphql';
 import gql from 'graphql-tag';
@@ -20,7 +19,7 @@ export async function buildFederatedSchema(
     ...options,
     directives: [
       ...specifiedDirectives,
-      ...federationDirectives,
+      ...knownSubgraphDirectives,
       ...(options.directives || []),
     ],
     skipCheck: true,
