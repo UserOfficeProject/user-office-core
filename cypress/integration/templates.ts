@@ -1077,6 +1077,72 @@ context('Template tests', () => {
       cy.get('[data-cy=search-button]').click();
       cy.get('[data-cy=question-list] div').should('have.length.above', 0);
     });
+
+    it('User officer import template', () => {
+      const fileName = 'template_import.json';
+      const resolvedQuestionTitle = 'General information';
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.get('[data-cy=import-template-button]').click();
+
+      cy.get('input[type="file"]').attachFixture({
+        filePath: fileName,
+        fileName: fileName,
+        mimeType: 'image/png',
+      });
+
+      cy.get("[data-cy='proposal_basis-accordion']")
+        .find('[data-cy=conflict-icon]')
+        .should('exist');
+
+      cy.get("[data-cy='proposal_basis-accordion']").click();
+
+      cy.get("[data-cy='proposal_basis-accordion']")
+        .find("[data-cy='new-question-checkbox']")
+        .click();
+
+      cy.get("[data-cy='proposal_basis-accordion']")
+        .find('[data-cy=conflict-icon]')
+        .should('not.exist');
+
+      cy.get("[data-cy='proposal_basis-accordion']")
+        .find('[data-cy=resolved-icon]')
+        .should('exist');
+
+      cy.get('[data-cy=import-template-button]').click();
+
+      cy.contains(resolvedQuestionTitle).should('exist');
+    });
+
+    it('should export template in compatible format', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.contains(initialDBData.template.name)
+        .closest('TR')
+        .find('[title="Export"]')
+        .click();
+
+      cy.fixture('template_export.json').then((expectedExport) => {
+        const downloadsFolder = Cypress.config('downloadsFolder');
+
+        cy.readFile(
+          path.join(downloadsFolder, `${initialDBData.template.name}.json`)
+        ).then((actualExport) => {
+          // remove date from the export, because it is not deterministic
+          delete expectedExport.exportDate;
+          delete actualExport.exportDate;
+
+          expect(expectedExport).to.deep.equal(actualExport);
+        });
+      });
+    });
   });
 
   describe('Proposal templates advanced tests', () => {
@@ -1545,32 +1611,6 @@ context('Template tests', () => {
         .parent()
         .find('[data-cy="image-figure"] input')
         .should('have.value', 'Fig_test');
-    });
-  });
-
-  it('should export template in compatible format', () => {
-    cy.login('officer');
-    cy.visit('/');
-
-    cy.navigateToTemplatesSubmenu('Proposal');
-
-    cy.contains(initialDBData.template.name)
-      .closest('TR')
-      .find('[title="Export"]')
-      .click();
-
-    cy.fixture('template_export.json').then((expectedExport) => {
-      const downloadsFolder = Cypress.config('downloadsFolder');
-
-      cy.readFile(
-        path.join(downloadsFolder, `${initialDBData.template.name}.json`)
-      ).then((actualExport) => {
-        // remove date from the export, because it is not deterministic
-        delete expectedExport.exportDate;
-        delete actualExport.exportDate;
-
-        expect(expectedExport).to.deep.equal(actualExport);
-      });
     });
   });
 });
