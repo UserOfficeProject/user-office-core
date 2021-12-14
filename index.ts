@@ -28,7 +28,8 @@ async function bootstrap() {
     .use(factory())
     .use(healthCheck())
     .use(readinessCheck())
-    .use(exceptionHandler());
+    .use(exceptionHandler())
+    .use(express.json({ limit: '5mb' }));
 
   await apolloServer(app);
 

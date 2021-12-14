@@ -1,14 +1,18 @@
 import { logger } from '@esss-swap/duo-logger';
 
+import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import {
   DataType,
   FieldDependency,
   Question,
+  QuestionComparison,
+  QuestionComparisonStatus,
   QuestionTemplateRelation,
   Template,
   TemplateCategory,
-  TemplateCategoryId,
+  TemplateExport,
   TemplateGroupId,
+  TemplateImportWithValidation,
   TemplatesHasQuestions,
   TemplateStep,
   Topic,
@@ -16,12 +20,19 @@ import {
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
+import { ConflictResolution } from '../../resolvers/mutations/ImportTemplateMutation';
 import { SetActiveTemplateArgs } from '../../resolvers/mutations/SetActiveTemplateMutation';
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
+import { deepEqual } from '../../utils/json';
+import { isBelowVersion, isAboveVersion } from '../../utils/version';
 import { TemplateDataSource } from '../TemplateDataSource';
+import {
+  TemplateCategoryId,
+  ConflictResolutionStrategy,
+} from './../../models/Template';
 import database from './database';
 import {
   createProposalTemplateObject,
@@ -38,6 +49,9 @@ import {
   TemplateRecord,
   TopicRecord,
 } from './records';
+
+const EXPORT_VERSION = '1.0.0';
+const MIN_SUPPORTED_VERSION = '1.0.0';
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
   async getTemplateCategories(): Promise<TemplateCategory[]> {
@@ -173,15 +187,18 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async getTemplateAsJson(templateId: number): Promise<string> {
-    const VERSION = '1.0.0';
     const EXPORT_DATE = new Date();
 
     const template = await this.getTemplate(templateId);
     const templateSteps = await this.getTemplateSteps(templateId);
     const questions = await this.getQuestionsInTemplate(templateId);
 
-    const object = {
-      version: VERSION,
+    if (!template || !templateSteps || !questions) {
+      throw new Error(`Template does not exist. ID: ${templateId}`);
+    }
+
+    const object: TemplateExport = {
+      version: EXPORT_VERSION,
       exportDate: EXPORT_DATE,
       template,
       templateSteps,
@@ -189,6 +206,125 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     };
 
     return JSON.stringify(object);
+  }
+
+  isCriticalConflict = (questionA: Question, questionB: Question) =>
+    questionA.dataType !== questionB.dataType ||
+    questionA.categoryId !== questionB.categoryId;
+
+  convertStringToTemplateExport = (string: string): TemplateExport => {
+    const object = JSON.parse(string);
+    object.exportDate = new Date(object.exportDate);
+
+    return object;
+  };
+
+  async validateTemplateImport(
+    json: string
+  ): Promise<TemplateImportWithValidation> {
+    const templateExport = this.convertStringToTemplateExport(json);
+    const errors: string[] = [];
+    const questionComparisons: QuestionComparison[] = [];
+
+    if (isBelowVersion(templateExport.version, MIN_SUPPORTED_VERSION)) {
+      errors.push(
+        `Template version ${templateExport.version} is below the minimum supported version ${MIN_SUPPORTED_VERSION}.`
+      );
+    }
+
+    if (isAboveVersion(templateExport.version, EXPORT_VERSION)) {
+      errors.push(
+        `Template version ${templateExport.version} is above the current supported version ${EXPORT_VERSION}.`
+      );
+    }
+
+    if (!templateExport.template) {
+      errors.push('Template is missing');
+    }
+
+    if (!templateExport.templateSteps) {
+      errors.push('TemplateSteps is missing');
+    }
+
+    if (!templateExport.questions) {
+      errors.push('Questions is missing');
+    }
+
+    if (!templateExport.template.name) {
+      errors.push('Template name is missing');
+    }
+
+    if (!templateExport.template.description) {
+      errors.push('Template description is missing');
+    }
+
+    if (!templateExport.template.groupId) {
+      errors.push('Template group is missing');
+    }
+
+    const questionIds = templateExport.questions.map((question) => question.id);
+
+    const existingQuestions = await this.getQuestions({
+      questionIds,
+    });
+
+    const newQuestions = templateExport.questions.map(
+      (question) =>
+        new Question(
+          question.categoryId,
+          question.id,
+          question.naturalKey,
+          question.dataType,
+          question.question,
+          createConfig<any>(question.dataType as DataType, question.config)
+        )
+    );
+
+    for (const newQuestion of newQuestions) {
+      const existingQuestion =
+        existingQuestions.find(
+          (existingQuestion) => existingQuestion.id === newQuestion.id
+        ) || null;
+
+      if (!existingQuestion) {
+        questionComparisons.push({
+          existingQuestion: null,
+          newQuestion: newQuestion,
+          status: QuestionComparisonStatus.NEW,
+          conflictResolutionStrategy: ConflictResolutionStrategy.USE_NEW,
+        });
+      } else {
+        if (deepEqual(newQuestion, existingQuestion)) {
+          questionComparisons.push({
+            existingQuestion: existingQuestion,
+            newQuestion: newQuestion,
+            status: QuestionComparisonStatus.SAME,
+            conflictResolutionStrategy: ConflictResolutionStrategy.USE_EXISTING,
+          });
+        } else {
+          if (this.isCriticalConflict(newQuestion, existingQuestion)) {
+            errors.push(
+              `Question with ID ${newQuestion.id} has a critical conflict with an existing question.`
+            );
+          }
+          questionComparisons.push({
+            existingQuestion: existingQuestion,
+            newQuestion: newQuestion,
+            status: QuestionComparisonStatus.DIFFERENT,
+            conflictResolutionStrategy: ConflictResolutionStrategy.UNRESOLVED,
+          });
+        }
+      }
+    }
+
+    return {
+      json: json,
+      version: templateExport.version,
+      exportDate: templateExport.exportDate,
+      errors: errors,
+      questionComparisons: questionComparisons,
+      isValid: errors.length === 0,
+    };
   }
 
   async getQuestionsDependencies(
@@ -511,6 +647,37 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return createQuestionObject(resultSet[0]);
   }
 
+  async upsertQuestion(
+    category_id: TemplateCategoryId,
+    question_id: string,
+    natural_key: string,
+    data_type: DataType,
+    question: string,
+    default_config: string
+  ): Promise<Question> {
+    const resultSet: QuestionRecord[] = await database
+      .insert(
+        {
+          category_id,
+          question_id,
+          natural_key,
+          data_type,
+          question,
+          default_config,
+        },
+        ['*']
+      )
+      .from('questions')
+      .onConflict('question_id')
+      .merge();
+
+    if (!resultSet || resultSet.length != 1) {
+      throw new Error('Failure to upsert question');
+    }
+
+    return createQuestionObject(resultSet[0]);
+  }
+
   async getQuestion(questionId: string): Promise<Question | null> {
     return database('questions')
       .where({ question_id: questionId })
@@ -786,5 +953,77 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .select('*');
 
     return rows.map((row) => createQuestionObject(row));
+  }
+
+  async importTemplate(
+    templateAsJson: string,
+    conflictResolutions: ConflictResolution[]
+  ): Promise<Template> {
+    let templateObj: TemplateExport;
+    try {
+      templateObj = JSON.parse(templateAsJson);
+    } catch (e) {
+      throw new Error('Could not parse template');
+    }
+    const { template, questions, templateSteps } = templateObj;
+
+    const newTemplate = await this.createTemplate({
+      groupId: template.groupId,
+      name: template.name,
+      description: template.description,
+    });
+
+    await Promise.all(
+      questions.map(async (question) => {
+        const conflictResolution = conflictResolutions.find(
+          (resolution) => resolution.questionId === question.id
+        );
+        switch (conflictResolution?.strategy) {
+          case ConflictResolutionStrategy.USE_NEW:
+            await this.upsertQuestion(
+              question.categoryId,
+              question.id,
+              question.naturalKey,
+              question.dataType,
+              question.question,
+              createConfig<any>(question.dataType as DataType, question.config)
+            );
+            break;
+
+          case ConflictResolutionStrategy.USE_EXISTING:
+            break;
+          case ConflictResolutionStrategy.UNRESOLVED:
+            throw new Error('No conflict resolution strategy provided');
+          default:
+            throw new Error('Unknown conflict resolution strategy');
+        }
+      })
+    );
+
+    await Promise.all(
+      templateSteps.map(async (step) => {
+        const newTopic = await this.createTopic({
+          title: step.topic.title,
+          templateId: newTemplate.templateId,
+          sortOrder: step.topic.sortOrder,
+        });
+
+        await this.upsertQuestionTemplateRelations(
+          step.fields.map((field) => ({
+            questionId: field.question.id,
+            templateId: newTemplate.templateId,
+            sortOrder: field.sortOrder,
+            topicId: newTopic.id,
+            config: createConfig<any>(
+              field.question.dataType as DataType,
+              field.config
+            ),
+            dependencies: field.dependencies,
+          }))
+        );
+      })
+    );
+
+    return newTemplate;
   }
 }
