@@ -3036,7 +3036,7 @@ export type VisitsFilter = {
 };
 
 
-export type Entity = Call | Proposal | Instrument | User;
+export type Entity = Call | BasicUserDetails | Proposal | Instrument | User;
 
 export type Service = {
   /** The sdl representing the federated service capabilities. Includes federation directives, removes federation types, and includes rest of full schema after schema directives have been applied */
