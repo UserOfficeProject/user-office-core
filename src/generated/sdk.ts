@@ -2281,7 +2281,6 @@ export type Question = {
 };
 
 export type QuestionComparison = {
-  __typename?: 'QuestionComparison';
   existingQuestion: Maybe<Question>;
   newQuestion: Question;
   status: QuestionComparisonStatus;
@@ -2788,7 +2787,6 @@ export enum TemplateGroupId {
 }
 
 export type TemplateImportWithValidation = {
-  __typename?: 'TemplateImportWithValidation';
   json: Scalars['String'];
   version: Scalars['String'];
   exportDate: Scalars['DateTime'];
@@ -2798,7 +2796,6 @@ export type TemplateImportWithValidation = {
 };
 
 export type TemplateImportWithValidationWrap = {
-  __typename?: 'TemplateImportWithValidationWrap';
   rejection: Maybe<Rejection>;
   validationResult: Maybe<TemplateImportWithValidation>;
 };
@@ -4611,19 +4608,7 @@ export type ImportTemplateMutationVariables = Exact<{
 }>;
 
 
-export type ImportTemplateMutation = (
-  { __typename?: 'Mutation' }
-  & { importTemplate: (
-    { __typename?: 'TemplateResponseWrap' }
-    & { template: Maybe<(
-      { __typename?: 'Template' }
-      & TemplateFragment
-    )>, rejection: Maybe<(
-      { __typename?: 'Rejection' }
-      & Pick<Rejection, 'reason' | 'context' | 'exception'>
-    )> }
-  ) }
-);
+export type ImportTemplateMutation = { importTemplate: { template: Maybe<TemplateFragment>, rejection: Maybe<Pick<Rejection, 'reason' | 'context' | 'exception'>> } };
 
 export type CloneTemplateMutationVariables = Exact<{
   templateId: Scalars['Int'];
@@ -4886,30 +4871,13 @@ export type ValidateTemplateImportMutationVariables = Exact<{
 }>;
 
 
-export type ValidateTemplateImportMutation = (
-  { __typename?: 'Mutation' }
-  & { validateTemplateImport: (
-    { __typename?: 'TemplateImportWithValidationWrap' }
-    & { validationResult: Maybe<(
-      { __typename?: 'TemplateImportWithValidation' }
-      & Pick<TemplateImportWithValidation, 'json' | 'version' | 'exportDate' | 'isValid' | 'errors'>
+export type ValidateTemplateImportMutation = { validateTemplateImport: { validationResult: Maybe<(
+      Pick<TemplateImportWithValidation, 'json' | 'version' | 'exportDate' | 'isValid' | 'errors'>
       & { questionComparisons: Array<(
-        { __typename?: 'QuestionComparison' }
-        & Pick<QuestionComparison, 'status' | 'conflictResolutionStrategy'>
-        & { existingQuestion: Maybe<(
-          { __typename?: 'Question' }
-          & QuestionFragment
-        )>, newQuestion: (
-          { __typename?: 'Question' }
-          & QuestionFragment
-        ) }
+        Pick<QuestionComparison, 'status' | 'conflictResolutionStrategy'>
+        & { existingQuestion: Maybe<QuestionFragment>, newQuestion: QuestionFragment }
       )> }
-    )>, rejection: Maybe<(
-      { __typename?: 'Rejection' }
-      & RejectionFragment
-    )> }
-  ) }
-);
+    )>, rejection: Maybe<RejectionFragment> } };
 
 export type CheckTokenQueryVariables = Exact<{
   token: Scalars['String'];
