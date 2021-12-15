@@ -1,9 +1,10 @@
-import { ObjectType, Field, Int } from 'type-graphql';
+import { ObjectType, Field, Int, Directive } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { BasicUserDetails as BasicUserDetailsOrigin } from '../../models/User';
 
 @ObjectType()
+@Directive('@key(fields: "id")')
 export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field(() => Int)
   public id: number;
