@@ -25,6 +25,8 @@ export type Scalars = {
 
 
 
+
+
 export type AddProposalWorkflowStatusInput = {
   proposalWorkflowId: Scalars['Int'];
   sortOrder: Scalars['Int'];
