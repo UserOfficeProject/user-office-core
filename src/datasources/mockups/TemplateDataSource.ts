@@ -10,6 +10,7 @@ import {
   TemplateCategoryId,
   TemplateGroup,
   TemplateGroupId,
+  TemplateImportWithValidation,
   TemplatesHasQuestions,
   TemplateStep,
   Topic,
@@ -126,6 +127,10 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   constructor() {
     this.init();
   }
+  importTemplate(templateAsJson: string): Promise<Template> {
+    throw new Error('Method not implemented.');
+  }
+
   async getTemplateAsJson(templateId: number): Promise<string> {
     return JSON.stringify(dummyProposalTemplate);
   }
@@ -369,5 +374,18 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return dummyTemplateSteps.flatMap((step) =>
       step.fields.map((field) => field.question)
     );
+  }
+
+  async validateTemplateImport(
+    json: string
+  ): Promise<TemplateImportWithValidation> {
+    return {
+      isValid: true,
+      errors: [],
+      questionComparisons: [],
+      exportDate: new Date(),
+      json: '{}',
+      version: '1.0.0',
+    };
   }
 }

@@ -128,3 +128,44 @@ export class Template {
     public isArchived: boolean
   ) {}
 }
+
+export enum QuestionComparisonStatus {
+  NEW = 'NEW',
+  DIFFERENT = 'DIFFERENT',
+  SAME = 'SAME',
+}
+
+export enum ConflictResolutionStrategy {
+  USE_NEW = 'USE_NEW',
+  USE_EXISTING = 'USE_EXISTING',
+  UNRESOLVED = 'UNRESOLVED',
+}
+
+export class QuestionComparison {
+  constructor(
+    public existingQuestion: Question | null,
+    public newQuestion: Question,
+    public status: QuestionComparisonStatus,
+    public conflictResolutionStrategy: ConflictResolutionStrategy
+  ) {}
+}
+export class TemplateImportWithValidation {
+  constructor(
+    public json: string,
+    public version: string,
+    public exportDate: Date,
+    public isValid: boolean,
+    public errors: string[],
+    public questionComparisons: QuestionComparison[]
+  ) {}
+}
+
+export class TemplateExport {
+  constructor(
+    public version: string,
+    public exportDate: Date,
+    public template: Template,
+    public templateSteps: TemplateStep[],
+    public questions: Question[]
+  ) {}
+}
