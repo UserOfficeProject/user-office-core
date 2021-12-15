@@ -6,7 +6,7 @@ BEGIN
 
     ALTER TABLE "scheduled_events"
     ADD COLUMN IF NOT EXISTS "local_contact" int DEFAULT NULL
-    REFERENCES users(user_id) ON DELETE CASCADE;
+    REFERENCES users(user_id) ON DELETE SET NULL;
 
   END;
   END IF;

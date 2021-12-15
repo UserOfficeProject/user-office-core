@@ -345,7 +345,7 @@ export default class PostgresInstrumentDataSource
         'name',
         'i.short_code',
         'description',
-        'i.manager_user_id',
+        'manager_user_id',
         'chi.availability_time',
         'chi.submitted',
         database.raw(
