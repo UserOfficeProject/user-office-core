@@ -77,7 +77,6 @@ const useStyles = makeStyles((theme) => ({
   orcButton: {
     '&:hover': {
       border: '1px solid #338caf',
-      color: theme.palette.primary.light,
     },
     border: '1px solid #D3D3D3',
     padding: '.3em',
@@ -85,7 +84,6 @@ const useStyles = makeStyles((theme) => ({
     'border-radius': '8px',
     'box-shadow': '1px 1px 3px #999',
     cursor: 'pointer',
-    color: '#999',
     'font-weight': 'bold',
     'font-size': '.8em',
     'line-height': '24px',
@@ -102,6 +100,12 @@ const useStyles = makeStyles((theme) => ({
     float: 'left',
     width: '24px',
     height: '24px',
+  },
+  orcidText: {
+    color: '#1a1a1a',
+    '&:hover': {
+      color: '#1a1a1a',
+    },
   },
   gridRoot: {
     flexGrow: 1,
@@ -349,7 +353,10 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                             src={orcid}
                             alt="ORCID iD icon"
                           />
-                          Create or connect your ORCID iD
+
+                          <span className={classes.orcidText}>
+                            Create or connect your ORCID iD
+                          </span>
                         </Button>
                       </React.Fragment>
                     )}
