@@ -1,5 +1,4 @@
 /* eslint-disable prefer-const */
-// @ts-nocheck
 import fs from 'fs';
 
 import to from 'await-to-js';
@@ -68,6 +67,7 @@ export default class PostgresFileDataSource implements FileDataSource {
       throw new Error('Expected to receive entry');
     }
 
+    // @ts-expect-error FIXME: Try to fix this typescript error.
     return createFileMetadata(resultSet[0]);
   }
 
@@ -92,6 +92,7 @@ export default class PostgresFileDataSource implements FileDataSource {
       }
 
       const blobManager = new LargeObjectManager({ pg: connection });
+      // @ts-expect-error FIXME: Try to fix this typescript error.
       [err, [oid, stream]] = await to(
         blobManager.createAndWritableStreamAsync()
       );
@@ -139,6 +140,7 @@ export default class PostgresFileDataSource implements FileDataSource {
       }
 
       const blobManager = new LargeObjectManager({ pg: connection });
+      // @ts-expect-error FIXME: Try to fix this typescript error.
       [err, [size, stream]] = await to(
         blobManager.openAndReadableStreamAsync(oid)
       );
