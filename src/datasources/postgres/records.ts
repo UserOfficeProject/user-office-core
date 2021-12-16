@@ -8,6 +8,7 @@ import {
 import { Feature, FeatureId } from '../../models/Feature';
 import { Feedback } from '../../models/Feedback';
 import { GenericTemplate } from '../../models/GenericTemplate';
+import { Institution } from '../../models/Institution';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
@@ -974,6 +975,14 @@ export const createTemplateGroupObject = (group: TemplateGroupRecord) => {
   return new TemplateGroup(
     group.template_group_id as TemplateGroupId,
     group.category_id
+  );
+};
+
+export const createInstitutionObject = (institution: InstitutionRecord) => {
+  return new Institution(
+    institution.institution_id,
+    institution.institution,
+    institution.verified
   );
 };
 
