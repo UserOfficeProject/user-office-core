@@ -6,6 +6,7 @@ import { Settings, SettingsId } from '../models/Settings';
 import { Unit } from '../models/Unit';
 import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
+import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
@@ -14,6 +15,7 @@ export interface AdminDataSource {
   createInstitution(institution: Institution): Promise<Institution | null>;
   updateInstitution(institution: Institution): Promise<Institution | null>;
   deleteInstitution(id: number): Promise<Institution>;
+  mergeInstitutions(args: MergeInstitutionsInput): Promise<Institution | null>;
   getInstitutions(filter?: InstitutionsFilter): Promise<Institution[]>;
   getInstitutionUsers(id: number): Promise<BasicUserDetails[]>;
   getCountries(): Promise<Entry[]>;
