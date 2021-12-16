@@ -1,12 +1,16 @@
+import { Tooltip } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Typography from '@material-ui/core/Typography';
+import { Check, MergeType } from '@material-ui/icons';
 import { Field, Form, Formik } from 'formik';
 import { Checkbox, TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { useHistory } from 'react-router';
 import * as Yup from 'yup';
 
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import UOLoader from 'components/common/UOLoader';
 import { Institution } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -21,6 +25,8 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
   institution,
 }) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
+  const history = useHistory();
+
   const initialValues = institution
     ? {
         name: institution.name,
@@ -121,17 +127,39 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
             }
             label="Verified"
           />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            data-cy="submit"
-            disabled={isExecutingCall}
-          >
-            {isExecutingCall && <UOLoader size={14} />}
-            {institution ? 'Update' : 'Create'}
-          </Button>
+          <ActionButtonContainer>
+            {institution && (
+              <Tooltip title="Merge with existing institution">
+                <Button
+                  startIcon={
+                    <MergeType style={{ transform: 'rotate(90deg)' }} />
+                  }
+                  type="button"
+                  variant="outlined"
+                  color="primary"
+                  data-cy="merge"
+                  disabled={isExecutingCall}
+                  onClick={() =>
+                    history.push(`/MergeInstitutionsPage/${institution.id}`)
+                  }
+                >
+                  {isExecutingCall && <UOLoader size={14} />}
+                  Merge
+                </Button>
+              </Tooltip>
+            )}
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              data-cy="submit"
+              disabled={isExecutingCall}
+              startIcon={<Check />}
+            >
+              {isExecutingCall && <UOLoader size={14} />}
+              {institution ? 'Update' : 'Create'}
+            </Button>
+          </ActionButtonContainer>
         </Form>
       )}
     </Formik>

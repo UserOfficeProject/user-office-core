@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import FormikDropdown from 'components/common/FormikDropdown';
-import { Instrument } from 'generated/sdk';
+import { InstrumentFragment } from 'generated/sdk';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 
 const useStyles = makeStyles((theme) => ({
@@ -27,7 +27,9 @@ const useStyles = makeStyles((theme) => ({
 
 type AssignProposalsToInstrumentProps = {
   close: () => void;
-  assignProposalsToInstrument: (instrument: Instrument | null) => Promise<void>;
+  assignProposalsToInstrument: (
+    instrument: InstrumentFragment | null
+  ) => Promise<void>;
   callIds: number[];
   instrumentIds: (number | null)[];
 };

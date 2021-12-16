@@ -66,17 +66,6 @@ declare global {
       ) => Cypress.Chainable<JQuery<HTMLElement>>;
 
       /**
-       * Call this method before your test to have delay between clicks
-       * Excellent for presentation purposes
-       *
-       * @returns {typeof presentationMode}
-       * @memberof Chainable
-       * @example
-       *    cy.presentationMode()
-       */
-      presentationMode: () => void;
-
-      /**
        * Set content in TinyMCE fetched by editor id.
        *
        * @returns {typeof setTinyMceContent}
