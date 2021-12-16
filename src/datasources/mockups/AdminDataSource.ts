@@ -5,6 +5,7 @@ import { Permissions } from '../../models/Permissions';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Unit } from '../../models/Unit';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
+import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource, Entry } from '../AdminDataSource';
 export const dummyUnit = new Unit(1, 'Second');
@@ -162,5 +163,11 @@ export class AdminDataSourceMock implements AdminDataSource {
 
   async deleteApiAccessToken(accessTokenId: string): Promise<boolean> {
     return true;
+  }
+
+  async mergeInstitutions(
+    args: MergeInstitutionsInput
+  ): Promise<Institution | null> {
+    return dummyInstitution;
   }
 }

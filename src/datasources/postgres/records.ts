@@ -8,6 +8,7 @@ import {
 import { Feature, FeatureId } from '../../models/Feature';
 import { Feedback } from '../../models/Feedback';
 import { GenericTemplate } from '../../models/GenericTemplate';
+import { Institution } from '../../models/Institution';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
@@ -64,6 +65,7 @@ export interface ScheduledEventRecord {
   readonly proposal_booking_id: number;
   readonly proposal_pk: number;
   readonly status: ProposalBookingStatusCore;
+  readonly local_contact: number | null;
 }
 
 export interface ProposalRecord {
@@ -977,6 +979,14 @@ export const createTemplateGroupObject = (group: TemplateGroupRecord) => {
   );
 };
 
+export const createInstitutionObject = (institution: InstitutionRecord) => {
+  return new Institution(
+    institution.institution_id,
+    institution.institution,
+    institution.verified
+  );
+};
+
 export const createScheduledEventObject = (
   scheduledEvent: ScheduledEventRecord
 ) =>
@@ -987,7 +997,8 @@ export const createScheduledEventObject = (
     scheduledEvent.ends_at,
     scheduledEvent.proposal_pk,
     scheduledEvent.proposal_booking_id,
-    scheduledEvent.status
+    scheduledEvent.status,
+    scheduledEvent.local_contact
   );
 
 export const createFeedbackObject = (scheduledEvent: FeedbackRecord) =>
