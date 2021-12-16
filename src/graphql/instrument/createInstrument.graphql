@@ -11,14 +11,7 @@ mutation createInstrument(
     managerUserId: $managerUserId
   ) {
     instrument {
-      id
-      name
-      shortCode
-      description
-      managerUserId
-      scientists {
-        ...basicUserDetails
-      }
+      ...instrument
     }
     rejection {
       ...rejection

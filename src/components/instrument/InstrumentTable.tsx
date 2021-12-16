@@ -12,7 +12,11 @@ import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
-import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
+import {
+  BasicUserDetails,
+  InstrumentFragment,
+  UserRole,
+} from '../../generated/sdk';
 import ParticipantModal from '../proposal/ParticipantModal';
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
@@ -134,13 +138,13 @@ const InstrumentTable: React.FC = () => {
   );
 
   const createModal = (
-    onUpdate: FunctionType<void, [Instrument | null]>,
-    onCreate: FunctionType<void, [Instrument | null]>,
-    editInstrument: Instrument | null
+    onUpdate: FunctionType<void, [InstrumentFragment | null]>,
+    onCreate: FunctionType<void, [InstrumentFragment | null]>,
+    editInstrument: InstrumentFragment | null
   ) => (
     <CreateUpdateInstrument
       instrument={editInstrument}
-      close={(instrument: Instrument | null) =>
+      close={(instrument: InstrumentFragment | null) =>
         !!editInstrument ? onUpdate(instrument) : onCreate(instrument)
       }
     />
@@ -198,7 +202,9 @@ const InstrumentTable: React.FC = () => {
                     icon: AssignmentIndIcon,
                     tooltip: 'Assign scientist',
                     onClick: (_event: unknown, rowData: unknown): void =>
-                      setAssigningInstrumentId((rowData as Instrument).id),
+                      setAssigningInstrumentId(
+                        (rowData as InstrumentFragment).id
+                      ),
                   },
                 ]
               : []

@@ -81,4 +81,46 @@ context('Institution tests', () => {
 
     cy.contains('Institution removed successfully!');
   });
+
+  it('User Officer should be able to merge Institution', () => {
+    const institutionA = 'Other';
+    const personFromInstitutionA = 'David';
+    const institutionB = 'Aarhus University';
+    const mergedName = faker.random.words(2);
+
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.contains('People').click();
+
+    cy.contains(personFromInstitutionA)
+      .closest('tr')
+      .should('contain', institutionA);
+
+    cy.contains('Institutions').click();
+
+    cy.contains(institutionA).closest('TR').find('[title="Edit"]').click();
+
+    cy.get('[title="Merge with existing institution"]').click();
+
+    cy.get('[data-cy="merge-institutions"]').should('be.disabled');
+
+    cy.get('#select-from-institution').should('have.value', institutionA);
+    cy.get('#select-to-institution').focus().type('{downarrow}');
+    cy.contains(institutionB).click();
+    cy.get('#merged-institution-name').clear().type(mergedName);
+    cy.get('[data-cy="merge-institutions"]').should('not.be.disabled');
+
+    cy.get('[data-cy="merge-institutions"]').click();
+
+    cy.get('[data-cy="confirm-ok"]').click();
+
+    cy.finishedLoading();
+
+    cy.contains('People').click();
+
+    cy.contains(personFromInstitutionA)
+      .closest('tr')
+      .should('contain', mergedName);
+  });
 });

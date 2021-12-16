@@ -12,7 +12,7 @@ import React from 'react';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import UOLoader from 'components/common/UOLoader';
-import { Instrument, UserRole } from 'generated/sdk';
+import { InstrumentFragment, UserRole } from 'generated/sdk';
 import { useUsersData } from 'hooks/user/useUsersData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
@@ -24,8 +24,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type CreateUpdateInstrumentProps = {
-  close: (instrumentAdded: Instrument | null) => void;
-  instrument: Instrument | null;
+  close: (instrumentAdded: InstrumentFragment | null) => void;
+  instrument: InstrumentFragment | null;
 };
 
 const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({

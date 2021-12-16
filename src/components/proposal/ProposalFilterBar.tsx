@@ -12,7 +12,7 @@ import QuestionaryFilter from 'components/common/proposalFilters/QuestionaryFilt
 import {
   Call,
   DataType,
-  Instrument,
+  InstrumentFragment,
   ProposalsFilter,
   ProposalStatus,
   QuestionFilterCompareOperator,
@@ -42,7 +42,7 @@ export const questionaryFilterFromUrlQuery = (
 };
 type ProposalFilterBarProps = {
   calls?: { data: Call[]; isLoading: boolean };
-  instruments?: { data: Instrument[]; isLoading: boolean };
+  instruments?: { data: InstrumentFragment[]; isLoading: boolean };
   proposalStatuses?: { data: ProposalStatus[]; isLoading: boolean };
   setProposalFilter: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;
