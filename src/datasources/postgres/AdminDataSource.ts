@@ -12,6 +12,7 @@ import { Settings } from '../../models/Settings';
 import { Unit } from '../../models/Unit';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
+import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource, Entry } from '../AdminDataSource';
 import { FeatureId } from './../../models/Feature';
@@ -32,6 +33,7 @@ import {
   TokensAndPermissionsRecord,
   UserRecord,
   UnitRecord,
+  createInstitutionObject,
 } from './records';
 
 const dbPatchesFolderPath = path.join(process.cwd(), 'db_patches');
@@ -510,6 +512,49 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     }
 
     return true;
+  }
+
+  async mergeInstitutions(
+    args: MergeInstitutionsInput
+  ): Promise<Institution | null> {
+    const [institutionFrom]: InstitutionRecord[] = await database
+      .select()
+      .from('institutions')
+      .where('institution_id', args.institutionIdFrom);
+
+    if (!institutionFrom) {
+      throw new Error(
+        `Could not find institution to merge with id: ${args.institutionIdFrom}`
+      );
+    }
+
+    const [institutionInto]: InstitutionRecord[] = await database
+      .select()
+      .from('institutions')
+      .where('institution_id', args.institutionIdInto);
+
+    if (!institutionInto) {
+      throw new Error(
+        `Could not find institution with id: ${args.institutionIdInto}`
+      );
+    }
+
+    return await database
+      .transaction(async (trx) => {
+        await trx('users')
+          .update({ organisation: args.institutionIdInto })
+          .where('organisation', args.institutionIdFrom);
+
+        await trx('institutions')
+          .del()
+          .where('institution_id', args.institutionIdFrom);
+      })
+      .then(() => {
+        return createInstitutionObject(institutionInto);
+      })
+      .catch((e) => {
+        throw new Error(`Failed to merge institutions: ${e}`);
+      });
   }
 }
 

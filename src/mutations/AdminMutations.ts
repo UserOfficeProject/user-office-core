@@ -11,7 +11,7 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { Page } from '../models/Admin';
 import { Institution } from '../models/Institution';
-import { Rejection, rejection } from '../models/Rejection';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { Unit } from '../models/Unit';
 import { UserWithRole } from '../models/User';
@@ -19,6 +19,7 @@ import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAcces
 import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
 import { CreateUnitArgs } from '../resolvers/mutations/CreateUnitMutation';
 import { DeleteApiAccessTokenInput } from '../resolvers/mutations/DeleteApiAccessTokenMutation';
+import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
 import { generateUniqueId } from '../utils/helperFunctions';
@@ -192,5 +193,28 @@ export default class AdminMutations {
         error
       );
     }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async mergeInstitutions(
+    agent: UserWithRole | null,
+    args: MergeInstitutionsInput
+  ): Promise<Institution | Rejection> {
+    const institution = await this.dataSource.mergeInstitutions(args);
+
+    if (!institution) {
+      return rejection('Could not merge institutions', { agent, args });
+    }
+
+    const updatedInstitution = await this.dataSource.updateInstitution({
+      ...institution,
+      name: args.newTitle,
+    });
+
+    if (!updatedInstitution) {
+      return rejection('Could not update institution', { agent, args });
+    }
+
+    return updatedInstitution;
   }
 }
