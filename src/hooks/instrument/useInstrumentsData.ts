@@ -7,21 +7,23 @@ import {
 } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import { Instrument, UserRole } from 'generated/sdk';
+import { InstrumentFragment, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useInstrumentsData(callIds?: number[]): {
   loadingInstruments: boolean;
-  instruments: Instrument[];
-  setInstrumentsWithLoading: Dispatch<SetStateAction<Instrument[]>>;
+  instruments: InstrumentFragment[];
+  setInstrumentsWithLoading: Dispatch<SetStateAction<InstrumentFragment[]>>;
 } {
-  const [instruments, setInstruments] = useState<Instrument[]>([]);
+  const [instruments, setInstruments] = useState<InstrumentFragment[]>([]);
   const [loadingInstruments, setLoadingInstruments] = useState(true);
   const { currentRole } = useContext(UserContext);
 
   const api = useDataApi();
 
-  const setInstrumentsWithLoading = (data: SetStateAction<Instrument[]>) => {
+  const setInstrumentsWithLoading = (
+    data: SetStateAction<InstrumentFragment[]>
+  ) => {
     setLoadingInstruments(true);
     setInstruments(data);
     setLoadingInstruments(false);
@@ -49,7 +51,7 @@ export function useInstrumentsData(callIds?: number[]): {
           }
 
           if (data.instruments) {
-            setInstruments(data.instruments.instruments as Instrument[]);
+            setInstruments(data.instruments.instruments);
           }
           setLoadingInstruments(false);
         });
@@ -62,7 +64,7 @@ export function useInstrumentsData(callIds?: number[]): {
           }
 
           if (data.me?.instruments) {
-            setInstruments(data.me.instruments as Instrument[]);
+            setInstruments(data.me.instruments);
           }
           setLoadingInstruments(false);
         });
