@@ -32,7 +32,7 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function resolveBasicUserReference(
+export async function resolveBasicUserDetailsReference(
   ...params: any
 ): Promise<BasicUserDetails> {
   // the order of the parameters and types are messed up,
