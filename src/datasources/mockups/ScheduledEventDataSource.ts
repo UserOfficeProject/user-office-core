@@ -24,7 +24,8 @@ export default class ScheduledEventDataSourceMock
         moment().add(2, 'days').toDate(),
         1,
         1,
-        ProposalBookingStatusCore.ACTIVE
+        ProposalBookingStatusCore.ACTIVE,
+        1
       ),
       new ScheduledEventCore(
         2,
@@ -33,7 +34,8 @@ export default class ScheduledEventDataSourceMock
         moment().add(2, 'days').toDate(),
         2,
         2,
-        ProposalBookingStatusCore.ACTIVE
+        ProposalBookingStatusCore.ACTIVE,
+        1
       ),
     ];
   }
