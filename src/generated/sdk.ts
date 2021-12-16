@@ -599,6 +599,7 @@ export type Mutation = {
   createInstitution: InstitutionResponseWrap;
   createUnit: UnitResponseWrap;
   deleteApiAccessToken: SuccessResponseWrap;
+  mergeInstitutions: InstitutionResponseWrap;
   updateApiAccessToken: ApiAccessTokenResponseWrap;
   updateInstitution: InstitutionResponseWrap;
   createCall: CallResponseWrap;
@@ -746,6 +747,13 @@ export type MutationCreateUnitArgs = {
 
 export type MutationDeleteApiAccessTokenArgs = {
   deleteApiAccessTokenInput: DeleteApiAccessTokenInput;
+};
+
+
+export type MutationMergeInstitutionsArgs = {
+  institutionIdFrom: Scalars['Int'];
+  institutionIdInto: Scalars['Int'];
+  newTitle: Scalars['String'];
 };
 
 
@@ -3369,6 +3377,27 @@ export type GetUnitsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetUnitsQuery = { units: Maybe<Array<Pick<Unit, 'id' | 'name'>>> };
+
+export type MergeInstitutionsMutationVariables = Exact<{
+  institutionIdFrom: Scalars['Int'];
+  institutionIdInto: Scalars['Int'];
+  newTitle: Scalars['String'];
+}>;
+
+
+export type MergeInstitutionsMutation = (
+  { __typename?: 'Mutation' }
+  & { mergeInstitutions: (
+    { __typename?: 'InstitutionResponseWrap' }
+    & { institution: Maybe<(
+      { __typename?: 'Institution' }
+      & Pick<Institution, 'id' | 'verified' | 'name'>
+    )>, rejection: Maybe<(
+      { __typename?: 'Rejection' }
+      & RejectionFragment
+    )> }
+  ) }
+);
 
 export type PrepareDbMutationVariables = Exact<{
   includeSeeds: Scalars['Boolean'];
@@ -6363,6 +6392,24 @@ export const GetUnitsDocument = gql`
   }
 }
     `;
+export const MergeInstitutionsDocument = gql`
+    mutation mergeInstitutions($institutionIdFrom: Int!, $institutionIdInto: Int!, $newTitle: String!) {
+  mergeInstitutions(
+    institutionIdFrom: $institutionIdFrom
+    institutionIdInto: $institutionIdInto
+    newTitle: $newTitle
+  ) {
+    institution {
+      id
+      verified
+      name
+    }
+    rejection {
+      ...rejection
+    }
+  }
+}
+    ${RejectionFragmentDoc}`;
 export const PrepareDbDocument = gql`
     mutation prepareDB($includeSeeds: Boolean!) {
   prepareDB(includeSeeds: $includeSeeds) {
@@ -9199,6 +9246,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getUnits(variables?: GetUnitsQueryVariables): Promise<GetUnitsQuery> {
       return withWrapper(() => client.request<GetUnitsQuery>(print(GetUnitsDocument), variables));
+    },
+    mergeInstitutions(variables: MergeInstitutionsMutationVariables): Promise<MergeInstitutionsMutation> {
+      return withWrapper(() => client.request<MergeInstitutionsMutation>(print(MergeInstitutionsDocument), variables));
     },
     prepareDB(variables: PrepareDbMutationVariables): Promise<PrepareDbMutation> {
       return withWrapper(() => client.request<PrepareDbMutation>(print(PrepareDbDocument), variables));
