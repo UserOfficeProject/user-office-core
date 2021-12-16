@@ -476,7 +476,7 @@ context('Proposal tests', () => {
 
     cy.contains('Save and continue').click();
 
-    cy.contains(textQuestion).then(($elem: any) => {
+    cy.contains('label', textQuestion).then(($elem) => {
       cy.get(`#${$elem.attr('for')}`).type(faker.random.word());
     });
     cy.contains('Save and continue').click();
@@ -501,7 +501,7 @@ context('Proposal tests', () => {
 
     cy.contains('New topic', { matchCase: false }).click();
 
-    cy.contains('label', textQuestion).then(($elem: any) => {
+    cy.contains('label', textQuestion).then(($elem) => {
       cy.get(`#${$elem.attr('for')}`).then(($inputElem) => {
         expect($inputElem.css('pointer-events')).to.be.eq('none');
       });

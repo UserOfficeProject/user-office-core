@@ -1,13 +1,9 @@
-import { useEffect, useState, Dispatch, SetStateAction } from 'react';
+import { useEffect, useState, SetStateAction } from 'react';
 
 import { Institution } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useInstitutionsData(): {
-  loadingInstitutions: boolean;
-  institutions: Institution[];
-  setInstitutionsWithLoading: Dispatch<SetStateAction<Institution[]>>;
-} {
+export function useInstitutionsData() {
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [loadingInstitutions, setLoadingInstitutions] = useState(true);
 
@@ -39,5 +35,10 @@ export function useInstitutionsData(): {
     };
   }, [api]);
 
-  return { loadingInstitutions, institutions, setInstitutionsWithLoading };
+  return {
+    loadingInstitutions,
+    institutions,
+    setInstitutionsWithLoading,
+    setInstitutions,
+  };
 }

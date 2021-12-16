@@ -30,14 +30,14 @@ function replaceLastOccurrenceInString(
   return beginString + replace + endString;
 }
 
-function replaceInvalidFileNameCharacters(filename: any) {
-  return filename.replaceAll(':', '.');
+function replaceInvalidFileNameCharacters(filename: string) {
+  return filename.replace(/:/g, '.');
 }
 
-module.exports = (on: any, config: any) => {
+module.exports = (on: Cypress.PluginEvents) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
-  on('after:screenshot', (details: any) => {
+  on('after:screenshot', (details: Cypress.ScreenshotDetails) => {
     const fileNamePrefix = replaceInvalidFileNameCharacters(details.takenAt);
     const newPath = replaceLastOccurrenceInString(
       details.path,
