@@ -3385,19 +3385,7 @@ export type MergeInstitutionsMutationVariables = Exact<{
 }>;
 
 
-export type MergeInstitutionsMutation = (
-  { __typename?: 'Mutation' }
-  & { mergeInstitutions: (
-    { __typename?: 'InstitutionResponseWrap' }
-    & { institution: Maybe<(
-      { __typename?: 'Institution' }
-      & Pick<Institution, 'id' | 'verified' | 'name'>
-    )>, rejection: Maybe<(
-      { __typename?: 'Rejection' }
-      & RejectionFragment
-    )> }
-  ) }
-);
+export type MergeInstitutionsMutation = { mergeInstitutions: { institution: Maybe<Pick<Institution, 'id' | 'verified' | 'name'>>, rejection: Maybe<RejectionFragment> } };
 
 export type PrepareDbMutationVariables = Exact<{
   includeSeeds: Scalars['Boolean'];
