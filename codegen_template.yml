@@ -4,6 +4,7 @@ documents: "src/graphql/**/*.graphql"
 generates:
   src/generated/sdk.ts:
     config:
+      skipTypename: true
       namingConvention:
         typeNames: change-case#pascalCase
         enumValues: change-case#upperCase
