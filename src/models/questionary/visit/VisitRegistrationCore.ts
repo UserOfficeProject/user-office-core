@@ -1,12 +1,10 @@
 import { GetUserProposalBookingsWithEventsQuery } from 'generated/sdk';
-import { ExcludeTypeName, ExcludeNull } from 'utils/utilTypes';
+import { ExcludeNull } from 'utils/utilTypes';
 
-export type VisitRegistrationCore = ExcludeTypeName<
+export type VisitRegistrationCore = ExcludeNull<
   ExcludeNull<
     ExcludeNull<
-      ExcludeNull<
-        ExcludeNull<GetUserProposalBookingsWithEventsQuery['me']>['proposals']
-      >[0]['proposalBookingCore']
-    >['scheduledEvents'][0]['visit']
-  >['registrations'][0]
->;
+      ExcludeNull<GetUserProposalBookingsWithEventsQuery['me']>['proposals']
+    >[0]['proposalBookingCore']
+  >['scheduledEvents'][0]['visit']
+>['registrations'][0];

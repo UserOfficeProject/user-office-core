@@ -43,8 +43,3 @@ export type FunctionType<T = void, U = unknown[]> = (
  * Exclude null from the type
  * */
 export type ExcludeNull<T> = Exclude<T, null>;
-
-/**
- * Exclude type graphql added property __typename
- * */
-export type ExcludeTypeName<T> = Exclude<T, '__typename'>;
