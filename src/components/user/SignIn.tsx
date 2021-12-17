@@ -183,8 +183,6 @@ export default function SignInSide() {
                   <div className={classes.loginAlternative}>
                     <span className={classes.loginAlternativeOr}>or</span>
                     <Button
-                      variant="contained"
-                      color="primary"
                       className={classes.orcButton}
                       onClick={() =>
                         (window.location.href = process.env
