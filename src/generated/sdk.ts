@@ -2948,6 +2948,7 @@ export type ScheduledEvent = {
   equipments: Array<EquipmentWithAssignmentStatus>;
   id: Scalars['Int'];
   instrument: Maybe<Instrument>;
+  localContact: Maybe<BasicUserDetails>;
   proposalBooking: Maybe<ProposalBooking>;
   proposalBookingId: Maybe<Scalars['Int']>;
   scheduledBy: Maybe<User>;
@@ -3338,6 +3339,7 @@ export type UpdateProposalWorkflowInput = {
 
 export type UpdateScheduledEventInput = {
   endsAt: Scalars['TzLessDateTime'];
+  localContact?: Maybe<Scalars['Int']>;
   scheduledEventId: Scalars['Int'];
   startsAt: Scalars['TzLessDateTime'];
 };
