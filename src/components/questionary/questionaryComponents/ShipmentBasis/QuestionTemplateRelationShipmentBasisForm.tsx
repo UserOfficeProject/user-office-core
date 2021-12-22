@@ -4,9 +4,10 @@ import { QuestionTemplateRelationFormProps } from 'components/questionary/Questi
 
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-export const QuestionTemplateRelationShipmentBasisForm: FC<QuestionTemplateRelationFormProps> =
-  (props) => {
-    return (
-      <QuestionTemplateRelationFormShell {...props} validationSchema={null} />
-    );
-  };
+export const QuestionTemplateRelationShipmentBasisForm: FC<
+  QuestionTemplateRelationFormProps
+> = (props) => {
+  return (
+    <QuestionTemplateRelationFormShell {...props} validationSchema={null} />
+  );
+};
