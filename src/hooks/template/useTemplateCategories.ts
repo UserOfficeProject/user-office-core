@@ -6,7 +6,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 export function useTemplateCategories(isArchived = false) {
   const api = useDataApi();
   const [categories, setCategories] = useState<
-    Exclude<GetTemplateCategoriesQuery['templateCategories'], null>
+    NonNullable<GetTemplateCategoriesQuery['templateCategories']>
   >([]);
   useEffect(() => {
     api()

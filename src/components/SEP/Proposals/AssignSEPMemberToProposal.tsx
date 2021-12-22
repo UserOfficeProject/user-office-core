@@ -9,7 +9,7 @@ export type SepAssignedMember = BasicUserDetails & Pick<SepReviewer, 'role'>;
 type AssignSEPMemberToProposalProps = {
   sepId: number;
   assignMemberToSEPProposal: (assignedMembers: SepAssignedMember[]) => void;
-  assignedMembers?: Array<BasicUserDetails | null>;
+  assignedMembers?: Array<BasicUserDetails | null | undefined>;
 };
 
 const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({

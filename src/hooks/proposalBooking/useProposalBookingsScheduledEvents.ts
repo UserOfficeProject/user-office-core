@@ -32,18 +32,19 @@ export type ProposalScheduledEvent = Pick<
     | 'finalStatus'
     | 'managementDecisionSubmitted'
   > & {
-    proposer: BasicUserDetailsFragment | null;
+    proposer: BasicUserDetailsFragment | null | undefined;
   } & {
     users: BasicUserDetailsFragment[];
   };
-  instrument: Pick<Instrument, 'id' | 'name'> | null;
+  instrument: Pick<Instrument, 'id' | 'name'> | null | undefined;
 } & {
   visit:
     | (VisitFragment & {
         registrations: VisitRegistrationCore[];
         shipments: ShipmentFragment[];
       } & Pick<Visit, 'teamLead'>)
-    | null;
+    | null
+    | undefined;
 } & { esi: Maybe<EsiFragment> } & { feedback: Maybe<FeedbackFragment> };
 
 export function useProposalBookingsScheduledEvents({

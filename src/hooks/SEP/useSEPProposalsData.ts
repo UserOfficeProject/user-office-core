@@ -2,14 +2,14 @@ import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 
 import { GetSepProposalsQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { Unpacked, NotNull } from 'utils/utilTypes';
+import { Unpacked } from 'utils/utilTypes';
 
 export type SEPProposalType = Unpacked<
-  NotNull<GetSepProposalsQuery['sepProposals']>
+  NonNullable<GetSepProposalsQuery['sepProposals']>
 >;
 
 export type SEPProposalAssignmentType = Unpacked<
-  NotNull<SEPProposalType['assignments']>
+  NonNullable<SEPProposalType['assignments']>
 >;
 
 export function useSEPProposalsData(

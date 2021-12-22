@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type AddSEPProps = {
-  close: (sepAdded: Sep | null) => void;
+  close: (sepAdded: Sep | null | undefined) => void;
 };
 
 const AddSEP: React.FC<AddSEPProps> = ({ close }) => {

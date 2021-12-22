@@ -6,12 +6,12 @@ generates:
     config:
       skipTypename: true
       namingConvention:
-        typeNames: change-case#pascalCase
         enumValues: change-case#upperCase
       avoidOptionals:
         field: true
         object: false
         inputValue: false
+      maybeValue: T | null | undefined
     plugins:
       - typescript
       - typescript-operations
