@@ -14,6 +14,8 @@ RUN CYPRESS_INSTALL_BINARY=0 npm ci --loglevel error --no-fund
 
 COPY ./ ./
 
+RUN ls src/images
+
 RUN npm run build
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
