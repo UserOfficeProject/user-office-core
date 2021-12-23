@@ -145,8 +145,9 @@ function getInitialStepIndex(state: QuestionarySubmissionState): number {
     .find((step) => step.getMetadata(state, step.payload).isCompleted === true);
 
   if (
-    (state as ProposalSubmissionState).proposal?.status?.shortCode.toString() ==
-    'EDITABLE_SUBMITTED'
+    (
+      state as ProposalSubmissionState
+    ).proposal?.status?.shortCode.toString() === 'EDITABLE_SUBMITTED'
   ) {
     return 0;
   }

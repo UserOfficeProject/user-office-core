@@ -106,7 +106,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
         notificationWithClientLog(this.enqueueSnackbar, 'Connection problem!');
       } else if (
         error.response.errors &&
-        error.response.errors[0].message == 'EXTERNAL_TOKEN_INVALID' &&
+        error.response.errors[0].message === 'EXTERNAL_TOKEN_INVALID' &&
         this.externalAuthLoginUrl
       ) {
         notificationWithClientLog(
