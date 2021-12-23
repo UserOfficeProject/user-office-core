@@ -75,7 +75,7 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
   const isSubmitted = state.shipment.status === ShipmentStatus.SUBMITTED;
 
   return (
-    <div>
+    <>
       <QuestionaryDetails
         questionaryId={state.shipment.questionaryId}
         additionalDetails={additionalDetails}
@@ -131,7 +131,7 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
           </NavigButton>
         )}
       </NavigationFragment>
-    </div>
+    </>
   );
 }
 
