@@ -1,9 +1,9 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import {
   setPageTextValidationSchema,
   createApiAccessTokenValidationSchema,
   updateApiAccessTokenValidationSchema,
-} from '@esss-swap/duo-validation';
+} from '@user-office-software/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';

@@ -1,5 +1,8 @@
-import { logger } from '@esss-swap/duo-logger';
-import { Queue, RabbitMQMessageBroker } from '@esss-swap/duo-message-broker';
+import { logger } from '@user-office-software/duo-logger';
+import {
+  Queue,
+  RabbitMQMessageBroker,
+} from '@user-office-software/duo-message-broker';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';

@@ -1,6 +1,6 @@
 import { existsSync, unlink } from 'fs';
 
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import express, { Request, Response } from 'express';
 import multer from 'multer';
 

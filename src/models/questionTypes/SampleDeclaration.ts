@@ -1,4 +1,10 @@
-import { DataType, TemplateCategoryId } from '../Template';
+import { sampleDeclarationValidationSchema } from '@user-office-software/duo-validation';
+
+import {
+  DataType,
+  QuestionTemplateRelation,
+  TemplateCategoryId,
+} from '../Template';
 import { SampleDeclarationConfig } from './../../resolvers/types/FieldConfig';
 import { Question } from './QuestionRegistry';
 
@@ -17,4 +23,11 @@ export const sampleDeclarationDefinition: Question = {
     return config;
   },
   getDefaultAnswer: () => [],
+  validate: (field: QuestionTemplateRelation, value: any) => {
+    if (field.question.dataType !== DataType.SAMPLE_DECLARATION) {
+      throw new Error('DataType should be SAMPLE_DECLARATION');
+    }
+
+    return sampleDeclarationValidationSchema(field).isValidSync(value);
+  },
 };

@@ -1,4 +1,7 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import {
+  getTranslation,
+  ResourceId,
+} from '@user-office-software/duo-localisation';
 
 import baseContext from '../../buildContext';
 import { ProposalEndStatus } from '../../models/Proposal';
