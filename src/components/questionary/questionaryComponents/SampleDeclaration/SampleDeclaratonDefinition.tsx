@@ -1,9 +1,9 @@
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import { sampleDeclarationValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
-import * as Yup from 'yup';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
-import { DataType, SubTemplateConfig } from 'generated/sdk';
+import { DataType } from 'generated/sdk';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
@@ -25,32 +25,8 @@ export const sampleDeclarationDefinition: QuestionaryComponentDefinition = {
     answerRenderer: () => null,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: (answer) => {
-    const config = answer.config as SubTemplateConfig;
-    let schema = Yup.array().of<Yup.AnyObjectSchema>(Yup.object());
-
-    if (config.minEntries) {
-      schema = schema.min(
-        config.minEntries,
-        `Please add at least ${config.minEntries} sample(s)`
-      );
-    }
-    if (config.maxEntries) {
-      schema = schema.max(
-        config.maxEntries,
-        `Please add at most ${config.maxEntries} sample(s)`
-      );
-    }
-
-    schema = schema.test(
-      'allSamplesCompleted',
-      'All samples must be completed',
-      (value) =>
-        value?.every((sample) => sample?.questionary.isCompleted) ?? false
-    );
-
-    return schema;
-  },
+  createYupValidationSchema: (answer) =>
+    sampleDeclarationValidationSchema(answer),
   getYupInitialValue: ({ state, answer }) => {
     const samplesState = state as ProposalSubmissionState;
 

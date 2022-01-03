@@ -15,7 +15,6 @@ import {
   prepareAnswers,
 } from 'models/questionary/QuestionaryFunctions';
 import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
-import submitFormAsync from 'utils/FormikAsyncFormHandler';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import NavigationFragment from './NavigationFragment';
@@ -215,17 +214,18 @@ export default function QuestionaryStepView(props: {
     <Formik
       initialValues={initialValues}
       validationSchema={Yup.object().shape(validationSchema)}
-      onSubmit={() => {}}
+      onSubmit={async () => {
+        const isSaveSuccess = await performSave(false);
+
+        if (isSaveSuccess) {
+          dispatch({ type: 'GO_STEP_FORWARD' });
+          props.onStepComplete?.(topicId);
+        }
+      }}
       enableReinitialize={true}
     >
       {(formikProps) => {
-        const {
-          submitForm,
-          validateForm,
-          setFieldValue,
-          isSubmitting,
-          setSubmitting,
-        } = formikProps;
+        const { submitForm, setFieldValue, isSubmitting } = formikProps;
 
         return (
           <form className={props.readonly ? classes.disabled : undefined}>
@@ -282,24 +282,7 @@ export default function QuestionaryStepView(props: {
                 </NavigButton>
               )}
               <NavigButton
-                onClick={() => {
-                  submitFormAsync(submitForm, validateForm).then(
-                    async (isValid: boolean) => {
-                      if (isValid) {
-                        const goNextStep = await performSave(false);
-
-                        if (!goNextStep) {
-                          setSubmitting(false);
-
-                          return;
-                        }
-
-                        dispatch({ type: 'GO_STEP_FORWARD' });
-                        props.onStepComplete?.(topicId);
-                      }
-                    }
-                  );
-                }}
+                onClick={submitForm}
                 isBusy={isSubmitting}
                 variant="contained"
                 color="primary"

@@ -8,8 +8,6 @@
   },
   "private": true,
   "dependencies": {
-    "@esss-swap/duo-localisation": "^1.1.15",
-    "@esss-swap/duo-validation": "^2.1.0",
     "@graphql-codegen/cli": "^1.21.8",
     "@graphql-codegen/typescript": "^1.23.0",
     "@graphql-codegen/typescript-graphql-request": "^1.17.7",
@@ -28,6 +26,8 @@
     "@types/react-router-dom": "^5.3.2",
     "@types/tinymce": "^4.6.4",
     "@types/yup": "~0.29.13",
+    "@user-office-software/duo-localisation": "^1.2.0",
+    "@user-office-software/duo-validation": "^2.4.3",
     "clsx": "^1.1.1",
     "date-fns": "^2.26.0",
     "dateformat": "^4.6.3",

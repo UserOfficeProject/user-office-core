@@ -1,4 +1,3 @@
-import { createUserValidationSchema } from '@esss-swap/duo-validation';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -10,6 +9,7 @@ import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { createUserValidationSchema } from '@user-office-software/duo-validation';
 import clsx from 'clsx';
 import { Field, Form, Formik } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-material-ui';

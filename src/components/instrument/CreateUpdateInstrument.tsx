@@ -1,10 +1,10 @@
-import {
-  createInstrumentValidationSchema,
-  updateInstrumentValidationSchema,
-} from '@esss-swap/duo-validation/lib/Instrument';
 import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
+import {
+  createInstrumentValidationSchema,
+  updateInstrumentValidationSchema,
+} from '@user-office-software/duo-validation/lib/Instrument';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
