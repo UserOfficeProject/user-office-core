@@ -1,4 +1,3 @@
-import { updateSEPValidationSchema } from '@esss-swap/duo-validation/lib/SEP';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -6,6 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import { updateSEPValidationSchema } from '@user-office-software/duo-validation/lib/SEP';
 import { Formik, Form, Field } from 'formik';
 import React from 'react';
 

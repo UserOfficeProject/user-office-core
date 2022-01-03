@@ -1,6 +1,6 @@
-import { createTemplateValidationSchema } from '@esss-swap/duo-validation/lib/Template';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import { createTemplateValidationSchema } from '@user-office-software/duo-validation/lib/Template';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';

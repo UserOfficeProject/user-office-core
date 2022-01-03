@@ -1,5 +1,5 @@
-import { richTextInputQuestionValidationSchema } from '@esss-swap/duo-validation';
 import TextFormatIcon from '@material-ui/icons/TextFormat';
+import { richTextInputQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';

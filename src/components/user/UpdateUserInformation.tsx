@@ -1,5 +1,4 @@
 import DateFnsUtils from '@date-io/date-fns'; // choose your lib
-import { updateUserValidationSchema } from '@esss-swap/duo-validation';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
@@ -11,6 +10,7 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
 import DoneIcon from '@material-ui/icons/Done';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import { updateUserValidationSchema } from '@user-office-software/duo-validation';
 import dateformat from 'dateformat';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';

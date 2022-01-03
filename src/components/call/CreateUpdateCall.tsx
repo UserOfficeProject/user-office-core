@@ -1,8 +1,8 @@
+import Typography from '@material-ui/core/Typography';
 import {
   createCallValidationSchemas,
   updateCallValidationSchemas,
-} from '@esss-swap/duo-validation/lib/Call';
-import Typography from '@material-ui/core/Typography';
+} from '@user-office-software/duo-validation/lib/Call';
 import PropTypes from 'prop-types';
 import React from 'react';
 
