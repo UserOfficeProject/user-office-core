@@ -1,5 +1,5 @@
-import { numberInputQuestionValidationSchema } from '@esss-swap/duo-validation';
 import ExposureZeroIcon from '@material-ui/icons/ExposureZero';
+import { numberInputQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';

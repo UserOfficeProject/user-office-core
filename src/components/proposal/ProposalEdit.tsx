@@ -1,4 +1,7 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import {
+  getTranslation,
+  ResourceId,
+} from '@user-office-software/duo-localisation';
 import React from 'react';
 import { useParams } from 'react-router';
 
