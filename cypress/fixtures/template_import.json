@@ -1,0 +1,220 @@
+{
+    "version": "1.0.0",
+    "exportDate": "2021-12-08T12:13:49.632Z",
+    "template": {
+        "templateId": 1,
+        "groupId": "PROPOSAL",
+        "name": "default template",
+        "description": "original template",
+        "isArchived": false
+    },
+    "templateSteps": [
+        {
+            "topic": {
+                "id": 1,
+                "title": "New proposal",
+                "templateId": 1,
+                "sortOrder": 0,
+                "isEnabled": true
+            },
+            "fields": [
+                {
+                    "question": {
+                        "categoryId": 1,
+                        "id": "proposal_basis",
+                        "naturalKey": "proposal_basis",
+                        "dataType": "PROPOSAL_BASIS",
+                        "question": "Proposal basic information",
+                        "config": {
+                            "tooltip": "",
+                            "required": false,
+                            "small_label": ""
+                        }
+                    },
+                    "topicId": 1,
+                    "sortOrder": 0,
+                    "config": {
+                        "tooltip": "",
+                        "required": false,
+                        "small_label": ""
+                    },
+                    "dependencies": [],
+                    "dependenciesOperator": "AND"
+                }
+            ]
+        },
+        {
+            "topic": {
+                "id": 5,
+                "title": "Topic titleasd",
+                "templateId": 1,
+                "sortOrder": 1,
+                "isEnabled": true
+            },
+            "fields": [
+                {
+                    "question": {
+                        "categoryId": 1,
+                        "id": "boolean_1638958975080",
+                        "naturalKey": "boolean_1638958975080",
+                        "dataType": "BOOLEAN",
+                        "question": "New Question",
+                        "config": {
+                            "small_label": "",
+                            "required": false,
+                            "tooltip": ""
+                        }
+                    },
+                    "topicId": 5,
+                    "sortOrder": 0,
+                    "config": {
+                        "small_label": "",
+                        "required": false,
+                        "tooltip": ""
+                    },
+                    "dependencies": [
+                        {
+                            "questionId": "boolean_1638958975080",
+                            "dependencyId": "selection_from_options_1638958969366",
+                            "dependencyNaturalKey": "selection_from_options_1638958969366",
+                            "condition": {
+                                "params": "harum repellendus debitis",
+                                "condition": "eq"
+                            }
+                        }
+                    ],
+                    "dependenciesOperator": "AND"
+                },
+                {
+                    "question": {
+                        "categoryId": 1,
+                        "id": "selection_from_options_1638958969366",
+                        "naturalKey": "selection_from_options_1638958969366",
+                        "dataType": "SELECTION_FROM_OPTIONS",
+                        "question": "accusantium eveniet autem",
+                        "config": {
+                            "small_label": "",
+                            "required": false,
+                            "tooltip": "",
+                            "variant": "dropdown",
+                            "options": [
+                                "harum repellendus debitis",
+                                "maiores eum nobis"
+                            ],
+                            "isMultipleSelect": false
+                        }
+                    },
+                    "topicId": 5,
+                    "sortOrder": 1,
+                    "config": {
+                        "small_label": "",
+                        "required": false,
+                        "tooltip": "",
+                        "variant": "dropdown",
+                        "options": [
+                            "harum repellendus debitis",
+                            "maiores eum nobis"
+                        ],
+                        "isMultipleSelect": false
+                    },
+                    "dependencies": [],
+                    "dependenciesOperator": "AND"
+                },
+                {
+                    "question": {
+                        "categoryId": 1,
+                        "id": "sample_declaration_question",
+                        "naturalKey": "sample_declaration_question",
+                        "dataType": "SAMPLE_DECLARATION",
+                        "question": "Add samples",
+                        "config": {
+                            "addEntryButtonLabel": "Add",
+                            "templateCategory": "SAMPLE_DECLARATION",
+                            "templateId": 4,
+                            "esiTemplateId": 3,
+                            "small_label": "",
+                            "required": false,
+                            "minEntries": null,
+                            "maxEntries": null
+                        }
+                    },
+                    "topicId": 5,
+                    "sortOrder": 2,
+                    "config": {
+                        "addEntryButtonLabel": "Add",
+                        "templateCategory": "SAMPLE_DECLARATION",
+                        "templateId": 4,
+                        "esiTemplateId": 3,
+                        "small_label": "",
+                        "required": false,
+                        "minEntries": null,
+                        "maxEntries": null
+                    },
+                    "dependencies": [],
+                    "dependenciesOperator": "AND"
+                }
+            ]
+        }
+    ],
+    "questions": [
+        {
+            "categoryId": 1,
+            "id": "proposal_basis",
+            "naturalKey": "proposal_basis",
+            "dataType": "PROPOSAL_BASIS",
+            "question": "General information",
+            "config": {
+                "tooltip": "",
+                "required": false,
+                "small_label": ""
+            }
+        },
+        {
+            "categoryId": 1,
+            "id": "boolean_1638958975080",
+            "naturalKey": "boolean_1638958975080",
+            "dataType": "BOOLEAN",
+            "question": "praesentium omnis quisquam",
+            "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": ""
+            }
+        },
+        {
+            "categoryId": 1,
+            "id": "selection_from_options_1638958969366",
+            "naturalKey": "selection_from_options_1638958969366",
+            "dataType": "SELECTION_FROM_OPTIONS",
+            "question": "accusantium eveniet autem",
+            "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "variant": "dropdown",
+                "options": [
+                    "harum repellendus debitis",
+                    "maiores eum nobis"
+                ],
+                "isMultipleSelect": false
+            }
+        },
+        {
+            "categoryId": 1,
+            "id": "sample_declaration_question",
+            "naturalKey": "sample_declaration_question",
+            "dataType": "SAMPLE_DECLARATION",
+            "question": "Add samples",
+            "config": {
+                "addEntryButtonLabel": "Add",
+                "templateCategory": "SAMPLE_DECLARATION",
+                "templateId": 4,
+                "esiTemplateId": 3,
+                "small_label": "",
+                "required": false,
+                "minEntries": null,
+                "maxEntries": null
+            }
+        }
+    ]
+}

@@ -1,4 +1,3 @@
-import { updateTimeAllocationValidationSchema } from '@esss-swap/duo-validation';
 import {
   Tooltip,
   IconButton,
@@ -16,6 +15,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import EditIcon from '@material-ui/icons/Edit';
+import { updateTimeAllocationValidationSchema } from '@user-office-software/duo-validation';
 import clsx from 'clsx';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';

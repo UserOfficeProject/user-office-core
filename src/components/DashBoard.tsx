@@ -26,6 +26,7 @@ import Can, { useCheckAccess } from './common/Can';
 import CreateFeedbackPage from './feedback/CreateFeedbackPage';
 import UpdateFeedbackPage from './feedback/UpdateFeedbackPage';
 import InstitutionPage from './institution/InstitutionPage';
+import MergeInstitutionsPage from './institution/MergeInstitutionPage';
 import InstrumentsPage from './instrument/InstrumentsPage';
 import MenuItems from './menu/MenuItems';
 import HelpPage from './pages/HelpPage';
@@ -52,6 +53,7 @@ import UnitTablePage from './settings/unitList/UnitTablePage';
 import ProposalEsiPage from './template/EsiPage';
 import FeedbackTemplatesPage from './template/FeedbackTemplatesPage';
 import GenericTemplatesPage from './template/GenericTemplatesPage';
+import ImportTemplatePage from './template/import/ImportTemplatePage';
 import ProposalTemplatesPage from './template/ProposalTemplatesPage';
 import QuestionsPage from './template/QuestionsPage';
 import SampleEsiPage from './template/SampleEsiPage';
@@ -255,6 +257,10 @@ const Dashboard: React.FC = () => {
           <Route path="/InstrumentPage" component={InstrumentsPage} />
           <Route path="/InstitutionPage" component={InstitutionPage} />
           <Route
+            path="/MergeInstitutionsPage/:institutionId"
+            component={MergeInstitutionsPage}
+          />
+          <Route
             path="/QuestionaryEditor/:templateId"
             component={TemplateEditor}
           />
@@ -313,6 +319,9 @@ const Dashboard: React.FC = () => {
           )}
           {isUserOfficer && (
             <Route path="/Questions" component={QuestionsPage} />
+          )}
+          {isUserOfficer && (
+            <Route path="/ImportTemplate" component={ImportTemplatePage} />
           )}
           <Route
             path="/CreateEsi/:scheduledEventId"

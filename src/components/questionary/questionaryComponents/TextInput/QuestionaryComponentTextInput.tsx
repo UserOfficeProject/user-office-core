@@ -5,6 +5,7 @@ import TextFieldWithCounter from 'components/common/TextFieldWithCounter';
 import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { TextInputConfig } from 'generated/sdk';
+import isEventFromAutoComplete from 'utils/isEventFromAutoComplete';
 
 const TextFieldNoSubmit = withPreventSubmit(TextFieldWithCounter);
 
@@ -48,6 +49,9 @@ export function QuestionaryComponentTextInput(props: BasicComponentProps) {
         value={stateValue}
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
           setStateValue(event.currentTarget.value);
+          if (isEventFromAutoComplete(event)) {
+            onComplete(event.currentTarget.value);
+          }
         }}
         onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
           if (

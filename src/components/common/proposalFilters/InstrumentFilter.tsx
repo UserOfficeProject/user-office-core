@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
-import { Instrument } from 'generated/sdk';
+import { InstrumentFragment } from 'generated/sdk';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type InstrumentFilterProps = {
-  instruments?: Instrument[];
+  instruments?: InstrumentFragment[];
   isLoading?: boolean;
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
