@@ -83,7 +83,6 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@stfc-user-programme/uows_client_generator": "^1.0.15",
     "@types/axios": "^0.14.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/content-disposition": "^0.5.4",
@@ -110,6 +109,7 @@
     "@types/yup": "^0.29.13",
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "@typescript-eslint/parser": "^4.32.0",
+    "@user-office-software/uows_client_generator": "^2.3.0",
     "commander": "^5.1.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",

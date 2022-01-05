@@ -447,7 +447,7 @@ export default class UserMutations {
     } catch (error) {
       return rejection(
         'Error occurred during external authentication',
-        {},
+        { externalToken },
         error
       );
     }
