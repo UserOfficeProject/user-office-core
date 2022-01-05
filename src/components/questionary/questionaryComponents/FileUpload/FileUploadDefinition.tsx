@@ -1,5 +1,5 @@
-import { fileUploadQuestionValidationSchema } from '@esss-swap/duo-validation';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
+import { fileUploadQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';

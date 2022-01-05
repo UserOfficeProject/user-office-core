@@ -3,7 +3,7 @@ import FormControl from '@material-ui/core/FormControl';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import EditIcon from '@material-ui/icons/Edit';
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { BasicUserDetails, UserRole } from 'generated/sdk';
 import { BasicUserData, useBasicUserData } from 'hooks/user/useUserData';
@@ -30,26 +30,12 @@ export default function ProposalParticipant(props: {
     null
   );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const { loadBasicUserData } = useBasicUserData();
+  const { userData } = useBasicUserData(props.userId);
+  useEffect(() => {
+    setCurUser(userData);
+  }, [userData]);
 
   const classes = useStyles();
-
-  useEffect(() => {
-    let unmounted = false;
-    if (props.userId) {
-      loadBasicUserData(props.userId).then((user) => {
-        if (unmounted) {
-          return;
-        }
-        setCurUser(user);
-      });
-    }
-
-    return () => {
-      // used to avoid unmounted component state update error
-      unmounted = true;
-    };
-  }, [props.userId, loadBasicUserData]);
 
   return (
     <div className={props.className}>

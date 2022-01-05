@@ -1,5 +1,5 @@
-import { textInputQuestionValidationSchema } from '@esss-swap/duo-validation';
 import ShortTextIcon from '@material-ui/icons/ShortText';
+import { textInputQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';

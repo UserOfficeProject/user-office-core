@@ -1,7 +1,7 @@
-import { createUserByEmailInviteValidationSchema } from '@esss-swap/duo-validation/lib/User';
 import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
+import { createUserByEmailInviteValidationSchema } from '@user-office-software/duo-validation/lib/User';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';

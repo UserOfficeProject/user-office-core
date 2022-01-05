@@ -1,5 +1,5 @@
-import { intervalQuestionValidationSchema } from '@esss-swap/duo-validation';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import { intervalQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';

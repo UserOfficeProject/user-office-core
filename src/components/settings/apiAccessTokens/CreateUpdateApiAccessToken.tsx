@@ -1,7 +1,3 @@
-import {
-  createApiAccessTokenValidationSchema,
-  updateApiAccessTokenValidationSchema,
-} from '@esss-swap/duo-validation/lib/Admin';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -11,6 +7,10 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
+import {
+  createApiAccessTokenValidationSchema,
+  updateApiAccessTokenValidationSchema,
+} from '@user-office-software/duo-validation/lib/Admin';
 import { Field, FieldArray, FieldArrayRenderProps, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';

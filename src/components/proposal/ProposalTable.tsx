@@ -82,6 +82,14 @@ const ProposalTable = ({
     return <Redirect push to={`/ProposalEdit/${editProposalPk}`} />;
   }
 
+  const showReferenceText = (
+    proposalData: PartialProposalsDataType[]
+  ): boolean => {
+    return proposalData.some((proposal) => {
+      return proposal.call?.referenceNumberFormat && !proposal.submitted;
+    });
+  };
+
   const cloneProposalsToCall = async (call: Call) => {
     setProposalToCloneId(null);
 
@@ -119,6 +127,7 @@ const ProposalTable = ({
       setPartialProposalsData(newProposalsData);
     }
   };
+  const data = partialProposalsData as PartialProposalsDataType[];
 
   return (
     <div data-cy="proposal-table">
@@ -144,7 +153,7 @@ const ProposalTable = ({
           </Typography>
         }
         columns={columns}
-        data={partialProposalsData as PartialProposalsDataType[]}
+        data={data}
         isLoading={isLoading}
         options={{
           search: search,
@@ -228,6 +237,12 @@ const ProposalTable = ({
           },
         ]}
       />
+      {showReferenceText(data) && (
+        <span>
+          <br />* Pre-submission reference. Reference will change upon
+          submission.
+        </span>
+      )}
     </div>
   );
 };

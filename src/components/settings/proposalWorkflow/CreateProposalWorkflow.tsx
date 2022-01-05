@@ -1,7 +1,7 @@
-import { createProposalWorkflowValidationSchema } from '@esss-swap/duo-validation/lib/ProposalWorkflow';
 import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
+import { createProposalWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/ProposalWorkflow';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';

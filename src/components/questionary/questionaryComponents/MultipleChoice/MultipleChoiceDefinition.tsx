@@ -1,4 +1,5 @@
 import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
+import { multipleChoiceValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
@@ -6,7 +7,6 @@ import MultipleChoiceSearchCriteriaComponent from 'components/questionary/questi
 import { DataType } from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
-import { createMultipleChoiceValidationSchema } from './createMultipleChoiceValidationSchema';
 import MultipleChoiceAnswerRenderer from './MultipleChoiceAnswerRenderer';
 import { QuestionaryComponentMultipleChoice } from './QuestionaryComponentMultipleChoice';
 import { QuestionMultipleChoiceForm } from './QuestionMultipleChoiceForm';
@@ -26,7 +26,7 @@ export const multipleChoiceDefinition: QuestionaryComponentDefinition = {
     answerRenderer: MultipleChoiceAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: createMultipleChoiceValidationSchema,
+  createYupValidationSchema: multipleChoiceValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || [],
   searchCriteriaComponent: MultipleChoiceSearchCriteriaComponent,
 };
