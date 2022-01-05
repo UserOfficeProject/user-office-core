@@ -294,10 +294,10 @@ export class StfcUserDataSource implements UserDataSource {
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     const dbUsers: BasicUserDetails[] = (
       await postgresUserDataSource.getUsers(
-        filter,
+        undefined,
         first,
         offset,
-        userRole,
+        undefined,
         subtractUsers
       )
     ).users;
@@ -313,6 +313,34 @@ export class StfcUserDataSource implements UserDataSource {
       users = stfcBasicPeople
         ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
         : [];
+    }
+
+    if (filter) {
+      users = [];
+
+      // If the filter represents an Email address, get the user from UOWS
+      if (filter.includes('@') && filter.includes('.')) {
+        const stfcBasicPersonByEmail = (
+          await client.getSearchableBasicPersonDetailsFromEmail(token, filter)
+        )?.return;
+
+        if (stfcBasicPersonByEmail != null) {
+          users.push(toEssBasicUserDetails(stfcBasicPersonByEmail));
+        }
+      }
+      // If the filter does not represent an Email address, we are getting users by last name
+      // because our User Office Web Service API does not include a first name endpoint.
+      else {
+        const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] | null = (
+          await client.getBasicPeopleDetailsFromSurname(token, filter, true)
+        )?.return;
+
+        users = stfcBasicPeopleByLastName
+          ? stfcBasicPeopleByLastName.map((person) =>
+              toEssBasicUserDetails(person)
+            )
+          : [];
+      }
     }
 
     return {
