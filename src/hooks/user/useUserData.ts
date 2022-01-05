@@ -49,8 +49,8 @@ export function useBasicUserData(id?: number) {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<BasicUserDetails | null>(null);
   useEffect(() => {
-    setLoading(true);
     if (id) {
+      setLoading(true);
       api()
         .getBasicUserDetails({ id })
         .then((data) => {
