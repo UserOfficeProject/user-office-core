@@ -25,7 +25,7 @@ router.use(
     let message: string;
 
     if (err instanceof Error) {
-      message = defaultErrorMessage;
+      message = err.message;
     } else if (typeof err === 'string') {
       message = err;
     } else {
@@ -41,7 +41,7 @@ router.use(
     };
 
     err instanceof Error
-      ? logger.logException(defaultErrorMessage, err, ctx)
+      ? logger.logException(err.message, err, ctx)
       : logger.logError(defaultErrorMessage, { err, ...ctx });
 
     res.status(500).end(message);
