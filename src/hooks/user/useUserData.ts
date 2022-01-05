@@ -1,7 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ReviewerFilter } from 'generated/sdk';
-import { UserWithReviewsQuery, ReviewStatus } from 'generated/sdk';
+import {
+  UserWithReviewsQuery,
+  ReviewStatus,
+  BasicUserDetails,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useUserWithReviewsData(filters?: {
@@ -40,19 +44,23 @@ export function useUserWithReviewsData(filters?: {
   return { loading, userData, setUserData, setUserWithReviewsFilter } as const;
 }
 
-export function useBasicUserData() {
+export function useBasicUserData(id?: number) {
   const api = useDataApi();
-
-  const loadBasicUserData = useCallback(
-    async (id: number) => {
-      return api()
+  const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState<BasicUserDetails | null>(null);
+  useEffect(() => {
+    if (id) {
+      setLoading(true);
+      api()
         .getBasicUserDetails({ id })
-        .then((data) => data.basicUserDetails);
-    },
-    [api]
-  );
+        .then((data) => {
+          setUserData(data.basicUserDetails);
+          setLoading(false);
+        });
+    }
+  }, [api, id]);
 
-  return { loadBasicUserData };
+  return { loading, userData };
 }
 
 export interface BasicUserData {
