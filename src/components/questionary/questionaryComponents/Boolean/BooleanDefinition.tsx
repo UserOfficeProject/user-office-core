@@ -1,5 +1,5 @@
-import { booleanQuestionValidationSchema } from '@esss-swap/duo-validation';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import { booleanQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';

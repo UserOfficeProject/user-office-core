@@ -1,4 +1,3 @@
-import { proposalTechnicalReviewValidationSchema } from '@esss-swap/duo-validation/lib/Review';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -7,6 +6,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import InfoIcon from '@material-ui/icons/InfoOutlined';
 import { Editor } from '@tinymce/tinymce-react';
+import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { useContext, useState } from 'react';
