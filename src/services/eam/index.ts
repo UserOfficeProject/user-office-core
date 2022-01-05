@@ -1,5 +1,5 @@
 // This is work in progress implementation for EAM service
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import axios from 'axios';
 import { ModuleOptions, ResourceOwnerPassword } from 'simple-oauth2';
 import { inject, injectable } from 'tsyringe';

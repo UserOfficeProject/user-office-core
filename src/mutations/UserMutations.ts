@@ -10,7 +10,7 @@ import {
   addUserRoleValidationSchema,
   updatePasswordValidationSchema,
   userPasswordFieldBEValidationSchema,
-} from '@esss-swap/duo-validation';
+} from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
 import { container, inject, injectable } from 'tsyringe';
 
