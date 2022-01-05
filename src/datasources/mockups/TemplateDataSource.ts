@@ -250,17 +250,23 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
   async getQuestion(questionId: string): Promise<Question | null> {
     const steps = await this.getTemplateSteps();
-    const allQuestions = steps.reduce((accumulated, current) => {
-      return accumulated.concat(current.fields.map((field) => field.question));
-    }, new Array<Question>());
-    const question = allQuestions.find(
-      (question) => question.id === questionId
+    const allQuestions = steps.map((step) => step.fields).flat();
+    const templateHasQuestion = allQuestions.find(
+      (templateHasQuestion) => templateHasQuestion.question.id === questionId
     );
-    if (!question) {
-      return null;
-    }
 
-    return question;
+    return templateHasQuestion?.question ?? null;
+  }
+
+  async getQuestionByNaturalKey(naturalKey: string): Promise<Question | null> {
+    const steps = await this.getTemplateSteps();
+    const allQuestions = steps.map((step) => step.fields).flat();
+    const templateHasQuestion = allQuestions.find(
+      (templateHasQuestion) =>
+        templateHasQuestion.question.naturalKey === naturalKey
+    );
+
+    return templateHasQuestion?.question ?? null;
   }
 
   async deleteQuestion(questionId: string): Promise<Question> {

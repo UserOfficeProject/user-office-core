@@ -6,6 +6,12 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { AnswerBasic } from '../../models/Questionary';
+import {
+  WEIGHT_QID,
+  WIDTH_QID,
+  HEIGHT_QID,
+  LENGTH_QID,
+} from '../../models/Shipment';
 import { ProposalDataSource } from './../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from './../../datasources/QuestionaryDataSource';
 import { ShipmentDataSource } from './../../datasources/ShipmentDataSource';
@@ -22,11 +28,6 @@ type EnvVars =
   | 'EAM_AUTH_SECRET'
   | 'EAM_AUTH_USER'
   | 'EAM_AUTH_PASS';
-
-const WEIGHT_QUESTION_ID = 'parcel_weight';
-const WIDTH_QUESTION_ID = 'parcel_width';
-const HEIGHT_QUESTION_ID = 'parcel_height';
-const LENGTH_QUESTION_ID = 'parcel_length';
 
 const getAnswerForNumberInput = (
   answerBasic: AnswerBasic
@@ -126,19 +127,19 @@ export class EAMAssetRegistrar implements AssetRegistrar {
 
     const weight = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      WEIGHT_QUESTION_ID
+      WEIGHT_QID
     );
     const width = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      WIDTH_QUESTION_ID
+      WIDTH_QID
     );
     const height = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      HEIGHT_QUESTION_ID
+      HEIGHT_QID
     );
     const length = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      LENGTH_QUESTION_ID
+      LENGTH_QID
     );
 
     if (!weight || !width || !height || !length) {
@@ -225,6 +226,6 @@ export class EAMAssetRegistrar implements AssetRegistrar {
 
 export class SkipAssetRegistrar implements AssetRegistrar {
   async register(): Promise<string> {
-    return '';
+    return '12345';
   }
 }
