@@ -7,6 +7,7 @@ import {
   EvaluatorOperator,
 } from '../models/ConditionEvaluator';
 import { FeatureId } from '../models/Feature';
+import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
 import { QuestionFilterCompareOperator } from '../models/Questionary';
@@ -16,7 +17,9 @@ import { SettingsId } from '../models/Settings';
 import { ShipmentStatus } from '../models/Shipment';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import {
+  ConflictResolutionStrategy,
   DataType,
+  QuestionComparisonStatus,
   TemplateCategoryId,
   TemplateGroupId,
 } from '../models/Template';
@@ -69,5 +72,15 @@ export const registerEnums = () => {
   });
   registerEnumType(EquipmentAssignmentStatus, {
     name: 'EquipmentAssignmentStatus',
+  });
+  registerEnumType(FeedbackStatus, {
+    name: 'FeedbackStatus',
+  });
+  registerEnumType(QuestionComparisonStatus, {
+    name: 'QuestionComparisonStatus',
+  });
+
+  registerEnumType(ConflictResolutionStrategy, {
+    name: 'ConflictResolutionStrategy',
   });
 };

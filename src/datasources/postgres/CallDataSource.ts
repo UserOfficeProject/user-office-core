@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import BluePromise from 'bluebird';
 
 import { Call } from '../../models/Call';
@@ -97,6 +97,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         start_cycle: args.startCycle,
         end_cycle: args.endCycle,
         cycle_comment: args.cycleComment,
+        submission_message: args.submissionMessage,
         survey_comment: args.surveyComment,
         reference_number_format: args.referenceNumberFormat,
         proposal_sequence: args.proposalSequence,
@@ -178,6 +179,7 @@ export default class PostgresCallDataSource implements CallDataSource {
               start_cycle: args.startCycle,
               end_cycle: args.endCycle,
               cycle_comment: args.cycleComment,
+              submission_message: args.submissionMessage,
               survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
               call_ended: args.callEnded,

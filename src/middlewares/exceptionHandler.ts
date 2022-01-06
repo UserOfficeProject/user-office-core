@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import { NextFunction, Request, Response } from 'express';
 
 interface MiddlewareError extends Error {

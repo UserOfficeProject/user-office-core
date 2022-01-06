@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import { Knex } from 'knex';
 
 import { QuestionFilterInput } from '../../resolvers/queries/ProposalsQuery';
@@ -6,6 +6,7 @@ import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
 import { embellishmentDefinition } from './Embellishment';
+import { feedbackBasisDefinition } from './FeedbackBasis';
 import { fileUploadDefinition } from './FileUpload';
 import { genericTemplateDefinition } from './GenericTemplate';
 import { genericTemplateBasisDefinition } from './GenericTemplateBasis';
@@ -67,21 +68,22 @@ const registry = [
   booleanDefinition,
   dateDefinition,
   embellishmentDefinition,
+  feedbackBasisDefinition,
   fileUploadDefinition,
+  genericTemplateBasisDefinition,
   genericTemplateDefinition,
-  selectionFromOptionsDefinition,
-  textInputDefinition,
-  sampleDeclarationDefinition,
-  sampleEsiBasisDefinition,
-  proposalBasisDefinition,
-  proposalEsiBasisDefinition,
-  sampleBasisDefinition,
   intervalDefinition,
   numberInputDefinition,
-  shipmentBasis,
+  proposalBasisDefinition,
+  proposalEsiBasisDefinition,
   richTextInputDefinition,
+  sampleBasisDefinition,
+  sampleDeclarationDefinition,
+  sampleEsiBasisDefinition,
+  selectionFromOptionsDefinition,
+  shipmentBasis,
+  textInputDefinition,
   visitBasisDefinition,
-  genericTemplateBasisDefinition,
 ];
 
 Object.freeze(registry);

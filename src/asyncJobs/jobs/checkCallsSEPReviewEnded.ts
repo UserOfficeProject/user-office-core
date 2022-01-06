@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { eventBus } from '../../events';

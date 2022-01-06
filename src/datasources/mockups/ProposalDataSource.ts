@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { Event } from '../../events/event.enum';
-import { Call } from '../../models/Call';
+import { AllocationTimeUnits, Call } from '../../models/Call';
 import {
   Proposal,
   ProposalEndStatus,
@@ -21,6 +21,7 @@ import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 
 export let dummyProposal: Proposal;
+export let dummyProposalView: ProposalView;
 export let dummyProposalSubmitted: Proposal;
 export let dummyProposalWithNotActiveCall: Proposal;
 
@@ -75,7 +76,8 @@ const dummyScheduledEventCore = new ScheduledEventCore(
   new Date(),
   1,
   1,
-  ProposalBookingStatusCore.ACTIVE
+  ProposalBookingStatusCore.ACTIVE,
+  1
 );
 
 export class ProposalDataSourceMock implements ProposalDataSource {
@@ -111,6 +113,33 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       questionaryId: 2,
       callId: 2,
     });
+
+    dummyProposalView = new ProposalView(
+      1,
+      '',
+      1,
+      '',
+      '',
+      'shortCode',
+      1,
+      1,
+      false,
+      1,
+      1,
+      1,
+      1,
+      false,
+      'instrument',
+      'call short code',
+      'sep code',
+      1,
+      1,
+      1,
+      1,
+      AllocationTimeUnits.Day,
+      1,
+      false
+    );
 
     allProposals = [
       dummyProposal,
@@ -226,7 +255,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     first?: number,
     offset?: number
   ) {
-    return { totalCount: 1, proposals: [dummyProposal] };
+    return { totalCount: 1, proposals: [dummyProposalView] };
   }
 
   async markEventAsDoneOnProposal(

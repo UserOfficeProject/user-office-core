@@ -7,7 +7,11 @@ import { Template } from '../models/Template';
 
 export interface QuestionaryDataSource {
   getCount(templateId: number): Promise<number>;
-  getAnswer(answer_id: number): Promise<AnswerBasic>;
+  getAnswer(answer_id: number): Promise<AnswerBasic | null>;
+  getAnswer(
+    proposalId: number,
+    questionId: string
+  ): Promise<AnswerBasic | null>;
   delete(questionary_id: number): Promise<Questionary>;
   getQuestionary(questionary_id: number): Promise<Questionary | null>;
   getQuestionarySteps(questionaryId: number): Promise<QuestionaryStep[]>;

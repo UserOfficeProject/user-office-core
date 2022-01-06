@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import express, { Request, Response, NextFunction } from 'express';
 
 import baseContext from '../buildContext';
@@ -25,7 +25,7 @@ router.use(
     let message: string;
 
     if (err instanceof Error) {
-      message = defaultErrorMessage;
+      message = err.message;
     } else if (typeof err === 'string') {
       message = err;
     } else {
@@ -41,7 +41,7 @@ router.use(
     };
 
     err instanceof Error
-      ? logger.logException(defaultErrorMessage, err, ctx)
+      ? logger.logException(err.message, err, ctx)
       : logger.logError(defaultErrorMessage, { err, ...ctx });
 
     res.status(500).end(message);

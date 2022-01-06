@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { booleanQuestionValidationSchema } from '@esss-swap/duo-validation';
+import { booleanQuestionValidationSchema } from '@user-office-software/duo-validation';
 
 import { BooleanConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';

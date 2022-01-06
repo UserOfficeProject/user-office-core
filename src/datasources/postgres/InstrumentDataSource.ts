@@ -156,7 +156,13 @@ export default class PostgresInstrumentDataSource
 
   async getUserInstruments(userId: number): Promise<Instrument[]> {
     return database
-      .select(['i.instrument_id', 'name', 'short_code', 'description'])
+      .select([
+        'i.instrument_id',
+        'name',
+        'short_code',
+        'description',
+        'manager_user_id',
+      ])
       .from('instruments as i')
       .join('instrument_has_scientists as ihs', {
         'i.instrument_id': 'ihs.instrument_id',
@@ -276,7 +282,13 @@ export default class PostgresInstrumentDataSource
     proposalPk: number
   ): Promise<Instrument | null> {
     return database
-      .select(['i.instrument_id', 'name', 'short_code', 'description'])
+      .select([
+        'i.instrument_id',
+        'name',
+        'short_code',
+        'description',
+        'manager_user_id',
+      ])
       .from('instruments as i')
       .join('instrument_has_proposals as ihp', {
         'i.instrument_id': 'ihp.instrument_id',
@@ -333,6 +345,7 @@ export default class PostgresInstrumentDataSource
         'name',
         'i.short_code',
         'description',
+        'manager_user_id',
         'chi.availability_time',
         'chi.submitted',
         database.raw(

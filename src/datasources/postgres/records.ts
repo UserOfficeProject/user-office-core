@@ -6,7 +6,9 @@ import {
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
 import { Feature, FeatureId } from '../../models/Feature';
+import { Feedback } from '../../models/Feedback';
 import { GenericTemplate } from '../../models/GenericTemplate';
+import { Institution } from '../../models/Institution';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
@@ -39,6 +41,7 @@ import {
   ScheduledEventBookingType,
 } from '../../resolvers/types/ProposalBooking';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
+import { FeedbackStatus } from './../../models/Feedback';
 
 // Interfaces corresponding exactly to database tables
 
@@ -62,6 +65,7 @@ export interface ScheduledEventRecord {
   readonly proposal_booking_id: number;
   readonly proposal_pk: number;
   readonly status: ProposalBookingStatusCore;
+  readonly local_contact: number | null;
 }
 
 export interface ProposalRecord {
@@ -90,11 +94,9 @@ export interface ProposalRecord {
   readonly management_decision_submitted: boolean;
   readonly technical_review_assignee: number;
 }
-
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
   readonly title: string;
-  readonly proposer_id: number;
   readonly proposal_status_id: number;
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
@@ -105,6 +107,8 @@ export interface ProposalViewRecord {
   readonly management_time_allocation: number;
   readonly notified: boolean;
   readonly technical_review_status: number;
+  readonly technical_review_submitted: boolean;
+  readonly technical_review_assignee: number;
   readonly instrument_name: string;
   readonly call_short_code: string;
   readonly sep_id: number;
@@ -115,6 +119,7 @@ export interface ProposalViewRecord {
   readonly call_id: number;
   readonly submitted: boolean;
   readonly allocation_time_unit: AllocationTimeUnits;
+  readonly full_count: number;
 }
 
 export interface TopicRecord {
@@ -265,6 +270,7 @@ export interface CallRecord {
   readonly end_cycle: Date;
   readonly cycle_comment: string;
   readonly survey_comment: string;
+  readonly submission_message: string;
   readonly reference_number_format: string;
   readonly proposal_sequence: number;
   readonly proposal_workflow_id: number;
@@ -563,6 +569,16 @@ export interface TemplateGroupRecord {
   readonly category_id: number;
 }
 
+export interface FeedbackRecord {
+  readonly feedback_id: number;
+  readonly scheduled_event_id: number;
+  readonly status: FeedbackStatus;
+  readonly questionary_id: number;
+  readonly creator_id: number;
+  readonly created_at: Date;
+  readonly submitted_at: Date;
+}
+
 export const createTopicObject = (record: TopicRecord) => {
   return new Topic(
     record.topic_id,
@@ -628,20 +644,22 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.proposal_id,
     proposal.rank_order,
     proposal.final_status,
+    proposal.notified,
     proposal.technical_time_allocation,
     proposal.management_time_allocation,
-    proposal.notified,
+    proposal.technical_time_allocation,
     proposal.technical_review_status,
+    proposal.technical_review_submitted,
     proposal.instrument_name,
     proposal.call_short_code,
-    proposal.sep_id,
     proposal.sep_code,
+    proposal.sep_id,
     proposal.average,
     proposal.deviation,
     proposal.instrument_id,
+    proposal.allocation_time_unit,
     proposal.call_id,
-    proposal.submitted,
-    proposal.allocation_time_unit
+    proposal.submitted
   );
 };
 
@@ -762,6 +780,7 @@ export const createCallObject = (call: CallRecord) => {
     call.end_cycle,
     call.cycle_comment,
     call.survey_comment,
+    call.submission_message,
     call.reference_number_format,
     call.proposal_sequence,
     call.proposal_workflow_id,
@@ -960,6 +979,14 @@ export const createTemplateGroupObject = (group: TemplateGroupRecord) => {
   );
 };
 
+export const createInstitutionObject = (institution: InstitutionRecord) => {
+  return new Institution(
+    institution.institution_id,
+    institution.institution,
+    institution.verified
+  );
+};
+
 export const createScheduledEventObject = (
   scheduledEvent: ScheduledEventRecord
 ) =>
@@ -970,5 +997,17 @@ export const createScheduledEventObject = (
     scheduledEvent.ends_at,
     scheduledEvent.proposal_pk,
     scheduledEvent.proposal_booking_id,
-    scheduledEvent.status
+    scheduledEvent.status,
+    scheduledEvent.local_contact
+  );
+
+export const createFeedbackObject = (scheduledEvent: FeedbackRecord) =>
+  new Feedback(
+    scheduledEvent.feedback_id,
+    scheduledEvent.scheduled_event_id,
+    scheduledEvent.status,
+    scheduledEvent.questionary_id,
+    scheduledEvent.creator_id,
+    scheduledEvent.created_at,
+    scheduledEvent.submitted_at
   );

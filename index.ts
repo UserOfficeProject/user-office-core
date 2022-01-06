@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import 'reflect-metadata';
@@ -28,7 +28,8 @@ async function bootstrap() {
     .use(factory())
     .use(healthCheck())
     .use(readinessCheck())
-    .use(exceptionHandler());
+    .use(exceptionHandler())
+    .use(express.json({ limit: '5mb' }));
 
   await apolloServer(app);
 
@@ -38,7 +39,10 @@ async function bootstrap() {
     logger.logException('Unhandled NODE exception', error);
   });
 
-  console.info(`Running a GraphQL API server at localhost:${PORT}/graphql`);
+  logger.logInfo(
+    `Running a GraphQL API server at localhost:${PORT}/graphql`,
+    {}
+  );
 
   startAsyncJobs();
   container.resolve<() => void>(Tokens.ConfigureEnvironment)();

@@ -1,5 +1,8 @@
-import { logger } from '@esss-swap/duo-logger';
-import { Queue, RabbitMQMessageBroker } from '@esss-swap/duo-message-broker';
+import { logger } from '@user-office-software/duo-logger';
+import {
+  Queue,
+  RabbitMQMessageBroker,
+} from '@user-office-software/duo-message-broker';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -282,10 +285,11 @@ export function createListenToRabbitMQHandler() {
           proposalBookingId: message.proposalBookingId,
           proposalPk: message.proposalPk,
           status: message.status,
-        };
+          localContactId: message.localContact,
+        } as ScheduledEventCore;
 
         await proposalDataSource.addProposalBookingScheduledEvent(
-          scheduledEventToAdd as ScheduledEventCore
+          scheduledEventToAdd
         );
 
         return;
@@ -307,6 +311,7 @@ export function createListenToRabbitMQHandler() {
           proposalBookingId: scheduledEvent.proposalBookingId,
           proposalPk: scheduledEvent.proposalPk,
           status: scheduledEvent.status,
+          localContactId: scheduledEvent.localContactId,
         }));
 
         await proposalDataSource.removeProposalBookingScheduledEvents(
@@ -332,10 +337,11 @@ export function createListenToRabbitMQHandler() {
           startsAt: message.startsAt,
           endsAt: message.endsAt,
           status: message.status,
-        };
+          localContactId: message.localContactId,
+        } as ScheduledEventCore;
 
         await proposalDataSource.updateProposalBookingScheduledEvent(
-          scheduledEventToUpdate as ScheduledEventCore
+          scheduledEventToUpdate
         );
 
         return;

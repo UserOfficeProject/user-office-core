@@ -7,6 +7,7 @@ import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
+import { Feedback } from './Feedback';
 import { GenericTemplate } from './GenericTemplate';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
@@ -31,6 +32,7 @@ import { Shipment } from './Shipment';
 import { StatusChangingEvent } from './StatusChangingEvent';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
+import { TemplateImportWithValidation } from './TemplateImportWithValidation';
 import { Topic } from './Topic';
 import { Unit } from './Unit';
 import { User } from './User';
@@ -342,4 +344,18 @@ export class GenericTemplateResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => GenericTemplate, { nullable: true })
   public genericTemplate: GenericTemplate;
+}
+
+@ObjectType()
+export class FeedbackResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => Feedback, { nullable: true })
+  public feedback: Feedback;
+}
+
+@ObjectType()
+export class TemplateImportWithValidationWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => TemplateImportWithValidation, { nullable: true })
+  public validationResult: TemplateImportWithValidation;
 }

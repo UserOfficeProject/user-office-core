@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { numberInputQuestionValidationSchema } from '@esss-swap/duo-validation';
+import { numberInputQuestionValidationSchema } from '@user-office-software/duo-validation';
 
 import {
   NumberInputConfig,

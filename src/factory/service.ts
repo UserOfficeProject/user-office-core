@@ -1,6 +1,6 @@
 import querystring from 'querystring';
 
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import contentDisposition from 'content-disposition';
 import { Request, Response, NextFunction } from 'express';
 import request from 'request';
@@ -29,7 +29,10 @@ export type XLSXMetaBase = MetaBase & { columns: string[] };
 const ENDPOINT = process.env.USER_OFFICE_FACTORY_ENDPOINT;
 
 if (!ENDPOINT) {
-  console.error('`USER_OFFICE_FACTORY_ENDPOINT` is missing');
+  logger.logError(
+    'Could not start application: the `USER_OFFICE_FACTORY_ENDPOINT` environment variable is missing. Exiting.',
+    {}
+  );
   process.exit(1);
 }
 
