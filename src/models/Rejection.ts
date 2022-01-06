@@ -10,6 +10,10 @@ export class Rejection {
   }
 
   get exceptionStr() {
+    if (this.exception instanceof Error) {
+      return `${this.exception.name}: ${this.exception.message}`;
+    }
+
     return JSON.stringify(this.exception);
   }
 }

@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import BluePromise from 'bluebird';
 import { injectable } from 'tsyringe';
 
@@ -794,6 +794,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         proposal_booking_id: eventMessage.proposalBookingId,
         proposal_pk: eventMessage.proposalPk,
         status: eventMessage.status,
+        local_contact: eventMessage.localContactId,
       })
       .into('scheduled_events')
       .returning(['*']);
@@ -815,6 +816,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         starts_at: eventToUpdate.startsAt,
         ends_at: eventToUpdate.endsAt,
         status: eventToUpdate.status,
+        local_contact: eventToUpdate.localContactId,
       })
       .where('scheduled_event_id', eventToUpdate.id)
       .andWhere('proposal_booking_id', eventToUpdate.proposalBookingId)

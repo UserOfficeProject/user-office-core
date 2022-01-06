@@ -23,8 +23,8 @@ export default class ${name.capitalize()}Queries {
 `;
 
 const mutationsTemplate = (name) =>
-  `import { logger } from '@esss-swap/duo-logger';
-  import { create${name.capitalize()}ValidationSchema } from '@esss-swap/duo-validation';
+  `import { logger } from '@user-office-software/duo-logger';
+  import { create${name.capitalize()}ValidationSchema } from '@user-office-software/duo-validation';
 
 import { ${name.capitalize()}DataSource } from '../datasources/${name.capitalize()}DataSource';
 import { Authorized, ValidateArgs } from '../decorators';

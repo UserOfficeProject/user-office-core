@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { textInputQuestionValidationSchema } from '@esss-swap/duo-validation';
+import { textInputQuestionValidationSchema } from '@user-office-software/duo-validation';
 
 import { ConfigBase, TextInputConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';

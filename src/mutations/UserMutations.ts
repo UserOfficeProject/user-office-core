@@ -10,7 +10,7 @@ import {
   addUserRoleValidationSchema,
   updatePasswordValidationSchema,
   userPasswordFieldBEValidationSchema,
-} from '@esss-swap/duo-validation';
+} from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
 import { container, inject, injectable } from 'tsyringe';
 
@@ -196,6 +196,9 @@ export default class UserMutations {
     let user = (await this.dataSource.getByEmail(args.email)) as UserWithRole;
 
     if (user && user.placeholder) {
+      user.currentRole = await this.dataSource.getRoleByShortCode(
+        UserRoleShortCodeMap[UserRole.USER]
+      );
       const changePassword = await this.updatePassword(user, {
         id: user.id,
         password: args.password,
@@ -205,7 +208,6 @@ export default class UserMutations {
         placeholder: false,
         ...args,
       })) as UserWithRole;
-
       if (isRejection(updatedUser) || !changePassword) {
         return rejection('Can not create user', {
           updatedUser,
@@ -447,7 +449,7 @@ export default class UserMutations {
     } catch (error) {
       return rejection(
         'Error occurred during external authentication',
-        {},
+        { externalToken },
         error
       );
     }

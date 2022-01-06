@@ -10,6 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { TzLessDateTime } from '../CustomScalars';
+import { BasicUserDetails } from './BasicUserDetails';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
 import { Feedback } from './Feedback';
 import {
@@ -34,6 +35,9 @@ export class ScheduledEventCore {
 
   @Field(() => ProposalBookingStatusCore)
   status: ProposalBookingStatusCore;
+
+  @Field(() => Int, { nullable: true })
+  localContactId: number | null;
 }
 
 @Resolver(() => ScheduledEventCore)
@@ -70,5 +74,15 @@ export class ScheduledEventResolver {
     });
 
     return esi ? esi[0] : null;
+  }
+
+  @FieldResolver(() => BasicUserDetails, { nullable: true })
+  async localContact(
+    @Root() event: ScheduledEventCore,
+    @Ctx() context: ResolverContext
+  ): Promise<BasicUserDetails | null> {
+    return event.localContactId
+      ? context.queries.user.getBasic(context.user, event.localContactId)
+      : null;
   }
 }

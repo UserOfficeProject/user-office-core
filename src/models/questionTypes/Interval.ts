@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 
-import { intervalQuestionValidationSchema } from '@esss-swap/duo-validation';
+import { intervalQuestionValidationSchema } from '@user-office-software/duo-validation';
 
 import { IntervalConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
