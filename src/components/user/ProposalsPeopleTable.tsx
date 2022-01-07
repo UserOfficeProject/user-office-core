@@ -345,6 +345,9 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
   );
 
   const currentPage = (query.offset as number) / (query.first as number);
+  const emailSearchText = isEmailInviteEnabled
+    ? 'Please check the spelling and if the user has registered with us. If not found, the user can be added through email invite.'
+    : 'Please check the spelling and if the user has registered with us or has the correct privacy settings to be found by this search.';
 
   return (
     <Formik
@@ -422,8 +425,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                 }
               >
                 <AlertTitle>We cannot find that email</AlertTitle>
-                Please check the spelling and if the user has registered with us
-                or has the correct privacy settings to be found by this search.
+                {emailSearchText}
               </Alert>
             )}
           </div>
