@@ -111,7 +111,7 @@ jobs:
       - name: Run docker-compose, generate and compare SDK
         run: |
           cd "$GITHUB_WORKSPACE/.."
-
+          sudo chmod 777 wait-for-db.sh
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           export USER_OFFICE_BACKEND_TAG=${{ needs.resolve_dep.outputs.BE_TAG }}
