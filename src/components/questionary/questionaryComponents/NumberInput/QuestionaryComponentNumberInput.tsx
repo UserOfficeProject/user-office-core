@@ -126,6 +126,12 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
               setStateValue(newValue);
               if (isEventFromAutoComplete(event)) {
                 onComplete(newValue);
+              } else {
+                /* Firefox's number spinner arrows don't grant focus
+                (see https://bugzilla.mozilla.org/show_bug.cgi?id=1012818)
+                but we use loss of focus (blur) to update component state.
+                Using blur means we don't update on every keystroke. */
+                event.target.focus();
               }
             }}
             onBlur={() => onComplete(stateValue)}
