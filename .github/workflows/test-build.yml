@@ -98,21 +98,26 @@ jobs:
           cat > docker-compose.all.yml << EOF
           version: "3.1"
           services:
-            backend:
+            proxy:
+              image: traefik:1.7
+              command: --api --docker
               ports:
-                - "4000:4000" # The HTTP port
+                - "80:80" # The HTTP port
+              volumes:
+                - /var/run/docker.sock:/var/run/docker.sock:ro
               depends_on:
                 - "db"
-              volumes:
-                - "./wait-for-db.sh:/home/node/app/wait-for-db.sh"
-              command: ["./wait-for-db.sh", "db:5432", "--", "node", "./build/index.js"]
+            backend:
+              labels:
+                - "traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads, /gateway, /graphql"
+              depends_on:
+                - "proxy"
           EOF
 
       - name: Run docker-compose, generate and compare SDK
         run: |
           cd "$GITHUB_WORKSPACE/.."
-          ls
-          sudo chmod 777 ./user-office-frontend/wait-for-db.sh
+
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           export USER_OFFICE_BACKEND_TAG=${{ needs.resolve_dep.outputs.BE_TAG }}
@@ -125,9 +130,9 @@ jobs:
           docker-compose --project-directory $PWD \
             -f user-office-backend/docker-compose.e2e.yml \
             -f docker-compose.all.yml \
-            up
+            up -d
 
-          export SCHEMA_URL=http://localhost:4000/graphql
+          export SCHEMA_URL=http://localhost:80/graphql
 
           while true; do
             STATUS=$(curl \
