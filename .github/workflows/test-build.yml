@@ -101,13 +101,18 @@ jobs:
             backend:
               ports:
                 - "4000:4000" # The HTTP port
+              depends_on:
+                - "db"
+              volumes:
+                - "./wait-for-db.sh:/home/node/app/wait-for-db.sh"
+              command: ["./wait-for-db.sh", "db:5432", "--", "node", "./build/index.js"]
           EOF
 
       - name: Run docker-compose, generate and compare SDK
         run: |
           cd "$GITHUB_WORKSPACE/.."
           ls
-          sudo chmod 777 wait-for-db.sh
+          sudo chmod 777 ./user-office-frontend/wait-for-db.sh
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           export USER_OFFICE_BACKEND_TAG=${{ needs.resolve_dep.outputs.BE_TAG }}
@@ -121,7 +126,6 @@ jobs:
             -f user-office-backend/docker-compose.e2e.yml \
             -f docker-compose.all.yml \
             up -d
-          echo hello
 
           export SCHEMA_URL=http://localhost:4000/graphql
 
