@@ -98,16 +98,9 @@ jobs:
           cat > docker-compose.all.yml << EOF
           version: "3.1"
           services:
-            proxy:
-              image: traefik:1.7
-              command: --api --docker
-              ports:
-                - "80:80" # The HTTP port
-              volumes:
-                - /var/run/docker.sock:/var/run/docker.sock:ro
             backend:
-              labels:
-                - "traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads, /gateway, /graphql"
+              ports:
+                - "4000:4000" # The HTTP port
           EOF
 
       - name: Run docker-compose, generate and compare SDK
@@ -128,7 +121,7 @@ jobs:
             -f docker-compose.all.yml \
             up -d
 
-          export SCHEMA_URL=http://localhost:80/graphql
+          export SCHEMA_URL=http://localhost:4000/graphql
 
           while true; do
             STATUS=$(curl \
