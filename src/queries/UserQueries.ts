@@ -210,7 +210,7 @@ export default class UserQueries {
     );
 
     return {
-      totalCount: returnableUsers.length,
+      totalCount: userData.totalCount,
       users: returnableUsers,
     };
   }
