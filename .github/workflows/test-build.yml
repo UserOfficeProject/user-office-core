@@ -103,6 +103,7 @@ jobs:
                 - "4000:4000" # The HTTP port
               depends_on:
                 - "db"
+              command: ["./wait-for-db.sh", "db:5432", "--", "node", "./build/index.js"]
           EOF
 
       - name: Run docker-compose, generate and compare SDK
