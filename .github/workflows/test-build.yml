@@ -111,6 +111,7 @@ jobs:
       - name: Run docker-compose, generate and compare SDK
         run: |
           cd "$GITHUB_WORKSPACE/.."
+          ls
           sudo chmod 777 wait-for-db.sh
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
