@@ -101,6 +101,8 @@ jobs:
             backend:
               ports:
                 - "4000:4000" # The HTTP port
+              depends_on:
+                - "db"
           EOF
 
       - name: Run docker-compose, generate and compare SDK
@@ -119,7 +121,7 @@ jobs:
           docker-compose --project-directory $PWD \
             -f user-office-backend/docker-compose.e2e.yml \
             -f docker-compose.all.yml \
-            up
+            up -d
 
           export SCHEMA_URL=http://localhost:4000/graphql
 
