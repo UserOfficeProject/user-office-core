@@ -114,6 +114,8 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/.."
           sudo iptables -I INPUT -m conntrack --ctstate INVALID -j DROP
+          docker-compose down
+          docker system prune --force
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
           export USER_OFFICE_BACKEND_TAG=${{ needs.resolve_dep.outputs.BE_TAG }}
