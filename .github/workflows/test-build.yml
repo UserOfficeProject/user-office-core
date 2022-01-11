@@ -126,12 +126,11 @@ jobs:
 
           docker-compose --project-directory $PWD \
             -f user-office-backend/docker-compose.e2e.yml \
-            -f user-office-factory/docker-compose.e2e.yml \
             -f "$REPO_DIR_NAME/docker-compose.e2e.yml" \
             -f docker-compose.all.yml \
             up -d
 
-          export SCHEMA_URL=http://localhost:4000/graphql
+          export SCHEMA_URL=http://localhost:80/graphql
 
           while true; do
             STATUS=$(curl \
