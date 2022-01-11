@@ -57,13 +57,13 @@ function editFinalRankingForm() {
 }
 
 const sep1 = {
-  code: faker.random.words(2),
-  description: faker.random.words(8),
+  code: faker.random.words(1),
+  description: faker.random.words(4),
 };
 
 const sep2 = {
-  code: faker.random.words(2),
-  description: faker.random.words(8),
+  code: faker.random.words(1),
+  description: faker.random.words(4),
 };
 
 const proposal1 = {
