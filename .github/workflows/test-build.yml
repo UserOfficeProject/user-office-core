@@ -113,8 +113,6 @@ jobs:
       - name: Run docker-compose, generate and compare SDK
         run: |
           cd "$GITHUB_WORKSPACE/.."
-          sudo iptables -I INPUT -m conntrack --ctstate INVALID -j DROP
-          docker system prune --force
 
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
@@ -125,11 +123,10 @@ jobs:
 
           export USER_OFFICE_FACTORY_ENDPOINT=noop
 
-          docker-compose --project-directory $PWD down
           docker-compose --project-directory $PWD \
             -f user-office-backend/docker-compose.e2e.yml \
             -f docker-compose.all.yml \
-            up -d
+            up -d --log-level DEBUG
 
           export SCHEMA_URL=http://localhost:80/graphql
 
