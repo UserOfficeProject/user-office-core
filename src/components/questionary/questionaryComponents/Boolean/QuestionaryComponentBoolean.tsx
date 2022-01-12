@@ -23,7 +23,7 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { id, question },
+    question: { id, question, naturalKey },
   } = answer;
   const config = answer.config as BooleanConfig;
   const fieldError = getIn(errors, id);
@@ -57,6 +57,7 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
               'aria-label': 'primary checkbox',
             }}
             className={classes.checkboxPadding}
+            data-natural-key={naturalKey}
           />
         }
         label={

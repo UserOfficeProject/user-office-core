@@ -77,7 +77,10 @@ declare global {
        * @example
        *    cy.createBooleanQuestion('Is dangerous')
        */
-      createBooleanQuestion: (title: string) => void;
+      createBooleanQuestion: (
+        title: string,
+        options?: { key?: string }
+      ) => void;
 
       /**
        * Creates Text question. You have to be in edit template view to call this method
@@ -129,6 +132,7 @@ declare global {
           option3?: string;
           isMultipleSelect?: boolean;
           type?: 'radio' | 'dropdown';
+          key?: string;
         }
       ) => void;
 

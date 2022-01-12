@@ -44,7 +44,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
     formikProps: { errors, touched },
   } = props;
   const {
-    question: { id, question },
+    question: { id, question, naturalKey },
     value,
   } = answer;
   const [stateValue, setStateValue] = useState<Array<string>>(value);
@@ -115,6 +115,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
               variant: 'menu',
               getContentAnchorEl: null,
             }}
+            data-natural-key={naturalKey}
           >
             {config.options.map((option) => {
               return (
