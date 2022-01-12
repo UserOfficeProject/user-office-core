@@ -414,11 +414,19 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async externalTokenLogin(token: string): Promise<User> {
-    const rawStfcUser = await client.getPersonDetailsFromSessionId(token);
-    if (!rawStfcUser) {
-      throw new Error(`User not found ${token}`);
-    }
-    const stfcUser = rawStfcUser.return;
+    const stfcUser = await client
+      .getPersonDetailsFromSessionId(token)
+      .then((rawStfcUser) => rawStfcUser.return)
+      .catch((error) => {
+        const rethrowMessage =
+          'Failed to fetch user details for STFC external authentication';
+        logger.logWarn(rethrowMessage, {
+          cause: error,
+          token: token,
+        });
+
+        throw rethrowMessage;
+      });
 
     // Create dummy user if one does not exist in the proposals DB.
     // This is needed to satisfy the FOREIGN_KEY constraints
@@ -438,13 +446,10 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async logout(token: string): Promise<void> {
-    await client.logout(token);
-    const rawStfcUser = await client.getPersonDetailsFromSessionId(token);
-    if (rawStfcUser) {
-      const userNumber = rawStfcUser.return.userNumber;
-      logger.logWarn('Failed to log out user', { userNumber, token });
+    await client.logout(token).catch(() => {
+      logger.logWarn('Failed to log out user', { token });
       throw new Error(`Failed to logout ${token}`);
-    }
+    });
 
     return;
   }

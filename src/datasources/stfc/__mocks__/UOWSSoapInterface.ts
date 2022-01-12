@@ -1,8 +1,8 @@
 export default class UOWSSoapClient {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public getPersonDetailsFromSessionId(SessionId: any): any {
+  public async getPersonDetailsFromSessionId(SessionId: any): Promise<any> {
     if (SessionId !== 'valid') {
-      return undefined;
+      throw 'Invalid token';
     }
 
     return {
@@ -12,7 +12,8 @@ export default class UOWSSoapClient {
     };
   }
 
-  public getRolesForUser(): any {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async getRolesForUser(): Promise<any> {
     return {
       return: [
         {
