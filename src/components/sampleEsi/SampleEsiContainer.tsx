@@ -24,30 +24,6 @@ export interface SampleEsiContextType extends QuestionaryContextType {
   state: SampleEsiSubmissionState | null;
 }
 
-const sampleEsiReducer = (
-  state: SampleEsiSubmissionState,
-  draftState: SampleEsiSubmissionState,
-  action: Event
-) => {
-  switch (action.type) {
-    case 'SAMPLE_ESI_CREATED':
-    case 'SAMPLE_ESI_LOADED':
-      const esi = action.esi;
-      draftState.isDirty = false;
-      draftState.itemWithQuestionary = esi;
-      break;
-    case 'SAMPLE_ESI_MODIFIED':
-      draftState.esi = {
-        ...draftState.esi,
-        ...action.esi,
-      };
-      draftState.isDirty = true;
-      break;
-  }
-
-  return draftState;
-};
-
 export interface SampleEsiContainerProps {
   esi: SampleEsiWithQuestionary;
   onUpdate?: (esi: SampleEsiWithQuestionary) => void;
@@ -69,8 +45,8 @@ export default function SampleEsiContainer(props: SampleEsiContainerProps) {
     if (esiState.esi.esiId === 0) {
       // if esi is not created yet
       dispatch({
-        type: 'SAMPLE_ESI_LOADED',
-        esi: initialState.esi,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: initialState.esi,
       });
     } else {
       await api()
@@ -81,8 +57,8 @@ export default function SampleEsiContainer(props: SampleEsiContainerProps) {
         .then((data) => {
           if (data.sampleEsi && data.sampleEsi.questionary!.steps) {
             dispatch({
-              type: 'SAMPLE_ESI_LOADED',
-              esi: data.sampleEsi,
+              type: 'ITEM_WITH_QUESTIONARY_LOADED',
+              itemWithQuestionary: data.sampleEsi,
             });
             dispatch({
               type: 'STEPS_LOADED',
@@ -114,11 +90,11 @@ export default function SampleEsiContainer(props: SampleEsiContainerProps) {
           handleReset();
           break;
 
-        case 'SAMPLE_ESI_MODIFIED':
+        case 'ITEM_WITH_QUESTIONARY_MODIFIED':
           props.onUpdate?.(state.esi);
           break;
 
-        case 'SAMPLE_ESI_SUBMITTED':
+        case 'ITEM_WITH_QUESTIONARY_SUBMITTED':
           props.onSubmitted?.(state.esi);
           break;
       }
@@ -132,18 +108,16 @@ export default function SampleEsiContainer(props: SampleEsiContainerProps) {
   );
 
   const { state, dispatch } =
-    QuestionarySubmissionModel<SampleEsiSubmissionState>(
-      initialState,
-      [handleEvents],
-      sampleEsiReducer
-    );
+    QuestionarySubmissionModel<SampleEsiSubmissionState>(initialState, [
+      handleEvents,
+    ]);
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime = previousInitialEsi === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: 'SAMPLE_ESI_LOADED',
-        esi: props.esi,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: props.esi,
       });
       dispatch({
         type: 'STEPS_LOADED',

@@ -76,12 +76,12 @@ function ProposalEsiReview({ confirm }: ProposalEsiReviewProps) {
                   return;
                 }
                 dispatch({
-                  type: 'ESI_MODIFIED',
-                  esi: result.updateEsi.esi,
+                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                  itemWithQuestionary: result.updateEsi.esi,
                 });
                 dispatch({
-                  type: 'ESI_SUBMITTED',
-                  esi: result.updateEsi.esi,
+                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                  itemWithQuestionary: result.updateEsi.esi,
                 });
               },
               {

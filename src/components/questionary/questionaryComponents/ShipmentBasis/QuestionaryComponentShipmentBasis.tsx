@@ -79,8 +79,8 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
 
   const handleChange = (changes: Partial<ShipmentBasisFormikData>) => {
     dispatch({
-      type: 'SHIPMENT_MODIFIED',
-      shipment: changes,
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: changes,
     });
   };
 
@@ -174,8 +174,8 @@ const shipmentBasisPreSubmit =
       });
       if (result.updateShipment.shipment) {
         dispatch({
-          type: 'SHIPMENT_MODIFIED',
-          shipment: result.updateShipment.shipment,
+          type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+          itemWithQuestionary: result.updateShipment.shipment,
         });
       }
     } else {
@@ -186,8 +186,8 @@ const shipmentBasisPreSubmit =
       });
       if (result.createShipment.shipment) {
         dispatch({
-          type: 'SHIPMENT_CREATED',
-          shipment: result.createShipment.shipment,
+          type: 'ITEM_WITH_QUESTIONARY_CREATED',
+          itemWithQuestionary: result.createShipment.shipment,
         });
         shipmentId = result.createShipment.shipment.id;
         returnValue = result.createShipment.shipment.questionaryId;

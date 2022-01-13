@@ -23,30 +23,6 @@ export interface FeedbackContextType extends QuestionaryContextType {
   state: FeedbackSubmissionState | null;
 }
 
-const feedbackReducer = (
-  state: FeedbackSubmissionState,
-  draftState: FeedbackSubmissionState,
-  action: Event
-) => {
-  switch (action.type) {
-    case 'FEEDBACK_CREATED':
-    case 'FEEDBACK_LOADED':
-      const feedback = action.feedback;
-      draftState.isDirty = false;
-      draftState.itemWithQuestionary = feedback;
-      break;
-    case 'FEEDBACK_MODIFIED':
-      draftState.feedback = {
-        ...draftState.feedback,
-        ...action.feedback,
-      };
-      draftState.isDirty = true;
-      break;
-  }
-
-  return draftState;
-};
-
 export interface FeedbackContainerProps {
   feedback: FeedbackWithQuestionary;
   onCreate?: (feedback: FeedbackWithQuestionary) => void;
@@ -69,8 +45,8 @@ export default function FeedbackContainer(props: FeedbackContainerProps) {
     if (feedbackState.feedback.questionaryId === 0) {
       // if feedback is not created yet
       dispatch({
-        type: 'FEEDBACK_LOADED',
-        feedback: initialState.feedback,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: initialState.feedback,
       });
     } else {
       await api()
@@ -80,8 +56,8 @@ export default function FeedbackContainer(props: FeedbackContainerProps) {
         .then((data) => {
           if (data.feedback && data.feedback.questionary!.steps) {
             dispatch({
-              type: 'FEEDBACK_LOADED',
-              feedback: data.feedback,
+              type: 'ITEM_WITH_QUESTIONARY_LOADED',
+              itemWithQuestionary: data.feedback,
             });
             dispatch({
               type: 'STEPS_LOADED',
@@ -113,15 +89,15 @@ export default function FeedbackContainer(props: FeedbackContainerProps) {
           handleReset();
           break;
 
-        case 'FEEDBACK_CREATED':
+        case 'ITEM_WITH_QUESTIONARY_CREATED':
           props.onCreate?.(state.feedback);
           break;
 
-        case 'FEEDBACK_MODIFIED':
+        case 'ITEM_WITH_QUESTIONARY_MODIFIED':
           props.onUpdate?.(state.feedback);
           break;
 
-        case 'FEEDBACK_SUBMITTED':
+        case 'ITEM_WITH_QUESTIONARY_SUBMITTED':
           props.onSubmitted?.(state.feedback);
           break;
       }
@@ -135,19 +111,17 @@ export default function FeedbackContainer(props: FeedbackContainerProps) {
   );
 
   const { state, dispatch } =
-    QuestionarySubmissionModel<FeedbackSubmissionState>(
-      initialState,
-      [handleEvents],
-      feedbackReducer
-    );
+    QuestionarySubmissionModel<FeedbackSubmissionState>(initialState, [
+      handleEvents,
+    ]);
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =
       previousInitialFeedback === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: 'FEEDBACK_LOADED',
-        feedback: props.feedback,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: props.feedback,
       });
       dispatch({
         type: 'STEPS_LOADED',
