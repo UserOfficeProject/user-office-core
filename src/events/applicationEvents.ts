@@ -48,6 +48,11 @@ interface ProposalUpdatedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalDeletedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_DELETED;
+  proposal: Proposal;
+}
+
 interface ProposalRejectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_REJECTED;
   proposal: Proposal;
@@ -271,6 +276,7 @@ interface ProposalBookingTimeSlotsRemovedEvent extends GeneralEvent {
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
+  | ProposalDeletedEvent
   | ProposalSubmittedEvent
   | ProposalFeasibleEvent
   | ProposalUnfeasibleEvent
