@@ -34,6 +34,7 @@ import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
 import SampleEsiQueries from './queries/SampleEsiQueries';
 import SampleQueries from './queries/SampleQueries';
+import ScheduledEventQueries from './queries/ScheduledEventQueries';
 import SEPQueries from './queries/SEPQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
 import SystemQueries from './queries/SystemQueries';
@@ -58,6 +59,7 @@ const context: BasicResolverContext = {
     review: container.resolve(ReviewQueries),
     sample: container.resolve(SampleQueries),
     sampleEsi: container.resolve(SampleEsiQueries),
+    scheduledEvent: container.resolve(ScheduledEventQueries),
     sep: container.resolve(SEPQueries),
     shipment: container.resolve(ShipmentQueries),
     system: container.resolve(SystemQueries),

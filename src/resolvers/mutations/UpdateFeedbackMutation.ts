@@ -20,6 +20,8 @@ export class UpdateFeedbackArgs {
 
   @Field(() => FeedbackStatus, { nullable: true })
   status?: FeedbackStatus;
+
+  submittedAt?: Date | null;
 }
 
 @Resolver()
