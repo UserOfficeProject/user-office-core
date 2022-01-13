@@ -182,7 +182,7 @@ const shipmentBasisPreSubmit =
       const result = await api.createShipment({
         title: title,
         proposalPk: shipment.proposalPk,
-        visitId: shipment.visitId,
+        scheduledEventId: shipment.scheduledEventId,
       });
       if (result.createShipment.shipment) {
         dispatch({

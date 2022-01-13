@@ -41,10 +41,11 @@ export type ProposalScheduledEvent = Pick<
   visit:
     | (VisitFragment & {
         registrations: VisitRegistrationCore[];
-        shipments: ShipmentFragment[];
       } & Pick<Visit, 'teamLead'>)
     | null;
-} & { esi: Maybe<EsiFragment> } & { feedback: Maybe<FeedbackFragment> };
+} & { esi: Maybe<EsiFragment> } & { feedback: Maybe<FeedbackFragment> } & {
+  shipments: ShipmentFragment[];
+};
 
 export function useProposalBookingsScheduledEvents({
   onlyUpcoming,
@@ -107,6 +108,7 @@ export function useProposalBookingsScheduledEvents({
                   visit: scheduledEvent.visit,
                   esi: scheduledEvent.esi,
                   feedback: scheduledEvent.feedback,
+                  shipments: scheduledEvent.shipments,
                 });
               }
             )

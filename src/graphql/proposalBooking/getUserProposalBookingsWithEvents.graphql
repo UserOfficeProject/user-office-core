@@ -28,9 +28,6 @@ query getUserProposalBookingsWithEvents(
             teamLead {
               ...basicUserDetails
             }
-            shipments {
-              ...shipment
-            }
             registrations {
               ...visitRegistration
               user {
@@ -43,6 +40,9 @@ query getUserProposalBookingsWithEvents(
           }
           feedback {
             ...feedback
+          }
+          shipments {
+            ...shipment
           }
           localContact {
             ...basicUserDetails
