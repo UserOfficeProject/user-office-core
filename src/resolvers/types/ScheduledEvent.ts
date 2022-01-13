@@ -17,6 +17,7 @@ import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from './ProposalBooking';
+import { Shipment } from './Shipment';
 import { Visit } from './Visit';
 
 @ObjectType()
@@ -84,5 +85,15 @@ export class ScheduledEventResolver {
     return event.localContactId
       ? context.queries.user.getBasic(context.user, event.localContactId)
       : null;
+  }
+
+  @FieldResolver(() => [Shipment])
+  async shipments(
+    @Root() event: ScheduledEventCore,
+    @Ctx() context: ResolverContext
+  ): Promise<Shipment[] | null> {
+    return context.queries.shipment.getShipments(context.user, {
+      filter: { scheduledEventId: event.id },
+    });
   }
 }

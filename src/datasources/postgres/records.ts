@@ -415,7 +415,7 @@ export interface SampleRecord {
 }
 
 export interface ShipmentRecord {
-  readonly visit_id: number;
+  readonly scheduled_event_id: number;
   readonly shipment_id: number;
   readonly title: string;
   readonly creator_id: number;
@@ -846,7 +846,7 @@ export const createShipmentObject = (shipment: ShipmentRecord) => {
     shipment.creator_id,
     shipment.proposal_pk,
     shipment.questionary_id,
-    shipment.visit_id,
+    shipment.scheduled_event_id,
     shipment.status as ShipmentStatus,
     shipment.external_ref,
     shipment.created_at

@@ -5,19 +5,18 @@ import { ModuleOptions, ResourceOwnerPassword } from 'simple-oauth2';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { ScheduledEventDataSource } from '../../datasources/ScheduledEventDataSource';
 import { AnswerBasic } from '../../models/Questionary';
 import {
-  WEIGHT_QID,
-  WIDTH_QID,
-  HEIGHT_QID,
-  LENGTH_QID,
+  WEIGHT_KEY,
+  WIDTH_KEY,
+  HEIGHT_KEY,
+  LENGTH_KEY,
 } from '../../models/Shipment';
 import { ProposalDataSource } from './../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from './../../datasources/QuestionaryDataSource';
-import { ScheduledEventDataSource } from './../../datasources/ScheduledEventDataSource';
 import { ShipmentDataSource } from './../../datasources/ShipmentDataSource';
 import { UserDataSource } from './../../datasources/UserDataSource';
-import { VisitDataSource } from './../../datasources/VisitDataSource';
 import getAddAssetEquipmentReq from './requests/AddAssetEquipment';
 import getCreateTicketReq from './requests/AddCaseManagement';
 
@@ -47,8 +46,6 @@ export class EAMAssetRegistrar implements AssetRegistrar {
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.ScheduledEventDataSource)
     private scheduledEventDataSource: ScheduledEventDataSource,
-    @inject(Tokens.VisitDataSource)
-    private visitDataSource: VisitDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource
   ) {}
@@ -111,21 +108,12 @@ export class EAMAssetRegistrar implements AssetRegistrar {
       throw new Error('Proposal not found');
     }
 
-    // TODO: After shipment is attached to scheduled event,
-    // we can skip getting the visit and get the scheduled event from the shipment
-    // blocked by #SWAP-2065. For now, we need to get the visit from the shipment
-    const visit = await this.visitDataSource.getVisit(shipment.visitId);
-    if (!visit) {
-      logger.logError('Visit for shipment not found', { shipment });
-      throw new Error('Visit not found');
-    }
-
     const scheduledEvent =
       await this.scheduledEventDataSource.getScheduledEvent(
-        visit.scheduledEventId
+        shipment.scheduledEventId
       );
     if (!scheduledEvent) {
-      logger.logError('Scheduled event for visit not found', { visit });
+      logger.logError('Scheduled event for shipment not found', { shipment });
       throw new Error('Scheduled event not found');
     }
 
@@ -135,14 +123,13 @@ export class EAMAssetRegistrar implements AssetRegistrar {
         scheduledEvent.localContactId
       );
     }
-
     const request = getCreateTicketReq(
       proposal.proposalId,
       proposal.title,
       containerId,
       scheduledEvent.startsAt,
       scheduledEvent.endsAt,
-      scheduledEvent.startsAt,
+      scheduledEvent.startsAt, // This is not correct, but we need a design decision to fix this
       localContact?.email ?? 'not set'
     );
 
@@ -167,19 +154,19 @@ export class EAMAssetRegistrar implements AssetRegistrar {
 
     const weight = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      WEIGHT_QID
+      WEIGHT_KEY
     );
     const width = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      WIDTH_QID
+      WIDTH_KEY
     );
     const height = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      HEIGHT_QID
+      HEIGHT_KEY
     );
     const length = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      LENGTH_QID
+      LENGTH_KEY
     );
 
     if (!weight || !width || !height || !length) {
