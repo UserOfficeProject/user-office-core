@@ -425,6 +425,17 @@ export type FeedbackBasisConfig = {
   tooltip: Scalars['String'];
 };
 
+export type FeedbackRequest = {
+  id: Scalars['Int'];
+  requestedAt: Scalars['DateTime'];
+  scheduledEventId: Scalars['Int'];
+};
+
+export type FeedbackRequestWrap = {
+  rejection: Maybe<Rejection>;
+  request: Maybe<FeedbackRequest>;
+};
+
 export type FeedbackResponseWrap = {
   feedback: Maybe<Feedback>;
   rejection: Maybe<Rejection>;
@@ -675,6 +686,7 @@ export type Mutation = {
   removeScientistFromInstrument: SuccessResponseWrap;
   removeUserForReview: ReviewResponseWrap;
   reorderSepMeetingDecisionProposals: SepMeetingDecisionResponseWrap;
+  requestFeedback: FeedbackRequestWrap;
   resetPassword: BasicUserDetailsResponseWrap;
   resetPasswordEmail: SuccessResponseWrap;
   saveSepMeetingDecision: SepMeetingDecisionResponseWrap;
@@ -965,8 +977,8 @@ export type MutationCreateSampleEsiArgs = {
 
 export type MutationCreateShipmentArgs = {
   proposalPk: Scalars['Int'];
+  scheduledEventId: Scalars['Int'];
   title: Scalars['String'];
-  visitId: Scalars['Int'];
 };
 
 
@@ -1248,6 +1260,11 @@ export type MutationRemoveUserForReviewArgs = {
 
 export type MutationReorderSepMeetingDecisionProposalsArgs = {
   reorderSepMeetingDecisionProposalsInput: ReorderSepMeetingDecisionProposalsInput;
+};
+
+
+export type MutationRequestFeedbackArgs = {
+  scheduledEventId: Scalars['Int'];
 };
 
 
@@ -1918,6 +1935,7 @@ export type Query = {
   sampleEsi: Maybe<SampleExperimentSafetyInput>;
   samples: Maybe<Array<Sample>>;
   samplesByCallId: Maybe<Array<Sample>>;
+  scheduledEvents: Maybe<Array<ScheduledEventCore>>;
   sep: Maybe<Sep>;
   sepMembers: Maybe<Array<SepReviewer>>;
   sepProposal: Maybe<SepProposal>;
@@ -2175,6 +2193,12 @@ export type QuerySamplesArgs = {
 
 export type QuerySamplesByCallIdArgs = {
   callId: Scalars['Int'];
+};
+
+
+export type QueryScheduledEventsArgs = {
+  endsAfter?: InputMaybe<Scalars['TzLessDateTime']>;
+  endsBefore?: InputMaybe<Scalars['TzLessDateTime']>;
 };
 
 
@@ -2587,9 +2611,11 @@ export type ScheduledEventCore = {
   endsAt: Scalars['TzLessDateTime'];
   esi: Maybe<ExperimentSafetyInput>;
   feedback: Maybe<Feedback>;
+  feedbackRequests: Array<FeedbackRequest>;
   id: Scalars['Int'];
   localContact: Maybe<BasicUserDetails>;
   localContactId: Maybe<Scalars['Int']>;
+  shipments: Array<Shipment>;
   startsAt: Scalars['TzLessDateTime'];
   status: ProposalBookingStatusCore;
   visit: Maybe<Visit>;
@@ -2627,6 +2653,9 @@ export type Settings = {
 
 export enum SettingsId {
   EXTERNAL_AUTH_LOGIN_URL = 'EXTERNAL_AUTH_LOGIN_URL',
+  FEEDBACK_EXHAUST_DAYS = 'FEEDBACK_EXHAUST_DAYS',
+  FEEDBACK_FREQUENCY_DAYS = 'FEEDBACK_FREQUENCY_DAYS',
+  FEEDBACK_MAX_REQUESTS = 'FEEDBACK_MAX_REQUESTS',
   HEADER_LOGO_FILENAME = 'HEADER_LOGO_FILENAME',
   PALETTE_ERROR_MAIN = 'PALETTE_ERROR_MAIN',
   PALETTE_INFO_MAIN = 'PALETTE_INFO_MAIN',
@@ -2654,9 +2683,9 @@ export type Shipment = {
   questionary: Questionary;
   questionaryId: Scalars['Int'];
   samples: Array<Sample>;
+  scheduledEventId: Scalars['Int'];
   status: ShipmentStatus;
   title: Scalars['String'];
-  visitId: Scalars['Int'];
 };
 
 export type ShipmentBasisConfig = {
@@ -2680,10 +2709,10 @@ export type ShipmentsFilter = {
   externalRef?: InputMaybe<Scalars['String']>;
   proposalPk?: InputMaybe<Scalars['Int']>;
   questionaryIds?: InputMaybe<Array<Scalars['Int']>>;
+  scheduledEventId?: InputMaybe<Scalars['Int']>;
   shipmentIds?: InputMaybe<Array<Scalars['Int']>>;
   status?: InputMaybe<ShipmentStatus>;
   title?: InputMaybe<Scalars['String']>;
-  visitId?: InputMaybe<Scalars['Int']>;
 };
 
 export type StatusChangingEvent = {
@@ -2992,7 +3021,6 @@ export type Visit = {
   registrations: Array<VisitRegistration>;
   samples: Array<Sample>;
   scheduledEventId: Scalars['Int'];
-  shipments: Array<Shipment>;
   status: VisitStatus;
   teamLead: BasicUserDetails;
   teamLeadUserId: Scalars['Int'];
@@ -3775,7 +3803,7 @@ export type GetUserProposalBookingsWithEventsQueryVariables = Exact<{
 }>;
 
 
-export type GetUserProposalBookingsWithEventsQuery = { me: { proposals: Array<{ primaryKey: number, title: string, proposalId: string, finalStatus: ProposalEndStatus | null | undefined, managementDecisionSubmitted: boolean, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined } | null | undefined, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined }>, proposalBookingCore: { scheduledEvents: Array<{ id: number, startsAt: string, endsAt: string, bookingType: ScheduledEventBookingType, status: ProposalBookingStatusCore, visit: { id: number, proposalPk: number, status: VisitStatus, creatorId: number, teamLead: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined }, shipments: Array<{ id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, visitId: number, creatorId: number, created: any, proposal: { proposalId: string } }>, registrations: Array<{ userId: number, visitId: number, registrationQuestionaryId: number | null | undefined, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null | undefined, user: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined } }> } | null | undefined, esi: { id: number, creatorId: number, questionaryId: number, isSubmitted: boolean, created: any } | null | undefined, feedback: { id: number, scheduledEventId: number, status: FeedbackStatus, questionaryId: number, creatorId: number } | null | undefined, localContact: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined } | null | undefined }> } | null | undefined, visits: Array<{ id: number, proposalPk: number, status: VisitStatus, creatorId: number }> | null | undefined, instrument: { id: number, name: string } | null | undefined }> } | null | undefined };
+export type GetUserProposalBookingsWithEventsQuery = { me: { proposals: Array<{ primaryKey: number, title: string, proposalId: string, finalStatus: ProposalEndStatus | null | undefined, managementDecisionSubmitted: boolean, proposer: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined } | null | undefined, users: Array<{ id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined }>, proposalBookingCore: { scheduledEvents: Array<{ id: number, startsAt: string, endsAt: string, bookingType: ScheduledEventBookingType, status: ProposalBookingStatusCore, visit: { id: number, proposalPk: number, status: VisitStatus, creatorId: number, teamLead: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined }, registrations: Array<{ userId: number, visitId: number, registrationQuestionaryId: number | null | undefined, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null | undefined, user: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined } }> } | null | undefined, esi: { id: number, creatorId: number, questionaryId: number, isSubmitted: boolean, created: any } | null | undefined, feedback: { id: number, scheduledEventId: number, status: FeedbackStatus, questionaryId: number, creatorId: number } | null | undefined, shipments: Array<{ id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, scheduledEventId: number, creatorId: number, created: any, proposal: { proposalId: string } }>, localContact: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined } | null | undefined }> } | null | undefined, visits: Array<{ id: number, proposalPk: number, status: VisitStatus, creatorId: number }> | null | undefined, instrument: { id: number, name: string } | null | undefined }> } | null | undefined };
 
 export type AnswerTopicMutationVariables = Exact<{
   questionaryId: Scalars['Int'];
@@ -4154,16 +4182,16 @@ export type AddSamplesToShipmentMutationVariables = Exact<{
 }>;
 
 
-export type AddSamplesToShipmentMutation = { addSamplesToShipment: { rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined, shipment: { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, visitId: number, creatorId: number, created: any, samples: Array<{ id: number, title: string, creatorId: number, questionaryId: number, safetyStatus: SampleStatus, safetyComment: string, isPostProposalSubmission: boolean, created: any, proposalPk: number, questionId: string }>, proposal: { proposalId: string } } | null | undefined } };
+export type AddSamplesToShipmentMutation = { addSamplesToShipment: { rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined, shipment: { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, scheduledEventId: number, creatorId: number, created: any, samples: Array<{ id: number, title: string, creatorId: number, questionaryId: number, safetyStatus: SampleStatus, safetyComment: string, isPostProposalSubmission: boolean, created: any, proposalPk: number, questionId: string }>, proposal: { proposalId: string } } | null | undefined } };
 
 export type CreateShipmentMutationVariables = Exact<{
   title: Scalars['String'];
   proposalPk: Scalars['Int'];
-  visitId: Scalars['Int'];
+  scheduledEventId: Scalars['Int'];
 }>;
 
 
-export type CreateShipmentMutation = { createShipment: { shipment: { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, visitId: number, creatorId: number, created: any, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null | undefined, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null | undefined, value: any | null | undefined, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, samples: Array<{ id: number, title: string, creatorId: number, questionaryId: number, safetyStatus: SampleStatus, safetyComment: string, isPostProposalSubmission: boolean, created: any, proposalPk: number, questionId: string }>, proposal: { proposalId: string } } | null | undefined, rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined } };
+export type CreateShipmentMutation = { createShipment: { shipment: { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, scheduledEventId: number, creatorId: number, created: any, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null | undefined, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null | undefined, value: any | null | undefined, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, samples: Array<{ id: number, title: string, creatorId: number, questionaryId: number, safetyStatus: SampleStatus, safetyComment: string, isPostProposalSubmission: boolean, created: any, proposalPk: number, questionId: string }>, proposal: { proposalId: string } } | null | undefined, rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined } };
 
 export type DeleteShipmentMutationVariables = Exact<{
   shipmentId: Scalars['Int'];
@@ -4172,26 +4200,26 @@ export type DeleteShipmentMutationVariables = Exact<{
 
 export type DeleteShipmentMutation = { deleteShipment: { rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined } };
 
-export type ShipmentFragment = { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, visitId: number, creatorId: number, created: any, proposal: { proposalId: string } };
+export type ShipmentFragment = { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, scheduledEventId: number, creatorId: number, created: any, proposal: { proposalId: string } };
 
 export type GetMyShipmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMyShipmentsQuery = { myShipments: Array<{ id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, visitId: number, creatorId: number, created: any, proposal: { proposalId: string } }> | null | undefined };
+export type GetMyShipmentsQuery = { myShipments: Array<{ id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, scheduledEventId: number, creatorId: number, created: any, proposal: { proposalId: string } }> | null | undefined };
 
 export type GetShipmentQueryVariables = Exact<{
   shipmentId: Scalars['Int'];
 }>;
 
 
-export type GetShipmentQuery = { shipment: { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, visitId: number, creatorId: number, created: any, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null | undefined, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null | undefined, value: any | null | undefined, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, samples: Array<{ id: number, title: string, creatorId: number, questionaryId: number, safetyStatus: SampleStatus, safetyComment: string, isPostProposalSubmission: boolean, created: any, proposalPk: number, questionId: string }>, proposal: { proposalId: string } } | null | undefined };
+export type GetShipmentQuery = { shipment: { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, scheduledEventId: number, creatorId: number, created: any, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null | undefined, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null | undefined, value: any | null | undefined, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, samples: Array<{ id: number, title: string, creatorId: number, questionaryId: number, safetyStatus: SampleStatus, safetyComment: string, isPostProposalSubmission: boolean, created: any, proposalPk: number, questionId: string }>, proposal: { proposalId: string } } | null | undefined };
 
 export type GetShipmentsQueryVariables = Exact<{
   filter?: InputMaybe<ShipmentsFilter>;
 }>;
 
 
-export type GetShipmentsQuery = { shipments: Array<{ id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, visitId: number, creatorId: number, created: any, proposal: { proposalId: string } }> | null | undefined };
+export type GetShipmentsQuery = { shipments: Array<{ id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, scheduledEventId: number, creatorId: number, created: any, proposal: { proposalId: string } }> | null | undefined };
 
 export type SetActiveTemplateMutationVariables = Exact<{
   templateGroupId: TemplateGroupId;
@@ -4206,7 +4234,7 @@ export type SubmitShipmentMutationVariables = Exact<{
 }>;
 
 
-export type SubmitShipmentMutation = { submitShipment: { rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined, shipment: { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, visitId: number, creatorId: number, created: any, proposal: { proposalId: string } } | null | undefined } };
+export type SubmitShipmentMutation = { submitShipment: { rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined, shipment: { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, scheduledEventId: number, creatorId: number, created: any, proposal: { proposalId: string } } | null | undefined } };
 
 export type UpdateShipmentMutationVariables = Exact<{
   shipmentId: Scalars['Int'];
@@ -4216,7 +4244,7 @@ export type UpdateShipmentMutationVariables = Exact<{
 }>;
 
 
-export type UpdateShipmentMutation = { updateShipment: { rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined, shipment: { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, visitId: number, creatorId: number, created: any, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null | undefined, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null | undefined, value: any | null | undefined, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, proposal: { proposalId: string } } | null | undefined } };
+export type UpdateShipmentMutation = { updateShipment: { rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined, shipment: { id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, scheduledEventId: number, creatorId: number, created: any, questionary: { isCompleted: boolean, questionaryId: number, templateId: number, created: any, steps: Array<{ isCompleted: boolean, topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ answerId: number | null | undefined, sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null | undefined, value: any | null | undefined, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null | undefined, maxDate: string | null | undefined, defaultDate: string | null | undefined, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { units: Array<string> | null | undefined, small_label: string, required: boolean, tooltip: string } | { units: Array<string> | null | undefined, numberValueConstraint: NumberValueConstraint | null | undefined, small_label: string, required: boolean, tooltip: string } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null | undefined } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, esiTemplateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null | undefined, maxEntries: number | null | undefined, templateId: number | null | undefined, templateCategory: string, required: boolean, small_label: string } | { min: number | null | undefined, max: number | null | undefined, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null | undefined, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }> }, proposal: { proposalId: string } } | null | undefined } };
 
 export type ImportTemplateMutationVariables = Exact<{
   templateAsJson: Scalars['String'];
@@ -4724,7 +4752,7 @@ export type CreateVisitMutationVariables = Exact<{
 }>;
 
 
-export type CreateVisitMutation = { createVisit: { visit: { id: number, proposalPk: number, status: VisitStatus, creatorId: number, teamLead: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined }, registrations: Array<{ userId: number, visitId: number, registrationQuestionaryId: number | null | undefined, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null | undefined, user: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined } }>, proposal: { primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null | undefined, commentForUser: string | null | undefined, commentForManagement: string | null | undefined, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null | undefined, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null | undefined, instrument: { name: string } | null | undefined, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null | undefined, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null | undefined, commentForUser: string | null | undefined, commentForManagement: string | null | undefined, rankOrder: number | null | undefined, submitted: boolean, submittedBy: number | null | undefined } | null | undefined }, shipments: Array<{ id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, visitId: number, creatorId: number, created: any, proposal: { proposalId: string } }> } | null | undefined, rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined } };
+export type CreateVisitMutation = { createVisit: { visit: { id: number, proposalPk: number, status: VisitStatus, creatorId: number, teamLead: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined }, registrations: Array<{ userId: number, visitId: number, registrationQuestionaryId: number | null | undefined, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null | undefined, user: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined } }>, proposal: { primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null | undefined, commentForUser: string | null | undefined, commentForManagement: string | null | undefined, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null | undefined, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null | undefined, instrument: { name: string } | null | undefined, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null | undefined, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null | undefined, commentForUser: string | null | undefined, commentForManagement: string | null | undefined, rankOrder: number | null | undefined, submitted: boolean, submittedBy: number | null | undefined } | null | undefined } } | null | undefined, rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined } };
 
 export type DeleteVisitMutationVariables = Exact<{
   visitId: Scalars['Int'];
@@ -4757,7 +4785,7 @@ export type UpdateVisitMutationVariables = Exact<{
 }>;
 
 
-export type UpdateVisitMutation = { updateVisit: { visit: { id: number, proposalPk: number, status: VisitStatus, creatorId: number, teamLead: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined }, registrations: Array<{ userId: number, visitId: number, registrationQuestionaryId: number | null | undefined, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null | undefined, user: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined } }>, proposal: { primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null | undefined, commentForUser: string | null | undefined, commentForManagement: string | null | undefined, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null | undefined, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null | undefined, instrument: { name: string } | null | undefined, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null | undefined, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null | undefined, commentForUser: string | null | undefined, commentForManagement: string | null | undefined, rankOrder: number | null | undefined, submitted: boolean, submittedBy: number | null | undefined } | null | undefined }, shipments: Array<{ id: number, title: string, proposalPk: number, status: ShipmentStatus, externalRef: string | null | undefined, questionaryId: number, visitId: number, creatorId: number, created: any, proposal: { proposalId: string } }> } | null | undefined, rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined } };
+export type UpdateVisitMutation = { updateVisit: { visit: { id: number, proposalPk: number, status: VisitStatus, creatorId: number, teamLead: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined }, registrations: Array<{ userId: number, visitId: number, registrationQuestionaryId: number | null | undefined, isRegistrationSubmitted: boolean, trainingExpiryDate: any | null | undefined, user: { id: number, firstname: string, lastname: string, preferredname: string | null | undefined, organisation: string, position: string, created: any | null | undefined, placeholder: boolean | null | undefined } }>, proposal: { primaryKey: number, title: string, abstract: string, statusId: number, publicStatus: ProposalPublicStatus, proposalId: string, finalStatus: ProposalEndStatus | null | undefined, commentForUser: string | null | undefined, commentForManagement: string | null | undefined, created: any, updated: any, callId: number, questionaryId: number, notified: boolean, submitted: boolean, managementTimeAllocation: number | null | undefined, managementDecisionSubmitted: boolean, technicalReviewAssignee: number | null | undefined, instrument: { name: string } | null | undefined, status: { id: number, shortCode: string, name: string, description: string, isDefault: boolean } | null | undefined, sepMeetingDecision: { proposalPk: number, recommendation: ProposalEndStatus | null | undefined, commentForUser: string | null | undefined, commentForManagement: string | null | undefined, rankOrder: number | null | undefined, submitted: boolean, submittedBy: number | null | undefined } | null | undefined } } | null | undefined, rejection: { reason: string, context: string | null | undefined, exception: string | null | undefined } | null | undefined } };
 
 export type CreateVisitRegistrationQuestionaryMutationVariables = Exact<{
   visitId: Scalars['Int'];
@@ -5185,7 +5213,7 @@ export const ShipmentFragmentDoc = gql`
   status
   externalRef
   questionaryId
-  visitId
+  scheduledEventId
   creatorId
   created
   proposal {
@@ -6830,9 +6858,6 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
             teamLead {
               ...basicUserDetails
             }
-            shipments {
-              ...shipment
-            }
             registrations {
               ...visitRegistration
               user {
@@ -6845,6 +6870,9 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
           }
           feedback {
             ...feedback
+          }
+          shipments {
+            ...shipment
           }
           localContact {
             ...basicUserDetails
@@ -6863,10 +6891,10 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
 }
     ${BasicUserDetailsFragmentDoc}
 ${VisitFragmentDoc}
-${ShipmentFragmentDoc}
 ${VisitRegistrationFragmentDoc}
 ${EsiFragmentDoc}
-${FeedbackFragmentDoc}`;
+${FeedbackFragmentDoc}
+${ShipmentFragmentDoc}`;
 export const AnswerTopicDocument = gql`
     mutation answerTopic($questionaryId: Int!, $topicId: Int!, $answers: [AnswerInput!]!, $isPartialSave: Boolean) {
   answerTopic(
@@ -7575,8 +7603,12 @@ export const AddSamplesToShipmentDocument = gql`
 ${ShipmentFragmentDoc}
 ${SampleFragmentDoc}`;
 export const CreateShipmentDocument = gql`
-    mutation createShipment($title: String!, $proposalPk: Int!, $visitId: Int!) {
-  createShipment(title: $title, proposalPk: $proposalPk, visitId: $visitId) {
+    mutation createShipment($title: String!, $proposalPk: Int!, $scheduledEventId: Int!) {
+  createShipment(
+    title: $title
+    proposalPk: $proposalPk
+    scheduledEventId: $scheduledEventId
+  ) {
     shipment {
       ...shipment
       questionary {
@@ -8440,9 +8472,6 @@ export const CreateVisitDocument = gql`
           name
         }
       }
-      shipments {
-        ...shipment
-      }
     }
     rejection {
       ...rejection
@@ -8453,7 +8482,6 @@ export const CreateVisitDocument = gql`
 ${BasicUserDetailsFragmentDoc}
 ${VisitRegistrationFragmentDoc}
 ${ProposalFragmentDoc}
-${ShipmentFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const DeleteVisitDocument = gql`
     mutation deleteVisit($visitId: Int!) {
@@ -8529,9 +8557,6 @@ export const UpdateVisitDocument = gql`
           name
         }
       }
-      shipments {
-        ...shipment
-      }
     }
     rejection {
       ...rejection
@@ -8542,7 +8567,6 @@ export const UpdateVisitDocument = gql`
 ${BasicUserDetailsFragmentDoc}
 ${VisitRegistrationFragmentDoc}
 ${ProposalFragmentDoc}
-${ShipmentFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const CreateVisitRegistrationQuestionaryDocument = gql`
     mutation createVisitRegistrationQuestionary($visitId: Int!) {

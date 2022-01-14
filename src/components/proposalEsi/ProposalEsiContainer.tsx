@@ -30,26 +30,13 @@ const proposalEsiReducer = (
   action: Event
 ) => {
   switch (action.type) {
-    case 'ESI_CREATED':
-    case 'ESI_LOADED':
-      const esi = action.esi;
-      draftState.isDirty = false;
-      draftState.itemWithQuestionary = esi;
-      break;
-    case 'ESI_MODIFIED':
-      draftState.esi = {
-        ...draftState.esi,
-        ...action.esi,
-      };
-      draftState.isDirty = true;
-      break;
     case 'ESI_SAMPLE_CREATED':
       if (!draftState.esi.proposal.samples) {
         draftState.esi.proposal.samples = [];
       }
       draftState.esi.proposal.samples.push(action.sample);
       break;
-    case 'ESI_SAMPLE_ESI_CREATED':
+    case 'ESI_ITEM_WITH_QUESTIONARY_CREATED':
       draftState.esi.sampleEsis.push(action.sampleEsi);
       break;
     case 'ESI_SAMPLE_ESI_UPDATED':
@@ -95,8 +82,8 @@ export default function ProposalEsiContainer(props: ProposalEsiContainerProps) {
     if (esiState.esi.id === 0) {
       // if esi is not created yet
       dispatch({
-        type: 'ESI_LOADED',
-        esi: initialState.esi,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: initialState.esi,
       });
     } else {
       await api()
@@ -106,8 +93,8 @@ export default function ProposalEsiContainer(props: ProposalEsiContainerProps) {
         .then((data) => {
           if (data.esi && data.esi.questionary!.steps) {
             dispatch({
-              type: 'ESI_LOADED',
-              esi: data.esi,
+              type: 'ITEM_WITH_QUESTIONARY_LOADED',
+              itemWithQuestionary: data.esi,
             });
             dispatch({
               type: 'STEPS_LOADED',
@@ -139,11 +126,11 @@ export default function ProposalEsiContainer(props: ProposalEsiContainerProps) {
           handleReset();
           break;
 
-        case 'ESI_MODIFIED':
+        case 'ITEM_WITH_QUESTIONARY_MODIFIED':
           props.onUpdate?.(state.esi);
           break;
 
-        case 'ESI_SUBMITTED':
+        case 'ITEM_WITH_QUESTIONARY_SUBMITTED':
           props.onSubmitted?.(state.esi);
           break;
       }
@@ -167,8 +154,8 @@ export default function ProposalEsiContainer(props: ProposalEsiContainerProps) {
     const isComponentMountedForTheFirstTime = previousInitialEsi === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: 'ESI_LOADED',
-        esi: props.esi,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: props.esi,
       });
       dispatch({
         type: 'STEPS_LOADED',

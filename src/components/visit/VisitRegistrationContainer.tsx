@@ -23,30 +23,6 @@ export interface VisitRegistrationContextType extends QuestionaryContextType {
   state: VisitRegistrationSubmissionState | null;
 }
 
-const visitReducer = (
-  state: VisitRegistrationSubmissionState,
-  draftState: VisitRegistrationSubmissionState,
-  action: Event
-) => {
-  switch (action.type) {
-    case 'REGISTRATION_CREATED':
-    case 'REGISTRATION_LOADED':
-      const visit = action.visit;
-      draftState.isDirty = false;
-      draftState.itemWithQuestionary = visit;
-      break;
-    case 'REGISTRATION_MODIFIED':
-      draftState.registration = {
-        ...draftState.registration,
-        ...action.visit,
-      };
-      draftState.isDirty = true;
-      break;
-  }
-
-  return draftState;
-};
-
 export interface VisitRegistrationContainerProps {
   registration: RegistrationWithQuestionary;
   onCreate?: (registration: RegistrationWithQuestionary) => void;
@@ -66,13 +42,13 @@ export default function VisitRegistrationContainer(
    * Returns true if reset was performed, false otherwise
    */
   const handleReset = async (): Promise<boolean> => {
-    const registrationState = state as VisitRegistrationSubmissionState;
+    const registrationState = state;
 
     if (registrationState.registration.registrationQuestionaryId === 0) {
       // if visit is not created yet
       dispatch({
-        type: 'REGISTRATION_LOADED',
-        visit: initialState.registration,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: initialState.registration,
       });
     } else {
       await api()
@@ -85,8 +61,8 @@ export default function VisitRegistrationContainer(
             data.visitRegistration.questionary!.steps
           ) {
             dispatch({
-              type: 'REGISTRATION_LOADED',
-              visit: data.visitRegistration,
+              type: 'ITEM_WITH_QUESTIONARY_LOADED',
+              itemWithQuestionary: data.visitRegistration,
             });
             dispatch({
               type: 'STEPS_LOADED',
@@ -118,15 +94,15 @@ export default function VisitRegistrationContainer(
           handleReset();
           break;
 
-        case 'REGISTRATION_CREATED':
+        case 'ITEM_WITH_QUESTIONARY_CREATED':
           props.onCreate?.(state.registration);
           break;
 
-        case 'REGISTRATION_MODIFIED':
+        case 'ITEM_WITH_QUESTIONARY_MODIFIED':
           props.onUpdate?.(state.registration);
           break;
 
-        case 'REGISTRATION_SUBMITTED':
+        case 'ITEM_WITH_QUESTIONARY_SUBMITTED':
           props.onSubmitted?.(state.registration);
           break;
       }
@@ -140,19 +116,17 @@ export default function VisitRegistrationContainer(
   );
 
   const { state, dispatch } =
-    QuestionarySubmissionModel<VisitRegistrationSubmissionState>(
-      initialState,
-      [handleEvents],
-      visitReducer
-    );
+    QuestionarySubmissionModel<VisitRegistrationSubmissionState>(initialState, [
+      handleEvents,
+    ]);
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =
       previousInitialVisit === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: 'REGISTRATION_LOADED',
-        visit: props.registration,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: props.registration,
       });
       dispatch({
         type: 'STEPS_LOADED',

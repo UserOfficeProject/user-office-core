@@ -72,7 +72,7 @@ context('visits tests', () => {
     cy.testActionButton(formTeamTitle, 'active');
     cy.testActionButton(registerVisitTitle, 'inactive');
     cy.testActionButton(individualTrainingTitle, 'inactive');
-    cy.testActionButton(declareShipmentTitle, 'inactive');
+    cy.testActionButton(declareShipmentTitle, 'neutral');
   });
 
   it('Non-visitor should not see upcoming events', () => {
@@ -92,7 +92,7 @@ context('visits tests', () => {
     cy.testActionButton(formTeamTitle, 'active');
     cy.testActionButton(registerVisitTitle, 'inactive');
     cy.testActionButton(individualTrainingTitle, 'inactive');
-    cy.testActionButton(declareShipmentTitle, 'inactive');
+    cy.testActionButton(declareShipmentTitle, 'neutral');
 
     // create visit
     cy.get(`[title="${formTeamTitle}"]`).first().click();

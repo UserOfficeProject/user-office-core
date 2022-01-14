@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import {
+  BasicUserDetailsFragment,
   EsiFragment,
   FeedbackFragment,
   Instrument,
@@ -8,17 +9,13 @@ import {
   Proposal,
   ProposalBookingStatusCore,
   ScheduledEventCore,
+  ShipmentFragment,
   Visit,
   VisitFragment,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { VisitRegistrationCore } from 'models/questionary/visit/VisitRegistrationCore';
 import { toTzLessDateTime } from 'utils/Time';
-
-import {
-  BasicUserDetailsFragment,
-  ShipmentFragment,
-} from './../../generated/sdk';
 
 export type ProposalScheduledEvent = Pick<
   ScheduledEventCore,
@@ -41,11 +38,12 @@ export type ProposalScheduledEvent = Pick<
   visit:
     | (VisitFragment & {
         registrations: VisitRegistrationCore[];
-        shipments: ShipmentFragment[];
       } & Pick<Visit, 'teamLead'>)
     | null
     | undefined;
-} & { esi: Maybe<EsiFragment> } & { feedback: Maybe<FeedbackFragment> };
+} & { esi: Maybe<EsiFragment> } & { feedback: Maybe<FeedbackFragment> } & {
+  shipments: ShipmentFragment[];
+};
 
 export function useProposalBookingsScheduledEvents({
   onlyUpcoming,
@@ -108,6 +106,7 @@ export function useProposalBookingsScheduledEvents({
                   visit: scheduledEvent.visit,
                   esi: scheduledEvent.esi,
                   feedback: scheduledEvent.feedback,
+                  shipments: scheduledEvent.shipments,
                 });
               }
             )
