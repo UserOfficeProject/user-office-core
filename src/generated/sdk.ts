@@ -432,6 +432,17 @@ export type FeedbackBasisConfig = {
   tooltip: Scalars['String'];
 };
 
+export type FeedbackRequest = {
+  id: Scalars['Int'];
+  scheduledEventId: Scalars['Int'];
+  requestedAt: Scalars['DateTime'];
+};
+
+export type FeedbackRequestWrap = {
+  rejection: Maybe<Rejection>;
+  request: Maybe<FeedbackRequest>;
+};
+
 export type FeedbackResponseWrap = {
   rejection: Maybe<Rejection>;
   feedback: Maybe<Feedback>;
@@ -714,6 +725,7 @@ export type Mutation = {
   notifyProposal: ProposalResponseWrap;
   prepareDB: PrepareDbResponseWrap;
   removeUserForReview: ReviewResponseWrap;
+  requestFeedback: FeedbackRequestWrap;
   resetPasswordEmail: SuccessResponseWrap;
   resetPassword: BasicUserDetailsResponseWrap;
   setPageContent: PageResponseWrap;
@@ -1493,6 +1505,11 @@ export type MutationRemoveUserForReviewArgs = {
 };
 
 
+export type MutationRequestFeedbackArgs = {
+  scheduledEventId: Scalars['Int'];
+};
+
+
 export type MutationResetPasswordEmailArgs = {
   email: Scalars['String'];
 };
@@ -1878,6 +1895,7 @@ export type Query = {
   proposals: Maybe<ProposalsQueryResult>;
   sampleEsi: Maybe<SampleExperimentSafetyInput>;
   samples: Maybe<Array<Sample>>;
+  scheduledEventsCore: Maybe<Array<ScheduledEventCore>>;
   shipments: Maybe<Array<Shipment>>;
   questions: Array<QuestionWithUsage>;
   templates: Maybe<Array<Template>>;
@@ -1991,6 +2009,12 @@ export type QuerySampleEsiArgs = {
 
 export type QuerySamplesArgs = {
   filter?: Maybe<SamplesFilter>;
+};
+
+
+export type QueryScheduledEventsCoreArgs = {
+  endsBefore?: Maybe<Scalars['TzLessDateTime']>;
+  endsAfter?: Maybe<Scalars['TzLessDateTime']>;
 };
 
 
@@ -2599,6 +2623,7 @@ export type ScheduledEventCore = {
   localContactId: Maybe<Scalars['Int']>;
   visit: Maybe<Visit>;
   feedback: Maybe<Feedback>;
+  feedbackRequests: Array<FeedbackRequest>;
   esi: Maybe<ExperimentSafetyInput>;
   localContact: Maybe<BasicUserDetails>;
   shipments: Array<Shipment>;
@@ -2650,7 +2675,10 @@ export enum SettingsId {
   PALETTE_SUCCESS_MAIN = 'PALETTE_SUCCESS_MAIN',
   PALETTE_WARNING_MAIN = 'PALETTE_WARNING_MAIN',
   PALETTE_INFO_MAIN = 'PALETTE_INFO_MAIN',
-  HEADER_LOGO_FILENAME = 'HEADER_LOGO_FILENAME'
+  HEADER_LOGO_FILENAME = 'HEADER_LOGO_FILENAME',
+  FEEDBACK_MAX_REQUESTS = 'FEEDBACK_MAX_REQUESTS',
+  FEEDBACK_FREQUENCY_DAYS = 'FEEDBACK_FREQUENCY_DAYS',
+  FEEDBACK_EXHAUST_DAYS = 'FEEDBACK_EXHAUST_DAYS'
 }
 
 export type Shipment = {
