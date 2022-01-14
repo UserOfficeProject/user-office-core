@@ -19,6 +19,7 @@ export function useActiveTemplates(
     group: groupId,
   });
 
+  // TODO: Why we are calling getTemplates twice here? This should probably be refactored a bit and use only one call.
   const { templates, setTemplates } = useTemplates(
     activeTemplates
       ? {

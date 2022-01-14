@@ -17,14 +17,12 @@ import {
   Theme,
   Typography,
   withStyles,
-  WithStyles,
 } from '@material-ui/core';
 import HelpIcon from '@material-ui/icons/Help';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import PropTypes from 'prop-types';
 import React, { useContext, useEffect } from 'react';
 
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
@@ -331,16 +329,4 @@ const CallGeneralInfo: React.FC<{
   );
 };
 
-CallGeneralInfo.propTypes = {
-  loadingProposalWorkflows: PropTypes.bool.isRequired,
-  proposalWorkflows: PropTypes.array.isRequired,
-  loadingTemplates: PropTypes.bool.isRequired,
-  templates: PropTypes.array.isRequired,
-};
-
 export default CallGeneralInfo;
-export interface DialogTitleProps extends WithStyles {
-  id: string;
-  children: React.ReactNode;
-  onClose: () => void;
-}
