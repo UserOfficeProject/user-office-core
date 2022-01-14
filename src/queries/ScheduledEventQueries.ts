@@ -5,7 +5,7 @@ import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSourc
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { ScheduledEventsFilter } from './../resolvers/queries/ScheduledEventsQuery';
+import { ScheduledEventsCoreFilter } from '../resolvers/queries/ScheduledEventsCoreQuery';
 import { ScheduledEventCore } from './../resolvers/types/ScheduledEvent';
 
 @injectable()
@@ -16,11 +16,13 @@ export default class ScheduledEventQueries {
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
-  async getScheduledEvents(
+  async getScheduledEventsCore(
     user: UserWithRole | null,
-    filter: ScheduledEventsFilter
+    filter: ScheduledEventsCoreFilter
   ): Promise<ScheduledEventCore[]> {
-    const scheduledEvents = await this.dataSource.getScheduledEvents(filter);
+    const scheduledEvents = await this.dataSource.getScheduledEventsCore(
+      filter
+    );
 
     return scheduledEvents;
   }

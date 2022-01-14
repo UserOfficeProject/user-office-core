@@ -109,7 +109,7 @@ export class EAMAssetRegistrar implements AssetRegistrar {
     }
 
     const scheduledEvent =
-      await this.scheduledEventDataSource.getScheduledEvent(
+      await this.scheduledEventDataSource.getScheduledEventCore(
         shipment.scheduledEventId
       );
     if (!scheduledEvent) {
