@@ -17,7 +17,7 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
@@ -149,6 +149,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID as string);
   const unauthorizedApi = useUnauthorizedApi();
   const { enqueueSnackbar } = useSnackbar();
+  const history = useHistory();
 
   if (orcData && orcData.token) {
     handleLogin(orcData.token);
@@ -172,7 +173,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
   };
 
   if (token) {
-    return <Redirect to="/" />;
+    history.push('/');
   }
 
   if (loadingInstitutions || !fieldsContent || (authCodeOrcID && loading)) {
