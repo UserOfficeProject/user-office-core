@@ -41,8 +41,8 @@ test('A user is allowed to fetch all relevant accounts', () => {
   return expect(
     userQueries.getAll(dummyUserWithRole, '')
   ).resolves.toStrictEqual({
-    totalCount: 1,
-    users: [basicDummyUser],
+    totalCount: 2,
+    users: [basicDummyUser, basicDummyUserNotOnProposal],
   });
 });
 
