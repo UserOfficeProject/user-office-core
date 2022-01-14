@@ -14,10 +14,13 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
     creator_id: number,
     proposal_pk: number,
     questionary_id: number,
-    visit_id: number
+    scheduled_event_id: number
   ): Promise<Shipment> {
     return database('shipments')
-      .insert({ title, creator_id, proposal_pk, questionary_id, visit_id }, '*')
+      .insert(
+        { title, creator_id, proposal_pk, questionary_id, scheduled_event_id },
+        '*'
+      )
       .then((records: ShipmentRecord[]) => {
         if (records.length !== 1) {
           logger.logError('Could not create shipment', {
@@ -25,7 +28,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
             creator_id,
             proposal_pk,
             questionary_id,
-            visit_id,
+            scheduled_event_id,
           });
           throw new Error('Failed to insert shipment');
         }
@@ -75,8 +78,8 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
         if (filter?.externalRef) {
           query.where('external_ref', filter.externalRef);
         }
-        if (filter?.visitId) {
-          query.where('visit_id', filter.visitId);
+        if (filter?.scheduledEventId) {
+          query.where('scheduled_event_id', filter.scheduledEventId);
         }
       })
       .select('*')

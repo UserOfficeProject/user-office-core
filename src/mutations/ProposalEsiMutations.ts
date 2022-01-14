@@ -38,7 +38,9 @@ export default class ProposalEsiMutations {
     scheduledEventId: number
   ): Promise<ExperimentSafetyInput | Rejection> {
     const scheduledEvent =
-      await this.scheduledEventDataSource.getScheduledEvent(scheduledEventId);
+      await this.scheduledEventDataSource.getScheduledEventCore(
+        scheduledEventId
+      );
     if (!scheduledEvent?.proposalPk) {
       return rejection(
         'Can not create ESI, because scheduled event does not exist or has no proposal attached to it'

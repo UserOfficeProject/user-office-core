@@ -23,17 +23,17 @@ import {
   CountryRecord,
   createBasicUserObject,
   createFeatureObject,
-  createSettingsObject,
+  createInstitutionObject,
   createPageObject,
+  createSettingsObject,
   FeatureRecord,
-  SettingsRecord,
   InstitutionRecord,
   NationalityRecord,
   PageTextRecord,
+  SettingsRecord,
   TokensAndPermissionsRecord,
-  UserRecord,
   UnitRecord,
-  createInstitutionObject,
+  UserRecord,
 } from './records';
 
 const dbPatchesFolderPath = path.join(process.cwd(), 'db_patches');
@@ -390,6 +390,15 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .then((settings: SettingsRecord[]) =>
         settings.map((settings) => createSettingsObject(settings))
       );
+  }
+
+  async getSetting(id: SettingsId): Promise<Settings> {
+    return database
+      .select()
+      .from('settings')
+      .where('setting_id', id)
+      .first()
+      .then((setting: SettingsRecord) => createSettingsObject(setting));
   }
 
   async getTokenAndPermissionsById(

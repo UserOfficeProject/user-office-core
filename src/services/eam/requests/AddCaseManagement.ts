@@ -13,7 +13,8 @@ const getRequest = (
   containerId: string,
   experimentStartDate: Date,
   experimentEndDate: Date,
-  dateRequested: Date
+  dateRequested: Date,
+  localContactEmail: string
 ) => `<?xml version="1.0" encoding="utf-8"?>
 <Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Header>
@@ -68,47 +69,47 @@ const getRequest = (
         </CaseDetails>		
         <TrackingDetails>          
           <DATEREQUESTED qualifier="ACCOUNTING" xmlns="http://schemas.datastream.net/MP_fields">
-            <YEAR xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getFullYear()}</YEAR>
+            <YEAR xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getUTCFullYear()}</YEAR>
             <MONTH xmlns="http://www.openapplications.org/oagis_fields">${
-              dateRequested.getMonth() + 1 // month is zero-based
+              dateRequested.getUTCMonth() + 1 // month is zero-based
             }</MONTH>
-            <DAY xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getDay()}</DAY>
-            <HOUR xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getHours()}</HOUR>
-            <MINUTE xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getMinutes()}</MINUTE>
-            <SECOND xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getSeconds()}</SECOND>
-            <SUBSECOND xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getMilliseconds()}</SUBSECOND>
+            <DAY xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getUTCDate()}</DAY>
+            <HOUR xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getUTCHours()}</HOUR>
+            <MINUTE xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getUTCMinutes()}</MINUTE>
+            <SECOND xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getUTCSeconds()}</SECOND>
+            <SUBSECOND xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getUTCMilliseconds()}</SUBSECOND>
             <TIMEZONE xmlns="http://www.openapplications.org/oagis_fields">${dateRequested.getTimezoneOffset()}</TIMEZONE>
           </DATEREQUESTED>
           <PERSONRESPONSIBLE xmlns="http://schemas.datastream.net/MP_fields">
-            <EMPLOYEECODE>11314</EMPLOYEECODE>
-			<DESCRIPTION>Nagaman Singh</DESCRIPTION>             
+            <EMPLOYEECODE></EMPLOYEECODE>
+			      <DESCRIPTION></DESCRIPTION>             
             <ORGANIZATIONID entity="Location">
               <ORGANIZATIONCODE>*</ORGANIZATIONCODE>              
             </ORGANIZATIONID>
           </PERSONRESPONSIBLE>
-          <EMAIL xmlns="http://schemas.datastream.net/MP_fields">nagaman.singh@ess.eu</EMAIL>         
+          <EMAIL xmlns="http://schemas.datastream.net/MP_fields">${localContactEmail}</EMAIL>         
           <SCHEDULEDSTARTDATE qualifier="ACCOUNTING" xmlns="http://schemas.datastream.net/MP_fields">
-          <YEAR xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getFullYear()}</YEAR>
+          <YEAR xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getUTCFullYear()}</YEAR>
           <MONTH xmlns="http://www.openapplications.org/oagis_fields">${
-            experimentStartDate.getMonth() + 1 // month is zero-based
+            experimentStartDate.getUTCMonth() + 1 // month is zero-based
           }</MONTH>
-          <DAY xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getDay()}</DAY>
-          <HOUR xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getHours()}</HOUR>
-          <MINUTE xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getMinutes()}</MINUTE>
-          <SECOND xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getSeconds()}</SECOND>
-          <SUBSECOND xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getMilliseconds()}</SUBSECOND>
+          <DAY xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getUTCDate()}</DAY>
+          <HOUR xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getUTCHours()}</HOUR>
+          <MINUTE xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getUTCMinutes()}</MINUTE>
+          <SECOND xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getUTCSeconds()}</SECOND>
+          <SUBSECOND xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getUTCMilliseconds()}</SUBSECOND>
           <TIMEZONE xmlns="http://www.openapplications.org/oagis_fields">${experimentStartDate.getTimezoneOffset()}</TIMEZONE>
           </SCHEDULEDSTARTDATE>
           <SCHEDULEDENDDATE qualifier="ACCOUNTING" xmlns="http://schemas.datastream.net/MP_fields">
-          <YEAR xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getFullYear()}</YEAR>
+          <YEAR xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getUTCFullYear()}</YEAR>
           <MONTH xmlns="http://www.openapplications.org/oagis_fields">${
-            experimentEndDate.getMonth() + 1 // month is zero-based
+            experimentEndDate.getUTCMonth() + 1 // month is zero-based
           }</MONTH>
-          <DAY xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getDay()}</DAY>
-          <HOUR xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getHours()}</HOUR>
-          <MINUTE xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getMinutes()}</MINUTE>
-          <SECOND xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getSeconds()}</SECOND>
-          <SUBSECOND xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getMilliseconds()}</SUBSECOND>
+          <DAY xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getUTCDate()}</DAY>
+          <HOUR xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getUTCHours()}</HOUR>
+          <MINUTE xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getUTCMinutes()}</MINUTE>
+          <SECOND xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getUTCSeconds()}</SECOND>
+          <SUBSECOND xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getUTCMilliseconds()}</SUBSECOND>
           <TIMEZONE xmlns="http://www.openapplications.org/oagis_fields">${experimentEndDate.getTimezoneOffset()}</TIMEZONE>
           </SCHEDULEDENDDATE>                 
         </TrackingDetails>		

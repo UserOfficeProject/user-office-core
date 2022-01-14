@@ -7,6 +7,7 @@ import {
 } from '../../models/ConditionEvaluator';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Feedback } from '../../models/Feedback';
+import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
@@ -415,7 +416,7 @@ export interface SampleRecord {
 }
 
 export interface ShipmentRecord {
-  readonly visit_id: number;
+  readonly scheduled_event_id: number;
   readonly shipment_id: number;
   readonly title: string;
   readonly creator_id: number;
@@ -577,6 +578,12 @@ export interface FeedbackRecord {
   readonly creator_id: number;
   readonly created_at: Date;
   readonly submitted_at: Date;
+}
+
+export interface FeedbackRequestRecord {
+  readonly feedback_request_id: number;
+  readonly scheduled_event_id: number;
+  readonly requested_at: Date;
 }
 
 export const createTopicObject = (record: TopicRecord) => {
@@ -846,7 +853,7 @@ export const createShipmentObject = (shipment: ShipmentRecord) => {
     shipment.creator_id,
     shipment.proposal_pk,
     shipment.questionary_id,
-    shipment.visit_id,
+    shipment.scheduled_event_id,
     shipment.status as ShipmentStatus,
     shipment.external_ref,
     shipment.created_at
@@ -1010,4 +1017,13 @@ export const createFeedbackObject = (scheduledEvent: FeedbackRecord) =>
     scheduledEvent.creator_id,
     scheduledEvent.created_at,
     scheduledEvent.submitted_at
+  );
+
+export const createFeedbackRequestObject = (
+  feedbackRequest: FeedbackRequestRecord
+) =>
+  new FeedbackRequest(
+    feedbackRequest.feedback_request_id,
+    feedbackRequest.scheduled_event_id,
+    feedbackRequest.requested_at
   );

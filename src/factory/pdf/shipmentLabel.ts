@@ -12,14 +12,14 @@ import { InstrumentDataSource } from './../../datasources/InstrumentDataSource';
 import { TemplateDataSource } from './../../datasources/TemplateDataSource';
 import { AnswerBasic } from './../../models/Questionary';
 import {
-  HEIGHT_QID,
-  LENGTH_QID,
-  WEIGHT_QID,
-  WIDTH_QID,
-  STORAGE_TEMPERATURE_QID,
-  IS_FRAGILE_QID,
-  LOCAL_CONTACT_QID,
-  IS_DANGEROUS_QID,
+  HEIGHT_KEY,
+  LENGTH_KEY,
+  WEIGHT_KEY,
+  WIDTH_KEY,
+  STORAGE_TEMPERATURE_KEY,
+  IS_FRAGILE_KEY,
+  LOCAL_CONTACT_KEY,
+  IS_DANGEROUS_KEY,
 } from './../../models/Shipment';
 
 export type ShipmentPDFData = {
@@ -78,17 +78,17 @@ const getAnswer = async (questionaryId: number, naturalKey: string) => {
 };
 
 const getQuestionaryData = async (questionaryId: number) => {
-  const weight = await getAnswer(questionaryId, WEIGHT_QID);
-  const width = await getAnswer(questionaryId, WIDTH_QID);
-  const height = await getAnswer(questionaryId, HEIGHT_QID);
-  const length = await getAnswer(questionaryId, LENGTH_QID);
+  const weight = await getAnswer(questionaryId, WEIGHT_KEY);
+  const width = await getAnswer(questionaryId, WIDTH_KEY);
+  const height = await getAnswer(questionaryId, HEIGHT_KEY);
+  const length = await getAnswer(questionaryId, LENGTH_KEY);
   const storageTemperature = await getAnswer(
     questionaryId,
-    STORAGE_TEMPERATURE_QID
+    STORAGE_TEMPERATURE_KEY
   );
-  const isFragile = await getAnswer(questionaryId, IS_FRAGILE_QID);
-  const localContact = await getAnswer(questionaryId, LOCAL_CONTACT_QID);
-  const isDangerous = await getAnswer(questionaryId, IS_DANGEROUS_QID);
+  const isFragile = await getAnswer(questionaryId, IS_FRAGILE_KEY);
+  const localContact = await getAnswer(questionaryId, LOCAL_CONTACT_KEY);
+  const isDangerous = await getAnswer(questionaryId, IS_DANGEROUS_KEY);
 
   return {
     weight,
