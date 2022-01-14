@@ -1935,7 +1935,7 @@ export type Query = {
   sampleEsi: Maybe<SampleExperimentSafetyInput>;
   samples: Maybe<Array<Sample>>;
   samplesByCallId: Maybe<Array<Sample>>;
-  scheduledEvents: Maybe<Array<ScheduledEventCore>>;
+  scheduledEventsCore: Maybe<Array<ScheduledEventCore>>;
   sep: Maybe<Sep>;
   sepMembers: Maybe<Array<SepReviewer>>;
   sepProposal: Maybe<SepProposal>;
@@ -2196,7 +2196,7 @@ export type QuerySamplesByCallIdArgs = {
 };
 
 
-export type QueryScheduledEventsArgs = {
+export type QueryScheduledEventsCoreArgs = {
   endsAfter?: InputMaybe<Scalars['TzLessDateTime']>;
   endsBefore?: InputMaybe<Scalars['TzLessDateTime']>;
 };
