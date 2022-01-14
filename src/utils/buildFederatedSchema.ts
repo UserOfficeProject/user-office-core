@@ -40,7 +40,7 @@ export async function buildFederatedSchema(
   // NOTE: applyMiddleware must be before addResolversToSchema as a workaround for the issue: https://github.com/maticzav/graphql-middleware/issues/395
   if (env === 'production') {
     // prevent exposing too much information when running in production
-    federatedSchema = applyMiddleware(schema, rejectionSanitizer);
+    federatedSchema = applyMiddleware(federatedSchema, rejectionSanitizer);
   } else {
     federatedSchema = applyMiddleware(federatedSchema, rejectionLogger);
   }
