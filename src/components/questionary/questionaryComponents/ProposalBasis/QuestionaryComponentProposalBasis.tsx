@@ -62,8 +62,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
               setLocalTitle(event.target.value),
             onBlur: () => {
               dispatch({
-                type: 'PROPOSAL_MODIFIED',
-                proposal: { title: localTitle },
+                type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                itemWithQuestionary: { title: localTitle },
               });
             },
           }}
@@ -85,8 +85,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
               setLocalAbstract(event.target.value),
             onBlur: () => {
               dispatch({
-                type: 'PROPOSAL_MODIFIED',
-                proposal: { abstract: localAbstract },
+                type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                itemWithQuestionary: { abstract: localAbstract },
               });
             },
           }}
@@ -108,8 +108,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         userChanged={(user: BasicUserDetails) => {
           formikProps.setFieldValue(`${id}.proposer`, user.id);
           dispatch({
-            type: 'PROPOSAL_MODIFIED',
-            proposal: {
+            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+            itemWithQuestionary: {
               proposer: user,
               users: users.concat(proposer as BasicUserDetails),
             },
@@ -127,8 +127,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             users.map((user) => user.id)
           );
           dispatch({
-            type: 'PROPOSAL_MODIFIED',
-            proposal: { users: users },
+            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+            itemWithQuestionary: { users: users },
           });
         }}
         preserveSelf={true}
@@ -161,8 +161,11 @@ const proposalBasisPreSubmit =
 
       if (result.updateProposal.proposal) {
         dispatch({
-          type: 'PROPOSAL_LOADED',
-          proposal: { ...proposal, ...result.updateProposal.proposal },
+          type: 'ITEM_WITH_QUESTIONARY_LOADED',
+          itemWithQuestionary: {
+            ...proposal,
+            ...result.updateProposal.proposal,
+          },
         });
       }
     } else {
@@ -179,8 +182,8 @@ const proposalBasisPreSubmit =
           proposerId: proposer?.id,
         });
         dispatch({
-          type: 'PROPOSAL_CREATED',
-          proposal: {
+          type: 'ITEM_WITH_QUESTIONARY_CREATED',
+          itemWithQuestionary: {
             ...proposal,
             ...createResult.createProposal.proposal,
             ...updateResult.updateProposal.proposal,

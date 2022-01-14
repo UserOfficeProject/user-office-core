@@ -136,10 +136,20 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
           <NavigButton
             onClick={() => {
               confirm(
-                () => {
+                async () => {
+                  const result = await api().submitProposal({
+                    proposalPk: state.proposal.primaryKey,
+                  });
+                  if (!result.submitProposal.proposal) {
+                    return;
+                  }
                   dispatch({
-                    type: 'PROPOSAL_SUBMIT_CLICKED',
-                    proposalPk: proposal.primaryKey,
+                    type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                    itemWithQuestionary: result.submitProposal.proposal,
+                  });
+                  dispatch({
+                    type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                    itemWithQuestionary: result.submitProposal.proposal,
                   });
                 },
                 {

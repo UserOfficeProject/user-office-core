@@ -25,30 +25,6 @@ export interface ShipmentContextType extends QuestionaryContextType {
   state: ShipmentSubmissionState | null;
 }
 
-const shipmentReducer = (
-  state: ShipmentSubmissionState,
-  draftState: ShipmentSubmissionState,
-  action: Event
-) => {
-  switch (action.type) {
-    case 'SHIPMENT_CREATED':
-    case 'SHIPMENT_LOADED':
-      const shipment: ShipmentWithQuestionary = action.shipment;
-      draftState.isDirty = false;
-      draftState.itemWithQuestionary = shipment;
-      break;
-    case 'SHIPMENT_MODIFIED':
-      draftState.shipment = {
-        ...draftState.shipment,
-        ...action.shipment,
-      };
-      draftState.isDirty = true;
-      break;
-  }
-
-  return draftState;
-};
-
 export default function ShipmentContainer(props: {
   shipment: ShipmentWithQuestionary;
   onShipmentSubmitted?: (shipment: ShipmentCore) => void;
@@ -68,8 +44,8 @@ export default function ShipmentContainer(props: {
     if (shipmentState.shipment.id === 0) {
       // if shipment is not created yet
       dispatch({
-        type: 'SHIPMENT_LOADED',
-        shipment: initialState.shipment,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: initialState.shipment,
       });
     } else {
       await api()
@@ -77,8 +53,8 @@ export default function ShipmentContainer(props: {
         .then((data) => {
           if (data.shipment && data.shipment.questionary.steps) {
             dispatch({
-              type: 'SHIPMENT_LOADED',
-              shipment: data.shipment,
+              type: 'ITEM_WITH_QUESTIONARY_LOADED',
+              itemWithQuestionary: data.shipment,
             });
             dispatch({
               type: 'STEPS_LOADED',
@@ -110,7 +86,7 @@ export default function ShipmentContainer(props: {
           handleReset();
           break;
 
-        case 'SHIPMENT_SUBMITTED':
+        case 'ITEM_WITH_QUESTIONARY_SUBMITTED':
           props.onShipmentSubmitted?.(state.shipment);
           break;
       }
@@ -123,19 +99,17 @@ export default function ShipmentContainer(props: {
     def.wizardStepFactory.getWizardSteps(props.shipment.questionary.steps)
   );
   const { state, dispatch } =
-    QuestionarySubmissionModel<ShipmentSubmissionState>(
-      initialState,
-      [handleEvents],
-      shipmentReducer
-    );
+    QuestionarySubmissionModel<ShipmentSubmissionState>(initialState, [
+      handleEvents,
+    ]);
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =
       previousInitialShipment === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: 'SHIPMENT_LOADED',
-        shipment: props.shipment,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: props.shipment,
       });
       dispatch({
         type: 'STEPS_LOADED',

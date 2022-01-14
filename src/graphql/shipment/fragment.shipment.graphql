@@ -5,7 +5,7 @@ fragment shipment on Shipment {
   status
   externalRef
   questionaryId
-  visitId
+  scheduledEventId
   creatorId
   created
   proposal {

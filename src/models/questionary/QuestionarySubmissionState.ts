@@ -10,17 +10,10 @@ import {
 } from 'utils/useReducerWithMiddleWares';
 
 import { SampleFragment } from './../../generated/sdk';
-import { FeedbackWithQuestionary } from './feedback/FeedbackWithQuestionary';
-import { GenericTemplateWithQuestionary } from './genericTemplate/GenericTemplateWithQuestionary';
 import { ProposalSubmissionState } from './proposal/ProposalSubmissionState';
-import { ProposalWithQuestionary } from './proposal/ProposalWithQuestionary';
-import { ProposalEsiWithQuestionary } from './proposalEsi/ProposalEsiWithQuestionary';
 import { getFieldById } from './QuestionaryFunctions';
-import { SampleWithQuestionary } from './sample/SampleWithQuestionary';
 import { SampleEsiWithQuestionary } from './sampleEsi/SampleEsiWithQuestionary';
-import { ShipmentWithQuestionary } from './shipment/ShipmentWithQuestionary';
 import { StepType } from './StepType';
-import { RegistrationWithQuestionary as RegistrationWQ } from './visit/VisitRegistrationWithQuestionary';
 
 export type Event =
   | { type: 'FIELD_CHANGED'; id: string; newValue: any }
@@ -32,68 +25,32 @@ export type Event =
   | { type: 'GO_TO_STEP'; stepIndex: number }
   | { type: 'STEPS_LOADED'; steps: QuestionaryStep[]; stepIndex?: number }
   | { type: 'STEP_ANSWERED'; step: QuestionaryStep }
+  // item with questionary
+  | {
+      type: 'ITEM_WITH_QUESTIONARY_CREATED';
+      itemWithQuestionary: { questionary: Questionary };
+    }
+  | {
+      type: 'ITEM_WITH_QUESTIONARY_LOADED';
+      itemWithQuestionary: { questionary: Questionary };
+    }
+  | {
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED';
+      itemWithQuestionary: Record<string, unknown>;
+    }
+  | {
+      type: 'ITEM_WITH_QUESTIONARY_SUBMITTED';
+      itemWithQuestionary: Record<string, unknown>;
+    }
   // sample
-  | { type: 'SAMPLE_CREATED'; sample: SampleWithQuestionary }
-  | { type: 'SAMPLE_LOADED'; sample: SampleWithQuestionary }
-  | { type: 'SAMPLE_UPDATED'; sample: Partial<SampleWithQuestionary> }
-  | { type: 'SAMPLE_MODIFIED'; sample: Partial<SampleWithQuestionary> }
-  | { type: 'SAMPLE_SUBMITTED'; sample: Partial<SampleWithQuestionary> }
-  // proposal
-  | { type: 'PROPOSAL_CREATED'; proposal: ProposalWithQuestionary }
-  | { type: 'PROPOSAL_LOADED'; proposal: ProposalWithQuestionary }
-  | { type: 'PROPOSAL_MODIFIED'; proposal: Partial<ProposalWithQuestionary> }
-  | { type: 'PROPOSAL_SUBMIT_CLICKED'; proposalPk: number }
-  // shipment
-  | { type: 'SHIPMENT_CREATED'; shipment: ShipmentWithQuestionary }
-  | { type: 'SHIPMENT_LOADED'; shipment: ShipmentWithQuestionary }
-  | { type: 'SHIPMENT_MODIFIED'; shipment: Partial<ShipmentWithQuestionary> }
-  | { type: 'SHIPMENT_SUBMITTED'; shipment: Partial<ShipmentWithQuestionary> }
-  // registration
-  | { type: 'REGISTRATION_CREATED'; visit: RegistrationWQ }
-  | { type: 'REGISTRATION_LOADED'; visit: RegistrationWQ }
-  | { type: 'REGISTRATION_MODIFIED'; visit: Partial<RegistrationWQ> }
-  | { type: 'REGISTRATION_SUBMITTED'; visit: Partial<RegistrationWQ> }
-  // generic template
-  | {
-      type: 'GENERIC_TEMPLATE_CREATED';
-      genericTemplate: GenericTemplateWithQuestionary;
-    }
-  | {
-      type: 'GENERIC_TEMPLATE_LOADED';
-      genericTemplate: GenericTemplateWithQuestionary;
-    }
-  | {
-      type: 'GENERIC_TEMPLATE_UPDATED';
-      genericTemplate: Partial<GenericTemplateWithQuestionary>;
-    }
-  | {
-      type: 'GENERIC_TEMPLATE_MODIFIED';
-      genericTemplate: Partial<GenericTemplateWithQuestionary>;
-    }
-  | {
-      type: 'GENERIC_TEMPLATE_SUBMITTED';
-      genericTemplate: Partial<GenericTemplateWithQuestionary>;
-    }
-  // esi
-  | { type: 'ESI_CREATED'; esi: ProposalEsiWithQuestionary }
-  | { type: 'ESI_LOADED'; esi: ProposalEsiWithQuestionary }
-  | { type: 'ESI_MODIFIED'; esi: Partial<ProposalEsiWithQuestionary> }
-  | { type: 'ESI_SUBMITTED'; esi: Partial<ProposalEsiWithQuestionary> }
   | { type: 'ESI_SAMPLE_CREATED'; sample: SampleFragment }
   | { type: 'ESI_SAMPLE_DELETED'; sampleId: number }
-  | { type: 'ESI_SAMPLE_ESI_CREATED'; sampleEsi: SampleEsiWithQuestionary }
+  | {
+      type: 'ESI_ITEM_WITH_QUESTIONARY_CREATED';
+      sampleEsi: SampleEsiWithQuestionary;
+    }
   | { type: 'ESI_SAMPLE_ESI_UPDATED'; sampleEsi: SampleEsiWithQuestionary }
-  | { type: 'ESI_SAMPLE_ESI_DELETED'; sampleId: number }
-  // sample esi
-  | { type: 'SAMPLE_ESI_CREATED'; esi: SampleEsiWithQuestionary }
-  | { type: 'SAMPLE_ESI_LOADED'; esi: SampleEsiWithQuestionary }
-  | { type: 'SAMPLE_ESI_MODIFIED'; esi: Partial<SampleEsiWithQuestionary> }
-  | { type: 'SAMPLE_ESI_SUBMITTED'; esi: Partial<SampleEsiWithQuestionary> }
-  // feedback
-  | { type: 'FEEDBACK_CREATED'; feedback: FeedbackWithQuestionary }
-  | { type: 'FEEDBACK_LOADED'; feedback: FeedbackWithQuestionary }
-  | { type: 'FEEDBACK_MODIFIED'; feedback: Partial<FeedbackWithQuestionary> }
-  | { type: 'FEEDBACK_SUBMITTED'; feedback: Partial<FeedbackWithQuestionary> };
+  | { type: 'ESI_SAMPLE_ESI_DELETED'; sampleId: number };
 
 export interface WizardStepMetadata {
   title: string;
@@ -170,6 +127,18 @@ export function QuestionarySubmissionModel<
   function reducer(state: T, action: Event) {
     return produce(state, (draftState) => {
       switch (action.type) {
+        case 'ITEM_WITH_QUESTIONARY_CREATED':
+        case 'ITEM_WITH_QUESTIONARY_LOADED':
+          draftState.isDirty = false;
+          draftState.itemWithQuestionary = action.itemWithQuestionary;
+          break;
+        case 'ITEM_WITH_QUESTIONARY_MODIFIED':
+          draftState.itemWithQuestionary = {
+            ...draftState.itemWithQuestionary,
+            ...action.itemWithQuestionary,
+          };
+          draftState.isDirty = true;
+          break;
         case 'FIELD_CHANGED':
           const field = getFieldById(
             draftState.questionary.steps,

@@ -63,12 +63,12 @@ function SampleEsiReview() {
               return;
             }
             dispatch({
-              type: 'SAMPLE_ESI_MODIFIED',
-              esi: result.updateSampleEsi.esi,
+              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+              itemWithQuestionary: result.updateSampleEsi.esi,
             });
             dispatch({
-              type: 'SAMPLE_ESI_SUBMITTED',
-              esi: result.updateSampleEsi.esi,
+              type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+              itemWithQuestionary: result.updateSampleEsi.esi,
             });
           }}
           disabled={isSubmitted || !isAffirmChecked}
