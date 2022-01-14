@@ -14,6 +14,10 @@ const router = express.Router();
 
 router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
   try {
+    if (!req.user) {
+      throw new Error('Not authorized');
+    }
+
     const userWithRole = {
       ...req.user.user,
       currentRole: req.user.currentRole,
@@ -55,6 +59,10 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
 
 router.get(`/${PDFType.SAMPLE}/:sample_ids`, async (req, res, next) => {
   try {
+    if (!req.user) {
+      throw new Error('Not authorized');
+    }
+
     const userWithRole = {
       ...req.user.user,
       currentRole: req.user.currentRole,
@@ -97,6 +105,10 @@ router.get(`/${PDFType.SAMPLE}/:sample_ids`, async (req, res, next) => {
 router.get(
   `/${PDFType.SHIPMENT_LABEL}/:shipment_ids`,
   async (req, res, next) => {
+    if (!req.user) {
+      throw new Error('Not authorized');
+    }
+
     try {
       const userWithRole = {
         ...req.user.user,

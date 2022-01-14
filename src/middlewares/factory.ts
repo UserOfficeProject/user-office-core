@@ -35,8 +35,8 @@ router.use(
     const ctx = {
       originalUrl: req.originalUrl,
       user: {
-        id: req.user.user.id,
-        currentRole: req.user.currentRole,
+        id: req.user?.user.id,
+        currentRole: req.user?.currentRole,
       },
     };
 
