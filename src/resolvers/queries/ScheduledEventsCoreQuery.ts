@@ -5,7 +5,7 @@ import { TzLessDateTime } from '../CustomScalars';
 import { ScheduledEventCore } from '../types/ScheduledEvent';
 
 @ArgsType()
-export class ScheduledEventsFilter {
+export class ScheduledEventsCoreFilter {
   @Field(() => TzLessDateTime, { nullable: true })
   endsBefore?: Date;
 
@@ -14,13 +14,13 @@ export class ScheduledEventsFilter {
 }
 
 @Resolver()
-export class ScheduledEventsQuery {
+export class ScheduledEventsCoreQuery {
   @Query(() => [ScheduledEventCore], { nullable: true })
-  async scheduledEvents(
-    @Args() filter: ScheduledEventsFilter,
+  async scheduledEventsCore(
+    @Args() filter: ScheduledEventsCoreFilter,
     @Ctx() context: ResolverContext
   ): Promise<ScheduledEventCore[] | null> {
-    return context.queries.scheduledEvent.getScheduledEvents(
+    return context.queries.scheduledEvent.getScheduledEventsCore(
       context.user,
       filter
     );

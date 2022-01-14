@@ -7,8 +7,10 @@ import {
 import { ApolloServer } from 'apollo-server-express';
 import { Express } from 'express';
 import { GraphQLError } from 'graphql';
+import { container } from 'tsyringe';
 
 import 'reflect-metadata';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import baseContext from '../buildContext';
 import { ResolverContext } from '../context';
 import { UserWithRole } from '../models/User';
@@ -72,6 +74,7 @@ const apolloServer = async (app: Express) => {
       let user = null;
       const userId = req.user?.user?.id as number;
       const accessTokenId = req.user?.accessTokenId;
+      const userAuthorization = container.resolve(UserAuthorization);
 
       if (req.user) {
         if (accessTokenId) {
@@ -93,6 +96,12 @@ const apolloServer = async (app: Express) => {
               req.user.currentRole ||
               (req.user.roles ? req.user.roles[0] : null),
             externalToken: req.user.externalToken,
+            externalTokenValid:
+              req.user.externalToken !== undefined
+                ? await userAuthorization.isExternalTokenValid(
+                    req.user.externalToken
+                  )
+                : false,
           } as UserWithRole;
         }
       }
