@@ -32,6 +32,7 @@ import QuestionaryQueries from '../queries/QuestionaryQueries';
 import ReviewQueries from '../queries/ReviewQueries';
 import SampleEsiQueries from '../queries/SampleEsiQueries';
 import SampleQueries from '../queries/SampleQueries';
+import ScheduledEventQueries from '../queries/ScheduledEventQueries';
 import SEPQueries from '../queries/SEPQueries';
 import ShipmentQueries from '../queries/ShipmentQueries';
 import SystemQueries from '../queries/SystemQueries';
@@ -54,6 +55,7 @@ interface ResolverContextQueries {
   review: ReviewQueries;
   sample: SampleQueries;
   sampleEsi: SampleEsiQueries;
+  scheduledEvent: ScheduledEventQueries;
   sep: SEPQueries;
   shipment: ShipmentQueries;
   system: SystemQueries;

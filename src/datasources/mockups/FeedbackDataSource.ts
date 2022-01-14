@@ -1,4 +1,5 @@
 import { Feedback, FeedbackStatus } from '../../models/Feedback';
+import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { CreateFeedbackArgs } from '../../resolvers/mutations/CreateFeedbackMutation';
 import { UpdateFeedbackArgs } from '../../resolvers/mutations/UpdateFeedbackMutation';
 import { FeedbacksFilter } from '../../resolvers/queries/FeedbacksQuery';
@@ -7,18 +8,32 @@ import { dummyUserWithRole } from './UserDataSource';
 
 export class FeedbackDataSourceMock implements FeedbackDataSource {
   private feedbacks: Feedback[];
+  private feedbackRequests: FeedbackRequest[];
   init() {
     this.feedbacks = [
+      // Finished feedback
       new Feedback(
-        1,
-        1,
+        3,
+        3,
+        FeedbackStatus.SUBMITTED,
+        3,
+        dummyUserWithRole.id,
+        new Date(),
+        new Date()
+      ),
+      // Unfinished feedback
+      new Feedback(
+        4,
+        4,
         FeedbackStatus.DRAFT,
-        1,
+        4,
         dummyUserWithRole.id,
         new Date(),
         new Date()
       ),
     ];
+
+    this.feedbackRequests = [new FeedbackRequest(1, 1, new Date())];
   }
 
   async getFeedback(feedbackId: number): Promise<Feedback | null> {
@@ -51,6 +66,35 @@ export class FeedbackDataSourceMock implements FeedbackDataSource {
         (feedback) => feedback.scheduledEventId === eventId
       ) ?? null
     );
+  }
+
+  async getFeedbackRequests(
+    scheduledEventId: number
+  ): Promise<FeedbackRequest[]> {
+    return this.feedbackRequests.reduce(
+      (matchingFeedbackRequests, currentFeedbackRequest) => {
+        if (currentFeedbackRequest.scheduledEventId === scheduledEventId) {
+          matchingFeedbackRequests.push(currentFeedbackRequest);
+        }
+
+        return matchingFeedbackRequests;
+      },
+      new Array<FeedbackRequest>()
+    );
+  }
+
+  async createFeedbackRequest(
+    scheduledEventId: number
+  ): Promise<FeedbackRequest> {
+    const newFeedbackRequest = new FeedbackRequest(
+      this.feedbacks.length,
+      scheduledEventId,
+      new Date()
+    );
+
+    this.feedbackRequests.push(newFeedbackRequest);
+
+    return newFeedbackRequest;
   }
 
   async createFeedback({

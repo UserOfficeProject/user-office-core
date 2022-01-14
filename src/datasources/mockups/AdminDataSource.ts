@@ -21,6 +21,15 @@ export const dummyApiAccessToken = new Permissions(
 export const dummyApiAccessTokens = [dummyApiAccessToken];
 
 export class AdminDataSourceMock implements AdminDataSource {
+  private settings: Settings[];
+  init() {
+    this.settings = [
+      new Settings(SettingsId.EXTERNAL_AUTH_LOGIN_URL, '', ''),
+      new Settings(SettingsId.FEEDBACK_MAX_REQUESTS, '', '2'),
+      new Settings(SettingsId.FEEDBACK_EXHAUST_DAYS, '', '90'),
+      new Settings(SettingsId.FEEDBACK_FREQUENCY_DAYS, '', '14'),
+    ];
+  }
   async setFeatures(
     features: FeatureId[],
     value: boolean
@@ -98,13 +107,16 @@ export class AdminDataSourceMock implements AdminDataSource {
     ];
   }
   async getSettings(): Promise<Settings[]> {
-    return [
-      {
-        id: SettingsId.EXTERNAL_AUTH_LOGIN_URL,
-        settingsValue: '',
-        description: '',
-      },
-    ];
+    return this.settings;
+  }
+
+  async getSetting(id: SettingsId): Promise<Settings> {
+    const setting = this.settings.find((setting) => setting.id === id);
+    if (!setting) {
+      throw new Error(`Could not find setting with id: ${id}`);
+    }
+
+    return setting;
   }
 
   async getTokenAndPermissionsById(
