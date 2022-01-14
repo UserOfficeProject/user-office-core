@@ -1,10 +1,16 @@
-import { Feedback } from '../../models/Feedback';
+import { Feedback, FeedbackStatus } from '../../models/Feedback';
+import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { CreateFeedbackArgs } from '../../resolvers/mutations/CreateFeedbackMutation';
 import { UpdateFeedbackArgs } from '../../resolvers/mutations/UpdateFeedbackMutation';
 import { FeedbacksFilter } from '../../resolvers/queries/FeedbacksQuery';
 import { FeedbackDataSource } from '../FeedbackDataSource';
 import database from './database';
-import { createFeedbackObject, FeedbackRecord } from './records';
+import {
+  createFeedbackObject,
+  FeedbackRecord,
+  createFeedbackRequestObject,
+  FeedbackRequestRecord,
+} from './records';
 
 class PostgresFeedbackDataSource implements FeedbackDataSource {
   async getFeedbacks(filter?: FeedbacksFilter): Promise<Feedback[]> {
@@ -25,6 +31,7 @@ class PostgresFeedbackDataSource implements FeedbackDataSource {
         feedbacks.map((feedback) => createFeedbackObject(feedback))
       );
   }
+
   async getFeedback(feedbackId: number): Promise<Feedback | null> {
     return database('feedbacks')
       .select('*')
@@ -43,6 +50,17 @@ class PostgresFeedbackDataSource implements FeedbackDataSource {
       .then((feedback) => (feedback ? createFeedbackObject(feedback) : null));
   }
 
+  async getFeedbackRequests(
+    scheduledEventId: number
+  ): Promise<FeedbackRequest[]> {
+    return database('feedback_requests')
+      .select('*')
+      .where({ scheduled_event_id: scheduledEventId })
+      .then((requests) =>
+        requests.map((request) => createFeedbackRequestObject(request))
+      );
+  }
+
   async createFeedback({
     scheduledEventId,
     questionaryId,
@@ -59,9 +77,16 @@ class PostgresFeedbackDataSource implements FeedbackDataSource {
   }
 
   async updateFeedback(args: UpdateFeedbackArgs): Promise<Feedback> {
+    if (args.status === FeedbackStatus.SUBMITTED) {
+      args.submittedAt = new Date();
+    } else {
+      args.submittedAt = null;
+    }
+
     return database('feedbacks')
       .update({
         status: args.status,
+        submitted_at: args.submittedAt,
       })
       .where({ feedback_id: args.feedbackId })
       .returning('*')
@@ -80,6 +105,17 @@ class PostgresFeedbackDataSource implements FeedbackDataSource {
 
         return createFeedbackObject(result[0]);
       });
+  }
+
+  async createFeedbackRequest(
+    scheduledEventId: number
+  ): Promise<FeedbackRequest> {
+    return database('feedback_requests')
+      .insert({ scheduled_event_id: scheduledEventId })
+      .returning('*')
+      .then((result: FeedbackRequestRecord[]) =>
+        createFeedbackRequestObject(result[0])
+      );
   }
 }
 

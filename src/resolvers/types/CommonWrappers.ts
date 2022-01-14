@@ -8,6 +8,7 @@ import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
 import { Feedback } from './Feedback';
+import { FeedbackRequest } from './FeedbackRequest';
 import { GenericTemplate } from './GenericTemplate';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
@@ -358,4 +359,11 @@ export class TemplateImportWithValidationWrap extends ResponseWrapBase {
   @Response()
   @Field(() => TemplateImportWithValidation, { nullable: true })
   public validationResult: TemplateImportWithValidation;
+}
+
+@ObjectType()
+export class FeedbackRequestWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => FeedbackRequest, { nullable: true })
+  public request: FeedbackRequest;
 }

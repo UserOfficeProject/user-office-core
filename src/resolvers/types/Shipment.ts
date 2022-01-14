@@ -39,7 +39,7 @@ export class Shipment implements Partial<ShipmentOrigin> {
   public questionaryId: number;
 
   @Field(() => Int)
-  public visitId: number;
+  public scheduledEventId: number;
 
   @Field(() => Int)
   public creatorId: number;
