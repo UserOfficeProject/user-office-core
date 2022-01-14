@@ -2,7 +2,9 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import context from '../buildContext';
+import { Tokens } from '../config/Tokens';
 import {
+  AdminDataSourceMock,
   dummyApiAccessToken,
   dummyApiAccessTokens,
 } from '../datasources/mockups/AdminDataSource';
@@ -15,6 +17,10 @@ import AdminQueries from './AdminQueries';
 const adminQueries = container.resolve(AdminQueries);
 
 describe('Test Admin Queries', () => {
+  beforeEach(() => {
+    container.resolve<AdminDataSourceMock>(Tokens.AdminDataSource).init();
+  });
+
   test('A user can get page text', () => {
     return expect(adminQueries.getPageText(1)).resolves.toBe('HELLO WORLD');
   });
@@ -24,7 +30,7 @@ describe('Test Admin Queries', () => {
   });
 
   test('A user can get settings', () => {
-    return expect(adminQueries.getSettings()).resolves.toHaveLength(1);
+    return expect(adminQueries.getSettings()).resolves.toHaveLength(4);
   });
 
   test('A user can not get all api access tokens', () => {

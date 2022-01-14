@@ -1,3 +1,4 @@
+import { container } from 'tsyringe';
 import {
   Ctx,
   Field,
@@ -8,11 +9,14 @@ import {
   Root,
 } from 'type-graphql';
 
+import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
 import { TzLessDateTime } from '../CustomScalars';
+import { FeedbackDataSource } from './../../datasources/FeedbackDataSource';
 import { BasicUserDetails } from './BasicUserDetails';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
 import { Feedback } from './Feedback';
+import { FeedbackRequest } from './FeedbackRequest';
 import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
@@ -63,6 +67,17 @@ export class ScheduledEventResolver {
       context.user,
       event.id
     );
+  }
+
+  @FieldResolver(() => [FeedbackRequest])
+  async feedbackRequests(
+    @Root() event: ScheduledEventCore
+  ): Promise<FeedbackRequest[] | null> {
+    const feedbackDataSource = container.resolve<FeedbackDataSource>(
+      Tokens.FeedbackDataSource
+    );
+
+    return feedbackDataSource.getFeedbackRequests(event.id);
   }
 
   @FieldResolver(() => ExperimentSafetyInput, { nullable: true })

@@ -20,7 +20,7 @@ export const defaultProposalDataColumns = [
   'Title',
   'Principal Investigator',
   'Technical Status',
-  'Tehnical Comment',
+  'Technical Comment',
   'Time(Days)',
   'Score difference',
   'Average Score',
