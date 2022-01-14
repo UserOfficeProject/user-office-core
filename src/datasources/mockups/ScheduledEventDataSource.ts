@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
-import { ScheduledEventsFilter } from '../../resolvers/queries/ScheduledEventsQuery';
+import { ScheduledEventsCoreFilter } from '../../resolvers/queries/ScheduledEventsCoreQuery';
 import { ScheduledEventDataSource } from '../ScheduledEventDataSource';
 import {
   ScheduledEventBookingType,
@@ -63,12 +63,12 @@ export default class ScheduledEventDataSourceMock
     ];
   }
 
-  async getScheduledEvent(id: number): Promise<ScheduledEventCore | null> {
+  async getScheduledEventCore(id: number): Promise<ScheduledEventCore | null> {
     return this.scheduledEvents.find((esi) => esi.id === id) || null;
   }
 
-  async getScheduledEvents(
-    filter: ScheduledEventsFilter
+  async getScheduledEventsCore(
+    filter: ScheduledEventsCoreFilter
   ): Promise<ScheduledEventCore[]> {
     return this.scheduledEvents
       .filter((esi) => {

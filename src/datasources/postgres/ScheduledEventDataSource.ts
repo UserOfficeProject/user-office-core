@@ -1,5 +1,5 @@
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
-import { ScheduledEventsFilter } from '../../resolvers/queries/ScheduledEventsQuery';
+import { ScheduledEventsCoreFilter } from '../../resolvers/queries/ScheduledEventsCoreQuery';
 import { ScheduledEventDataSource } from '../ScheduledEventDataSource';
 import database from './database';
 import { createScheduledEventObject, ScheduledEventRecord } from './records';
@@ -7,8 +7,8 @@ import { createScheduledEventObject, ScheduledEventRecord } from './records';
 export default class PostgresScheduledEventDataSource
   implements ScheduledEventDataSource
 {
-  async getScheduledEvents(
-    filter: ScheduledEventsFilter
+  async getScheduledEventsCore(
+    filter: ScheduledEventsCoreFilter
   ): Promise<ScheduledEventCore[]> {
     return database
       .select('*')
@@ -25,7 +25,7 @@ export default class PostgresScheduledEventDataSource
         rows.map((row) => createScheduledEventObject(row))
       );
   }
-  async getScheduledEvent(id: number): Promise<ScheduledEventCore | null> {
+  async getScheduledEventCore(id: number): Promise<ScheduledEventCore | null> {
     return database
       .select('*')
       .from('scheduled_events')

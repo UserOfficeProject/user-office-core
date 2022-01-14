@@ -69,7 +69,7 @@ export default class FeedbackMutations {
     }
 
     const scheduledEvent =
-      await this.scheduledEventDataSource.getScheduledEvent(
+      await this.scheduledEventDataSource.getScheduledEventCore(
         args.scheduledEventId
       );
     if (!scheduledEvent) {
@@ -274,7 +274,9 @@ export default class FeedbackMutations {
   ): Promise<FeedbackRequest | Rejection> {
     // Check if scheduled event exists
     const scheduledEvent =
-      await this.scheduledEventDataSource.getScheduledEvent(scheduledEventId);
+      await this.scheduledEventDataSource.getScheduledEventCore(
+        scheduledEventId
+      );
     if (!scheduledEvent) {
       return rejection(
         'Can not create feedback because scheduled event does not exist',
