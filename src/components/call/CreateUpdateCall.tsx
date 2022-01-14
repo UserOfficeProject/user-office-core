@@ -7,7 +7,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
-import UOLoader from 'components/common/UOLoader';
 import {
   Call,
   AllocationTimeUnits,
@@ -84,10 +83,6 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       close(callToReturn);
     }
   };
-
-  if (!proposalTemplates || !proposalEsiTemplates) {
-    return <UOLoader />;
-  }
 
   return (
     <>

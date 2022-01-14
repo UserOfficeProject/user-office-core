@@ -37,11 +37,10 @@ import {
   ProposalWorkflow,
   UpdateCallMutationVariables,
 } from 'generated/sdk';
-import { ExcludeNull } from 'utils/utilTypes';
 
 const CallGeneralInfo: React.FC<{
-  templates: ExcludeNull<GetTemplatesQuery['templates']>;
-  esiTemplates: ExcludeNull<GetTemplatesQuery['templates']>;
+  templates: GetTemplatesQuery['templates'];
+  esiTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
   proposalWorkflows: ProposalWorkflow[];
   loadingProposalWorkflows: boolean;
@@ -262,10 +261,12 @@ const CallGeneralInfo: React.FC<{
         label="Call template"
         loading={loadingTemplates}
         noOptionsText="No templates"
-        items={templates.map((template) => ({
-          text: template.name,
-          value: template.templateId,
-        }))}
+        items={
+          templates?.map((template) => ({
+            text: template.name,
+            value: template.templateId,
+          })) || []
+        }
         InputProps={{ 'data-cy': 'call-template' }}
         required
       />
@@ -275,10 +276,12 @@ const CallGeneralInfo: React.FC<{
           label="ESI template"
           loading={loadingTemplates}
           noOptionsText="No templates"
-          items={esiTemplates.map((template) => ({
-            text: template.name,
-            value: template.templateId,
-          }))}
+          items={
+            esiTemplates?.map((template) => ({
+              text: template.name,
+              value: template.templateId,
+            })) || []
+          }
           InputProps={{ 'data-cy': 'call-esi-template' }}
           required
         />
