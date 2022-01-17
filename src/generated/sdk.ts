@@ -432,6 +432,17 @@ export type FeedbackBasisConfig = {
   tooltip: Scalars['String'];
 };
 
+export type FeedbackRequest = {
+  id: Scalars['Int'];
+  scheduledEventId: Scalars['Int'];
+  requestedAt: Scalars['DateTime'];
+};
+
+export type FeedbackRequestWrap = {
+  rejection: Maybe<Rejection>;
+  request: Maybe<FeedbackRequest>;
+};
+
 export type FeedbackResponseWrap = {
   rejection: Maybe<Rejection>;
   feedback: Maybe<Feedback>;
@@ -714,6 +725,7 @@ export type Mutation = {
   notifyProposal: ProposalResponseWrap;
   prepareDB: PrepareDbResponseWrap;
   removeUserForReview: ReviewResponseWrap;
+  requestFeedback: FeedbackRequestWrap;
   resetPasswordEmail: SuccessResponseWrap;
   resetPassword: BasicUserDetailsResponseWrap;
   setPageContent: PageResponseWrap;
@@ -1133,7 +1145,7 @@ export type MutationUpdateSepTimeAllocationArgs = {
 export type MutationCreateShipmentArgs = {
   title: Scalars['String'];
   proposalPk: Scalars['Int'];
-  visitId: Scalars['Int'];
+  scheduledEventId: Scalars['Int'];
 };
 
 
@@ -1490,6 +1502,11 @@ export type MutationPrepareDbArgs = {
 export type MutationRemoveUserForReviewArgs = {
   sepId: Scalars['Int'];
   reviewId: Scalars['Int'];
+};
+
+
+export type MutationRequestFeedbackArgs = {
+  scheduledEventId: Scalars['Int'];
 };
 
 
@@ -1878,6 +1895,7 @@ export type Query = {
   proposals: Maybe<ProposalsQueryResult>;
   sampleEsi: Maybe<SampleExperimentSafetyInput>;
   samples: Maybe<Array<Sample>>;
+  scheduledEventsCore: Maybe<Array<ScheduledEventCore>>;
   shipments: Maybe<Array<Shipment>>;
   questions: Array<QuestionWithUsage>;
   templates: Maybe<Array<Template>>;
@@ -1991,6 +2009,12 @@ export type QuerySampleEsiArgs = {
 
 export type QuerySamplesArgs = {
   filter?: Maybe<SamplesFilter>;
+};
+
+
+export type QueryScheduledEventsCoreArgs = {
+  endsBefore?: Maybe<Scalars['TzLessDateTime']>;
+  endsAfter?: Maybe<Scalars['TzLessDateTime']>;
 };
 
 
@@ -2599,8 +2623,10 @@ export type ScheduledEventCore = {
   localContactId: Maybe<Scalars['Int']>;
   visit: Maybe<Visit>;
   feedback: Maybe<Feedback>;
+  feedbackRequests: Array<FeedbackRequest>;
   esi: Maybe<ExperimentSafetyInput>;
   localContact: Maybe<BasicUserDetails>;
+  shipments: Array<Shipment>;
 };
 
 export type SelectionFromOptionsConfig = {
@@ -2649,7 +2675,10 @@ export enum SettingsId {
   PALETTE_SUCCESS_MAIN = 'PALETTE_SUCCESS_MAIN',
   PALETTE_WARNING_MAIN = 'PALETTE_WARNING_MAIN',
   PALETTE_INFO_MAIN = 'PALETTE_INFO_MAIN',
-  HEADER_LOGO_FILENAME = 'HEADER_LOGO_FILENAME'
+  HEADER_LOGO_FILENAME = 'HEADER_LOGO_FILENAME',
+  FEEDBACK_MAX_REQUESTS = 'FEEDBACK_MAX_REQUESTS',
+  FEEDBACK_FREQUENCY_DAYS = 'FEEDBACK_FREQUENCY_DAYS',
+  FEEDBACK_EXHAUST_DAYS = 'FEEDBACK_EXHAUST_DAYS'
 }
 
 export type Shipment = {
@@ -2659,7 +2688,7 @@ export type Shipment = {
   status: ShipmentStatus;
   externalRef: Maybe<Scalars['String']>;
   questionaryId: Scalars['Int'];
-  visitId: Scalars['Int'];
+  scheduledEventId: Scalars['Int'];
   creatorId: Scalars['Int'];
   created: Scalars['DateTime'];
   questionary: Questionary;
@@ -2691,7 +2720,7 @@ export type ShipmentsFilter = {
   status?: Maybe<ShipmentStatus>;
   externalRef?: Maybe<Scalars['String']>;
   shipmentIds?: Maybe<Array<Scalars['Int']>>;
-  visitId?: Maybe<Scalars['Int']>;
+  scheduledEventId?: Maybe<Scalars['Int']>;
 };
 
 export type StatusChangingEvent = {
@@ -3003,7 +3032,6 @@ export type Visit = {
   proposal: Proposal;
   registrations: Array<VisitRegistration>;
   teamLead: BasicUserDetails;
-  shipments: Array<Shipment>;
   samples: Array<Sample>;
 };
 
@@ -4024,12 +4052,12 @@ export type GetUserProposalBookingsWithEventsQuery = { me: Maybe<{ proposals: Ar
       & { proposer: Maybe<BasicUserDetailsFragment>, users: Array<BasicUserDetailsFragment>, proposalBookingCore: Maybe<{ scheduledEvents: Array<(
           Pick<ScheduledEventCore, 'id' | 'startsAt' | 'endsAt' | 'bookingType' | 'status'>
           & { visit: Maybe<(
-            { teamLead: BasicUserDetailsFragment, shipments: Array<ShipmentFragment>, registrations: Array<(
+            { teamLead: BasicUserDetailsFragment, registrations: Array<(
               { user: BasicUserDetailsFragment }
               & VisitRegistrationFragment
             )> }
             & VisitFragment
-          )>, esi: Maybe<EsiFragment>, feedback: Maybe<FeedbackFragment>, localContact: Maybe<BasicUserDetailsFragment> }
+          )>, esi: Maybe<EsiFragment>, feedback: Maybe<FeedbackFragment>, shipments: Array<ShipmentFragment>, localContact: Maybe<BasicUserDetailsFragment> }
         )> }>, visits: Maybe<Array<VisitFragment>>, instrument: Maybe<Pick<Instrument, 'id' | 'name'>> }
     )> }> };
 
@@ -4538,7 +4566,7 @@ export type AddSamplesToShipmentMutation = { addSamplesToShipment: { rejection: 
 export type CreateShipmentMutationVariables = Exact<{
   title: Scalars['String'];
   proposalPk: Scalars['Int'];
-  visitId: Scalars['Int'];
+  scheduledEventId: Scalars['Int'];
 }>;
 
 
@@ -4558,7 +4586,7 @@ export type DeleteShipmentMutationVariables = Exact<{
 export type DeleteShipmentMutation = { deleteShipment: { rejection: Maybe<RejectionFragment> } };
 
 export type ShipmentFragment = (
-  Pick<Shipment, 'id' | 'title' | 'proposalPk' | 'status' | 'externalRef' | 'questionaryId' | 'visitId' | 'creatorId' | 'created'>
+  Pick<Shipment, 'id' | 'title' | 'proposalPk' | 'status' | 'externalRef' | 'questionaryId' | 'scheduledEventId' | 'creatorId' | 'created'>
   & { proposal: Pick<Proposal, 'proposalId'> }
 );
 
@@ -5206,7 +5234,7 @@ export type CreateVisitMutation = { createVisit: { visit: Maybe<(
       )>, proposal: (
         { instrument: Maybe<Pick<Instrument, 'name'>> }
         & ProposalFragment
-      ), shipments: Array<ShipmentFragment> }
+      ) }
       & VisitFragment
     )>, rejection: Maybe<RejectionFragment> } };
 
@@ -5263,7 +5291,7 @@ export type UpdateVisitMutation = { updateVisit: { visit: Maybe<(
       )>, proposal: (
         { instrument: Maybe<Pick<Instrument, 'name'>> }
         & ProposalFragment
-      ), shipments: Array<ShipmentFragment> }
+      ) }
       & VisitFragment
     )>, rejection: Maybe<RejectionFragment> } };
 
@@ -5705,7 +5733,7 @@ export const ShipmentFragmentDoc = gql`
   status
   externalRef
   questionaryId
-  visitId
+  scheduledEventId
   creatorId
   created
   proposal {
@@ -7351,9 +7379,6 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
             teamLead {
               ...basicUserDetails
             }
-            shipments {
-              ...shipment
-            }
             registrations {
               ...visitRegistration
               user {
@@ -7366,6 +7391,9 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
           }
           feedback {
             ...feedback
+          }
+          shipments {
+            ...shipment
           }
           localContact {
             ...basicUserDetails
@@ -7384,10 +7412,10 @@ export const GetUserProposalBookingsWithEventsDocument = gql`
 }
     ${BasicUserDetailsFragmentDoc}
 ${VisitFragmentDoc}
-${ShipmentFragmentDoc}
 ${VisitRegistrationFragmentDoc}
 ${EsiFragmentDoc}
-${FeedbackFragmentDoc}`;
+${FeedbackFragmentDoc}
+${ShipmentFragmentDoc}`;
 export const AnswerTopicDocument = gql`
     mutation answerTopic($questionaryId: Int!, $topicId: Int!, $answers: [AnswerInput!]!, $isPartialSave: Boolean) {
   answerTopic(
@@ -8096,8 +8124,12 @@ export const AddSamplesToShipmentDocument = gql`
 ${ShipmentFragmentDoc}
 ${SampleFragmentDoc}`;
 export const CreateShipmentDocument = gql`
-    mutation createShipment($title: String!, $proposalPk: Int!, $visitId: Int!) {
-  createShipment(title: $title, proposalPk: $proposalPk, visitId: $visitId) {
+    mutation createShipment($title: String!, $proposalPk: Int!, $scheduledEventId: Int!) {
+  createShipment(
+    title: $title
+    proposalPk: $proposalPk
+    scheduledEventId: $scheduledEventId
+  ) {
     shipment {
       ...shipment
       questionary {
@@ -8961,9 +8993,6 @@ export const CreateVisitDocument = gql`
           name
         }
       }
-      shipments {
-        ...shipment
-      }
     }
     rejection {
       ...rejection
@@ -8974,7 +9003,6 @@ export const CreateVisitDocument = gql`
 ${BasicUserDetailsFragmentDoc}
 ${VisitRegistrationFragmentDoc}
 ${ProposalFragmentDoc}
-${ShipmentFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const DeleteVisitDocument = gql`
     mutation deleteVisit($visitId: Int!) {
@@ -9050,9 +9078,6 @@ export const UpdateVisitDocument = gql`
           name
         }
       }
-      shipments {
-        ...shipment
-      }
     }
     rejection {
       ...rejection
@@ -9063,7 +9088,6 @@ export const UpdateVisitDocument = gql`
 ${BasicUserDetailsFragmentDoc}
 ${VisitRegistrationFragmentDoc}
 ${ProposalFragmentDoc}
-${ShipmentFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const CreateVisitRegistrationQuestionaryDocument = gql`
     mutation createVisitRegistrationQuestionary($visitId: Int!) {

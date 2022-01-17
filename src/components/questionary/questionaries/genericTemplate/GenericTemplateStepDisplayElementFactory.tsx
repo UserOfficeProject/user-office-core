@@ -37,8 +37,8 @@ const GenericTemplateQuestionaryStepView = ({
         onStepComplete={() => {
           if (isLastStep(wizardStep)) {
             dispatch({
-              type: 'GENERIC_TEMPLATE_SUBMITTED',
-              genericTemplate: state.genericTemplate,
+              type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+              itemWithQuestionary: state.genericTemplate,
             });
           }
         }}

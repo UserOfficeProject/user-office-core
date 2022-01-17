@@ -41,8 +41,8 @@ const visitBasisPreSubmit =
 
     if (newRegistration?.questionary) {
       dispatch({
-        type: 'REGISTRATION_CREATED',
-        visit: newRegistration,
+        type: 'ITEM_WITH_QUESTIONARY_CREATED',
+        itemWithQuestionary: newRegistration,
       });
       returnValue = newRegistration.questionary.questionaryId;
     }

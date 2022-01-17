@@ -10,7 +10,6 @@ import {
 import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
 import { TemplateGroupId } from 'generated/sdk';
 import { usePrevious } from 'hooks/common/usePrevious';
-import { usePersistProposalModel } from 'hooks/proposal/usePersistProposalModel';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
 import {
@@ -27,37 +26,12 @@ export interface ProposalContextType extends QuestionaryContextType {
   state: ProposalSubmissionState | null;
 }
 
-const proposalReducer = (
-  state: ProposalSubmissionState,
-  draftState: ProposalSubmissionState,
-  action: Event
-) => {
-  switch (action.type) {
-    case 'PROPOSAL_CREATED':
-    case 'PROPOSAL_LOADED':
-      const proposal = action.proposal;
-      draftState.isDirty = false;
-      draftState.itemWithQuestionary = proposal;
-      break;
-    case 'PROPOSAL_MODIFIED':
-      draftState.itemWithQuestionary = {
-        ...draftState.itemWithQuestionary,
-        ...action.proposal,
-      };
-      draftState.isDirty = true;
-      break;
-  }
-
-  return draftState;
-};
-
 export default function ProposalContainer(props: {
   proposal: ProposalWithQuestionary;
   proposalCreated?: (proposal: ProposalWithQuestionary) => void;
   proposalUpdated?: (proposal: ProposalWithQuestionary) => void;
 }) {
   const { api } = useDataApiWithFeedback();
-  const { persistModel: persistProposalModel } = usePersistProposalModel();
   const previousInitialProposal = usePrevious(props.proposal);
 
   const def = getQuestionaryDefinition(TemplateGroupId.PROPOSAL);
@@ -70,8 +44,8 @@ export default function ProposalContainer(props: {
     if (proposalState.proposal.primaryKey === 0) {
       // if proposal is not created yet
       dispatch({
-        type: 'PROPOSAL_LOADED',
-        proposal: initialState.proposal,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: initialState.proposal,
       });
     } else {
       await api()
@@ -79,8 +53,8 @@ export default function ProposalContainer(props: {
         .then((data) => {
           if (data.proposal && data.proposal.questionary?.steps) {
             dispatch({
-              type: 'PROPOSAL_LOADED',
-              proposal: data.proposal,
+              type: 'ITEM_WITH_QUESTIONARY_LOADED',
+              itemWithQuestionary: data.proposal,
             });
             dispatch({
               type: 'STEPS_LOADED',
@@ -102,11 +76,14 @@ export default function ProposalContainer(props: {
       next(action); // first update state/model
       const state = getState() as ProposalSubmissionState;
       switch (action.type) {
-        case 'PROPOSAL_MODIFIED':
-          props.proposalUpdated?.({ ...state.proposal, ...action.proposal });
+        case 'ITEM_WITH_QUESTIONARY_MODIFIED':
+          props.proposalUpdated?.({
+            ...state.proposal,
+            ...action.itemWithQuestionary,
+          });
           break;
-        case 'PROPOSAL_CREATED':
-          props.proposalCreated?.(action.proposal);
+        case 'ITEM_WITH_QUESTIONARY_CREATED':
+          props.proposalCreated?.(state.proposal);
           break;
         case 'BACK_CLICKED':
           if (!state.isDirty || (await handleReset())) {
@@ -128,19 +105,17 @@ export default function ProposalContainer(props: {
   );
 
   const { state, dispatch } =
-    QuestionarySubmissionModel<ProposalSubmissionState>(
-      initialState,
-      [handleEvents, persistProposalModel],
-      proposalReducer
-    );
+    QuestionarySubmissionModel<ProposalSubmissionState>(initialState, [
+      handleEvents,
+    ]);
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =
       previousInitialProposal === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: 'PROPOSAL_LOADED',
-        proposal: props.proposal,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: props.proposal,
       });
       if (props.proposal.questionary) {
         dispatch({

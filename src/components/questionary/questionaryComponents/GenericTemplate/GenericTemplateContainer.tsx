@@ -24,29 +24,6 @@ export interface GenericTemplateContextType extends QuestionaryContextType {
   state: GenericTemplateSubmissionState | null;
 }
 
-const genericTemplatesReducer = (
-  state: GenericTemplateSubmissionState,
-  draftState: GenericTemplateSubmissionState,
-  action: Event
-) => {
-  switch (action.type) {
-    case 'GENERIC_TEMPLATE_CREATED':
-    case 'GENERIC_TEMPLATE_LOADED':
-      draftState.isDirty = false;
-      draftState.itemWithQuestionary = action.genericTemplate;
-      break;
-    case 'GENERIC_TEMPLATE_MODIFIED':
-      draftState.genericTemplate = {
-        ...draftState.genericTemplate,
-        ...action.genericTemplate,
-      };
-      draftState.isDirty = true;
-      break;
-  }
-
-  return draftState;
-};
-
 export function GenericTemplateContainer(props: {
   genericTemplate: GenericTemplateWithQuestionary;
   genericTemplateCreated?: (
@@ -72,8 +49,8 @@ export function GenericTemplateContainer(props: {
     if (genericTemplateState.genericTemplate.id === 0) {
       // if genericTemplate isn't created yet
       dispatch({
-        type: 'GENERIC_TEMPLATE_LOADED',
-        genericTemplate: initialState.genericTemplate,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: initialState.genericTemplate,
       });
     } else {
       await api()
@@ -83,8 +60,8 @@ export function GenericTemplateContainer(props: {
         .then((data) => {
           if (data.genericTemplate && data.genericTemplate.questionary.steps) {
             dispatch({
-              type: 'GENERIC_TEMPLATE_LOADED',
-              genericTemplate: data.genericTemplate,
+              type: 'ITEM_WITH_QUESTIONARY_LOADED',
+              itemWithQuestionary: data.genericTemplate,
             });
             dispatch({
               type: 'STEPS_LOADED',
@@ -106,16 +83,16 @@ export function GenericTemplateContainer(props: {
       next(action);
       const state = getState() as GenericTemplateSubmissionState;
       switch (action.type) {
-        case 'GENERIC_TEMPLATE_UPDATED':
+        case 'ITEM_WITH_QUESTIONARY_MODIFIED':
           props.genericTemplateUpdated?.({
             ...state.genericTemplate,
-            ...action.genericTemplate,
+            ...action.itemWithQuestionary,
           });
           break;
-        case 'GENERIC_TEMPLATE_CREATED':
-          props.genericTemplateCreated?.(action.genericTemplate);
+        case 'ITEM_WITH_QUESTIONARY_CREATED':
+          props.genericTemplateCreated?.(state.genericTemplate);
           break;
-        case 'GENERIC_TEMPLATE_SUBMITTED':
+        case 'ITEM_WITH_QUESTIONARY_SUBMITTED':
           props.genericTemplateEditDone?.();
           break;
         case 'BACK_CLICKED':
@@ -140,19 +117,17 @@ export function GenericTemplateContainer(props: {
   );
 
   const { state, dispatch } =
-    QuestionarySubmissionModel<GenericTemplateSubmissionState>(
-      initialState,
-      [handleEvents],
-      genericTemplatesReducer
-    );
+    QuestionarySubmissionModel<GenericTemplateSubmissionState>(initialState, [
+      handleEvents,
+    ]);
 
   useEffect(() => {
     const isComponentMountedForTheFirstTime =
       previousInitialGenericTemplate === undefined;
     if (isComponentMountedForTheFirstTime) {
       dispatch({
-        type: 'GENERIC_TEMPLATE_LOADED',
-        genericTemplate: props.genericTemplate,
+        type: 'ITEM_WITH_QUESTIONARY_LOADED',
+        itemWithQuestionary: props.genericTemplate,
       });
       dispatch({
         type: 'STEPS_LOADED',
