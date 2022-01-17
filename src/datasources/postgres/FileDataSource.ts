@@ -4,7 +4,6 @@ import fs from 'fs';
 import to from 'await-to-js';
 import { Client } from 'pg';
 import { LargeObjectManager } from 'pg-large-object';
-import { WriteStream, ReadStream } from 'pg-large-object';
 
 import { FileMetadata } from '../../models/Blob';
 import { FileDataSource } from '../IFileDataSource';
@@ -53,7 +52,7 @@ export default class PostgresFileDataSource implements FileDataSource {
     const oid = await this.storeBlob(path);
 
     fs.unlinkSync(path);
-    const resultSet = await database
+    const resultSet: FileRecord[] = await database
       .insert({
         file_name: fileName,
         mime_type: mimeType,
@@ -67,7 +66,6 @@ export default class PostgresFileDataSource implements FileDataSource {
       throw new Error('Expected to receive entry');
     }
 
-    // @ts-expect-error FIXME: Try to fix this typescript error.
     return createFileMetadata(resultSet[0]);
   }
 
@@ -84,23 +82,25 @@ export default class PostgresFileDataSource implements FileDataSource {
     }
 
     return new Promise<number>(async (resolve, reject) => {
-      let err: any, oid: number, stream: WriteStream;
-
-      [err] = await to(connection.query('BEGIN')); // start the transaction
-      if (err) {
-        return reject(`Could not begin transaction \n${err}`);
+      const [transactionError] = await to(connection.query('BEGIN')); // start the transaction
+      if (transactionError) {
+        return reject(`Could not begin transaction \n${transactionError}`);
       }
 
       const blobManager = new LargeObjectManager({ pg: connection });
-      // @ts-expect-error FIXME: Try to fix this typescript error.
-      [err, [oid, stream]] = await to(
+
+      const [writeableStreamError, response] = await to(
         blobManager.createAndWritableStreamAsync()
       );
-      if (err) {
-        connection.emit('error', err);
+      if (writeableStreamError || !response) {
+        connection.emit('error', writeableStreamError);
 
-        return reject(`Could not create writeable stream \n${err}`);
+        return reject(
+          `Could not create writeable stream \n${writeableStreamError} ${response}`
+        );
       }
+
+      const [oid, stream] = response;
 
       stream.on('finish', () => {
         connection.query('COMMIT', () => resolve(oid));
@@ -119,37 +119,39 @@ export default class PostgresFileDataSource implements FileDataSource {
 
   private async retrieveBlob(oid: number, output: string): Promise<void> {
     return new Promise(async (resolve, reject) => {
-      let err: any, stream: ReadStream, connection: Client | undefined, size;
-
       if (!output) reject('Output must be specified');
 
-      [err, connection] = await to(database.client.acquireConnection());
-      if (err) {
-        return reject(`Could not establish connection with database \n ${err}`);
+      const [connectionError, connection] = await to(
+        database.client.acquireConnection() as Promise<Client | undefined>
+      );
+      if (connectionError || !connection) {
+        return reject(
+          `Error ocurred while establishing connection with database \n ${connectionError} ${connection}`
+        );
       }
 
-      if (!connection) {
-        return reject('Could not obtain connection');
-      }
-
-      [err] = await to(connection.query('BEGIN')); // start the transaction
-      if (err) {
+      const [transactionError] = await to(connection.query('BEGIN')); // start the transaction
+      if (transactionError) {
         database.client.releaseConnection(connection);
 
-        return reject(`Could not begin transaction \n${err}`);
+        return reject(`Could not begin transaction \n${transactionError}`);
       }
 
       const blobManager = new LargeObjectManager({ pg: connection });
-      // @ts-expect-error FIXME: Try to fix this typescript error.
-      [err, [size, stream]] = await to(
+      const [streamErr, response] = await to(
         blobManager.openAndReadableStreamAsync(oid)
       );
-      if (err) {
-        connection.emit('error', err);
+
+      if (streamErr || !response) {
+        connection.emit('error', streamErr);
         database.client.releaseConnection(connection);
 
-        return reject(`Could not create readable stream \n${err}`);
+        return reject(
+          `Could not create readable stream \n${streamErr} ${response}`
+        );
       }
+
+      const [, stream] = response;
 
       stream.on('end', function () {
         connection?.query('COMMIT', () => resolve());
