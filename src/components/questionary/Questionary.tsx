@@ -5,26 +5,19 @@ import React, { useContext, useRef, useEffect } from 'react';
 import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
 
-import { StepDisplayElementFactory } from './DefaultStepDisplayElementFactory';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from './QuestionaryContext';
+import { getQuestionaryDefinition } from './QuestionaryRegistry';
 import { QuestionaryStepButton } from './QuestionaryStepButton';
 
 interface QuestionaryProps {
   title: string;
   info?: JSX.Element | string;
-  displayElementFactory: StepDisplayElementFactory;
-  handleReset: () => Promise<boolean>;
 }
 
-function Questionary({
-  title,
-  info,
-  handleReset,
-  displayElementFactory,
-}: QuestionaryProps) {
+function Questionary({ title, info }: QuestionaryProps) {
   const isMobile = useMediaQuery('(max-width: 500px)');
 
   const useStyles = makeStyles((theme) => ({
@@ -93,25 +86,10 @@ function Questionary({
             <Step key={index}>
               <QuestionaryStepButton
                 onClick={async () => {
-                  if (!state.isDirty) {
-                    await handleReset();
-                    dispatch({
-                      type: 'GO_TO_STEP',
-                      stepIndex: index,
-                    });
-                  } else {
-                    if (
-                      window.confirm(
-                        'Changes you recently made in this step will not be saved! Are you sure?'
-                      )
-                    ) {
-                      await handleReset();
-                      dispatch({
-                        type: 'GO_TO_STEP',
-                        stepIndex: index,
-                      });
-                    }
-                  }
+                  dispatch({
+                    type: 'GO_TO_STEP_CLICKED',
+                    stepIndex: index,
+                  });
                 }}
                 completed={stepMetadata.isCompleted}
                 readonly={stepMetadata.isReadonly && !isUserOfficer}
@@ -133,6 +111,10 @@ function Questionary({
     if (!currentStep) {
       return null;
     }
+
+    const { displayElementFactory } = getQuestionaryDefinition(
+      state.templateGroupId
+    );
 
     return displayElementFactory.getDisplayElement(
       currentStep,

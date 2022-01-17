@@ -49,9 +49,14 @@ function createShipmentStub(
 interface CreateShipmentProps {
   event: ProposalScheduledEvent;
   // for now only one shipment
-  onShipmentSubmitted: (shipment: ShipmentCore) => void;
+  onShipmentSubmitted?: (shipment: ShipmentCore) => void;
+  onShipmentCreated?: (shipment: ShipmentCore) => void;
 }
-function CreateShipment({ event, onShipmentSubmitted }: CreateShipmentProps) {
+function CreateShipment({
+  event,
+  onShipmentSubmitted,
+  onShipmentCreated,
+}: CreateShipmentProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [blankShipment, setBlankShipment] = useState<ShipmentWithQuestionary>();
@@ -98,6 +103,7 @@ function CreateShipment({ event, onShipmentSubmitted }: CreateShipmentProps) {
     <ShipmentContainer
       shipment={blankShipment}
       onShipmentSubmitted={onShipmentSubmitted}
+      onShipmentCreated={onShipmentCreated}
     />
   );
 }

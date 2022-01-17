@@ -188,19 +188,7 @@ export default function QuestionaryStepView(props: {
     return true;
   };
 
-  const backHandler = () => {
-    if (state.isDirty) {
-      if (
-        window.confirm(
-          'Changes you recently made in this step will not be saved! Are you sure?'
-        )
-      ) {
-        dispatch({ type: 'BACK_CLICKED' });
-      }
-    } else {
-      dispatch({ type: 'BACK_CLICKED' });
-    }
-  };
+  const backHandler = () => dispatch({ type: 'BACK_CLICKED' });
 
   const resetHandler = () => dispatch({ type: 'RESET_CLICKED' });
 
