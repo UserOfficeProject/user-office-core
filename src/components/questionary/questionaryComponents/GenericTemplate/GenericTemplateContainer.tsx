@@ -1,24 +1,20 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { default as React, useEffect } from 'react';
+import { default as React, useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
 import {
   QuestionaryContext,
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
-import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
 import { TemplateGroupId } from 'generated/sdk';
-import { usePrevious } from 'hooks/common/usePrevious';
+import createCustomEventHandlers from 'models/questionary/createCustomEventHandlers';
 import { GenericTemplateSubmissionState } from 'models/questionary/genericTemplate/GenericTemplateSubmissionState';
 import { GenericTemplateWithQuestionary } from 'models/questionary/genericTemplate/GenericTemplateWithQuestionary';
 import {
   Event,
   QuestionarySubmissionModel,
-  QuestionarySubmissionState,
 } from 'models/questionary/QuestionarySubmissionState';
-import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
-import { FunctionType } from 'utils/utilTypes';
+import useEventHandlers from 'models/questionary/useEventHandlers';
 
 export interface GenericTemplateContextType extends QuestionaryContextType {
   state: GenericTemplateSubmissionState | null;
@@ -35,53 +31,14 @@ export function GenericTemplateContainer(props: {
   genericTemplateEditDone?: () => void;
   title: string;
 }) {
-  const { api } = useDataApiWithFeedback();
+  const [initialState] = useState(
+    new GenericTemplateSubmissionState(props.genericTemplate)
+  );
 
-  const def = getQuestionaryDefinition(TemplateGroupId.GENERIC_TEMPLATE);
+  const eventHandlers = useEventHandlers(TemplateGroupId.GENERIC_TEMPLATE);
 
-  const previousInitialGenericTemplate = usePrevious(props.genericTemplate);
-
-  /**
-   * Returns true if reset was performed, false otherwise
-   */
-  const handleReset = async (): Promise<boolean> => {
-    const genericTemplateState = state as GenericTemplateSubmissionState;
-    if (genericTemplateState.genericTemplate.id === 0) {
-      // if genericTemplate isn't created yet
-      dispatch({
-        type: 'ITEM_WITH_QUESTIONARY_LOADED',
-        itemWithQuestionary: initialState.genericTemplate,
-      });
-    } else {
-      await api()
-        .getGenericTemplate({
-          genericTemplateId: genericTemplateState.genericTemplate.id,
-        }) // or load blankQuestionarySteps if genericTemplate is null
-        .then((data) => {
-          if (data.genericTemplate && data.genericTemplate.questionary.steps) {
-            dispatch({
-              type: 'ITEM_WITH_QUESTIONARY_LOADED',
-              itemWithQuestionary: data.genericTemplate,
-            });
-            dispatch({
-              type: 'STEPS_LOADED',
-              steps: data.genericTemplate.questionary.steps,
-              stepIndex: state.stepIndex,
-            });
-          }
-        });
-    }
-
-    return true;
-  };
-
-  const handleEvents = ({
-    getState,
-    dispatch,
-  }: MiddlewareInputParams<QuestionarySubmissionState, Event>) => {
-    return (next: FunctionType) => async (action: Event) => {
-      next(action);
-      const state = getState() as GenericTemplateSubmissionState;
+  const customEventHandlers = createCustomEventHandlers(
+    (state: GenericTemplateSubmissionState, action: Event) => {
       switch (action.type) {
         case 'ITEM_WITH_QUESTIONARY_MODIFIED':
           props.genericTemplateUpdated?.({
@@ -95,54 +52,18 @@ export function GenericTemplateContainer(props: {
         case 'ITEM_WITH_QUESTIONARY_SUBMITTED':
           props.genericTemplateEditDone?.();
           break;
-        case 'BACK_CLICKED':
-          if (!state.isDirty || (await handleReset())) {
-            dispatch({ type: 'GO_STEP_BACK' });
-          }
-          break;
-        case 'RESET_CLICKED':
-          handleReset();
-          break;
       }
-    };
-  };
-
-  const initialState = new GenericTemplateSubmissionState(
-    props.genericTemplate,
-    0,
-    false,
-    def.wizardStepFactory.getWizardSteps(
-      props.genericTemplate.questionary.steps
-    )
+    }
   );
 
-  const { state, dispatch } =
-    QuestionarySubmissionModel<GenericTemplateSubmissionState>(initialState, [
-      handleEvents,
-    ]);
-
-  useEffect(() => {
-    const isComponentMountedForTheFirstTime =
-      previousInitialGenericTemplate === undefined;
-    if (isComponentMountedForTheFirstTime) {
-      dispatch({
-        type: 'ITEM_WITH_QUESTIONARY_LOADED',
-        itemWithQuestionary: props.genericTemplate,
-      });
-      dispatch({
-        type: 'STEPS_LOADED',
-        steps: props.genericTemplate.questionary.steps,
-      });
-    }
-  }, [previousInitialGenericTemplate, props.genericTemplate, dispatch]);
+  const { state, dispatch } = QuestionarySubmissionModel(initialState, [
+    eventHandlers,
+    customEventHandlers,
+  ]);
 
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
-      <Questionary
-        title={state.genericTemplate.title || props.title}
-        handleReset={handleReset}
-        displayElementFactory={def.displayElementFactory}
-      />
+      <Questionary title={state.genericTemplate.title || props.title} />
     </QuestionaryContext.Provider>
   );
 }

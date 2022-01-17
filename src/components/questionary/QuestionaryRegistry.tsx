@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { TemplateGroupId } from 'generated/sdk';
+import { Sdk, TemplateGroupId } from 'generated/sdk';
+import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 
 import { StepDisplayElementFactory } from './DefaultStepDisplayElementFactory';
 import { esiQuestionaryDefinition } from './questionaries/esi/EsiQuestionaryDefinition';
@@ -27,6 +28,15 @@ export interface QuestionaryDefinition {
    * WizardStepFactory
    */
   readonly wizardStepFactory: WizardStepFactory;
+
+  /**
+   * Get ItemWithQuestionary
+   * @param itemId
+   */
+  getItemWithQuestionary(
+    api: Sdk,
+    itemId: number | [number, number]
+  ): Promise<ItemWithQuestionary | null>;
 }
 
 const registry = [

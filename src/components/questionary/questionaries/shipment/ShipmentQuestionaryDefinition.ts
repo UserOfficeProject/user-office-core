@@ -2,7 +2,8 @@ import { DefaultReviewWizardStep } from 'components/questionary/createDefaultRev
 import { DefaultStepDisplayElementFactory } from 'components/questionary/DefaultStepDisplayElementFactory';
 import { DefaultWizardStepFactory } from 'components/questionary/DefaultWizardStepFactory';
 import ShipmentReview from 'components/shipments/ShipmentReview';
-import { ShipmentStatus, TemplateGroupId } from 'generated/sdk';
+import { Sdk, ShipmentStatus, TemplateGroupId } from 'generated/sdk';
+import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 import { ShipmentSubmissionState } from 'models/questionary/shipment/ShipmentSubmissionState';
 
 import { QuestionaryDefinition } from '../../QuestionaryRegistry';
@@ -20,4 +21,11 @@ export const shipmentQuestionaryDefinition: QuestionaryDefinition = {
       );
     })
   ),
+
+  getItemWithQuestionary(
+    api: Sdk,
+    shipmentId: number
+  ): Promise<ItemWithQuestionary | null> {
+    return api.getShipment({ shipmentId }).then(({ shipment }) => shipment);
+  },
 };

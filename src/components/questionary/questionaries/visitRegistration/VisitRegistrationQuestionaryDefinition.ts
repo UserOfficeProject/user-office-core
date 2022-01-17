@@ -2,7 +2,8 @@ import { DefaultReviewWizardStep } from 'components/questionary/createDefaultRev
 import { DefaultStepDisplayElementFactory } from 'components/questionary/DefaultStepDisplayElementFactory';
 import { DefaultWizardStepFactory } from 'components/questionary/DefaultWizardStepFactory';
 import VisitRegistrationReview from 'components/visit/VisitRegistrationReview';
-import { TemplateGroupId } from 'generated/sdk';
+import { Sdk, TemplateGroupId } from 'generated/sdk';
+import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
 import { QuestionaryDefinition } from '../../QuestionaryRegistry';
@@ -23,4 +24,13 @@ export const visitRegistrationQuestionaryDefinition: QuestionaryDefinition = {
           .isRegistrationSubmitted
     )
   ),
+
+  getItemWithQuestionary(
+    api: Sdk,
+    visitId: number
+  ): Promise<ItemWithQuestionary | null> {
+    return api
+      .getVisitRegistration({ visitId })
+      .then(({ visitRegistration }) => visitRegistration);
+  },
 };

@@ -3,7 +3,7 @@ import React from 'react';
 
 const DotBadge = ({ children, ...rest }: BadgeProps) => {
   return (
-    <Badge variant="dot" overlap="circle" {...rest}>
+    <Badge variant="dot" overlap="circular" {...rest}>
       {children}
     </Badge>
   );

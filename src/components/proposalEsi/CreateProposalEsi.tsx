@@ -2,21 +2,14 @@ import React, { useEffect, useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { CreateEsiMutation } from 'generated/sdk';
-import { ProposalEsiWithQuestionary } from 'models/questionary/proposalEsi/ProposalEsiWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import ProposalEsiContainer from './ProposalEsiContainer';
 
 interface CreateProposalEsiProps {
-  onUpdate?: (esi: ProposalEsiWithQuestionary) => void;
-  onSubmitted?: (esi: ProposalEsiWithQuestionary) => void;
   scheduledEventId: number;
 }
-function CreateProposalEsi({
-  onUpdate,
-  onSubmitted,
-  scheduledEventId,
-}: CreateProposalEsiProps) {
+function CreateProposalEsi({ scheduledEventId }: CreateProposalEsiProps) {
   const { api } = useDataApiWithFeedback();
   const [esi, setEsi] = useState<CreateEsiMutation['createEsi']['esi']>(null);
 
@@ -34,13 +27,7 @@ function CreateProposalEsi({
     return <UOLoader />;
   }
 
-  return (
-    <ProposalEsiContainer
-      esi={esi}
-      onUpdate={onUpdate}
-      onSubmitted={onSubmitted}
-    />
-  );
+  return <ProposalEsiContainer esi={esi} />;
 }
 
 export default CreateProposalEsi;

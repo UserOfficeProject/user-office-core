@@ -2,7 +2,10 @@
 import produce, { Draft } from 'immer';
 import { Reducer } from 'react';
 
+import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
+import { TemplateGroupId } from 'generated/sdk';
 import { Answer, Questionary, QuestionaryStep } from 'generated/sdk';
+import { deepClone } from 'utils/json';
 import { clamp } from 'utils/Math';
 import {
   ReducerMiddleware,
@@ -10,7 +13,6 @@ import {
 } from 'utils/useReducerWithMiddleWares';
 
 import { SampleFragment } from './../../generated/sdk';
-import { ProposalSubmissionState } from './proposal/ProposalSubmissionState';
 import { getFieldById } from './QuestionaryFunctions';
 import { SampleEsiWithQuestionary } from './sampleEsi/SampleEsiWithQuestionary';
 import { StepType } from './StepType';
@@ -19,6 +21,7 @@ export type Event =
   | { type: 'FIELD_CHANGED'; id: string; newValue: any }
   | { type: 'BACK_CLICKED' }
   | { type: 'RESET_CLICKED' }
+  | { type: 'GO_TO_STEP_CLICKED'; stepIndex: number }
   | { type: 'GO_STEP_BACK' }
   | { type: 'GO_STEP_FORWARD' }
   | { type: 'CLEAN_DIRTY_STATE' }
@@ -67,13 +70,37 @@ export interface WizardStep {
   ) => WizardStepMetadata;
 }
 
+export interface ItemWithQuestionary {
+  questionary: Questionary;
+}
+const clamStepIndex = (stepIndex: number, stepCount: number) => {
+  const minStepIndex = 0;
+  const maxStepIndex = stepCount - 1;
+
+  return clamp(stepIndex, minStepIndex, maxStepIndex);
+};
 export abstract class QuestionarySubmissionState {
   constructor(
-    public stepIndex: number,
-    public isDirty: boolean,
-    public wizardSteps: WizardStep[]
-  ) {}
-  abstract itemWithQuestionary: { questionary: Questionary };
+    public templateGroupId: TemplateGroupId,
+    public initItem: ItemWithQuestionary,
+    public wizardSteps: WizardStep[] = getQuestionaryDefinition(
+      templateGroupId
+    ).wizardStepFactory.getWizardSteps(initItem.questionary.steps),
+    public stepIndex: number = 0,
+    public isDirty: boolean = false
+  ) {
+    this.initItem = deepClone(initItem); // save initial data to restore it if reset is clicked
+  }
+
+  /**
+   * Returns item that has questionary associated with it
+   */
+  abstract itemWithQuestionary: ItemWithQuestionary;
+
+  /**
+   * Unique id of the item
+   */
+  abstract getItemId(): number | [number, number];
 
   get questionary() {
     return this.itemWithQuestionary.questionary;
@@ -82,39 +109,27 @@ export abstract class QuestionarySubmissionState {
   set questionary(questionary) {
     this.itemWithQuestionary.questionary = questionary;
   }
-}
 
-const clamStepIndex = (stepIndex: number, stepCount: number) => {
-  const minStepIndex = 0;
-  const maxStepIndex = stepCount - 1;
+  /** returns the index the form should start on, for new questionary it's 0,
+   * but for unfinished it's the first unfinished step */
+  getInitialStepIndex(): number {
+    const wizardSteps = this.wizardSteps;
+    const lastFinishedStep = this.wizardSteps
+      .slice()
+      .reverse()
+      .find(
+        (step) => step.getMetadata(this, step.payload).isCompleted === true
+      );
 
-  return clamp(stepIndex, minStepIndex, maxStepIndex);
-};
+    if (!lastFinishedStep) {
+      return 0;
+    }
 
-/** returns the index the form should start on, for new questionary it's 0,
- * but for unfinished it's the first unfinished step */
-// TODO move getInitialStepIndex to the Questionary definition
-function getInitialStepIndex(state: QuestionarySubmissionState): number {
-  const wizardSteps = state.wizardSteps;
-  const lastFinishedStep = state.wizardSteps
-    .slice()
-    .reverse()
-    .find((step) => step.getMetadata(state, step.payload).isCompleted === true);
+    const lastFinishedStepIndex = wizardSteps.indexOf(lastFinishedStep);
+    const nextUnfinishedStep = lastFinishedStepIndex + 1;
 
-  if (
-    (state as ProposalSubmissionState).proposal?.status?.shortCode.toString() ==
-    'EDITABLE_SUBMITTED'
-  ) {
-    return 0;
+    return clamStepIndex(nextUnfinishedStep, wizardSteps.length);
   }
-  if (!lastFinishedStep) {
-    return 0;
-  }
-
-  const lastFinishedStepIndex = wizardSteps.indexOf(lastFinishedStep);
-  const nextUnfinishedStep = lastFinishedStepIndex + 1;
-
-  return clamStepIndex(nextUnfinishedStep, wizardSteps.length);
 }
 
 export function QuestionarySubmissionModel<
@@ -180,7 +195,7 @@ export function QuestionarySubmissionModel<
           const stepIndex =
             action.stepIndex !== undefined
               ? action.stepIndex
-              : getInitialStepIndex(draftState);
+              : draftState.getInitialStepIndex();
           draftState.stepIndex = stepIndex;
           draftState.isDirty = false;
           break;
