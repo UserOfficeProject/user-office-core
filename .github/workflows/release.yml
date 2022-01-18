@@ -28,7 +28,7 @@ jobs:
           TAG_NAME=${{ github.event.release.tag_name }}
 
           # set output variable accessible in the action
-          echo ::set-output name=TAG::${TAG_NAME}
+          echo ::set-output name=TAG_NAME::${TAG_NAME}
 
         # Build and push release image tagged with the same tag as github release
       - name: Build and push
