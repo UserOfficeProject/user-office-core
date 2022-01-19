@@ -1,22 +1,19 @@
 import { immerable } from 'immer';
 
-import { Questionary } from 'generated/sdk';
+import { Questionary, TemplateGroupId } from 'generated/sdk';
 
-import {
-  QuestionarySubmissionState,
-  WizardStep,
-} from '../QuestionarySubmissionState';
+import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 import { RegistrationWithQuestionary } from './VisitRegistrationWithQuestionary';
 
 export class VisitRegistrationSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
-  constructor(
-    public registration: RegistrationWithQuestionary,
-    stepIndex: number,
-    isDirty: boolean,
-    wizardSteps: WizardStep[]
-  ) {
-    super(stepIndex, isDirty, wizardSteps);
+  constructor(public registration: RegistrationWithQuestionary) {
+    super(TemplateGroupId.VISIT_REGISTRATION, registration);
+    this.stepIndex = this.getInitialStepIndex();
+  }
+
+  getItemId(): number {
+    return this.registration.visitId;
   }
 
   get itemWithQuestionary() {

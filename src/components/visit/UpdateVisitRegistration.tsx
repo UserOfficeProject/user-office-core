@@ -8,13 +8,11 @@ import VisitRegistrationContainer from './VisitRegistrationContainer';
 
 interface UpdateVisitRegistrationProps {
   visitRegistration: VisitRegistrationCore;
-  onUpdate?: (registration: VisitRegistrationCore) => void;
   onSubmitted?: (registration: VisitRegistrationCore) => void;
 }
 
 function UpdateVisitRegistration({
   visitRegistration,
-  onUpdate,
   onSubmitted,
 }: UpdateVisitRegistrationProps) {
   const { registration } = useVisitRegistration(visitRegistration.visitId);
@@ -26,7 +24,6 @@ function UpdateVisitRegistration({
   return (
     <VisitRegistrationContainer
       registration={registration}
-      onUpdate={onUpdate}
       onSubmitted={onSubmitted}
     />
   );

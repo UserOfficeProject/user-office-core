@@ -7,7 +7,6 @@ import {
   QuestionaryStep,
   TemplateGroupId,
 } from 'generated/sdk';
-import { FeedbackCore } from 'models/questionary/feedback/FeedbackCore';
 import { FeedbackWithQuestionary } from 'models/questionary/feedback/FeedbackWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -36,17 +35,9 @@ function createFeedbackStub(
 }
 
 interface CreateFeedbackProps {
-  onCreate?: (feedback: FeedbackCore) => void;
-  onUpdate?: (feedback: FeedbackCore) => void;
-  onSubmitted?: (feedback: FeedbackCore) => void;
   scheduledEventId: number;
 }
-function CreateFeedback({
-  onCreate,
-  onUpdate,
-  onSubmitted,
-  scheduledEventId,
-}: CreateFeedbackProps) {
+function CreateFeedback({ scheduledEventId }: CreateFeedbackProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [blankFeedback, setBlankFeedback] = useState<FeedbackWithQuestionary>();
@@ -79,14 +70,7 @@ function CreateFeedback({
     return <UOLoader />;
   }
 
-  return (
-    <FeedbackContainer
-      feedback={blankFeedback}
-      onCreate={onCreate}
-      onUpdate={onUpdate}
-      onSubmitted={onSubmitted}
-    />
-  );
+  return <FeedbackContainer feedback={blankFeedback} />;
 }
 
 export default CreateFeedback;
