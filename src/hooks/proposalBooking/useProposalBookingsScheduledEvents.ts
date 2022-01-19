@@ -29,18 +29,17 @@ export type ProposalScheduledEvent = Pick<
     | 'finalStatus'
     | 'managementDecisionSubmitted'
   > & {
-    proposer: BasicUserDetailsFragment | null | undefined;
+    proposer: BasicUserDetailsFragment | null;
   } & {
     users: BasicUserDetailsFragment[];
   };
-  instrument: Pick<Instrument, 'id' | 'name'> | null | undefined;
+  instrument: Pick<Instrument, 'id' | 'name'> | null;
 } & {
   visit:
     | (VisitFragment & {
         registrations: VisitRegistrationCore[];
       } & Pick<Visit, 'teamLead'>)
-    | null
-    | undefined;
+    | null;
 } & { esi: Maybe<EsiFragment> } & { feedback: Maybe<FeedbackFragment> } & {
   shipments: ShipmentFragment[];
 };

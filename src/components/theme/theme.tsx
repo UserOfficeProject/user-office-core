@@ -69,7 +69,7 @@ const Theme: React.FC = (props) => {
   const updateCssPalette = useCallback(
     async function () {
       settings.forEach((setting) => {
-        if (setting.id.startsWith('PALETTE') && setting.settingsValue) {
+        if (setting.id.startsWith('PALETTE')) {
           document.documentElement.style.setProperty(
             '--' + setting.id,
             setting.settingsValue

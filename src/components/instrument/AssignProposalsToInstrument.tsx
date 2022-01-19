@@ -31,7 +31,7 @@ type AssignProposalsToInstrumentProps = {
     instrument: InstrumentFragment | null
   ) => Promise<void>;
   callIds: number[];
-  instrumentIds: (number | null | undefined)[];
+  instrumentIds: (number | null)[];
 };
 
 const AssignProposalsToInstrument: React.FC<

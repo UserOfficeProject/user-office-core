@@ -156,8 +156,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
   const registerVisitAction = (event: ProposalScheduledEvent) => {
     let buttonState: ActionButtonState;
 
-    // FIXME: Check if this could be just like if (event.visit) instead of if (event.visit !== null && event.visit !== undefined)
-    if (event.visit !== null && event.visit !== undefined) {
+    if (event.visit !== null) {
       const registration = event.visit.registrations.find(
         (registration) => registration.userId === user.id
       );
@@ -208,7 +207,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
   const individualTrainingAction = (event: ProposalScheduledEvent) => {
     let buttonState: ActionButtonState;
 
-    if (event.visit !== null && event.visit !== undefined) {
+    if (event.visit !== null) {
       const registration = event.visit.registrations.find(
         (reg) => reg.userId === user.id
       );

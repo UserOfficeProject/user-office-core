@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 type AssignProposalToSEPProps = {
   close: () => void;
   assignProposalsToSEP: (sep: Sep | null) => Promise<void>;
-  sepIds: (number | null | undefined)[];
+  sepIds: (number | null)[];
 };
 
 const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({

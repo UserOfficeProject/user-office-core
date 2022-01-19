@@ -7,7 +7,7 @@ export function useBlankQuestionaryStepsData(
   templateId: number | undefined | null
 ) {
   const [questionarySteps, setQuestionarySteps] = useState<
-    QuestionaryStep[] | null | undefined
+    QuestionaryStep[] | null
   >(null);
   const [loading, setLoading] = useState(true);
 

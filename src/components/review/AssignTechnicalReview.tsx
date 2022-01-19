@@ -44,7 +44,7 @@ function AssignTechnicalReview({
     return null;
   }
 
-  const userIdToUser = (userId: number | null | undefined) =>
+  const userIdToUser = (userId: number | null) =>
     usersData.users.find((user) => user.id === userId);
 
   return (

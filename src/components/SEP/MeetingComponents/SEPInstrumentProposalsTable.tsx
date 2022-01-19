@@ -131,8 +131,7 @@ const SEPInstrumentProposalsTable: React.FC<
         .sort(sortByRankOrder)
         .map((proposalData) => {
           const proposalAllocationTime =
-            proposalData.sepTimeAllocation !== null &&
-            proposalData.sepTimeAllocation !== undefined
+            proposalData.sepTimeAllocation !== null
               ? proposalData.sepTimeAllocation
               : proposalData.proposal.technicalReview?.timeAllocation || 0;
 

@@ -41,8 +41,8 @@ export function FileEntry(props: {
   onDeleteClicked: FunctionType<void, FileMetaData>;
   metaData: FileMetaData;
   onImageCaptionOrFigureAdded: FunctionType<void, FileIdWithCaptionAndFigure>;
-  caption: Maybe<string>;
-  figure: Maybe<string>;
+  caption?: Maybe<string>;
+  figure?: Maybe<string>;
 }) {
   const classes = makeStyles((theme) => ({
     fileListWrapper: {

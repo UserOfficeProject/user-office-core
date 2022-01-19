@@ -4,9 +4,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 import { ProposalEsiWithQuestionary } from 'models/questionary/proposalEsi/ProposalEsiWithQuestionary';
 
 export function useEsi(esiId: number) {
-  const [esi, setEsi] = useState<ProposalEsiWithQuestionary | null | undefined>(
-    null
-  );
+  const [esi, setEsi] = useState<ProposalEsiWithQuestionary | null>(null);
   const [loading, setLoading] = useState(true);
 
   const api = useDataApi();

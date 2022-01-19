@@ -123,7 +123,7 @@ function QuestionaryComponentProposalEsiBasis(
 
           const sample = result.createSample.sample;
 
-          if (sample !== null && sample !== undefined) {
+          if (sample !== null) {
             dispatch({ type: 'ESI_SAMPLE_CREATED', sample: sample });
             declareEsi(sample.id);
           }
@@ -202,7 +202,7 @@ function QuestionaryComponentProposalEsiBasis(
                 })
                 .then((response) => {
                   const newSample = response.cloneSample.sample;
-                  if (newSample !== null && newSample !== undefined) {
+                  if (newSample !== null) {
                     dispatch({ type: 'ESI_SAMPLE_CREATED', sample: newSample });
                   }
                 });
@@ -227,7 +227,7 @@ function QuestionaryComponentProposalEsiBasis(
                 })
                 .then((response) => {
                   const newSampleEsi = response.cloneSampleEsi.esi;
-                  if (newSampleEsi !== null && newSampleEsi !== undefined) {
+                  if (newSampleEsi !== null) {
                     dispatch({
                       type: 'ESI_SAMPLE_CREATED',
                       sample: newSampleEsi.sample,

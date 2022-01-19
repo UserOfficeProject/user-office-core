@@ -4,9 +4,7 @@ import { GetProposalQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useProposalData(primaryKey: number | null | undefined) {
-  const [proposalData, setProposalData] = useState<
-    ProposalData | null | undefined
-  >(null);
+  const [proposalData, setProposalData] = useState<ProposalData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const api = useDataApi();

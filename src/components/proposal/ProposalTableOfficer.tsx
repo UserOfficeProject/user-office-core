@@ -60,8 +60,8 @@ type ProposalTableOfficerProps = {
 };
 
 type ProposalWithCallInstrumentAndSepId = ProposalPkWithCallId & {
-  instrumentId: number | null | undefined;
-  sepId: number | null | undefined;
+  instrumentId: number | null;
+  sepId: number | null;
   statusId: number;
 };
 
