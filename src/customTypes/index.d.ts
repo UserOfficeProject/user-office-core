@@ -1,9 +1,10 @@
-import { AuthJwtApiTokenPayload, AuthJwtPayload } from '../models/User';
+import { Role } from '../models/Role';
+import { AuthJwtPayload, AuthJwtApiTokenPayload } from '../models/User';
+
+type AuthJwtPayloadUnionType = AuthJwtPayload & AuthJwtApiTokenPayload;
 
 declare global {
   namespace Express {
-    interface Request {
-      user: AuthJwtPayload & AuthJwtApiTokenPayload;
-    }
+    interface User extends AuthJwtPayloadUnionType {}
   }
 }
