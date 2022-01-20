@@ -10,7 +10,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 ### `npm run lint`
 
 Lints typescript code and log if there are any errors.<br>
-`npm run lint:fix` should be used if you want to fix all auto-fixable errors and warnings.
+`npm run lint:fix` should be used if you want to fix all auto-fixable errors and warnings. 
 
 ## Contribution and release versioning
 

@@ -81,7 +81,7 @@ const getUsersTableData = (
       ...user,
       tableData: {
         checked: selectedUsers.some(
-          (selectedUser) => selectedUser.id == user.id
+          (selectedUser) => selectedUser.id === user.id
         ),
       },
     })),

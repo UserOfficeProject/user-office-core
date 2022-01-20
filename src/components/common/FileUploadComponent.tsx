@@ -23,6 +23,7 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import InfoOutlined from '@material-ui/icons/InfoOutlined';
 import React, { ChangeEvent, useState } from 'react';
 
+import { Maybe } from 'generated/sdk';
 import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
 import { useFileMetadata } from 'hooks/file/useFileMetadata';
 import { FileMetaData } from 'models/questionary/FileUpload';
@@ -40,8 +41,8 @@ export function FileEntry(props: {
   onDeleteClicked: FunctionType<void, FileMetaData>;
   metaData: FileMetaData;
   onImageCaptionOrFigureAdded: FunctionType<void, FileIdWithCaptionAndFigure>;
-  caption: string | null | undefined;
-  figure: string | null | undefined;
+  caption?: Maybe<string>;
+  figure?: Maybe<string>;
 }) {
   const classes = makeStyles((theme) => ({
     fileListWrapper: {

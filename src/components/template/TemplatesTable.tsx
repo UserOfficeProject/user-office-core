@@ -34,7 +34,7 @@ export type TemplateRowDataType = Pick<
 export interface TemplatesTableProps {
   columns: Column<TemplateRowDataType>[];
   templateGroup: TemplateGroupId;
-  dataProvider: () => Promise<Exclude<GetTemplatesQuery['templates'], null>>;
+  dataProvider: () => Promise<NonNullable<GetTemplatesQuery['templates']>>;
   isRowRemovable: (row: TemplateRowDataType) => boolean;
   actions?: MaterialTableProps<TemplateRowDataType>['actions'];
 }

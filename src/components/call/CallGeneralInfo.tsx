@@ -37,11 +37,10 @@ import {
   ProposalWorkflow,
   UpdateCallMutationVariables,
 } from 'generated/sdk';
-import { ExcludeNull } from 'utils/utilTypes';
 
 const CallGeneralInfo: React.FC<{
-  templates: ExcludeNull<GetTemplatesQuery['templates']>;
-  esiTemplates: ExcludeNull<GetTemplatesQuery['templates']>;
+  templates: NonNullable<GetTemplatesQuery['templates']>;
+  esiTemplates: NonNullable<GetTemplatesQuery['templates']>;
   loadingTemplates: boolean;
   proposalWorkflows: ProposalWorkflow[];
   loadingProposalWorkflows: boolean;
