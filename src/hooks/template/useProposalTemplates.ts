@@ -9,7 +9,7 @@ export function useProposalsTemplates(
 ) {
   const api = useDataApi();
   const [templates, setTemplates] = useState<
-    Exclude<GetProposalTemplatesQuery['proposalTemplates'], null>
+    NonNullable<GetProposalTemplatesQuery['proposalTemplates']>
   >([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
 

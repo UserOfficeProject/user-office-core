@@ -1,6 +1,5 @@
 import { GetVisitRegistrationQuery } from 'generated/sdk';
-import { ExcludeNull } from 'utils/utilTypes';
 
-export type RegistrationWithQuestionary = ExcludeNull<
+export type RegistrationWithQuestionary = NonNullable<
   GetVisitRegistrationQuery['visitRegistration']
 >;

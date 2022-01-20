@@ -442,7 +442,9 @@ context('Proposal administration tests', () => {
         officerProposalsTableAsTextBeforeSort = element.text();
       });
 
-      cy.contains('Title').dblclick();
+      cy.contains('Title')
+        .find('[data-testid="mtableheader-sortlabel"]')
+        .dblclick();
 
       cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
         officerProposalsTableAsTextAfterSort = element.text();
@@ -459,23 +461,25 @@ context('Proposal administration tests', () => {
         expect(element.text()).not.equal(officerProposalsTableAsTextBeforeSort);
       });
 
-      cy.get(
-        '.MuiTableSortLabel-active .MuiTableSortLabel-iconDirectionDesc'
-      ).should('exist');
+      cy.contains('Title')
+        .find('[data-testid="mtableheader-sortlabel"]')
+        .should('have.attr', 'aria-sort', 'Descendant');
 
       cy.contains('Calls').click();
 
       cy.finishedLoading();
 
-      cy.contains('Short Code').click();
+      cy.contains('Short Code')
+        .find('[data-testid="mtableheader-sortlabel"]')
+        .click();
 
       cy.reload();
 
       cy.finishedLoading();
 
-      cy.get(
-        '.MuiTableSortLabel-active .MuiTableSortLabel-iconDirectionAsc'
-      ).should('exist');
+      cy.contains('Short Code')
+        .find('[data-testid="mtableheader-sortlabel"]')
+        .should('have.attr', 'aria-sort', 'Ascendant');
     });
 
     it('Should preserve the ordering when row is selected', () => {

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-export const Query = <T extends unknown>(props: {
+export function Query<T>(props: {
   children: MyQueryChildrenType<T>;
   serviceCall: () => Promise<T>;
-}) => {
+}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [data, setData] = useState<T | null>(null);
@@ -26,7 +26,7 @@ export const Query = <T extends unknown>(props: {
   }, [props, props.serviceCall]);
 
   return <div>{props.children({ loading, error, data })}</div>;
-};
+}
 
 type MyQueryChildrenType<T> = ({
   loading,

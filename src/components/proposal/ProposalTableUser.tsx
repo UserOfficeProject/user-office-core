@@ -14,7 +14,7 @@ import ProposalTable from './ProposalTable';
 export type PartialProposalsDataType = {
   primaryKey: number;
   title: string;
-  status: ProposalStatus | null;
+  status: Maybe<ProposalStatus>;
   publicStatus: ProposalPublicStatus;
   finalStatus?: string;
   notified?: boolean;

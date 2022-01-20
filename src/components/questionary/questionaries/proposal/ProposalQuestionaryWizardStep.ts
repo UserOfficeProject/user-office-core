@@ -1,4 +1,3 @@
-import { QuestionaryStep } from 'generated/sdk';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
 import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
@@ -6,9 +5,6 @@ import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmis
 import { QuestionaryWizardStep } from '../../DefaultWizardStepFactory';
 
 export class ProposalQuestionaryWizardStep extends QuestionaryWizardStep {
-  constructor(step: QuestionaryStep, index: number) {
-    super(step, index);
-  }
   isItemWithQuestionaryEditable(state: QuestionarySubmissionState) {
     const { proposal } = state as ProposalSubmissionState;
 

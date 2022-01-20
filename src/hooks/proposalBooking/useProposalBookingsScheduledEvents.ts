@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import {
+  BasicUserDetailsFragment,
   EsiFragment,
   FeedbackFragment,
   Instrument,
@@ -8,17 +9,13 @@ import {
   Proposal,
   ProposalBookingStatusCore,
   ScheduledEventCore,
+  ShipmentFragment,
   Visit,
   VisitFragment,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { VisitRegistrationCore } from 'models/questionary/visit/VisitRegistrationCore';
 import { toTzLessDateTime } from 'utils/Time';
-
-import {
-  BasicUserDetailsFragment,
-  ShipmentFragment,
-} from './../../generated/sdk';
 
 export type ProposalScheduledEvent = Pick<
   ScheduledEventCore,
