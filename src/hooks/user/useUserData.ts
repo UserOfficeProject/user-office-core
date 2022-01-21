@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { ReviewerFilter } from 'generated/sdk';
-import {
-  UserWithReviewsQuery,
-  ReviewStatus,
-  BasicUserDetails,
-} from 'generated/sdk';
+import { GetBasicUserDetailsQuery, ReviewerFilter } from 'generated/sdk';
+import { UserWithReviewsQuery, ReviewStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useUserWithReviewsData(filters?: {
@@ -16,9 +12,7 @@ export function useUserWithReviewsData(filters?: {
 }) {
   const api = useDataApi();
   const [userWithReviewsFilter, setUserWithReviewsFilter] = useState(filters);
-  const [userData, setUserData] = useState<UserWithReviewsQuery['me'] | null>(
-    null
-  );
+  const [userData, setUserData] = useState<UserWithReviewsQuery['me']>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,7 +41,8 @@ export function useUserWithReviewsData(filters?: {
 export function useBasicUserData(id?: number) {
   const api = useDataApi();
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState<BasicUserDetails | null>(null);
+  const [userData, setUserData] =
+    useState<GetBasicUserDetailsQuery['basicUserDetails']>(null);
   useEffect(() => {
     if (id) {
       setLoading(true);

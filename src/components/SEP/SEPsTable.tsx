@@ -98,7 +98,7 @@ const SEPsTable: React.FC = () => {
     } else {
       return (
         <AddSEP
-          close={(sepAdded: Sep | null) => {
+          close={(sepAdded: Sep | null | undefined) => {
             setTimeout(() => {
               history.push(`/SEPPage/${sepAdded?.id}`);
             });
