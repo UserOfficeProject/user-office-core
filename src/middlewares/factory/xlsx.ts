@@ -20,6 +20,10 @@ const router = express.Router();
 
 router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
   try {
+    if (!req.user) {
+      throw new Error('Not authorized');
+    }
+
     const userWithRole = {
       ...req.user.user,
       currentRole: req.user.currentRole,
@@ -68,6 +72,10 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
 
 router.get(`/${XLSXType.SEP}/:sep_id/call/:call_id`, async (req, res, next) => {
   try {
+    if (!req.user) {
+      throw new Error('Not authorized');
+    }
+
     const userWithRole = {
       ...req.user.user,
       currentRole: req.user.currentRole,
