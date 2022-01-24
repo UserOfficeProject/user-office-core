@@ -5,10 +5,18 @@ import { ModuleOptions, ResourceOwnerPassword } from 'simple-oauth2';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { ScheduledEventDataSource } from '../../datasources/ScheduledEventDataSource';
 import { AnswerBasic } from '../../models/Questionary';
+import {
+  WEIGHT_KEY,
+  WIDTH_KEY,
+  HEIGHT_KEY,
+  LENGTH_KEY,
+} from '../../models/Shipment';
 import { ProposalDataSource } from './../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from './../../datasources/QuestionaryDataSource';
 import { ShipmentDataSource } from './../../datasources/ShipmentDataSource';
+import { UserDataSource } from './../../datasources/UserDataSource';
 import getAddAssetEquipmentReq from './requests/AddAssetEquipment';
 import getCreateTicketReq from './requests/AddCaseManagement';
 
@@ -23,11 +31,6 @@ type EnvVars =
   | 'EAM_AUTH_USER'
   | 'EAM_AUTH_PASS';
 
-const WEIGHT_QUESTION_ID = 'parcel_weight';
-const WIDTH_QUESTION_ID = 'parcel_width';
-const HEIGHT_QUESTION_ID = 'parcel_height';
-const LENGTH_QUESTION_ID = 'parcel_length';
-
 const getAnswerForNumberInput = (
   answerBasic: AnswerBasic
 ): number | undefined => answerBasic.answer?.value?.value;
@@ -40,7 +43,11 @@ export class EAMAssetRegistrar implements AssetRegistrar {
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.QuestionaryDataSource)
-    private questionaryDataSource: QuestionaryDataSource
+    private questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.ScheduledEventDataSource)
+    private scheduledEventDataSource: ScheduledEventDataSource,
+    @inject(Tokens.UserDataSource)
+    private userDataSource: UserDataSource
   ) {}
 
   getEnvOrThrow(envVariable: EnvVars) {
@@ -56,7 +63,7 @@ export class EAMAssetRegistrar implements AssetRegistrar {
     return value;
   }
 
-  async performApiRequest(request: string) {
+  async performApiRequest(requestData: string) {
     const accessToken = await this.getToken();
 
     const response = await axios({
@@ -64,14 +71,19 @@ export class EAMAssetRegistrar implements AssetRegistrar {
       url: `${this.getEnvOrThrow(
         'EAM_API_URL'
       )}/infor/CustomerApi/EAMWS/EAMTESTAPI/EWSConnector`,
-      data: request,
+      data: requestData,
       headers: {
         'Content-Type': 'text/xml',
-        'Content-Length': `${request.length}`,
+        'Content-Length': `${requestData.length}`,
         Authorization: `Bearer ${accessToken.token.access_token}`,
       },
     }).catch((error) => {
-      logger.logError('Error while calling EAM API', { error });
+      const { message, response } = error;
+      logger.logError('Error while calling EAM API', {
+        message,
+        requestData,
+        responseData: response?.data,
+      });
       throw new Error('Error while calling EAM API');
     });
 
@@ -96,13 +108,29 @@ export class EAMAssetRegistrar implements AssetRegistrar {
       throw new Error('Proposal not found');
     }
 
+    const scheduledEvent =
+      await this.scheduledEventDataSource.getScheduledEventCore(
+        shipment.scheduledEventId
+      );
+    if (!scheduledEvent) {
+      logger.logError('Scheduled event for shipment not found', { shipment });
+      throw new Error('Scheduled event not found');
+    }
+
+    let localContact = null;
+    if (scheduledEvent.localContactId) {
+      localContact = await this.userDataSource.getUser(
+        scheduledEvent.localContactId
+      );
+    }
     const request = getCreateTicketReq(
       proposal.proposalId,
       proposal.title,
       containerId,
-      new Date(), // TODO: insert here the experiment start date. blocked by #SWAP-2065
-      new Date(), // TODO: insert here the experiment end date. blocked by #SWAP-2065
-      new Date() // TODO: insert here the experiment end date blocked by #SWAP-2065
+      scheduledEvent.startsAt,
+      scheduledEvent.endsAt,
+      scheduledEvent.startsAt, // This is not correct, but we need a design decision to fix this
+      localContact?.email ?? 'not set'
     );
 
     await this.performApiRequest(request);
@@ -126,19 +154,19 @@ export class EAMAssetRegistrar implements AssetRegistrar {
 
     const weight = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      WEIGHT_QUESTION_ID
+      WEIGHT_KEY
     );
     const width = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      WIDTH_QUESTION_ID
+      WIDTH_KEY
     );
     const height = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      HEIGHT_QUESTION_ID
+      HEIGHT_KEY
     );
     const length = await this.questionaryDataSource.getAnswer(
       shipment.questionaryId,
-      LENGTH_QUESTION_ID
+      LENGTH_KEY
     );
 
     if (!weight || !width || !height || !length) {
@@ -225,6 +253,6 @@ export class EAMAssetRegistrar implements AssetRegistrar {
 
 export class SkipAssetRegistrar implements AssetRegistrar {
   async register(): Promise<string> {
-    return '';
+    return '12345';
   }
 }

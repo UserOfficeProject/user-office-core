@@ -27,6 +27,7 @@ export interface AdminDataSource {
   getFeatures(): Promise<Feature[]>;
   setFeatures(features: FeatureId[], value: boolean): Promise<FeatureId[]>;
   getSettings(): Promise<Settings[]>;
+  getSetting(id: SettingsId): Promise<Settings>;
   createUnit(unit: Unit): Promise<Unit | null>;
   deleteUnit(id: number): Promise<Unit>;
   getUnits(): Promise<Unit[]>;

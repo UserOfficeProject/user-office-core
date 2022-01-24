@@ -682,12 +682,27 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return database('questions')
       .where({ question_id: questionId })
       .select('*')
-      .then((resultSet: QuestionRecord[]) => {
-        if (!resultSet || resultSet.length === 0) {
+      .first()
+      .then((result: QuestionRecord | null) => {
+        if (!result) {
           return null;
         }
 
-        return createQuestionObject(resultSet[0]);
+        return createQuestionObject(result);
+      });
+  }
+
+  async getQuestionByNaturalKey(naturalKey: string): Promise<Question | null> {
+    return database('questions')
+      .where({ natural_key: naturalKey })
+      .select('*')
+      .first()
+      .then((result: QuestionRecord | null) => {
+        if (!result) {
+          return null;
+        }
+
+        return createQuestionObject(result);
       });
   }
 

@@ -1,4 +1,6 @@
-FROM node:12-alpine
+FROM node:16.13-alpine
+
+USER node
 
 # The Git repo should be mounted from the host into this directory
 WORKDIR /app

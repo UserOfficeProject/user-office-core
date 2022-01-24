@@ -53,8 +53,10 @@ const getRequest = (
 				</DEPARTMENTID>
 				<COMMISSIONDATE qualifier="ACCOUNTING" xmlns="http://schemas.datastream.net/MP_fields">
 					<YEAR xmlns="http://www.openapplications.org/oagis_fields">${date.getUTCFullYear()}</YEAR>
-					<MONTH xmlns="http://www.openapplications.org/oagis_fields">${date.getUTCMonth()}</MONTH>
-					<DAY xmlns="http://www.openapplications.org/oagis_fields">${date.getUTCDay()}</DAY>
+					<MONTH xmlns="http://www.openapplications.org/oagis_fields">${
+            date.getUTCMonth() + 1 // +1 because getUTCMonth returns 0-11
+          }</MONTH>
+					<DAY xmlns="http://www.openapplications.org/oagis_fields">${date.getUTCDate()}</DAY>
 					<HOUR xmlns="http://www.openapplications.org/oagis_fields">${date.getUTCHours()}</HOUR>
 					<MINUTE xmlns="http://www.openapplications.org/oagis_fields">${date.getUTCMinutes()}</MINUTE>
 					<SECOND xmlns="http://www.openapplications.org/oagis_fields">${date.getUTCSeconds()}</SECOND>

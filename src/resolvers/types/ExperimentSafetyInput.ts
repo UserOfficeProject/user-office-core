@@ -72,7 +72,7 @@ export class ExperimentSafetyInputResolver {
       container.resolve<ScheduledEventDataSource>(
         Tokens.ScheduledEventDataSource
       );
-    const scheduledEvent = await scheduledEventDataSource.getScheduledEvent(
+    const scheduledEvent = await scheduledEventDataSource.getScheduledEventCore(
       esi.scheduledEventId
     );
     if (scheduledEvent === null || scheduledEvent.proposalPk === null) {

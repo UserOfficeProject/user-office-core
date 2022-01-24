@@ -21,7 +21,7 @@ export class CreateShipmentInput {
   proposalPk: number;
 
   @Field(() => Int)
-  visitId: number;
+  scheduledEventId: number;
 }
 
 @Resolver()

@@ -196,15 +196,23 @@ export default class UserMutations {
     let user = (await this.dataSource.getByEmail(args.email)) as UserWithRole;
 
     if (user && user.placeholder) {
+      user.currentRole = await this.dataSource.getRoleByShortCode(
+        UserRoleShortCodeMap[UserRole.USER]
+      );
       const changePassword = await this.updatePassword(user, {
         id: user.id,
         password: args.password,
       });
-      const updatedUser = (await this.update(user, {
-        id: user.id,
-        placeholder: false,
-        ...args,
-      })) as UserWithRole;
+
+      const updatedUser = await this.dataSource
+        .update({
+          ...user,
+          ...args,
+        })
+        .then((user) => user as UserWithRole)
+        .catch((err) => {
+          return rejection('Could not update user', { user }, err);
+        });
 
       if (isRejection(updatedUser) || !changePassword) {
         return rejection('Can not create user', {
@@ -447,7 +455,7 @@ export default class UserMutations {
     } catch (error) {
       return rejection(
         'Error occurred during external authentication',
-        {},
+        { externalToken },
         error
       );
     }

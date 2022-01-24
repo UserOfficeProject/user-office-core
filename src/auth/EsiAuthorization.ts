@@ -20,7 +20,7 @@ export class EsiAuthorization {
   ) {}
 
   getScheduledEvent = async (scheduledEventId: number) =>
-    await this.scheduledEventDataSource.getScheduledEvent(scheduledEventId);
+    await this.scheduledEventDataSource.getScheduledEventCore(scheduledEventId);
 
   private async resolveEsi(
     esiOrEsiId: ExperimentSafetyInput | number

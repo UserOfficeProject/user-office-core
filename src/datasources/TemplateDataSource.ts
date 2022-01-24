@@ -49,6 +49,7 @@ export interface TemplateDataSource {
   ): Promise<Question>;
 
   getQuestion(questionId: string): Promise<Question | null>;
+  getQuestionByNaturalKey(naturalKey: string): Promise<Question | null>;
   updateQuestion(
     questionId: string,
     values: {
