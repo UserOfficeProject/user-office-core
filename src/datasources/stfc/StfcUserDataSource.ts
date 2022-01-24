@@ -318,29 +318,15 @@ export class StfcUserDataSource implements UserDataSource {
     if (filter) {
       users = [];
 
-      // If the filter represents an Email address, get the user from UOWS
-      if (filter.includes('@') && filter.includes('.')) {
-        const stfcBasicPersonByEmail = (
-          await client.getSearchableBasicPersonDetailsFromEmail(token, filter)
-        )?.return;
+      const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] | null = (
+        await client.getBasicPeopleDetailsFromSurname(token, filter, true)
+      )?.return;
 
-        if (stfcBasicPersonByEmail != null) {
-          users.push(toEssBasicUserDetails(stfcBasicPersonByEmail));
-        }
-      }
-      // If the filter does not represent an Email address, we are getting users by last name
-      // because our User Office Web Service API does not include a first name endpoint.
-      else {
-        const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] | null = (
-          await client.getBasicPeopleDetailsFromSurname(token, filter, true)
-        )?.return;
-
-        users = stfcBasicPeopleByLastName
-          ? stfcBasicPeopleByLastName.map((person) =>
-              toEssBasicUserDetails(person)
-            )
-          : [];
-      }
+      users = stfcBasicPeopleByLastName
+        ? stfcBasicPeopleByLastName.map((person) =>
+            toEssBasicUserDetails(person)
+          )
+        : [];
     }
 
     return {
