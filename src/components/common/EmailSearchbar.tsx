@@ -18,7 +18,7 @@ const useStyles = makeStyles({
     }
   });
 
-const StylisedToolbar: React.FC = (props) => {
+const EmailSearchbar: React.FC = (props) => {
     const classes = useStyles();
   
     return (
@@ -53,3 +53,5 @@ const StylisedToolbar: React.FC = (props) => {
       </>
     );
   };
+
+export default EmailSearchbar;
