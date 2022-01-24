@@ -105,4 +105,5 @@ export interface SEPDataSource {
   getSepProposalsWithReviewGradesAndRanking(
     proposalPks: number[]
   ): Promise<SEPProposalWithReviewGradesAndRanking[]>;
+  getRelatedUsersOnSep(id: number): Promise<number[]>;
 }
