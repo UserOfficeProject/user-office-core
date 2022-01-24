@@ -26,7 +26,7 @@ type InputComponentType<T> = T & {
  * @param Component Input component
  * @returns Wrapped component, what has the checkmark
  */
-function withMarkTemplateAsActiveAction<T extends unknown>(
+function withMarkTemplateAsActiveAction<T>(
   Component: React.ComponentType<InputComponentType<T>>
 ) {
   const WrappedComponent = (props: InputComponentType<T>) => {

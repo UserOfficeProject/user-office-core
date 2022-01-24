@@ -28,9 +28,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const withConfirm = <T extends unknown>(
-  WrappedComponent: React.ComponentType<T>
-) => {
+function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
   return function WithConfirmComponent(props: Omit<T, 'confirm'>): JSX.Element {
     const classes = useStyles();
     const [onConfirm, setOnConfirm] = useState<FunctionType | null>(null);
@@ -110,7 +108,7 @@ const withConfirm = <T extends unknown>(
       </>
     );
   };
-};
+}
 
 interface Options {
   title: string;

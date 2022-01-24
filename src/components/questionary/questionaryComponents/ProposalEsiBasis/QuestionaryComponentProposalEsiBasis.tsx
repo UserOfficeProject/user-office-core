@@ -71,7 +71,7 @@ function QuestionaryComponentProposalEsiBasis(
               const sampleEsi = response.createSampleEsi?.esi;
               if (sampleEsi) {
                 dispatch({
-                  type: 'ESI_SAMPLE_ESI_CREATED',
+                  type: 'ESI_ITEM_WITH_QUESTIONARY_CREATED',
                   sampleEsi: sampleEsi,
                 });
                 setSelectedSampleEsi(response.createSampleEsi.esi);
@@ -233,7 +233,7 @@ function QuestionaryComponentProposalEsiBasis(
                       sample: newSampleEsi.sample,
                     });
                     dispatch({
-                      type: 'ESI_SAMPLE_ESI_CREATED',
+                      type: 'ESI_ITEM_WITH_QUESTIONARY_CREATED',
                       sampleEsi: newSampleEsi,
                     });
                     form.setFieldValue(answerId, [

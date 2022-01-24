@@ -6,6 +6,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, Call, QuestionaryStep } from 'generated/sdk';
 import { useCallData } from 'hooks/call/useCallData';
 import { useBlankQuestionaryStepsData } from 'hooks/questionary/useBlankQuestionaryStepsData';
+import { useBasicUserData } from 'hooks/user/useUserData';
 import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
 
 import ProposalContainer from './ProposalContainer';
@@ -59,8 +60,8 @@ export default function ProposalCreate() {
 
   // get call using api
   const { call } = useCallData(+callId);
-
-  if (!questionarySteps || !call) {
+  const { userData } = useBasicUserData(user.id);
+  if (!questionarySteps || !call || !userData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
@@ -70,7 +71,7 @@ export default function ProposalCreate() {
         parseInt(callId as string),
         parseInt(templateId as string),
         questionarySteps,
-        user,
+        userData,
         call as Call
       )}
     />

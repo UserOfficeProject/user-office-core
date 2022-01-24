@@ -6,7 +6,7 @@ import { GetMyShipmentsQuery } from './../../generated/sdk';
 
 export function useMyShipments() {
   const [myShipments, setMyShipments] = useState<
-    Exclude<GetMyShipmentsQuery['myShipments'], null>
+    NonNullable<GetMyShipmentsQuery['myShipments']>
   >([]);
   const [loadingMyShipments, setLoadingMyShipments] = useState(false);
 

@@ -53,6 +53,14 @@ context('Shipments tests', () => {
     const LENGTH_KEY = 'parcel_length';
     const WEIGHT_KEY = 'parcel_weight';
 
+    const STORAGE_TEMPERATURE_KEY = 'storage_temperature';
+    const IS_FRAGILE_KEY = 'is_fragile';
+    const LOCAL_CONTACT_KEY = 'shipment_local_contact';
+    const IS_DANGEROUS_KEY = 'is_dangerous';
+
+    const localContactName = faker.name.firstName();
+    const storageOption = faker.lorem.words(3);
+
     cy.login('officer');
     cy.visit('/');
 
@@ -72,6 +80,20 @@ context('Shipments tests', () => {
     cy.createNumberInputQuestion('height', { key: HEIGHT_KEY });
     cy.createNumberInputQuestion('length', { key: LENGTH_KEY });
     cy.createNumberInputQuestion('weight', { key: WEIGHT_KEY });
+
+    cy.createMultipleChoiceQuestion('storage temperature', {
+      key: STORAGE_TEMPERATURE_KEY,
+      option1: storageOption,
+      option2: faker.lorem.words(3),
+    });
+    cy.createBooleanQuestion('is fragile', { key: IS_FRAGILE_KEY });
+    cy.createMultipleChoiceQuestion('local contact', {
+      key: LOCAL_CONTACT_KEY,
+      option1: localContactName,
+      option2: faker.name.firstName(),
+      option3: faker.name.firstName(),
+    });
+    cy.createBooleanQuestion('is dangerous', { key: IS_DANGEROUS_KEY });
 
     cy.contains('New shipment');
 
@@ -106,6 +128,15 @@ context('Shipments tests', () => {
     cy.get(`[data-natural-key=${HEIGHT_KEY}]`).clear().type('1').click();
     cy.get(`[data-natural-key=${LENGTH_KEY}]`).clear().type('1').click();
     cy.get(`[data-natural-key=${WEIGHT_KEY}]`).clear().type('1').click();
+
+    cy.get(`[data-natural-key=${STORAGE_TEMPERATURE_KEY}]`).click();
+    cy.get('[role=presentation]').contains(storageOption).click();
+
+    cy.get(`[data-natural-key=${LOCAL_CONTACT_KEY}]`).click();
+    cy.get('[role=presentation]').contains(localContactName).click();
+
+    cy.get(`[data-natural-key=${IS_DANGEROUS_KEY}]`).click();
+    cy.get(`[data-natural-key=${IS_FRAGILE_KEY}]`).click();
 
     cy.get('[data-cy=save-and-continue-button]').click();
 

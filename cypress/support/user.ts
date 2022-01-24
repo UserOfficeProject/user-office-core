@@ -1,4 +1,4 @@
-import { decode } from 'jsonwebtoken';
+import jwtDecode from 'jwt-decode';
 
 import {
   CreateUserMutation,
@@ -58,7 +58,7 @@ const login = (
       return resp;
     }
 
-    const { currentRole, user, exp } = decode(
+    const { currentRole, user, exp } = jwtDecode(
       resp.login.token
     ) as DecodedTokenData;
 
@@ -131,7 +131,7 @@ function changeActiveRole(selectedRoleId: number) {
       return;
     }
 
-    const { currentRole, user, exp } = decode(
+    const { currentRole, user, exp } = jwtDecode(
       resp.selectRole.token
     ) as DecodedTokenData;
 

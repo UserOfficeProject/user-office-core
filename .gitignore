@@ -26,8 +26,6 @@
 .env.production.local
 .vscode/*
 
-react-app-env.d.ts
-
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

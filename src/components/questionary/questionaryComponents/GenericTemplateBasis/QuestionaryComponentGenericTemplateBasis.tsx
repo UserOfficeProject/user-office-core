@@ -48,8 +48,8 @@ function QuestionaryComponentGenericTemplateBasis(props: BasicComponentProps) {
           },
           onBlur: () => {
             dispatch({
-              type: 'GENERIC_TEMPLATE_MODIFIED',
-              genericTemplate: { title: title },
+              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+              itemWithQuestionary: { title: title },
             });
           },
         }}
@@ -79,8 +79,8 @@ const genericTemplateBasisPreSubmit =
       });
       if (result.updateGenericTemplate.genericTemplate) {
         dispatch({
-          type: 'GENERIC_TEMPLATE_UPDATED',
-          genericTemplate: result.updateGenericTemplate.genericTemplate,
+          type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+          itemWithQuestionary: result.updateGenericTemplate.genericTemplate,
         });
       }
     } else {
@@ -93,8 +93,8 @@ const genericTemplateBasisPreSubmit =
 
       if (result.createGenericTemplate.genericTemplate) {
         dispatch({
-          type: 'GENERIC_TEMPLATE_CREATED',
-          genericTemplate: result.createGenericTemplate.genericTemplate,
+          type: 'ITEM_WITH_QUESTIONARY_CREATED',
+          itemWithQuestionary: result.createGenericTemplate.genericTemplate,
         });
         returnValue =
           result.createGenericTemplate.genericTemplate.questionaryId;

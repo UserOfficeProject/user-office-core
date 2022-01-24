@@ -240,8 +240,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
   const declareShipmentAction = (event: ProposalScheduledEvent) => {
     let buttonState: ActionButtonState;
 
-    if (event.visit !== null) {
-      const isAtLeastOneShipmentSubmitted = event.visit.shipments.some(
+    if (
+      event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
+      event.proposal.managementDecisionSubmitted
+    ) {
+      const isAtLeastOneShipmentSubmitted = event.shipments.some(
         (shipment) => shipment.status === ShipmentStatus.SUBMITTED
       );
 
@@ -261,14 +264,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       () => {
         openModal(
           <CreateUpdateShipment
-            visit={event.visit!}
+            event={event}
             onShipmentSubmitted={(shipment) => {
               eventUpdated({
                 ...event,
-                visit: {
-                  ...event.visit!,
-                  shipments: shipment ? [shipment] : [],
-                },
+                shipments: shipment ? [shipment] : [],
               });
             }}
           />

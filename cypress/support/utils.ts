@@ -187,7 +187,6 @@ Cypress.Commands.add('finishedLoading', finishedLoading);
 Cypress.Commands.add(
   'dragElement',
   { prevSubject: 'element' },
-  // @ts-expect-error FIXME: this should be solved
   (element, args) => {
     return dragElement(element, args);
   }

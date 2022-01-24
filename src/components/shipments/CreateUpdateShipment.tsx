@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { VisitFragment } from 'generated/sdk';
+import { ProposalScheduledEvent } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
 import { ShipmentCore } from 'models/questionary/shipment/ShipmentCore';
 
 import CreateShipment from './CreateShipment';
@@ -8,20 +8,18 @@ import UpdateShipment from './UpdateShipment';
 
 type CreateUpdateShipmentProps = {
   onShipmentSubmitted: (shipment: ShipmentCore) => void;
-  visit: VisitFragment & {
-    shipments: ShipmentCore[];
-  };
+  event: ProposalScheduledEvent;
 };
 
 function CreateUpdateShipment({
-  visit,
+  event,
   onShipmentSubmitted,
 }: CreateUpdateShipmentProps) {
-  if (visit.shipments.length > 1) {
+  if (event.shipments.length > 1) {
     return <span>Multiple shipments per visit is not supported yet</span>;
   }
 
-  const shipment = visit.shipments[0]; // currently only supporting 1 shipment per visit
+  const shipment = event.shipments[0]; // currently only supporting 1 shipment per visit
 
   return shipment ? (
     <UpdateShipment
@@ -29,7 +27,7 @@ function CreateUpdateShipment({
       onShipmentSubmitted={onShipmentSubmitted}
     />
   ) : (
-    <CreateShipment visit={visit} onShipmentSubmitted={onShipmentSubmitted} />
+    <CreateShipment event={event} onShipmentSubmitted={onShipmentSubmitted} />
   );
 }
 

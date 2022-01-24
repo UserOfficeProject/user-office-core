@@ -47,12 +47,7 @@ interface CreateVisitProps {
   onSubmitted?: (visit: VisitRegistrationCore) => void;
   visitId: number;
 }
-function CreateVisit({
-  onCreate,
-  onUpdate,
-  onSubmitted,
-  visitId,
-}: CreateVisitProps) {
+function CreateVisit({ onSubmitted, visitId }: CreateVisitProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [blankRegistration, setBlankRegistration] =
@@ -89,8 +84,6 @@ function CreateVisit({
   return (
     <VisitRegistrationContainer
       registration={blankRegistration}
-      onCreate={onCreate}
-      onUpdate={onUpdate}
       onSubmitted={onSubmitted}
     />
   );

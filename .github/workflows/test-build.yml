@@ -105,9 +105,13 @@ jobs:
                 - "80:80" # The HTTP port
               volumes:
                 - /var/run/docker.sock:/var/run/docker.sock:ro
+              depends_on:
+                - "db"
             backend:
               labels:
                 - "traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads, /gateway, /graphql"
+              depends_on:
+                - "proxy"
           EOF
 
       - name: Run docker-compose, generate and compare SDK

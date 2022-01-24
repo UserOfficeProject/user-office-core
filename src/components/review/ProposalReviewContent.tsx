@@ -210,7 +210,7 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
       case 'Grade':
         return <Fragment key={index}>{GradeTab}</Fragment>;
       default:
-        break;
+        return null;
     }
   });
 
