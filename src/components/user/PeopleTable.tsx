@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import MaterialTable, { Options, Column } from '@material-table/core';
+import MaterialTable, { Options, Column, MTableToolbar } from '@material-table/core';
 import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -9,11 +9,13 @@ import makeStyles from '@material-ui/styles/makeStyles';
 import React, { useState, useEffect, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import EmailSearchbar from 'components/common/EmailSearchbar';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { getCurrentUser } from 'context/UserContextProvider';
 import {
   BasicUserDetails,
   FeatureId,
+  GetBasicUserDetailsByEmailQuery,
   GetUsersQueryVariables,
   UserRole,
 } from 'generated/sdk';
@@ -22,6 +24,8 @@ import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
 import InviteUserForm from './InviteUserForm';
+import { Formik } from 'formik';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 type InvitationButtonProps = {
   title: string;
@@ -91,6 +95,16 @@ const getTitle = (invitationUserRole?: UserRole): string => {
   }
 };
 
+async function getUserByEmail(email: string, api: any) {
+  return api()
+    .getBasicUserDetailsByEmail({ email: email, role: UserRole.USER })
+    .then((user: GetBasicUserDetailsByEmailQuery) => {
+      const userDetails = user?.basicUserDetailsByEmail;
+
+      return userDetails;
+    });
+}
+
 const getUsersTableData = (
   users: BasicUserDetailsWithTableData,
   selectedUsers: BasicUserDetails[]
@@ -118,7 +132,8 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
   const isEmailInviteEnabled = !!featureContext.features.get(
     FeatureId.EMAIL_INVITE
   )?.isEnabled;
-
+  
+  const api = useDataApi();
   const { isLoading } = props;
   const { usersData, loadingUsersData } = useUsersData(query);
   const [loading, setLoading] = useState(props.isLoading ?? false);
@@ -132,6 +147,8 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     BasicUserDetails[]
   >([]);
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
+  const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
+  const [tableEmails, setTableEmails] = useState<string[]>([]);
 
   const classes = useStyles();
 
@@ -227,184 +244,242 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
   const currentPage = (query.offset as number) / (query.first as number);
 
   return (
-    <div data-cy="co-proposers" className={classes.tableWrapper}>
-      <Dialog
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-        open={inviteUserModal.show}
-        onClose={(): void =>
-          setInviteUserModal({
-            ...inviteUserModal,
-            show: false,
-          })
-        }
-        style={{ backdropFilter: 'blur(6px)' }}
-      >
-        <DialogContent>
-          <InviteUserForm
-            title={inviteUserModal.title}
-            userRole={inviteUserModal.userRole}
-            close={() =>
-              setInviteUserModal({
-                ...inviteUserModal,
-                show: false,
-              })
-            }
-            action={(invitedUser) => {
-              if (invitedUser) {
-                setQuery({ ...query, refreshData: !query.refreshData });
-              }
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-      <MaterialTable
-        icons={tableIcons}
-        title={
-          <Typography variant="h6" component="h1">
-            {props.title}
-          </Typography>
-        }
-        page={currentPage}
-        columns={props.columns ?? columns}
-        onSelectionChange={(selectedItems, selectedItem) => {
-          // when the user wants to (un)select all items
-          // `selectedItem` will be undefined
-          if (!selectedItem) {
-            // first clear the current page because if any row was unselected
-            // the (un)select all option will select every rows
-            // which would result in duplicates
-            setSelectedParticipants((selectedParticipants) =>
-              selectedParticipants.filter(
-                ({ id }) => !currentPageIds.includes(id)
-              )
-            );
+    <Formik
+      initialValues={{
+        email: '',
+      }}
+      initialErrors={{
+        email: 'test',
+      }}
+      onSubmit={async (values, { setFieldError, setFieldValue }) => {
+        // If there is an email and it has not already been searched
+        if (values.email && !tableEmails.includes(values.email)) {
+          setLoading(true);
+          const userDetails = await getUserByEmail(values.email, api);
 
-            if (selectedItems.length > 0) {
-              setSelectedParticipants((selectedParticipants) => [
-                ...selectedParticipants,
-                ...(selectedItems.map((selectedItem) => ({
-                  id: selectedItem.id,
-                  firstname: selectedItem.firstname,
-                  lastname: selectedItem.lastname,
-                  organisation: selectedItem.organisation,
-                })) as BasicUserDetails[]),
-              ]);
-            }
+          if (!userDetails) {
+            setFieldError('email', 'Please enter valid email address');
+            setLoading(false);
 
             return;
           }
 
-          setSelectedParticipants((selectedParticipants) =>
-            (
-              selectedItem as BasicUserDetails & {
-                tableData: { checked: boolean };
+          if (props.selectedUsers?.includes(userDetails.id)) {
+            setFieldError('email', 'User is already on the proposal');
+            setLoading(false);
+
+            return;
+          }
+
+          if (!invitedUsers.some((user) => user.id === userDetails.id)) {
+            //Add users to the table
+            setInvitedUsers([userDetails].concat(invitedUsers));
+            setTableEmails(tableEmails.concat([values.email]));
+            setFieldValue('email', '');
+
+            //If we are selecting multiple users add the user as pre selected.
+            if (props.selection)
+              setSelectedParticipants(
+                selectedParticipants.concat([userDetails])
+              );
+
+            setQuery({ ...query, refreshData: !query.refreshData });
+          } else {
+            setFieldError('email', 'Could not add user to Proposal');
+          }
+          setLoading(false);
+        } else if (tableEmails.includes(values.email)) {
+          setFieldError(
+            'email',
+            'User has already been added, possibly use filter instead'
+          );
+        } else {
+          setFieldError('email', 'Please enter a email');
+        }
+      }}
+    >
+      <div data-cy="co-proposers" className={classes.tableWrapper}>
+        <Dialog
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
+          open={inviteUserModal.show}
+          onClose={(): void =>
+            setInviteUserModal({
+              ...inviteUserModal,
+              show: false,
+            })
+          }
+          style={{ backdropFilter: 'blur(6px)' }}
+        >
+          <DialogContent>
+            <InviteUserForm
+              title={inviteUserModal.title}
+              userRole={inviteUserModal.userRole}
+              close={() =>
+                setInviteUserModal({
+                  ...inviteUserModal,
+                  show: false,
+                })
               }
-            ).tableData.checked
-              ? ([
+              action={(invitedUser) => {
+                if (invitedUser) {
+                  setQuery({ ...query, refreshData: !query.refreshData });
+                }
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+        <MaterialTable
+          icons={tableIcons}
+          title={
+            <Typography variant="h6" component="h1">
+              {props.title}
+            </Typography>
+          }
+          page={currentPage}
+          columns={props.columns ?? columns}
+          onSelectionChange={(selectedItems, selectedItem) => {
+            // when the user wants to (un)select all items
+            // `selectedItem` will be undefined
+            if (!selectedItem) {
+              // first clear the current page because if any row was unselected
+              // the (un)select all option will select every rows
+              // which would result in duplicates
+              setSelectedParticipants((selectedParticipants) =>
+                selectedParticipants.filter(
+                  ({ id }) => !currentPageIds.includes(id)
+                )
+              );
+
+              if (selectedItems.length > 0) {
+                setSelectedParticipants((selectedParticipants) => [
                   ...selectedParticipants,
-                  {
+                  ...(selectedItems.map((selectedItem) => ({
                     id: selectedItem.id,
                     firstname: selectedItem.firstname,
                     lastname: selectedItem.lastname,
                     organisation: selectedItem.organisation,
-                  },
-                ] as BasicUserDetails[])
-              : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
-          );
-        }}
-        data={usersTableData}
-        totalCount={usersData.totalCount}
-        isLoading={loading || loadingUsersData}
-        options={{
-          search: props.search,
-          debounceInterval: 400,
-          pageSize: query.first as number,
-          selection: props.selection,
-          headerSelectionProps: {
-            inputProps: { 'aria-label': 'Select All Rows' },
-          },
-          ...props.mtOptions,
-          selectionProps: (rowdata: any) => ({
-            inputProps: {
-              'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
+                  })) as BasicUserDetails[]),
+                ]);
+              }
+
+              return;
+            }
+
+            setSelectedParticipants((selectedParticipants) =>
+              (
+                selectedItem as BasicUserDetails & {
+                  tableData: { checked: boolean };
+                }
+              ).tableData.checked
+                ? ([
+                    ...selectedParticipants,
+                    {
+                      id: selectedItem.id,
+                      firstname: selectedItem.firstname,
+                      lastname: selectedItem.lastname,
+                      organisation: selectedItem.organisation,
+                    },
+                  ] as BasicUserDetails[])
+                : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
+            );
+          }}
+          data={usersTableData}
+          totalCount={usersData.totalCount}
+          isLoading={loading || loadingUsersData}
+          options={{
+            search: props.search,
+            debounceInterval: 400,
+            pageSize: query.first as number,
+            selection: props.selection,
+            headerSelectionProps: {
+              inputProps: { 'aria-label': 'Select All Rows' },
             },
-          }),
-        }}
-        actions={actionArray}
-        editable={
-          props.onRemove
-            ? {
-                onRowDelete: (oldData) =>
-                  new Promise<void>((resolve) => {
-                    resolve();
-                    (props.onRemove as FunctionType)(oldData);
-                    setQuery({ ...query, refreshData: !query.refreshData });
-                  }),
-                isDeletable: (rowData) => {
-                  return (
-                    getCurrentUser()?.user.id !== rowData.id ||
-                    !props.preserveSelf
-                  );
-                },
-              }
-            : {}
-        }
-        localization={{
-          body: { emptyDataSourceMessage: 'No Users' },
-          toolbar: {
-            nRowsSelected: '{0} Users(s) Selected',
-            searchPlaceholder: 'Filter found users',
-            searchTooltip: 'Filter found users',
-          },
-        }}
-        onPageChange={(page) =>
-          setQuery({ ...query, offset: page * (query.first as number) })
-        }
-        onSearchChange={(search) => setQuery({ ...query, filter: search })}
-        onRowsPerPageChange={(rowsPerPage) =>
-          setQuery({ ...query, first: rowsPerPage })
-        }
-      />
-      {props.selection && (
-        <ActionButtonContainer>
-          <div className={classes.verticalCentered}>
-            {selectedParticipants.length} user(s) selected
-          </div>
-          <Button
-            type="button"
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              if (props.onUpdate) {
-                props.onUpdate(selectedParticipants);
-                setSelectedParticipants([]);
-              }
-            }}
-            disabled={selectedParticipants.length === 0}
-            data-cy="assign-selected-users"
-          >
-            Update
-          </Button>
-        </ActionButtonContainer>
-      )}
-      {props.showInvitationButtons && (
-        <ActionButtonContainer>
-          {invitationButtons.map((item: InvitationButtonProps, i) => (
+            ...props.mtOptions,
+            selectionProps: (rowdata: any) => ({
+              inputProps: {
+                'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
+              },
+            }),
+          }}
+          actions={actionArray}
+          editable={
+            props.onRemove
+              ? {
+                  onRowDelete: (oldData) =>
+                    new Promise<void>((resolve) => {
+                      resolve();
+                      (props.onRemove as FunctionType)(oldData);
+                      setQuery({ ...query, refreshData: !query.refreshData });
+                    }),
+                  isDeletable: (rowData) => {
+                    return (
+                      getCurrentUser()?.user.id !== rowData.id ||
+                      !props.preserveSelf
+                    );
+                  },
+                }
+              : {}
+          }
+          localization={{
+            body: { emptyDataSourceMessage: 'No Users' },
+            toolbar: {
+              nRowsSelected: '{0} Users(s) Selected',
+              searchPlaceholder: 'Filter found users',
+              searchTooltip: 'Filter found users',
+            },
+          }}
+          onPageChange={(page) =>
+            setQuery({ ...query, offset: page * (query.first as number) })
+          }
+          onSearchChange={(search) => setQuery({ ...query, filter: search })}
+          onRowsPerPageChange={(rowsPerPage) =>
+            setQuery({ ...query, first: rowsPerPage })
+          }
+          components={{
+            Toolbar: isEmailInviteEnabled ? MTableToolbar : EmailSearchbar,
+          }}
+        />
+        {props.selection && (
+          <ActionButtonContainer>
+            <div className={classes.verticalCentered}>
+              {selectedParticipants.length} user(s) selected
+            </div>
             <Button
               type="button"
               variant="contained"
               color="primary"
-              onClick={() => item.action()}
-              data-cy={item['data-cy']}
-              key={i}
+              onClick={() => {
+                if (props.onUpdate) {
+                  props.onUpdate(selectedParticipants);
+                  setSelectedParticipants([]);
+                }
+              }}
+              disabled={selectedParticipants.length === 0}
+              data-cy="assign-selected-users"
             >
-              {item.title}
+              Update
             </Button>
-          ))}
-        </ActionButtonContainer>
-      )}
-    </div>
+          </ActionButtonContainer>
+        )}
+        {props.showInvitationButtons && (
+          <ActionButtonContainer>
+            {invitationButtons.map((item: InvitationButtonProps, i) => (
+              <Button
+                type="button"
+                variant="contained"
+                color="primary"
+                onClick={() => item.action()}
+                data-cy={item['data-cy']}
+                key={i}
+              >
+                {item.title}
+              </Button>
+            ))}
+          </ActionButtonContainer>
+        )}
+      </div>
+    </Formik>
   );
 };
 
