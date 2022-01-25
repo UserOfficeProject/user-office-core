@@ -7,7 +7,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
-import UOLoader from 'components/common/UOLoader';
 import {
   Call,
   AllocationTimeUnits,
@@ -51,9 +50,11 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const initialValues = call
     ? {
         ...call,
-        templateId: call.templateId || 0,
-        esiTemplateId: call.esiTemplateId || undefined,
-        proposalWorkflowId: call.proposalWorkflowId || 0,
+        title: call.title || '',
+        description: call.description || '',
+        templateId: call.templateId || '',
+        esiTemplateId: call.esiTemplateId || '',
+        proposalWorkflowId: call.proposalWorkflowId || '',
         referenceNumberFormat: call.referenceNumberFormat || '',
       }
     : {
@@ -73,7 +74,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         surveyComment: '',
         proposalWorkflowId: '',
         templateId: '',
-        esiTemplateId: undefined,
+        esiTemplateId: '',
         allocationTimeUnit: AllocationTimeUnits.DAY,
         title: '',
         description: '',
@@ -84,10 +85,6 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       close(callToReturn);
     }
   };
-
-  if (!proposalTemplates || !proposalEsiTemplates) {
-    return <UOLoader />;
-  }
 
   return (
     <>
