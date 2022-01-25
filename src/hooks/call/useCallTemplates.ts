@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { TemplateGroupId } from 'generated/sdk';
-import { useTemplates } from 'hooks/template/useTemplates';
+import { GetTemplatesQuery, TemplateGroupId } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+
 /**
  * Gets all active templates based on given parameters
  * @param groupId The group id for templates
@@ -12,29 +13,37 @@ export function useActiveTemplates(
   groupId: TemplateGroupId,
   includeTemplate?: number | null
 ) {
-  const [loading, setLoading] = useState(true);
+  const api = useDataApi();
 
-  const { templates: activeTemplates } = useTemplates({
-    isArchived: false,
-    group: groupId,
-  });
-
-  // TODO: Why we are calling getTemplates twice here? This should probably be refactored a bit and use only one call.
-  const { templates, setTemplates } = useTemplates(
-    activeTemplates
-      ? {
-          templateIds: activeTemplates
-            .map((t) => t.templateId)
-            .concat(includeTemplate ? includeTemplate : []),
-        }
-      : undefined
-  );
+  const [templates, setTemplates] = useState<
+    GetTemplatesQuery['templates'] | null
+  >(null);
 
   useEffect(() => {
-    if (templates) {
-      setLoading(false);
-    }
-  }, [templates]);
+    api()
+      .getTemplates({ filter: { group: groupId, isArchived: false } })
+      .then((data) => {
+        // if we need to include an extra template
+        if (includeTemplate) {
+          api()
+            .getTemplate({ templateId: includeTemplate })
+            .then(({ template }) => {
+              if (template && data.templates) {
+                const alreadyContainsExtraTemplate = data.templates.find(
+                  (t) => t.templateId === template.templateId
+                );
+                if (alreadyContainsExtraTemplate) {
+                  setTemplates(data.templates);
+                } else {
+                  setTemplates([...data.templates, template]);
+                }
+              }
+            });
+        } else {
+          setTemplates(data.templates);
+        }
+      });
+  }, [groupId, includeTemplate, api]);
 
-  return { templates, setTemplates, loading };
+  return { templates, setTemplates };
 }
