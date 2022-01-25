@@ -3,8 +3,9 @@ import * as bcrypt from 'bcryptjs';
 // TODO: Try to replace request-promise with axios. request-promise depends on request which is deprecated.
 import { CoreOptions, UriOptions } from 'request';
 import rp from 'request-promise';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
@@ -21,6 +22,7 @@ import { signToken, verifyToken } from '../utils/jwt';
 
 @injectable()
 export default class UserQueries {
+  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.UserDataSource) public dataSource: UserDataSource
   ) {}
@@ -47,20 +49,21 @@ export default class UserQueries {
   @Authorized()
   async getBasic(agent: UserWithRole | null, id: number) {
     const user = await this.dataSource.getBasicUserInfo(id);
-    if (!user) {
+    const hasPermissions = await this.userAuth.canReadUser(agent, id);
+    if (hasPermissions && user) {
+      return new BasicUserDetails(
+        user.id,
+        user.firstname,
+        user.lastname,
+        user.preferredname,
+        user.organisation,
+        user.position,
+        user.created,
+        user.placeholder
+      );
+    } else {
       return null;
     }
-
-    return new BasicUserDetails(
-      user.id,
-      user.firstname,
-      user.lastname,
-      user.preferredname,
-      user.organisation,
-      user.position,
-      user.created,
-      user.placeholder
-    );
   }
 
   @Authorized()
@@ -189,13 +192,27 @@ export default class UserQueries {
     userRole?: UserRole,
     subtractUsers?: [number]
   ) {
-    return this.dataSource.getUsers(
+    const userData = await this.dataSource.getUsers(
       filter,
       first,
       offset,
       userRole,
       subtractUsers
     );
+
+    const returnableUserIds = await this.userAuth.listReadableUsers(
+      agent,
+      userData.users.map((u) => u.id)
+    );
+
+    const returnableUsers = userData.users.filter((u) =>
+      returnableUserIds.includes(u.id)
+    );
+
+    return {
+      totalCount: userData.totalCount,
+      users: returnableUsers,
+    };
   }
 
   @Authorized()
@@ -223,10 +240,12 @@ export default class UserQueries {
     return this.dataSource.getRoles();
   }
 
-  async getUser(id: number) {
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async getUser(agent: UserWithRole | null, id: number) {
     return this.dataSource.getUser(id);
   }
 
+  @Authorized()
   async getProposers(agent: UserWithRole | null, proposalPk: number) {
     return this.dataSource.getProposalUsers(proposalPk);
   }
