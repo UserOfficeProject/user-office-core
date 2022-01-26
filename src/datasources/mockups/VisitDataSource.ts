@@ -163,4 +163,8 @@ export class VisitDataSourceMock implements VisitDataSource {
       ? true
       : false;
   }
+
+  async getRelatedUsersOnVisits(id: number): Promise<number[]> {
+    return [];
+  }
 }

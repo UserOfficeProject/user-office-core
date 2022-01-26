@@ -34,4 +34,5 @@ export interface VisitDataSource {
   deleteVisit(visitId: number): Promise<Visit>;
   isVisitorOfProposal(visitorId: number, proposalPk: number): Promise<boolean>;
   isVisitorOfVisit(visitorId: number, visitId: number): Promise<boolean>;
+  getRelatedUsersOnVisits(id: number): Promise<number[]>;
 }

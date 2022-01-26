@@ -22,7 +22,6 @@ import {
   GenericTemplatePDFData,
 } from './genericTemplates';
 import { collectSamplePDFData, SamplePDFData } from './sample';
-
 type ProposalPDFData = {
   proposal: Proposal;
   principalInvestigator: BasicUserDetails;
