@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { UserContext } from 'context/UserContextProvider';
+import { UserContext, BasicUser } from 'context/UserContextProvider';
 import {
-  BasicUserDetails,
   QuestionaryStep,
   ShipmentStatus,
   TemplateGroupId,
@@ -16,7 +15,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import ShipmentContainer from './ShipmentContainer';
 
 function createShipmentStub(
-  creator: BasicUserDetails,
+  creator: BasicUser,
   questionarySteps: QuestionaryStep[],
   templateId: number,
   scheduledEventId: number,
