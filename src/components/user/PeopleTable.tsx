@@ -132,6 +132,9 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
   const isEmailInviteEnabled = !!featureContext.features.get(
     FeatureId.EMAIL_INVITE
   )?.isEnabled;
+  const isEmailSearchEnabled = !!featureContext.features.get(
+    FeatureId.EMAIL_SEARCH
+  )?.isEnabled;
   
   const api = useDataApi();
   const { isLoading } = props;
@@ -437,7 +440,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             setQuery({ ...query, first: rowsPerPage })
           }
           components={{
-            Toolbar: isEmailInviteEnabled ? MTableToolbar : EmailSearchbar,
+            Toolbar: isEmailSearchEnabled ? MTableToolbar : EmailSearchbar,
           }}
         />
         {props.selection && (
