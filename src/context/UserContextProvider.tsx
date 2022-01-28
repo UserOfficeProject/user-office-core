@@ -4,12 +4,13 @@ import PropTypes from 'prop-types';
 import React, { useCallback, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 
-import { Role, UserRole } from 'generated/sdk';
+import { Role, UserRole, User } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
-import { dummyUser, User } from 'models/User';
+
+export type BasicUser = Pick<User, 'id' | 'email'>;
 
 interface UserContextData {
-  user: User;
+  user: BasicUser;
   token: string;
   roles: Role[];
   currentRole: UserRole | null;
@@ -34,7 +35,7 @@ enum ActionType {
 }
 
 const initUserData: UserContextData = {
-  user: dummyUser,
+  user: { id: 0, email: '' },
   token: '',
   roles: [],
   currentRole: null,

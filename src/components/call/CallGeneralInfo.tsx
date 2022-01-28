@@ -17,14 +17,12 @@ import {
   Theme,
   Typography,
   withStyles,
-  WithStyles,
 } from '@material-ui/core';
 import HelpIcon from '@material-ui/icons/Help';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import PropTypes from 'prop-types';
 import React, { useContext, useEffect } from 'react';
 
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
@@ -39,8 +37,8 @@ import {
 } from 'generated/sdk';
 
 const CallGeneralInfo: React.FC<{
-  templates: NonNullable<GetTemplatesQuery['templates']>;
-  esiTemplates: NonNullable<GetTemplatesQuery['templates']>;
+  templates: GetTemplatesQuery['templates'];
+  esiTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
   proposalWorkflows: ProposalWorkflow[];
   loadingProposalWorkflows: boolean;
@@ -261,10 +259,12 @@ const CallGeneralInfo: React.FC<{
         label="Call template"
         loading={loadingTemplates}
         noOptionsText="No templates"
-        items={templates.map((template) => ({
-          text: template.name,
-          value: template.templateId,
-        }))}
+        items={
+          templates?.map((template) => ({
+            text: template.name,
+            value: template.templateId,
+          })) || []
+        }
         InputProps={{ 'data-cy': 'call-template' }}
         required
       />
@@ -274,10 +274,12 @@ const CallGeneralInfo: React.FC<{
           label="ESI template"
           loading={loadingTemplates}
           noOptionsText="No templates"
-          items={esiTemplates.map((template) => ({
-            text: template.name,
-            value: template.templateId,
-          }))}
+          items={
+            esiTemplates?.map((template) => ({
+              text: template.name,
+              value: template.templateId,
+            })) || []
+          }
           InputProps={{ 'data-cy': 'call-esi-template' }}
           required
         />
@@ -327,16 +329,4 @@ const CallGeneralInfo: React.FC<{
   );
 };
 
-CallGeneralInfo.propTypes = {
-  loadingProposalWorkflows: PropTypes.bool.isRequired,
-  proposalWorkflows: PropTypes.array.isRequired,
-  loadingTemplates: PropTypes.bool.isRequired,
-  templates: PropTypes.array.isRequired,
-};
-
 export default CallGeneralInfo;
-export interface DialogTitleProps extends WithStyles {
-  id: string;
-  children: React.ReactNode;
-  onClose: () => void;
-}
