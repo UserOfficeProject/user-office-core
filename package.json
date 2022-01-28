@@ -24,7 +24,7 @@
     "lint:fix": "tsc --noEmit && eslint . --ext .js,.ts --fix --quiet",
     "start": "tsc && node ./build/index.js",
     "apitest": "newman run api_tests/tests.json --environment api_tests/environment.json",
-    "debug": "rm -R -f ./build && tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere DEPENDENCY_CONFIG=ess USER_OFFICE_FACTORY_ENDPOINT=http://localhost:4500/generate ts-node-dev --inspect --respawn -- ./index.ts",
+    "debug": "ts-node-dev --inspect --respawn -T ./index.ts",
     "populate": "ts-node-dev --respawn -T ./src/populate/index.ts",
     "generate:uows-client:dev": "uows-client-generator https://devapis.facilities.rl.ac.uk/ws/UserOfficeWebService?wsdl src/datasources/stfc/UOWSSoapInterface.ts"
   },
@@ -42,7 +42,7 @@
     "@apollo/federation": "^0.33.8",
     "@apollo/subgraph": "^0.1.5",
     "@user-office-software/duo-localisation": "^1.2.0",
-    "@user-office-software/duo-logger": "^1.2.0",
+    "@user-office-software/duo-logger": "^2.0.2",
     "@user-office-software/duo-message-broker": "^1.3.0",
     "@user-office-software/duo-validation": "^2.4.3",
     "apollo-graphql": "^0.9.5",

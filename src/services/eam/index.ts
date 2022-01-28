@@ -50,14 +50,21 @@ export class EAMAssetRegistrar implements AssetRegistrar {
     private userDataSource: UserDataSource
   ) {}
 
+  createAndLogError(message: string, context: Record<string, unknown>) {
+    logger.logError(message, context);
+
+    return new Error(message);
+  }
   getEnvOrThrow(envVariable: EnvVars) {
     const value = process.env[envVariable];
     if (!value) {
-      logger.logError(`Environmental variable ${envVariable} is not set`, {
-        envVariable,
-        value,
-      });
-      throw new Error(`Environmental variable ${envVariable} is not set`);
+      throw this.createAndLogError(
+        `Environmental variable ${envVariable} is not set`,
+        {
+          envVariable,
+          value,
+        }
+      );
     }
 
     return value;
@@ -79,17 +86,17 @@ export class EAMAssetRegistrar implements AssetRegistrar {
       },
     }).catch((error) => {
       const { message, response } = error;
-      logger.logError('Error while calling EAM API', {
+      throw this.createAndLogError('Error while calling EAM API', {
         message,
         requestData,
         responseData: response?.data,
       });
-      throw new Error('Error while calling EAM API');
     });
 
     if (response.status !== 200) {
-      logger.logError('Failed to execute registerAssetInEAM', { response });
-      throw new Error('Failed to execute registerAssetInEAM');
+      throw this.createAndLogError('Failed to execute registerAssetInEAM', {
+        response,
+      });
     }
 
     return response.data as string;
@@ -98,14 +105,16 @@ export class EAMAssetRegistrar implements AssetRegistrar {
   private async createTicket(shipmentId: number, containerId: string) {
     const shipment = await this.shipmentDataSource.getShipment(shipmentId);
     if (!shipment) {
-      logger.logError('Shipment not found', { shipmentId });
-      throw new Error('Shipment not found');
+      throw this.createAndLogError('Shipment for ticket not found', {
+        shipmentId,
+      });
     }
 
     const proposal = await this.proposalDataSource.get(shipment.proposalPk);
     if (!proposal) {
-      logger.logError('Proposal for shipment not found', { shipment });
-      throw new Error('Proposal not found');
+      throw this.createAndLogError('Proposal for ticket not found', {
+        shipment,
+      });
     }
 
     const scheduledEvent =
@@ -113,8 +122,9 @@ export class EAMAssetRegistrar implements AssetRegistrar {
         shipment.scheduledEventId
       );
     if (!scheduledEvent) {
-      logger.logError('Scheduled event for shipment not found', { shipment });
-      throw new Error('Scheduled event not found');
+      throw this.createAndLogError('Scheduled event for ticket not found', {
+        shipment,
+      });
     }
 
     let localContact = null;
@@ -142,14 +152,16 @@ export class EAMAssetRegistrar implements AssetRegistrar {
   private async createContainer(shipmentId: number) {
     const shipment = await this.shipmentDataSource.getShipment(shipmentId);
     if (!shipment) {
-      logger.logError('Shipment not found', { shipmentId });
-      throw new Error('Shipment not found');
+      throw this.createAndLogError('Shipment for container not found', {
+        shipmentId,
+      });
     }
 
     const proposal = await this.proposalDataSource.get(shipment.proposalPk);
     if (!proposal) {
-      logger.logError('Proposal for shipment not found', { shipment });
-      throw new Error('Proposal not found');
+      throw this.createAndLogError('Proposal for container not found', {
+        shipment,
+      });
     }
 
     const weight = await this.questionaryDataSource.getAnswer(
@@ -170,11 +182,13 @@ export class EAMAssetRegistrar implements AssetRegistrar {
     );
 
     if (!weight || !width || !height || !length) {
-      logger.logError(
-        'Can not create shipment because shipment template is not properly configured',
-        { shipmentId, weight, width, height, length }
-      );
-      throw new Error('Could not create shipment');
+      throw this.createAndLogError('Template is not properly configured', {
+        shipmentId,
+        weight,
+        width,
+        height,
+        length,
+      });
     }
 
     const weightAnswer = getAnswerForNumberInput(weight);
@@ -183,14 +197,13 @@ export class EAMAssetRegistrar implements AssetRegistrar {
     const lengthAnswer = getAnswerForNumberInput(length);
 
     if (!weightAnswer || !widthAnswer || !heightAnswer || !lengthAnswer) {
-      logger.logError('Can not create shipment because answer is missing', {
+      throw this.createAndLogError('Answer is missing for shipment creation', {
         shipmentId,
         weight,
         width,
         height,
         length,
       });
-      throw new Error('Could not create shipment');
     }
 
     const request = getAddAssetEquipmentReq(
@@ -209,8 +222,9 @@ export class EAMAssetRegistrar implements AssetRegistrar {
     const result = response.match(regexFindEquipmentCode);
 
     if (!result || result.length < 2) {
-      logger.logError('Unexpected response from EAM API', { response });
-      throw new Error('Unexpected response from EAM API');
+      throw this.createAndLogError('Unexpected response from EAM API', {
+        response,
+      });
     }
 
     return result[1];
