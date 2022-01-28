@@ -45,6 +45,7 @@ async function bootstrap() {
   );
 
   startAsyncJobs();
+  container.resolve<(() => void) | undefined>(Tokens.ConfigureLogger)?.();
   container.resolve<() => void>(Tokens.ConfigureEnvironment)();
 }
 

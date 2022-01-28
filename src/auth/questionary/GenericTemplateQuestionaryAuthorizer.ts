@@ -59,9 +59,12 @@ export class GenericTemplateQuestionaryAuthorizer
     );
 
     if (!proposal) {
-      logger.logError('Could not find proposal for questionary', {
-        questionaryId,
-      });
+      logger.logError(
+        'Could not find proposal for generic template questionary',
+        {
+          questionaryId,
+        }
+      );
 
       return false;
     }

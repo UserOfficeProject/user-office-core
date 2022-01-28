@@ -4,6 +4,7 @@ export const Tokens = {
   AssetRegistrar: Symbol('AssetRegistrar'),
   CallDataSource: Symbol('CallDataSource'),
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
+  ConfigureLogger: Symbol('ConfigureLogger'),
   EventLogsDataSource: Symbol('EventLogsDataSource'),
   FeedbackDataSource: Symbol('FeedbackDataSource'),
   FileDataSource: Symbol('FileDataSource'),

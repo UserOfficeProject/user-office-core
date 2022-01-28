@@ -1,3 +1,4 @@
+import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
@@ -61,3 +62,4 @@ mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureESSDevelopmentEnvironment);
+mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));

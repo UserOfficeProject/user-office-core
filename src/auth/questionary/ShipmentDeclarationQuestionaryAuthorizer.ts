@@ -56,7 +56,7 @@ export class ShipmentDeclarationQuestionaryAuthorizer
     const proposal = await this.proposalDataSource.get(shipment.proposalPk);
 
     if (!proposal) {
-      logger.logError('Could not find proposal for questionary', {
+      logger.logError('Could not find proposal for shipment questionary', {
         questionaryId,
       });
 
