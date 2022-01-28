@@ -440,7 +440,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             setQuery({ ...query, first: rowsPerPage })
           }
           components={{
-            Toolbar: isEmailSearchEnabled ? MTableToolbar : EmailSearchbar,
+            Toolbar: isEmailSearchEnabled ? EmailSearchbar : MTableToolbar,
           }}
         />
         {props.selection && (
