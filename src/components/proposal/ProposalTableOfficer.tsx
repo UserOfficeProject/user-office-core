@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import MaterialTable, { Column } from '@material-table/core';
 import { Typography } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
@@ -130,6 +129,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       setPreselectedProposalsData((proposalsData) =>
         proposalsData.map((proposal) => ({
           ...proposal,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           tableData: { ...(proposal as any).tableData, checked: false },
         }))
       );
@@ -583,6 +583,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             selectedProposalStatuses={selectedProposals.map(
               (selectedProposal) => selectedProposal.statusId
             )}
+            allSelectedProposalsHaveInstrument={selectedProposals.every(
+              (selectedProposal) => selectedProposal.instrumentId
+            )}
           />
         </DialogContent>
       </Dialog>
@@ -656,7 +659,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           },
           debounceInterval: 400,
           columnsButton: true,
-          selectionProps: (rowdata: any) => ({
+          selectionProps: (rowdata: ProposalViewData) => ({
             inputProps: {
               'aria-label': `${rowdata.title}-select`,
             },
