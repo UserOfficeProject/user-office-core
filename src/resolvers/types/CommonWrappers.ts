@@ -26,6 +26,7 @@ import { ReviewWithNextProposalStatus } from './Review';
 import { Review } from './Review';
 import { Sample } from './Sample';
 import { SampleExperimentSafetyInput } from './SampleExperimentSafetyInput';
+import { ScheduledEventCore } from './ScheduledEvent';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
 import { SEPProposal } from './SEPProposal';
@@ -366,4 +367,11 @@ export class FeedbackRequestWrap extends ResponseWrapBase {
   @Response()
   @Field(() => FeedbackRequest, { nullable: true })
   public request: FeedbackRequest;
+}
+
+@ObjectType()
+export class ScheduledEventResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => ScheduledEventCore, { nullable: true })
+  public scheduledEvent: ScheduledEventCore;
 }

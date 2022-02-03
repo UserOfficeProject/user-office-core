@@ -20,7 +20,7 @@ import { AddSamplesToShipmentArgs } from '../resolvers/mutations/AddSamplesShipm
 import { CreateShipmentInput } from '../resolvers/mutations/CreateShipmentMutation';
 import { SubmitShipmentArgs } from '../resolvers/mutations/SubmitShipmentMutation';
 import { UpdateShipmentArgs } from '../resolvers/mutations/UpdateShipmentMutation';
-import { AssetRegistrar } from '../services/eam';
+import { AssetRegistrar } from '../services/assetRegistrar/AssetRegistrar';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 
 @injectable()
