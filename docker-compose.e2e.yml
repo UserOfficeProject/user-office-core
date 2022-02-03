@@ -12,6 +12,7 @@ services:
       NODE_ENV: development
       DEPENDENCY_CONFIG: e2e
       USER_OFFICE_FACTORY_ENDPOINT: ${USER_OFFICE_FACTORY_ENDPOINT}
+      TZ: Europe/Stockholm
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /downloads, /files, /download, /uploads"
       - "traefik.port=4000"
@@ -25,6 +26,7 @@ services:
       POSTGRES_PASSWORD: duopassword
       POSTGRES_USER: duouser
       POSTGRES_DB: duo
+      PGTZ: Europe/Stockholm
     ports:
       - 5432:5432
     volumes:

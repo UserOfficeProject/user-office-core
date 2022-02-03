@@ -34,6 +34,7 @@ async function enableDefaultStfcFeatures() {
     SettingsId.EXTERNAL_AUTH_LOGIN_URL,
     process.env.EXTERNAL_AUTH_LOGIN_URL
   );
+  await db.updateSettings(SettingsId.TIMEZONE, process.env.TZ);
 }
 
 export async function configureSTFCEnvironment() {

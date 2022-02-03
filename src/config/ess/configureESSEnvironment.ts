@@ -34,6 +34,7 @@ async function enableDefaultEssFeatures() {
     ],
     true
   );
+  await db.updateSettings(SettingsId.TIMEZONE, process.env.TZ);
 }
 
 export async function configureESSDevelopmentEnvironment() {
