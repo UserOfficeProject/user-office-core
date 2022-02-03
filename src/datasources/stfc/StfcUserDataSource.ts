@@ -292,37 +292,35 @@ export class StfcUserDataSource implements UserDataSource {
     userRole?: number,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
-    const dbUsers: BasicUserDetails[] = (
-      await postgresUserDataSource.getUsers(
-        undefined,
-        first,
-        offset,
-        undefined,
-        subtractUsers
-      )
-    ).users;
+    const { users, totalCount } = await postgresUserDataSource.getUsers(
+      undefined,
+      first,
+      offset,
+      undefined,
+      subtractUsers
+    );
 
-    let users: BasicUserDetails[] = [];
+    let userDeatails: BasicUserDetails[] = [];
 
-    if (dbUsers[0]) {
-      const userNumbers: string[] = dbUsers.map((record) => String(record.id));
+    if (users[0]) {
+      const userNumbers: string[] = users.map((record) => String(record.id));
       const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
         await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
       )?.return;
 
-      users = stfcBasicPeople
+      userDeatails = stfcBasicPeople
         ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
         : [];
     }
 
     if (filter) {
-      users = [];
+      userDeatails = [];
 
       const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] | null = (
         await client.getBasicPeopleDetailsFromSurname(token, filter, true)
       )?.return;
 
-      users = stfcBasicPeopleByLastName
+      userDeatails = stfcBasicPeopleByLastName
         ? stfcBasicPeopleByLastName.map((person) =>
             toEssBasicUserDetails(person)
           )
@@ -330,8 +328,8 @@ export class StfcUserDataSource implements UserDataSource {
     }
 
     return {
-      totalCount: users.length,
-      users,
+      users: userDeatails,
+      totalCount: totalCount,
     };
   }
 
