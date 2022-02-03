@@ -1,4 +1,5 @@
 import faker from 'faker';
+import { DateTime } from 'luxon';
 
 import {
   AllocationTimeUnits,
@@ -570,6 +571,88 @@ context('Calls tests', () => {
         variant: 'success',
         text: 'Call deleted successfully',
       });
+    });
+  });
+
+  it('Call displays correct time remaining', () => {
+    /*
+      The time remaining is rounded down to the nearest min, hour or day.
+      No time remaining is displayed if over 30 days or under one minute.
+    */
+    cy.login('user');
+    cy.visit('/');
+
+    // Create a future call, so that there is always two calls to choose from
+    cy.createCall({
+      ...newCall,
+      endCall: DateTime.now().plus({ days: 365 }),
+      proposalWorkflowId: workflowId,
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ days: 31, hours: 1 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.contains('New Proposal').click();
+
+      cy.contains('remaining').should('not.exist');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ days: 30, hours: 1 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains('30 days remaining');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ days: 1, hours: 1 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains('1 day remaining');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ hours: 7, minutes: 30 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains('7 hours remaining');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ minutes: 1, seconds: 30 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains('1 minute remaining');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ seconds: 59 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains('remaining').should('not.exist');
     });
   });
 });

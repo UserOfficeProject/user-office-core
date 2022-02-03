@@ -97,20 +97,24 @@ export function daysRemaining(date: Date) {
   );
 }
 
-export function timeRemaining(date: Date): string {
-  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-  const firstDate = new Date();
-  const secondDate = date;
+export function timeRemaining(toDate: Date): string {
+  const diff = toDate.getTime() - new Date().getTime();
 
-  const days = Math.abs((firstDate.getTime() - secondDate.getTime()) / oneDay);
-  const hours = Math.round((days % 1) * 24);
-  const minutes = Math.round((((days % 1) * 24) % 1) * 60);
+  const minutes = Math.floor(diff / 1000 / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
 
-  if (hours < 1) {
-    return `${minutes} minutes remaining`;
+  if (days > 30) {
+    return '';
+  } else if (days >= 1) {
+    return `${days} day${days > 1 ? 's' : ''} remaining`;
+  } else if (hours >= 1) {
+    return `${hours} hour${hours > 1 ? 's' : ''} remaining`;
+  } else if (minutes >= 1) {
+    return `${minutes} minute${minutes > 1 ? 's' : ''} remaining`;
+  } else {
+    return '';
   }
-
-  return `${hours} hours remaining`;
 }
 
 export const TZ_LESS_DATE_TIME_FORMAT = 'yyyy-MM-DD HH:mm:ss';
