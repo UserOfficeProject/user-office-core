@@ -171,6 +171,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               )}
               disabled={isDisabled(isSubmitting)}
               required
+              nbrOptionShown={10}
               data-cy="grade-proposal"
             />
           </Box>
