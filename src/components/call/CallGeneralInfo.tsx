@@ -1,4 +1,4 @@
-import DateFnsUtils from '@date-io/date-fns';
+import LuxonUtils from '@date-io/luxon';
 import {
   Button,
   createStyles,
@@ -27,12 +27,14 @@ import React, { useContext, useEffect } from 'react';
 
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
 import { FeatureContext } from 'context/FeatureContextProvider';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   AllocationTimeUnits,
   CreateCallMutationVariables,
   FeatureId,
   GetTemplatesQuery,
   ProposalWorkflow,
+  SettingsId,
   UpdateCallMutationVariables,
 } from 'generated/sdk';
 
@@ -50,6 +52,8 @@ const CallGeneralInfo: React.FC<{
   loadingTemplates,
 }) => {
   const { features } = useContext(FeatureContext);
+
+  const settingsContext = useContext(SettingsContext);
 
   const proposalWorkflowOptions = proposalWorkflows.map((proposalWorkflow) => ({
     text: proposalWorkflow.name,
@@ -127,6 +131,9 @@ const CallGeneralInfo: React.FC<{
     })
   )(TableRow);
 
+  const timezone =
+    settingsContext.settings.get(SettingsId.TIMEZONE)?.settingsValue || '';
+
   function populateTable(format: string, refNumber: string) {
     return { format, refNumber };
   }
@@ -150,10 +157,10 @@ const CallGeneralInfo: React.FC<{
         required
         data-cy="short-code"
       />
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      <MuiPickersUtilsProvider utils={LuxonUtils}>
         <Field
           name="startCall"
-          label="Start"
+          label={`Start (${timezone})`}
           id="start-call-input"
           format="yyyy-MM-dd HH:mm"
           component={KeyboardDateTimePicker}
@@ -162,10 +169,9 @@ const CallGeneralInfo: React.FC<{
           required
           data-cy="start-date"
         />
-
         <Field
           name="endCall"
-          label="End"
+          label={`End (${timezone})`}
           id="end-call-input"
           format="yyyy-MM-dd HH:mm"
           component={KeyboardDateTimePicker}

@@ -20,8 +20,8 @@ context('Calls tests', () => {
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startCall: faker.date.past().toISOString().slice(0, 10),
-    endCall: faker.date.future().toISOString().slice(0, 10),
+    startCall: faker.date.past().toISOString().slice(0, 16).replace('T', ' '),
+    endCall: faker.date.future().toISOString().slice(0, 16).replace('T', ' '),
     startReview: currentDayStart,
     endReview: currentDayStart,
     startSEPReview: currentDayStart,
@@ -40,8 +40,8 @@ context('Calls tests', () => {
 
   const newInactiveCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startCall: twoDaysAgo.toISOString().slice(0, 10),
-    endCall: yesterday.toISOString().slice(0, 10),
+    startCall: twoDaysAgo.toISOString(),
+    endCall: yesterday.toISOString(),
     startReview: currentDayStart,
     endReview: currentDayStart,
     startSEPReview: currentDayStart,
@@ -58,8 +58,8 @@ context('Calls tests', () => {
 
   const updatedCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startDate: faker.date.past().toISOString().slice(0, 10),
-    endDate: faker.date.future().toISOString().slice(0, 10),
+    startDate: faker.date.past().toISOString().slice(0, 16).replace('T', ' '),
+    endDate: faker.date.future().toISOString().slice(0, 16).replace('T', ' '),
   };
 
   const proposalWorkflow = {
@@ -122,8 +122,18 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able go to next step or create call if there is validation error', () => {
       const shortCode = faker.random.alphaNumeric(15);
-      const startDate = faker.date.past().toISOString().slice(0, 10);
-      const endDate = faker.date.future().toISOString().slice(0, 10);
+      const startDate = faker.date
+        .past()
+        .toISOString()
+        .slice(0, 16)
+        .replace('T', ' ');
+      const endDate = faker.date
+        .future()
+        .toISOString()
+        .slice(0, 16)
+        .replace('T', ' ');
+      const invalidPastDate = faker.date.past().toISOString().slice(0, 10); // no time
+      const invalidFutureDate = faker.date.future().toISOString().slice(0, 10); // no time
 
       cy.contains('Proposals');
 
@@ -147,8 +157,21 @@ context('Calls tests', () => {
       cy.contains('Invalid Date');
 
       cy.get('[data-cy=start-date] input')
+        .clear()
+        .type(invalidPastDate)
+        .should('have.value', invalidPastDate + ' __:__');
+
+      cy.contains('Invalid Date');
+
+      cy.get('[data-cy=start-date] input')
+        .clear()
         .type(startDate)
         .should('have.value', startDate);
+
+      cy.get('[data-cy=end-date] input')
+        .clear()
+        .type(invalidFutureDate)
+        .should('have.value', invalidFutureDate + ' __:__');
 
       cy.get('[data-cy=end-date] input')
         .clear()
@@ -195,8 +218,8 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able to create a call with end dates before start dates', () => {
       const shortCode = faker.random.alphaNumeric(15);
-      const startDate = '2021-02-25';
-      const endDate = '2021-02-24';
+      const startDate = '2021-02-25 00:01';
+      const endDate = '2021-02-25 00:00';
 
       cy.contains('Proposals');
 
@@ -230,10 +253,13 @@ context('Calls tests', () => {
 
       cy.get('[data-cy=start-date] input')
         .clear()
-        .type('2021-02-27')
-        .should('have.value', '2021-02-27');
+        .type('2021-02-27 00:02')
+        .should('have.value', '2021-02-27 00:02');
 
-      cy.get('[data-cy=end-date] input').should('have.value', '2021-02-27');
+      cy.get('[data-cy=end-date] input').should(
+        'have.value',
+        '2021-02-27 00:02'
+      );
     });
 
     it('A user-officer should be able to create a call', () => {
@@ -241,9 +267,11 @@ context('Calls tests', () => {
         newCall;
       const callShortCode = shortCode || faker.lorem.word();
       const callStartDate =
-        startCall || faker.date.past().toISOString().slice(0, 10);
+        startCall ||
+        faker.date.past().toISOString().slice(0, 16).replace('T', ' ');
       const callEndDate =
-        endCall || faker.date.future().toISOString().slice(0, 10);
+        endCall ||
+        faker.date.future().toISOString().slice(0, 16).replace('T', ' ');
       const callSurveyComment = faker.lorem.word();
       const callCycleComment = faker.lorem.word();
 
