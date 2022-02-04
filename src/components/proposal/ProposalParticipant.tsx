@@ -54,7 +54,7 @@ export default function ProposalParticipant(props: {
         }}
         participant={true}
       />
-      <FormControl className={classes.container} margin="dense">
+      <FormControl className={classes.container} margin="dense" fullWidth>
         <TextField
           label="Principal Investigator"
           value={
@@ -68,6 +68,7 @@ export default function ProposalParticipant(props: {
           }}
           data-cy="principal-investigator"
           required
+          fullWidth
         />
 
         <Tooltip title="Edit Principal Investigator">
