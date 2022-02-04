@@ -27,7 +27,7 @@ import {
   createSkipListeningHandler,
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
-import { SkipAssetRegistrar } from '../services/eam';
+import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';

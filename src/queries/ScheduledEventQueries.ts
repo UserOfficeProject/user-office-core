@@ -26,4 +26,18 @@ export default class ScheduledEventQueries {
 
     return scheduledEvents;
   }
+
+  @Authorized([Roles.USER])
+  async getScheduledEventCore(
+    user: UserWithRole | null,
+    scheduledEventId: number
+  ): Promise<ScheduledEventCore | null> {
+    const scheduledEvent = await this.dataSource.getScheduledEventCore(
+      scheduledEventId
+    );
+
+    // TODO check if user has access to this scheduled event
+
+    return scheduledEvent;
+  }
 }
