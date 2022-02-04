@@ -50,6 +50,7 @@ import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage
 import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
 import UnitTablePage from './settings/unitList/UnitTablePage';
+import DeclareShipmentsPage from './shipments/DeclareShipmentsPage';
 import ProposalEsiPage from './template/EsiPage';
 import FeedbackTemplatesPage from './template/FeedbackTemplatesPage';
 import GenericTemplatesPage from './template/GenericTemplatesPage';
@@ -335,6 +336,10 @@ const Dashboard: React.FC = () => {
           <Route
             path="/UpdateFeedback/:feedbackId"
             component={UpdateFeedbackPage}
+          />
+          <Route
+            path="/DeclareShipments/:scheduledEventId"
+            component={DeclareShipmentsPage}
           />
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}
