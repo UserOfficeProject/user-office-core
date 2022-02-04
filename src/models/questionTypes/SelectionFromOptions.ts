@@ -1,4 +1,6 @@
 /* eslint-disable quotes */
+import { multipleChoiceValidationSchema } from '@user-office-software/duo-validation';
+
 import { SelectionFromOptionsConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -11,20 +13,7 @@ export const selectionFromOptionsDefinition: Question = {
       throw new Error('DataType should be SELECTION_FROM_OPTIONS');
     }
 
-    const config = field.config as SelectionFromOptionsConfig;
-    if (config.required && !value) {
-      return false;
-    }
-
-    if (config.required && value.length === 0) {
-      return false;
-    }
-
-    if (value.every((val) => config.options.includes(val)) !== true) {
-      return false;
-    }
-
-    return true;
+    return multipleChoiceValidationSchema(field).isValidSync(value);
   },
   createBlankConfig: (): SelectionFromOptionsConfig => {
     const config = new SelectionFromOptionsConfig();

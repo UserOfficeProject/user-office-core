@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -56,7 +56,7 @@ export class ShipmentDeclarationQuestionaryAuthorizer
     const proposal = await this.proposalDataSource.get(shipment.proposalPk);
 
     if (!proposal) {
-      logger.logError('Could not find proposal for questionary', {
+      logger.logError('Could not find proposal for shipment questionary', {
         questionaryId,
       });
 

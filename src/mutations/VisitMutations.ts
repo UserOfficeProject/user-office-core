@@ -60,7 +60,7 @@ export default class VisitMutations {
     }
 
     const scheduledEvent =
-      await this.scheduledEventDataSource.getScheduledEvent(
+      await this.scheduledEventDataSource.getScheduledEventCore(
         args.scheduledEventId
       );
     if (!scheduledEvent) {

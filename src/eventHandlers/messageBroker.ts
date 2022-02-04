@@ -1,5 +1,8 @@
-import { logger } from '@esss-swap/duo-logger';
-import { Queue, RabbitMQMessageBroker } from '@esss-swap/duo-message-broker';
+import { logger } from '@user-office-software/duo-logger';
+import {
+  Queue,
+  RabbitMQMessageBroker,
+} from '@user-office-software/duo-message-broker';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -223,6 +226,12 @@ export function createPostToRabbitMQHandler() {
         await rabbitMQ.sendBroadcast(Event.PROPOSAL_UPDATED, json);
         break;
       }
+      case Event.PROPOSAL_DELETED: {
+        const json = await getProposalMessageData(event.proposal);
+
+        await rabbitMQ.sendMessage(Queue.SCHEDULING_PROPOSAL, event.type, json);
+        break;
+      }
       case Event.PROPOSAL_CREATED: {
         const json = await getProposalMessageData(event.proposal);
 
@@ -282,10 +291,11 @@ export function createListenToRabbitMQHandler() {
           proposalBookingId: message.proposalBookingId,
           proposalPk: message.proposalPk,
           status: message.status,
-        };
+          localContactId: message.localContact,
+        } as ScheduledEventCore;
 
         await proposalDataSource.addProposalBookingScheduledEvent(
-          scheduledEventToAdd as ScheduledEventCore
+          scheduledEventToAdd
         );
 
         return;
@@ -307,6 +317,7 @@ export function createListenToRabbitMQHandler() {
           proposalBookingId: scheduledEvent.proposalBookingId,
           proposalPk: scheduledEvent.proposalPk,
           status: scheduledEvent.status,
+          localContactId: scheduledEvent.localContactId,
         }));
 
         await proposalDataSource.removeProposalBookingScheduledEvents(
@@ -332,10 +343,11 @@ export function createListenToRabbitMQHandler() {
           startsAt: message.startsAt,
           endsAt: message.endsAt,
           status: message.status,
-        };
+          localContactId: message.localContactId,
+        } as ScheduledEventCore;
 
         await proposalDataSource.updateProposalBookingScheduledEvent(
-          scheduledEventToUpdate as ScheduledEventCore
+          scheduledEventToUpdate
         );
 
         return;
@@ -348,13 +360,13 @@ export function createListenToRabbitMQHandler() {
 }
 
 export function createSkipPostingHandler() {
-  return async (event: ApplicationEvent) => {
+  return async () => {
     // no op
   };
 }
 
 export function createSkipListeningHandler() {
-  return async (event: ApplicationEvent) => {
+  return async () => {
     // no op
   };
 }

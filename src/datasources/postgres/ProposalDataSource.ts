@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import BluePromise from 'bluebird';
 import { injectable } from 'tsyringe';
 
@@ -794,6 +794,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         proposal_booking_id: eventMessage.proposalBookingId,
         proposal_pk: eventMessage.proposalPk,
         status: eventMessage.status,
+        local_contact: eventMessage.localContactId,
       })
       .into('scheduled_events')
       .returning(['*']);
@@ -815,6 +816,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         starts_at: eventToUpdate.startsAt,
         ends_at: eventToUpdate.endsAt,
         status: eventToUpdate.status,
+        local_contact: eventToUpdate.localContactId,
       })
       .where('scheduled_event_id', eventToUpdate.id)
       .andWhere('proposal_booking_id', eventToUpdate.proposalBookingId)
@@ -848,5 +850,36 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           .join(', ')} `
       );
     }
+  }
+
+  async getRelatedUsersOnProposals(id: number): Promise<number[]> {
+    const relatedCoIs = await database
+      .select('ou.user_id')
+      .distinct()
+      .from('proposals as p')
+      .leftJoin('proposal_user as u', function () {
+        this.on('u.proposal_pk', 'p.proposal_pk');
+        this.andOn(function () {
+          this.onVal('u.user_id', id); // user is on the proposal
+          this.orOnVal('p.proposer_id', id); // user is the proposal PI
+        });
+      }) // this gives a list of proposals that a user is related to
+      .join('proposal_user as ou', { 'ou.proposal_pk': 'u.proposal_pk' }); // this gives us all of the associated coIs
+
+    const relatedPis = await database
+      .select('p.proposer_id')
+      .distinct()
+      .from('proposals as p')
+      .leftJoin('proposal_user as u', {
+        'u.proposal_pk': 'p.proposal_pk',
+        'u.user_id': id,
+      }); // this gives a list of proposals that a user is related to
+
+    const relatedUsers = [
+      ...relatedCoIs.map((r) => r.user_id),
+      ...relatedPis.map((r) => r.proposer_id),
+    ];
+
+    return relatedUsers;
   }
 }

@@ -26,8 +26,9 @@ import {
   createListenToRabbitMQHandler,
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
-import { EAMAssetRegistrar } from '../services/eam';
+import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
+import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
@@ -66,3 +67,4 @@ mapValue(
   Tokens.ConfigureEnvironment,
   isProduction ? () => {} : configureESSDevelopmentEnvironment
 );
+mapValue(Tokens.ConfigureLogger, configureGraylogLogger);

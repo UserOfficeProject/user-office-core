@@ -19,6 +19,7 @@ import {
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
+import { basicDummyUser } from './UserDataSource';
 
 export let dummyProposal: Proposal;
 export let dummyProposalView: ProposalView;
@@ -76,7 +77,8 @@ const dummyScheduledEventCore = new ScheduledEventCore(
   new Date(),
   1,
   1,
-  ProposalBookingStatusCore.ACTIVE
+  ProposalBookingStatusCore.ACTIVE,
+  1
 );
 
 export class ProposalDataSourceMock implements ProposalDataSource {
@@ -343,5 +345,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     eventMessage: ScheduledEventCore
   ): Promise<void> {
     return;
+  }
+
+  async getRelatedUsersOnProposals(id: number): Promise<number[]> {
+    return [basicDummyUser.id];
   }
 }

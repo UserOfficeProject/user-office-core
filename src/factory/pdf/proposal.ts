@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { ProposalAuthorization } from '../../auth/ProposalAuthorization';
@@ -22,7 +22,6 @@ import {
   GenericTemplatePDFData,
 } from './genericTemplates';
 import { collectSamplePDFData, SamplePDFData } from './sample';
-
 type ProposalPDFData = {
   proposal: Proposal;
   principalInvestigator: BasicUserDetails;

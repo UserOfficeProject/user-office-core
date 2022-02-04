@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import { AuthenticationError } from 'apollo-server-core';
 import { container } from 'tsyringe';
 
@@ -37,10 +37,7 @@ const Authorized = (roles: Roles[] = []) => {
         return isMutation ? rejection('NOT_LOGGED_IN') : null;
       }
 
-      if (
-        agent.externalToken &&
-        !(await userAuthorization.isExternalTokenValid(agent.externalToken))
-      ) {
+      if (agent.externalToken && !agent.externalTokenValid) {
         logger.logWarn('External token invalid/Expired', {
           externalToken: agent.externalToken,
         });

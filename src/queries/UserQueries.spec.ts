@@ -37,7 +37,7 @@ test('A user officer is allowed to fetch all accounts', () => {
   });
 });
 
-test('A user is allowed to fetch all accounts', () => {
+test('A user is allowed to fetch all relevant accounts', () => {
   return expect(
     userQueries.getAll(dummyUserWithRole, '')
   ).resolves.toStrictEqual({

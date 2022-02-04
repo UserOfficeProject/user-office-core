@@ -8,6 +8,7 @@ import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { ExperimentSafetyInput } from './ExperimentSafetyInput';
 import { Feedback } from './Feedback';
+import { FeedbackRequest } from './FeedbackRequest';
 import { GenericTemplate } from './GenericTemplate';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
@@ -25,6 +26,7 @@ import { ReviewWithNextProposalStatus } from './Review';
 import { Review } from './Review';
 import { Sample } from './Sample';
 import { SampleExperimentSafetyInput } from './SampleExperimentSafetyInput';
+import { ScheduledEventCore } from './ScheduledEvent';
 import { SEP } from './SEP';
 import { SepMeetingDecision } from './SepMeetingDecision';
 import { SEPProposal } from './SEPProposal';
@@ -358,4 +360,18 @@ export class TemplateImportWithValidationWrap extends ResponseWrapBase {
   @Response()
   @Field(() => TemplateImportWithValidation, { nullable: true })
   public validationResult: TemplateImportWithValidation;
+}
+
+@ObjectType()
+export class FeedbackRequestWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => FeedbackRequest, { nullable: true })
+  public request: FeedbackRequest;
+}
+
+@ObjectType()
+export class ScheduledEventResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => ScheduledEventCore, { nullable: true })
+  public scheduledEvent: ScheduledEventCore;
 }

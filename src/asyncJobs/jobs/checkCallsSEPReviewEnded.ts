@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { eventBus } from '../../events';
@@ -44,7 +44,7 @@ const checkCallsSEPReviewEnded = async (dataSource: CallDataSource) => {
 
     return updatedCalls;
   } catch (error) {
-    logger.logException('Checking and ending calls review failed: ', error);
+    logger.logException('Checking and ending calls SEP review failed: ', error);
   }
 };
 

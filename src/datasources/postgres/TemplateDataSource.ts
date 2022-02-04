@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 
 import { createConfig } from '../../models/questionTypes/QuestionRegistry';
 import {
@@ -682,12 +682,27 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return database('questions')
       .where({ question_id: questionId })
       .select('*')
-      .then((resultSet: QuestionRecord[]) => {
-        if (!resultSet || resultSet.length === 0) {
+      .first()
+      .then((result: QuestionRecord | null) => {
+        if (!result) {
           return null;
         }
 
-        return createQuestionObject(resultSet[0]);
+        return createQuestionObject(result);
+      });
+  }
+
+  async getQuestionByNaturalKey(naturalKey: string): Promise<Question | null> {
+    return database('questions')
+      .where({ natural_key: naturalKey })
+      .select('*')
+      .first()
+      .then((result: QuestionRecord | null) => {
+        if (!result) {
+          return null;
+        }
+
+        return createQuestionObject(result);
       });
   }
 
@@ -955,6 +970,53 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return rows.map((row) => createQuestionObject(row));
   }
 
+  async importQuestionTemplatRelation(
+    templateId: number,
+    topicId: number,
+    field: QuestionTemplateRelation
+  ) {
+    await this.upsertQuestionTemplateRelations([
+      {
+        questionId: field.question.id,
+        templateId: templateId,
+        sortOrder: field.sortOrder,
+        topicId: topicId,
+        config: createConfig<any>(
+          field.question.dataType as DataType,
+          field.config
+        ),
+        dependencies: field.dependencies,
+      },
+    ]);
+
+    if (field.dependencies.length > 0) {
+      await this.updateQuestionTemplateRelationSettings({
+        questionId: field.question.id,
+        templateId: templateId,
+        config: createConfig<any>(
+          field.question.dataType as DataType,
+          field.config
+        ),
+        dependenciesOperator: field.dependenciesOperator,
+        dependencies: field.dependencies,
+      });
+    }
+  }
+
+  async importTemplateStep(templateId: number, step: TemplateStep) {
+    const newTopic = await this.createTopic({
+      title: step.topic.title,
+      templateId: templateId,
+      sortOrder: step.topic.sortOrder,
+    });
+
+    for (const field of step.fields) {
+      await this.importQuestionTemplatRelation(templateId, newTopic.id, field);
+    }
+
+    return newTopic;
+  }
+
   async importTemplate(
     templateAsJson: string,
     conflictResolutions: ConflictResolution[]
@@ -966,12 +1028,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       throw new Error('Could not parse template');
     }
     const { template, questions, templateSteps } = templateObj;
-
-    const newTemplate = await this.createTemplate({
-      groupId: template.groupId,
-      name: template.name,
-      description: template.description,
-    });
 
     await Promise.all(
       questions.map(async (question) => {
@@ -1000,29 +1056,15 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       })
     );
 
-    await Promise.all(
-      templateSteps.map(async (step) => {
-        const newTopic = await this.createTopic({
-          title: step.topic.title,
-          templateId: newTemplate.templateId,
-          sortOrder: step.topic.sortOrder,
-        });
+    const newTemplate = await this.createTemplate({
+      groupId: template.groupId,
+      name: template.name,
+      description: template.description,
+    });
 
-        await this.upsertQuestionTemplateRelations(
-          step.fields.map((field) => ({
-            questionId: field.question.id,
-            templateId: newTemplate.templateId,
-            sortOrder: field.sortOrder,
-            topicId: newTopic.id,
-            config: createConfig<any>(
-              field.question.dataType as DataType,
-              field.config
-            ),
-            dependencies: field.dependencies,
-          }))
-        );
-      })
-    );
+    for (const step of templateSteps) {
+      await this.importTemplateStep(newTemplate.templateId, step);
+    }
 
     return newTemplate;
   }

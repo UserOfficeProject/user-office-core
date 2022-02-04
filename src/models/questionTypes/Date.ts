@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import { dateQuestionValidationSchema } from '@esss-swap/duo-validation';
+import { dateQuestionValidationSchema } from '@user-office-software/duo-validation';
 
 import { DateConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';

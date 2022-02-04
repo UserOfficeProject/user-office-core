@@ -1,3 +1,4 @@
+import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
@@ -26,7 +27,7 @@ import {
   createSkipListeningHandler,
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
-import { SkipAssetRegistrar } from '../services/eam';
+import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
@@ -61,3 +62,4 @@ mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureESSDevelopmentEnvironment);
+mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));

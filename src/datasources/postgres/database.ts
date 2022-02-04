@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import Knex from 'knex';
 
 const db = Knex({
@@ -7,7 +7,7 @@ const db = Knex({
 });
 
 db.on('query-error', function (error: any, obj: any) {
-  logger.logError('QUERY ERROR', { error, obj });
+  logger.logError('QUERY ERROR', { error, obj, QueryName: obj?.sql });
 });
 
 if (process.env.DATABASE_LOG_QUERIES === '1') {

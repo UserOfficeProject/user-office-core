@@ -65,7 +65,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             .leftJoin(
               'answers',
               'answers.questionary_id',
-              'proposals.questionary_id'
+              'proposal_table_view.questionary_id'
             )
             .andWhere('answers.question_id', questionFilter.questionId)
             .modify(questionFilterQuery, questionFilter);

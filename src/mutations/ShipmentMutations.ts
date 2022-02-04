@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
 import { SampleAuthorization } from '../auth/SampleAuthorization';
@@ -11,6 +11,7 @@ import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
+import { ProposalEndStatus } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
 import { ShipmentStatus } from '../models/Shipment';
 import { TemplateGroupId } from '../models/Template';
@@ -19,7 +20,7 @@ import { AddSamplesToShipmentArgs } from '../resolvers/mutations/AddSamplesShipm
 import { CreateShipmentInput } from '../resolvers/mutations/CreateShipmentMutation';
 import { SubmitShipmentArgs } from '../resolvers/mutations/SubmitShipmentMutation';
 import { UpdateShipmentArgs } from '../resolvers/mutations/UpdateShipmentMutation';
-import { AssetRegistrar } from '../services/eam';
+import { AssetRegistrar } from '../services/assetRegistrar/AssetRegistrar';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 
 @injectable()
@@ -90,6 +91,19 @@ export default class ShipmentMutations {
       );
     }
 
+    if (
+      proposal.finalStatus !== ProposalEndStatus.ACCEPTED ||
+      proposal.managementDecisionSubmitted === false
+    ) {
+      return rejection(
+        'Can not create shipment because the proposal is not yet accepted',
+        {
+          args,
+          agent,
+        }
+      );
+    }
+
     return this.questionaryDataSource
       .create(agent.id, template.templateId)
       .then((questionary) => {
@@ -98,7 +112,7 @@ export default class ShipmentMutations {
           agent.id,
           args.proposalPk,
           questionary.questionaryId,
-          args.visitId
+          args.scheduledEventId
         );
       })
       .catch((error) => {
@@ -138,7 +152,7 @@ export default class ShipmentMutations {
       );
 
       return rejection(
-        'Could not submit shipment because an error occurred',
+        'Could not submit shipment because an error occurred. Please try again later.',
         { args },
         error
       );

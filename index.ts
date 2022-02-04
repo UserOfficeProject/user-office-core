@@ -1,4 +1,4 @@
-import { logger } from '@esss-swap/duo-logger';
+import { logger } from '@user-office-software/duo-logger';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import 'reflect-metadata';
@@ -45,6 +45,7 @@ async function bootstrap() {
   );
 
   startAsyncJobs();
+  container.resolve<(() => void) | undefined>(Tokens.ConfigureLogger)?.();
   container.resolve<() => void>(Tokens.ConfigureEnvironment)();
 }
 

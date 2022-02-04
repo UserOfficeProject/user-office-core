@@ -1,4 +1,7 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import {
+  getTranslation,
+  ResourceId,
+} from '@user-office-software/duo-localisation';
 
 import baseContext from '../../buildContext';
 import { ProposalEndStatus } from '../../models/Proposal';
@@ -17,7 +20,7 @@ export const defaultProposalDataColumns = [
   'Title',
   'Principal Investigator',
   'Technical Status',
-  'Tehnical Comment',
+  'Technical Comment',
   'Time(Days)',
   'Score difference',
   'Average Score',

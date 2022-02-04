@@ -1,9 +1,10 @@
-import { ObjectType, Field, Int } from 'type-graphql';
+import { ObjectType, Field, Int, Directive } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { BasicUserDetails as BasicUserDetailsOrigin } from '../../models/User';
 
 @ObjectType()
+@Directive('@key(fields: "id")')
 export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field(() => Int)
   public id: number;
@@ -31,7 +32,7 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function resolveBasicUserReference(
+export async function resolveBasicUserDetailsReference(
   ...params: any
 ): Promise<BasicUserDetails> {
   // the order of the parameters and types are messed up,
