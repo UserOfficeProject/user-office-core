@@ -1936,6 +1936,7 @@ export type Query = {
   sampleEsi: Maybe<SampleExperimentSafetyInput>;
   samples: Maybe<Array<Sample>>;
   samplesByCallId: Maybe<Array<Sample>>;
+  scheduledEventCore: Maybe<ScheduledEventCore>;
   scheduledEventsCore: Maybe<Array<ScheduledEventCore>>;
   sep: Maybe<Sep>;
   sepMembers: Maybe<Array<SepReviewer>>;
@@ -2194,6 +2195,11 @@ export type QuerySamplesArgs = {
 
 export type QuerySamplesByCallIdArgs = {
   callId: Scalars['Int'];
+};
+
+
+export type QueryScheduledEventCoreArgs = {
+  scheduledEventId: Scalars['Int'];
 };
 
 
@@ -2616,6 +2622,7 @@ export type ScheduledEventCore = {
   id: Scalars['Int'];
   localContact: Maybe<BasicUserDetails>;
   localContactId: Maybe<Scalars['Int']>;
+  proposalPk: Maybe<Scalars['Int']>;
   shipments: Array<Shipment>;
   startsAt: Scalars['TzLessDateTime'];
   status: ProposalBookingStatusCore;
