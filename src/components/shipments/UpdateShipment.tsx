@@ -8,7 +8,7 @@ import ShipmentContainer from './ShipmentContainer';
 
 interface UpdateShipmentProps {
   shipment: ShipmentCore;
-  onShipmentSubmitted: (shipment: ShipmentCore) => void;
+  onShipmentSubmitted?: (shipment: ShipmentCore) => void;
 }
 
 function UpdateShipment({
