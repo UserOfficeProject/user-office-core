@@ -3,15 +3,20 @@ import { container, inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { UserWithRole } from '../models/User';
+import { ScheduledEventDataSource } from './../datasources/ScheduledEventDataSource';
 import { Shipment } from './../resolvers/types/Shipment';
 import { ProposalAuthorization } from './ProposalAuthorization';
+import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class ShipmentAuthorization {
   private proposalAuth = container.resolve(ProposalAuthorization);
+  private userAuth = container.resolve(UserAuthorization);
   constructor(
     @inject(Tokens.ShipmentDataSource)
-    private shipmentDataSource: ShipmentDataSource
+    private shipmentDataSource: ShipmentDataSource,
+    @inject(Tokens.ScheduledEventDataSource)
+    private scheduledEventDataSource: ScheduledEventDataSource
   ) {}
 
   private async resolveShipment(
@@ -42,7 +47,16 @@ export class ShipmentAuthorization {
     agent: UserWithRole | null,
     shipmentOrShipmentId: Shipment | number
   ): Promise<boolean> {
-    return this.hasAccessRights(agent, shipmentOrShipmentId);
+    if (this.userAuth.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const shipment = await this.resolveShipment(shipmentOrShipmentId);
+    if (!shipment) {
+      return false;
+    }
+
+    return this.proposalAuth.hasReadRights(agent, shipment.proposalPk);
   }
 
   async hasWriteRights(
@@ -57,22 +71,15 @@ export class ShipmentAuthorization {
     agent: UserWithRole | null,
     shipmentOrShipmentId: Shipment | number
   ): Promise<boolean> {
-    return await this.hasAccessRights(agent, shipmentOrShipmentId);
-  }
+    if (this.userAuth.isUserOfficer(agent)) {
+      return true;
+    }
 
-  private async hasAccessRights(
-    agent: UserWithRole | null,
-    shipmentOrShipmentId: Shipment | number
-  ) {
     const shipment = await this.resolveShipment(shipmentOrShipmentId);
     if (!shipment) {
       return false;
     }
 
-    /*
-     * For the shipment the authorization follows the business logic for the proposal
-     * authorization that the shipment is associated with, this should be changed
-     */
     return this.proposalAuth.hasReadRights(agent, shipment.proposalPk);
   }
 }
