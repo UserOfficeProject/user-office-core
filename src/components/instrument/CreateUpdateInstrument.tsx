@@ -1,10 +1,10 @@
-import {
-  createInstrumentValidationSchema,
-  updateInstrumentValidationSchema,
-} from '@esss-swap/duo-validation/lib/Instrument';
 import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
+import {
+  createInstrumentValidationSchema,
+  updateInstrumentValidationSchema,
+} from '@user-office-software/duo-validation/lib/Instrument';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
@@ -12,7 +12,7 @@ import React from 'react';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import UOLoader from 'components/common/UOLoader';
-import { Instrument, UserRole } from 'generated/sdk';
+import { InstrumentFragment, UserRole } from 'generated/sdk';
 import { useUsersData } from 'hooks/user/useUsersData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
@@ -24,8 +24,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type CreateUpdateInstrumentProps = {
-  close: (instrumentAdded: Instrument | null) => void;
-  instrument: Instrument | null;
+  close: (instrumentAdded: InstrumentFragment | null) => void;
+  instrument: InstrumentFragment | null;
 };
 
 const CreateUpdateInstrument: React.FC<CreateUpdateInstrumentProps> = ({

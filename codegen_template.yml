@@ -4,13 +4,14 @@ documents: "src/graphql/**/*.graphql"
 generates:
   src/generated/sdk.ts:
     config:
+      skipTypename: true
       namingConvention:
-        typeNames: change-case#pascalCase
         enumValues: change-case#upperCase
       avoidOptionals:
         field: true
         object: false
         inputValue: false
+      maybeValue: T | null
     plugins:
       - typescript
       - typescript-operations

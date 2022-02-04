@@ -142,10 +142,14 @@ function updateQuestionTemplateRelationSettings(
   return cy.wrap(request);
 }
 
-function createBooleanQuestion(question: string) {
+function createBooleanQuestion(question: string, options?: { key?: string }) {
   openQuestionsMenu();
 
   cy.contains('Add Boolean').click();
+
+  if (options?.key) {
+    cy.get('[data-cy=natural_key]').clear().type(options.key);
+  }
 
   cy.get('[data-cy=question]').clear().type(question);
 
@@ -241,6 +245,7 @@ function createDateQuestion(
 function createMultipleChoiceQuestion(
   question: string,
   options?: {
+    key?: string;
     option1?: string;
     option2?: string;
     option3?: string;
@@ -251,6 +256,10 @@ function createMultipleChoiceQuestion(
   openQuestionsMenu();
 
   cy.contains('Add Multiple choice').click();
+
+  if (options?.key) {
+    cy.get('[data-cy=natural_key]').clear().type(options.key);
+  }
 
   cy.get('[data-cy=question]').clear().type(question);
 

@@ -93,33 +93,6 @@ const finishedLoading = () => {
     .should('not.exist');
 };
 
-function presentationMode() {
-  const COMMAND_DELAY = 300;
-
-  for (const command of [
-    'visit',
-    'click',
-    'trigger',
-    'type',
-    'clear',
-    'reload',
-    'contains',
-  ]) {
-    Cypress.Commands.overwrite(
-      command as keyof Cypress.Chainable<any>,
-      (originalFn: any, ...args: any[]) => {
-        const origVal = originalFn(...args);
-
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(origVal);
-          }, COMMAND_DELAY);
-        });
-      }
-    );
-  }
-}
-
 const dragElement = (
   element: JQuery<HTMLElement>,
   moveArgs: {
@@ -214,13 +187,10 @@ Cypress.Commands.add('finishedLoading', finishedLoading);
 Cypress.Commands.add(
   'dragElement',
   { prevSubject: 'element' },
-  // @ts-expect-error FIXME: this should be solved
   (element, args) => {
     return dragElement(element, args);
   }
 );
-
-Cypress.Commands.add('presentationMode', presentationMode);
 
 Cypress.Commands.add('setTinyMceContent', setTinyMceContent);
 Cypress.Commands.add('getTinyMceContent', getTinyMceContent);

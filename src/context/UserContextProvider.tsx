@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { decode } from 'jsonwebtoken';
+import jwtDecode from 'jwt-decode';
 import PropTypes from 'prop-types';
 import React, { useCallback, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 
-import { Role, UserRole } from 'generated/sdk';
+import { Role, UserRole, User } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
-import { dummyUser, User } from 'models/User';
+
+export type BasicUser = Pick<User, 'id' | 'email'>;
 
 interface UserContextData {
-  user: User;
+  user: BasicUser;
   token: string;
   roles: Role[];
   currentRole: UserRole | null;
@@ -34,7 +35,7 @@ enum ActionType {
 }
 
 const initUserData: UserContextData = {
-  user: dummyUser,
+  user: { id: 0, email: '' },
   token: '',
   roles: [],
   currentRole: null,
@@ -45,7 +46,7 @@ const initUserData: UserContextData = {
 };
 
 export const getCurrentUser = () =>
-  decode(localStorage.token) as DecodedTokenData | null;
+  jwtDecode(localStorage.token) as DecodedTokenData | null;
 
 const checkLocalStorage = (
   dispatch: React.Dispatch<{
@@ -90,7 +91,9 @@ const reducer = (
         expToken: action.payload.expToken,
       };
     case ActionType.LOGINUSER: {
-      const { user, exp, roles } = decode(action.payload) as DecodedTokenData;
+      const { user, exp, roles } = jwtDecode(
+        action.payload
+      ) as DecodedTokenData;
       localStorage.user = JSON.stringify(user);
       localStorage.token = action.payload;
       localStorage.expToken = exp;
@@ -107,7 +110,7 @@ const reducer = (
       };
     }
     case ActionType.SETTOKEN: {
-      const { currentRole, roles, exp } = decode(
+      const { currentRole, roles, exp } = jwtDecode(
         action.payload
       ) as DecodedTokenData;
       localStorage.token = action.payload;

@@ -44,8 +44,8 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
           },
           onBlur: () => {
             dispatch({
-              type: 'SAMPLE_MODIFIED',
-              sample: { title: title },
+              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+              itemWithQuestionary: { title: title },
             });
           },
         }}
@@ -74,8 +74,8 @@ const sampleBasisPreSubmit =
       });
       if (result.updateSample.sample) {
         dispatch({
-          type: 'SAMPLE_UPDATED',
-          sample: result.updateSample.sample,
+          type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+          itemWithQuestionary: result.updateSample.sample,
         });
       }
     } else {
@@ -88,8 +88,8 @@ const sampleBasisPreSubmit =
 
       if (result.createSample.sample) {
         dispatch({
-          type: 'SAMPLE_CREATED',
-          sample: result.createSample.sample,
+          type: 'ITEM_WITH_QUESTIONARY_CREATED',
+          itemWithQuestionary: result.createSample.sample,
         });
         returnValue = result.createSample.sample.questionaryId;
       }

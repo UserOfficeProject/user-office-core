@@ -1,6 +1,5 @@
 import { GetSamplesWithProposalDataQuery } from 'generated/sdk';
 
-export type SampleWithProposalData = Exclude<
-  GetSamplesWithProposalDataQuery['samples'],
-  null
+export type SampleWithProposalData = NonNullable<
+  GetSamplesWithProposalDataQuery['samples']
 >[number];

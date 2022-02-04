@@ -1,5 +1,8 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { Column } from '@material-table/core';
+import {
+  getTranslation,
+  ResourceId,
+} from '@user-office-software/duo-localisation';
 
 import { SortDirectionType } from 'components/common/SuperMaterialTable';
 import { Proposal, ProposalEndStatus, ProposalStatus } from 'generated/sdk';

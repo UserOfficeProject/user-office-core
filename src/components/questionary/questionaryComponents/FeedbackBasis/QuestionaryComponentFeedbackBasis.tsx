@@ -39,8 +39,8 @@ const feedbackBasisPreSubmit =
 
     if (newFeedback?.questionary) {
       dispatch({
-        type: 'FEEDBACK_CREATED',
-        feedback: newFeedback,
+        type: 'ITEM_WITH_QUESTIONARY_CREATED',
+        itemWithQuestionary: newFeedback,
       });
 
       return newFeedback.questionary.questionaryId;

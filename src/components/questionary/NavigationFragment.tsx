@@ -33,7 +33,11 @@ const NavigationFragment = (props: {
 
   return (
     <div className={classes.buttons}>
-      {props.isLoading ? <UOLoader /> : <Fragment>{props.children}</Fragment>}
+      {props.isLoading ? (
+        <UOLoader size="2em" />
+      ) : (
+        <Fragment>{props.children}</Fragment>
+      )}
     </div>
   );
 };

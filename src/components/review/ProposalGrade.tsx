@@ -1,10 +1,10 @@
-import { proposalGradeValidationSchema } from '@esss-swap/duo-validation/lib/Review';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InputLabel from '@material-ui/core/InputLabel';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
+import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Field, Form, Formik, useFormikContext } from 'formik';
 import React, { useState, useContext } from 'react';
 import { Prompt } from 'react-router';

@@ -34,4 +34,4 @@ export function useProposalData(primaryKey: number | null | undefined) {
   return { loading, proposalData, setProposalData };
 }
 
-export type ProposalData = Exclude<GetProposalQuery['proposal'], null>;
+export type ProposalData = NonNullable<GetProposalQuery['proposal']>;

@@ -1,4 +1,3 @@
-import { createUserValidationSchema } from '@esss-swap/duo-validation';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -10,6 +9,7 @@ import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { createUserValidationSchema } from '@user-office-software/duo-validation';
 import clsx from 'clsx';
 import { Field, Form, Formik } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-material-ui';
@@ -17,7 +17,7 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
@@ -77,7 +77,6 @@ const useStyles = makeStyles((theme) => ({
   orcButton: {
     '&:hover': {
       border: '1px solid #338caf',
-      color: theme.palette.primary.light,
     },
     border: '1px solid #D3D3D3',
     padding: '.3em',
@@ -85,7 +84,6 @@ const useStyles = makeStyles((theme) => ({
     'border-radius': '8px',
     'box-shadow': '1px 1px 3px #999',
     cursor: 'pointer',
-    color: '#999',
     'font-weight': 'bold',
     'font-size': '.8em',
     'line-height': '24px',
@@ -102,6 +100,12 @@ const useStyles = makeStyles((theme) => ({
     float: 'left',
     width: '24px',
     height: '24px',
+  },
+  orcidText: {
+    color: '#1a1a1a',
+    '&:hover': {
+      color: '#1a1a1a',
+    },
   },
   gridRoot: {
     flexGrow: 1,
@@ -145,6 +149,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID as string);
   const unauthorizedApi = useUnauthorizedApi();
   const { enqueueSnackbar } = useSnackbar();
+  const history = useHistory();
 
   if (orcData && orcData.token) {
     handleLogin(orcData.token);
@@ -168,7 +173,7 @@ const SignUp: React.FC<SignUpProps> = (props) => {
   };
 
   if (token) {
-    return <Redirect to="/" />;
+    history.push('/');
   }
 
   if (loadingInstitutions || !fieldsContent || (authCodeOrcID && loading)) {
@@ -349,7 +354,10 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                             src={orcid}
                             alt="ORCID iD icon"
                           />
-                          Create or connect your ORCID iD
+
+                          <span className={classes.orcidText}>
+                            Create or connect your ORCID iD
+                          </span>
                         </Button>
                       </React.Fragment>
                     )}

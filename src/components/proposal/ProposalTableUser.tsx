@@ -14,7 +14,7 @@ import ProposalTable from './ProposalTable';
 export type PartialProposalsDataType = {
   primaryKey: number;
   title: string;
-  status: ProposalStatus | null;
+  status: Maybe<ProposalStatus>;
   publicStatus: ProposalPublicStatus;
   finalStatus?: string;
   notified?: boolean;
@@ -86,7 +86,6 @@ const ProposalTableUser: React.FC = () => {
         searchQuery={sendUserProposalRequest}
         isLoading={loading}
       />
-      <br />* Pre-submission reference. Reference will change upon submission.
     </div>
   );
 };

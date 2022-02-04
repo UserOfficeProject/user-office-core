@@ -55,12 +55,14 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
                   return;
                 }
                 dispatch({
-                  type: 'REGISTRATION_MODIFIED',
-                  visit: result.updateVisitRegistration.registration,
+                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                  itemWithQuestionary:
+                    result.updateVisitRegistration.registration,
                 });
                 dispatch({
-                  type: 'REGISTRATION_SUBMITTED',
-                  visit: result.updateVisitRegistration.registration,
+                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                  itemWithQuestionary:
+                    result.updateVisitRegistration.registration,
                 });
               },
               {

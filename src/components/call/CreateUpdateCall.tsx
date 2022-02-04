@@ -1,18 +1,19 @@
+import Typography from '@material-ui/core/Typography';
 import {
   createCallValidationSchemas,
   updateCallValidationSchemas,
-} from '@esss-swap/duo-validation/lib/Call';
-import Typography from '@material-ui/core/Typography';
+} from '@user-office-software/duo-validation/lib/Call';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
-import UOLoader from 'components/common/UOLoader';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
   AllocationTimeUnits,
   UpdateCallInput,
   TemplateGroupId,
+  FeatureId,
 } from 'generated/sdk';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
@@ -29,6 +30,7 @@ type CreateUpdateCallProps = {
 
 const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { api } = useDataApiWithFeedback();
+  const { features } = useContext(FeatureContext);
 
   const { templates: proposalTemplates } = useActiveTemplates(
     TemplateGroupId.PROPOSAL,
@@ -48,12 +50,24 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const currentDayEnd = new Date();
   currentDayEnd.setHours(23, 59, 59, 999);
 
+  /**
+   * NOTE: This is needed because the ESI template field is hidden under feature flag.
+   * If we set the default value to 'undefined' on the initial values then
+   * Material-UI fires a console warning that value provided is out of range.
+   */
+  const initialEsiTemplateId = features.get(FeatureId.RISK_ASSESSMENT)
+    ?.isEnabled
+    ? ''
+    : undefined;
+
   const initialValues = call
     ? {
         ...call,
-        templateId: call.templateId || 0,
-        esiTemplateId: call.esiTemplateId || undefined,
-        proposalWorkflowId: call.proposalWorkflowId || 0,
+        title: call.title || '',
+        description: call.description || '',
+        templateId: call.templateId || '',
+        esiTemplateId: call.esiTemplateId || initialEsiTemplateId,
+        proposalWorkflowId: call.proposalWorkflowId || '',
         referenceNumberFormat: call.referenceNumberFormat || '',
       }
     : {
@@ -73,7 +87,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         surveyComment: '',
         proposalWorkflowId: '',
         templateId: '',
-        esiTemplateId: undefined,
+        esiTemplateId: initialEsiTemplateId,
         allocationTimeUnit: AllocationTimeUnits.DAY,
         title: '',
         description: '',
@@ -84,10 +98,6 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       close(callToReturn);
     }
   };
-
-  if (!proposalTemplates || !proposalEsiTemplates) {
-    return <UOLoader />;
-  }
 
   return (
     <>

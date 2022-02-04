@@ -75,7 +75,7 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
   const isSubmitted = state.shipment.status === ShipmentStatus.SUBMITTED;
 
   return (
-    <div>
+    <>
       <QuestionaryDetails
         questionaryId={state.shipment.questionaryId}
         additionalDetails={additionalDetails}
@@ -93,12 +93,12 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
                   return;
                 }
                 dispatch({
-                  type: 'SHIPMENT_MODIFIED',
-                  shipment: result.submitShipment.shipment,
+                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                  itemWithQuestionary: result.submitShipment.shipment,
                 });
                 dispatch({
-                  type: 'SHIPMENT_SUBMITTED',
-                  shipment: result.submitShipment.shipment,
+                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                  itemWithQuestionary: result.submitShipment.shipment,
                 });
               },
               {
@@ -131,7 +131,7 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
           </NavigButton>
         )}
       </NavigationFragment>
-    </div>
+    </>
   );
 }
 

@@ -36,7 +36,10 @@ const SampleQuestionaryStepView = ({
         topicId={topicId}
         onStepComplete={() => {
           if (isLastStep(wizardStep)) {
-            dispatch({ type: 'SAMPLE_SUBMITTED', sample: state.sample });
+            dispatch({
+              type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+              itemWithQuestionary: state.sample,
+            });
           }
         }}
       />

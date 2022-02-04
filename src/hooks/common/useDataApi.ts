@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLClient } from 'graphql-request';
 import { Variables } from 'graphql-request/dist/types';
-import { decode } from 'jsonwebtoken';
+import jwtDecode from 'jwt-decode';
 import { useSnackbar, WithSnackbarProps } from 'notistack';
 import { useCallback, useContext } from 'react';
 
@@ -38,10 +38,7 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
     super(endpoint);
   }
 
-  async request<T extends any>(
-    query: string,
-    variables?: Variables
-  ): Promise<T> {
+  async request(query: string, variables?: Variables) {
     return super.request(query, variables).catch((error) => {
       // if the `notificationWithClientLog` fails
       // and it fails while reporting an error, it can
@@ -64,7 +61,7 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
       }
 
       return error;
-    }) as T;
+    });
   }
 }
 
@@ -86,10 +83,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     this.externalToken = this.getExternalToken(token);
   }
 
-  async request<T extends any>(
-    query: string,
-    variables?: Variables
-  ): Promise<T> {
+  async request(query: string, variables?: Variables) {
     const nowTimestampSeconds = Date.now() / 1000;
     if (this.renewalDate < nowTimestampSeconds) {
       const data = await getSdk(new GraphQLClient(this.endpoint)).getToken({
@@ -112,7 +106,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
         notificationWithClientLog(this.enqueueSnackbar, 'Connection problem!');
       } else if (
         error.response.errors &&
-        error.response.errors[0].message == 'EXTERNAL_TOKEN_INVALID' &&
+        error.response.errors[0].message === 'EXTERNAL_TOKEN_INVALID' &&
         this.externalAuthLoginUrl
       ) {
         notificationWithClientLog(
@@ -134,17 +128,17 @@ class AuthorizedGraphQLClient extends GraphQLClient {
       this.error && this.error(error);
 
       return error;
-    }) as T;
+    });
   }
 
   private getRenewalDate(token: string): number {
     const oneHour = 3600;
 
-    return (decode(token) as any).iat + oneHour;
+    return (jwtDecode(token) as any).iat + oneHour;
   }
 
   private getExternalToken(token: string): string {
-    return (decode(token) as any).externalToken;
+    return (jwtDecode(token) as any).externalToken;
   }
 }
 

@@ -15,20 +15,19 @@ import ActionButton, {
 import CreateUpdateVisit from 'components/proposalBooking/CreateUpdateVisit';
 import CreateUpdateShipment from 'components/shipments/CreateUpdateShipment';
 import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
-import { UserContext } from 'context/UserContextProvider';
+import { UserContext, BasicUser } from 'context/UserContextProvider';
 import {
   FeedbackStatus,
   ProposalBookingStatusCore,
   ProposalEndStatus,
   ShipmentStatus,
 } from 'generated/sdk';
-import { User } from 'models/User';
 import { parseTzLessDateTime } from 'utils/Time';
 
 import { ProposalScheduledEvent } from './useProposalBookingsScheduledEvents';
 
 const getParticipationRole = (
-  user: User,
+  user: BasicUser,
   event: ProposalScheduledEvent
 ): 'PI' | 'co-proposer' | 'visitor' | null => {
   if (event.proposal.proposer?.id === user.id) {
@@ -46,13 +45,13 @@ const getParticipationRole = (
   }
 };
 
-const isPiOrCoProposer = (user: User, event: ProposalScheduledEvent) => {
+const isPiOrCoProposer = (user: BasicUser, event: ProposalScheduledEvent) => {
   const role = getParticipationRole(user, event);
 
   return role === 'PI' || role === 'co-proposer';
 };
 
-const isTeamlead = (user: User, event: ProposalScheduledEvent) =>
+const isTeamlead = (user: BasicUser, event: ProposalScheduledEvent) =>
   event.visit && event.visit.teamLead.id === user.id;
 
 const createActionButton = (
@@ -240,8 +239,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
   const declareShipmentAction = (event: ProposalScheduledEvent) => {
     let buttonState: ActionButtonState;
 
-    if (event.visit !== null) {
-      const isAtLeastOneShipmentSubmitted = event.visit.shipments.some(
+    if (
+      event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
+      event.proposal.managementDecisionSubmitted
+    ) {
+      const isAtLeastOneShipmentSubmitted = event.shipments.some(
         (shipment) => shipment.status === ShipmentStatus.SUBMITTED
       );
 
@@ -261,14 +263,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       () => {
         openModal(
           <CreateUpdateShipment
-            visit={event.visit!}
+            event={event}
             onShipmentSubmitted={(shipment) => {
               eventUpdated({
                 ...event,
-                visit: {
-                  ...event.visit!,
-                  shipments: shipment ? [shipment] : [],
-                },
+                shipments: shipment ? [shipment] : [],
               });
             }}
           />

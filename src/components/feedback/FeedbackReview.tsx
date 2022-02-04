@@ -56,12 +56,12 @@ function FeedbackReview({ confirm }: FeedbackReviewProps) {
                   return;
                 }
                 dispatch({
-                  type: 'FEEDBACK_MODIFIED',
-                  feedback: result.updateFeedback.feedback,
+                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                  itemWithQuestionary: result.updateFeedback.feedback,
                 });
                 dispatch({
-                  type: 'FEEDBACK_SUBMITTED',
-                  feedback: result.updateFeedback.feedback,
+                  type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                  itemWithQuestionary: result.updateFeedback.feedback,
                 });
               },
               {
