@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
 
 import { GetOrcIdInformationQuery } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
 export function useOrcIDInformation(authorizationCode?: string | null) {
   const [orcData, setOrcData] =
     useState<GetOrcIdInformationQuery['getOrcIDInformation']>(null);
   const [loading, setLoading] = useState(true);
-
-  const api = useDataApi();
 
   useEffect(() => {
     if (!authorizationCode) {
@@ -17,13 +15,13 @@ export function useOrcIDInformation(authorizationCode?: string | null) {
 
       return;
     }
-    api()
+    getUnauthorizedApi()
       .getOrcIDInformation({ authorizationCode })
       .then((data) => {
         setOrcData(data.getOrcIDInformation);
         setLoading(false);
       });
-  }, [authorizationCode, api]);
+  }, [authorizationCode]);
 
   return { loading, orcData };
 }
