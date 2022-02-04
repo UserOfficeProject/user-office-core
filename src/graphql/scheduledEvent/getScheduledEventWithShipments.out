@@ -1,0 +1,8 @@
+query getScheduledEventWithShipments($scheduledEventId: Int!) {
+  scheduledEventCore(scheduledEventId: $scheduledEventId) {
+    ...scheduledEvent
+    shipments {
+      ...shipment
+    }
+  }
+}
