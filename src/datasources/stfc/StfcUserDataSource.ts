@@ -292,45 +292,50 @@ export class StfcUserDataSource implements UserDataSource {
     userRole?: number,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
-    const { users, totalCount } = await postgresUserDataSource.getUsers(
-      undefined,
-      first,
-      offset,
-      undefined,
-      subtractUsers,
-      'asc'
-    );
-
     let userDetails: BasicUserDetails[] = [];
-
-    if (users[0]) {
-      const userNumbers: string[] = users.map((record) => String(record.id));
-      const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
-        await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
-      )?.return;
-
-      userDetails = stfcBasicPeople
-        ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
-        : [];
-    }
+    let finalTotalCount = 0;
 
     if (filter) {
       userDetails = [];
 
-      const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] | null = (
+      const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] = (
         await client.getBasicPeopleDetailsFromSurname(token, filter, true)
       )?.return;
 
-      userDetails = stfcBasicPeopleByLastName
-        ? stfcBasicPeopleByLastName.map((person) =>
-            toEssBasicUserDetails(person)
-          )
-        : [];
+      userDetails = stfcBasicPeopleByLastName.map((person) =>
+        toEssBasicUserDetails(person)
+      );
+
+      finalTotalCount = userDetails.length;
+      // eslint-disable-next-line no-console
+      console.log(finalTotalCount);
+    } else {
+      const { users, totalCount } = await postgresUserDataSource.getUsers(
+        undefined,
+        first,
+        offset,
+        undefined,
+        subtractUsers,
+        'asc'
+      );
+
+      finalTotalCount = totalCount;
+
+      if (users[0]) {
+        const userNumbers: string[] = users.map((record) => String(record.id));
+        const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
+          await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+        )?.return;
+
+        userDetails = stfcBasicPeople
+          ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
+          : [];
+      }
     }
 
     return {
       users: userDetails.sort((a, b) => a.id - b.id),
-      totalCount: totalCount,
+      totalCount: finalTotalCount,
     };
   }
 
