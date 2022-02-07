@@ -1,9 +1,10 @@
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import AddOutlinedIcon from '@material-ui/icons/AddOutlined';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import React from 'react';
+
+import { ButtonContainer } from 'styles/StyledComponents';
 
 import { QuestionnairesListItem } from './QuestionnairesListItem';
 
@@ -20,13 +21,14 @@ export interface QuestionnairesListProps {
   data: Array<QuestionnairesListRow>;
   addButtonLabel?: string;
   maxEntries?: number;
+  style?: React.CSSProperties;
 }
 
 const useStyles = makeStyles(() => ({
   questionnairesList: {
     maxWidth: '440px',
     padding: 0,
-    marginBottom: 0,
+    marginBottom: '10px',
     '& li': {
       paddingLeft: 0,
       paddingRight: 0,
@@ -34,35 +36,53 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export function QuestionnairesList(props: QuestionnairesListProps) {
+export function QuestionnairesList({
+  onAddNewClick,
+  onDeleteClick,
+  onEditClick,
+  onCloneClick,
+  style,
+  data,
+  maxEntries,
+  addButtonLabel,
+}: QuestionnairesListProps) {
   const classes = useStyles();
 
   return (
-    <List component="ul" className={classes.questionnairesList}>
-      {props.data.map((record) => {
-        return (
-          <QuestionnairesListItem
-            record={record}
-            onEditClick={(record) => props.onEditClick?.(record)}
-            onDeleteClick={(record) => props.onDeleteClick?.(record)}
-            onCloneClick={(record) => props.onCloneClick?.(record)}
-            key={record.id}
-          />
-        );
-      })}
-      <ListItem key="add-new">
+    <div>
+      <List
+        component="ul"
+        className={classes.questionnairesList}
+        style={{ ...style }}
+      >
+        {data.map((record) => {
+          return (
+            <QuestionnairesListItem
+              record={record}
+              onEditClick={onEditClick}
+              onDeleteClick={onDeleteClick}
+              onCloneClick={onCloneClick}
+              key={record.id}
+            />
+          );
+        })}
+      </List>
+      <ButtonContainer>
         <Button
-          onClick={props.onAddNewClick}
-          color="primary"
+          onClick={onAddNewClick}
           variant="outlined"
-          fullWidth
-          startIcon={<AddOutlinedIcon />}
           data-cy="add-button"
-          disabled={!!props.maxEntries && props.data.length >= props.maxEntries}
+          size="small"
+          color="primary"
+          startIcon={<AddCircleOutlineIcon />}
+          disabled={
+            (!!maxEntries && data.length >= maxEntries) ||
+            onAddNewClick === undefined
+          }
         >
-          {props.addButtonLabel || 'Add'}
+          {addButtonLabel || 'Add'}
         </Button>
-      </ListItem>
-    </List>
+      </ButtonContainer>
+    </div>
   );
 }

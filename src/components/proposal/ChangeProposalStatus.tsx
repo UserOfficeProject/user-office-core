@@ -29,12 +29,14 @@ const useStyles = makeStyles((theme) => ({
 type ChangeProposalStatusProps = {
   close: () => void;
   changeStatusOnProposals: (status: ProposalStatus) => Promise<void>;
+  allSelectedProposalsHaveInstrument: boolean;
   selectedProposalStatuses: number[];
 };
 
 const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
   close,
   changeStatusOnProposals,
+  allSelectedProposalsHaveInstrument,
   selectedProposalStatuses,
 }) => {
   const classes = useStyles();
@@ -102,6 +104,14 @@ const ChangeProposalStatus: React.FC<ChangeProposalStatusProps> = ({
                 proposal for changes and submission.
               </Alert>
             )}
+            {values.selectedStatusId === '8' &&
+              !allSelectedProposalsHaveInstrument && (
+                <Alert severity="warning">
+                  Be aware that proposal/s not assigned to an instrument will
+                  not be shown in the scheduler after changing status to
+                  &quot;SCHEDULING&quot;.
+                </Alert>
+              )}
             {!values.selectedStatusId && (
               <Alert
                 severity="warning"
