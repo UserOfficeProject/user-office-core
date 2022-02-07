@@ -307,8 +307,6 @@ export class StfcUserDataSource implements UserDataSource {
       );
 
       finalTotalCount = userDetails.length;
-      // eslint-disable-next-line no-console
-      console.log(finalTotalCount);
     } else {
       const { users, totalCount } = await postgresUserDataSource.getUsers(
         undefined,
