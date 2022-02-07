@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import MaterialTable, { Options, Column, MTableToolbar } from '@material-table/core';
+import MaterialTable, {
+  Options,
+  Column,
+  MTableToolbar,
+} from '@material-table/core';
 import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import Email from '@material-ui/icons/Email';
 import makeStyles from '@material-ui/styles/makeStyles';
+import { Formik } from 'formik';
 import React, { useState, useEffect, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -19,13 +24,12 @@ import {
   GetUsersQueryVariables,
   UserRole,
 } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { useUsersData } from 'hooks/user/useUsersData';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
 import InviteUserForm from './InviteUserForm';
-import { Formik } from 'formik';
-import { useDataApi } from 'hooks/common/useDataApi';
 
 type InvitationButtonProps = {
   title: string;
@@ -107,14 +111,41 @@ async function getUserByEmail(email: string, api: any) {
 
 const getUsersTableData = (
   users: BasicUserDetailsWithTableData,
-  selectedUsers: BasicUserDetails[]
+  selectedUsers: BasicUserDetails[],
+  invitedUsers: BasicUserDetails[],
+  query: GetUsersQueryVariables,
+  totalCount: number
 ) => {
-  const selectedUserIds = selectedUsers.map((participant) => participant.id);
+  const queryInvitedUsersIds = invitedUsers.map(
+    (user: BasicUserDetails) => user.id
+  ); // ids of all users being invited
 
-  return users.map((tableItem) => ({
-    ...tableItem,
-    tableData: { checked: selectedUserIds.includes(tableItem.id) },
-  }));
+  if (query.offset == 0) {
+    // update users array to remove any invitedUsers. We re-add them so that they appear at the top of the list
+    // this helps users find someone in the list even if they are already there
+
+    const invitedUsersFormatted = invitedUsers.filter((user) =>
+      query.filter
+        ? user.firstname.toLowerCase().includes(query.filter?.toLowerCase()) ||
+          user.lastname.toLowerCase().includes(query.filter?.toLowerCase()) ||
+          user.organisation.toLowerCase().includes(query.filter?.toLowerCase())
+        : true
+    );
+
+    users = [...invitedUsersFormatted, ...users];
+  }
+
+  return {
+    users: users.map((user: BasicUserDetails) => ({
+      ...user,
+      tableData: {
+        checked: selectedUsers.some(
+          (selectedUser) => selectedUser.id === user.id
+        ),
+      },
+    })),
+    totalCount: totalCount,
+  };
 };
 
 const PeopleTable: React.FC<PeopleTableProps> = (props) => {
@@ -135,7 +166,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
   const isEmailSearchEnabled = !!featureContext.features.get(
     FeatureId.EMAIL_SEARCH
   )?.isEnabled;
-  
+
   const api = useDataApi();
   const { isLoading } = props;
   const { usersData, loadingUsersData } = useUsersData(query);
@@ -241,10 +272,15 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
 
   const usersTableData = getUsersTableData(
     props.data || usersData?.users,
-    selectedParticipants
+    selectedParticipants,
+    invitedUsers,
+    query,
+    props.data?.length || usersData.totalCount
   );
 
-  const currentPage = (query.offset as number) / (query.first as number);
+  const currentPage = (query.offset as number)
+    ? ((query.offset as number) + invitedUsers.length) / (query.first as number)
+    : 0;
 
   return (
     <Formik
@@ -274,7 +310,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             return;
           }
 
-          if (!invitedUsers.some((user) => user.id === userDetails.id)) {
+          if (invitedUsers.every((user) => user.id !== userDetails.id)) {
             //Add users to the table
             setInvitedUsers([userDetails].concat(invitedUsers));
             setTableEmails(tableEmails.concat([values.email]));
@@ -286,7 +322,14 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
                 selectedParticipants.concat([userDetails])
               );
 
-            setQuery({ ...query, refreshData: !query.refreshData });
+            setQuery({
+              ...query,
+              refreshData: !query.refreshData,
+              subtractUsers: (query.subtractUsers as number[]).concat(
+                userDetails.id
+              ),
+              offset: 0,
+            });
           } else {
             setFieldError('email', 'Could not add user to Proposal');
           }
@@ -384,16 +427,19 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
                       organisation: selectedItem.organisation,
                     },
                   ] as BasicUserDetails[])
-                : selectedParticipants.filter(({ id }) => id !== selectedItem.id)
+                : selectedParticipants.filter(
+                    ({ id }) => id !== selectedItem.id
+                  )
             );
           }}
-          data={usersTableData}
-          totalCount={usersData.totalCount}
+          data={usersTableData.users}
+          totalCount={usersTableData.totalCount + invitedUsers.length}
           isLoading={loading || loadingUsersData}
           options={{
             search: props.search,
             debounceInterval: 400,
             pageSize: query.first as number,
+            emptyRowsWhenPaging: false,
             selection: props.selection,
             headerSelectionProps: {
               inputProps: { 'aria-label': 'Select All Rows' },
@@ -433,7 +479,13 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             },
           }}
           onPageChange={(page) =>
-            setQuery({ ...query, offset: page * (query.first as number) })
+            setQuery({
+              ...query,
+              offset: Math.max(
+                page * (query.first as number) - invitedUsers.length,
+                0
+              ),
+            })
           }
           onSearchChange={(search) => setQuery({ ...query, filter: search })}
           onRowsPerPageChange={(rowsPerPage) =>
