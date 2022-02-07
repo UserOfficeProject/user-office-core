@@ -12,7 +12,7 @@ export enum DependenciesLogicOperator {
 
 export class EqualityValidator implements FieldConditionEvaluator {
   isSatisfied(answer: Answer, params: Record<string, unknown>): boolean {
-    return answer.value === params;
+    return new String(answer.value).valueOf() === new String(params).valueOf();
   }
 }
 
