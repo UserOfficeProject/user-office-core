@@ -297,10 +297,11 @@ export class StfcUserDataSource implements UserDataSource {
       first,
       offset,
       undefined,
-      subtractUsers
+      subtractUsers,
+      'asc'
     );
 
-    let userDeatails: BasicUserDetails[] = [];
+    let userDetails: BasicUserDetails[] = [];
 
     if (users[0]) {
       const userNumbers: string[] = users.map((record) => String(record.id));
@@ -308,19 +309,19 @@ export class StfcUserDataSource implements UserDataSource {
         await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
       )?.return;
 
-      userDeatails = stfcBasicPeople
+      userDetails = stfcBasicPeople
         ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
         : [];
     }
 
     if (filter) {
-      userDeatails = [];
+      userDetails = [];
 
       const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] | null = (
         await client.getBasicPeopleDetailsFromSurname(token, filter, true)
       )?.return;
 
-      userDeatails = stfcBasicPeopleByLastName
+      userDetails = stfcBasicPeopleByLastName
         ? stfcBasicPeopleByLastName.map((person) =>
             toEssBasicUserDetails(person)
           )
@@ -328,7 +329,7 @@ export class StfcUserDataSource implements UserDataSource {
     }
 
     return {
-      users: userDeatails,
+      users: userDetails.sort((a, b) => a.id - b.id),
       totalCount: totalCount,
     };
   }
