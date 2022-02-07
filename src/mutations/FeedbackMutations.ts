@@ -19,12 +19,12 @@ import { UserWithRole } from '../models/User';
 import { CreateFeedbackArgs } from '../resolvers/mutations/CreateFeedbackMutation';
 import { UpdateFeedbackArgs } from '../resolvers/mutations/UpdateFeedbackMutation';
 import { ProposalBookingStatusCore } from '../resolvers/types/ProposalBooking';
+import { ScheduledEventCore } from '../resolvers/types/ScheduledEvent';
 import { AdminDataSource } from './../datasources/AdminDataSource';
 import { TemplateDataSource } from './../datasources/TemplateDataSource';
 import { UserDataSource } from './../datasources/UserDataSource';
 import { VisitDataSource } from './../datasources/VisitDataSource';
 import { FeedbackRequest } from './../resolvers/types/FeedbackRequest';
-import { ScheduledEventCore } from './../resolvers/types/ScheduledEvent';
 
 @injectable()
 export default class FeedbackMutations {
