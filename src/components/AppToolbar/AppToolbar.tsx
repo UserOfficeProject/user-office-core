@@ -25,9 +25,14 @@ type AppToolbarProps = {
   open: boolean;
   /** Text of the button link in the information modal. */
   handleDrawerOpen: () => void;
+  header: string;
 };
 
-const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
+const AppToolbar: React.FC<AppToolbarProps> = ({
+  open,
+  handleDrawerOpen,
+  header,
+}) => {
   const { settings } = useContext(SettingsContext);
 
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
@@ -125,7 +130,7 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
             noWrap
             className={classes.title}
           >
-            | User Office
+            {'| User Office / ' + header}
           </Typography>
         )}
         <div className={classes.horizontalSpacing}>

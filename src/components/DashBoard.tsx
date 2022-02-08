@@ -11,7 +11,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import clsx from 'clsx';
 import parse from 'html-react-parser';
 import PropTypes from 'prop-types';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -29,6 +29,7 @@ import InstitutionPage from './institution/InstitutionPage';
 import MergeInstitutionsPage from './institution/MergeInstitutionPage';
 import InstrumentsPage from './instrument/InstrumentsPage';
 import MenuItems from './menu/MenuItems';
+import Page from './Page';
 import HelpPage from './pages/HelpPage';
 import InformationModal from './pages/InformationModal';
 import OverviewPage from './pages/OverviewPage';
@@ -151,6 +152,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Dashboard: React.FC = () => {
+  const [header, setHeader] = useState('User Office');
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const classes = useStyles();
   const [open, setOpen] = React.useState(
@@ -196,7 +198,11 @@ const Dashboard: React.FC = () => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppToolbar open={open} handleDrawerOpen={handleDrawerOpen} />
+      <AppToolbar
+        open={open}
+        handleDrawerOpen={handleDrawerOpen}
+        header={header}
+      />
       <Drawer
         variant={isTabletOrMobile ? 'temporary' : 'permanent'}
         className={clsx(classes.drawer, {
@@ -215,7 +221,7 @@ const Dashboard: React.FC = () => {
         <div className={classes.toolbarIcon}>
           {isTabletOrMobile && (
             <Typography component="h1" variant="h6" color="inherit" noWrap>
-              User Office
+              {header}
             </Typography>
           )}
           <IconButton
@@ -234,7 +240,12 @@ const Dashboard: React.FC = () => {
       </Drawer>
       <main className={classes.content}>
         <Switch>
-          <Route path="/ProposalEdit/:proposalPk" component={ProposalEdit} />
+          <Page
+            setHeader={setHeader}
+            title="ProposalEdit"
+            path="/ProposalEdit/:proposalPk"
+            component={ProposalEdit}
+          />
           <Route
             path="/ProposalSelectType"
             component={() => <ProposalChooseCall callsData={calls} />}
