@@ -38,7 +38,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
   };
 
   const formatDate = (date: Date) => {
-    return dateformat(new Date(date), 'dd-mmm-yyyy h:MM TT');
+    return dateformat(new Date(date), 'dd-mmm-yyyy hh:MM TT');
   };
 
   return (
