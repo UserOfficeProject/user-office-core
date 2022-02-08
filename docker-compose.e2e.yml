@@ -26,7 +26,6 @@ services:
       POSTGRES_PASSWORD: duopassword
       POSTGRES_USER: duouser
       POSTGRES_DB: duo
-      PGTZ: Europe/Stockholm
     ports:
       - 5432:5432
     volumes:
