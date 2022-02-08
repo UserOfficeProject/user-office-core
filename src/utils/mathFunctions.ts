@@ -7,16 +7,7 @@ export const average = (numbers: number[]) => {
 
   const avg = sum / numbers.length;
 
-  return avg;
-};
-
-export const absoluteDifference = (numbers: number[]) => {
-  if (numbers.length < 2) {
-    return NaN;
-  }
-  numbers = numbers.sort();
-
-  return Math.abs(numbers[numbers.length - 1] - numbers[0]);
+  return Number(avg.toFixed(2));
 };
 
 export const standardDeviation = (numbers: number[]) => {
@@ -36,7 +27,7 @@ export const standardDeviation = (numbers: number[]) => {
 
   const stdDev = Math.sqrt(avgSquareDiff);
 
-  return stdDev;
+  return Number(stdDev.toFixed(2));
 };
 
 export const getGrades = (reviews: Review[] | null | undefined) =>

@@ -37,6 +37,7 @@ export interface FormikUICustomMultipleSelectProps {
   availableOptions: Option[] | string[];
   label: string;
   multiple?: boolean;
+  nbrOptionShown?: number;
   // props below are injected by Field
   field: FieldInputProps<SelectedValueType>;
   form: FormikHelpers<FormikValues>;
@@ -44,15 +45,6 @@ export interface FormikUICustomMultipleSelectProps {
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-  getContentAnchorEl: null,
-};
 
 const FormikUICustomSelect = ({
   field,
@@ -61,8 +53,18 @@ const FormikUICustomSelect = ({
   id,
   label,
   multiple,
+  nbrOptionShown,
   ...props
 }: FormikUICustomMultipleSelectProps) => {
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * (nbrOptionShown ?? 4.5) + ITEM_PADDING_TOP,
+        width: 250,
+      },
+    },
+    getContentAnchorEl: null,
+  };
   const availableOptionsNormalized: Option[] =
     normalizeOptions(availableOptions);
 
