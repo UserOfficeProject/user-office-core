@@ -247,108 +247,257 @@ const Dashboard: React.FC = () => {
             path="/ProposalEdit/:proposalPk"
             component={ProposalEdit}
           />
-          <Route
+          <Page
+            setHeader={setHeader}
+            title="ProposalSelectType"
             path="/ProposalSelectType"
             component={() => <ProposalChooseCall callsData={calls} />}
           />
-          <Route
+          <Page
+            setHeader={setHeader}
+            title="Create Proposal"
             path="/ProposalCreate/:callId/:templateId"
             component={ProposalCreate}
           />
-          <Route path="/ProfilePage/:id" component={ProfilePage} />
+          <Page
+            setHeader={setHeader}
+            title="Profile Page"
+            path="/ProfilePage/:id"
+            component={ProfilePage}
+          />
           {isUserOfficer && (
-            <Route path="/PeoplePage/:id" component={UserPage} />
+            <Page
+              setHeader={setHeader}
+              title="User Page"
+              path="/PeoplePage/:id"
+              component={UserPage}
+            />
           )}
           {isUserOfficer && <Route path="/PeoplePage" component={PeoplePage} />}
-          <Route path="/ProposalPage" component={ProposalPage} />
-          <Route path="/PageEditor" component={PageEditor} />
-          {isUserOfficer && <Route path="/CallPage" component={CallPage} />}
-          <Route path="/HelpPage" component={HelpPage} />
-          <Route path="/SEPPage/:id" component={SEPPage} />
-          <Route path="/SEPPage" component={SEPsPage} />
-          <Route path="/InstrumentPage" component={InstrumentsPage} />
-          <Route path="/InstitutionPage" component={InstitutionPage} />
-          <Route
+          <Page
+            setHeader={setHeader}
+            title="Proposal"
+            path="/ProposalPage"
+            component={ProposalPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="Page Editor"
+            path="/PageEditor"
+            component={PageEditor}
+          />
+          {isUserOfficer && (
+            <Page
+              setHeader={setHeader}
+              title="Call Page"
+              path="/CallPage"
+              component={CallPage}
+            />
+          )}
+          <Page
+            setHeader={setHeader}
+            title="Help Page"
+            path="/HelpPage"
+            component={HelpPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="SEP Page"
+            path="/SEPPage/:id"
+            component={SEPPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="SEPs Page"
+            path="/SEPPage"
+            component={SEPsPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="Instruments"
+            path="/InstrumentPage"
+            component={InstrumentsPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="Institution"
+            path="/InstitutionPage"
+            component={InstitutionPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="Merge Institution"
             path="/MergeInstitutionsPage/:institutionId"
             component={MergeInstitutionsPage}
           />
-          <Route
+          <Page
+            setHeader={setHeader}
+            title="Template Editor"
             path="/QuestionaryEditor/:templateId"
             component={TemplateEditor}
           />
-          <Route path="/ProposalTemplates" component={ProposalTemplatesPage} />
-          <Route
+          <Page
+            setHeader={setHeader}
+            title="Proposal Templates"
+            path="/ProposalTemplates"
+            component={ProposalTemplatesPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="Samples Templates"
             path="/SampleDeclarationTemplates"
             component={SampleTemplatesPage}
           />
-          <Route path="/GenericTemplates" component={GenericTemplatesPage} />
-          <Route
+          <Page
+            setHeader={setHeader}
+            title="Generic Template"
+            path="/GenericTemplates"
+            component={GenericTemplatesPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="Shipment Templates"
             path="/ShipmentDeclarationTemplates"
             component={ShipmentTemplatesPage}
           />
-          <Route path="/VisitTemplates" component={VisitTemplatesPage} />
-          <Route path="/FeedbackTemplates" component={FeedbackTemplatesPage} />
-          <Route path="/EsiTemplates" component={ProposalEsiPage} />
-          <Route path="/SampleEsiTemplates" component={SampleEsiPage} />
-          <Route
+          <Page
+            setHeader={setHeader}
+            title="Visits Template"
+            path="/VisitTemplates"
+            component={VisitTemplatesPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="Feedback Template"
+            path="/FeedbackTemplates"
+            component={FeedbackTemplatesPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="Proposal Esi Page"
+            path="/EsiTemplates"
+            component={ProposalEsiPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="Samples Esi"
+            path="/SampleEsiTemplates"
+            component={SampleEsiPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="Proposal Table Reviewer"
             path="/ProposalTableReviewer"
             component={ProposalTableReviewer}
           />
-          {isUserOfficer && <Route path="/Units" component={UnitTablePage} />}
           {isUserOfficer && (
-            <Route path="/ProposalStatuses" component={ProposalStatusesPage} />
+            <Page
+              setHeader={setHeader}
+              title="Uits Table"
+              path="/Units"
+              component={UnitTablePage}
+            />
           )}
           {isUserOfficer && (
-            <Route
+            <Page
+              setHeader={setHeader}
+              title="Proposal Status"
+              path="/ProposalStatuses"
+              component={ProposalStatusesPage}
+            />
+          )}
+          {isUserOfficer && (
+            <Page
+              setHeader={setHeader}
+              title="Proposal Workflows"
               path="/ProposalWorkflows"
               component={ProposalWorkflowsPage}
             />
           )}
           {isUserOfficer && (
-            <Route
+            <Page
+              setHeader={setHeader}
+              title="Proposal Worjflow Editor"
               path="/ProposalWorkflowEditor/:workflowId"
               component={ProposalWorkflowEditor}
             />
           )}
           {(isSampleSafetyReviewer || isUserOfficer) && (
-            <Route path="/SampleSafety" component={SampleSafetyPage} />
+            <Page
+              setHeader={setHeader}
+              title="Samples Safety"
+              path="/SampleSafety"
+              component={SampleSafetyPage}
+            />
           )}
 
           {isUserOfficer && (
-            <Route path="/ApiAccessTokens" component={ApiAccessTokensPage} />
+            <Page
+              setHeader={setHeader}
+              title="Api Access Tokens"
+              path="/ApiAccessTokens"
+              component={ApiAccessTokensPage}
+            />
           )}
           {isSchedulerEnabled && (
-            <Route
+            <Page
+              setHeader={setHeader}
+              title="User Experiment TimeTable"
               path="/ExperimentTimes"
               component={UserExperimentTimesTable}
             />
           )}
           {isSchedulerEnabled && (
-            <Route
+            <Page
+              setHeader={setHeader}
+              title="InstrSci Upcoming Experiment TimeTable"
               path="/UpcomingExperimentTimes"
               component={InstrSciUpcomingExperimentTimesTable}
             />
           )}
           {isUserOfficer && (
-            <Route path="/Questions" component={QuestionsPage} />
+            <Page
+              setHeader={setHeader}
+              title="Questions"
+              path="/Questions"
+              component={QuestionsPage}
+            />
           )}
           {isUserOfficer && (
-            <Route path="/ImportTemplate" component={ImportTemplatePage} />
+            <Page
+              setHeader={setHeader}
+              title="Import Templates"
+              path="/ImportTemplate"
+              component={ImportTemplatePage}
+            />
           )}
-          <Route
+          <Page
+            setHeader={setHeader}
+            title="Create Proposal Esi"
             path="/CreateEsi/:scheduledEventId"
             component={CreateProposalEsiPage}
           />
-          <Route path="/UpdateEsi/:esiId" component={UpdateProposalEsiPage} />
-          <Route
+          <Page
+            setHeader={setHeader}
+            title="Update Proposal Esi"
+            path="/UpdateEsi/:esiId"
+            component={UpdateProposalEsiPage}
+          />
+          <Page
+            setHeader={setHeader}
+            title="Create Feedback"
             path="/CreateFeedback/:scheduledEventId"
             component={CreateFeedbackPage}
           />
-          <Route
+          <Page
+            setHeader={setHeader}
+            title="Update Feedback"
             path="/UpdateFeedback/:feedbackId"
             component={UpdateFeedbackPage}
           />
-          <Route
+          <Page
+            setHeader={setHeader}
+            title="Declare Shipments"
             path="/DeclareShipments/:scheduledEventId"
             component={DeclareShipmentsPage}
           />
