@@ -53,7 +53,7 @@
     "use-query-params": "^1.2.3",
     "yup": "^0.32.11"
   },
-  "proxy": "http://localhost:4100",
+  "proxy": "http://localhost:4000",
   "scripts": {
     "dev": "react-scripts start",
     "debug": "react-scripts --inspect-brk start",
