@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { AdminDataSource } from '../../datasources/AdminDataSource';
@@ -34,7 +35,17 @@ async function enableDefaultStfcFeatures() {
     SettingsId.EXTERNAL_AUTH_LOGIN_URL,
     process.env.EXTERNAL_AUTH_LOGIN_URL
   );
-  await db.updateSettings(SettingsId.TIMEZONE, process.env.TZ);
+
+  if (process.env.TZ) {
+    await db.updateSettings(SettingsId.TIMEZONE, process.env.TZ);
+  } else {
+    const defaultTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    logger.logWarn(
+      `Timezone should be explicitly set via TZ environment variable, defaulting to: ${defaultTimezone}`,
+      {}
+    );
+    await db.updateSettings(SettingsId.TIMEZONE, defaultTimezone);
+  }
 }
 
 export async function configureSTFCEnvironment() {
