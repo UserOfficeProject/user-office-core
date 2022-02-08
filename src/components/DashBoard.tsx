@@ -243,13 +243,13 @@ const Dashboard: React.FC = () => {
         <Switch>
           <Page
             setHeader={setHeader}
-            title="ProposalEdit"
+            title="Edit Proposal"
             path="/ProposalEdit/:proposalPk"
             component={ProposalEdit}
           />
           <Page
             setHeader={setHeader}
-            title="ProposalSelectType"
+            title="Select Proposal Type"
             path="/ProposalSelectType"
             component={() => <ProposalChooseCall callsData={calls} />}
           />
@@ -374,13 +374,13 @@ const Dashboard: React.FC = () => {
           />
           <Page
             setHeader={setHeader}
-            title="Proposal Esi Page"
+            title="Esi Proposal Page"
             path="/EsiTemplates"
             component={ProposalEsiPage}
           />
           <Page
             setHeader={setHeader}
-            title="Samples Esi"
+            title="Esi Samples"
             path="/SampleEsiTemplates"
             component={SampleEsiPage}
           />
@@ -393,7 +393,7 @@ const Dashboard: React.FC = () => {
           {isUserOfficer && (
             <Page
               setHeader={setHeader}
-              title="Uits Table"
+              title="Units Table"
               path="/Units"
               component={UnitTablePage}
             />
@@ -473,13 +473,13 @@ const Dashboard: React.FC = () => {
           )}
           <Page
             setHeader={setHeader}
-            title="Create Proposal Esi"
+            title="Create Esi Proposal"
             path="/CreateEsi/:scheduledEventId"
             component={CreateProposalEsiPage}
           />
           <Page
             setHeader={setHeader}
-            title="Update Proposal Esi"
+            title="Update Esi Proposal"
             path="/UpdateEsi/:esiId"
             component={UpdateProposalEsiPage}
           />
