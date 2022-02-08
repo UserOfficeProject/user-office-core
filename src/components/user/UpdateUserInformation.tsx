@@ -1,4 +1,4 @@
-import DateFnsUtils from '@date-io/date-fns'; // choose your lib
+import LuxonUtils from '@date-io/luxon';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
@@ -227,7 +227,7 @@ export default function UpdateUserInformation(props: { id: number }) {
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={6}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <MuiPickersUtilsProvider utils={LuxonUtils}>
                   <>
                     <FormikDropdown
                       name="user_title"
