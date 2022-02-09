@@ -338,13 +338,13 @@ const Dashboard: React.FC = () => {
           />
           <Page
             setHeader={setHeader}
-            title="Proposal Templates"
+            title="Proposal Template"
             path="/ProposalTemplates"
             component={ProposalTemplatesPage}
           />
           <Page
             setHeader={setHeader}
-            title="Samples Templates"
+            title="Samples Template"
             path="/SampleDeclarationTemplates"
             component={SampleTemplatesPage}
           />
@@ -356,7 +356,7 @@ const Dashboard: React.FC = () => {
           />
           <Page
             setHeader={setHeader}
-            title="Shipment Templates"
+            title="Shipment Template"
             path="/ShipmentDeclarationTemplates"
             component={ShipmentTemplatesPage}
           />
@@ -417,7 +417,7 @@ const Dashboard: React.FC = () => {
           {isUserOfficer && (
             <Page
               setHeader={setHeader}
-              title="Proposal Worjflow Editor"
+              title="Proposal Workflow Editor"
               path="/ProposalWorkflowEditor/:workflowId"
               component={ProposalWorkflowEditor}
             />
