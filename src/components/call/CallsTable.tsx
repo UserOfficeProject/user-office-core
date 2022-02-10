@@ -78,7 +78,7 @@ const CallsTable: React.FC = () => {
       render: (rowData: Call): string =>
         DateTime.fromISO(rowData.startCall, {
           zone: timezone,
-        }).toFormat('dd-MMM-yyyy hh:mm a'),
+        }).toFormat('dd-MMM-yyyy HH:mm'),
     },
     {
       title: `End Date (${timezone})`,
@@ -86,7 +86,7 @@ const CallsTable: React.FC = () => {
       render: (rowData: Call): string =>
         DateTime.fromISO(rowData.endCall, {
           zone: timezone,
-        }).toFormat('dd-MMM-yyyy hh:mm a'),
+        }).toFormat('dd-MMM-yyyy HH:mm'),
     },
     {
       title: 'Reference number format',
