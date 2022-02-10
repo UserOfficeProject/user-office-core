@@ -1,4 +1,4 @@
-import LuxonUtils from '@date-io/luxon';
+import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -30,7 +30,7 @@ const CallCycleInfo: React.FC = () => {
 
   return (
     <>
-      <MuiPickersUtilsProvider utils={LuxonUtils}>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <Field
           name="startNotify"
           label="Start of notification period"
