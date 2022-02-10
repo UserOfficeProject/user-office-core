@@ -55,7 +55,7 @@ export class SampleDeclarationQuestionaryAuthorizer
     const proposal = await this.proposalDataSource.get(sample.proposalPk);
 
     if (!proposal) {
-      logger.logError('Could not find proposal for questionary', {
+      logger.logError('Could not find proposal for sample questionary', {
         questionaryId,
       });
 

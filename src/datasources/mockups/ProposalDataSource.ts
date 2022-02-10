@@ -19,6 +19,7 @@ import {
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
+import { basicDummyUser } from './UserDataSource';
 
 export let dummyProposal: Proposal;
 export let dummyProposalView: ProposalView;
@@ -344,5 +345,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     eventMessage: ScheduledEventCore
   ): Promise<void> {
     return;
+  }
+
+  async getRelatedUsersOnProposals(id: number): Promise<number[]> {
+    return [basicDummyUser.id];
   }
 }

@@ -120,7 +120,7 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: UpdateProposalArgs
   ): Promise<Proposal | Rejection> {
-    const { proposalPk, title, abstract, users, proposerId } = args;
+    const { proposalPk } = args;
 
     // Get proposal information
     const proposal = await this.proposalDataSource.get(proposalPk); //Hacky
@@ -177,7 +177,7 @@ export default class ProposalMutations {
       });
 
       return updatedProposal;
-    } catch (err: any) {
+    } catch (err) {
       return rejection(
         'Could not update proposal',
         {
@@ -269,6 +269,7 @@ export default class ProposalMutations {
 
   @ValidateArgs(deleteProposalValidationSchema)
   @Authorized()
+  @EventBus(Event.PROPOSAL_DELETED)
   async delete(
     agent: UserWithRole | null,
     { proposalPk }: { proposalPk: number }
@@ -604,7 +605,7 @@ export default class ProposalMutations {
       }
 
       return clonedProposal;
-    } catch (error: any) {
+    } catch (error) {
       return rejection(
         'Could not clone the proposal',
         { proposalToClonePk },

@@ -37,6 +37,6 @@ export class EventLogResolver {
     @Root() eventLog: EventLogOrigin,
     @Ctx() context: ResolverContext
   ): Promise<User | null> {
-    return await context.queries.user.getUser(eventLog.changedBy);
+    return await context.queries.user.getUser(context.user, eventLog.changedBy);
   }
 }

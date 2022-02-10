@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
+
 import 'reflect-metadata';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
@@ -24,7 +26,7 @@ import {
   createSkipListeningHandler,
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
-import { SkipAssetRegistrar } from '../services/eam';
+import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { SampleEsiDataSourceMock } from './../datasources/mockups/SampleEsiDataSource';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { Tokens } from './Tokens';
@@ -60,3 +62,4 @@ mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 mapClass(Tokens.MailService, SkipSendMailService);
 
 mapValue(Tokens.ConfigureEnvironment, () => {});
+mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));

@@ -817,4 +817,40 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         }
       );
   }
+  async getRelatedUsersOnSep(id: number): Promise<number[]> {
+    const relatedSepMembeers = await database
+      .select('sr.user_id')
+      .distinct()
+      .from('SEPs as s')
+      .leftJoin('SEP_Reviewers as r', function () {
+        this.on('s.sep_id', 'r.sep_id');
+        this.andOn(function () {
+          this.onVal('r.user_id', id); // where the user is part of the visit
+          this.orOnVal('s.sep_chair_user_id', id); // where the user is a chair
+          this.orOnVal('s.sep_secretary_user_id', id); // where the user is the secretary
+        });
+      }) // this gives a list of proposals that a user is related to
+      .join('SEP_Reviewers as sr', { 'sr.sep_id': 's.sep_id' }); // this gives us all of the associated reviewers
+
+    const relatedSepChairsAndSecs = await database
+      .select('s.sep_chair_user_id', 's.sep_secretary_user_id')
+      .distinct()
+      .from('SEPs as s')
+      .leftJoin('SEP_Reviewers as r', function () {
+        this.on('s.sep_id', 'r.sep_id');
+        this.andOn(function () {
+          this.onVal('r.user_id', id); // where the user is part of the visit
+          this.orOnVal('s.sep_chair_user_id', id); // where the user is a chair
+          this.orOnVal('s.sep_secretary_user_id', id); // where the user is the secretary
+        });
+      });
+
+    const relatedUsers = [
+      ...relatedSepMembeers.map((r) => r.user_id),
+      ...relatedSepChairsAndSecs.map((r) => r.sep_chair_user_id),
+      ...relatedSepChairsAndSecs.map((r) => r.sep_secretary_user_id),
+    ];
+
+    return relatedUsers;
+  }
 }

@@ -386,4 +386,8 @@ export class SEPDataSourceMock implements SEPDataSource {
   ): Promise<SEPProposalWithReviewGradesAndRanking[]> {
     return [new SEPProposalWithReviewGradesAndRanking(1, 1, [7])];
   }
+
+  async getRelatedUsersOnSep(id: number): Promise<number[]> {
+    return [];
+  }
 }

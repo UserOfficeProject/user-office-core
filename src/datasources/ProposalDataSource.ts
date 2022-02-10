@@ -85,4 +85,6 @@ export interface ProposalDataSource {
   updateProposalBookingScheduledEvent(
     eventMessage: ScheduledEventCore
   ): Promise<void>;
+
+  getRelatedUsersOnProposals(id: number): Promise<number[]>;
 }

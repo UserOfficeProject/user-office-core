@@ -3,6 +3,7 @@ export enum Event {
   PROPOSAL_CREATED = 'PROPOSAL_CREATED',
   PROPOSAL_UPDATED = 'PROPOSAL_UPDATED',
   PROPOSAL_SUBMITTED = 'PROPOSAL_SUBMITTED',
+  PROPOSAL_DELETED = 'PROPOSAL_DELETED',
   PROPOSAL_FEASIBLE = 'PROPOSAL_FEASIBLE',
   PROPOSAL_UNFEASIBLE = 'PROPOSAL_UNFEASIBLE',
   PROPOSAL_SEP_SELECTED = 'PROPOSAL_SEP_SELECTED',
@@ -59,6 +60,7 @@ export const EventLabel = new Map<Event, string>([
   [Event.PROPOSAL_CREATED, 'Event occurs when proposal is created'],
   [Event.PROPOSAL_UPDATED, 'Event occurs when proposal is updated'],
   [Event.PROPOSAL_SUBMITTED, 'Event occurs when proposal is submitted'],
+  [Event.PROPOSAL_DELETED, 'Event occurs when proposal is removed'],
   [
     Event.PROPOSAL_FEASIBLE,
     'Event occurs when proposal feasibility review is submitted with value of feasible',
