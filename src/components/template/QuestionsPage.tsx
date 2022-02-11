@@ -90,26 +90,28 @@ function QuestionsPage() {
                 setQuestionsFilter(filter);
               }}
             />
-            <SuperMaterialTable
-              createModal={createModal}
-              delete={(questionId) =>
-                api('Question deleted')
-                  .deleteQuestion({ questionId: questionId as string })
-                  .then((result) => result.deleteQuestion === null)
-              }
-              setData={setQuestions}
-              icons={tableIcons}
-              title={
-                <Typography variant="h6" component="h2">
-                  Questions
-                </Typography>
-              }
-              columns={columns}
-              isLoading={loadingQuestions}
-              data={questions}
-              options={{ search: false }}
-              hasAccess={{ create: false, update: true, remove: true }}
-            />
+            <div data-cy="questions-table">
+              <SuperMaterialTable
+                createModal={createModal}
+                delete={(questionId) =>
+                  api('Question deleted')
+                    .deleteQuestion({ questionId: questionId as string })
+                    .then((result) => result.deleteQuestion === null)
+                }
+                setData={setQuestions}
+                icons={tableIcons}
+                title={
+                  <Typography variant="h6" component="h2">
+                    Questions
+                  </Typography>
+                }
+                columns={columns}
+                isLoading={loadingQuestions}
+                data={questions}
+                options={{ search: false }}
+                hasAccess={{ create: false, update: true, remove: true }}
+              />
+            </div>
           </StyledPaper>
         </Grid>
       </Grid>

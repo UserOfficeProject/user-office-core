@@ -1,14 +1,16 @@
 import faker from 'faker';
 
+import { DataType } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 context('Questions tests', () => {
   beforeEach(() => {
-    cy.resetDB();
+    cy.resetDB(true);
     cy.viewport(1920, 1080);
   });
 
   const textQuestion = faker.lorem.words(2);
+  const samplesQuestion = initialDBData.questions.addSamples.text;
 
   it('User officer search questions', () => {
     cy.login('officer');
@@ -42,7 +44,9 @@ context('Questions tests', () => {
     cy.contains(textQuestion).should('not.exist');
 
     cy.get('[data-cy=type-dropdown]').click();
-    cy.get('[role=presentation]').contains('Text Input').click();
+    cy.get('[role=presentation]')
+      .find(`[data-value="${DataType.TEXT_INPUT}"]`)
+      .click();
 
     cy.contains(textQuestion);
 
@@ -58,5 +62,22 @@ context('Questions tests', () => {
       .type(`${textQuestion}{enter}`);
 
     cy.contains(textQuestion);
+  });
+
+  it('Search text should be trimmed', () => {
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+
+    const samplesQuestionWithSpaces = '   ' + samplesQuestion + '   ';
+
+    cy.get('[data-cy=search-input] input')
+      .clear()
+      .type(`${samplesQuestionWithSpaces}{enter}`);
+
+    cy.get('[data-cy=questions-table]')
+      .contains(samplesQuestion)
+      .should('exist');
   });
 });

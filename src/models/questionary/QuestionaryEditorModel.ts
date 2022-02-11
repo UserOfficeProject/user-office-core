@@ -164,7 +164,10 @@ export default function QuestionaryEditorModel(
           return draft;
         }
         case EventType.TEMPLATE_METADATA_UPDATED: {
-          return { ...draft, ...action.payload };
+          const metaData: Pick<Template, 'name' | 'description'> =
+            action.payload;
+          draft.description = metaData.description;
+          draft.name = metaData.name;
         }
       }
     });
