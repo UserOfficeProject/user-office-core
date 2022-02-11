@@ -17,4 +17,4 @@ const TitledRoute: React.FC<PageProps> = (props: PageProps) => {
   return <Route {...rest} />;
 };
 
-export default Page;
+export default TitledRoute;
