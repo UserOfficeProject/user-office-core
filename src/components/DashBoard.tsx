@@ -29,7 +29,7 @@ import InstitutionPage from './institution/InstitutionPage';
 import MergeInstitutionsPage from './institution/MergeInstitutionPage';
 import InstrumentsPage from './instrument/InstrumentsPage';
 import MenuItems from './menu/MenuItems';
-import Page from './Page';
+import TitledRoute./TitledRoute'./TitledRoute';
 import HelpPage from './pages/HelpPage';
 import InformationModal from './pages/InformationModal';
 import OverviewPage from './pages/OverviewPage';
@@ -241,32 +241,32 @@ const Dashboard: React.FC = () => {
       </Drawer>
       <main className={classes.content}>
         <Switch>
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Edit Proposal"
             path="/ProposalEdit/:proposalPk"
             component={ProposalEdit}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Select Proposal Type"
             path="/ProposalSelectType"
             component={() => <ProposalChooseCall callsData={calls} />}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Create Proposal"
             path="/ProposalCreate/:callId/:templateId"
             component={ProposalCreate}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Profile Page"
             path="/ProfilePage/:id"
             component={ProfilePage}
           />
           {isUserOfficer && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="User Page"
               path="/PeoplePage/:id"
@@ -274,124 +274,124 @@ const Dashboard: React.FC = () => {
             />
           )}
           {isUserOfficer && <Route path="/PeoplePage" component={PeoplePage} />}
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Proposal"
             path="/ProposalPage"
             component={ProposalPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Page Editor"
             path="/PageEditor"
             component={PageEditor}
           />
           {isUserOfficer && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="Call Page"
               path="/CallPage"
               component={CallPage}
             />
           )}
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Help Page"
             path="/HelpPage"
             component={HelpPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="SEP Page"
             path="/SEPPage/:id"
             component={SEPPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="SEPs Page"
             path="/SEPPage"
             component={SEPsPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Instruments"
             path="/InstrumentPage"
             component={InstrumentsPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Institution"
             path="/InstitutionPage"
             component={InstitutionPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Merge Institution"
             path="/MergeInstitutionsPage/:institutionId"
             component={MergeInstitutionsPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Template Editor"
             path="/QuestionaryEditor/:templateId"
             component={TemplateEditor}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Proposal Template"
             path="/ProposalTemplates"
             component={ProposalTemplatesPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Samples Template"
             path="/SampleDeclarationTemplates"
             component={SampleTemplatesPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Generic Template"
             path="/GenericTemplates"
             component={GenericTemplatesPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Shipment Template"
             path="/ShipmentDeclarationTemplates"
             component={ShipmentTemplatesPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Visits Template"
             path="/VisitTemplates"
             component={VisitTemplatesPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Feedback Template"
             path="/FeedbackTemplates"
             component={FeedbackTemplatesPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Esi Proposal Page"
             path="/EsiTemplates"
             component={ProposalEsiPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Esi Samples"
             path="/SampleEsiTemplates"
             component={SampleEsiPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Proposal Table Reviewer"
             path="/ProposalTableReviewer"
             component={ProposalTableReviewer}
           />
           {isUserOfficer && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="Units Table"
               path="/Units"
@@ -399,7 +399,7 @@ const Dashboard: React.FC = () => {
             />
           )}
           {isUserOfficer && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="Proposal Status"
               path="/ProposalStatuses"
@@ -407,7 +407,7 @@ const Dashboard: React.FC = () => {
             />
           )}
           {isUserOfficer && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="Proposal Workflows"
               path="/ProposalWorkflows"
@@ -415,7 +415,7 @@ const Dashboard: React.FC = () => {
             />
           )}
           {isUserOfficer && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="Proposal Workflow Editor"
               path="/ProposalWorkflowEditor/:workflowId"
@@ -423,7 +423,7 @@ const Dashboard: React.FC = () => {
             />
           )}
           {(isSampleSafetyReviewer || isUserOfficer) && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="Samples Safety"
               path="/SampleSafety"
@@ -432,7 +432,7 @@ const Dashboard: React.FC = () => {
           )}
 
           {isUserOfficer && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="Api Access Tokens"
               path="/ApiAccessTokens"
@@ -440,7 +440,7 @@ const Dashboard: React.FC = () => {
             />
           )}
           {isSchedulerEnabled && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="User Experiment TimeTable"
               path="/ExperimentTimes"
@@ -448,7 +448,7 @@ const Dashboard: React.FC = () => {
             />
           )}
           {isSchedulerEnabled && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="InstrSci Upcoming Experiment TimeTable"
               path="/UpcomingExperimentTimes"
@@ -456,7 +456,7 @@ const Dashboard: React.FC = () => {
             />
           )}
           {isUserOfficer && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="Questions"
               path="/Questions"
@@ -464,38 +464,38 @@ const Dashboard: React.FC = () => {
             />
           )}
           {isUserOfficer && (
-            <Page
+            <TitledRoute
               setHeader={setHeader}
               title="Import Templates"
               path="/ImportTemplate"
               component={ImportTemplatePage}
             />
           )}
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Create Esi Proposal"
             path="/CreateEsi/:scheduledEventId"
             component={CreateProposalEsiPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Update Esi Proposal"
             path="/UpdateEsi/:esiId"
             component={UpdateProposalEsiPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Create Feedback"
             path="/CreateFeedback/:scheduledEventId"
             component={CreateFeedbackPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Update Feedback"
             path="/UpdateFeedback/:feedbackId"
             component={UpdateFeedbackPage}
           />
-          <Page
+          <TitledRoute
             setHeader={setHeader}
             title="Declare Shipments"
             path="/DeclareShipments/:scheduledEventId"
