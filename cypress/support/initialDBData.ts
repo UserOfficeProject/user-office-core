@@ -12,6 +12,12 @@ export default {
       title: 'Topic title',
     },
   },
+  questions: {
+    addSamples: {
+      id: 1,
+      text: 'Add samples',
+    },
+  },
   proposal: {
     id: 1,
     title: 'Test proposal',
