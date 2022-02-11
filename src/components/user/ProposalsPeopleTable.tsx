@@ -314,9 +314,6 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
       initialValues={{
         email: '',
       }}
-      initialErrors={{
-        email: 'test',
-      }}
       onSubmit={async (values, { setFieldError, setFieldValue }) => {
         // If there is an email and it has not already been searched
         if (values.email && !tableEmails.includes(values.email)) {

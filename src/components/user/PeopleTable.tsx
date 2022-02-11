@@ -116,15 +116,11 @@ const getUsersTableData = (
   query: GetUsersQueryVariables,
   totalCount: number
 ) => {
-  const queryInvitedUsersIds = invitedUsers.map(
-    (user: BasicUserDetails) => user.id
-  ); // ids of all users being invited
-
   if (query.offset == 0) {
     // update users array to remove any invitedUsers. We re-add them so that they appear at the top of the list
     // this helps users find someone in the list even if they are already there
 
-    const invitedUsersFormatted = invitedUsers.filter((user) =>
+    const invitedUsersFiltered = invitedUsers.filter((user) =>
       query.filter
         ? user.firstname.toLowerCase().includes(query.filter?.toLowerCase()) ||
           user.lastname.toLowerCase().includes(query.filter?.toLowerCase()) ||
@@ -132,7 +128,7 @@ const getUsersTableData = (
         : true
     );
 
-    users = [...invitedUsersFormatted, ...users];
+    users = [...invitedUsersFiltered, ...users];
   }
 
   return {
@@ -286,9 +282,6 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
     <Formik
       initialValues={{
         email: '',
-      }}
-      initialErrors={{
-        email: 'test',
       }}
       onSubmit={async (values, { setFieldError, setFieldValue }) => {
         // If there is an email and it has not already been searched

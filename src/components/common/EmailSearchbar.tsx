@@ -3,11 +3,8 @@ import { Button, makeStyles } from '@material-ui/core';
 import { Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
+
 // This component is used to retrieve a user from the database using an email.
-// It is defined outside the component as when the component re renders it will lose
-// focus of the textbox if it is defined within the table component.
-// This specificity effect the search box as when a search is done the query is updated so component
-// renders and loses focus of the box.
 
 const useStyles = makeStyles({
   titleStyle: {
