@@ -554,6 +554,35 @@ context('Template tests', () => {
       cy.contains(timeQuestion);
     });
 
+    it('User officer can change template title and description', () => {
+      const newName = faker.lorem.words(3);
+      const newDescription = faker.lorem.words(5);
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find("[title='Edit']")
+        .first()
+        .click();
+
+      cy.get('[data-cy=edit-metadata]').click();
+      cy.get('[data-cy=template-name] input').clear().type(newName);
+      cy.get('[data-cy=template-description] input')
+        .clear()
+        .type(newDescription);
+
+      cy.get('[data-cy="save-metadata-btn"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(newName);
+      cy.contains(newDescription);
+    });
+
     it('User officer can clone template', () => {
       cy.login('officer');
       cy.visit('/');

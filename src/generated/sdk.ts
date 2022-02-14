@@ -1950,6 +1950,10 @@ export type Query = {
   sample: Maybe<Sample>;
   samplesByCallId: Maybe<Array<Sample>>;
   scheduledEventCore: Maybe<ScheduledEventCore>;
+<<<<<<< HEAD
+=======
+  scheduledEventsCore: Maybe<Array<ScheduledEventCore>>;
+>>>>>>> 56e9d876fd1581f2a2f04b14f8587a1c6383ec87
   sep: Maybe<Sep>;
   sepMembers: Maybe<Array<SepReviewer>>;
   sepReviewers: Maybe<Array<SepReviewer>>;
@@ -2222,6 +2226,15 @@ export type QuerySamplesByCallIdArgs = {
 
 export type QueryScheduledEventCoreArgs = {
   scheduledEventId: Scalars['Int'];
+<<<<<<< HEAD
+=======
+};
+
+
+export type QueryScheduledEventsCoreArgs = {
+  endsAfter?: InputMaybe<Scalars['TzLessDateTime']>;
+  endsBefore?: InputMaybe<Scalars['TzLessDateTime']>;
+>>>>>>> 56e9d876fd1581f2a2f04b14f8587a1c6383ec87
 };
 
 
@@ -2637,6 +2650,11 @@ export type ScheduledEventCore = {
   feedbackRequests: Array<FeedbackRequest>;
   esi: Maybe<ExperimentSafetyInput>;
   localContact: Maybe<BasicUserDetails>;
+<<<<<<< HEAD
+=======
+  localContactId: Maybe<Scalars['Int']>;
+  proposalPk: Maybe<Scalars['Int']>;
+>>>>>>> 56e9d876fd1581f2a2f04b14f8587a1c6383ec87
   shipments: Array<Shipment>;
 };
 
@@ -4434,6 +4452,15 @@ export type UpdateSampleMutationVariables = Exact<{
 
 export type UpdateSampleMutation = { updateSample: { sample: Maybe<SampleFragment>, rejection: Maybe<RejectionFragment> } };
 
+export type ScheduledEventCoreFragment = { id: number, proposalPk: number | null, bookingType: ScheduledEventBookingType, startsAt: string, endsAt: string, status: ProposalBookingStatusCore, localContactId: number | null };
+
+export type GetScheduledEventCoreQueryVariables = Exact<{
+  scheduledEventId: Scalars['Int'];
+}>;
+
+
+export type GetScheduledEventCoreQuery = { scheduledEventCore: { id: number, proposalPk: number | null, bookingType: ScheduledEventBookingType, startsAt: string, endsAt: string, status: ProposalBookingStatusCore, localContactId: number | null } | null };
+
 export type AddProposalWorkflowStatusMutationVariables = Exact<{
   proposalWorkflowId: Scalars['Int'];
   sortOrder: Scalars['Int'];
@@ -5748,6 +5775,17 @@ export const SampleFragmentDoc = gql`
   created
   proposalPk
   questionId
+}
+    `;
+export const ScheduledEventCoreFragmentDoc = gql`
+    fragment scheduledEventCore on ScheduledEventCore {
+  id
+  proposalPk
+  bookingType
+  startsAt
+  endsAt
+  status
+  localContactId
 }
     `;
 export const ShipmentFragmentDoc = gql`
@@ -7906,6 +7944,13 @@ export const UpdateSampleDocument = gql`
 }
     ${SampleFragmentDoc}
 ${RejectionFragmentDoc}`;
+export const GetScheduledEventCoreDocument = gql`
+    query getScheduledEventCore($scheduledEventId: Int!) {
+  scheduledEventCore(scheduledEventId: $scheduledEventId) {
+    ...scheduledEventCore
+  }
+}
+    ${ScheduledEventCoreFragmentDoc}`;
 export const AddProposalWorkflowStatusDocument = gql`
     mutation addProposalWorkflowStatus($proposalWorkflowId: Int!, $sortOrder: Int!, $droppableGroupId: String!, $parentDroppableGroupId: String, $proposalStatusId: Int!, $nextProposalStatusId: Int, $prevProposalStatusId: Int) {
   addProposalWorkflowStatus(
@@ -9547,8 +9592,16 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     updateSample(variables: UpdateSampleMutationVariables): Promise<UpdateSampleMutation> {
       return withWrapper(() => client.request<UpdateSampleMutation>(print(UpdateSampleDocument), variables));
     },
+<<<<<<< HEAD
     addProposalWorkflowStatus(variables: AddProposalWorkflowStatusMutationVariables): Promise<AddProposalWorkflowStatusMutation> {
       return withWrapper(() => client.request<AddProposalWorkflowStatusMutation>(print(AddProposalWorkflowStatusDocument), variables));
+=======
+    getScheduledEventCore(variables: GetScheduledEventCoreQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetScheduledEventCoreQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetScheduledEventCoreQuery>(GetScheduledEventCoreDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getScheduledEventCore');
+    },
+    addProposalWorkflowStatus(variables: AddProposalWorkflowStatusMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AddProposalWorkflowStatusMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<AddProposalWorkflowStatusMutation>(AddProposalWorkflowStatusDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addProposalWorkflowStatus');
+>>>>>>> 56e9d876fd1581f2a2f04b14f8587a1c6383ec87
     },
     addStatusChangingEventsToConnection(variables: AddStatusChangingEventsToConnectionMutationVariables): Promise<AddStatusChangingEventsToConnectionMutation> {
       return withWrapper(() => client.request<AddStatusChangingEventsToConnectionMutation>(print(AddStatusChangingEventsToConnectionDocument), variables));
