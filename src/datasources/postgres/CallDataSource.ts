@@ -263,7 +263,13 @@ export default class PostgresCallDataSource implements CallDataSource {
         'instrument_has_scientists.instrument_id',
         'call_has_instruments.instrument_id'
       )
-      .where('instrument_has_scientists.user_id', scientistId);
+      .join(
+        'instruments',
+        'instruments.instrument_id',
+        'call_has_instruments.instrument_id'
+      )
+      .where('instrument_has_scientists.user_id', scientistId)
+      .orWhere('instruments.manager_user_id', scientistId);
 
     return records.map(createCallObject);
   }
