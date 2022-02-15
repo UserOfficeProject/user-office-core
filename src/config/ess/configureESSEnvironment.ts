@@ -1,9 +1,9 @@
-import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { FeatureId } from '../../models/Feature';
 import { SettingsId } from '../../models/Settings';
+import { setTimezone } from '../setTimezone';
 import { Tokens } from '../Tokens';
 
 async function setEssColourTheme() {
@@ -35,20 +35,10 @@ async function enableDefaultEssFeatures() {
     ],
     true
   );
-
-  if (process.env.TZ) {
-    await db.updateSettings(SettingsId.TIMEZONE, process.env.TZ);
-  } else {
-    const defaultTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    logger.logInfo(
-      `Timezone should be explicitly set via 'TZ' environment variable, defaulting to '${defaultTimezone}'`,
-      {}
-    );
-    await db.updateSettings(SettingsId.TIMEZONE, defaultTimezone);
-  }
 }
 
 export async function configureESSDevelopmentEnvironment() {
   await setEssColourTheme();
   await enableDefaultEssFeatures();
+  await setTimezone();
 }

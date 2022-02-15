@@ -1,10 +1,10 @@
 import 'reflect-metadata';
-import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { FeatureId } from '../../models/Feature';
 import { SettingsId } from '../../models/Settings';
+import { setTimezone } from '../setTimezone';
 import { Tokens } from '../Tokens';
 
 async function setStfcColourTheme() {
@@ -35,20 +35,10 @@ async function enableDefaultStfcFeatures() {
     SettingsId.EXTERNAL_AUTH_LOGIN_URL,
     process.env.EXTERNAL_AUTH_LOGIN_URL
   );
-
-  if (process.env.TZ) {
-    await db.updateSettings(SettingsId.TIMEZONE, process.env.TZ);
-  } else {
-    const defaultTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    logger.logWarn(
-      `Timezone should be explicitly set via TZ environment variable, defaulting to: ${defaultTimezone}`,
-      {}
-    );
-    await db.updateSettings(SettingsId.TIMEZONE, defaultTimezone);
-  }
 }
 
 export async function configureSTFCEnvironment() {
   await setStfcColourTheme();
   await enableDefaultStfcFeatures();
+  await setTimezone();
 }
