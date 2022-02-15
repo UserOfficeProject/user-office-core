@@ -10,7 +10,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
@@ -34,10 +34,11 @@ const AppToolbar: React.FC<AppToolbarProps> = ({
   header,
 }) => {
   const { settings } = useContext(SettingsContext);
-
+  const location = useLocation();
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
 
+  if (location.pathname === '/') document.title = 'User Office Dashboard';
   const logoFilename = settings.get(
     SettingsId.HEADER_LOGO_FILENAME
   )?.settingsValue;
@@ -130,7 +131,9 @@ const AppToolbar: React.FC<AppToolbarProps> = ({
             noWrap
             className={classes.title}
           >
-            {'| User Office / ' + header}
+            {location.pathname === '/'
+              ? 'User Office / Dashboard'
+              : 'User Office / ' + header}
           </Typography>
         )}
         <div className={classes.horizontalSpacing}>

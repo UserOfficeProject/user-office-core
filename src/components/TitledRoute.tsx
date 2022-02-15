@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Route, RouteProps } from 'react-router-dom';
 
 interface PageProps extends RouteProps {
@@ -7,10 +7,8 @@ interface PageProps extends RouteProps {
 }
 
 const TitledRoute: React.FC<PageProps> = (props: PageProps) => {
-  useEffect(() => {
-    document.title = props.title;
-    props.setHeader(props.title);
-  });
+  document.title = props.title;
+  props.setHeader(props.title);
 
   const { title, ...rest } = props;
 
