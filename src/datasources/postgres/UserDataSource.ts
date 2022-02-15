@@ -390,13 +390,14 @@ export default class PostgresUserDataSource implements UserDataSource {
     first?: number,
     offset?: number,
     userRole?: UserRole,
-    subtractUsers?: [number]
+    subtractUsers?: [number],
+    order = 'desc'
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('users')
       .join('institutions as i', { organisation: 'i.institution_id' })
-      .orderBy('users.user_id', 'desc')
+      .orderBy('users.user_id', order)
       .modify((query) => {
         if (filter) {
           query.andWhere((qb) => {
