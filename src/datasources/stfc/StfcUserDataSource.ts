@@ -292,32 +292,48 @@ export class StfcUserDataSource implements UserDataSource {
     userRole?: number,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
-    const dbUsers: BasicUserDetails[] = (
-      await postgresUserDataSource.getUsers(
-        filter,
-        first,
-        offset,
-        userRole,
-        subtractUsers
-      )
-    ).users;
+    let userDetails: BasicUserDetails[] = [];
+    let finalTotalCount = 0;
 
-    let users: BasicUserDetails[] = [];
+    if (filter) {
+      userDetails = [];
 
-    if (dbUsers[0]) {
-      const userNumbers: string[] = dbUsers.map((record) => String(record.id));
-      const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
-        await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+      const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] = (
+        await client.getBasicPeopleDetailsFromSurname(token, filter, true)
       )?.return;
 
-      users = stfcBasicPeople
-        ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
-        : [];
+      userDetails = stfcBasicPeopleByLastName.map((person) =>
+        toEssBasicUserDetails(person)
+      );
+
+      finalTotalCount = userDetails.length;
+    } else {
+      const { users, totalCount } = await postgresUserDataSource.getUsers(
+        undefined,
+        first,
+        offset,
+        undefined,
+        subtractUsers,
+        'asc'
+      );
+
+      finalTotalCount = totalCount;
+
+      if (users[0]) {
+        const userNumbers: string[] = users.map((record) => String(record.id));
+        const stfcBasicPeople: StfcBasicPersonDetails[] | null = (
+          await client.getBasicPeopleDetailsFromUserNumbers(token, userNumbers)
+        )?.return;
+
+        userDetails = stfcBasicPeople
+          ? stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
+          : [];
+      }
     }
 
     return {
-      totalCount: users.length,
-      users,
+      users: userDetails.sort((a, b) => a.id - b.id),
+      totalCount: finalTotalCount,
     };
   }
 
