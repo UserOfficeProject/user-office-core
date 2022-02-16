@@ -13,14 +13,12 @@ import ActionButton, {
   ActionButtonState,
 } from 'components/proposalBooking/ActionButton';
 import CreateUpdateVisit from 'components/proposalBooking/CreateUpdateVisit';
-import CreateUpdateShipment from 'components/shipments/CreateUpdateShipment';
 import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
 import { UserContext, BasicUser } from 'context/UserContextProvider';
 import {
   FeedbackStatus,
   ProposalBookingStatusCore,
   ProposalEndStatus,
-  ShipmentStatus,
 } from 'generated/sdk';
 import { parseTzLessDateTime } from 'utils/Time';
 
@@ -243,15 +241,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
       event.proposal.managementDecisionSubmitted
     ) {
-      const isAtLeastOneShipmentSubmitted = event.shipments.some(
-        (shipment) => shipment.status === ShipmentStatus.SUBMITTED
-      );
-
-      if (isAtLeastOneShipmentSubmitted) {
-        buttonState = 'completed';
-      } else {
-        buttonState = 'neutral';
-      }
+      buttonState = 'neutral';
     } else {
       buttonState = 'inactive';
     }
@@ -261,17 +251,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <BoxIcon />,
       buttonState,
       () => {
-        openModal(
-          <CreateUpdateShipment
-            event={event}
-            onShipmentSubmitted={(shipment) => {
-              eventUpdated({
-                ...event,
-                shipments: shipment ? [shipment] : [],
-              });
-            }}
-          />
-        );
+        history.push(`/DeclareShipments/${event.id}`);
       }
     );
   };

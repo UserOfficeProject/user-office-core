@@ -108,6 +108,8 @@ context('Shipments tests', () => {
       .find(`[title="${declareShipmentTitle}"]`)
       .click();
 
+    cy.get('[data-cy=add-button]').click();
+
     cy.get('[data-cy=title-input] input')
       .click()
       .clear()
@@ -154,8 +156,10 @@ context('Shipments tests', () => {
 
     cy.get('body').type('{esc}');
 
+    cy.contains('1 shipment(s)');
+
     cy.visit('/');
 
-    cy.testActionButton(declareShipmentTitle, 'completed');
+    cy.testActionButton(declareShipmentTitle, 'neutral');
   });
 });

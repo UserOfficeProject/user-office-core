@@ -29,68 +29,76 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export function QuestionnairesListItem(props: {
+interface QuestionnairesListProps {
   record: QuestionnairesListRow;
-  onEditClick: (record: QuestionnairesListRow) => void;
-  onDeleteClick: (record: QuestionnairesListRow) => void;
-  onCloneClick: (record: QuestionnairesListRow) => void;
-}) {
+  onDeleteClick?: (record: QuestionnairesListRow) => void;
+  onEditClick?: (record: QuestionnairesListRow) => void;
+  onCloneClick?: (record: QuestionnairesListRow) => void;
+}
+
+export function QuestionnairesListItem({
+  record,
+  onEditClick,
+  onDeleteClick,
+  onCloneClick,
+}: QuestionnairesListProps) {
   const classes = useStyles();
 
   return (
     <ListItem
       button
-      onClick={() => props.onEditClick(props.record)}
+      onClick={() => onEditClick?.(record)}
       data-cy="questionnaires-list-item"
     >
       <ListItemAvatar>
         <Avatar>
           <DescriptionIcon
-            color={props.record.isCompleted ? undefined : 'error'}
-            data-cy={`questionnaires-list-item-completed:${props.record.isCompleted}`}
+            color={record.isCompleted ? undefined : 'error'}
+            data-cy={`questionnaires-list-item-completed:${record.isCompleted}`}
           />
         </Avatar>
       </ListItemAvatar>
       <ListItemText
         primary={
-          <Tooltip
-            title={props.record.label}
-            enterDelay={500}
-            enterNextDelay={500}
-          >
-            <div>{props.record.label}</div>
+          <Tooltip title={record.label} enterDelay={500} enterNextDelay={500}>
+            <div>{record.label}</div>
           </Tooltip>
         }
         className={classes.text}
       />
-      <ListItemIcon className={`${classes.icon} ${classes.iconPadding}`}>
-        <IconButton
-          edge="start"
-          aria-label="clone"
-          data-cy="clone"
-          title="Copy"
-          onClick={(e: MouseEvent) => {
-            e.stopPropagation();
-            props.onCloneClick(props.record);
-          }}
-        >
-          <FileCopy />
-        </IconButton>
-      </ListItemIcon>
-      <ListItemIcon className={classes.icon}>
-        <IconButton
-          edge="end"
-          aria-label="delete"
-          data-cy="delete"
-          title="Remove"
-          onClick={(e: MouseEvent) => {
-            e.stopPropagation();
-            props.onDeleteClick(props.record);
-          }}
-        >
-          <DeleteIcon />
-        </IconButton>
-      </ListItemIcon>
+      {onCloneClick && (
+        <ListItemIcon className={`${classes.icon} ${classes.iconPadding}`}>
+          <IconButton
+            edge="start"
+            aria-label="clone"
+            data-cy="clone"
+            title="Copy"
+            onClick={(e: MouseEvent) => {
+              e.stopPropagation();
+              onCloneClick(record);
+            }}
+          >
+            <FileCopy />
+          </IconButton>
+        </ListItemIcon>
+      )}
+
+      {onDeleteClick && (
+        <ListItemIcon className={classes.icon}>
+          <IconButton
+            edge="end"
+            aria-label="delete"
+            data-cy="delete"
+            title="Remove"
+            onClick={(e: MouseEvent) => {
+              e.stopPropagation();
+              onDeleteClick(record);
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </ListItemIcon>
+      )}
     </ListItem>
   );
 }

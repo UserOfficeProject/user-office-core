@@ -97,7 +97,9 @@ function QuestionsTableFilter(props: QuestionsTableFilterProps) {
           onChange={(event) => setSearchText(event.target.value)}
           onKeyPress={(event) => {
             if (event.key === 'Enter') {
-              handleChange({ text: searchText });
+              const trimmedSearchText = searchText?.trim();
+              setSearchText(trimmedSearchText);
+              handleChange({ text: trimmedSearchText });
               event.preventDefault();
             }
           }}

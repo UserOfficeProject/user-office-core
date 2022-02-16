@@ -66,7 +66,7 @@ export function TemplateMetadataEditor(props: {
   const classes = useStyles();
 
   const staticJSX = (
-    <div onClick={() => setIsEditMode(true)}>
+    <div onClick={() => setIsEditMode(true)} data-cy="edit-metadata">
       <label className={classes.label}>Name</label>
       <div className={clsx(classes.templateName, classes.editableField)}>
         {template.name}
@@ -107,7 +107,7 @@ export function TemplateMetadataEditor(props: {
             onChange={handleChange}
             className={classes.inputField}
             fullWidth
-            data-cy="name"
+            InputProps={{ 'data-cy': 'template-name' }}
           />
 
           <Field
@@ -120,7 +120,7 @@ export function TemplateMetadataEditor(props: {
             onChange={handleChange}
             className={classes.inputField}
             fullWidth
-            data-cy="description"
+            InputProps={{ 'data-cy': 'template-description' }}
           />
           <ActionButtonContainer className={classes.buttonContainer}>
             <IconButton
@@ -130,7 +130,11 @@ export function TemplateMetadataEditor(props: {
               <Close />
             </IconButton>
 
-            <IconButton disabled={isSubmitting} type="submit">
+            <IconButton
+              disabled={isSubmitting}
+              type="submit"
+              data-cy="save-metadata-btn"
+            >
               <Check />
             </IconButton>
           </ActionButtonContainer>

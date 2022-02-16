@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import MaterialTable, { Action, MTableToolbar } from '@material-table/core';
+import MaterialTable, { Action } from '@material-table/core';
 import { IconButton, Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import CloseIcon from '@material-ui/icons/Close';
 import Email from '@material-ui/icons/Email';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import makeStyles from '@material-ui/styles/makeStyles';
-import { Formik, Field, Form } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { Formik } from 'formik';
 import React, { useState, useEffect, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import EmailSearchbar from 'components/common/EmailSearchbar';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   BasicUserDetails,
@@ -133,51 +133,11 @@ const useStyles = makeStyles({
 });
 
 const columns = [
-  { title: 'Fristname', field: 'firstname' },
+  { title: 'Firstname', field: 'firstname' },
   { title: 'Surname', field: 'lastname' },
   { title: 'Preferred name', field: 'preferredname' },
   { title: 'Organisation', field: 'organisation' },
 ];
-
-// StylisedToolbar is defined outside the component as when the component re renders it will lose
-// focuses of textbooks in the StylisedToolbar if it is defined within the functional component.
-//  This specificity effect the search box as when a search is done the query is updated so component
-// renders and loses focus of the box.
-const StylisedToolbar: React.FC = (props) => {
-  const classes = useStyles();
-
-  return (
-    <>
-      <div className={classes.titleStyle}>
-        <MTableToolbar {...props} />
-      </div>
-      <div>
-        <Form className={useStyles().email}>
-          <Field
-            name="email"
-            label="E-mail"
-            id="Email-input"
-            type="email"
-            component={TextField}
-            margin="normal"
-            fullWidth
-            flex="1"
-            data-cy="email"
-          />
-          <Button
-            data-cy="findUser"
-            variant="contained"
-            color="primary"
-            type="submit"
-            className={useStyles().inviteButton}
-          >
-            Find User
-          </Button>
-        </Form>
-      </div>
-    </>
-  );
-};
 
 const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
   const tableRef = React.useRef();
@@ -354,9 +314,6 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
       initialValues={{
         email: '',
       }}
-      initialErrors={{
-        email: 'test',
-      }}
       onSubmit={async (values, { setFieldError, setFieldValue }) => {
         // If there is an email and it has not already been searched
         if (values.email && !tableEmails.includes(values.email)) {
@@ -478,7 +435,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
                 setQuery({ ...query, first: rowsPerPage })
               }
               components={{
-                Toolbar: StylisedToolbar,
+                Toolbar: EmailSearchbar,
               }}
             />
             {props.selection && (
