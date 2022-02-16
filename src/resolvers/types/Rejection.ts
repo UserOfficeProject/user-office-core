@@ -1,7 +1,8 @@
-import { Field, ObjectType } from 'type-graphql';
+import { Directive, Field, ObjectType } from 'type-graphql';
 
 import { Rejection as RejectionOrig } from '../../models/Rejection';
 
+@Directive('@key(fields: "reason")')
 @ObjectType()
 export class Rejection implements Partial<RejectionOrig> {
   @Field(() => String)
