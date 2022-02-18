@@ -3073,7 +3073,7 @@ export type VisitsFilter = {
   scheduledEventId?: InputMaybe<Scalars['Int']>;
 };
 
-export type _Entity = BasicUserDetails | Call | Instrument | Proposal | User;
+export type _Entity = BasicUserDetails | Call | Instrument | Proposal | Rejection | User;
 
 export type _Service = {
   /** The sdl representing the federated service capabilities. Includes federation directives, removes federation types, and includes rest of full schema after schema directives have been applied */
