@@ -117,6 +117,14 @@ class AuthorizedGraphQLClient extends GraphQLClient {
         this.error && this.error(error);
 
         return { data: null };
+      } else if ((jwtDecode(this.token) as any).exp < nowTimestampSeconds) {
+        this.enqueueSnackbar(
+          'Your session has expired, you will need to log in again.',
+          {
+            variant: 'error',
+            preventDuplicate: true,
+          }
+        );
       } else {
         notificationWithClientLog(
           this.enqueueSnackbar,
