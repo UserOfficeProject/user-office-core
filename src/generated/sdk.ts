@@ -403,6 +403,7 @@ export type Feature = {
 
 export enum FeatureId {
   EMAIL_INVITE = 'EMAIL_INVITE',
+  EMAIL_SEARCH = 'EMAIL_SEARCH',
   EXTERNAL_AUTH = 'EXTERNAL_AUTH',
   RISK_ASSESSMENT = 'RISK_ASSESSMENT',
   SCHEDULER = 'SCHEDULER',
@@ -3073,7 +3074,7 @@ export type VisitsFilter = {
   scheduledEventId?: InputMaybe<Scalars['Int']>;
 };
 
-export type _Entity = BasicUserDetails | Call | Instrument | Proposal | User;
+export type _Entity = BasicUserDetails | Call | Instrument | Proposal | Rejection | User;
 
 export type _Service = {
   /** The sdl representing the federated service capabilities. Includes federation directives, removes federation types, and includes rest of full schema after schema directives have been applied */
