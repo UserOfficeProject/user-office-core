@@ -169,7 +169,7 @@ export default class PostgresInstrumentDataSource
       })
       .where('ihs.user_id', userId)
       .orWhere('i.manager_user_id', userId)
-      .distinct()
+      .distinct('i.instrument_id')
       .then((instruments: InstrumentRecord[]) => {
         const result = instruments.map((instrument) =>
           this.createInstrumentObject(instrument)

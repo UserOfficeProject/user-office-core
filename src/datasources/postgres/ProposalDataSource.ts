@@ -434,7 +434,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           scientistId
         );
       })
-      .distinct()
+      .distinct('proposal_table_view.proposal_pk')
       .orderBy('proposal_table_view.proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.text) {
