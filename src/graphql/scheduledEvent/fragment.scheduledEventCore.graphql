@@ -1,0 +1,11 @@
+fragment scheduledEventCore on ScheduledEventCore {
+    id
+    proposalPk
+    bookingType
+    startsAt
+    endsAt
+    status
+    localContactId
+}
+
+

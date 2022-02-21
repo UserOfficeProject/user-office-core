@@ -59,6 +59,7 @@ const ProposalWorkflowMetadataEditor: React.FC<{
           startIcon={<EditIcon />}
           onClick={() => setIsEditMode(true)}
           className={classes.button}
+          data-cy="Edit-button"
         >
           Edit
         </Button>

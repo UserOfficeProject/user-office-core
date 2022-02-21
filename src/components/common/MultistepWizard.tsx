@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Button from '@material-ui/core/Button';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -69,22 +68,25 @@ export const Wizard: React.FC<WizardProps> = ({
   const totalSteps = steps.length;
   const isLastStep = stepNumber === totalSteps - 1;
 
-  const next = (values: any) => {
+  const next = (values: FormikValues) => {
     setSnapshot(values);
     setStepNumber(Math.min(stepNumber + 1, totalSteps - 1));
   };
 
-  const previous = (values: any) => {
+  const previous = (values: FormikValues) => {
     setSnapshot(values);
     setStepNumber(Math.max(stepNumber - 1, 0));
   };
 
-  const handleStep = (step: number, values: any) => () => {
+  const handleStep = (step: number, values: FormikValues) => () => {
     setSnapshot(values);
     setStepNumber(step);
   };
 
-  const handleSubmit = async (values: any, actions: FormikHelpers<any>) => {
+  const handleSubmit = async (
+    values: FormikValues,
+    actions: FormikHelpers<FormikValues>
+  ) => {
     if (step.props.onSubmit) {
       await step.props.onSubmit(values, actions);
     }

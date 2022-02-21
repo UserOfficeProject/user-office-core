@@ -300,6 +300,36 @@ context('Proposal administration tests', () => {
       cy.contains('DRAFT');
     });
 
+    it('Should show warning if proposal status is changing to SCHEDULING and proposal has no instrument', () => {
+      cy.contains('Proposals').click();
+
+      if (proposalName1) {
+        cy.contains(proposalName1).parent().find('[type="checkbox"]').check();
+      } else {
+        cy.get('[type="checkbox"]').first().check();
+      }
+
+      cy.get('[data-cy="change-proposal-status"]').click();
+
+      cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
+      cy.get('@dialog').contains('Change proposal/s status');
+
+      cy.get('@dialog')
+        .find('#selectedStatusId-input')
+        .should('not.have.class', 'Mui-disabled');
+
+      cy.get('@dialog').find('#selectedStatusId-input').click();
+
+      cy.get('[role="listbox"]').contains('SCHEDULING').click();
+
+      cy.get('[role="alert"] .MuiAlert-message')
+        .should('exist')
+        .and(
+          'contain.text',
+          'Be aware that proposal/s not assigned to an instrument will not be shown in the scheduler after changing status to "SCHEDULING"'
+        );
+    });
+
     it('Should be able to re-open proposal for submission', () => {
       cy.contains('Proposals').click();
 

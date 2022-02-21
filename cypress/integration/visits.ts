@@ -1,9 +1,9 @@
 import faker from 'faker';
 
 import {
-  DataType,
-  TemplateCategoryId,
   TemplateGroupId,
+  TemplateCategoryId,
+  DataType,
 } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
@@ -234,7 +234,11 @@ context('visits tests', () => {
 
     cy.get(`[title="${formTeamTitle}"]`).first().click();
 
-    cy.contains('Carlsson').parent().find('[title=Delete]').click();
+    cy.get('[role="dialog"]')
+      .contains('Carlsson')
+      .parent()
+      .find('[title=Delete]')
+      .click();
 
     cy.get('[title="Save"]').click();
 
