@@ -39,7 +39,7 @@ export function useUserProposals(role = UserRole.USER) {
 
           if (data.proposalsView) {
             setProposals(
-              data.proposalsView.map((proposalView) => ({
+              data.proposalsView.proposalViews.map((proposalView) => ({
                 primaryKey: proposalView.primaryKey,
                 proposalId: proposalView.proposalId,
                 title: proposalView.title,

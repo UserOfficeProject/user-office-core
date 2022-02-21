@@ -8,7 +8,14 @@ import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, ProposalView, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useProposalsCoreData(filter: ProposalsFilter) {
+export function useProposalsCoreData(
+  filter: ProposalsFilter,
+  first?: number,
+  offset?: number,
+  sortField?: string,
+  sortDirection?: string,
+  searchText?: string
+) {
   const api = useDataApi();
   const [proposalsData, setProposalsData] = useState<ProposalViewData[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
@@ -83,6 +90,11 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
             }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
             text,
           },
+          first,
+          offset,
+          sortField,
+          sortDirection,
+          searchText,
         })
         .then((data) => {
           if (unmounted) {
@@ -91,7 +103,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
 
           if (data.proposalsView) {
             setProposalsData(
-              data.proposalsView.map((proposal) => {
+              data.proposalsView.proposalViews.map((proposal) => {
                 return {
                   ...proposal,
                   status: proposal.submitted ? 'Submitted' : 'Open',
@@ -104,6 +116,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
                 } as ProposalViewData;
               })
             );
+            setTotalCount(data.proposalsView.totalCount);
           }
           setLoading(false);
 
@@ -121,6 +134,11 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
     questionFilter,
     api,
     currentRole,
+    first,
+    offset,
+    sortField,
+    sortDirection,
+    searchText,
   ]);
 
   return { loading, proposalsData, setProposalsData, totalCount };
