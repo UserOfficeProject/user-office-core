@@ -41,6 +41,7 @@ export function useShipments(filter?: ShipmentsFilter) {
   return {
     loadingShipments,
     shipments,
+    setShipments,
     setShipmentsWithLoading,
     setShipmentsFilter,
   };

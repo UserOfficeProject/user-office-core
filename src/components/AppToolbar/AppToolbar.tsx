@@ -10,7 +10,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
@@ -25,14 +25,20 @@ type AppToolbarProps = {
   open: boolean;
   /** Text of the button link in the information modal. */
   handleDrawerOpen: () => void;
+  header: string;
 };
 
-const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
+const AppToolbar: React.FC<AppToolbarProps> = ({
+  open,
+  handleDrawerOpen,
+  header,
+}) => {
   const { settings } = useContext(SettingsContext);
-
+  const location = useLocation();
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
 
+  if (location.pathname === '/') document.title = 'User Office Dashboard';
   const logoFilename = settings.get(
     SettingsId.HEADER_LOGO_FILENAME
   )?.settingsValue;
@@ -125,7 +131,9 @@ const AppToolbar: React.FC<AppToolbarProps> = ({ open, handleDrawerOpen }) => {
             noWrap
             className={classes.title}
           >
-            | User Office
+            {location.pathname === '/'
+              ? 'User Office / Dashboard'
+              : 'User Office / ' + header}
           </Typography>
         )}
         <div className={classes.horizontalSpacing}>

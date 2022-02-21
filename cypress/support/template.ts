@@ -273,8 +273,6 @@ function createMultipleChoiceQuestion(
     cy.contains('Is multiple select').click();
   }
 
-  cy.contains('Items').click();
-
   if (options?.option1) {
     cy.get('[data-cy=add-answer-button]').closest('button').click();
     cy.get('[placeholder=Answer]').type(options?.option1);
