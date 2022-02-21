@@ -696,7 +696,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             searchText: searchText ? searchText : undefined,
           });
           setUrlQueryParams({ search: searchText ? searchText : undefined });
-          console.log(query);
         }}
         onSelectionChange={(selectedItems) => {
           setUrlQueryParams((params) => ({
