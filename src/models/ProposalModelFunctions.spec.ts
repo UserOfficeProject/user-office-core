@@ -65,3 +65,27 @@ it('Dependencies should be satisfied if value matches', async () => {
     false
   );
 });
+
+it('Multiple choice dependencies should be satisfied if value matches', async () => {
+  const questionarySteps = await dataSource.getQuestionarySteps(1);
+  const dependee = getFieldById(
+    questionarySteps,
+    'has_links_with_industry'
+  ) as Answer;
+  const depender = getFieldById(
+    questionarySteps,
+    'links_with_industry'
+  ) as Answer;
+
+  dependee.value = ['yes'];
+
+  expect(areDependenciesSatisfied(questionarySteps, depender.question.id)).toBe(
+    true
+  );
+
+  dependee.value = ['no'];
+
+  expect(areDependenciesSatisfied(questionarySteps, depender.question.id)).toBe(
+    false
+  );
+});

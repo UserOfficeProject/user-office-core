@@ -43,6 +43,9 @@ export class ScheduledEventCore {
 
   @Field(() => Int, { nullable: true })
   localContactId: number | null;
+
+  @Field(() => Int, { nullable: true })
+  proposalPk: number | null;
 }
 
 @Resolver(() => ScheduledEventCore)
