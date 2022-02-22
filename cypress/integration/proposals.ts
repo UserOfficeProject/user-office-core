@@ -28,11 +28,12 @@ context('Proposal tests', () => {
   currentDayStart.setHours(0, 0, 0, 0);
   const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
   const twoDaysAgo = new Date(new Date().setDate(new Date().getDate() - 2));
+  const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1));
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startCall: faker.date.past().toISOString().slice(0, 10),
-    endCall: faker.date.future().toISOString().slice(0, 10),
+    startCall: faker.date.past().toISOString(),
+    endCall: faker.date.future().toISOString(),
     startReview: currentDayStart,
     endReview: currentDayStart,
     startSEPReview: currentDayStart,
@@ -516,5 +517,39 @@ context('Proposal tests', () => {
     });
 
     cy.contains('Save and continue').should('not.exist');
+  });
+
+  it('User cannot select inactive call for new proposal', () => {
+    let createdCallId: number;
+    const createdCallTitle = 'Created call';
+
+    cy.login('user');
+    cy.visit('/');
+
+    cy.createCall({
+      ...newCall,
+      title: createdCallTitle,
+      endCall: tomorrow,
+      proposalWorkflowId: createdWorkflowId,
+    }).then((response) => {
+      if (response.createCall.call) {
+        createdCallId = response.createCall.call.id;
+      }
+
+      cy.contains('New Proposal').click();
+
+      cy.contains(createdCallTitle);
+
+      cy.updateCall({
+        id: createdCallId,
+        ...newCall,
+        endCall: yesterday,
+        proposalWorkflowId: createdWorkflowId,
+      });
+
+      cy.reload();
+
+      cy.contains(createdCallTitle).should('not.exist');
+    });
   });
 });

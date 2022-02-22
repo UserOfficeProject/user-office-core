@@ -2,6 +2,7 @@ import DateFnsUtils from '@date-io/date-fns';
 import { DateType } from '@date-io/type';
 import FormControl from '@material-ui/core/FormControl';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import { Field } from 'formik';
 import {
   KeyboardDatePicker,
@@ -36,9 +37,14 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
       variant="inline"
       disableToolbar
       autoOk={true}
-      onChange={(date: DateType | null) => {
-        date?.setHours(0, 0, 0, 0); // omit time
-        onComplete(date);
+      onChange={(date: MaterialUiPickersDate) => {
+        /*
+        DateFnsUtils correct type is Date | null, but use of Luxon elsewhere (in call modal)
+        causes incorrect type inference: https://github.com/dmtrKovalenko/date-io/issues/584
+        */
+        const newDate = date as unknown as Date;
+        newDate?.setHours(0, 0, 0, 0); // omit time
+        onComplete(newDate);
       }}
     />
   );
