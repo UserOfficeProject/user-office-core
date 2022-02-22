@@ -10,6 +10,7 @@ import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import React, { useState } from 'react';
 
 import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
@@ -70,12 +71,17 @@ function DateSearchCriteriaInput({
             autoOk={true}
             label="Date"
             value={value}
-            onChange={(date: Date | null) => {
-              if (date && !isNaN(date.getTime())) {
-                date.setUTCHours(0, 0, 0, 0);
-                onChange(comparator, date.toISOString());
+            onChange={(date: MaterialUiPickersDate) => {
+              /*
+              DateFnsUtils uses native Date object, but use of Luxon elsewhere (in call modal)
+              causes incorrect type inference: https://github.com/dmtrKovalenko/date-io/issues/584
+              */
+              const newDate = date as unknown as Date;
+              if (newDate && !isNaN(newDate.getTime())) {
+                newDate.setUTCHours(0, 0, 0, 0);
+                onChange(comparator, newDate.toISOString());
               }
-              setValue(date);
+              setValue(newDate);
             }}
             InputLabelProps={{
               shrink: value ? true : undefined,
