@@ -4,6 +4,17 @@ import Knex from 'knex';
 const db = Knex({
   client: 'postgresql',
   connection: process.env.DATABASE_URL,
+  pool: {
+    afterCreate: function (connection: any, done: any) {
+      const defaultTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      connection.query(
+        `SET timezone = "${process.env.TZ || defaultTimezone}";`,
+        function (err: any) {
+          done(err, connection);
+        }
+      );
+    },
+  },
 });
 
 db.on('query-error', function (error: any, obj: any) {
