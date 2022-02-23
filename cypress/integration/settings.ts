@@ -219,58 +219,59 @@ context('Settings tests', () => {
       });
     };
 
-    const addMultipleStatusesToMultiColumnProposalWorkflowWithChangingEvents = () => {
-      cy.addProposalWorkflowStatus({
-        droppableGroupId: 'proposalWorkflowConnections_0',
-        proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-        proposalWorkflowId: createdWorkflowId,
-        sortOrder: 1,
-        prevProposalStatusId: prevProposalStatusId,
-      }).then((result) => {
-        const connection =
-          result.addProposalWorkflowStatus.proposalWorkflowConnection;
-        if (connection) {
-          cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: connection.id,
-            statusChangingEvents: ['PROPOSAL_SUBMITTED'],
-          });
-        }
-      });
-      cy.addProposalWorkflowStatus({
-        droppableGroupId: 'proposalWorkflowConnections_1',
-        proposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
-        proposalWorkflowId: createdWorkflowId,
-        sortOrder: 0,
-        prevProposalStatusId:
-          initialDBData.proposalStatuses.feasibilityReview.id,
-        parentDroppableGroupId: 'proposalWorkflowConnections_0',
-      }).then((result) => {
-        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
-          cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId:
-              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
-            statusChangingEvents: ['PROPOSAL_FEASIBLE'],
-          });
-        }
-      });
-      cy.addProposalWorkflowStatus({
-        droppableGroupId: 'proposalWorkflowConnections_2',
-        proposalStatusId: initialDBData.proposalStatuses.notFeasible.id,
-        proposalWorkflowId: createdWorkflowId,
-        sortOrder: 0,
-        prevProposalStatusId:
-          initialDBData.proposalStatuses.feasibilityReview.id,
-        parentDroppableGroupId: 'proposalWorkflowConnections_0',
-      }).then((result) => {
-        if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
-          cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId:
-              result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
-            statusChangingEvents: ['PROPOSAL_UNFEASIBLE'],
-          });
-        }
-      });
-    };
+    const addMultipleStatusesToMultiColumnProposalWorkflowWithChangingEvents =
+      () => {
+        cy.addProposalWorkflowStatus({
+          droppableGroupId: 'proposalWorkflowConnections_0',
+          proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+          proposalWorkflowId: createdWorkflowId,
+          sortOrder: 1,
+          prevProposalStatusId: prevProposalStatusId,
+        }).then((result) => {
+          const connection =
+            result.addProposalWorkflowStatus.proposalWorkflowConnection;
+          if (connection) {
+            cy.addStatusChangingEventsToConnection({
+              proposalWorkflowConnectionId: connection.id,
+              statusChangingEvents: ['PROPOSAL_SUBMITTED'],
+            });
+          }
+        });
+        cy.addProposalWorkflowStatus({
+          droppableGroupId: 'proposalWorkflowConnections_1',
+          proposalStatusId: initialDBData.proposalStatuses.sepSelection.id,
+          proposalWorkflowId: createdWorkflowId,
+          sortOrder: 0,
+          prevProposalStatusId:
+            initialDBData.proposalStatuses.feasibilityReview.id,
+          parentDroppableGroupId: 'proposalWorkflowConnections_0',
+        }).then((result) => {
+          if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+            cy.addStatusChangingEventsToConnection({
+              proposalWorkflowConnectionId:
+                result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+              statusChangingEvents: ['PROPOSAL_FEASIBLE'],
+            });
+          }
+        });
+        cy.addProposalWorkflowStatus({
+          droppableGroupId: 'proposalWorkflowConnections_2',
+          proposalStatusId: initialDBData.proposalStatuses.notFeasible.id,
+          proposalWorkflowId: createdWorkflowId,
+          sortOrder: 0,
+          prevProposalStatusId:
+            initialDBData.proposalStatuses.feasibilityReview.id,
+          parentDroppableGroupId: 'proposalWorkflowConnections_0',
+        }).then((result) => {
+          if (result.addProposalWorkflowStatus.proposalWorkflowConnection) {
+            cy.addStatusChangingEventsToConnection({
+              proposalWorkflowConnectionId:
+                result.addProposalWorkflowStatus.proposalWorkflowConnection.id,
+              statusChangingEvents: ['PROPOSAL_UNFEASIBLE'],
+            });
+          }
+        });
+      };
 
     beforeEach(() => {
       // NOTE: Cypress scrolls automatically to the status position and dragging element is problematic when the droppable area is out of the view. For now this solution to extend the height of the view is the fastest
