@@ -418,8 +418,7 @@ context('Settings tests', () => {
 
       cy.get('[title="Edit"]').last().click();
 
-      cy.contains('Edit').click();
-
+      cy.get('[data-cy="Edit-button"]').click();
       cy.get('#name').clear().type(updatedWorkflowName);
       cy.get('#description').clear().type(updatedWorkflowDescription);
       cy.get('[data-cy="submit"]').click();

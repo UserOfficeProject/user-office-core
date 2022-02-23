@@ -1,4 +1,5 @@
 import faker from 'faker';
+import { DateTime } from 'luxon';
 
 import {
   AllocationTimeUnits,
@@ -19,8 +20,8 @@ context('Calls tests', () => {
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startCall: faker.date.past().toISOString().slice(0, 10),
-    endCall: faker.date.future().toISOString().slice(0, 10),
+    startCall: faker.date.past().toISOString().slice(0, 16).replace('T', ' '),
+    endCall: faker.date.future().toISOString().slice(0, 16).replace('T', ' '),
     startReview: currentDayStart,
     endReview: currentDayStart,
     startSEPReview: currentDayStart,
@@ -39,8 +40,8 @@ context('Calls tests', () => {
 
   const newInactiveCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startCall: twoDaysAgo.toISOString().slice(0, 10),
-    endCall: yesterday.toISOString().slice(0, 10),
+    startCall: twoDaysAgo.toISOString(),
+    endCall: yesterday.toISOString(),
     startReview: currentDayStart,
     endReview: currentDayStart,
     startSEPReview: currentDayStart,
@@ -57,8 +58,8 @@ context('Calls tests', () => {
 
   const updatedCall = {
     shortCode: faker.random.alphaNumeric(15),
-    startDate: faker.date.past().toISOString().slice(0, 10),
-    endDate: faker.date.future().toISOString().slice(0, 10),
+    startDate: faker.date.past().toISOString().slice(0, 16).replace('T', ' '),
+    endDate: faker.date.future().toISOString().slice(0, 16).replace('T', ' '),
   };
 
   const proposalWorkflow = {
@@ -121,8 +122,18 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able go to next step or create call if there is validation error', () => {
       const shortCode = faker.random.alphaNumeric(15);
-      const startDate = faker.date.past().toISOString().slice(0, 10);
-      const endDate = faker.date.future().toISOString().slice(0, 10);
+      const startDate = faker.date
+        .past()
+        .toISOString()
+        .slice(0, 16)
+        .replace('T', ' ');
+      const endDate = faker.date
+        .future()
+        .toISOString()
+        .slice(0, 16)
+        .replace('T', ' ');
+      const invalidPastDate = faker.date.past().toISOString().slice(0, 10); // no time
+      const invalidFutureDate = faker.date.future().toISOString().slice(0, 10); // no time
 
       cy.contains('Proposals');
 
@@ -146,8 +157,21 @@ context('Calls tests', () => {
       cy.contains('Invalid Date');
 
       cy.get('[data-cy=start-date] input')
+        .clear()
+        .type(invalidPastDate)
+        .should('have.value', invalidPastDate + ' __:__');
+
+      cy.contains('Invalid Date');
+
+      cy.get('[data-cy=start-date] input')
+        .clear()
         .type(startDate)
         .should('have.value', startDate);
+
+      cy.get('[data-cy=end-date] input')
+        .clear()
+        .type(invalidFutureDate)
+        .should('have.value', invalidFutureDate + ' __:__');
 
       cy.get('[data-cy=end-date] input')
         .clear()
@@ -194,8 +218,8 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able to create a call with end dates before start dates', () => {
       const shortCode = faker.random.alphaNumeric(15);
-      const startDate = '2021-02-25';
-      const endDate = '2021-02-24';
+      const startDate = '2021-02-25 00:01';
+      const endDate = '2021-02-25 00:00';
 
       cy.contains('Proposals');
 
@@ -229,10 +253,13 @@ context('Calls tests', () => {
 
       cy.get('[data-cy=start-date] input')
         .clear()
-        .type('2021-02-27')
-        .should('have.value', '2021-02-27');
+        .type('2021-02-27 00:02')
+        .should('have.value', '2021-02-27 00:02');
 
-      cy.get('[data-cy=end-date] input').should('have.value', '2021-02-27');
+      cy.get('[data-cy=end-date] input').should(
+        'have.value',
+        '2021-02-27 00:02'
+      );
     });
 
     it('A user-officer should be able to create a call', () => {
@@ -240,9 +267,11 @@ context('Calls tests', () => {
         newCall;
       const callShortCode = shortCode || faker.lorem.word();
       const callStartDate =
-        startCall || faker.date.past().toISOString().slice(0, 10);
+        startCall ||
+        faker.date.past().toISOString().slice(0, 16).replace('T', ' ');
       const callEndDate =
-        endCall || faker.date.future().toISOString().slice(0, 10);
+        endCall ||
+        faker.date.future().toISOString().slice(0, 16).replace('T', ' ');
       const callSurveyComment = faker.lorem.word();
       const callCycleComment = faker.lorem.word();
 
@@ -570,6 +599,88 @@ context('Calls tests', () => {
         variant: 'success',
         text: 'Call deleted successfully',
       });
+    });
+  });
+
+  it('Call displays correct time remaining', () => {
+    /*
+      The time remaining is rounded down to the nearest min, hour or day.
+      No time remaining is displayed if over 30 days or under one minute.
+    */
+    cy.login('user');
+    cy.visit('/');
+
+    // Create a future call, so that there is always two calls to choose from
+    cy.createCall({
+      ...newCall,
+      endCall: DateTime.now().plus({ days: 365 }),
+      proposalWorkflowId: workflowId,
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ days: 31, hours: 1 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.contains('New Proposal').click();
+
+      cy.contains('remaining').should('not.exist');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ days: 30, hours: 1 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains('30 days remaining');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ days: 1, hours: 1 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains('1 day remaining');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ hours: 7, minutes: 30 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains('7 hours remaining');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ minutes: 1, seconds: 30 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains('1 minute remaining');
+    });
+
+    cy.updateCall({
+      id: initialDBData.call.id,
+      ...newCall,
+      endCall: DateTime.now().plus({ seconds: 59 }),
+      proposalWorkflowId: initialDBData.proposal.id,
+    }).then(() => {
+      cy.reload();
+
+      cy.contains('remaining').should('not.exist');
     });
   });
 });

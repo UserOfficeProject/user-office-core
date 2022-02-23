@@ -473,6 +473,7 @@ context('Proposal administration tests', () => {
       });
 
       cy.contains('Title')
+        .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
         .dblclick();
 
@@ -492,6 +493,7 @@ context('Proposal administration tests', () => {
       });
 
       cy.contains('Title')
+        .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
         .should('have.attr', 'aria-sort', 'Descendant');
 
@@ -500,6 +502,7 @@ context('Proposal administration tests', () => {
       cy.finishedLoading();
 
       cy.contains('Short Code')
+        .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
         .click();
 
@@ -508,6 +511,7 @@ context('Proposal administration tests', () => {
       cy.finishedLoading();
 
       cy.contains('Short Code')
+        .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
         .should('have.attr', 'aria-sort', 'Ascendant');
     });
