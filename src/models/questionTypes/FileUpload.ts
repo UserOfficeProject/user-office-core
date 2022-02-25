@@ -14,7 +14,7 @@ export const fileUploadDefinition: Question = {
       throw new Error('DataType should be FILE_UPLOAD');
     }
 
-    return fileUploadQuestionValidationSchema(field).isValidSync(value);
+    return fileUploadQuestionValidationSchema(field).isValid(value);
   },
   createBlankConfig: (): FileUploadConfig => {
     const config = new FileUploadConfig();

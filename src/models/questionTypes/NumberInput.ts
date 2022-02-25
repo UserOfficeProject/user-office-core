@@ -31,7 +31,7 @@ export const numberInputDefinition: Question = {
     return numberInputQuestionValidationSchema(
       field,
       NumberValueConstraint
-    ).isValidSync(value);
+    ).isValid(value);
   },
   createBlankConfig: (): NumberInputConfig => {
     const config = new NumberInputConfig();
