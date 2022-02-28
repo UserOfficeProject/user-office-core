@@ -203,11 +203,12 @@ export default class UserMutations {
         id: user.id,
         password: args.password,
       });
-
+      //update user record and set placeholder flag to false
       const updatedUser = await this.dataSource
         .update({
           ...user,
           ...args,
+          placeholder: false,
         })
         .then((user) => user as UserWithRole)
         .catch((err) => {
