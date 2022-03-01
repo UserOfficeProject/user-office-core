@@ -16,6 +16,7 @@ mutation updateProposal(
       primaryKey
       title
       abstract
+
       proposer {
         ...basicUserDetails
       }
