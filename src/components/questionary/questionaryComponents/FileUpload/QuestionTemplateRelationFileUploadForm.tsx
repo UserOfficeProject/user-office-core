@@ -21,7 +21,7 @@ export const QuestionTemplateRelationFileUploadForm: FC<
       validationSchema={Yup.object().shape({
         question: Yup.object({
           config: Yup.object({
-            file_type: Yup.array(),
+            file_type: Yup.array().required().min(1, 'File type is required'),
             small_label: Yup.string(),
             max_files: Yup.number(),
           }),
@@ -56,7 +56,7 @@ export const QuestionTemplateRelationFileUploadForm: FC<
             />
             <Field
               name="config.file_type"
-              label="Accepted file types (leave empty for any)"
+              label="Accepted file types"
               id="fileType"
               component={FormikUICustomSelect}
               multiple
@@ -70,6 +70,7 @@ export const QuestionTemplateRelationFileUploadForm: FC<
               ]}
               fullWidth
               data-cy="file_type"
+              required
             />
             <Field
               name="config.max_files"

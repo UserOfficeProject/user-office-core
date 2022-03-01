@@ -300,6 +300,7 @@ context('Template tests', () => {
         cy.updateQuestion({
           id: createdQuestion.id,
           question: fileQuestion,
+          config: `{"file_type":[".pdf",".docx","image/*"]}`,
         });
 
         if (shouldAddQuestionsToTemplate) {
@@ -540,7 +541,7 @@ context('Template tests', () => {
 
       /* File */
 
-      cy.createFileUploadQuestion(fileQuestion);
+      cy.createFileUploadQuestion(fileQuestion, ['.pdf', 'image/*']);
 
       /* --- */
 
@@ -1319,6 +1320,10 @@ context('Template tests', () => {
         .click();
 
       cy.contains(fileQuestion).click();
+
+      cy.get('[role="presentation"]').contains('image/*').click();
+
+      cy.get('body').type('{esc}');
 
       cy.contains('Is required').click();
 
