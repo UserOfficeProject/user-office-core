@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { FeatureId } from '../../models/Feature';
 import { SettingsId } from '../../models/Settings';
+import { setTimezone } from '../setTimezone';
 import { Tokens } from '../Tokens';
 
 async function setStfcColourTheme() {
@@ -39,4 +40,5 @@ async function enableDefaultStfcFeatures() {
 export async function configureSTFCEnvironment() {
   await setStfcColourTheme();
   await enableDefaultStfcFeatures();
+  await setTimezone();
 }
