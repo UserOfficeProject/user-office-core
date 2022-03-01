@@ -2617,7 +2617,6 @@ export type SaveSepMeetingDecisionInput = {
 };
 
 export enum ScheduledEventBookingType {
-  COMMISSIONING = 'COMMISSIONING',
   EQUIPMENT = 'EQUIPMENT',
   MAINTENANCE = 'MAINTENANCE',
   SHUTDOWN = 'SHUTDOWN',
