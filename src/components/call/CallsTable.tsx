@@ -1,6 +1,6 @@
 import { Typography } from '@material-ui/core';
-import dateformat from 'dateformat';
-import React, { useState } from 'react';
+import { DateTime } from 'luxon';
+import React, { useContext, useState } from 'react';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -10,7 +10,13 @@ import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
-import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
+import { SettingsContext } from 'context/SettingsContextProvider';
+import {
+  Call,
+  InstrumentWithAvailabilityTime,
+  SettingsId,
+  UserRole,
+} from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -32,6 +38,7 @@ const getFilterStatus = (callStatus: string | CallStatus) =>
 
 const CallsTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
+  const settingsContext = useContext(SettingsContext);
   const [assigningInstrumentsCallId, setAssigningInstrumentsCallId] = useState<
     number | null
   >(null);
@@ -60,19 +67,26 @@ const CallsTable: React.FC = () => {
     }));
   };
 
+  const timezone =
+    settingsContext.settings.get(SettingsId.TIMEZONE)?.settingsValue || '';
+
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
     {
-      title: 'Start Date',
+      title: `Start Date (${timezone})`,
       field: 'startCall',
       render: (rowData: Call): string =>
-        dateformat(new Date(rowData.startCall), 'dd-mmm-yyyy'),
+        DateTime.fromISO(rowData.startCall, {
+          zone: timezone,
+        }).toFormat('dd-MMM-yyyy HH:mm'),
     },
     {
-      title: 'End Date',
+      title: `End Date (${timezone})`,
       field: 'endCall',
       render: (rowData: Call): string =>
-        dateformat(new Date(rowData.endCall), 'dd-mmm-yyyy'),
+        DateTime.fromISO(rowData.endCall, {
+          zone: timezone,
+        }).toFormat('dd-MMM-yyyy HH:mm'),
     },
     {
       title: 'Reference number format',
