@@ -104,8 +104,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   }>({
     first: prefetchSize,
     offset: 0,
+    sortField: urlQueryParams?.sortField,
+    sortDirection: urlQueryParams?.sortDirection ?? undefined,
+    searchText: urlQueryParams?.search ?? undefined,
   });
-
   const { loading, setProposalsData, proposalsData, totalCount } =
     useProposalsCoreData(
       proposalFilter,
@@ -838,6 +840,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             setUrlQueryParams((params) => ({
               ...params,
               sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
+              sortField:
+                orderedColumnId >= 0
+                  ? columns[orderedColumnId].field?.toString()
+                  : undefined,
               sortDirection: orderDirection ? orderDirection : undefined,
             }));
           if (orderDirection && orderedColumnId > 0) {
