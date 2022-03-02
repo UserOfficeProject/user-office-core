@@ -1,12 +1,21 @@
-import { Field, Int, ObjectType } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 
 import { Unit as UnitOrigin } from '../../models/Unit';
 
 @ObjectType()
 export class Unit implements Partial<UnitOrigin> {
-  @Field(() => Int)
-  id: number;
+  @Field()
+  id: string;
 
   @Field()
-  name: string;
+  unit: string;
+
+  @Field()
+  quantity: string;
+
+  @Field()
+  symbol: string;
+
+  @Field()
+  siConversionFormula: string;
 }

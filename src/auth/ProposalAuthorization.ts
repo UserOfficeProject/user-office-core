@@ -186,16 +186,21 @@ export class ProposalAuthorization {
   }
 
   private async isProposalEditable(proposal: Proposal): Promise<boolean> {
-    const proposalStatus =
-      await this.proposalSettingsDataSource.getProposalStatus(
-        proposal.statusId
-      );
+    const callId = proposal.callId;
+    const isCallActive = await this.callDataSource.checkActiveCall(callId);
+    const proposalStatus = (
+      await this.proposalSettingsDataSource.getProposalStatus(proposal.statusId)
+    )?.shortCode;
 
-    return (
-      proposal.submitted === false ||
-      proposalStatus?.shortCode ===
-        ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED
-    );
+    if (proposalStatus === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED) {
+      return true;
+    }
+
+    if (isCallActive) {
+      return proposalStatus === ProposalStatusDefaultShortCodes.DRAFT;
+    } else {
+      return false;
+    }
   }
 
   async hasWriteRights(
@@ -227,12 +232,10 @@ export class ProposalAuthorization {
       return true;
     }
 
-    const callId = proposal.callId;
     const isMemberOfProposal = await this.isMemberOfProposal(agent, proposal);
-    const isCallActive = await this.callDataSource.checkActiveCall(callId);
     const isProposalEditable = await this.isProposalEditable(proposal);
 
-    if (isMemberOfProposal && isCallActive && isProposalEditable) {
+    if (isMemberOfProposal && isProposalEditable) {
       return true;
     }
 

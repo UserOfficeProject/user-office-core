@@ -1,5 +1,7 @@
 import { createUnionType, Field, Int, ObjectType } from 'type-graphql';
 
+import { Unit } from './Unit';
+
 @ObjectType()
 export class ConfigBase {
   @Field(() => String)
@@ -142,8 +144,8 @@ export class SampleDeclarationConfig extends SubTemplateConfig {
 }
 @ObjectType()
 export class IntervalConfig extends ConfigBase {
-  @Field(() => [String], { nullable: true })
-  units: string[] | null;
+  @Field(() => [Unit])
+  units: Unit[];
 }
 
 export enum NumberValueConstraint {
@@ -154,8 +156,8 @@ export enum NumberValueConstraint {
 
 @ObjectType()
 export class NumberInputConfig extends ConfigBase {
-  @Field(() => [String], { nullable: true })
-  units: string[] | null;
+  @Field(() => [Unit])
+  units: Unit[];
 
   @Field(() => NumberValueConstraint, { nullable: true })
   numberValueConstraint: NumberValueConstraint | null;
