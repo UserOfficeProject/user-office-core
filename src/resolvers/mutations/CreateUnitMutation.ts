@@ -6,8 +6,20 @@ import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class CreateUnitArgs {
-  @Field(() => String)
-  name: string;
+  @Field()
+  id: string;
+
+  @Field()
+  unit: string;
+
+  @Field()
+  quantity: string;
+
+  @Field()
+  symbol: string;
+
+  @Field()
+  siConversionFormula: string;
 }
 
 @Resolver()

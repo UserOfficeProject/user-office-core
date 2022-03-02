@@ -94,6 +94,8 @@ export default class QuestionaryQueries {
       return null;
     }
 
+    const q = await this.dataSource.getQuestionarySteps(questionaryId);
+
     return this.dataSource.getQuestionarySteps(questionaryId);
   }
 

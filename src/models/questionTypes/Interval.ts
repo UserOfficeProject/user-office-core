@@ -1,10 +1,13 @@
 /* eslint-disable quotes */
 
+import { logger } from '@user-office-software/duo-logger';
 import { intervalQuestionValidationSchema } from '@user-office-software/duo-validation';
 
 import { IntervalConfig } from '../../resolvers/types/FieldConfig';
+import { isSiConversionFormulaValid } from '../../utils/isSiConversionFormulaValid';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
+import { Unit } from '../Unit';
 import { Question } from './QuestionRegistry';
 
 export const intervalDefinition: Question = {
@@ -40,12 +43,12 @@ export const intervalDefinition: Question = {
     switch (filter.compareOperator) {
       case QuestionFilterCompareOperator.LESS_THAN:
         return queryBuilder.andWhereRaw(
-          "(answers.answer->'value'->>'max')::float < ?",
+          "(answers.answer->'value'->>'siMax')::float < ?",
           value
         );
       case QuestionFilterCompareOperator.GREATER_THAN:
         return queryBuilder.andWhereRaw(
-          "(answers.answer->'value'->>'min')::float > ?",
+          "(answers.answer->'value'->>'siMin')::float > ?",
           value
         );
       default:
@@ -53,5 +56,21 @@ export const intervalDefinition: Question = {
           `Unsupported comparator for Interval ${filter.compareOperator}`
         );
     }
+  },
+  transform: (
+    field: QuestionTemplateRelation,
+    answer: { value: number; unit: Unit | null }
+  ) => {
+    const { unit } = answer;
+
+    if (unit && unit.siConversionFormula) {
+      const isValid = isSiConversionFormulaValid(unit.siConversionFormula);
+      if (isValid === false) {
+        logger.logError('Conversion formula is not valid', answer);
+        throw new Error('Error while processing conversion formula');
+      }
+    }
+
+    return answer;
   },
 };
