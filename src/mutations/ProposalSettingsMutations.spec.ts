@@ -2,8 +2,6 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import {
-  anotherDummyProposalStatus,
-  dummyProposalStatus,
   dummyProposalWorkflow,
   dummyProposalWorkflowConnection,
   dummyStatusChangingEvent,
@@ -24,7 +22,11 @@ describe('Test Proposal settings mutations', () => {
     const result =
       (await ProposalSettingsMutationsInstance.createProposalStatus(
         dummyUserWithRole,
-        dummyProposalStatus
+        {
+          shortCode: 'NEW',
+          name: 'new',
+          description: 'new',
+        }
       )) as Rejection;
 
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
@@ -44,40 +46,62 @@ describe('Test Proposal settings mutations', () => {
   });
 
   test('A userofficer can create proposal status', () => {
+    const newStatus = {
+      shortCode: 'NEW',
+      name: 'NEW',
+      description: 'NEW',
+    };
+
     return expect(
       ProposalSettingsMutationsInstance.createProposalStatus(
         dummyUserOfficerWithRole,
-        dummyProposalStatus
+        newStatus
       )
-    ).resolves.toStrictEqual(dummyProposalStatus);
+    ).resolves.toMatchObject(newStatus);
   });
 
   test('A user cannot update proposal status', async () => {
     const result =
       (await ProposalSettingsMutationsInstance.updateProposalStatus(
         dummyUserWithRole,
-        dummyProposalStatus
+        {
+          id: 1,
+          shortCode: 'UPDATE',
+          name: 'update',
+          description: 'update',
+          isDefault: false,
+        }
       )) as Rejection;
 
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
   });
 
   test('A userofficer can update proposal status', () => {
+    const updatedStatus = {
+      id: 1,
+      shortCode: 'UPDATE',
+      name: 'update',
+      description: 'update',
+      isDefault: false,
+    };
+
     return expect(
       ProposalSettingsMutationsInstance.updateProposalStatus(
         dummyUserOfficerWithRole,
-        anotherDummyProposalStatus
+        updatedStatus
       )
-    ).resolves.toStrictEqual(anotherDummyProposalStatus);
+    ).resolves.toMatchObject(updatedStatus);
   });
 
   test('A userofficer can remove proposal status', () => {
+    const statusId = 2;
+
     return expect(
       ProposalSettingsMutationsInstance.deleteProposalStatus(
         dummyUserOfficerWithRole,
-        { id: 11 }
+        { id: statusId }
       )
-    ).resolves.toStrictEqual(anotherDummyProposalStatus);
+    ).resolves.toHaveProperty('id', statusId);
   });
 
   test('A user can not create proposal workflow', async () => {

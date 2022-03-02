@@ -654,7 +654,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.notified,
     proposal.technical_time_allocation,
     proposal.management_time_allocation,
-    proposal.technical_time_allocation,
+    proposal.technical_review_assignee,
     proposal.technical_review_status,
     proposal.technical_review_submitted,
     proposal.instrument_name,
