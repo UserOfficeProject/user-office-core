@@ -35,7 +35,7 @@ function createProposalStub(
     proposalId: '',
     status: {
       id: 0,
-      shortCode: '',
+      shortCode: 'DRAFT',
       description: '',
       name: '',
       isDefault: true,

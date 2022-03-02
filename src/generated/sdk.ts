@@ -2,7 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import * as Dom from 'graphql-request/dist/types.dom';
 import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
-export type InputMaybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -2678,7 +2678,8 @@ export enum SettingsId {
   PALETTE_SECONDARY_MAIN = 'PALETTE_SECONDARY_MAIN',
   PALETTE_SUCCESS_MAIN = 'PALETTE_SUCCESS_MAIN',
   PALETTE_WARNING_MAIN = 'PALETTE_WARNING_MAIN',
-  PROFILE_PAGE_LINK = 'PROFILE_PAGE_LINK'
+  PROFILE_PAGE_LINK = 'PROFILE_PAGE_LINK',
+  TIMEZONE = 'TIMEZONE'
 }
 
 export type Shipment = {

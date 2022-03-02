@@ -13,7 +13,7 @@ import { useHistory } from 'react-router';
 
 import { Call } from 'generated/sdk';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
-import { daysRemaining } from 'utils/Time';
+import { timeRemaining } from 'utils/Time';
 
 const useStyles = makeStyles(() => ({
   date: {
@@ -24,16 +24,6 @@ const useStyles = makeStyles(() => ({
 
 type ProposalChooseCallProps = {
   callsData: Call[];
-};
-
-const getDaysRemainingText = (daysRemaining: number) => {
-  if (daysRemaining <= 1) {
-    return '(last day remaining)';
-  } else if (daysRemaining > 1 && daysRemaining < 30) {
-    return `(${daysRemaining} days remaining)`;
-  } else {
-    return '';
-  }
 };
 
 const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
@@ -48,7 +38,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
   };
 
   const formatDate = (date: Date) => {
-    return dateformat(new Date(date), 'dd-mmm-yyyy');
+    return dateformat(new Date(date), 'dd-mmm-yyyy HH:MM');
   };
 
   return (
@@ -59,8 +49,10 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
         </Typography>
         <List data-cy="call-list">
           {callsData.map((call) => {
-            const daysRemainingNum = daysRemaining(new Date(call.endCall));
-            const daysRemainingText = getDaysRemainingText(daysRemainingNum);
+            let timeRemainingText = timeRemaining(new Date(call.endCall));
+            if (timeRemainingText != '') {
+              timeRemainingText = `(${timeRemainingText})`;
+            }
 
             const header =
               call.title === null || call.title === '' ? (
@@ -87,7 +79,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
                       <Typography component="div" className={classes.date}>
                         {`Application deadline: ${formatDate(
                           call.endCall
-                        )} ${daysRemainingText}`}
+                        )} ${timeRemainingText}`}
                       </Typography>
                       <Typography component="div">
                         {call.description}

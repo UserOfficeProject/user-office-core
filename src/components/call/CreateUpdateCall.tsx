@@ -3,17 +3,20 @@ import {
   createCallValidationSchemas,
   updateCallValidationSchemas,
 } from '@user-office-software/duo-validation/lib/Call';
+import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 
 import { Wizard, WizardStep } from 'components/common/MultistepWizard';
 import { FeatureContext } from 'context/FeatureContextProvider';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   Call,
   AllocationTimeUnits,
   UpdateCallInput,
   TemplateGroupId,
   FeatureId,
+  SettingsId,
 } from 'generated/sdk';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
@@ -31,6 +34,7 @@ type CreateUpdateCallProps = {
 const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const { api } = useDataApiWithFeedback();
   const { features } = useContext(FeatureContext);
+  const settingsContext = useContext(SettingsContext);
 
   const { templates: proposalTemplates } = useActiveTemplates(
     TemplateGroupId.PROPOSAL,
@@ -43,6 +47,9 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   );
   const { proposalWorkflows, loadingProposalWorkflows } =
     useProposalWorkflowsData();
+
+  const timezone =
+    settingsContext.settings.get(SettingsId.TIMEZONE)?.settingsValue || '';
 
   const currentDayStart = new Date();
   currentDayStart.setHours(0, 0, 0, 0);
@@ -69,11 +76,15 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         esiTemplateId: call.esiTemplateId || initialEsiTemplateId,
         proposalWorkflowId: call.proposalWorkflowId || '',
         referenceNumberFormat: call.referenceNumberFormat || '',
+        startCall: DateTime.fromISO(call.startCall, {
+          zone: timezone,
+        }),
+        endCall: DateTime.fromISO(call.endCall, { zone: timezone }),
       }
     : {
         shortCode: '',
-        startCall: currentDayStart,
-        endCall: currentDayEnd,
+        startCall: DateTime.now().setZone(timezone).startOf('day'),
+        endCall: DateTime.now().setZone(timezone).endOf('day'),
         referenceNumberFormat: '',
         startReview: currentDayStart,
         endReview: currentDayEnd,
