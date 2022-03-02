@@ -1,0 +1,5 @@
+query getQuantities {
+   quantities {
+    id
+  } 
+}

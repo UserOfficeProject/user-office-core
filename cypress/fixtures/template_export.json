@@ -1,6 +1,6 @@
 {
-    "version": "1.0.0",
-    "exportDate": "2021-12-06T10:03:45.159Z",
+    "version": "1.1.0",
+    "exportDate": "2022-02-10T13:15:14.319Z",
     "template": {
         "templateId": 1,
         "groupId": "PROPOSAL",
@@ -66,8 +66,8 @@
                             "esiTemplateId": 3,
                             "small_label": "",
                             "required": false,
-                            "minEntries": null,
-                            "maxEntries": null
+                            "maxEntries": null,
+                            "minEntries": null
                         }
                     },
                     "topicId": 5,
@@ -79,8 +79,65 @@
                         "esiTemplateId": 3,
                         "small_label": "",
                         "required": false,
-                        "minEntries": null,
-                        "maxEntries": null
+                        "maxEntries": null,
+                        "minEntries": null
+                    },
+                    "dependencies": [],
+                    "dependenciesOperator": "AND"
+                },
+                {
+                    "question": {
+                        "categoryId": 1,
+                        "id": "number_question",
+                        "naturalKey": "number_question",
+                        "dataType": "NUMBER_INPUT",
+                        "question": "Number question from seeds",
+                        "config": {
+                            "small_label": "",
+                            "required": false,
+                            "tooltip": "",
+                            "units": [
+                                {
+                                    "id": "meter",
+                                    "unit": "meter",
+                                    "symbol": "m",
+                                    "quantity": "length",
+                                    "siConversionFormula": "x"
+                                },
+                                {
+                                    "id": "centimeter",
+                                    "unit": "centimeter",
+                                    "symbol": "cm",
+                                    "quantity": "length",
+                                    "siConversionFormula": "x / 100"
+                                }
+                            ],
+                            "numberValueConstraint": null
+                        }
+                    },
+                    "topicId": 5,
+                    "sortOrder": 2,
+                    "config": {
+                        "small_label": "",
+                        "required": false,
+                        "tooltip": "",
+                        "units": [
+                            {
+                                "id": "meter",
+                                "unit": "meter",
+                                "symbol": "m",
+                                "quantity": "length",
+                                "siConversionFormula": "x"
+                            },
+                            {
+                                "id": "centimeter",
+                                "unit": "centimeter",
+                                "symbol": "cm",
+                                "quantity": "length",
+                                "siConversionFormula": "x / 100"
+                            }
+                        ],
+                        "numberValueConstraint": null
                     },
                     "dependencies": [],
                     "dependenciesOperator": "AND"
@@ -114,8 +171,37 @@
                 "esiTemplateId": 3,
                 "small_label": "",
                 "required": false,
-                "minEntries": null,
-                "maxEntries": null
+                "maxEntries": null,
+                "minEntries": null
+            }
+        },
+        {
+            "categoryId": 1,
+            "id": "number_question",
+            "naturalKey": "number_question",
+            "dataType": "NUMBER_INPUT",
+            "question": "Number question from seeds",
+            "config": {
+                "small_label": "",
+                "required": false,
+                "tooltip": "",
+                "units": [
+                    {
+                        "id": "meter",
+                        "unit": "meter",
+                        "symbol": "m",
+                        "quantity": "length",
+                        "siConversionFormula": "x"
+                    },
+                    {
+                        "id": "centimeter",
+                        "unit": "centimeter",
+                        "symbol": "cm",
+                        "quantity": "length",
+                        "siConversionFormula": "x / 100"
+                    }
+                ],
+                "numberValueConstraint": null
             }
         }
     ]

@@ -335,11 +335,10 @@ function createNumberInputQuestion(
   }
 
   if (options?.units && options.units.length > 0) {
-    cy.get('[data-cy=units]>[role=button]').click({ force: true });
     for (const unit of options.units) {
+      cy.get('[data-cy=units]').find('[title=Open]').click();
       cy.contains(unit).click();
     }
-    cy.get('body').type('{esc}');
   }
 
   cy.contains('Save').click();
@@ -364,11 +363,10 @@ function createIntervalQuestion(
   cy.get('[data-cy=question]').clear().type(question);
 
   if (options?.units && options.units.length > 0) {
-    cy.get('[data-cy=units]>[role=button]').click({ force: true });
     for (const unit of options.units) {
+      cy.get('[data-cy=units]').find('[title=Open]').click();
       cy.contains(unit).click();
     }
-    cy.get('body').type('{esc}');
   }
 
   cy.contains('Save').click();

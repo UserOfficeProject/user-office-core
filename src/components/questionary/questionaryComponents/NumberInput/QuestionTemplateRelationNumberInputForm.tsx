@@ -1,32 +1,27 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import { TextField as MaterialTextField } from '@material-ui/core';
+import { Autocomplete } from '@material-ui/lab';
 import { Field, getIn } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
-import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionExcerpt } from 'components/questionary/questionaryComponents/QuestionExcerpt';
-import { NumberValueConstraint } from 'generated/sdk';
+import { NumberInputConfig, NumberValueConstraint } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
-const useStyles = makeStyles(() => ({
-  units: {
-    minWidth: '100%',
-  },
-}));
-
 export const QuestionTemplateRelationNumberForm: FC<
   QuestionTemplateRelationFormProps
 > = (props) => {
-  const classes = useStyles();
+  const numberConfig = props.questionRel.config as NumberInputConfig;
   const { units } = useUnitsData();
+  const [selectedUnits, setSelectedUnits] = useState(numberConfig.units);
 
   return (
     <QuestionTemplateRelationFormShell
@@ -35,7 +30,15 @@ export const QuestionTemplateRelationNumberForm: FC<
         question: Yup.object({
           config: Yup.object({
             required: Yup.bool(),
-            units: Yup.array().of(Yup.string()),
+            units: Yup.array().of(
+              Yup.object({
+                id: Yup.string(),
+                quantity: Yup.string(),
+                siConversionFormula: Yup.string(),
+                symbol: Yup.string(),
+                unit: Yup.string(),
+              })
+            ),
           }),
         }),
       })}
@@ -71,14 +74,21 @@ export const QuestionTemplateRelationNumberForm: FC<
                 InputProps={{ 'data-cy': 'required' }}
               />
 
-              <Field
-                name="config.units"
-                component={FormikUICustomSelect}
+              <Autocomplete
+                id="config-units"
                 multiple
-                label="Units"
-                margin="normal"
-                availableOptions={units.map((unit) => unit.name)}
-                className={classes.units}
+                options={units}
+                getOptionLabel={({ unit, symbol, quantity }) =>
+                  `${symbol} (${unit}) - ${quantity}`
+                }
+                renderInput={(params) => (
+                  <MaterialTextField {...params} label="Units" />
+                )}
+                onChange={(_event, newValue) => {
+                  setSelectedUnits(newValue);
+                  formikProps.setFieldValue('config.units', newValue);
+                }}
+                value={selectedUnits ?? undefined}
                 data-cy="units"
               />
 
