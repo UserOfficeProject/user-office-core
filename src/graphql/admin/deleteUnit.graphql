@@ -1,4 +1,4 @@
-mutation deleteUnit($id: Int!) {
+mutation deleteUnit($id: String!) {
   deleteUnit(id: $id) {
     unit {
       id

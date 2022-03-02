@@ -151,7 +151,22 @@ context('Template tests', () => {
         cy.updateQuestion({
           id: createdQuestion.id,
           question: intervalQuestion,
-          config: '{"units":["celsius","kelvin"]}',
+          config: `{"units":[
+                            {
+                              "id": "celsius",
+                              "unit": "celsius",
+                              "symbol": "c",
+                              "quantity": "thermodynamic temperature",
+                              "siConversionFormula": "x + 273.15"
+                            },
+                            {
+                                "id": "kelvin",
+                                "unit": "kelvin",
+                                "symbol": "k",
+                                "quantity": "thermodynamic temperature",
+                                "siConversionFormula": "x"
+                            }
+          ]}`,
         });
 
         if (shouldAddQuestionsToTemplate) {
@@ -175,7 +190,22 @@ context('Template tests', () => {
         cy.updateQuestion({
           id: createdQuestion.id,
           question: numberQuestion,
-          config: '{"units":["celsius","kelvin"]}',
+          config: `{"units":[
+                            {
+                              "id": "celsius",
+                              "unit": "celsius",
+                              "symbol": "c",
+                              "quantity": "thermodynamic temperature",
+                              "siConversionFormula": "x + 273.15"
+                            },
+                            {
+                                "id": "kelvin",
+                                "unit": "kelvin",
+                                "symbol": "k",
+                                "quantity": "thermodynamic temperature",
+                                "siConversionFormula": "x"
+                            }
+          ]}`,
         });
 
         if (shouldAddQuestionsToTemplate) {
@@ -764,13 +794,13 @@ context('Template tests', () => {
 
       cy.get('[data-cy=question]').clear().type(numberQuestion2.title);
 
-      cy.get('[data-cy=units]>[role=button]').click();
+      cy.get('[data-cy=units]').find('[title=Open]').click();
 
       cy.contains('celsius').click();
 
-      cy.contains('kelvin').click();
+      cy.get('[data-cy=units]').find('[title=Open]').click();
 
-      cy.get('body').type('{esc}');
+      cy.contains('kelvin').click();
 
       cy.get('[data-cy="numberValueConstraint"]').click();
 
@@ -798,13 +828,13 @@ context('Template tests', () => {
 
       cy.get('[data-cy=question]').clear().type(numberQuestion3.title);
 
-      cy.get('[data-cy=units]>[role=button]').click();
+      cy.get('[data-cy=units]').find('[title=Open]').click();
 
       cy.contains('celsius').click();
 
-      cy.contains('kelvin').click();
+      cy.get('[data-cy=units]').find('[title=Open]').click();
 
-      cy.get('body').type('{esc}');
+      cy.contains('kelvin').click();
 
       cy.get('[data-cy="numberValueConstraint"]').click();
 
@@ -828,10 +858,11 @@ context('Template tests', () => {
 
       cy.contains(numberQuestion3.title).click();
 
-      cy.get('[data-cy=units] input').should('have.value', 'celsius,kelvin');
-      cy.get('[data-cy="numberValueConstraint"] input').should(
-        'have.value',
-        'ONLY_POSITIVE'
+      cy.get('[data-cy=units]').contains('celsius');
+      cy.get('[data-cy=units]').contains('kelvin');
+
+      cy.get('[data-cy="numberValueConstraint"]').contains(
+        'Only positive numbers'
       );
 
       cy.get('[data-cy="numberValueConstraint"]').click();
@@ -1145,6 +1176,11 @@ context('Template tests', () => {
       cy.get('[data-cy=import-template-button]').click();
 
       cy.contains(resolvedQuestionTitle).should('exist');
+
+      cy.notification({
+        variant: 'success',
+        text: 'Template imported successfully',
+      });
     });
 
     it('should export template in compatible format', () => {

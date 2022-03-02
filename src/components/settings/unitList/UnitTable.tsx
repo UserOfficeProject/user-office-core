@@ -18,7 +18,11 @@ import CreateUnit from './CreateUnit';
 const UnitTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
   const { loadingUnits, units, setUnitsWithLoading: setUnits } = useUnitsData();
-  const columns = [{ title: 'Unit', field: 'name' }];
+  const columns = [
+    { title: 'Quantity', field: 'quantity' },
+    { title: 'Symbol', field: 'symbol' },
+    { title: 'Unit', field: 'unit' },
+  ];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
@@ -31,11 +35,9 @@ const UnitTable: React.FC = () => {
     <CreateUnit unit={editUnit} close={(unit: Unit | null) => onCreate(unit)} />
   );
 
-  const deleteUnit = async (id: number | string) => {
+  const deleteUnit = async (id: string | number) => {
     return await api('Unit deleted successfully')
-      .deleteUnit({
-        id: id as number,
-      })
+      .deleteUnit({ id: id as string })
       .then((resp) => {
         if (!resp.deleteUnit.rejection) {
           const newObjectsArray = units.filter(

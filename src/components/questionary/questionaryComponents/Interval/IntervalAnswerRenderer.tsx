@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
+import { Unit } from 'generated/sdk';
 
 export const IntervalAnswerRenderer: AnswerRenderer = (answer) => {
   const isMinAnswered = typeof answer.value.min === 'number';
@@ -14,11 +15,11 @@ export const IntervalAnswerRenderer: AnswerRenderer = (answer) => {
 
   const min = answer.value.min ?? 'unspecified';
   const max = answer.value.max ?? 'unspecified';
-  const unit = answer.value.unit || '';
+  const symbol = (answer.value.unit as Unit)?.symbol || '';
 
   return (
     <span>
-      {min} &ndash; {max} ({unit})
+      {min} &ndash; {max} {symbol ?? ''}
     </span>
   );
 };
