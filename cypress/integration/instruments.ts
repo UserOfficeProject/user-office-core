@@ -296,12 +296,10 @@ context('Instrument tests', () => {
       cy.get('@dialog').contains('Technical review').click();
 
       cy.get('[data-cy="reviewed-by-info"]').should('exist');
-      cy.get('[data-cy="reviewed-by-info"]')
-        .invoke('attr', 'title')
-        .should(
-          'eq',
-          `Reviewed by ${scientist2.firstName} ${scientist2.lastName}`
-        );
+      cy.get('[data-cy="reviewed-by-info"]').should(
+        'contain',
+        `Reviewed by ${scientist2.firstName} ${scientist2.lastName}`
+      );
     });
 
     it('User Officer should be able to re-open submitted technical review', () => {
