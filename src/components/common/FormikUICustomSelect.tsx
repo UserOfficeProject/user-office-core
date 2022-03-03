@@ -9,7 +9,7 @@ import React from 'react';
 import MultiMenuItem from './MultiMenuItem';
 
 export type ValueType = string | number;
-type SelectedValueType = ValueType | ValueType[];
+export type SelectedValueType = ValueType | ValueType[];
 
 interface Option {
   label: string;

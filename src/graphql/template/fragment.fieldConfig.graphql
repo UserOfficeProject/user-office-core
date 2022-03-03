@@ -28,7 +28,9 @@ fragment fieldConfig on FieldConfig {
   }
 
   ... on IntervalConfig {
-    units
+    units {
+      ...unit
+    }
 
     small_label
     required
@@ -36,7 +38,9 @@ fragment fieldConfig on FieldConfig {
   }
 
   ... on NumberInputConfig {
-    units
+    units {
+      ...unit
+    }
     numberValueConstraint
 
     small_label

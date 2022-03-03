@@ -96,13 +96,16 @@ const ProposalTableInstrumentScientist: React.FC = () => {
           }
         >
           <IconButton
-            data-cy="view-proposal"
             onClick={() => {
               setUrlQueryParams({ reviewModal: rowData.primaryKey });
             }}
             style={iconButtonStyle}
           >
-            {showView ? <Visibility /> : <Edit />}
+            {showView ? (
+              <Visibility data-cy="view-proposal-and-technical-review" />
+            ) : (
+              <Edit data-cy="edit-technical-review" />
+            )}
           </IconButton>
         </Tooltip>
 

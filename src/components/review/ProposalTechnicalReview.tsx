@@ -2,9 +2,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
-import InfoIcon from '@material-ui/icons/InfoOutlined';
 import { Editor } from '@tinymce/tinymce-react';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Formik, Form, Field, useFormikContext } from 'formik';
@@ -120,18 +118,13 @@ const ProposalTechnicalReview = ({
   return (
     <>
       <Typography variant="h6" component="h2" gutterBottom>
-        Technical Review{' '}
-        {proposal.technicalReview?.reviewer && (
-          <Tooltip
-            data-cy="reviewed-by-info"
-            title={`Reviewed by ${getFullUserName(
-              proposal.technicalReview?.reviewer
-            )}`}
-          >
-            <InfoIcon fontSize="small" />
-          </Tooltip>
-        )}
+        Technical Review
       </Typography>
+      {proposal.technicalReview?.reviewer && (
+        <Typography variant="subtitle2" data-cy="reviewed-by-info">
+          {`Reviewed by ${getFullUserName(proposal.technicalReview?.reviewer)}`}
+        </Typography>
+      )}
       <Formik
         initialValues={initialValues}
         validationSchema={proposalTechnicalReviewValidationSchema}

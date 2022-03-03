@@ -3,6 +3,11 @@ import faker from 'faker';
 import { TechnicalReviewStatus } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
+const selectAllProposalsFilterStatus = () => {
+  cy.get('[data-cy="status-filter"]').click();
+  cy.get('[role="listbox"] [data-value="0"]').click();
+};
+
 context('Instrument tests', () => {
   const proposal1 = {
     title: faker.random.words(2),
@@ -291,12 +296,10 @@ context('Instrument tests', () => {
       cy.get('@dialog').contains('Technical review').click();
 
       cy.get('[data-cy="reviewed-by-info"]').should('exist');
-      cy.get('[data-cy="reviewed-by-info"]')
-        .invoke('attr', 'title')
-        .should(
-          'eq',
-          `Reviewed by ${scientist2.firstName} ${scientist2.lastName}`
-        );
+      cy.get('[data-cy="reviewed-by-info"]').should(
+        'contain',
+        `Reviewed by ${scientist2.firstName} ${scientist2.lastName}`
+      );
     });
 
     it('User Officer should be able to re-open submitted technical review', () => {
@@ -360,12 +363,10 @@ context('Instrument tests', () => {
 
       cy.contains('Proposals');
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
-
+      selectAllProposalsFilterStatus();
       cy.contains(proposal1.title)
         .parent()
-        .find('[data-cy="view-proposal"]')
+        .find('[data-cy="edit-technical-review"]')
         .click();
       cy.get('[role="dialog"]').contains('Technical review').click();
 
@@ -506,8 +507,7 @@ context('Instrument tests', () => {
     it('Instrument scientist should be able to see proposals assigned to instrument where he is instrument scientist', () => {
       cy.contains('Proposals');
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
+      selectAllProposalsFilterStatus();
 
       cy.contains(proposal1.title);
     });
@@ -515,8 +515,7 @@ context('Instrument tests', () => {
     it('Instrument scientist should have a call and instrument filter', () => {
       cy.contains('Proposals');
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
+      selectAllProposalsFilterStatus();
 
       cy.contains(proposal1.title);
 
@@ -571,8 +570,7 @@ context('Instrument tests', () => {
       });
       cy.contains('Proposals');
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
+      selectAllProposalsFilterStatus();
 
       cy.contains(proposal1.title);
       cy.contains(proposal2.title);
@@ -611,12 +609,11 @@ context('Instrument tests', () => {
       const publicComment = faker.random.words(2);
       cy.contains('Proposals');
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
+      selectAllProposalsFilterStatus();
 
       cy.contains(proposal1.title)
         .parent()
-        .find('[data-cy="view-proposal"]')
+        .find('[data-cy="edit-technical-review"]')
         .click();
       cy.get('[role="dialog"]').as('dialog');
       cy.finishedLoading();
@@ -689,10 +686,36 @@ context('Instrument tests', () => {
 
       cy.contains('Proposals').click();
 
-      cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="0"]').click();
+      selectAllProposalsFilterStatus();
 
       cy.contains('20');
+    });
+
+    it('Technical review assignee should see edit icon if assigned to review a proposal and review is not submitted', () => {
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal-and-technical-review"]')
+        .should('not.exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="edit-technical-review"]')
+        .should('exist')
+        .click();
+
+      cy.closeModal();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="edit-technical-review"]')
+        .should('exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal-and-technical-review"]')
+        .should('not.exist');
     });
   });
 });
