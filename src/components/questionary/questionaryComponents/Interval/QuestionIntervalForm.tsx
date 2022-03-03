@@ -1,29 +1,24 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import { TextField as MaterialTextField } from '@material-ui/core';
+import { Autocomplete } from '@material-ui/lab';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
-import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
+import { IntervalConfig } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-const useStyles = makeStyles(() => ({
-  units: {
-    minWidth: '100%',
-  },
-}));
-
 export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
   const field = props.question;
+  const intervalConfig = props.question.config as IntervalConfig;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
   const { units } = useUnitsData();
-
-  const classes = useStyles();
+  const [selectedUnits, setSelectedUnits] = useState(intervalConfig.units);
 
   return (
     <QuestionFormShell
@@ -33,11 +28,19 @@ export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
         question: Yup.string().required('Question is required'),
         config: Yup.object({
           required: Yup.bool(),
-          units: Yup.array().of(Yup.string()),
+          units: Yup.array().of(
+            Yup.object({
+              id: Yup.string(),
+              quantity: Yup.string(),
+              siConversionFormula: Yup.string(),
+              symbol: Yup.string(),
+              unit: Yup.string(),
+            })
+          ),
         }),
       })}
     >
-      {() => (
+      {({ setFieldValue }) => (
         <>
           <Field
             name="naturalKey"
@@ -81,13 +84,20 @@ export const QuestionIntervalForm: FC<QuestionFormProps> = (props) => {
               InputProps={{ 'data-cy': 'required' }}
             />
 
-            <Field
-              name="config.units"
-              component={FormikUICustomSelect}
+            <Autocomplete
               multiple
-              label="Units"
-              availableOptions={units.map((unit) => unit.name)}
-              className={classes.units}
+              options={units}
+              getOptionLabel={({ unit, symbol, quantity }) =>
+                `${symbol} (${unit}) - ${quantity}`
+              }
+              renderInput={(params) => (
+                <MaterialTextField {...params} label="Units" />
+              )}
+              onChange={(_event, newValue) => {
+                setSelectedUnits(newValue);
+                setFieldValue('config.units', newValue);
+              }}
+              value={selectedUnits ?? undefined}
               data-cy="units"
             />
           </TitledContainer>

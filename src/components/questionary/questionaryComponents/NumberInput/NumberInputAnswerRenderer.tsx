@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
+import { Unit } from 'generated/sdk';
 
 const NumberInputAnswerRenderer: AnswerRenderer = (answer) => {
   if (!answer.value.value) {
@@ -8,12 +9,11 @@ const NumberInputAnswerRenderer: AnswerRenderer = (answer) => {
   }
 
   const value = answer.value.value;
-  const unit = answer.value.unit;
+  const symbol = (answer.value.unit as Unit)?.symbol;
 
   return (
     <span>
-      {value}
-      {unit ? ` ${unit}` : ''}
+      {value} {symbol ?? ''}
     </span>
   );
 };
