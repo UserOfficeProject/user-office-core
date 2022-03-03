@@ -58,6 +58,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
   const { api } = useDataApiWithFeedback();
   const { setAssignmentReview } = useContext(ReviewAndAssignmentContext);
   const [shouldSubmit, setShouldSubmit] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!review) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -105,12 +106,14 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
       );
     }
     onChange();
+    setIsSubmitting(false);
   };
 
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
+        setIsSubmitting(true);
         if (shouldSubmit) {
           confirm(
             async () => {
@@ -120,6 +123,9 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               title: 'Please confirm',
               description:
                 'I am aware that no further changes to the grade are possible after submission.',
+              onCancel: () => {
+                setIsSubmitting(false);
+              },
             }
           )();
         } else {
@@ -128,7 +134,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
       }}
       validationSchema={proposalGradeValidationSchema}
     >
-      {({ isSubmitting, setFieldValue }) => (
+      {({ setFieldValue }) => (
         <Form>
           <PromptIfDirty />
           <CssBaseline />

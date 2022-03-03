@@ -21,7 +21,7 @@ function readWriteReview() {
 
   cy.get('@dialog').contains('Proposal information', { matchCase: false });
   cy.get('@dialog').contains('Technical review');
-  cy.get('@dialog').contains('Grade').click();
+  cy.get('@dialog').contains('Grade');
 
   cy.setTinyMceContent('comment', faker.lorem.words(3));
 
@@ -202,7 +202,7 @@ context('SEP reviews tests', () => {
 
       cy.contains(proposal1.proposalTitle)
         .parent()
-        .get('[title="View Proposal"]')
+        .find('[title="View Proposal"]')
         .click();
 
       cy.finishedLoading();
@@ -305,7 +305,7 @@ context('SEP reviews tests', () => {
 
       cy.contains(sepMembers.reviewer.lastName)
         .parent()
-        .find('[title="Review proposal"]')
+        .find('[data-cy="grade-proposal-icon"]')
         .click();
       readWriteReview();
     });
@@ -403,7 +403,7 @@ context('SEP reviews tests', () => {
 
       cy.contains(proposal1.proposalTitle)
         .parent()
-        .get('[title="View Proposal"]')
+        .find('[title="View Proposal"]')
         .click();
 
       cy.finishedLoading();
@@ -431,7 +431,7 @@ context('SEP reviews tests', () => {
 
       cy.contains(sepMembers.reviewer.lastName)
         .parent()
-        .find('[title="Review proposal"]')
+        .find('[data-cy="grade-proposal-icon"]')
         .click();
       readWriteReview();
     });
@@ -506,28 +506,7 @@ context('SEP reviews tests', () => {
 
       cy.contains(sepMembers.reviewer.lastName)
         .parent()
-        .find('[title="Review proposal"]')
-        .click();
-      readWriteReview();
-    });
-
-    it('SEP Secretary should be able to read/write reviews', () => {
-      cy.assignSepReviewersToProposal({
-        sepId: createdSepId,
-        memberIds: [sepMembers.reviewer.id],
-        proposalPk: createdProposalId,
-      });
-
-      cy.visit(`/SEPPage/${createdSepId}`);
-
-      cy.contains('Proposals and Assignments').click();
-      cy.finishedLoading();
-
-      cy.get('[title="Show Reviewers"]').click();
-
-      cy.contains(sepMembers.reviewer.lastName)
-        .parent()
-        .find('[title="Review proposal"]')
+        .find('[data-cy="grade-proposal-icon"]')
         .click();
       readWriteReview();
     });
@@ -1252,13 +1231,13 @@ context('SEP meeting components tests', () => {
 
       cy.contains(proposal1.proposalTitle)
         .parent()
-        .find('[title="Review proposal"]')
+        .find('[title="Grade proposal"]')
         .click();
 
       cy.finishedLoading();
 
       cy.contains(proposal1.proposalTitle);
-      cy.get('[role="dialog"]').contains('Grade').click();
+      cy.get('[role="dialog"]').contains('Grade');
       cy.get('textarea[id="comment"]').should('exist');
       cy.get('button[type="submit"]').should('exist');
     });
