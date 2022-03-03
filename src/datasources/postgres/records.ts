@@ -229,6 +229,8 @@ export interface VisitRegistrationRecord {
   registration_questionary_id: number | null;
   is_registration_submitted: boolean;
   training_expiry_date: Date | null;
+  starts_at: Date | null;
+  ends_at: Date | null;
 }
 
 export interface RoleRecord {
@@ -775,6 +777,8 @@ export const createVisitRegistrationObject = (
     record.visit_id,
     record.registration_questionary_id,
     record.is_registration_submitted,
+    record.starts_at,
+    record.ends_at,
     record.training_expiry_date
   );
 };

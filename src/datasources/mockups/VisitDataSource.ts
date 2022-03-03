@@ -52,6 +52,8 @@ export class VisitDataSourceMock implements VisitDataSource {
         1,
         1,
         false,
+        new Date(),
+        new Date(),
         new Date('2033-07-19T00:00:00.0000')
       ),
     ];

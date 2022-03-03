@@ -14,7 +14,7 @@ import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class UpdateVisitRegistrationArgs {
-  @Field(() => Int!)
+  @Field(() => Int)
   visitId: number;
 
   @Field(() => Date, { nullable: true })
@@ -22,6 +22,12 @@ export class UpdateVisitRegistrationArgs {
 
   @Field(() => Boolean, { nullable: true })
   isRegistrationSubmitted?: boolean;
+
+  @Field(() => Date, { nullable: true })
+  startsAt?: boolean;
+
+  @Field(() => Date, { nullable: true })
+  endsAt?: boolean;
 
   registrationQuestionaryId?: number;
 }
