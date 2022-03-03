@@ -158,7 +158,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
             }}
             disabled={isDisabled(isSubmitting)}
           />
-          <ErrorMessage name="comment"></ErrorMessage>
+          <ErrorMessage name="comment" />
           <Box marginTop={1} width={150}>
             <Field
               name="grade"
