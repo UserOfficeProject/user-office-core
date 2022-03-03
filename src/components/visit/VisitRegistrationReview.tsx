@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import React, { useContext } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
@@ -29,10 +30,21 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const isSubmitted = state.registration.isRegistrationSubmitted;
+  const registration = state.registration;
 
   const additionalDetails: TableRowData[] = [
-    { label: 'Status', value: isSubmitted ? 'Submitted' : 'Draft' },
+    {
+      label: 'Status',
+      value: registration.isRegistrationSubmitted ? 'Submitted' : 'Draft',
+    },
+    {
+      label: 'Start date',
+      value: DateTime.fromISO(registration.startsAt).toFormat('YYYY-MM-DD'),
+    },
+    {
+      label: 'End date',
+      value: DateTime.fromISO(registration.endsAt).toFormat('YYYY-MM-DD'),
+    },
   ];
 
   return (
@@ -72,12 +84,12 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
               }
             )()
           }
-          disabled={isSubmitted}
+          disabled={registration.isRegistrationSubmitted}
           variant="contained"
           color="primary"
           data-cy="submit-visit-registration-button"
         >
-          {isSubmitted ? '✔ Submitted' : 'Submit'}
+          {registration.isRegistrationSubmitted ? '✔ Submitted' : 'Submit'}
         </NavigButton>
       </NavigationFragment>
     </div>
