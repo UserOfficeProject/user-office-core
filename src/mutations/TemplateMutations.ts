@@ -470,7 +470,7 @@ export default class TemplateMutations {
       return await this.dataSource.validateTemplateImport(templateAsJson);
     } catch (error) {
       return rejection(
-        'Could not validate template import',
+        `Could not validate template import. ${error}`,
         { agent, templateAsJson },
         error
       );
