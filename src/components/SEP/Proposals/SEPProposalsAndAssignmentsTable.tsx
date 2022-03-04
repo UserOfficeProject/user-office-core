@@ -12,13 +12,16 @@ import React, { useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
-import ProposalReviewContent from 'components/review/ProposalReviewContent';
+import ProposalReviewContent, {
+  PROPOSAL_MODAL_TAB_NAMES,
+} from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import {
   SepAssignment,
   UserRole,
   ReviewWithNextProposalStatus,
   ProposalStatus,
+  Review,
 } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import {
@@ -27,7 +30,11 @@ import {
   SEPProposalAssignmentType,
 } from 'hooks/SEP/useSEPProposalsData';
 import { tableIcons } from 'utils/materialIcons';
-import { average, standardDeviation } from 'utils/mathFunctions';
+import {
+  average,
+  getGradesFromReviews,
+  standardDeviation,
+} from 'utils/mathFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import AssignSEPMemberToProposal, {
@@ -43,6 +50,73 @@ type SEPProposalsAndAssignmentsTableProps = {
   /** Call id that we want to filter by */
   selectedCallId: number;
 };
+
+const getReviewsFromAssignments = (assignments: SEPProposalAssignmentType[]) =>
+  assignments
+    .map((assignment) => assignment.review)
+    .filter((review): review is Review => !!review);
+
+const SEPProposalColumns = [
+  { title: 'ID', field: 'proposal.proposalId' },
+  {
+    title: 'Title',
+    field: 'proposal.title',
+  },
+  {
+    title: 'Status',
+    field: 'proposal.status.name',
+  },
+  {
+    title: 'Date assigned',
+    field: 'dateAssigned',
+    render: (rowData: SEPProposalType): string =>
+      dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
+  },
+  {
+    title: 'Reviewers',
+    field: 'assignments.length',
+    emptyValue: '-',
+  },
+  {
+    title: 'Average grade',
+    render: (rowData: SEPProposalType): string => {
+      const avgGrade = average(
+        getGradesFromReviews(
+          getReviewsFromAssignments(rowData.assignments ?? [])
+        )
+      );
+
+      return avgGrade === 0 ? '-' : `${avgGrade}`;
+    },
+    customSort: (a: SEPProposalType, b: SEPProposalType) =>
+      average(
+        getGradesFromReviews(getReviewsFromAssignments(a.assignments ?? []))
+      ) -
+      average(
+        getGradesFromReviews(getReviewsFromAssignments(b.assignments ?? []))
+      ),
+  },
+  {
+    title: 'Deviation',
+    field: 'deviation',
+    render: (rowData: SEPProposalType): string => {
+      const stdDeviation = standardDeviation(
+        getGradesFromReviews(
+          getReviewsFromAssignments(rowData.assignments ?? [])
+        )
+      );
+
+      return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
+    },
+    customSort: (a: SEPProposalType, b: SEPProposalType) =>
+      standardDeviation(
+        getGradesFromReviews(getReviewsFromAssignments(a.assignments ?? []))
+      ) -
+      standardDeviation(
+        getGradesFromReviews(getReviewsFromAssignments(b.assignments ?? []))
+      ),
+  },
+];
 
 const SEPProposalsAndAssignmentsTable: React.FC<
   SEPProposalsAndAssignmentsTableProps
@@ -64,65 +138,6 @@ const SEPProposalsAndAssignmentsTable: React.FC<
   const hasRightToRemoveAssignedProposal = useCheckAccess([
     UserRole.USER_OFFICER,
   ]);
-
-  const getGradesFromAssignments = (assignments: SEPProposalAssignmentType[]) =>
-    assignments?.map((assignment) => assignment.review?.grade) ?? [];
-
-  const SEPProposalColumns = [
-    { title: 'ID', field: 'proposal.proposalId' },
-    {
-      title: 'Title',
-      field: 'proposal.title',
-    },
-    {
-      title: 'Status',
-      field: 'proposal.status.name',
-    },
-    {
-      title: 'Date assigned',
-      field: 'dateAssigned',
-      render: (rowData: SEPProposalType): string =>
-        dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
-    },
-    {
-      title: 'Reviewers',
-      field: 'assignments.length',
-      emptyValue: '-',
-    },
-    {
-      title: 'Average grade',
-      render: (rowData: SEPProposalType): string => {
-        const avgGrade = average(
-          getGradesFromAssignments(rowData.assignments ?? []) as number[]
-        );
-
-        return isNaN(avgGrade) ? '-' : `${avgGrade}`;
-      },
-      customSort: (a: SEPProposalType, b: SEPProposalType) =>
-        (average(getGradesFromAssignments(a.assignments ?? []) as number[]) ||
-          0) -
-        (average(getGradesFromAssignments(b.assignments ?? []) as number[]) ||
-          0),
-    },
-    {
-      title: 'Deviation',
-      field: 'deviation',
-      render: (rowData: SEPProposalType): string => {
-        const stdDeviation = standardDeviation(
-          getGradesFromAssignments(rowData.assignments ?? []) as number[]
-        );
-
-        return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
-      },
-      customSort: (a: SEPProposalType, b: SEPProposalType) =>
-        (standardDeviation(
-          getGradesFromAssignments(a.assignments ?? []) as number[]
-        ) || 0) -
-        (standardDeviation(
-          getGradesFromAssignments(b.assignments ?? []) as number[]
-        ) || 0),
-    },
-  ];
 
   const removeProposalFromSEP = async (
     proposalToRemove: SEPProposalType
@@ -321,7 +336,10 @@ const SEPProposalsAndAssignmentsTable: React.FC<
       >
         <ProposalReviewContent
           proposalPk={urlQueryParams.reviewModal}
-          tabNames={['Proposal information', 'Technical review']}
+          tabNames={[
+            PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+            PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
+          ]}
         />
       </ProposalReviewModal>
       <Dialog

@@ -29,16 +29,17 @@ import ProposalGrade from './ProposalGrade';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
 
-export type TabNames =
-  | 'Proposal information'
-  | 'Technical review'
-  | 'Reviews'
-  | 'Admin'
-  | 'Grade'
-  | 'Logs';
+export enum PROPOSAL_MODAL_TAB_NAMES {
+  PROPOSAL_INFORMATION = 'Proposal information',
+  TECHNICAL_REVIEW = 'Technical review',
+  REVIEWS = 'Reviews',
+  ADMIN = 'Admin',
+  GRADE = 'Grade',
+  LOGS = 'Logs',
+}
 
 type ProposalReviewContentProps = {
-  tabNames: TabNames[];
+  tabNames: PROPOSAL_MODAL_TAB_NAMES[];
   proposalPk?: number | null;
   reviewId?: number | null;
   sepId?: number | null;
