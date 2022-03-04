@@ -1046,8 +1046,6 @@ context('Settings tests', () => {
               'application/json'
             );
             expect(response.status).to.be.equal(200);
-            cy.log(response.body.data.proposalsView);
-            cy.log(response.body.data);
             expect(response.body.data.proposalsView).to.be.equal({
               totalCount: 0,
               proposalViews: [],
