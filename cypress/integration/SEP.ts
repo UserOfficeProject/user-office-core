@@ -89,19 +89,6 @@ let createdProposalId: number;
 
 function initializationBeforeTests() {
   cy.resetDB();
-  cy.updateUserRoles({
-    id: sepMembers.chair.id,
-    roles: [initialDBData.roles.sepReviewer],
-  });
-  cy.updateUserRoles({
-    id: sepMembers.secretary.id,
-    roles: [initialDBData.roles.sepReviewer],
-  });
-  cy.updateUserRoles({
-    id: sepMembers.reviewer.id,
-    roles: [initialDBData.roles.sepReviewer],
-  });
-
   cy.createSep({
     code: sep1.code,
     description: sep1.description,
@@ -133,6 +120,19 @@ function initializationBeforeTests() {
       });
     }
   });
+  cy.updateUserRoles({
+    id: sepMembers.chair.id,
+    roles: [initialDBData.roles.sepReviewer],
+  });
+  cy.updateUserRoles({
+    id: sepMembers.secretary.id,
+    roles: [initialDBData.roles.sepReviewer],
+  });
+  cy.updateUserRoles({
+    id: sepMembers.reviewer.id,
+    roles: [initialDBData.roles.sepReviewer],
+  });
+
   cy.viewport(1920, 1080);
 }
 
@@ -692,6 +692,84 @@ context('SEP meeting components tests', () => {
       cy.finishedLoading();
 
       cy.get('[title="Submit instrument"]').should('not.be.disabled');
+    });
+
+    it('Officer should be able to reorder proposal with drag and drop', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const createdProposal = result.createProposal.proposal;
+        if (createdProposal) {
+          cy.updateProposal({
+            proposalPk: createdProposal.primaryKey,
+            title: proposal2.proposalTitle,
+            proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal.primaryKey,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 5,
+            submitted: true,
+            reviewerId: 0,
+          });
+
+          cy.assignProposalsToInstrument({
+            instrumentId: createdInstrumentId,
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: createdProposal.primaryKey,
+              },
+            ],
+          });
+
+          cy.assignProposalsToSep({
+            sepId: createdSepId,
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: createdProposal.primaryKey,
+              },
+            ],
+          });
+
+          // Manually changing the proposal status to be shown in the SEPs. -------->
+          cy.changeProposalsStatus({
+            statusId: initialDBData.proposalStatuses.sepReview.id,
+            proposals: [
+              {
+                callId: initialDBData.call.id,
+                primaryKey: createdProposal.primaryKey,
+              },
+            ],
+          });
+        }
+      });
+      cy.login('officer');
+      cy.visit(`/SEPPage/${createdSepId}`);
+
+      cy.contains('Meeting Components').click();
+
+      cy.finishedLoading();
+
+      cy.get('[title="Show proposals"]').first().click();
+
+      cy.get('[data-cy="drag-icon"]').first().as('firstDragIcon');
+      cy.get('[data-cy="drag-icon"]').last().as('secondDragIcon');
+      cy.get('@firstDragIcon').trigger('dragstart');
+
+      cy.get('@secondDragIcon').trigger('dragenter');
+
+      cy.get('.droppableAreaRow')
+        .should('exist')
+        .and('include.text', 'Drop here');
+
+      cy.get('@secondDragIcon').trigger('dragend');
+      cy.finishedLoading();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Reordering of proposals saved successfully',
+      });
     });
 
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
