@@ -1047,7 +1047,7 @@ context('Settings tests', () => {
               'application/json'
             );
             expect(response.status).to.be.equal(200);
-            expect(response.body.data.proposalsView).to.be.equal({
+            expect(response.body.data.proposalsView).to.be.deep.equal({
               totalCount: 0,
               proposalViews: [],
             });
