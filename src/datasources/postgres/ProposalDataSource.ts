@@ -370,6 +370,34 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               sortField = 'instrument_name';
               break;
             }
+            case 'callShortCode': {
+              sortField = 'proposal_table_view.call_short_code';
+              break;
+            }
+            case 'reviewDeviation': {
+              sortField = 'deviation';
+              break;
+            }
+            case 'reviewAverage': {
+              sortField = 'average';
+              break;
+            }
+            case 'rankOrder': {
+              sortField = 'rank_order';
+              break;
+            }
+            case 'sepCode': {
+              sortField = 'sep_code';
+              break;
+            }
+            case 'technicalStatus': {
+              sortField = 'technical_review_status';
+              break;
+            }
+            case 'finalStatus': {
+              sortField = 'final_status';
+              break;
+            }
             default: {
               break;
             }
