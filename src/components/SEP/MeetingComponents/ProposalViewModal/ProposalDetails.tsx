@@ -12,7 +12,7 @@ import React from 'react';
 import { Proposal } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { StyledPaper } from 'styles/StyledComponents';
-import { average, getGrades } from 'utils/mathFunctions';
+import { average, getGradesFromReviews } from 'utils/mathFunctions';
 import { getFullUserName } from 'utils/user';
 
 type ProposalDetailsProps = {
@@ -61,7 +61,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
                   Average score
                 </TableCell>
                 <TableCell>
-                  {average(getGrades(proposal.reviews)) || '-'}
+                  {average(getGradesFromReviews(proposal.reviews ?? [])) || '-'}
                 </TableCell>
               </TableRow>
               <TableRow key="principalInvestigatorAndStatus">
@@ -87,7 +87,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
                   Initial Rank (by average score)
                 </TableCell>
                 <TableCell>
-                  {average(getGrades(proposal.reviews)) || '-'}
+                  {average(getGradesFromReviews(proposal.reviews ?? [])) || '-'}
                 </TableCell>
                 <TableCell className={classes.textBold}>Current Rank</TableCell>
                 <TableCell>{proposal.sepMeetingDecision?.rankOrder}</TableCell>

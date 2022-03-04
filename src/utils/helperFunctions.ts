@@ -8,7 +8,11 @@ import { SortDirectionType } from 'components/common/SuperMaterialTable';
 import { Proposal, ProposalEndStatus, ProposalStatus } from 'generated/sdk';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 
-import { average, getGrades, standardDeviation } from './mathFunctions';
+import {
+  average,
+  getGradesFromReviews,
+  standardDeviation,
+} from './mathFunctions';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const getUniqueArrayBy = (roles: any[], uniqueBy: string): any[] => {
@@ -69,8 +73,10 @@ export const fromProposalToProposalView = (proposal: Proposal) => {
     ),
     instrumentName: proposal.instrument?.name || null,
     instrumentId: proposal.instrument?.id || null,
-    reviewAverage: average(getGrades(proposal.reviews)) || null,
-    reviewDeviation: standardDeviation(getGrades(proposal.reviews)) || null,
+    reviewAverage:
+      average(getGradesFromReviews(proposal.reviews ?? [])) || null,
+    reviewDeviation:
+      standardDeviation(getGradesFromReviews(proposal.reviews ?? [])) || null,
     sepCode: proposal.sep?.code,
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,

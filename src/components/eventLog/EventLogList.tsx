@@ -19,6 +19,20 @@ type EventLogListProps = {
   eventType?: string;
 };
 
+const columns = [
+  {
+    title: 'Changed by',
+    render: (rowData: EventLog): string =>
+      `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`,
+  },
+  {
+    title: 'Changed on',
+    render: (rowData: EventLog): string =>
+      dateformat(new Date(rowData.eventTStamp), 'dd-mmm-yyyy HH:MM:ss'),
+  },
+  { title: 'Event type', field: 'eventType' },
+];
+
 const EventLogList: React.FC<EventLogListProps> = ({
   changedObjectId = '*',
   eventType = '*',
@@ -27,19 +41,6 @@ const EventLogList: React.FC<EventLogListProps> = ({
     eventType,
     changedObjectId.toString()
   );
-  const columns = [
-    {
-      title: 'Changed by',
-      render: (rowData: EventLog): string =>
-        `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`,
-    },
-    {
-      title: 'Changed on',
-      render: (rowData: EventLog): string =>
-        dateformat(new Date(rowData.eventTStamp), 'dd-mmm-yyyy HH:MM:ss'),
-    },
-    { title: 'Event type', field: 'eventType' },
-  ];
 
   return (
     <div data-cy="event-logs-table">
@@ -51,9 +52,7 @@ const EventLogList: React.FC<EventLogListProps> = ({
           </Typography>
         }
         columns={columns}
-        data={eventLogsData.map((changedObject) =>
-          Object.assign(changedObject, { id: changedObject.changedObjectId })
-        )}
+        data={eventLogsData}
         isLoading={loading}
         options={{
           search: true,

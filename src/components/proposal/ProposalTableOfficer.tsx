@@ -19,7 +19,7 @@ import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
 import ProposalReviewContent, {
-  TabNames,
+  PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import AssignProposalsToSEP from 'components/SEP/Proposals/AssignProposalsToSEP';
@@ -525,12 +525,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
   );
 
-  const userOfficerProposalReviewTabs: TabNames[] = [
-    'Proposal information',
-    'Technical review',
-    'Reviews',
-    'Admin',
-    'Logs',
+  const userOfficerProposalReviewTabs = [
+    PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
+    PROPOSAL_MODAL_TAB_NAMES.REVIEWS,
+    PROPOSAL_MODAL_TAB_NAMES.ADMIN,
+    PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
 
   return (

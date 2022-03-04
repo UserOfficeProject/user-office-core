@@ -111,7 +111,7 @@ context('Personal information tests', () => {
 
     cy.finishedLoading();
 
-    cy.contains('Proposals to review');
+    cy.contains('Proposals to grade');
 
     cy.get('[data-cy="SEPRoles-menu-items"]')
       .find('.MuiListItem-root')

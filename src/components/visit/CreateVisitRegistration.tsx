@@ -20,6 +20,8 @@ function createRegistrationStub(
     registrationQuestionaryId: 0,
     isRegistrationSubmitted: false,
     trainingExpiryDate: null,
+    startsAt: null,
+    endsAt: null,
     visitId: visitId,
     user: {
       firstname: '',
