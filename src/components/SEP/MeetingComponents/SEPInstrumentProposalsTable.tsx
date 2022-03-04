@@ -44,9 +44,19 @@ const useStyles = makeStyles((theme) => ({
       padding: '0 40px',
       backgroundColor: '#fafafa',
     },
-
     '& .draggingRow': {
       backgroundColor: `${theme.palette.warning.light} !important`,
+    },
+    '& .droppableAreaRow': {
+      height: '0px',
+      backgroundColor: theme.palette.grey[300],
+      transition: '0.1s',
+      textAlign: 'center',
+      color: theme.palette.grey[600],
+
+      '&.droppableAreaAnimate': {
+        height: '50px',
+      },
     },
   },
   disabled: {
@@ -207,7 +217,11 @@ const SEPInstrumentProposalsTable: React.FC<
     return (
       <>
         <Tooltip title="Drag proposals to reorder">
-          <IconButton style={{ cursor: 'grab' }} color="inherit">
+          <IconButton
+            style={{ cursor: 'grab' }}
+            color="inherit"
+            data-cy="drag-icon"
+          >
             <DragHandle />
           </IconButton>
         </Tooltip>
@@ -416,6 +430,124 @@ const SEPInstrumentProposalsTable: React.FC<
     setSavingOrder(false);
   };
 
+  const createDroppableAreaRow = () => {
+    const doppableAreaRow = document.createElement('tr');
+    doppableAreaRow.className = 'droppableAreaRow';
+    // NOTE: Full width column is needed to set proper background
+    const doppableAreaColumn = document.createElement('td');
+    doppableAreaColumn.colSpan = assignmentColumns.length;
+    doppableAreaColumn.textContent = 'Drop here';
+    doppableAreaRow.appendChild(doppableAreaColumn);
+
+    return doppableAreaRow;
+  };
+
+  const insertDroppableAreaRowIntoTable = (
+    tableBodyElement: HTMLElement,
+    allTableRowElements: Element[],
+    droppableAreaRowElement: HTMLTableRowElement
+  ) => {
+    if (DragState.dropIndex === sortedProposalsWithAverageScore.length - 1) {
+      tableBodyElement.appendChild(droppableAreaRowElement);
+    } else if (
+      DragState.dropIndex === 0 ||
+      DragState.row === DragState.dropIndex + 1
+    ) {
+      tableBodyElement.insertBefore(
+        droppableAreaRowElement,
+        allTableRowElements[DragState.dropIndex]
+      );
+    } else {
+      tableBodyElement.insertBefore(
+        droppableAreaRowElement,
+        allTableRowElements[DragState.dropIndex + 1]
+      );
+    }
+  };
+
+  const handleOnRowDragStart = (
+    e: DragEvent<HTMLTableRowElement>,
+    tableDataId: number
+  ) => {
+    e.currentTarget.classList.add('draggingRow');
+    DragState.row = tableDataId;
+  };
+
+  const handleOnRowDragEnter = (
+    e: DragEvent<HTMLTableRowElement>,
+    tableDataId: number
+  ) => {
+    e.preventDefault();
+
+    const tableBodyElement = e.currentTarget.parentElement;
+
+    if (tableBodyElement && DragState.dropIndex !== tableDataId) {
+      const allTableRowElements = Array.from(tableBodyElement.children);
+
+      const droppableAreaSeparatorToRemove = allTableRowElements.find(
+        (element, index) => {
+          if (element.className.includes('droppableAreaRow')) {
+            allTableRowElements.splice(index, 1);
+
+            return element;
+          }
+        }
+      );
+
+      if (droppableAreaSeparatorToRemove) {
+        tableBodyElement.removeChild(droppableAreaSeparatorToRemove);
+      }
+
+      DragState.dropIndex = tableDataId;
+
+      if (DragState.row === DragState.dropIndex) {
+        return;
+      }
+
+      const droppableAreaRowElement = createDroppableAreaRow();
+
+      insertDroppableAreaRowIntoTable(
+        tableBodyElement,
+        allTableRowElements,
+        droppableAreaRowElement
+      );
+
+      // NOTE: Add class with timeout to be able to animate.
+      setTimeout(
+        () => droppableAreaRowElement.classList.add('droppableAreaAnimate'),
+        100
+      );
+    }
+  };
+
+  const handleOnRowDragEnd = async (e: DragEvent<HTMLTableRowElement>) => {
+    e.currentTarget.classList.remove('draggingRow');
+
+    if (DragState.dropIndex !== -1 && DragState.dropIndex !== DragState.row) {
+      const tableBodyElement = e.currentTarget.parentElement;
+
+      if (tableBodyElement) {
+        const allTableRowElements = Array.from(tableBodyElement.children);
+        const elToRemove = allTableRowElements.find((element) =>
+          element.className.includes('droppableAreaRow')
+        );
+
+        if (elToRemove) {
+          tableBodyElement.removeChild(elToRemove);
+        }
+      }
+
+      await reOrderRow(DragState.row, DragState.dropIndex);
+    }
+    DragState.row = -1;
+    DragState.dropIndex = -1;
+  };
+
+  const sortedProposalsWithAverageScoreAndId =
+    sortedProposalsWithAverageScore.map((proposal) =>
+      Object.assign(proposal, { id: proposal.proposalPk })
+    );
+
   /**  NOTE: Making this to work on mobile is a bit harder and might need more attention.
    * Here is some useful article (https://medium.com/@deepakkadarivel/drag-and-drop-dnd-for-mobile-browsers-fc9bcd1ad3c5)
    * And example https://github.com/deepakkadarivel/DnDWithTouch/blob/master/main.js
@@ -425,27 +557,13 @@ const SEPInstrumentProposalsTable: React.FC<
     <MTableBodyRow
       {...props}
       draggable="true"
-      onDragStart={(e: DragEvent<HTMLDivElement>) => {
-        e.currentTarget.classList.add('draggingRow');
-        DragState.row = props.data.tableData.id;
-      }}
-      onDragEnter={(e: DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-
-        DragState.dropIndex = props.data.tableData.id;
-      }}
-      onDragEnd={async (e: DragEvent<HTMLDivElement>) => {
-        e.currentTarget.classList.remove('draggingRow');
-
-        if (
-          DragState.dropIndex !== -1 &&
-          DragState.dropIndex !== DragState.row
-        ) {
-          await reOrderRow(DragState.row, DragState.dropIndex);
-        }
-        DragState.row = -1;
-        DragState.dropIndex = -1;
-      }}
+      onDragStart={(e: DragEvent<HTMLTableRowElement>) =>
+        handleOnRowDragStart(e, props.data.tableData.id)
+      }
+      onDragEnter={(e: DragEvent<HTMLTableRowElement>) =>
+        handleOnRowDragEnter(e, props.data.tableData.id)
+      }
+      onDragEnd={handleOnRowDragEnd}
     />
   );
 
@@ -465,9 +583,7 @@ const SEPInstrumentProposalsTable: React.FC<
         icons={tableIcons}
         columns={assignmentColumns}
         title={'Assigned reviewers'}
-        data={sortedProposalsWithAverageScore.map((proposal) =>
-          Object.assign(proposal, { id: proposal.proposalPk })
-        )}
+        data={sortedProposalsWithAverageScoreAndId}
         isLoading={loadingInstrumentProposals || savingOrder}
         components={{
           Row: RowDraggableComponent,
