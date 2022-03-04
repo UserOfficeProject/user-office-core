@@ -4,10 +4,13 @@ import RateReviewIcon from '@material-ui/icons/RateReview';
 import Visibility from '@material-ui/icons/Visibility';
 import dateformat from 'dateformat';
 import PropTypes from 'prop-types';
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
+import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
-import ProposalReviewContent from 'components/review/ProposalReviewContent';
+import ProposalReviewContent, {
+  PROPOSAL_MODAL_TAB_NAMES,
+} from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import { SepAssignment, ReviewStatus, UserRole } from 'generated/sdk';
@@ -36,13 +39,38 @@ type SEPAssignedReviewersTableProps = {
   updateView: (currentAssignment: SepAssignment) => void;
 };
 
+const assignmentColumns = [
+  {
+    title: 'First name',
+    field: 'user.firstname',
+  },
+  {
+    title: 'Last name',
+    field: 'user.lastname',
+  },
+  {
+    title: 'Date assigned',
+    field: 'dateAssigned',
+    render: (rowData: SepAssignment): string =>
+      dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
+  },
+  { title: 'Review status', field: 'review.status' },
+  {
+    title: 'Grade',
+    field: 'review.grade',
+    emptyValue: '-',
+  },
+];
+
 const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
   sepProposal,
   removeAssignedReviewer,
   updateView,
 }) => {
-  const [editReviewID, setEditReviewID] = useState<null | number>(null);
-  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
+    reviewerModal: NumberParam,
+    modalTab: NumberParam,
+  });
   const classes = useStyles();
   const { setCurrentAssignment, currentAssignment } = useContext(
     ReviewAndAssignmentContext
@@ -53,43 +81,29 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
     UserRole.SEP_SECRETARY,
   ]);
 
-  const assignmentColumns = [
-    {
-      title: 'First name',
-      field: 'user.firstname',
-    },
-    {
-      title: 'Last name',
-      field: 'user.lastname',
-    },
-    {
-      title: 'Date assigned',
-      field: 'dateAssigned',
-      render: (rowData: SepAssignment): string =>
-        dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
-    },
-    { title: 'Review status', field: 'review.status' },
-    {
-      title: 'Grade',
-      field: 'review.grade',
-      emptyValue: '-',
-    },
+  const isDraftStatus = (status?: ReviewStatus) =>
+    status === ReviewStatus.DRAFT;
+
+  const reviewProposalTabNames = [
+    PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
+    PROPOSAL_MODAL_TAB_NAMES.GRADE,
   ];
 
   return (
     <div className={classes.root} data-cy="sep-reviewer-assignments-table">
       <ProposalReviewModal
-        title={`Review proposal: ${sepProposal.proposal.title} (${sepProposal.proposal.proposalId})`}
-        proposalReviewModalOpen={reviewModalOpen}
+        title={`Proposal: ${sepProposal.proposal.title} (${sepProposal.proposal.proposalId})`}
+        proposalReviewModalOpen={!!urlQueryParams.reviewerModal}
         setProposalReviewModalOpen={() => {
-          setReviewModalOpen(false);
+          setUrlQueryParams({ reviewerModal: undefined, modalTab: undefined });
           currentAssignment && updateView(currentAssignment);
         }}
       >
         <ProposalReviewContent
-          reviewId={editReviewID}
+          reviewId={urlQueryParams.reviewerModal}
           sepId={sepProposal.sepId}
-          tabNames={['Proposal information', 'Technical review', 'Grade']}
+          tabNames={reviewProposalTabNames}
         />
       </ProposalReviewModal>
 
@@ -117,26 +131,32 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
         }
         actions={[
           (rowData) => ({
-            icon:
-              rowData.review?.status === ReviewStatus.DRAFT
-                ? () => <RateReviewIcon />
-                : () => <Visibility />,
+            icon: isDraftStatus(rowData?.review?.status)
+              ? () => <RateReviewIcon data-cy="grade-proposal-icon" />
+              : () => <Visibility data-cy="view-proposal-details-icon" />,
             onClick: () => {
               if (!rowData.review) {
                 return;
               }
 
-              setEditReviewID(rowData.review.id);
+              setUrlQueryParams({
+                modalTab: isDraftStatus(rowData?.review?.status)
+                  ? reviewProposalTabNames.indexOf(
+                      PROPOSAL_MODAL_TAB_NAMES.GRADE
+                    )
+                  : reviewProposalTabNames.indexOf(
+                      PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION
+                    ),
+                reviewerModal: rowData.review.id,
+              });
               setCurrentAssignment({
                 ...rowData,
                 proposalPk: sepProposal.proposalPk,
               });
-              setReviewModalOpen(true);
             },
-            tooltip:
-              rowData.review?.status === ReviewStatus.DRAFT
-                ? 'Review proposal'
-                : 'View review',
+            tooltip: isDraftStatus(rowData?.review?.status)
+              ? 'Grade proposal'
+              : 'View review',
           }),
         ]}
         options={{

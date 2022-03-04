@@ -399,7 +399,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
             {hasAccessRights && (
               <ActionButtonContainer>
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   onClick={() => setOpen(true)}
                   data-cy="add-participant-button"
                   color="primary"

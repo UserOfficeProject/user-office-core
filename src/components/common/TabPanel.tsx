@@ -55,6 +55,7 @@ const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
   tabNames,
   children,
   isInsideModal,
+  ...other
 }) => {
   const theme = useTheme();
   const [query, setQuery] = useQueryParams({
@@ -95,6 +96,7 @@ const FullWidthTabs: React.FC<FullWidthTabsProps> = ({
           textColor="primary"
           variant="fullWidth"
           aria-label="full width tabs example"
+          {...other}
         >
           {tabNames.map((tabName, i) => (
             <Tab key={i} label={tabName} {...a11yProps(i)} />

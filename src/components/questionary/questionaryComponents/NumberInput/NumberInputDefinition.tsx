@@ -3,7 +3,11 @@ import { numberInputQuestionValidationSchema } from '@user-office-software/duo-v
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
-import { DataType, NumberValueConstraint } from 'generated/sdk';
+import {
+  DataType,
+  NumberInputConfig,
+  NumberValueConstraint,
+} from 'generated/sdk';
 
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 import NumberInputAnswerRenderer from './NumberInputAnswerRenderer';
@@ -25,9 +29,12 @@ export const numberInputDefinition: QuestionaryComponentDefinition = {
     answerRenderer: NumberInputAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-
   createYupValidationSchema: (field) =>
     numberInputQuestionValidationSchema(field, NumberValueConstraint),
-  getYupInitialValue: ({ answer }) => answer.value || { value: '', unit: null },
+  getYupInitialValue: ({ answer }) =>
+    answer.value || {
+      value: '',
+      unit: (answer.config as NumberInputConfig).units?.[0] || null,
+    },
   searchCriteriaComponent: NumberSearchCriteriaComponent,
 };

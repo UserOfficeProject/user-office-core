@@ -10,7 +10,8 @@ import { getIn } from 'formik';
 import React, { useState } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { NumberInputConfig } from 'generated/sdk';
+import { NumberInputConfig, Unit } from 'generated/sdk';
+import expressionToFunction from 'utils/expressionToFunction';
 import isEventFromAutoComplete from 'utils/isEventFromAutoComplete';
 
 const useStyles = makeStyles((theme) => ({
@@ -29,6 +30,18 @@ const useStyles = makeStyles((theme) => ({
 
 type AcceptableUserInput = number | '';
 
+const getNumberOrDefault = (
+  input: string,
+  defaultValue: AcceptableUserInput
+) => {
+  if (input === '') {
+    return defaultValue;
+  }
+  const maybeNumber = parseFloat(input);
+
+  return isNaN(maybeNumber) ? defaultValue : maybeNumber;
+};
+
 export function QuestionaryComponentNumber(props: BasicComponentProps) {
   const {
     answer,
@@ -42,8 +55,9 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
   const [stateValue, setStateValue] = useState<{
+    siValue: AcceptableUserInput;
     value: AcceptableUserInput;
-    unit: string;
+    unit: Unit | null; // unit can be null, in case user has specified answer before units were added to the question
   }>(answer.value);
 
   const classes = useStyles();
@@ -51,31 +65,30 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
   const valueFieldId = `${id}.value`;
   const unitFieldId = `${id}.unit`;
 
-  const getNumberOrDefault = (
-    input: string,
-    defaultValue: AcceptableUserInput
-  ) => {
-    const maybeNumber = parseFloat(input);
-
-    return isNaN(maybeNumber) && input !== '' ? defaultValue : maybeNumber;
-  };
-
   const getUnits = () => {
     if (config.units?.length === 0) {
       return null;
     } else if (config.units?.length === 1) {
       return (
         <span className={`${classes.singleUnit} MuiFormControl-marginNormal`}>
-          {stateValue.unit}
+          {stateValue.unit?.symbol}
         </span>
       );
     } else {
       return (
         <Select
           label="Unit"
-          value={stateValue.unit}
+          value={stateValue.unit?.id ?? ''}
           onChange={(e) => {
-            const newState = { ...stateValue, unit: e.target.value as string };
+            const newUnitId = e.target.value as string;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+            const unit = config.units?.find((u) => u.id === newUnitId)!;
+            const convertToSi = expressionToFunction(unit.siConversionFormula);
+            const newState = {
+              ...stateValue,
+              unit,
+              siValue: convertToSi(stateValue.value),
+            };
             setStateValue(newState);
             onComplete(newState);
           }}
@@ -83,9 +96,9 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
           data-cy={unitFieldId}
           className="MuiFormControl-marginDense"
         >
-          {config.units?.map((unit) => (
-            <MenuItem value={unit} key={unit}>
-              {unit}
+          {config.units?.map(({ id, unit, symbol }) => (
+            <MenuItem value={id} key={id}>
+              {`${symbol} (${unit})`}
             </MenuItem>
           ))}
         </Select>
@@ -119,11 +132,17 @@ export function QuestionaryComponentNumber(props: BasicComponentProps) {
             label="Value"
             id={`${id}-value`}
             onChange={(event) => {
-              const newValue = {
+              const unit = stateValue.unit;
+              const newValue = getNumberOrDefault(event.target.value, '');
+              const convertToSi = unit
+                ? expressionToFunction(unit.siConversionFormula)
+                : () => newValue;
+              const newStateValue = {
                 ...stateValue,
-                value: getNumberOrDefault(event.target.value, stateValue.value),
+                value: newValue,
+                siValue: convertToSi(newValue),
               };
-              setStateValue(newValue);
+              setStateValue(newStateValue);
               if (isEventFromAutoComplete(event)) {
                 onComplete(newValue);
               } else {
