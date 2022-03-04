@@ -200,19 +200,19 @@ export default class VisitMutations {
     return this.dataSource.deleteVisit(visitId);
   }
   @Authorized()
-  async createVisitRegistrationQuestionary(
+  async createVisitRegistration(
     user: UserWithRole | null,
     visitId: number
   ): Promise<VisitRegistration | Rejection> {
     if (!user) {
       return rejection(
-        'Can not create visit registration questionary, because the request is not authorized'
+        'Can not create visit registration, because the request is not authorized'
       );
     }
 
     if (!visitId) {
       return rejection(
-        'Can not create visit registration questionary, visit id not specified'
+        'Can not create visit registration, visit id not specified'
       );
     }
 
@@ -221,7 +221,7 @@ export default class VisitMutations {
     );
     if (!activeTemplate) {
       return rejection(
-        'Could not create visit registration questionary, because no active template for visit is set',
+        'Could not create visit registration, because no active template for visit is set',
         { visitId }
       );
     }
@@ -240,9 +240,17 @@ export default class VisitMutations {
   async updateVisitRegistration(
     user: UserWithRole | null,
     args: UpdateVisitRegistrationArgs
-  ): Promise<any> {
+  ): Promise<VisitRegistration | null> {
     if (!user) {
       return null;
+    }
+
+    // TODO implement visitRegistrationAuth and perform checks there
+    if (this.userAuth.isUserOfficer(user) !== true) {
+      delete args.trainingExpiryDate;
+      if (args.isRegistrationSubmitted === false) {
+        delete args.isRegistrationSubmitted;
+      }
     }
 
     return this.dataSource.updateRegistration(user.id, args);

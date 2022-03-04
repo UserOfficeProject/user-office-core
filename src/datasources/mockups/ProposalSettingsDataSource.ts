@@ -11,22 +11,10 @@ import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/Cr
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 
-export const dummyProposalStatus = new ProposalStatus(
-  1,
-  'DRAFT',
-  'Draft',
-  'When proposal is created it gets draft status before it is submitted.',
-  true
-);
-
-export const anotherDummyProposalStatus = new ProposalStatus(
-  11,
-  'NEW_PROPOSAL_STATUS',
-  'New proposal status',
-  'Proposal status for testing.',
-  false
-);
-
+export const dummyProposalStatuses = [
+  new ProposalStatus(1, 'DRAFT', 'Draft', '', true),
+  new ProposalStatus(2, 'FEASIBILITY_REVIEW', 'Feasibility review', '', true),
+];
 export const dummyProposalWorkflow = new ProposalWorkflow(
   1,
   'Test workflow',
@@ -82,17 +70,19 @@ export class ProposalSettingsDataSourceMock
   async createProposalStatus(
     newProposalStatusInput: CreateProposalStatusInput
   ): Promise<ProposalStatus> {
-    return dummyProposalStatus;
+    return { ...newProposalStatusInput, id: 1, isDefault: false };
   }
 
   async getProposalStatus(
     proposalStatusId: number
   ): Promise<ProposalStatus | null> {
-    return dummyProposalStatus;
+    return dummyProposalStatuses.find(
+      (s) => s.id === proposalStatusId
+    ) as ProposalStatus;
   }
 
   async getAllProposalStatuses(): Promise<ProposalStatus[]> {
-    return [dummyProposalStatus];
+    return dummyProposalStatuses;
   }
 
   async updateProposalStatus(
@@ -104,7 +94,10 @@ export class ProposalSettingsDataSourceMock
   async deleteProposalStatus(
     proposalStatusId: number
   ): Promise<ProposalStatus> {
-    return anotherDummyProposalStatus;
+    return dummyProposalStatuses.splice(
+      dummyProposalStatuses.findIndex((s) => s.id === proposalStatusId),
+      1
+    )[0];
   }
 
   async createProposalWorkflow(

@@ -5,17 +5,14 @@ import { VisitRegistrationResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
-export class CreateVisitRegistrationQuestionaryMutation {
+export class CreateVisitRegistrationMutation {
   @Mutation(() => VisitRegistrationResponseWrap)
-  createVisitRegistrationQuestionary(
+  createVisitRegistration(
     @Arg('visitId', () => Int) visitId: number,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.visit.createVisitRegistrationQuestionary(
-        context.user,
-        visitId
-      ),
+      context.mutations.visit.createVisitRegistration(context.user, visitId),
       VisitRegistrationResponseWrap
     );
   }

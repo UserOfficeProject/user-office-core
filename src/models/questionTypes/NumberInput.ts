@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 /* eslint-disable quotes */
 import { numberInputQuestionValidationSchema } from '@user-office-software/duo-validation';
 
@@ -5,8 +6,10 @@ import {
   NumberInputConfig,
   NumberValueConstraint,
 } from '../../resolvers/types/FieldConfig';
+import { isSiConversionFormulaValid } from '../../utils/isSiConversionFormulaValid';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
+import { Unit } from '../Unit';
 import { Question } from './QuestionRegistry';
 
 export const numberInputDefinition: Question = {
@@ -44,17 +47,17 @@ export const numberInputDefinition: Question = {
     switch (filter.compareOperator) {
       case QuestionFilterCompareOperator.LESS_THAN:
         return queryBuilder.andWhereRaw(
-          "(answers.answer->'value'->>'value')::float < ?",
+          "(answers.answer->'value'->>'siValue')::float < ?",
           value
         );
       case QuestionFilterCompareOperator.EQUALS:
         return queryBuilder.andWhereRaw(
-          "(answers.answer->'value'->>'value')::float = ?",
+          "(answers.answer->'value'->>'siValue')::float = ?",
           value
         );
       case QuestionFilterCompareOperator.GREATER_THAN:
         return queryBuilder.andWhereRaw(
-          "(answers.answer->'value'->>'value')::float > ?",
+          "(answers.answer->'value'->>'siValue')::float > ?",
           value
         );
       default:
@@ -62,5 +65,21 @@ export const numberInputDefinition: Question = {
           `Unsupported comparator for NumberInput ${filter.compareOperator}`
         );
     }
+  },
+  transform: (
+    field: QuestionTemplateRelation,
+    answer: { value: number; unit: Unit | null }
+  ) => {
+    const { unit } = answer;
+
+    if (unit && unit.siConversionFormula) {
+      const isValid = isSiConversionFormulaValid(unit.siConversionFormula);
+      if (isValid === false) {
+        logger.logError('Conversion formula is not valid', answer);
+        throw new Error('Error while processing conversion formula');
+      }
+    }
+
+    return answer;
   },
 };
