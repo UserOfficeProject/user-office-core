@@ -13,7 +13,7 @@ import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import ProposalReviewContent, {
-  TabNames,
+  PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
@@ -204,9 +204,9 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     (proposal) => proposal.primaryKey === urlQueryParams.reviewModal
   );
 
-  const instrumentScientistProposalReviewTabs: TabNames[] = [
-    'Proposal information',
-    'Technical review',
+  const instrumentScientistProposalReviewTabs = [
+    PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
   ];
 
   return (

@@ -1,4 +1,3 @@
-import { makeStyles } from '@material-ui/core';
 import React, { useContext } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
@@ -7,21 +6,12 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import QuestionaryDetails, {
-  TableRowData,
-} from 'components/questionary/QuestionaryDetails';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ProposalEsiContextType } from './ProposalEsiContainer';
-
-const useStyles = makeStyles(() => ({
-  sampleList: {
-    listStyle: 'none',
-    padding: 0,
-  },
-}));
+import ProposalEsiDetails from './ProposalEsiDetails';
 
 type ProposalEsiReviewProps = {
   onComplete?: FunctionType<void>;
@@ -30,7 +20,6 @@ type ProposalEsiReviewProps = {
 
 function ProposalEsiReview({ confirm }: ProposalEsiReviewProps) {
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const classes = useStyles();
 
   const { state, dispatch } = useContext(
     QuestionaryContext
@@ -41,28 +30,9 @@ function ProposalEsiReview({ confirm }: ProposalEsiReviewProps) {
 
   const isSubmitted = state.esi.isSubmitted;
 
-  const additionalDetails: TableRowData[] = [
-    { label: 'Proposal ID', value: state.esi?.proposal.proposalId || '' },
-    { label: 'Proposal Title', value: state.esi?.proposal.title || '' },
-    {
-      label: 'Samples for the experiment',
-      value: (
-        <ul className={classes.sampleList}>
-          {state.esi.sampleEsis.map((esi) => (
-            <li key={esi.sampleId}>{esi.sample.title}</li>
-          ))}
-        </ul>
-      ),
-    },
-  ];
-
   return (
     <>
-      <QuestionaryDetails
-        questionaryId={state.esi.questionary.questionaryId}
-        additionalDetails={additionalDetails}
-        title="Experiment safety input"
-      />
+      <ProposalEsiDetails esiId={state.esi.id} />
       <NavigationFragment isLoading={isExecutingCall}>
         <NavigButton
           onClick={() =>
