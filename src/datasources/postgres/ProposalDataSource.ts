@@ -353,7 +353,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .orWhereRaw('proposal_table_view.title ILIKE ?', searchText)
             .orWhereRaw('proposal_status_name ILIKE ?', searchText)
             .orWhereRaw('instrument_name ILIKE ?', searchText);
-          // .orWhereRaw('proposal_table_view.call.title ILIKE ?', searchText);
         }
 
         if (sortField && sortDirection) {
