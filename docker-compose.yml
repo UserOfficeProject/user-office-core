@@ -100,4 +100,3 @@ services:
       - scheduler-db
     ports:
       - 44000:4000 # avoid collision
-
