@@ -475,7 +475,9 @@ context('Proposal administration tests', () => {
       cy.contains('Title')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
-        .dblclick();
+        .click();
+
+      cy.finishedLoading();
 
       cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
         officerProposalsTableAsTextAfterSort = element.text();
@@ -495,7 +497,7 @@ context('Proposal administration tests', () => {
       cy.contains('Title')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
-        .should('have.attr', 'aria-sort', 'Descendant');
+        .should('have.attr', 'aria-sort', 'Ascendant');
 
       cy.contains('Calls').click();
 
