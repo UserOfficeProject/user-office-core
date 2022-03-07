@@ -106,10 +106,12 @@ function DeclareShipments({
           <li>Post the shipment</li>
         </ol>
       </Typography>
-      <Alert severity="warning" hidden={!hasLocalContact}>
-        Shipment declarations are not possible until the local contact has been
-        assigned to your scheduled event
-      </Alert>
+      {!hasLocalContact && (
+        <Alert severity="warning">
+          Shipment declarations are not possible until the local contact has
+          been assigned to your scheduled event
+        </Alert>
+      )}
       <QuestionnairesList
         addButtonLabel="Add Shipment"
         data={shipments.map(shipmentToListRow) ?? []}

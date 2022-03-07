@@ -9,6 +9,7 @@ import { Field, Form, Formik, useFormikContext } from 'formik';
 import React, { useState, useContext } from 'react';
 import { Prompt } from 'react-router';
 
+import ErrorMessage from 'components/common/ErrorMessage';
 import FormikUICustomSelect from 'components/common/FormikUICustomSelect';
 import UOLoader from 'components/common/UOLoader';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
@@ -163,6 +164,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
             }}
             disabled={isDisabled(isSubmitting)}
           />
+          <ErrorMessage name="comment" />
           <Box marginTop={1} width={150}>
             <Field
               name="grade"
