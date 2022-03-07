@@ -106,10 +106,6 @@ context('Calls tests', () => {
 
     cy.should('not.contain', 'Calls');
 
-    cy.get('[data-cy="user-menu-items"]')
-      .find('.MuiListItem-root')
-      .should('have.length', 5);
-
     cy.visit('/CallPage');
     cy.contains('My proposals');
   });

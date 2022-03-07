@@ -13,7 +13,6 @@ import FolderOpen from '@material-ui/icons/FolderOpen';
 import FunctionsIcon from '@material-ui/icons/Functions';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import Help from '@material-ui/icons/Help';
-import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import NoteAdd from '@material-ui/icons/NoteAdd';
 import People from '@material-ui/icons/People';
 import Settings from '@material-ui/icons/Settings';
@@ -137,9 +136,6 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const multipleCalls = callsData.length > 1;
   const context = useContext(FeatureContext);
 
-  const isShipmentFeatureEnabled = !!context.features.get(FeatureId.SHIPPING)
-    ?.isEnabled;
-
   const isSchedulerEnabled = context.features.get(
     FeatureId.SCHEDULER
   )?.isEnabled;
@@ -171,16 +167,6 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
           <ListItemText primary="New Proposal" />
         </ListItem>
       </Tooltip>
-      {isShipmentFeatureEnabled && (
-        <Tooltip title="Shipments">
-          <ListItem component={NavLink} to="/MyShipments" button>
-            <ListItemIcon>
-              <LocalShippingIcon />
-            </ListItemIcon>
-            <ListItemText primary="Shipments" />
-          </ListItem>
-        </Tooltip>
-      )}
       {isSchedulerEnabled && (
         <Tooltip title="Experiment Times">
           <ListItem component={NavLink} to="/ExperimentTimes" button>
