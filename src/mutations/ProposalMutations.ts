@@ -101,16 +101,35 @@ export default class ProposalMutations {
       call.templateId
     );
 
-    return this.proposalDataSource
-      .create(submitterId, call.id, questionary.questionaryId)
-      .then((proposal) => proposal)
-      .catch((err) => {
-        return rejection(
-          'Could not create proposal',
-          { submitterId, call },
-          err
+    let retry = 5;
+    while (retry) {
+      retry -= 1;
+      try {
+        const proposal = await this.proposalDataSource.create(
+          submitterId,
+          call.id,
+          questionary.questionaryId
         );
-      });
+
+        return proposal;
+      } catch (er) {
+        if (
+          !(er as Error).message.includes(
+            '- duplicate key value violates unique constraint "proposals_short_code_key"'
+          ) ||
+          !retry
+        ) {
+          return rejection(
+            'Could not create proposal',
+            { submitterId, call },
+            er
+          );
+        }
+      }
+    }
+
+    // theoretically should never be reached as last iteration of while loop hits !retry condition in if statement above
+    return rejection('Could not create proposal', { submitterId, call });
   }
 
   @ValidateArgs(updateProposalValidationSchema)
