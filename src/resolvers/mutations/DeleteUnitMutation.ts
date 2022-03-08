@@ -1,4 +1,4 @@
-import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
+import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { UnitResponseWrap } from '../types/CommonWrappers';
@@ -8,7 +8,7 @@ import { wrapResponse } from '../wrapResponse';
 export class DeleteUnitlMutation {
   @Mutation(() => UnitResponseWrap)
   deleteUnit(
-    @Arg('id', () => Int) id: number,
+    @Arg('id', () => String) id: string,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(

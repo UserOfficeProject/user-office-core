@@ -3,7 +3,7 @@ import { container } from 'tsyringe';
 
 import {
   anotherDummyProposalWorkflowConnection,
-  dummyProposalStatus,
+  dummyProposalStatuses,
   dummyProposalWorkflow,
   dummyProposalWorkflowConnection,
 } from '../datasources/mockups/ProposalSettingsDataSource';
@@ -11,6 +11,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { ProposalStatus } from './../models/ProposalStatus';
 import ProposalSettingsQueries from './ProposalSettingsQueries';
 
 const ProposalSettingsQueriesInstance = container.resolve(
@@ -18,12 +19,12 @@ const ProposalSettingsQueriesInstance = container.resolve(
 );
 
 describe('Test Proposal Statuses Queries', () => {
-  test('A userofficer can get all Proposal Statuses', () => {
+  test('A userofficer can get all Proposal Statuses', async () => {
     return expect(
       ProposalSettingsQueriesInstance.getAllProposalStatuses(
         dummyUserOfficerWithRole
       )
-    ).resolves.toStrictEqual([dummyProposalStatus]);
+    ).resolves.toEqual(expect.arrayContaining(dummyProposalStatuses));
   });
 
   test('A userofficer can get Proposal Status by id', () => {
@@ -32,7 +33,7 @@ describe('Test Proposal Statuses Queries', () => {
         dummyUserOfficerWithRole,
         1
       )
-    ).resolves.toStrictEqual(dummyProposalStatus);
+    ).resolves.toBeInstanceOf(ProposalStatus);
   });
 });
 
