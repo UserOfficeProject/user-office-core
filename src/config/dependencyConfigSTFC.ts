@@ -1,6 +1,7 @@
 import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
+import { StfcAuthorization } from '../auth/StfcAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
@@ -53,6 +54,8 @@ mapClass(Tokens.SystemDataSource, PostgresSystemDataSource);
 mapClass(Tokens.TemplateDataSource, PostgresTemplateDataSource);
 mapClass(Tokens.UserDataSource, StfcUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
+
+mapClass(Tokens.UserAuthorization, StfcAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
