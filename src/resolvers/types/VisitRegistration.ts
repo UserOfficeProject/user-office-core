@@ -30,6 +30,12 @@ export class VisitRegistration implements Partial<VisitRegistrationOrig> {
 
   @Field(() => Date, { nullable: true })
   public trainingExpiryDate: Date | null;
+
+  @Field(() => Date, { nullable: true })
+  public startsAt: Date | null;
+
+  @Field(() => Date, { nullable: true })
+  public endsAt: Date | null;
 }
 
 @Resolver((of) => VisitRegistration)

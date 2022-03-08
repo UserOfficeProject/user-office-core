@@ -418,21 +418,23 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return database
       .select([
         'proposal_table_view.*',
-        'instrument_has_scientists.*',
-        'instrument_has_proposals.instrument_id',
-        'instrument_has_proposals.proposal_pk',
         database.raw('count(*) OVER() AS full_count'),
       ])
       .from('proposal_table_view')
       .join('instrument_has_scientists', {
-        'instrument_has_scientists.user_id': scientistId,
+        'instrument_has_scientists.instrument_id':
+          'proposal_table_view.instrument_id',
       })
-      .join('instrument_has_proposals', {
-        'instrument_has_proposals.proposal_pk':
-          'proposal_table_view.proposal_pk',
-        'instrument_has_proposals.instrument_id':
-          'instrument_has_scientists.instrument_id',
+      .join('instruments', {
+        'instruments.instrument_id': 'proposal_table_view.instrument_id',
       })
+      .where(function () {
+        this.where('instrument_has_scientists.user_id', scientistId).orWhere(
+          'instruments.manager_user_id',
+          scientistId
+        );
+      })
+      .distinct('proposal_table_view.proposal_pk')
       .orderBy('proposal_table_view.proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.text) {
@@ -444,10 +446,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.where('proposal_table_view.call_id', filter.callId);
         }
         if (filter?.instrumentId) {
-          query.where(
-            'instrument_has_proposals.instrument_id',
-            filter.instrumentId
-          );
+          query.where('instruments.instrument_id', filter.instrumentId);
         }
 
         if (filter?.proposalStatusId) {
@@ -481,7 +480,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .leftJoin(
               'answers',
               'answers.questionary_id',
-              'proposals.questionary_id'
+              'proposal_table_view.questionary_id'
             )
             .andWhere('answers.question_id', questionFilter.questionId)
             .modify(questionFilterQuery, questionFilter);
