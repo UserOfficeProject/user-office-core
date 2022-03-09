@@ -9,10 +9,6 @@ Open [http://localhost:4000](http://localhost:4000) to view the GraphQL playgrou
 
 You will need to manually reload if you make edits.<br>
 
-### `npm run test`
-
-Launches the Jest test runner and prints the coverage report when done with tests.<br>
-
 ### `npm run tsc`
 
 Compiles typescript to javascript for production to the `build` folder.<br>
