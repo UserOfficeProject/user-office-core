@@ -1689,8 +1689,6 @@ context('Template tests', () => {
       cy.login('officer');
       cy.visit('/');
 
-      cy.createProposal({ callId: initialDBData.call.id });
-
       cy.navigateToTemplatesSubmenu('Proposal');
 
       cy.contains(initialDBData.template.name)
@@ -1748,16 +1746,16 @@ context('Template tests', () => {
     it('Unidentifiable disguised file is uploaded but not accepted', () => {
       const fileName = 'unidentifiable_file.pdf';
 
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
       cy.get('input[type="file"]').attachFixture({
         filePath: fileName,
         fileName: fileName,
         mimeType: 'application/pdf',
       });
-
-      cy.intercept({
-        method: 'POST',
-        url: '/files/upload',
-      }).as('upload');
 
       // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
       cy.wait('@upload', { requestTimeout: 30000 });
@@ -1772,16 +1770,16 @@ context('Template tests', () => {
     it('Identifiable disguised file is uploaded but not accepted', () => {
       const fileName = 'mp3_file.pdf';
 
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
       cy.get('input[type="file"]').attachFixture({
         filePath: fileName,
         fileName: fileName,
         mimeType: 'application/pdf',
       });
-
-      cy.intercept({
-        method: 'POST',
-        url: '/files/upload',
-      }).as('upload');
 
       // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
       cy.wait('@upload', { requestTimeout: 30000 });
@@ -1797,16 +1795,16 @@ context('Template tests', () => {
       const validFile = 'file_upload_test.png';
       const invalidFile = 'mp3_file.pdf';
 
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
       cy.get('input[type="file"]').attachFixture({
         filePath: validFile,
         fileName: validFile,
         mimeType: 'image/png',
       });
-
-      cy.intercept({
-        method: 'POST',
-        url: '/files/upload',
-      }).as('upload');
 
       // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
       cy.wait('@upload', { requestTimeout: 30000 });
@@ -1822,16 +1820,16 @@ context('Template tests', () => {
       cy.contains(fileQuestion);
       cy.contains(validFile);
 
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
       cy.get('input[type="file"]').attachFixture({
         filePath: invalidFile,
         fileName: invalidFile,
         mimeType: 'application/pdf',
       });
-
-      cy.intercept({
-        method: 'POST',
-        url: '/files/upload',
-      }).as('upload');
 
       // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
       cy.wait('@upload', { requestTimeout: 30000 });
