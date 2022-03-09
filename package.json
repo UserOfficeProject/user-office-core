@@ -79,7 +79,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "node ./node_modules/eslint/bin/eslint.js --fix $(git diff --name-only --diff-filter=ACMRTUXB develop | grep -E '(.js$|.ts$|.tsx$)')"
+      "pre-commit": "lint-staged"
     }
   },
   "eslintConfig": {
