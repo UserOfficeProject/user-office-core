@@ -163,6 +163,7 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
       // don't support .domain in browsers while setting cookies
       // include the leading dot only for "real" domains
       domain: hostname.includes('.') ? `.${hostname}` : hostname,
+      sameSite: 'lax',
     });
   }, [setCookie, state]);
 
