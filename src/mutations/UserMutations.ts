@@ -552,7 +552,7 @@ export default class UserMutations {
 
         return true;
       } else {
-        return rejection('Can not verify user', { user });
+        return rejection('Can not verify user', { user, decoded });
       }
     } catch (error) {
       return rejection('Can not verify email', {}, error);
