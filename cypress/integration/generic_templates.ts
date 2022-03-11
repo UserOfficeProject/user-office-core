@@ -45,8 +45,8 @@ context('GenericTemplates tests', () => {
     endCycle: currentDayStart,
     templateName: initialDBData.template.name,
     allocationTimeUnit: AllocationTimeUnits.DAY,
-    cycleComment: faker.lorem.word(),
-    surveyComment: faker.lorem.word(),
+    cycleComment: faker.lorem.word(10),
+    surveyComment: faker.lorem.word(10),
   };
 
   let createdTemplateId: number;
