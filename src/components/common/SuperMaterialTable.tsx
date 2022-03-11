@@ -53,6 +53,7 @@ interface SuperProps<RowData extends Record<keyof RowData, unknown>> {
   hasAccess?: { create?: boolean; update?: boolean; remove?: boolean };
   urlQueryParams?: DecodedValueMap<UrlQueryParamsType>;
   setUrlQueryParams?: SetQuery<UrlQueryParamsType>;
+  extraActionButtons?: React.ReactNode;
 }
 
 interface EntryID {
@@ -65,6 +66,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
     remove: true,
     update: true,
   },
+  extraActionButtons,
   ...props
 }: MaterialTableProps<Entry> & SuperProps<Entry>) {
   const [show, setShow] = useState(false);
@@ -243,6 +245,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
       />
       {hasAccess.create && (
         <ActionButtonContainer>
+          {extraActionButtons && extraActionButtons}
           <Button
             type="button"
             variant="contained"

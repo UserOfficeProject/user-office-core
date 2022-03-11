@@ -39,14 +39,14 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
         siConversionFormula: '',
       };
 
+  if (loadingQuantities) return <UOLoader />;
+
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={async (newUnit): Promise<void> => {
         const data = await api('Unit created successfully').createUnit(newUnit);
-        if (data.createUnit.rejection) {
-          close(null);
-        } else if (data.createUnit.unit) {
+        if (data.createUnit.unit) {
           close(data.createUnit.unit);
         }
       }}
@@ -98,7 +98,6 @@ const CreateUnit: React.FC<CreateUnitProps> = ({ close, unit }) => {
             }))}
             InputProps={{ 'data-cy': 'unit-quantity' }}
             required
-            loading={loadingQuantities}
           />
           <Field
             name="symbol"

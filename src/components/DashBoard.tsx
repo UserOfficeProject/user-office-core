@@ -63,6 +63,7 @@ import ShipmentTemplatesPage from './template/ShipmentTemplatesPage';
 import TemplateEditor from './template/TemplateEditor';
 import VisitTemplatesPage from './template/VisitTemplatesPage';
 import TitledRoute from './TitledRoute';
+import ImportUnitsPage from './unit/ImportUnitsPage';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
@@ -471,9 +472,10 @@ const Dashboard: React.FC = () => {
               component={ImportTemplatePage}
             />
           )}
-          <TitledRoute
-            setHeader={setHeader}
-            title="Create Esi Proposal"
+          {isUserOfficer && (
+            <Route path="/ImportUnits" component={ImportUnitsPage} />
+          )}
+          <Route
             path="/CreateEsi/:scheduledEventId"
             component={CreateProposalEsiPage}
           />

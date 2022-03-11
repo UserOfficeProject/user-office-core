@@ -1162,7 +1162,7 @@ context('Template tests', () => {
       cy.get("[data-cy='proposal_basis-accordion']").click();
 
       cy.get("[data-cy='proposal_basis-accordion']")
-        .find("[data-cy='new-question-checkbox']")
+        .find("[data-cy='new-item-checkbox']")
         .click();
 
       cy.get("[data-cy='proposal_basis-accordion']")
