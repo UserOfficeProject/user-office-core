@@ -57,7 +57,7 @@ function editFinalRankingForm() {
 }
 
 const sep1 = {
-  code: faker.lorem.words(1),
+  code: faker.lorem.word(10),
   description: faker.random.words(8),
 };
 

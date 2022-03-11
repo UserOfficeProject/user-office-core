@@ -14,6 +14,7 @@ import { Redirect } from 'react-router';
 import { UserContext } from 'context/UserContextProvider';
 import { Call } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { ProposalData } from 'hooks/proposal/useProposalData';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
 import { timeAgo } from 'utils/Time';
@@ -52,9 +53,10 @@ const ProposalTable = ({
     PartialProposalsDataType[] | undefined
   >([]);
   const [openCallSelection, setOpenCallSelection] = useState(false);
-  const [proposalToClonePk, setProposalToCloneId] = useState<number | null>(
-    null
-  );
+  const [proposalToClone, setProposalToClone] = useState<Pick<
+    ProposalData,
+    'primaryKey' | 'questionary'
+  > | null>(null);
 
   useEffect(() => {
     searchQuery().then((data) => {
@@ -91,15 +93,15 @@ const ProposalTable = ({
   };
 
   const cloneProposalsToCall = async (call: Call) => {
-    setProposalToCloneId(null);
+    setProposalToClone(null);
 
-    if (!call?.id || !proposalToClonePk) {
+    if (!call?.id || !proposalToClone) {
       return;
     }
 
     const result = await api('Proposal cloned successfully').cloneProposals({
       callId: call.id,
-      proposalsToClonePk: [proposalToClonePk],
+      proposalsToClonePk: [proposalToClone.primaryKey],
     });
 
     const [resultProposal] = result.cloneProposals.proposals;
@@ -141,6 +143,7 @@ const ProposalTable = ({
           <CallSelectModalOnProposalsClone
             cloneProposalsToCall={cloneProposalsToCall}
             close={(): void => setOpenCallSelection(false)}
+            templateId={proposalToClone?.questionary.templateId}
           />
         </DialogContent>
       </Dialog>
@@ -179,11 +182,13 @@ const ProposalTable = ({
           {
             icon: FileCopy,
             tooltip: 'Clone proposal',
-            onClick: (event, rowData) => {
-              setProposalToCloneId(
-                (rowData as PartialProposalsDataType).primaryKey
-              );
-              setOpenCallSelection(true);
+            onClick: (_event, rowData) => {
+              api()
+                .getProposal({ primaryKey: rowData.primaryKey })
+                .then((result) => {
+                  setProposalToClone(result.proposal);
+                  setOpenCallSelection(true);
+                });
             },
           },
           {

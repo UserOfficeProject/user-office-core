@@ -33,8 +33,8 @@ context('Calls tests', () => {
     templateName: initialDBData.template.name,
     templateId: initialDBData.template.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
-    cycleComment: faker.lorem.word(),
-    surveyComment: faker.lorem.word(),
+    cycleComment: faker.lorem.word(10),
+    surveyComment: faker.lorem.word(10),
     esiTemplateName: esiTemplateName,
   };
 
@@ -52,8 +52,8 @@ context('Calls tests', () => {
     endCycle: currentDayStart,
     templateId: initialDBData.template.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
-    cycleComment: faker.lorem.word(),
-    surveyComment: faker.lorem.word(),
+    cycleComment: faker.lorem.word(10),
+    surveyComment: faker.lorem.word(10),
   };
 
   const updatedCall = {
@@ -261,15 +261,15 @@ context('Calls tests', () => {
     it('A user-officer should be able to create a call', () => {
       const { shortCode, startCall, endCall, templateName, esiTemplateName } =
         newCall;
-      const callShortCode = shortCode || faker.lorem.word();
+      const callShortCode = shortCode || faker.lorem.word(10);
       const callStartDate =
         startCall ||
         faker.date.past().toISOString().slice(0, 16).replace('T', ' ');
       const callEndDate =
         endCall ||
         faker.date.future().toISOString().slice(0, 16).replace('T', ' ');
-      const callSurveyComment = faker.lorem.word();
-      const callCycleComment = faker.lorem.word();
+      const callSurveyComment = faker.lorem.word(10);
+      const callCycleComment = faker.lorem.word(10);
 
       cy.contains('Calls').click();
 

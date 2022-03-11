@@ -38,7 +38,7 @@ context('Template tests', () => {
     title: faker.lorem.words(3),
     maxChars: 1000,
     answer: faker.lorem.words(5),
-    newId: faker.lorem.word(),
+    newId: faker.lorem.word(10),
   };
   const richTextInputQuestion = {
     title: faker.lorem.words(3),
