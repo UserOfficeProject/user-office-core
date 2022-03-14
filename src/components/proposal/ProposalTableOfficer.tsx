@@ -65,8 +65,8 @@ type ProposalWithCallInstrumentAndSepId = ProposalPkWithCallId & {
 };
 
 export type QueryParameters = {
-  first: number;
-  offset: number;
+  first?: number;
+  offset?: number;
   sortField?: string | undefined;
   sortDirection?: string | undefined;
   searchText?: string | undefined;

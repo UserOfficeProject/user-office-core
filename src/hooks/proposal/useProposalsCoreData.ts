@@ -12,7 +12,7 @@ import { QueryParameters } from '../../components/proposal/ProposalTableOfficer'
 
 export function useProposalsCoreData(
   filter: ProposalsFilter,
-  queryParameters: QueryParameters
+  queryParameters?: QueryParameters
 ) {
   const api = useDataApi();
   const [proposalsData, setProposalsData] = useState<ProposalViewData[]>([]);
@@ -27,8 +27,6 @@ export function useProposalsCoreData(
     text,
     questionFilter,
   } = filter;
-  const { first, offset, sortField, sortDirection, searchText } =
-    queryParameters;
 
   useEffect(() => {
     let unmounted = false;
@@ -89,11 +87,7 @@ export function useProposalsCoreData(
             }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
             text,
           },
-          first,
-          offset,
-          sortField,
-          sortDirection,
-          searchText,
+          ...queryParameters,
         })
         .then((data) => {
           if (unmounted) {
@@ -133,11 +127,7 @@ export function useProposalsCoreData(
     questionFilter,
     api,
     currentRole,
-    first,
-    offset,
-    sortField,
-    sortDirection,
-    searchText,
+    queryParameters,
   ]);
 
   return { loading, proposalsData, setProposalsData, totalCount };
