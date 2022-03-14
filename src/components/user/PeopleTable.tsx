@@ -290,7 +290,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
           const userDetails = await getUserByEmail(values.email, api);
 
           if (!userDetails) {
-            setFieldError('email', 'Please enter valid email address');
+            setFieldError('email', 'No user found for the given email');
             setLoading(false);
 
             return;
