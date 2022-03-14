@@ -44,18 +44,7 @@ const UnitTable: React.FC = () => {
   const deleteUnit = async (id: string | number) => {
     return await api('Unit deleted successfully')
       .deleteUnit({ id: id as string })
-      .then((resp) => {
-        if (!resp.deleteUnit.rejection) {
-          const newObjectsArray = units.filter(
-            (objectItem) => objectItem.id !== id
-          );
-          setUnits(newObjectsArray);
-
-          return true;
-        } else {
-          return false;
-        }
-      });
+      .then((resp) => resp.deleteUnit.rejection === null);
   };
 
   return (
