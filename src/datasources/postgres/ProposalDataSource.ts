@@ -28,6 +28,20 @@ import {
   StatusChangingEventRecord,
 } from './records';
 
+const fieldMap: { [key: string]: string } = {
+  finalStatus: 'final_status',
+  technicalStatus: 'technical_review_status',
+  sepCode: 'sep_code',
+  rankOrder: 'rank_order',
+  reviewAverage: 'average',
+  reviewDeviation: 'deviation',
+  callShortCode: 'proposal_table_view.call_short_code',
+  instrumentName: 'instrument_name',
+  statusName: 'proposal_table_view.proposal_status_id',
+  proposalId: 'proposal_table_view.proposal_id',
+  title: 'title',
+};
+
 export async function calculateReferenceNumber(
   format: string,
   sequence: number | null
@@ -356,51 +370,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (sortField && sortDirection) {
-          switch (sortField) {
-            case 'proposalId': {
-              sortField = 'proposal_table_view.proposal_id';
-              break;
-            }
-            case 'statusName': {
-              sortField = 'proposal_table_view.proposal_status_id';
-              break;
-            }
-            case 'instrumentName': {
-              sortField = 'instrument_name';
-              break;
-            }
-            case 'callShortCode': {
-              sortField = 'proposal_table_view.call_short_code';
-              break;
-            }
-            case 'reviewDeviation': {
-              sortField = 'deviation';
-              break;
-            }
-            case 'reviewAverage': {
-              sortField = 'average';
-              break;
-            }
-            case 'rankOrder': {
-              sortField = 'rank_order';
-              break;
-            }
-            case 'sepCode': {
-              sortField = 'sep_code';
-              break;
-            }
-            case 'technicalStatus': {
-              sortField = 'technical_review_status';
-              break;
-            }
-            case 'finalStatus': {
-              sortField = 'final_status';
-              break;
-            }
-            default: {
-              break;
-            }
-          }
+          sortField = fieldMap[sortField];
           query.orderBy(sortField, sortDirection);
         }
 
