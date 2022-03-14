@@ -45,8 +45,8 @@ context('Proposal tests', () => {
     templateName: initialDBData.template.name,
     templateId: initialDBData.template.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
-    cycleComment: faker.lorem.word(),
-    surveyComment: faker.lorem.word(),
+    cycleComment: faker.lorem.word(10),
+    surveyComment: faker.lorem.word(10),
   };
 
   const createTopicAndQuestionToExistingTemplate = () => {

@@ -1,5 +1,9 @@
-import { Typography } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
+import PublishIcon from '@material-ui/icons/Publish';
+import ShareIcon from '@material-ui/icons/Share';
+import { DateTime } from 'luxon';
 import React from 'react';
+import { useHistory } from 'react-router';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -9,6 +13,7 @@ import SuperMaterialTable, {
 } from 'components/common/SuperMaterialTable';
 import { UserRole, Unit } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
+import { downloadBlob } from 'utils/downloadBlob';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -17,6 +22,7 @@ import CreateUnit from './CreateUnit';
 
 const UnitTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
+  const history = useHistory();
   const { loadingUnits, units, setUnitsWithLoading: setUnits } = useUnitsData();
   const columns = [
     { title: 'Quantity', field: 'quantity' },
@@ -38,18 +44,7 @@ const UnitTable: React.FC = () => {
   const deleteUnit = async (id: string | number) => {
     return await api('Unit deleted successfully')
       .deleteUnit({ id: id as string })
-      .then((resp) => {
-        if (!resp.deleteUnit.rejection) {
-          const newObjectsArray = units.filter(
-            (objectItem) => objectItem.id !== id
-          );
-          setUnits(newObjectsArray);
-
-          return true;
-        } else {
-          return false;
-        }
-      });
+      .then((resp) => resp.deleteUnit.rejection === null);
   };
 
   return (
@@ -78,6 +73,48 @@ const UnitTable: React.FC = () => {
         urlQueryParams={urlQueryParams}
         setUrlQueryParams={setUrlQueryParams}
         delete={deleteUnit}
+        extraActionButtons={
+          <>
+            <Button
+              startIcon={<PublishIcon />}
+              type="button"
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                history.push('/ImportUnits');
+              }}
+              data-cy="import-units-button"
+            >
+              Import
+            </Button>
+            <Button
+              startIcon={<ShareIcon />}
+              type="button"
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                api()
+                  .getUnitsAsJson()
+                  .then((result) => {
+                    if (!result.unitsAsJson) {
+                      return;
+                    }
+
+                    const blob = new Blob([result.unitsAsJson], {
+                      type: 'application/json;charset=utf8',
+                    });
+                    downloadBlob(
+                      blob,
+                      `units_${DateTime.now().toFormat('yyyy-LLL-dd')}.json`
+                    );
+                  });
+              }}
+              data-cy="export-units-button"
+            >
+              Export
+            </Button>
+          </>
+        }
       />
     </div>
   );

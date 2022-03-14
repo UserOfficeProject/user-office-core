@@ -40,9 +40,17 @@ function QuestionsPage() {
       return createQuestionForm({
         question,
         onUpdated: (q) => onUpdate(q as QuestionWithUsage),
+        onDeleted: (q) => {
+          setQuestions(questions.filter((q2) => q2.id !== q.id));
+        },
       });
     }
   };
+
+  const deleteQuestion = async (questionId: string | number) =>
+    api('Question deleted')
+      .deleteQuestion({ questionId: questionId as string })
+      .then((result) => result.deleteQuestion.rejection === null);
 
   const templateCountButton = (rowData: QuestionWithUsage) => (
     <Link
@@ -93,11 +101,7 @@ function QuestionsPage() {
             <div data-cy="questions-table">
               <SuperMaterialTable
                 createModal={createModal}
-                delete={(questionId) =>
-                  api('Question deleted')
-                    .deleteQuestion({ questionId: questionId as string })
-                    .then((result) => result.deleteQuestion === null)
-                }
+                delete={deleteQuestion}
                 setData={setQuestions}
                 icons={tableIcons}
                 title={

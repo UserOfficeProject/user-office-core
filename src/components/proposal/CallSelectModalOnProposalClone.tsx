@@ -29,13 +29,17 @@ const useStyles = makeStyles((theme) => ({
 type CallSelectModalOnProposalsCloneProps = {
   close: () => void;
   cloneProposalsToCall: (call: Call) => Promise<void>;
+  templateId?: number;
 };
 
 const CallSelectModalOnProposalsClone: React.FC<
   CallSelectModalOnProposalsCloneProps
-> = ({ close, cloneProposalsToCall }) => {
+> = ({ close, cloneProposalsToCall, templateId }) => {
   const classes = useStyles();
-  const { calls, loadingCalls } = useCallsData({ isActive: true });
+  const { calls, loadingCalls } = useCallsData({
+    isActive: true,
+    templateIds: templateId ? [templateId] : undefined,
+  });
 
   return (
     <Container component="main" maxWidth="xs">

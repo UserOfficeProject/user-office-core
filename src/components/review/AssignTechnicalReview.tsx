@@ -80,7 +80,7 @@ function AssignTechnicalReview({
                   .then((result) => {
                     onProposalUpdated({
                       ...proposal,
-                      ...result.updateTechnicalReviewAssignee.proposals[0],
+                      ...result.updateTechnicalReviewAssignee.proposals?.[0],
                     });
                   }),
               {
