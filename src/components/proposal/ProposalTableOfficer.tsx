@@ -64,6 +64,14 @@ type ProposalWithCallInstrumentAndSepId = ProposalPkWithCallId & {
   statusId: number;
 };
 
+export type QueryParameters = {
+  first: number;
+  offset: number;
+  sortField?: string | undefined;
+  sortDirection?: string | undefined;
+  searchText?: string | undefined;
+};
+
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
   urlQueryParams,
@@ -95,13 +103,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const [query, setQuery] = useState<{
-    offset: number;
-    first: number;
-    sortField?: string;
-    sortDirection?: string;
-    searchText?: string;
-  }>({
+  const [query, setQuery] = useState<QueryParameters>({
     first: prefetchSize,
     offset: 0,
     sortField: urlQueryParams?.sortField,
@@ -109,14 +111,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     searchText: urlQueryParams?.search ?? undefined,
   });
   const { loading, setProposalsData, proposalsData, totalCount } =
-    useProposalsCoreData(
-      proposalFilter,
-      query.first,
-      query.offset,
-      query.sortField,
-      query.sortDirection,
-      query.searchText
-    );
+    useProposalsCoreData(proposalFilter, query);
 
   useEffect(() => {
     setPreselectedProposalsData(proposalsData);
@@ -143,7 +138,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   useEffect(() => {
     if (urlQueryParams.selection.length > 0) {
       const selection = new Set(urlQueryParams.selection);
-
       setPreselectedProposalsData((preselectedProposalsData) => {
         const selected: ProposalWithCallInstrumentAndSepId[] = [];
         const preselected = preselectedProposalsData.map((proposal) => {

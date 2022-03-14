@@ -8,20 +8,17 @@ import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, ProposalView, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
+import { QueryParameters } from '../../components/proposal/ProposalTableOfficer';
+
 export function useProposalsCoreData(
   filter: ProposalsFilter,
-  first?: number,
-  offset?: number,
-  sortField?: string,
-  sortDirection?: string,
-  searchText?: string
+  queryParameters: QueryParameters
 ) {
   const api = useDataApi();
   const [proposalsData, setProposalsData] = useState<ProposalViewData[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const { currentRole } = useContext(UserContext);
-
   const {
     callId,
     instrumentId,
@@ -30,6 +27,8 @@ export function useProposalsCoreData(
     text,
     questionFilter,
   } = filter;
+  const { first, offset, sortField, sortDirection, searchText } =
+    queryParameters;
 
   useEffect(() => {
     let unmounted = false;
