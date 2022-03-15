@@ -186,7 +186,7 @@ describe('Test SEPMutations', () => {
   test('A userofficer can remove member from SEP', () => {
     return expect(
       SEPMutationsInstance.removeMemberFromSEP(dummyUserOfficerWithRole, {
-        memberId: 1,
+        memberId: 2,
         sepId: 1,
         roleId: UserRole.SEP_CHAIR,
       })

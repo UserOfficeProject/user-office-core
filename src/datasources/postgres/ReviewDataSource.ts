@@ -1,9 +1,9 @@
 import { Review, ReviewStatus } from '../../models/Review';
 import { TechnicalReview } from '../../models/TechnicalReview';
-import { AddReviewArgs } from '../../resolvers/mutations/AddReviewMutation';
 import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReviewMutation';
 import { SubmitTechnicalReviewInput } from '../../resolvers/mutations/SubmitTechnicalReviewMutation';
+import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
 import { ReviewDataSource } from '../ReviewDataSource';
 import database from './database';
 import { ReviewRecord, TechnicalReviewRecord } from './records';
@@ -131,7 +131,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     return this.createReviewObject(reviewRecord);
   }
 
-  async updateReview(args: AddReviewArgs): Promise<Review> {
+  async updateReview(args: UpdateReviewArgs): Promise<Review> {
     const { reviewID, comment, grade, status, sepID } = args;
 
     return database
