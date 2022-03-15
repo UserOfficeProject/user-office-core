@@ -542,12 +542,8 @@ export default class UserMutations {
     try {
       const decoded = verifyToken<EmailVerificationJwtPayload>(token);
       const user = await this.dataSource.getUser(decoded.id);
-      //Check that user exist and that it has not been updated since token creation
-      if (
-        user &&
-        user.updated === decoded.updated &&
-        decoded.type === 'emailVerification'
-      ) {
+      //Check that user exist
+      if (user && decoded.type === 'emailVerification') {
         await this.dataSource.setUserEmailVerified(user.id);
 
         return true;
@@ -555,7 +551,11 @@ export default class UserMutations {
         return rejection('Can not verify user', { user, decoded });
       }
     } catch (error) {
-      return rejection('Can not verify email', {}, error);
+      return rejection(
+        'Can not verify email, please contact user office for help',
+        {},
+        error
+      );
     }
   }
 
