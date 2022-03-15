@@ -14,7 +14,7 @@ import { ReviewWithNextStatusResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class AddReviewArgs {
+export class UpdateReviewArgs {
   @Field(() => Int)
   public reviewID: number;
 
@@ -34,7 +34,10 @@ export class AddReviewArgs {
 @Resolver()
 export class UpdateReviewMutation {
   @Mutation(() => ReviewWithNextStatusResponseWrap)
-  addReview(@Args() args: AddReviewArgs, @Ctx() context: ResolverContext) {
+  updateReview(
+    @Args() args: UpdateReviewArgs,
+    @Ctx() context: ResolverContext
+  ) {
     return wrapResponse(
       context.mutations.review.updateReview(context.user, args),
       ReviewWithNextStatusResponseWrap

@@ -290,7 +290,7 @@ export default class UserMutations {
   }
 
   @ValidateArgs(updateUserValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @Authorized()
   @EventBus(Event.USER_UPDATED)
   async update(
     agent: UserWithRole | null,
@@ -571,7 +571,7 @@ export default class UserMutations {
   }
 
   @ValidateArgs(updatePasswordValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @Authorized()
   async updatePassword(
     agent: UserWithRole | null,
     { id, password }: { id: number; password: string }
