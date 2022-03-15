@@ -6,7 +6,7 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Roles } from '../models/Role';
-import { User, UserWithRole } from '../models/User';
+import { UserWithRole } from '../models/User';
 
 @injectable()
 export class UserAuthorization {
@@ -53,14 +53,21 @@ export class UserAuthorization {
   }
 
   async isChairOrSecretaryOfSEP(
-    agent: User | null,
+    agent: UserWithRole | null,
     sepId: number
   ): Promise<boolean> {
     if (agent == null || !agent.id || !sepId) {
       return false;
     }
 
-    return this.sepDataSource.isChairOrSecretaryOfSEP(agent.id, sepId);
+    const hasChairOrSecretaryAsCurrentRole =
+      agent.currentRole?.shortCode === Roles.SEP_CHAIR ||
+      agent.currentRole?.shortCode === Roles.SEP_SECRETARY;
+
+    return (
+      hasChairOrSecretaryAsCurrentRole &&
+      this.sepDataSource.isChairOrSecretaryOfSEP(agent.id, sepId)
+    );
   }
 
   hasGetAccessByToken(agent: UserWithRole) {
