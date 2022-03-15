@@ -25,7 +25,7 @@ export const Tokens = {
   ShipmentDataSource: Symbol('ShipmentDataSource'),
   SystemDataSource: Symbol('SystemDataSource'),
   TemplateDataSource: Symbol('TemplateDataSource'),
-  UserAuthorization: Symbol('UserAuthorization'),
+  UnitDataSource: Symbol('UnitDataSource'),
   UserDataSource: Symbol('UserDataSource'),
   VisitDataSource: Symbol('VisitDataSource'),
 };
