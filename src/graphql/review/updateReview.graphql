@@ -1,11 +1,11 @@
-mutation addReview(
+mutation updateReview(
   $reviewID: Int!
   $grade: Int!
   $comment: String!
   $status: ReviewStatus!
   $sepID: Int!
 ) {
-  addReview(
+  updateReview(
     reviewID: $reviewID
     grade: $grade
     comment: $comment
