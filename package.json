@@ -55,7 +55,7 @@
     "cookie-parser": "^1.4.6",
     "cron": "^1.8.2",
     "dotenv": "^14.3.2",
-    "email-templates": "^8.0.8",
+    "email-templates": "^8.0.9",
     "express": "^4.17.3",
     "express-jwt": "^6.1.1",
     "graphql": "^15.8.0",
