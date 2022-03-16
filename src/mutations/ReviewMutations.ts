@@ -23,11 +23,11 @@ import {
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
-import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
 import { AddTechnicalReviewInput } from '../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
 import { ProposalPkWithReviewId } from '../resolvers/mutations/SubmitProposalsReviewMutation';
 import { SubmitTechnicalReviewInput } from '../resolvers/mutations/SubmitTechnicalReviewMutation';
+import { UpdateReviewArgs } from '../resolvers/mutations/UpdateReviewMutation';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssignee';
 import { checkAllReviewsSubmittedOnProposal } from '../utils/helperFunctions';
 
@@ -49,7 +49,7 @@ export default class ReviewMutations {
   @Authorized()
   async updateReview(
     agent: UserWithRole | null,
-    args: AddReviewArgs
+    args: UpdateReviewArgs
   ): Promise<ReviewWithNextProposalStatus | Rejection> {
     const { reviewID, comment, grade } = args;
     const review = await this.dataSource.getReview(reviewID);
@@ -60,13 +60,18 @@ export default class ReviewMutations {
       });
     }
 
+    const isChairOrSecretaryOfSEP = await this.userAuth.isChairOrSecretaryOfSEP(
+      agent,
+      review.sepID
+    );
+
     if (
       !(
         (await this.proposalAuth.isReviewerOfProposal(
           agent,
           review.proposalPk
         )) ||
-        (await this.userAuth.isChairOrSecretaryOfSEP(agent, review.sepID)) ||
+        isChairOrSecretaryOfSEP ||
         this.userAuth.isUserOfficer(agent)
       )
     ) {
@@ -78,7 +83,7 @@ export default class ReviewMutations {
 
     if (
       review.status === ReviewStatus.SUBMITTED &&
-      !this.userAuth.isUserOfficer(agent)
+      !(this.userAuth.isUserOfficer(agent) || isChairOrSecretaryOfSEP)
     ) {
       return rejection(
         'Can not update review because review already submitted',

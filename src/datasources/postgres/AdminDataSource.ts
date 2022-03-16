@@ -10,7 +10,6 @@ import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
 import { Quantity } from '../../models/Quantity';
 import { Settings } from '../../models/Settings';
-import { Unit } from '../../models/Unit';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
 import { CreateUnitArgs } from '../../resolvers/mutations/CreateUnitMutation';
@@ -37,7 +36,6 @@ import {
   QuantityRecord,
   SettingsRecord,
   TokensAndPermissionsRecord,
-  UnitRecord,
   UserRecord,
 } from './records';
 
@@ -46,59 +44,6 @@ const seedsPath = path.join(dbPatchesFolderPath, 'db_seeds');
 
 @injectable()
 export default class PostgresAdminDataSource implements AdminDataSource {
-  async createUnit(unit: CreateUnitArgs): Promise<Unit | null> {
-    const [unitRecord]: UnitRecord[] = await database
-      .insert({
-        unit_id: unit.id,
-        unit: unit.unit,
-        quantity: unit.quantity,
-        symbol: unit.symbol,
-        si_conversion_formula: unit.siConversionFormula,
-      })
-      .into('units')
-      .returning('*');
-
-    if (!unitRecord) {
-      throw new Error('Could not create unit');
-    }
-
-    return createUnitObject(unitRecord);
-  }
-
-  async deleteUnit(id: string): Promise<Unit> {
-    const [unitRecord]: UnitRecord[] = await database('units')
-      .where('units.unit_id', id)
-      .del()
-      .from('units')
-      .returning('*');
-
-    if (!unitRecord) {
-      throw new Error(`Could not delete unit with id:${id}`);
-    }
-
-    return createUnitObject(unitRecord);
-  }
-
-  async getUnits(): Promise<Unit[]> {
-    return await database
-      .select()
-      .from('units')
-      .orderBy('unit', 'asc')
-      .then((records: UnitRecord[]) =>
-        records.map((unit) => createUnitObject(unit))
-      );
-  }
-
-  async getQuantities(): Promise<Quantity[]> {
-    return await database
-      .select()
-      .from('quantities')
-      .orderBy('quantity_id', 'asc')
-      .then((records: QuantityRecord[]) =>
-        records.map((quantity) => createQuantityObject(quantity))
-      );
-  }
-
   async updateInstitution(
     institution: Institution
   ): Promise<Institution | null> {
