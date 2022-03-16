@@ -20,6 +20,7 @@ import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
+import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import {
@@ -51,6 +52,7 @@ mapClass(Tokens.ScheduledEventDataSource, ScheduledEventDataSourceMock);
 mapClass(Tokens.ShipmentDataSource, ShipmentDataSourceMock);
 mapClass(Tokens.SystemDataSource, SystemDataSourceMock);
 mapClass(Tokens.TemplateDataSource, TemplateDataSourceMock);
+mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
 mapClass(Tokens.VisitDataSource, VisitDataSourceMock);
 

@@ -7,6 +7,6 @@ import { Quantity } from '../types/Quantity';
 export class QuantitiesQuery {
   @Query(() => [Quantity])
   quantities(@Ctx() context: ResolverContext) {
-    return context.queries.admin.getQuantities();
+    return context.queries.unit.getQuantities();
   }
 }

@@ -27,7 +27,7 @@ export class CreateUnitMutation {
   @Mutation(() => UnitResponseWrap)
   createUnit(@Args() args: CreateUnitArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
-      context.mutations.admin.createUnit(context.user, args),
+      context.mutations.unit.createUnit(context.user, args),
       UnitResponseWrap
     );
   }
