@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -6,7 +7,7 @@ import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Roles } from '../models/Role';
-import { UserWithRole } from '../models/User';
+import { User, UserWithRole } from '../models/User';
 
 @injectable()
 export class UserAuthorization {
