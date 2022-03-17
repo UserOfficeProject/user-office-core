@@ -46,7 +46,6 @@ import { signToken, verifyToken } from '../utils/jwt';
 
 @injectable()
 export default class UserMutations {
-  //private userAuth = container.resolve(UserAuthorization);
   //Set as a class variable to avoid excessive calls to database
   private externalAuth: boolean;
 
