@@ -11,6 +11,7 @@ context('User administration tests', () => {
   const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.phoneNumber('0##########');
   const newTelephoneAlt = faker.phone.phoneNumber('0##########');
+  const newOrganisation = faker.company.companyName();
   const placeholderUser = initialDBData.users.placeholder;
 
   beforeEach(() => {
@@ -100,6 +101,8 @@ context('User administration tests', () => {
     cy.get("[name='telephone']").clear().type(newTelephone);
 
     cy.get("[name='telephone_alt']").clear().type(newTelephoneAlt);
+
+    cy.get("[name='otherOrganisation']").clear().type(newOrganisation);
 
     cy.contains('Update Profile').click();
 

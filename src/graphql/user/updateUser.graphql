@@ -14,6 +14,7 @@ mutation updateUser(
   $email: String!
   $telephone: String!
   $telephone_alt: String
+  $otherOrganisation: String
 ) {
   updateUser(
     id: $id
@@ -31,6 +32,7 @@ mutation updateUser(
     email: $email
     telephone: $telephone
     telephone_alt: $telephone_alt
+    otherOrganisation: $otherOrganisation
   ) {
     user {
       id
