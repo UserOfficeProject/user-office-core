@@ -59,7 +59,7 @@
     "express": "^4.17.3",
     "express-jwt": "^6.1.1",
     "graphql": "^15.8.0",
-    "graphql-middleware": "^6.1.14",
+    "graphql-middleware": "^6.1.15",
     "graphql-tag": "^2.12.6",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.95.15",
