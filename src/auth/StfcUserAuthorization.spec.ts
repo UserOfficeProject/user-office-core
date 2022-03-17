@@ -2,11 +2,11 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { dummyUser } from '../datasources/mockups/UserDataSource';
-import { StfcAuthorization } from './StfcAuthorization';
+import { StfcUserAuthorization } from './StfcUserAuthorization';
 
 jest.mock('../datasources/stfc/UOWSSoapInterface.ts');
 
-const userAuthorization = container.resolve(StfcAuthorization);
+const userAuthorization = container.resolve(StfcUserAuthorization);
 
 test('When an invalid external token is supplied, no user is found', async () => {
   return expect(

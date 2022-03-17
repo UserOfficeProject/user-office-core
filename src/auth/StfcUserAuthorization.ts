@@ -13,7 +13,7 @@ import { UserAuthorization } from './UserAuthorization';
 const client = new UOWSSoapClient(process.env.EXTERNAL_AUTH_SERVICE_URL);
 
 @injectable()
-export class StfcAuthorization extends UserAuthorization {
+export class StfcUserAuthorization extends UserAuthorization {
   constructor(
     @inject(Tokens.UserDataSource) protected userDataSource: UserDataSource,
     @inject(Tokens.SEPDataSource) protected sepDataSource: SEPDataSource,

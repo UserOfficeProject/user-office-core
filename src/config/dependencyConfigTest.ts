@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
 
-import { UserAuthorization } from '../auth/UserAuthorization';
+import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import 'reflect-metadata';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
@@ -57,7 +57,7 @@ mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
 mapClass(Tokens.VisitDataSource, VisitDataSourceMock);
 
-mapClass(Tokens.UserAuthorization, UserAuthorization);
+mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
