@@ -13,7 +13,7 @@ export const dateDefinition: Question = {
       throw new Error('DataType should be DATE');
     }
 
-    return dateQuestionValidationSchema(field).isValidSync(value);
+    return dateQuestionValidationSchema(field).isValid(value);
   },
   createBlankConfig: (): DateConfig => {
     const config = new DateConfig();

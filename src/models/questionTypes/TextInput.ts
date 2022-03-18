@@ -13,7 +13,7 @@ export const textInputDefinition: Question = {
       throw new Error('DataType should be TEXT_INPUT');
     }
 
-    return textInputQuestionValidationSchema(field).isValidSync(value);
+    return textInputQuestionValidationSchema(field).isValid(value);
   },
   createBlankConfig: (): ConfigBase => {
     const config = new TextInputConfig();
