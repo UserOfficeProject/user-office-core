@@ -6,8 +6,8 @@ import { TemplateImportWithValidation } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import { SelectImportFile } from '../../common/SelectImportFile';
 import { MergeReview } from './MergeReview';
-import { SelectTemplateFile } from './SelectTemplateFile';
 
 export const getFileContents = async (file: File): Promise<string> => {
   return new Promise((resolve) => {
@@ -36,7 +36,7 @@ export default function ImportTemplatePage() {
             onBack={() => setValidationResult(null)}
           />
         ) : (
-          <SelectTemplateFile
+          <SelectImportFile
             onFileSelected={(json) => {
               api()
                 .validateTemplateImport({ templateAsJson: json })

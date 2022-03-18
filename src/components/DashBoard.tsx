@@ -41,7 +41,6 @@ import InstrSciUpcomingExperimentTimesTable from './proposalBooking/InstrSciUpco
 import UserExperimentTimesTable from './proposalBooking/UserExperimentsTable';
 import CreateProposalEsiPage from './proposalEsi/CreateProposalEsiPage';
 import UpdateProposalEsiPage from './proposalEsi/UpdateProposalEsiPage';
-import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
@@ -63,6 +62,7 @@ import ShipmentTemplatesPage from './template/ShipmentTemplatesPage';
 import TemplateEditor from './template/TemplateEditor';
 import VisitTemplatesPage from './template/VisitTemplatesPage';
 import TitledRoute from './TitledRoute';
+import ImportUnitsPage from './unit/ImportUnitsPage';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
@@ -384,12 +384,6 @@ const Dashboard: React.FC = () => {
             path="/SampleEsiTemplates"
             component={SampleEsiPage}
           />
-          <TitledRoute
-            setHeader={setHeader}
-            title="Proposal Table Reviewer"
-            path="/ProposalTableReviewer"
-            component={ProposalTableReviewer}
-          />
           {isUserOfficer && (
             <TitledRoute
               setHeader={setHeader}
@@ -469,6 +463,14 @@ const Dashboard: React.FC = () => {
               title="Import Templates"
               path="/ImportTemplate"
               component={ImportTemplatePage}
+            />
+          )}
+          {isUserOfficer && (
+            <TitledRoute
+              setHeader={setHeader}
+              title="Import Units"
+              path="/ImportUnits"
+              component={ImportUnitsPage}
             />
           )}
           <TitledRoute

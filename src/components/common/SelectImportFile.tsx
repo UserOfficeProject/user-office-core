@@ -4,9 +4,9 @@ import React, { ChangeEvent } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 
-import { getFileContents } from './ImportTemplatePage';
+import { getFileContents } from '../template/import/ImportTemplatePage';
 
-export function SelectTemplateFile(props: {
+export function SelectImportFile(props: {
   onFileSelected: (json: string) => void;
 }) {
   const onFileSelected = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -20,7 +20,7 @@ export function SelectTemplateFile(props: {
   return (
     <>
       <Typography variant="body2" component="div">
-        Please select the template file you wish to import.
+        Please select the file you wish to import.
       </Typography>
       <label>
         <input

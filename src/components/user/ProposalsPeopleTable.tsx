@@ -322,7 +322,7 @@ const ProposalsPeopleTable: React.FC<PeopleTableProps> = (props) => {
 
           if (!userDetails) {
             setDisplayError(true);
-            setFieldError('email', 'Please enter valid email address');
+            setFieldError('email', 'No user found for the given email');
             setLoading(false);
 
             return;

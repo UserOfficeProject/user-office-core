@@ -1,3 +1,8 @@
+import path from 'path';
+
+import faker from 'faker';
+import { DateTime } from 'luxon';
+
 import initialDBData from '../support/initialDBData';
 
 context('Units tests', () => {
@@ -25,8 +30,29 @@ context('Units tests', () => {
 
       cy.get('[data-cy="submit"]').click();
       cy.get('[placeholder="Search"]').clear().type('test');
+    });
 
-      cy.get('[placeholder="Search"]').clear().type('test');
+    it('Can no create unit with invalid conversion formula', () => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.get('[data-cy=officer-menu-items]').contains('Settings').click();
+      cy.get('[data-cy=officer-menu-items]').contains('Units').click();
+
+      cy.get('[data-cy="create-new-entry"]').click();
+      cy.get('[data-cy="unit-id"]').clear().type('test');
+      cy.get('[data-cy="unit-name"]').clear().type('test');
+      cy.get('[data-cy="unit-quantity"]').click();
+      cy.get('#quantity-input-option-0').click();
+
+      cy.get('[data-cy="unit-symbol"]').clear().type('test');
+      cy.get('[data-cy="unit-siConversionFormula"]')
+        .clear()
+        .type(faker.lorem.words(2));
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.notification({ variant: 'error', text: /formula is not valid/g });
     });
 
     it('User officer can delete unit', () => {
@@ -47,6 +73,73 @@ context('Units tests', () => {
       cy.get('[title=Save]').click();
 
       cy.contains(BECQUEREL_UNIT_TITLE).should('not.exist');
+    });
+
+    it('User officer can import units', () => {
+      const fileName = 'units_import.json';
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.get('[data-cy=officer-menu-items]').contains('Settings').click();
+      cy.get('[data-cy=officer-menu-items]').contains('Units').click();
+
+      cy.get('[data-cy="import-units-button"]').click();
+      cy.get('input[type="file"]').attachFixture({
+        filePath: fileName,
+        fileName: fileName,
+        mimeType: 'application/json',
+      });
+
+      cy.get('[data-cy="back-button"]').click();
+
+      cy.get('input[type="file"]').attachFixture({
+        filePath: fileName,
+        fileName: fileName,
+        mimeType: 'application/json',
+      });
+
+      cy.get('[data-cy="import-units-button"]').should('be.disabled');
+
+      cy.get('[data-cy="electric_current-accordion"]').click();
+      cy.get('[data-cy="electric_current-accordion"]')
+        .find('[data-cy="new-item-checkbox"]')
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get('[data-cy="import-units-button"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains('ampere from import');
+    });
+
+    it('User officer can export units', () => {
+      const fileName = 'units_export.json';
+      const now = DateTime.now();
+      const downloadFileName = `units_${now.toFormat('yyyy-LLL-dd')}.json`;
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.get('[data-cy=officer-menu-items]').contains('Settings').click();
+      cy.get('[data-cy=officer-menu-items]').contains('Units').click();
+
+      cy.get('[data-cy="export-units-button"]').click();
+
+      cy.fixture(fileName).then((expectedExport) => {
+        const downloadsFolder = Cypress.config('downloadsFolder');
+
+        cy.readFile(path.join(downloadsFolder, downloadFileName)).then(
+          (actualExport) => {
+            // remove date from the export, because it is not deterministic
+            delete expectedExport.exportDate;
+            delete actualExport.exportDate;
+
+            expect(expectedExport).to.deep.equal(actualExport);
+          }
+        );
+      });
     });
   });
 
