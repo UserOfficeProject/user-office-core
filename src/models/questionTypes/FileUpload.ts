@@ -71,9 +71,9 @@ export const fileUploadDefinition: Question = {
  * @param fileId The ID of the file to check
  * @param field The question data containing the config
  * @param value All files in the question
- * @returns True if the file is identified as one of the accepted types.
- * False if the file cannot be retrieved or identified, or is not one of
- * the accepted types
+ * @returns True if the file is identified as one of the accepted
+ * types, or if the file cannot be retrieved. False is the file
+ * cannot be identified, or is not one of the accepted types.
  */
 const isValidFileType = async (
   fileId: string,
