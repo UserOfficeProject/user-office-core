@@ -51,7 +51,7 @@ export const richTextInputDefinition: Question = {
       throw new Error('DataType should be RICH_TEXT_INPUT');
     }
 
-    return richTextInputQuestionValidationSchema(field).isValidSync(value);
+    return richTextInputQuestionValidationSchema(field).isValid(value);
   },
   transform: (field: QuestionTemplateRelation, value: any) =>
     sanitizeHtml(value, sanitizerConfig),

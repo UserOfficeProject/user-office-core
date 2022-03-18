@@ -27,8 +27,8 @@ it('Field config "required=true" should make field required', async () => {
     },
     config: createConfig<BooleanConfig>(DataType.BOOLEAN, { required: true }),
   });
-  expect(isMatchingConstraints(question, false)).toBe(false);
-  expect(isMatchingConstraints(question, true)).toBe(true);
+  await expect(isMatchingConstraints(question, false)).resolves.toBe(false);
+  await expect(isMatchingConstraints(question, true)).resolves.toBe(true);
 });
 
 it('Field config "required=false" should make field not required', async () => {
@@ -40,8 +40,8 @@ it('Field config "required=false" should make field not required', async () => {
       required: false,
     }),
   });
-  expect(isMatchingConstraints(question, 'text')).toBe(true);
-  expect(isMatchingConstraints(question, '')).toBe(true);
+  await expect(isMatchingConstraints(question, 'text')).resolves.toBe(true);
+  await expect(isMatchingConstraints(question, '')).resolves.toBe(true);
 });
 
 it('Dependencies should be satisfied if value matches', async () => {
