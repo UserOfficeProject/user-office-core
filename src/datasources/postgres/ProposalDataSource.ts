@@ -390,7 +390,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           );
         }
         if (filter?.referenceNumbers) {
-          query.whereIn('reference_number_sequence', filter.referenceNumbers);
+          query.whereIn('proposals.proposal_id', filter.referenceNumbers);
         }
 
         if (first) {
