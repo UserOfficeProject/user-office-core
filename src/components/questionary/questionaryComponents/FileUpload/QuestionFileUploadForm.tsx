@@ -22,7 +22,7 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
         naturalKey: naturalKeySchema,
         question: Yup.string().required('Question is required'),
         config: Yup.object({
-          file_type: Yup.array(),
+          file_type: Yup.array().required().min(1, 'File type is required'),
           small_label: Yup.string(),
           max_files: Yup.number(),
         }),
@@ -77,7 +77,7 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
             />
             <Field
               name="config.file_type"
-              label="Accepted file types (leave empty for any)"
+              label="Accepted file types"
               id="fileType"
               component={FormikUICustomSelect}
               multiple
@@ -91,6 +91,7 @@ export const QuestionFileUploadForm: FC<QuestionFormProps> = (props) => {
               ]}
               fullWidth
               data-cy="file_type"
+              required
             />
             <Field
               name="config.max_files"

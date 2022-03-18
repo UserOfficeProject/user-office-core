@@ -143,9 +143,9 @@ declare global {
        * @returns {typeof createFileUploadQuestion}
        * @memberof Chainable
        * @example
-       *    cy.createFileUploadQuestion('Provide a file')
+       *    cy.createFileUploadQuestion('Provide a file', ['.pdf', 'image/*'])
        */
-      createFileUploadQuestion: (title: string) => void;
+      createFileUploadQuestion: (title: string, fileTypes: string[]) => void;
 
       /**
        * Creates NumberImput question.
