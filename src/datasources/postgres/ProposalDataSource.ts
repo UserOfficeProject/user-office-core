@@ -389,6 +389,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             `proposals.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
           );
         }
+        if (filter?.referenceNumbers) {
+          query.whereIn('reference_number_sequence', filter.referenceNumbers);
+        }
 
         if (first) {
           query.limit(first);
