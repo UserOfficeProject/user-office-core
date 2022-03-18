@@ -370,6 +370,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (sortField && sortDirection) {
+          if (!fieldMap.hasOwnProperty(sortField)) {
+            throw new Error(`Bad sort field given: ${sortField}`);
+          }
           sortField = fieldMap[sortField];
           query.orderBy(sortField, sortDirection);
         }
