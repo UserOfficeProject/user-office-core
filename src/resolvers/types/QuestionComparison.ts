@@ -3,7 +3,7 @@ import { ObjectType, Field } from 'type-graphql';
 import {
   ConflictResolutionStrategy,
   QuestionComparison as QuestionComparisonOrigin,
-  QuestionComparisonStatus,
+  ComparisonStatus,
 } from '../../models/Template';
 import { Question } from './Question';
 
@@ -15,8 +15,8 @@ export class QuestionComparison implements Partial<QuestionComparisonOrigin> {
   @Field(() => Question)
   public newQuestion: Question;
 
-  @Field(() => QuestionComparisonStatus)
-  public status: QuestionComparisonStatus;
+  @Field(() => ComparisonStatus)
+  public status: ComparisonStatus;
 
   @Field(() => ConflictResolutionStrategy)
   public conflictResolutionStrategy: ConflictResolutionStrategy;

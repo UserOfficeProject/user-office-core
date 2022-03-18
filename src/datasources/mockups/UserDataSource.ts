@@ -97,6 +97,11 @@ export const dummyUserWithRole: UserWithRole = {
   currentRole: { id: 1, title: 'User', shortCode: 'user' },
 };
 
+export const dummySEPChairWithRole: UserWithRole = {
+  ...dummyUser,
+  currentRole: { id: 4, title: 'SEP Chair', shortCode: 'sep_chair' },
+};
+
 export const dummySampleReviewer: UserWithRole = {
   ...dummyUser,
   currentRole: {
@@ -281,6 +286,8 @@ export class UserDataSourceMock implements UserDataSource {
       ];
     } else if (id === 1001) {
       return [{ id: 2, shortCode: 'sep_reviewer', title: 'User' }];
+    } else if (id === dummySEPChairWithRole.id) {
+      return [{ id: 4, shortCode: 'sep_chair', title: 'SEP Chair' }];
     } else {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }

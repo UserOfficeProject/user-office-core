@@ -6,7 +6,7 @@ import {
   FieldDependency,
   Question,
   QuestionComparison,
-  QuestionComparisonStatus,
+  ComparisonStatus,
   QuestionTemplateRelation,
   Template,
   TemplateCategory,
@@ -20,12 +20,12 @@ import {
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
-import { ConflictResolution } from '../../resolvers/mutations/ImportTemplateMutation';
 import { SetActiveTemplateArgs } from '../../resolvers/mutations/SetActiveTemplateMutation';
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
+import { ConflictResolution } from '../../resolvers/types/ConflictResolution';
 import { deepEqual } from '../../utils/json';
 import { isBelowVersion, isAboveVersion } from '../../utils/version';
 import { TemplateDataSource } from '../TemplateDataSource';
@@ -239,27 +239,27 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     }
 
     if (!templateExport.template) {
-      errors.push('Template is missing');
+      throw new Error('Template field is missing');
     }
 
     if (!templateExport.templateSteps) {
-      errors.push('TemplateSteps is missing');
+      throw new Error('TemplateSteps field is missing');
     }
 
     if (!templateExport.questions) {
-      errors.push('Questions is missing');
+      throw new Error('Questions field is missing');
     }
 
     if (!templateExport.template.name) {
-      errors.push('Template name is missing');
+      throw new Error('Template.name field is missing');
     }
 
     if (!templateExport.template.description) {
-      errors.push('Template description is missing');
+      throw new Error('Template.description field is missing');
     }
 
     if (!templateExport.template.groupId) {
-      errors.push('Template group is missing');
+      throw new Error('Template.group field is missing');
     }
 
     const questionIds = templateExport.questions.map((question) => question.id);
@@ -290,7 +290,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         questionComparisons.push({
           existingQuestion: null,
           newQuestion: newQuestion,
-          status: QuestionComparisonStatus.NEW,
+          status: ComparisonStatus.NEW,
           conflictResolutionStrategy: ConflictResolutionStrategy.USE_NEW,
         });
       } else {
@@ -298,7 +298,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           questionComparisons.push({
             existingQuestion: existingQuestion,
             newQuestion: newQuestion,
-            status: QuestionComparisonStatus.SAME,
+            status: ComparisonStatus.SAME,
             conflictResolutionStrategy: ConflictResolutionStrategy.USE_EXISTING,
           });
         } else {
@@ -310,7 +310,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           questionComparisons.push({
             existingQuestion: existingQuestion,
             newQuestion: newQuestion,
-            status: QuestionComparisonStatus.DIFFERENT,
+            status: ComparisonStatus.DIFFERENT,
             conflictResolutionStrategy: ConflictResolutionStrategy.UNRESOLVED,
           });
         }
@@ -1036,7 +1036,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     await Promise.all(
       questions.map(async (question) => {
         const conflictResolution = conflictResolutions.find(
-          (resolution) => resolution.questionId === question.id
+          (resolution) => resolution.itemId === question.id
         );
         switch (conflictResolution?.strategy) {
           case ConflictResolutionStrategy.USE_NEW:

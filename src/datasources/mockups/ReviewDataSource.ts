@@ -1,8 +1,8 @@
 import { Review, ReviewWithNextProposalStatus } from '../../models/Review';
 import { TechnicalReview } from '../../models/TechnicalReview';
-import { AddReviewArgs } from '../../resolvers/mutations/AddReviewMutation';
 import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReviewMutation';
+import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
 import { ReviewDataSource } from '../ReviewDataSource';
 
 export const dummyReview = new Review(4, 10, 1, 'Good proposal', 9, 0, 1);
@@ -41,7 +41,7 @@ export class ReviewDataSourceMock implements ReviewDataSource {
     return dummyReview;
   }
 
-  async updateReview(args: AddReviewArgs): Promise<Review> {
+  async updateReview(args: UpdateReviewArgs): Promise<Review> {
     return dummyReview;
   }
   async getProposalReviews(id: number): Promise<Review[]> {
