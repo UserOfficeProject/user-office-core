@@ -3,7 +3,11 @@ import React from 'react';
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
 
 const BooleanAnswerRenderer: AnswerRenderer = ({ value }) => {
-  return <span>{value ? 'Yes' : 'No'}</span>;
+  if (value === null || value === undefined) {
+    return <span>Not answered</span>;
+  }
+
+  return <span>{value === true ? 'Yes' : 'No'}</span>;
 };
 
 export default BooleanAnswerRenderer;

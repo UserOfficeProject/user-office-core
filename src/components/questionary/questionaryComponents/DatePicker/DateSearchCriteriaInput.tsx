@@ -10,7 +10,6 @@ import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
-import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import React, { useState } from 'react';
 
 import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
@@ -20,8 +19,8 @@ function DateSearchCriteriaInput({
   onChange,
   searchCriteria,
 }: SearchCriteriaInputProps) {
-  const [value, setValue] = useState<Date | null>(
-    searchCriteria ? new Date(searchCriteria?.value as string) : null
+  const [value, setValue] = useState<string | null>(
+    searchCriteria ? (searchCriteria?.value as string) : null
   );
   const [comparator, setComparator] = useState<QuestionFilterCompareOperator>(
     searchCriteria?.compareOperator ?? QuestionFilterCompareOperator.EQUALS
@@ -40,7 +39,7 @@ function DateSearchCriteriaInput({
                 .value as QuestionFilterCompareOperator;
               setComparator(newComparator);
               if (value) {
-                onChange(newComparator, value.toISOString());
+                onChange(newComparator, value);
               }
             }}
             value={comparator}
@@ -71,17 +70,11 @@ function DateSearchCriteriaInput({
             autoOk={true}
             label="Date"
             value={value}
-            onChange={(date: MaterialUiPickersDate) => {
-              /*
-              DateFnsUtils uses native Date object, but use of Luxon elsewhere (in call modal)
-              causes incorrect type inference: https://github.com/dmtrKovalenko/date-io/issues/584
-              */
-              const newDate = date as unknown as Date;
-              if (newDate && !isNaN(newDate.getTime())) {
-                newDate.setUTCHours(0, 0, 0, 0);
-                onChange(comparator, newDate.toISOString());
+            onChange={(_date, value) => {
+              if (typeof value === 'string') {
+                onChange(comparator, value);
+                setValue(value);
               }
-              setValue(newDate);
             }}
             InputLabelProps={{
               shrink: value ? true : undefined,

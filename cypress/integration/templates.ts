@@ -254,7 +254,7 @@ context('Template tests', () => {
         cy.updateQuestion({
           id: createdQuestion.id,
           question: dateQuestion.title,
-          config: `{"required":true, "includeTime": false,"tooltip": "${dateQuestion.tooltip}"}`,
+          config: `{"required":false, "includeTime": false,"tooltip": "${dateQuestion.tooltip}"}`,
         });
 
         if (shouldAddQuestionsToTemplate) {
@@ -300,6 +300,7 @@ context('Template tests', () => {
         cy.updateQuestion({
           id: createdQuestion.id,
           question: fileQuestion,
+          config: `{"file_type":[".pdf",".docx","image/*"]}`,
         });
 
         if (shouldAddQuestionsToTemplate) {
@@ -540,7 +541,7 @@ context('Template tests', () => {
 
       /* File */
 
-      cy.createFileUploadQuestion(fileQuestion);
+      cy.createFileUploadQuestion(fileQuestion, ['.pdf', 'image/*']);
 
       /* --- */
 
@@ -1032,7 +1033,7 @@ context('Template tests', () => {
         });
 
         if (contains.length === 0) {
-          cy.get('[role="listbox"]').children().should('have.length', 0);
+          cy.get('[role="listbox"]').children().should('have.length', 2);
         }
 
         if (select) {
@@ -1320,13 +1321,13 @@ context('Template tests', () => {
 
       cy.contains(fileQuestion).click();
 
+      cy.get('[role="presentation"]').contains('image/*').click();
+
+      cy.get('body').type('{esc}');
+
       cy.contains('Is required').click();
 
       cy.contains('Update').click();
-
-      cy.contains(fileQuestion)
-        .parent()
-        .dragElement([{ direction: 'left', length: 1 }]);
 
       cy.logout();
 
@@ -1334,6 +1335,10 @@ context('Template tests', () => {
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+
+      cy.get('[data-cy=title] input').type(faker.lorem.words(2));
+      cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
+      cy.contains('Save and continue').click();
 
       cy.contains(fileQuestion);
       cy.contains('Save and continue').click();
@@ -1583,7 +1588,7 @@ context('Template tests', () => {
     });
 
     it('User can add captions after uploading image/* file', () => {
-      const fileName = 'file_upload_test.png';
+      const fileName = 'file_upload_test2.png'; // need to use another file due to bug in cypress, which do not allow the same fixture to be reused
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
@@ -1596,23 +1601,6 @@ context('Template tests', () => {
         }
       });
 
-      cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[title='Edit']")
-        .first()
-        .click();
-
-      cy.contains(fileQuestion)
-        .parent()
-        .dragElement([{ direction: 'left', length: 1 }]);
-
-      cy.logout();
-
       cy.login('user');
       cy.visit('/');
 
@@ -1621,6 +1609,8 @@ context('Template tests', () => {
         .find('[title="Edit proposal"]')
         .click();
       cy.finishedLoading();
+
+      cy.contains('Save and continue').click();
 
       cy.contains(fileQuestion);
 
@@ -1660,12 +1650,11 @@ context('Template tests', () => {
       cy.contains(fileName);
 
       cy.get('[data-cy="questionary-stepper"]')
-        .contains('New proposal')
+        .contains(initialDBData.template.topic.title)
         .click();
 
-      cy.get('[data-cy="co-proposers"]').should('exist');
-
       cy.finishedLoading();
+      cy.contains('Save and continue');
 
       cy.contains(fileQuestion)
         .parent()
@@ -1676,6 +1665,164 @@ context('Template tests', () => {
         .parent()
         .find('[data-cy="image-figure"] input')
         .should('have.value', 'Fig_test');
+    });
+  });
+
+  describe('File upload tests', () => {
+    beforeEach(() => {
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find("[title='Edit']")
+        .first()
+        .click();
+
+      cy.createFileUploadQuestion(fileQuestion, ['.pdf', '.docx', 'image/*']);
+
+      cy.login('user');
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+
+      cy.get('[data-cy=title] input').type('title');
+
+      cy.get('[data-cy=abstract] textarea').first().type('abstract');
+
+      cy.contains('Save and continue').click();
+
+      cy.contains(fileQuestion);
+    });
+
+    it('Accepted formats are displayed', () => {
+      cy.contains('.pdf');
+      cy.contains('.docx');
+      cy.contains('any image');
+    });
+
+    it('File without extension cannot be uploaded', () => {
+      const fileName = 'file_without_ext';
+
+      cy.get('input[type="file"]').attachFixture({
+        filePath: fileName,
+        fileName: fileName,
+        mimeType: 'application/pdf',
+      });
+
+      cy.contains('Incorrect file type');
+    });
+
+    it('File with incorrect content header cannot be uploaded', () => {
+      const fileName = 'file_upload_test.png';
+
+      cy.get('input[type="file"]').attachFixture({
+        filePath: fileName,
+        fileName: fileName,
+        mimeType: 'application/octet-stream',
+      });
+
+      cy.contains('Incorrect file type');
+    });
+
+    it('Unidentifiable disguised file is uploaded but not accepted', () => {
+      const fileName = 'unidentifiable_file.pdf';
+
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
+      cy.get('input[type="file"]').attachFixture({
+        filePath: fileName,
+        fileName: fileName,
+        mimeType: 'application/pdf',
+      });
+
+      // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
+      cy.wait('@upload', { requestTimeout: 30000 });
+
+      cy.contains(fileName);
+
+      cy.contains('Save and continue').click();
+
+      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+    });
+
+    it('Identifiable disguised file is uploaded but not accepted', () => {
+      const fileName = 'mp3_file.pdf';
+
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
+      cy.get('input[type="file"]').attachFixture({
+        filePath: fileName,
+        fileName: fileName,
+        mimeType: 'application/pdf',
+      });
+
+      // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
+      cy.wait('@upload', { requestTimeout: 30000 });
+
+      cy.contains(fileName);
+
+      cy.contains('Save and continue').click();
+
+      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
+    });
+
+    it('Question is not accepted when one of many files is invalid', () => {
+      const validFile = 'file_upload_test.png';
+      const invalidFile = 'mp3_file.pdf';
+
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
+      cy.get('input[type="file"]').attachFixture({
+        filePath: validFile,
+        fileName: validFile,
+        mimeType: 'image/png',
+      });
+
+      // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
+      cy.wait('@upload', { requestTimeout: 30000 });
+
+      cy.contains(validFile);
+
+      cy.contains('Save and continue').click();
+
+      cy.notification({ variant: 'success', text: 'Saved' });
+
+      cy.contains('Back').click();
+
+      cy.contains(fileQuestion);
+      cy.contains(validFile);
+
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
+      cy.get('input[type="file"]').attachFixture({
+        filePath: invalidFile,
+        fileName: invalidFile,
+        mimeType: 'application/pdf',
+      });
+
+      // wait for the '/files/upload' request, and leave a 30 seconds delay before throwing an error
+      cy.wait('@upload', { requestTimeout: 30000 });
+
+      cy.contains(invalidFile);
+
+      cy.contains('Save and continue').click();
+
+      cy.notification({ variant: 'error', text: 'not satisfying constraint' });
     });
   });
 });
