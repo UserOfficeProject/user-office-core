@@ -1036,7 +1036,7 @@ context('Settings tests', () => {
             url: '/graphql',
             body: {
               query:
-                'query { proposalsView(filter: {}) { primaryKey title proposalId}}',
+                'query { proposalsView(filter: {}) { totalCount proposalViews { primaryKey title proposalId }}}',
             },
             auth: {
               bearer: (accessToken as string).split(' ')[1],
@@ -1046,7 +1046,10 @@ context('Settings tests', () => {
               'application/json'
             );
             expect(response.status).to.be.equal(200);
-            expect(response.body.data.proposalsView).to.be.an('array');
+            expect(response.body.data.proposalsView).to.be.deep.equal({
+              totalCount: 0,
+              proposalViews: [],
+            });
           });
         });
     });
@@ -1089,7 +1092,7 @@ context('Settings tests', () => {
             url: '/graphql',
             body: {
               query:
-                'query { proposalsView(filter: {}) { primaryKey title proposalId}}',
+                'query { proposalsView(filter: {}) { totalCount proposalViews { primaryKey title proposalId }}}',
             },
             auth: {
               bearer: removedAccessToken.split(' ')[1],
