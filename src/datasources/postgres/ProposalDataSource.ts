@@ -1,5 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import BluePromise from 'bluebird';
+import { Knex } from 'knex';
 import { injectable } from 'tsyringe';
 
 import { Event } from '../../events/event.enum';
@@ -14,7 +15,10 @@ import {
 } from '../../resolvers/types/ProposalBooking';
 import { UserProposalsFilter } from '../../resolvers/types/User';
 import { ProposalDataSource } from '../ProposalDataSource';
-import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
+import {
+  ProposalsFilter,
+  QuestionFilterInput,
+} from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
 import {
   CallRecord,
@@ -283,6 +287,32 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
+  addQuestionFilter(
+    query: Knex.QueryBuilder,
+    questionFilter: QuestionFilterInput
+  ) {
+    const questionFilterQuery = getQuestionDefinition(
+      questionFilter.dataType
+    ).filterQuery;
+
+    if (!questionFilterQuery) {
+      throw new Error(
+        `Filter query not implemented for ${questionFilter.dataType}`
+      );
+    }
+
+    query
+      .leftJoin(
+        'answers',
+        'answers.questionary_id',
+        'proposal_table_view.questionary_id'
+      )
+      .andWhere('answers.question_id', questionFilter.questionId)
+      .modify(questionFilterQuery, questionFilter);
+
+    return query;
+  }
+
   async getProposalsFromView(
     filter?: ProposalsFilter
   ): Promise<ProposalView[]> {
@@ -318,22 +348,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
         if (filter?.questionFilter) {
           const questionFilter = filter.questionFilter;
-          const questionFilterQuery = getQuestionDefinition(
-            questionFilter.dataType
-          ).filterQuery;
-          if (!questionFilterQuery) {
-            throw new Error(
-              `Filter query not implemented for ${filter.questionFilter.dataType}`
-            );
-          }
-          query
-            .leftJoin(
-              'answers',
-              'answers.questionary_id',
-              'proposal_table_view.questionary_id'
-            )
-            .andWhere('answers.question_id', questionFilter.questionId)
-            .modify(questionFilterQuery, questionFilter);
+
+          this.addQuestionFilter(query, questionFilter);
         }
       })
       .then((proposals: ProposalViewRecord[]) => {
@@ -468,22 +484,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
         if (filter?.questionFilter) {
           const questionFilter = filter.questionFilter;
-          const questionFilterQuery = getQuestionDefinition(
-            questionFilter.dataType
-          ).filterQuery;
-          if (!questionFilterQuery) {
-            throw new Error(
-              `Filter query not implemented for ${filter.questionFilter.dataType}`
-            );
-          }
-          query
-            .leftJoin(
-              'answers',
-              'answers.questionary_id',
-              'proposal_table_view.questionary_id'
-            )
-            .andWhere('answers.question_id', questionFilter.questionId)
-            .modify(questionFilterQuery, questionFilter);
+
+          this.addQuestionFilter(query, questionFilter);
         }
 
         if (first) {
