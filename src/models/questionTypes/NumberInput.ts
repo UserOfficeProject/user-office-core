@@ -16,8 +16,10 @@ export const numberInputDefinition: Question = {
   dataType: DataType.NUMBER_INPUT,
   getDefaultAnswer: (field) => {
     return {
-      value: '',
       unit: (field.config as NumberInputConfig).units?.[0] || null,
+      value: '',
+      siUnits: 0,
+      siValue: '',
     };
   },
   validate: (
