@@ -32,7 +32,10 @@ export interface Question {
   /**
    * Perform validation rules before persisting data into the database
    */
-  readonly validate?: (field: QuestionTemplateRelation, value: any) => boolean;
+  readonly validate?: (
+    field: QuestionTemplateRelation,
+    value: any
+  ) => Promise<boolean>;
 
   /**
    * Question can contain configuration, e.g. isRequired, maxValue, etc,

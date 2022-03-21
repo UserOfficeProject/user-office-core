@@ -86,10 +86,10 @@ export function areDependenciesSatisfied(
   );
 }
 
-export function isMatchingConstraints(
+export async function isMatchingConstraints(
   questionTemplateRelation: QuestionTemplateRelation,
   value: any
-): boolean {
+): Promise<boolean> {
   const definition = getQuestionDefinition(
     questionTemplateRelation.question.dataType
   );
