@@ -295,7 +295,9 @@ context('Proposal administration tests', () => {
       cy.contains('Title')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
-        .dblclick();
+        .click();
+
+      cy.finishedLoading();
 
       cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
         officerProposalsTableAsTextAfterSort = element.text();
@@ -315,7 +317,7 @@ context('Proposal administration tests', () => {
       cy.contains('Title')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
-        .should('have.attr', 'aria-sort', 'Descendant');
+        .should('have.attr', 'aria-sort', 'Ascendant');
 
       cy.contains('Calls').click();
 
@@ -351,13 +353,13 @@ context('Proposal administration tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
-      cy.contains('Title').dblclick();
       cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.contains('Title').click();
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
 
       cy.get('table tbody tr input[type="checkbox"]').first().click();
 
-      cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
     });
 
     it('User officer should see Reviews tab before doing the Admin(management decision)', () => {

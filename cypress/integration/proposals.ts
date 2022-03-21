@@ -418,7 +418,6 @@ context('Proposal tests', () => {
         .uncheck();
 
       cy.contains('SEP Meeting').parent().find('[type="checkbox"]').check();
-
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.finishedLoading();
@@ -442,8 +441,10 @@ context('Proposal tests', () => {
         ],
       });
 
-      cy.contains(newProposalTitle).parent().find('[type="checkbox"]').check();
-
+      cy.contains(clonedProposalTitle)
+        .parent()
+        .find('[type="checkbox"]')
+        .check();
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.get('[role="presentation"]')

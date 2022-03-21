@@ -64,6 +64,14 @@ type ProposalWithCallInstrumentAndSepId = ProposalPkWithCallId & {
   statusId: number;
 };
 
+export type QueryParameters = {
+  first?: number;
+  offset?: number;
+  sortField?: string | undefined;
+  sortDirection?: string | undefined;
+  searchText?: string | undefined;
+};
+
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
   urlQueryParams,
@@ -89,17 +97,47 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
-  const { loading, setProposalsData, proposalsData } =
-    useProposalsCoreData(proposalFilter);
+
+  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
+  const prefetchSize = 200;
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [query, setQuery] = useState<QueryParameters>({
+    first: prefetchSize,
+    offset: 0,
+    sortField: urlQueryParams?.sortField,
+    sortDirection: urlQueryParams?.sortDirection ?? undefined,
+    searchText: urlQueryParams?.search ?? undefined,
+  });
+  const { loading, setProposalsData, proposalsData, totalCount } =
+    useProposalsCoreData(proposalFilter, query);
 
   useEffect(() => {
     setPreselectedProposalsData(proposalsData);
-  }, [proposalsData]);
+  }, [proposalsData, query]);
+
+  useEffect(() => {
+    let isMounted = true;
+    let endSlice = rowsPerPage * (currentPage + 1);
+    endSlice = endSlice == 0 ? prefetchSize + 1 : endSlice + 1; // Final page of a loaded section would produce the slice (x, 0) without this
+    if (isMounted) {
+      setTableData(
+        preselectedProposalsData.slice(
+          (currentPage * rowsPerPage) % prefetchSize,
+          endSlice
+        )
+      );
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentPage, rowsPerPage, preselectedProposalsData, query]);
 
   useEffect(() => {
     if (urlQueryParams.selection.length > 0) {
       const selection = new Set(urlQueryParams.selection);
-
       setPreselectedProposalsData((preselectedProposalsData) => {
         const selected: ProposalWithCallInstrumentAndSepId[] = [];
         const preselected = preselectedProposalsData.map((proposal) => {
@@ -206,7 +244,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     },
     {
       title: 'Technical time allocation',
-      render: (rowData) =>
+      render: (rowData: ProposalViewData) =>
         rowData.technicalTimeAllocation
           ? `${rowData.technicalTimeAllocation}(${rowData.allocationTimeUnit}s)`
           : '',
@@ -218,7 +256,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     },
     {
       title: 'Final time allocation',
-      render: (rowData) =>
+      render: (rowData: ProposalViewData) =>
         rowData.managementTimeAllocation
           ? `${rowData.managementTimeAllocation}(${rowData.allocationTimeUnit}s)`
           : '',
@@ -230,7 +268,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     },
     {
       title: 'Submitted',
-      render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
+      render: (rowData: ProposalViewData) => (rowData.submitted ? 'Yes' : 'No'),
     },
     {
       title: 'Status',
@@ -250,7 +288,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     },
     {
       title: 'Notified',
-      render: (rowData) => (rowData.notified ? 'Yes' : 'No'),
+      render: (rowData: ProposalViewData) => (rowData.notified ? 'Yes' : 'No'),
     },
     {
       title: 'Instrument',
@@ -264,7 +302,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       title: 'SEP',
       field: 'sepCode',
     },
-  ];
+  ].map((v: Column<ProposalViewData>) => {
+    v.customSort = () => 0; // Disables client side sorting
+
+    return v;
+  });
 
   // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.
   if (localStorageValue) {
@@ -632,11 +674,26 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           </Typography>
         }
         columns={columns}
-        data={preselectedProposalsData.map((proposal) =>
+        totalCount={totalCount}
+        page={currentPage}
+        onPageChange={(page, pageSize) => {
+          const newOffset =
+            Math.floor((pageSize * page) / prefetchSize) * prefetchSize;
+          if (page !== currentPage && newOffset != query.offset) {
+            setQuery({ ...query, offset: newOffset });
+          }
+          setCurrentPage(page);
+        }}
+        onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
+        data={tableData.map((proposal) =>
           Object.assign(proposal, { id: proposal.primaryKey })
         )}
         isLoading={loading}
         onSearchChange={(searchText) => {
+          setQuery({
+            ...query,
+            searchText: searchText ? searchText : undefined,
+          });
           setUrlQueryParams({ search: searchText ? searchText : undefined });
         }}
         onSelectionChange={(selectedItems) => {
@@ -777,8 +834,23 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             setUrlQueryParams((params) => ({
               ...params,
               sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
+              sortField:
+                orderedColumnId >= 0
+                  ? columns[orderedColumnId].field?.toString()
+                  : undefined,
               sortDirection: orderDirection ? orderDirection : undefined,
             }));
+          if (orderDirection && orderedColumnId > 0) {
+            setQuery({
+              ...query,
+              sortField: columns[orderedColumnId].field?.toString(),
+              sortDirection: orderDirection,
+            });
+          } else {
+            delete query.sortField;
+            delete query.sortDirection;
+            setQuery(query);
+          }
         }}
       />
     </>
