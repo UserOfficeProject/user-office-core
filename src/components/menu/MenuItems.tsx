@@ -269,7 +269,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
       </ListItem>
-      <ListItem component={NavLink} to="/SEPPage" button>
+      <ListItem component={NavLink} to="/SEPs" button>
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
@@ -299,7 +299,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItem>
-      <ListItem component={NavLink} to="/InstrumentPage" button>
+      <ListItem component={NavLink} to="/Instruments" button>
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
