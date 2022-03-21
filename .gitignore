@@ -6,6 +6,8 @@ coverage
 downloads
 uploads
 
+.idea
+
 .vscode/tasks.json
 .vscode/launch.json
 .vscode/settings.json
