@@ -1,3 +1,5 @@
+import { DataType } from '../../src/generated/sdk';
+
 // NOTE: Instruments, proposal and scheduled events are seeded only if resetDB(true).
 export default {
   call: {
@@ -13,14 +15,114 @@ export default {
     },
   },
   questions: {
+    boolean: {
+      id: 'boolean_question',
+      text: 'Boolean question from seeds',
+      type: DataType.BOOLEAN,
+    },
+    date: {
+      id: 'date_question',
+      text: 'Date question from seeds',
+      type: DataType.DATE,
+    },
+    embellishment: {
+      id: 'embellishment_question',
+      text: 'Embellishment question from seeds',
+      type: DataType.EMBELLISHMENT,
+    },
+    fileUpload: {
+      id: 'file_upload_question',
+      text: 'File upload question from seeds',
+      type: DataType.FILE_UPLOAD,
+    },
+    interval: {
+      id: 'interval_question',
+      text: 'Interval question from seeds',
+      type: DataType.INTERVAL,
+    },
+    numberInput: {
+      id: 'number_question',
+      text: 'Number question from seeds',
+      type: DataType.NUMBER_INPUT,
+    },
+    richTextInput: {
+      id: 'rich_text_input_question',
+      text: 'Rich text input question from seeds',
+      type: DataType.RICH_TEXT_INPUT,
+    },
+    selectionFromOptions: {
+      id: 'selection_from_options_question',
+      text: 'Selection from options question from seeds',
+      type: DataType.SELECTION_FROM_OPTIONS,
+    },
+    textInput: {
+      id: 'text_input_question',
+      text: 'Text input question from seeds',
+      type: DataType.TEXT_INPUT,
+    },
     addSamples: {
-      id: 1,
+      id: 'sample_declaration_question',
       text: 'Add samples',
+      type: DataType.SAMPLE_DECLARATION,
+    },
+  },
+  answers: {
+    proposal: {
+      boolean: {
+        value: true,
+      },
+      date: {
+        value: '2030-01-01',
+      },
+      embellishment: {
+        value: '<h1>Embellishment value<h1>',
+      },
+      fileUpload: {
+        value: { id: '1c4b2ca8-f849-42db-b5d6-35aba2b26f8b' },
+      },
+      interval: {
+        value: {
+          max: 100,
+          min: 1,
+          unit: {
+            id: 'meter',
+            unit: 'meter',
+            symbol: 'm',
+            quantity: 'length',
+            siConversionFormula: 'x',
+          },
+          siMax: 100,
+          siMin: 1,
+        },
+      },
+      numberInput: {
+        value: {
+          unit: {
+            id: 'centimeter',
+            unit: 'centimeter',
+            symbol: 'cm',
+            quantity: 'length',
+            siConversionFormula: 'x / 100',
+          },
+          value: 99,
+          siValue: 0.99,
+        },
+      },
+      richTextInput: {
+        value: {},
+      },
+      selectionFromOptions: {
+        value: ['One'],
+      },
+      textInput: {
+        value: 'Text input answer from seeds',
+      },
     },
   },
   proposal: {
     id: 1,
     title: 'Test proposal',
+    questionaryId: 1,
   },
   instrument1: {
     id: 1,

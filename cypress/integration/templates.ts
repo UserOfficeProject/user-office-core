@@ -254,7 +254,7 @@ context('Template tests', () => {
         cy.updateQuestion({
           id: createdQuestion.id,
           question: dateQuestion.title,
-          config: `{"required":true, "includeTime": false,"tooltip": "${dateQuestion.tooltip}"}`,
+          config: `{"required":false, "includeTime": false,"tooltip": "${dateQuestion.tooltip}"}`,
         });
 
         if (shouldAddQuestionsToTemplate) {
@@ -1033,7 +1033,7 @@ context('Template tests', () => {
         });
 
         if (contains.length === 0) {
-          cy.get('[role="listbox"]').children().should('have.length', 0);
+          cy.get('[role="listbox"]').children().should('have.length', 2);
         }
 
         if (select) {
@@ -1329,16 +1329,16 @@ context('Template tests', () => {
 
       cy.contains('Update').click();
 
-      cy.contains(fileQuestion)
-        .parent()
-        .dragElement([{ direction: 'left', length: 1 }]);
-
       cy.logout();
 
       cy.login('user');
       cy.visit('/');
 
       cy.contains('New Proposal').click();
+
+      cy.get('[data-cy=title] input').type(faker.lorem.words(2));
+      cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
+      cy.contains('Save and continue').click();
 
       cy.contains(fileQuestion);
       cy.contains('Save and continue').click();
@@ -1588,7 +1588,7 @@ context('Template tests', () => {
     });
 
     it('User can add captions after uploading image/* file', () => {
-      const fileName = 'file_upload_test.png';
+      const fileName = 'file_upload_test2.png'; // need to use another file due to bug in cypress, which do not allow the same fixture to be reused
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal.proposal;
         if (createdProposal) {
@@ -1601,23 +1601,6 @@ context('Template tests', () => {
         }
       });
 
-      cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[title='Edit']")
-        .first()
-        .click();
-
-      cy.contains(fileQuestion)
-        .parent()
-        .dragElement([{ direction: 'left', length: 1 }]);
-
-      cy.logout();
-
       cy.login('user');
       cy.visit('/');
 
@@ -1626,6 +1609,8 @@ context('Template tests', () => {
         .find('[title="Edit proposal"]')
         .click();
       cy.finishedLoading();
+
+      cy.contains('Save and continue').click();
 
       cy.contains(fileQuestion);
 
@@ -1665,12 +1650,11 @@ context('Template tests', () => {
       cy.contains(fileName);
 
       cy.get('[data-cy="questionary-stepper"]')
-        .contains('New proposal')
+        .contains(initialDBData.template.topic.title)
         .click();
 
-      cy.get('[data-cy="co-proposers"]').should('exist');
-
       cy.finishedLoading();
+      cy.contains('Save and continue');
 
       cy.contains(fileQuestion)
         .parent()
