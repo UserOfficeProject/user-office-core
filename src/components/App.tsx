@@ -114,12 +114,21 @@ const Routes: React.FC<RouteProps> = () => {
 };
 
 class App extends React.Component {
-  static getDerivedStateFromError(): void {
+  state = { errorUserInformation: '' };
+  static getDerivedStateFromError() {
     // Update state so the next render will show the fallback UI.
+    const user = localStorage.getItem('user');
+    const errorUserInformation = {
+      id: user ? JSON.parse(user).id : 'Not logged in',
+      currentRole: localStorage.getItem('currentRole'),
+    };
+
     localStorage.removeItem('token');
     localStorage.removeItem('currentRole');
     localStorage.removeItem('user');
     localStorage.removeItem('expToken');
+
+    return { errorUserInformation };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
@@ -128,6 +137,7 @@ class App extends React.Component {
       errorMessage = JSON.stringify({
         error: error.toString(),
         errorInfo: errorInfo.componentStack.toString(),
+        user: this.state.errorUserInformation,
       });
     } catch (e) {
       errorMessage = 'Exception while preparing error message';

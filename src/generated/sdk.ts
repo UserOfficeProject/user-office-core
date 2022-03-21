@@ -602,7 +602,6 @@ export type MoveProposalWorkflowStatusInput = {
 export type Mutation = {
   addClientLog: SuccessResponseWrap;
   addProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
-  addReview: ReviewWithNextStatusResponseWrap;
   addSamplesToShipment: ShipmentResponseWrap;
   addStatusChangingEventsToConnection: ProposalStatusChangingEventResponseWrap;
   addTechnicalReview: TechnicalReviewResponseWrap;
@@ -720,6 +719,7 @@ export type Mutation = {
   updateQuestion: QuestionResponseWrap;
   updateQuestionTemplateRelation: TemplateResponseWrap;
   updateQuestionTemplateRelationSettings: TemplateResponseWrap;
+  updateReview: ReviewWithNextStatusResponseWrap;
   updateSEP: SepResponseWrap;
   updateSEPTimeAllocation: SepProposalResponseWrap;
   updateSample: SampleResponseWrap;
@@ -744,15 +744,6 @@ export type MutationAddClientLogArgs = {
 
 export type MutationAddProposalWorkflowStatusArgs = {
   newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput;
-};
-
-
-export type MutationAddReviewArgs = {
-  comment: Scalars['String'];
-  grade: Scalars['Int'];
-  reviewID: Scalars['Int'];
-  sepID: Scalars['Int'];
-  status: ReviewStatus;
 };
 
 
@@ -1464,6 +1455,15 @@ export type MutationUpdateQuestionTemplateRelationSettingsArgs = {
   dependenciesOperator?: InputMaybe<DependenciesLogicOperator>;
   questionId: Scalars['String'];
   templateId: Scalars['Int'];
+};
+
+
+export type MutationUpdateReviewArgs = {
+  comment: Scalars['String'];
+  grade: Scalars['Int'];
+  reviewID: Scalars['Int'];
+  sepID: Scalars['Int'];
+  status: ReviewStatus;
 };
 
 
@@ -3999,7 +3999,7 @@ export type SubmitTechnicalReviewMutationVariables = Exact<{
 
 export type SubmitTechnicalReviewMutation = { submitTechnicalReview: { rejection: { reason: string, context: string | null, exception: string | null } | null, technicalReview: { id: number } | null } };
 
-export type AddReviewMutationVariables = Exact<{
+export type UpdateReviewMutationVariables = Exact<{
   reviewID: Scalars['Int'];
   grade: Scalars['Int'];
   comment: Scalars['String'];
@@ -4008,7 +4008,7 @@ export type AddReviewMutationVariables = Exact<{
 }>;
 
 
-export type AddReviewMutation = { addReview: { rejection: { reason: string, context: string | null, exception: string | null } | null, review: { id: number, userID: number, status: ReviewStatus, comment: string | null, grade: number | null, sepID: number, nextProposalStatus: { id: number | null, shortCode: string | null, name: string | null } | null } | null } };
+export type UpdateReviewMutation = { updateReview: { rejection: { reason: string, context: string | null, exception: string | null } | null, review: { id: number, userID: number, status: ReviewStatus, comment: string | null, grade: number | null, sepID: number, nextProposalStatus: { id: number | null, shortCode: string | null, name: string | null } | null } | null } };
 
 export type UserWithReviewsQueryVariables = Exact<{
   callId?: InputMaybe<Scalars['Int']>;
@@ -4363,7 +4363,7 @@ export type CreateTemplateMutationVariables = Exact<{
 }>;
 
 
-export type CreateTemplateMutation = { createTemplate: { template: { questionaryCount: number, templateId: number, name: string, description: string | null, isArchived: boolean, steps: Array<{ topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean } }> } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
+export type CreateTemplateMutation = { createTemplate: { template: { questionaryCount: number, isArchived: boolean, templateId: number, groupId: TemplateGroupId, name: string, description: string | null, steps: Array<{ topic: { title: string, id: number, templateId: number, sortOrder: number, isEnabled: boolean }, fields: Array<{ sortOrder: number, topicId: number, dependenciesOperator: DependenciesLogicOperator | null, question: { id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string }, dependencies: Array<{ questionId: string, dependencyId: string, dependencyNaturalKey: string, condition: { condition: EvaluatorOperator, params: any } }> }> }>, complementaryQuestions: Array<{ id: string, question: string, naturalKey: string, dataType: DataType, categoryId: TemplateCategoryId, config: { small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string, minDate: string | null, maxDate: string | null, defaultDate: string | null, includeTime: boolean } | { html: string, plain: string, omitFromPdf: boolean } | { small_label: string, required: boolean, tooltip: string } | { file_type: Array<string>, max_files: number, small_label: string, required: boolean, tooltip: string } | { titlePlaceholder: string, questionLabel: string } | { small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { numberValueConstraint: NumberValueConstraint | null, small_label: string, required: boolean, tooltip: string, units: Array<{ id: string, unit: string, quantity: string, symbol: string, siConversionFormula: string }> } | { tooltip: string } | { tooltip: string } | { small_label: string, required: boolean, tooltip: string, max: number | null } | { titlePlaceholder: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, esiTemplateId: number | null, templateCategory: string, required: boolean, small_label: string } | { tooltip: string } | { variant: string, options: Array<string>, isMultipleSelect: boolean, small_label: string, required: boolean, tooltip: string } | { small_label: string, required: boolean, tooltip: string } | { addEntryButtonLabel: string, minEntries: number | null, maxEntries: number | null, templateId: number | null, templateCategory: string, required: boolean, small_label: string } | { min: number | null, max: number | null, multiline: boolean, placeholder: string, small_label: string, required: boolean, tooltip: string, htmlQuestion: string | null, isHtmlQuestion: boolean, isCounterHidden: boolean } | { small_label: string, required: boolean, tooltip: string } }>, group: { groupId: TemplateGroupId, categoryId: TemplateCategoryId } } | null, rejection: { reason: string, context: string | null, exception: string | null } | null } };
 
 export type CreateTopicMutationVariables = Exact<{
   templateId: Scalars['Int'];
@@ -7195,9 +7195,9 @@ export const SubmitTechnicalReviewDocument = gql`
   }
 }
     ${RejectionFragmentDoc}`;
-export const AddReviewDocument = gql`
-    mutation addReview($reviewID: Int!, $grade: Int!, $comment: String!, $status: ReviewStatus!, $sepID: Int!) {
-  addReview(
+export const UpdateReviewDocument = gql`
+    mutation updateReview($reviewID: Int!, $grade: Int!, $comment: String!, $status: ReviewStatus!, $sepID: Int!) {
+  updateReview(
     reviewID: $reviewID
     grade: $grade
     comment: $comment
@@ -7918,7 +7918,7 @@ export const CreateTemplateDocument = gql`
     mutation createTemplate($groupId: TemplateGroupId!, $name: String!, $description: String) {
   createTemplate(groupId: $groupId, name: $name, description: $description) {
     template {
-      ...templateMetadata
+      ...template
       questionaryCount
     }
     rejection {
@@ -7926,7 +7926,7 @@ export const CreateTemplateDocument = gql`
     }
   }
 }
-    ${TemplateMetadataFragmentDoc}
+    ${TemplateFragmentDoc}
 ${RejectionFragmentDoc}`;
 export const CreateTopicDocument = gql`
     mutation createTopic($templateId: Int!, $sortOrder: Int!) {
@@ -9164,8 +9164,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     submitTechnicalReview(variables: SubmitTechnicalReviewMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SubmitTechnicalReviewMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<SubmitTechnicalReviewMutation>(SubmitTechnicalReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'submitTechnicalReview');
     },
-    addReview(variables: AddReviewMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<AddReviewMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<AddReviewMutation>(AddReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addReview');
+    updateReview(variables: UpdateReviewMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateReviewMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateReviewMutation>(UpdateReviewDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateReview');
     },
     userWithReviews(variables?: UserWithReviewsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UserWithReviewsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<UserWithReviewsQuery>(UserWithReviewsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'userWithReviews');
