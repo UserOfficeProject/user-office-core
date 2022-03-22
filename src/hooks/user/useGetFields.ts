@@ -11,11 +11,21 @@ export function useGetFields() {
   const api = useDataApi();
 
   useEffect(() => {
+    let unmounted = false;
+
     api()
       .getFields()
       .then((data) => {
+        if (unmounted) {
+          return;
+        }
+
         setFieldContent(data.getFields);
       });
+
+    return () => {
+      unmounted = true;
+    };
   }, [api]);
 
   return fieldContent;

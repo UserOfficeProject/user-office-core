@@ -1,13 +1,13 @@
-import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormLabel from '@material-ui/core/FormLabel';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import Select from '@material-ui/core/Select';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormLabel from '@mui/material/FormLabel';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import makeStyles from '@mui/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { useEffect, useState } from 'react';
 
@@ -23,15 +23,12 @@ const toArray = (input: string | string[]): string[] => {
   return input;
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   horizontalLayout: {
     flexDirection: 'row',
   },
   verticalLayout: {
     flexDirection: 'column',
-  },
-  radioGroupSpacing: {
-    marginBottom: -theme.spacing(1),
   },
 }));
 
@@ -57,10 +54,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
   }, [answer]);
 
   const handleOnChange = (
-    _evt: React.ChangeEvent<{
-      name?: string | undefined;
-      value: unknown;
-    }>,
+    _evt: SelectChangeEvent<string | string[]>,
     value: string | string[]
   ) => {
     const newValue = toArray(value);
@@ -113,7 +107,6 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
             }
             MenuProps={{
               variant: 'menu',
-              getContentAnchorEl: null,
             }}
             data-natural-key={naturalKey}
           >
@@ -131,12 +124,7 @@ export function QuestionaryComponentMultipleChoice(props: BasicComponentProps) {
 
     default:
       return (
-        <FormControl
-          required={config.required}
-          error={isError}
-          margin="dense"
-          className={classes.radioGroupSpacing}
-        >
+        <FormControl required={config.required} error={isError} margin="dense">
           <FormLabel>{label}</FormLabel>
           <RadioGroup
             id={id}

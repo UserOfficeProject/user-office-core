@@ -3,10 +3,11 @@ import MaterialTable, {
   MTableAction,
   MTableToolbar,
 } from '@material-table/core';
-import { Button, makeStyles } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import AddIcon from '@mui/icons-material/Add';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import Button from '@mui/material/Button';
+import makeStyles from '@mui/styles/makeStyles';
 import { FormikHelpers, FormikValues } from 'formik';
 import React, { useRef } from 'react';
 
@@ -35,7 +36,7 @@ function move(
 }
 
 const useStyles = makeStyles((theme) => ({
-  buttonContainer: {
+  StyledButtonContainer: {
     marginTop: theme.spacing(1),
   },
   customToolbar: {
@@ -147,13 +148,12 @@ export const FormikUICustomTable = ({
         }}
         {...props}
       />
-      <ActionButtonContainer className={classes.buttonContainer}>
+      <ActionButtonContainer className={classes.StyledButtonContainer}>
         <Button
           variant="outlined"
           onClick={() => addActionRef.current?.click()}
           data-cy="add-answer-button"
           size="small"
-          color="primary"
           startIcon={<AddIcon />}
         >
           Add

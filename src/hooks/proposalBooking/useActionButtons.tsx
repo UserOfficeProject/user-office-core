@@ -1,9 +1,9 @@
 import { Action } from '@material-table/core';
-import FeedbackIcon from '@material-ui/icons/Feedback';
-import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
-import GroupIcon from '@material-ui/icons/Group';
-import SchoolIcon from '@material-ui/icons/School';
-import moment from 'moment';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import GroupIcon from '@mui/icons-material/Group';
+import SchoolIcon from '@mui/icons-material/School';
+import { DateTime } from 'luxon';
 import React, { ReactNode, useContext } from 'react';
 import { useHistory } from 'react-router';
 
@@ -212,7 +212,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         const trainingExpiryDate: Date | null =
           registration.trainingExpiryDate || null;
 
-        if (moment(trainingExpiryDate) > parseTzLessDateTime(event.startsAt)) {
+        if (
+          trainingExpiryDate &&
+          DateTime.fromJSDate(trainingExpiryDate) >
+            parseTzLessDateTime(event.startsAt)
+        ) {
           buttonState = 'completed';
         } else {
           buttonState = 'active';

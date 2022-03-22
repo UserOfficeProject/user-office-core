@@ -1,18 +1,18 @@
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Container from '@material-ui/core/Container';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import FormLabel from '@material-ui/core/FormLabel';
-import Grid from '@material-ui/core/Grid';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Container from '@mui/material/Container';
+import CssBaseline from '@mui/material/CssBaseline';
+import FormLabel from '@mui/material/FormLabel';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { createUserValidationSchema } from '@user-office-software/duo-validation';
 import clsx from 'clsx';
 import { Field, Form, Formik } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-material-ui';
+import { CheckboxWithLabel, TextField } from 'formik-mui';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
@@ -344,8 +344,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                         </p>
                         <Button
                           fullWidth
-                          variant="contained"
-                          color="primary"
                           className={classes.orcButton}
                           onClick={() => reDirectOrcID()}
                         >
@@ -378,7 +376,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       id="email-input"
                       type="email"
                       component={TextField}
-                      margin="normal"
                       fullWidth
                       data-cy="email"
                       required
@@ -390,7 +387,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       id="password-input"
                       type="password"
                       component={TextField}
-                      margin="normal"
                       fullWidth
                       autoComplete="new-password"
                       data-cy="password"
@@ -404,7 +400,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       id="confirm-password-input"
                       type="password"
                       component={TextField}
-                      margin="normal"
                       fullWidth
                       autoComplete="new-password"
                       data-cy="confirmPassword"
@@ -440,7 +435,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       id="fname-input"
                       type="text"
                       component={TextField}
-                      margin="normal"
                       fullWidth
                       data-cy="firstname"
                       required
@@ -452,7 +446,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       id="mname-input"
                       type="text"
                       component={TextField}
-                      margin="normal"
                       fullWidth
                       data-cy="middlename"
                       disabled={!orcData}
@@ -463,7 +456,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       id="lname-input"
                       type="text"
                       component={TextField}
-                      margin="normal"
                       fullWidth
                       data-cy="lastname"
                       required
@@ -475,7 +467,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       id="pname-input"
                       type="text"
                       component={TextField}
-                      margin="normal"
                       fullWidth
                       data-cy="preferredname"
                       disabled={!orcData}
@@ -499,7 +490,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                         id="gender-input"
                         type="text"
                         component={TextField}
-                        margin="normal"
                         fullWidth
                         data-cy="othergender"
                         required
@@ -520,7 +510,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       id="birthdate-input"
                       type="date"
                       component={TextField}
-                      margin="normal"
                       fullWidth
                       data-cy="birthdate"
                       required
@@ -544,7 +533,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                         id="position-input"
                         type="text"
                         component={TextField}
-                        margin="normal"
                         fullWidth
                         data-cy="position"
                         required
@@ -556,7 +544,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                         id="department-input"
                         type="text"
                         component={TextField}
-                        margin="normal"
                         fullWidth
                         data-cy="department"
                         required
@@ -577,7 +564,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                           id="organisation-input"
                           type="text"
                           component={TextField}
-                          margin="normal"
                           fullWidth
                           data-cy="otherOrganisation"
                           required
@@ -600,7 +586,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                         id="telephone-input"
                         type="text"
                         component={TextField}
-                        margin="normal"
                         fullWidth
                         data-cy="telephone"
                         required
@@ -612,7 +597,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                         id="telephone-input-alt"
                         type="text"
                         component={TextField}
-                        margin="normal"
                         fullWidth
                         data-cy="telephone-alt"
                         disabled={!orcData}
@@ -637,7 +621,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       </>
                     ),
                   }}
-                  margin="normal"
                   data-cy="privacy-agreement"
                   disabled={!orcData}
                 />
@@ -657,7 +640,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                       </>
                     ),
                   }}
-                  margin="normal"
                   data-cy="cookie-policy"
                   disabled={!orcData}
                 />
@@ -665,8 +647,6 @@ const SignUp: React.FC<SignUpProps> = (props) => {
                 <Button
                   type="submit"
                   fullWidth
-                  variant="contained"
-                  color="primary"
                   className={classes.submit}
                   data-cy="submit"
                   disabled={

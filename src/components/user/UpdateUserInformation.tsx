@@ -1,30 +1,31 @@
-import DateFnsUtils from '@date-io/date-fns'; // choose your lib
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Chip from '@material-ui/core/Chip';
-import Grid from '@material-ui/core/Grid';
-import InputLabel from '@material-ui/core/InputLabel';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
-import DoneIcon from '@material-ui/icons/Done';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import DoneIcon from '@mui/icons-material/Done';
+import DateAdapter from '@mui/lab/AdapterLuxon';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { updateUserValidationSchema } from '@user-office-software/duo-validation';
-import dateformat from 'dateformat';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import React, { useEffect, useState, useContext } from 'react';
+import { TextField } from 'formik-mui';
+import { DatePicker } from 'formik-mui-lab';
+import { DateTime } from 'luxon';
+import React, { useState, useContext } from 'react';
 
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
-import { UpdateUserMutationVariables, User, UserRole } from 'generated/sdk';
+import { UpdateUserMutationVariables, UserRole } from 'generated/sdk';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { useGetFields } from 'hooks/user/useGetFields';
+import { useUserData } from 'hooks/user/useUserData';
 import orcid from 'images/orcid.png';
-import { ButtonContainer } from 'styles/StyledComponents';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles((theme) => ({
@@ -55,33 +56,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function UpdateUserInformation(props: { id: number }) {
-  const { user, currentRole } = useContext(UserContext);
-  const [userData, setUserData] = useState<User | null>(null);
+  const { currentRole } = useContext(UserContext);
+  const { userData, setUserData } = useUserData(props);
   const { api } = useDataApiWithFeedback();
   const fieldsContent = useGetFields();
   const { institutions, loadingInstitutions } = useInstitutionsData();
   const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const classes = useStyles();
-
-  useEffect(() => {
-    const getUserInformation = (id: number) => {
-      if (user.id !== props.id) {
-        api()
-          .getUser({ id })
-          .then((data) => {
-            setUserData({ ...(data.user as User) });
-          });
-      } else {
-        api()
-          .getUserMe()
-          .then((data) => {
-            setUserData({ ...(data.me as User) });
-          });
-      }
-    };
-    getUserInformation(props.id);
-  }, [props.id, user.id, api]);
 
   if (loadingInstitutions || !fieldsContent || !userData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />;
@@ -161,9 +143,8 @@ export default function UpdateUserInformation(props: { id: number }) {
               : userData.gender,
           othergender: userData.gender,
           nationality: userData.nationality,
-          birthdate: dateformat(
-            new Date(parseInt(userData.birthdate)),
-            'yyyy-mm-dd'
+          birthdate: DateTime.fromMillis(parseInt(userData.birthdate)).toFormat(
+            'yyyy-MM-dd'
           ),
           organisation: userData.organisation,
           department: userData.department,
@@ -227,102 +208,96 @@ export default function UpdateUserInformation(props: { id: number }) {
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={6}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <>
-                    <FormikDropdown
-                      name="user_title"
-                      label="Title"
-                      items={[
-                        { text: 'Ms.', value: 'Ms.' },
-                        { text: 'Mr.', value: 'Mr.' },
-                        { text: 'Dr.', value: 'Dr.' },
-                        { text: 'Prof.', value: 'Prof.' },
-                        { text: 'Rather not say', value: 'unspecified' },
-                      ]}
-                      data-cy="title"
-                    />
+                <LocalizationProvider dateAdapter={DateAdapter}>
+                  <FormikDropdown
+                    name="user_title"
+                    label="Title"
+                    items={[
+                      { text: 'Ms.', value: 'Ms.' },
+                      { text: 'Mr.', value: 'Mr.' },
+                      { text: 'Dr.', value: 'Dr.' },
+                      { text: 'Prof.', value: 'Prof.' },
+                      { text: 'Rather not say', value: 'unspecified' },
+                    ]}
+                    data-cy="title"
+                  />
+                  <Field
+                    name="firstname"
+                    label="Firstname"
+                    id="firstname-input"
+                    type="text"
+                    component={TextField}
+                    fullWidth
+                    data-cy="firstname"
+                  />
+                  <Field
+                    name="middlename"
+                    label="Middle name"
+                    id="middlename-input"
+                    type="text"
+                    component={TextField}
+                    fullWidth
+                    data-cy="middlename"
+                  />
+                  <Field
+                    name="lastname"
+                    label="Lastname"
+                    id="lastname-input"
+                    type="text"
+                    component={TextField}
+                    fullWidth
+                    data-cy="lastname"
+                  />
+                  <Field
+                    name="preferredname"
+                    label="Preferred name"
+                    id="preferredname-input"
+                    type="text"
+                    component={TextField}
+                    fullWidth
+                    data-cy="preferredname"
+                  />
+                  <FormikDropdown
+                    name="gender"
+                    label="Gender"
+                    items={[
+                      { text: 'Female', value: 'female' },
+                      { text: 'Male', value: 'male' },
+                      { text: 'Other', value: 'other' },
+                    ]}
+                    data-cy="gender"
+                  />
+                  {values.gender === 'other' && (
                     <Field
-                      name="firstname"
-                      label="Firstname"
-                      id="firstname-input"
+                      name="othergender"
+                      label="Please specify gender"
+                      id="othergender-input"
                       type="text"
                       component={TextField}
-                      margin="normal"
                       fullWidth
-                      data-cy="firstname"
+                      data-cy="othergender"
+                      required
                     />
-                    <Field
-                      name="middlename"
-                      label="Middle name"
-                      id="middlename-input"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="middlename"
-                    />
-                    <Field
-                      name="lastname"
-                      label="Lastname"
-                      id="lastname-input"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="lastname"
-                    />
-                    <Field
-                      name="preferredname"
-                      label="Preferred name"
-                      id="preferredname-input"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="preferredname"
-                    />
-                    <FormikDropdown
-                      name="gender"
-                      label="Gender"
-                      items={[
-                        { text: 'Female', value: 'female' },
-                        { text: 'Male', value: 'male' },
-                        { text: 'Other', value: 'other' },
-                      ]}
-                      data-cy="gender"
-                    />
-                    {values.gender === 'other' && (
-                      <Field
-                        name="othergender"
-                        label="Please specify gender"
-                        id="othergender-input"
-                        type="text"
-                        component={TextField}
-                        margin="normal"
-                        fullWidth
-                        data-cy="othergender"
-                        required
-                      />
-                    )}
-                    <FormikDropdown
-                      name="nationality"
-                      label="Nationality"
-                      items={nationalitiesList}
-                      data-cy="nationality"
-                    />
+                  )}
+                  <FormikDropdown
+                    name="nationality"
+                    label="Nationality"
+                    items={nationalitiesList}
+                    data-cy="nationality"
+                  />
 
-                    <Field
-                      name="birthdate"
-                      label="Birthdate"
-                      id="birthdate-input"
-                      format="yyyy-MM-dd"
-                      component={KeyboardDatePicker}
-                      margin="normal"
-                      fullWidth
-                      data-cy="birthdate"
-                    />
-                  </>
-                </MuiPickersUtilsProvider>
+                  <Field
+                    name="birthdate"
+                    label="Birthdate"
+                    id="birthdate-input"
+                    inputFormat="yyyy-MM-dd"
+                    component={DatePicker}
+                    textField={{
+                      fullWidth: true,
+                      'data-cy': 'birthdate',
+                    }}
+                  />
+                </LocalizationProvider>
               </Grid>
               <Grid item xs={6}>
                 <div className={classes.orcIdContainer}>
@@ -348,7 +323,6 @@ export default function UpdateUserInformation(props: { id: number }) {
                   id="username-input"
                   type="text"
                   component={TextField}
-                  margin="normal"
                   fullWidth
                   autoComplete="off"
                   data-cy="username"
@@ -366,7 +340,6 @@ export default function UpdateUserInformation(props: { id: number }) {
                   id="department-input"
                   type="text"
                   component={TextField}
-                  margin="normal"
                   fullWidth
                   data-cy="department"
                 />
@@ -376,7 +349,6 @@ export default function UpdateUserInformation(props: { id: number }) {
                   id="position-input"
                   type="text"
                   component={TextField}
-                  margin="normal"
                   fullWidth
                   data-cy="position"
                 />
@@ -386,7 +358,6 @@ export default function UpdateUserInformation(props: { id: number }) {
                   id="email-input"
                   type="email"
                   component={TextField}
-                  margin="normal"
                   fullWidth
                   data-cy="email"
                 />
@@ -396,7 +367,6 @@ export default function UpdateUserInformation(props: { id: number }) {
                   id="telephone-input"
                   type="text"
                   component={TextField}
-                  margin="normal"
                   fullWidth
                   data-cy="telephone"
                 />
@@ -406,23 +376,20 @@ export default function UpdateUserInformation(props: { id: number }) {
                   id="telephone-alt-input"
                   type="text"
                   component={TextField}
-                  margin="normal"
                   fullWidth
                   data-cy="telephone-alt"
                 />
               </Grid>
             </Grid>
-            <ButtonContainer>
+            <StyledButtonContainer>
               <Button
                 disabled={isSubmitting}
                 type="submit"
-                variant="contained"
-                color="primary"
                 className={classes.button}
               >
                 Update Profile
               </Button>
-            </ButtonContainer>
+            </StyledButtonContainer>
           </Form>
         )}
       </Formik>

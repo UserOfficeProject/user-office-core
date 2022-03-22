@@ -1,8 +1,8 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import InputLabel from '@material-ui/core/InputLabel';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import InputLabel from '@mui/material/InputLabel';
+import makeStyles from '@mui/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Field, Form, Formik, useFormikContext } from 'formik';
@@ -21,7 +21,7 @@ import {
   Review,
   UserRole,
 } from 'generated/sdk';
-import { ButtonContainer } from 'styles/StyledComponents';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -196,7 +196,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               data-cy="grade-proposal"
             />
           </Box>
-          <ButtonContainer>
+          <StyledButtonContainer>
             {isSubmitting && (
               <Box display="flex" alignItems="center" mx={1}>
                 <UOLoader buttonSized />
@@ -208,14 +208,12 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
                 name="submitted"
                 component={FormikUICustomCheckbox}
                 label="Submitted"
-                color="primary"
                 disabled={isSubmitting}
                 data-cy="is-grade-submitted"
               />
             )}
             <Button
               disabled={isDisabled(isSubmitting)}
-              variant="contained"
               color="secondary"
               type="submit"
               onClick={() => setShouldSubmit(false)}
@@ -226,8 +224,6 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
               <Button
                 className={classes.button}
                 disabled={isDisabled(isSubmitting)}
-                variant="contained"
-                color="primary"
                 type="submit"
                 onClick={() => setShouldSubmit(true)}
               >
@@ -236,7 +232,7 @@ const ProposalGrade: React.FC<ProposalGradeProps> = ({
                   : 'Submit'}
               </Button>
             )}
-          </ButtonContainer>
+          </StyledButtonContainer>
         </Form>
       )}
     </Formik>

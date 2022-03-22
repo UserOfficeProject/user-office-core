@@ -1,6 +1,6 @@
-import { FormControlLabel } from '@material-ui/core';
+import { FormControlLabel } from '@mui/material';
 import { Field } from 'formik';
-import { Checkbox } from 'formik-material-ui';
+import { Checkbox } from 'formik-mui';
 import React, { ChangeEvent, FC, useState } from 'react';
 import * as Yup from 'yup';
 
@@ -13,6 +13,8 @@ import { SelectionFromOptionsConfig } from 'generated/sdk';
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionExcerpt } from '../QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
+
+const columns = [{ title: 'Answer', field: 'answer' }];
 
 export const QuestionTemplateRelationMultipleChoiceForm: FC<
   QuestionTemplateRelationFormProps
@@ -42,7 +44,6 @@ export const QuestionTemplateRelationMultipleChoiceForm: FC<
                 <Field
                   name="config.required"
                   component={Checkbox}
-                  margin="normal"
                   type="checkbox"
                   inputProps={{ 'data-cy': 'required' }}
                 />
@@ -70,7 +71,6 @@ export const QuestionTemplateRelationMultipleChoiceForm: FC<
                   <Field
                     name="config.isMultipleSelect"
                     component={Checkbox}
-                    margin="normal"
                     type="checkbox"
                     inputProps={{ 'data-cy': 'is-multiple-select' }}
                   />
@@ -85,7 +85,7 @@ export const QuestionTemplateRelationMultipleChoiceForm: FC<
               title=""
               name="config.options"
               component={FormikUICustomTable}
-              columns={[{ title: 'Answer', field: 'answer' }]}
+              columns={columns}
               dataTransforms={{
                 toTable: (options: string[]) => {
                   return options.map((option) => {
@@ -96,7 +96,6 @@ export const QuestionTemplateRelationMultipleChoiceForm: FC<
                   return rows.map((row) => row.answer);
                 },
               }}
-              margin="normal"
               fullWidth
               data-cy="options"
             />

@@ -1,5 +1,5 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
@@ -33,7 +33,6 @@ export const QuestionRichTextInputForm: FC<QuestionFormProps> = (props) => {
             id="Key-input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
@@ -43,7 +42,6 @@ export const QuestionRichTextInputForm: FC<QuestionFormProps> = (props) => {
             id="Question-input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
@@ -53,7 +51,6 @@ export const QuestionRichTextInputForm: FC<QuestionFormProps> = (props) => {
               name="config.required"
               component={FormikUICustomCheckbox}
               label="Is required"
-              margin="normal"
               fullWidth
               data-cy="required"
             />
@@ -63,7 +60,6 @@ export const QuestionRichTextInputForm: FC<QuestionFormProps> = (props) => {
               type="text"
               id="Max-input"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="max"
             />

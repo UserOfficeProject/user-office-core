@@ -1,4 +1,4 @@
-import InboxIcon from '@material-ui/icons/Inbox';
+import InboxIcon from '@mui/icons-material/Inbox';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';

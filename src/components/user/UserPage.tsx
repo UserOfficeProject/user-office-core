@@ -1,11 +1,11 @@
-import Divider from '@material-ui/core/Divider';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import Divider from '@mui/material/Divider';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 
 import SimpleTabs from 'components/common/TabPanel';
 import EventLogList from 'components/eventLog/EventLogList';
-import { ContentContainer } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import { Impersonate } from './Impersonate';
 import UpdatePassword from './UpdatePassword';
@@ -29,22 +29,24 @@ function UserPage(props: { match: { params: { id: string } } }) {
   const classes = useStyles();
 
   return (
-    <ContentContainer cy-data="user-page">
-      <SimpleTabs tabNames={['General', 'Settings', 'Logs']}>
-        <UpdateUserInformation id={userId} />
-        <React.Fragment>
-          <UpdatePassword id={userId} />
-          <Divider className={classes.divider} />
-          <UpdateUserRoles id={userId} />
-          <Divider className={classes.divider} />
-          <Impersonate id={userId} />
-        </React.Fragment>
-        <EventLogList
-          eventType="USER | EMAIL_INVITE"
-          changedObjectId={userId}
-        />
-      </SimpleTabs>
-    </ContentContainer>
+    <StyledContainer>
+      <StyledPaper cy-data="user-page">
+        <SimpleTabs tabNames={['General', 'Settings', 'Logs']}>
+          <UpdateUserInformation id={userId} />
+          <React.Fragment>
+            <UpdatePassword id={userId} />
+            <Divider className={classes.divider} />
+            <UpdateUserRoles id={userId} />
+            <Divider className={classes.divider} />
+            <Impersonate id={userId} />
+          </React.Fragment>
+          <EventLogList
+            eventType="USER | EMAIL_INVITE"
+            changedObjectId={userId}
+          />
+        </SimpleTabs>
+      </StyledPaper>
+    </StyledContainer>
   );
 }
 

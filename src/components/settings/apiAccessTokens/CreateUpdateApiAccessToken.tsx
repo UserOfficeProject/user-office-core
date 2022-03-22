@@ -1,18 +1,18 @@
-import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Tooltip from '@material-ui/core/Tooltip';
-import Typography from '@material-ui/core/Typography';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import {
   createApiAccessTokenValidationSchema,
   updateApiAccessTokenValidationSchema,
 } from '@user-office-software/duo-validation/lib/Admin';
 import { Field, FieldArray, FieldArrayRenderProps, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
@@ -20,6 +20,7 @@ import SimpleTabs from 'components/common/TabPanel';
 import UOLoader from 'components/common/UOLoader';
 import { PermissionsWithAccessToken } from 'generated/sdk';
 import { useQueriesAndMutationsData } from 'hooks/admin/useQueriesAndMutationsData';
+import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles((theme) => ({
@@ -43,17 +44,6 @@ const useStyles = makeStyles((theme) => ({
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
-    },
-  },
-  tabsContainer: {
-    '& > div': {
-      margin: 0,
-      padding: theme.spacing(1, 0),
-      boxShadow: 'none',
-
-      '& [role="tabpanel"] > div': {
-        padding: theme.spacing(0, 0.5),
-      },
     },
   },
   checkBoxLabelText: {
@@ -143,7 +133,6 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
                   name="accessPermissions"
                   value={item}
                   checked={formValues.accessPermissions.includes(item)}
-                  color="primary"
                   data-cy={`permission-${title.toLowerCase()}`}
                   onChange={(e) => {
                     if (e.target.checked) fieldArrayHelpers.push(item);
@@ -228,7 +217,6 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
             label="Name"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             data-cy="name"
             disabled={isExecutingCall}
@@ -241,7 +229,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
             <FieldArray
               name="accessPermissions"
               render={(arrayHelpers) => (
-                <div className={classes.tabsContainer}>
+                <StyledPaper margin={[0]} padding={[0]}>
                   <SimpleTabs tabNames={['Queries', 'Mutations']}>
                     {allAccessPermissions(
                       queriesAndMutations.queries,
@@ -256,7 +244,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
                       arrayHelpers
                     )}
                   </SimpleTabs>
-                </div>
+                </StyledPaper>
               )}
             />
           )}
@@ -266,7 +254,6 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
             label="Access token"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             className={classes.darkerDisabledTextField}
             InputProps={{
@@ -290,7 +277,7 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
           />
           <Grid
             container
-            justify="flex-end"
+            justifyContent="flex-end"
             className={classes.submitContainer}
           >
             <Grid item>
@@ -298,8 +285,6 @@ const CreateUpdateApiAccessToken: React.FC<CreateUpdateApiAccessTokenProps> = ({
 
               <Button
                 type="submit"
-                variant="contained"
-                color="primary"
                 disabled={
                   isSubmitting || loadingQueriesAndMutations || isExecutingCall
                 }

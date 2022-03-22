@@ -1,21 +1,21 @@
+import Check from '@mui/icons-material/Check';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
+import Error from '@mui/icons-material/Error';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Checkbox,
   FormControlLabel,
-  makeStyles,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-} from '@material-ui/core';
-import Check from '@material-ui/icons/Check';
-import DoneAllIcon from '@material-ui/icons/DoneAll';
-import Error from '@material-ui/icons/Error';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React, { useEffect } from 'react';
 

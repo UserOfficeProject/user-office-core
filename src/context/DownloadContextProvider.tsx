@@ -1,4 +1,9 @@
 import {
+  ExpandLess,
+  ExpandMore,
+  Inbox as InboxIcon,
+} from '@mui/icons-material';
+import {
   Paper,
   List,
   ListItem,
@@ -7,9 +12,8 @@ import {
   Collapse,
   CircularProgress,
   Button,
-} from '@material-ui/core';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import { ExpandLess, ExpandMore, Inbox as InboxIcon } from '@material-ui/icons';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import crossFetch from 'cross-fetch';
 import { useSnackbar } from 'notistack';
 import React, { useState, useContext, useRef } from 'react';
@@ -93,7 +97,9 @@ const DownloadMonitorDialog = ({
                       )
                     }
                   />
-                  <Button onClick={() => cancel(item.id)}>Cancel</Button>
+                  <Button variant="text" onClick={() => cancel(item.id)}>
+                    Cancel
+                  </Button>
                 </ListItem>
               );
             })}

@@ -1,7 +1,7 @@
-import Button from '@material-ui/core/Button';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Switch from '@material-ui/core/Switch';
+import Button from '@mui/material/Button';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -53,7 +53,6 @@ const GeneralInformation: React.FC<GeneralInformationProps> = ({
               onChange={() => {
                 setIsEditable(!isEditable);
               }}
-              color="primary"
             />
           }
           label={isEditable ? 'Close' : 'Edit proposal'}
@@ -65,7 +64,6 @@ const GeneralInformation: React.FC<GeneralInformationProps> = ({
           <Button
             className={classes.button}
             onClick={() => downloadPDFProposal([data.primaryKey], data.title)}
-            variant="contained"
           >
             Download PDF
           </Button>

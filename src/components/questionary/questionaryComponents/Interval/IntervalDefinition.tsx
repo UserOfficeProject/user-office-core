@@ -1,4 +1,4 @@
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { intervalQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 

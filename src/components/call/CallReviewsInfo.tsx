@@ -1,8 +1,9 @@
-import DateFnsUtils from '@date-io/date-fns';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateAdapter from '@mui/lab/AdapterLuxon';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import useTheme from '@mui/material/styles/useTheme';
 import { Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-material-ui';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
+import { TextField } from 'formik-mui';
+import { DatePicker } from 'formik-mui-lab';
 import React, { useEffect } from 'react';
 
 import {
@@ -11,6 +12,7 @@ import {
 } from 'generated/sdk';
 
 const CallReviewAndNotification: React.FC = () => {
+  const theme = useTheme();
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
@@ -31,54 +33,65 @@ const CallReviewAndNotification: React.FC = () => {
 
   return (
     <>
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      <LocalizationProvider dateAdapter={DateAdapter}>
         <Field
           name="startReview"
           label="Start of review"
           id="start-review-input"
-          format="yyyy-MM-dd"
-          component={KeyboardDatePicker}
-          margin="normal"
-          fullWidth
-          data-cy="start-review"
+          inputFormat="yyyy-MM-dd"
+          component={DatePicker}
+          allowSameDateSelection
+          textField={{
+            fullWidth: true,
+            'data-cy': 'start-review',
+          }}
+          desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
         <Field
           name="endReview"
           label="End of review"
           id="end-review-input"
-          format="yyyy-MM-dd"
+          inputFormat="yyyy-MM-dd"
           minDate={startReview}
-          component={KeyboardDatePicker}
-          margin="normal"
-          fullWidth
+          component={DatePicker}
+          allowSameDateSelection
+          textField={{
+            fullWidth: true,
+          }}
+          desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
         <Field
           name="startSEPReview"
           label="Start of SEP review"
           id="start-sep-review-input"
-          format="yyyy-MM-dd"
-          component={KeyboardDatePicker}
-          margin="normal"
-          fullWidth
+          inputFormat="yyyy-MM-dd"
+          allowSameDateSelection
+          component={DatePicker}
+          textField={{
+            fullWidth: true,
+          }}
+          desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
         <Field
           name="endSEPReview"
           label="End of SEP review"
           id="end-sep-review-input"
-          format="yyyy-MM-dd"
+          inputFormat="yyyy-MM-dd"
+          allowSameDateSelection
           minDate={endSEPReview}
-          component={KeyboardDatePicker}
-          margin="normal"
-          fullWidth
+          component={DatePicker}
+          textField={{
+            fullWidth: true,
+          }}
+          desktopModeMediaQuery={theme.breakpoints.up('sm')}
         />
-      </MuiPickersUtilsProvider>
+      </LocalizationProvider>
       <Field
         name="surveyComment"
         label="Survey Comment"
         id="survey-comment-input"
         type="text"
         component={TextField}
-        margin="normal"
         fullWidth
         required
         inputProps={{ maxLength: '100' }}

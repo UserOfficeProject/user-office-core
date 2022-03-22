@@ -1,5 +1,5 @@
-import { Button, makeStyles, TextField } from '@material-ui/core';
-import { Autocomplete } from '@material-ui/lab';
+import { Button, TextField, Autocomplete } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useState } from 'react';
 
 import { UserRole } from 'generated/sdk';
@@ -94,8 +94,6 @@ function AssignTechnicalReview({
         }}
         data-cy="re-assign-submit"
         type="button"
-        variant="contained"
-        color="primary"
         className={classes.submitButton}
         disabled={proposal.technicalReview?.submitted}
       >
@@ -108,7 +106,6 @@ function AssignTechnicalReview({
         }}
         type="button"
         variant="outlined"
-        color="primary"
         className={classes.submitButton}
       >
         Cancel

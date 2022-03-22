@@ -1,6 +1,6 @@
 import MaterialTable, { Options } from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import DoneAll from '@material-ui/icons/DoneAll';
+import DoneAll from '@mui/icons-material/DoneAll';
+import { Typography } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -21,6 +21,22 @@ type SEPMeetingInstrumentsTableProps = {
   confirm: WithConfirmType;
 };
 
+const columns = [
+  { title: 'Name', field: 'name' },
+  { title: 'Short code', field: 'shortCode' },
+  { title: 'Description', field: 'description' },
+  {
+    title: 'Availability time',
+    field: 'availabilityTime',
+    emptyValue: '-',
+  },
+  {
+    title: 'Submitted',
+    render: (rowData: InstrumentWithAvailabilityTime) =>
+      rowData.submitted ? 'Yes' : 'No',
+  },
+];
+
 const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
   sepId,
   selectedCallId,
@@ -36,22 +52,6 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     UserRole.SEP_SECRETARY,
   ]);
   const { enqueueSnackbar } = useSnackbar();
-
-  const columns = [
-    { title: 'Name', field: 'name' },
-    { title: 'Short code', field: 'shortCode' },
-    { title: 'Description', field: 'description' },
-    {
-      title: 'Availability time',
-      field: 'availabilityTime',
-      emptyValue: '-',
-    },
-    {
-      title: 'Submitted',
-      render: (rowData: InstrumentWithAvailabilityTime) =>
-        rowData.submitted ? 'Yes' : 'No',
-    },
-  ];
 
   const SEPInstrumentProposalsTableComponent = React.useCallback(
     ({ rowData }) => {

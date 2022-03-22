@@ -1,4 +1,3 @@
-import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import {
   NumberParam,
@@ -15,7 +14,7 @@ import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
@@ -58,33 +57,27 @@ export default function ProposalPage() {
     useProposalStatusesData();
 
   return (
-    <>
-      <ContentContainer>
-        <Grid container>
-          <Grid item xs={12}>
-            <StyledPaper data-cy="officer-proposals-table">
-              <ProposalFilterBar
-                calls={{ data: calls, isLoading: loadingCalls }}
-                instruments={{
-                  data: instruments,
-                  isLoading: loadingInstruments,
-                }}
-                proposalStatuses={{
-                  data: proposalStatuses,
-                  isLoading: loadingProposalStatuses,
-                }}
-                setProposalFilter={setProposalFilter}
-                filter={proposalFilter}
-              />
-              <ProposalTableOfficer
-                proposalFilter={proposalFilter}
-                urlQueryParams={urlQueryParams}
-                setUrlQueryParams={setUrlQueryParams}
-              />
-            </StyledPaper>
-          </Grid>
-        </Grid>
-      </ContentContainer>
-    </>
+    <StyledContainer>
+      <StyledPaper data-cy="officer-proposals-table">
+        <ProposalFilterBar
+          calls={{ data: calls, isLoading: loadingCalls }}
+          instruments={{
+            data: instruments,
+            isLoading: loadingInstruments,
+          }}
+          proposalStatuses={{
+            data: proposalStatuses,
+            isLoading: loadingProposalStatuses,
+          }}
+          setProposalFilter={setProposalFilter}
+          filter={proposalFilter}
+        />
+        <ProposalTableOfficer
+          proposalFilter={proposalFilter}
+          urlQueryParams={urlQueryParams}
+          setUrlQueryParams={setUrlQueryParams}
+        />
+      </StyledPaper>
+    </StyledContainer>
   );
 }

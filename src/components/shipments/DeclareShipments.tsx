@@ -1,5 +1,10 @@
-import { Dialog, DialogContent, Divider, Typography } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import {
+  Dialog,
+  DialogContent,
+  Divider,
+  Typography,
+  Alert,
+} from '@mui/material';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';

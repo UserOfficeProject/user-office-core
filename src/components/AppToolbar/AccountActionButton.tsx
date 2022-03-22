@@ -1,13 +1,13 @@
-import Badge from '@material-ui/core/Badge';
-import Box from '@material-ui/core/Box';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import IconButton from '@material-ui/core/IconButton';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import { ExitToApp } from '@material-ui/icons';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
+import { ExitToApp } from '@mui/icons-material';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
+import Badge from '@mui/material/Badge';
+import Box from '@mui/material/Box';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import React, { useContext, useState } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';

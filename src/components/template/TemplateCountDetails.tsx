@@ -8,6 +8,15 @@ import { tableIcons } from 'utils/materialIcons';
 interface TemplateCountDetailsProps {
   question: QuestionWithUsage | null;
 }
+
+// NOTE: Keeping columns outside of the component is better to avoid console warning(https://github.com/material-table-core/core/issues/286)
+const columns = [
+  { title: 'ID', field: 'templateId' },
+  { title: 'Name', field: 'name' },
+  { title: 'Description', field: 'description' },
+  { title: 'Is Archived', field: 'isArchived' },
+];
+
 function TemplateCountDetails({ question }: TemplateCountDetailsProps) {
   const templateIds = useMemo(
     () => question?.templates.map((template) => template.templateId),
@@ -18,19 +27,16 @@ function TemplateCountDetails({ question }: TemplateCountDetailsProps) {
     return null;
   }
 
+  const templatesWithId = templates.map((template) =>
+    Object.assign(template, { id: template.templateId })
+  );
+
   return (
     <MaterialTable
       style={{ width: '100%' }}
       icons={tableIcons}
-      columns={[
-        { title: 'ID', field: 'templateId' },
-        { title: 'Name', field: 'name' },
-        { title: 'Description', field: 'description' },
-        { title: 'Is Archived', field: 'isArchived' },
-      ]}
-      data={templates.map((template) =>
-        Object.assign(template, { id: template.templateId })
-      )}
+      columns={columns}
+      data={templatesWithId}
       title="Templates"
       options={{ paging: false }}
     />

@@ -1,22 +1,22 @@
-import { IconButton } from '@material-ui/core';
-import AppBar from '@material-ui/core/AppBar';
-import Divider from '@material-ui/core/Divider';
-import Fade from '@material-ui/core/Fade';
-import Grid from '@material-ui/core/Grid';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import useTheme from '@material-ui/core/styles/useTheme';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import { Check } from '@material-ui/icons';
-import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
-import EditIcon from '@material-ui/icons/Edit';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import { Check } from '@mui/icons-material';
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import EditIcon from '@mui/icons-material/Edit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import { IconButton } from '@mui/material';
+import AppBar from '@mui/material/AppBar';
+import Divider from '@mui/material/Divider';
+import Fade from '@mui/material/Fade';
+import Grid from '@mui/material/Grid';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
+import useTheme from '@mui/styles/useTheme';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import {
@@ -310,7 +310,7 @@ export default function QuestionaryEditorTopic(props: {
           style={getItemStyle(provided.draggableProps.style)}
           {...provided.dragHandleProps}
         >
-          <Grid xs={12}>
+          <Grid item xs={12}>
             <AppBar position="static" className={classes.appBar}>
               <Toolbar className={classes.toolbar}>
                 <div className={classes.title}>{titleJsx}</div>

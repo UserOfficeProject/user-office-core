@@ -1,5 +1,5 @@
-import { Typography } from '@material-ui/core';
-import Delete from '@material-ui/icons/DeleteOutline';
+import Delete from '@mui/icons-material/DeleteOutline';
+import { Typography } from '@mui/material';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -17,6 +17,12 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CreateUpdateProposalStatus from './CreateUpdateProposalStatus';
 
+const columns = [
+  { title: 'Short code', field: 'shortCode' },
+  { title: 'Name', field: 'name' },
+  { title: 'Description', field: 'description' },
+];
+
 const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
   confirm,
 }) => {
@@ -26,11 +32,6 @@ const ProposalStatusesTable: React.FC<{ confirm: WithConfirmType }> = ({
     proposalStatuses,
     setProposalStatusesWithLoading: setProposalStatuses,
   } = useProposalStatusesData();
-  const columns = [
-    { title: 'Short code', field: 'shortCode' },
-    { title: 'Name', field: 'name' },
-    { title: 'Description', field: 'description' },
-  ];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);

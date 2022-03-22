@@ -1,3 +1,7 @@
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import FileCopy from '@mui/icons-material/FileCopy';
 import {
   Button,
   Checkbox,
@@ -7,12 +11,8 @@ import {
   ListItem,
   ListItemText,
   Typography,
-} from '@material-ui/core';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
-import FileCopy from '@material-ui/icons/FileCopy';
+} from '@mui/material';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import { Field, FieldProps } from 'formik';
 import React, { MouseEvent, useContext, useState } from 'react';
 
@@ -35,7 +35,7 @@ import {
 } from 'generated/sdk';
 import { getQuestionsByType } from 'models/questionary/QuestionaryFunctions';
 import { SampleEsiWithQuestionary } from 'models/questionary/sampleEsi/SampleEsiWithQuestionary';
-import { ButtonContainer } from 'styles/StyledComponents';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import withPrompt, { WithPromptType } from 'utils/withPrompt';
@@ -362,7 +362,7 @@ function QuestionaryComponentProposalEsiBasis(
               })}
             </List>
             <ErrorMessage name={answerId} />
-            <ButtonContainer>
+            <StyledButtonContainer>
               <Button
                 onClick={() =>
                   prompt(
@@ -375,12 +375,11 @@ function QuestionaryComponentProposalEsiBasis(
                 variant="outlined"
                 data-cy="add-sample-btn"
                 size="small"
-                color="primary"
                 startIcon={<AddCircleOutlineIcon />}
               >
                 Create new sample
               </Button>
-            </ButtonContainer>
+            </StyledButtonContainer>
             <Divider style={{ margin: '12px 0' }} />
             <Typography variant="body1" align={'right'}>
               {`${declaredEsis.length ?? 0} of

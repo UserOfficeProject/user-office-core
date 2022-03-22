@@ -1,8 +1,8 @@
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import { createTemplateValidationSchema } from '@user-office-software/duo-validation/lib/Template';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 
@@ -49,7 +49,6 @@ const CreateTemplate = (props: {
               name="name"
               label="Name"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="name"
             />
@@ -58,20 +57,13 @@ const CreateTemplate = (props: {
               name="description"
               label="Description"
               component={TextField}
-              margin="normal"
               fullWidth
               multiline
               rowsMax="16"
               rows="3"
               data-cy="description"
             />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              data-cy="submit"
-            >
+            <Button type="submit" fullWidth data-cy="submit">
               Create
             </Button>
           </Form>

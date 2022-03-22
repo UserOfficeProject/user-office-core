@@ -1,6 +1,6 @@
-import Button from '@material-ui/core/Button';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router';
 
@@ -27,8 +27,6 @@ export function Impersonate(props: { id: number }) {
       </Typography>
       <div className={classes.buttons}>
         <Button
-          variant="contained"
-          color="primary"
           onClick={() =>
             api()
               .getTokenForUser({ userId: props.id })
