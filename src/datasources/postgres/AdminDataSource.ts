@@ -52,7 +52,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!institutionRecord) {
-      throw new Error(`Could not update page with id:${institution.id}`);
+      throw new Error(`Could not update institution with id:${institution.id}`);
     }
 
     return {
@@ -125,12 +125,13 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async setPageText(id: number, content: string): Promise<Page> {
-    const [pagetextRecord]: PageTextRecord[] = await database
-      .update({
-        content,
+    const [pagetextRecord]: PageTextRecord[] = await database('pagetext')
+      .insert({
+        pagetext_id: id,
+        content: content,
       })
-      .from('pagetext')
-      .where('pagetext_id', id)
+      .onConflict('pagetext_id')
+      .merge()
       .returning('*');
 
     if (!pagetextRecord) {
