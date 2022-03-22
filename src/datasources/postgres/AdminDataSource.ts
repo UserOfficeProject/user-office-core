@@ -8,11 +8,9 @@ import { Page } from '../../models/Admin';
 import { Feature } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
-import { Quantity } from '../../models/Quantity';
 import { Settings } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
-import { CreateUnitArgs } from '../../resolvers/mutations/CreateUnitMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource, Entry } from '../AdminDataSource';
@@ -26,14 +24,11 @@ import {
   createFeatureObject,
   createInstitutionObject,
   createPageObject,
-  createQuantityObject,
   createSettingsObject,
-  createUnitObject,
   FeatureRecord,
   InstitutionRecord,
   NationalityRecord,
   PageTextRecord,
-  QuantityRecord,
   SettingsRecord,
   TokensAndPermissionsRecord,
   UserRecord,
