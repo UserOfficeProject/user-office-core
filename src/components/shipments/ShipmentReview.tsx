@@ -1,5 +1,6 @@
-import { Link, makeStyles } from '@material-ui/core';
-import GetAppIcon from '@material-ui/icons/GetApp';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import { Link } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
@@ -109,8 +110,6 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
             )()
           }
           disabled={isSubmitted}
-          variant="contained"
-          color="primary"
         >
           {isSubmitted ? '✔ Submitted' : 'Submit'}
         </NavigButton>
@@ -123,7 +122,6 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
               )
             }
             startIcon={<GetAppIcon />}
-            variant="contained"
             color="secondary"
             data-cy="download-shipment-label"
           >

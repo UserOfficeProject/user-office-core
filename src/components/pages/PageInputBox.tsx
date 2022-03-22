@@ -13,10 +13,10 @@ import 'tinymce/plugins/charmap';
 import 'tinymce/plugins/wordcount';
 import 'tinymce/icons/default/icons';
 
-import Button from '@material-ui/core/Button';
-import Divider from '@material-ui/core/Divider';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
 import React, { useState, useEffect } from 'react';
 
@@ -70,8 +70,6 @@ export default function PageInputBox(props: {
       )}
       <div className={classes.buttons}>
         <Button
-          variant="contained"
-          color="primary"
           className={classes.button}
           onClick={() =>
             api('Updated Page').setPageContent({

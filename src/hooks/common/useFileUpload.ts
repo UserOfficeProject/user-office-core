@@ -9,6 +9,7 @@ export enum UPLOAD_STATE {
   COMPLETE,
   ERROR,
   ABORTED,
+  REJECTED,
 }
 
 export function useFileUpload() {
@@ -86,5 +87,5 @@ export function useFileUpload() {
     xhr.send(formData);
   };
 
-  return { uploadFile, progress, state, abort };
+  return { uploadFile, progress, state, setState, abort };
 }

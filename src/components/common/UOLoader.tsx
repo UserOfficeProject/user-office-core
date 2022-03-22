@@ -1,7 +1,7 @@
 import CircularProgress, {
   CircularProgressProps,
-} from '@material-ui/core/CircularProgress';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+} from '@mui/material/CircularProgress';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React from 'react';
 

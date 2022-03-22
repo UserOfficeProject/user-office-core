@@ -1,4 +1,4 @@
-import ExposureZeroIcon from '@material-ui/icons/ExposureZero';
+import NumberOneIcon from '@mui/icons-material/LooksOneOutlined';
 import { numberInputQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
@@ -24,7 +24,7 @@ export const numberInputDefinition: QuestionaryComponentDefinition = {
   questionTemplateRelationForm: () => QuestionTemplateRelationNumberForm,
   readonly: false,
   creatable: true,
-  icon: <ExposureZeroIcon />,
+  icon: <NumberOneIcon />,
   renderers: {
     answerRenderer: NumberInputAnswerRenderer,
     questionRenderer: defaultRenderer.questionRenderer,

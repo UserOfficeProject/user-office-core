@@ -8,7 +8,6 @@ import initialDBData from '../support/initialDBData';
 context('Units tests', () => {
   describe('Template basic unit tests', () => {
     beforeEach(() => {
-      cy.viewport(1920, 1080);
       cy.resetDB();
     });
 
@@ -23,7 +22,7 @@ context('Units tests', () => {
       cy.get('[data-cy="unit-id"]').clear().type('test');
       cy.get('[data-cy="unit-name"]').clear().type('test');
       cy.get('[data-cy="unit-quantity"]').click();
-      cy.get('#quantity-input-option-0').click();
+      cy.get('[role="presentation"] [role="option"]').first().click();
 
       cy.get('[data-cy="unit-symbol"]').clear().type('test');
       cy.get('[data-cy="unit-siConversionFormula"]').clear().type('x');
@@ -32,7 +31,7 @@ context('Units tests', () => {
       cy.get('[placeholder="Search"]').clear().type('test');
     });
 
-    it('Can no create unit with invalid conversion formula', () => {
+    it('Can not create unit with invalid conversion formula', () => {
       cy.login('officer');
       cy.visit('/');
 
@@ -43,7 +42,7 @@ context('Units tests', () => {
       cy.get('[data-cy="unit-id"]').clear().type('test');
       cy.get('[data-cy="unit-name"]').clear().type('test');
       cy.get('[data-cy="unit-quantity"]').click();
-      cy.get('#quantity-input-option-0').click();
+      cy.get('[role="presentation"] [role="option"]').first().click();
 
       cy.get('[data-cy="unit-symbol"]').clear().type('test');
       cy.get('[data-cy="unit-siConversionFormula"]')
@@ -67,10 +66,10 @@ context('Units tests', () => {
 
       cy.contains(BECQUEREL_UNIT_TITLE)
         .closest('tr')
-        .find('[title=Delete]')
+        .find('[aria-label=Delete]')
         .click();
 
-      cy.get('[title=Save]').click();
+      cy.get('[aria-label=Save]').click();
 
       cy.contains(BECQUEREL_UNIT_TITLE).should('not.exist');
     });
@@ -145,7 +144,6 @@ context('Units tests', () => {
 
   describe('Template advanced unit tests', () => {
     beforeEach(() => {
-      cy.viewport(1920, 1080);
       cy.resetDB(true);
     });
 
@@ -156,13 +154,13 @@ context('Units tests', () => {
       cy.get('[role=listbox]').contains('call 1').click();
       cy.get('[data-cy=question-search-toggle]').click();
       cy.get('#question-list').click();
-      cy.get('#question-list-option-0').click();
+      cy.get('[role="presentation"] [role="option"]').first().click();
       cy.get('body').click();
 
       cy.get('[data-cy=comparator]').click();
       cy.get('[data-value="LESS_THAN"]').click();
 
-      cy.get('[data-cy="value"]').clear().type('5');
+      cy.get('[data-cy="value"] input').clear().type('5');
 
       cy.get('[data-cy=unit-select]').click();
       cy.get('[data-value="centimeter"]').click();

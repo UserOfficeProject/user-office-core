@@ -1,10 +1,10 @@
-import Button from '@material-ui/core/Button';
-import List from '@material-ui/core/List';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
-import { ButtonContainer } from 'styles/StyledComponents';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 
 import { QuestionnairesListItem } from './QuestionnairesListItem';
 
@@ -67,13 +67,12 @@ export function QuestionnairesList({
           );
         })}
       </List>
-      <ButtonContainer>
+      <StyledButtonContainer>
         <Button
           onClick={onAddNewClick}
           variant="outlined"
           data-cy="add-button"
           size="small"
-          color="primary"
           startIcon={<AddCircleOutlineIcon />}
           disabled={
             (!!maxEntries && data.length >= maxEntries) ||
@@ -82,7 +81,7 @@ export function QuestionnairesList({
         >
           {addButtonLabel || 'Add'}
         </Button>
-      </ButtonContainer>
+      </StyledButtonContainer>
     </div>
   );
 }

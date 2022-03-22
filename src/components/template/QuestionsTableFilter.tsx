@@ -1,11 +1,11 @@
 import {
   FormControl,
   InputLabel,
-  makeStyles,
   MenuItem,
   Select,
   TextField,
-} from '@material-ui/core';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useState } from 'react';
 
 import { creatableQuestions } from 'components/questionary/QuestionaryComponentRegistry';
@@ -94,6 +94,7 @@ function QuestionsTableFilter(props: QuestionsTableFilterProps) {
         <TextField
           label=" "
           value={searchText ?? ''}
+          margin="none"
           onChange={(event) => setSearchText(event.target.value)}
           onKeyPress={(event) => {
             if (event.key === 'Enter') {

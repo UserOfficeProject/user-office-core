@@ -1,8 +1,9 @@
-import DateFnsUtils from '@date-io/date-fns';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateAdapter from '@mui/lab/AdapterLuxon';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import useTheme from '@mui/material/styles/useTheme';
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
+import { TextField } from 'formik-mui';
+import { DatePicker } from 'formik-mui-lab';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
@@ -14,6 +15,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
+  const theme = useTheme();
   const field = props.question;
 
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
@@ -34,7 +36,6 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
             id="Key-Input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
@@ -44,7 +45,6 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
             id="Question-Input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
@@ -53,7 +53,6 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
             id="Include-time-Input"
             label="Include time"
             component={FormikUICustomCheckbox}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'includeTime' }}
           />
@@ -63,7 +62,6 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
             label="Tooltip"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'tooltip' }}
           />
@@ -74,42 +72,47 @@ export const QuestionDateForm: FC<QuestionFormProps> = (props) => {
               id="Is-Required-Input"
               label="Is required"
               component={FormikUICustomCheckbox}
-              margin="normal"
               fullWidth
               data-cy="required"
             />
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <LocalizationProvider dateAdapter={DateAdapter}>
               <Field
                 name="config.minDate"
                 id="Min-Time-Input"
                 label="Min"
-                format="yyyy-MM-dd"
-                component={KeyboardDatePicker}
-                margin="normal"
-                fullWidth
-                data-cy="minDate"
+                inputFormat="yyyy-MM-dd"
+                component={DatePicker}
+                textField={{
+                  fullWidth: true,
+                  'data-cy': 'minDate',
+                }}
+                desktopModeMediaQuery={theme.breakpoints.up('sm')}
               />
               <Field
                 name="config.maxDate"
                 id="Max-Time-Input"
                 label="Max"
-                format="yyyy-MM-dd"
-                component={KeyboardDatePicker}
-                margin="normal"
-                fullWidth
-                data-cy="maxDate"
+                inputFormat="yyyy-MM-dd"
+                component={DatePicker}
+                textField={{
+                  fullWidth: true,
+                  'data-cy': 'maxDate',
+                }}
+                desktopModeMediaQuery={theme.breakpoints.up('sm')}
               />
               <Field
                 name="config.defaultDate"
                 id="Default-Time-Input"
                 label="Default"
-                format="yyyy-MM-dd"
-                component={KeyboardDatePicker}
-                margin="normal"
-                fullWidth
-                data-cy="defaultDate"
+                inputFormat="yyyy-MM-dd"
+                component={DatePicker}
+                textField={{
+                  fullWidth: true,
+                  'data-cy': 'defaultDate',
+                }}
+                desktopModeMediaQuery={theme.breakpoints.up('sm')}
               />
-            </MuiPickersUtilsProvider>
+            </LocalizationProvider>
           </TitledContainer>
         </>
       )}

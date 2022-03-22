@@ -1,8 +1,8 @@
-import { MenuItem } from '@material-ui/core';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import ListItemText from '@material-ui/core/ListItemText';
-import Select from '@material-ui/core/Select';
+import { MenuItem } from '@mui/material';
+import Input from '@mui/material/Input';
+import InputLabel from '@mui/material/InputLabel';
+import ListItemText from '@mui/material/ListItemText';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { FieldInputProps, FormikHelpers, FormikValues } from 'formik';
 import React from 'react';
 
@@ -63,7 +63,6 @@ const FormikUICustomSelect = ({
         width: 250,
       },
     },
-    getContentAnchorEl: null,
   };
   const availableOptionsNormalized: Option[] =
     normalizeOptions(availableOptions);
@@ -73,11 +72,7 @@ const FormikUICustomSelect = ({
       (option) => option.value === (value as ValueType)
     );
 
-  const handleChange = (
-    event: React.ChangeEvent<{
-      value: SelectedValueType;
-    }>
-  ) => {
+  const handleChange = (event: SelectChangeEvent<SelectedValueType>) => {
     const newValue = event.target.value;
     form.setFieldValue(field.name, newValue);
   };
@@ -92,7 +87,6 @@ const FormikUICustomSelect = ({
       <Select
         value={field.value}
         multiple={multiple}
-        // @ts-expect-error seems to have wrong typedefinition for onChange signature
         onChange={handleChange}
         input={<Input />}
         renderValue={(value) => {

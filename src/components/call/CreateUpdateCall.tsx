@@ -1,4 +1,4 @@
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import {
   createCallValidationSchemas,
   updateCallValidationSchemas,
@@ -51,11 +51,8 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const timezone =
     settingsContext.settings.get(SettingsId.TIMEZONE)?.settingsValue || '';
 
-  const currentDayStart = new Date();
-  currentDayStart.setHours(0, 0, 0, 0);
-
-  const currentDayEnd = new Date();
-  currentDayEnd.setHours(23, 59, 59, 999);
+  const currentDayStart = DateTime.now().setZone(timezone).startOf('day');
+  const currentDayEnd = DateTime.now().setZone(timezone).endOf('day');
 
   /**
    * NOTE: This is needed because the ESI template field is hidden under feature flag.
@@ -67,6 +64,11 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
     ? ''
     : undefined;
 
+  const getDateTimeFromISO = (value: string) =>
+    DateTime.fromISO(value, {
+      zone: timezone,
+    });
+
   const initialValues = call
     ? {
         ...call,
@@ -76,15 +78,21 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         esiTemplateId: call.esiTemplateId || initialEsiTemplateId,
         proposalWorkflowId: call.proposalWorkflowId || '',
         referenceNumberFormat: call.referenceNumberFormat || '',
-        startCall: DateTime.fromISO(call.startCall, {
-          zone: timezone,
-        }),
-        endCall: DateTime.fromISO(call.endCall, { zone: timezone }),
+        startCall: getDateTimeFromISO(call.startCall),
+        endCall: getDateTimeFromISO(call.endCall),
+        startReview: getDateTimeFromISO(call.startReview),
+        endReview: getDateTimeFromISO(call.endReview),
+        startSEPReview: getDateTimeFromISO(call.startSEPReview),
+        endSEPReview: getDateTimeFromISO(call.endSEPReview),
+        startNotify: getDateTimeFromISO(call.startNotify),
+        endNotify: getDateTimeFromISO(call.endNotify),
+        startCycle: getDateTimeFromISO(call.startCycle),
+        endCycle: getDateTimeFromISO(call.endCycle),
       }
     : {
         shortCode: '',
-        startCall: DateTime.now().setZone(timezone).startOf('day'),
-        endCall: DateTime.now().setZone(timezone).endOf('day'),
+        startCall: currentDayStart,
+        endCall: currentDayEnd,
         referenceNumberFormat: '',
         startReview: currentDayStart,
         endReview: currentDayEnd,

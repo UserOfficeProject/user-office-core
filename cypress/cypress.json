@@ -1,5 +1,7 @@
 {
   "video": false,
+  "viewportWidth": 1920,
+  "viewportHeight": 1080,
   "baseUrl": "http://proxy:80",
   "screenshotsFolder": "/tmp/screenshots",
   "retries": 1,

@@ -1,5 +1,6 @@
-import { Button, Link, makeStyles, Paper, Typography } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
+import { Button, Link, Paper, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React, { Fragment, useContext, useState } from 'react';
 
@@ -23,6 +24,7 @@ import {
 } from 'generated/sdk';
 import { ProposalData, useProposalData } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
+import { StyledPaper } from 'styles/StyledComponents';
 
 import AssignTechnicalReview from './AssignTechnicalReview';
 import ProposalGrade from './ProposalGrade';
@@ -85,7 +87,9 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
     return (
       <Box display="flex" flexDirection="column" alignItems="center">
         <h2>Proposal not found</h2>
-        <Button onClick={() => console.log('Not implemented')}>Retry</Button>
+        <Button variant="text" onClick={() => console.log('Not implemented')}>
+          Retry
+        </Button>
       </Box>
     );
   }
@@ -216,9 +220,11 @@ const ProposalReviewContent: React.FC<ProposalReviewContentProps> = ({
   });
 
   return (
-    <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
-      {tabsContent}
-    </SimpleTabs>
+    <StyledPaper>
+      <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
+        {tabsContent}
+      </SimpleTabs>
+    </StyledPaper>
   );
 };
 

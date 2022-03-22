@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 import { QuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import { DateConfig } from 'generated/sdk';
@@ -12,6 +12,6 @@ export const preSubmitDateTransform: QuestionaryComponentDefinition['preSubmitTr
       ...answer,
       value: ifNotRequiredDateCanBeNull
         ? null
-        : moment(answer.value).format('YYYY-MM-DDTHH:mm:ss.SSS'), // ISO time format without timezone
+        : DateTime.fromISO(answer.value, { zone: 'utc' }).toISO(), // ISO time format with utc timezone
     };
   };

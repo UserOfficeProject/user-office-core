@@ -72,8 +72,6 @@ function FeedbackReview({ confirm }: FeedbackReviewProps) {
             )()
           }
           disabled={isSubmitted}
-          variant="contained"
-          color="primary"
           data-cy="submit-feedback-button"
         >
           {isSubmitted ? '✔ Submitted' : 'Submit'}

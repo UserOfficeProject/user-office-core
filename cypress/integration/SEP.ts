@@ -136,8 +136,6 @@ function initializationBeforeTests() {
     id: sepMembers.reviewer.id,
     roles: [initialDBData.roles.sepReviewer],
   });
-
-  cy.viewport(1920, 1080);
 }
 
 context('SEP reviews tests', () => {
@@ -164,7 +162,7 @@ context('SEP reviews tests', () => {
         .find('[type="checkbox"]')
         .check();
 
-      cy.get("[title='Assign proposals to SEP']").first().click();
+      cy.get("[aria-label='Assign proposals to SEP']").first().click();
 
       cy.get('#selectedSEPId-input').should('not.have.class', 'Mui-disabled');
       cy.get('#selectedSEPId-input').first().click();
@@ -206,7 +204,7 @@ context('SEP reviews tests', () => {
 
       cy.contains(proposal1.proposalTitle)
         .parent()
-        .find('[title="View Proposal"]')
+        .find('[aria-label="View Proposal"]')
         .click();
 
       cy.finishedLoading();
@@ -255,7 +253,7 @@ context('SEP reviews tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[title='Assign SEP Member']").first().click();
+      cy.get("[aria-label='Assign SEP Member']").first().click();
 
       cy.finishedLoading();
 
@@ -273,7 +271,7 @@ context('SEP reviews tests', () => {
       });
 
       cy.get('[role="dialog"]').should('not.exist');
-      cy.get("[title='Show Reviewers']").first().click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
       cy.contains(sepMembers.reviewer.lastName);
 
       cy.contains('Logs').click();
@@ -305,7 +303,7 @@ context('SEP reviews tests', () => {
       cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
 
-      cy.get('[title="Show Reviewers"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.contains(sepMembers.reviewer.lastName)
         .parent()
@@ -336,7 +334,7 @@ context('SEP reviews tests', () => {
       cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
 
-      cy.get('[title="Show Reviewers"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.contains(sepMembers.reviewer.lastName)
         .parent()
@@ -371,7 +369,7 @@ context('SEP reviews tests', () => {
         .contains('Proposals and assignments', { matchCase: false })
         .click();
       cy.finishedLoading();
-      cy.get('[title="Show Reviewers"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.contains(sepMembers.reviewer.lastName).parent().contains('DRAFT');
     });
@@ -397,7 +395,7 @@ context('SEP reviews tests', () => {
 
       cy.get('[type="checkbox"]').first().check();
 
-      cy.get('[title="Delete proposals"]').click();
+      cy.get('[aria-label="Delete proposals"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
@@ -438,7 +436,7 @@ context('SEP reviews tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[title='Assign SEP Member']").first().click();
+      cy.get("[aria-label='Assign SEP Member']").first().click();
 
       cy.finishedLoading();
 
@@ -456,7 +454,7 @@ context('SEP reviews tests', () => {
       });
 
       cy.get('[role="dialog"]').should('not.exist');
-      cy.get("[title='Show Reviewers']").first().click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
       cy.contains(sepMembers.chair.lastName);
     });
@@ -469,7 +467,7 @@ context('SEP reviews tests', () => {
 
       cy.contains(proposal1.proposalTitle)
         .parent()
-        .find('[title="View Proposal"]')
+        .find('[aria-label="View Proposal"]')
         .click();
 
       cy.finishedLoading();
@@ -493,7 +491,7 @@ context('SEP reviews tests', () => {
       cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
 
-      cy.get('[title="Show Reviewers"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.contains(sepMembers.reviewer.lastName)
         .parent()
@@ -534,7 +532,7 @@ context('SEP reviews tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[title='Assign SEP Member']").first().click();
+      cy.get("[aria-label='Assign SEP Member']").first().click();
 
       cy.finishedLoading();
 
@@ -552,7 +550,7 @@ context('SEP reviews tests', () => {
       });
 
       cy.get('[role="dialog"]').should('not.exist');
-      cy.get("[title='Show Reviewers']").first().click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
       cy.contains(sepMembers.secretary.lastName);
     });
@@ -569,7 +567,7 @@ context('SEP reviews tests', () => {
       cy.contains('Proposals and Assignments').click();
       cy.finishedLoading();
 
-      cy.get('[title="Show Reviewers"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.contains(sepMembers.reviewer.lastName)
         .parent()
@@ -713,16 +711,16 @@ context('SEP meeting components tests', () => {
 
       cy.contains(instrument.name);
 
-      cy.get("[title='Submit instrument']").should('exist');
+      cy.get("[aria-label='Submit instrument']").should('exist');
 
-      cy.get("[title='Show proposals']").first().click();
+      cy.get("[aria-label='Detail panel visibility toggle']").first().click();
 
       cy.get('[data-cy="sep-instrument-proposals-table"] thead').contains(
         'Deviation'
       );
 
       cy.get(
-        '[data-cy="sep-instrument-proposals-table"] [title="View proposal details"]'
+        '[data-cy="sep-instrument-proposals-table"] [aria-label="View proposal details"]'
       ).click();
 
       cy.finishedLoading();
@@ -742,7 +740,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[title='Submit instrument']").first().click();
+      cy.get("[aria-label='Submit instrument']").first().click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -759,7 +757,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[title="Submit instrument"]').should('not.be.disabled');
+      cy.get('[aria-label="Submit instrument"]').should('not.be.disabled');
     });
 
     it('Officer should be able to reorder proposal with drag and drop', () => {
@@ -819,7 +817,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[title="Show proposals"]').first().click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
       cy.get('[data-cy="drag-icon"]').first().as('firstDragIcon');
       cy.get('[data-cy="drag-icon"]').last().as('secondDragIcon');
@@ -848,7 +846,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[title="Show proposals"]').first().click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
       cy.get(
         '[data-cy="sep-instrument-proposals-table"] tbody tr:last-child'
       ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
@@ -861,11 +859,11 @@ context('SEP meeting components tests', () => {
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
 
-      cy.get('[title="Show proposals"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.finishedLoading();
 
-      cy.get('[title="View proposal details"]').click();
+      cy.get('[aria-label="View proposal details"]').click();
 
       editFinalRankingForm();
     });
@@ -936,9 +934,9 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[title="Show proposals"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
-      cy.get('[title="View proposal details"]').click();
+      cy.get('[aria-label="View proposal details"]').click();
 
       cy.get('[data-cy="edit-sep-time-allocation"]').scrollIntoView();
       cy.get('[data-cy="edit-sep-time-allocation"]').click();
@@ -965,9 +963,9 @@ context('SEP meeting components tests', () => {
 
       cy.reload();
       cy.contains('Meeting Components').click();
-      cy.get('[title="Show proposals"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
-      cy.get('[title="View proposal details"]').click();
+      cy.get('[aria-label="View proposal details"]').click();
 
       cy.get('[data-cy="edit-sep-time-allocation"]').click();
       cy.get('@timeAllocation').should('have.value', '9999');
@@ -989,13 +987,13 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[title="Show proposals"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.get(
         '[data-cy="sep-instrument-proposals-table"] tbody tr:last-child'
       ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
 
-      cy.get('[title="View proposal details"]').click();
+      cy.get('[aria-label="View proposal details"]').click();
 
       cy.get('[data-cy="edit-sep-time-allocation"]').scrollIntoView();
       cy.get('[data-cy="edit-sep-time-allocation"]').click();
@@ -1025,9 +1023,9 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[title="Show proposals"]').first().click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
-      cy.get('[title="View proposal details"]').first().click();
+      cy.get('[aria-label="View proposal details"]').first().click();
 
       cy.get('[role="dialog"] > header + div').scrollTo('top');
 
@@ -1042,7 +1040,7 @@ context('SEP meeting components tests', () => {
         text: 'SEP meeting decision submitted successfully',
       });
 
-      cy.get("[title='Submit instrument']").first().click();
+      cy.get("[aria-label='Submit instrument']").first().click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -1066,7 +1064,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[title="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
     });
 
     it('Officer should be able to edit SEP Meeting form after instrument is submitted', () => {
@@ -1088,13 +1086,13 @@ context('SEP meeting components tests', () => {
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
 
-      cy.get('[title="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
 
-      cy.get('[title="Show proposals"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.finishedLoading();
 
-      cy.get('[title="View proposal details"]').click();
+      cy.get('[aria-label="View proposal details"]').click();
 
       editFinalRankingForm();
     });
@@ -1121,7 +1119,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get("[title='Show Reviewers']").first().click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
       cy.get('[data-cy="sep-reviewer-assignments-table"] table tbody tr').as(
         'rows'
@@ -1132,8 +1130,8 @@ context('SEP meeting components tests', () => {
       function assertAndRemoveAssignment(length: number) {
         cy.get('@rows').should('have.length', length);
 
-        cy.get('[title="Remove assignment"]').first().click();
-        cy.get('[title="Save"]').click();
+        cy.get('[aria-label="Remove assignment"]').first().click();
+        cy.get('[aria-label="Save"]').click();
 
         cy.notification({
           variant: 'success',
@@ -1162,8 +1160,8 @@ context('SEP meeting components tests', () => {
       cy.finishedLoading();
       cy.contains('Loading...').should('not.exist');
 
-      cy.get('[title="Remove assigned proposal"]').click();
-      cy.get('[title="Save"]').click();
+      cy.get('[aria-label="Remove assigned proposal"]').click();
+      cy.get('[aria-label="Save"]').click();
 
       cy.notification({
         variant: 'success',
@@ -1210,11 +1208,11 @@ context('SEP meeting components tests', () => {
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
 
-      cy.get('[title="Show proposals"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.finishedLoading();
 
-      cy.get('[title="View proposal details"]').click();
+      cy.get('[aria-label="View proposal details"]').click();
 
       editFinalRankingForm();
     });
@@ -1236,13 +1234,13 @@ context('SEP meeting components tests', () => {
 
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
-      cy.get('[title="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
 
-      cy.get('[title="Show proposals"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.finishedLoading();
 
-      cy.get('[title="View proposal details"]').click();
+      cy.get('[aria-label="View proposal details"]').click();
 
       cy.get('#commentForUser')
         .parent()
@@ -1265,7 +1263,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[title="Remove assigned proposal"]').should('not.exist');
+      cy.get('[aria-label="Remove assigned proposal"]').should('not.exist');
     });
   });
 
@@ -1293,11 +1291,11 @@ context('SEP meeting components tests', () => {
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
 
-      cy.get('[title="Show proposals"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.finishedLoading();
 
-      cy.get('[title="View proposal details"]').click();
+      cy.get('[aria-label="View proposal details"]').click();
 
       editFinalRankingForm();
     });
@@ -1319,13 +1317,13 @@ context('SEP meeting components tests', () => {
 
       cy.contains('Meeting Components').click();
       cy.finishedLoading();
-      cy.get('[title="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
 
-      cy.get('[title="Show proposals"]').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
       cy.finishedLoading();
 
-      cy.get('[title="View proposal details"]').click();
+      cy.get('[aria-label="View proposal details"]').click();
 
       cy.get('#commentForUser')
         .parent()
@@ -1348,7 +1346,7 @@ context('SEP meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[title="Remove assigned proposal"]').should('not.exist');
+      cy.get('[aria-label="Remove assigned proposal"]').should('not.exist');
     });
   });
 
@@ -1377,7 +1375,7 @@ context('SEP meeting components tests', () => {
 
       cy.contains(proposal1.proposalTitle)
         .parent()
-        .find('[title="Grade proposal"]')
+        .find('[aria-label="Grade proposal"]')
         .click();
 
       cy.finishedLoading();

@@ -1,9 +1,9 @@
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Link from '@material-ui/core/Link';
-import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Link from '@mui/material/Link';
+import MenuItem from '@mui/material/MenuItem';
 import { Field } from 'formik';
-import { Select, TextField } from 'formik-material-ui';
+import { Select, TextField } from 'formik-mui';
 import { default as React, FC, useContext } from 'react';
 import * as Yup from 'yup';
 
@@ -64,7 +64,6 @@ export const QuestionTemplateRelationSampleDeclarationForm: FC<
               placeholder='(e.g. "add new")'
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="addEntryButtonLabel"
             />
@@ -78,7 +77,6 @@ export const QuestionTemplateRelationSampleDeclarationForm: FC<
               placeholder="(e.g. 1, leave blank for unlimited)"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="min-entries"
             />
@@ -88,7 +86,6 @@ export const QuestionTemplateRelationSampleDeclarationForm: FC<
               id="Max-input"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="max-entries"
             />
@@ -101,7 +98,6 @@ export const QuestionTemplateRelationSampleDeclarationForm: FC<
                 name="config.templateId"
                 type="text"
                 component={Select}
-                margin="normal"
                 data-cy="templateId"
                 defaultValue={''}
               >

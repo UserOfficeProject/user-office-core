@@ -33,7 +33,6 @@ export const QuestionTemplateRelationBooleanForm: FC<
               name="config.required"
               component={FormikUICustomCheckbox}
               label="User must check it to continue"
-              margin="normal"
               fullWidth
               data-cy="required"
             />

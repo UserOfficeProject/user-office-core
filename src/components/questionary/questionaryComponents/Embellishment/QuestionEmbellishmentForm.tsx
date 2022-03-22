@@ -1,5 +1,5 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
@@ -34,7 +34,6 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
             id="naturalKey-Input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
@@ -43,7 +42,6 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
             id="HTML-Input"
             type="text"
             component={FormikUICustomEditor}
-            margin="normal"
             fullWidth
             init={{
               skin: false,
@@ -61,7 +59,6 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
             label="Plain description"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             data-cy="plain"
           />
@@ -74,7 +71,6 @@ export const QuestionEmbellishmentForm: FC<QuestionFormProps> = (props) => {
             }
             component={FormikUICustomCheckbox}
             label="Omit from PDF"
-            margin="normal"
             fullWidth
             data-cy="omit"
           />

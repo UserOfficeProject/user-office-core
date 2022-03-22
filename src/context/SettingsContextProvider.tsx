@@ -1,4 +1,4 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 import { Settings, SettingsId } from 'generated/sdk';

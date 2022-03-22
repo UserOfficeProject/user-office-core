@@ -1,9 +1,9 @@
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
-import Alert from '@material-ui/lab/Alert';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
@@ -102,8 +102,6 @@ const AssignProposalsToSEP: React.FC<AssignProposalToSEPProps> = ({
             <Button
               type="submit"
               fullWidth
-              variant="contained"
-              color="primary"
               className={classes.submit}
               disabled={isSubmitting || loadingSEPs}
               data-cy="submit"

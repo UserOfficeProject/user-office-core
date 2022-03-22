@@ -1,4 +1,4 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext, useEffect } from 'react';
 import { Redirect, useLocation } from 'react-router';
 

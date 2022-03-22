@@ -1,10 +1,10 @@
-import { PropTypes } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
-import MenuItem from '@material-ui/core/MenuItem';
-import MuiTextField from '@material-ui/core/TextField';
-import Clear from '@material-ui/icons/Clear';
+import Clear from '@mui/icons-material/Clear';
+import { FormControlTypeMap } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import MenuItem from '@mui/material/MenuItem';
+import MuiTextField from '@mui/material/TextField';
 import { connect, Field, FormikContextType } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React from 'react';
 
 type TProps = {
@@ -19,7 +19,7 @@ type TProps = {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isClearable?: boolean;
-  margin?: PropTypes.Margin;
+  margin?: FormControlTypeMap['props']['margin'];
 };
 
 const FormikDropdown: React.FC<
@@ -68,7 +68,6 @@ const FormikDropdown: React.FC<
         label={label}
         defaultValue="Loading..."
         disabled
-        margin="normal"
         InputLabelProps={{
           shrink: true,
         }}
@@ -114,7 +113,6 @@ const FormikDropdown: React.FC<
       label={label}
       id={name + '-input'}
       select
-      margin="normal"
       component={TextField}
       InputLabelProps={{
         shrink: true,

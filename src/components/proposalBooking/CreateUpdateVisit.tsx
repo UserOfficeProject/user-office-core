@@ -1,4 +1,4 @@
-import { Button, Typography } from '@material-ui/core';
+import { Button, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
@@ -105,7 +105,6 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
             <Button
               disabled={isSubmitting}
               variant="text"
-              color="primary"
               onClick={() => close(event)}
             >
               Close
@@ -113,8 +112,6 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
             <Button
               disabled={isSubmitting}
               type="submit"
-              variant="contained"
-              color="primary"
               data-cy="create-visit-button"
             >
               {visit ? 'Update' : 'Create'}

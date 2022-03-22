@@ -1,8 +1,8 @@
 import MaterialTable, { Column } from '@material-table/core';
-import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
-import dateformat from 'dateformat';
-import React, { useState } from 'react';
+import Button from '@mui/material/Button';
+import Link from '@mui/material/Link';
+import { DateTime } from 'luxon';
+import React, { useCallback, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
@@ -12,29 +12,30 @@ import { tableIcons } from 'utils/materialIcons';
 
 import TemplatesTable, { TemplateRowDataType } from './TemplatesTable';
 
+const callListColumns = [
+  { title: 'Short Code', field: 'shortCode' },
+  {
+    title: 'Start Date',
+    field: 'startCall',
+    render: (rowData: Call) =>
+      DateTime.fromISO(rowData.startCall).toFormat('dd-MMM-yyyy'),
+  },
+  {
+    title: 'End Date',
+    field: 'endCall',
+    render: (rowData: Call) =>
+      DateTime.fromISO(rowData.endCall).toFormat('dd-MMM-yyyy'),
+  },
+];
+
 function CallsList(props: { filterTemplateId: number }) {
   const { calls } = useCallsData({ templateIds: [props.filterTemplateId] });
-  const columns = [
-    { title: 'Short Code', field: 'shortCode' },
-    {
-      title: 'Start Date',
-      field: 'startCall',
-      render: (rowData: Call) =>
-        dateformat(new Date(rowData.startCall), 'dd-mmm-yyyy'),
-    },
-    {
-      title: 'End Date',
-      field: 'endCall',
-      render: (rowData: Call) =>
-        dateformat(new Date(rowData.endCall), 'dd-mmm-yyyy'),
-    },
-  ];
 
   return (
     <MaterialTable
       icons={tableIcons}
       title="Calls"
-      columns={columns}
+      columns={callListColumns}
       data={calls}
     />
   );
@@ -78,17 +79,22 @@ type ProposalTemplatesTableProps = {
 function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number>();
 
-  const NumberOfCalls = (rowData: ProposalTemplateRowDataType) => (
-    <Link
-      onClick={() => {
-        setSelectedTemplateId(rowData.templateId);
-      }}
-      style={{ cursor: 'pointer' }}
-    >
-      {rowData.callCount || 0}
-    </Link>
+  // NOTE: Wrapping NumberOfCalls with useCallback to avoid the console warning(https://github.com/material-table-core/core/issues/286)
+  const NumberOfCalls = useCallback(
+    (rowData: ProposalTemplateRowDataType) => (
+      <Link
+        onClick={() => {
+          setSelectedTemplateId(rowData.templateId);
+        }}
+        style={{ cursor: 'pointer' }}
+      >
+        {rowData.callCount || 0}
+      </Link>
+    ),
+    []
   );
 
+  // NOTE: Keeping the columns inside the component just because it needs NumberOfCalls which is wrapped with callback and uses setSelectedTemplateId.
   const columns: Column<ProposalTemplateRowDataType>[] = [
     { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },

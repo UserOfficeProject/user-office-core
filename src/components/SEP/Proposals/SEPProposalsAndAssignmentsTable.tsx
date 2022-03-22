@@ -1,12 +1,12 @@
 import MaterialTable, { Options } from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import Grid from '@material-ui/core/Grid';
-import AssignmentInd from '@material-ui/icons/AssignmentInd';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import Visibility from '@material-ui/icons/Visibility';
-import dateformat from 'dateformat';
+import AssignmentInd from '@mui/icons-material/AssignmentInd';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import Visibility from '@mui/icons-material/Visibility';
+import { Typography } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import Grid from '@mui/material/Grid';
+import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
@@ -70,7 +70,7 @@ const SEPProposalColumns = [
     title: 'Date assigned',
     field: 'dateAssigned',
     render: (rowData: SEPProposalType): string =>
-      dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
+      DateTime.fromISO(rowData.dateAssigned).toFormat('dd-MMM-yyyy HH:mm:ss'),
   },
   {
     title: 'Reviewers',
@@ -189,7 +189,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
         if (proposalItem.proposalPk === proposalPk) {
           const newAssignments: SEPProposalAssignmentType[] = [
             ...(proposalItem.assignments ?? []),
-            ...assignedMembers.map(({ role, ...user }) => ({
+            ...assignedMembers.map(({ role = null, ...user }) => ({
               sepMemberUserId: user.id,
               dateAssigned: Date.now(),
               user,
@@ -325,6 +325,10 @@ const SEPProposalsAndAssignmentsTable: React.FC<
     [setSEPProposalsData, sepId, api]
   );
 
+  const SEPProposalsWitId = initialValues.map((sepProposal) =>
+    Object.assign(sepProposal, { id: sepProposal.proposalPk })
+  );
+
   return (
     <React.Fragment>
       <ProposalReviewModal
@@ -375,9 +379,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<
                 SEP Proposals
               </Typography>
             }
-            data={initialValues.map((sepProposal) =>
-              Object.assign(sepProposal, { id: sepProposal.proposalPk })
-            )}
+            data={SEPProposalsWitId}
             isLoading={loadingSEPProposals}
             localization={{
               toolbar: {

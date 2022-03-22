@@ -1,16 +1,16 @@
 import MaterialTable, { Column } from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import Delete from '@material-ui/icons/Delete';
-import Email from '@material-ui/icons/Email';
-import FileCopy from '@material-ui/icons/FileCopy';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import GridOnIcon from '@material-ui/icons/GridOn';
-import GroupWork from '@material-ui/icons/GroupWork';
-import Visibility from '@material-ui/icons/Visibility';
+import Delete from '@mui/icons-material/Delete';
+import Email from '@mui/icons-material/Email';
+import FileCopy from '@mui/icons-material/FileCopy';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import GridOnIcon from '@mui/icons-material/GridOn';
+import GroupWork from '@mui/icons-material/GroupWork';
+import Visibility from '@mui/icons-material/Visibility';
+import { Typography } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import React, { useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
@@ -64,6 +64,90 @@ type ProposalWithCallInstrumentAndSepId = ProposalPkWithCallId & {
   statusId: number;
 };
 
+export type QueryParameters = {
+  first?: number;
+  offset?: number;
+  sortField?: string | undefined;
+  sortDirection?: string | undefined;
+  searchText?: string | undefined;
+};
+
+let columns: Column<ProposalViewData>[] = [
+  {
+    title: 'Actions',
+    cellStyle: { padding: 0, minWidth: 152 },
+    sorting: false,
+    removable: false,
+    field: 'rowActionButtons',
+  },
+  { title: 'Proposal ID', field: 'proposalId' },
+  {
+    title: 'Title',
+    field: 'title',
+    ...{ width: 'auto' },
+  },
+  {
+    title: 'Technical time allocation',
+    render: (rowData) =>
+      rowData.technicalTimeAllocation
+        ? `${rowData.technicalTimeAllocation}(${rowData.allocationTimeUnit}s)`
+        : '',
+    hidden: true,
+  },
+  {
+    title: 'Technical status',
+    field: 'technicalStatus',
+  },
+  {
+    title: 'Final time allocation',
+    render: (rowData) =>
+      rowData.managementTimeAllocation
+        ? `${rowData.managementTimeAllocation}(${rowData.allocationTimeUnit}s)`
+        : '',
+    hidden: true,
+  },
+  {
+    title: 'Final Status',
+    field: 'finalStatus',
+  },
+  {
+    title: 'Submitted',
+    render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
+  },
+  {
+    title: 'Status',
+    field: 'statusName',
+  },
+  {
+    title: 'Deviation',
+    field: 'reviewDeviation',
+  },
+  {
+    title: 'Average Score',
+    field: 'reviewAverage',
+  },
+  {
+    title: 'Ranking',
+    field: 'rankOrder',
+  },
+  {
+    title: 'Notified',
+    render: (rowData) => (rowData.notified ? 'Yes' : 'No'),
+  },
+  {
+    title: 'Instrument',
+    field: 'instrumentName',
+  },
+  {
+    title: 'Call',
+    field: 'callShortCode',
+  },
+  {
+    title: 'SEP',
+    field: 'sepCode',
+  },
+];
+
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
   urlQueryParams,
@@ -78,6 +162,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const [selectedProposals, setSelectedProposals] = useState<
     ProposalWithCallInstrumentAndSepId[]
   >([]);
+  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
     ProposalViewData[]
   >([]);
@@ -89,17 +174,46 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
-  const { loading, setProposalsData, proposalsData } =
-    useProposalsCoreData(proposalFilter);
+
+  const prefetchSize = 200;
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [query, setQuery] = useState<QueryParameters>({
+    first: prefetchSize,
+    offset: 0,
+    sortField: urlQueryParams?.sortField,
+    sortDirection: urlQueryParams?.sortDirection ?? undefined,
+    searchText: urlQueryParams?.search ?? undefined,
+  });
+  const { loading, setProposalsData, proposalsData, totalCount } =
+    useProposalsCoreData(proposalFilter, query);
 
   useEffect(() => {
     setPreselectedProposalsData(proposalsData);
-  }, [proposalsData]);
+  }, [proposalsData, query]);
+
+  useEffect(() => {
+    let isMounted = true;
+    let endSlice = rowsPerPage * (currentPage + 1);
+    endSlice = endSlice == 0 ? prefetchSize + 1 : endSlice + 1; // Final page of a loaded section would produce the slice (x, 0) without this
+    if (isMounted) {
+      setTableData(
+        preselectedProposalsData.slice(
+          (currentPage * rowsPerPage) % prefetchSize,
+          endSlice
+        )
+      );
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentPage, rowsPerPage, preselectedProposalsData, query]);
 
   useEffect(() => {
     if (urlQueryParams.selection.length > 0) {
       const selection = new Set(urlQueryParams.selection);
-
       setPreselectedProposalsData((preselectedProposalsData) => {
         const selected: ProposalWithCallInstrumentAndSepId[] = [];
         const preselected = preselectedProposalsData.map((proposal) => {
@@ -190,81 +304,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     );
   };
 
-  let columns: Column<ProposalViewData>[] = [
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 152 },
-      sorting: false,
-      removable: false,
-      render: RowActionButtons,
-    },
-    { title: 'Proposal ID', field: 'proposalId' },
-    {
-      title: 'Title',
-      field: 'title',
-      ...{ width: 'auto' },
-    },
-    {
-      title: 'Technical time allocation',
-      render: (rowData) =>
-        rowData.technicalTimeAllocation
-          ? `${rowData.technicalTimeAllocation}(${rowData.allocationTimeUnit}s)`
-          : '',
-      hidden: true,
-    },
-    {
-      title: 'Technical status',
-      field: 'technicalStatus',
-    },
-    {
-      title: 'Final time allocation',
-      render: (rowData) =>
-        rowData.managementTimeAllocation
-          ? `${rowData.managementTimeAllocation}(${rowData.allocationTimeUnit}s)`
-          : '',
-      hidden: true,
-    },
-    {
-      title: 'Final Status',
-      field: 'finalStatus',
-    },
-    {
-      title: 'Submitted',
-      render: (rowData) => (rowData.submitted ? 'Yes' : 'No'),
-    },
-    {
-      title: 'Status',
-      field: 'statusName',
-    },
-    {
-      title: 'Deviation',
-      field: 'reviewDeviation',
-    },
-    {
-      title: 'Average Score',
-      field: 'reviewAverage',
-    },
-    {
-      title: 'Ranking',
-      field: 'rankOrder',
-    },
-    {
-      title: 'Notified',
-      render: (rowData) => (rowData.notified ? 'Yes' : 'No'),
-    },
-    {
-      title: 'Instrument',
-      field: 'instrumentName',
-    },
-    {
-      title: 'Call',
-      field: 'callShortCode',
-    },
-    {
-      title: 'SEP',
-      field: 'sepCode',
-    },
-  ];
+  columns = columns.map((v: Column<ProposalViewData>) => {
+    v.customSort = () => 0; // Disables client side sorting
+
+    return v;
+  });
 
   // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.
   if (localStorageValue) {
@@ -533,6 +577,17 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
 
+  /** NOTE:
+   * Including the id property for https://material-table-core.com/docs/breaking-changes#id
+   * Including the action buttons as property to avoid the console warning(https://github.com/material-table-core/core/issues/286)
+   */
+  const preselectedProposalDataWithIdAndRowActions = tableData.map((proposal) =>
+    Object.assign(proposal, {
+      id: proposal.primaryKey,
+      rowActionButtons: RowActionButtons(proposal),
+    })
+  );
+
   return (
     <>
       <Dialog
@@ -632,11 +687,24 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           </Typography>
         }
         columns={columns}
-        data={preselectedProposalsData.map((proposal) =>
-          Object.assign(proposal, { id: proposal.primaryKey })
-        )}
+        data={preselectedProposalDataWithIdAndRowActions}
+        totalCount={totalCount}
+        page={currentPage}
+        onPageChange={(page, pageSize) => {
+          const newOffset =
+            Math.floor((pageSize * page) / prefetchSize) * prefetchSize;
+          if (page !== currentPage && newOffset != query.offset) {
+            setQuery({ ...query, offset: newOffset });
+          }
+          setCurrentPage(page);
+        }}
+        onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
         isLoading={loading}
         onSearchChange={(searchText) => {
+          setQuery({
+            ...query,
+            searchText: searchText ? searchText : undefined,
+          });
           setUrlQueryParams({ search: searchText ? searchText : undefined });
         }}
         onSelectionChange={(selectedItems) => {
@@ -777,8 +845,23 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             setUrlQueryParams((params) => ({
               ...params,
               sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
+              sortField:
+                orderedColumnId >= 0
+                  ? columns[orderedColumnId].field?.toString()
+                  : undefined,
               sortDirection: orderDirection ? orderDirection : undefined,
             }));
+          if (orderDirection && orderedColumnId > 0) {
+            setQuery({
+              ...query,
+              sortField: columns[orderedColumnId].field?.toString(),
+              sortDirection: orderDirection,
+            });
+          } else {
+            delete query.sortField;
+            delete query.sortDirection;
+            setQuery(query);
+          }
         }}
       />
     </>

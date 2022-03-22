@@ -1,8 +1,8 @@
 import MaterialTable from '@material-table/core';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import RateReviewIcon from '@material-ui/icons/RateReview';
-import Visibility from '@material-ui/icons/Visibility';
-import dateformat from 'dateformat';
+import RateReviewIcon from '@mui/icons-material/RateReview';
+import Visibility from '@mui/icons-material/Visibility';
+import makeStyles from '@mui/styles/makeStyles';
+import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
@@ -52,7 +52,7 @@ const assignmentColumns = [
     title: 'Date assigned',
     field: 'dateAssigned',
     render: (rowData: SepAssignment): string =>
-      dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
+      DateTime.fromISO(rowData.dateAssigned).toFormat('dd-MMM-yyyy HH:mm:ss'),
   },
   { title: 'Review status', field: 'review.status' },
   {
@@ -90,6 +90,10 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
     PROPOSAL_MODAL_TAB_NAMES.GRADE,
   ];
 
+  const SEPAssignmentsWithId = (sepProposal.assignments as SepAssignment[]).map(
+    (sepAssignment) =>
+      Object.assign(sepAssignment, { id: sepAssignment.sepMemberUserId })
+  );
   const proposalReviewModalShouldOpen =
     !!urlQueryParams.reviewerModal &&
     currentAssignment?.proposalPk === sepProposal.proposalPk;
@@ -126,10 +130,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
         icons={tableIcons}
         columns={assignmentColumns}
         title={'Assigned reviewers'}
-        data={(sepProposal.assignments as SepAssignment[]).map(
-          (sepAssignment) =>
-            Object.assign(sepAssignment, { id: sepAssignment.sepMemberUserId })
-        )}
+        data={SEPAssignmentsWithId}
         editable={editableTableRow}
         actions={[
           (rowData) => ({

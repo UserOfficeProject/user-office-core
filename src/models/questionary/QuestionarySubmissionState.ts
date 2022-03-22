@@ -183,6 +183,7 @@ export function QuestionarySubmissionModel<
           break;
 
         case 'GO_TO_STEP':
+          // TODO: Here we can also mark the step as completed after going to next step
           draftState.stepIndex = clamStepIndex(
             action.stepIndex,
             draftState.wizardSteps.length

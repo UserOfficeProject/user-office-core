@@ -1,16 +1,16 @@
-import DateFnsUtils from '@date-io/date-fns';
+import DateAdapter from '@mui/lab/AdapterLuxon';
+import DatePicker from '@mui/lab/DatePicker';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import {
   FormControl,
   Grid,
   InputLabel,
   MenuItem,
   Select,
-} from '@material-ui/core';
-import {
-  KeyboardDatePicker,
-  MuiPickersUtilsProvider,
-} from '@material-ui/pickers';
-import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
+  TextField,
+  useTheme,
+} from '@mui/material';
+import { DateTime } from 'luxon';
 import React, { useState } from 'react';
 
 import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
@@ -20,6 +20,7 @@ function DateSearchCriteriaInput({
   onChange,
   searchCriteria,
 }: SearchCriteriaInputProps) {
+  const theme = useTheme();
   const [value, setValue] = useState<Date | null>(
     searchCriteria ? new Date(searchCriteria?.value as string) : null
   );
@@ -28,9 +29,9 @@ function DateSearchCriteriaInput({
   );
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} alignItems="end">
       <Grid item xs={6}>
-        <FormControl style={{ width: '100%' }}>
+        <FormControl fullWidth>
           <InputLabel shrink id="comparator">
             Operator
           </InputLabel>
@@ -63,32 +64,35 @@ function DateSearchCriteriaInput({
         </FormControl>
       </Grid>
       <Grid item xs={6}>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <KeyboardDatePicker
-            disableToolbar
-            format="yyyy-MM-dd"
-            variant="inline"
-            autoOk={true}
+        <LocalizationProvider dateAdapter={DateAdapter}>
+          <DatePicker
+            inputFormat="yyyy-MM-dd"
+            renderInput={(props) => (
+              <TextField
+                {...props}
+                required
+                margin="none"
+                size="small"
+                fullWidth
+                data-cy="value"
+                InputLabelProps={{
+                  shrink: value ? true : undefined,
+                }}
+              />
+            )}
             label="Date"
             value={value}
-            onChange={(date: MaterialUiPickersDate) => {
-              /*
-              DateFnsUtils uses native Date object, but use of Luxon elsewhere (in call modal)
-              causes incorrect type inference: https://github.com/dmtrKovalenko/date-io/issues/584
-              */
-              const newDate = date as unknown as Date;
+            onChange={(date: DateTime | null) => {
+              const newDate = date?.startOf('day').toJSDate();
+
               if (newDate && !isNaN(newDate.getTime())) {
-                newDate.setUTCHours(0, 0, 0, 0);
                 onChange(comparator, newDate.toISOString());
               }
-              setValue(newDate);
+              setValue(newDate || null);
             }}
-            InputLabelProps={{
-              shrink: value ? true : undefined,
-            }}
-            data-cy="value"
+            desktopModeMediaQuery={theme.breakpoints.up('sm')}
           />
-        </MuiPickersUtilsProvider>
+        </LocalizationProvider>
       </Grid>
     </Grid>
   );

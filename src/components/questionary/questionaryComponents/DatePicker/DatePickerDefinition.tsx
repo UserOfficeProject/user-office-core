@@ -1,4 +1,4 @@
-import TodayIcon from '@material-ui/icons/Today';
+import TodayIcon from '@mui/icons-material/Today';
 import { dateQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 

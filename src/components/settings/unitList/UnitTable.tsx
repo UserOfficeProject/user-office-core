@@ -1,6 +1,7 @@
-import { Button, Typography } from '@material-ui/core';
-import PublishIcon from '@material-ui/icons/Publish';
-import ShareIcon from '@material-ui/icons/Share';
+import PublishIcon from '@mui/icons-material/Publish';
+import ShareIcon from '@mui/icons-material/Share';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { useHistory } from 'react-router';
@@ -20,15 +21,16 @@ import { FunctionType } from 'utils/utilTypes';
 
 import CreateUnit from './CreateUnit';
 
+const columns = [
+  { title: 'Quantity', field: 'quantity' },
+  { title: 'Symbol', field: 'symbol' },
+  { title: 'Unit', field: 'unit' },
+];
+
 const UnitTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
   const history = useHistory();
   const { loadingUnits, units, setUnitsWithLoading: setUnits } = useUnitsData();
-  const columns = [
-    { title: 'Quantity', field: 'quantity' },
-    { title: 'Symbol', field: 'symbol' },
-    { title: 'Unit', field: 'unit' },
-  ];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
@@ -78,8 +80,6 @@ const UnitTable: React.FC = () => {
             <Button
               startIcon={<PublishIcon />}
               type="button"
-              variant="contained"
-              color="primary"
               onClick={() => {
                 history.push('/ImportUnits');
               }}
@@ -90,8 +90,6 @@ const UnitTable: React.FC = () => {
             <Button
               startIcon={<ShareIcon />}
               type="button"
-              variant="contained"
-              color="primary"
               onClick={() => {
                 api()
                   .getUnitsAsJson()

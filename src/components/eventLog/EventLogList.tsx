@@ -1,6 +1,6 @@
 import MaterialTable from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import dateformat from 'dateformat';
+import { Typography } from '@mui/material';
+import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -28,7 +28,7 @@ const columns = [
   {
     title: 'Changed on',
     render: (rowData: EventLog): string =>
-      dateformat(new Date(rowData.eventTStamp), 'dd-mmm-yyyy HH:MM:ss'),
+      DateTime.fromISO(rowData.eventTStamp).toFormat('dd-MMM-yyyy HH:mm:ss'),
   },
   { title: 'Event type', field: 'eventType' },
 ];
