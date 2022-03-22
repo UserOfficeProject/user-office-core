@@ -1,11 +1,11 @@
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import InputLabel from '@material-ui/core/InputLabel';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import Typography from '@mui/material/Typography';
 import { Editor } from '@tinymce/tinymce-react';
 import { administrationProposalValidationSchema } from '@user-office-software/duo-validation/lib/Proposal';
 import { Formik, Form, Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React from 'react';
 import { Prompt } from 'react-router';
 
@@ -15,7 +15,7 @@ import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import { UserRole } from 'generated/sdk';
 import { ProposalEndStatus } from 'generated/sdk';
 import { ProposalData } from 'hooks/proposal/useProposalData';
-import { ButtonContainer } from 'styles/StyledComponents';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export type AdministrationFormData = {
@@ -119,7 +119,6 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
                   id="time-managemment-input"
                   type="number"
                   component={TextField}
-                  margin="normal"
                   fullWidth
                   autoComplete="off"
                   data-cy="managementTimeAllocation"
@@ -204,25 +203,22 @@ const ProposalAdmin: React.FC<ProposalAdminProps> = ({
               </Grid>
               {isUserOfficer && (
                 <Grid item xs={12}>
-                  <ButtonContainer>
+                  <StyledButtonContainer>
                     <Field
                       id="managementDecisionSubmitted"
                       name="managementDecisionSubmitted"
                       component={FormikUICustomCheckbox}
                       label="Submitted"
-                      color="primary"
                       data-cy="is-management-decision-submitted"
                     />
                     <Button
                       disabled={isSubmitting}
                       type="submit"
-                      variant="contained"
-                      color="primary"
                       data-cy="save-admin-decision"
                     >
                       Save
                     </Button>
-                  </ButtonContainer>
+                  </StyledButtonContainer>
                 </Grid>
               )}
             </Grid>

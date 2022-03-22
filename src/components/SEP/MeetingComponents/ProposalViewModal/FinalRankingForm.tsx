@@ -1,9 +1,9 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import InputLabel from '@material-ui/core/InputLabel';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
 import { saveSepMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
 import { Formik, Form, Field, useFormikContext } from 'formik';
@@ -22,7 +22,7 @@ import {
   SepMeetingDecision,
   UserRole,
 } from 'generated/sdk';
-import { StyledPaper, ButtonContainer } from 'styles/StyledComponents';
+import { StyledPaper, StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -250,7 +250,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                       !hasWriteAccess || shouldDisableForm(isSubmitting)
                     }
                   />
-                  <ButtonContainer style={{ margin: '2rem 0 0' }}>
+                  <StyledButtonContainer style={{ margin: '2rem 0 0' }}>
                     {hasWriteAccess && (
                       <>
                         {isSubmitting && (
@@ -268,14 +268,12 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                             name="submitted"
                             component={FormikUICustomCheckbox}
                             label="Submitted"
-                            color="primary"
                             disabled={isSubmitting}
                             data-cy="is-sep-meeting-submitted"
                           />
                         )}
                         <Button
                           type="submit"
-                          variant="contained"
                           onClick={() => {
                             setShouldClose(false);
                             setShouldSubmit(false);
@@ -289,7 +287,6 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                         </Button>
                         <Button
                           type="submit"
-                          variant="contained"
                           onClick={() => {
                             setShouldClose(true);
                             setShouldSubmit(false);
@@ -304,12 +301,10 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                         {!isUserOfficer && (
                           <Button
                             type="submit"
-                            variant="contained"
                             onClick={() => {
                               setShouldClose(false);
                               setShouldSubmit(true);
                             }}
-                            color={'primary'}
                             className={classes.button}
                             data-cy="submitSepMeeting"
                             disabled={shouldDisableForm(isSubmitting)}
@@ -319,7 +314,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                         )}
                       </>
                     )}
-                  </ButtonContainer>
+                  </StyledButtonContainer>
                 </Grid>
               </Grid>
             </Form>

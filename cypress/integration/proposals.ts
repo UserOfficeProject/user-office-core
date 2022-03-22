@@ -1,4 +1,5 @@
 import faker from 'faker';
+import { DateTime } from 'luxon';
 
 import {
   AllocationTimeUnits,
@@ -24,11 +25,10 @@ context('Proposal tests', () => {
   let createdProposalPk: number;
   const textQuestion = faker.random.words(2);
 
-  const currentDayStart = new Date();
-  currentDayStart.setHours(0, 0, 0, 0);
-  const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
-  const twoDaysAgo = new Date(new Date().setDate(new Date().getDate() - 2));
-  const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1));
+  const currentDayStart = DateTime.now().startOf('day');
+  const yesterday = currentDayStart.plus({ days: -1 });
+  const twoDaysAgo = currentDayStart.plus({ days: -2 });
+  const tomorrow = currentDayStart.plus({ days: 1 });
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
@@ -108,7 +108,6 @@ context('Proposal tests', () => {
           });
         }
       });
-      cy.viewport(1920, 1080);
     });
 
     it('Should be able create proposal', () => {
@@ -130,7 +129,10 @@ context('Proposal tests', () => {
 
       cy.get('[data-cy=findUser]').click();
 
-      cy.contains('Benjamin').parent().find("[title='Select user']").click();
+      cy.contains('Benjamin')
+        .parent()
+        .find("[aria-label='Select user']")
+        .click();
 
       cy.contains('Save and continue').click();
 
@@ -152,7 +154,7 @@ context('Proposal tests', () => {
       cy.get('@modal')
         .contains(proposer.firstName)
         .parent()
-        .find("[title='Select user']")
+        .find("[aria-label='Select user']")
         .click();
 
       cy.contains('Save and continue').click();
@@ -167,7 +169,7 @@ context('Proposal tests', () => {
 
       cy.contains(title)
         .parent()
-        .find('[title="Edit proposal"]')
+        .find('[aria-label="Edit proposal"]')
         .should('exist')
         .click();
 
@@ -179,7 +181,7 @@ context('Proposal tests', () => {
       cy.contains(title);
       cy.contains('submitted');
 
-      cy.get('[title="View proposal"]').should('exist');
+      cy.get('[aria-label="View proposal"]').should('exist');
     });
 
     it('Officer should be able to edit proposal', () => {
@@ -190,7 +192,7 @@ context('Proposal tests', () => {
 
       cy.contains(newProposalTitle)
         .parent()
-        .find('[title="View proposal"]')
+        .find('[aria-label="View proposal"]')
         .click();
 
       cy.contains('Edit proposal').click();
@@ -215,7 +217,7 @@ context('Proposal tests', () => {
 
       cy.contains('Proposals').click();
 
-      cy.get("[title='Show Columns']").first().click();
+      cy.get("[aria-label='Show Columns']").first().click();
       cy.get('.MuiPopover-paper').contains('Call').click();
       cy.get('.MuiPopover-paper').contains('SEP').click();
 
@@ -237,7 +239,7 @@ context('Proposal tests', () => {
 
       cy.contains('Proposals').click();
 
-      cy.get("[title='Show Columns']").first().click();
+      cy.get("[aria-label='Show Columns']").first().click();
       cy.get('.MuiPopover-paper').contains('Technical time allocation').click();
       cy.get('.MuiPopover-paper').contains('Final time allocation').click();
 
@@ -245,7 +247,7 @@ context('Proposal tests', () => {
 
       cy.contains(newProposalTitle)
         .parent()
-        .find('[title="View proposal"]')
+        .find('[aria-label="View proposal"]')
         .click();
 
       cy.contains('Technical review').click();
@@ -265,7 +267,7 @@ context('Proposal tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[title="Edit"]').first().click();
+      cy.get('[aria-label="Edit"]').first().click();
 
       cy.get('[data-cy="call-workflow"]').click();
       cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
@@ -299,9 +301,9 @@ context('Proposal tests', () => {
       cy.contains(newProposalTitle);
       cy.contains('submitted');
 
-      cy.get('[title="View proposal"]').should('exist');
+      cy.get('[aria-label="View proposal"]').should('exist');
 
-      cy.get('[title="Clone proposal"]').first().click();
+      cy.get('[aria-label="Clone proposal"]').first().click();
 
       cy.get('#selectedCallId-input').click();
       cy.get('#menu-selectedCallId').contains(newCall.shortCode).click();
@@ -465,7 +467,7 @@ context('Proposal tests', () => {
 
       cy.contains(newProposalTitle)
         .parent()
-        .find('[title="Delete proposal"]')
+        .find('[aria-label="Delete proposal"]')
         .click();
 
       cy.contains('OK').click();
@@ -480,7 +482,7 @@ context('Proposal tests', () => {
 
       cy.contains(newProposalTitle)
         .parent()
-        .find('[title="Edit proposal"]')
+        .find('[aria-label="Edit proposal"]')
         .click();
 
       cy.contains('Save and continue').click();
@@ -503,13 +505,13 @@ context('Proposal tests', () => {
 
       cy.contains(newProposalTitle)
         .parent()
-        .find('[title="View proposal"]')
+        .find('[aria-label="View proposal"]')
         .click();
 
       cy.contains('Submit').should('be.disabled');
 
       cy.get('[data-cy="user-menu-items"]')
-        .find('[title="New Proposal"]')
+        .find('[aria-label="New Proposal"]')
         .should('have.css', 'pointer-events', 'none');
     });
 
@@ -551,13 +553,12 @@ context('Proposal tests', () => {
   describe('Proposal advanced tests', () => {
     beforeEach(() => {
       cy.resetDB(true);
-      cy.viewport(1920, 1080);
     });
 
     it('User officer should reopen proposal', () => {
       cy.login('user');
       cy.visit('/');
-      cy.get('[title="View proposal"]').click();
+      cy.get('[aria-label="View proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();
       cy.get('[data-cy=button-submit-proposal]').should('be.disabled');
 
@@ -572,7 +573,7 @@ context('Proposal tests', () => {
 
       cy.login('user');
       cy.visit('/');
-      cy.get('[title="Edit proposal"]').click();
+      cy.get('[aria-label="Edit proposal"]').click();
       cy.get('[role="tablist"]').contains('Proposal').click();
       cy.get('[data-cy=save-and-continue-button]').should('not.be.disabled');
 

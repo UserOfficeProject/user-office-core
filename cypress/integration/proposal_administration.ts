@@ -19,7 +19,6 @@ context('Proposal administration tests', () => {
 
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   describe('Proposal administration advanced search filter tests', () => {
@@ -192,7 +191,7 @@ context('Proposal administration tests', () => {
 
       cy.contains(proposalName1)
         .parent()
-        .get('[title="Edit proposal"]')
+        .get('[aria-label="Edit proposal"]')
         .click();
 
       cy.finishedLoading();
@@ -355,6 +354,7 @@ context('Proposal administration tests', () => {
 
       cy.get('table tbody tr').eq(1).contains(proposalFixedName);
       cy.contains('Title').click();
+      cy.finishedLoading();
       cy.get('table tbody tr').eq(0).contains(proposalFixedName);
 
       cy.get('table tbody tr input[type="checkbox"]').first().click();
@@ -488,11 +488,12 @@ context('Proposal administration tests', () => {
       cy.contains('Search').click();
       cy.contains(proposal.title).should('not.exist');
 
-      cy.get('[data-cy=comparator]').click();
-      cy.get('[role=listbox]').contains('Exact').click();
-      cy.get('[data-cy=value] input').clear().type(DATE_ANSWER);
-      cy.contains('Search').click();
-      cy.contains(proposal.title).should('exist');
+      // TODO: This should be allowed here: https://github.com/UserOfficeProject/user-office-frontend/pull/815
+      // cy.get('[data-cy=comparator]').click();
+      // cy.get('[role=listbox]').contains('Exact').click();
+      // cy.get('[data-cy=value] input').clear().type(DATE_ANSWER);
+      // cy.contains('Search').click();
+      // cy.contains(proposal.title).should('exist');
 
       cy.get('[data-cy=comparator]').click();
       cy.get('[role=listbox]').contains('After').click();

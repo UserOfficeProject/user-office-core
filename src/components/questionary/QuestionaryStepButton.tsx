@@ -1,5 +1,5 @@
-import StepButton from '@material-ui/core/StepButton';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import StepButton from '@mui/material/StepButton';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { PropsWithChildren } from 'react';
 
 const useStyles = makeStyles((theme) => ({
@@ -25,7 +25,6 @@ export function QuestionaryStepButton(
   props: PropsWithChildren<{
     onClick: () => Promise<void>;
     active?: boolean;
-    completed?: boolean;
     clickable?: boolean;
     readonly: boolean;
   }>

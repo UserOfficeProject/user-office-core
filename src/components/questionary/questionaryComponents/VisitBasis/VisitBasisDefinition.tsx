@@ -1,4 +1,4 @@
-import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';

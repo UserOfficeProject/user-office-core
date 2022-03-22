@@ -1,15 +1,14 @@
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import MenuItem from '@material-ui/core/MenuItem';
-import Tooltip from '@material-ui/core/Tooltip';
-import Typography from '@material-ui/core/Typography';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import VisibilityIcon from '@material-ui/icons/Visibility';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import MenuItem from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { useEffect, useState } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
@@ -20,7 +19,7 @@ import { Maybe, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useDownloadPDFSample } from 'hooks/sample/useDownloadPDFSample';
 import { SampleWithProposalData } from 'models/questionary/sample/SampleWithProposalData';
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import SampleDetails from './SampleDetails';
@@ -67,7 +66,6 @@ function SampleEvaluationDialog(props: {
               name="safetyStatus"
               label="Status"
               select
-              margin="normal"
               component={TextField}
               InputLabelProps={{
                 shrink: true,
@@ -131,13 +129,7 @@ function SampleEvaluationDialog(props: {
             />
 
             <ActionButtonContainer>
-              <Button
-                variant="contained"
-                type="submit"
-                color="primary"
-                data-cy="submit"
-                disabled={!dirty}
-              >
+              <Button type="submit" data-cy="submit" disabled={!dirty}>
                 Submit
               </Button>
             </ActionButtonContainer>
@@ -147,6 +139,22 @@ function SampleEvaluationDialog(props: {
     </InputDialog>
   );
 }
+
+const columns = [
+  {
+    title: 'Actions',
+    sorting: false,
+    removable: false,
+    field: 'rowActions',
+  },
+  {
+    title: 'Proposal ID',
+    field: 'proposal.proposalId',
+  },
+  { title: 'Title', field: 'title' },
+  { title: 'Status', field: 'safetyStatus' },
+  { title: 'Created', field: 'created' },
+];
 
 function SampleSafetyPage() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
@@ -210,67 +218,13 @@ function SampleSafetyPage() {
     );
   };
 
-  const columns = [
-    {
-      title: 'Actions',
-      sorting: false,
-      removable: false,
-      render: RowActionButtons,
-    },
-    {
-      title: 'Proposal ID',
-      field: 'proposal.proposalId',
-    },
-    { title: 'Title', field: 'title' },
-    { title: 'Status', field: 'safetyStatus' },
-    { title: 'Created', field: 'created' },
-  ];
+  const samplesWithRowActions = samples.map((sample) => ({
+    ...sample,
+    rowActions: RowActionButtons(sample),
+  }));
 
   return (
     <>
-      <ContentContainer>
-        <Grid container>
-          <Grid item xs={12}>
-            <StyledPaper>
-              <CallFilter
-                callId={selectedCallId}
-                calls={calls}
-                isLoading={loadingCalls}
-                onChange={(callId) => {
-                  setSelectedCallId(callId);
-                }}
-                shouldShowAll={true}
-              />
-              <SamplesTable
-                data={samples}
-                isLoading={isExecutingCall}
-                urlQueryParams={urlQueryParams}
-                setUrlQueryParams={setUrlQueryParams}
-                columns={columns}
-                options={{
-                  selection: true,
-                  headerSelectionProps: {
-                    inputProps: { 'aria-label': 'Select All Rows' },
-                  },
-                }}
-                actions={[
-                  {
-                    icon: GetAppIcon,
-                    tooltip: 'Download sample',
-                    onClick: (event, rowData) =>
-                      downloadPDFSample(
-                        (rowData as SampleWithProposalData[]).map(
-                          ({ id }) => id
-                        ),
-                        (rowData as SampleWithProposalData[])[0].title
-                      ),
-                  },
-                ]}
-              />
-            </StyledPaper>
-          </Grid>
-        </Grid>
-      </ContentContainer>
       {selectedSample && (
         <SampleEvaluationDialog
           sample={selectedSample}
@@ -286,6 +240,43 @@ function SampleSafetyPage() {
           }}
         />
       )}
+      <StyledContainer>
+        <StyledPaper>
+          <CallFilter
+            callId={selectedCallId}
+            calls={calls}
+            isLoading={loadingCalls}
+            onChange={(callId) => {
+              setSelectedCallId(callId);
+            }}
+            shouldShowAll={true}
+          />
+          <SamplesTable
+            data={samplesWithRowActions}
+            isLoading={isExecutingCall}
+            urlQueryParams={urlQueryParams}
+            setUrlQueryParams={setUrlQueryParams}
+            columns={columns}
+            options={{
+              selection: true,
+              headerSelectionProps: {
+                inputProps: { 'aria-label': 'Select All Rows' },
+              },
+            }}
+            actions={[
+              {
+                icon: GetAppIcon,
+                tooltip: 'Download sample',
+                onClick: (event, rowData) =>
+                  downloadPDFSample(
+                    (rowData as SampleWithProposalData[]).map(({ id }) => id),
+                    (rowData as SampleWithProposalData[])[0].title
+                  ),
+              },
+            ]}
+          />
+        </StyledPaper>
+      </StyledContainer>
     </>
   );
 }

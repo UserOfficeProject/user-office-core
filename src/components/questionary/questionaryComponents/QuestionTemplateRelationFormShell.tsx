@@ -1,7 +1,7 @@
-import Button from '@material-ui/core/Button';
-import Link from '@material-ui/core/Link';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import React from 'react';
 
@@ -122,7 +122,6 @@ export const QuestionTemplateRelationFormShell = (
               <Button
                 type="button"
                 variant="outlined"
-                color="primary"
                 data-cy="remove-from-template"
                 onClick={deleteHandler}
                 disabled={definition.creatable === false}
@@ -131,9 +130,8 @@ export const QuestionTemplateRelationFormShell = (
               </Button>
               <Button
                 type="submit"
-                variant="contained"
-                color="primary"
                 data-cy="submit"
+                disabled={!formikProps.isValid}
               >
                 Update
               </Button>

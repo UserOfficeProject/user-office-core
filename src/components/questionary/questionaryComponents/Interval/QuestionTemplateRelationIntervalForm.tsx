@@ -1,7 +1,7 @@
-import { TextField as MaterialTextField } from '@material-ui/core';
-import { Autocomplete } from '@material-ui/lab';
+import Autocomplete from '@mui/lab/Autocomplete';
+import MaterialTextField from '@mui/material/TextField';
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { FC, useState } from 'react';
 import * as Yup from 'yup';
 
@@ -52,7 +52,6 @@ export const QuestionTemplateRelationIntervalForm: FC<
             id="small-label-input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'small-label' }}
           />
@@ -61,7 +60,6 @@ export const QuestionTemplateRelationIntervalForm: FC<
               name="config.required"
               component={FormikUICustomCheckbox}
               label="Check to make this field mandatory"
-              margin="normal"
               fullWidth
               InputProps={{ 'data-cy': 'required' }}
             />
@@ -74,7 +72,7 @@ export const QuestionTemplateRelationIntervalForm: FC<
                 `${symbol} (${unit}) - ${quantity}`
               }
               renderInput={(params) => (
-                <MaterialTextField {...params} label="Units" />
+                <MaterialTextField {...params} label="Units" margin="none" />
               )}
               onChange={(_event, newValue) => {
                 setSelectedUnits(newValue);

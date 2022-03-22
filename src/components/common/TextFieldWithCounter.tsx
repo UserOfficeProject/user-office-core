@@ -1,6 +1,6 @@
-import InputAdornment from '@material-ui/core/InputAdornment';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import TextField, { TextFieldProps } from '@material-ui/core/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React, { ChangeEvent, useState } from 'react';
 

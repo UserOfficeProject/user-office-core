@@ -1,9 +1,9 @@
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Link from '@material-ui/core/Link';
-import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Link from '@mui/material/Link';
+import MenuItem from '@mui/material/MenuItem';
 import { Field } from 'formik';
-import { Select, TextField } from 'formik-material-ui';
+import { Select, TextField } from 'formik-mui';
 import React, { FC, useContext } from 'react';
 import * as Yup from 'yup';
 
@@ -59,7 +59,6 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
             label="Key"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
@@ -70,13 +69,12 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
             label="Question"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
 
           <TitledContainer label="Options">
-            <FormControl fullWidth margin="normal">
+            <FormControl fullWidth>
               <InputLabel htmlFor="config.templateId">Template name</InputLabel>
               <Field
                 name="config.templateId"
@@ -150,7 +148,6 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
               placeholder='(e.g. "add new")'
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="addEntryButtonLabel"
             />
@@ -161,7 +158,6 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
               placeholder="(e.g. 1, leave blank for unlimited)"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="min-entries"
             />
@@ -172,7 +168,6 @@ export const QuestionSampleDeclarationForm: FC<QuestionFormProps> = (props) => {
               placeholder="(e.g. 4, leave blank for unlimited)"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="max-entries"
             />

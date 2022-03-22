@@ -1,12 +1,12 @@
 import {
   FormControl,
   InputLabel,
-  makeStyles,
   MenuItem,
   Paper,
   Select,
   TextField,
-} from '@material-ui/core';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
 import { getQuestionaryComponentDefinitions } from 'components/questionary/QuestionaryComponentRegistry';

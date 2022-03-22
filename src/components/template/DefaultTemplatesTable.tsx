@@ -27,6 +27,7 @@ function DefaultTemplatesTable(props: DefaultTemplatesTableProps) {
 
   const defaultIsRowRemovable = () => true;
 
+  // NOTE: Here we keep the columns inside the component just because of the itemCountLabel shown in the title
   const defaultColumns: Column<TemplateRowDataType>[] = [
     { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },

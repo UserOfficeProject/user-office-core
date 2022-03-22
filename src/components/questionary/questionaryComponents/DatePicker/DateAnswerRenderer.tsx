@@ -1,4 +1,4 @@
-import dateFormat from 'dateformat';
+import { DateTime } from 'luxon';
 import React from 'react';
 
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
@@ -9,10 +9,10 @@ const DateAnswerRenderer: AnswerRenderer = ({ config, value }) => {
     return <span>Left blank</span>;
   }
   const format = (config as DateConfig).includeTime
-    ? 'dd-mmm-yyyy HH:MM'
-    : 'dd-mmm-yyyy';
+    ? 'dd-MMM-yyyy HH:mm'
+    : 'dd-MMM-yyyy';
 
-  return <span>{dateFormat(value, format)}</span>;
+  return <span>{DateTime.fromISO(value).toFormat(format)}</span>;
 };
 
 export default DateAnswerRenderer;

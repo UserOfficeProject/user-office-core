@@ -4,7 +4,7 @@ import { UserRole } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 function searchMuiTableAsync(search: string) {
-  cy.get('[aria-label="Search"]').type(search);
+  cy.get('[data-cy="co-proposers"] [aria-label="Search"]').type(search);
 
   cy.get('[role="progressbar"]').should('exist');
   cy.get('[role="progressbar"]').should('not.exist');
@@ -29,7 +29,6 @@ const sep2 = {
 context('General scientific evaluation panel tests', () => {
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   it('User should not be able to see SEPs page', () => {
@@ -63,11 +62,13 @@ context('General scientific evaluation panel tests', () => {
     it('Officer should be able to assign SEP Reviewer role', () => {
       cy.contains('People').click();
       searchMuiTableAsync(sepMembers.chair.lastName);
-      cy.get('[title="Edit user"]').click();
+      cy.get('[aria-label="Edit user"]').click();
       cy.get('[cy-data="user-page"]').contains('Settings').click();
       cy.contains('Add role').click();
 
-      cy.get('[aria-label="Search"]').type('SEP Reviewer');
+      cy.get('[data-cy="role-modal"] input[aria-label="Search"]').type(
+        'SEP Reviewer'
+      );
       cy.get('[role="dialog"] input[type="checkbox"]').first().click();
 
       cy.contains('Update').click();
@@ -78,11 +79,13 @@ context('General scientific evaluation panel tests', () => {
       cy.contains('People').click();
 
       searchMuiTableAsync(sepMembers.secretary.lastName);
-      cy.get('[title="Edit user"]').click();
+      cy.get('[aria-label="Edit user"]').click();
       cy.get('[cy-data="user-page"]').contains('Settings').click();
       cy.contains('Add role').click();
 
-      cy.get('[aria-label="Search"]').type('SEP Reviewer');
+      cy.get('[data-cy="role-modal"] input[aria-label="Search"]').type(
+        'SEP Reviewer'
+      );
       cy.get('[role="dialog"] input[type="checkbox"]').first().click();
 
       cy.contains('Update').click();
@@ -94,9 +97,9 @@ context('General scientific evaluation panel tests', () => {
 
     it('Officer should be able to delete SEP', () => {
       cy.contains('SEPs').click();
-      cy.get('[title="Delete"]').last().click();
+      cy.get('[aria-label="Delete"]').last().click();
 
-      cy.get('[title="Save"]').click();
+      cy.get('[aria-label="Save"]').click();
 
       cy.notification({ variant: 'success', text: 'SEP deleted successfully' });
     });
@@ -134,7 +137,7 @@ context('General scientific evaluation panel tests', () => {
       const newDescription = faker.random.words(8);
 
       cy.contains('SEPs').click();
-      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
+      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
       cy.get('#code').type(newCode);
       cy.get('#description').type(newDescription);
       cy.get('[data-cy="submit"]').click();
@@ -193,11 +196,11 @@ context('General scientific evaluation panel tests', () => {
       let selectedSecretaryUserLastName = '';
 
       cy.contains('SEPs').click();
-      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
+      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
 
       cy.contains('Members').click();
 
-      cy.get('[title="Set SEP Chair"]').click();
+      cy.get('[aria-label="Set SEP Chair"]').click();
 
       cy.finishedLoading();
 
@@ -219,7 +222,7 @@ context('General scientific evaluation panel tests', () => {
           selectedChairUserLastName = element.text();
         });
 
-      cy.get('[title="Select user"]').first().click();
+      cy.get('[aria-label="Select user"]').first().click();
 
       cy.notification({
         variant: 'success',
@@ -236,7 +239,7 @@ context('General scientific evaluation panel tests', () => {
         );
       });
 
-      cy.get('[title="Set SEP Secretary"]').click();
+      cy.get('[aria-label="Set SEP Secretary"]').click();
 
       cy.finishedLoading();
 
@@ -258,7 +261,7 @@ context('General scientific evaluation panel tests', () => {
           selectedSecretaryUserLastName = element.text();
         });
 
-      cy.get('[title="Select user"]').first().click();
+      cy.get('[aria-label="Select user"]').first().click();
 
       cy.notification({
         variant: 'success',
@@ -302,13 +305,13 @@ context('General scientific evaluation panel tests', () => {
         },
       });
       cy.contains('SEPs').click();
-      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
+      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
 
       cy.contains('Members').click();
 
       cy.finishedLoading();
 
-      cy.get('[title="Remove SEP Chair"]').click();
+      cy.get('[aria-label="Remove SEP chair"]').click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -317,7 +320,7 @@ context('General scientific evaluation panel tests', () => {
         text: 'SEP member removed successfully',
       });
 
-      cy.get('[title="Remove SEP Secretary"]').click();
+      cy.get('[aria-label="Remove SEP secretary"]').click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -329,7 +332,7 @@ context('General scientific evaluation panel tests', () => {
 
     it('Officer should be able to assign SEP Reviewers to existing SEP', () => {
       cy.contains('SEPs').click();
-      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
+      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
 
       cy.contains('Members').click();
 
@@ -361,13 +364,13 @@ context('General scientific evaluation panel tests', () => {
         memberIds: [sepMembers.reviewer.id],
       });
       cy.contains('SEPs').click();
-      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
+      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
 
       cy.contains('Members').click();
 
-      cy.get('[title="Remove reviewer"]').click();
+      cy.get('[aria-label="Remove reviewer"]').click();
 
-      cy.get('[title="Save"]').click();
+      cy.get('[aria-label="Save"]').click();
 
       cy.notification({
         variant: 'success',
@@ -433,17 +436,17 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('SEPs').click();
 
-      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
+      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
 
       cy.contains('Members').click();
 
       cy.finishedLoading();
 
-      cy.get('[title="Set SEP Chair"]').should('not.exist');
-      cy.get('[title="Set SEP Secretary"]').should('not.exist');
+      cy.get('[aria-label="Set SEP Chair"]').should('not.exist');
+      cy.get('[aria-label="Set SEP Secretary"]').should('not.exist');
 
-      cy.get('[title="Remove SEP Chair"]').should('not.exist');
-      cy.get('[title="Remove SEP Secretary"]').should('not.exist');
+      cy.get('[aria-label="Remove SEP chair"]').should('not.exist');
+      cy.get('[aria-label="Remove SEP secretary"]').should('not.exist');
     });
 
     it('SEP Chair should be able to modify SEP Reviewers', () => {
@@ -453,7 +456,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('SEPs').click();
 
-      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
+      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
 
       cy.contains('Members').click();
 
@@ -476,8 +479,8 @@ context('General scientific evaluation panel tests', () => {
 
       cy.closeNotification();
 
-      cy.get('[title="Remove reviewer"]').click();
-      cy.get('[title="Save"]').click();
+      cy.get('[aria-label="Remove reviewer"]').click();
+      cy.get('[aria-label="Save"]').click();
 
       cy.notification({
         variant: 'success',
@@ -545,17 +548,17 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('SEPs').click();
 
-      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
+      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
 
       cy.contains('Members').click();
 
       cy.finishedLoading();
 
-      cy.get('[title="Set SEP Chair"]').should('not.exist');
-      cy.get('[title="Set SEP Secretary"]').should('not.exist');
+      cy.get('[aria-label="Set SEP Chair"]').should('not.exist');
+      cy.get('[aria-label="Set SEP Secretary"]').should('not.exist');
 
-      cy.get('[title="Remove SEP Chair"]').should('not.exist');
-      cy.get('[title="Remove SEP Secretary"]').should('not.exist');
+      cy.get('[aria-label="Remove SEP Chair"]').should('not.exist');
+      cy.get('[aria-label="Remove SEP Secretary"]').should('not.exist');
     });
 
     it('SEP Secretary should be able to modify SEP Reviewers', () => {
@@ -565,7 +568,7 @@ context('General scientific evaluation panel tests', () => {
 
       cy.contains('SEPs').click();
 
-      cy.contains(sep1.code).parent().find('button[title="Edit"]').click();
+      cy.contains(sep1.code).parent().find('button[aria-label="Edit"]').click();
 
       cy.contains('Members').click();
 
@@ -588,8 +591,8 @@ context('General scientific evaluation panel tests', () => {
 
       cy.closeNotification();
 
-      cy.get('[title="Remove reviewer"]').click();
-      cy.get('[title="Save"]').click();
+      cy.get('[aria-label="Remove reviewer"]').click();
+      cy.get('[aria-label="Save"]').click();
 
       cy.notification({
         variant: 'success',

@@ -1,5 +1,5 @@
-import { Typography } from '@material-ui/core';
-import Container from '@material-ui/core/Container';
+import { Typography } from '@mui/material';
+import Container from '@mui/material/Container';
 import React from 'react';
 
 import { TemplateImportWithValidation } from 'generated/sdk';

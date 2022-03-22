@@ -1,12 +1,9 @@
-import Button, { ButtonProps, ButtonClassKey } from '@material-ui/core/Button';
-import { StandardProps } from '@material-ui/core/index';
+import Button, { ButtonProps } from '@mui/material/Button';
 import React, { Component } from 'react';
 
 import UOLoader from './UOLoader';
 
-export class NavigButton extends Component<
-  StandardProps<ButtonProps & { isBusy?: boolean }, ButtonClassKey>
-> {
+export class NavigButton extends Component<ButtonProps & { isBusy?: boolean }> {
   render() {
     const { className, isBusy, disabled, ...other } = this.props;
 

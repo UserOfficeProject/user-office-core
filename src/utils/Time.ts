@@ -1,4 +1,4 @@
-import moment, { Moment } from 'moment';
+import { DateTime } from 'luxon';
 
 import { Scalars } from 'generated/sdk';
 
@@ -87,22 +87,16 @@ export function timeAgo(dateParam: Date | Scalars['DateTime'] | null): string {
   return getFormattedDate(date); // 10. January 2017. at 10:20
 }
 
-export function daysRemaining(date: Date) {
-  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-  const firstDate = new Date();
-  const secondDate = date;
-
-  return Math.round(
-    Math.abs((firstDate.getTime() - secondDate.getTime()) / oneDay)
-  );
-}
-
 export function timeRemaining(toDate: Date): string {
-  const diff = toDate.getTime() - new Date().getTime();
+  const fromNow = DateTime.now();
+  const untilDate = DateTime.fromJSDate(toDate);
 
-  const minutes = Math.floor(diff / 1000 / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+  const { days, hours, minutes } = untilDate.diff(fromNow, [
+    'days',
+    'hours',
+    'minutes',
+    'seconds',
+  ]);
 
   if (days > 30) {
     return '';
@@ -117,18 +111,20 @@ export function timeRemaining(toDate: Date): string {
   }
 }
 
-export const TZ_LESS_DATE_TIME_FORMAT = 'yyyy-MM-DD HH:mm:ss';
+export const TZ_LESS_DATE_TIME_FORMAT = 'yyyy-MM-dd HH:mm:ss';
 
-export const TZ_LESS_DATE_TIME_LOW_PREC_FORMAT = 'yyyy-MM-DD HH:mm';
+export const TZ_LESS_DATE_TIME_LOW_PREC_FORMAT = 'yyyy-MM-dd HH:mm';
 
-export function parseTzLessDateTime(tzLessDateTime: string): Moment {
-  return moment(tzLessDateTime, TZ_LESS_DATE_TIME_FORMAT);
+export function parseTzLessDateTime(tzLessDateTime: string) {
+  return DateTime.fromSQL(tzLessDateTime);
 }
 
-export function toTzLessDateTime(dateTime: Moment | Date | string): string {
-  if (dateTime instanceof Date || typeof dateTime === 'string') {
-    dateTime = moment(dateTime);
+export function toTzLessDateTime(dateTime: DateTime | Date | string): string {
+  if (dateTime instanceof Date) {
+    dateTime = DateTime.fromJSDate(dateTime);
+  } else if (typeof dateTime === 'string') {
+    dateTime = DateTime.fromISO(dateTime);
   }
 
-  return dateTime.format(TZ_LESS_DATE_TIME_FORMAT);
+  return dateTime.toFormat(TZ_LESS_DATE_TIME_FORMAT);
 }

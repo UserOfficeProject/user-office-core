@@ -26,7 +26,6 @@ context('visits tests', () => {
       managementTimeAllocation: 5,
       managementDecisionSubmitted: true,
     });
-    cy.viewport(1920, 1080);
   });
 
   const startQuestion = 'Visit start';
@@ -93,7 +92,7 @@ context('visits tests', () => {
     cy.testActionButton(declareShipmentTitle, 'neutral');
 
     // create visit
-    cy.get(`[title="${formTeamTitle}"]`).first().click();
+    cy.get(`[aria-label="${formTeamTitle}"]`).first().click();
 
     // test error messages
     cy.get('[type="submit"]').click();
@@ -170,14 +169,14 @@ context('visits tests', () => {
     // test if the actions are available after co-proposer defined the team
     cy.testActionButton(registerVisitTitle, 'active');
 
-    cy.get(`[title="${registerVisitTitle}"]`).first().click();
+    cy.get(`[aria-label="${registerVisitTitle}"]`).first().click();
 
     cy.get('[data-cy=save-and-continue-button]').click();
     cy.contains(/invalid date/i).should('exist');
 
     cy.contains(startQuestion).parent().click().clear().type('101010');
     cy.get('[data-cy=save-and-continue-button]').click();
-    cy.contains(/invalid date format/i).should('exist');
+    cy.contains(/Invalid date/i).should('exist');
 
     cy.contains(startQuestion).parent().click().clear().type(endDate);
     cy.contains(endQuestion).parent().click().clear().type(startDate);
@@ -215,25 +214,25 @@ context('visits tests', () => {
     cy.testActionButton(registerVisitTitle, 'active');
     cy.testActionButton(individualTrainingTitle, 'active');
 
-    cy.get(`[title="${formTeamTitle}"]`).first().click();
+    cy.get(`[aria-label="${formTeamTitle}"]`).first().click();
 
     cy.get('[role="dialog"]')
       .contains('Carlsson')
       .parent()
-      .find('[title=Delete]')
+      .find('[aria-label=Delete]')
       .click();
 
-    cy.get('[title="Save"]').click();
+    cy.get('[aria-label="Save"]').click();
 
     cy.get('[data-cy=create-visit-button]').click();
 
     cy.contains('2023-01-07 10:00')
       .parent()
-      .get(`[title="${registerVisitTitle}]`)
+      .get(`[aria-label="${registerVisitTitle}]`)
       .should('not.exist');
     cy.contains('2023-01-07 10:00')
       .parent()
-      .get(`[title="${individualTrainingTitle}]`)
+      .get(`[aria-label="${individualTrainingTitle}]`)
       .should('not.exist');
   });
 });

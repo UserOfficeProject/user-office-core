@@ -1,4 +1,4 @@
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
@@ -13,6 +13,15 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
 import CreateUpdateInstitution from './CreateUpdateInstitution';
+
+const columns = [
+  { title: 'Name', field: 'name' },
+  {
+    title: 'Verified',
+    field: 'verified',
+    lookup: { true: 'true', false: 'false' },
+  },
+];
 
 const InstitutionPage: React.FC = () => {
   const { api } = useDataApiWithFeedback();
@@ -38,15 +47,6 @@ const InstitutionPage: React.FC = () => {
         }
       });
   };
-
-  const columns = [
-    { title: 'Name', field: 'name' },
-    {
-      title: 'Verified',
-      field: 'verified',
-      lookup: { true: 'true', false: 'false' },
-    },
-  ];
 
   const createModal = (
     onUpdate: FunctionType<void, [Institution | null]>,
