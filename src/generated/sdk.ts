@@ -1632,6 +1632,7 @@ export enum PageName {
   FOOTERCONTENT = 'FOOTERCONTENT',
   HELPPAGE = 'HELPPAGE',
   HOMEPAGE = 'HOMEPAGE',
+  LOGINHELPPAGE = 'LOGINHELPPAGE',
   PRIVACYPAGE = 'PRIVACYPAGE',
   REVIEWPAGE = 'REVIEWPAGE'
 }
@@ -1874,6 +1875,7 @@ export type ProposalsFilter = {
   proposalStatusId?: InputMaybe<Scalars['Int']>;
   questionFilter?: InputMaybe<QuestionFilterInput>;
   questionaryIds?: InputMaybe<Array<Scalars['Int']>>;
+  referenceNumbers?: InputMaybe<Array<Scalars['String']>>;
   shortCodes?: InputMaybe<Array<Scalars['String']>>;
   text?: InputMaybe<Scalars['String']>;
 };
