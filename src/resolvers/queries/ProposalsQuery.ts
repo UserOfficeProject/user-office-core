@@ -52,6 +52,9 @@ export class ProposalsFilter {
 
   @Field(() => QuestionFilterInput, { nullable: true })
   public questionFilter?: QuestionFilterInput;
+
+  @Field(() => [String], { nullable: true })
+  public referenceNumbers?: string[];
 }
 
 @ArgsType()
