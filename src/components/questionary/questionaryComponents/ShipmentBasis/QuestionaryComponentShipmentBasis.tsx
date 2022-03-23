@@ -170,7 +170,13 @@ const shipmentBasisPreSubmit =
       if (result.updateShipment.shipment) {
         dispatch({
           type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-          itemWithQuestionary: result.updateShipment.shipment,
+          itemWithQuestionary: {
+            ...result.updateShipment.shipment,
+            questionary: {
+              ...result.updateShipment.shipment.questionary,
+              steps: state.questionary.steps,
+            },
+          },
         });
       }
     } else {
@@ -182,7 +188,13 @@ const shipmentBasisPreSubmit =
       if (result.createShipment.shipment) {
         dispatch({
           type: 'ITEM_WITH_QUESTIONARY_CREATED',
-          itemWithQuestionary: result.createShipment.shipment,
+          itemWithQuestionary: {
+            ...result.createShipment.shipment,
+            questionary: {
+              ...result.createShipment.shipment.questionary,
+              steps: state.questionary.steps,
+            },
+          },
         });
         shipmentId = result.createShipment.shipment.id;
         returnValue = result.createShipment.shipment.questionaryId;
