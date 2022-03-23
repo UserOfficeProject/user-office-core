@@ -16,13 +16,11 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
 import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
-import { CreateUnitArgs } from '../resolvers/mutations/CreateUnitMutation';
 import { DeleteApiAccessTokenInput } from '../resolvers/mutations/DeleteApiAccessTokenMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
 import { generateUniqueId } from '../utils/helperFunctions';
-import { isSiConversionFormulaValid } from '../utils/isSiConversionFormulaValid';
 import { signToken } from '../utils/jwt';
 
 const IS_BACKEND_VALIDATION = true;
@@ -96,20 +94,6 @@ export default class AdminMutations {
     const institution = new Institution(0, args.name, args.verified);
 
     return await this.dataSource.createInstitution(institution);
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  async createUnit(agent: UserWithRole | null, args: CreateUnitArgs) {
-    if (isSiConversionFormulaValid(args.siConversionFormula) === false) {
-      return rejection('The SI conversion formula is not valid', { args });
-    }
-
-    return await this.dataSource.createUnit(args);
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  async deleteUnit(agent: UserWithRole | null, id: string) {
-    return await this.dataSource.deleteUnit(id);
   }
 
   @Authorized([Roles.USER_OFFICER])

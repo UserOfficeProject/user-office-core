@@ -129,7 +129,7 @@ export class Template {
   ) {}
 }
 
-export enum QuestionComparisonStatus {
+export enum ComparisonStatus {
   NEW = 'NEW',
   DIFFERENT = 'DIFFERENT',
   SAME = 'SAME',
@@ -145,7 +145,7 @@ export class QuestionComparison {
   constructor(
     public existingQuestion: Question | null,
     public newQuestion: Question,
-    public status: QuestionComparisonStatus,
+    public status: ComparisonStatus,
     public conflictResolutionStrategy: ConflictResolutionStrategy
   ) {}
 }

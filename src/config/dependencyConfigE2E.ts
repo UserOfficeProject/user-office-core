@@ -20,6 +20,7 @@ import PostgresSEPDataSource from '../datasources/postgres/SEPDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
+import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
@@ -51,6 +52,7 @@ mapClass(Tokens.ScheduledEventDataSource, PostgresScheduledEventDataSource);
 mapClass(Tokens.ShipmentDataSource, PostgresShipmentDataSource);
 mapClass(Tokens.SystemDataSource, PostgresSystemDataSource);
 mapClass(Tokens.TemplateDataSource, PostgresTemplateDataSource);
+mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
 

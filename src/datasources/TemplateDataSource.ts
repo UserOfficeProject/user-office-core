@@ -14,12 +14,12 @@ import {
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
-import { ConflictResolution } from '../resolvers/mutations/ImportTemplateMutation';
 import { SetActiveTemplateArgs } from '../resolvers/mutations/SetActiveTemplateMutation';
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { QuestionsFilter } from '../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
+import { ConflictResolution } from '../resolvers/types/ConflictResolution';
 import { TemplateGroup } from '../resolvers/types/TemplateGroup';
 
 export interface TemplateDataSource {
