@@ -8,11 +8,9 @@ import { Page } from '../../models/Admin';
 import { Feature } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
-import { Quantity } from '../../models/Quantity';
 import { Settings } from '../../models/Settings';
 import { BasicUserDetails } from '../../models/User';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
-import { CreateUnitArgs } from '../../resolvers/mutations/CreateUnitMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource, Entry } from '../AdminDataSource';
@@ -26,14 +24,11 @@ import {
   createFeatureObject,
   createInstitutionObject,
   createPageObject,
-  createQuantityObject,
   createSettingsObject,
-  createUnitObject,
   FeatureRecord,
   InstitutionRecord,
   NationalityRecord,
   PageTextRecord,
-  QuantityRecord,
   SettingsRecord,
   TokensAndPermissionsRecord,
   UserRecord,
@@ -57,7 +52,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .returning('*');
 
     if (!institutionRecord) {
-      throw new Error(`Could not update page with id:${institution.id}`);
+      throw new Error(`Could not update institution with id:${institution.id}`);
     }
 
     return {
@@ -130,12 +125,13 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async setPageText(id: number, content: string): Promise<Page> {
-    const [pagetextRecord]: PageTextRecord[] = await database
-      .update({
-        content,
+    const [pagetextRecord]: PageTextRecord[] = await database('pagetext')
+      .insert({
+        pagetext_id: id,
+        content: content,
       })
-      .from('pagetext')
-      .where('pagetext_id', id)
+      .onConflict('pagetext_id')
+      .merge()
       .returning('*');
 
     if (!pagetextRecord) {
