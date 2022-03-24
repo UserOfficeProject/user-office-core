@@ -258,6 +258,7 @@ export interface TechnicalReviewRecord {
   readonly status: number;
   readonly submitted: boolean;
   readonly reviewer_id: number;
+  readonly files: string;
 }
 
 export interface CallRecord {

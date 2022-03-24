@@ -7,7 +7,8 @@ export class TechnicalReview {
     public timeAllocation: number,
     public status: TechnicalReviewStatus,
     public submitted: boolean,
-    public reviewerId: number
+    public reviewerId: number,
+    public files: string
   ) {}
 }
 
