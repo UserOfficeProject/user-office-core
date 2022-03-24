@@ -6,4 +6,5 @@ export enum PageName {
   REVIEWPAGE = 5,
   FOOTERCONTENT = 6,
   LOGINHELPPAGE = 7,
+  GRADEGUIDEPAGE = 8,
 }
