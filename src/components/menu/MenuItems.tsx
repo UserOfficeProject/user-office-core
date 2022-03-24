@@ -192,7 +192,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const userOfficer = (
     <div data-cy="officer-menu-items">
       <Tooltip title="Proposals">
-        <ListItem component={NavLink} to="/ProposalPage" button>
+        <ListItem component={NavLink} to="/Proposals" button>
           <ListItemIcon>
             <FolderOpen />
           </ListItemIcon>
@@ -200,7 +200,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       <Tooltip title="Calls">
-        <ListItem component={NavLink} to="/CallPage" button>
+        <ListItem component={NavLink} to="/Calls" button>
           <ListItemIcon>
             <CalendarToday />
           </ListItemIcon>
@@ -208,7 +208,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       <Tooltip title="People">
-        <ListItem component={NavLink} to="/PeoplePage" button>
+        <ListItem component={NavLink} to="/People" button>
           <ListItemIcon>
             <People />
           </ListItemIcon>
@@ -216,7 +216,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       <Tooltip title="Instruments">
-        <ListItem component={NavLink} to="/InstrumentPage" button>
+        <ListItem component={NavLink} to="/Instruments" button>
           <ListItemIcon>
             <ScienceIcon />
           </ListItemIcon>
@@ -224,7 +224,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       <Tooltip title="Scientific evaluation panels">
-        <ListItem component={NavLink} to="/SEPPage" button>
+        <ListItem component={NavLink} to="/SEPs" button>
           <ListItemIcon>
             <GroupWorkIcon />
           </ListItemIcon>
@@ -240,7 +240,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       <Tooltip title="Institutions">
-        <ListItem component={NavLink} to="/InstitutionPage" button>
+        <ListItem component={NavLink} to="/Institutions" button>
           <ListItemIcon>
             <AccountBalanceIcon />
           </ListItemIcon>
@@ -269,7 +269,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
       </ListItem>
-      <ListItem component={NavLink} to="/SEPPage" button>
+      <ListItem component={NavLink} to="/SEPs" button>
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
@@ -299,7 +299,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItem>
-      <ListItem component={NavLink} to="/InstrumentPage" button>
+      <ListItem component={NavLink} to="/Instruments" button>
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>

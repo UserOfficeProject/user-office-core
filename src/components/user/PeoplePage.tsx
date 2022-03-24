@@ -15,7 +15,7 @@ export default function PeoplePage() {
 
   if (userData) {
     setTimeout(() => {
-      history.push(`/PeoplePage/${userData.id}`);
+      history.push(`/People/${userData.id}`);
     });
   }
 

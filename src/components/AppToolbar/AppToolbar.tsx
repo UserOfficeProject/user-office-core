@@ -9,7 +9,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
@@ -17,7 +17,6 @@ import { UserContext } from 'context/UserContextProvider';
 import { SettingsId } from 'generated/sdk';
 
 import AccountActionButton from './AccountActionButton';
-
 const drawerWidth = 250;
 
 type AppToolbarProps = {
@@ -37,15 +36,20 @@ const AppToolbar: React.FC<AppToolbarProps> = ({
   const location = useLocation();
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
+  const [logo, setLogo] = useState('');
 
   if (location.pathname === '/') document.title = 'User Office Dashboard';
   const logoFilename = settings.get(
     SettingsId.HEADER_LOGO_FILENAME
   )?.settingsValue;
-  let logo;
-  if (logoFilename) {
-    logo = require('images/' + logoFilename).default;
-  }
+
+  useEffect(() => {
+    async function fetchData() {
+      const importedLogo = await import('images/' + logoFilename);
+      setLogo(importedLogo.default);
+    }
+    fetchData();
+  }, [logoFilename]);
 
   const useStyles = makeStyles((theme) => ({
     appBar: {

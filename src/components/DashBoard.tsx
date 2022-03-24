@@ -269,15 +269,15 @@ const Dashboard: React.FC = () => {
             <TitledRoute
               setHeader={setHeader}
               title="User"
-              path="/PeoplePage/:id"
+              path="/People/:id"
               component={UserPage}
             />
           )}
-          {isUserOfficer && <Route path="/PeoplePage" component={PeoplePage} />}
+          {isUserOfficer && <Route path="/People" component={PeoplePage} />}
           <TitledRoute
             setHeader={setHeader}
             title="Proposal"
-            path="/ProposalPage"
+            path="/Proposals"
             component={ProposalPage}
           />
           <TitledRoute
@@ -290,7 +290,7 @@ const Dashboard: React.FC = () => {
             <TitledRoute
               setHeader={setHeader}
               title="Call"
-              path="/CallPage"
+              path="/Calls"
               component={CallPage}
             />
           )}
@@ -309,19 +309,19 @@ const Dashboard: React.FC = () => {
           <TitledRoute
             setHeader={setHeader}
             title="SEPs"
-            path="/SEPPage"
+            path="/SEPs"
             component={SEPsPage}
           />
           <TitledRoute
             setHeader={setHeader}
             title="Instruments"
-            path="/InstrumentPage"
+            path="/Instruments"
             component={InstrumentsPage}
           />
           <TitledRoute
             setHeader={setHeader}
             title="Institution"
-            path="/InstitutionPage"
+            path="/Institutions"
             component={InstitutionPage}
           />
           <TitledRoute
