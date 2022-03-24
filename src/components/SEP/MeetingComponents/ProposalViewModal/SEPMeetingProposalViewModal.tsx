@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       marginLeft: theme.spacing(2),
       flex: 1,
+      color: 'white',
     },
   })
 );
