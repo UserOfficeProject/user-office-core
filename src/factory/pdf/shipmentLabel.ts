@@ -4,12 +4,15 @@ import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
-import { Shipment } from '../../models/Shipment';
+import { IS_DANGEROUS_GOODS_KEY, Shipment } from '../../models/Shipment';
 import { DataType, Question } from '../../models/Template';
+import { Unit } from '../../models/Unit';
 import { UserWithRole } from '../../models/User';
 import { CallDataSource } from './../../datasources/CallDataSource';
 import { InstrumentDataSource } from './../../datasources/InstrumentDataSource';
+import { ScheduledEventDataSource } from './../../datasources/ScheduledEventDataSource';
 import { TemplateDataSource } from './../../datasources/TemplateDataSource';
+import { UserDataSource } from './../../datasources/UserDataSource';
 import { AnswerBasic } from './../../models/Questionary';
 import {
   HEIGHT_KEY,
@@ -17,9 +20,6 @@ import {
   WEIGHT_KEY,
   WIDTH_KEY,
   STORAGE_TEMPERATURE_KEY,
-  IS_FRAGILE_KEY,
-  LOCAL_CONTACT_KEY,
-  IS_DANGEROUS_KEY,
 } from './../../models/Shipment';
 
 export type ShipmentPDFData = {
@@ -32,19 +32,18 @@ export type ShipmentPDFData = {
     height: number;
     length: number;
     storageTemperature: string;
-    isFragile: boolean;
     localContact: string;
-    isDangerous: boolean;
+    isDangerousGoods: boolean;
   };
 };
 
 const formatAnswer = ({ answer }: AnswerBasic, question: Question) => {
   switch (question.dataType) {
     case DataType.BOOLEAN:
-      return answer.value === true ? 'Yes' : 'No';
+      return answer.value ? 'Yes' : 'No';
     case DataType.NUMBER_INPUT:
       const value = answer.value.value;
-      const unit = answer.value.unit;
+      const unit = (answer.value.unit as Unit).symbol;
 
       return `${value} ${unit ? unit : ''}`;
     case DataType.SELECTION_FROM_OPTIONS:
@@ -86,9 +85,10 @@ const getQuestionaryData = async (questionaryId: number) => {
     questionaryId,
     STORAGE_TEMPERATURE_KEY
   );
-  const isFragile = await getAnswer(questionaryId, IS_FRAGILE_KEY);
-  const localContact = await getAnswer(questionaryId, LOCAL_CONTACT_KEY);
-  const isDangerous = await getAnswer(questionaryId, IS_DANGEROUS_KEY);
+  const isDangerousGoods = await getAnswer(
+    questionaryId,
+    IS_DANGEROUS_GOODS_KEY
+  );
 
   return {
     weight,
@@ -96,9 +96,7 @@ const getQuestionaryData = async (questionaryId: number) => {
     height,
     length,
     storageTemperature,
-    isFragile,
-    localContact,
-    isDangerous,
+    isDangerousGoods,
   };
 };
 
@@ -147,6 +145,32 @@ const getInstrumentData = async (proposalPk: number) => {
   };
 };
 
+const getUser = async (userId: number) => {
+  const dataSource = container.resolve<UserDataSource>(Tokens.UserDataSource);
+
+  const user = await dataSource.getUser(userId);
+  if (!user) {
+    throw new Error(`User not found for userId: ${userId}`);
+  }
+
+  return user;
+};
+
+const getScheduledEvent = async (scheduledEventId: number) => {
+  const dataSource = container.resolve<ScheduledEventDataSource>(
+    Tokens.ScheduledEventDataSource
+  );
+
+  const scheduledEvent = await dataSource.getScheduledEventCore(
+    scheduledEventId
+  );
+  if (!scheduledEvent) {
+    throw new Error(`User not found for userId: ${scheduledEventId}`);
+  }
+
+  return scheduledEvent;
+};
+
 export async function collectShipmentPDFData(
   shipmentId: number,
   user: UserWithRole,
@@ -164,18 +188,24 @@ export async function collectShipmentPDFData(
 
   notify?.(`shipment_${shipment.id}.pdf`);
 
-  const proposal = await getProposalData(shipment.proposalPk);
+  const scheduledEvent = await getScheduledEvent(shipment.scheduledEventId);
+  if (scheduledEvent.localContactId === null) {
+    throw new Error(`Shipment with ID '${shipmentId}' has no local contact`);
+  }
+  const proposalData = await getProposalData(shipment.proposalPk);
   const questionaryData = await getQuestionaryData(shipment.questionaryId);
-  const callData = await getCallData(proposal.callId);
-  const instrumentdata = await getInstrumentData(proposal.proposalPk);
+  const callData = await getCallData(proposalData.callId);
+  const instrumentData = await getInstrumentData(proposalData.proposalPk);
+  const localContact = await getUser(scheduledEvent.localContactId);
 
   const out = {
     shipment: {
       ...shipment,
-      ...proposal,
+      ...proposalData,
       ...questionaryData,
       ...callData,
-      ...instrumentdata,
+      ...instrumentData,
+      localContact: `${localContact.preferredname} ${localContact.lastname}`,
     },
   };
 

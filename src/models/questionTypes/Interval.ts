@@ -27,7 +27,7 @@ export const intervalDefinition: Question = {
       throw new Error('DataType should be INTERVAL');
     }
 
-    return intervalQuestionValidationSchema(field).isValidSync(value);
+    return intervalQuestionValidationSchema(field).isValid(value);
   },
   createBlankConfig: (): IntervalConfig => {
     const config = new IntervalConfig();

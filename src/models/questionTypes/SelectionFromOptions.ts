@@ -13,7 +13,7 @@ export const selectionFromOptionsDefinition: Question = {
       throw new Error('DataType should be SELECTION_FROM_OPTIONS');
     }
 
-    return multipleChoiceValidationSchema(field).isValidSync(value);
+    return multipleChoiceValidationSchema(field).isValid(value);
   },
   createBlankConfig: (): SelectionFromOptionsConfig => {
     const config = new SelectionFromOptionsConfig();

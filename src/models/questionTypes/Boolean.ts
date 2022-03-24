@@ -13,7 +13,7 @@ export const booleanDefinition: Question = {
       throw new Error('DataType should be BOOLEAN');
     }
 
-    return booleanQuestionValidationSchema(field).isValidSync(value);
+    return booleanQuestionValidationSchema(field).isValid(value);
   },
   createBlankConfig: (): BooleanConfig => {
     const config = new BooleanConfig();

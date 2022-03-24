@@ -108,7 +108,7 @@ export default class QuestionaryMutations {
         const { value, ...parsedAnswerRest } = JSON.parse(answer.value);
         if (
           !isPartialSave &&
-          !isMatchingConstraints(questionTemplateRelation, value)
+          !(await isMatchingConstraints(questionTemplateRelation, value))
         ) {
           return rejection(
             'Can not answer topic because provided value is not satisfying constraint',
