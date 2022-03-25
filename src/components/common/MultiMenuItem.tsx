@@ -1,13 +1,8 @@
-import {
-  Checkbox,
-  MenuItem,
-  MenuItemProps,
-  WithStyles,
-  withStyles,
-} from '@material-ui/core';
+import { Checkbox, MenuItem, MenuItemProps } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
-const styles = () => ({
+const useStyles = makeStyles(() => ({
   container: {
     display: 'flex',
     alignItems: 'center',
@@ -15,21 +10,17 @@ const styles = () => ({
     outline: 'none',
     padding: '5px',
   },
-});
+}));
 
-class MultiMenuItem extends React.Component<
-  MenuItemProps & WithStyles<typeof styles>
-> {
-  render() {
-    const { classes, ...rest } = this.props;
+const MultiMenuItem: React.FC<MenuItemProps> = (props) => {
+  const classes = useStyles();
 
-    return (
-      <MenuItem {...rest} button={false} className={classes.container}>
-        <Checkbox checked={this.props.selected} />
-        <div>{this.props.children}</div>
-      </MenuItem>
-    );
-  }
-}
+  return (
+    <MenuItem {...props} className={classes.container}>
+      <Checkbox checked={props.selected} />
+      <div>{props.children}</div>
+    </MenuItem>
+  );
+};
 
-export default withStyles(styles)(MultiMenuItem);
+export default MultiMenuItem;

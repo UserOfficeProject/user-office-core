@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 import { ErrorMessage as FormikErrorMessage, ErrorMessageProps } from 'formik';
 import React from 'react';
 

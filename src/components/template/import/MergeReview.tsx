@@ -1,6 +1,6 @@
-import { Button, Card, CardContent, Typography } from '@material-ui/core';
-import dateformat from 'dateformat';
+import { Button, Card, CardContent, Typography } from '@mui/material';
 import produce from 'immer';
+import { DateTime } from 'luxon';
 import React, { useCallback, useState } from 'react';
 import { useHistory } from 'react-router';
 
@@ -32,7 +32,9 @@ export function MergeReview(props: MergeReviewProps) {
   const history = useHistory();
   const templateExport = props.data;
   const { version, json } = templateExport;
-  const exportDate = dateformat(templateExport.exportDate, 'dd-mmm-yyyy');
+  const exportDate = DateTime.fromISO(templateExport.exportDate).toFormat(
+    'dd-MMM-yyyy'
+  );
 
   const [state, setState] = useState({ ...templateExport });
 
@@ -132,17 +134,11 @@ export function MergeReview(props: MergeReviewProps) {
         />
       ))}
       <ActionButtonContainer>
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={() => props.onBack?.()}
-        >
+        <Button variant="outlined" onClick={() => props.onBack?.()}>
           Back
         </Button>
         <Button
           data-cy="import-template-button"
-          variant="contained"
-          color="primary"
           onClick={handleImportClick}
           disabled={hasUnresolvedConflicts(state.questionComparisons)}
         >

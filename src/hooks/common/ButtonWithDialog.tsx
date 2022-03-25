@@ -1,4 +1,4 @@
-import { Button } from '@material-ui/core';
+import Button from '@mui/material/Button';
 import React from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -14,7 +14,9 @@ function ButtonWithDialog({ children, label }: ButtonWithDialogProps) {
 
   return (
     <>
-      <Button onClick={() => setIsDialogOpen(true)}>{label}</Button>
+      <Button variant="text" onClick={() => setIsDialogOpen(true)}>
+        {label}
+      </Button>
       <InputDialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
         {children}
         <ActionButtonContainer>

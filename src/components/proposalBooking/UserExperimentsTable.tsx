@@ -1,8 +1,7 @@
-import Grid from '@material-ui/core/Grid';
 import React from 'react';
 
 import { useProposalBookingsScheduledEvents } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import ExperimentsTable from './ExperimentTimesTable';
 
@@ -13,24 +12,20 @@ export default function UserExperimentTimesTable() {
     });
 
   return (
-    <ContentContainer>
-      <Grid container>
-        <Grid item xs={12}>
-          <StyledPaper margin={[0]}>
-            <ExperimentsTable
-              isLoading={loading}
-              proposalScheduledEvents={proposalScheduledEvents}
-              title="Experiment Times"
-              options={{
-                search: true,
-                padding: 'default',
-                emptyRowsWhenPaging: true,
-                paging: true,
-              }}
-            />
-          </StyledPaper>
-        </Grid>
-      </Grid>
-    </ContentContainer>
+    <StyledContainer>
+      <StyledPaper>
+        <ExperimentsTable
+          isLoading={loading}
+          proposalScheduledEvents={proposalScheduledEvents}
+          title="Experiment Times"
+          options={{
+            search: true,
+            padding: 'normal',
+            emptyRowsWhenPaging: true,
+            paging: true,
+          }}
+        />
+      </StyledPaper>
+    </StyledContainer>
   );
 }

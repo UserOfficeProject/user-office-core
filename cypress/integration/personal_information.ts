@@ -5,7 +5,6 @@ import initialDBData from '../support/initialDBData';
 context('Personal information tests', () => {
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   const newFirstName = faker.name.firstName();
@@ -67,7 +66,10 @@ context('Personal information tests', () => {
 
     cy.finishedLoading();
 
-    cy.contains('Andersson').parent().find('button[title="Edit user"]').click();
+    cy.contains('Andersson')
+      .parent()
+      .find('button[aria-label="Edit user"]')
+      .click();
 
     cy.get('main').as('mainContentElement');
     cy.get('@mainContentElement').contains('Settings').click();

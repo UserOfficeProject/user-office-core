@@ -1,6 +1,8 @@
-import { Button, makeStyles, TextField } from '@material-ui/core';
-import Grid from '@material-ui/core/Grid';
-import MergeType from '@material-ui/icons/MergeType';
+import MergeType from '@mui/icons-material/MergeType';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router';
 
@@ -8,7 +10,7 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import UOLoader from 'components/common/UOLoader';
 import { Institution } from 'generated/sdk';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -63,7 +65,7 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
   }
 
   return (
-    <ContentContainer>
+    <StyledContainer>
       <StyledPaper>
         <Grid container>
           <Grid item xs={12}>
@@ -117,8 +119,6 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
             <ActionButtonContainer>
               <Button
                 type="button"
-                variant="contained"
-                color="primary"
                 disabled={
                   institutionFrom === null ||
                   institutionInto === null ||
@@ -176,7 +176,7 @@ function MergeInstitutionsPage({ confirm }: MergeInstitutionPageProps) {
           </Grid>
         </Grid>
       </StyledPaper>
-    </ContentContainer>
+    </StyledContainer>
   );
 }
 

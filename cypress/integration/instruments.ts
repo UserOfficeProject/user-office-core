@@ -38,7 +38,6 @@ context('Instrument tests', () => {
 
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   // TODO: Maybe this should be moved to permission testing.
@@ -89,7 +88,10 @@ context('Instrument tests', () => {
       cy.createInstrument(instrument1);
 
       cy.contains('Instruments').click();
-      cy.contains(instrument1.name).parent().find('[title="Edit"]').click();
+      cy.contains(instrument1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
       cy.get('#name').clear();
       cy.get('#name').type(newName);
       cy.get('#shortCode').clear();
@@ -115,7 +117,7 @@ context('Instrument tests', () => {
 
       cy.contains('call 1')
         .parent()
-        .find('[title="Assign Instrument"]')
+        .find('[aria-label="Assign Instrument"]')
         .click();
 
       cy.contains(instrument1.name).parent().find('[type="checkbox"]').check();
@@ -133,9 +135,12 @@ context('Instrument tests', () => {
 
       cy.contains('Instruments').click();
 
-      cy.contains(instrument1.name).parent().find('[title="Delete"]').click();
+      cy.contains(instrument1.name)
+        .parent()
+        .find('[aria-label="Delete"]')
+        .click();
 
-      cy.get('[title="Save"]').click();
+      cy.get('[aria-label="Save"]').click();
 
       cy.notification({ variant: 'success', text: 'Instrument removed' });
 
@@ -243,7 +248,7 @@ context('Instrument tests', () => {
 
       cy.contains(instrument1.name)
         .parent()
-        .find('[title="Assign scientist"]')
+        .find('[aria-label="Assign scientist"]')
         .click();
 
       cy.get('[data-cy="co-proposers"]')
@@ -384,17 +389,17 @@ context('Instrument tests', () => {
 
       cy.contains(instrument1.name)
         .parent()
-        .find('[title="Show Scientists"]')
+        .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
       cy.contains(scientist2.lastName);
 
       cy.contains(scientist2.lastName)
         .parent()
-        .find('[title="Delete"]')
+        .find('[aria-label="Delete"]')
         .click();
 
-      cy.get('[title="Save"]').click();
+      cy.get('[aria-label="Save"]').click();
 
       cy.notification({
         variant: 'success',
@@ -413,7 +418,10 @@ context('Instrument tests', () => {
     it('User Officer should be able to update beamline manager', () => {
       cy.contains('Instruments').click();
 
-      cy.contains(instrument1.name).parent().find('[title="Edit"]').click();
+      cy.contains(instrument1.name)
+        .parent()
+        .find('[aria-label="Edit"]')
+        .click();
 
       cy.get('[data-cy=beamline-manager]').click();
 
@@ -499,7 +507,10 @@ context('Instrument tests', () => {
 
       cy.contains(instrument1.name);
 
-      cy.get('[title="Show Scientists"]').first().should('exist').click();
+      cy.get('[aria-label="Detail panel visibility toggle"]')
+        .first()
+        .should('exist')
+        .click();
 
       cy.contains(scientist2.lastName);
     });
@@ -586,7 +597,7 @@ context('Instrument tests', () => {
         .find('input[type="checkbox"]')
         .check();
 
-      cy.get('[title="Download proposals"]').click();
+      cy.get('[aria-label="Download proposals"]').click();
 
       cy.get('[data-cy="preparing-download-dialog"]').should('exist');
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(

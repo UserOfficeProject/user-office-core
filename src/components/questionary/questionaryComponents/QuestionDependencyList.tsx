@@ -1,13 +1,13 @@
-import Box from '@material-ui/core/Box';
-import FormControl from '@material-ui/core/FormControl';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import Tooltip from '@material-ui/core/Tooltip';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import ClearIcon from '@material-ui/icons/Clear';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ClearIcon from '@mui/icons-material/Clear';
+import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Tooltip from '@mui/material/Tooltip';
 import { Field, FieldArray, FormikProps } from 'formik';
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -103,8 +103,8 @@ const QuestionDependencyList: React.FC<QuestionDependencyListProps> = ({
                       name="dependenciesOperator"
                       value={logicOperator}
                       onChange={(
-                        event: React.ChangeEvent<{ value: unknown }>
-                      ): void => {
+                        event: SelectChangeEvent<DependenciesLogicOperator>
+                      ) => {
                         setLogicOperator(
                           event.target.value as DependenciesLogicOperator
                         );
@@ -136,7 +136,6 @@ const QuestionDependencyList: React.FC<QuestionDependencyListProps> = ({
                       template={template}
                       dependency={dependency}
                       currentQuestionId={currentQuestionId}
-                      margin="normal"
                       fullWidth
                       inputProps={{ 'data-cy': 'dependencies' }}
                     />

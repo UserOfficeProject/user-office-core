@@ -1,4 +1,4 @@
-import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
+import DynamicFeedIcon from '@mui/icons-material/DynamicFeed';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';

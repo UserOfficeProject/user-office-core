@@ -1,5 +1,5 @@
-import { Typography } from '@material-ui/core';
-import Edit from '@material-ui/icons/Edit';
+import Edit from '@mui/icons-material/Edit';
+import { Typography } from '@mui/material';
 import React from 'react';
 import { useHistory } from 'react-router';
 import { useQueryParams } from 'use-query-params';
@@ -17,6 +17,11 @@ import { FunctionType } from 'utils/utilTypes';
 
 import CreateProposalWorkflow from './CreateProposalWorkflow';
 
+const columns = [
+  { title: 'Name', field: 'name' },
+  { title: 'Description', field: 'description' },
+];
+
 const ProposalWorkflowsTable: React.FC = () => {
   const { api } = useDataApiWithFeedback();
   const {
@@ -26,10 +31,6 @@ const ProposalWorkflowsTable: React.FC = () => {
   } = useProposalWorkflowsData();
   const [urlQueryParams, setUrlQueryParams] =
     useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
-  const columns = [
-    { title: 'Name', field: 'name' },
-    { title: 'Description', field: 'description' },
-  ];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const history = useHistory();
 

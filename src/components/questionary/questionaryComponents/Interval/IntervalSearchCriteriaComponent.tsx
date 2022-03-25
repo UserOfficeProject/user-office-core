@@ -5,7 +5,7 @@ import {
   MenuItem,
   Select,
   TextField,
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { useState } from 'react';
 
 import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInputProps';
@@ -34,11 +34,12 @@ function IntervalSearchCriteriaComponent({
   return (
     <Grid container spacing={2}>
       <Grid item xs={5}>
-        <FormControl style={{ width: '100%' }}>
-          <InputLabel shrink id="comparator">
+        <FormControl fullWidth>
+          <InputLabel shrink id="comparator-label">
             Operator
           </InputLabel>
           <Select
+            labelId="comparator-label"
             onChange={(event) => {
               const newComparator = event.target
                 .value as QuestionFilterCompareOperator;
@@ -64,6 +65,7 @@ function IntervalSearchCriteriaComponent({
         <TextField
           name="value"
           label="Value"
+          margin="none"
           type="number"
           value={value}
           fullWidth
@@ -74,24 +76,30 @@ function IntervalSearchCriteriaComponent({
           data-cy="value"
         />
       </Grid>
-      <Grid item xs={4} style={{ marginTop: 'auto' }}>
-        <Select
-          onChange={(unit) => {
-            const selectedUnit = availableUnits.find(
-              (availableUnit) => availableUnit.id === unit.target.value
-            )!;
-            setUnit(selectedUnit);
-            onChange(comparator, convertToSi(value as number, selectedUnit));
-          }}
-          value={unit?.id}
-          data-cy="unit-select"
-        >
-          {availableUnits.map((unit) => (
-            <MenuItem key={unit.id} value={unit.id}>
-              {unit.symbol}
-            </MenuItem>
-          ))}
-        </Select>
+      <Grid item xs={4}>
+        <FormControl fullWidth>
+          <InputLabel shrink id="unit-label">
+            Unit
+          </InputLabel>
+          <Select
+            labelId="unit-label"
+            onChange={(unit) => {
+              const selectedUnit = availableUnits.find(
+                (availableUnit) => availableUnit.id === unit.target.value
+              )!;
+              setUnit(selectedUnit);
+              onChange(comparator, convertToSi(value as number, selectedUnit));
+            }}
+            value={unit?.id}
+            data-cy="unit-select"
+          >
+            {availableUnits.map((unit) => (
+              <MenuItem key={unit.id} value={unit.id}>
+                {unit.symbol}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
     </Grid>
   );

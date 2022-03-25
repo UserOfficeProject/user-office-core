@@ -1,15 +1,15 @@
-import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import TextField from '@material-ui/core/TextField';
-import EditIcon from '@material-ui/icons/Edit';
+import EditIcon from '@mui/icons-material/Edit';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
 import { updateProposalWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/ProposalWorkflow';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { ProposalWorkflow } from 'generated/sdk';
-import { ButtonContainer } from 'styles/StyledComponents';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 
 import { Event, EventType } from './ProposalWorkflowEditorModel';
 
@@ -52,10 +52,8 @@ const ProposalWorkflowMetadataEditor: React.FC<{
       <div className={classes.workflowDescription}>
         {proposalWorkflow.description}
       </div>
-      <ButtonContainer>
+      <StyledButtonContainer>
         <Button
-          variant="contained"
-          color="primary"
           startIcon={<EditIcon />}
           onClick={() => setIsEditMode(true)}
           className={classes.button}
@@ -63,7 +61,7 @@ const ProposalWorkflowMetadataEditor: React.FC<{
         >
           Edit
         </Button>
-      </ButtonContainer>
+      </StyledButtonContainer>
     </div>
   );
   const inputJSX = (
@@ -88,7 +86,6 @@ const ProposalWorkflowMetadataEditor: React.FC<{
             component={TextField}
             value={values.name}
             onChange={handleChange}
-            margin="normal"
             fullWidth
             data-cy="name"
           />
@@ -101,7 +98,6 @@ const ProposalWorkflowMetadataEditor: React.FC<{
             component={TextField}
             value={values.description}
             onChange={handleChange}
-            margin="normal"
             fullWidth
             data-cy="description"
           />
@@ -119,8 +115,6 @@ const ProposalWorkflowMetadataEditor: React.FC<{
               disabled={isSubmitting}
               data-cy="submit"
               type="submit"
-              variant="contained"
-              color="primary"
               className={classes.button}
             >
               Update

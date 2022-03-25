@@ -1,10 +1,10 @@
 import MaterialTable, { Column } from '@material-table/core';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import DoneAll from '@material-ui/icons/DoneAll';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import RateReviewIcon from '@material-ui/icons/RateReview';
-import Visibility from '@material-ui/icons/Visibility';
+import DoneAll from '@mui/icons-material/DoneAll';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import RateReviewIcon from '@mui/icons-material/RateReview';
+import Visibility from '@mui/icons-material/Visibility';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import React, { useState, useContext, useEffect } from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
@@ -63,6 +63,25 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
 
 const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.YOU ? ReviewerFilter.YOU : ReviewerFilter.ALL;
+
+let columns: Column<UserWithReview>[] = [
+  {
+    title: 'Actions',
+    cellStyle: { padding: 0, minWidth: 120 },
+    sorting: false,
+    field: 'rowActions',
+  },
+  { title: 'Proposal ID', field: 'proposalId' },
+  { title: 'Title', field: 'title' },
+  { title: 'Grade', field: 'grade' },
+  {
+    title: 'Review status',
+    render: (user) => capitalize(user.status),
+    customSort: (a, b) => a.status.localeCompare(b.status),
+  },
+  { title: 'Call', field: 'callShortCode' },
+  { title: 'Instrument', field: 'instrumentShortCode' },
+];
 
 const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
   confirm,
@@ -245,25 +264,6 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     }
   ): JSX.Element => <DoneAll {...props} />;
 
-  let columns: Column<UserWithReview>[] = [
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
-      sorting: false,
-      render: RowActionButtons,
-    },
-    { title: 'Proposal ID', field: 'proposalId' },
-    { title: 'Title', field: 'title' },
-    { title: 'Grade', field: 'grade' },
-    {
-      title: 'Review status',
-      render: (user) => capitalize(user.status),
-      customSort: (a, b) => a.status.localeCompare(b.status),
-    },
-    { title: 'Call', field: 'callShortCode' },
-    { title: 'Instrument', field: 'instrumentShortCode' },
-  ];
-
   columns = setSortDirectionOnSortColumn(
     columns,
     urlQueryParams.sortColumn,
@@ -340,6 +340,10 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
     (review) => review.reviewId === urlQueryParams.reviewModal
   );
 
+  const preselectedProposalsDataWithRowActions = preselectedProposalsData.map(
+    (proposal) => ({ ...proposal, rowActions: RowActionButtons(proposal) })
+  );
+
   return (
     <>
       <ReviewerFilterComponent
@@ -387,7 +391,7 @@ const ProposalTableReviewer: React.FC<{ confirm: WithConfirmType }> = ({
         icons={tableIcons}
         title={'Proposals to grade'}
         columns={columns}
-        data={preselectedProposalsData}
+        data={preselectedProposalsDataWithRowActions}
         isLoading={loading}
         options={{
           search: false,

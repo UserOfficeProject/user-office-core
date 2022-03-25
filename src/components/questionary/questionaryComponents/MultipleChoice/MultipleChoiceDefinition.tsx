@@ -1,4 +1,4 @@
-import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import { multipleChoiceValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 

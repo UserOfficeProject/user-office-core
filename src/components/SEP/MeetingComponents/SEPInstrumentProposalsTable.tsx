@@ -1,10 +1,10 @@
 import MaterialTable, { MTableBodyRow } from '@material-table/core';
-import IconButton from '@material-ui/core/IconButton';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import useTheme from '@material-ui/core/styles/useTheme';
-import Tooltip from '@material-ui/core/Tooltip';
-import DragHandle from '@material-ui/icons/DragHandle';
-import Visibility from '@material-ui/icons/Visibility';
+import DragHandle from '@mui/icons-material/DragHandle';
+import Visibility from '@mui/icons-material/Visibility';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import makeStyles from '@mui/styles/makeStyles';
+import useTheme from '@mui/styles/useTheme';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext, DragEvent, useState, useEffect } from 'react';
@@ -69,6 +69,82 @@ type SEPInstrumentProposalsTableProps = {
   sepId: number;
   selectedCallId: number;
 };
+
+const assignmentColumns = [
+  {
+    title: 'Actions',
+    cellStyle: { padding: 0, minWidth: 100 },
+    sorting: false,
+    field: 'rowActions',
+  },
+  {
+    title: 'Title',
+    field: 'proposal.title',
+  },
+  {
+    title: 'ID',
+    field: 'proposal.proposalId',
+  },
+  { title: 'Status', field: 'proposal.status.name' },
+  {
+    title: 'Average score',
+    field: 'proposalAverageScore',
+    emptyValue: '-',
+  },
+  {
+    title: 'Deviation',
+    field: 'deviation',
+    render: (
+      rowData: SepProposalWithAverageScoreAndAvailabilityZone
+    ): string => {
+      const stdDeviation = standardDeviation(
+        getGradesFromReviews(rowData.proposal.reviews ?? [])
+      );
+
+      return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
+    },
+    customSort: (
+      a: SepProposalWithAverageScoreAndAvailabilityZone,
+      b: SepProposalWithAverageScoreAndAvailabilityZone
+    ) =>
+      (standardDeviation(getGradesFromReviews(a.proposal.reviews ?? [])) || 0) -
+      (standardDeviation(getGradesFromReviews(b.proposal.reviews ?? [])) || 0),
+  },
+  {
+    title: 'Current rank',
+    field: 'proposal.sepMeetingDecision.rankOrder',
+    emptyValue: '-',
+  },
+  {
+    title: 'Time allocation',
+    field: 'timeAllocation',
+    customSort: (
+      a: SepProposalWithAverageScoreAndAvailabilityZone,
+      b: SepProposalWithAverageScoreAndAvailabilityZone
+    ) => {
+      if (a.sepTimeAllocation && b.sepTimeAllocation) {
+        return a.sepTimeAllocation - b.sepTimeAllocation;
+      }
+
+      if (
+        a.proposal.technicalReview?.timeAllocation &&
+        b.proposal.technicalReview?.timeAllocation
+      ) {
+        return (
+          a.proposal.technicalReview.timeAllocation -
+          b.proposal.technicalReview.timeAllocation
+        );
+      } else {
+        return -1;
+      }
+    },
+  },
+  {
+    title: 'SEP meeting submitted',
+    render: (rowData: SepProposalWithAverageScoreAndAvailabilityZone): string =>
+      rowData.proposal.sepMeetingDecision?.submitted ? 'Yes' : 'No',
+  },
+];
 
 const SEPInstrumentProposalsTable: React.FC<
   SEPInstrumentProposalsTableProps
@@ -175,7 +251,7 @@ const SEPInstrumentProposalsTable: React.FC<
     setSortedProposalsWithAverageScore(sortedProposals);
   }, [instrumentProposalsData, sepInstrument.availabilityTime]);
 
-  const proposalTimeAllocationColumn = (
+  const ProposalTimeAllocationColumn = (
     rowData: SepProposal & {
       proposalAverageScore: number;
     }
@@ -242,87 +318,6 @@ const SEPInstrumentProposalsTable: React.FC<
       </>
     );
   };
-
-  const assignmentColumns = [
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 100 },
-      sorting: false,
-      render: RowActionButtons,
-    },
-    {
-      title: 'Title',
-      field: 'proposal.title',
-    },
-    {
-      title: 'ID',
-      field: 'proposal.proposalId',
-    },
-    { title: 'Status', field: 'proposal.status.name' },
-    {
-      title: 'Average score',
-      field: 'proposalAverageScore',
-      emptyValue: '-',
-    },
-    {
-      title: 'Deviation',
-      field: 'deviation',
-      render: (
-        rowData: SepProposalWithAverageScoreAndAvailabilityZone
-      ): string => {
-        const stdDeviation = standardDeviation(
-          getGradesFromReviews(rowData.proposal.reviews ?? [])
-        );
-
-        return isNaN(stdDeviation) ? '-' : `${stdDeviation}`;
-      },
-      customSort: (
-        a: SepProposalWithAverageScoreAndAvailabilityZone,
-        b: SepProposalWithAverageScoreAndAvailabilityZone
-      ) =>
-        (standardDeviation(getGradesFromReviews(a.proposal.reviews ?? [])) ||
-          0) -
-        (standardDeviation(getGradesFromReviews(b.proposal.reviews ?? [])) ||
-          0),
-    },
-    {
-      title: 'Current rank',
-      field: 'proposal.sepMeetingDecision.rankOrder',
-      emptyValue: '-',
-    },
-    {
-      title: 'Time allocation',
-      render: (rowData: SepProposalWithAverageScoreAndAvailabilityZone) =>
-        proposalTimeAllocationColumn(rowData),
-      customSort: (
-        a: SepProposalWithAverageScoreAndAvailabilityZone,
-        b: SepProposalWithAverageScoreAndAvailabilityZone
-      ) => {
-        if (a.sepTimeAllocation && b.sepTimeAllocation) {
-          return a.sepTimeAllocation - b.sepTimeAllocation;
-        }
-
-        if (
-          a.proposal.technicalReview?.timeAllocation &&
-          b.proposal.technicalReview?.timeAllocation
-        ) {
-          return (
-            a.proposal.technicalReview.timeAllocation -
-            b.proposal.technicalReview.timeAllocation
-          );
-        } else {
-          return -1;
-        }
-      },
-    },
-    {
-      title: 'SEP meeting submitted',
-      render: (
-        rowData: SepProposalWithAverageScoreAndAvailabilityZone
-      ): string =>
-        rowData.proposal.sepMeetingDecision?.submitted ? 'Yes' : 'No',
-    },
-  ];
 
   const onMeetingSubmitted = (data: SepMeetingDecision) => {
     const newInstrumentProposalsData = instrumentProposalsData.map(
@@ -544,9 +539,12 @@ const SEPInstrumentProposalsTable: React.FC<
   };
 
   const sortedProposalsWithAverageScoreAndId =
-    sortedProposalsWithAverageScore.map((proposal) =>
-      Object.assign(proposal, { id: proposal.proposalPk })
-    );
+    sortedProposalsWithAverageScore.map((proposal) => ({
+      ...proposal,
+      id: proposal.proposalPk,
+      rowActions: RowActionButtons(proposal),
+      timeAllocation: ProposalTimeAllocationColumn(proposal),
+    }));
 
   /**  NOTE: Making this to work on mobile is a bit harder and might need more attention.
    * Here is some useful article (https://medium.com/@deepakkadarivel/drag-and-drop-dnd-for-mobile-browsers-fc9bcd1ad3c5)

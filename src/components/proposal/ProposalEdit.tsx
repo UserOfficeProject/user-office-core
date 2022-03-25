@@ -8,6 +8,7 @@ import { useParams } from 'react-router';
 import SimpleTabs from 'components/common/TabPanel';
 import UOLoader from 'components/common/UOLoader';
 import { useProposalData } from 'hooks/proposal/useProposalData';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import ProposalContainer from './ProposalContainer';
 
@@ -22,19 +23,24 @@ export default function ProposalEdit() {
 
   if (proposalData.notified) {
     return (
-      <SimpleTabs tabNames={['Comment', 'Proposal']}>
-        <>
-          <p>
-            Decision: {getTranslation(proposalData.finalStatus as ResourceId)}
-          </p>
-          <div
-            dangerouslySetInnerHTML={{
-              __html: proposalData.commentForUser || '-',
-            }}
-          />
-        </>
-        <ProposalContainer proposal={proposalData} />
-      </SimpleTabs>
+      <StyledContainer>
+        <StyledPaper>
+          <SimpleTabs tabNames={['Comment', 'Proposal']}>
+            <>
+              <p>
+                Decision:{' '}
+                {getTranslation(proposalData.finalStatus as ResourceId)}
+              </p>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: proposalData.commentForUser || '-',
+                }}
+              />
+            </>
+            <ProposalContainer proposal={proposalData} />
+          </SimpleTabs>
+        </StyledPaper>
+      </StyledContainer>
     );
   }
 

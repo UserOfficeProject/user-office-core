@@ -1,60 +1,69 @@
-import Box from '@material-ui/core/Box';
-import Container from '@material-ui/core/Container';
-import Paper from '@material-ui/core/Paper';
-import { Theme } from '@material-ui/core/styles';
-import styled from '@material-ui/core/styles/styled';
-import { CSSProperties } from '@material-ui/styles';
-import React from 'react';
+import Box from '@mui/material/Box';
+import Container, { ContainerProps } from '@mui/material/Container';
+import Paper, { PaperProps } from '@mui/material/Paper';
+import { Theme, styled } from '@mui/material/styles';
+import { BoxProps } from '@mui/system';
 
-const getValueFromArrayProperty = (prop: number[], theme: Theme) =>
-  prop.map((item) => `${theme.spacing(item)}px`).join(' ');
+const getValueFromArrayProperty = (
+  prop: [number, number?, number?, number?],
+  theme: Theme
+) =>
+  prop.map((item) => `${item !== undefined && theme.spacing(item)}`).join(' ');
 
-export const StyledPaper = styled(({ ...other }) => <Paper {...other} />)(
-  ({ theme, ...props }: { theme: Theme } & CSSProperties) => {
-    const margin: string | number | undefined = Array.isArray(props.margin)
-      ? getValueFromArrayProperty(props.margin, theme)
-      : props.margin;
-    const padding: string | number | undefined = Array.isArray(props.padding)
-      ? getValueFromArrayProperty(props.padding, theme)
-      : props.padding;
+type StyledComponentProps = {
+  margin?: [number, number?, number?, number?];
+  padding?: [number, number?, number?, number?];
+};
 
-    return {
-      margin: margin || theme.spacing(3, 0),
-      padding: padding || theme.spacing(2),
-      [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-        margin: margin || theme.spacing(6, 0),
-        padding: padding || theme.spacing(3),
-      },
-    };
-  }
-);
-export const FormWrapper = styled(({ ...other }) => <Box {...other} />)(
-  ({ theme, ...props }: { theme: Theme } & CSSProperties) => {
-    const margin: string | number | undefined = Array.isArray(props.margin)
-      ? getValueFromArrayProperty(props.margin, theme)
-      : props.margin;
-
-    return {
-      margin: margin || theme.spacing(8),
-      display: props.display || 'flex',
-      flexDirection: props.flexDirection || 'column',
-      alignItems: props.alignItems || 'center',
-      overflow: props.overflow || 'auto',
-    };
-  }
-);
-export const ContentContainer = styled(({ maxWidth = false, ...other }) => (
-  <Container maxWidth={maxWidth} {...other} />
-))(({ theme, ...props }: { theme: Theme } & CSSProperties) => {
-  const padding: string | number | undefined = Array.isArray(props.padding)
-    ? getValueFromArrayProperty(props.padding, theme)
-    : props.padding;
+export const StyledPaper = styled(Paper, {
+  shouldForwardProp: (prop) => prop !== 'margin' && prop !== 'padding',
+})<PaperProps & StyledComponentProps>(({ margin, padding, theme }) => {
+  const marginValue: string | number | undefined = Array.isArray(margin)
+    ? getValueFromArrayProperty(margin, theme)
+    : margin;
+  const paddingValue: string | number | undefined = Array.isArray(padding)
+    ? getValueFromArrayProperty(padding, theme)
+    : padding;
 
   return {
-    padding: padding || theme.spacing(2, 2),
+    margin: marginValue || theme.spacing(2, 0),
+    padding: paddingValue || theme.spacing(2),
+    [theme.breakpoints.up(600)]: {
+      margin: marginValue || theme.spacing(4, 0),
+      padding: paddingValue || theme.spacing(3),
+    },
   };
 });
-export const ButtonContainer = styled(({ ...other }) => <div {...other} />)({
+
+export const StyledFormWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'margin' && prop !== 'padding',
+})<BoxProps & StyledComponentProps>(({ margin, theme }) => {
+  const marginValue: string | number | undefined = Array.isArray(margin)
+    ? getValueFromArrayProperty(margin, theme)
+    : margin;
+
+  return {
+    margin: marginValue || theme.spacing(3, 0),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    overflow: 'auto',
+  };
+});
+
+export const StyledContainer = styled(Container, {
+  shouldForwardProp: (prop) => prop !== 'margin' && prop !== 'padding',
+})<ContainerProps & StyledComponentProps>(({ padding, theme }) => {
+  const paddingValue: string | number | undefined = Array.isArray(padding)
+    ? getValueFromArrayProperty(padding, theme)
+    : padding;
+
+  return {
+    padding: paddingValue || theme.spacing(2, 2),
+  };
+});
+
+export const StyledButtonContainer = styled('div')({
   display: 'flex',
   justifyContent: 'flex-end',
 });

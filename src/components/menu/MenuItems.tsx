@@ -1,27 +1,27 @@
-import Collapse from '@material-ui/core/Collapse';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Tooltip from '@material-ui/core/Tooltip';
-import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
-import CalendarToday from '@material-ui/icons/CalendarToday';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import EventIcon from '@material-ui/icons/Event';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import FolderOpen from '@material-ui/icons/FolderOpen';
-import FunctionsIcon from '@material-ui/icons/Functions';
-import GroupWorkIcon from '@material-ui/icons/GroupWork';
-import Help from '@material-ui/icons/Help';
-import NoteAdd from '@material-ui/icons/NoteAdd';
-import People from '@material-ui/icons/People';
-import Settings from '@material-ui/icons/Settings';
-import SettingsApplications from '@material-ui/icons/SettingsApplications';
-import VpnKey from '@material-ui/icons/VpnKey';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import CalendarToday from '@mui/icons-material/CalendarToday';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import EventIcon from '@mui/icons-material/Event';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import FolderOpen from '@mui/icons-material/FolderOpen';
+import FunctionsIcon from '@mui/icons-material/Functions';
+import GroupWorkIcon from '@mui/icons-material/GroupWork';
+import Help from '@mui/icons-material/Help';
+import NoteAdd from '@mui/icons-material/NoteAdd';
+import People from '@mui/icons-material/People';
+import Settings from '@mui/icons-material/Settings';
+import SettingsApplications from '@mui/icons-material/SettingsApplications';
+import VpnKey from '@mui/icons-material/VpnKey';
+import Collapse from '@mui/material/Collapse';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
+import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { Call, FeatureId, UserRole } from 'generated/sdk';
 
@@ -192,7 +192,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const userOfficer = (
     <div data-cy="officer-menu-items">
       <Tooltip title="Proposals">
-        <ListItem component={NavLink} to="/ProposalPage" button>
+        <ListItem component={NavLink} to="/Proposals" button>
           <ListItemIcon>
             <FolderOpen />
           </ListItemIcon>
@@ -200,7 +200,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       <Tooltip title="Calls">
-        <ListItem component={NavLink} to="/CallPage" button>
+        <ListItem component={NavLink} to="/Calls" button>
           <ListItemIcon>
             <CalendarToday />
           </ListItemIcon>
@@ -208,7 +208,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       <Tooltip title="People">
-        <ListItem component={NavLink} to="/PeoplePage" button>
+        <ListItem component={NavLink} to="/People" button>
           <ListItemIcon>
             <People />
           </ListItemIcon>
@@ -216,7 +216,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       <Tooltip title="Instruments">
-        <ListItem component={NavLink} to="/InstrumentPage" button>
+        <ListItem component={NavLink} to="/Instruments" button>
           <ListItemIcon>
             <ScienceIcon />
           </ListItemIcon>
@@ -224,7 +224,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       <Tooltip title="Scientific evaluation panels">
-        <ListItem component={NavLink} to="/SEPPage" button>
+        <ListItem component={NavLink} to="/SEPs" button>
           <ListItemIcon>
             <GroupWorkIcon />
           </ListItemIcon>
@@ -240,7 +240,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItem>
       </Tooltip>
       <Tooltip title="Institutions">
-        <ListItem component={NavLink} to="/InstitutionPage" button>
+        <ListItem component={NavLink} to="/Institutions" button>
           <ListItemIcon>
             <AccountBalanceIcon />
           </ListItemIcon>
@@ -269,7 +269,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
       </ListItem>
-      <ListItem component={NavLink} to="/SEPPage" button>
+      <ListItem component={NavLink} to="/SEPs" button>
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
@@ -299,7 +299,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItem>
-      <ListItem component={NavLink} to="/InstrumentPage" button>
+      <ListItem component={NavLink} to="/Instruments" button>
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>

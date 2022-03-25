@@ -1,4 +1,4 @@
-import DescriptionIcon from '@material-ui/icons/Description';
+import DescriptionIcon from '@mui/icons-material/Description';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';

@@ -1,4 +1,5 @@
 import faker from 'faker';
+import { DateTime } from 'luxon';
 
 import {
   AllocationTimeUnits,
@@ -23,8 +24,7 @@ context('Samples tests', () => {
     description: faker.random.words(5),
   };
 
-  const currentDayStart = new Date();
-  currentDayStart.setHours(0, 0, 0, 0);
+  const currentDayStart = DateTime.now().startOf('day');
 
   const updatedCall = {
     id: initialDBData.call.id,
@@ -140,7 +140,6 @@ context('Samples tests', () => {
         createdWorkflowId = result.createProposalWorkflow.proposalWorkflow.id;
       }
     });
-    cy.viewport(1920, 1080);
   });
 
   describe('Samples basic tests', () => {
@@ -206,7 +205,7 @@ context('Samples tests', () => {
 
       cy.contains('Calls').click();
 
-      cy.get('[title="Edit"]').click();
+      cy.get('[aria-label="Edit"]').click();
 
       cy.get('[data-cy=call-template]').click();
 
@@ -332,7 +331,7 @@ context('Samples tests', () => {
         .find('input[type="checkbox"]')
         .click();
 
-      cy.get("[title='Delete proposals']").first().click();
+      cy.get("[aria-label='Delete proposals']").first().click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -357,7 +356,7 @@ context('Samples tests', () => {
         .find('input[type="checkbox"]')
         .click();
 
-      cy.get('[title="Clone proposals to call"]').click();
+      cy.get('[aria-label="Clone proposals to call"]').click();
 
       cy.get('#selectedCallId-input').click();
       cy.get('[role="presentation"]').contains(updatedCall.shortCode).click();
@@ -371,7 +370,7 @@ context('Samples tests', () => {
 
       cy.contains(`Copy of ${proposalTitle}`)
         .parent()
-        .find('[title="View proposal"]')
+        .find('[aria-label="View proposal"]')
         .click();
 
       cy.contains('Edit proposal').click();
@@ -394,7 +393,7 @@ context('Samples tests', () => {
 
       cy.contains(proposalTitle)
         .parent()
-        .find('[title="Edit proposal"]')
+        .find('[aria-label="Edit proposal"]')
         .click();
 
       cy.contains('Save and continue').click();
@@ -469,7 +468,7 @@ context('Samples tests', () => {
       cy.contains(createdProposalId)
         .last()
         .parent()
-        .find('[title="Review sample"]')
+        .find('[aria-label="Review sample"]')
         .click();
 
       cy.get('[data-cy="safety-status"]').click();
@@ -487,7 +486,7 @@ context('Samples tests', () => {
       cy.contains(createdProposalId)
         .last()
         .parent()
-        .find('[title="Review sample"]')
+        .find('[aria-label="Review sample"]')
         .last()
         .click();
 

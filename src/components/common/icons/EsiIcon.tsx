@@ -1,4 +1,4 @@
-import SvgIcon from '@material-ui/core/SvgIcon';
+import SvgIcon from '@mui/material/SvgIcon';
 import React from 'react';
 
 const EsiIcon: React.FC = (props) => {

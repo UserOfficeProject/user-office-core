@@ -1,20 +1,19 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import MaterialTable, {
   Options,
   Column,
   MTableToolbar,
 } from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import Email from '@material-ui/icons/Email';
-import makeStyles from '@material-ui/styles/makeStyles';
+import Email from '@mui/icons-material/Email';
+import { Typography } from '@mui/material';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import makeStyles from '@mui/styles/makeStyles';
 import { Formik } from 'formik';
 import React, { useState, useEffect, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import EmailSearchbar from 'components/common/EmailSearchbar';
+import EmailSearchBar from 'components/common/EmailSearchBar';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { getCurrentUser } from 'context/UserContextProvider';
 import {
@@ -22,7 +21,10 @@ import {
   FeatureId,
   GetBasicUserDetailsByEmailQuery,
   GetUsersQueryVariables,
+  Role,
   UserRole,
+  Maybe,
+  getSdk,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useUsersData } from 'hooks/user/useUsersData';
@@ -41,14 +43,16 @@ type BasicUserDetailsWithTableData = (BasicUserDetails & {
   tableData?: { checked: boolean };
 })[];
 
-type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
+type PeopleTableProps<
+  T extends BasicUserDetails = BasicUserDetails & { role?: Maybe<Role> }
+> = {
   selection: boolean;
   isLoading?: boolean;
   title?: string;
   userRole?: UserRole;
   invitationUserRole?: UserRole;
   action?: {
-    fn: (data: any) => void;
+    fn: (data: T | T[]) => void;
     actionIcon: JSX.Element;
     actionText: string;
   };
@@ -56,12 +60,12 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetails> = {
   data?: T[];
   search?: boolean;
   onRemove?: FunctionType<void, T>;
-  onUpdate?: FunctionType<void, [any[]]>;
+  onUpdate?: FunctionType<void, [T[]]>;
   emailInvite?: boolean;
   showInvitationButtons?: boolean;
   selectedUsers?: number[];
-  mtOptions?: Options<JSX.Element>;
-  columns?: Column<any>[];
+  mtOptions?: Options<T>;
+  columns?: Column<T>[];
   preserveSelf?: boolean;
 };
 
@@ -99,7 +103,10 @@ const getTitle = (invitationUserRole?: UserRole): string => {
   }
 };
 
-async function getUserByEmail(email: string, api: any) {
+async function getUserByEmail(
+  email: string,
+  api: () => ReturnType<typeof getSdk>
+) {
   return api()
     .getBasicUserDetailsByEmail({ email: email, role: UserRole.USER })
     .then((user: GetBasicUserDetailsByEmailQuery) => {
@@ -438,7 +445,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
               inputProps: { 'aria-label': 'Select All Rows' },
             },
             ...props.mtOptions,
-            selectionProps: (rowdata: any) => ({
+            selectionProps: (rowdata: BasicUserDetails) => ({
               inputProps: {
                 'aria-label': `${rowdata.firstname}-${rowdata.lastname}-${rowdata.organisation}-select`,
               },
@@ -485,7 +492,7 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             setQuery({ ...query, first: rowsPerPage })
           }
           components={{
-            Toolbar: isEmailSearchEnabled ? EmailSearchbar : MTableToolbar,
+            Toolbar: isEmailSearchEnabled ? EmailSearchBar : MTableToolbar,
           }}
         />
         {props.selection && (
@@ -495,8 +502,6 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             </div>
             <Button
               type="button"
-              variant="contained"
-              color="primary"
               onClick={() => {
                 if (props.onUpdate) {
                   props.onUpdate(selectedParticipants);
@@ -515,8 +520,6 @@ const PeopleTable: React.FC<PeopleTableProps> = (props) => {
             {invitationButtons.map((item: InvitationButtonProps, i) => (
               <Button
                 type="button"
-                variant="contained"
-                color="primary"
                 onClick={() => item.action()}
                 data-cy={item['data-cy']}
                 key={i}

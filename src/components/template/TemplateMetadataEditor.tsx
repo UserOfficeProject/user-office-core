@@ -1,9 +1,9 @@
-import { IconButton } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import TextField from '@material-ui/core/TextField';
-import { Check, Close } from '@material-ui/icons';
-import EditIcon from '@material-ui/icons/Edit';
+import { Check, Close } from '@mui/icons-material';
+import EditIcon from '@mui/icons-material/Edit';
+import { IconButton } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
-  buttonContainer: {
+  StyledButtonContainer: {
     margin: `${theme.spacing(1)} 0 0 0`,
   },
 }));
@@ -122,7 +122,7 @@ export function TemplateMetadataEditor(props: {
             fullWidth
             InputProps={{ 'data-cy': 'template-description' }}
           />
-          <ActionButtonContainer className={classes.buttonContainer}>
+          <ActionButtonContainer className={classes.StyledButtonContainer}>
             <IconButton
               disabled={isSubmitting}
               onClick={() => setIsEditMode(false)}

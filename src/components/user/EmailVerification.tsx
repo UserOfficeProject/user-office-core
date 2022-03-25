@@ -1,14 +1,14 @@
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
-import Email from '@material-ui/icons/Email';
+import Email from '@mui/icons-material/Email';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useDataApi } from 'hooks/common/useDataApi';
-import { FormWrapper } from 'styles/StyledComponents';
+import { StyledFormWrapper } from 'styles/StyledComponents';
 
 import PhotoInSide from './PhotoInSide';
 
@@ -55,7 +55,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({ match }) => {
 
   return (
     <PhotoInSide>
-      <FormWrapper>
+      <StyledFormWrapper>
         <Avatar className={classes.avatar}>
           <Email />
         </Avatar>
@@ -65,13 +65,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({ match }) => {
         </Typography>
         {emailVerified && (
           <Link to="/SignIn/" className={classes.signLink}>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-            >
+            <Button type="submit" fullWidth className={classes.submit}>
               click here to sign in
             </Button>
           </Link>
@@ -82,7 +76,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({ match }) => {
             useroffice@esss.se
           </p>
         )}
-      </FormWrapper>
+      </StyledFormWrapper>
     </PhotoInSide>
   );
 };

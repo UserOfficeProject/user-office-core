@@ -1,6 +1,6 @@
 import MaterialTable, { Column } from '@material-table/core';
-import { Dialog, DialogContent } from '@material-ui/core';
-import Grid from '@material-ui/core/Grid';
+import { Dialog, DialogContent } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import React, { useState } from 'react';
 import { ReactNode } from 'react';
 
@@ -16,6 +16,32 @@ import {
   TZ_LESS_DATE_TIME_LOW_PREC_FORMAT,
 } from 'utils/Time';
 import { getFullUserName } from 'utils/user';
+
+const columns: Column<ProposalScheduledEvent>[] = [
+  { title: 'Proposal title', field: 'proposal.title' },
+  { title: 'Proposal ID', field: 'proposal.proposalId' },
+  { title: 'Instrument', field: 'instrument.name' },
+  {
+    title: 'Local contact',
+    render: (rowData) => getFullUserName(rowData.localContact),
+  },
+  {
+    title: 'Starts at',
+    field: 'startsAt',
+    render: (rowData) =>
+      parseTzLessDateTime(rowData.startsAt).toFormat(
+        TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
+      ),
+  },
+  {
+    title: 'Ends at',
+    field: 'endsAt',
+    render: (rowData) =>
+      parseTzLessDateTime(rowData.endsAt).toFormat(
+        TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
+      ),
+  },
+];
 
 export default function UserUpcomingExperimentsTable() {
   const { loading, proposalScheduledEvents, setProposalScheduledEvents } =
@@ -46,32 +72,6 @@ export default function UserUpcomingExperimentsTable() {
     },
   });
 
-  const columns: Column<ProposalScheduledEvent>[] = [
-    { title: 'Proposal title', field: 'proposal.title' },
-    { title: 'Proposal ID', field: 'proposal.proposalId' },
-    { title: 'Instrument', field: 'instrument.name' },
-    {
-      title: 'Local contact',
-      render: (rowData) => getFullUserName(rowData.localContact),
-    },
-    {
-      title: 'Starts at',
-      field: 'startsAt',
-      render: (rowData) =>
-        parseTzLessDateTime(rowData.startsAt).format(
-          TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-        ),
-    },
-    {
-      title: 'Ends at',
-      field: 'endsAt',
-      render: (rowData) =>
-        parseTzLessDateTime(rowData.endsAt).format(
-          TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-        ),
-    },
-  ];
-
   // if there are no upcoming experiments
   // just hide the whole table altogether
   if (proposalScheduledEvents.length === 0) {
@@ -80,7 +80,7 @@ export default function UserUpcomingExperimentsTable() {
 
   return (
     <Grid item xs={12} data-cy="upcoming-experiments">
-      <StyledPaper margin={[0]}>
+      <StyledPaper>
         <MaterialTable
           actions={[
             formTeamAction,

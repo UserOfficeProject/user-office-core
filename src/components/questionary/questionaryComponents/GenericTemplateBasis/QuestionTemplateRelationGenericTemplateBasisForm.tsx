@@ -1,6 +1,6 @@
-//import { FormControlLabel } from '@material-ui/core';
+//import { FormControlLabel } from '@mui/material';
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
@@ -31,7 +31,6 @@ export const QuestionTemplateRelationGenericTemplateBasisForm: FC<
               name="config.questionLabel"
               label="Question"
               component={TextField}
-              margin="normal"
               type="text"
               inputProps={{ 'data-cy': 'question' }}
             />

@@ -1,14 +1,14 @@
 import MaterialTable from '@material-table/core';
-import { Button } from '@material-ui/core';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
-import Typography from '@material-ui/core/Typography';
-import Clear from '@material-ui/icons/Clear';
-import Person from '@material-ui/icons/Person';
-import PersonAdd from '@material-ui/icons/PersonAdd';
+import Clear from '@mui/icons-material/Clear';
+import Person from '@mui/icons-material/Person';
+import PersonAdd from '@mui/icons-material/PersonAdd';
+import { Button } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useState, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -47,6 +47,18 @@ type SEPMembersProps = {
   confirm: WithConfirmType;
 };
 
+const columns = [
+  { title: 'Name', field: 'user.firstname' },
+  {
+    title: 'Surname',
+    field: 'user.lastname',
+  },
+  {
+    title: 'Organization',
+    field: 'user.organisation',
+  },
+];
+
 const SEPMembers: React.FC<SEPMembersProps> = ({
   data: sepData,
   sepId,
@@ -71,18 +83,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
     UserRole.SEP_SECRETARY,
   ]);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-
-  const columns = [
-    { title: 'Name', field: 'user.firstname' },
-    {
-      title: 'Surname',
-      field: 'user.lastname',
-    },
-    {
-      title: 'Organization',
-      field: 'user.organisation',
-    },
-  ];
 
   const sendSEPChairUpdate = async (
     value: BasicUserDetails[]
@@ -204,12 +204,14 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
 
   const AddPersonIcon = (): JSX.Element => <PersonAdd data-cy="add-member" />;
 
-  const alreadySelectedMembers = (SEPReviewersData ?? []).map(
-    ({ userId }) => userId
-  );
+  const alreadySelectedMembers = SEPReviewersData.map(({ userId }) => userId);
 
   sepData.sepChair && alreadySelectedMembers.push(sepData.sepChair.id);
   sepData.sepSecretary && alreadySelectedMembers.push(sepData.sepSecretary.id);
+
+  const SEPReviewersDataWithId = SEPReviewersData.map((sepReviewer) =>
+    Object.assign(sepReviewer, { id: sepReviewer.userId })
+  );
 
   return (
     <>
@@ -373,9 +375,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                 </Typography>
               }
               columns={columns}
-              data={(SEPReviewersData ?? []).map((sepReviewer) =>
-                Object.assign(sepReviewer, { id: sepReviewer.userId })
-              )}
+              data={SEPReviewersDataWithId}
               editable={
                 hasAccessRights
                   ? {
@@ -402,7 +402,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({
                   variant="outlined"
                   onClick={() => setOpen(true)}
                   data-cy="add-participant-button"
-                  color="primary"
                   startIcon={<AddPersonIcon />}
                 >
                   Add reviewers

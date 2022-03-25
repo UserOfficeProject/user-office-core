@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import { default as React, useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
@@ -16,7 +16,7 @@ import {
   QuestionarySubmissionModel,
 } from 'models/questionary/QuestionarySubmissionState';
 import useEventHandlers from 'models/questionary/useEventHandlers';
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 export interface ProposalContextType extends QuestionaryContextType {
   state: ProposalSubmissionState | null;
@@ -64,14 +64,14 @@ export default function ProposalContainer(props: {
 
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
-      <ContentContainer maxWidth="md">
+      <StyledContainer>
         <StyledPaper>
           <Questionary
             title={state.proposal.title || 'New Proposal'}
             info={info}
           />
         </StyledPaper>
-      </ContentContainer>
+      </StyledContainer>
     </QuestionaryContext.Provider>
   );
 }

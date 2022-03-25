@@ -1,9 +1,11 @@
 import faker from 'faker';
+import { DateTime } from 'luxon';
 
-import { DataType, TemplateCategoryId } from '../../src/generated/sdk';
 import initialDBData from '../support/initialDBData';
 
 context('Proposal administration tests', () => {
+  const DATE_FORMAT = 'yyyy-MM-dd';
+
   const proposalName1 = faker.lorem.words(3);
   const proposalName2 = faker.lorem.words(3);
   const proposalFixedName = '0000. Alphabetically first title';
@@ -11,195 +13,12 @@ context('Proposal administration tests', () => {
   const textUser = faker.lorem.words(5);
   const textManager = faker.lorem.words(5);
 
-  const answerDate = '2030-01-01';
-  const answerMultipleChoice = 'One';
-  const answerText = faker.lorem.words(3);
-  const answerNumberInput = 99.9;
-  const answerIntervalMin = 1;
-  const answerIntervalMax = 100;
-
-  const textQuestion = faker.lorem.words(3);
-  const dateQuestion = faker.lorem.words(3);
-  const boolQuestion = faker.lorem.words(3);
-  const multipleChoiceQuestion = faker.lorem.words(3);
-  const numberInputQuestion = faker.lorem.words(3);
-  const fileUploadQuestion = faker.lorem.words(3);
-  const intervalQuestion = faker.lorem.words(3);
   const existingUserId = 1;
   const existingTopicId = 1;
   const existingQuestionaryId = 1;
 
-  let textQuestionId: string;
-  let dateQuestionId: string;
-  let boolQuestionId: string;
-  let multipleChoiceQuestionId: string;
-  let fileUploadQuestionId: string;
-  let numberInputQuestionId: string;
-  let intervalQuestionId: string;
-  const createdTemplateId = 1;
-
-  const createTemplateAndAllQuestions = () => {
-    cy.createTopic({
-      templateId: createdTemplateId,
-      sortOrder: 1,
-    }).then((topicResult) => {
-      if (!topicResult.createTopic.template) {
-        throw new Error('Can not create topic');
-      }
-
-      const topicId =
-        topicResult.createTopic.template.steps[
-          topicResult.createTopic.template.steps.length - 1
-        ].topic.id;
-      cy.createQuestion({
-        categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-        dataType: DataType.INTERVAL,
-      }).then((questionResult) => {
-        if (questionResult.createQuestion.question) {
-          intervalQuestionId = questionResult.createQuestion.question.id;
-
-          cy.updateQuestion({
-            id: intervalQuestionId,
-            question: intervalQuestion,
-          });
-
-          cy.createQuestionTemplateRelation({
-            questionId: intervalQuestionId,
-            templateId: createdTemplateId,
-            sortOrder: 0,
-            topicId: topicId,
-          });
-        }
-      });
-      cy.createQuestion({
-        categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-        dataType: DataType.BOOLEAN,
-      }).then((questionResult) => {
-        if (questionResult.createQuestion.question) {
-          boolQuestionId = questionResult.createQuestion.question.id;
-
-          cy.updateQuestion({
-            id: boolQuestionId,
-            question: boolQuestion,
-          });
-
-          cy.createQuestionTemplateRelation({
-            questionId: boolQuestionId,
-            templateId: createdTemplateId,
-            sortOrder: 1,
-            topicId: topicId,
-          });
-        }
-      });
-      cy.createQuestion({
-        categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-        dataType: DataType.DATE,
-      }).then((questionResult) => {
-        if (questionResult.createQuestion.question) {
-          dateQuestionId = questionResult.createQuestion.question.id;
-
-          cy.updateQuestion({
-            id: dateQuestionId,
-            question: dateQuestion,
-            config: '{"required":true}',
-          });
-
-          cy.createQuestionTemplateRelation({
-            questionId: dateQuestionId,
-            templateId: createdTemplateId,
-            sortOrder: 2,
-            topicId: topicId,
-          });
-        }
-      });
-      cy.createQuestion({
-        categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-        dataType: DataType.SELECTION_FROM_OPTIONS,
-      }).then((questionResult) => {
-        if (questionResult.createQuestion.question) {
-          multipleChoiceQuestionId = questionResult.createQuestion.question.id;
-
-          cy.updateQuestion({
-            id: multipleChoiceQuestionId,
-            question: multipleChoiceQuestion,
-            config:
-              '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}',
-          });
-
-          cy.createQuestionTemplateRelation({
-            questionId: multipleChoiceQuestionId,
-            templateId: createdTemplateId,
-            sortOrder: 3,
-            topicId: topicId,
-          });
-        }
-      });
-      cy.createQuestion({
-        categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-        dataType: DataType.TEXT_INPUT,
-      }).then((questionResult) => {
-        if (questionResult.createQuestion.question) {
-          textQuestionId = questionResult.createQuestion.question.id;
-
-          cy.updateQuestion({
-            id: textQuestionId,
-            question: textQuestion,
-          });
-
-          cy.createQuestionTemplateRelation({
-            questionId: textQuestionId,
-            templateId: createdTemplateId,
-            sortOrder: 4,
-            topicId: topicId,
-          });
-        }
-      });
-      cy.createQuestion({
-        categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-        dataType: DataType.FILE_UPLOAD,
-      }).then((questionResult) => {
-        if (questionResult.createQuestion.question) {
-          fileUploadQuestionId = questionResult.createQuestion.question.id;
-
-          cy.updateQuestion({
-            id: fileUploadQuestionId,
-            question: fileUploadQuestion,
-          });
-
-          cy.createQuestionTemplateRelation({
-            questionId: fileUploadQuestionId,
-            templateId: createdTemplateId,
-            sortOrder: 5,
-            topicId: topicId,
-          });
-        }
-      });
-      cy.createQuestion({
-        categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-        dataType: DataType.NUMBER_INPUT,
-      }).then((questionResult) => {
-        if (questionResult.createQuestion.question) {
-          numberInputQuestionId = questionResult.createQuestion.question.id;
-
-          cy.updateQuestion({
-            id: numberInputQuestionId,
-            question: numberInputQuestion,
-          });
-
-          cy.createQuestionTemplateRelation({
-            questionId: numberInputQuestionId,
-            templateId: createdTemplateId,
-            sortOrder: 6,
-            topicId: topicId,
-          });
-        }
-      });
-    });
-  };
-
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   describe('Proposal administration advanced search filter tests', () => {
@@ -239,7 +58,7 @@ context('Proposal administration tests', () => {
 
       cy.get('#finalStatus-input').click();
 
-      cy.contains('Accepted').click();
+      cy.get('[data-value="ACCEPTED"]').click();
 
       cy.get('[data-cy="managementTimeAllocation"] input')
         .clear()
@@ -372,7 +191,7 @@ context('Proposal administration tests', () => {
 
       cy.contains(proposalName1)
         .parent()
-        .get('[title="Edit proposal"]')
+        .get('[aria-label="Edit proposal"]')
         .click();
 
       cy.finishedLoading();
@@ -475,7 +294,9 @@ context('Proposal administration tests', () => {
       cy.contains('Title')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
-        .dblclick();
+        .click();
+
+      cy.finishedLoading();
 
       cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
         officerProposalsTableAsTextAfterSort = element.text();
@@ -495,7 +316,7 @@ context('Proposal administration tests', () => {
       cy.contains('Title')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
-        .should('have.attr', 'aria-sort', 'Descendant');
+        .should('have.attr', 'aria-sort', 'Ascendant');
 
       cy.contains('Calls').click();
 
@@ -531,13 +352,14 @@ context('Proposal administration tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
-      cy.contains('Title').dblclick();
       cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.contains('Title').click();
+      cy.finishedLoading();
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
 
       cy.get('table tbody tr input[type="checkbox"]').first().click();
 
-      cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
     });
 
     it('User officer should see Reviews tab before doing the Admin(management decision)', () => {
@@ -556,63 +378,12 @@ context('Proposal administration tests', () => {
 
   describe('Proposal administration advanced search tests', () => {
     beforeEach(() => {
-      createTemplateAndAllQuestions();
-      cy.login('user');
-      cy.visit('/');
-    });
+      cy.resetDB(true);
 
-    it('Should be able to search by question', () => {
-      // Create a test proposal
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal.proposal) {
-          cy.updateProposal({
-            proposalPk: result.createProposal.proposal.primaryKey,
-            title: proposalName2,
-            abstract: proposalName2,
-            proposerId: existingUserId,
-          });
-        }
-      });
+      cy.viewport(1920, 1080);
 
-      cy.contains(proposalName2)
-        .parent()
-        .find('[title="Edit proposal"]')
-        .click();
-      cy.finishedLoading();
-      cy.contains('Save and continue').click();
-
-      cy.get(`#${boolQuestionId}`).click();
-
-      cy.get(`[data-cy='${dateQuestionId}.value'] input`)
-        .clear()
-        .type(answerDate);
-
-      cy.get(`#${multipleChoiceQuestionId}`).click();
-
-      cy.contains(answerMultipleChoice).click();
-
-      cy.get('body').type('{esc}');
-
-      cy.get(`#${textQuestionId}`).clear().type(answerText);
-
-      cy.get(`[data-cy='${numberInputQuestionId}.value'] input`)
-        .clear()
-        .type(answerNumberInput.toString());
-
-      cy.get(`[data-cy='${intervalQuestionId}.min'] input`)
-        .clear()
-        .type(answerIntervalMin.toString());
-
-      cy.get(`[data-cy='${intervalQuestionId}.max'] input`)
-        .clear()
-        .type(answerIntervalMax.toString());
-
-      cy.contains('Save and continue').click();
-
-      cy.logout();
-
-      // search proposals
       cy.login('officer');
+
       cy.visit('/');
 
       cy.get('[data-cy=call-filter]').click();
@@ -620,51 +391,142 @@ context('Proposal administration tests', () => {
       cy.get('[role=listbox]').contains('call 1').first().click();
 
       cy.get('[data-cy=question-search-toggle]').click();
+    });
 
-      // Boolean questions
+    it('Should be able to search Boolean question', () => {
+      // If answer true, find when search for Yes
+      cy.answerTopic({
+        questionaryId: initialDBData.proposal.questionaryId,
+        topicId: initialDBData.template.topic.id,
+        answers: [
+          {
+            questionId: initialDBData.questions.boolean.id,
+            value: '{"value":true}',
+          },
+        ],
+      });
       cy.get('[data-cy=question-list]').click();
-
-      cy.contains(boolQuestion).click();
-
+      cy.contains(initialDBData.questions.boolean.text).click();
       cy.get('[data-cy=is-checked]').click();
-
       cy.get('[role=listbox]').contains('No').click();
-
       cy.contains('Search').click();
-
-      cy.contains(proposalName2).should('not.exist');
+      cy.finishedLoading();
+      cy.contains(initialDBData.proposal.title).should('not.exist');
 
       cy.get('[data-cy=is-checked]').click();
-
       cy.get('[role=listbox]').contains('Yes').click();
-
       cy.contains('Search').click();
+      cy.finishedLoading();
+      cy.contains(initialDBData.proposal.title).should('exist');
 
-      cy.contains(proposalName2);
-
-      // Date questions
+      // If answer false, find when search for No
+      cy.answerTopic({
+        questionaryId: initialDBData.proposal.questionaryId,
+        topicId: initialDBData.template.topic.id,
+        answers: [
+          {
+            questionId: initialDBData.questions.boolean.id,
+            value: '{"value":false}',
+          },
+        ],
+      });
       cy.get('[data-cy=question-list]').click();
-
-      cy.contains(dateQuestion).click();
-
-      cy.get('[data-cy=value] input').clear().type('2020-01-01');
-
+      cy.contains(initialDBData.questions.boolean.text).click();
+      cy.get('[data-cy=is-checked]').click();
+      cy.get('[role=listbox]').contains('No').click();
       cy.contains('Search').click();
+      cy.finishedLoading();
+      cy.contains(initialDBData.proposal.title).should('exist');
 
-      cy.contains(proposalName2).should('not.exist');
+      cy.get('[data-cy=is-checked]').click();
+      cy.get('[role=listbox]').contains('Yes').click();
+      cy.contains('Search').click();
+      cy.finishedLoading();
+      cy.contains(initialDBData.proposal.title).should('not.exist');
+
+      // If missing answer, do not find the result for both, Yes and No
+      cy.answerTopic({
+        questionaryId: initialDBData.proposal.questionaryId,
+        topicId: initialDBData.template.topic.id,
+        answers: [],
+      });
+      cy.get('[data-cy=question-list]').click();
+      cy.contains(initialDBData.questions.boolean.text).click();
+      cy.get('[data-cy=is-checked]').click();
+      cy.get('[role=listbox]').contains('No').click();
+      cy.contains('Search').click();
+      cy.finishedLoading();
+      cy.contains(initialDBData.proposal.title).should('not.exist');
+
+      cy.get('[data-cy=is-checked]').click();
+      cy.get('[role=listbox]').contains('Yes').click();
+      cy.contains('Search').click();
+      cy.finishedLoading();
+      cy.contains(initialDBData.proposal.title).should('not.exist');
+    });
+
+    it('Should be able to search Date question', () => {
+      // Date questions
+      const { questions, proposal, answers } = initialDBData;
+
+      const DATE_ANSWER = answers.proposal.date.value;
+
+      const DATE_BEFORE = DateTime.fromFormat(DATE_ANSWER, DATE_FORMAT)
+        .minus({ days: 1 })
+        .toFormat(DATE_FORMAT);
+
+      const DATE_AFTER = DateTime.fromFormat(DATE_ANSWER, DATE_FORMAT)
+        .plus({ days: 1 })
+        .toFormat(DATE_FORMAT);
+
+      cy.get('[data-cy=question-list]').click();
+      cy.contains(questions.date.text).click();
 
       cy.get('[data-cy=comparator]').click();
-
-      cy.get('[role=listbox]').contains('After').click();
-
+      cy.get('[role=listbox]').contains('Exact').click();
+      cy.get('[data-cy=value] input').clear().type(DATE_BEFORE);
       cy.contains('Search').click();
+      cy.contains(proposal.title).should('not.exist');
 
-      cy.contains(proposalName2);
+      // TODO: This should be allowed here: https://github.com/UserOfficeProject/user-office-frontend/pull/815
+      // cy.get('[data-cy=comparator]').click();
+      // cy.get('[role=listbox]').contains('Exact').click();
+      // cy.get('[data-cy=value] input').clear().type(DATE_ANSWER);
+      // cy.contains('Search').click();
+      // cy.contains(proposal.title).should('exist');
 
-      // Multiple choice questions
+      cy.get('[data-cy=comparator]').click();
+      cy.get('[role=listbox]').contains('After').click();
+      cy.get('[data-cy=value] input').clear().type(DATE_BEFORE);
+      cy.contains('Search').click();
+      cy.contains(proposal.title).should('exist');
+
+      cy.get('[data-cy=comparator]').click();
+      cy.get('[role=listbox]').contains('Before').click();
+      cy.get('[data-cy=value] input').clear().type(DATE_BEFORE);
+      cy.contains('Search').click();
+      cy.contains(proposal.title).should('not.exist');
+
+      cy.get('[data-cy=comparator]').click();
+      cy.get('[role=listbox]').contains('After').click();
+      cy.get('[data-cy=value] input').clear().type(DATE_AFTER);
+      cy.contains('Search').click();
+      cy.contains(proposal.title).should('not.exist');
+
+      cy.get('[data-cy=comparator]').click();
+      cy.get('[role=listbox]').contains('Before').click();
+      cy.get('[data-cy=value] input').clear().type(DATE_AFTER);
+      cy.contains('Search').click();
+      cy.contains(proposal.title).should('exist');
+    });
+
+    it('Should be able to search Select from options question', () => {
+      const { questions, proposal, answers } = initialDBData;
+
+      // Selection from options questions
       cy.get('[data-cy=question-list]').click();
 
-      cy.contains(multipleChoiceQuestion).click();
+      cy.contains(questions.selectionFromOptions.text).click();
 
       cy.get('[data-cy=value]').click();
 
@@ -672,168 +534,135 @@ context('Proposal administration tests', () => {
 
       cy.contains('Search').click();
 
-      cy.contains(proposalName2).should('not.exist');
+      cy.contains(proposal.title).should('not.exist');
 
       cy.get('[data-cy=value]').click();
 
-      cy.get('[role=listbox]').contains('One').click();
+      cy.get('[role=listbox]')
+        .contains(answers.proposal.selectionFromOptions.value[0])
+        .click();
 
       cy.contains('Search').click();
 
-      cy.contains(proposalName2);
+      cy.contains(proposal.title).should('exist');
+    });
+
+    it('Should be able to search Text question', () => {
+      const { questions, proposal, answers } = initialDBData;
 
       // Text questions
       cy.get('[data-cy=question-list]').click();
-
-      cy.contains(textQuestion).click();
-
+      cy.contains(questions.textInput.text).click();
       cy.get('[name=value]').clear().type(faker.lorem.words(3));
-
       cy.contains('Search').click();
+      cy.contains(proposal.title).should('not.exist');
 
-      cy.contains(proposalName2).should('not.exist');
-
-      cy.get('[name=value]').clear().type(answerText);
-
+      cy.get('[name=value]').clear().type(answers.proposal.textInput.value);
       cy.contains('Search').click();
+      cy.contains(proposal.title).should('exist');
+    });
 
-      cy.contains(proposalName2);
+    it('Should be able to search File upload question', () => {
+      const { questions, proposal } = initialDBData;
 
       // File upload questions
       cy.get('[data-cy=question-list]').click();
-
-      cy.contains(fileUploadQuestion).click();
-
+      cy.contains(questions.fileUpload.text).click();
       cy.get('[data-cy=has-attachments]').click();
-
       cy.get('[role=listbox]').contains('Yes').click();
-
       cy.contains('Search').click();
-
-      cy.contains(proposalName2).should('not.exist');
+      cy.contains(proposal.title).should('exist');
 
       cy.get('[data-cy=has-attachments]').click();
-
       cy.get('[role=listbox]').contains('No').click();
-
       cy.contains('Search').click();
+      cy.contains(proposal.title).should('not.exist');
+    });
 
-      cy.contains(proposalName2);
-
+    it('Should be able to search Number input question', () => {
+      const { questions, proposal, answers } = initialDBData;
       // NumberInput questions
       cy.get('[data-cy=question-list]').click();
-
-      cy.contains(numberInputQuestion).click();
-
+      cy.contains(questions.numberInput.text).click();
       // NumberInput questions - Less than
       cy.get('[data-cy=comparator]').click();
-
       cy.get('[role=listbox]').contains('Less than').click();
-
       cy.get('[data-cy=value] input')
         .clear()
-        .type((answerNumberInput - 1).toString());
-
+        .type((answers.proposal.numberInput.value.value - 1).toString());
+      cy.get('[data-cy=unit-select]').click();
+      cy.get('[role=listbox]')
+        .contains(answers.proposal.numberInput.value.unit.symbol)
+        .click();
       cy.contains('Search').click();
-
-      cy.contains(proposalName2).should('not.exist');
-
+      cy.contains(proposal.title).should('not.exist');
       cy.get('[data-cy=value] input')
         .clear()
-        .type((answerNumberInput + 1).toString());
-
+        .type((answers.proposal.numberInput.value.value + 1).toString());
       cy.contains('Search').click();
-
-      cy.contains(proposalName2).should('exist');
+      cy.contains(proposal.title).should('exist');
 
       // NumberInput questions - Equals
       cy.get('[data-cy=comparator]').click();
-
       cy.get('[role=listbox]').contains('Equals').click();
-
       cy.get('[data-cy=value] input')
         .clear()
-        .type((answerNumberInput + 1).toString());
-
+        .type((answers.proposal.numberInput.value.value + 1).toString());
       cy.contains('Search').click();
-
-      cy.contains(proposalName2).should('not.exist');
-
+      cy.contains(proposal.title).should('not.exist');
       cy.get('[data-cy=value] input')
         .clear()
-        .type(answerNumberInput.toString());
-
+        .type(answers.proposal.numberInput.value.value.toString());
       cy.contains('Search').click();
-
-      cy.contains(proposalName2).should('exist');
+      cy.contains(proposal.title).should('exist');
 
       // NumberInput questions - Less than
       cy.get('[data-cy=comparator]').click();
-
       cy.get('[role=listbox]').contains('Less than').click();
-
       cy.get('[data-cy=value] input')
         .clear()
-        .type((answerNumberInput - 1).toString());
-
+        .type((answers.proposal.numberInput.value.value - 1).toString());
       cy.contains('Search').click();
-
-      cy.contains(proposalName2).should('not.exist');
-
+      cy.contains(proposal.title).should('not.exist');
       cy.get('[data-cy=value] input')
         .clear()
-        .type((answerNumberInput + 1).toString());
-
+        .type((answers.proposal.numberInput.value.value + 1).toString());
       cy.contains('Search').click();
+      cy.contains(proposal.title).should('exist');
+    });
 
-      cy.contains(proposalName2).should('exist');
-
+    it('Should be able to search Interval input question', () => {
+      const { questions, proposal, answers } = initialDBData;
       // Interval question
       cy.get('[data-cy=question-list]').click();
-
-      cy.contains(intervalQuestion).click();
-
+      cy.contains(questions.interval.text).click();
       // Interval question - Less than
       cy.get('[data-cy=comparator]').click();
-
       cy.get('[role=listbox]').contains('Less than').click();
-
       cy.get('[data-cy=value] input')
         .clear()
-        .type(answerIntervalMax.toString());
-
+        .type(answers.proposal.interval.value.max.toString());
       cy.contains('Search').click();
-
-      cy.contains(proposalName2).should('not.exist');
-
+      cy.contains(proposal.title).should('not.exist');
       cy.get('[data-cy=value] input')
         .clear()
-        .type((answerIntervalMax + 1).toString());
-
+        .type((answers.proposal.interval.value.max + 1).toString());
       cy.contains('Search').click();
-
-      cy.contains(proposalName2).should('exist');
+      cy.contains(proposal.title).should('exist');
 
       // Interval question -  Greater than
       cy.get('[data-cy=comparator]').click();
-
       cy.get('[role=listbox]').contains('Greater than').click();
-
       cy.get('[data-cy=value] input')
         .clear()
-        .type(answerIntervalMin.toString());
-
+        .type(answers.proposal.interval.value.min.toString());
       cy.contains('Search').click();
-
-      cy.contains(proposalName2).should('not.exist');
-
+      cy.contains(proposal.title).should('not.exist');
       cy.get('[data-cy=value] input')
         .clear()
-        .type((answerIntervalMin - 1).toString());
-
+        .type((answers.proposal.interval.value.min - 1).toString());
       cy.contains('Search').click();
-
-      cy.contains(proposalName2).should('exist');
+      cy.contains(proposal.title).should('exist');
     });
   });
 });

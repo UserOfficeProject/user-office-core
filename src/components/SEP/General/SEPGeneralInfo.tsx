@@ -1,10 +1,10 @@
-import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Grid from '@material-ui/core/Grid';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { updateSEPValidationSchema } from '@user-office-software/duo-validation/lib/SEP';
 import { Formik, Form, Field } from 'formik';
 import React from 'react';
@@ -12,7 +12,7 @@ import React from 'react';
 import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
 import { Sep, UserRole } from 'generated/sdk';
-import { ButtonContainer } from 'styles/StyledComponents';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type SEPPageProps = {
@@ -75,7 +75,6 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                 value={values.code}
                 onChange={handleChange}
                 component={TextField}
-                margin="normal"
                 fullWidth
                 data-cy="code"
                 error={touched.code && errors.code !== undefined}
@@ -88,7 +87,6 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                 label="Number of ratings required"
                 type="number"
                 component={TextField}
-                margin="normal"
                 fullWidth
                 onChange={handleChange}
                 value={values.numberRatingsRequired}
@@ -112,7 +110,6 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                 label="Description"
                 type="text"
                 component={TextField}
-                margin="normal"
                 fullWidth
                 multiline
                 maxRows="16"
@@ -136,7 +133,6 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                     type="checkbox"
                     component={Checkbox}
                     checked={values.active}
-                    color="primary"
                     onChange={(): void =>
                       setFieldValue('active', !values.active)
                     }
@@ -149,19 +145,17 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
             </Grid>
           </Grid>
           {hasAccessRights && (
-            <ButtonContainer>
+            <StyledButtonContainer>
               <Button
                 disabled={isExecutingCall}
                 type="submit"
-                variant="contained"
-                color="primary"
                 className={classes.button}
                 data-cy="submit"
               >
                 {isExecutingCall && <UOLoader size={14} />}
                 Update SEP
               </Button>
-            </ButtonContainer>
+            </StyledButtonContainer>
           )}
         </Form>
       )}

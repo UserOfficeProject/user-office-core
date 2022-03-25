@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
 import { Field, FieldProps, FormikProps } from 'formik';
 import React, { useContext, useState } from 'react';
 
@@ -10,12 +10,7 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import {
-  Answer,
-  QuestionaryStep,
-  // GenericTemplateStatus,
-  SubTemplateConfig,
-} from 'generated/sdk';
+import { Answer, QuestionaryStep, SubTemplateConfig } from 'generated/sdk';
 import { GenericTemplateCore } from 'models/questionary/genericTemplate/GenericTemplateCore';
 import { GenericTemplateWithQuestionary } from 'models/questionary/genericTemplate/GenericTemplateWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';

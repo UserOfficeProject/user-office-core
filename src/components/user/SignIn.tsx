@@ -1,22 +1,24 @@
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Grid from '@material-ui/core/Grid';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { signInValidationSchema } from '@user-office-software/duo-validation/lib/User';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { useContext, useState } from 'react';
 import { useLocation } from 'react-router';
 import { Link, Redirect } from 'react-router-dom';
 
 import UOLoader from 'components/common/UOLoader';
+import LoginHelpPage from 'components/pages/LoginHelpPage';
 import { UserContext } from 'context/UserContextProvider';
+import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 import orcid from 'images/orcid.png';
-import { FormWrapper } from 'styles/StyledComponents';
+import { StyledFormWrapper } from 'styles/StyledComponents';
 
 import PhotoInSide from './PhotoInSide';
 
@@ -71,6 +73,16 @@ const useStyles = makeStyles((theme) => ({
     'margin-right': '4px',
     'padding-right': '6px',
   },
+  signInContainer: {
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  footer: {
+    'text-align': 'center',
+    padding: theme.spacing(2),
+  },
 }));
 
 export default function SignInSide() {
@@ -117,92 +129,96 @@ export default function SignInSide() {
 
   return (
     <PhotoInSide>
-      <Formik
-        initialValues={{ email: '', password: '' }}
-        onSubmit={async (values): Promise<void> => {
-          await requestToken(values);
-        }}
-        validationSchema={signInValidationSchema}
-      >
-        {({ isSubmitting }) => (
-          <Form className={classes.form}>
-            <CssBaseline />
-            <FormWrapper margin={[8, 4]}>
-              <Avatar className={classes.avatar}>
-                <LockOutlinedIcon />
-              </Avatar>
-              <Typography component="h1" variant="h5">
-                Sign in
-              </Typography>
-              <Field
-                name="email"
-                label="Email"
-                id="email-input"
-                type="text"
-                component={TextField}
-                margin="normal"
-                fullWidth
-                data-cy="input-email"
-                disabled={isSubmitting}
-              />
-              <Field
-                name="password"
-                label="Password"
-                id="Password-input"
-                type="password"
-                component={TextField}
-                margin="normal"
-                fullWidth
-                data-cy="input-password"
-                disabled={isSubmitting}
-              />
-              {failedLogin && (
-                <p className={classes.errorMessage}>{errorMessage}</p>
-              )}
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-                data-cy="submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? <UOLoader size={24} /> : 'Sign In'}
-              </Button>
-              <Grid container>
-                <Grid item xs>
-                  <Link to="/ResetPasswordEmail">Forgot password?</Link>
+      <div className={classes.signInContainer}>
+        <Formik
+          initialValues={{ email: '', password: '' }}
+          onSubmit={async (values): Promise<void> => {
+            await requestToken(values);
+          }}
+          validationSchema={signInValidationSchema}
+        >
+          {({ isSubmitting }) => (
+            <Form className={classes.form}>
+              <CssBaseline />
+              <StyledFormWrapper margin={[8, 4]}>
+                <Avatar className={classes.avatar}>
+                  <LockOutlinedIcon />
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                  Sign in
+                </Typography>
+                <Field
+                  name="email"
+                  label="Email"
+                  id="email-input"
+                  type="text"
+                  component={TextField}
+                  fullWidth
+                  data-cy="input-email"
+                  disabled={isSubmitting}
+                />
+                <Field
+                  name="password"
+                  label="Password"
+                  id="Password-input"
+                  type="password"
+                  component={TextField}
+                  fullWidth
+                  data-cy="input-password"
+                  disabled={isSubmitting}
+                />
+                {failedLogin && (
+                  <p className={classes.errorMessage}>{errorMessage}</p>
+                )}
+                <Button
+                  type="submit"
+                  fullWidth
+                  className={classes.submit}
+                  data-cy="submit"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? <UOLoader size={24} /> : 'Sign In'}
+                </Button>
+                <Grid container>
+                  <Grid item xs>
+                    <Link to="/ResetPasswordEmail">Forgot password?</Link>
+                  </Grid>
+                  <Grid item>
+                    <Link to="/SignUp" data-cy="create-account">
+                      Don&apos;t have an account? Sign Up
+                    </Link>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <div className={classes.loginAlternative}>
+                      <span className={classes.loginAlternativeOr}>or</span>
+                      <Button
+                        className={classes.orcButton}
+                        variant="text"
+                        onClick={() =>
+                          (window.location.href = process.env
+                            .REACT_APP_ORCID_REDIRECT as string)
+                        }
+                      >
+                        <img
+                          className={classes.orcidIconMedium}
+                          src={orcid}
+                          alt="ORCID iD icon"
+                        />
+                        Sign in with <b>&nbsp;ORCID</b>
+                      </Button>
+                    </div>
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <Link to="/SignUp" data-cy="create-account">
-                    Don&apos;t have an account? Sign Up
-                  </Link>
-                </Grid>
-                <Grid item xs={12}>
-                  <div className={classes.loginAlternative}>
-                    <span className={classes.loginAlternativeOr}>or</span>
-                    <Button
-                      className={classes.orcButton}
-                      onClick={() =>
-                        (window.location.href = process.env
-                          .REACT_APP_ORCID_REDIRECT as string)
-                      }
-                    >
-                      <img
-                        className={classes.orcidIconMedium}
-                        src={orcid}
-                        alt="ORCID iD icon"
-                      />
-                      Sign in with <b>&nbsp;ORCID</b>
-                    </Button>
-                  </div>
-                </Grid>
-              </Grid>
-            </FormWrapper>
-          </Form>
-        )}
-      </Formik>
+              </StyledFormWrapper>
+            </Form>
+          )}
+        </Formik>
+        <div className={classes.footer}>
+          <ButtonWithDialog label="Problems signing in?">
+            <LoginHelpPage />
+          </ButtonWithDialog>
+        </div>
+      </div>
     </PhotoInSide>
   );
 }

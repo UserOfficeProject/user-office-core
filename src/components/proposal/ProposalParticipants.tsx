@@ -1,6 +1,8 @@
-import { Button, makeStyles, Typography } from '@material-ui/core';
-import FormControl from '@material-ui/core/FormControl';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 
@@ -15,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '12px',
     color: 'grey',
   },
-  buttonContainer: {
+  StyledButtonContainer: {
     marginTop: theme.spacing(1),
   },
 }));
@@ -103,13 +105,12 @@ const Participants: React.FC<ParticipantsProps> = ({
           onRemove={removeUser}
           preserveSelf={preserveSelf}
         />
-        <ActionButtonContainer className={classes.buttonContainer}>
+        <ActionButtonContainer className={classes.StyledButtonContainer}>
           <Button
             variant="outlined"
             onClick={openModal}
             data-cy="add-participant-button"
             size="small"
-            color="primary"
             startIcon={<PersonAddIcon />}
           >
             Add

@@ -1,12 +1,11 @@
-import { Typography } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Alert from '@material-ui/lab/Alert';
+import { Alert, Typography } from '@mui/material';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useCallback, useState } from 'react';
 
 import { FunctionType } from './utilTypes';
@@ -79,7 +78,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
           onClose={handleCancel}
         >
           {title && (
-            <DialogTitle className={classes.title} disableTypography={true}>
+            <DialogTitle className={classes.title}>
               <Typography variant="h6" component="h1" gutterBottom>
                 {title}
               </Typography>
@@ -92,12 +91,15 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
             </DialogContent>
           )}
           <DialogActions>
-            <Button onClick={handleCancel} data-cy="confirm-cancel">
+            <Button
+              variant="text"
+              onClick={handleCancel}
+              data-cy="confirm-cancel"
+            >
               {cancellationText}
             </Button>
             <Button
               onClick={handleConfirm}
-              color="primary"
               data-cy="confirm-ok"
               disabled={!!alertText}
             >

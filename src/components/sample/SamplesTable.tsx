@@ -2,7 +2,7 @@ import MaterialTable, {
   MaterialTableProps,
   Column,
 } from '@material-table/core';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import React from 'react';
 import { DecodedValueMap, SetQuery, QueryParamConfig } from 'use-query-params';
 

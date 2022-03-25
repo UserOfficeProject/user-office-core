@@ -5,7 +5,7 @@ mutation createTemplate(
 ) {
   createTemplate(groupId: $groupId, name: $name, description: $description) {
     template {
-      ...templateMetadata
+      ...template
       questionaryCount
     }
     rejection {

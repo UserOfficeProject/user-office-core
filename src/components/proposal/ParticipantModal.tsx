@@ -1,6 +1,6 @@
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import AddBox from '@material-ui/icons/AddBox';
+import AddBox from '@mui/icons-material/AddBox';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
 import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -19,15 +19,10 @@ function ParticipantModal(props: {
   invitationUserRole?: UserRole;
   participant?: boolean;
 }) {
-  const addUser = (rowData: BasicUserDetails) => {
-    props.addParticipants([
-      {
-        firstname: rowData.firstname,
-        lastname: rowData.lastname,
-        organisation: rowData.organisation,
-        id: rowData.id,
-      } as BasicUserDetails,
-    ]);
+  const addUser = (rowData: BasicUserDetails | BasicUserDetails[]) => {
+    const addedUserDetails = rowData as BasicUserDetails;
+
+    props.addParticipants([addedUserDetails]);
   };
 
   const userTableProps = {
