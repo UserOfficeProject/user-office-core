@@ -314,7 +314,7 @@ export default class UserMutations {
     }
 
     let organisationId = args.organisation;
-    // Check if user has other org and if so create it
+    // Check if user has other as selected org and if so create it
     if (args.otherOrganisation) {
       organisationId = await this.dataSource.createOrganisation(
         args.otherOrganisation,
