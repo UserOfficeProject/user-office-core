@@ -1,4 +1,4 @@
-import { TableProps } from '@material-ui/core';
+import { TableProps } from '@mui/material';
 import React, { FunctionComponent } from 'react';
 
 import UOLoader from 'components/common/UOLoader';

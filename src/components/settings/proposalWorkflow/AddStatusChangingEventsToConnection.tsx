@@ -1,10 +1,10 @@
-import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox';
-import Container from '@material-ui/core/Container';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Grid from '@material-ui/core/Grid';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import Container from '@mui/material/Container';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { FieldArray, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -113,7 +113,6 @@ const AddStatusChangingEventsToConnection: React.FC<
                                 checked={values.selectedStatusChangingEvents.includes(
                                   proposalEvent.name
                                 )}
-                                color="primary"
                                 data-cy="status-changing-event"
                                 onChange={(e) => {
                                   if (e.target.checked)
@@ -145,7 +144,7 @@ const AddStatusChangingEventsToConnection: React.FC<
             </Grid>
             <Grid
               container
-              justify="flex-end"
+              justifyContent="flex-end"
               className={classes.submitContainer}
             >
               <Grid item>
@@ -153,8 +152,6 @@ const AddStatusChangingEventsToConnection: React.FC<
 
                 <Button
                   type="submit"
-                  variant="contained"
-                  color="primary"
                   disabled={isSubmitting || loadingProposalEvents}
                   data-cy="submit"
                 >

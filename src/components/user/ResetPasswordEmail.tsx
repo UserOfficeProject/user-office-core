@@ -1,18 +1,18 @@
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Grid from '@material-ui/core/Grid';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { resetPasswordByEmailValidationSchema } from '@user-office-software/duo-validation/lib/User';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
-import { FormWrapper } from 'styles/StyledComponents';
+import { StyledFormWrapper } from 'styles/StyledComponents';
 
 import PhotoInSide from './PhotoInSide';
 
@@ -57,7 +57,7 @@ export default function ResetPasswordEmail() {
       >
         <Form className={classes.form}>
           <CssBaseline />
-          <FormWrapper margin={[8, 4]}>
+          <StyledFormWrapper margin={[8, 4]}>
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
             </Avatar>
@@ -70,7 +70,6 @@ export default function ResetPasswordEmail() {
               id="email-id"
               type="email"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="reset-password-email"
             />
@@ -84,13 +83,7 @@ export default function ResetPasswordEmail() {
                   No account found for this email address.
                 </p>
               ))}
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-            >
+            <Button type="submit" fullWidth className={classes.submit}>
               Send Email
             </Button>
             <Grid container>
@@ -98,7 +91,7 @@ export default function ResetPasswordEmail() {
                 <Link to="/SignIn/">Have an account? Sign In</Link>
               </Grid>
             </Grid>
-          </FormWrapper>
+          </StyledFormWrapper>
         </Form>
       </Formik>
     </PhotoInSide>

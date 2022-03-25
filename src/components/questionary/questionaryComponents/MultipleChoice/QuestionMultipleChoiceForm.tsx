@@ -1,6 +1,6 @@
-import { FormControlLabel } from '@material-ui/core';
+import { FormControlLabel } from '@mui/material';
 import { Field } from 'formik';
-import { Checkbox, TextField } from 'formik-material-ui';
+import { Checkbox, TextField } from 'formik-mui';
 import React, { ChangeEvent, FC, useState } from 'react';
 import * as Yup from 'yup';
 
@@ -12,6 +12,8 @@ import { SelectionFromOptionsConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
+
+const columns = [{ title: 'Answer', field: 'answer' }];
 
 export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
   const field = props.question;
@@ -41,7 +43,6 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
             id="Key-input"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
@@ -51,7 +52,6 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
             label="Question"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
@@ -63,7 +63,6 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
                   name="config.required"
                   component={Checkbox}
                   type="checkbox"
-                  margin="normal"
                   inputProps={{ 'data-cy': 'required' }}
                 />
               }
@@ -91,7 +90,6 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
                   <Field
                     name="config.isMultipleSelect"
                     component={Checkbox}
-                    margin="normal"
                     type="checkbox"
                     inputProps={{ 'data-cy': 'is-multiple-select' }}
                   />
@@ -106,7 +104,7 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
               title=""
               name="config.options"
               component={FormikUICustomTable}
-              columns={[{ title: 'Answer', field: 'answer' }]}
+              columns={columns}
               dataTransforms={{
                 toTable: (options: string[]) => {
                   return options.map((option) => {
@@ -117,7 +115,6 @@ export const QuestionMultipleChoiceForm: FC<QuestionFormProps> = (props) => {
                   return rows.map((row) => row.answer);
                 },
               }}
-              margin="normal"
               fullWidth
               data-cy="options"
             />

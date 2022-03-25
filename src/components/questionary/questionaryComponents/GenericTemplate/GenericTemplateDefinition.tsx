@@ -1,4 +1,4 @@
-import ListAltIcon from '@material-ui/icons/ListAlt';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 import React from 'react';
 import * as Yup from 'yup';
 

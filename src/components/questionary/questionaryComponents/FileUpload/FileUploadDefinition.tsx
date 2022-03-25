@@ -1,4 +1,4 @@
-import AttachFileIcon from '@material-ui/icons/AttachFile';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { fileUploadQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 

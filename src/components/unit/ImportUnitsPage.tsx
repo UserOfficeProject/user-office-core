@@ -1,10 +1,10 @@
-import { Typography } from '@material-ui/core';
+import Typography from '@mui/material/Typography';
 import React from 'react';
 import { UnitMergeReview } from 'units/UnitMergeReview';
 
 import { SelectImportFile } from 'components/common/SelectImportFile';
 import { UnitsImportWithValidation } from 'generated/sdk';
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export const getFileContents = async (file: File): Promise<string> => {
@@ -34,7 +34,7 @@ export default function ImportUnitsPage() {
   };
 
   return (
-    <ContentContainer>
+    <StyledContainer>
       <StyledPaper>
         <Typography variant="h5" component="h5">
           Import units
@@ -48,6 +48,6 @@ export default function ImportUnitsPage() {
           <SelectImportFile onFileSelected={handleFileSelect} />
         )}
       </StyledPaper>
-    </ContentContainer>
+    </StyledContainer>
   );
 }

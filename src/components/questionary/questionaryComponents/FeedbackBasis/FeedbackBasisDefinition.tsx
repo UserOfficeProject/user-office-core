@@ -1,4 +1,4 @@
-import FeedbackIcon from '@material-ui/icons/Feedback';
+import FeedbackIcon from '@mui/icons-material/Feedback';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';

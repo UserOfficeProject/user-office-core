@@ -19,7 +19,6 @@ context('Proposal administration tests', () => {
 
   beforeEach(() => {
     cy.resetDB();
-    cy.viewport(1920, 1080);
   });
 
   describe('Proposal administration advanced search filter tests', () => {
@@ -192,7 +191,7 @@ context('Proposal administration tests', () => {
 
       cy.contains(proposalName1)
         .parent()
-        .get('[title="Edit proposal"]')
+        .get('[aria-label="Edit proposal"]')
         .click();
 
       cy.finishedLoading();
@@ -295,7 +294,9 @@ context('Proposal administration tests', () => {
       cy.contains('Title')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
-        .dblclick();
+        .click();
+
+      cy.finishedLoading();
 
       cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
         officerProposalsTableAsTextAfterSort = element.text();
@@ -315,7 +316,7 @@ context('Proposal administration tests', () => {
       cy.contains('Title')
         .parent()
         .find('[data-testid="mtableheader-sortlabel"]')
-        .should('have.attr', 'aria-sort', 'Descendant');
+        .should('have.attr', 'aria-sort', 'Ascendant');
 
       cy.contains('Calls').click();
 
@@ -351,13 +352,14 @@ context('Proposal administration tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
-      cy.contains('Title').dblclick();
       cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.contains('Title').click();
+      cy.finishedLoading();
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
 
       cy.get('table tbody tr input[type="checkbox"]').first().click();
 
-      cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
     });
 
     it('User officer should see Reviews tab before doing the Admin(management decision)', () => {
@@ -486,11 +488,12 @@ context('Proposal administration tests', () => {
       cy.contains('Search').click();
       cy.contains(proposal.title).should('not.exist');
 
-      cy.get('[data-cy=comparator]').click();
-      cy.get('[role=listbox]').contains('Exact').click();
-      cy.get('[data-cy=value] input').clear().type(DATE_ANSWER);
-      cy.contains('Search').click();
-      cy.contains(proposal.title).should('exist');
+      // TODO: This should be allowed here: https://github.com/UserOfficeProject/user-office-frontend/pull/815
+      // cy.get('[data-cy=comparator]').click();
+      // cy.get('[role=listbox]').contains('Exact').click();
+      // cy.get('[data-cy=value] input').clear().type(DATE_ANSWER);
+      // cy.contains('Search').click();
+      // cy.contains(proposal.title).should('exist');
 
       cy.get('[data-cy=comparator]').click();
       cy.get('[role=listbox]').contains('After').click();

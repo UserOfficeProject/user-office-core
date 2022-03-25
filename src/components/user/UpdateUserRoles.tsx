@@ -1,24 +1,26 @@
 import MaterialTable from '@material-table/core';
-import { Typography } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import React, { useContext, useEffect, useState } from 'react';
+import { Typography } from '@mui/material';
+import Button from '@mui/material/Button';
+import React, { useContext, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { UserContext } from 'context/UserContextProvider';
-import { GetUserWithRolesQuery, Role } from 'generated/sdk';
+import { Role } from 'generated/sdk';
 import { useRenewToken } from 'hooks/common/useRenewToken';
+import { useUserWithRolesData } from 'hooks/user/useUserWithRoles';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import RoleModal from './RoleModal';
 
+const columns = [{ title: 'Name', field: 'title' }];
+
 export default function UpdateUserRoles(props: { id: number }) {
-  const [userData, setUserData] = useState<
-    GetUserWithRolesQuery['user'] | null
-  >(null);
+  const { userData, setUserData, loading } = useUserWithRolesData({
+    id: props.id,
+  });
   const [modalOpen, setOpen] = useState(false);
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const [roles, setRoles] = useState<Array<Role>>([]);
   const { setRenewTokenValue } = useRenewToken();
   const { user } = useContext(UserContext);
 
@@ -36,38 +38,30 @@ export default function UpdateUserRoles(props: { id: number }) {
   };
 
   const addRole = async (newSelectedRoles: Role[]) => {
-    const newRoles = [...roles, ...newSelectedRoles];
-    setRoles(newRoles);
+    if (!userData) {
+      return;
+    }
+
+    const newRoles = [...userData.roles, ...newSelectedRoles];
+    setUserData({ ...userData, roles: newRoles });
     await sendUpdateRoles(newRoles);
     setOpen(false);
   };
 
   const removeRole = (role: Pick<Role, 'id' | 'title'>) => {
-    const newRoles = [...roles];
+    if (!userData) {
+      return;
+    }
+
+    const newRoles = [...userData.roles];
     newRoles.splice(
       newRoles.findIndex((element) => role.id === element.id),
       1
     );
-    setRoles(newRoles);
+    setUserData({ ...userData, roles: newRoles });
 
     return newRoles;
   };
-
-  useEffect(() => {
-    const getUserInformation = () => {
-      api()
-        .getUserWithRoles({ id: props.id })
-        .then((data) => {
-          if (data?.user) {
-            setUserData({ ...data.user });
-            setRoles(data.user.roles);
-          }
-        });
-    };
-    getUserInformation();
-  }, [props.id, api]);
-
-  const columns = [{ title: 'Name', field: 'title' }];
 
   return (
     <div data-cy="user-roles-table">
@@ -75,7 +69,7 @@ export default function UpdateUserRoles(props: { id: number }) {
         show={modalOpen}
         close={() => setOpen(false)}
         add={addRole}
-        activeRoles={roles}
+        activeRoles={userData?.roles}
       />
       <MaterialTable
         title={
@@ -85,10 +79,12 @@ export default function UpdateUserRoles(props: { id: number }) {
         }
         columns={columns}
         icons={tableIcons}
-        data={roles.map((role: Role) => {
-          return { title: role.title, id: role.id };
-        })}
-        isLoading={!userData}
+        data={
+          userData?.roles.map((role: Role) => {
+            return { title: role.title, id: role.id };
+          }) || []
+        }
+        isLoading={loading}
         options={{
           search: false,
         }}
@@ -96,7 +92,9 @@ export default function UpdateUserRoles(props: { id: number }) {
           onRowDelete: (oldData) =>
             new Promise<void>(async (resolve) => {
               const newRoles = removeRole(oldData);
-              await sendUpdateRoles(newRoles);
+              if (newRoles) {
+                await sendUpdateRoles(newRoles);
+              }
               resolve();
             }),
         }}
@@ -105,11 +103,9 @@ export default function UpdateUserRoles(props: { id: number }) {
       <ActionButtonContainer>
         <Button
           type="button"
-          variant="contained"
-          color="primary"
           data-cy="add-role-button"
           onClick={() => setOpen(true)}
-          disabled={isExecutingCall}
+          disabled={isExecutingCall || loading}
         >
           Add role
         </Button>

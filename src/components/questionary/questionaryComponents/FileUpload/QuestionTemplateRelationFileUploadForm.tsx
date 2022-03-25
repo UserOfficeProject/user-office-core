@@ -1,5 +1,5 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
@@ -39,7 +39,6 @@ export const QuestionTemplateRelationFileUploadForm: FC<
               placeholder="(e.g. only PDF accepted)"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="small_label"
             />
@@ -50,7 +49,6 @@ export const QuestionTemplateRelationFileUploadForm: FC<
               name="config.required"
               label="Is required"
               component={FormikUICustomCheckbox}
-              margin="normal"
               fullWidth
               data-cy="required"
             />
@@ -78,7 +76,6 @@ export const QuestionTemplateRelationFileUploadForm: FC<
               id="Max-files-id"
               type="text"
               component={TextField}
-              margin="normal"
               fullWidth
               data-cy="max_files"
             />

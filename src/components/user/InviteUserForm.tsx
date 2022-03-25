@@ -1,17 +1,17 @@
-import Button from '@material-ui/core/Button';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { createUserByEmailInviteValidationSchema } from '@user-office-software/duo-validation/lib/User';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React from 'react';
 
-import { UserRole } from 'generated/sdk';
+import { BasicUserDetails, UserRole } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
 type InviteUserFormProps = {
-  action: FunctionType;
+  action: FunctionType<void, [BasicUserDetails]>;
   title: string;
   userRole: UserRole;
   close: FunctionType;
@@ -54,13 +54,15 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
           email: values.email,
           userRole: userRole,
         });
-        action({
-          firstname: values.firstname,
-          lastname: values.lastname,
-          organisation: '',
-          id: createResult?.createUserByEmailInvite.id,
-        });
-        close();
+        if (createResult?.createUserByEmailInvite.id) {
+          action({
+            id: createResult.createUserByEmailInvite.id,
+            firstname: values.firstname,
+            lastname: values.lastname,
+            organisation: '',
+          } as BasicUserDetails);
+          close();
+        }
       }}
       validationSchema={createUserByEmailInviteValidationSchema(UserRole)}
     >
@@ -75,7 +77,6 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
             label="First name"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             data-cy="firstname"
           />
@@ -85,7 +86,6 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
             label="Last name"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             data-cy="lastname"
           />
@@ -95,7 +95,6 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
             label="E-mail"
             type="email"
             component={TextField}
-            margin="normal"
             fullWidth
             data-cy="email"
           />
@@ -103,15 +102,12 @@ const InviteUserForm: React.FC<InviteUserFormProps> = ({
           <div className={classes.buttons}>
             <Button
               onClick={() => close()}
-              variant="contained"
               color="secondary"
               className={classes.button}
             >
               Cancel
             </Button>
             <Button
-              variant="contained"
-              color="primary"
               className={classes.button}
               type="submit"
               data-cy="invitation-submit"

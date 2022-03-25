@@ -1,4 +1,4 @@
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import { booleanQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 

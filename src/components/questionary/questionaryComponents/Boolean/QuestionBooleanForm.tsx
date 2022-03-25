@@ -1,5 +1,5 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { FC } from 'react';
 import * as Yup from 'yup';
 
@@ -31,7 +31,6 @@ export const QuestionBooleanForm: FC<QuestionFormProps> = (props) => {
             label="Key"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
             id="boolean-key-input"
@@ -41,7 +40,6 @@ export const QuestionBooleanForm: FC<QuestionFormProps> = (props) => {
             label="Question"
             type="text"
             component={TextField}
-            margin="normal"
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
             id="boolean-question-input"
@@ -52,7 +50,6 @@ export const QuestionBooleanForm: FC<QuestionFormProps> = (props) => {
               name="config.required"
               component={FormikUICustomCheckbox}
               label="User must check it to continue"
-              margin="normal"
               fullWidth
               data-cy="required"
             />

@@ -1,4 +1,4 @@
-import { BadgeProps, Badge } from '@material-ui/core';
+import { BadgeProps, Badge } from '@mui/material';
 import React from 'react';
 
 const DotBadge = ({ children, ...rest }: BadgeProps) => {

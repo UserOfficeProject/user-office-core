@@ -1,12 +1,12 @@
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import InputLabel from '@material-ui/core/InputLabel';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Formik, Form, Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField } from 'formik-mui';
 import React, { useContext, useState, useEffect } from 'react';
 import { Prompt } from 'react-router';
 
@@ -24,7 +24,7 @@ import {
   UserRole,
   Proposal,
 } from 'generated/sdk';
-import { ButtonContainer } from 'styles/StyledComponents';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -198,7 +198,6 @@ const ProposalTechnicalReview = ({
                   id="time-allocation-input"
                   type="number"
                   component={TextField}
-                  margin="normal"
                   fullWidth
                   autoComplete="off"
                   data-cy="timeAllocation"
@@ -313,14 +312,13 @@ const ProposalTechnicalReview = ({
                 />
               </Grid>
               <Grid item xs={12}>
-                <ButtonContainer>
+                <StyledButtonContainer>
                   {isUserOfficer && (
                     <Field
                       id="submitted"
                       name="submitted"
                       component={FormikUICustomCheckbox}
                       label="Submitted"
-                      color="primary"
                       disabled={isSubmitting}
                       data-cy="is-review-submitted"
                     />
@@ -332,7 +330,6 @@ const ProposalTechnicalReview = ({
                     }
                     type="submit"
                     onClick={() => setShouldSubmit(false)}
-                    variant="contained"
                     color={isUserOfficer ? 'primary' : 'secondary'}
                     data-cy="save-technical-review"
                   >
@@ -344,14 +341,12 @@ const ProposalTechnicalReview = ({
                       type="submit"
                       className={classes.submitButton}
                       onClick={() => setShouldSubmit(true)}
-                      variant="contained"
-                      color="primary"
                       data-cy="submit-technical-review"
                     >
                       {data?.submitted ? 'Submitted' : 'Submit'}
                     </Button>
                   )}
-                </ButtonContainer>
+                </StyledButtonContainer>
               </Grid>
             </Grid>
           </Form>

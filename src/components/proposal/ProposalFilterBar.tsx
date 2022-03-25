@@ -1,6 +1,6 @@
-import { Button, Collapse } from '@material-ui/core';
-import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Button, Collapse } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { DecodedValueMap } from 'use-query-params';

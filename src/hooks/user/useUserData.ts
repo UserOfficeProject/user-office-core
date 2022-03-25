@@ -1,8 +1,60 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
-import { GetBasicUserDetailsQuery, ReviewerFilter } from 'generated/sdk';
+import { UserContext } from 'context/UserContextProvider';
+import {
+  GetBasicUserDetailsQuery,
+  GetUserMeQuery,
+  GetUserMeQueryVariables,
+  GetUserQuery,
+  GetUserQueryVariables,
+  ReviewerFilter,
+} from 'generated/sdk';
 import { UserWithReviewsQuery, ReviewStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+
+export function useUserData({
+  id,
+}: GetUserQueryVariables | GetUserMeQueryVariables) {
+  const api = useDataApi();
+  const { user } = useContext(UserContext);
+  const [userData, setUserData] = useState<
+    GetUserQuery['user'] | GetUserMeQuery['me']
+  >(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let unmounted = false;
+
+    setLoading(true);
+    if (user.id !== id) {
+      api()
+        .getUser({ id })
+        .then((data) => {
+          if (unmounted || !data.user) {
+            return;
+          }
+
+          setUserData(data.user);
+        });
+    } else {
+      api()
+        .getUserMe()
+        .then((data) => {
+          if (unmounted || !data.me) {
+            return;
+          }
+
+          setUserData(data.me);
+        });
+    }
+
+    return () => {
+      unmounted = true;
+    };
+  }, [api, id, user.id]);
+
+  return { loading, userData, setUserData } as const;
+}
 
 export function useUserWithReviewsData(filters?: {
   callId?: number;

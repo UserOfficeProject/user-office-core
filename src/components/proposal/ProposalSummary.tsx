@@ -1,5 +1,5 @@
-import Button from '@material-ui/core/Button';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import Button from '@mui/material/Button';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -159,8 +159,6 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
               )();
             }}
             disabled={submitDisabled}
-            variant="contained"
-            color="primary"
             data-cy="button-submit-proposal"
           >
             {proposal.submitted ? '✔ Submitted' : 'Submit'}
@@ -171,7 +169,6 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
             }
             disabled={!allStepsComplete}
             className={classes.button}
-            variant="contained"
             color="secondary"
           >
             Download PDF

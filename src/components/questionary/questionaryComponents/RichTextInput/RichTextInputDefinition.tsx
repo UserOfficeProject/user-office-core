@@ -1,4 +1,4 @@
-import TextFormatIcon from '@material-ui/icons/TextFormat';
+import TextFormatIcon from '@mui/icons-material/TextFormat';
 import { richTextInputQuestionValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 

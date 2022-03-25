@@ -35,7 +35,7 @@ context('Scheduler tests', () => {
         },
       ],
     });
-    cy.viewport(1920, 1080);
+
     cy.login('user');
     cy.visit('/');
   });

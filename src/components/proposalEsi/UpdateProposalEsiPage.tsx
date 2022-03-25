@@ -1,8 +1,7 @@
-import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import { useParams } from 'react-router';
 
-import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import UpdateProposalEsi from './UpdateProposalEsi';
 
@@ -14,14 +13,10 @@ export default function UpdateProposalEsiPage() {
   }
 
   return (
-    <ContentContainer maxWidth="md">
-      <Grid container>
-        <Grid item xs={12} data-cy="update-proposal-esi-table">
-          <StyledPaper>
-            <UpdateProposalEsi esiId={+esiId} />
-          </StyledPaper>
-        </Grid>
-      </Grid>
-    </ContentContainer>
+    <StyledContainer>
+      <StyledPaper data-cy="update-proposal-esi-table">
+        <UpdateProposalEsi esiId={+esiId} />
+      </StyledPaper>
+    </StyledContainer>
   );
 }

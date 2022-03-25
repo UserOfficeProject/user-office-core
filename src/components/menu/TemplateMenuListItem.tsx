@@ -1,22 +1,22 @@
-import Collapse from '@material-ui/core/Collapse';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Tooltip from '@material-ui/core/Tooltip';
-import DescriptionIcon from '@material-ui/icons/Description';
-import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import FeedbackIcon from '@material-ui/icons/Feedback';
-import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
-import InboxIcon from '@material-ui/icons/Inbox';
-import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
-import LocalShippingIcon from '@material-ui/icons/LocalShipping';
+import DescriptionIcon from '@mui/icons-material/Description';
+import DynamicFeedIcon from '@mui/icons-material/DynamicFeed';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import InboxIcon from '@mui/icons-material/Inbox';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import Collapse from '@mui/material/Collapse';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
 import EsiIcon from 'components/common/icons/EsiIcon';
+import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
 

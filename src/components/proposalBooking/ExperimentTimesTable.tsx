@@ -1,4 +1,4 @@
-import MaterialTable, { Options } from '@material-table/core';
+import MaterialTable, { Column, Options } from '@material-table/core';
 import React from 'react';
 
 import { ProposalScheduledEvent } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
@@ -13,8 +13,34 @@ type ExperimentTimesTableProps = {
   title: string;
   isLoading: boolean;
   proposalScheduledEvents: ProposalScheduledEvent[];
-  options?: Partial<Options<JSX.Element>>;
+  options?: Partial<Options<ProposalScheduledEvent>>;
 };
+
+const columns: Column<ProposalScheduledEvent>[] = [
+  { title: 'Proposal title', field: 'proposal.title' },
+  { title: 'Proposal ID', field: 'proposal.proposalId' },
+  { title: 'Instrument', field: 'instrument.name' },
+  {
+    title: 'Local contact',
+    render: (rowData) => getFullUserName(rowData.localContact),
+  },
+  {
+    title: 'Starts at',
+    field: 'startsAt',
+    render: (rowData) =>
+      parseTzLessDateTime(rowData.startsAt).toFormat(
+        TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
+      ),
+  },
+  {
+    title: 'Ends at',
+    field: 'endsAt',
+    render: (rowData) =>
+      parseTzLessDateTime(rowData.endsAt).toFormat(
+        TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
+      ),
+  },
+];
 
 export default function ExperimentsTable({
   title,
@@ -27,31 +53,7 @@ export default function ExperimentsTable({
       icons={tableIcons}
       title={title}
       isLoading={isLoading}
-      columns={[
-        { title: 'Proposal title', field: 'proposal.title' },
-        { title: 'Proposal ID', field: 'proposal.proposalId' },
-        { title: 'Instrument', field: 'instrument.name' },
-        {
-          title: 'Local contact',
-          render: (rowData) => getFullUserName(rowData.localContact),
-        },
-        {
-          title: 'Starts at',
-          field: 'startsAt',
-          render: (rowData) =>
-            parseTzLessDateTime(rowData.startsAt).format(
-              TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-            ),
-        },
-        {
-          title: 'Ends at',
-          field: 'endsAt',
-          render: (rowData) =>
-            parseTzLessDateTime(rowData.endsAt).format(
-              TZ_LESS_DATE_TIME_LOW_PREC_FORMAT
-            ),
-        },
-      ]}
+      columns={columns}
       data={proposalScheduledEvents}
       options={{
         search: false,

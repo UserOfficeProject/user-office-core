@@ -1,6 +1,6 @@
-import Button from '@material-ui/core/Button';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import React from 'react';
 
@@ -87,19 +87,13 @@ export const QuestionFormShell = (
               <Button
                 type="button"
                 variant="outlined"
-                color="primary"
                 data-cy="delete"
                 onClick={deleteHandler}
                 disabled={definition.creatable === false}
               >
                 Delete
               </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                data-cy="submit"
-              >
+              <Button type="submit" data-cy="submit">
                 Save
               </Button>
             </ActionButtonContainer>

@@ -1,5 +1,5 @@
-import { Button, Typography } from '@material-ui/core';
-import PublishIcon from '@material-ui/icons/Publish';
+import PublishIcon from '@mui/icons-material/Publish';
+import { Button, Typography } from '@mui/material';
 import React, { ChangeEvent } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -31,7 +31,7 @@ export function SelectImportFile(props: {
           onChange={onFileSelected}
         />
         <ActionButtonContainer>
-          <Button variant="contained" component="span">
+          <Button component="span">
             <PublishIcon /> Select file
           </Button>
         </ActionButtonContainer>
