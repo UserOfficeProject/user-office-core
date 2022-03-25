@@ -334,6 +334,19 @@ export default function UpdateUserInformation(props: { id: number }) {
                   items={institutionsList}
                   data-cy="organisation"
                 />
+                {+values.organisation === 1 && (
+                  <Field
+                    name="otherOrganisation"
+                    label="Please specify organisation"
+                    id="organisation-input"
+                    type="text"
+                    component={TextField}
+                    margin="normal"
+                    fullWidth
+                    data-cy="otherOrganisation"
+                    required
+                  />
+                )}
                 <Field
                   name="department"
                   label="Department"
