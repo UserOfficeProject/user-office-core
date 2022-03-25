@@ -149,11 +149,6 @@ export function createPostToRabbitMQHandler() {
           proposalStatus?.shortCode !==
           ProposalStatusDefaultShortCodes.SCHEDULING
         ) {
-          logger.logDebug(
-            `Proposal '${proposal.primaryKey}' status isn't 'SCHEDULING', skipping`,
-            { proposal, proposalStatus }
-          );
-
           return;
         }
 
