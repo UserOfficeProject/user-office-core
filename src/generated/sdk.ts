@@ -313,6 +313,7 @@ export enum EvaluatorOperator {
 }
 
 export enum Event {
+  CALL_CREATED = 'CALL_CREATED',
   CALL_ENDED = 'CALL_ENDED',
   CALL_REVIEW_ENDED = 'CALL_REVIEW_ENDED',
   CALL_SEP_REVIEW_ENDED = 'CALL_SEP_REVIEW_ENDED',
