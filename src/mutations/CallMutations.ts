@@ -8,7 +8,8 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
-import { Authorized, ValidateArgs } from '../decorators';
+import { Authorized, EventBus, ValidateArgs } from '../decorators';
+import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -72,6 +73,7 @@ export default class CallMutations {
 
   @ValidateArgs(createCallValidationSchema)
   @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.CALL_CREATED)
   async create(
     agent: UserWithRole | null,
     args: CreateCallInput

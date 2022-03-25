@@ -28,6 +28,6 @@ export const sampleDeclarationDefinition: Question = {
       throw new Error('DataType should be SAMPLE_DECLARATION');
     }
 
-    return sampleDeclarationValidationSchema(field).isValidSync(value);
+    return sampleDeclarationValidationSchema(field).isValid(value);
   },
 };
