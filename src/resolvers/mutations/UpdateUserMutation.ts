@@ -74,6 +74,9 @@ export class UpdateUserArgs {
 
   @Field(() => String, { nullable: true })
   public refreshToken?: string;
+
+  @Field(() => String, { nullable: true })
+  public otherOrganisation?: string;
 }
 
 @ArgsType()

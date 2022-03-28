@@ -313,12 +313,22 @@ export default class UserMutations {
       });
     }
 
+    let organisationId = args.organisation;
+    // Check if user has other as selected org and if so create it
+    if (args.otherOrganisation) {
+      organisationId = await this.dataSource.createOrganisation(
+        args.otherOrganisation,
+        false
+      );
+    }
+
     delete args.orcid;
     delete args.refreshToken;
 
     user = {
       ...user,
       ...args,
+      organisation: organisationId ?? user.organisation,
     };
 
     return this.dataSource
