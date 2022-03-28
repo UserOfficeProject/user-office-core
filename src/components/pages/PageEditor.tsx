@@ -19,6 +19,7 @@ export default function PageEditor() {
             'Cookie',
             'Footer',
             'Login',
+            'Grade guide',
           ]}
         >
           <PageInputBox
@@ -48,6 +49,10 @@ export default function PageEditor() {
           <PageInputBox
             pageName={PageName.LOGINHELPPAGE}
             heading={'Set login help page'}
+          />
+          <PageInputBox
+            pageName={PageName.GRADEGUIDEPAGE}
+            heading={'Set grade guide page'}
           />
         </SimpleTabs>
       </StyledPaper>
