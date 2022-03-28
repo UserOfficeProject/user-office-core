@@ -135,13 +135,13 @@ const getInstrumentData = async (proposalPk: number) => {
     Tokens.InstrumentDataSource
   );
 
-  const instrumnet = await dataSource.getInstrumentByProposalPk(proposalPk);
-  if (!instrumnet) {
+  const instrument = await dataSource.getInstrumentByProposalPk(proposalPk);
+  if (!instrument) {
     throw new Error(`Instrument not found for proposalPk: ${proposalPk}`);
   }
 
   return {
-    instrumentShortCode: instrumnet.shortCode,
+    instrumentShortCode: instrument.shortCode,
   };
 };
 
