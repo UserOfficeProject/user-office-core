@@ -361,6 +361,9 @@ const useStyles = makeStyles(() => ({
       paddingLeft: 0,
     },
   },
+  nbrFilesText: {
+    display: 'block',
+  },
 }));
 export function FileUploadComponent(props: {
   maxFiles?: number;
@@ -429,7 +432,9 @@ export function FileUploadComponent(props: {
   }
 
   const amountFilesInfo =
-    maxFiles > 1 ? <span>Max: {maxFiles} file(s)</span> : null;
+    maxFiles > 1 ? (
+      <span className={classes.nbrFilesText}>Max: {maxFiles} file(s)</span>
+    ) : null;
 
   const fileTypeInfo = fileType.split(',').map((type) => {
     return type.includes('*') ? 'any ' + type.split('/')[0] : type;
