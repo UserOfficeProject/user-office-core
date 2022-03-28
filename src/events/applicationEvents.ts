@@ -249,6 +249,11 @@ interface SEPMemberRemovedEvent extends GeneralEvent {
   sep: SEP;
 }
 
+interface CallCreatedEvent extends GeneralEvent {
+  type: Event.CALL_CREATED;
+  call: Call;
+}
+
 interface CallEndedEvent extends GeneralEvent {
   type: Event.CALL_ENDED;
   call: Call;
@@ -302,6 +307,7 @@ export type ApplicationEvent =
   | SEPMemberRemovedFromProposalEvent
   | UserDeletedEvent
   | ProposalNotifiedEvent
+  | CallCreatedEvent
   | CallEndedEvent
   | CallReviewEndedEvent
   | CallSEPReviewEndedEvent
