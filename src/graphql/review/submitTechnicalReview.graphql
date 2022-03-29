@@ -6,6 +6,7 @@ mutation submitTechnicalReview(
   $status: TechnicalReviewStatus
   $submitted: Boolean!
   $reviewerId: Int!
+  $files: String
 ) {
   submitTechnicalReview(
     submitTechnicalReviewInput: {
@@ -16,6 +17,7 @@ mutation submitTechnicalReview(
       status: $status
       submitted: $submitted
       reviewerId: $reviewerId
+      files: $files
     }
   ) {
     rejection {

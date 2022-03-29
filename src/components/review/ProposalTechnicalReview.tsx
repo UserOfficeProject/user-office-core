@@ -7,10 +7,14 @@ import { Editor } from '@tinymce/tinymce-react';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import { TextField } from 'formik-mui';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
+import {
+  FileIdWithCaptionAndFigure,
+  FileUploadComponent,
+} from 'components/common/FileUploadComponent';
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
 import { UserContext } from 'context/UserContextProvider';
@@ -24,7 +28,6 @@ import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
-
 const useStyles = makeStyles((theme) => ({
   submitButton: {
     marginLeft: theme.spacing(1),
@@ -37,6 +40,7 @@ type TechnicalReviewFormType = {
   comment: string;
   publicComment: string;
   submitted: boolean;
+  files: string;
 };
 
 type ProposalTechnicalReviewProps = {
@@ -56,7 +60,15 @@ const ProposalTechnicalReview = ({
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const classes = useStyles();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const { user } = useContext(UserContext);
+  const [fileList, setFileList] = useState<FileIdWithCaptionAndFigure[]>([]);
+
+  useEffect(() => {
+    if (data?.files) {
+      setFileList(JSON.parse(data.files));
+    }
+  }, [data?.files]);
 
   const initialValues: TechnicalReviewFormType = {
     status: data?.status || '',
@@ -64,6 +76,7 @@ const ProposalTechnicalReview = ({
     comment: data?.comment || '',
     publicComment: data?.publicComment || '',
     submitted: data?.submitted || false,
+    files: data?.files || '',
   };
 
   const PromptIfDirty = () => {
@@ -97,6 +110,7 @@ const ProposalTechnicalReview = ({
       status: TechnicalReviewStatus[values.status as TechnicalReviewStatus],
       submitted: shouldSubmit,
       reviewerId: user.id,
+      files: JSON.stringify(fileList),
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -189,48 +203,75 @@ const ProposalTechnicalReview = ({
                   required
                 />
               </Grid>
-              <Grid item xs={12}>
-                <InputLabel htmlFor="comment" shrink margin="dense">
-                  Internal comment
-                </InputLabel>
-                {/* NOTE: We are using Editor directly instead of FormikUICustomEditor with Formik Field component.
+              {(isUserOfficer || isInstrumentScientist) && (
+                <Grid item xs={12}>
+                  <InputLabel htmlFor="comment" shrink margin="dense">
+                    Internal comment
+                  </InputLabel>
+                  {/* NOTE: We are using Editor directly instead of FormikUICustomEditor with Formik Field component.
                     This is because FormikUICustomEditor is not updated properly when we set form field onEditorChange.
                     It works when we use onBlur on Editor but it is problematic to test that with Cypress,
                     because for some reason it is not firing the onBlur event and form is not updated.
                 */}
-                <Editor
-                  id="comment"
-                  initialValue={initialValues.comment}
-                  init={{
-                    skin: false,
-                    content_css: false,
-                    plugins: [
-                      'link',
-                      'preview',
-                      'code',
-                      'charmap',
-                      'wordcount',
-                    ],
-                    toolbar: 'bold italic',
-                    branding: false,
-                  }}
-                  onEditorChange={(content, editor) => {
-                    // NOTE: Remove \n (newline) characters to be able to compare because they are a bit problematic.
-                    const normalizedContent = content.replace(
-                      /(?:\r\n|\r|\n)/g,
-                      ''
-                    );
+                  <Editor
+                    id="comment"
+                    initialValue={initialValues.comment}
+                    init={{
+                      skin: false,
+                      content_css: false,
+                      plugins: [
+                        'link',
+                        'preview',
+                        'code',
+                        'charmap',
+                        'wordcount',
+                      ],
+                      toolbar: 'bold italic',
+                      branding: false,
+                    }}
+                    onEditorChange={(content, editor) => {
+                      // NOTE: Remove \n (newline) characters to be able to compare because they are a bit problematic.
+                      const normalizedContent = content.replace(
+                        /(?:\r\n|\r|\n)/g,
+                        ''
+                      );
 
-                    if (
-                      normalizedContent !== editor.startContent ||
-                      editor.isDirty()
-                    ) {
-                      setFieldValue('comment', content);
+                      if (
+                        normalizedContent !== editor.startContent ||
+                        editor.isDirty()
+                      ) {
+                        setFieldValue('comment', content);
+                      }
+                    }}
+                    disabled={shouldDisableForm(isSubmitting)}
+                  />
+                </Grid>
+              )}
+              {(isUserOfficer || isInstrumentScientist) && (
+                <Grid item xs={12}>
+                  <InputLabel htmlFor="comment" shrink margin="dense">
+                    Internal documents
+                  </InputLabel>
+                  <FileUploadComponent
+                    maxFiles={5}
+                    fileType={'.pdf'}
+                    onChange={(
+                      fileMetaDataList: FileIdWithCaptionAndFigure[]
+                    ) => {
+                      const newStateValue = fileMetaDataList.map((file) => ({
+                        ...file,
+                      }));
+                      setFileList(newStateValue);
+                      setFieldValue('pdfUpload', newStateValue);
+                    }}
+                    value={
+                      initialValues.files
+                        ? JSON.parse(initialValues.files) || []
+                        : []
                     }
-                  }}
-                  disabled={shouldDisableForm(isSubmitting)}
-                />
-              </Grid>
+                  />
+                </Grid>
+              )}
               <Grid item xs={12}>
                 <InputLabel htmlFor="publicComment" shrink margin="dense">
                   Comments for the review panel
@@ -268,7 +309,6 @@ const ProposalTechnicalReview = ({
                   disabled={shouldDisableForm(isSubmitting)}
                 />
               </Grid>
-
               <Grid item xs={12}>
                 <StyledButtonContainer>
                   {isUserOfficer && (
