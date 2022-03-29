@@ -2,6 +2,7 @@
 import { Typography } from '@mui/material';
 import { default as React, useState } from 'react';
 
+import CopyToClipboard from 'components/common/CopyToClipboard';
 import Questionary from 'components/questionary/Questionary';
 import {
   QuestionaryContext,
@@ -52,12 +53,26 @@ export default function ProposalContainer(props: {
 
   const { submitted, proposalId } = state.proposal;
 
-  let info: JSX.Element | string = proposalId || 'DRAFT';
+  let info: JSX.Element | string =
+    (
+      <CopyToClipboard
+        text={proposalId}
+        successMessage={`'${proposalId}' copied to clipboard`}
+      >
+        {proposalId ? `Proposal ID: ${proposalId}` : ''}
+      </CopyToClipboard>
+    ) || 'DRAFT';
 
   if (!submitted && hasReferenceNumberFormat && proposalId) {
     info = (
       <Typography>
-        {proposalId} <br /> <small>Pre-submission reference</small>
+        <CopyToClipboard
+          text={proposalId}
+          successMessage={`'${proposalId}' copied to clipboard`}
+        >
+          {proposalId}
+        </CopyToClipboard>{' '}
+        <br /> <small>Pre-submission reference</small>
       </Typography>
     );
   }
