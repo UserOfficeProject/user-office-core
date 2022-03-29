@@ -62,13 +62,11 @@ const ProposalTechnicalReview = ({
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const { user } = useContext(UserContext);
-  const [stateValue, setStateValue] = useState<FileIdWithCaptionAndFigure[]>(
-    []
-  );
+  const [fileList, setFileList] = useState<FileIdWithCaptionAndFigure[]>([]);
 
   useEffect(() => {
     if (data?.files) {
-      setStateValue(JSON.parse(data.files));
+      setFileList(JSON.parse(data.files));
     }
   }, [data?.files]);
 
@@ -112,7 +110,7 @@ const ProposalTechnicalReview = ({
       status: TechnicalReviewStatus[values.status as TechnicalReviewStatus],
       submitted: shouldSubmit,
       reviewerId: user.id,
-      files: JSON.stringify(stateValue),
+      files: JSON.stringify(fileList),
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -260,12 +258,11 @@ const ProposalTechnicalReview = ({
                     onChange={(
                       fileMetaDataList: FileIdWithCaptionAndFigure[]
                     ) => {
+                      console.log(fileMetaDataList);
                       const newStateValue = fileMetaDataList.map((file) => ({
-                        id: file.id,
-                        caption: file.caption,
-                        figure: file.figure,
+                        ...file,
                       }));
-                      setStateValue(newStateValue);
+                      setFileList(newStateValue);
                       setFieldValue('pdfUpload', newStateValue);
                     }}
                     value={
