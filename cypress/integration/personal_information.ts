@@ -35,7 +35,7 @@ context('Personal information tests', () => {
     cy.get("[name='department']").clear().type(newDepartment);
 
     cy.get("[name='telephone']").clear().type(newTelephone);
-    
+
     cy.get("[name='otherOrganisation']").clear().type(otherOrg);
 
     cy.contains('Update Profile').click();

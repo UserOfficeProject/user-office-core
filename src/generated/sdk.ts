@@ -38,6 +38,7 @@ export type AddStatusChangingEventsToConnectionInput = {
 
 export type AddTechnicalReviewInput = {
   comment?: InputMaybe<Scalars['String']>;
+  files?: InputMaybe<Scalars['String']>;
   proposalPk: Scalars['Int'];
   publicComment?: InputMaybe<Scalars['String']>;
   reviewerId?: InputMaybe<Scalars['Int']>;
@@ -2786,6 +2787,7 @@ export type SubmitProposalsReviewInput = {
 
 export type SubmitTechnicalReviewInput = {
   comment?: InputMaybe<Scalars['String']>;
+  files?: InputMaybe<Scalars['String']>;
   proposalPk: Scalars['Int'];
   publicComment?: InputMaybe<Scalars['String']>;
   reviewerId: Scalars['Int'];
@@ -2801,6 +2803,7 @@ export type SuccessResponseWrap = {
 
 export type TechnicalReview = {
   comment: Maybe<Scalars['String']>;
+  files: Maybe<Scalars['String']>;
   id: Scalars['Int'];
   proposal: Maybe<Proposal>;
   proposalPk: Scalars['Int'];
