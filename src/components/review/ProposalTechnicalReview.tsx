@@ -258,7 +258,6 @@ const ProposalTechnicalReview = ({
                     onChange={(
                       fileMetaDataList: FileIdWithCaptionAndFigure[]
                     ) => {
-                      console.log(fileMetaDataList);
                       const newStateValue = fileMetaDataList.map((file) => ({
                         ...file,
                       }));
@@ -266,7 +265,9 @@ const ProposalTechnicalReview = ({
                       setFieldValue('pdfUpload', newStateValue);
                     }}
                     value={
-                      initialValues.files ? JSON.parse(initialValues.files) : []
+                      initialValues.files
+                        ? JSON.parse(initialValues.files) || []
+                        : []
                     }
                   />
                 </Grid>
