@@ -7,6 +7,6 @@ import { Unit } from '../types/Unit';
 export class UnitsQuery {
   @Query(() => [Unit], { nullable: true })
   units(@Ctx() context: ResolverContext) {
-    return context.queries.admin.getUnits();
+    return context.queries.unit.getUnits();
   }
 }

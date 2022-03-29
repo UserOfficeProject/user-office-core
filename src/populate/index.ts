@@ -309,6 +309,7 @@ const createReviews = async () => {
         timeAllocation: dummy.positiveNumber(10),
         submitted: faker.random.boolean(),
         reviewerId: 1,
+        files: '[]',
       },
       false
     );

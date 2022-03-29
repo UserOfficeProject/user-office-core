@@ -27,7 +27,8 @@ const getRequest = (
   shipmentSenderCityCountry: string,
   shipmentSenderName: string,
   shipmentSenderEmail: string,
-  shipmentSenderPhone: string
+  shipmentSenderPhone: string,
+  instrumentShortCode: string
 ) => `<?xml version="1.0" encoding="utf-8"?>
 <Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<Header>
@@ -329,6 +330,21 @@ const getRequest = (
 							</ORGANIZATIONID>
 						</CLASSID>
 						<TEXTFIELD>${shipmentSenderPhone}</TEXTFIELD>
+						<LOVSETTINGS>
+							<LOV_TYPE>-</LOV_TYPE>
+							<LOV_VALIDATE>-</LOV_VALIDATE>
+						</LOVSETTINGS>
+					</CUSTOMFIELD>
+					<CUSTOMFIELD index="160" entity="OBJ" type="CHAR">
+						<PROPERTYCODE>SM000013</PROPERTYCODE>
+						<PROPERTYLABEL>Instrument </PROPERTYLABEL>
+						<CLASSID>
+							<CLASSCODE>SMPCON</CLASSCODE>
+							<ORGANIZATIONID>
+								<ORGANIZATIONCODE>*</ORGANIZATIONCODE>
+							</ORGANIZATIONID>
+						</CLASSID>
+						<TEXTFIELD>${instrumentShortCode}</TEXTFIELD>
 						<LOVSETTINGS>
 							<LOV_TYPE>-</LOV_TYPE>
 							<LOV_VALIDATE>-</LOV_VALIDATE>

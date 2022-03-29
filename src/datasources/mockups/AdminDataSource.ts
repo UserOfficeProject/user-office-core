@@ -2,15 +2,11 @@ import { Page } from '../../models/Admin';
 import { Feature, FeatureId } from '../../models/Feature';
 import { Institution } from '../../models/Institution';
 import { Permissions } from '../../models/Permissions';
-import { Quantity } from '../../models/Quantity';
 import { Settings, SettingsId } from '../../models/Settings';
-import { Unit } from '../../models/Unit';
 import { CreateApiAccessTokenInput } from '../../resolvers/mutations/CreateApiAccessTokenMutation';
-import { CreateUnitArgs } from '../../resolvers/mutations/CreateUnitMutation';
 import { MergeInstitutionsInput } from '../../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { AdminDataSource, Entry } from '../AdminDataSource';
-export const dummyUnit = new Unit('minute', 'Minute', 'time', 'm', 'x/60');
 
 export const dummyInstitution = new Institution(1, 'ESS', true);
 export const dummyApiAccessToken = new Permissions(
@@ -37,22 +33,6 @@ export class AdminDataSourceMock implements AdminDataSource {
     value: boolean
   ): Promise<FeatureId[]> {
     return features;
-  }
-  updateUnit(unit: Unit): Promise<Unit | null> {
-    throw new Error('Method not implemented.');
-  }
-  async createUnit(unit: CreateUnitArgs): Promise<Unit | null> {
-    return dummyUnit;
-  }
-  async deleteUnit(id: string): Promise<Unit> {
-    return dummyUnit;
-  }
-  async getUnits(): Promise<Unit[]> {
-    return [dummyUnit];
-  }
-
-  async getQuantities(): Promise<Quantity[]> {
-    return [];
   }
 
   async getInstitutionUsers(

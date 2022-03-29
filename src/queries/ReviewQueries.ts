@@ -30,7 +30,7 @@ export default class ReviewQueries {
     }
 
     if (
-      review.userID === agent!.id ||
+      review.userID === agent?.id ||
       this.userAuth.isUserOfficer(agent) ||
       (sepId && (await this.userAuth.isChairOrSecretaryOfSEP(agent, sepId))) ||
       (await this.proposalAuth.isReviewerOfProposal(agent, review.proposalPk))

@@ -27,6 +27,7 @@ import { DataType } from '../../../../models/Template';
 import getRequest from '../requests/AddAssetEquipment';
 import { createAndLogError } from '../utils/createAndLogError';
 import { performApiRequest } from '../utils/performApiRequest';
+import { InstrumentDataSource } from './../../../../datasources/InstrumentDataSource';
 
 async function getAnswer(
   questionaryId: number,
@@ -86,6 +87,10 @@ export async function createContainer(shipmentId: number) {
     Tokens.ProposalDataSource
   );
 
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
+
   const shipment = await shipmentDataSource.getShipment(shipmentId);
   if (!shipment) {
     throw createAndLogError('Shipment for container not found', {
@@ -117,6 +122,9 @@ export async function createContainer(shipmentId: number) {
   const senderName = await getAnswer(qid, SHIPMENT_SENDER_NAME_KEY);
   const senderEmail = await getAnswer(qid, SHIPMENT_SENDER_EMAIL_KEY);
   const senderPhone = await getAnswer(qid, SHIPMENT_SENDER_PHONE_KEY);
+  const instrument = await instrumentDataSource.getInstrumentByProposalPk(
+    proposal.primaryKey
+  );
 
   const request = getRequest(
     proposal.proposalId,
@@ -136,7 +144,8 @@ export async function createContainer(shipmentId: number) {
     countryCity ?? 'No value',
     senderName ?? 'No value',
     senderEmail ?? 'No value',
-    senderPhone ?? 'No value'
+    senderPhone ?? 'No value',
+    instrument?.shortCode ?? 'No value'
   );
 
   const response = await performApiRequest(request);

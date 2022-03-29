@@ -53,7 +53,7 @@ export const dummyQuestionFactory = (
   return new Question(
     values?.categoryId || TemplateCategoryId.PROPOSAL_QUESTIONARY,
     values?.id || 'random_field_name_' + Math.random(),
-    values?.naturalKey || 'is_dangerous',
+    values?.naturalKey || 'is_dangerous_goods',
     values?.dataType || DataType.TEXT_INPUT,
     values?.question || 'Some random question',
     values?.config || dummyConfigFactory()

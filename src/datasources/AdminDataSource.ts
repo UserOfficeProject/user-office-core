@@ -2,12 +2,9 @@ import { Page } from '../models/Admin';
 import { Feature, FeatureId } from '../models/Feature';
 import { Institution } from '../models/Institution';
 import { Permissions } from '../models/Permissions';
-import { Quantity } from '../models/Quantity';
 import { Settings, SettingsId } from '../models/Settings';
-import { Unit } from '../models/Unit';
 import { BasicUserDetails } from '../models/User';
 import { CreateApiAccessTokenInput } from '../resolvers/mutations/CreateApiAccessTokenMutation';
-import { CreateUnitArgs } from '../resolvers/mutations/CreateUnitMutation';
 import { MergeInstitutionsInput } from '../resolvers/mutations/MergeInstitutionsMutation';
 import { UpdateApiAccessTokenInput } from '../resolvers/mutations/UpdateApiAccessTokenMutation';
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
@@ -30,10 +27,6 @@ export interface AdminDataSource {
   setFeatures(features: FeatureId[], value: boolean): Promise<FeatureId[]>;
   getSettings(): Promise<Settings[]>;
   getSetting(id: SettingsId): Promise<Settings>;
-  createUnit(unit: CreateUnitArgs): Promise<Unit | null>;
-  deleteUnit(id: string): Promise<Unit>;
-  getUnits(): Promise<Unit[]>;
-  getQuantities(): Promise<Quantity[]>;
   createApiAccessToken(
     args: CreateApiAccessTokenInput,
     accessTokenId: string,

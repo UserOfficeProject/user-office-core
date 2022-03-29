@@ -290,7 +290,7 @@ export default class UserMutations {
   }
 
   @ValidateArgs(updateUserValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @Authorized()
   @EventBus(Event.USER_UPDATED)
   async update(
     agent: UserWithRole | null,
@@ -313,12 +313,22 @@ export default class UserMutations {
       });
     }
 
+    let organisationId = args.organisation;
+    // Check if user has other as selected org and if so create it
+    if (args.otherOrganisation) {
+      organisationId = await this.dataSource.createOrganisation(
+        args.otherOrganisation,
+        false
+      );
+    }
+
     delete args.orcid;
     delete args.refreshToken;
 
     user = {
       ...user,
       ...args,
+      organisation: organisationId ?? user.organisation,
     };
 
     return this.dataSource
@@ -542,20 +552,20 @@ export default class UserMutations {
     try {
       const decoded = verifyToken<EmailVerificationJwtPayload>(token);
       const user = await this.dataSource.getUser(decoded.id);
-      //Check that user exist and that it has not been updated since token creation
-      if (
-        user &&
-        user.updated === decoded.updated &&
-        decoded.type === 'emailVerification'
-      ) {
+      //Check that user exist
+      if (user && decoded.type === 'emailVerification') {
         await this.dataSource.setUserEmailVerified(user.id);
 
         return true;
       } else {
-        return rejection('Can not verify user', { user });
+        return rejection('Can not verify user', { user, decoded });
       }
     } catch (error) {
-      return rejection('Can not verify email', {}, error);
+      return rejection(
+        'Can not verify email, please contact user office for help',
+        {},
+        error
+      );
     }
   }
 
@@ -571,7 +581,7 @@ export default class UserMutations {
   }
 
   @ValidateArgs(updatePasswordValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @Authorized()
   async updatePassword(
     agent: UserWithRole | null,
     { id, password }: { id: number; password: string }

@@ -24,8 +24,8 @@ type ProposalMessageData = {
   shortCode: string;
   title: string;
   abstract: string;
-  members: { firstName: string; lastName: string; email: string }[];
-  proposer?: { firstName: string; lastName: string; email: string };
+  members: { firstName: string; lastName: string; email: string; id: string }[];
+  proposer?: { firstName: string; lastName: string; email: string; id: string };
 };
 
 let rabbitMQCachedBroker: null | RabbitMQMessageBroker = null;
@@ -81,6 +81,7 @@ const getProposalMessageData = async (proposal: Proposal) => {
       firstName: proposalUser.firstname,
       lastName: proposalUser.lastname,
       email: proposalUser.email,
+      id: proposalUser.id.toString(),
     })),
   };
 
@@ -91,6 +92,7 @@ const getProposalMessageData = async (proposal: Proposal) => {
       firstName: proposer.firstname,
       lastName: proposer.lastname,
       email: proposer.email,
+      id: proposer.id.toString(),
     };
   }
 
@@ -147,11 +149,6 @@ export function createPostToRabbitMQHandler() {
           proposalStatus?.shortCode !==
           ProposalStatusDefaultShortCodes.SCHEDULING
         ) {
-          logger.logDebug(
-            `Proposal '${proposal.primaryKey}' status isn't 'SCHEDULING', skipping`,
-            { proposal, proposalStatus }
-          );
-
           return;
         }
 
@@ -238,6 +235,12 @@ export function createPostToRabbitMQHandler() {
         await rabbitMQ.sendBroadcast(Event.PROPOSAL_CREATED, json);
         break;
       }
+      case Event.PROPOSAL_SUBMITTED: {
+        const json = await getProposalMessageData(event.proposal);
+
+        await rabbitMQ.sendBroadcast(Event.PROPOSAL_SUBMITTED, json);
+        break;
+      }
       case Event.TOPIC_ANSWERED: {
         const proposal = await proposalDataSource.getProposals({
           questionaryIds: [event.questionarystep.questionaryId],
@@ -259,6 +262,12 @@ export function createPostToRabbitMQHandler() {
 
         const json = JSON.stringify(answers);
         await rabbitMQ.sendBroadcast(Event.TOPIC_ANSWERED, json);
+        break;
+      }
+      case Event.CALL_CREATED: {
+        const callJson = JSON.stringify(event.call);
+
+        await rabbitMQ.sendBroadcast(Event.CALL_CREATED, callJson);
         break;
       }
     }

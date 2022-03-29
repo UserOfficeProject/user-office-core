@@ -19,7 +19,7 @@ import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import {
   ConflictResolutionStrategy,
   DataType,
-  QuestionComparisonStatus,
+  ComparisonStatus,
   TemplateCategoryId,
   TemplateGroupId,
 } from '../models/Template';
@@ -76,7 +76,7 @@ export const registerEnums = () => {
   registerEnumType(FeedbackStatus, {
     name: 'FeedbackStatus',
   });
-  registerEnumType(QuestionComparisonStatus, {
+  registerEnumType(ComparisonStatus, {
     name: 'QuestionComparisonStatus',
   });
 

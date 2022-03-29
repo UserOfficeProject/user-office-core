@@ -37,6 +37,7 @@ import { Template } from './Template';
 import { TemplateImportWithValidation } from './TemplateImportWithValidation';
 import { Topic } from './Topic';
 import { Unit } from './Unit';
+import { UnitsImportWithValidation } from './UnitsImportWithValidation';
 import { User } from './User';
 import { Visit } from './Visit';
 import { VisitRegistration } from './VisitRegistration';
@@ -134,7 +135,7 @@ export class QuestionaryResponseWrap extends ResponseWrapBase {
 @ObjectType()
 export class SamplesResponseWrap extends ResponseWrapBase {
   @Response()
-  @Field(() => [Sample])
+  @Field(() => [Sample], { nullable: true })
   public samples: Sample[];
 }
 
@@ -199,6 +200,13 @@ export class UnitResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => Unit, { nullable: true })
   public unit: Unit;
+}
+
+@ObjectType()
+export class UnitsResponseWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => [Unit], { nullable: true })
+  public units: Unit[];
 }
 
 @ObjectType()
@@ -309,7 +317,7 @@ export class ApiAccessTokenResponseWrap extends ResponseWrapBase {
 @ObjectType()
 export class ProposalsResponseWrap extends ResponseWrapBase {
   @Response()
-  @Field(() => [Proposal])
+  @Field(() => [Proposal], { nullable: true })
   public proposals: Proposal[];
 }
 
@@ -374,4 +382,11 @@ export class ScheduledEventResponseWrap extends ResponseWrapBase {
   @Response()
   @Field(() => ScheduledEventCore, { nullable: true })
   public scheduledEvent: ScheduledEventCore;
+}
+
+@ObjectType()
+export class UnitsImportWithValidationWrap extends ResponseWrapBase {
+  @Response()
+  @Field(() => UnitsImportWithValidation, { nullable: true })
+  public validationResult: UnitsImportWithValidation;
 }

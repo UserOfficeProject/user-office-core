@@ -18,6 +18,7 @@ import SampleMutations from './mutations/SampleMutations';
 import SEPMutations from './mutations/SEPMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
 import TemplateMutations from './mutations/TemplateMutations';
+import UnitMutations from './mutations/UnitMutations';
 import UserMutations from './mutations/UserMutations';
 import VisitMutations from './mutations/VisitMutations';
 import AdminQueries from './queries/AdminQueries';
@@ -39,6 +40,7 @@ import SEPQueries from './queries/SEPQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
 import SystemQueries from './queries/SystemQueries';
 import TemplateQueries from './queries/TemplateQueries';
+import UnitQueries from './queries/UnitQueries';
 import UserQueries from './queries/UserQueries';
 import VisitQueries from './queries/VisitQueries';
 
@@ -64,6 +66,7 @@ const context: BasicResolverContext = {
     shipment: container.resolve(ShipmentQueries),
     system: container.resolve(SystemQueries),
     template: container.resolve(TemplateQueries),
+    unit: container.resolve(UnitQueries),
     user: container.resolve(UserQueries),
     visit: container.resolve(VisitQueries),
   },
@@ -84,6 +87,7 @@ const context: BasicResolverContext = {
     sep: container.resolve(SEPMutations),
     shipment: container.resolve(ShipmentMutations),
     template: container.resolve(TemplateMutations),
+    unit: container.resolve(UnitMutations),
     user: container.resolve(UserMutations),
     visit: container.resolve(VisitMutations),
   },

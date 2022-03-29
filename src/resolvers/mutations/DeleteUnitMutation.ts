@@ -5,14 +5,14 @@ import { UnitResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
-export class DeleteUnitlMutation {
+export class DeleteUnitMutation {
   @Mutation(() => UnitResponseWrap)
   deleteUnit(
     @Arg('id', () => String) id: string,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.admin.deleteUnit(context.user, id),
+      context.mutations.unit.deleteUnit(context.user, id),
       UnitResponseWrap
     );
   }

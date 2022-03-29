@@ -13,7 +13,14 @@ import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 import { ProposalEventsRecord } from './postgres/records';
 
 export interface ProposalDataSource {
-  getProposalsFromView(filter?: ProposalsFilter): Promise<ProposalView[]>;
+  getProposalsFromView(
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ): Promise<{ totalCount: number; proposalViews: ProposalView[] }>;
   // Read
   get(primaryKey: number): Promise<Proposal | null>;
 
