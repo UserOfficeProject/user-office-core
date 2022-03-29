@@ -1,4 +1,5 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { Box } from '@mui/material';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import makeStyles from '@mui/styles/makeStyles';
@@ -24,15 +25,24 @@ export interface QuestionnairesListProps {
   style?: React.CSSProperties;
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   questionnairesList: {
-    maxWidth: '440px',
     padding: 0,
     marginBottom: '10px',
     '& li': {
       paddingLeft: 0,
       paddingRight: 0,
     },
+  },
+  emptyList: {
+    display: 'flex',
+    justifyContent: 'center',
+    fontStyle: 'italic',
+    padding: theme.spacing(2),
+    color: theme.palette.grey[500],
+  },
+  buttonContainer: {
+    flex: '1 1 0px',
   },
 }));
 
@@ -47,41 +57,50 @@ export function QuestionnairesList({
   addButtonLabel,
 }: QuestionnairesListProps) {
   const classes = useStyles();
+  const isListEmpty = data.length === 0;
 
   return (
     <div>
-      <List
-        component="ul"
-        className={classes.questionnairesList}
-        style={{ ...style }}
-      >
-        {data.map((record) => {
-          return (
-            <QuestionnairesListItem
-              record={record}
-              onEditClick={onEditClick}
-              onDeleteClick={onDeleteClick}
-              onCloneClick={onCloneClick}
-              key={record.id}
-            />
-          );
-        })}
-      </List>
-      <StyledButtonContainer>
-        <Button
-          onClick={onAddNewClick}
-          variant="outlined"
-          data-cy="add-button"
-          size="small"
-          startIcon={<AddCircleOutlineIcon />}
-          disabled={
-            (!!maxEntries && data.length >= maxEntries) ||
-            onAddNewClick === undefined
-          }
+      {isListEmpty ? (
+        <div className={classes.emptyList}>The list is empty</div>
+      ) : (
+        <List
+          component="ul"
+          className={classes.questionnairesList}
+          style={{ ...style }}
         >
-          {addButtonLabel || 'Add'}
-        </Button>
-      </StyledButtonContainer>
+          {data.map((record) => {
+            return (
+              <QuestionnairesListItem
+                record={record}
+                onEditClick={onEditClick}
+                onDeleteClick={onDeleteClick}
+                onCloneClick={onCloneClick}
+                key={record.id}
+              />
+            );
+          })}
+        </List>
+      )}
+      <Box display="flex" alignItems="center">
+        {`${data.length} item(s)`}
+        <StyledButtonContainer className={classes.buttonContainer}>
+          <Button
+            onClick={onAddNewClick}
+            variant="outlined"
+            data-cy="add-button"
+            size="small"
+            color="primary"
+            startIcon={<AddCircleOutlineIcon />}
+            disabled={
+              (!!maxEntries && data.length >= maxEntries) ||
+              onAddNewClick === undefined
+            }
+          >
+            {addButtonLabel || 'Add'}
+          </Button>
+        </StyledButtonContainer>
+      </Box>
     </div>
   );
 }

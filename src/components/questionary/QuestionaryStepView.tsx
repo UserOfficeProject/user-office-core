@@ -29,7 +29,7 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   componentWrapper: {
-    margin: theme.spacing(1, 0),
+    margin: theme.spacing(2, 0, 0, 0),
   },
   disabled: {
     pointerEvents: 'none',
